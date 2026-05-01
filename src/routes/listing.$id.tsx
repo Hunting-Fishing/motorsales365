@@ -8,7 +8,23 @@ import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import { formatPHP, formatDate } from "@/lib/format";
+
+const REPORT_REASONS = [
+  "Suspected scam or fraud",
+  "Wrong category",
+  "Misleading photos or description",
+  "Vehicle already sold",
+  "Prohibited item",
+  "Other",
+];
 
 export const Route = createFileRoute("/listing/$id")({
   component: ListingDetailPage,
@@ -47,6 +63,10 @@ function ListingDetailPage() {
   const [favorited, setFavorited] = useState(false);
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportReason, setReportReason] = useState(REPORT_REASONS[0]);
+  const [reportDetails, setReportDetails] = useState("");
+  const [submittingReport, setSubmittingReport] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -101,11 +121,25 @@ function ListingDetailPage() {
     toast.success("Message sent — check your messages for replies.");
   };
 
-  const reportListing = async () => {
-    if (!user) { navigate({ to: "/login" }); return; }
-    const reason = window.prompt("Why are you reporting this listing?");
-    if (!reason) return;
-    await supabase.from("reports").insert({ listing_id: id, reporter_id: user.id, reason });
+  const submitReport = async () => {
+    if (!user) {
+      navigate({ to: "/login" });
+      return;
+    }
+    setSubmittingReport(true);
+    const { error } = await supabase.from("reports").insert({
+      listing_id: id,
+      reporter_id: user.id,
+      reason: reportReason,
+      details: reportDetails || null,
+    });
+    setSubmittingReport(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setReportOpen(false);
+    setReportDetails("");
     toast.success("Report submitted. Thank you.");
   };
 
@@ -212,9 +246,49 @@ function ListingDetailPage() {
             <span>·</span>
             <span>{listing.view_count} views</span>
             <span>·</span>
-            <button onClick={reportListing} className="inline-flex items-center gap-1 hover:text-destructive">
-              <Flag className="h-3 w-3" /> Report listing
-            </button>
+            <Dialog open={reportOpen} onOpenChange={setReportOpen}>
+              <DialogTrigger asChild>
+                <button className="inline-flex items-center gap-1 hover:text-destructive">
+                  <Flag className="h-3 w-3" /> Report listing
+                </button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Report this listing</DialogTitle>
+                  <DialogDescription>
+                    Help us keep AutoTrader Philippines safe. Our team will review your report.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-3">
+                  <div>
+                    <Label>Reason</Label>
+                    <Select value={reportReason} onValueChange={setReportReason}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {REPORT_REASONS.map((r) => (
+                          <SelectItem key={r} value={r}>{r}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Additional details (optional)</Label>
+                    <Textarea
+                      rows={3}
+                      value={reportDetails}
+                      onChange={(e) => setReportDetails(e.target.value)}
+                      placeholder="Tell us more…"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setReportOpen(false)}>Cancel</Button>
+                  <Button onClick={submitReport} disabled={submittingReport}>
+                    {submittingReport ? "Submitting…" : "Submit report"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
@@ -227,7 +301,13 @@ function ListingDetailPage() {
                 {(seller?.business_name ?? seller?.full_name ?? "?").slice(0, 1).toUpperCase()}
               </div>
               <div>
-                <div className="font-medium">{seller?.business_name ?? seller?.full_name ?? "Seller"}</div>
+                <Link
+                  to="/seller/$id"
+                  params={{ id: listing.user_id }}
+                  className="font-medium hover:text-primary"
+                >
+                  {seller?.business_name ?? seller?.full_name ?? "Seller"}
+                </Link>
                 <div className="text-xs text-muted-foreground">
                   {listing.seller_type === "business" ? "Business" : "Private"} seller
                 </div>

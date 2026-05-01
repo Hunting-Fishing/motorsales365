@@ -419,6 +419,33 @@ export type Database = {
           },
         ]
       }
+      saved_searches: {
+        Row: {
+          category_slug: string | null
+          created_at: string
+          id: string
+          name: string
+          query: Json
+          user_id: string
+        }
+        Insert: {
+          category_slug?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          query?: Json
+          user_id: string
+        }
+        Update: {
+          category_slug?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          query?: Json
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscription_plans: {
         Row: {
           active: boolean

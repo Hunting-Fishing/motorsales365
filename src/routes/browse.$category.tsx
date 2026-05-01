@@ -1,8 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Search } from "lucide-react";
+import { Search, BookmarkPlus } from "lucide-react";
+import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
 import { Input } from "@/components/ui/input";
@@ -41,6 +43,7 @@ function BrowsePage() {
   const { category } = Route.useParams();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
+  const { user } = useAuth();
 
   const [keyword, setKeyword] = useState(search.q ?? "");
   const [region, setRegion] = useState(search.region ?? "all");
@@ -101,6 +104,29 @@ function BrowsePage() {
     });
   };
 
+  const saveCurrentSearch = async () => {
+    if (!user) {
+      navigate({ to: "/login" });
+      return;
+    }
+    const name = window.prompt("Name this saved search", `${CATEGORY_LABEL[category] ?? category}${keyword ? ` — ${keyword}` : ""}`);
+    if (!name) return;
+    const { error } = await supabase.from("saved_searches").insert({
+      user_id: user.id,
+      name,
+      category_slug: category,
+      query: {
+        q: keyword || null,
+        region: region !== "all" ? region : null,
+        min: minPrice ? Number(minPrice) : null,
+        max: maxPrice ? Number(maxPrice) : null,
+        sort,
+      },
+    });
+    if (error) toast.error(error.message);
+    else toast.success("Search saved. Find it in your dashboard.");
+  };
+
   return (
     <SiteLayout>
       <div className="border-b border-border bg-secondary/40">
@@ -158,6 +184,9 @@ function BrowsePage() {
               </Select>
             </div>
             <Button type="submit" className="w-full">Apply filters</Button>
+            <Button type="button" variant="outline" className="w-full" onClick={saveCurrentSearch}>
+              <BookmarkPlus className="mr-2 h-4 w-4" />Save search
+            </Button>
           </form>
         </aside>
 
