@@ -184,6 +184,9 @@ function BrowsePage() {
               </Select>
             </div>
             <Button type="submit" className="w-full">Apply filters</Button>
+            <Button type="button" variant="outline" className="w-full" onClick={saveCurrentSearch}>
+              <BookmarkPlus className="mr-2 h-4 w-4" />Save search
+            </Button>
           </form>
         </aside>
 
