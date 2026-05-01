@@ -43,6 +43,7 @@ function BrowsePage() {
   const { category } = Route.useParams();
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
+  const { user } = useAuth();
 
   const [keyword, setKeyword] = useState(search.q ?? "");
   const [region, setRegion] = useState(search.region ?? "all");
