@@ -21,7 +21,7 @@ function AdminListings() {
   };
   useEffect(() => { load(); }, []);
 
-  const setStatus = async (id: string, status: string) => {
+  const setStatus = async (id: string, status: "active" | "hidden" | "expired" | "sold") => {
     await supabase.from("listings").update({ status, published_at: status === "active" ? new Date().toISOString() : null }).eq("id", id);
     toast.success(`Listing ${status}`); load();
   };

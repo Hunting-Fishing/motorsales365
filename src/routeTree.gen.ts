@@ -12,16 +12,25 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AdminRouteImport } from './routes/admin'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
 import { Route as DashboardMessagesRouteImport } from './routes/dashboard.messages'
 import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favorites'
 import { Route as DashboardBillingRouteImport } from './routes/dashboard.billing'
 import { Route as BrowseCategoryRouteImport } from './routes/browse.$category'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminReportsRouteImport } from './routes/admin.reports'
+import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
+import { Route as AdminListingsRouteImport } from './routes/admin.listings'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -38,6 +47,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PricingRoute = PricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -46,6 +60,21 @@ const LoginRoute = LoginRouteImport.update({
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -57,6 +86,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => DashboardRoute,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRoute,
 } as any)
 const ListingIdRoute = ListingIdRouteImport.update({
   id: '/listing/$id',
@@ -88,103 +122,179 @@ const BrowseCategoryRoute = BrowseCategoryRouteImport.update({
   path: '/browse/$category',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminReportsRoute = AdminReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPricingRoute = AdminPricingRouteImport.update({
+  id: '/pricing',
+  path: '/pricing',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminListingsRoute = AdminListingsRouteImport.update({
+  id: '/listings',
+  path: '/listings',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
+  '/admin/listings': typeof AdminListingsRoute
+  '/admin/pricing': typeof AdminPricingRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/listing/$id': typeof ListingIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
+  '/admin/listings': typeof AdminListingsRoute
+  '/admin/pricing': typeof AdminPricingRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/listing/$id': typeof ListingIdRoute
+  '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/admin': typeof AdminRouteWithChildren
+  '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/login': typeof LoginRoute
+  '/pricing': typeof PricingRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
+  '/admin/listings': typeof AdminListingsRoute
+  '/admin/pricing': typeof AdminPricingRoute
+  '/admin/reports': typeof AdminReportsRoute
+  '/admin/users': typeof AdminUsersRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/listing/$id': typeof ListingIdRoute
+  '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
+    | '/admin'
+    | '/contact'
     | '/dashboard'
     | '/login'
+    | '/pricing'
     | '/reset-password'
     | '/sell'
     | '/signup'
+    | '/admin/listings'
+    | '/admin/pricing'
+    | '/admin/reports'
+    | '/admin/users'
     | '/browse/$category'
     | '/dashboard/billing'
     | '/dashboard/favorites'
     | '/dashboard/messages'
     | '/dashboard/profile'
     | '/listing/$id'
+    | '/admin/'
     | '/dashboard/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
+    | '/contact'
     | '/login'
+    | '/pricing'
     | '/reset-password'
     | '/sell'
     | '/signup'
+    | '/admin/listings'
+    | '/admin/pricing'
+    | '/admin/reports'
+    | '/admin/users'
     | '/browse/$category'
     | '/dashboard/billing'
     | '/dashboard/favorites'
     | '/dashboard/messages'
     | '/dashboard/profile'
     | '/listing/$id'
+    | '/admin'
     | '/dashboard'
   id:
     | '__root__'
     | '/'
+    | '/about'
+    | '/admin'
+    | '/contact'
     | '/dashboard'
     | '/login'
+    | '/pricing'
     | '/reset-password'
     | '/sell'
     | '/signup'
+    | '/admin/listings'
+    | '/admin/pricing'
+    | '/admin/reports'
+    | '/admin/users'
     | '/browse/$category'
     | '/dashboard/billing'
     | '/dashboard/favorites'
     | '/dashboard/messages'
     | '/dashboard/profile'
     | '/listing/$id'
+    | '/admin/'
     | '/dashboard/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRouteWithChildren
+  ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   LoginRoute: typeof LoginRoute
+  PricingRoute: typeof PricingRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SellRoute: typeof SellRoute
   SignupRoute: typeof SignupRoute
@@ -215,6 +325,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pricing': {
+      id: '/pricing'
+      path: '/pricing'
+      fullPath: '/pricing'
+      preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -227,6 +344,27 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -242,6 +380,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/listing/$id': {
       id: '/listing/$id'
@@ -285,8 +430,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BrowseCategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/reports': {
+      id: '/admin/reports'
+      path: '/reports'
+      fullPath: '/admin/reports'
+      preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/pricing': {
+      id: '/admin/pricing'
+      path: '/pricing'
+      fullPath: '/admin/pricing'
+      preLoaderRoute: typeof AdminPricingRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/listings': {
+      id: '/admin/listings'
+      path: '/listings'
+      fullPath: '/admin/listings'
+      preLoaderRoute: typeof AdminListingsRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminListingsRoute: typeof AdminListingsRoute
+  AdminPricingRoute: typeof AdminPricingRoute
+  AdminReportsRoute: typeof AdminReportsRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminIndexRoute: typeof AdminIndexRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminListingsRoute: AdminListingsRoute,
+  AdminPricingRoute: AdminPricingRoute,
+  AdminReportsRoute: AdminReportsRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminIndexRoute: AdminIndexRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface DashboardRouteChildren {
   DashboardBillingRoute: typeof DashboardBillingRoute
@@ -310,8 +501,12 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  AdminRoute: AdminRouteWithChildren,
+  ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   LoginRoute: LoginRoute,
+  PricingRoute: PricingRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SellRoute: SellRoute,
   SignupRoute: SignupRoute,
