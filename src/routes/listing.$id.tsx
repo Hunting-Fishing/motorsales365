@@ -301,7 +301,13 @@ function ListingDetailPage() {
                 {(seller?.business_name ?? seller?.full_name ?? "?").slice(0, 1).toUpperCase()}
               </div>
               <div>
-                <div className="font-medium">{seller?.business_name ?? seller?.full_name ?? "Seller"}</div>
+                <Link
+                  to="/seller/$id"
+                  params={{ id: listing.user_id }}
+                  className="font-medium hover:text-primary"
+                >
+                  {seller?.business_name ?? seller?.full_name ?? "Seller"}
+                </Link>
                 <div className="text-xs text-muted-foreground">
                   {listing.seller_type === "business" ? "Business" : "Private"} seller
                 </div>
