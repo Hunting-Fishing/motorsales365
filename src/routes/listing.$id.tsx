@@ -121,11 +121,25 @@ function ListingDetailPage() {
     toast.success("Message sent — check your messages for replies.");
   };
 
-  const reportListing = async () => {
-    if (!user) { navigate({ to: "/login" }); return; }
-    const reason = window.prompt("Why are you reporting this listing?");
-    if (!reason) return;
-    await supabase.from("reports").insert({ listing_id: id, reporter_id: user.id, reason });
+  const submitReport = async () => {
+    if (!user) {
+      navigate({ to: "/login" });
+      return;
+    }
+    setSubmittingReport(true);
+    const { error } = await supabase.from("reports").insert({
+      listing_id: id,
+      reporter_id: user.id,
+      reason: reportReason,
+      details: reportDetails || null,
+    });
+    setSubmittingReport(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setReportOpen(false);
+    setReportDetails("");
     toast.success("Report submitted. Thank you.");
   };
 
