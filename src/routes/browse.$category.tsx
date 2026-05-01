@@ -104,6 +104,29 @@ function BrowsePage() {
     });
   };
 
+  const saveCurrentSearch = async () => {
+    if (!user) {
+      navigate({ to: "/login" });
+      return;
+    }
+    const name = window.prompt("Name this saved search", `${CATEGORY_LABEL[category] ?? category}${keyword ? ` — ${keyword}` : ""}`);
+    if (!name) return;
+    const { error } = await supabase.from("saved_searches").insert({
+      user_id: user.id,
+      name,
+      category_slug: category,
+      query: {
+        q: keyword || null,
+        region: region !== "all" ? region : null,
+        min: minPrice ? Number(minPrice) : null,
+        max: maxPrice ? Number(maxPrice) : null,
+        sort,
+      },
+    });
+    if (error) toast.error(error.message);
+    else toast.success("Search saved. Find it in your dashboard.");
+  };
+
   return (
     <SiteLayout>
       <div className="border-b border-border bg-secondary/40">
