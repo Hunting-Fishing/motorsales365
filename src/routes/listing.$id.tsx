@@ -8,7 +8,23 @@ import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
 import { formatPHP, formatDate } from "@/lib/format";
+
+const REPORT_REASONS = [
+  "Suspected scam or fraud",
+  "Wrong category",
+  "Misleading photos or description",
+  "Vehicle already sold",
+  "Prohibited item",
+  "Other",
+];
 
 export const Route = createFileRoute("/listing/$id")({
   component: ListingDetailPage,

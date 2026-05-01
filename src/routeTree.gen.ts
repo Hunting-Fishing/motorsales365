@@ -23,6 +23,7 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
+import { Route as DashboardSearchesRouteImport } from './routes/dashboard.searches'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
 import { Route as DashboardMessagesRouteImport } from './routes/dashboard.messages'
 import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favorites'
@@ -104,6 +105,11 @@ const ListingIdRoute = ListingIdRouteImport.update({
   path: '/listing/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardSearchesRoute = DashboardSearchesRouteImport.update({
+  id: '/searches',
+  path: '/searches',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardProfileRoute = DashboardProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -175,6 +181,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/searches': typeof DashboardSearchesRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/seller/$id': typeof SellerIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -199,6 +206,7 @@ export interface FileRoutesByTo {
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/searches': typeof DashboardSearchesRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/seller/$id': typeof SellerIdRoute
   '/admin': typeof AdminIndexRoute
@@ -226,6 +234,7 @@ export interface FileRoutesById {
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/searches': typeof DashboardSearchesRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/seller/$id': typeof SellerIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -254,6 +263,7 @@ export interface FileRouteTypes {
     | '/dashboard/favorites'
     | '/dashboard/messages'
     | '/dashboard/profile'
+    | '/dashboard/searches'
     | '/listing/$id'
     | '/seller/$id'
     | '/admin/'
@@ -278,6 +288,7 @@ export interface FileRouteTypes {
     | '/dashboard/favorites'
     | '/dashboard/messages'
     | '/dashboard/profile'
+    | '/dashboard/searches'
     | '/listing/$id'
     | '/seller/$id'
     | '/admin'
@@ -304,6 +315,7 @@ export interface FileRouteTypes {
     | '/dashboard/favorites'
     | '/dashboard/messages'
     | '/dashboard/profile'
+    | '/dashboard/searches'
     | '/listing/$id'
     | '/seller/$id'
     | '/admin/'
@@ -427,6 +439,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/searches': {
+      id: '/dashboard/searches'
+      path: '/searches'
+      fullPath: '/dashboard/searches'
+      preLoaderRoute: typeof DashboardSearchesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/profile': {
       id: '/dashboard/profile'
       path: '/profile'
@@ -523,6 +542,7 @@ interface DashboardRouteChildren {
   DashboardFavoritesRoute: typeof DashboardFavoritesRoute
   DashboardMessagesRoute: typeof DashboardMessagesRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
+  DashboardSearchesRoute: typeof DashboardSearchesRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
@@ -531,6 +551,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardFavoritesRoute: DashboardFavoritesRoute,
   DashboardMessagesRoute: DashboardMessagesRoute,
   DashboardProfileRoute: DashboardProfileRoute,
+  DashboardSearchesRoute: DashboardSearchesRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 
