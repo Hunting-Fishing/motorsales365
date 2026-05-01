@@ -246,9 +246,49 @@ function ListingDetailPage() {
             <span>·</span>
             <span>{listing.view_count} views</span>
             <span>·</span>
-            <button onClick={reportListing} className="inline-flex items-center gap-1 hover:text-destructive">
-              <Flag className="h-3 w-3" /> Report listing
-            </button>
+            <Dialog open={reportOpen} onOpenChange={setReportOpen}>
+              <DialogTrigger asChild>
+                <button className="inline-flex items-center gap-1 hover:text-destructive">
+                  <Flag className="h-3 w-3" /> Report listing
+                </button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Report this listing</DialogTitle>
+                  <DialogDescription>
+                    Help us keep AutoTrader Philippines safe. Our team will review your report.
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-3">
+                  <div>
+                    <Label>Reason</Label>
+                    <Select value={reportReason} onValueChange={setReportReason}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        {REPORT_REASONS.map((r) => (
+                          <SelectItem key={r} value={r}>{r}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Additional details (optional)</Label>
+                    <Textarea
+                      rows={3}
+                      value={reportDetails}
+                      onChange={(e) => setReportDetails(e.target.value)}
+                      placeholder="Tell us more…"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setReportOpen(false)}>Cancel</Button>
+                  <Button onClick={submitReport} disabled={submittingReport}>
+                    {submittingReport ? "Submitting…" : "Submit report"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
 
