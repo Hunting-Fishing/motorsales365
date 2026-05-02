@@ -250,6 +250,26 @@ function MyListings() {
           })}
         </div>
       )}
+
+      <AlertDialog open={!!soldTarget} onOpenChange={(open) => !open && setSoldTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm this item is sold</AlertDialogTitle>
+            <AlertDialogDescription>
+              {soldTarget ? (
+                <>
+                  Mark <span className="font-semibold text-foreground">"{soldTarget.title}"</span> as sold? It
+                  will be removed from the active market. You can undo this later if the sale doesn't complete.
+                </>
+              ) : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmMarkSold}>Yes, mark as sold</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
