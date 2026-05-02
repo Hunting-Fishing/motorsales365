@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Upload, X, Camera, Video as VideoIcon } from "lucide-react";
+import { Upload, X, Camera, Video as VideoIcon, RotateCw, AlertCircle, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -16,6 +17,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { formatPHP } from "@/lib/format";
 import { LocationPicker } from "@/components/location-picker";
 import { VehiclePicker } from "@/components/vehicle-picker";
+import { uploadWithRetry } from "@/lib/storage-upload";
 
 export const Route = createFileRoute("/sell")({
   component: SellPage,
@@ -57,6 +59,17 @@ function SellPage() {
   const [video, setVideo] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  type UploadState = {
+    status: "idle" | "uploading" | "done" | "error";
+    percent: number;
+    error?: string;
+    url?: string;
+    path?: string;
+  };
+  const [photoUploads, setPhotoUploads] = useState<UploadState[]>([]);
+  const [videoUpload, setVideoUpload] = useState<UploadState>({ status: "idle", percent: 0 });
+  const [listingId, setListingId] = useState<string | null>(null);
+
   const [pricing, setPricing] = useState<Record<string, number>>({});
 
   useEffect(() => {
@@ -86,24 +99,107 @@ function SellPage() {
           : `Up to ${maxPhotos} photos allowed. ${overflow} photo(s) skipped.`,
       );
     }
-    const next = [...photos, ...files].slice(0, maxPhotos);
-    setPhotos(next);
-    // Allow re-selecting the same files after a blocked attempt.
+    const accepted = files.slice(0, Math.max(remaining, 0));
+    setPhotos((p) => [...p, ...accepted].slice(0, maxPhotos));
+    setPhotoUploads((u) => [
+      ...u,
+      ...accepted.map(() => ({ status: "idle" as const, percent: 0 })),
+    ].slice(0, maxPhotos));
     e.target.value = "";
   };
 
-  const removePhoto = (i: number) => setPhotos(photos.filter((_, idx) => idx !== i));
+  const removePhoto = (i: number) => {
+    setPhotos((p) => p.filter((_, idx) => idx !== i));
+    setPhotoUploads((u) => u.filter((_, idx) => idx !== i));
+  };
 
   const handleVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
-    if (!file) { setVideo(null); return; }
+    if (!file) {
+      setVideo(null);
+      setVideoUpload({ status: "idle", percent: 0 });
+      return;
+    }
     if (maxVideos < 1) {
       toast.error("Videos are not included in this plan.");
       e.target.value = "";
       return;
     }
     setVideo(file);
+    setVideoUpload({ status: "idle", percent: 0 });
   };
+
+  const removeVideo = () => {
+    setVideo(null);
+    setVideoUpload({ status: "idle", percent: 0 });
+  };
+
+  const setPhotoState = (i: number, patch: Partial<UploadState>) => {
+    setPhotoUploads((u) => u.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
+  };
+
+  const uploadOnePhoto = async (i: number, file: File, lid: string) => {
+    setPhotoState(i, { status: "uploading", percent: 0, error: undefined });
+    try {
+      const path = `${user!.id}/${lid}/${Date.now()}-${i}-${file.name}`;
+      const { publicUrl } = await uploadWithRetry({
+        bucket: "listing-photos",
+        path,
+        file,
+        contentType: file.type || "image/jpeg",
+        onProgress: (e) => setPhotoState(i, { percent: e.percent }),
+      });
+      setPhotoState(i, { status: "done", percent: 100, url: publicUrl, path });
+      await supabase.from("listing_media").insert({
+        listing_id: lid,
+        type: "photo",
+        url: publicUrl,
+        storage_path: path,
+        sort_order: i,
+      });
+      return true;
+    } catch (err: any) {
+      setPhotoState(i, { status: "error", error: err?.message ?? "Upload failed" });
+      return false;
+    }
+  };
+
+  const uploadVideo = async (file: File, lid: string) => {
+    setVideoUpload({ status: "uploading", percent: 0 });
+    try {
+      const path = `${user!.id}/${lid}/${Date.now()}-${file.name}`;
+      const { publicUrl } = await uploadWithRetry({
+        bucket: "listing-videos",
+        path,
+        file,
+        contentType: file.type || "video/mp4",
+        onProgress: (e) => setVideoUpload((s) => ({ ...s, percent: e.percent })),
+      });
+      setVideoUpload({ status: "done", percent: 100, url: publicUrl, path });
+      await supabase.from("listing_media").insert({
+        listing_id: lid,
+        type: "video",
+        url: publicUrl,
+        storage_path: path,
+        sort_order: 0,
+      });
+      return true;
+    } catch (err: any) {
+      setVideoUpload((s) => ({ ...s, status: "error", error: err?.message ?? "Upload failed" }));
+      return false;
+    }
+  };
+
+  const retryPhoto = async (i: number) => {
+    if (!listingId || !photos[i]) return;
+    await uploadOnePhoto(i, photos[i], listingId);
+  };
+
+  const retryVideo = async () => {
+    if (!listingId || !video) return;
+    await uploadVideo(video, listingId);
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,70 +222,79 @@ function SellPage() {
 
     setSubmitting(true);
     try {
-      const attributes: Record<string, any> = {};
-      if (year) attributes.year = year;
-      if (make) attributes.make = make;
-      if (model) attributes.model = model;
-      if (make || model) attributes.make_model = [make, model].filter(Boolean).join(" ");
-      if (mileage) attributes.mileage_km = mileage;
-      if (transmission) attributes.transmission = transmission;
-      if (fuel) attributes.fuel = fuel;
+      let lid = listingId;
+      if (!lid) {
+        const attributes: Record<string, any> = {};
+        if (year) attributes.year = year;
+        if (make) attributes.make = make;
+        if (model) attributes.model = model;
+        if (make || model) attributes.make_model = [make, model].filter(Boolean).join(" ");
+        if (mileage) attributes.mileage_km = mileage;
+        if (transmission) attributes.transmission = transmission;
+        if (fuel) attributes.fuel = fuel;
 
-      const expiryDays = pricing.listing_expiry_days ?? 60;
-      const expires = new Date();
-      expires.setDate(expires.getDate() + expiryDays);
+        const expiryDays = pricing.listing_expiry_days ?? 60;
+        const expires = new Date();
+        expires.setDate(expires.getDate() + expiryDays);
 
-      const { data: listing, error } = await supabase.from("listings").insert({
-        user_id: user.id,
-        category_slug: category,
-        title,
-        description,
-        price_php: Number(price),
-        condition,
-        region,
-        province,
-        city,
-        barangay,
-        seller_type: sellerType,
-        plan,
-        contact_phone: phone || null,
-        attributes,
-        status: "pending_payment",
-        expires_at: expires.toISOString(),
-      }).select().single();
+        const { data: listing, error } = await supabase.from("listings").insert({
+          user_id: user.id,
+          category_slug: category,
+          title,
+          description,
+          price_php: Number(price),
+          condition,
+          region,
+          province,
+          city,
+          barangay,
+          seller_type: sellerType,
+          plan,
+          contact_phone: phone || null,
+          attributes,
+          status: "pending_payment",
+          expires_at: expires.toISOString(),
+        }).select().single();
 
-      if (error || !listing) throw error;
+        if (error || !listing) throw error;
+        lid = listing.id;
+        setListingId(lid);
+      }
 
-      // Upload photos
-      const mediaInserts: any[] = [];
+      // Upload photos that are not already done. Run sequentially to keep the
+      // UI responsive and avoid hammering the network on flaky connections.
+      let allOk = true;
       for (let i = 0; i < photos.length; i++) {
-        const file = photos[i];
-        const path = `${user.id}/${listing.id}/${Date.now()}-${i}-${file.name}`;
-        const { error: upErr } = await supabase.storage.from("listing-photos").upload(path, file);
-        if (upErr) throw upErr;
-        const { data: pub } = supabase.storage.from("listing-photos").getPublicUrl(path);
-        mediaInserts.push({ listing_id: listing.id, type: "photo", url: pub.publicUrl, storage_path: path, sort_order: i });
+        if (photoUploads[i]?.status === "done") continue;
+        const ok = await uploadOnePhoto(i, photos[i], lid);
+        if (!ok) allOk = false;
       }
-      if (video) {
-        const path = `${user.id}/${listing.id}/${Date.now()}-${video.name}`;
-        const { error: upErr } = await supabase.storage.from("listing-videos").upload(path, video);
-        if (upErr) throw upErr;
-        const { data: pub } = supabase.storage.from("listing-videos").getPublicUrl(path);
-        mediaInserts.push({ listing_id: listing.id, type: "video", url: pub.publicUrl, storage_path: path, sort_order: 0 });
-      }
-      if (mediaInserts.length) {
-        await supabase.from("listing_media").insert(mediaInserts);
+      if (video && videoUpload.status !== "done") {
+        const ok = await uploadVideo(video, lid);
+        if (!ok) allOk = false;
       }
 
-      // Create pending payment record
-      await supabase.from("payments").insert({
-        user_id: user.id,
-        listing_id: listing.id,
-        kind: plan === "upgraded" ? "upgrade" : "listing",
-        amount_php: totalFee,
-        status: "pending",
-        method: "manual",
-      });
+      if (!allOk) {
+        toast.error("Some uploads failed. You can retry the failed items and submit again.");
+        return;
+      }
+
+      // Create pending payment record (only once — guarded by a select first).
+      const { data: existingPayments } = await supabase
+        .from("payments")
+        .select("id")
+        .eq("listing_id", lid)
+        .limit(1);
+      if (!existingPayments || existingPayments.length === 0) {
+        await supabase.from("payments").insert({
+          user_id: user.id,
+          listing_id: lid,
+          kind: plan === "upgraded" ? "upgrade" : "listing",
+          amount_php: totalFee,
+          status: "pending",
+          method: "manual",
+        });
+      }
 
       toast.success("Listing submitted! Awaiting payment confirmation.");
       navigate({ to: "/dashboard" });
@@ -370,14 +475,43 @@ function SellPage() {
             <div>
               <Label className="flex items-center gap-2"><Camera className="h-4 w-4" />Photos ({photos.length}/{maxPhotos})</Label>
               <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-5">
-                {photos.map((file, i) => (
-                  <div key={i} className="relative aspect-square overflow-hidden rounded-md bg-secondary">
-                    <img src={URL.createObjectURL(file)} alt="" className="h-full w-full object-cover" />
-                    <button type="button" onClick={() => removePhoto(i)} className="absolute right-1 top-1 rounded-full bg-black/60 p-1 text-white">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ))}
+                {photos.map((file, i) => {
+                  const u = photoUploads[i] ?? { status: "idle" as const, percent: 0 };
+                  return (
+                    <div key={i} className="relative aspect-square overflow-hidden rounded-md bg-secondary">
+                      <img src={URL.createObjectURL(file)} alt="" className="h-full w-full object-cover" />
+                      {u.status !== "done" && (
+                        <button type="button" onClick={() => removePhoto(i)} className="absolute right-1 top-1 rounded-full bg-black/60 p-1 text-white" aria-label="Remove photo">
+                          <X className="h-3 w-3" />
+                        </button>
+                      )}
+                      {u.status === "done" && (
+                        <div className="absolute right-1 top-1 rounded-full bg-emerald-600 p-1 text-white">
+                          <CheckCircle2 className="h-3 w-3" />
+                        </div>
+                      )}
+                      {u.status === "uploading" && (
+                        <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1.5">
+                          <Progress value={u.percent} className="h-1" />
+                          <div className="mt-0.5 text-center text-[10px] text-white">{u.percent}%</div>
+                        </div>
+                      )}
+                      {u.status === "error" && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-destructive/85 p-1 text-center text-[10px] text-destructive-foreground">
+                          <AlertCircle className="h-4 w-4" />
+                          <span className="line-clamp-2">{u.error ?? "Failed"}</span>
+                          <button
+                            type="button"
+                            onClick={() => retryPhoto(i)}
+                            className="inline-flex items-center gap-1 rounded bg-background/90 px-1.5 py-0.5 text-[10px] font-medium text-foreground hover:bg-background"
+                          >
+                            <RotateCw className="h-3 w-3" /> Retry
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
                 {photos.length < maxPhotos && (
                   <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-border text-muted-foreground hover:bg-secondary/50">
                     <Upload className="h-5 w-5" />
@@ -389,11 +523,31 @@ function SellPage() {
             </div>
             <div>
               <Label className="flex items-center gap-2"><VideoIcon className="h-4 w-4" />Video (max {maxVideos})</Label>
-              <Input type="file" accept="video/*" onChange={handleVideo} className="mt-2" />
+              <Input type="file" accept="video/*" onChange={handleVideo} className="mt-2" disabled={videoUpload.status === "uploading"} />
               {video && (
-                <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="truncate">{video.name}</span>
-                  <button type="button" onClick={() => setVideo(null)} className="text-foreground hover:underline">Remove</button>
+                <div className="mt-2 space-y-1">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="truncate flex-1">{video.name}</span>
+                    {videoUpload.status === "done" && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />}
+                    {videoUpload.status !== "uploading" && videoUpload.status !== "done" && (
+                      <button type="button" onClick={removeVideo} className="text-foreground hover:underline">Remove</button>
+                    )}
+                  </div>
+                  {videoUpload.status === "uploading" && (
+                    <div className="flex items-center gap-2">
+                      <Progress value={videoUpload.percent} className="h-1.5 flex-1" />
+                      <span className="text-xs text-muted-foreground">{videoUpload.percent}%</span>
+                    </div>
+                  )}
+                  {videoUpload.status === "error" && (
+                    <div className="flex items-center gap-2 rounded border border-destructive/40 bg-destructive/10 px-2 py-1.5 text-xs text-destructive">
+                      <AlertCircle className="h-3.5 w-3.5" />
+                      <span className="flex-1 truncate">{videoUpload.error ?? "Upload failed"}</span>
+                      <button type="button" onClick={retryVideo} className="inline-flex items-center gap-1 rounded bg-background px-1.5 py-0.5 text-foreground hover:bg-secondary">
+                        <RotateCw className="h-3 w-3" /> Retry
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
               {plan === "standard" && (
