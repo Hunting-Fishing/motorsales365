@@ -48,7 +48,9 @@ function BrowsePage() {
   const { user } = useAuth();
 
   const [keyword, setKeyword] = useState(search.q ?? "");
-  const [region, setRegion] = useState(search.region ?? "all");
+  const [region, setRegion] = useState<string | null>(search.region ?? null);
+  const [province, setProvince] = useState<string | null>(search.province ?? null);
+  const [city, setCity] = useState<string | null>(search.city ?? null);
   const [minPrice, setMinPrice] = useState(search.min?.toString() ?? "");
   const [maxPrice, setMaxPrice] = useState(search.max?.toString() ?? "");
   const [sort, setSort] = useState(search.sort ?? "recent");
@@ -66,6 +68,8 @@ function BrowsePage() {
 
       if (search.q) q = q.ilike("title", `%${search.q}%`);
       if (search.region && search.region !== "all") q = q.eq("region", search.region);
+      if (search.province) q = q.eq("province", search.province);
+      if (search.city) q = q.eq("city", search.city);
       if (search.min) q = q.gte("price_php", search.min);
       if (search.max) q = q.lte("price_php", search.max);
 
@@ -99,7 +103,9 @@ function BrowsePage() {
       params: { category },
       search: {
         q: keyword || undefined,
-        region: region !== "all" ? region : undefined,
+        region: region ?? undefined,
+        province: province ?? undefined,
+        city: city ?? undefined,
         min: minPrice ? Number(minPrice) : undefined,
         max: maxPrice ? Number(maxPrice) : undefined,
         sort,
@@ -120,7 +126,9 @@ function BrowsePage() {
       category_slug: category,
       query: {
         q: keyword || null,
-        region: region !== "all" ? region : null,
+        region: region ?? null,
+        province: province ?? null,
+        city: city ?? null,
         min: minPrice ? Number(minPrice) : null,
         max: maxPrice ? Number(maxPrice) : null,
         sort,
