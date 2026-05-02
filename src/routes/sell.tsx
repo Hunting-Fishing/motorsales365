@@ -215,9 +215,32 @@ function SellPage() {
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Details</h2>
+            {(category === "car" || category === "motorcycle") ? (
+              <div className="space-y-4">
+                <VehiclePicker
+                  category={category as "car" | "motorcycle"}
+                  make={make}
+                  model={model}
+                  onChange={(v) => { setMake(v.make); setModel(v.model); }}
+                />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div><Label>Year</Label><Input value={year} onChange={(e) => setYear(e.target.value)} placeholder="e.g. 2019" /></div>
+                </div>
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label>Make / Brand</Label>
+                  <Input value={make} onChange={(e) => setMake(e.target.value)} />
+                </div>
+                <div>
+                  <Label>Model</Label>
+                  <Input value={model} onChange={(e) => setModel(e.target.value)} />
+                </div>
+                <div><Label>Year</Label><Input value={year} onChange={(e) => setYear(e.target.value)} /></div>
+              </div>
+            )}
             <div className="grid gap-4 sm:grid-cols-2">
-              <div><Label>Make & model</Label><Input value={makeModel} onChange={(e) => setMakeModel(e.target.value)} /></div>
-              <div><Label>Year</Label><Input value={year} onChange={(e) => setYear(e.target.value)} /></div>
               {(category === "car" || category === "motorcycle") && (
                 <>
                   <div><Label>Mileage (km)</Label><Input value={mileage} onChange={(e) => setMileage(e.target.value)} /></div>
