@@ -42,7 +42,7 @@ async function uploadViaSignedUrl({
 }: UploadOptions): Promise<void> {
   const { data, error } = await supabase.storage
     .from(bucket)
-    .createSignedUploadURL(path);
+    .createSignedUploadUrl(path);
   if (error || !data) {
     throw new UploadError(error?.message ?? "Failed to create upload URL", {
       cause: error,
