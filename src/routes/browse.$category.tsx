@@ -94,7 +94,7 @@ function BrowsePage() {
       setLoading(false);
     };
     fetchListings();
-  }, [category, search.q, search.region, search.min, search.max, search.sort]);
+  }, [category, search.q, search.region, search.province, search.city, search.min, search.max, search.sort]);
 
   const applyFilters = (e: React.FormEvent) => {
     e.preventDefault();
@@ -163,16 +163,17 @@ function BrowsePage() {
                 <Input id="kw" value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="Make, model…" className="pl-8" />
               </div>
             </div>
-            <div>
-              <Label>Region</Label>
-              <Select value={region} onValueChange={setRegion}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All regions</SelectItem>
-                  {PH_REGIONS.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
+            <LocationPicker
+              asFilter
+              stacked
+              showBarangay={false}
+              value={{ region, province, city }}
+              onChange={(v) => {
+                setRegion(v.region ?? null);
+                setProvince(v.province ?? null);
+                setCity(v.city ?? null);
+              }}
+            />
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <Label>Min ₱</Label>
