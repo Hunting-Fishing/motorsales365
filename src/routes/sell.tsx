@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Upload, X, Camera, Video as VideoIcon } from "lucide-react";
+import { Upload, X, Camera, Video as VideoIcon, RotateCw, AlertCircle, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
@@ -16,6 +17,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { formatPHP } from "@/lib/format";
 import { LocationPicker } from "@/components/location-picker";
 import { VehiclePicker } from "@/components/vehicle-picker";
+import { uploadWithRetry } from "@/lib/storage-upload";
 
 export const Route = createFileRoute("/sell")({
   component: SellPage,
