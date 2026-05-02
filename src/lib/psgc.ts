@@ -45,3 +45,67 @@ export function citiesOf(
 }
 
 export const REGION_OPTIONS = PSGC.map((r) => ({ value: regionLabel(r), label: regionLabel(r) }));
+
+// --- Fuzzy resolution from free-text (e.g. reverse-geocoded place names) ---
+
+function norm(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\bcity of\b/g, "")
+    .replace(/\bcity\b/g, "")
+    .replace(/\bmunicipality of\b/g, "")
+    .replace(/\bprovince of\b/g, "")
+    .replace(/[^a-z0-9 ]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function eqLoose(a: string, b: string): boolean {
+  const na = norm(a);
+  const nb = norm(b);
+  return na === nb || na.includes(nb) || nb.includes(na);
+}
+
+/**
+ * Resolve free-text place fields (from a reverse geocoder) into a PSGC tuple.
+ * Any of the inputs may be missing; we match what we can.
+ */
+export function resolvePsgc(input: {
+  region?: string | null;
+  province?: string | null;
+  city?: string | null;
+  municipality?: string | null;
+  town?: string | null;
+}): { region: string | null; province: string | null; city: string | null } {
+  const cityish = [input.city, input.municipality, input.town].filter(Boolean) as string[];
+
+  // 1) Try to find the city/municipality across all regions.
+  for (const r of PSGC) {
+    // Province cities
+    for (const p of r.provinces) {
+      const hit = p.cities.find((c) => cityish.some((q) => eqLoose(c, q)));
+      if (hit) return { region: regionLabel(r), province: p.name, city: hit };
+    }
+    // HUC / NCR cities
+    const huc = r.cities.find((c) => cityish.some((q) => eqLoose(c, q)));
+    if (huc) return { region: regionLabel(r), province: null, city: huc };
+  }
+
+  // 2) Fall back to province match.
+  if (input.province) {
+    for (const r of PSGC) {
+      const p = r.provinces.find((x) => eqLoose(x.name, input.province!));
+      if (p) return { region: regionLabel(r), province: p.name, city: null };
+    }
+  }
+
+  // 3) Fall back to region match.
+  if (input.region) {
+    const r = PSGC.find((x) => eqLoose(x.name, input.region!) || eqLoose(x.regionName, input.region!));
+    if (r) return { region: regionLabel(r), province: null, city: null };
+  }
+
+  return { region: null, province: null, city: null };
+}

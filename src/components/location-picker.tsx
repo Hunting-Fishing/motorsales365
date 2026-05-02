@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { Check, ChevronsUpDown, X } from "lucide-react";
+import { Check, ChevronsUpDown, X, MapPin, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,7 +9,7 @@ import {
   Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
-import { PSGC, regionLabel, provincesOf, citiesOf } from "@/lib/psgc";
+import { PSGC, regionLabel, provincesOf, citiesOf, resolvePsgc } from "@/lib/psgc";
 
 export type LocationValue = {
   region?: string | null;
@@ -130,9 +131,75 @@ export function LocationPicker({
   const cities = useMemo(() => citiesOf(value.region, value.province), [value.region, value.province]);
 
   const grid = stacked ? "space-y-4" : "grid gap-4 sm:grid-cols-2";
+  const [locating, setLocating] = useState(false);
+
+  async function useMyLocation() {
+    if (typeof window === "undefined" || !navigator.geolocation) {
+      toast.error("Geolocation isn't supported on this device.");
+      return;
+    }
+    setLocating(true);
+    try {
+      const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true, timeout: 12000, maximumAge: 60000,
+        });
+      });
+      const { latitude, longitude } = pos.coords;
+      const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&accept-language=en&zoom=12`;
+      const res = await fetch(url, { headers: { "Accept": "application/json" } });
+      if (!res.ok) throw new Error("Reverse geocoding failed");
+      const data = await res.json();
+      const a = data.address ?? {};
+      if (a.country_code && String(a.country_code).toLowerCase() !== "ph") {
+        toast.error("Location is outside the Philippines.");
+        return;
+      }
+      const resolved = resolvePsgc({
+        region: a.region ?? a.state ?? null,
+        province: a.province ?? a.state_district ?? null,
+        city: a.city ?? null,
+        municipality: a.municipality ?? null,
+        town: a.town ?? a.village ?? a.suburb ?? null,
+      });
+      if (!resolved.region && !resolved.province && !resolved.city) {
+        toast.error("Couldn't match your location to a Philippine region.");
+        return;
+      }
+      onChange({
+        region: resolved.region,
+        province: resolved.province,
+        city: resolved.city,
+        barangay: a.neighbourhood ?? a.suburb ?? value.barangay ?? null,
+      });
+      const summary = [resolved.city, resolved.province, resolved.region].filter(Boolean).join(", ");
+      toast.success(`Location set: ${summary}`);
+    } catch (err: any) {
+      const code = err?.code;
+      if (code === 1) toast.error("Permission denied. Enable location access and try again.");
+      else if (code === 2) toast.error("Position unavailable. Try again outdoors.");
+      else if (code === 3) toast.error("Location request timed out.");
+      else toast.error(err?.message ?? "Couldn't get your location.");
+    } finally {
+      setLocating(false);
+    }
+  }
 
   return (
-    <div className={`${grid} ${className ?? ""}`}>
+    <div className={className}>
+      <div className="mb-3 flex justify-end">
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={useMyLocation}
+          disabled={locating}
+        >
+          {locating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <MapPin className="mr-2 h-4 w-4" />}
+          Use my location
+        </Button>
+      </div>
+      <div className={grid}>
       <Combo
         label="Region"
         placeholder={asFilter ? "All regions" : "Select region"}
@@ -191,6 +258,7 @@ export function LocationPicker({
           />
         </div>
       )}
+      </div>
     </div>
   );
 }
