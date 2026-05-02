@@ -1,11 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Star, Eye, Rocket, RefreshCcw, CheckCircle2, Edit } from "lucide-react";
+import { Plus, Trash2, Star, Eye, Rocket, RefreshCcw, CheckCircle2, Edit, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { formatPHP, formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/dashboard/")({
