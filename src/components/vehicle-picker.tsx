@@ -15,6 +15,8 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { getMakes, type VehicleCategory } from "@/data/vehicles";
+import { fuzzyScore } from "@/lib/fuzzy";
+import { MAKE_ALIASES } from "@/lib/vehicle-aliases";
 
 type Props = {
   category: VehicleCategory;
