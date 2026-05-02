@@ -66,9 +66,18 @@ function Combo({
       </PopoverTrigger>
       <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
         <Command
-          filter={(itemValue, search) =>
-            itemValue.toLowerCase().includes(search.toLowerCase()) ? 1 : 0
-          }
+          filter={(itemValue, search, keywords) => {
+            if (!search.trim()) return 1;
+            const candidates = [itemValue, ...(keywords ?? [])];
+            let best = Infinity;
+            for (const c of candidates) {
+              const s = fuzzyScore(search, c);
+              if (s < best) best = s;
+            }
+            if (best === Infinity) return 0;
+            // cmdk wants higher = better, in (0, 1].
+            return 1 / (1 + best);
+          }}
         >
           <CommandInput
             placeholder={searchPlaceholder}
