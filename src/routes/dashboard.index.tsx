@@ -60,12 +60,28 @@ function MyListings() {
     }
   };
 
-  const markSold = async (id: string) => {
-    if (!confirm("Mark this listing as sold?")) return;
-    const { error } = await supabase.from("listings").update({ status: "sold" }).eq("id", id);
+  const confirmMarkSold = async () => {
+    if (!soldTarget) return;
+    const { error } = await supabase.from("listings").update({ status: "sold" }).eq("id", soldTarget.id);
     if (error) toast.error(error.message);
     else {
       toast.success("Marked as sold");
+      load();
+    }
+    setSoldTarget(null);
+  };
+
+  const undoSold = async (id: string) => {
+    const days = pricing.listing_expiry_days ?? 60;
+    const expires = new Date();
+    expires.setDate(expires.getDate() + days);
+    const { error } = await supabase
+      .from("listings")
+      .update({ status: "active", expires_at: expires.toISOString() })
+      .eq("id", id);
+    if (error) toast.error(error.message);
+    else {
+      toast.success("Listing restored to active");
       load();
     }
   };
