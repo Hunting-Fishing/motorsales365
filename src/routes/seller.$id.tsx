@@ -4,7 +4,9 @@ import { MapPin, Building2, User as UserIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/site-layout";
 import { Badge } from "@/components/ui/badge";
+import { VerifiedBadge } from "@/components/verified-badge";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
+import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/seller/$id")({
   component: SellerProfilePage,
