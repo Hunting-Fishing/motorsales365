@@ -14,6 +14,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { LocationPicker } from "@/components/location-picker";
+import { buildTitleSearchTerms } from "@/lib/vehicle-aliases";
+import { fuzzyFilter } from "@/lib/fuzzy";
 
 const searchSchema = z.object({
   q: z.string().optional(),
