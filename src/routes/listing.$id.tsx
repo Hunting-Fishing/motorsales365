@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { VerifiedBadge } from "@/components/verified-badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
@@ -300,14 +301,19 @@ function ListingDetailPage() {
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary font-semibold">
                 {(seller?.business_name ?? seller?.full_name ?? "?").slice(0, 1).toUpperCase()}
               </div>
-              <div>
-                <Link
-                  to="/seller/$id"
-                  params={{ id: listing.user_id }}
-                  className="font-medium hover:text-primary"
-                >
-                  {seller?.business_name ?? seller?.full_name ?? "Seller"}
-                </Link>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  <Link
+                    to="/seller/$id"
+                    params={{ id: listing.user_id }}
+                    className="truncate font-medium hover:text-primary"
+                  >
+                    {seller?.business_name ?? seller?.full_name ?? "Seller"}
+                  </Link>
+                  {seller?.verification_status === "verified" && (
+                    <VerifiedBadge size="sm" showLabel />
+                  )}
+                </div>
                 <div className="text-xs text-muted-foreground">
                   {listing.seller_type === "business" ? "Business" : "Private"} seller
                 </div>
