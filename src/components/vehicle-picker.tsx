@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronsUpDown, X } from "lucide-react";
+import { Check, ChevronsUpDown, Plus, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  CommandSeparator,
 } from "@/components/ui/command";
 import { getMakes, type VehicleCategory } from "@/data/vehicles";
 import { fuzzyScore } from "@/lib/fuzzy";
@@ -34,6 +35,7 @@ function Combo({
   emptyText,
   disabled,
   allowCustom = true,
+  addLabel,
   getKeywords,
 }: {
   value: string;
@@ -44,10 +46,23 @@ function Combo({
   emptyText: string;
   disabled?: boolean;
   allowCustom?: boolean;
+  addLabel: string;
   getKeywords?: (option: string) => string[];
 }) {
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState("");
+
+  const trimmed = query.trim();
+  const exactMatch = trimmed
+    ? options.some((o) => o.toLowerCase() === trimmed.toLowerCase())
+    : false;
+  const showAdd = allowCustom && trimmed.length > 0 && !exactMatch;
+
+  const commit = (v: string) => {
+    onSelect(v);
+    setOpen(false);
+    setQuery("");
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -77,7 +92,6 @@ function Combo({
               if (s < best) best = s;
             }
             if (best === Infinity) return 0;
-            // cmdk wants higher = better, in (0, 1].
             return 1 / (1 + best);
           }}
         >
@@ -88,17 +102,14 @@ function Combo({
           />
           <CommandList className="max-h-72">
             <CommandEmpty>
-              {allowCustom && query.trim() ? (
+              {showAdd ? (
                 <button
                   type="button"
-                  className="w-full rounded-sm px-2 py-1.5 text-left text-sm hover:bg-accent"
-                  onClick={() => {
-                    onSelect(query.trim());
-                    setOpen(false);
-                    setQuery("");
-                  }}
+                  className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm hover:bg-accent"
+                  onClick={() => commit(trimmed)}
                 >
-                  Use “{query.trim()}”
+                  <Plus className="h-4 w-4" />
+                  {addLabel}: “{trimmed}”
                 </button>
               ) : (
                 emptyText
@@ -110,11 +121,7 @@ function Combo({
                   key={opt}
                   value={opt}
                   keywords={getKeywords?.(opt)}
-                  onSelect={() => {
-                    onSelect(opt);
-                    setOpen(false);
-                    setQuery("");
-                  }}
+                  onSelect={() => commit(opt)}
                 >
                   <Check
                     className={cn(
@@ -126,6 +133,21 @@ function Combo({
                 </CommandItem>
               ))}
             </CommandGroup>
+            {showAdd && (
+              <>
+                <CommandSeparator />
+                <CommandGroup>
+                  <CommandItem
+                    value={`__add__${trimmed}`}
+                    onSelect={() => commit(trimmed)}
+                    className="text-primary"
+                  >
+                    <Plus className="mr-2 h-4 w-4" />
+                    {addLabel}: “{trimmed}”
+                  </CommandItem>
+                </CommandGroup>
+              </>
+            )}
           </CommandList>
         </Command>
       </PopoverContent>
@@ -165,6 +187,7 @@ export function VehiclePicker({ category, make, model, onChange }: Props) {
           placeholder="Select make"
           searchPlaceholder="Search make…"
           emptyText="No makes found"
+          addLabel="Add missing make"
           getKeywords={(opt) => MAKE_ALIASES[opt] ?? []}
           onSelect={(v) => onChange({ make: v, model: "" })}
         />
@@ -197,6 +220,7 @@ export function VehiclePicker({ category, make, model, onChange }: Props) {
             placeholder={make ? "Select model" : "Pick a make first"}
             searchPlaceholder="Search model…"
             emptyText="No models found"
+            addLabel="Add model"
             onSelect={(v) => onChange({ make, model: v })}
           />
         )}
