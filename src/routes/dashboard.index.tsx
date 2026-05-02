@@ -235,8 +235,18 @@ function MyListings() {
                     variant="outline"
                     size="sm"
                     onClick={() => boost(l)}
-                    disabled={l.status !== "active" || boosted}
-                    title={boosted ? "Already boosted" : "Boost listing"}
+                    disabled={
+                      boosted ||
+                      !(l.status === "active" ||
+                        (l.status === "pending_sale" && (pricing.pending_sale_boost_eligible ?? 1) === 1))
+                    }
+                    title={
+                      boosted
+                        ? "Already boosted"
+                        : l.status === "pending_sale" && (pricing.pending_sale_boost_eligible ?? 1) !== 1
+                          ? "Boost disabled for Pending Sale listings"
+                          : "Boost listing"
+                    }
                   >
                     <Rocket className="h-4 w-4" />
                   </Button>
