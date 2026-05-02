@@ -360,6 +360,13 @@ function SellPage() {
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Photos & video</h2>
+            {(photos.length > maxPhotos || (video && maxVideos < 1)) && (
+              <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+                Your media exceeds the {plan === "standard" ? "Standard" : "current"} plan limit ({maxPhotos} photos
+                {maxVideos > 0 ? `, ${maxVideos} video${maxVideos > 1 ? "s" : ""}` : ", no video"}).
+                Remove items or switch to Upgraded to submit.
+              </div>
+            )}
             <div>
               <Label className="flex items-center gap-2"><Camera className="h-4 w-4" />Photos ({photos.length}/{maxPhotos})</Label>
               <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-5">
