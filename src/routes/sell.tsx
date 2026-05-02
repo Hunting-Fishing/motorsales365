@@ -222,70 +222,79 @@ function SellPage() {
 
     setSubmitting(true);
     try {
-      const attributes: Record<string, any> = {};
-      if (year) attributes.year = year;
-      if (make) attributes.make = make;
-      if (model) attributes.model = model;
-      if (make || model) attributes.make_model = [make, model].filter(Boolean).join(" ");
-      if (mileage) attributes.mileage_km = mileage;
-      if (transmission) attributes.transmission = transmission;
-      if (fuel) attributes.fuel = fuel;
+      let lid = listingId;
+      if (!lid) {
+        const attributes: Record<string, any> = {};
+        if (year) attributes.year = year;
+        if (make) attributes.make = make;
+        if (model) attributes.model = model;
+        if (make || model) attributes.make_model = [make, model].filter(Boolean).join(" ");
+        if (mileage) attributes.mileage_km = mileage;
+        if (transmission) attributes.transmission = transmission;
+        if (fuel) attributes.fuel = fuel;
 
-      const expiryDays = pricing.listing_expiry_days ?? 60;
-      const expires = new Date();
-      expires.setDate(expires.getDate() + expiryDays);
+        const expiryDays = pricing.listing_expiry_days ?? 60;
+        const expires = new Date();
+        expires.setDate(expires.getDate() + expiryDays);
 
-      const { data: listing, error } = await supabase.from("listings").insert({
-        user_id: user.id,
-        category_slug: category,
-        title,
-        description,
-        price_php: Number(price),
-        condition,
-        region,
-        province,
-        city,
-        barangay,
-        seller_type: sellerType,
-        plan,
-        contact_phone: phone || null,
-        attributes,
-        status: "pending_payment",
-        expires_at: expires.toISOString(),
-      }).select().single();
+        const { data: listing, error } = await supabase.from("listings").insert({
+          user_id: user.id,
+          category_slug: category,
+          title,
+          description,
+          price_php: Number(price),
+          condition,
+          region,
+          province,
+          city,
+          barangay,
+          seller_type: sellerType,
+          plan,
+          contact_phone: phone || null,
+          attributes,
+          status: "pending_payment",
+          expires_at: expires.toISOString(),
+        }).select().single();
 
-      if (error || !listing) throw error;
+        if (error || !listing) throw error;
+        lid = listing.id;
+        setListingId(lid);
+      }
 
-      // Upload photos
-      const mediaInserts: any[] = [];
+      // Upload photos that are not already done. Run sequentially to keep the
+      // UI responsive and avoid hammering the network on flaky connections.
+      let allOk = true;
       for (let i = 0; i < photos.length; i++) {
-        const file = photos[i];
-        const path = `${user.id}/${listing.id}/${Date.now()}-${i}-${file.name}`;
-        const { error: upErr } = await supabase.storage.from("listing-photos").upload(path, file);
-        if (upErr) throw upErr;
-        const { data: pub } = supabase.storage.from("listing-photos").getPublicUrl(path);
-        mediaInserts.push({ listing_id: listing.id, type: "photo", url: pub.publicUrl, storage_path: path, sort_order: i });
+        if (photoUploads[i]?.status === "done") continue;
+        const ok = await uploadOnePhoto(i, photos[i], lid);
+        if (!ok) allOk = false;
       }
-      if (video) {
-        const path = `${user.id}/${listing.id}/${Date.now()}-${video.name}`;
-        const { error: upErr } = await supabase.storage.from("listing-videos").upload(path, video);
-        if (upErr) throw upErr;
-        const { data: pub } = supabase.storage.from("listing-videos").getPublicUrl(path);
-        mediaInserts.push({ listing_id: listing.id, type: "video", url: pub.publicUrl, storage_path: path, sort_order: 0 });
-      }
-      if (mediaInserts.length) {
-        await supabase.from("listing_media").insert(mediaInserts);
+      if (video && videoUpload.status !== "done") {
+        const ok = await uploadVideo(video, lid);
+        if (!ok) allOk = false;
       }
 
-      // Create pending payment record
-      await supabase.from("payments").insert({
-        user_id: user.id,
-        listing_id: listing.id,
-        kind: plan === "upgraded" ? "upgrade" : "listing",
-        amount_php: totalFee,
-        status: "pending",
-        method: "manual",
-      });
+      if (!allOk) {
+        toast.error("Some uploads failed. You can retry the failed items and submit again.");
+        return;
+      }
+
+      // Create pending payment record (only once — guarded by a select first).
+      const { data: existingPayments } = await supabase
+        .from("payments")
+        .select("id")
+        .eq("listing_id", lid)
+        .limit(1);
+      if (!existingPayments || existingPayments.length === 0) {
+        await supabase.from("payments").insert({
+          user_id: user.id,
+          listing_id: lid,
+          kind: plan === "upgraded" ? "upgrade" : "listing",
+          amount_php: totalFee,
+          status: "pending",
+          method: "manual",
+        });
+      }
 
       toast.success("Listing submitted! Awaiting payment confirmation.");
       navigate({ to: "/dashboard" });
