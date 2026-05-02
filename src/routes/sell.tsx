@@ -523,11 +523,31 @@ function SellPage() {
             </div>
             <div>
               <Label className="flex items-center gap-2"><VideoIcon className="h-4 w-4" />Video (max {maxVideos})</Label>
-              <Input type="file" accept="video/*" onChange={handleVideo} className="mt-2" />
+              <Input type="file" accept="video/*" onChange={handleVideo} className="mt-2" disabled={videoUpload.status === "uploading"} />
               {video && (
-                <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="truncate">{video.name}</span>
-                  <button type="button" onClick={() => setVideo(null)} className="text-foreground hover:underline">Remove</button>
+                <div className="mt-2 space-y-1">
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="truncate flex-1">{video.name}</span>
+                    {videoUpload.status === "done" && <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />}
+                    {videoUpload.status !== "uploading" && videoUpload.status !== "done" && (
+                      <button type="button" onClick={removeVideo} className="text-foreground hover:underline">Remove</button>
+                    )}
+                  </div>
+                  {videoUpload.status === "uploading" && (
+                    <div className="flex items-center gap-2">
+                      <Progress value={videoUpload.percent} className="h-1.5 flex-1" />
+                      <span className="text-xs text-muted-foreground">{videoUpload.percent}%</span>
+                    </div>
+                  )}
+                  {videoUpload.status === "error" && (
+                    <div className="flex items-center gap-2 rounded border border-destructive/40 bg-destructive/10 px-2 py-1.5 text-xs text-destructive">
+                      <AlertCircle className="h-3.5 w-3.5" />
+                      <span className="flex-1 truncate">{videoUpload.error ?? "Upload failed"}</span>
+                      <button type="button" onClick={retryVideo} className="inline-flex items-center gap-1 rounded bg-background px-1.5 py-0.5 text-foreground hover:bg-secondary">
+                        <RotateCw className="h-3 w-3" /> Retry
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
               {plan === "standard" && (
