@@ -16,7 +16,7 @@ function FavoritesPage() {
     if (!user) return;
     supabase
       .from("favorites")
-      .select("listing_id, listings:listing_id(id,title,price_php,region,city,seller_type,boost_until,category_slug,user_id,listing_media(url,type),profiles:user_id(verification_status))")
+      .select("listing_id, listings:listing_id(id,title,price_php,region,city,seller_type,boost_until,status,category_slug,user_id,listing_media(url,type),profiles:user_id(verification_status))")
       .eq("user_id", user.id)
       .then(({ data }) => {
         const mapped = (data ?? []).map((row: any) => {
@@ -30,7 +30,7 @@ function FavoritesPage() {
             boost_until: r.boost_until, category_slug: r.category_slug,
             cover_url: photos[0]?.url ?? null,
             photo_count: photos.length, has_video: videos.length > 0,
-            seller_verified: r.profiles?.verification_status === "verified",
+            seller_verified: r.profiles?.verification_status === "verified", status: r.status,
           } as ListingCardData;
         }).filter(Boolean) as ListingCardData[];
         setItems(mapped);

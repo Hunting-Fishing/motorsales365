@@ -26,10 +26,10 @@ function SellerProfilePage() {
         supabase
           .from("listings")
           .select(
-            "id,title,price_php,region,city,seller_type,boost_until,category_slug,listing_media(url,type)",
+            "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,listing_media(url,type)",
           )
           .eq("user_id", id)
-          .eq("status", "active")
+          .in("status", ["active","pending_sale"])
           .order("created_at", { ascending: false }),
       ]);
       setProfile(p);
@@ -50,7 +50,7 @@ function SellerProfilePage() {
             cover_url: photos[0]?.url ?? null,
             photo_count: photos.length,
             has_video: videos.length > 0,
-            seller_verified: verified,
+            seller_verified: verified, status: r.status,
           };
         }),
       );

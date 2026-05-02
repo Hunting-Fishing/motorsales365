@@ -634,6 +634,7 @@ export type Database = {
         | "expired"
         | "hidden"
         | "sold"
+        | "pending_sale"
       media_type: "photo" | "video"
       payment_kind: "listing" | "upgrade" | "boost" | "subscription"
       payment_status: "pending" | "paid" | "failed" | "refunded"
@@ -781,6 +782,7 @@ export const Constants = {
         "expired",
         "hidden",
         "sold",
+        "pending_sale",
       ],
       media_type: ["photo", "video"],
       payment_kind: ["listing", "upgrade", "boost", "subscription"],

@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Star, Eye, Rocket, RefreshCcw, CheckCircle2, Edit, Undo2 } from "lucide-react";
+import { Plus, Trash2, Star, Eye, Rocket, RefreshCcw, CheckCircle2, Edit, Undo2, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -86,6 +86,21 @@ function MyListings() {
     }
   };
 
+  const togglePendingSale = async (l: any) => {
+    const next = l.status === "pending_sale" ? "active" : "pending_sale";
+    const message =
+      next === "pending_sale"
+        ? "Mark this listing as Pending Sale? It stays visible and buyers can still send offers."
+        : "Cancel pending sale and return this listing to Active?";
+    if (!confirm(message)) return;
+    const { error } = await supabase.from("listings").update({ status: next }).eq("id", l.id);
+    if (error) toast.error(error.message);
+    else {
+      toast.success(next === "pending_sale" ? "Marked as Pending Sale" : "Listing returned to Active");
+      load();
+    }
+  };
+
   const renew = async (id: string) => {
     const days = pricing.listing_expiry_days ?? 60;
     const expires = new Date();
@@ -133,6 +148,7 @@ function MyListings() {
     expired: "bg-muted text-muted-foreground",
     hidden: "bg-muted text-muted-foreground",
     sold: "bg-primary text-primary-foreground",
+    pending_sale: "bg-warning text-warning-foreground",
   };
 
   return (
@@ -222,6 +238,16 @@ function MyListings() {
                   <Button variant="outline" size="sm" onClick={() => renew(l.id)} title="Renew">
                     <RefreshCcw className="h-4 w-4" />
                   </Button>
+                  {l.status !== "sold" && (
+                    <Button
+                      variant={l.status === "pending_sale" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => togglePendingSale(l)}
+                      title={l.status === "pending_sale" ? "Cancel pending sale" : "Mark as pending sale"}
+                    >
+                      <Clock className="h-4 w-4" />
+                    </Button>
+                  )}
                   {l.status !== "sold" ? (
                     <Button
                       variant="outline"
