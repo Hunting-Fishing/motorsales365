@@ -358,13 +358,11 @@ function SellPage() {
               <div className="space-y-4">
                 <VehiclePicker
                   category={category as "car" | "motorcycle"}
+                  year={year}
                   make={make}
                   model={model}
-                  onChange={(v) => { setMake(v.make); setModel(v.model); }}
+                  onChange={(v) => { setYear(v.year); setMake(v.make); setModel(v.model); }}
                 />
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div><Label>Year</Label><Input value={year} onChange={(e) => setYear(e.target.value)} placeholder="e.g. 2019" /></div>
-                </div>
               </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
