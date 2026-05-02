@@ -77,11 +77,33 @@ function SellPage() {
 
   const handlePhotos = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
+    const remaining = maxPhotos - photos.length;
+    if (files.length > remaining) {
+      const overflow = files.length - Math.max(remaining, 0);
+      toast.error(
+        plan === "standard"
+          ? `Standard listings allow up to ${maxPhotos} photos. ${overflow} photo(s) skipped — upgrade to add up to 20.`
+          : `Up to ${maxPhotos} photos allowed. ${overflow} photo(s) skipped.`,
+      );
+    }
     const next = [...photos, ...files].slice(0, maxPhotos);
     setPhotos(next);
+    // Allow re-selecting the same files after a blocked attempt.
+    e.target.value = "";
   };
 
   const removePhoto = (i: number) => setPhotos(photos.filter((_, idx) => idx !== i));
+
+  const handleVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    if (!file) { setVideo(null); return; }
+    if (maxVideos < 1) {
+      toast.error("Videos are not included in this plan.");
+      e.target.value = "";
+      return;
+    }
+    setVideo(file);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,6 +111,18 @@ function SellPage() {
     if (!title || !price) { toast.error("Title and price are required"); return; }
     if (!region || !city) { toast.error("Please select region and city"); return; }
     if (photos.length === 0) { toast.error("Please add at least one photo"); return; }
+    if (photos.length > maxPhotos) {
+      toast.error(
+        plan === "standard"
+          ? `Too many photos for Standard (max ${maxPhotos}). Remove some or upgrade.`
+          : `Too many photos (max ${maxPhotos}).`,
+      );
+      return;
+    }
+    if (video && maxVideos < 1) {
+      toast.error("Remove the video or upgrade your plan to include video.");
+      return;
+    }
 
     setSubmitting(true);
     try {
