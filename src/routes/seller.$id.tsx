@@ -101,12 +101,20 @@ function SellerProfilePage() {
                 <Badge variant={isBusiness ? "default" : "secondary"}>
                   {isBusiness ? "Business seller" : "Private seller"}
                 </Badge>
+                {profile.verification_status === "verified" && (
+                  <VerifiedBadge size="md" showLabel />
+                )}
               </div>
               {isBusiness && profile.business_address && (
                 <div className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
                   <MapPin className="h-4 w-4" />
                   {profile.business_address}
                   {location && ` · ${location}`}
+                </div>
+              )}
+              {profile.verification_status === "verified" && profile.verified_at && (
+                <div className="mt-1 text-xs text-muted-foreground">
+                  Verified business since {formatDate(profile.verified_at)}
                 </div>
               )}
               <div className="mt-2 text-sm text-muted-foreground">
