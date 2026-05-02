@@ -59,6 +59,17 @@ function SellPage() {
   const [video, setVideo] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
+  type UploadState = {
+    status: "idle" | "uploading" | "done" | "error";
+    percent: number;
+    error?: string;
+    url?: string;
+    path?: string;
+  };
+  const [photoUploads, setPhotoUploads] = useState<UploadState[]>([]);
+  const [videoUpload, setVideoUpload] = useState<UploadState>({ status: "idle", percent: 0 });
+  const [listingId, setListingId] = useState<string | null>(null);
+
   const [pricing, setPricing] = useState<Record<string, number>>({});
 
   useEffect(() => {
