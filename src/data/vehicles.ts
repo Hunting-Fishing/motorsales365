@@ -922,6 +922,19 @@ export const CAR_MAKES: MakeModels[] = [
   { make: "Proton", models: ["Saga", "Persona", "Iriz", "X50", "X70", "X90", "Exora", "Preve", "Inspira", "Wira"] },
   { make: "Perodua", models: ["Myvi", "Axia", "Bezza", "Aruz", "Ativa", "Alza", "Kancil", "Kelisa", "Kembara", "Kenari", "Viva"] },
 
+  // ---------- More Asian-market makes ----------
+  { make: "Maruti Suzuki", models: ["Alto", "Alto K10", "Alto 800", "Swift", "Swift Dzire", "Dzire", "Baleno", "Brezza", "Vitara Brezza", "Grand Vitara", "Ertiga", "XL6", "Jimny", "Jimny 5-door", "Fronx", "Ignis", "Eeco", "Wagon R", "Celerio", "S-Presso", "Ciaz", "S-Cross", "Invicto", "Esteem", "800", "Omni", "Gypsy", "Ritz", "A-Star"] },
+  { make: "Force Motors", models: ["Gurkha", "Gurkha 5-door", "Trax", "Traveller", "Tempo", "Citiline", "Monobus", "Toofan"] },
+  { make: "Premier", models: ["Padmini", "118NE", "Rio", "Sigma"] },
+  { make: "Hindustan Motors", models: ["Ambassador", "Contessa", "Trekker"] },
+  { make: "Wuling", models: ["Confero", "Confero S", "Cortez", "Formo", "Alvez", "Bingo", "Air EV", "Almaz", "Almaz Hybrid", "Almaz RS", "Hongguang", "Hongguang Mini EV", "Mini EV Macaron", "Mini EV Cabrio"] },
+  { make: "Mahindra Electric", models: ["e2o", "eVerito", "eSupro", "Treo"] },
+  { make: "TATA Motors PV", models: ["Bolt", "Zest", "Hexa"] },
+  { make: "Renault India", models: ["Kwid Climber", "Kiger Turbo", "Triber Easy-R", "Pulse", "Scala"] },
+  { make: "MG India", models: ["Astor", "Gloster", "Comet EV", "ZS EV", "Hector", "Hector Plus"] },
+  { make: "Tata Daewoo", models: ["Prima", "Novus"] },
+  { make: "Daewoo", models: ["Matiz", "Lanos", "Nubira", "Tacuma", "Leganza", "Magnus", "Tosca", "Espero", "Racer", "Cielo", "Damas", "Labo"] },
+
   // ---------- Other ----------
   { make: "Other", models: ["Other"] },
 ];
