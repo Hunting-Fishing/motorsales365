@@ -120,6 +120,11 @@ function MyListings() {
     if (!user) return;
     const fee = pricing.boost_fee_php ?? 50;
     const days = pricing.boost_renewal_days ?? 14;
+    const pendingEligible = (pricing.pending_sale_boost_eligible ?? 1) === 1;
+    if (l.status === "pending_sale" && !pendingEligible) {
+      toast.error("Boosting is disabled for Pending Sale listings.");
+      return;
+    }
     if (!confirm(`Boost this listing for ${days} days at ${formatPHP(fee)}? Payment will be confirmed by admin.`)) return;
 
     const until = new Date();
@@ -230,8 +235,18 @@ function MyListings() {
                     variant="outline"
                     size="sm"
                     onClick={() => boost(l)}
-                    disabled={l.status !== "active" || boosted}
-                    title={boosted ? "Already boosted" : "Boost listing"}
+                    disabled={
+                      boosted ||
+                      !(l.status === "active" ||
+                        (l.status === "pending_sale" && (pricing.pending_sale_boost_eligible ?? 1) === 1))
+                    }
+                    title={
+                      boosted
+                        ? "Already boosted"
+                        : l.status === "pending_sale" && (pricing.pending_sale_boost_eligible ?? 1) !== 1
+                          ? "Boost disabled for Pending Sale listings"
+                          : "Boost listing"
+                    }
                   >
                     <Rocket className="h-4 w-4" />
                   </Button>
