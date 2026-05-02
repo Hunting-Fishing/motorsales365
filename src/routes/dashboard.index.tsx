@@ -133,6 +133,7 @@ function MyListings() {
     expired: "bg-muted text-muted-foreground",
     hidden: "bg-muted text-muted-foreground",
     sold: "bg-primary text-primary-foreground",
+    pending_sale: "bg-warning text-warning-foreground",
   };
 
   return (
