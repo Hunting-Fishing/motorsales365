@@ -49,6 +49,9 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
             {listing.seller_type === "business" ? "Business" : "Private"}
           </Badge>
           {listing.seller_verified && <VerifiedBadge size="sm" showLabel />}
+          {listing.status === "pending_sale" && (
+            <Badge className="bg-warning text-warning-foreground">Pending Sale</Badge>
+          )}
         </div>
         <div className="absolute bottom-2 right-2 flex items-center gap-2 rounded-md bg-black/55 px-2 py-1 text-[11px] font-medium text-white">
           <span className="flex items-center gap-1"><Camera className="h-3 w-3" />{listing.photo_count ?? 0}</span>
