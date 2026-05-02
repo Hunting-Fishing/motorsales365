@@ -60,7 +60,9 @@ function VerificationPage() {
     contact_email: "",
     address: "",
     region: "",
+    province: "",
     city: "",
+    barangay: "",
   });
   const [docs, setDocs] = useState<DocItem[]>([]);
 
@@ -89,7 +91,9 @@ function VerificationPage() {
         contact_email: req.contact_email ?? "",
         address: req.address ?? "",
         region: req.region ?? "",
+        province: req.province ?? "",
         city: req.city ?? "",
+        barangay: req.barangay ?? "",
       });
       setDocs(((req.documents as DocItem[]) ?? []) as DocItem[]);
     }
@@ -149,7 +153,9 @@ function VerificationPage() {
       contact_email: form.contact_email.trim() || null,
       address: form.address.trim() || null,
       region: form.region || null,
+      province: form.province || null,
       city: form.city.trim() || null,
+      barangay: form.barangay.trim() || null,
       documents: docs,
       status: "pending" as const,
       submitted_at: new Date().toISOString(),
