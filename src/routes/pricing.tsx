@@ -9,7 +9,7 @@ import { formatPHP } from "@/lib/format";
 export const Route = createFileRoute("/pricing")({
   head: () => ({
     meta: [
-      { title: "Pricing & plans — AutoTrader Philippines" },
+      { title: "Pricing & plans — 365 MotorSales Philippines" },
       { name: "description", content: "Listing fees, upgrades, boosts, and monthly subscriptions for sellers in the Philippines." },
     ],
   }),

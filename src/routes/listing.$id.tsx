@@ -270,7 +270,7 @@ function ListingDetailPage() {
                 <DialogHeader>
                   <DialogTitle>Report this listing</DialogTitle>
                   <DialogDescription>
-                    Help us keep AutoTrader Philippines safe. Our team will review your report.
+                    Help us keep 365 MotorSales Philippines safe. Our team will review your report.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-3">

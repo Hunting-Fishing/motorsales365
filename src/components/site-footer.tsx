@@ -11,7 +11,7 @@ export function SiteFooter() {
               <Car className="h-5 w-5" />
             </div>
             <div className="flex flex-col leading-none">
-              <span className="font-display text-lg font-bold">AutoTrader</span>
+              <span className="font-display text-lg font-bold">365 MotorSales</span>
               <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Philippines</span>
             </div>
           </Link>
@@ -45,7 +45,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-border py-4 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} AutoTrader Philippines. Prices in ₱ PHP.
+        © {new Date().getFullYear()} 365 MotorSales Philippines. Prices in ₱ PHP.
       </div>
     </footer>
   );
