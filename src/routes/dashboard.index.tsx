@@ -222,9 +222,23 @@ function MyListings() {
                   <Button variant="outline" size="sm" onClick={() => renew(l.id)} title="Renew">
                     <RefreshCcw className="h-4 w-4" />
                   </Button>
-                  {l.status !== "sold" && (
-                    <Button variant="outline" size="sm" onClick={() => markSold(l.id)} title="Mark sold">
+                  {l.status !== "sold" ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSoldTarget({ id: l.id, title: l.title })}
+                      title="Mark sold"
+                    >
                       <CheckCircle2 className="h-4 w-4" />
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => undoSold(l.id)}
+                      title="Undo sold — restore to active"
+                    >
+                      <Undo2 className="h-4 w-4" />
                     </Button>
                   )}
                   <Button variant="outline" size="sm" onClick={() => remove(l.id)} title="Delete">
