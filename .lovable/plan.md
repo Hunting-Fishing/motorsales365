@@ -1,54 +1,53 @@
-## Seller Verification Workflow
+# Plan: Fuzzy Typo Matching for Vehicle Search
 
-Add a verification system where repair shops, insurance providers, and businesses can submit credentials for admin review and earn a "Verified" trust badge that appears on listings and seller profiles.
+## Goal
+Make vehicle make/model search tolerant of small typos (e.g., "Toyta" → "Toyota", "Hondaa" → "Honda", "Mitusbishi" → "Mitsubishi") so users still find listings when they misspell brand or model names.
 
-### Database changes
+## Approach
+Implement a small, dependency-free fuzzy matcher based on **Damerau–Levenshtein distance** (handles 1-char insert/delete/substitute and adjacent transpositions like "Toyta"↔"Toyota"). This stacks on top of the alias matching from the previous plan — aliases handle known variants ("VW"→"Volkswagen"), fuzzy handles typos.
 
-New table `verification_requests`:
-- `id`, `user_id`, `business_type` (`repair_shop` | `insurance` | `dealer` | `other`)
-- `legal_name`, `dti_sec_registration` (PH business registry #), `tax_id`, `contact_phone`, `contact_email`, `address`, `region`, `city`
-- `documents` (jsonb array of storage paths — DTI/SEC cert, BIR 2303, mayor's permit, ID)
-- `status` (`pending` | `approved` | `rejected` | `more_info`)
-- `submitted_at`, `reviewed_at`, `reviewed_by`, `review_notes`
-- RLS: owner can insert/select own; admins manage all
+Match policy (prevents bad matches on short strings):
+- Length 1–3: exact only (no fuzzy)
+- Length 4–6: distance ≤ 1
+- Length 7+: distance ≤ 2
+- Always prefer: exact > prefix/substring > alias > fuzzy
 
-New columns on `profiles`:
-- `verification_status` (`unverified` | `pending` | `verified` | `rejected`) default `unverified`
-- `verified_at` timestamptz
-- `business_type` text (repair_shop, insurance, dealer, etc.)
+## Files
 
-Storage bucket `verification-docs` (private, owner + admin read via RLS).
+### Add: `src/lib/vehicle-aliases.ts`
+- `MAKE_ALIASES`: map of canonical make → alias array (VW→Volkswagen, Benz/Mercedes→Mercedes-Benz, Chevy→Chevrolet, Lynk and Co→Lynk & Co, BMW M, Beemer, Bimmer, etc.).
+- `normalize(s)`: lowercase, strip punctuation/`&`/`-`, collapse spaces.
+- `expandMakeQuery(q)`: returns array of canonical candidates from alias map.
 
-### New routes
+### Add: `src/lib/fuzzy.ts`
+- `damerauLevenshtein(a, b)`: small DP implementation (~40 lines), early-exit when distance exceeds threshold.
+- `fuzzyThreshold(len)`: returns 0 / 1 / 2 per policy above.
+- `fuzzyMatch(query, candidate)`: boolean — true if normalized query matches by exact, substring, alias, or distance ≤ threshold.
+- `fuzzyScore(query, candidate)`: numeric rank (0=exact, 1=prefix, 2=substring, 3+ =distance) for sorting.
+- `fuzzyFilter<T>(items, query, getText)`: utility to filter+sort an array by best score.
 
-- `src/routes/dashboard.verification.tsx` — User-facing form. Shows current status, submission form (business type, registration numbers, document uploads), and resubmit if rejected. Sidebar entry in dashboard.
-- `src/routes/admin.verifications.tsx` — Admin queue. Lists pending requests, opens detail panel with documents (signed URLs), notes field, Approve / Reject / Request More Info actions. On approve: sets `profiles.verification_status = 'verified'`, `verified_at = now()`. Added to admin sidebar.
+### Edit: `src/components/vehicle-picker.tsx`
+- Replace the `Command`'s `filter` prop with a custom function that uses `fuzzyMatch` against the option string (also matching aliases for makes).
+- Update the "No makes/models found" empty state still offers "Use {query}" for custom values.
+- Sort visible results by `fuzzyScore` so the closest match floats to the top (e.g. typing "Toyta" puts "Toyota" first).
 
-### UI changes (trust badge)
+### Edit: `src/routes/browse.$category.tsx`
+The current Supabase query uses `ilike("title", "%q%")`, which won't catch typos server-side. Two-layer approach:
+1. **Server side**: when the query looks like a make/model, expand it via aliases + close fuzzy matches against the known make/model list (`getMakes`) and build an `or(title.ilike.%alt1%,title.ilike.%alt2%,…)` filter (cap at ~8 alternates) so DB filtering still helps.
+2. **Client side**: after results return, if the user's `q` didn't match many rows (<6) and looks like a vehicle term, run a second fetch without the title filter (still scoped by category/region/etc.) and apply `fuzzyFilter` on `title` client-side, capped at 60 rows. This preserves typo tolerance without scanning the entire DB.
 
-- New `VerifiedBadge` component (`src/components/verified-badge.tsx`) — shield-check icon, blue accent, tooltip "Identity & business verified by AutoTrader PH."
-- `ListingCard`: show badge next to seller_type chip when `profile.verification_status = 'verified'`. Update card query in `browse.$category.tsx`, `seller.$id.tsx`, `index.tsx`, `dashboard.favorites.tsx` to join `profiles(verification_status)`.
-- `seller.$id.tsx`: show badge prominently next to display name; add a "Verified business" section with verified date + business type label.
-- `listing.$id.tsx`: show badge in the seller info card.
+A small helper `buildTitleSearchTerms(q)` lives in `src/lib/vehicle-aliases.ts` and produces the alternates list (canonical make + its aliases + fuzzy-close makes/models from the dataset).
 
-### Admin enhancements
+## Technical details
+- Pure TS, zero new dependencies.
+- Damerau–Levenshtein with early termination keeps cost trivial for small candidate lists (~80 makes, a few hundred models).
+- All matching runs on **normalized** strings (lowercased, punctuation/spaces stripped) so "Lynk & Co" / "lynkandco" / "lynk co" all align.
+- Fuzzy is only applied to vehicle make/model search — not general text fields — to avoid surprising matches in unrelated places.
+- Existing listings and stored data are untouched; this is purely a search/UX layer.
 
-- `admin.index.tsx`: add "Pending verifications" stat card linking to the queue.
-- `admin.users.tsx`: add manual "Mark verified / Revoke" buttons (audit logged in `review_notes`).
+## Out of scope
+- Phonetic matching (Soundex/Metaphone). Damerau–Levenshtein already covers the common Filipino-keyboard typos.
+- Server-side trigram/`pg_trgm` index. Can add later if listing volume makes the fallback fetch too costly.
+- Fuzzy matching on city/region names.
 
-### Technical details
-
-- Document uploads go to `verification-docs/{user_id}/{timestamp}-{filename}`, paths stored in `verification_requests.documents`. Admin viewer creates signed URLs (60s) via `supabase.storage.from('verification-docs').createSignedUrl`.
-- Trigger on `verification_requests` update: when `status` changes to `approved`/`rejected`, sync `profiles.verification_status` + `verified_at`.
-- Validation with zod: registration numbers required for `repair_shop`/`insurance`/`dealer`; at least 1 document required.
-- Realtime not needed — admin queue refreshes on action.
-
-### Out of scope (Phase 4 candidates)
-
-- Automated DTI/SEC API lookup, email notifications on status change, verification expiry/renewal, public business directory page.
-
-### Files
-
-- migration: `verification_requests` table + `profiles` columns + storage bucket + RLS + sync trigger
-- create: `src/components/verified-badge.tsx`, `src/routes/dashboard.verification.tsx`, `src/routes/admin.verifications.tsx`
-- edit: `src/components/listing-card.tsx`, `src/routes/admin.tsx` (nav), `src/routes/admin.index.tsx`, `src/routes/admin.users.tsx`, `src/routes/dashboard.tsx` (nav), `src/routes/seller.$id.tsx`, `src/routes/listing.$id.tsx`, `src/routes/browse.$category.tsx`, `src/routes/index.tsx`, `src/routes/dashboard.favorites.tsx`
+Approve and I'll implement.

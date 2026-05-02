@@ -15,6 +15,8 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { getMakes, type VehicleCategory } from "@/data/vehicles";
+import { fuzzyScore } from "@/lib/fuzzy";
+import { MAKE_ALIASES } from "@/lib/vehicle-aliases";
 
 type Props = {
   category: VehicleCategory;
@@ -32,6 +34,7 @@ function Combo({
   emptyText,
   disabled,
   allowCustom = true,
+  getKeywords,
 }: {
   value: string;
   options: string[];
@@ -41,6 +44,7 @@ function Combo({
   emptyText: string;
   disabled?: boolean;
   allowCustom?: boolean;
+  getKeywords?: (option: string) => string[];
 }) {
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState("");
@@ -64,9 +68,18 @@ function Combo({
       </PopoverTrigger>
       <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0" align="start">
         <Command
-          filter={(itemValue, search) =>
-            itemValue.toLowerCase().includes(search.toLowerCase()) ? 1 : 0
-          }
+          filter={(itemValue, search, keywords) => {
+            if (!search.trim()) return 1;
+            const candidates = [itemValue, ...(keywords ?? [])];
+            let best = Infinity;
+            for (const c of candidates) {
+              const s = fuzzyScore(search, c);
+              if (s < best) best = s;
+            }
+            if (best === Infinity) return 0;
+            // cmdk wants higher = better, in (0, 1].
+            return 1 / (1 + best);
+          }}
         >
           <CommandInput
             placeholder={searchPlaceholder}
@@ -96,6 +109,7 @@ function Combo({
                 <CommandItem
                   key={opt}
                   value={opt}
+                  keywords={getKeywords?.(opt)}
                   onSelect={() => {
                     onSelect(opt);
                     setOpen(false);
@@ -151,6 +165,7 @@ export function VehiclePicker({ category, make, model, onChange }: Props) {
           placeholder="Select make"
           searchPlaceholder="Search make…"
           emptyText="No makes found"
+          getKeywords={(opt) => MAKE_ALIASES[opt] ?? []}
           onSelect={(v) => onChange({ make: v, model: "" })}
         />
       </div>
