@@ -22,11 +22,11 @@ export function SiteFooter() {
         <div>
           <h4 className="mb-3 text-sm font-semibold">Browse</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/browse/car" className="hover:text-foreground">Cars</Link></li>
-            <li><Link to="/browse/motorcycle" className="hover:text-foreground">Motorcycles</Link></li>
-            <li><Link to="/browse/boat" className="hover:text-foreground">Boats</Link></li>
-            <li><Link to="/browse/airplane" className="hover:text-foreground">Airplanes</Link></li>
-            <li><Link to="/browse/equipment" className="hover:text-foreground">Equipment</Link></li>
+            <li><Link to="/browse/$category" params={{ category: "car" }} className="hover:text-foreground">Cars</Link></li>
+            <li><Link to="/browse/$category" params={{ category: "motorcycle" }} className="hover:text-foreground">Motorcycles</Link></li>
+            <li><Link to="/browse/$category" params={{ category: "boat" }} className="hover:text-foreground">Boats</Link></li>
+            <li><Link to="/browse/$category" params={{ category: "airplane" }} className="hover:text-foreground">Airplanes</Link></li>
+            <li><Link to="/browse/$category" params={{ category: "equipment" }} className="hover:text-foreground">Equipment</Link></li>
           </ul>
         </div>
         <div>

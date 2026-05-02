@@ -16,11 +16,11 @@ import {
 } from "@/components/ui/sheet";
 
 const NAV = [
-  { to: "/browse/car", label: "Cars" },
-  { to: "/browse/motorcycle", label: "Motorcycles" },
-  { to: "/browse/boat", label: "Boats" },
-  { to: "/browse/airplane", label: "Airplanes" },
-  { to: "/browse/equipment", label: "Equipment" },
+  { category: "car", label: "Cars" },
+  { category: "motorcycle", label: "Motorcycles" },
+  { category: "boat", label: "Boats" },
+  { category: "airplane", label: "Airplanes" },
+  { category: "equipment", label: "Equipment" },
 ] as const;
 
 export function SiteHeader() {
@@ -49,8 +49,9 @@ export function SiteHeader() {
           <nav className="hidden items-center gap-1 lg:flex">
             {NAV.map((n) => (
               <Link
-                key={n.to}
-                to={n.to}
+                key={n.category}
+                to="/browse/$category"
+                params={{ category: n.category }}
                 className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                 activeProps={{ className: "bg-secondary text-foreground" }}
               >
@@ -108,7 +109,7 @@ export function SiteHeader() {
             <SheetContent>
               <div className="mt-8 flex flex-col gap-1">
                 {NAV.map((n) => (
-                  <Link key={n.to} to={n.to} className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">
+                  <Link key={n.category} to="/browse/$category" params={{ category: n.category }} className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">
                     {n.label}
                   </Link>
                 ))}

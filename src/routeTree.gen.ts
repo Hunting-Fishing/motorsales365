@@ -23,12 +23,14 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
+import { Route as DashboardVerificationRouteImport } from './routes/dashboard.verification'
 import { Route as DashboardSearchesRouteImport } from './routes/dashboard.searches'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
 import { Route as DashboardMessagesRouteImport } from './routes/dashboard.messages'
 import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favorites'
 import { Route as DashboardBillingRouteImport } from './routes/dashboard.billing'
 import { Route as BrowseCategoryRouteImport } from './routes/browse.$category'
+import { Route as AdminVerificationsRouteImport } from './routes/admin.verifications'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
@@ -105,6 +107,11 @@ const ListingIdRoute = ListingIdRouteImport.update({
   path: '/listing/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardVerificationRoute = DashboardVerificationRouteImport.update({
+  id: '/verification',
+  path: '/verification',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardSearchesRoute = DashboardSearchesRouteImport.update({
   id: '/searches',
   path: '/searches',
@@ -134,6 +141,11 @@ const BrowseCategoryRoute = BrowseCategoryRouteImport.update({
   id: '/browse/$category',
   path: '/browse/$category',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminVerificationsRoute = AdminVerificationsRouteImport.update({
+  id: '/verifications',
+  path: '/verifications',
+  getParentRoute: () => AdminRoute,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
@@ -176,12 +188,14 @@ export interface FileRoutesByFullPath {
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/verifications': typeof AdminVerificationsRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
+  '/dashboard/verification': typeof DashboardVerificationRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/seller/$id': typeof SellerIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -201,12 +215,14 @@ export interface FileRoutesByTo {
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/verifications': typeof AdminVerificationsRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
+  '/dashboard/verification': typeof DashboardVerificationRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/seller/$id': typeof SellerIdRoute
   '/admin': typeof AdminIndexRoute
@@ -229,12 +245,14 @@ export interface FileRoutesById {
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/admin/verifications': typeof AdminVerificationsRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
+  '/dashboard/verification': typeof DashboardVerificationRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/seller/$id': typeof SellerIdRoute
   '/admin/': typeof AdminIndexRoute
@@ -258,12 +276,14 @@ export interface FileRouteTypes {
     | '/admin/pricing'
     | '/admin/reports'
     | '/admin/users'
+    | '/admin/verifications'
     | '/browse/$category'
     | '/dashboard/billing'
     | '/dashboard/favorites'
     | '/dashboard/messages'
     | '/dashboard/profile'
     | '/dashboard/searches'
+    | '/dashboard/verification'
     | '/listing/$id'
     | '/seller/$id'
     | '/admin/'
@@ -283,12 +303,14 @@ export interface FileRouteTypes {
     | '/admin/pricing'
     | '/admin/reports'
     | '/admin/users'
+    | '/admin/verifications'
     | '/browse/$category'
     | '/dashboard/billing'
     | '/dashboard/favorites'
     | '/dashboard/messages'
     | '/dashboard/profile'
     | '/dashboard/searches'
+    | '/dashboard/verification'
     | '/listing/$id'
     | '/seller/$id'
     | '/admin'
@@ -310,12 +332,14 @@ export interface FileRouteTypes {
     | '/admin/pricing'
     | '/admin/reports'
     | '/admin/users'
+    | '/admin/verifications'
     | '/browse/$category'
     | '/dashboard/billing'
     | '/dashboard/favorites'
     | '/dashboard/messages'
     | '/dashboard/profile'
     | '/dashboard/searches'
+    | '/dashboard/verification'
     | '/listing/$id'
     | '/seller/$id'
     | '/admin/'
@@ -439,6 +463,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/verification': {
+      id: '/dashboard/verification'
+      path: '/verification'
+      fullPath: '/dashboard/verification'
+      preLoaderRoute: typeof DashboardVerificationRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/searches': {
       id: '/dashboard/searches'
       path: '/searches'
@@ -480,6 +511,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/browse/$category'
       preLoaderRoute: typeof BrowseCategoryRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/verifications': {
+      id: '/admin/verifications'
+      path: '/verifications'
+      fullPath: '/admin/verifications'
+      preLoaderRoute: typeof AdminVerificationsRouteImport
+      parentRoute: typeof AdminRoute
     }
     '/admin/users': {
       id: '/admin/users'
@@ -524,6 +562,7 @@ interface AdminRouteChildren {
   AdminPricingRoute: typeof AdminPricingRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminUsersRoute: typeof AdminUsersRoute
+  AdminVerificationsRoute: typeof AdminVerificationsRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -532,6 +571,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPricingRoute: AdminPricingRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminUsersRoute: AdminUsersRoute,
+  AdminVerificationsRoute: AdminVerificationsRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
@@ -543,6 +583,7 @@ interface DashboardRouteChildren {
   DashboardMessagesRoute: typeof DashboardMessagesRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardSearchesRoute: typeof DashboardSearchesRoute
+  DashboardVerificationRoute: typeof DashboardVerificationRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
 
@@ -552,6 +593,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardMessagesRoute: DashboardMessagesRoute,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardSearchesRoute: DashboardSearchesRoute,
+  DashboardVerificationRoute: DashboardVerificationRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
 
