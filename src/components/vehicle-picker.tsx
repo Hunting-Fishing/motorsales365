@@ -221,6 +221,7 @@ export function VehiclePicker({ category, make, model, onChange }: Props) {
             searchPlaceholder="Search model…"
             emptyText="No models found"
             addLabel="Add model"
+            getKeywords={(opt) => getModelAliases(opt)}
             onSelect={(v) => onChange({ make, model: v })}
           />
         )}
