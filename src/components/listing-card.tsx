@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { MapPin, Camera, Video, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { VerifiedBadge } from "@/components/verified-badge";
 import { formatPHP } from "@/lib/format";
 
 export interface ListingCardData {
@@ -15,6 +16,7 @@ export interface ListingCardData {
   photo_count?: number;
   has_video?: boolean;
   category_slug: string;
+  seller_verified?: boolean;
 }
 
 export function ListingCard({ listing }: { listing: ListingCardData }) {
@@ -38,13 +40,14 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
             <Camera className="h-10 w-10" />
           </div>
         )}
-        <div className="absolute left-2 top-2 flex gap-1">
+        <div className="absolute left-2 top-2 flex flex-wrap gap-1">
           {boosted && (
             <Badge className="bg-accent text-accent-foreground"><Star className="mr-1 h-3 w-3" />Featured</Badge>
           )}
           <Badge variant={listing.seller_type === "business" ? "default" : "secondary"}>
             {listing.seller_type === "business" ? "Business" : "Private"}
           </Badge>
+          {listing.seller_verified && <VerifiedBadge size="sm" showLabel />}
         </div>
         <div className="absolute bottom-2 right-2 flex items-center gap-2 rounded-md bg-black/55 px-2 py-1 text-[11px] font-medium text-white">
           <span className="flex items-center gap-1"><Camera className="h-3 w-3" />{listing.photo_count ?? 0}</span>
