@@ -30,14 +30,14 @@ export function VerifiedBadge({ size = "md", showLabel = false, className }: Ver
               showLabel ? "text-xs" : "text-[0]",
               className,
             )}
-            aria-label="Verified by AutoTrader Philippines"
+            aria-label="Verified by 365 MotorSales Philippines"
           >
             <BadgeCheck className={cn(SIZE[size], "fill-primary text-primary-foreground")} />
             {showLabel && <span>Verified</span>}
           </span>
         </TooltipTrigger>
         <TooltipContent side="top">
-          Identity & business verified by AutoTrader Philippines.
+          Identity & business verified by 365 MotorSales Philippines.
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>

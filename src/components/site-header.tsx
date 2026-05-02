@@ -41,7 +41,7 @@ export function SiteHeader() {
               <Car className="h-5 w-5" />
             </div>
             <div className="flex flex-col leading-none">
-              <span className="font-display text-lg font-bold tracking-tight">AutoTrader</span>
+              <span className="font-display text-lg font-bold tracking-tight">365 MotorSales</span>
               <span className="text-[10px] font-semibold uppercase tracking-widest text-accent-foreground/70">Philippines</span>
             </div>
           </Link>

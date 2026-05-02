@@ -34,7 +34,7 @@ export const Route = createFileRoute("/browse/$category")({
   validateSearch: searchSchema,
   head: ({ params }) => ({
     meta: [
-      { title: `${CATEGORY_LABEL[params.category] ?? "Listings"} for sale — AutoTrader Philippines` },
+      { title: `${CATEGORY_LABEL[params.category] ?? "Listings"} for sale — 365 MotorSales Philippines` },
       { name: "description", content: `Browse ${CATEGORY_LABEL[params.category] ?? "vehicles"} for sale across the Philippines.` },
     ],
   }),

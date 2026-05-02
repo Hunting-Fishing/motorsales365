@@ -45,7 +45,7 @@ function LoginPage() {
     <SiteLayout>
       <div className="container mx-auto flex max-w-md flex-col px-4 py-16">
         <h1 className="font-display text-3xl font-bold">Sign in</h1>
-        <p className="text-muted-foreground">Welcome back to AutoTrader Philippines.</p>
+        <p className="text-muted-foreground">Welcome back to 365 MotorSales Philippines.</p>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           <div>

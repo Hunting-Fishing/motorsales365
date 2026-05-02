@@ -31,9 +31,9 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "AutoTrader Philippines — Buy & Sell Vehicles" },
+      { title: "365 MotorSales Philippines — Buy & Sell Vehicles" },
       { name: "description", content: "Buy and sell cars, motorcycles, boats, airplanes, and equipment across the Philippines. Trusted listings, private and business sellers." },
-      { property: "og:title", content: "AutoTrader Philippines — Buy & Sell Vehicles" },
+      { property: "og:title", content: "365 MotorSales Philippines — Buy & Sell Vehicles" },
       { property: "og:description", content: "The Philippines' marketplace for cars, motorcycles, boats, airplanes, and equipment." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
