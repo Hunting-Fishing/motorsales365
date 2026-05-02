@@ -99,6 +99,7 @@ function MyListings() {
       toast.success(next === "pending_sale" ? "Marked as Pending Sale" : "Listing returned to Active");
       load();
     }
+  };
 
   const renew = async (id: string) => {
     const days = pricing.listing_expiry_days ?? 60;
