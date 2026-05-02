@@ -382,8 +382,16 @@ function SellPage() {
             </div>
             <div>
               <Label className="flex items-center gap-2"><VideoIcon className="h-4 w-4" />Video (max {maxVideos})</Label>
-              <Input type="file" accept="video/*" onChange={(e) => setVideo(e.target.files?.[0] ?? null)} className="mt-2" />
-              {video && <div className="mt-1 text-xs text-muted-foreground">{video.name}</div>}
+              <Input type="file" accept="video/*" onChange={handleVideo} className="mt-2" />
+              {video && (
+                <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="truncate">{video.name}</span>
+                  <button type="button" onClick={() => setVideo(null)} className="text-foreground hover:underline">Remove</button>
+                </div>
+              )}
+              {plan === "standard" && (
+                <p className="mt-1 text-xs text-muted-foreground">Standard includes 1 video. Upgrade to add up to 3.</p>
+              )}
             </div>
           </section>
 
