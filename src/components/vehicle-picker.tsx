@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/command";
 import { getMakes, type VehicleCategory } from "@/data/vehicles";
 import { fuzzyScore } from "@/lib/fuzzy";
-import { MAKE_ALIASES } from "@/lib/vehicle-aliases";
+import { MAKE_ALIASES, getModelAliases } from "@/lib/vehicle-aliases";
 
 type Props = {
   category: VehicleCategory;
@@ -221,6 +221,7 @@ export function VehiclePicker({ category, make, model, onChange }: Props) {
             searchPlaceholder="Search model…"
             emptyText="No models found"
             addLabel="Add model"
+            getKeywords={(opt) => getModelAliases(opt)}
             onSelect={(v) => onChange({ make, model: v })}
           />
         )}
