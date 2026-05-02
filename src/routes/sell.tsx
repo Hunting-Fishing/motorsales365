@@ -475,14 +475,43 @@ function SellPage() {
             <div>
               <Label className="flex items-center gap-2"><Camera className="h-4 w-4" />Photos ({photos.length}/{maxPhotos})</Label>
               <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-5">
-                {photos.map((file, i) => (
-                  <div key={i} className="relative aspect-square overflow-hidden rounded-md bg-secondary">
-                    <img src={URL.createObjectURL(file)} alt="" className="h-full w-full object-cover" />
-                    <button type="button" onClick={() => removePhoto(i)} className="absolute right-1 top-1 rounded-full bg-black/60 p-1 text-white">
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ))}
+                {photos.map((file, i) => {
+                  const u = photoUploads[i] ?? { status: "idle" as const, percent: 0 };
+                  return (
+                    <div key={i} className="relative aspect-square overflow-hidden rounded-md bg-secondary">
+                      <img src={URL.createObjectURL(file)} alt="" className="h-full w-full object-cover" />
+                      {u.status !== "done" && (
+                        <button type="button" onClick={() => removePhoto(i)} className="absolute right-1 top-1 rounded-full bg-black/60 p-1 text-white" aria-label="Remove photo">
+                          <X className="h-3 w-3" />
+                        </button>
+                      )}
+                      {u.status === "done" && (
+                        <div className="absolute right-1 top-1 rounded-full bg-emerald-600 p-1 text-white">
+                          <CheckCircle2 className="h-3 w-3" />
+                        </div>
+                      )}
+                      {u.status === "uploading" && (
+                        <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1.5">
+                          <Progress value={u.percent} className="h-1" />
+                          <div className="mt-0.5 text-center text-[10px] text-white">{u.percent}%</div>
+                        </div>
+                      )}
+                      {u.status === "error" && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-destructive/85 p-1 text-center text-[10px] text-destructive-foreground">
+                          <AlertCircle className="h-4 w-4" />
+                          <span className="line-clamp-2">{u.error ?? "Failed"}</span>
+                          <button
+                            type="button"
+                            onClick={() => retryPhoto(i)}
+                            className="inline-flex items-center gap-1 rounded bg-background/90 px-1.5 py-0.5 text-[10px] font-medium text-foreground hover:bg-background"
+                          >
+                            <RotateCw className="h-3 w-3" /> Retry
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
                 {photos.length < maxPhotos && (
                   <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-border text-muted-foreground hover:bg-secondary/50">
                     <Upload className="h-5 w-5" />
