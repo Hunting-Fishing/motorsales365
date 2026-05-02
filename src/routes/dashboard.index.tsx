@@ -86,6 +86,20 @@ function MyListings() {
     }
   };
 
+  const togglePendingSale = async (l: any) => {
+    const next = l.status === "pending_sale" ? "active" : "pending_sale";
+    const message =
+      next === "pending_sale"
+        ? "Mark this listing as Pending Sale? It stays visible and buyers can still send offers."
+        : "Cancel pending sale and return this listing to Active?";
+    if (!confirm(message)) return;
+    const { error } = await supabase.from("listings").update({ status: next }).eq("id", l.id);
+    if (error) toast.error(error.message);
+    else {
+      toast.success(next === "pending_sale" ? "Marked as Pending Sale" : "Listing returned to Active");
+      load();
+    }
+
   const renew = async (id: string) => {
     const days = pricing.listing_expiry_days ?? 60;
     const expires = new Date();
