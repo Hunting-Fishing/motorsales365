@@ -4,7 +4,9 @@ import { MapPin, Building2, User as UserIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/site-layout";
 import { Badge } from "@/components/ui/badge";
+import { VerifiedBadge } from "@/components/verified-badge";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
+import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/seller/$id")({
   component: SellerProfilePage,
@@ -31,6 +33,7 @@ function SellerProfilePage() {
           .order("created_at", { ascending: false }),
       ]);
       setProfile(p);
+      const verified = p?.verification_status === "verified";
       setListings(
         (ls ?? []).map((l: any) => {
           const photos = (l.listing_media ?? []).filter((m: any) => m.type === "photo");
@@ -47,6 +50,7 @@ function SellerProfilePage() {
             cover_url: photos[0]?.url ?? null,
             photo_count: photos.length,
             has_video: videos.length > 0,
+            seller_verified: verified,
           };
         }),
       );
@@ -97,12 +101,20 @@ function SellerProfilePage() {
                 <Badge variant={isBusiness ? "default" : "secondary"}>
                   {isBusiness ? "Business seller" : "Private seller"}
                 </Badge>
+                {profile.verification_status === "verified" && (
+                  <VerifiedBadge size="md" showLabel />
+                )}
               </div>
               {isBusiness && profile.business_address && (
                 <div className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
                   <MapPin className="h-4 w-4" />
                   {profile.business_address}
                   {location && ` · ${location}`}
+                </div>
+              )}
+              {profile.verification_status === "verified" && profile.verified_at && (
+                <div className="mt-1 text-xs text-muted-foreground">
+                  Verified business since {formatDate(profile.verified_at)}
                 </div>
               )}
               <div className="mt-2 text-sm text-muted-foreground">
