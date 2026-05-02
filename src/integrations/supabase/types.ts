@@ -303,6 +303,7 @@ export type Database = {
           business_address: string | null
           business_city: string | null
           business_hours: Json | null
+          business_kind: Database["public"]["Enums"]["business_kind"] | null
           business_lat: number | null
           business_lng: number | null
           business_logo_url: string | null
@@ -314,12 +315,15 @@ export type Database = {
           phone: string | null
           seller_type: Database["public"]["Enums"]["seller_type"]
           updated_at: string
+          verification_status: Database["public"]["Enums"]["verification_status"]
+          verified_at: string | null
         }
         Insert: {
           avatar_url?: string | null
           business_address?: string | null
           business_city?: string | null
           business_hours?: Json | null
+          business_kind?: Database["public"]["Enums"]["business_kind"] | null
           business_lat?: number | null
           business_lng?: number | null
           business_logo_url?: string | null
@@ -331,12 +335,15 @@ export type Database = {
           phone?: string | null
           seller_type?: Database["public"]["Enums"]["seller_type"]
           updated_at?: string
+          verification_status?: Database["public"]["Enums"]["verification_status"]
+          verified_at?: string | null
         }
         Update: {
           avatar_url?: string | null
           business_address?: string | null
           business_city?: string | null
           business_hours?: Json | null
+          business_kind?: Database["public"]["Enums"]["business_kind"] | null
           business_lat?: number | null
           business_lng?: number | null
           business_logo_url?: string | null
@@ -348,6 +355,8 @@ export type Database = {
           phone?: string | null
           seller_type?: Database["public"]["Enums"]["seller_type"]
           updated_at?: string
+          verification_status?: Database["public"]["Enums"]["verification_status"]
+          verified_at?: string | null
         }
         Relationships: []
       }
@@ -535,6 +544,72 @@ export type Database = {
         }
         Relationships: []
       }
+      verification_requests: {
+        Row: {
+          address: string | null
+          business_kind: Database["public"]["Enums"]["business_kind"]
+          city: string | null
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          documents: Json
+          dti_sec_registration: string | null
+          id: string
+          legal_name: string
+          region: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["verification_request_status"]
+          submitted_at: string
+          tax_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          business_kind: Database["public"]["Enums"]["business_kind"]
+          city?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          documents?: Json
+          dti_sec_registration?: string | null
+          id?: string
+          legal_name: string
+          region?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["verification_request_status"]
+          submitted_at?: string
+          tax_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          business_kind?: Database["public"]["Enums"]["business_kind"]
+          city?: string | null
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          documents?: Json
+          dti_sec_registration?: string | null
+          id?: string
+          legal_name?: string
+          region?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["verification_request_status"]
+          submitted_at?: string
+          tax_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -550,6 +625,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      business_kind: "repair_shop" | "insurance" | "dealer" | "other"
       listing_plan: "standard" | "upgraded"
       listing_status:
         | "draft"
@@ -562,6 +638,12 @@ export type Database = {
       payment_kind: "listing" | "upgrade" | "boost" | "subscription"
       payment_status: "pending" | "paid" | "failed" | "refunded"
       seller_type: "private" | "business"
+      verification_request_status:
+        | "pending"
+        | "approved"
+        | "rejected"
+        | "more_info"
+      verification_status: "unverified" | "pending" | "verified" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -690,6 +772,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      business_kind: ["repair_shop", "insurance", "dealer", "other"],
       listing_plan: ["standard", "upgraded"],
       listing_status: [
         "draft",
@@ -703,6 +786,13 @@ export const Constants = {
       payment_kind: ["listing", "upgrade", "boost", "subscription"],
       payment_status: ["pending", "paid", "failed", "refunded"],
       seller_type: ["private", "business"],
+      verification_request_status: [
+        "pending",
+        "approved",
+        "rejected",
+        "more_info",
+      ],
+      verification_status: ["unverified", "pending", "verified", "rejected"],
     },
   },
 } as const
