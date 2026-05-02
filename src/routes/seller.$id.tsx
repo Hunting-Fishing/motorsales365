@@ -26,7 +26,7 @@ function SellerProfilePage() {
         supabase
           .from("listings")
           .select(
-            "id,title,price_php,region,city,seller_type,boost_until,category_slug,listing_media(url,type)",
+            "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,listing_media(url,type)",
           )
           .eq("user_id", id)
           .in("status", ["active","pending_sale"])
