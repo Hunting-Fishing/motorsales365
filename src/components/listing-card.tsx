@@ -17,6 +17,7 @@ export interface ListingCardData {
   has_video?: boolean;
   category_slug: string;
   seller_verified?: boolean;
+  status?: string;
 }
 
 export function ListingCard({ listing }: { listing: ListingCardData }) {
