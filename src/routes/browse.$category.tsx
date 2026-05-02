@@ -13,11 +13,13 @@ import { Button } from "@/components/ui/button";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { PH_REGIONS } from "@/lib/format";
+import { LocationPicker } from "@/components/location-picker";
 
 const searchSchema = z.object({
   q: z.string().optional(),
   region: z.string().optional(),
+  province: z.string().optional(),
+  city: z.string().optional(),
   min: z.coerce.number().optional(),
   max: z.coerce.number().optional(),
   sort: z.enum(["recent", "price_asc", "price_desc"]).optional(),
