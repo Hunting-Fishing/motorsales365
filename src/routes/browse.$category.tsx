@@ -59,7 +59,7 @@ function BrowsePage() {
       let q = supabase
         .from("listings")
         .select("id,title,price_php,region,city,seller_type,boost_until,category_slug,user_id,listing_media(url,type),profiles:user_id(verification_status)")
-        .eq("status", "active")
+        .in("status", ["active","pending_sale"])
         .eq("category_slug", category);
 
       if (search.q) q = q.ilike("title", `%${search.q}%`);

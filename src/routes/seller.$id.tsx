@@ -29,7 +29,7 @@ function SellerProfilePage() {
             "id,title,price_php,region,city,seller_type,boost_until,category_slug,listing_media(url,type)",
           )
           .eq("user_id", id)
-          .eq("status", "active")
+          .in("status", ["active","pending_sale"])
           .order("created_at", { ascending: false }),
       ]);
       setProfile(p);
