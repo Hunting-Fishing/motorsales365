@@ -1048,3 +1048,41 @@ export const MOTORCYCLE_MAKES: MakeModels[] = [
 export function getMakes(category: VehicleCategory): MakeModels[] {
   return category === "motorcycle" ? MOTORCYCLE_MAKES : CAR_MAKES;
 }
+
+/** Models for the given make filtered by year (unmapped models stay visible). */
+export function getModelsForYear(
+  category: VehicleCategory,
+  make: string,
+  year: number | undefined,
+): string[] {
+  const found = getMakes(category).find(
+    (m) => m.make.toLowerCase() === make.toLowerCase(),
+  );
+  if (!found) return [];
+  if (!year) return found.models;
+  return found.models.filter((m) => modelMatchesYear(category, make, m, year));
+}
+
+/** Makes that have ≥1 model available in the given year. Unmapped makes always pass. */
+export function getMakesForYear(
+  category: VehicleCategory,
+  year: number | undefined,
+): MakeModels[] {
+  const makes = getMakes(category);
+  if (!year) return makes;
+  const map = getModelYears(category);
+  const mappedMakeKeys = new Set(Object.keys(map).map((k) => k.toLowerCase()));
+  return makes.filter((m) => {
+    if (!mappedMakeKeys.has(m.make.toLowerCase())) return true; // unmapped → keep
+    return m.models.some((mod) => modelMatchesYear(category, m.make, mod, year));
+  });
+}
+
+/** Year-dropdown options (newest first, down to 1980). */
+export function getYearOptions(): number[] {
+  const current = new Date().getFullYear();
+  const next = current + 1;
+  const years: number[] = [];
+  for (let y = next; y >= 1980; y--) years.push(y);
+  return years;
+}
