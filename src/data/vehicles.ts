@@ -148,9 +148,39 @@ export const CAR_MAKES: MakeModels[] = [
   { make: "GAC", models: ["GS3", "GS4", "GS8", "Empow", "M8"] },
   { make: "Hongqi", models: ["H5", "H9", "HS5", "E-HS9"] },
 
+  { make: "Bestune", models: ["T55", "T77", "T90", "B70"] },
+  { make: "Changhe", models: ["M50", "Freedom"] },
+  { make: "DFSK", models: ["Glory 500", "Glory 580", "Glory 600", "Glory iX5", "Super Cab", "Mini Truck", "C31", "C35"] },
+  { make: "Deepal", models: ["S07", "S05", "L07", "G318"] },
+  { make: "DENZA", models: ["D9", "N7", "N9", "Z9 GT"] },
+  { make: "FAW", models: ["Bestune T77", "Sirius S80", "Bestune B30", "V80", "Tiger V"] },
+  { make: "Haima", models: ["S5", "7X", "8S"] },
+  { make: "JETOUR", models: ["Dashing", "X70", "X70 Plus", "X90", "X95", "T2"] },
+  { make: "Jaecoo", models: ["J7", "J8"] },
+  { make: "Kaicene", models: ["F70", "Star Truck", "Star 9"] },
+  { make: "Kaiyi", models: ["X3 Pro", "E5", "X3"] },
+  { make: "KG Mobility", models: ["Tivoli", "Korando", "Torres", "Rexton", "Musso"] },
+  { make: "King Long", models: ["Kingo", "Kingwin", "Sea Lion"] },
+  { make: "Li Auto", models: ["L6", "L7", "L8", "L9", "Mega"] },
+  { make: "Lynk & Co", models: ["01", "03", "05", "06", "09"] },
+  { make: "Omoda", models: ["Omoda 5", "Omoda E5", "Omoda C7", "Omoda C9"] },
+  { make: "RADAR", models: ["RD6"] },
+  { make: "VinFast", models: ["VF 3", "VF 5", "VF 6", "VF 7", "VF 8", "VF 9", "VF e34"] },
+  { make: "Voyah", models: ["Free", "Dream", "Courage", "Passion"] },
+  { make: "ZEEKR", models: ["001", "007", "009", "X", "Mix"] },
+
   // ---------- Indian ----------
-  { make: "Tata", models: ["Nexon", "Punch", "Tiago", "Harrier", "Safari", "Xpres-T"] },
-  { make: "Mahindra", models: ["Scorpio", "Scorpio-N", "XUV300", "XUV700", "Bolero", "Thar", "Pik Up"] },
+  { make: "Tata", models: ["Nexon", "Punch", "Tiago", "Tigor", "Altroz", "Harrier", "Safari", "Xpres-T", "Ace"] },
+  { make: "Mahindra", models: ["Scorpio", "Scorpio-N", "XUV300", "XUV400", "XUV700", "Bolero", "Bolero Neo", "Thar", "Thar Roxx", "Pik Up", "Marazzo", "Enforcer"] },
+
+  // ---------- Italian / British (niche) ----------
+  { make: "Abarth", models: ["595", "695", "500e"] },
+  { make: "Chrysler", models: ["300", "Pacifica"] },
+  { make: "Aston Martin", models: ["Vantage", "DB11", "DB12", "DBS", "DBX"] },
+
+  // ---------- New PH-market EV brands ----------
+  { make: "Aito", models: ["M5", "M7", "M9"] },
+  { make: "GAZ", models: ["Gazelle Next", "Sobol"] },
 
   // ---------- Other ----------
   { make: "Other", models: ["Other"] },
