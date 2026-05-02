@@ -32,13 +32,13 @@ export const CAR_MAKES: MakeModels[] = [
   {
     make: "Honda",
     models: [
-      "Brio", "Brio Amaze", "City", "City Hatchback", "City RS", "Civic", "Civic Type R", "Civic Hybrid",
-      "Civic Si", "Civic Hatchback", "Accord", "Accord Hybrid",
-      "BR-V", "WR-V", "HR-V", "CR-V", "ZR-V", "Pilot", "Passport", "Odyssey", "Mobilio", "Stream",
-      "Fit", "Jazz", "Fit / Jazz", "Stepwgn", "Freed", "e:N1", "Insight", "FR-V", "Edix",
-      "Integra", "Prelude", "S2000", "NSX", "Beat", "S660",
-      "Vezel", "Shuttle", "Crosstour", "Element", "Ridgeline", "CR-Z",
-      "Legend", "City ZX", "City SX-8", "Civic VTi", "Civic SiR",
+      "Brio", "Brio Amaze", "Brio RS", "City", "City Hatchback", "City RS", "City Hybrid", "City Aspire", "Civic", "Civic Type R", "Civic Hybrid", "Civic e:HEV",
+      "Civic Si", "Civic Hatchback", "Civic Coupe", "Civic Tourer", "Civic Ferio", "Civic EK9", "Civic EG", "Civic EF", "Accord", "Accord Hybrid", "Accord Coupe", "Accord Tourer", "Accord Euro",
+      "BR-V", "WR-V", "HR-V", "HR-V e:HEV", "CR-V", "CR-V Hybrid", "ZR-V", "Pilot", "Pilot TrailSport", "Passport", "Odyssey", "Mobilio", "Stream", "Capa",
+      "Fit", "Fit Hybrid", "Jazz", "Fit / Jazz", "Stepwgn", "Freed", "Freed Hybrid", "e:N1", "e:NS1", "e:NP1", "Insight", "FR-V", "Edix", "Airwave", "Partner",
+      "Integra", "Integra Type R", "Prelude", "S2000", "NSX", "NSX Type S", "Beat", "S660", "S800", "Today",
+      "Vezel", "Vezel Hybrid", "Shuttle", "Crosstour", "Element", "Ridgeline", "CR-Z", "Crossroad", "Avancier", "UR-V",
+      "Legend", "Inspire", "Saber", "Vigor", "City ZX", "City SX-8", "Civic VTi", "Civic SiR", "Acty", "N-Box", "N-One", "N-WGN", "N-Van",
     ],
   },
   {
