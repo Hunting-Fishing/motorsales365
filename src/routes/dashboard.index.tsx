@@ -1,11 +1,21 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Star, Eye, Rocket, RefreshCcw, CheckCircle2, Edit } from "lucide-react";
+import { Plus, Trash2, Star, Eye, Rocket, RefreshCcw, CheckCircle2, Edit, Undo2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { formatPHP, formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/dashboard/")({
@@ -17,6 +27,7 @@ function MyListings() {
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [pricing, setPricing] = useState<Record<string, number>>({});
+  const [soldTarget, setSoldTarget] = useState<{ id: string; title: string } | null>(null);
 
   const load = async () => {
     if (!user) return;
@@ -49,12 +60,28 @@ function MyListings() {
     }
   };
 
-  const markSold = async (id: string) => {
-    if (!confirm("Mark this listing as sold?")) return;
-    const { error } = await supabase.from("listings").update({ status: "sold" }).eq("id", id);
+  const confirmMarkSold = async () => {
+    if (!soldTarget) return;
+    const { error } = await supabase.from("listings").update({ status: "sold" }).eq("id", soldTarget.id);
     if (error) toast.error(error.message);
     else {
       toast.success("Marked as sold");
+      load();
+    }
+    setSoldTarget(null);
+  };
+
+  const undoSold = async (id: string) => {
+    const days = pricing.listing_expiry_days ?? 60;
+    const expires = new Date();
+    expires.setDate(expires.getDate() + days);
+    const { error } = await supabase
+      .from("listings")
+      .update({ status: "active", expires_at: expires.toISOString() })
+      .eq("id", id);
+    if (error) toast.error(error.message);
+    else {
+      toast.success("Listing restored to active");
       load();
     }
   };
@@ -195,9 +222,23 @@ function MyListings() {
                   <Button variant="outline" size="sm" onClick={() => renew(l.id)} title="Renew">
                     <RefreshCcw className="h-4 w-4" />
                   </Button>
-                  {l.status !== "sold" && (
-                    <Button variant="outline" size="sm" onClick={() => markSold(l.id)} title="Mark sold">
+                  {l.status !== "sold" ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setSoldTarget({ id: l.id, title: l.title })}
+                      title="Mark sold"
+                    >
                       <CheckCircle2 className="h-4 w-4" />
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => undoSold(l.id)}
+                      title="Undo sold — restore to active"
+                    >
+                      <Undo2 className="h-4 w-4" />
                     </Button>
                   )}
                   <Button variant="outline" size="sm" onClick={() => remove(l.id)} title="Delete">
@@ -209,6 +250,26 @@ function MyListings() {
           })}
         </div>
       )}
+
+      <AlertDialog open={!!soldTarget} onOpenChange={(open) => !open && setSoldTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm this item is sold</AlertDialogTitle>
+            <AlertDialogDescription>
+              {soldTarget ? (
+                <>
+                  Mark <span className="font-semibold text-foreground">"{soldTarget.title}"</span> as sold? It
+                  will be removed from the active market. You can undo this later if the sale doesn't complete.
+                </>
+              ) : null}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmMarkSold}>Yes, mark as sold</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
