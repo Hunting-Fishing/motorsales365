@@ -50,7 +50,7 @@ function SellerProfilePage() {
             cover_url: photos[0]?.url ?? null,
             photo_count: photos.length,
             has_video: videos.length > 0,
-            seller_verified: verified, status: r.status,
+            seller_verified: verified, status: l.status,
           };
         }),
       );
