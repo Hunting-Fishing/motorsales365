@@ -15,6 +15,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { formatPHP } from "@/lib/format";
 import { LocationPicker } from "@/components/location-picker";
+import { VehiclePicker } from "@/components/vehicle-picker";
 
 export const Route = createFileRoute("/sell")({
   component: SellPage,
