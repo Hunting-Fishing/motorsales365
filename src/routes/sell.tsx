@@ -94,7 +94,9 @@ function SellPage() {
     try {
       const attributes: Record<string, any> = {};
       if (year) attributes.year = year;
-      if (makeModel) attributes.make_model = makeModel;
+      if (make) attributes.make = make;
+      if (model) attributes.model = model;
+      if (make || model) attributes.make_model = [make, model].filter(Boolean).join(" ");
       if (mileage) attributes.mileage_km = mileage;
       if (transmission) attributes.transmission = transmission;
       if (fuel) attributes.fuel = fuel;
