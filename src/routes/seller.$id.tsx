@@ -31,6 +31,7 @@ function SellerProfilePage() {
           .order("created_at", { ascending: false }),
       ]);
       setProfile(p);
+      const verified = p?.verification_status === "verified";
       setListings(
         (ls ?? []).map((l: any) => {
           const photos = (l.listing_media ?? []).filter((m: any) => m.type === "photo");
@@ -47,6 +48,7 @@ function SellerProfilePage() {
             cover_url: photos[0]?.url ?? null,
             photo_count: photos.length,
             has_video: videos.length > 0,
+            seller_verified: verified,
           };
         }),
       );
