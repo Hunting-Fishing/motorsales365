@@ -27,6 +27,7 @@ function MyListings() {
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [pricing, setPricing] = useState<Record<string, number>>({});
+  const [soldTarget, setSoldTarget] = useState<{ id: string; title: string } | null>(null);
 
   const load = async () => {
     if (!user) return;
