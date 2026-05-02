@@ -238,6 +238,16 @@ function MyListings() {
                   <Button variant="outline" size="sm" onClick={() => renew(l.id)} title="Renew">
                     <RefreshCcw className="h-4 w-4" />
                   </Button>
+                  {l.status !== "sold" && (
+                    <Button
+                      variant={l.status === "pending_sale" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => togglePendingSale(l)}
+                      title={l.status === "pending_sale" ? "Cancel pending sale" : "Mark as pending sale"}
+                    >
+                      <Clock className="h-4 w-4" />
+                    </Button>
+                  )}
                   {l.status !== "sold" ? (
                     <Button
                       variant="outline"
