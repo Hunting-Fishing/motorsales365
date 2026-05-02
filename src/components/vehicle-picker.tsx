@@ -220,6 +220,7 @@ export function VehiclePicker({ category, make, model, onChange }: Props) {
             placeholder={make ? "Select model" : "Pick a make first"}
             searchPlaceholder="Search model…"
             emptyText="No models found"
+            addLabel="Add model"
             onSelect={(v) => onChange({ make, model: v })}
           />
         )}
