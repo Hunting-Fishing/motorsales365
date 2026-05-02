@@ -99,24 +99,107 @@ function SellPage() {
           : `Up to ${maxPhotos} photos allowed. ${overflow} photo(s) skipped.`,
       );
     }
-    const next = [...photos, ...files].slice(0, maxPhotos);
-    setPhotos(next);
-    // Allow re-selecting the same files after a blocked attempt.
+    const accepted = files.slice(0, Math.max(remaining, 0));
+    setPhotos((p) => [...p, ...accepted].slice(0, maxPhotos));
+    setPhotoUploads((u) => [
+      ...u,
+      ...accepted.map(() => ({ status: "idle" as const, percent: 0 })),
+    ].slice(0, maxPhotos));
     e.target.value = "";
   };
 
-  const removePhoto = (i: number) => setPhotos(photos.filter((_, idx) => idx !== i));
+  const removePhoto = (i: number) => {
+    setPhotos((p) => p.filter((_, idx) => idx !== i));
+    setPhotoUploads((u) => u.filter((_, idx) => idx !== i));
+  };
 
   const handleVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
-    if (!file) { setVideo(null); return; }
+    if (!file) {
+      setVideo(null);
+      setVideoUpload({ status: "idle", percent: 0 });
+      return;
+    }
     if (maxVideos < 1) {
       toast.error("Videos are not included in this plan.");
       e.target.value = "";
       return;
     }
     setVideo(file);
+    setVideoUpload({ status: "idle", percent: 0 });
   };
+
+  const removeVideo = () => {
+    setVideo(null);
+    setVideoUpload({ status: "idle", percent: 0 });
+  };
+
+  const setPhotoState = (i: number, patch: Partial<UploadState>) => {
+    setPhotoUploads((u) => u.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
+  };
+
+  const uploadOnePhoto = async (i: number, file: File, lid: string) => {
+    setPhotoState(i, { status: "uploading", percent: 0, error: undefined });
+    try {
+      const path = `${user!.id}/${lid}/${Date.now()}-${i}-${file.name}`;
+      const { publicUrl } = await uploadWithRetry({
+        bucket: "listing-photos",
+        path,
+        file,
+        contentType: file.type || "image/jpeg",
+        onProgress: (e) => setPhotoState(i, { percent: e.percent }),
+      });
+      setPhotoState(i, { status: "done", percent: 100, url: publicUrl, path });
+      await supabase.from("listing_media").insert({
+        listing_id: lid,
+        type: "photo",
+        url: publicUrl,
+        storage_path: path,
+        sort_order: i,
+      });
+      return true;
+    } catch (err: any) {
+      setPhotoState(i, { status: "error", error: err?.message ?? "Upload failed" });
+      return false;
+    }
+  };
+
+  const uploadVideo = async (file: File, lid: string) => {
+    setVideoUpload({ status: "uploading", percent: 0 });
+    try {
+      const path = `${user!.id}/${lid}/${Date.now()}-${file.name}`;
+      const { publicUrl } = await uploadWithRetry({
+        bucket: "listing-videos",
+        path,
+        file,
+        contentType: file.type || "video/mp4",
+        onProgress: (e) => setVideoUpload((s) => ({ ...s, percent: e.percent })),
+      });
+      setVideoUpload({ status: "done", percent: 100, url: publicUrl, path });
+      await supabase.from("listing_media").insert({
+        listing_id: lid,
+        type: "video",
+        url: publicUrl,
+        storage_path: path,
+        sort_order: 0,
+      });
+      return true;
+    } catch (err: any) {
+      setVideoUpload((s) => ({ ...s, status: "error", error: err?.message ?? "Upload failed" }));
+      return false;
+    }
+  };
+
+  const retryPhoto = async (i: number) => {
+    if (!listingId || !photos[i]) return;
+    await uploadOnePhoto(i, photos[i], listingId);
+  };
+
+  const retryVideo = async () => {
+    if (!listingId || !video) return;
+    await uploadVideo(video, listingId);
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
