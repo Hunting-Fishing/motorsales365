@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { LocationPicker } from "@/components/location-picker";
 
 export const Route = createFileRoute("/dashboard/profile")({
   component: ProfilePage,
@@ -69,6 +70,25 @@ function ProfilePage() {
             <div>
               <Label>Business address</Label>
               <Input value={profile.business_address ?? ""} onChange={(e) => setProfile({ ...profile, business_address: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label className="block">Business location</Label>
+              <p className="text-xs text-muted-foreground">Based on the official PSA Philippine Standard Geographic Code.</p>
+              <LocationPicker
+                value={{
+                  region: profile.business_region ?? null,
+                  province: profile.business_province ?? null,
+                  city: profile.business_city ?? null,
+                  barangay: profile.business_barangay ?? null,
+                }}
+                onChange={(v) => setProfile({
+                  ...profile,
+                  business_region: v.region ?? null,
+                  business_province: v.province ?? null,
+                  business_city: v.city ?? null,
+                  business_barangay: v.barangay ?? null,
+                })}
+              />
             </div>
           </>
         )}
