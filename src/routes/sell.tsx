@@ -15,6 +15,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { formatPHP } from "@/lib/format";
 import { LocationPicker } from "@/components/location-picker";
+import { VehiclePicker } from "@/components/vehicle-picker";
 
 export const Route = createFileRoute("/sell")({
   component: SellPage,
@@ -46,7 +47,8 @@ function SellPage() {
   const [sellerType, setSellerType] = useState<"private" | "business">("private");
   const [plan, setPlan] = useState<"standard" | "upgraded">("standard");
   const [year, setYear] = useState("");
-  const [makeModel, setMakeModel] = useState("");
+  const [make, setMake] = useState("");
+  const [model, setModel] = useState("");
   const [mileage, setMileage] = useState("");
   const [transmission, setTransmission] = useState("");
   const [fuel, setFuel] = useState("");
@@ -92,7 +94,9 @@ function SellPage() {
     try {
       const attributes: Record<string, any> = {};
       if (year) attributes.year = year;
-      if (makeModel) attributes.make_model = makeModel;
+      if (make) attributes.make = make;
+      if (model) attributes.model = model;
+      if (make || model) attributes.make_model = [make, model].filter(Boolean).join(" ");
       if (mileage) attributes.mileage_km = mileage;
       if (transmission) attributes.transmission = transmission;
       if (fuel) attributes.fuel = fuel;
@@ -211,9 +215,32 @@ function SellPage() {
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Details</h2>
+            {(category === "car" || category === "motorcycle") ? (
+              <div className="space-y-4">
+                <VehiclePicker
+                  category={category as "car" | "motorcycle"}
+                  make={make}
+                  model={model}
+                  onChange={(v) => { setMake(v.make); setModel(v.model); }}
+                />
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div><Label>Year</Label><Input value={year} onChange={(e) => setYear(e.target.value)} placeholder="e.g. 2019" /></div>
+                </div>
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label>Make / Brand</Label>
+                  <Input value={make} onChange={(e) => setMake(e.target.value)} />
+                </div>
+                <div>
+                  <Label>Model</Label>
+                  <Input value={model} onChange={(e) => setModel(e.target.value)} />
+                </div>
+                <div><Label>Year</Label><Input value={year} onChange={(e) => setYear(e.target.value)} /></div>
+              </div>
+            )}
             <div className="grid gap-4 sm:grid-cols-2">
-              <div><Label>Make & model</Label><Input value={makeModel} onChange={(e) => setMakeModel(e.target.value)} /></div>
-              <div><Label>Year</Label><Input value={year} onChange={(e) => setYear(e.target.value)} /></div>
               {(category === "car" || category === "motorcycle") && (
                 <>
                   <div><Label>Mileage (km)</Label><Input value={mileage} onChange={(e) => setMileage(e.target.value)} /></div>
