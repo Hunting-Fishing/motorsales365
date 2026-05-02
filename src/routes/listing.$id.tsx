@@ -201,6 +201,19 @@ function ListingDetailPage() {
             )}
           </div>
 
+          {listing.status === "pending_sale" && (
+            <div className="mt-6 flex items-start gap-3 rounded-xl border border-warning/40 bg-warning/10 p-4">
+              <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-warning/20 text-warning-foreground">⏳</span>
+              <div className="text-sm">
+                <div className="font-semibold text-foreground">Pending Sale</div>
+                <p className="text-muted-foreground">
+                  The seller is finalizing a sale on this vehicle. You can still send a message or make a backup
+                  offer — the listing will return to active if the deal doesn't go through.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Title block */}
           <div className="mt-6 flex flex-wrap items-start justify-between gap-4">
             <div>
