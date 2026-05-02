@@ -44,6 +44,12 @@ function AdminPricing() {
     await supabase.from("promotions").update({ active }).eq("id", id); load();
   };
 
+  const runPendingCleanup = async () => {
+    const { data, error } = await supabase.rpc("expire_stale_pending_sales");
+    if (error) toast.error(error.message);
+    else toast.success(`Restored ${data ?? 0} stale Pending Sale listing(s) to Active.`);
+  };
+
   return (
     <div className="space-y-8">
       <div>
@@ -52,7 +58,12 @@ function AdminPricing() {
       </div>
 
       <section className="rounded-xl border border-border bg-card p-6">
-        <h2 className="mb-4 font-display text-lg font-semibold">Listing fees</h2>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-display text-lg font-semibold">Listing fees & rules</h2>
+          <Button variant="outline" size="sm" onClick={runPendingCleanup}>
+            Run pending-sale cleanup
+          </Button>
+        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           {settings.map((s) => (
             <div key={s.key}>
