@@ -47,7 +47,8 @@ function SellPage() {
   const [sellerType, setSellerType] = useState<"private" | "business">("private");
   const [plan, setPlan] = useState<"standard" | "upgraded">("standard");
   const [year, setYear] = useState("");
-  const [makeModel, setMakeModel] = useState("");
+  const [make, setMake] = useState("");
+  const [model, setModel] = useState("");
   const [mileage, setMileage] = useState("");
   const [transmission, setTransmission] = useState("");
   const [fuel, setFuel] = useState("");
