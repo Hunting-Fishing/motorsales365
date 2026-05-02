@@ -89,11 +89,11 @@ export function LocationPicker({
             <SelectValue placeholder={
               !value.region ? "Pick a region first" :
               cities.length === 0 ? "Pick a province first" :
-              "Select city"
+              asFilter ? "All cities" : "Select city"
             } />
           </SelectTrigger>
           <SelectContent className="max-h-72">
-            {asFilter && cities.length > 0 && <SelectItem value={ALL}>All cities</SelectItem>}
+            {asFilter && value.city && cities.length > 0 && <SelectItem value={ALL}>All cities</SelectItem>}
             {cities.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
           </SelectContent>
         </Select>
