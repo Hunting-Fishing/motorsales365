@@ -41,15 +41,15 @@ export function LocationPicker({
       <div>
         <Label>Region</Label>
         <Select
-          value={value.region ?? (asFilter ? ALL : undefined)}
+          value={value.region ?? undefined}
           onValueChange={(v) => onChange({
             region: v === ALL ? null : v,
             province: null, city: null, barangay: value.barangay ?? null,
           })}
         >
-          <SelectTrigger><SelectValue placeholder="Select region" /></SelectTrigger>
+          <SelectTrigger><SelectValue placeholder={asFilter ? "All regions" : "Select region"} /></SelectTrigger>
           <SelectContent className="max-h-72">
-            {asFilter && <SelectItem value={ALL}>All regions</SelectItem>}
+            {asFilter && value.region && <SelectItem value={ALL}>All regions</SelectItem>}
             {regionOpts.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
           </SelectContent>
         </Select>
@@ -58,7 +58,7 @@ export function LocationPicker({
       <div>
         <Label>Province</Label>
         <Select
-          value={value.province ?? (asFilter ? ALL : undefined)}
+          value={value.province ?? undefined}
           disabled={!value.region || provinces.length === 0}
           onValueChange={(v) => onChange({
             ...value, province: v === ALL ? null : v, city: null,
@@ -68,11 +68,11 @@ export function LocationPicker({
             <SelectValue placeholder={
               !value.region ? "Pick a region first" :
               provinces.length === 0 ? "No provinces (HUC/NCR)" :
-              "Select province"
+              asFilter ? "All provinces" : "Select province"
             } />
           </SelectTrigger>
           <SelectContent className="max-h-72">
-            {asFilter && provinces.length > 0 && <SelectItem value={ALL}>All provinces</SelectItem>}
+            {asFilter && value.province && provinces.length > 0 && <SelectItem value={ALL}>All provinces</SelectItem>}
             {provinces.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
           </SelectContent>
         </Select>
@@ -81,7 +81,7 @@ export function LocationPicker({
       <div>
         <Label>City / Municipality</Label>
         <Select
-          value={value.city ?? (asFilter ? ALL : undefined)}
+          value={value.city ?? undefined}
           disabled={!value.region || cities.length === 0}
           onValueChange={(v) => onChange({ ...value, city: v === ALL ? null : v })}
         >
