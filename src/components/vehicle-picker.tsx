@@ -34,6 +34,7 @@ function Combo({
   emptyText,
   disabled,
   allowCustom = true,
+  getKeywords,
 }: {
   value: string;
   options: string[];
@@ -43,6 +44,7 @@ function Combo({
   emptyText: string;
   disabled?: boolean;
   allowCustom?: boolean;
+  getKeywords?: (option: string) => string[];
 }) {
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState("");
