@@ -13,7 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { PH_REGIONS, formatDate } from "@/lib/format";
+import { formatDate } from "@/lib/format";
+import { LocationPicker } from "@/components/location-picker";
 
 export const Route = createFileRoute("/dashboard/verification")({
   component: VerificationPage,
@@ -35,7 +36,9 @@ const formSchema = z.object({
   contact_email: z.string().trim().email("Invalid email").max(255).optional().or(z.literal("")),
   address: z.string().trim().max(300).optional().or(z.literal("")),
   region: z.string().optional().or(z.literal("")),
+  province: z.string().optional().or(z.literal("")),
   city: z.string().trim().max(100).optional().or(z.literal("")),
+  barangay: z.string().trim().max(100).optional().or(z.literal("")),
 });
 
 type DocItem = { path: string; name: string };
@@ -286,29 +289,22 @@ function VerificationPage() {
           />
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div>
-            <Label>Region</Label>
-            <Select
-              value={form.region}
-              onValueChange={(v) => setForm({ ...form, region: v })}
-              disabled={!canEdit}
-            >
-              <SelectTrigger><SelectValue placeholder="Select region" /></SelectTrigger>
-              <SelectContent>
-                {PH_REGIONS.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <Label>City / Municipality</Label>
-            <Input
-              value={form.city}
-              onChange={(e) => setForm({ ...form, city: e.target.value })}
-              disabled={!canEdit}
-              maxLength={100}
-            />
-          </div>
+        <div className={canEdit ? "" : "pointer-events-none opacity-60"}>
+          <LocationPicker
+            value={{
+              region: form.region || null,
+              province: form.province || null,
+              city: form.city || null,
+              barangay: form.barangay || null,
+            }}
+            onChange={(v) => setForm({
+              ...form,
+              region: v.region ?? "",
+              province: v.province ?? "",
+              city: v.city ?? "",
+              barangay: v.barangay ?? "",
+            })}
+          />
         </div>
 
         <div>
