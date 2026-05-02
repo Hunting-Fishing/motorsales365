@@ -288,8 +288,25 @@ export const CAR_MAKES: MakeModels[] = [
   { make: "Lucid", models: ["Air", "Gravity"] },
 
   // ---------- Other PH-market specialty ----------
-  { make: "GAZ", models: ["Gazelle Next", "Gazelle Business", "Sobol", "Sadko", "Volga"] },
+  { make: "GAZ", models: ["Gazelle Next", "Gazelle Business", "Sobol", "Sadko", "Volga", "Tigr", "Siber"] },
   { make: "Haier", models: ["Brio"] },
+  { make: "UAZ", models: ["Patriot", "Hunter", "Pickup", "Cargo", "Bukhanka", "Profi"] },
+  { make: "Lada", models: ["Niva", "Niva Travel", "Granta", "Vesta", "Vesta SW", "Largus", "4x4", "Kalina", "Priora", "Samara"] },
+  { make: "Daihatsu", models: ["Terios", "Rocky", "Charade", "Mira", "Move", "Tanto", "Hijet", "Copen", "Sirion", "Boon", "Materia", "Atrai"] },
+  { make: "Datsun", models: ["GO", "GO+", "redi-GO", "Cross", "240Z", "260Z", "280Z", "510", "1200", "Sunny"] },
+  { make: "Pontiac", models: ["G6", "G8", "GTO", "Solstice", "Vibe", "Firebird", "Trans Am", "Bonneville", "Grand Prix", "Sunfire", "Aztek"] },
+  { make: "Saturn", models: ["Ion", "Aura", "Vue", "Sky", "Astra", "Outlook"] },
+  { make: "Hummer", models: ["H1", "H2", "H3", "H3T", "EV"] },
+  { make: "Saab", models: ["9-3", "9-5", "9-7X", "900", "9000"] },
+  { make: "Skoda", models: ["Fabia", "Octavia", "Octavia RS", "Superb", "Kamiq", "Karoq", "Kodiaq", "Kodiaq RS", "Scala", "Enyaq", "Enyaq Coupe", "Slavia", "Kushaq"] },
+  { make: "Seat", models: ["Ibiza", "Leon", "Leon Cupra", "Arona", "Ateca", "Tarraco", "Toledo", "Alhambra", "Mii"] },
+  { make: "Cupra", models: ["Leon", "Formentor", "Born", "Ateca", "Tavascan", "Terramar"] },
+  { make: "Opel", models: ["Astra", "Corsa", "Insignia", "Mokka", "Crossland", "Grandland", "Combo", "Vivaro", "Movano", "Zafira"] },
+  { make: "Vauxhall", models: ["Astra", "Corsa", "Insignia", "Mokka", "Crossland", "Grandland", "Combo", "Vivaro", "Zafira"] },
+  { make: "Dacia", models: ["Sandero", "Logan", "Duster", "Jogger", "Spring", "Bigster"] },
+  { make: "Holden", models: ["Commodore", "Monaro", "Astra", "Cruze", "Captiva", "Colorado", "Trailblazer", "Ute"] },
+  { make: "Proton", models: ["Saga", "Persona", "Iriz", "X50", "X70", "X90", "Exora", "Preve", "Inspira", "Wira"] },
+  { make: "Perodua", models: ["Myvi", "Axia", "Bezza", "Aruz", "Ativa", "Alza", "Kancil", "Kelisa", "Kembara", "Kenari", "Viva"] },
 
   // ---------- Other ----------
   { make: "Other", models: ["Other"] },
