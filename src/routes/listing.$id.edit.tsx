@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { PH_REGIONS } from "@/lib/format";
+import { LocationPicker } from "@/components/location-picker";
 
 export const Route = createFileRoute("/listing/$id/edit")({
   component: EditListingPage,
@@ -29,8 +29,10 @@ function EditListingPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [region, setRegion] = useState(PH_REGIONS[0]);
-  const [city, setCity] = useState("");
+  const [region, setRegion] = useState<string | null>(null);
+  const [province, setProvince] = useState<string | null>(null);
+  const [city, setCity] = useState<string | null>(null);
+  const [barangay, setBarangay] = useState<string | null>(null);
   const [condition, setCondition] = useState("Used");
   const [phone, setPhone] = useState("");
   const [allowMessages, setAllowMessages] = useState(true);
@@ -56,8 +58,10 @@ function EditListingPage() {
     setTitle(l.title ?? "");
     setDescription(l.description ?? "");
     setPrice(String(l.price_php ?? ""));
-    setRegion(l.region ?? PH_REGIONS[0]);
-    setCity(l.city ?? "");
+    setRegion(l.region ?? null);
+    setProvince(l.province ?? null);
+    setCity(l.city ?? null);
+    setBarangay(l.barangay ?? null);
     setCondition(l.condition ?? "Used");
     setPhone(l.contact_phone ?? "");
     setAllowMessages(l.allow_messages);
@@ -86,7 +90,9 @@ function EditListingPage() {
         description,
         price_php: Number(price),
         region,
+        province,
         city,
+        barangay,
         condition,
         contact_phone: phone || null,
         allow_messages: allowMessages,
@@ -192,20 +198,16 @@ function EditListingPage() {
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Location & contact</h2>
+            <LocationPicker
+              value={{ region, province, city, barangay }}
+              onChange={(v) => {
+                setRegion(v.region ?? null);
+                setProvince(v.province ?? null);
+                setCity(v.city ?? null);
+                setBarangay(v.barangay ?? null);
+              }}
+            />
             <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <Label>Region</Label>
-                <Select value={region} onValueChange={setRegion}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {PH_REGIONS.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>City</Label>
-                <Input value={city} onChange={(e) => setCity(e.target.value)} />
-              </div>
               <div>
                 <Label>Contact phone</Label>
                 <Input value={phone} onChange={(e) => setPhone(e.target.value)} />

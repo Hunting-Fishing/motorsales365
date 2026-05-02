@@ -13,7 +13,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { PH_REGIONS, formatPHP } from "@/lib/format";
+import { formatPHP } from "@/lib/format";
+import { LocationPicker } from "@/components/location-picker";
 
 export const Route = createFileRoute("/sell")({
   component: SellPage,
@@ -36,8 +37,10 @@ function SellPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [region, setRegion] = useState(PH_REGIONS[0]);
-  const [city, setCity] = useState("");
+  const [region, setRegion] = useState<string | null>(null);
+  const [province, setProvince] = useState<string | null>(null);
+  const [city, setCity] = useState<string | null>(null);
+  const [barangay, setBarangay] = useState<string | null>(null);
   const [condition, setCondition] = useState("Used");
   const [phone, setPhone] = useState("");
   const [sellerType, setSellerType] = useState<"private" | "business">("private");
@@ -82,6 +85,7 @@ function SellPage() {
     e.preventDefault();
     if (!user) return;
     if (!title || !price) { toast.error("Title and price are required"); return; }
+    if (!region || !city) { toast.error("Please select region and city"); return; }
     if (photos.length === 0) { toast.error("Please add at least one photo"); return; }
 
     setSubmitting(true);
@@ -105,7 +109,9 @@ function SellPage() {
         price_php: Number(price),
         condition,
         region,
+        province,
         city,
+        barangay,
         seller_type: sellerType,
         plan,
         contact_phone: phone || null,
@@ -245,18 +251,16 @@ function SellPage() {
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Location</h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <Label>Region</Label>
-                <Select value={region} onValueChange={setRegion}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {PH_REGIONS.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div><Label>City / Municipality</Label><Input value={city} onChange={(e) => setCity(e.target.value)} /></div>
-            </div>
+            <p className="text-xs text-muted-foreground">Based on the official PSA Philippine Standard Geographic Code.</p>
+            <LocationPicker
+              value={{ region, province, city, barangay }}
+              onChange={(v) => {
+                setRegion(v.region ?? null);
+                setProvince(v.province ?? null);
+                setCity(v.city ?? null);
+                setBarangay(v.barangay ?? null);
+              }}
+            />
           </section>
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">

@@ -103,6 +103,7 @@ export type Database = {
         Row: {
           allow_messages: boolean
           attributes: Json
+          barangay: string | null
           boost_until: string | null
           category_slug: string
           city: string | null
@@ -116,6 +117,7 @@ export type Database = {
           lng: number | null
           plan: Database["public"]["Enums"]["listing_plan"]
           price_php: number
+          province: string | null
           published_at: string | null
           region: string | null
           seller_type: Database["public"]["Enums"]["seller_type"]
@@ -128,6 +130,7 @@ export type Database = {
         Insert: {
           allow_messages?: boolean
           attributes?: Json
+          barangay?: string | null
           boost_until?: string | null
           category_slug: string
           city?: string | null
@@ -141,6 +144,7 @@ export type Database = {
           lng?: number | null
           plan?: Database["public"]["Enums"]["listing_plan"]
           price_php?: number
+          province?: string | null
           published_at?: string | null
           region?: string | null
           seller_type?: Database["public"]["Enums"]["seller_type"]
@@ -153,6 +157,7 @@ export type Database = {
         Update: {
           allow_messages?: boolean
           attributes?: Json
+          barangay?: string | null
           boost_until?: string | null
           category_slug?: string
           city?: string | null
@@ -166,6 +171,7 @@ export type Database = {
           lng?: number | null
           plan?: Database["public"]["Enums"]["listing_plan"]
           price_php?: number
+          province?: string | null
           published_at?: string | null
           region?: string | null
           seller_type?: Database["public"]["Enums"]["seller_type"]
@@ -301,6 +307,7 @@ export type Database = {
         Row: {
           avatar_url: string | null
           business_address: string | null
+          business_barangay: string | null
           business_city: string | null
           business_hours: Json | null
           business_kind: Database["public"]["Enums"]["business_kind"] | null
@@ -308,6 +315,7 @@ export type Database = {
           business_lng: number | null
           business_logo_url: string | null
           business_name: string | null
+          business_province: string | null
           business_region: string | null
           created_at: string
           full_name: string | null
@@ -321,6 +329,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           business_address?: string | null
+          business_barangay?: string | null
           business_city?: string | null
           business_hours?: Json | null
           business_kind?: Database["public"]["Enums"]["business_kind"] | null
@@ -328,6 +337,7 @@ export type Database = {
           business_lng?: number | null
           business_logo_url?: string | null
           business_name?: string | null
+          business_province?: string | null
           business_region?: string | null
           created_at?: string
           full_name?: string | null
@@ -341,6 +351,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           business_address?: string | null
+          business_barangay?: string | null
           business_city?: string | null
           business_hours?: Json | null
           business_kind?: Database["public"]["Enums"]["business_kind"] | null
@@ -348,6 +359,7 @@ export type Database = {
           business_lng?: number | null
           business_logo_url?: string | null
           business_name?: string | null
+          business_province?: string | null
           business_region?: string | null
           created_at?: string
           full_name?: string | null
@@ -547,6 +559,7 @@ export type Database = {
       verification_requests: {
         Row: {
           address: string | null
+          barangay: string | null
           business_kind: Database["public"]["Enums"]["business_kind"]
           city: string | null
           contact_email: string | null
@@ -556,6 +569,7 @@ export type Database = {
           dti_sec_registration: string | null
           id: string
           legal_name: string
+          province: string | null
           region: string | null
           review_notes: string | null
           reviewed_at: string | null
@@ -568,6 +582,7 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          barangay?: string | null
           business_kind: Database["public"]["Enums"]["business_kind"]
           city?: string | null
           contact_email?: string | null
@@ -577,6 +592,7 @@ export type Database = {
           dti_sec_registration?: string | null
           id?: string
           legal_name: string
+          province?: string | null
           region?: string | null
           review_notes?: string | null
           reviewed_at?: string | null
@@ -589,6 +605,7 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          barangay?: string | null
           business_kind?: Database["public"]["Enums"]["business_kind"]
           city?: string | null
           contact_email?: string | null
@@ -598,6 +615,7 @@ export type Database = {
           dti_sec_registration?: string | null
           id?: string
           legal_name?: string
+          province?: string | null
           region?: string | null
           review_notes?: string | null
           reviewed_at?: string | null

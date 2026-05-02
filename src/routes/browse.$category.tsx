@@ -13,11 +13,13 @@ import { Button } from "@/components/ui/button";
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
-import { PH_REGIONS } from "@/lib/format";
+import { LocationPicker } from "@/components/location-picker";
 
 const searchSchema = z.object({
   q: z.string().optional(),
   region: z.string().optional(),
+  province: z.string().optional(),
+  city: z.string().optional(),
   min: z.coerce.number().optional(),
   max: z.coerce.number().optional(),
   sort: z.enum(["recent", "price_asc", "price_desc"]).optional(),
@@ -46,7 +48,9 @@ function BrowsePage() {
   const { user } = useAuth();
 
   const [keyword, setKeyword] = useState(search.q ?? "");
-  const [region, setRegion] = useState(search.region ?? "all");
+  const [region, setRegion] = useState<string | null>(search.region ?? null);
+  const [province, setProvince] = useState<string | null>(search.province ?? null);
+  const [city, setCity] = useState<string | null>(search.city ?? null);
   const [minPrice, setMinPrice] = useState(search.min?.toString() ?? "");
   const [maxPrice, setMaxPrice] = useState(search.max?.toString() ?? "");
   const [sort, setSort] = useState(search.sort ?? "recent");
@@ -64,6 +68,8 @@ function BrowsePage() {
 
       if (search.q) q = q.ilike("title", `%${search.q}%`);
       if (search.region && search.region !== "all") q = q.eq("region", search.region);
+      if (search.province) q = q.eq("province", search.province);
+      if (search.city) q = q.eq("city", search.city);
       if (search.min) q = q.gte("price_php", search.min);
       if (search.max) q = q.lte("price_php", search.max);
 
@@ -88,7 +94,7 @@ function BrowsePage() {
       setLoading(false);
     };
     fetchListings();
-  }, [category, search.q, search.region, search.min, search.max, search.sort]);
+  }, [category, search.q, search.region, search.province, search.city, search.min, search.max, search.sort]);
 
   const applyFilters = (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,7 +103,9 @@ function BrowsePage() {
       params: { category },
       search: {
         q: keyword || undefined,
-        region: region !== "all" ? region : undefined,
+        region: region ?? undefined,
+        province: province ?? undefined,
+        city: city ?? undefined,
         min: minPrice ? Number(minPrice) : undefined,
         max: maxPrice ? Number(maxPrice) : undefined,
         sort,
@@ -118,7 +126,9 @@ function BrowsePage() {
       category_slug: category,
       query: {
         q: keyword || null,
-        region: region !== "all" ? region : null,
+        region: region ?? null,
+        province: province ?? null,
+        city: city ?? null,
         min: minPrice ? Number(minPrice) : null,
         max: maxPrice ? Number(maxPrice) : null,
         sort,
@@ -153,16 +163,17 @@ function BrowsePage() {
                 <Input id="kw" value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="Make, model…" className="pl-8" />
               </div>
             </div>
-            <div>
-              <Label>Region</Label>
-              <Select value={region} onValueChange={setRegion}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All regions</SelectItem>
-                  {PH_REGIONS.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
-                </SelectContent>
-              </Select>
-            </div>
+            <LocationPicker
+              asFilter
+              stacked
+              showBarangay={false}
+              value={{ region, province, city }}
+              onChange={(v) => {
+                setRegion(v.region ?? null);
+                setProvince(v.province ?? null);
+                setCity(v.city ?? null);
+              }}
+            />
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <Label>Min ₱</Label>
