@@ -62,24 +62,52 @@ function BrowsePage() {
   useEffect(() => {
     const fetchListings = async () => {
       setLoading(true);
-      let q = supabase
-        .from("listings")
-        .select("id,title,price_php,region,city,seller_type,boost_until,status,category_slug,user_id,listing_media(url,type),profiles:user_id(verification_status)")
-        .in("status", ["active","pending_sale"])
-        .eq("category_slug", category);
+      const baseSelect = "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,user_id,listing_media(url,type),profiles:user_id(verification_status)";
+      const buildBase = () => {
+        let q = supabase
+          .from("listings")
+          .select(baseSelect)
+          .in("status", ["active","pending_sale"])
+          .eq("category_slug", category);
+        if (search.region && search.region !== "all") q = q.eq("region", search.region);
+        if (search.province) q = q.eq("province", search.province);
+        if (search.city) q = q.eq("city", search.city);
+        if (search.min) q = q.gte("price_php", search.min);
+        if (search.max) q = q.lte("price_php", search.max);
+        if (search.sort === "price_asc") q = q.order("price_php", { ascending: true });
+        else if (search.sort === "price_desc") q = q.order("price_php", { ascending: false });
+        else q = q.order("boost_until", { ascending: false, nullsFirst: false }).order("published_at", { ascending: false, nullsFirst: false });
+        return q;
+      };
 
-      if (search.q) q = q.ilike("title", `%${search.q}%`);
-      if (search.region && search.region !== "all") q = q.eq("region", search.region);
-      if (search.province) q = q.eq("province", search.province);
-      if (search.city) q = q.eq("city", search.city);
-      if (search.min) q = q.gte("price_php", search.min);
-      if (search.max) q = q.lte("price_php", search.max);
+      // Build alias/fuzzy alternates for the keyword (handles "VW", "Toyta", etc.)
+      const terms = search.q ? buildTitleSearchTerms(search.q, 6) : [];
+      const escape = (s: string) => s.replace(/[%,()]/g, " ").trim();
 
-      if (search.sort === "price_asc") q = q.order("price_php", { ascending: true });
-      else if (search.sort === "price_desc") q = q.order("price_php", { ascending: false });
-      else q = q.order("boost_until", { ascending: false, nullsFirst: false }).order("published_at", { ascending: false, nullsFirst: false });
+      let q = buildBase();
+      if (search.q && terms.length > 0) {
+        const orExpr = terms.map((t) => `title.ilike.%${escape(t)}%`).join(",");
+        q = q.or(orExpr);
+      }
 
-      const { data } = await q.limit(60);
+      let { data } = await q.limit(60);
+
+      // Fallback: if very few hits and a keyword was provided, fetch a wider
+      // pool and apply fuzzy matching client-side to catch typos/variants.
+      if (search.q && (!data || data.length < 6)) {
+        const fb = await buildBase().limit(200);
+        if (fb.data) {
+          const fuzz = fuzzyFilter(fb.data as any[], search.q, (r) => r.title ?? "");
+          const seen = new Set((data ?? []).map((r: any) => r.id));
+          for (const r of fuzz) {
+            if (!seen.has((r as any).id)) {
+              (data ??= []).push(r as any);
+              if (data.length >= 60) break;
+            }
+          }
+        }
+      }
+
       const mapped = (data ?? []).map((r: any) => {
         const photos = (r.listing_media ?? []).filter((m: any) => m.type === "photo");
         const videos = (r.listing_media ?? []).filter((m: any) => m.type === "video");
