@@ -165,6 +165,7 @@ export function VehiclePicker({ category, make, model, onChange }: Props) {
           placeholder="Select make"
           searchPlaceholder="Search make…"
           emptyText="No makes found"
+          getKeywords={(opt) => MAKE_ALIASES[opt] ?? []}
           onSelect={(v) => onChange({ make: v, model: "" })}
         />
       </div>
