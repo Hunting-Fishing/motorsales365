@@ -109,6 +109,7 @@ function Combo({
                 <CommandItem
                   key={opt}
                   value={opt}
+                  keywords={getKeywords?.(opt)}
                   onSelect={() => {
                     onSelect(opt);
                     setOpen(false);
