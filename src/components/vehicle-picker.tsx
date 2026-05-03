@@ -90,17 +90,24 @@ function Combo({
         <Command
           filter={(itemValue, search, keywords) => {
             if (!search.trim()) return 1;
-            // Score the option name first — this is what should drive matching.
-            const nameScore = fuzzyScore(search, itemValue);
-            // Aliases ONLY fire on exact (normalized) equality so e.g. typing
-            // "sup" doesn't pull in items whose alias *contains* "sup"
-            // (like Hiace's "super grandia"). But "chevy" still resolves to
-            // Chevrolet because "chevy" === alias "chevy".
             const nq = normalize(search);
+            if (!nq) return 1;
+            const nv = normalize(itemValue);
+            // Prefix-only match: the option, or any of its words, must START
+            // with the typed query. No substring/fuzzy matches — typing "d"
+            // should NOT surface "Quadrifoglio" or "Spider".
+            const startsWithQuery = (s: string) => {
+              if (s.startsWith(nq)) return true;
+              for (const w of s.split(" ")) if (w.startsWith(nq)) return true;
+              return false;
+            };
+            if (startsWithQuery(nv)) {
+              return nv === nq ? 1 : nv.startsWith(nq) ? 0.95 : 0.85;
+            }
+            // Aliases still only fire on exact normalized equality.
             const aliasHit = (keywords ?? []).some((k) => normalize(k) === nq);
-            const best = aliasHit ? Math.min(nameScore, 0.8) : nameScore;
-            if (best === Infinity) return 0;
-            return 1 / (1 + best);
+            if (aliasHit) return 0.7;
+            return 0;
           }}
         >
           <CommandInput
