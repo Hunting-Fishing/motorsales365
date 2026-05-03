@@ -74,6 +74,14 @@ function SellPage() {
   const [transmission, setTransmission] = useState("");
   const [fuel, setFuel] = useState("");
 
+  // Towing service-specific fields
+  const [towServiceType, setTowServiceType] = useState("");
+  const [towCapacity, setTowCapacity] = useState("");
+  const [towCoverage, setTowCoverage] = useState("");
+  const [towBaseRate, setTowBaseRate] = useState("");
+  const [towPerKm, setTowPerKm] = useState("");
+  const [tow247, setTow247] = useState(false);
+
   const [photos, setPhotos] = useState<File[]>([]);
   const [video, setVideo] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
