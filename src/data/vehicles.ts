@@ -877,8 +877,8 @@ export const CAR_MAKES: MakeModels[] = [
   { make: "Dongfeng", models: ["Rich 6", "Rich 7", "Glory 500", "Glory 580", "Glory 600", "Forthing T5", "Forthing T5 Evo", "Forthing 4", "Box", "E70", "MAGE", "M5"] },
   { make: "BAIC", models: ["X3", "X35", "X55", "X55 II", "X7", "BJ20", "BJ30", "BJ40", "BJ40 Plus", "BJ60", "BJ80", "BJ90", "Beijing X7", "EU5", "EX3", "EX5", "EU260"] },
   { make: "Changan", models: ["CS15", "CS35", "CS35 Plus", "CS55", "CS55 Plus", "CS75", "CS75 Plus", "CS75 Plus Champion", "CS85", "CS95", "Alsvin", "Eado", "Hunter", "Hunter Plus", "Hunter Black Knight", "Hunter K50", "UNI-T", "UNI-K", "UNI-V", "UNI-Z", "Lumin", "Star 5", "Star 7", "Star 9"] },
-  { make: "GAC", models: ["GS3", "GS3 Power", "GS3 Emzoom", "GS4", "GS4 Plus", "GS5", "GS7", "GS8", "GS8 II", "M6", "M6 Pro", "M8", "M8 Master", "M8 GS", "Empow", "Aion S", "Aion V", "Aion Y", "Aion ES", "Aion RT", "Aion UT", "Aion Hyptec", "Hyptec HT", "Hyptec GT"] },
-  { make: "Hongqi", models: ["H5", "H6", "H9", "HS3", "HS5", "HS6", "HS7", "HS9", "E-HS3", "E-HS9", "E-QM5", "EH7", "L5", "LS7"] },
+  { make: "GAC", models: ["GS3", "GS3 Power", "GS3 Emzoom", "GS4", "GS4 Plus", "GS5", "GS7", "GS8", "GS8 II", "M6", "M6 Pro", "M8", "M8 Master", "M8 GS", "Empow", "Aion S", "Aion V", "Aion Y", "Aion ES", "Aion ES Pro", "Aion RT", "Aion UT", "Aion Hyper GT", "Aion Hyptec", "Hyptec HT", "Hyptec GT", "Hyptec SSR"] },
+  { make: "Hongqi", models: ["H5", "H6", "H9", "HS3", "HS5", "HS6", "HS7", "HS9", "HQ9", "E-HS3", "E-HS9", "E-QM5", "E001", "EH7", "L5", "LS7", "Tiantian"] },
 
   { make: "Trumpchi", models: ["GS3", "GS3 Power", "GS4", "GS4 Plus", "GS8", "M6", "M6 Pro", "M8", "M8 Master", "Empow", "E9", "ES9"] },
   { make: "Roewe", models: ["RX5", "RX5 Max", "RX9", "i5", "i6", "i6 Max", "Marvel R", "D7", "Ei5"] },
