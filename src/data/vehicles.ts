@@ -938,7 +938,7 @@ export const CAR_MAKES: MakeModels[] = [
   { make: "Haier", models: ["Brio"] },
   { make: "UAZ", models: ["Patriot", "Hunter", "Pickup", "Cargo", "Bukhanka", "Profi"] },
   { make: "Lada", models: ["Niva", "Niva Travel", "Granta", "Vesta", "Vesta SW", "Largus", "4x4", "Kalina", "Priora", "Samara"] },
-  { make: "Daihatsu", models: ["Terios", "Rocky", "Charade", "Mira", "Move", "Tanto", "Hijet", "Copen", "Sirion", "Boon", "Materia", "Atrai"] },
+  { make: "Daihatsu", models: ["Terios", "Rocky", "Rocky Hybrid", "Charade", "Mira", "Move", "Move Canbus", "Tanto", "Hijet", "Copen", "Sirion", "Boon", "Materia", "Atrai", "Atrai EV"] },
   { make: "Datsun", models: ["GO", "GO+", "redi-GO", "Cross", "240Z", "260Z", "280Z", "510", "1200", "Sunny"] },
   { make: "Pontiac", models: ["G6", "G8", "GTO", "Solstice", "Vibe", "Firebird", "Trans Am", "Bonneville", "Grand Prix", "Sunfire", "Aztek"] },
   { make: "Saturn", models: ["Ion", "Aura", "Vue", "Sky", "Astra", "Outlook"] },
