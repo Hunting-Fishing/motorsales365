@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/dashboard/tow")({
@@ -127,7 +128,7 @@ function TowProviderDashboard() {
   const mine = useMemo(() => requests.filter(r => r.requester_id === user?.id), [requests, user]);
 
   const myBidFor = (requestId: string) => bids.find(b => b.request_id === requestId && b.provider_id === user?.id);
-  const bidsForRequest = (requestId: string) => bids.filter(b => b.request_id === requestId);
+  const bidsForRequest = (requestId: string) => bids.filter(b => b.request_id === requestId && b.status !== "withdrawn");
 
   // ==== Direct request actions ====
   const accept = async (r: TowRequest) => {
@@ -203,22 +204,40 @@ function TowProviderDashboard() {
 
   const submitBid = async () => {
     if (!user || !bidTarget) return;
+    if (bidTarget.status !== "open") { toast.error("This request is no longer open"); return; }
     const price = Number(bidPrice);
     if (!Number.isFinite(price) || price < 0) { toast.error("Enter a valid price"); return; }
     const etaNum = bidEta ? Number(bidEta) : null;
     if (etaNum != null && (!Number.isFinite(etaNum) || etaNum < 0)) { toast.error("Enter a valid ETA"); return; }
     setBidSubmitting(true);
     try {
-      const { error } = await supabase.from("tow_bids").upsert({
-        request_id: bidTarget.id,
-        provider_id: user.id,
-        price_php: price,
-        eta_minutes: etaNum,
-        note: bidNote.trim() || null,
-        status: "pending",
-      }, { onConflict: "request_id,provider_id" });
-      if (error) throw error;
-      toast.success("Bid submitted");
+      const existing = myBidFor(bidTarget.id);
+      if (existing && existing.status === "pending") {
+        const { error } = await supabase.from("tow_bids")
+          .update({ price_php: price, eta_minutes: etaNum, note: bidNote.trim() || null })
+          .eq("id", existing.id)
+          .eq("status", "pending");
+        if (error) throw error;
+        toast.success("Bid updated");
+      } else if (existing) {
+        // Existing row is withdrawn/declined — revive as a fresh pending bid
+        const { error } = await supabase.from("tow_bids")
+          .update({ price_php: price, eta_minutes: etaNum, note: bidNote.trim() || null, status: "pending" })
+          .eq("id", existing.id);
+        if (error) throw error;
+        toast.success("Bid submitted");
+      } else {
+        const { error } = await supabase.from("tow_bids").insert({
+          request_id: bidTarget.id,
+          provider_id: user.id,
+          price_php: price,
+          eta_minutes: etaNum,
+          note: bidNote.trim() || null,
+          status: "pending",
+        });
+        if (error) throw error;
+        toast.success("Bid submitted");
+      }
       setBidTarget(null);
       load();
     } catch (e: any) {
@@ -229,7 +248,10 @@ function TowProviderDashboard() {
   };
 
   const withdrawBid = async (bidId: string) => {
-    const { error } = await supabase.from("tow_bids").delete().eq("id", bidId);
+    const { error } = await supabase.from("tow_bids")
+      .update({ status: "withdrawn" })
+      .eq("id", bidId)
+      .eq("status", "pending");
     if (error) return toast.error(error.message);
     toast.success("Bid withdrawn");
     load();
@@ -337,13 +359,37 @@ function TowProviderDashboard() {
               }}
               renderActions={(r) => {
                 const my = myBidFor(r.id);
+                const requestOpen = r.status === "open";
+                const canEdit = !my || my.status === "pending" || my.status === "withdrawn" || my.status === "declined";
+                if (!requestOpen) {
+                  return <div className="text-xs text-muted-foreground">Request closed</div>;
+                }
                 return (
                   <div className="flex flex-wrap gap-2">
-                    <Button size="sm" onClick={() => openBid(r)}>
-                      <Gavel className="mr-1 h-3.5 w-3.5" />{my ? "Update bid" : "Place bid"}
-                    </Button>
+                    {canEdit && (
+                      <Button size="sm" onClick={() => openBid(r)}>
+                        <Gavel className="mr-1 h-3.5 w-3.5" />
+                        {my && my.status === "pending" ? "Update bid" : my ? "Re-bid" : "Place bid"}
+                      </Button>
+                    )}
                     {my && my.status === "pending" && (
-                      <Button size="sm" variant="ghost" onClick={() => withdrawBid(my.id)}>Withdraw</Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="sm" variant="ghost">Withdraw</Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Withdraw your bid?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              The customer will no longer see this bid. You can place a new one while the request is still open.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Keep bid</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => withdrawBid(my.id)}>Withdraw</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     )}
                   </div>
                 );
@@ -447,7 +493,7 @@ function TowProviderDashboard() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setBidTarget(null)} disabled={bidSubmitting}>Cancel</Button>
-            <Button onClick={submitBid} disabled={bidSubmitting}>{bidSubmitting ? "Submitting…" : "Submit bid"}</Button>
+            <Button onClick={submitBid} disabled={bidSubmitting}>{bidSubmitting ? "Submitting…" : (myBidFor(bidTarget?.id ?? "")?.status === "pending" ? "Save changes" : "Submit bid")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
