@@ -259,6 +259,14 @@ function SellPage() {
         if (mileage) attributes.mileage_km = mileage;
         if (transmission) attributes.transmission = transmission;
         if (fuel) attributes.fuel = fuel;
+        if (category === "towing") {
+          if (towServiceType) attributes.service_type = towServiceType;
+          if (towCapacity) attributes.vehicle_capacity = towCapacity;
+          if (towCoverage) attributes.coverage_regions = towCoverage.split(",").map(s => s.trim()).filter(Boolean);
+          if (towBaseRate) attributes.base_rate_php = Number(towBaseRate);
+          if (towPerKm) attributes.per_km_rate_php = Number(towPerKm);
+          attributes.available_24_7 = tow247;
+        }
 
         const expiryDays = pricing.listing_expiry_days ?? 60;
         const expires = new Date();
