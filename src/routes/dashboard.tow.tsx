@@ -602,6 +602,129 @@ function TowProviderDashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Pickup dialog */}
+      <Dialog open={!!pickupTarget} onOpenChange={(o) => { if (!o) setPickupTarget(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mark as picked up</DialogTitle>
+            <DialogDescription>The customer will be notified that the vehicle is on the way.</DialogDescription>
+          </DialogHeader>
+          <div>
+            <Label htmlFor="pickupEta">Drop-off ETA (minutes, optional)</Label>
+            <Input id="pickupEta" type="number" min={0} value={pickupEta} onChange={(e) => setPickupEta(e.target.value)} placeholder="e.g. 30" />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPickupTarget(null)} disabled={stageSubmitting}>Cancel</Button>
+            <Button onClick={submitPickup} disabled={stageSubmitting}>{stageSubmitting ? "Saving…" : "Mark picked up"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dropoff dialog */}
+      <Dialog open={!!dropoffTarget} onOpenChange={(o) => { if (!o) setDropoffTarget(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mark as dropped off</DialogTitle>
+            <DialogDescription>Record the final bill. The customer will get a notification to confirm completion.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="finalPrice">Final bill (₱)</Label>
+              <Input id="finalPrice" type="number" min={0} step="any" value={dropoffPrice} onChange={(e) => setDropoffPrice(e.target.value)} placeholder="e.g. 2500" />
+            </div>
+            <div>
+              <Label htmlFor="finalNotes">Notes (optional)</Label>
+              <Textarea id="finalNotes" rows={3} value={dropoffNotes} onChange={(e) => setDropoffNotes(e.target.value)} placeholder="Extra distance, waiting time, etc." />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDropoffTarget(null)} disabled={stageSubmitting}>Cancel</Button>
+            <Button onClick={submitDropoff} disabled={stageSubmitting}>{stageSubmitting ? "Saving…" : "Mark dropped off"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Customer confirm completion */}
+      <Dialog open={!!confirmTarget} onOpenChange={(o) => { if (!o) setConfirmTarget(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm job completion</DialogTitle>
+            <DialogDescription>
+              {confirmTarget && (
+                <>Final bill: <span className="font-semibold">{formatPHP(confirmTarget.final_price_php ?? 0)}</span>. Confirming will close the job and notify the provider.</>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          {confirmTarget?.completion_notes && (
+            <div className="rounded-md border border-border bg-muted/40 p-3 text-sm">{confirmTarget.completion_notes}</div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmTarget(null)} disabled={stageSubmitting}>Not yet</Button>
+            <Button onClick={confirmCompletion} disabled={stageSubmitting}>{stageSubmitting ? "Confirming…" : "Confirm completion"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function ProviderJobStage({ r, onUpdateEta }: { r: TowRequest; onUpdateEta: (eta: number | null) => void }) {
+  const [eta, setEta] = useState(r.eta_minutes != null ? String(r.eta_minutes) : "");
+  if (r.status !== "picked_up" && r.status !== "dropped_off" && r.status !== "completed") return null;
+  return (
+    <div className="mt-3 space-y-2 rounded-md border border-border bg-muted/40 p-3 text-sm">
+      {r.status === "picked_up" && (
+        <>
+          <div className="flex items-center gap-1 font-medium"><PackageCheck className="h-4 w-4" />Picked up {r.picked_up_at && <span className="text-muted-foreground">· {new Date(r.picked_up_at).toLocaleString()}</span>}</div>
+          <div className="flex items-end gap-2">
+            <div className="flex-1">
+              <Label htmlFor={`eta-${r.id}`} className="text-xs">Drop-off ETA (min)</Label>
+              <Input id={`eta-${r.id}`} type="number" min={0} value={eta} onChange={(e) => setEta(e.target.value)} className="h-8" />
+            </div>
+            <Button size="sm" variant="outline" onClick={() => onUpdateEta(eta === "" ? null : Number(eta))}>Update ETA</Button>
+          </div>
+        </>
+      )}
+      {(r.status === "dropped_off" || r.status === "completed") && (
+        <>
+          <div className="flex items-center gap-1 font-medium"><PackageOpen className="h-4 w-4" />Dropped off {r.dropped_off_at && <span className="text-muted-foreground">· {new Date(r.dropped_off_at).toLocaleString()}</span>}</div>
+          <div className="flex items-center gap-1"><Receipt className="h-4 w-4" />Final bill: <span className="font-semibold">{formatPHP(r.final_price_php ?? 0)}</span></div>
+          {r.status === "dropped_off" && <div className="text-xs text-muted-foreground">Waiting for customer to confirm completion.</div>}
+          {r.status === "completed" && <div className="text-xs text-muted-foreground">Customer confirmed {r.completed_at && new Date(r.completed_at).toLocaleString()}.</div>}
+        </>
+      )}
+    </div>
+  );
+}
+
+function CustomerJobStage({ r }: { r: TowRequest }) {
+  if (!["accepted", "picked_up", "dropped_off", "completed"].includes(r.status)) return null;
+  return (
+    <div className="mt-3 space-y-1 rounded-md border border-border bg-muted/40 p-3 text-sm">
+      {r.status === "accepted" && <div className="text-muted-foreground">Provider accepted. They'll let you know once your vehicle is picked up.</div>}
+      {r.status === "picked_up" && (
+        <>
+          <div className="flex items-center gap-1 font-medium text-foreground"><PackageCheck className="h-4 w-4" />Vehicle picked up</div>
+          {r.picked_up_at && <div className="text-xs text-muted-foreground">{new Date(r.picked_up_at).toLocaleString()}</div>}
+          {r.eta_minutes != null && <div>Estimated drop-off in <span className="font-semibold">{r.eta_minutes} minutes</span>.</div>}
+        </>
+      )}
+      {r.status === "dropped_off" && (
+        <>
+          <div className="flex items-center gap-1 font-medium text-foreground"><PackageOpen className="h-4 w-4" />Dropped off</div>
+          {r.dropped_off_at && <div className="text-xs text-muted-foreground">{new Date(r.dropped_off_at).toLocaleString()}</div>}
+          <div className="flex items-center gap-1"><Receipt className="h-4 w-4" />Final bill: <span className="font-semibold">{formatPHP(r.final_price_php ?? 0)}</span></div>
+          {r.completion_notes && <div className="text-muted-foreground">{r.completion_notes}</div>}
+        </>
+      )}
+      {r.status === "completed" && (
+        <>
+          <div className="flex items-center gap-1 font-medium text-foreground"><CheckCircle2 className="h-4 w-4" />Completed</div>
+          <div className="flex items-center gap-1"><Receipt className="h-4 w-4" />Final bill: <span className="font-semibold">{formatPHP(r.final_price_php ?? 0)}</span></div>
+          {r.completed_at && <div className="text-xs text-muted-foreground">{new Date(r.completed_at).toLocaleString()}</div>}
+        </>
+      )}
     </div>
   );
 }
