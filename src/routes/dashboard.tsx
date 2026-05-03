@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { LayoutGrid, Heart, MessageSquare, User as UserIcon, CreditCard, Bookmark, ShieldCheck } from "lucide-react";
+import { LayoutGrid, Heart, MessageSquare, User as UserIcon, CreditCard, Bookmark, ShieldCheck, Truck } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 
@@ -13,6 +13,7 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean }[] = [
   { to: "/dashboard/favorites", label: "Favorites", Icon: Heart },
   { to: "/dashboard/searches", label: "Saved searches", Icon: Bookmark },
   { to: "/dashboard/messages", label: "Messages", Icon: MessageSquare },
+  { to: "/dashboard/tow", label: "Tow requests", Icon: Truck },
   { to: "/dashboard/profile", label: "Profile", Icon: UserIcon },
   { to: "/dashboard/verification", label: "Verification", Icon: ShieldCheck },
   { to: "/dashboard/billing", label: "Billing", Icon: CreditCard },

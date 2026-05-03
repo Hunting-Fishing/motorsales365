@@ -25,6 +25,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as DashboardVerificationRouteImport } from './routes/dashboard.verification'
+import { Route as DashboardTowRouteImport } from './routes/dashboard.tow'
 import { Route as DashboardSearchesRouteImport } from './routes/dashboard.searches'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
 import { Route as DashboardMessagesRouteImport } from './routes/dashboard.messages'
@@ -118,6 +119,11 @@ const DashboardVerificationRoute = DashboardVerificationRouteImport.update({
   path: '/verification',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardTowRoute = DashboardTowRouteImport.update({
+  id: '/tow',
+  path: '/tow',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardSearchesRoute = DashboardSearchesRouteImport.update({
   id: '/searches',
   path: '/searches',
@@ -202,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
+  '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/seller/$id': typeof SellerIdRoute
@@ -230,6 +237,7 @@ export interface FileRoutesByTo {
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
+  '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/seller/$id': typeof SellerIdRoute
@@ -261,6 +269,7 @@ export interface FileRoutesById {
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
+  '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/seller/$id': typeof SellerIdRoute
@@ -293,6 +302,7 @@ export interface FileRouteTypes {
     | '/dashboard/messages'
     | '/dashboard/profile'
     | '/dashboard/searches'
+    | '/dashboard/tow'
     | '/dashboard/verification'
     | '/listing/$id'
     | '/seller/$id'
@@ -321,6 +331,7 @@ export interface FileRouteTypes {
     | '/dashboard/messages'
     | '/dashboard/profile'
     | '/dashboard/searches'
+    | '/dashboard/tow'
     | '/dashboard/verification'
     | '/listing/$id'
     | '/seller/$id'
@@ -351,6 +362,7 @@ export interface FileRouteTypes {
     | '/dashboard/messages'
     | '/dashboard/profile'
     | '/dashboard/searches'
+    | '/dashboard/tow'
     | '/dashboard/verification'
     | '/listing/$id'
     | '/seller/$id'
@@ -490,6 +502,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardVerificationRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/tow': {
+      id: '/dashboard/tow'
+      path: '/tow'
+      fullPath: '/dashboard/tow'
+      preLoaderRoute: typeof DashboardTowRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/searches': {
       id: '/dashboard/searches'
       path: '/searches'
@@ -603,6 +622,7 @@ interface DashboardRouteChildren {
   DashboardMessagesRoute: typeof DashboardMessagesRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardSearchesRoute: typeof DashboardSearchesRoute
+  DashboardTowRoute: typeof DashboardTowRoute
   DashboardVerificationRoute: typeof DashboardVerificationRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
 }
@@ -613,6 +633,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardMessagesRoute: DashboardMessagesRoute,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardSearchesRoute: DashboardSearchesRoute,
+  DashboardTowRoute: DashboardTowRoute,
   DashboardVerificationRoute: DashboardVerificationRoute,
   DashboardIndexRoute: DashboardIndexRoute,
 }
