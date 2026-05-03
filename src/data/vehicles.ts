@@ -930,8 +930,8 @@ export const CAR_MAKES: MakeModels[] = [
   
 
   // ---------- Indian ----------
-  { make: "Tata", models: ["Nexon", "Nexon EV", "Punch", "Punch EV", "Tiago", "Tiago EV", "Tigor", "Tigor EV", "Altroz", "Harrier", "Harrier EV", "Safari", "Curvv", "Curvv EV", "Sierra", "Avinya", "Xpres-T", "Ace", "Ace Gold", "Yodha", "Intra", "Sumo", "Indica", "Indigo"] },
-  { make: "Mahindra", models: ["Scorpio", "Scorpio Classic", "Scorpio-N", "XUV300", "XUV3XO", "XUV400", "XUV700", "XUV.e8", "XUV.e9", "Bolero", "Bolero Neo", "Bolero Neo Plus", "Thar", "Thar Roxx", "Thar Roxx 5-door", "Pik Up", "Pik-Up", "Marazzo", "Enforcer", "TUV300", "KUV100", "Alturas G4", "BE 6", "XEV 9e"] },
+  { make: "Tata", models: ["Nexon", "Nexon EV", "Punch", "Punch EV", "Punch EV Long Range", "Tiago", "Tiago EV", "Tigor", "Tigor EV", "Altroz", "Altroz Racer", "Harrier", "Harrier EV", "Safari", "Curvv", "Curvv ICE", "Curvv EV", "Sierra", "Avinya", "Xpres-T", "Ace", "Ace Gold", "Yodha", "Intra", "Sumo", "Sumo Gold", "Indica", "Indigo"] },
+  { make: "Mahindra", models: ["Scorpio", "Scorpio Classic", "Scorpio-N", "XUV300", "XUV3XO", "XUV 3XO", "XUV400", "XUV700", "XUV.e8", "XUV.e9", "Bolero", "Bolero Neo", "Bolero Neo Plus", "Thar", "Thar Roxx", "Thar Roxx 5-door", "Thar.e", "Pik Up", "Pik-Up", "Marazzo", "Enforcer", "TUV300", "KUV100", "Alturas G4", "BE 6", "BE 7", "BE 9", "XEV 9e"] },
 
   // ---------- Italian / British / niche / luxury ----------
   { make: "Abarth", models: ["595", "595 Competizione", "695", "695 Biposto", "500e", "124 Spider"] },
