@@ -204,22 +204,40 @@ function TowProviderDashboard() {
 
   const submitBid = async () => {
     if (!user || !bidTarget) return;
+    if (bidTarget.status !== "open") { toast.error("This request is no longer open"); return; }
     const price = Number(bidPrice);
     if (!Number.isFinite(price) || price < 0) { toast.error("Enter a valid price"); return; }
     const etaNum = bidEta ? Number(bidEta) : null;
     if (etaNum != null && (!Number.isFinite(etaNum) || etaNum < 0)) { toast.error("Enter a valid ETA"); return; }
     setBidSubmitting(true);
     try {
-      const { error } = await supabase.from("tow_bids").upsert({
-        request_id: bidTarget.id,
-        provider_id: user.id,
-        price_php: price,
-        eta_minutes: etaNum,
-        note: bidNote.trim() || null,
-        status: "pending",
-      }, { onConflict: "request_id,provider_id" });
-      if (error) throw error;
-      toast.success("Bid submitted");
+      const existing = myBidFor(bidTarget.id);
+      if (existing && existing.status === "pending") {
+        const { error } = await supabase.from("tow_bids")
+          .update({ price_php: price, eta_minutes: etaNum, note: bidNote.trim() || null })
+          .eq("id", existing.id)
+          .eq("status", "pending");
+        if (error) throw error;
+        toast.success("Bid updated");
+      } else if (existing) {
+        // Existing row is withdrawn/declined — revive as a fresh pending bid
+        const { error } = await supabase.from("tow_bids")
+          .update({ price_php: price, eta_minutes: etaNum, note: bidNote.trim() || null, status: "pending" })
+          .eq("id", existing.id);
+        if (error) throw error;
+        toast.success("Bid submitted");
+      } else {
+        const { error } = await supabase.from("tow_bids").insert({
+          request_id: bidTarget.id,
+          provider_id: user.id,
+          price_php: price,
+          eta_minutes: etaNum,
+          note: bidNote.trim() || null,
+          status: "pending",
+        });
+        if (error) throw error;
+        toast.success("Bid submitted");
+      }
       setBidTarget(null);
       load();
     } catch (e: any) {
@@ -230,7 +248,10 @@ function TowProviderDashboard() {
   };
 
   const withdrawBid = async (bidId: string) => {
-    const { error } = await supabase.from("tow_bids").delete().eq("id", bidId);
+    const { error } = await supabase.from("tow_bids")
+      .update({ status: "withdrawn" })
+      .eq("id", bidId)
+      .eq("status", "pending");
     if (error) return toast.error(error.message);
     toast.success("Bid withdrawn");
     load();
