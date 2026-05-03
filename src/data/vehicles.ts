@@ -939,7 +939,7 @@ export const CAR_MAKES: MakeModels[] = [
   { make: "Aston Martin", models: ["Vantage", "DB9", "DB11", "DB12", "DBS", "DBS Superleggera", "DBX", "DBX707", "Rapide", "Vanquish", "Valkyrie", "Valhalla", "Virage", "One-77"] },
   { make: "McLaren", models: ["540C", "570S", "570GT", "600LT", "650S", "675LT", "720S", "750S", "765LT", "Artura", "GT", "P1", "Senna", "Speedtail", "Elva", "MP4-12C"] },
   { make: "Smart", models: ["fortwo", "forfour", "#1", "#3", "Roadster"] },
-  { make: "Polestar", models: ["Polestar 1", "Polestar 2", "Polestar 3", "Polestar 4", "Polestar 5"] },
+  { make: "Polestar", models: ["Polestar 1", "Polestar 2", "Polestar 3", "Polestar 4", "Polestar 5", "Polestar 6", "Polestar 7"] },
   { make: "Rivian", models: ["R1T", "R1S", "R2", "R3"] },
   { make: "Lucid", models: ["Air", "Gravity"] },
 
