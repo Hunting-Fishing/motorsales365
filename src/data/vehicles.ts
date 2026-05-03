@@ -918,7 +918,7 @@ export const CAR_MAKES: MakeModels[] = [
   { make: "Lynk & Co", models: ["01", "02", "03", "03+", "05", "06", "06 EM-P", "07 EM-P", "08 EM-P", "09", "900", "Z10", "Z20"] },
   { make: "Omoda", models: ["Omoda 3", "Omoda 5", "Omoda C5 PHEV", "Omoda E5", "Omoda 7", "Omoda C7", "Omoda 9", "Omoda C9"] },
   { make: "RADAR", models: ["RD6", "Horizon"] },
-  { make: "VinFast", models: ["VF 3", "VF 3 LFP", "VF 5", "VF 6", "VF 7", "VF 8", "VF 9", "VF e34", "VF Wild", "Limo Green", "Lux A2.0", "Lux SA2.0", "Fadil", "President"] },
+  { make: "VinFast", models: ["VF 3", "VF 3 LFP", "VF 5", "VF 6", "VF 7", "VF 8", "VF 9", "VF e34", "VF Wild", "Limo Green", "Lux A2.0", "Lux SA2.0", "Fadil", "President", "VF 1", "VF 4"] },
   { make: "Voyah", models: ["Free", "Free EV", "Free 2024", "Dream", "Courage", "Passion", "Zhiyin", "Lan", "Cha"] },
   { make: "ZEEKR", models: ["001", "001 FR", "007", "009", "009 Grand", "X", "Mix", "7X", "9X"] },
   { make: "Aito", models: ["M5", "M5 EV", "M5 Ultra", "M7", "M7 Ultra", "M8", "M9", "M9 EV"] },
