@@ -88,6 +88,15 @@ function TowProviderDashboard() {
   const [bidNote, setBidNote] = useState("");
   const [bidSubmitting, setBidSubmitting] = useState(false);
 
+  // Pickup / dropoff / confirm-completion dialog state
+  const [pickupTarget, setPickupTarget] = useState<TowRequest | null>(null);
+  const [pickupEta, setPickupEta] = useState("");
+  const [dropoffTarget, setDropoffTarget] = useState<TowRequest | null>(null);
+  const [dropoffPrice, setDropoffPrice] = useState("");
+  const [dropoffNotes, setDropoffNotes] = useState("");
+  const [confirmTarget, setConfirmTarget] = useState<TowRequest | null>(null);
+  const [stageSubmitting, setStageSubmitting] = useState(false);
+
   // Provider rates
   const [rates, setRates] = useState<ProviderRates | null>(null);
   const [savingRates, setSavingRates] = useState(false);
