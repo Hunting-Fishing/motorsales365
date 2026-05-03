@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Truck, Clock, MapPin, CheckCircle2, XCircle, Inbox, Gavel, Settings2 } from "lucide-react";
+import { Truck, Clock, MapPin, CheckCircle2, XCircle, Inbox, Gavel, Settings2, PackageCheck, PackageOpen, Receipt } from "lucide-react";
+import { formatPHP } from "@/lib/format";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,12 @@ type TowRequest = {
   needed_at: string | null;
   notes: string | null;
   created_at: string;
+  picked_up_at: string | null;
+  dropped_off_at: string | null;
+  completed_at: string | null;
+  eta_minutes: number | null;
+  final_price_php: number | null;
+  completion_notes: string | null;
 };
 
 type TowBid = {
@@ -80,6 +87,15 @@ function TowProviderDashboard() {
   const [bidEta, setBidEta] = useState("");
   const [bidNote, setBidNote] = useState("");
   const [bidSubmitting, setBidSubmitting] = useState(false);
+
+  // Pickup / dropoff / confirm-completion dialog state
+  const [pickupTarget, setPickupTarget] = useState<TowRequest | null>(null);
+  const [pickupEta, setPickupEta] = useState("");
+  const [dropoffTarget, setDropoffTarget] = useState<TowRequest | null>(null);
+  const [dropoffPrice, setDropoffPrice] = useState("");
+  const [dropoffNotes, setDropoffNotes] = useState("");
+  const [confirmTarget, setConfirmTarget] = useState<TowRequest | null>(null);
+  const [stageSubmitting, setStageSubmitting] = useState(false);
 
   // Provider rates
   const [rates, setRates] = useState<ProviderRates | null>(null);
@@ -179,11 +195,80 @@ function TowProviderDashboard() {
     }
   };
 
-  const complete = async (r: TowRequest) => {
-    const { error } = await supabase.from("tow_requests").update({ status: "completed" }).eq("id", r.id);
+  // (legacy direct-complete removed — use pickup → dropoff → customer confirm flow)
+
+
+  const acceptedBidPriceFor = (r: TowRequest): number | null => {
+    const accepted = bids.find(b => b.request_id === r.id && b.status === "accepted");
+    return accepted ? Number(accepted.price_php) : null;
+  };
+
+  const openPickup = (r: TowRequest) => {
+    setPickupEta(r.eta_minutes != null ? String(r.eta_minutes) : "");
+    setPickupTarget(r);
+  };
+
+  const submitPickup = async () => {
+    if (!pickupTarget) return;
+    const etaNum = pickupEta ? Number(pickupEta) : null;
+    if (etaNum != null && (!Number.isFinite(etaNum) || etaNum < 0)) { toast.error("Enter a valid ETA"); return; }
+    setStageSubmitting(true);
+    try {
+      const { error } = await supabase.from("tow_requests")
+        .update({ status: "picked_up", eta_minutes: etaNum })
+        .eq("id", pickupTarget.id);
+      if (error) throw error;
+      toast.success("Marked picked up — customer notified");
+      setPickupTarget(null);
+      load();
+    } catch (e: any) { toast.error(e.message ?? "Failed"); }
+    finally { setStageSubmitting(false); }
+  };
+
+  const updateEta = async (r: TowRequest, eta: number | null) => {
+    const { error } = await supabase.from("tow_requests").update({ eta_minutes: eta }).eq("id", r.id);
     if (error) return toast.error(error.message);
-    toast.success("Marked completed");
+    toast.success("ETA updated");
     load();
+  };
+
+  const openDropoff = (r: TowRequest) => {
+    const fallback = acceptedBidPriceFor(r);
+    setDropoffPrice(r.final_price_php != null ? String(r.final_price_php) : (fallback != null ? String(fallback) : ""));
+    setDropoffNotes(r.completion_notes ?? "");
+    setDropoffTarget(r);
+  };
+
+  const submitDropoff = async () => {
+    if (!dropoffTarget) return;
+    const price = Number(dropoffPrice);
+    if (!Number.isFinite(price) || price < 0) { toast.error("Enter the final bill amount"); return; }
+    setStageSubmitting(true);
+    try {
+      const { error } = await supabase.from("tow_requests")
+        .update({ status: "dropped_off", final_price_php: price, completion_notes: dropoffNotes.trim() || null })
+        .eq("id", dropoffTarget.id);
+      if (error) throw error;
+      toast.success("Marked dropped off — waiting for customer to confirm");
+      setDropoffTarget(null);
+      load();
+    } catch (e: any) { toast.error(e.message ?? "Failed"); }
+    finally { setStageSubmitting(false); }
+  };
+
+  const confirmCompletion = async () => {
+    if (!confirmTarget) return;
+    setStageSubmitting(true);
+    try {
+      const { error } = await supabase.from("tow_requests")
+        .update({ status: "completed" })
+        .eq("id", confirmTarget.id);
+      if (error) throw error;
+      toast.success("Job completed — provider notified");
+      setConfirmTarget(null);
+      load();
+    } catch (e: any) { toast.error(e.message ?? "Failed"); }
+    finally { setStageSubmitting(false); }
   };
 
   // ==== Bid flow ====
@@ -318,6 +403,7 @@ function TowProviderDashboard() {
           <RequestList
             items={direct}
             empty="No direct requests yet. When customers tap “Request a tow from this provider” on your listing, jobs land here."
+            renderExtra={(r) => <ProviderJobStage r={r} onUpdateEta={(eta) => updateEta(r, eta)} />}
             renderActions={(r) => (
               <div className="flex flex-wrap gap-2">
                 {r.status === "open" && (
@@ -327,7 +413,14 @@ function TowProviderDashboard() {
                   </>
                 )}
                 {r.status === "accepted" && (
-                  <Button size="sm" onClick={() => complete(r)}>Mark completed</Button>
+                  <Button size="sm" onClick={() => openPickup(r)}>
+                    <PackageCheck className="mr-1 h-3.5 w-3.5" />Mark picked up
+                  </Button>
+                )}
+                {r.status === "picked_up" && (
+                  <Button size="sm" onClick={() => openDropoff(r)}>
+                    <PackageOpen className="mr-1 h-3.5 w-3.5" />Mark dropped off
+                  </Button>
                 )}
               </div>
             )}
@@ -404,42 +497,54 @@ function TowProviderDashboard() {
             empty="You haven't requested any tows yet."
             renderExtra={(r) => {
               const list = bidsForRequest(r.id);
-              if (r.provider_id || list.length === 0) return null;
+              const showBids = !r.provider_id && list.length > 0;
               return (
-                <div className="mt-3 space-y-2">
-                  <div className="text-sm font-medium">{list.length} bid{list.length === 1 ? "" : "s"}</div>
-                  <ul className="space-y-2">
-                    {list.map((b) => (
-                      <li key={b.id} className="rounded-md border border-border bg-muted/40 p-3">
-                        <div className="flex flex-wrap items-start justify-between gap-2">
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="font-semibold">{providerNames[b.provider_id] ?? "Provider"}</span>
-                              <BidStatusBadge status={b.status} />
+                <>
+                  <CustomerJobStage r={r} />
+                  {showBids && (
+                    <div className="mt-3 space-y-2">
+                      <div className="text-sm font-medium">{list.length} bid{list.length === 1 ? "" : "s"}</div>
+                      <ul className="space-y-2">
+                        {list.map((b) => (
+                          <li key={b.id} className="rounded-md border border-border bg-muted/40 p-3">
+                            <div className="flex flex-wrap items-start justify-between gap-2">
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold">{providerNames[b.provider_id] ?? "Provider"}</span>
+                                  <BidStatusBadge status={b.status} />
+                                </div>
+                                <div className="text-sm">
+                                  <span className="font-semibold">₱{b.price_php}</span>
+                                  {b.eta_minutes != null && <span className="text-muted-foreground"> · ETA {b.eta_minutes}m</span>}
+                                </div>
+                                {b.note && <div className="mt-1 text-sm text-muted-foreground">{b.note}</div>}
+                              </div>
+                              {r.status === "open" && b.status === "pending" && (
+                                <Button size="sm" onClick={() => acceptBid(b)}>Accept bid</Button>
+                              )}
                             </div>
-                            <div className="text-sm">
-                              <span className="font-semibold">₱{b.price_php}</span>
-                              {b.eta_minutes != null && <span className="text-muted-foreground"> · ETA {b.eta_minutes}m</span>}
-                            </div>
-                            {b.note && <div className="mt-1 text-sm text-muted-foreground">{b.note}</div>}
-                          </div>
-                          {r.status === "open" && b.status === "pending" && (
-                            <Button size="sm" onClick={() => acceptBid(b)}>Accept bid</Button>
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </>
               );
             }}
             renderActions={(r) => (
-              r.status === "open" || r.status === "accepted" ? (
-                <Button size="sm" variant="outline" onClick={async () => {
-                  await supabase.from("tow_requests").update({ status: "cancelled" }).eq("id", r.id);
-                  load();
-                }}>Cancel</Button>
-              ) : null
+              <div className="flex flex-wrap gap-2">
+                {r.status === "dropped_off" && (
+                  <Button size="sm" onClick={() => setConfirmTarget(r)}>
+                    <CheckCircle2 className="mr-1 h-3.5 w-3.5" />Confirm completion
+                  </Button>
+                )}
+                {(r.status === "open" || r.status === "accepted") && (
+                  <Button size="sm" variant="outline" onClick={async () => {
+                    await supabase.from("tow_requests").update({ status: "cancelled" }).eq("id", r.id);
+                    load();
+                  }}>Cancel</Button>
+                )}
+              </div>
             )}
           />
         </TabsContent>
@@ -497,6 +602,129 @@ function TowProviderDashboard() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Pickup dialog */}
+      <Dialog open={!!pickupTarget} onOpenChange={(o) => { if (!o) setPickupTarget(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mark as picked up</DialogTitle>
+            <DialogDescription>The customer will be notified that the vehicle is on the way.</DialogDescription>
+          </DialogHeader>
+          <div>
+            <Label htmlFor="pickupEta">Drop-off ETA (minutes, optional)</Label>
+            <Input id="pickupEta" type="number" min={0} value={pickupEta} onChange={(e) => setPickupEta(e.target.value)} placeholder="e.g. 30" />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setPickupTarget(null)} disabled={stageSubmitting}>Cancel</Button>
+            <Button onClick={submitPickup} disabled={stageSubmitting}>{stageSubmitting ? "Saving…" : "Mark picked up"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dropoff dialog */}
+      <Dialog open={!!dropoffTarget} onOpenChange={(o) => { if (!o) setDropoffTarget(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Mark as dropped off</DialogTitle>
+            <DialogDescription>Record the final bill. The customer will get a notification to confirm completion.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="finalPrice">Final bill (₱)</Label>
+              <Input id="finalPrice" type="number" min={0} step="any" value={dropoffPrice} onChange={(e) => setDropoffPrice(e.target.value)} placeholder="e.g. 2500" />
+            </div>
+            <div>
+              <Label htmlFor="finalNotes">Notes (optional)</Label>
+              <Textarea id="finalNotes" rows={3} value={dropoffNotes} onChange={(e) => setDropoffNotes(e.target.value)} placeholder="Extra distance, waiting time, etc." />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDropoffTarget(null)} disabled={stageSubmitting}>Cancel</Button>
+            <Button onClick={submitDropoff} disabled={stageSubmitting}>{stageSubmitting ? "Saving…" : "Mark dropped off"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Customer confirm completion */}
+      <Dialog open={!!confirmTarget} onOpenChange={(o) => { if (!o) setConfirmTarget(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm job completion</DialogTitle>
+            <DialogDescription>
+              {confirmTarget && (
+                <>Final bill: <span className="font-semibold">{formatPHP(confirmTarget.final_price_php ?? 0)}</span>. Confirming will close the job and notify the provider.</>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          {confirmTarget?.completion_notes && (
+            <div className="rounded-md border border-border bg-muted/40 p-3 text-sm">{confirmTarget.completion_notes}</div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setConfirmTarget(null)} disabled={stageSubmitting}>Not yet</Button>
+            <Button onClick={confirmCompletion} disabled={stageSubmitting}>{stageSubmitting ? "Confirming…" : "Confirm completion"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+function ProviderJobStage({ r, onUpdateEta }: { r: TowRequest; onUpdateEta: (eta: number | null) => void }) {
+  const [eta, setEta] = useState(r.eta_minutes != null ? String(r.eta_minutes) : "");
+  if (r.status !== "picked_up" && r.status !== "dropped_off" && r.status !== "completed") return null;
+  return (
+    <div className="mt-3 space-y-2 rounded-md border border-border bg-muted/40 p-3 text-sm">
+      {r.status === "picked_up" && (
+        <>
+          <div className="flex items-center gap-1 font-medium"><PackageCheck className="h-4 w-4" />Picked up {r.picked_up_at && <span className="text-muted-foreground">· {new Date(r.picked_up_at).toLocaleString()}</span>}</div>
+          <div className="flex items-end gap-2">
+            <div className="flex-1">
+              <Label htmlFor={`eta-${r.id}`} className="text-xs">Drop-off ETA (min)</Label>
+              <Input id={`eta-${r.id}`} type="number" min={0} value={eta} onChange={(e) => setEta(e.target.value)} className="h-8" />
+            </div>
+            <Button size="sm" variant="outline" onClick={() => onUpdateEta(eta === "" ? null : Number(eta))}>Update ETA</Button>
+          </div>
+        </>
+      )}
+      {(r.status === "dropped_off" || r.status === "completed") && (
+        <>
+          <div className="flex items-center gap-1 font-medium"><PackageOpen className="h-4 w-4" />Dropped off {r.dropped_off_at && <span className="text-muted-foreground">· {new Date(r.dropped_off_at).toLocaleString()}</span>}</div>
+          <div className="flex items-center gap-1"><Receipt className="h-4 w-4" />Final bill: <span className="font-semibold">{formatPHP(r.final_price_php ?? 0)}</span></div>
+          {r.status === "dropped_off" && <div className="text-xs text-muted-foreground">Waiting for customer to confirm completion.</div>}
+          {r.status === "completed" && <div className="text-xs text-muted-foreground">Customer confirmed {r.completed_at && new Date(r.completed_at).toLocaleString()}.</div>}
+        </>
+      )}
+    </div>
+  );
+}
+
+function CustomerJobStage({ r }: { r: TowRequest }) {
+  if (!["accepted", "picked_up", "dropped_off", "completed"].includes(r.status)) return null;
+  return (
+    <div className="mt-3 space-y-1 rounded-md border border-border bg-muted/40 p-3 text-sm">
+      {r.status === "accepted" && <div className="text-muted-foreground">Provider accepted. They'll let you know once your vehicle is picked up.</div>}
+      {r.status === "picked_up" && (
+        <>
+          <div className="flex items-center gap-1 font-medium text-foreground"><PackageCheck className="h-4 w-4" />Vehicle picked up</div>
+          {r.picked_up_at && <div className="text-xs text-muted-foreground">{new Date(r.picked_up_at).toLocaleString()}</div>}
+          {r.eta_minutes != null && <div>Estimated drop-off in <span className="font-semibold">{r.eta_minutes} minutes</span>.</div>}
+        </>
+      )}
+      {r.status === "dropped_off" && (
+        <>
+          <div className="flex items-center gap-1 font-medium text-foreground"><PackageOpen className="h-4 w-4" />Dropped off</div>
+          {r.dropped_off_at && <div className="text-xs text-muted-foreground">{new Date(r.dropped_off_at).toLocaleString()}</div>}
+          <div className="flex items-center gap-1"><Receipt className="h-4 w-4" />Final bill: <span className="font-semibold">{formatPHP(r.final_price_php ?? 0)}</span></div>
+          {r.completion_notes && <div className="text-muted-foreground">{r.completion_notes}</div>}
+        </>
+      )}
+      {r.status === "completed" && (
+        <>
+          <div className="flex items-center gap-1 font-medium text-foreground"><CheckCircle2 className="h-4 w-4" />Completed</div>
+          <div className="flex items-center gap-1"><Receipt className="h-4 w-4" />Final bill: <span className="font-semibold">{formatPHP(r.final_price_php ?? 0)}</span></div>
+          {r.completed_at && <div className="text-xs text-muted-foreground">{new Date(r.completed_at).toLocaleString()}</div>}
+        </>
+      )}
     </div>
   );
 }
@@ -610,6 +838,8 @@ function RequestList({
 
 function StatusBadge({ status }: { status: string }) {
   if (status === "accepted") return <Badge className="gap-1"><CheckCircle2 className="h-3 w-3" />Accepted</Badge>;
+  if (status === "picked_up") return <Badge className="gap-1"><PackageCheck className="h-3 w-3" />Picked up</Badge>;
+  if (status === "dropped_off") return <Badge className="gap-1"><PackageOpen className="h-3 w-3" />Dropped off</Badge>;
   if (status === "completed") return <Badge variant="secondary" className="gap-1"><CheckCircle2 className="h-3 w-3" />Completed</Badge>;
   if (status === "cancelled") return <Badge variant="destructive" className="gap-1"><XCircle className="h-3 w-3" />Cancelled</Badge>;
   return <Badge variant="outline">Open</Badge>;

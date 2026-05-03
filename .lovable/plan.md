@@ -1,31 +1,77 @@
 ## Goal
 
-Providers can already place a bid and there's an "Update bid" / "Withdraw" affordance, but the flow has rough edges. Make edit and withdraw work cleanly and only while the bid is still `pending`.
+Extend the existing tow workflow (`open → accepted → completed`) with intermediate states so providers can acknowledge pickup and dropoff, customers see live status updates in‑app, and the final bill is captured before the job is closed.
 
-## Behavior
+## New job lifecycle
 
-**Edit (only while pending)**
-- "Update bid" button is shown only when the provider's bid status is `pending`. If the bid is `accepted`/`declined`/`withdrawn`, show a status badge instead with no edit button.
-- Dialog title reads "Update your bid" when editing; submit button reads "Save changes".
-- Submitting performs an `UPDATE` on the existing row (price, eta, note, `status='pending'`, `updated_at=now()`), not an upsert that could clobber a non-pending row.
-- New bids continue to use insert with `status='pending'`.
+```text
+open → accepted → picked_up → dropped_off → completed
+                                          ↘ disputed (optional, stretch)
+```
 
-**Withdraw (only while pending)**
-- Confirmation via `AlertDialog` ("Withdraw your bid? The customer will no longer see it.").
-- Performs `UPDATE tow_bids SET status='withdrawn'` instead of DELETE — preserves history and matches the existing status enum used by the trigger/RLS.
-- After withdrawing, the provider can place a fresh bid again (the upsert path treats a non-pending row as replaceable, setting status back to `pending`).
-- Requester's bid list filters out `withdrawn` and `declined` bids so the UI stays clean.
+- `accepted`: provider committed (existing).
+- `picked_up`: provider has the vehicle. Captures `picked_up_at` and an updated drop‑off ETA (minutes).
+- `dropped_off`: vehicle delivered to destination. Captures `dropped_off_at` and the **final bill** (`final_price_php`, optional `completion_notes`).
+- `completed`: customer acknowledges the job is done. Captures `completed_at`. Only the customer (or admin) can transition `dropped_off → completed`.
 
-**Guardrails**
-- Re-check `my.status === 'pending'` inside `submitBid`/`withdrawBid` before firing the request, so a stale UI can't bypass the rule (RLS already prevents cross-provider edits).
-- If the parent `tow_requests.status` is no longer `open` (already accepted/cancelled/completed), disable both buttons and surface a small "Request closed" hint.
+Each state change inserts an in‑app `messages` row to the other party so notifications surface in the existing inbox / Messages tab.
+
+## Database changes (migration)
+
+Add to `tow_requests`:
+- `picked_up_at timestamptz null`
+- `dropped_off_at timestamptz null`
+- `completed_at timestamptz null`
+- `eta_minutes int null` — provider's live drop‑off ETA, set at pickup, can be updated.
+- `final_price_php numeric null`
+- `completion_notes text null`
+
+Update RLS for `tow_requests` UPDATE: keep current rule (requester / provider / admin can update). Add a `BEFORE UPDATE` trigger `enforce_tow_status_transitions()` that:
+- Rejects illegal status transitions.
+- Restricts transitions by actor:
+  - `accepted → picked_up` and `picked_up → dropped_off` only when `auth.uid() = provider_id`.
+  - `dropped_off → completed` only when `auth.uid() = requester_id` (or admin).
+  - Customer cancel allowed only while status is `open` or `accepted`.
+- Auto‑stamps `picked_up_at`, `dropped_off_at`, `completed_at` when status flips, so the client can't backdate them.
+
+Add an `AFTER UPDATE` trigger `notify_tow_status_change()` that inserts a `messages` row to the counter‑party for each meaningful transition (picked up / dropped off / completed / cancelled), mirroring the existing `handle_tow_bid_accepted` notification pattern. This keeps notifications server‑side and reliable even if the client closes the tab.
+
+## Provider UI (`src/routes/dashboard.tow.tsx` — Direct + Open jobs tabs)
+
+Replace the single "Mark completed" button on accepted jobs with a state‑aware action row:
+
+- `accepted` → **Mark picked up** button opens a small dialog: "Drop‑off ETA (minutes, optional)". Submitting updates status to `picked_up`, sets `eta_minutes`.
+- `picked_up` → **Update ETA** (inline) and **Mark dropped off** button opens a dialog with `Final bill (₱)` (required, defaults to accepted bid price) and `Notes` (optional). Submits status `dropped_off` with `final_price_php` + `completion_notes`.
+- `dropped_off` → read‑only "Waiting for customer to confirm" hint with the final bill shown.
+- `completed` / `cancelled` → status badge only.
+
+Status badges in `StatusBadge` get two new variants (`Picked up`, `Dropped off`).
+
+## Customer UI ("Sent by me" tab + dashboard messages)
+
+For each request the requester sent:
+- `accepted` → show provider name, original bid price, "Provider hasn't started yet" hint.
+- `picked_up` → green callout: "Your vehicle has been picked up — ETA {eta_minutes}m" plus `picked_up_at` timestamp.
+- `dropped_off` → callout with **final bill** and **Confirm completion** button. Confirm sets status to `completed`. Optional textarea for a short note that gets attached to the auto‑message back to the provider.
+- `completed` → show final bill + completion timestamp.
+
+Cancel button stays available only while status is `open` or `accepted`.
+
+## Notifications (in‑app)
+
+All notifications use the existing `messages` table so they appear in the dashboard Messages tab and respect existing realtime subscriptions. Messages are inserted by the new `notify_tow_status_change()` trigger:
+
+- Picked up → customer: "Your tow for '{vehicle}' has been picked up. ETA to drop‑off: {eta} min."
+- ETA updated (provider edits `eta_minutes` while `picked_up`) → customer: "Updated drop‑off ETA: {eta} min."
+- Dropped off → customer: "Your vehicle has been dropped off. Final bill: ₱{amount}. Please confirm completion in your dashboard."
+- Completed → provider: "Customer confirmed completion. Final bill: ₱{amount}. Thanks!"
+
+The customer dashboard already polls/realtime‑subscribes to `tow_requests`, so the cards auto‑refresh; no extra realtime channel is needed.
 
 ## Files touched
 
-- `src/routes/dashboard.tow.tsx`
-  - Replace the upsert in `submitBid` with insert-or-update branching based on whether `myBidFor(r.id)` exists and is pending.
-  - Change `withdrawBid` to update status to `withdrawn` and wrap the trigger button in an `AlertDialog`.
-  - Tighten the broadcast tab action row: hide Update/Withdraw unless bid is pending and request is still open; show status badge otherwise.
-  - Filter `bidsForRequest` used in the requester "Sent by me" tab to exclude `withdrawn`/`declined`.
+- `supabase/migrations/<new>.sql` — new columns on `tow_requests`, status‑transition trigger, status‑change notification trigger.
+- `src/routes/dashboard.tow.tsx` — new pickup / dropoff dialogs, customer confirm‑completion dialog, expanded `StatusBadge`, extra rendering of `picked_up_at`, `eta_minutes`, `final_price_php`, `completed_at`.
+- `src/integrations/supabase/types.ts` — auto‑regenerated by the migration; no manual edit.
 
-No database migration is needed — `tow_bids.status` already supports `withdrawn`, RLS already lets providers manage their own rows, and the accept trigger only fires on transition to `accepted`.
+No edge functions, no new secrets, no AI calls. Existing RLS and `handle_tow_bid_accepted` flows are untouched.

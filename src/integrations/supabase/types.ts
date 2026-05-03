@@ -614,15 +614,21 @@ export type Database = {
       }
       tow_requests: {
         Row: {
+          completed_at: string | null
+          completion_notes: string | null
           created_at: string
           dropoff_address: string | null
           dropoff_city: string | null
           dropoff_province: string | null
           dropoff_region: string | null
+          dropped_off_at: string | null
+          eta_minutes: number | null
+          final_price_php: number | null
           id: string
           listing_id: string | null
           needed_at: string | null
           notes: string | null
+          picked_up_at: string | null
           pickup_address: string | null
           pickup_city: string | null
           pickup_province: string | null
@@ -634,15 +640,21 @@ export type Database = {
           vehicle_summary: string
         }
         Insert: {
+          completed_at?: string | null
+          completion_notes?: string | null
           created_at?: string
           dropoff_address?: string | null
           dropoff_city?: string | null
           dropoff_province?: string | null
           dropoff_region?: string | null
+          dropped_off_at?: string | null
+          eta_minutes?: number | null
+          final_price_php?: number | null
           id?: string
           listing_id?: string | null
           needed_at?: string | null
           notes?: string | null
+          picked_up_at?: string | null
           pickup_address?: string | null
           pickup_city?: string | null
           pickup_province?: string | null
@@ -654,15 +666,21 @@ export type Database = {
           vehicle_summary: string
         }
         Update: {
+          completed_at?: string | null
+          completion_notes?: string | null
           created_at?: string
           dropoff_address?: string | null
           dropoff_city?: string | null
           dropoff_province?: string | null
           dropoff_region?: string | null
+          dropped_off_at?: string | null
+          eta_minutes?: number | null
+          final_price_php?: number | null
           id?: string
           listing_id?: string | null
           needed_at?: string | null
           notes?: string | null
+          picked_up_at?: string | null
           pickup_address?: string | null
           pickup_city?: string | null
           pickup_province?: string | null
