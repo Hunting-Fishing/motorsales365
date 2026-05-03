@@ -402,6 +402,39 @@ export type Database = {
         }
         Relationships: []
       }
+      provider_tow_rates: {
+        Row: {
+          available_24_7: boolean
+          created_at: string
+          flat_base_php: number | null
+          min_php: number | null
+          notes: string | null
+          per_km_php: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          available_24_7?: boolean
+          created_at?: string
+          flat_base_php?: number | null
+          min_php?: number | null
+          notes?: string | null
+          per_km_php?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          available_24_7?: boolean
+          created_at?: string
+          flat_base_php?: number | null
+          min_php?: number | null
+          notes?: string | null
+          per_km_php?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       reports: {
         Row: {
           created_at: string
@@ -531,6 +564,50 @@ export type Database = {
             columns: ["plan_id"]
             isOneToOne: false
             referencedRelation: "subscription_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tow_bids: {
+        Row: {
+          created_at: string
+          eta_minutes: number | null
+          id: string
+          note: string | null
+          price_php: number
+          provider_id: string
+          request_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          eta_minutes?: number | null
+          id?: string
+          note?: string | null
+          price_php: number
+          provider_id: string
+          request_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          eta_minutes?: number | null
+          id?: string
+          note?: string | null
+          price_php?: number
+          provider_id?: string
+          request_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tow_bids_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "tow_requests"
             referencedColumns: ["id"]
           },
         ]
