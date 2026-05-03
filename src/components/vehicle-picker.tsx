@@ -335,8 +335,7 @@ export function VehiclePicker({ category, year, make, model, onChange }: Props) 
 
       <div className="flex items-center justify-between">
         <p className="text-xs text-muted-foreground">
-          Pick year first to filter models like a parts catalog. Models without a
-          known year stay visible.
+          Can't find your vehicle? Just type it — we'll add it to your listing.
         </p>
         <button
           type="button"
