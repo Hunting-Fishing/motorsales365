@@ -202,6 +202,79 @@ function TowProviderDashboard() {
     load();
   };
 
+  const acceptedBidPriceFor = (r: TowRequest): number | null => {
+    const accepted = bids.find(b => b.request_id === r.id && b.status === "accepted");
+    return accepted ? Number(accepted.price_php) : null;
+  };
+
+  const openPickup = (r: TowRequest) => {
+    setPickupEta(r.eta_minutes != null ? String(r.eta_minutes) : "");
+    setPickupTarget(r);
+  };
+
+  const submitPickup = async () => {
+    if (!pickupTarget) return;
+    const etaNum = pickupEta ? Number(pickupEta) : null;
+    if (etaNum != null && (!Number.isFinite(etaNum) || etaNum < 0)) { toast.error("Enter a valid ETA"); return; }
+    setStageSubmitting(true);
+    try {
+      const { error } = await supabase.from("tow_requests")
+        .update({ status: "picked_up", eta_minutes: etaNum })
+        .eq("id", pickupTarget.id);
+      if (error) throw error;
+      toast.success("Marked picked up — customer notified");
+      setPickupTarget(null);
+      load();
+    } catch (e: any) { toast.error(e.message ?? "Failed"); }
+    finally { setStageSubmitting(false); }
+  };
+
+  const updateEta = async (r: TowRequest, eta: number | null) => {
+    const { error } = await supabase.from("tow_requests").update({ eta_minutes: eta }).eq("id", r.id);
+    if (error) return toast.error(error.message);
+    toast.success("ETA updated");
+    load();
+  };
+
+  const openDropoff = (r: TowRequest) => {
+    const fallback = acceptedBidPriceFor(r);
+    setDropoffPrice(r.final_price_php != null ? String(r.final_price_php) : (fallback != null ? String(fallback) : ""));
+    setDropoffNotes(r.completion_notes ?? "");
+    setDropoffTarget(r);
+  };
+
+  const submitDropoff = async () => {
+    if (!dropoffTarget) return;
+    const price = Number(dropoffPrice);
+    if (!Number.isFinite(price) || price < 0) { toast.error("Enter the final bill amount"); return; }
+    setStageSubmitting(true);
+    try {
+      const { error } = await supabase.from("tow_requests")
+        .update({ status: "dropped_off", final_price_php: price, completion_notes: dropoffNotes.trim() || null })
+        .eq("id", dropoffTarget.id);
+      if (error) throw error;
+      toast.success("Marked dropped off — waiting for customer to confirm");
+      setDropoffTarget(null);
+      load();
+    } catch (e: any) { toast.error(e.message ?? "Failed"); }
+    finally { setStageSubmitting(false); }
+  };
+
+  const confirmCompletion = async () => {
+    if (!confirmTarget) return;
+    setStageSubmitting(true);
+    try {
+      const { error } = await supabase.from("tow_requests")
+        .update({ status: "completed" })
+        .eq("id", confirmTarget.id);
+      if (error) throw error;
+      toast.success("Job completed — provider notified");
+      setConfirmTarget(null);
+      load();
+    } catch (e: any) { toast.error(e.message ?? "Failed"); }
+    finally { setStageSubmitting(false); }
+  };
+
   // ==== Bid flow ====
   const openBid = (r: TowRequest) => {
     const existing = myBidFor(r.id);
