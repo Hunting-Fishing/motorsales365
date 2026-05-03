@@ -912,7 +912,7 @@ export const CAR_MAKES: MakeModels[] = [
   { make: "Jaecoo", models: ["J5", "J5 EV", "J6", "J7", "J7 PHEV", "J7 Plus", "J8", "J8 PHEV"] },
   { make: "Kaicene", models: ["F70", "Star Truck", "Star 5", "Star 9", "Hunter"] },
   { make: "Kaiyi", models: ["X3", "X3 Pro", "E5", "E5 Pro", "Xuanjie"] },
-  { make: "KG Mobility", models: ["Tivoli", "Tivoli XLV", "Korando", "Korando e-Motion", "Torres", "Torres EVX", "Rexton", "Rexton Sports", "Musso", "Musso EV", "Musso Sports", "Actyon", "Actyon 2024"] },
+  { make: "KG Mobility", models: ["Tivoli", "Tivoli XLV", "Korando", "Korando e-Motion", "Torres", "Torres EVX", "Rexton", "Rexton Sports", "Musso", "Musso EV", "Musso Sports", "Actyon", "Actyon 2024", "O100"] },
   { make: "King Long", models: ["Kingo", "Kingwin", "Sea Lion", "XMQ6900", "XMQ6127"] },
   { make: "Li Auto", models: ["L6", "L7", "L8", "L9", "Mega", "Mega Home", "ONE"] },
   { make: "Lynk & Co", models: ["01", "02", "03", "03+", "05", "06", "06 EM-P", "07 EM-P", "08 EM-P", "09", "Z10", "Z20"] },
