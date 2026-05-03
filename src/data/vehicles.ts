@@ -997,7 +997,7 @@ export const MOTORCYCLE_MAKES: MakeModels[] = [
       "Africa Twin", "Transalp", "VFR", "VFR800", "VFR1200", "Gold Wing", "Goldwing",
       "CRF150F", "CRF150L", "CRF230F", "CRF250L", "CRF250 Rally", "CRF300L", "CRF300 Rally", "CRF450L", "CRF450X", "XR125", "XR150L", "XR190L", "XR250", "XLR125",
       "Monkey", "Grom", "Super Cub", "C70", "C90", "C100", "Dax", "Cub",
-      "NX500", "Hornet 2.0", "CB350", "CB350 H'ness", "GB350", "GB350S", "ADV160 e:HEV", "Forza 350 2024", "Rebel 1100T",
+      "NX500", "Hornet 2.0", "CB350", "CB350 RS", "CB350 H'ness", "GB350", "GB350S", "GB350 C", "ADV160 e:HEV", "Forza 350 2024", "Rebel 1100T",
     ],
   },
   {
