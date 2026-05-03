@@ -178,12 +178,20 @@ export function VehiclePicker({ category, year, make, model, onChange }: Props) 
     [category, yearNum],
   );
   const makeNames = React.useMemo(
-    () => filteredMakes.map((m) => m.make),
+    () =>
+      filteredMakes
+        .map((m) => m.make)
+        .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" })),
     [filteredMakes],
   );
 
   const modelOptions = React.useMemo(
-    () => (make ? getModelsForYear(category, make, yearNum) : []),
+    () =>
+      make
+        ? [...getModelsForYear(category, make, yearNum)].sort((a, b) =>
+            a.localeCompare(b, undefined, { sensitivity: "base" }),
+          )
+        : [],
     [category, make, yearNum],
   );
 
