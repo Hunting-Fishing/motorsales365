@@ -29,7 +29,26 @@ const CATEGORIES = [
   { slug: "boat", name: "Boat" },
   { slug: "airplane", name: "Airplane" },
   { slug: "equipment", name: "Heavy Equipment" },
+  { slug: "towing", name: "Towing & Trucking service" },
   { slug: "other", name: "Other" },
+];
+
+const TOW_SERVICE_TYPES = [
+  "Flatbed",
+  "Wheel-lift / Hook",
+  "Heavy wrecker",
+  "Self-loader",
+  "Box truck",
+  "Lowboy / Trailer",
+  "Roadside assist",
+];
+const TOW_CAPACITIES = [
+  "Motorcycle",
+  "Sedan / Hatchback",
+  "SUV / Pickup",
+  "Van",
+  "Heavy equipment",
+  "Boat / Trailer",
 ];
 
 function SellPage() {
