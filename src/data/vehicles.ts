@@ -721,6 +721,7 @@ export const CAR_MAKES: MakeModels[] = [
       "Forester", "Forester e-Boxer", "Forester Wilderness", "Forester XT", "Outback", "Outback Wilderness", "Evoltis", "Ascent", "Tribeca",
       "SVX", "Justy", "Loyale", "Liberty", "Levorg", "Levorg STI Sport", "Exiga", "BRAT", "Sambar", "Stella", "Pleo", "Vivio", "R1", "R2",
       "Solterra",
+      "Pleo Plus", "Lucra", "Trezia", "Dex", "Dias Wagon", "Sambar Truck", "Sambar Van",
     ],
   },
   {
