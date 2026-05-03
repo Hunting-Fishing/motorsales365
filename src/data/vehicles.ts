@@ -951,8 +951,8 @@ export const CAR_MAKES: MakeModels[] = [
   { make: "Vauxhall", models: ["Astra", "Corsa", "Insignia", "Mokka", "Crossland", "Grandland", "Combo", "Vivaro", "Zafira"] },
   { make: "Dacia", models: ["Sandero", "Logan", "Duster", "Jogger", "Spring", "Bigster"] },
   { make: "Holden", models: ["Commodore", "Monaro", "Astra", "Cruze", "Captiva", "Colorado", "Trailblazer", "Ute"] },
-  { make: "Proton", models: ["Saga", "Persona", "Iriz", "X50", "X70", "X90", "Exora", "Preve", "Inspira", "Wira"] },
-  { make: "Perodua", models: ["Myvi", "Axia", "Bezza", "Aruz", "Ativa", "Alza", "Kancil", "Kelisa", "Kembara", "Kenari", "Viva"] },
+  { make: "Proton", models: ["Saga", "Persona", "Iriz", "X50", "X70", "X90", "e.MAS 7", "Exora", "Preve", "Inspira", "Wira"] },
+  { make: "Perodua", models: ["Myvi", "Axia", "Bezza", "Aruz", "Ativa", "Ativa Hybrid", "Alza", "Kancil", "Kelisa", "Kembara", "Kenari", "Viva"] },
 
   // ---------- More Asian-market makes ----------
   { make: "Maruti Suzuki", models: ["Alto", "Alto K10", "Alto 800", "Swift", "Swift Dzire", "Dzire", "Baleno", "Brezza", "Vitara Brezza", "Grand Vitara", "Ertiga", "XL6", "Jimny", "Jimny 5-door", "Fronx", "Ignis", "Eeco", "Wagon R", "Celerio", "S-Presso", "Ciaz", "S-Cross", "Invicto", "Esteem", "800", "Omni", "Gypsy", "Ritz", "A-Star"] },
