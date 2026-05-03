@@ -955,7 +955,7 @@ export const CAR_MAKES: MakeModels[] = [
   { make: "Perodua", models: ["Myvi", "Axia", "Bezza", "Aruz", "Ativa", "Ativa Hybrid", "Alza", "Kancil", "Kelisa", "Kembara", "Kenari", "Viva"] },
 
   // ---------- More Asian-market makes ----------
-  { make: "Maruti Suzuki", models: ["Alto", "Alto K10", "Alto 800", "Swift", "Swift Dzire", "Dzire", "Baleno", "Brezza", "Vitara Brezza", "Grand Vitara", "Ertiga", "XL6", "Jimny", "Jimny 5-door", "Fronx", "Ignis", "Eeco", "Wagon R", "Celerio", "S-Presso", "Ciaz", "S-Cross", "Invicto", "Esteem", "800", "Omni", "Gypsy", "Ritz", "A-Star"] },
+  { make: "Maruti Suzuki", models: ["Alto", "Alto K10", "Alto 800", "Swift", "Swift Dzire", "Dzire", "Baleno", "Brezza", "Vitara Brezza", "Grand Vitara", "Ertiga", "XL6", "Jimny", "Jimny 5-door", "Fronx", "Fronx Strong Hybrid", "Ignis", "Eeco", "Wagon R", "Celerio", "S-Presso", "Ciaz", "S-Cross", "Invicto", "eVX", "Esteem", "800", "Omni", "Gypsy", "Ritz", "A-Star"] },
   { make: "Force Motors", models: ["Gurkha", "Gurkha 5-door", "Trax", "Traveller", "Tempo", "Citiline", "Monobus", "Toofan"] },
   { make: "Premier", models: ["Padmini", "118NE", "Rio", "Sigma"] },
   { make: "Hindustan Motors", models: ["Ambassador", "Contessa", "Trekker"] },
