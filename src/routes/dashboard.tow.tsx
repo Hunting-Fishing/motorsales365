@@ -128,7 +128,7 @@ function TowProviderDashboard() {
   const mine = useMemo(() => requests.filter(r => r.requester_id === user?.id), [requests, user]);
 
   const myBidFor = (requestId: string) => bids.find(b => b.request_id === requestId && b.provider_id === user?.id);
-  const bidsForRequest = (requestId: string) => bids.filter(b => b.request_id === requestId);
+  const bidsForRequest = (requestId: string) => bids.filter(b => b.request_id === requestId && b.status !== "withdrawn");
 
   // ==== Direct request actions ====
   const accept = async (r: TowRequest) => {
