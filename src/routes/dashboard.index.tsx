@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { formatPHP, formatDate } from "@/lib/format";
 import placeholderCar from "@/assets/placeholder-car.png";
+import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 
 export const Route = createFileRoute("/dashboard/")({
   component: MyListings,
@@ -191,7 +192,7 @@ function MyListings() {
             return (
               <div key={l.id} className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 sm:flex-row">
                 <div className="h-24 w-32 shrink-0 overflow-hidden rounded-md bg-secondary">
-                  <img src={photo?.url || placeholderCar} alt="" className="h-full w-full object-cover" />
+                  <ImageWithSkeleton src={photo?.url || placeholderCar} alt="" />
                 </div>
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-2">

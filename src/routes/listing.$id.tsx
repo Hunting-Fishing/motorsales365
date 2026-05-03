@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { formatPHP, formatDate } from "@/lib/format";
 import placeholderCar from "@/assets/placeholder-car.png";
+import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 
 const REPORT_REASONS = [
   "Suspected scam or fraud",
@@ -178,10 +179,9 @@ function ListingDetailPage() {
           {/* Gallery */}
           <div className="overflow-hidden rounded-xl border border-border bg-card">
             <div className="aspect-[16/10] bg-secondary">
-              <img
+              <ImageWithSkeleton
                 src={cover?.url || placeholderCar}
                 alt={cover ? listing.title : "Vehicle photo coming soon"}
-                className="h-full w-full object-cover"
               />
             </div>
             {(photos.length > 1 || videos.length > 0) && (
@@ -192,7 +192,7 @@ function ListingDetailPage() {
                     onClick={() => setActiveIdx(i)}
                     className={`h-16 w-24 shrink-0 overflow-hidden rounded-md border-2 ${i === activeIdx ? "border-primary" : "border-transparent"}`}
                   >
-                    <img src={p.url} alt="" className="h-full w-full object-cover" />
+                    <ImageWithSkeleton src={p.url} alt="" />
                   </button>
                 ))}
                 {videos.map((v) => (
