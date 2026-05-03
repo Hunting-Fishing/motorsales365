@@ -736,11 +736,11 @@ export const CAR_MAKES: MakeModels[] = [
   },
   { make: "Lexus", models: [
     "IS", "IS 300", "IS 350", "IS F", "ES", "ES 300h", "ES 350", "GS", "GS F", "LS", "LS 500", "LS 500h",
-    "UX", "UX 250h", "UX 300e", "NX", "NX 350h", "NX 450h+", "RX", "RX 350h", "RX 500h", "GX", "GX 460", "GX 550",
+    "UX", "UX 250h", "UX 300e", "NX", "NX 350h", "NX 450h+", "RX", "RX 350h", "RX 500h", "GX", "GX 460", "GX 550", "GX 550 Overtrail",
     "LX", "LX 600", "LX 570", "RZ", "RZ 450e", "RC", "RC F", "LC", "LC 500", "LC 500h", "LM", "LM 350h", "LM 500h",
-    "TX", "SC", "HS", "CT 200h",
+    "TX", "SC", "HS", "CT 200h", "LBX",
   ] },
-  { make: "Acura", models: ["Integra", "TLX", "ILX", "RLX", "RDX", "MDX", "ZDX", "NSX", "RSX", "TSX", "TL"] },
+  { make: "Acura", models: ["Integra", "TLX", "ILX", "RLX", "RDX", "MDX", "ZDX", "NSX", "RSX", "TSX", "TL", "ADX", "RSX EV"] },
   { make: "Infiniti", models: ["Q50", "Q60", "Q70", "QX30", "QX50", "QX55", "QX60", "QX70", "QX80", "G35", "G37", "M35", "M37", "FX35", "FX45"] },
 
   // ---------- Korean ----------
