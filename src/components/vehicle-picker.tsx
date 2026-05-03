@@ -20,7 +20,7 @@ import {
   getYearOptions,
   type VehicleCategory,
 } from "@/data/vehicles";
-import { fuzzyScore } from "@/lib/fuzzy";
+import { fuzzyScore, normalize } from "@/lib/fuzzy";
 import { MAKE_ALIASES, getModelAliases } from "@/lib/vehicle-aliases";
 
 type Props = {
@@ -90,12 +90,15 @@ function Combo({
         <Command
           filter={(itemValue, search, keywords) => {
             if (!search.trim()) return 1;
-            const candidates = [itemValue, ...(keywords ?? [])];
-            let best = Infinity;
-            for (const c of candidates) {
-              const s = fuzzyScore(search, c);
-              if (s < best) best = s;
-            }
+            // Score the option name first — this is what should drive matching.
+            const nameScore = fuzzyScore(search, itemValue);
+            // Aliases ONLY fire on exact (normalized) equality so e.g. typing
+            // "sup" doesn't pull in items whose alias *contains* "sup"
+            // (like Hiace's "super grandia"). But "chevy" still resolves to
+            // Chevrolet because "chevy" === alias "chevy".
+            const nq = normalize(search);
+            const aliasHit = (keywords ?? []).some((k) => normalize(k) === nq);
+            const best = aliasHit ? Math.min(nameScore, 0.8) : nameScore;
             if (best === Infinity) return 0;
             return 1 / (1 + best);
           }}
@@ -175,12 +178,20 @@ export function VehiclePicker({ category, year, make, model, onChange }: Props) 
     [category, yearNum],
   );
   const makeNames = React.useMemo(
-    () => filteredMakes.map((m) => m.make),
+    () =>
+      filteredMakes
+        .map((m) => m.make)
+        .sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" })),
     [filteredMakes],
   );
 
   const modelOptions = React.useMemo(
-    () => (make ? getModelsForYear(category, make, yearNum) : []),
+    () =>
+      make
+        ? [...getModelsForYear(category, make, yearNum)].sort((a, b) =>
+            a.localeCompare(b, undefined, { sensitivity: "base" }),
+          )
+        : [],
     [category, make, yearNum],
   );
 
