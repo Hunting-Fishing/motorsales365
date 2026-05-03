@@ -699,6 +699,7 @@ export const CAR_MAKES: MakeModels[] = [
       "323", "323F", "626", "626 Capella", "929", "Familia", "Familia GTR", "Protege", "Protege5", "Demio", "Axela", "Atenza", "Bongo", "Eunos Cosmo", "Cosmo",
       "B-Series", "Roadster",
       "CX-60 PHEV", "EZ-6", "Arata", "EZ-60", "Iceo",
+      "Verisa", "Carol", "Flair", "Flair Crossover", "Scrum", "Bongo Brawny", "Familia Van", "CX-80 PHEV",
     ],
   },
   {
