@@ -158,6 +158,8 @@ function AdminPerformance() {
           </div>
         </div>
       </section>
+
+      <ImageMetricsPanel />
     </div>
   );
 }
