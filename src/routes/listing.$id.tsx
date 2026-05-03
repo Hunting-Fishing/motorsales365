@@ -182,6 +182,7 @@ function ListingDetailPage() {
               <ImageWithSkeleton
                 src={cover?.url || placeholderCar}
                 alt={cover ? listing.title : "Vehicle photo coming soon"}
+                eager
               />
             </div>
             {(photos.length > 1 || videos.length > 0) && (
