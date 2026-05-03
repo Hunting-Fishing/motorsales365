@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Settings, ListChecks, Users, Flag, CreditCard, ShieldCheck } from "lucide-react";
+import { Settings, ListChecks, Users, Flag, CreditCard, ShieldCheck, Gauge } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 
@@ -11,6 +11,7 @@ export const Route = createFileRoute("/admin")({
 const NAV: { to: string; label: string; Icon: any; exact?: boolean }[] = [
   { to: "/admin", label: "Overview", Icon: Settings, exact: true },
   { to: "/admin/pricing", label: "Pricing & plans", Icon: CreditCard },
+  { to: "/admin/performance", label: "Performance", Icon: Gauge },
   { to: "/admin/listings", label: "Listings", Icon: ListChecks },
   { to: "/admin/verifications", label: "Verifications", Icon: ShieldCheck },
   { to: "/admin/users", label: "Users", Icon: Users },
