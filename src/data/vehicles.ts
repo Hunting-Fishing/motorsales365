@@ -1027,7 +1027,7 @@ export const MOTORCYCLE_MAKES: MakeModels[] = [
       "V-Strom 250", "V-Strom 250 SX", "V-Strom 650", "V-Strom 650XT", "V-Strom 800DE", "V-Strom 1000", "V-Strom 1050", "V-Strom 1050DE",
       "Katana", "Boulevard", "Boulevard M109R", "Intruder",
       "DR-Z125", "DR-Z250", "DR-Z400", "DR-Z400S", "DR-Z400SM", "DR200", "DR650", "RM-Z250", "RM-Z450", "RM85",
-      "GSX-8R", "GSX-8S", "V-Strom 800RE", "Burgman Street EX 125", "GSX-S1000GX",
+      "GSX-8R", "GSX-8S", "V-Strom 800RE", "Burgman Street EX 125", "GSX-S1000GX", "e-Burgman", "Avenis 125",
     ],
   },
   {
