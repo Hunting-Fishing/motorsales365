@@ -12,6 +12,7 @@ import {
   setPerfSettings,
   type PerfSettings,
 } from "@/lib/perf-settings";
+import { ImageMetricsPanel } from "@/components/image-metrics-panel";
 
 export const Route = createFileRoute("/admin/performance")({
   component: AdminPerformance,
