@@ -1003,6 +1003,7 @@ export const MOTORCYCLE_MAKES: MakeModels[] = [
       "Tenere 700", "WR155R", "WR250R", "WR250F", "WR450F", "Serow", "TT-R125",
       "YZ65", "YZ85", "YZ125", "YZ250", "YZ250F", "YZ250FX", "YZ450F", "YZ450FX",
       "Banshee", "Raptor", "Warrior",
+      "MT-07 2024", "YZF-R9", "Tenere 700 World Raid", "Aerox 155 Turbo", "Y-Connect 125",
     ],
   },
   {
