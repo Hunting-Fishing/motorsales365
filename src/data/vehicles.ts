@@ -641,6 +641,7 @@ export const CAR_MAKES: MakeModels[] = [
       "Mark X", "Mark II", "Cressida", "Crown Majesta", "Starlet", "Starlet GT", "Echo", "Soluna", "Probox", "Succeed", "Granvia", "Avensis", "Auris", "Verso", "Avalon", "Solara", "Matrix", "Venza",
       "MR2", "MR-S", "Celica", "Celica GT-Four", "Supra", "Supra A80", "Supra A90", "Sera", "Estima", "Estima Hybrid", "Previa", "Noah", "Voxy", "Esquire", "Sienta", "Spade", "Porte",
       "Raize", "Raize Hybrid", "Urban Cruiser", "Hilux Surf", "Crown Comfort", "Comfort", "Crown Royal", "Aqua", "Glanza", "Innova HyCross",
+      "Innova HyCross Hybrid", "Hilux GR Sport", "Hilux GR Sport II", "Hilux Rogue", "Yaris Cross Hybrid", "Vios GR-S", "Crown Signia", "Crown Estate", "Camry XV80", "Camry XV80 Hybrid", "Land Cruiser 250 Prado", "GR Yaris MY24", "Land Hopper", "Rumion", "Stout",
     ],
   },
   {

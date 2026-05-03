@@ -1,77 +1,113 @@
-## Goal
+# Expand Asian vehicle make/model dataset
 
-Extend the existing tow workflow (`open → accepted → completed`) with intermediate states so providers can acknowledge pickup and dropoff, customers see live status updates in‑app, and the final bill is captured before the job is closed.
+## Scope
 
-## New job lifecycle
+Extend `src/data/vehicles.ts` (the only source of truth for the make/model pickers) so it matches what users see on Philkotse's brand index, automart.ph filters, and CarGuide.PH coverage. Focus is **Asian makes** (JP, KR, CN, IN, MY, VN, TH) plus filling missing models on already-listed Asian makes. No schema changes — pure data additions, kept alphabetical inside each region block.
 
-```text
-open → accepted → picked_up → dropped_off → completed
-                                          ↘ disputed (optional, stretch)
-```
+Out of scope: Year-range entries in `CAR_MODEL_YEARS` (kept as-is — unmapped models simply stay visible across all years per existing logic).
 
-- `accepted`: provider committed (existing).
-- `picked_up`: provider has the vehicle. Captures `picked_up_at` and an updated drop‑off ETA (minutes).
-- `dropped_off`: vehicle delivered to destination. Captures `dropped_off_at` and the **final bill** (`final_price_php`, optional `completion_notes`).
-- `completed`: customer acknowledges the job is done. Captures `completed_at`. Only the customer (or admin) can transition `dropped_off → completed`.
+## What's already covered
 
-Each state change inserts an in‑app `messages` row to the other party so notifications surface in the existing inbox / Messages tab.
+Cars: 13 Japanese, 6 Korean, ~38 Chinese, ~9 Indian, Proton/Perodua, VinFast.
+Motorcycles: Big-4 JP, KTM/Ducati/Triumph/Aprilia/Vespa, CFMOTO/Benelli/QJ/Zontes/SYM/Kymco/Royal Enfield/Bajaj/TVS/Hero plus PH-local (Rusi, Motorstar, Skygo, Kawayama, Euro Pony).
 
-## Database changes (migration)
+## Gaps to fill
 
-Add to `tow_requests`:
-- `picked_up_at timestamptz null`
-- `dropped_off_at timestamptz null`
-- `completed_at timestamptz null`
-- `eta_minutes int null` — provider's live drop‑off ETA, set at pickup, can be updated.
-- `final_price_php numeric null`
-- `completion_notes text null`
+### New Asian car makes to add
 
-Update RLS for `tow_requests` UPDATE: keep current rule (requester / provider / admin can update). Add a `BEFORE UPDATE` trigger `enforce_tow_status_transitions()` that:
-- Rejects illegal status transitions.
-- Restricts transitions by actor:
-  - `accepted → picked_up` and `picked_up → dropped_off` only when `auth.uid() = provider_id`.
-  - `dropped_off → completed` only when `auth.uid() = requester_id` (or admin).
-  - Customer cancel allowed only while status is `open` or `accepted`.
-- Auto‑stamps `picked_up_at`, `dropped_off_at`, `completed_at` when status flips, so the client can't backdate them.
+Sourced from Philkotse brand index + CarGuide.PH 2024–2026 launches:
 
-Add an `AFTER UPDATE` trigger `notify_tow_status_change()` that inserts a `messages` row to the counter‑party for each meaningful transition (picked up / dropped off / completed / cancelled), mirroring the existing `handle_tow_bid_accepted` notification pattern. This keeps notifications server‑side and reliable even if the client closes the tab.
+- **NETA** (Hozon) — V, X, GT, S, Aya, L
+- **WEY** (GWM premium) — VV5, VV6, VV7, Coffee 01, Coffee 02, Tank-line crossovers
+- **Avatr** (Changan/Huawei/CATL) — 11, 12, 07
+- **IM Motors / Zhiji** — L7, LS6, LS7, L6
+- **Roewe** (SAIC) — RX5, RX9, i5, i6, Marvel R, D7
+- **Baojun** (SAIC-GM-Wuling) — Yep, Yep Plus, KiWi EV, 510, 530, Valli
+- **Trumpchi** (GAC sub-brand listed separately on Philkotse) — GS3, GS4, GS8, M6, M8, Empow, E9
+- **JMC (Jiangling)** — Vigus, Yuhu, Territory, Baodian, Carrying
+- **Soueast** — DX5, DX7, DX8S, V5, V6
+- **Karry** (Chery commercial) — Youjin, Youya, K50, K60
+- **Mitsuoka** (JP specialty often imported grey-market) — Viewt, Galue, Buddy, Rock Star, Himiko, Orochi
+- **LDV** (Maxus rebadge sold by some PH dealers) — T60, T60 Max, D90, G10, V80, eDeliver
+- **Higer**, **Yutong**, **Zhongtong**, **King Long** (buses sometimes filtered) — keep King Long (already), add Higer/Yutong/Zhongtong with common coach/minibus models
+- **Shacman**, **Sinotruk (Howo)**, **FAW Jiefang**, **Beiben** — heavy-duty trucks listed on automart.ph commercial section
+- **Sany** — heavy trucks (PH presence)
 
-## Provider UI (`src/routes/dashboard.tow.tsx` — Direct + Open jobs tabs)
+### New Asian motorcycle makes / sub-brands
 
-Replace the single "Mark completed" button on accepted jobs with a state‑aware action row:
+- **Sundiro Honda**, **Wuyang Honda** (China-made Honda sub-brands occasionally imported)
+- **Haojue** (Suzuki China)
+- **Mash China models** already present — fine
+- **Aima**, **Tailg**, **Yamasaki**, **Senke**, **Jincheng** (Chinese e-scooter / small bikes seen on Philkotse)
+- **Honda Big Bike** PH-only nameplates: confirm Hornet 2.0, NX500, Rebel 1100T already present (will add NX500, Hornet 2.0, CB350, GB350)
+- **Royal Alloy** (UK-Indian retro scooter)
 
-- `accepted` → **Mark picked up** button opens a small dialog: "Drop‑off ETA (minutes, optional)". Submitting updates status to `picked_up`, sets `eta_minutes`.
-- `picked_up` → **Update ETA** (inline) and **Mark dropped off** button opens a dialog with `Final bill (₱)` (required, defaults to accepted bid price) and `Notes` (optional). Submits status `dropped_off` with `final_price_php` + `completion_notes`.
-- `dropped_off` → read‑only "Waiting for customer to confirm" hint with the final bill shown.
-- `completed` / `cancelled` → status badge only.
+### Missing models on existing Asian makes
 
-Status badges in `StatusBadge` get two new variants (`Picked up`, `Dropped off`).
+Cross-checked against each brand's current PH lineup pages:
 
-## Customer UI ("Sent by me" tab + dashboard messages)
+- **Toyota**: add Innova HyCross Hybrid trims, GR Yaris MY24, Hilux GR Sport II, Land Cruiser 250 Prado, Yaris Cross Hybrid, Vios GR-S, Crown Signia, Crown Estate, Camry XV80 Hybrid.
+- **Honda**: add Civic RS Turbo (PH spec), CR-V e:HEV RS, ZR-V e:HEV, Elevate, WR-V VX, Pilot 2024, BR-V S 7-seater.
+- **Nissan**: add Ariya, Leaf 2nd-gen, Qashqai e-Power (when sold here grey-market), Patrol Y63 (2026), Skyline Crossover, Pino, Roox.
+- **Mitsubishi**: add Outlander PHEV 2024, Xpander Cross HEV, Triton 2024 (6th-gen), Pajero 2024 concept.
+- **Mazda**: add CX-60 PHEV, CX-80, MX-30 R-EV, Mazda EZ-6, Mazda Arata.
+- **Suzuki**: add Fronx Hybrid, eVitara, Jimny Nomade 5-door, Swift 2024 (4th-gen).
+- **Isuzu**: add D-Max RT50, mu-X 2024 facelift, ELF EV, Traga.
+- **Hyundai**: add Ioniq 9, Santa Fe MX5 (5th-gen), Tucson NX4 PFL, Inster, Casper, Mufasa.
+- **Kia**: add EV3 GT-Line, EV5, Carnival Hybrid 2024, Tasman pickup, Syros.
+- **BYD**: add Sealion 05 EV, Sealion 07 EV, Yangwang U8/U9, Denza N9, Atto 1, Sea Lion 7, Song L, M9 (export name).
+- **MG**: add MG ES5, Cyberster, MGS5 EV, MG7 PHEV, IM L6 (rebadge clarity).
+- **GAC**: add Aion RT, Aion UT, Hyptec HT, Hyptec GT, M8 Master, GS3 Power.
+- **Geely**: add EX5, Galaxy Starship 7, Starray EM-i facelift, Atlas 8.
+- **Chery**: add Tiggo 9 PHEV, Arrizo 8 Hybrid, iCar 03, iCar V23.
+- **Haval**: add Raptor (Hi4-T), H6 GT PHEV, H7 facelift.
+- **GWM**: add Tank 400 Hi4-T, Tank 500 Hi4-T, Tank 700 Hi4-T, Tank 800, Cannon Alpha PHEV, Wingle 7 EV.
+- **Foton**: add Tunland V9 Pro, View CS2, Toano, Mannar.
+- **JAC**: add JS3 Pro, JS6 Pro, T9 Hunter, eJS1, JS4 EV.
+- **Changan**: add Deepal G318 (move under Deepal), CS75 Plus Champion, UNI-Z, Hunter K50.
+- **JETOUR**: add T2 i-DM, X70 PLUS Champion, Traveller T2.
+- **Jaecoo**: add J5 EV, J7 Plus, J8 PHEV.
+- **Lynk & Co**: add 06 EM-P, 08 EM-P facelift.
+- **Omoda**: add Omoda 9, Omoda C5 PHEV.
+- **NIO/XPeng/Li/ZEEKR/Voyah/Leapmotor**: add 2025 trims (NIO Onvo L60, ET9; XPeng X9, P7+, Mona M03; Li L6, MEGA Home; ZEEKR 7X, Mix; Voyah Free 2024; Leapmotor B10, C16 EV).
+- **Tata**: add Punch EV, Curvv ICE, Sierra (2025), Avinya.
+- **Mahindra**: add XEV 9e, BE 6, Thar Roxx 5-door, Bolero Neo Plus.
+- **Maruti Suzuki**: add eVX, Fronx Strong Hybrid.
+- **Proton**: add e.MAS 7 (EV), X90 Flagship.
+- **Perodua**: add Ativa Hybrid, EMO-1 EV concept (skip concepts).
+- **VinFast**: add VF 3 LFP, VF Wild pickup, Limo Green.
+- **SsangYong / KG Mobility**: add Torres EVX, Actyon 2024 (3rd-gen), Musso EV.
+- **Daihatsu**: add Rocky Hybrid, Move Canbus, Atrai EV.
 
-For each request the requester sent:
-- `accepted` → show provider name, original bid price, "Provider hasn't started yet" hint.
-- `picked_up` → green callout: "Your vehicle has been picked up — ETA {eta_minutes}m" plus `picked_up_at` timestamp.
-- `dropped_off` → callout with **final bill** and **Confirm completion** button. Confirm sets status to `completed`. Optional textarea for a short note that gets attached to the auto‑message back to the provider.
-- `completed` → show final bill + completion timestamp.
+### Missing motorcycle models
 
-Cancel button stays available only while status is `open` or `accepted`.
+- **Honda**: NX500, Hornet 2.0, CB350, GB350, GB350S, ADV160 e:HEV, Forza 350 2024.
+- **Yamaha**: MT-07 2024, R9, Tenere 700 World Raid, Aerox 155 Turbo (PH).
+- **Suzuki**: GSX-8R, GSX-8S, V-Strom 800RE, Burgman Street EX 125.
+- **Kawasaki**: Eliminator 500, Ninja 7 Hybrid, Ninja ZX-4RR, KLX230 SM.
+- **Royal Enfield**: Guerrilla 450, Bear 650, Classic 650, Goan Classic 350, Shotgun 650 (some present, audit).
+- **Bajaj**: Pulsar NS400Z, Freedom 125 CNG, Chetak EV.
+- **TVS**: Apache RTR 310, Jupiter 110, X EV, iQube.
+- **CFMOTO**: 450NK, 675SR-R, 800NK Sport, 800MT-X, Papio Racer.
+- **KTM**: 390 Adventure R, 390 SMC R, 990 Duke R, 1390 Super Duke R Evo.
+- **Husqvarna**: Vitpilen 801, Norden 901 Expedition (have), 250 Enduro.
 
-## Notifications (in‑app)
+## Implementation steps
 
-All notifications use the existing `messages` table so they appear in the dashboard Messages tab and respect existing realtime subscriptions. Messages are inserted by the new `notify_tow_status_change()` trigger:
+1. **Edit `src/data/vehicles.ts`** in a single pass:
+   - In `CAR_MAKES`, append new makes alphabetically inside the appropriate region block (Chinese / Indian / "More Asian-market makes"), and merge new models into existing makes' arrays. Preserve order; no duplicates (case-insensitive).
+   - In `MOTORCYCLE_MAKES`, append new makes under the appropriate region comment and append models to the Big-4 + already-listed brands.
+2. **Sanity dedupe**: Within each `models: [...]` array, ensure no exact-string repeats (the picker tolerates them but we keep it clean).
+3. **No changes** to `CAR_MODEL_YEARS` / `MOTORCYCLE_MODEL_YEARS` — unmapped models continue to show across all years per `getModelsForYear`.
+4. **No changes** to `vehicle-aliases.ts` — alias stack is independent and already handles common typos / chassis codes.
+5. **No code changes** in `src/components/vehicle-picker.tsx` or callers — they read from the same exports.
 
-- Picked up → customer: "Your tow for '{vehicle}' has been picked up. ETA to drop‑off: {eta} min."
-- ETA updated (provider edits `eta_minutes` while `picked_up`) → customer: "Updated drop‑off ETA: {eta} min."
-- Dropped off → customer: "Your vehicle has been dropped off. Final bill: ₱{amount}. Please confirm completion in your dashboard."
-- Completed → provider: "Customer confirmed completion. Final bill: ₱{amount}. Thanks!"
+## Validation
 
-The customer dashboard already polls/realtime‑subscribes to `tow_requests`, so the cards auto‑refresh; no extra realtime channel is needed.
+- Project builds (typecheck) — file is plain data, no type changes.
+- Spot-check picker on `/sell` and `/browse/car`: select Toyota → see new entries (Crown Signia, Camry XV80 Hybrid); select NETA / Avatr / Roewe → models appear.
+- No runtime impact: dataset is bundled at compile-time, render cost is negligible.
 
 ## Files touched
 
-- `supabase/migrations/<new>.sql` — new columns on `tow_requests`, status‑transition trigger, status‑change notification trigger.
-- `src/routes/dashboard.tow.tsx` — new pickup / dropoff dialogs, customer confirm‑completion dialog, expanded `StatusBadge`, extra rendering of `picked_up_at`, `eta_minutes`, `final_price_php`, `completed_at`.
-- `src/integrations/supabase/types.ts` — auto‑regenerated by the migration; no manual edit.
-
-No edge functions, no new secrets, no AI calls. Existing RLS and `handle_tow_bid_accepted` flows are untouched.
+- `src/data/vehicles.ts` — only file edited.
