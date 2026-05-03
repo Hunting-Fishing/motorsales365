@@ -1050,7 +1050,7 @@ export const MOTORCYCLE_MAKES: MakeModels[] = [
   { make: "Moto Guzzi", models: ["V7", "V7 Stone", "V7 Special", "V9", "V9 Bobber", "V85 TT", "V100 Mandello", "California", "Audace", "Eldorado"] },
 
   // Chinese / Local PH-popular
-  { make: "CFMOTO", models: ["150NK", "250NK", "300NK", "300SR", "400NK", "450SR", "450MT", "650NK", "650MT", "650 Adventura", "650GT", "700CL-X", "800NK", "800MT", "800MT Touring", "1250TR-G", "Papio", "Papio SS", "Papio CL", "Papio XO"] },
+  { make: "CFMOTO", models: ["150NK", "250NK", "300NK", "300SR", "400NK", "450NK", "450SR", "450MT", "650NK", "650MT", "650 Adventura", "650GT", "675SR-R", "700CL-X", "800NK", "800NK Sport", "800MT", "800MT Touring", "800MT-X", "1250TR-G", "Papio", "Papio SS", "Papio CL", "Papio XO", "Papio Racer"] },
   { make: "Benelli", models: ["TNT 135", "TNT 150", "TNT 250", "TNT 300", "TNT 600", "TNT 600i", "302S", "302R", "502C", "502X", "752S", "Leoncino 250", "Leoncino 500", "Leoncino 800", "TRK 251", "TRK 502", "TRK 502X", "TRK 702", "TRK 702X", "Imperiale 400", "Tornado 302R"] },
   { make: "QJMotor", models: ["SRK 250", "SRK 400", "SRK 600", "SRK 700", "SRT 550", "SRT 700", "SRT 750", "SRT 800", "SRT 800X", "SRG 600", "SRV 250"] },
   { make: "Zontes", models: ["GK 350", "ZT 125", "ZT 155", "ZT 250", "ZT 310", "ZT 350", "X310", "X350", "T310", "T350", "U150", "U310"] },
