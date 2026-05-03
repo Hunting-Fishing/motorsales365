@@ -211,6 +211,9 @@ function TowPage() {
             {submitting ? "Submitting…" : (search.provider ? "Send to provider" : "Post tow request")}
           </Button>
           <p className="text-xs text-muted-foreground">
+            Open requests are visible to verified tow providers, who can bid on the job. You'll see all bids on your dashboard and pick the one you like.
+          </p>
+          <p className="text-xs text-muted-foreground">
             Browsing for a tow provider?{" "}
             <Link to="/browse/$category" params={{ category: "towing" }} className="font-medium text-primary underline">See towing & trucking listings</Link>.
           </p>
