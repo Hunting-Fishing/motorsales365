@@ -27,6 +27,13 @@ export function SiteFooter() {
             <li><Link to="/browse/$category" params={{ category: "boat" }} className="hover:text-foreground">Boats</Link></li>
             <li><Link to="/browse/$category" params={{ category: "airplane" }} className="hover:text-foreground">Airplanes</Link></li>
             <li><Link to="/browse/$category" params={{ category: "equipment" }} className="hover:text-foreground">Equipment</Link></li>
+            <li><Link to="/browse/$category" params={{ category: "towing" }} className="hover:text-foreground">Towing & Trucking</Link></li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="mb-3 text-sm font-semibold">Tow & deliver</h4>
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            <li><Link to="/tow" className="hover:text-foreground">Request a tow</Link></li>
           </ul>
         </div>
         <div>
