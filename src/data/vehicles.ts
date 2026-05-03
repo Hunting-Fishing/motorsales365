@@ -923,10 +923,10 @@ export const CAR_MAKES: MakeModels[] = [
   { make: "ZEEKR", models: ["001", "001 FR", "007", "009", "009 Grand", "X", "Mix", "7X", "9X"] },
   { make: "Aito", models: ["M5", "M5 EV", "M5 Ultra", "M7", "M7 Ultra", "M8", "M9", "M9 EV"] },
   { make: "Skywell", models: ["ET5", "EW7"] },
-  { make: "Wuling", models: ["Hongguang", "Hongguang Mini EV", "Bingo", "Almaz", "Air EV", "Cortez"] },
+  { make: "Wuling", models: ["Hongguang", "Hongguang Mini EV", "Bingo", "Bingo S", "Almaz", "Air EV", "Cloud EV", "Cortez", "Starlight", "Xingguang"] },
   { make: "Leapmotor", models: ["T03", "C01", "C10", "C16", "C16 EV", "B10"] },
-  { make: "XPeng", models: ["G3", "G6", "G9", "P5", "P7", "P7+", "X9", "Mona M03"] },
-  { make: "NIO", models: ["ES6", "ES7", "ES8", "EC6", "EC7", "ET5", "ET5T", "ET7", "ET9", "EL6", "EL7", "EL8", "Onvo L60"] },
+  { make: "XPeng", models: ["G3", "G6", "G7", "G9", "P5", "P7", "P7+", "X9", "Mona M03", "MONA M03 Max"] },
+  { make: "NIO", models: ["ES6", "ES7", "ES8", "EC6", "EC7", "ET5", "ET5T", "ET7", "ET9", "EL6", "EL7", "EL8", "Onvo L60", "Onvo L90", "Firefly"] },
   
 
   // ---------- Indian ----------
