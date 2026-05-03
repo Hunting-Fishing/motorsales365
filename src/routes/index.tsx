@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Search, Car, Bike, Ship, Plane, Truck, Caravan, ShieldCheck, Tag, Zap } from "lucide-react";
+import { Search, Car, Bike, Ship, Plane, Truck, Caravan, ShieldCheck, Tag, Zap, TruckIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/site-layout";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
