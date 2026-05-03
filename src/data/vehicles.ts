@@ -917,7 +917,7 @@ export const CAR_MAKES: MakeModels[] = [
   { make: "Leapmotor", models: ["T03", "C01", "C10", "C16", "C16 EV", "B10"] },
   { make: "XPeng", models: ["G3", "G6", "G9", "P5", "P7", "P7+", "X9", "Mona M03"] },
   { make: "NIO", models: ["ES6", "ES7", "ES8", "EC6", "EC7", "ET5", "ET5T", "ET7", "ET9", "EL6", "EL7", "EL8", "Onvo L60"] },
-  { make: "Haojue", models: ["DR300", "DR160S", "TR300", "DK150", "HJ150"] },
+  
 
   // ---------- Indian ----------
   { make: "Tata", models: ["Nexon", "Nexon EV", "Punch", "Punch EV", "Tiago", "Tiago EV", "Tigor", "Tigor EV", "Altroz", "Harrier", "Harrier EV", "Safari", "Curvv", "Curvv EV", "Sierra", "Avinya", "Xpres-T", "Ace", "Ace Gold", "Yodha", "Intra", "Sumo", "Indica", "Indigo"] },
