@@ -671,6 +671,7 @@ export const CAR_MAKES: MakeModels[] = [
       "3000GT", "GTO", "FTO", "Colt", "Colt Plus", "Colt Rallyart", "Mirage Coupe", "Lancer GSR", "Lancer Cedia", "Sigma", "Diamante", "Magna", "Verada",
       "Airtrek", "i-MiEV", "Carisma", "Lancer 1.6 GLS",
       "Outlander PHEV 2024", "Xpander Cross HEV", "Triton 2024", "Triton 6th-gen", "Pajero 2024",
+      "eK Wagon", "eK X", "eK Cross", "eK Cross EV", "Town Box", "Minicab", "Minicab MiEV", "Minicab EV", "Pajero Sport 2024 Facelift",
     ],
   },
   {
