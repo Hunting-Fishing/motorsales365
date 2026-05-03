@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
+import { usePerfSettings } from "@/hooks/use-perf-settings";
+import { withImageTransform } from "@/lib/perf-settings";
 
 interface ImageWithSkeletonProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
@@ -9,8 +11,10 @@ interface ImageWithSkeletonProps extends React.ImgHTMLAttributes<HTMLImageElemen
   skeletonClassName?: string;
   /** If true, image loads immediately. Otherwise it preloads when within rootMargin of the viewport. */
   eager?: boolean;
-  /** How far outside the viewport to start preloading. Defaults to 400px. */
+  /** How far outside the viewport to start preloading. Overrides admin setting. */
   rootMargin?: string;
+  /** Use full-size resolution rather than thumbnail. Defaults to false. */
+  full?: boolean;
 }
 
 export function ImageWithSkeleton({
@@ -20,11 +24,16 @@ export function ImageWithSkeleton({
   wrapperClassName,
   skeletonClassName,
   eager = false,
-  rootMargin = "400px",
+  rootMargin,
+  full = false,
   onLoad,
   onError,
   ...rest
 }: ImageWithSkeletonProps) {
+  const perf = usePerfSettings();
+  const effectiveRootMargin = rootMargin ?? perf.rootMargin;
+  const targetWidth = full ? perf.fullWidth : perf.thumbWidth;
+  const transformedSrc = withImageTransform(src, targetWidth, perf.quality);
   const [loaded, setLoaded] = useState(false);
   const [shouldLoad, setShouldLoad] = useState(eager);
   const wrapperRef = useRef<HTMLDivElement | null>(null);

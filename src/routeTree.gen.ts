@@ -36,6 +36,7 @@ import { Route as AdminVerificationsRouteImport } from './routes/admin.verificat
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
+import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
 
@@ -174,6 +175,11 @@ const AdminPricingRoute = AdminPricingRouteImport.update({
   path: '/pricing',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPerformanceRoute = AdminPerformanceRouteImport.update({
+  id: '/performance',
+  path: '/performance',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminListingsRoute = AdminListingsRouteImport.update({
   id: '/listings',
   path: '/listings',
@@ -198,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/tow': typeof TowRoute
   '/admin/listings': typeof AdminListingsRoute
+  '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -227,6 +234,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/tow': typeof TowRoute
   '/admin/listings': typeof AdminListingsRoute
+  '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -259,6 +267,7 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/tow': typeof TowRoute
   '/admin/listings': typeof AdminListingsRoute
+  '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -292,6 +301,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/tow'
     | '/admin/listings'
+    | '/admin/performance'
     | '/admin/pricing'
     | '/admin/reports'
     | '/admin/users'
@@ -321,6 +331,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/tow'
     | '/admin/listings'
+    | '/admin/performance'
     | '/admin/pricing'
     | '/admin/reports'
     | '/admin/users'
@@ -352,6 +363,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/tow'
     | '/admin/listings'
+    | '/admin/performance'
     | '/admin/pricing'
     | '/admin/reports'
     | '/admin/users'
@@ -579,6 +591,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPricingRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/performance': {
+      id: '/admin/performance'
+      path: '/performance'
+      fullPath: '/admin/performance'
+      preLoaderRoute: typeof AdminPerformanceRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/listings': {
       id: '/admin/listings'
       path: '/listings'
@@ -598,6 +617,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminListingsRoute: typeof AdminListingsRoute
+  AdminPerformanceRoute: typeof AdminPerformanceRoute
   AdminPricingRoute: typeof AdminPricingRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -607,6 +627,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminListingsRoute: AdminListingsRoute,
+  AdminPerformanceRoute: AdminPerformanceRoute,
   AdminPricingRoute: AdminPricingRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminUsersRoute: AdminUsersRoute,
