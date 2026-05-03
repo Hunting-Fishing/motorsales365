@@ -682,6 +682,7 @@ export const CAR_MAKES: MakeModels[] = [
       "Leaf", "Leaf e+", "Ariya", "Serena", "Serena e-Power", "Elgrand", "Quest", "Maxima", "Altima", "Altima Coupe", "Teana", "Cefiro", "President",
       "Bluebird", "Bluebird Sylphy", "Primera", "Stanza", "Silvia", "Silvia S15", "180SX", "200SX", "240SX", "300ZX", "Fairlady", "Skyline R30", "Skyline R31", "Cedric", "Gloria", "Laurel",
       "Vanette", "Caravan", "Civilian", "Atlas", "Cabstar", "Datsun", "Pao", "Figaro", "Be-1", "S-Cargo",
+      "Ariya", "Leaf 2nd-gen", "Qashqai e-Power", "Patrol Y63", "Skyline Crossover", "Pino", "Roox", "Magnite", "Sakura",
     ],
   },
   {
