@@ -195,12 +195,8 @@ function TowProviderDashboard() {
     }
   };
 
-  const complete = async (r: TowRequest) => {
-    const { error } = await supabase.from("tow_requests").update({ status: "completed" }).eq("id", r.id);
-    if (error) return toast.error(error.message);
-    toast.success("Marked completed");
-    load();
-  };
+  // (legacy direct-complete removed — use pickup → dropoff → customer confirm flow)
+
 
   const acceptedBidPriceFor = (r: TowRequest): number | null => {
     const accepted = bids.find(b => b.request_id === r.id && b.status === "accepted");
