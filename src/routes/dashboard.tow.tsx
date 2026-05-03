@@ -42,6 +42,12 @@ type TowRequest = {
   needed_at: string | null;
   notes: string | null;
   created_at: string;
+  picked_up_at: string | null;
+  dropped_off_at: string | null;
+  completed_at: string | null;
+  eta_minutes: number | null;
+  final_price_php: number | null;
+  completion_notes: string | null;
 };
 
 type TowBid = {
