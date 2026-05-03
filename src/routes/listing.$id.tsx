@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { MapPin, Heart, Flag, Star, Phone, MessageSquare, ChevronLeft } from "lucide-react";
+import { MapPin, Heart, Flag, Star, Phone, MessageSquare, ChevronLeft, Truck } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -343,6 +343,20 @@ function ListingDetailPage() {
                 <Heart className={`mr-2 h-4 w-4 ${favorited ? "fill-destructive text-destructive" : ""}`} />
                 {favorited ? "Saved" : "Save listing"}
               </Button>
+              {listing.category_slug !== "towing" && (
+                <Button asChild variant="outline" className="w-full">
+                  <Link to="/tow" search={{ listing: listing.id }}>
+                    <Truck className="mr-2 h-4 w-4" /> Need this towed?
+                  </Link>
+                </Button>
+              )}
+              {listing.category_slug === "towing" && (
+                <Button asChild className="w-full">
+                  <Link to="/tow" search={{ provider: listing.id }}>
+                    <Truck className="mr-2 h-4 w-4" /> Request a tow from this provider
+                  </Link>
+                </Button>
+              )}
             </div>
           </div>
 

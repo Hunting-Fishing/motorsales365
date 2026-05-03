@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TowRouteImport } from './routes/tow'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -37,6 +38,11 @@ import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
 
+const TowRoute = TowRouteImport.update({
+  id: '/tow',
+  path: '/tow',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -184,6 +190,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
+  '/tow': typeof TowRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -211,6 +218,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
+  '/tow': typeof TowRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -241,6 +249,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
+  '/tow': typeof TowRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -272,6 +281,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sell'
     | '/signup'
+    | '/tow'
     | '/admin/listings'
     | '/admin/pricing'
     | '/admin/reports'
@@ -299,6 +309,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sell'
     | '/signup'
+    | '/tow'
     | '/admin/listings'
     | '/admin/pricing'
     | '/admin/reports'
@@ -328,6 +339,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sell'
     | '/signup'
+    | '/tow'
     | '/admin/listings'
     | '/admin/pricing'
     | '/admin/reports'
@@ -358,6 +370,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SellRoute: typeof SellRoute
   SignupRoute: typeof SignupRoute
+  TowRoute: typeof TowRoute
   BrowseCategoryRoute: typeof BrowseCategoryRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   SellerIdRoute: typeof SellerIdRoute
@@ -365,6 +378,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/tow': {
+      id: '/tow'
+      path: '/tow'
+      fullPath: '/tow'
+      preLoaderRoute: typeof TowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -624,6 +644,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SellRoute: SellRoute,
   SignupRoute: SignupRoute,
+  TowRoute: TowRoute,
   BrowseCategoryRoute: BrowseCategoryRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   SellerIdRoute: SellerIdRoute,

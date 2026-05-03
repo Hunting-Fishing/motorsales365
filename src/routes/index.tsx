@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Search, Car, Bike, Ship, Plane, Truck, Caravan, ShieldCheck, Tag, Zap } from "lucide-react";
+import { Search, Car, Bike, Ship, Plane, Truck, Caravan, ShieldCheck, Tag, Zap, Construction } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/site-layout";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
@@ -19,7 +19,8 @@ const CATEGORIES = [
   { slug: "motorcycle", name: "Motorcycles", Icon: Bike },
   { slug: "boat", name: "Boats", Icon: Ship },
   { slug: "airplane", name: "Airplanes", Icon: Plane },
-  { slug: "equipment", name: "Equipment", Icon: Truck },
+  { slug: "equipment", name: "Equipment", Icon: Construction },
+  { slug: "towing", name: "Towing & Trucking", Icon: Truck },
   { slug: "other", name: "Other", Icon: Caravan },
 ] as const;
 
@@ -102,7 +103,7 @@ function Index() {
               Buy and sell anything that <span className="text-accent">moves</span>.
             </h1>
             <p className="mt-4 max-w-2xl text-lg text-white/85">
-              Cars, motorcycles, boats, airplanes, and heavy equipment — listed by trusted private sellers and businesses across the Philippines.
+              Cars, motorcycles, boats, airplanes, and heavy equipment — listed by trusted private sellers and businesses across the Philippines. Need it delivered? <Link to="/tow" className="underline underline-offset-2 hover:text-accent">Request a tow</Link>.
             </p>
 
             <form

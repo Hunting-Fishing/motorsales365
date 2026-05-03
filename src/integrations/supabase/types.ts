@@ -535,6 +535,69 @@ export type Database = {
           },
         ]
       }
+      tow_requests: {
+        Row: {
+          created_at: string
+          dropoff_address: string | null
+          dropoff_city: string | null
+          dropoff_province: string | null
+          dropoff_region: string | null
+          id: string
+          listing_id: string | null
+          needed_at: string | null
+          notes: string | null
+          pickup_address: string | null
+          pickup_city: string | null
+          pickup_province: string | null
+          pickup_region: string | null
+          provider_id: string | null
+          requester_id: string
+          status: string
+          updated_at: string
+          vehicle_summary: string
+        }
+        Insert: {
+          created_at?: string
+          dropoff_address?: string | null
+          dropoff_city?: string | null
+          dropoff_province?: string | null
+          dropoff_region?: string | null
+          id?: string
+          listing_id?: string | null
+          needed_at?: string | null
+          notes?: string | null
+          pickup_address?: string | null
+          pickup_city?: string | null
+          pickup_province?: string | null
+          pickup_region?: string | null
+          provider_id?: string | null
+          requester_id: string
+          status?: string
+          updated_at?: string
+          vehicle_summary: string
+        }
+        Update: {
+          created_at?: string
+          dropoff_address?: string | null
+          dropoff_city?: string | null
+          dropoff_province?: string | null
+          dropoff_region?: string | null
+          id?: string
+          listing_id?: string | null
+          needed_at?: string | null
+          notes?: string | null
+          pickup_address?: string | null
+          pickup_city?: string | null
+          pickup_province?: string | null
+          pickup_region?: string | null
+          provider_id?: string | null
+          requester_id?: string
+          status?: string
+          updated_at?: string
+          vehicle_summary?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -641,6 +704,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_towing_provider: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "user"

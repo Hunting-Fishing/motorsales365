@@ -29,7 +29,26 @@ const CATEGORIES = [
   { slug: "boat", name: "Boat" },
   { slug: "airplane", name: "Airplane" },
   { slug: "equipment", name: "Heavy Equipment" },
+  { slug: "towing", name: "Towing & Trucking service" },
   { slug: "other", name: "Other" },
+];
+
+const TOW_SERVICE_TYPES = [
+  "Flatbed",
+  "Wheel-lift / Hook",
+  "Heavy wrecker",
+  "Self-loader",
+  "Box truck",
+  "Lowboy / Trailer",
+  "Roadside assist",
+];
+const TOW_CAPACITIES = [
+  "Motorcycle",
+  "Sedan / Hatchback",
+  "SUV / Pickup",
+  "Van",
+  "Heavy equipment",
+  "Boat / Trailer",
 ];
 
 function SellPage() {
@@ -54,6 +73,14 @@ function SellPage() {
   const [mileage, setMileage] = useState("");
   const [transmission, setTransmission] = useState("");
   const [fuel, setFuel] = useState("");
+
+  // Towing service-specific fields
+  const [towServiceType, setTowServiceType] = useState("");
+  const [towCapacity, setTowCapacity] = useState("");
+  const [towCoverage, setTowCoverage] = useState("");
+  const [towBaseRate, setTowBaseRate] = useState("");
+  const [towPerKm, setTowPerKm] = useState("");
+  const [tow247, setTow247] = useState(false);
 
   const [photos, setPhotos] = useState<File[]>([]);
   const [video, setVideo] = useState<File | null>(null);
@@ -232,6 +259,14 @@ function SellPage() {
         if (mileage) attributes.mileage_km = mileage;
         if (transmission) attributes.transmission = transmission;
         if (fuel) attributes.fuel = fuel;
+        if (category === "towing") {
+          if (towServiceType) attributes.service_type = towServiceType;
+          if (towCapacity) attributes.vehicle_capacity = towCapacity;
+          if (towCoverage) attributes.coverage_regions = towCoverage.split(",").map(s => s.trim()).filter(Boolean);
+          if (towBaseRate) attributes.base_rate_php = Number(towBaseRate);
+          if (towPerKm) attributes.per_km_rate_php = Number(towPerKm);
+          attributes.available_24_7 = tow247;
+        }
 
         const expiryDays = pricing.listing_expiry_days ?? 60;
         const expires = new Date();
@@ -354,7 +389,44 @@ function SellPage() {
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Details</h2>
-            {(category === "car" || category === "motorcycle") ? (
+            {category === "towing" ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label>Service type</Label>
+                  <Select value={towServiceType} onValueChange={setTowServiceType}>
+                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectContent>
+                      {TOW_SERVICE_TYPES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Vehicle capacity</Label>
+                  <Select value={towCapacity} onValueChange={setTowCapacity}>
+                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectContent>
+                      {TOW_CAPACITIES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="sm:col-span-2">
+                  <Label>Coverage regions (comma-separated)</Label>
+                  <Input value={towCoverage} onChange={(e) => setTowCoverage(e.target.value)} placeholder="NCR, Region IV-A, Region III" />
+                </div>
+                <div>
+                  <Label>Base rate (₱)</Label>
+                  <Input type="number" min="0" value={towBaseRate} onChange={(e) => setTowBaseRate(e.target.value)} />
+                </div>
+                <div>
+                  <Label>Per-km rate (₱)</Label>
+                  <Input type="number" min="0" value={towPerKm} onChange={(e) => setTowPerKm(e.target.value)} />
+                </div>
+                <label className="flex items-center gap-2 text-sm sm:col-span-2">
+                  <input type="checkbox" checked={tow247} onChange={(e) => setTow247(e.target.checked)} />
+                  Available 24/7
+                </label>
+              </div>
+            ) : (category === "car" || category === "motorcycle") ? (
               <div className="space-y-4">
                 <VehiclePicker
                   category={category as "car" | "motorcycle"}
