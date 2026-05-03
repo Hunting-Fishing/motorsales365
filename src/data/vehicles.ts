@@ -770,7 +770,7 @@ export const CAR_MAKES: MakeModels[] = [
       "K3 GT Hatch", "Niro Plus", "Bongo III EV", "Carens Clavis EV", "Tasman X-Pro",
     ],
   },
-  { make: "Genesis", models: ["G70", "G80", "G80 Electrified", "G90", "GV60", "GV70", "GV70 Electrified", "GV80", "GV80 Coupe", "X Convertible"] },
+  { make: "Genesis", models: ["G70", "G70 Shooting Brake", "G80", "G80 Electrified", "G90", "GV60", "GV70", "GV70 Electrified", "GV80", "GV80 Coupe", "GV80 Coupe Magma", "Neolun", "X Convertible"] },
   { make: "SsangYong", models: ["Tivoli", "Tivoli XLV", "Korando", "Rexton", "Rexton Sports", "Musso", "Stavic", "Rodius", "Actyon", "Kyron", "Chairman"] },
 
   // ---------- American ----------
