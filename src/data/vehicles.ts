@@ -694,6 +694,7 @@ export const CAR_MAKES: MakeModels[] = [
       "BT-50", "Tribute", "RX-7", "RX-7 FD", "RX-7 FC", "RX-8", "Mazda5", "Premacy", "Biante", "MPV",
       "323", "323F", "626", "626 Capella", "929", "Familia", "Familia GTR", "Protege", "Protege5", "Demio", "Axela", "Atenza", "Bongo", "Eunos Cosmo", "Cosmo",
       "B-Series", "Roadster",
+      "CX-60 PHEV", "EZ-6", "Arata", "EZ-60", "Iceo",
     ],
   },
   {
