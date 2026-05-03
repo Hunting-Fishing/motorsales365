@@ -724,6 +724,7 @@ export const CAR_MAKES: MakeModels[] = [
       "Hi-Lander", "Fuego", "Trooper", "Trooper II", "Wizard", "Rodeo", "VehiCROSS", "Bighorn", "Panther", "Ascender",
       "Traviz", "N-Series", "NPR", "NQR", "NHR", "NLR", "F-Series", "FRR", "FVR", "FVZ", "FSR", "Giga", "C-Series",
       "Elf", "Forward", "Reach", "Como", "Stylus", "Impulse",
+      "D-Max RT50", "mu-X 2024 Facelift", "Elf EV", "Traga", "QKR",
     ],
   },
   { make: "Lexus", models: [
