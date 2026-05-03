@@ -20,7 +20,7 @@ import {
   getYearOptions,
   type VehicleCategory,
 } from "@/data/vehicles";
-import { fuzzyScore } from "@/lib/fuzzy";
+import { fuzzyScore, normalize } from "@/lib/fuzzy";
 import { MAKE_ALIASES, getModelAliases } from "@/lib/vehicle-aliases";
 
 type Props = {
