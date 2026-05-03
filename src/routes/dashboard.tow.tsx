@@ -493,7 +493,7 @@ function TowProviderDashboard() {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setBidTarget(null)} disabled={bidSubmitting}>Cancel</Button>
-            <Button onClick={submitBid} disabled={bidSubmitting}>{bidSubmitting ? "Submitting…" : "Submit bid"}</Button>
+            <Button onClick={submitBid} disabled={bidSubmitting}>{bidSubmitting ? "Submitting…" : (myBidFor(bidTarget?.id ?? "")?.status === "pending" ? "Save changes" : "Submit bid")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
