@@ -21,6 +21,7 @@ const NAV = [
   { category: "boat", label: "Boats" },
   { category: "airplane", label: "Airplanes" },
   { category: "equipment", label: "Equipment" },
+  { category: "towing", label: "Towing" },
 ] as const;
 
 export function SiteHeader() {
