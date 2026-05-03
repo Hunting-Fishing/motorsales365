@@ -7,6 +7,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 export const Route = createFileRoute("/dashboard/tow")({
   head: () => ({
@@ -42,6 +44,9 @@ function TowProviderDashboard() {
   const [isProvider, setIsProvider] = useState<boolean | null>(null);
   const [requests, setRequests] = useState<TowRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [declineTarget, setDeclineTarget] = useState<TowRequest | null>(null);
+  const [declineReason, setDeclineReason] = useState("");
+  const [declining, setDeclining] = useState(false);
 
   const load = async () => {
     if (!user) return;
@@ -102,16 +107,40 @@ function TowProviderDashboard() {
     load();
   };
 
-  const decline = async (r: TowRequest) => {
+  const decline = (r: TowRequest) => {
     if (!user) return;
-    // For direct requests, mark cancelled. For broadcasts, just hide locally (we can't delete others' requests).
+    // For direct requests, open the reason dialog. For broadcasts, hide locally.
     if (r.provider_id === user.id) {
-      const { error } = await supabase.from("tow_requests").update({ status: "cancelled" }).eq("id", r.id);
-      if (error) return toast.error(error.message);
-      toast.success("Request declined");
-      load();
+      setDeclineReason("");
+      setDeclineTarget(r);
     } else {
       setRequests(prev => prev.filter(x => x.id !== r.id));
+    }
+  };
+
+  const confirmDecline = async () => {
+    if (!user || !declineTarget) return;
+    const r = declineTarget;
+    setDeclining(true);
+    try {
+      const { error } = await supabase.from("tow_requests").update({ status: "cancelled" }).eq("id", r.id);
+      if (error) throw error;
+      const reason = declineReason.trim();
+      const body = reason
+        ? `I'm unable to take your tow request for "${r.vehicle_summary}". Reason: ${reason}`
+        : `I'm unable to take your tow request for "${r.vehicle_summary}".`;
+      const msg: any = { sender_id: user.id, recipient_id: r.requester_id, body };
+      if (r.listing_id) msg.listing_id = r.listing_id;
+      const { error: msgErr } = await supabase.from("messages").insert(msg);
+      if (msgErr) throw msgErr;
+      toast.success("Request declined");
+      setDeclineTarget(null);
+      setDeclineReason("");
+      load();
+    } catch (e: any) {
+      toast.error(e.message ?? "Failed to decline");
+    } finally {
+      setDeclining(false);
     }
   };
 
@@ -205,6 +234,29 @@ function TowProviderDashboard() {
           />
         </TabsContent>
       </Tabs>
+
+      <Dialog open={!!declineTarget} onOpenChange={(o) => { if (!o) { setDeclineTarget(null); setDeclineReason(""); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Decline tow request</DialogTitle>
+            <DialogDescription>
+              The requester will get a message letting them know. Adding a reason is optional but helpful.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            rows={4}
+            value={declineReason}
+            onChange={(e) => setDeclineReason(e.target.value)}
+            placeholder="e.g. Out of coverage area, vehicle too heavy for my flatbed, fully booked that day…"
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeclineTarget(null)} disabled={declining}>Cancel</Button>
+            <Button onClick={confirmDecline} disabled={declining}>
+              {declining ? "Declining…" : "Decline & notify"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
