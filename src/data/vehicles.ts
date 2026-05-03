@@ -686,6 +686,7 @@ export const CAR_MAKES: MakeModels[] = [
       "Bluebird", "Bluebird Sylphy", "Primera", "Stanza", "Silvia", "Silvia S15", "180SX", "200SX", "240SX", "300ZX", "Fairlady", "Skyline R30", "Skyline R31", "Cedric", "Gloria", "Laurel",
       "Vanette", "Caravan", "Civilian", "Atlas", "Cabstar", "Datsun", "Pao", "Figaro", "Be-1", "S-Cargo",
       "Ariya", "Leaf 2nd-gen", "Qashqai e-Power", "Patrol Y63", "Skyline Crossover", "Pino", "Roox", "Magnite", "Sakura",
+      "Note Aura", "Note Aura Nismo", "X-Trail T33", "Skyline V37", "Cima", "Fuga", "Wingroad", "AD Van", "Dayz",
     ],
   },
   {
