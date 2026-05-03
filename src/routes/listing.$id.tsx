@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { formatPHP, formatDate } from "@/lib/format";
 import placeholderCar from "@/assets/placeholder-car.png";
+import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 
 const REPORT_REASONS = [
   "Suspected scam or fraud",
