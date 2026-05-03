@@ -654,6 +654,7 @@ export const CAR_MAKES: MakeModels[] = [
       "Integra", "Integra Type R", "Prelude", "S2000", "NSX", "NSX Type S", "Beat", "S660", "S800", "Today",
       "Vezel", "Vezel Hybrid", "Shuttle", "Crosstour", "Element", "Ridgeline", "CR-Z", "Crossroad", "Avancier", "UR-V",
       "Legend", "Inspire", "Saber", "Vigor", "City ZX", "City SX-8", "Civic VTi", "Civic SiR", "Acty", "N-Box", "N-One", "N-WGN", "N-Van",
+      "Civic RS Turbo", "CR-V e:HEV RS", "ZR-V e:HEV", "Elevate", "WR-V VX", "BR-V S 7-Seater", "Pilot 2024", "N-Box Slash", "N-Box Joy",
     ],
   },
   {
