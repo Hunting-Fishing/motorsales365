@@ -389,7 +389,44 @@ function SellPage() {
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Details</h2>
-            {(category === "car" || category === "motorcycle") ? (
+            {category === "towing" ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label>Service type</Label>
+                  <Select value={towServiceType} onValueChange={setTowServiceType}>
+                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectContent>
+                      {TOW_SERVICE_TYPES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Vehicle capacity</Label>
+                  <Select value={towCapacity} onValueChange={setTowCapacity}>
+                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectContent>
+                      {TOW_CAPACITIES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="sm:col-span-2">
+                  <Label>Coverage regions (comma-separated)</Label>
+                  <Input value={towCoverage} onChange={(e) => setTowCoverage(e.target.value)} placeholder="NCR, Region IV-A, Region III" />
+                </div>
+                <div>
+                  <Label>Base rate (₱)</Label>
+                  <Input type="number" min="0" value={towBaseRate} onChange={(e) => setTowBaseRate(e.target.value)} />
+                </div>
+                <div>
+                  <Label>Per-km rate (₱)</Label>
+                  <Input type="number" min="0" value={towPerKm} onChange={(e) => setTowPerKm(e.target.value)} />
+                </div>
+                <label className="flex items-center gap-2 text-sm sm:col-span-2">
+                  <input type="checkbox" checked={tow247} onChange={(e) => setTow247(e.target.checked)} />
+                  Available 24/7
+                </label>
+              </div>
+            ) : (category === "car" || category === "motorcycle") ? (
               <div className="space-y-4">
                 <VehiclePicker
                   category={category as "car" | "motorcycle"}
