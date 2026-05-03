@@ -56,11 +56,11 @@ export function ImageWithSkeleton({
           }
         }
       },
-      { rootMargin },
+      { rootMargin: effectiveRootMargin },
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [eager, shouldLoad, rootMargin]);
+  }, [eager, shouldLoad, effectiveRootMargin]);
 
   return (
     <div ref={wrapperRef} className={cn("relative h-full w-full", wrapperClassName)}>
@@ -70,7 +70,7 @@ export function ImageWithSkeleton({
       {shouldLoad && (
         <img
           {...rest}
-          src={src}
+          src={transformedSrc}
           alt={alt}
           decoding="async"
           loading={eager ? "eager" : "lazy"}
