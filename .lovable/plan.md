@@ -1,98 +1,86 @@
-# Year → Make → Model cascading picker (Asian-market focus)
+## Add Towing & Trucking category
 
-Goal: behave like a parts catalog lookup (RockAuto / PartsAvatar style) — pick **Year first**, then **Make**, then **Model**, where the model list is filtered to nameplates actually sold that year. Cover Asian-market makes/models exhaustively, with explicit "Other" + add-missing affordances.
+Two parts: a new marketplace category where towing/trucking providers list their service, and a "Request a tow" quick-action so buyers can arrange transport for a vehicle they're buying (to home, to a mechanic, between regions).
 
-## Scope
+### 1. Database (migration)
 
-1. Expand `src/data/vehicles.ts` to include **year ranges per model** (Asian market — JDM, PH, Thai/Indo CKD, Indian, Chinese, Korean, Malaysian).
-2. Reshape the picker into a 3-step cascade: Year → Make → Model.
-3. Filter Make + Model lists by the selected Year.
-4. Keep "Add missing make / Add model / Other" affordances at every step.
-5. Hook the new Year value into `sell.tsx` (replace its free-text Year input) and `listing.$id.edit.tsx` if it has the same flow.
-
-No DB migration needed — `year` already lives in `listings.attributes.year` (free text today). We just upgrade the input.
-
-## Data shape change
-
-`src/data/vehicles.ts` — replace `models: string[]` with `models: ModelEntry[]`:
-
-```ts
-export type ModelEntry = {
-  name: string;
-  /** Year the nameplate was first sold in any Asian market. */
-  startYear: number;
-  /** Last year sold; omit/null = still in production. */
-  endYear?: number | null;
-  /** Optional: market tags for future filters ("PH","JDM","IN","CN","TH","KR","MY"). */
-  markets?: string[];
-};
-
-export type MakeModels = {
-  make: string;
-  models: ModelEntry[];
-};
-```
-
-Backwards-compat helper:
-
-```ts
-export function getModelsForYear(make: string, category, year?: number): string[]
-export function getMakesForYear(category, year?: number): string[]
-```
-
-When `year` is undefined, return everything (so the picker still works without a year).
-
-### Coverage targets (sourced again from autodeal.com.ph, philkotse.com, carguide.ph, automart.ph top-15, plus market history):
-
-- **Japanese (Toyota, Honda, Nissan, Mazda, Mitsubishi, Suzuki, Subaru, Isuzu, Daihatsu, Lexus, Infiniti, Acura, Datsun)** — every PH-CBU/CKD nameplate + JDM grey-import staples (Mark X, Crown Athlete, Stagea, Cefiro A31/A32/A33, Laurel C33/C34/C35, Skyline R32–R35, Silvia S13–S15, Cresta, Chaser, Soarer, Aristo, Celsior, Caldina, Wingroad, AD Van, Probox, Succeed, Bongo, Bongo Friendee, Delica, etc.) with accurate generation years.
-- **Korean (Hyundai, Kia, Genesis, SsangYong/KGM, Daewoo)** — Eon, i10, i20, Reina, Stargazer, Stargazer X, Staria, Casper, Creta, Venue, Alcazar, Exter, Ioniq 5/6/9, Sonata, Stonic, Carens, EV5/EV6/EV9, Tasman, Mohave, Carnival/Sedona generations, Sportage MK1–MK5, Sorento, Telluride, Picanto/Morning, Rio, Soul, Cerato/Forte/K3, K5/Optima, K8, K9/Quoris, Ray, Bongo, Frontier, etc.
-- **Chinese (BYD, MG, Geely, Chery, GAC, Haval, GWM, Foton, JAC, Maxus, BAIC, Changan, DFSK, Dongfeng, JETOUR, Jaecoo, Omoda, Forthing, Leapmotor, Xpeng, NIO, Zeekr, Hongqi, Hozon Neta, Lynk & Co, IM Motors, Smart, Voyah)** — full current PH/SE-Asia lineups with launch years (Atto 3 2022→, Seal 2023→, M6 2023→, Coolray 2019→, GS3 Emzoom 2023→, Tiggo 2/4/5/7/8 series, Jolion 2021→, H6 2021→, Tank 300/500, etc.).
-- **Indian (Tata, Mahindra, Maruti Suzuki, Force, Bajaj/Bajaj Auto, Premier, Hindustan)** — Nexon, Punch, Harrier, Safari, Curvv, Tiago, Tigor, Altroz, Sumo, Indica/Indigo legacy; Mahindra XUV300/400/700, Scorpio/Scorpio-N, Thar, Bolero, Marazzo, KUV, TUV, Alturas G4; Maruti Swift/Dzire/Baleno/Brezza/Ertiga/XL6/Grand Vitara/Jimny/Fronx/Ignis/Eeco/Wagon R/Celerio/S-Presso/Alto K10.
-- **Malaysian (Proton, Perodua)** — Saga MK1–MK4, Persona, Iriz, Exora, X50, X70, X90, S70, e.MAS 7; Myvi, Bezza, Axia, Ativa, Aruz, Alza.
-- **Indonesian/Thai-CKD specials** — Toyota Avanza/Veloz/Rush/Raize/Yaris Cross AC200, Daihatsu Xenia/Terios/Sigra/Ayla/Rocky, Wuling Air EV/Almaz/Confero/Alvez, DFSK Glory.
-
-Same depth for **motorcycles**: Honda (Wave 100/110/125/Alpha, XRM 110/125/150/RS, TMX 125/155, CG125, Click 125/150/160, ADV 150/160/350, BeAT, Genio, Vario, PCX 125/150/160, Air Blade, Super Cub, CBR series, CB series, CRF series, X-ADV, Forza, Gold Wing, Africa Twin), Yamaha (Mio family, Sniper, NMAX, Aerox, XSR, MT, YZF-R, FZ, Tracer, Tenere, Bolt, FZR), Suzuki (Raider J/R150/R150 Fi, Skydrive, Smash, Burgman, Hayabusa, GSX, V-Strom, Jixxer), Kawasaki (Barako II, Rouser NS series, CT100, Bajaj Pulsar rebadges, Ninja 250/300/400/650/ZX-6R/ZX-10R, Z series, Versys, KLR, KX), plus KTM, Husqvarna, Ducati, BMW Motorrad, Triumph, Royal Enfield, Bajaj, TVS, Hero, CFMOTO, Benelli, QJ Motor, GPX, Keeway, Kymco, Lambretta, Vespa with nameplate years.
-
-Volume: roughly 2–3× current model count, ~1500–2200 entries total. Done in chunks per region to keep the file reviewable.
-
-## Picker UX
-
-`src/components/vehicle-picker.tsx`:
+- Insert new row in `categories`:
+  - `slug = 'towing'`, `name = 'Towing & Trucking'`, `icon = 'truck'`, `sort_order = 6` (bump `other` to 7).
+- No schema changes needed — towing service listings reuse `listings` with `category_slug = 'towing'` and store service details in `attributes` JSON:
+  - `service_type` (flatbed / wheel-lift / heavy wrecker / self-loader / box-truck / lowboy)
+  - `vehicle_capacity` (sedan / SUV / motorcycle / heavy equipment / boat trailer)
+  - `coverage_regions` (string[])
+  - `base_rate_php`, `per_km_rate_php`
+  - `available_24_7` (bool), `response_time_minutes`
+- Optional new table `tow_requests` (so requests aren't lost in the messages thread):
 
 ```text
-┌───────── Vehicle ─────────┐
-│ [ Year ▾ ]  [ Make ▾ ]  [ Model ▾ ]   [ + Other ]
-└───────────────────────────┘
+tow_requests
+  id uuid pk
+  requester_id uuid (auth.uid)
+  provider_id uuid null     -- null = broadcast/open request
+  listing_id uuid null      -- the vehicle being towed, if from a listing page
+  pickup_region/province/city/address text
+  dropoff_region/province/city/address text
+  vehicle_summary text       -- "2018 Civic, non-running"
+  needed_at timestamptz null
+  notes text
+  status text default 'open' -- open / accepted / completed / cancelled
+  created_at, updated_at
 ```
 
-- `<Props>` becomes `{ year, make, model, onChange({year,make,model}) }`.
-- **Year combo**: list 1980 → currentYear+1 (newest first). Always allows free-text custom year. Includes an "Older" option for pre-1980.
-- **Make combo**: filtered to makes that have ≥1 model produced in the selected year. If no Year picked, show all. Persistent "Add missing make" footer.
-- **Model combo**: filtered to models whose `[startYear, endYear ?? +∞]` covers the year. Persistent "Add model" footer.
-- Selecting Year clears Model if the current Model is out-of-range; same when Make changes.
-- Top-level **"Other / Not in list"** button switches the whole row into 3 free-text inputs (Year/Make/Model) and stays editable. This satisfies the "Add Other button" ask.
+RLS:
+- Requester can SELECT/UPDATE/DELETE own rows.
+- Provider (if `provider_id = auth.uid()`) can SELECT and UPDATE status.
+- INSERT: `auth.uid() = requester_id`.
+- Open broadcast requests (`provider_id is null` and `status = 'open'`) are SELECTable by users with a published towing listing (verified via EXISTS on listings).
 
-Search/filter still uses the existing `fuzzyScore` + alias keywords (Civic FE, Micra K14, etc.).
+### 2. Frontend
 
-## Caller updates
+**Category wiring (`car`-like everywhere):**
+- `src/routes/index.tsx` — add `{ slug: "towing", name: "Towing & Trucking", Icon: Truck }` to category grid.
+- `src/components/site-header.tsx` — add nav entry.
+- `src/components/site-footer.tsx` — add Browse link.
+- `src/routes/sell.tsx` — add `{ slug: "towing", name: "Towing & Trucking" }`. When selected, hide the VehiclePicker (year/make/model) and show towing-specific fields (service type, capacity, coverage regions multi-select, rates, 24/7 toggle).
+- `src/routes/browse.$category.tsx` — already param-driven; add a small filter group when `category === 'towing'` (service type, coverage region) reading from `attributes`.
 
-- `src/routes/sell.tsx`:
-  - Drop the standalone `<Input>` Year field at line 366/379.
-  - Pass `year` through `VehiclePicker` and into `attributes.year` (already there at line 228).
-  - Free-text fallback path (the `Other`/non-vehicle category branch at 373–379) keeps its plain inputs.
-- `src/routes/listing.$id.edit.tsx`: same change if it mirrors sell.tsx (will verify and update during implementation).
-- Browse filter (`browse.$category.tsx`) is unaffected — still filters via title/attributes search; we can wire a Year filter in a follow-up.
+**New route `src/routes/tow.tsx`** — "Request a tow" landing page:
+- Form: pickup + dropoff (LocationPicker), vehicle summary, needed-by date/time, notes.
+- Optional: pick a specific provider (links from a provider listing pre-fill `provider_id`) or broadcast.
+- On submit → insert into `tow_requests`; also create a `messages` row to the provider (if specific) so it appears in their inbox.
+- Show user's own past requests with status.
 
-## Files touched
+**"Request a tow" CTA on listing detail (`src/routes/listing.$id.tsx`):**
+- Below the contact-seller block, add "Need this towed?" button → links to `/tow?listing=<id>` with that listing prefilled (pickup = seller location, dropoff blank, vehicle_summary = listing title).
 
-- `src/data/vehicles.ts` — new `ModelEntry` shape, expanded data, `getMakesForYear` / `getModelsForYear` helpers.
-- `src/lib/vehicle-aliases.ts` — minor: alias keys keyed by string still work (no shape change required).
-- `src/components/vehicle-picker.tsx` — 3-step cascade, year combo, "Other" toggle.
-- `src/routes/sell.tsx` — pass year through picker, remove duplicate year input.
-- `src/routes/listing.$id.edit.tsx` — same wiring.
+**Provider dashboard tab `src/routes/dashboard.tow.tsx`:**
+- Lists incoming `tow_requests` (direct + open broadcasts matching their coverage regions).
+- Accept / decline / mark completed actions.
+- Add link in `src/routes/dashboard.tsx` sidebar visible only when user has at least one active towing listing.
 
-## Out of scope (call out for later if wanted)
+### 3. Listing card / vehicle data
 
-- Trims/sub-models per year (e.g. Civic RS vs E vs V for 2024 PH spec). Could be a 4th column.
-- Browse-page Year facet filter.
-- Server-side year validation.
+- `src/data/vehicles.ts` is unchanged — towing listings don't go through VehiclePicker.
+- `src/components/listing-card.tsx` — when `category_slug === 'towing'`, show service type + coverage regions instead of year/mileage chips (if those exist).
+
+### 4. Out of scope (for now)
+
+- No payments/escrow for tow jobs — coordination happens via existing messages.
+- No live driver tracking / map routing.
+- No automatic price quoting — providers quote in chat.
+
+### Files to touch
+
+```text
+supabase migration: add categories row + tow_requests table & RLS
+src/routes/index.tsx
+src/components/site-header.tsx
+src/components/site-footer.tsx
+src/routes/sell.tsx
+src/routes/browse.$category.tsx
+src/routes/listing.$id.tsx
+src/routes/tow.tsx                (new)
+src/routes/dashboard.tow.tsx      (new)
+src/routes/dashboard.tsx
+src/components/listing-card.tsx
+```
