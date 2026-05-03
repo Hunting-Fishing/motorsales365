@@ -359,13 +359,37 @@ function TowProviderDashboard() {
               }}
               renderActions={(r) => {
                 const my = myBidFor(r.id);
+                const requestOpen = r.status === "open";
+                const canEdit = !my || my.status === "pending" || my.status === "withdrawn" || my.status === "declined";
+                if (!requestOpen) {
+                  return <div className="text-xs text-muted-foreground">Request closed</div>;
+                }
                 return (
                   <div className="flex flex-wrap gap-2">
-                    <Button size="sm" onClick={() => openBid(r)}>
-                      <Gavel className="mr-1 h-3.5 w-3.5" />{my ? "Update bid" : "Place bid"}
-                    </Button>
+                    {canEdit && (
+                      <Button size="sm" onClick={() => openBid(r)}>
+                        <Gavel className="mr-1 h-3.5 w-3.5" />
+                        {my && my.status === "pending" ? "Update bid" : my ? "Re-bid" : "Place bid"}
+                      </Button>
+                    )}
                     {my && my.status === "pending" && (
-                      <Button size="sm" variant="ghost" onClick={() => withdrawBid(my.id)}>Withdraw</Button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="sm" variant="ghost">Withdraw</Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Withdraw your bid?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              The customer will no longer see this bid. You can place a new one while the request is still open.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Keep bid</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => withdrawBid(my.id)}>Withdraw</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     )}
                   </div>
                 );
