@@ -497,42 +497,54 @@ function TowProviderDashboard() {
             empty="You haven't requested any tows yet."
             renderExtra={(r) => {
               const list = bidsForRequest(r.id);
-              if (r.provider_id || list.length === 0) return null;
+              const showBids = !r.provider_id && list.length > 0;
               return (
-                <div className="mt-3 space-y-2">
-                  <div className="text-sm font-medium">{list.length} bid{list.length === 1 ? "" : "s"}</div>
-                  <ul className="space-y-2">
-                    {list.map((b) => (
-                      <li key={b.id} className="rounded-md border border-border bg-muted/40 p-3">
-                        <div className="flex flex-wrap items-start justify-between gap-2">
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-2">
-                              <span className="font-semibold">{providerNames[b.provider_id] ?? "Provider"}</span>
-                              <BidStatusBadge status={b.status} />
+                <>
+                  <CustomerJobStage r={r} />
+                  {showBids && (
+                    <div className="mt-3 space-y-2">
+                      <div className="text-sm font-medium">{list.length} bid{list.length === 1 ? "" : "s"}</div>
+                      <ul className="space-y-2">
+                        {list.map((b) => (
+                          <li key={b.id} className="rounded-md border border-border bg-muted/40 p-3">
+                            <div className="flex flex-wrap items-start justify-between gap-2">
+                              <div className="min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold">{providerNames[b.provider_id] ?? "Provider"}</span>
+                                  <BidStatusBadge status={b.status} />
+                                </div>
+                                <div className="text-sm">
+                                  <span className="font-semibold">₱{b.price_php}</span>
+                                  {b.eta_minutes != null && <span className="text-muted-foreground"> · ETA {b.eta_minutes}m</span>}
+                                </div>
+                                {b.note && <div className="mt-1 text-sm text-muted-foreground">{b.note}</div>}
+                              </div>
+                              {r.status === "open" && b.status === "pending" && (
+                                <Button size="sm" onClick={() => acceptBid(b)}>Accept bid</Button>
+                              )}
                             </div>
-                            <div className="text-sm">
-                              <span className="font-semibold">₱{b.price_php}</span>
-                              {b.eta_minutes != null && <span className="text-muted-foreground"> · ETA {b.eta_minutes}m</span>}
-                            </div>
-                            {b.note && <div className="mt-1 text-sm text-muted-foreground">{b.note}</div>}
-                          </div>
-                          {r.status === "open" && b.status === "pending" && (
-                            <Button size="sm" onClick={() => acceptBid(b)}>Accept bid</Button>
-                          )}
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </>
               );
             }}
             renderActions={(r) => (
-              r.status === "open" || r.status === "accepted" ? (
-                <Button size="sm" variant="outline" onClick={async () => {
-                  await supabase.from("tow_requests").update({ status: "cancelled" }).eq("id", r.id);
-                  load();
-                }}>Cancel</Button>
-              ) : null
+              <div className="flex flex-wrap gap-2">
+                {r.status === "dropped_off" && (
+                  <Button size="sm" onClick={() => setConfirmTarget(r)}>
+                    <CheckCircle2 className="mr-1 h-3.5 w-3.5" />Confirm completion
+                  </Button>
+                )}
+                {(r.status === "open" || r.status === "accepted") && (
+                  <Button size="sm" variant="outline" onClick={async () => {
+                    await supabase.from("tow_requests").update({ status: "cancelled" }).eq("id", r.id);
+                    load();
+                  }}>Cancel</Button>
+                )}
+              </div>
             )}
           />
         </TabsContent>
