@@ -711,6 +711,7 @@ export const CAR_MAKES: MakeModels[] = [
       "APV", "Carry", "Multicab", "Every", "Every Wagon", "Wagon R", "Wagon R+", "Cultus", "Liana", "SX4", "SX4 S-Cross", "Splash", "Forenza", "Reno", "Verona",
       "Ignis", "Fronx", "Brezza", "Solio", "Hustler", "Spacia", "Lapin", "Cappuccino", "Kei",
       "Fronx Hybrid", "eVitara", "Jimny Nomade", "Jimny Nomade 5-door", "Swift 4th-gen", "S-Cross Hybrid",
+      "MR Wagon", "Palette", "Landy", "Solio Bandit", "Across", "Spacia Custom", "Spacia Gear", "Wagon R Smile",
     ],
   },
   {
