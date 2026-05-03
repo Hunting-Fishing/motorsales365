@@ -755,6 +755,7 @@ export const CAR_MAKES: MakeModels[] = [
       "Ioniq", "Ioniq Hybrid", "Ioniq Electric", "Ioniq 5", "Ioniq 5 N", "Ioniq 6", "Ioniq 7", "Ioniq 9", "Getz", "Atos", "Atos Prime", "Matrix", "Trajet", "Lavita",
       "Coupe", "Tiburon", "Tiburon Tuscani", "Tuscani", "XG", "Equus", "Centennial", "Azera", "Aslan", "Grandeur", "Dynasty", "Excel", "Pony", "Stellar", "Galloper", "Terracan",
       "Santa Fe MX5", "Tucson NX4 Facelift", "Inster", "Casper", "Casper Electric", "Mufasa", "Custo", "Alcazar",
+      "Aura", "i20 Active", "Tucson NX4", "Venue N Line", "Verna Turbo", "Stargazer Hybrid",
     ],
   },
   {
