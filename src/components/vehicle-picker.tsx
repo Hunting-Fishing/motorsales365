@@ -107,11 +107,26 @@ function Combo({
             onValueChange={setQuery}
           />
           <CommandList className="max-h-72">
+            {showAdd && (
+              <CommandGroup
+                heading="Not in list?"
+                className="sticky top-0 z-10 border-b border-border bg-popover"
+              >
+                <CommandItem
+                  value={`__add__${trimmed}`}
+                  onSelect={() => commit(trimmed)}
+                  className="text-primary"
+                >
+                  <Plus className="mr-2 h-4 w-4" />
+                  {addLabel}: “{trimmed}”
+                </CommandItem>
+              </CommandGroup>
+            )}
             <CommandEmpty>
               {showAdd ? (
                 <button
                   type="button"
-                  className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm hover:bg-accent"
+                  className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm text-primary hover:bg-accent"
                   onClick={() => commit(trimmed)}
                 >
                   <Plus className="h-4 w-4" />
@@ -139,21 +154,6 @@ function Combo({
                 </CommandItem>
               ))}
             </CommandGroup>
-            {showAdd && (
-              <>
-                <CommandSeparator />
-                <CommandGroup>
-                  <CommandItem
-                    value={`__add__${trimmed}`}
-                    onSelect={() => commit(trimmed)}
-                    className="text-primary"
-                  >
-                    <Plus className="mr-2 h-4 w-4" />
-                    {addLabel}: “{trimmed}”
-                  </CommandItem>
-                </CommandGroup>
-              </>
-            )}
           </CommandList>
         </Command>
       </PopoverContent>
