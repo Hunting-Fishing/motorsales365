@@ -109,21 +109,6 @@ function Combo({
             onValueChange={setQuery}
           />
           <CommandList className="max-h-72">
-            {showAdd && (
-              <CommandGroup
-                heading="Not in list?"
-                className="sticky top-0 z-10 border-b border-border bg-popover"
-              >
-                <CommandItem
-                  value={`__add__${trimmed}`}
-                  onSelect={() => commit(trimmed)}
-                  className="text-primary"
-                >
-                  <Plus className="mr-2 h-4 w-4" />
-                  {addLabel}: “{trimmed}”
-                </CommandItem>
-              </CommandGroup>
-            )}
             <CommandEmpty>
               {showAdd ? (
                 <button
