@@ -3,17 +3,15 @@ import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePerfSettings } from "@/hooks/use-perf-settings";
 import { withImageTransform } from "@/lib/perf-settings";
+import { recordImageEvent } from "@/lib/image-metrics";
 
 interface ImageWithSkeletonProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
   alt: string;
   wrapperClassName?: string;
   skeletonClassName?: string;
-  /** If true, image loads immediately. Otherwise it preloads when within rootMargin of the viewport. */
   eager?: boolean;
-  /** How far outside the viewport to start preloading. Overrides admin setting. */
   rootMargin?: string;
-  /** Use full-size resolution rather than thumbnail. Defaults to false. */
   full?: boolean;
 }
 
@@ -37,7 +35,18 @@ export function ImageWithSkeleton({
   const [loaded, setLoaded] = useState(false);
   const [shouldLoad, setShouldLoad] = useState(eager);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const startedAtRef = useRef<number | null>(null);
+  const loadedRef = useRef(false);
+  const visibleReportedRef = useRef(false);
 
+  // Mark "request started" when we decide to load.
+  useEffect(() => {
+    if (shouldLoad && startedAtRef.current === null) {
+      startedAtRef.current = performance.now();
+    }
+  }, [shouldLoad]);
+
+  // Preload observer (off-viewport, by rootMargin)
   useEffect(() => {
     if (eager || shouldLoad) return;
     const el = wrapperRef.current;
@@ -62,6 +71,35 @@ export function ImageWithSkeleton({
     return () => io.disconnect();
   }, [eager, shouldLoad, effectiveRootMargin]);
 
+  // Visibility observer (rootMargin: 0px) — used to record preload hit rate.
+  useEffect(() => {
+    if (eager || visibleReportedRef.current) return;
+    const el = wrapperRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && !visibleReportedRef.current) {
+            visibleReportedRef.current = true;
+            recordImageEvent({
+              type: "visible",
+              loadedBeforeVisible: loadedRef.current,
+              full,
+              rootMargin: effectiveRootMargin,
+              quality: perf.quality,
+              width: targetWidth,
+            });
+            io.disconnect();
+            break;
+          }
+        }
+      },
+      { rootMargin: "0px", threshold: 0.01 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [eager, effectiveRootMargin, full, perf.quality, targetWidth]);
+
   return (
     <div ref={wrapperRef} className={cn("relative h-full w-full", wrapperClassName)}>
       {!loaded && (
@@ -76,10 +114,27 @@ export function ImageWithSkeleton({
           loading={eager ? "eager" : "lazy"}
           onLoad={(e) => {
             setLoaded(true);
+            loadedRef.current = true;
+            const start = startedAtRef.current;
+            recordImageEvent({
+              type: "load",
+              durationMs: start != null ? Math.round(performance.now() - start) : undefined,
+              full,
+              rootMargin: effectiveRootMargin,
+              quality: perf.quality,
+              width: targetWidth,
+            });
             onLoad?.(e);
           }}
           onError={(e) => {
             setLoaded(true);
+            recordImageEvent({
+              type: "error",
+              full,
+              rootMargin: effectiveRootMargin,
+              quality: perf.quality,
+              width: targetWidth,
+            });
             onError?.(e);
           }}
           className={cn(
