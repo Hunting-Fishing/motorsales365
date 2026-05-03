@@ -17,6 +17,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { formatPHP, formatDate } from "@/lib/format";
+import placeholderCar from "@/assets/placeholder-car.png";
 
 const REPORT_REASONS = [
   "Suspected scam or fraud",

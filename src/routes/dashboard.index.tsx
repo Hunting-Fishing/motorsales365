@@ -17,6 +17,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { formatPHP, formatDate } from "@/lib/format";
+import placeholderCar from "@/assets/placeholder-car.png";
 
 export const Route = createFileRoute("/dashboard/")({
   component: MyListings,
