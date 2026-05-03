@@ -17,6 +17,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { formatPHP, formatDate } from "@/lib/format";
+import placeholderCar from "@/assets/placeholder-car.png";
 
 const REPORT_REASONS = [
   "Suspected scam or fraud",
@@ -177,11 +178,11 @@ function ListingDetailPage() {
           {/* Gallery */}
           <div className="overflow-hidden rounded-xl border border-border bg-card">
             <div className="aspect-[16/10] bg-secondary">
-              {cover ? (
-                <img src={cover.url} alt={listing.title} className="h-full w-full object-cover" />
-              ) : (
-                <div className="flex h-full items-center justify-center text-muted-foreground">No photos</div>
-              )}
+              <img
+                src={cover?.url || placeholderCar}
+                alt={cover ? listing.title : "Vehicle photo coming soon"}
+                className="h-full w-full object-cover"
+              />
             </div>
             {(photos.length > 1 || videos.length > 0) && (
               <div className="flex gap-2 overflow-x-auto p-3">
