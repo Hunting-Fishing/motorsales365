@@ -234,6 +234,29 @@ function TowProviderDashboard() {
           />
         </TabsContent>
       </Tabs>
+
+      <Dialog open={!!declineTarget} onOpenChange={(o) => { if (!o) { setDeclineTarget(null); setDeclineReason(""); } }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Decline tow request</DialogTitle>
+            <DialogDescription>
+              The requester will get a message letting them know. Adding a reason is optional but helpful.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            rows={4}
+            value={declineReason}
+            onChange={(e) => setDeclineReason(e.target.value)}
+            placeholder="e.g. Out of coverage area, vehicle too heavy for my flatbed, fully booked that day…"
+          />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeclineTarget(null)} disabled={declining}>Cancel</Button>
+            <Button onClick={confirmDecline} disabled={declining}>
+              {declining ? "Declining…" : "Decline & notify"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
