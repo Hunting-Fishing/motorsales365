@@ -838,6 +838,8 @@ function RequestList({
 
 function StatusBadge({ status }: { status: string }) {
   if (status === "accepted") return <Badge className="gap-1"><CheckCircle2 className="h-3 w-3" />Accepted</Badge>;
+  if (status === "picked_up") return <Badge className="gap-1"><PackageCheck className="h-3 w-3" />Picked up</Badge>;
+  if (status === "dropped_off") return <Badge className="gap-1"><PackageOpen className="h-3 w-3" />Dropped off</Badge>;
   if (status === "completed") return <Badge variant="secondary" className="gap-1"><CheckCircle2 className="h-3 w-3" />Completed</Badge>;
   if (status === "cancelled") return <Badge variant="destructive" className="gap-1"><XCircle className="h-3 w-3" />Cancelled</Badge>;
   return <Badge variant="outline">Open</Badge>;
