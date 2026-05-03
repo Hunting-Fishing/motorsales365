@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { VerifiedBadge } from "@/components/verified-badge";
 import { formatPHP } from "@/lib/format";
 import placeholderCar from "@/assets/placeholder-car.png";
+import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 
 export interface ListingCardData {
   id: string;
@@ -30,10 +31,10 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
       className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-elegant)]"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
-        <img
+        <ImageWithSkeleton
           src={listing.cover_url || placeholderCar}
           alt={listing.cover_url ? listing.title : "Vehicle photo coming soon"}
-          className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+          className="transition-transform duration-300 group-hover:scale-105"
           loading="lazy"
         />
         <div className="absolute left-2 top-2 flex flex-wrap gap-1">
