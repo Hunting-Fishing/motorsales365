@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.notify_towing_providers() FROM PUBLIC, anon, authenticated;
