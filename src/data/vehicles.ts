@@ -1089,6 +1089,15 @@ export const MOTORCYCLE_MAKES: MakeModels[] = [
   { make: "Super Soco", models: ["TC", "TC Max", "CPx", "CUx", "TS", "TSx"] },
   { make: "Kove", models: ["321R", "321RR", "450 Rally", "500F", "500X", "800X"] },
   { make: "Mash", models: ["Five Hundred", "Seventy Five", "Two Fifty", "Black Seven", "Six Hundred"] },
+  { make: "Sundiro Honda", models: ["SDH125", "SDH150", "Lead 125", "Joy 125"] },
+  { make: "Wuyang Honda", models: ["WH150", "WH125", "Future 125", "Wing 125"] },
+  { make: "Haojue", models: ["DR300", "DR160S", "TR300", "DK150", "HJ150", "Lindy 125"] },
+  { make: "Aima", models: ["A500", "A350", "Q5", "Mini Bike"] },
+  { make: "Tailg", models: ["TDT", "TDR", "TDX", "Mini Cruiser"] },
+  { make: "Yamasaki", models: ["YM150", "YM200", "Cruiser 250"] },
+  { make: "Senke", models: ["SK150", "SK200", "Cruiser"] },
+  { make: "Jincheng", models: ["JC125", "JC150", "Suzuki Jincheng AX100"] },
+  { make: "Royal Alloy", models: ["GP 125", "GP 150", "GP 200", "TG 125", "TG 300"] },
 
   // Other
   { make: "Other", models: ["Other"] },
