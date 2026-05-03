@@ -668,6 +668,7 @@ export const CAR_MAKES: MakeModels[] = [
       "Xforce", "Delica", "Delica D:5", "Delica Mini", "Space Gear", "Space Wagon", "Grandis", "Fuzion", "Endeavor", "Raider",
       "3000GT", "GTO", "FTO", "Colt", "Colt Plus", "Colt Rallyart", "Mirage Coupe", "Lancer GSR", "Lancer Cedia", "Sigma", "Diamante", "Magna", "Verada",
       "Airtrek", "i-MiEV", "Carisma", "Lancer 1.6 GLS",
+      "Outlander PHEV 2024", "Xpander Cross HEV", "Triton 2024", "Triton 6th-gen", "Pajero 2024",
     ],
   },
   {
