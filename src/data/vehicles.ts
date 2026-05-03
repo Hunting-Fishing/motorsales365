@@ -1029,7 +1029,8 @@ export const MOTORCYCLE_MAKES: MakeModels[] = [
       "Versys 250", "Versys 300", "Versys 650", "Versys 1000", "Versys-X 300",
       "KLR650", "KLX110", "KLX140", "KLX150", "KLX150L", "KLX150BF", "KLX230", "KLX300", "KLX300SM", "KLX450R",
       "KX65", "KX85", "KX112", "KX250", "KX250F", "KX450", "KX450F",
-      "W175", "W175SE", "W650", "W800", "Vulcan S", "Vulcan 900", "Vulcan 1700", "Vulcan 2000", "Eliminator", "Concours",
+      "W175", "W175SE", "W650", "W800", "Vulcan S", "Vulcan 900", "Vulcan 1700", "Vulcan 2000", "Eliminator", "Eliminator 500", "Concours",
+      "Ninja 7 Hybrid", "Z7 Hybrid", "KLX230 SM",
     ],
   },
 
