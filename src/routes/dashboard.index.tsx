@@ -190,7 +190,7 @@ function MyListings() {
             return (
               <div key={l.id} className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 sm:flex-row">
                 <div className="h-24 w-32 shrink-0 overflow-hidden rounded-md bg-secondary">
-                  {photo ? <img src={photo.url} alt="" className="h-full w-full object-cover" /> : null}
+                  <img src={photo?.url || placeholderCar} alt="" className="h-full w-full object-cover" />
                 </div>
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-2">
