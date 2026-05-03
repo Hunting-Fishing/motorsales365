@@ -767,6 +767,7 @@ export const CAR_MAKES: MakeModels[] = [
       "EV3", "EV4", "EV5", "EV6", "EV6 GT", "EV9", "EV9 GT", "Niro", "Niro EV", "Niro Hybrid", "Niro PHEV", "Soul", "Soul EV", "Soul Booster", "PV5",
       "Pregio", "K2500", "K2700", "K3000", "K3600", "K5000", "Bongo", "Bongo III", "Frontier", "Tasman",
       "EV3 GT-Line", "EV5 GT-Line", "Carnival Hybrid", "Syros", "Clavis", "Ray EV",
+      "K3 GT Hatch", "Niro Plus", "Bongo III EV", "Carens Clavis EV", "Tasman X-Pro",
     ],
   },
   { make: "Genesis", models: ["G70", "G80", "G80 Electrified", "G90", "GV60", "GV70", "GV70 Electrified", "GV80", "GV80 Coupe", "X Convertible"] },
