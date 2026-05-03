@@ -103,7 +103,7 @@ function Index() {
               Buy and sell anything that <span className="text-accent">moves</span>.
             </h1>
             <p className="mt-4 max-w-2xl text-lg text-white/85">
-              Cars, motorcycles, boats, airplanes, and heavy equipment — listed by trusted private sellers and businesses across the Philippines.
+              Cars, motorcycles, boats, airplanes, and heavy equipment — listed by trusted private sellers and businesses across the Philippines. Need it delivered? <Link to="/tow" className="underline underline-offset-2 hover:text-accent">Request a tow</Link>.
             </p>
 
             <form
