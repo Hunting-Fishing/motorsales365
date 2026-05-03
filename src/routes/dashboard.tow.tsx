@@ -403,6 +403,7 @@ function TowProviderDashboard() {
           <RequestList
             items={direct}
             empty="No direct requests yet. When customers tap “Request a tow from this provider” on your listing, jobs land here."
+            renderExtra={(r) => <ProviderJobStage r={r} onUpdateEta={(eta) => updateEta(r, eta)} />}
             renderActions={(r) => (
               <div className="flex flex-wrap gap-2">
                 {r.status === "open" && (
@@ -412,7 +413,14 @@ function TowProviderDashboard() {
                   </>
                 )}
                 {r.status === "accepted" && (
-                  <Button size="sm" onClick={() => complete(r)}>Mark completed</Button>
+                  <Button size="sm" onClick={() => openPickup(r)}>
+                    <PackageCheck className="mr-1 h-3.5 w-3.5" />Mark picked up
+                  </Button>
+                )}
+                {r.status === "picked_up" && (
+                  <Button size="sm" onClick={() => openDropoff(r)}>
+                    <PackageOpen className="mr-1 h-3.5 w-3.5" />Mark dropped off
+                  </Button>
                 )}
               </div>
             )}
