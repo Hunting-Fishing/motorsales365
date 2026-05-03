@@ -1093,7 +1093,7 @@ export const MOTORCYCLE_MAKES: MakeModels[] = [
   { make: "Can-Am", models: ["Spyder F3", "Spyder RT", "Ryker", "Ryker Rally", "Origin", "Pulse"] },
   { make: "Ural", models: ["Gear Up", "Sportsman", "Patrol", "M70", "Tourist"] },
   { make: "Jawa", models: ["42", "Perak", "Forty Two", "Yezdi Roadster", "Yezdi Adventure"] },
-  { make: "Hero", models: ["Splendor", "Glamour", "Passion", "HF Deluxe", "Xpulse 200", "Xtreme 160R", "Xtreme 200R", "Karizma XMR", "Mavrick 440", "Destini 125"] },
+  { make: "Hero", models: ["Splendor", "Glamour", "Passion", "HF Deluxe", "Xpulse 200", "Xpulse 210", "Xtreme 160R", "Xtreme 200R", "Xtreme 250R", "Karizma XMR", "Mavrick 440", "Destini 125"] },
   { make: "Italjet", models: ["Dragster 125", "Dragster 200", "Dragster 500", "Velocifero"] },
   { make: "Yadea", models: ["G5", "G6", "C-Umi", "T9", "Voltguard"] },
   { make: "NIU", models: ["NQi", "MQi", "UQi", "RQi", "KQi"] },
