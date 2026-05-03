@@ -870,7 +870,7 @@ export const CAR_MAKES: MakeModels[] = [
     "Arrizo 5", "Arrizo 6", "Arrizo 8", "Arrizo 8 Hybrid", "QQ", "Fulwin", "Fulwin A8", "Fulwin T10", "iCar 03", "iCar 03T", "iCar V23",
   ] },
   { make: "Haval", models: ["Jolion", "Jolion Hybrid", "Jolion Pro", "H2", "H6", "H6 Hybrid", "H6 GT", "H6 GT PHEV", "H7", "H7 Facelift", "H8", "H9", "Big Dog", "Dargo", "Xiaolong", "Raptor", "Raptor Hi4-T"] },
-  { make: "GWM", models: ["Tank 300", "Tank 400", "Tank 400 Hi4-T", "Tank 500", "Tank 500 Hi4-T", "Tank 700", "Tank 700 Hi4-T", "Tank 800", "Cannon", "Cannon Alpha", "Cannon Alpha PHEV", "Poer", "Wingle 7", "Wingle 7 EV", "Ora Good Cat", "Ora 03", "Ora Funky Cat", "Ora 07"] },
+  { make: "GWM", models: ["Tank 300", "Tank 400", "Tank 400 Hi4-T", "Tank 500", "Tank 500 Hi4-T", "Tank 700", "Tank 700 Hi4-T", "Tank 800", "Cannon", "Cannon Alpha", "Cannon Alpha PHEV", "Poer", "Wingle 7", "Wingle 7 EV", "Ora Good Cat", "Ora 03", "Ora Funky Cat", "Ora 07", "Ora 7", "Wey 80", "Wey Lanshan"] },
   { make: "Maxus", models: ["G10", "G20", "G50", "G90", "T60", "T70", "T90", "T90 EV", "D60", "D90", "D90 Pro", "V80", "V90", "Mifa", "Mifa 9", "eDeliver 3", "eDeliver 9", "eMaxus"] },
   { make: "Foton", models: ["Toplander", "Toplander S", "Thunder", "Thunder Plus", "Gratour", "Gratour Mini Truck", "Gratour Midi", "View Traveller", "View IX5", "View IX7", "View CS2", "Toano", "Mannar", "Tornado", "Tunland", "Tunland G7", "Tunland V7", "Tunland V9", "Tunland V9 Pro", "Aumark", "Auman"] },
   { make: "JAC", models: ["S2", "S3", "S4", "S5", "S7", "JS3", "JS3 Pro", "JS4", "JS4 EV", "JS6", "JS6 Pro", "JS8 Pro", "T6", "T8", "T9", "T9 Hunter", "Sunray", "Refine S2", "Refine S3", "iEV6E", "iEV7S", "JS3 Lite", "eJS1"] },
