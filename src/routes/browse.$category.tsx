@@ -120,7 +120,7 @@ function BrowsePage() {
           boost_until: r.boost_until, category_slug: r.category_slug,
           cover_url: photos[0]?.url ?? null,
           photo_count: photos.length, has_video: videos.length > 0,
-          seller_verified: r.profiles?.verification_status === "verified", status: r.status,
+          seller_verified: r.profiles?.verification_status === "verified", status: r.status, attributes: r.attributes,
         } as ListingCardData;
       });
       setItems(mapped);
