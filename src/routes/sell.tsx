@@ -307,7 +307,28 @@ function SellPage() {
           if (towPerKm) attributes.per_km_rate_php = Number(towPerKm);
           attributes.available_24_7 = tow247;
         }
-
+        if (category === "carwash") {
+          if (washServices.length) attributes.services = washServices;
+          if (washTier) attributes.pricing_tier = washTier;
+          if (washStartingPrice) attributes.starting_price_php = Number(washStartingPrice);
+          attributes.accepts_walk_ins = washWalkIn;
+          attributes.available_24_7 = wash247;
+          if (washHours) attributes.operating_hours = washHours;
+        }
+        if (category === "parts") {
+          if (partType) attributes.part_type = partType;
+          if (partBrand) attributes.brand = partBrand;
+          if (partFits) attributes.fits = partFits;
+          if (partOemAfter) attributes.oem_or_aftermarket = partOemAfter;
+          if (partStock) attributes.stock_quantity = Number(partStock);
+        }
+        if (category === "drone") {
+          if (droneBizType) attributes.business_type = droneBizType;
+          if (droneBrands) attributes.brands_carried = droneBrands;
+          if (droneServices.length) attributes.services = droneServices;
+          attributes.licensed_operator = droneLicensed;
+          if (droneCoverage) attributes.coverage_regions = droneCoverage.split(",").map(s => s.trim()).filter(Boolean);
+        }
         const expiryDays = pricing.listing_expiry_days ?? 60;
         const expires = new Date();
         expires.setDate(expires.getDate() + expiryDays);
