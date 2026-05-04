@@ -46,7 +46,7 @@ function Index() {
 
       const { data: recentRows } = await supabase
         .from("listings")
-        .select("id,title,price_php,region,city,seller_type,boost_until,status,category_slug,user_id,listing_media(url,type),profiles:user_id(verification_status)")
+        .select("id,title,price_php,region,city,seller_type,boost_until,status,category_slug,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status)")
         .in("status", ["active","pending_sale"])
         .order("published_at", { ascending: false, nullsFirst: false })
         .limit(12);
