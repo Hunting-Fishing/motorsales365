@@ -30,6 +30,9 @@ const CATEGORIES = [
   { slug: "airplane", name: "Airplane" },
   { slug: "equipment", name: "Heavy Equipment" },
   { slug: "towing", name: "Towing & Trucking service" },
+  { slug: "carwash", name: "Car Wash" },
+  { slug: "parts", name: "Parts & Accessories" },
+  { slug: "drone", name: "Drones & Aerial" },
   { slug: "other", name: "Other" },
 ];
 
@@ -49,6 +52,21 @@ const TOW_CAPACITIES = [
   "Van",
   "Heavy equipment",
   "Boat / Trailer",
+];
+
+const CARWASH_SERVICES = [
+  "Basic wash", "Detailing", "Interior cleaning", "Engine wash",
+  "Ceramic coating", "Motorcycle wash",
+];
+const PARTS_TYPES = [
+  "Engine", "Body", "Suspension", "Electrical",
+  "Tires & Wheels", "Accessories", "Other",
+];
+const DRONE_BUSINESS_TYPES = [
+  "Sales", "Aerial photography service", "Repair", "Training",
+];
+const DRONE_SERVICES = [
+  "Photo", "Video", "Mapping", "Inspection", "Agriculture",
 ];
 
 function SellPage() {
