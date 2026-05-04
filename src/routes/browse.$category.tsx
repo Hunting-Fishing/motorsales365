@@ -65,7 +65,7 @@ function BrowsePage() {
   useEffect(() => {
     const fetchListings = async () => {
       setLoading(true);
-      const baseSelect = "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,user_id,listing_media(url,type),profiles:user_id(verification_status)";
+      const baseSelect = "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status)";
       const buildBase = () => {
         let q = supabase
           .from("listings")
@@ -120,7 +120,7 @@ function BrowsePage() {
           boost_until: r.boost_until, category_slug: r.category_slug,
           cover_url: photos[0]?.url ?? null,
           photo_count: photos.length, has_video: videos.length > 0,
-          seller_verified: r.profiles?.verification_status === "verified", status: r.status,
+          seller_verified: r.profiles?.verification_status === "verified", status: r.status, attributes: r.attributes,
         } as ListingCardData;
       });
       setItems(mapped);
