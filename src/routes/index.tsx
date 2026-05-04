@@ -21,6 +21,9 @@ const CATEGORIES = [
   { slug: "airplane", name: "Airplanes", Icon: Plane },
   { slug: "equipment", name: "Equipment", Icon: Construction },
   { slug: "towing", name: "Towing & Trucking", Icon: Truck },
+  { slug: "carwash", name: "Car Wash", Icon: Droplets },
+  { slug: "parts", name: "Parts & Accessories", Icon: Wrench },
+  { slug: "drone", name: "Drones & Aerial", Icon: Send },
   { slug: "other", name: "Other", Icon: Caravan },
 ] as const;
 
