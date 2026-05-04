@@ -100,6 +100,28 @@ function SellPage() {
   const [towPerKm, setTowPerKm] = useState("");
   const [tow247, setTow247] = useState(false);
 
+  // Car Wash fields
+  const [washServices, setWashServices] = useState<string[]>([]);
+  const [washTier, setWashTier] = useState("");
+  const [washStartingPrice, setWashStartingPrice] = useState("");
+  const [washWalkIn, setWashWalkIn] = useState(true);
+  const [wash247, setWash247] = useState(false);
+  const [washHours, setWashHours] = useState("");
+
+  // Parts fields
+  const [partType, setPartType] = useState("");
+  const [partBrand, setPartBrand] = useState("");
+  const [partFits, setPartFits] = useState("");
+  const [partOemAfter, setPartOemAfter] = useState("");
+  const [partStock, setPartStock] = useState("");
+
+  // Drone fields
+  const [droneBizType, setDroneBizType] = useState("");
+  const [droneBrands, setDroneBrands] = useState("");
+  const [droneServices, setDroneServices] = useState<string[]>([]);
+  const [droneLicensed, setDroneLicensed] = useState(false);
+  const [droneCoverage, setDroneCoverage] = useState("");
+
   const [photos, setPhotos] = useState<File[]>([]);
   const [video, setVideo] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
