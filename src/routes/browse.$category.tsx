@@ -65,7 +65,7 @@ function BrowsePage() {
   useEffect(() => {
     const fetchListings = async () => {
       setLoading(true);
-      const baseSelect = "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,user_id,listing_media(url,type),profiles:user_id(verification_status)";
+      const baseSelect = "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status)";
       const buildBase = () => {
         let q = supabase
           .from("listings")
