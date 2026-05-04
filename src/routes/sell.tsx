@@ -30,6 +30,9 @@ const CATEGORIES = [
   { slug: "airplane", name: "Airplane" },
   { slug: "equipment", name: "Heavy Equipment" },
   { slug: "towing", name: "Towing & Trucking service" },
+  { slug: "carwash", name: "Car Wash" },
+  { slug: "parts", name: "Parts & Accessories" },
+  { slug: "drone", name: "Drones & Aerial" },
   { slug: "other", name: "Other" },
 ];
 
@@ -49,6 +52,21 @@ const TOW_CAPACITIES = [
   "Van",
   "Heavy equipment",
   "Boat / Trailer",
+];
+
+const CARWASH_SERVICES = [
+  "Basic wash", "Detailing", "Interior cleaning", "Engine wash",
+  "Ceramic coating", "Motorcycle wash",
+];
+const PARTS_TYPES = [
+  "Engine", "Body", "Suspension", "Electrical",
+  "Tires & Wheels", "Accessories", "Other",
+];
+const DRONE_BUSINESS_TYPES = [
+  "Sales", "Aerial photography service", "Repair", "Training",
+];
+const DRONE_SERVICES = [
+  "Photo", "Video", "Mapping", "Inspection", "Agriculture",
 ];
 
 function SellPage() {
@@ -81,6 +99,28 @@ function SellPage() {
   const [towBaseRate, setTowBaseRate] = useState("");
   const [towPerKm, setTowPerKm] = useState("");
   const [tow247, setTow247] = useState(false);
+
+  // Car Wash fields
+  const [washServices, setWashServices] = useState<string[]>([]);
+  const [washTier, setWashTier] = useState("");
+  const [washStartingPrice, setWashStartingPrice] = useState("");
+  const [washWalkIn, setWashWalkIn] = useState(true);
+  const [wash247, setWash247] = useState(false);
+  const [washHours, setWashHours] = useState("");
+
+  // Parts fields
+  const [partType, setPartType] = useState("");
+  const [partBrand, setPartBrand] = useState("");
+  const [partFits, setPartFits] = useState("");
+  const [partOemAfter, setPartOemAfter] = useState("");
+  const [partStock, setPartStock] = useState("");
+
+  // Drone fields
+  const [droneBizType, setDroneBizType] = useState("");
+  const [droneBrands, setDroneBrands] = useState("");
+  const [droneServices, setDroneServices] = useState<string[]>([]);
+  const [droneLicensed, setDroneLicensed] = useState(false);
+  const [droneCoverage, setDroneCoverage] = useState("");
 
   const [photos, setPhotos] = useState<File[]>([]);
   const [video, setVideo] = useState<File | null>(null);
@@ -267,7 +307,28 @@ function SellPage() {
           if (towPerKm) attributes.per_km_rate_php = Number(towPerKm);
           attributes.available_24_7 = tow247;
         }
-
+        if (category === "carwash") {
+          if (washServices.length) attributes.services = washServices;
+          if (washTier) attributes.pricing_tier = washTier;
+          if (washStartingPrice) attributes.starting_price_php = Number(washStartingPrice);
+          attributes.accepts_walk_ins = washWalkIn;
+          attributes.available_24_7 = wash247;
+          if (washHours) attributes.operating_hours = washHours;
+        }
+        if (category === "parts") {
+          if (partType) attributes.part_type = partType;
+          if (partBrand) attributes.brand = partBrand;
+          if (partFits) attributes.fits = partFits;
+          if (partOemAfter) attributes.oem_or_aftermarket = partOemAfter;
+          if (partStock) attributes.stock_quantity = Number(partStock);
+        }
+        if (category === "drone") {
+          if (droneBizType) attributes.business_type = droneBizType;
+          if (droneBrands) attributes.brands_carried = droneBrands;
+          if (droneServices.length) attributes.services = droneServices;
+          attributes.licensed_operator = droneLicensed;
+          if (droneCoverage) attributes.coverage_regions = droneCoverage.split(",").map(s => s.trim()).filter(Boolean);
+        }
         const expiryDays = pricing.listing_expiry_days ?? 60;
         const expires = new Date();
         expires.setDate(expires.getDate() + expiryDays);
@@ -389,7 +450,126 @@ function SellPage() {
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Details</h2>
-            {category === "towing" ? (
+            {category === "carwash" ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <Label>Services offered</Label>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {CARWASH_SERVICES.map((s) => {
+                      const active = washServices.includes(s);
+                      return (
+                        <button type="button" key={s}
+                          onClick={() => setWashServices((prev) => active ? prev.filter(x => x !== s) : [...prev, s])}
+                          className={`rounded-full border px-3 py-1 text-xs ${active ? "border-primary bg-primary/10 text-primary" : "border-border bg-background text-muted-foreground"}`}>
+                          {s}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div>
+                  <Label>Pricing tier</Label>
+                  <Select value={washTier} onValueChange={setWashTier}>
+                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Budget">Budget</SelectItem>
+                      <SelectItem value="Mid">Mid-range</SelectItem>
+                      <SelectItem value="Premium">Premium</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Starting price (₱)</Label>
+                  <Input type="number" min="0" value={washStartingPrice} onChange={(e) => setWashStartingPrice(e.target.value)} />
+                </div>
+                <div className="sm:col-span-2">
+                  <Label>Operating hours</Label>
+                  <Input value={washHours} onChange={(e) => setWashHours(e.target.value)} placeholder="Mon–Sat, 8AM–6PM" />
+                </div>
+                <label className="flex items-center gap-2 text-sm">
+                  <input type="checkbox" checked={washWalkIn} onChange={(e) => setWashWalkIn(e.target.checked)} />
+                  Accepts walk-ins
+                </label>
+                <label className="flex items-center gap-2 text-sm">
+                  <input type="checkbox" checked={wash247} onChange={(e) => setWash247(e.target.checked)} />
+                  Open 24/7
+                </label>
+              </div>
+            ) : category === "parts" ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label>Part type</Label>
+                  <Select value={partType} onValueChange={setPartType}>
+                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectContent>
+                      {PARTS_TYPES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Brand</Label>
+                  <Input value={partBrand} onChange={(e) => setPartBrand(e.target.value)} placeholder="e.g. Bosch, OEM Toyota" />
+                </div>
+                <div className="sm:col-span-2">
+                  <Label>Fits (make / model / year)</Label>
+                  <Input value={partFits} onChange={(e) => setPartFits(e.target.value)} placeholder="e.g. Toyota Vios 2015–2020" />
+                </div>
+                <div>
+                  <Label>OEM or Aftermarket</Label>
+                  <Select value={partOemAfter} onValueChange={setPartOemAfter}>
+                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="OEM">OEM</SelectItem>
+                      <SelectItem value="Aftermarket">Aftermarket</SelectItem>
+                      <SelectItem value="Surplus">Surplus</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Stock quantity</Label>
+                  <Input type="number" min="0" value={partStock} onChange={(e) => setPartStock(e.target.value)} />
+                </div>
+              </div>
+            ) : category === "drone" ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label>Business type</Label>
+                  <Select value={droneBizType} onValueChange={setDroneBizType}>
+                    <SelectTrigger><SelectValue placeholder="Select" /></SelectTrigger>
+                    <SelectContent>
+                      {DRONE_BUSINESS_TYPES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label>Brands carried</Label>
+                  <Input value={droneBrands} onChange={(e) => setDroneBrands(e.target.value)} placeholder="DJI, Autel, Skydio" />
+                </div>
+                <div className="sm:col-span-2">
+                  <Label>Services offered</Label>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {DRONE_SERVICES.map((s) => {
+                      const active = droneServices.includes(s);
+                      return (
+                        <button type="button" key={s}
+                          onClick={() => setDroneServices((prev) => active ? prev.filter(x => x !== s) : [...prev, s])}
+                          className={`rounded-full border px-3 py-1 text-xs ${active ? "border-primary bg-primary/10 text-primary" : "border-border bg-background text-muted-foreground"}`}>
+                          {s}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="sm:col-span-2">
+                  <Label>Coverage regions (comma-separated)</Label>
+                  <Input value={droneCoverage} onChange={(e) => setDroneCoverage(e.target.value)} placeholder="NCR, Region IV-A" />
+                </div>
+                <label className="flex items-center gap-2 text-sm sm:col-span-2">
+                  <input type="checkbox" checked={droneLicensed} onChange={(e) => setDroneLicensed(e.target.checked)} />
+                  Licensed CAAP operator
+                </label>
+              </div>
+            ) : category === "towing" ? (
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <Label>Service type</Label>

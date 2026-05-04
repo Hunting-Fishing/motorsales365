@@ -29,7 +29,10 @@ const searchSchema = z.object({
 
 const CATEGORY_LABEL: Record<string, string> = {
   car: "Cars", motorcycle: "Motorcycles", boat: "Boats",
-  airplane: "Airplanes", equipment: "Heavy Equipment", other: "Other Transport",
+  airplane: "Airplanes", equipment: "Heavy Equipment",
+  towing: "Towing & Trucking",
+  carwash: "Car Wash", parts: "Parts & Accessories", drone: "Drones & Aerial",
+  other: "Other Transport",
 };
 
 export const Route = createFileRoute("/browse/$category")({
