@@ -341,6 +341,14 @@ function SellPage() {
           attributes.licensed_operator = droneLicensed;
           if (droneCoverage) attributes.coverage_regions = droneCoverage.split(",").map(s => s.trim()).filter(Boolean);
         }
+        // Unified service tags (works for any service category, including parts/carwash)
+        if (serviceTags.length) attributes.tags = serviceTags;
+        if (SERVICE_CATEGORIES.has(category) || category === "repair" || category === "bodyshop" || category === "salvage") {
+          if (serviceHours) attributes.operating_hours = serviceHours;
+          attributes.accepts_walk_ins = serviceWalkIn;
+          if (serviceBrands) attributes.brands_serviced = serviceBrands;
+          if (serviceWarranty) attributes.warranty = serviceWarranty;
+        }
         const expiryDays = pricing.listing_expiry_days ?? 60;
         const expires = new Date();
         expires.setDate(expires.getDate() + expiryDays);
