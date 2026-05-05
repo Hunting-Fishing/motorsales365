@@ -17,6 +17,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { formatPHP } from "@/lib/format";
 import { LocationPicker } from "@/components/location-picker";
 import { VehiclePicker } from "@/components/vehicle-picker";
+import { TagPicker } from "@/components/tag-picker";
+import { CATEGORY_DEFAULT_GROUPS, SERVICE_CATEGORIES } from "@/data/service-tags";
 import { uploadWithRetry } from "@/lib/storage-upload";
 
 export const Route = createFileRoute("/sell")({
@@ -33,6 +35,9 @@ const CATEGORIES = [
   { slug: "carwash", name: "Car Wash" },
   { slug: "parts", name: "Parts & Accessories" },
   { slug: "drone", name: "Drones & Aerial" },
+  { slug: "repair", name: "Repair Shop" },
+  { slug: "bodyshop", name: "Body Shop" },
+  { slug: "salvage", name: "Auto Salvage" },
   { slug: "other", name: "Other" },
 ];
 
@@ -121,6 +126,13 @@ function SellPage() {
   const [droneServices, setDroneServices] = useState<string[]>([]);
   const [droneLicensed, setDroneLicensed] = useState(false);
   const [droneCoverage, setDroneCoverage] = useState("");
+
+  // Service business fields (repair, bodyshop, salvage, also reused by carwash/parts)
+  const [serviceTags, setServiceTags] = useState<string[]>([]);
+  const [serviceHours, setServiceHours] = useState("");
+  const [serviceWalkIn, setServiceWalkIn] = useState(true);
+  const [serviceBrands, setServiceBrands] = useState("");
+  const [serviceWarranty, setServiceWarranty] = useState("");
 
   const [photos, setPhotos] = useState<File[]>([]);
   const [video, setVideo] = useState<File | null>(null);
