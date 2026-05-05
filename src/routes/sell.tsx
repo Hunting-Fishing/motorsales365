@@ -468,9 +468,42 @@ function SellPage() {
             </div>
           </section>
 
+          {SERVICE_CATEGORIES.has(category) && (
+            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+              <div>
+                <h2 className="font-display text-lg font-semibold">What do you offer?</h2>
+                <p className="text-xs text-muted-foreground">Pick everything that applies — buyers filter by these tags.</p>
+              </div>
+              <TagPicker
+                value={serviceTags}
+                onChange={setServiceTags}
+                defaultGroups={CATEGORY_DEFAULT_GROUPS[category] ?? []}
+              />
+            </section>
+          )}
+
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Details</h2>
-            {category === "carwash" ? (
+            {(category === "repair" || category === "bodyshop" || category === "salvage") ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <Label>Operating hours</Label>
+                  <Input value={serviceHours} onChange={(e) => setServiceHours(e.target.value)} placeholder="Mon–Sat, 8AM–6PM" />
+                </div>
+                <div>
+                  <Label>Brands serviced (optional)</Label>
+                  <Input value={serviceBrands} onChange={(e) => setServiceBrands(e.target.value)} placeholder="Toyota, Honda, Ford…" />
+                </div>
+                <div>
+                  <Label>Warranty (optional)</Label>
+                  <Input value={serviceWarranty} onChange={(e) => setServiceWarranty(e.target.value)} placeholder="e.g. 30-day parts & labor" />
+                </div>
+                <label className="flex items-center gap-2 text-sm sm:col-span-2">
+                  <input type="checkbox" checked={serviceWalkIn} onChange={(e) => setServiceWalkIn(e.target.checked)} />
+                  Accepts walk-ins
+                </label>
+              </div>
+            ) : category === "carwash" ? (
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
                   <Label>Services offered</Label>
