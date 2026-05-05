@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Search, Car, Bike, Ship, Plane, Truck, Caravan, ShieldCheck, Tag, Zap, Construction, Droplets, Wrench, Send } from "lucide-react";
+import { Search, Car, Bike, Ship, Plane, Truck, Caravan, ShieldCheck, Tag, Zap, Construction, Droplets, Wrench, Send, SprayCan, Recycle, Wrench as WrenchIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/site-layout";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
@@ -24,6 +24,9 @@ const CATEGORIES = [
   { slug: "carwash", name: "Car Wash", Icon: Droplets },
   { slug: "parts", name: "Parts & Accessories", Icon: Wrench },
   { slug: "drone", name: "Drones & Aerial", Icon: Send },
+  { slug: "repair", name: "Repair Shop", Icon: WrenchIcon },
+  { slug: "bodyshop", name: "Body Shop", Icon: SprayCan },
+  { slug: "salvage", name: "Auto Salvage", Icon: Recycle },
   { slug: "other", name: "Other", Icon: Caravan },
 ] as const;
 

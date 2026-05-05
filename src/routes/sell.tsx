@@ -17,6 +17,8 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { formatPHP } from "@/lib/format";
 import { LocationPicker } from "@/components/location-picker";
 import { VehiclePicker } from "@/components/vehicle-picker";
+import { TagPicker } from "@/components/tag-picker";
+import { CATEGORY_DEFAULT_GROUPS, SERVICE_CATEGORIES } from "@/data/service-tags";
 import { uploadWithRetry } from "@/lib/storage-upload";
 
 export const Route = createFileRoute("/sell")({
@@ -33,6 +35,9 @@ const CATEGORIES = [
   { slug: "carwash", name: "Car Wash" },
   { slug: "parts", name: "Parts & Accessories" },
   { slug: "drone", name: "Drones & Aerial" },
+  { slug: "repair", name: "Repair Shop" },
+  { slug: "bodyshop", name: "Body Shop" },
+  { slug: "salvage", name: "Auto Salvage" },
   { slug: "other", name: "Other" },
 ];
 
@@ -121,6 +126,13 @@ function SellPage() {
   const [droneServices, setDroneServices] = useState<string[]>([]);
   const [droneLicensed, setDroneLicensed] = useState(false);
   const [droneCoverage, setDroneCoverage] = useState("");
+
+  // Service business fields (repair, bodyshop, salvage, also reused by carwash/parts)
+  const [serviceTags, setServiceTags] = useState<string[]>([]);
+  const [serviceHours, setServiceHours] = useState("");
+  const [serviceWalkIn, setServiceWalkIn] = useState(true);
+  const [serviceBrands, setServiceBrands] = useState("");
+  const [serviceWarranty, setServiceWarranty] = useState("");
 
   const [photos, setPhotos] = useState<File[]>([]);
   const [video, setVideo] = useState<File | null>(null);
@@ -329,6 +341,14 @@ function SellPage() {
           attributes.licensed_operator = droneLicensed;
           if (droneCoverage) attributes.coverage_regions = droneCoverage.split(",").map(s => s.trim()).filter(Boolean);
         }
+        // Unified service tags (works for any service category, including parts/carwash)
+        if (serviceTags.length) attributes.tags = serviceTags;
+        if (SERVICE_CATEGORIES.has(category) || category === "repair" || category === "bodyshop" || category === "salvage") {
+          if (serviceHours) attributes.operating_hours = serviceHours;
+          attributes.accepts_walk_ins = serviceWalkIn;
+          if (serviceBrands) attributes.brands_serviced = serviceBrands;
+          if (serviceWarranty) attributes.warranty = serviceWarranty;
+        }
         const expiryDays = pricing.listing_expiry_days ?? 60;
         const expires = new Date();
         expires.setDate(expires.getDate() + expiryDays);
@@ -448,9 +468,42 @@ function SellPage() {
             </div>
           </section>
 
+          {SERVICE_CATEGORIES.has(category) && (
+            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+              <div>
+                <h2 className="font-display text-lg font-semibold">What do you offer?</h2>
+                <p className="text-xs text-muted-foreground">Pick everything that applies — buyers filter by these tags.</p>
+              </div>
+              <TagPicker
+                value={serviceTags}
+                onChange={setServiceTags}
+                defaultGroups={CATEGORY_DEFAULT_GROUPS[category] ?? []}
+              />
+            </section>
+          )}
+
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Details</h2>
-            {category === "carwash" ? (
+            {(category === "repair" || category === "bodyshop" || category === "salvage") ? (
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="sm:col-span-2">
+                  <Label>Operating hours</Label>
+                  <Input value={serviceHours} onChange={(e) => setServiceHours(e.target.value)} placeholder="Mon–Sat, 8AM–6PM" />
+                </div>
+                <div>
+                  <Label>Brands serviced (optional)</Label>
+                  <Input value={serviceBrands} onChange={(e) => setServiceBrands(e.target.value)} placeholder="Toyota, Honda, Ford…" />
+                </div>
+                <div>
+                  <Label>Warranty (optional)</Label>
+                  <Input value={serviceWarranty} onChange={(e) => setServiceWarranty(e.target.value)} placeholder="e.g. 30-day parts & labor" />
+                </div>
+                <label className="flex items-center gap-2 text-sm sm:col-span-2">
+                  <input type="checkbox" checked={serviceWalkIn} onChange={(e) => setServiceWalkIn(e.target.checked)} />
+                  Accepts walk-ins
+                </label>
+              </div>
+            ) : category === "carwash" ? (
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
                   <Label>Services offered</Label>

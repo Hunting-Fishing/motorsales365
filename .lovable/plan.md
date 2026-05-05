@@ -1,48 +1,89 @@
-# Add Car Wash, Parts, and Drones categories
+# Service Locations + Service Tags
 
-Add three new listing categories so users can list and browse: car-wash locations, parts shops/sellers, and drone companies. Each follows the existing service/product listing pattern (location + photos + contact + category-specific attributes), mirroring how Towing works today.
+Expand the marketplace to support automotive service businesses posting their **locations** with selectable **tags** describing what they do or sell. Builds on the existing Car Wash / Parts / Drones pattern.
 
-## What gets added
+## 1. New categories
 
-**1. Three new categories in the database**
-Insert into `public.categories`:
-- `carwash` — "Car Wash" (icon: droplets, sort 7)
-- `parts` — "Parts & Accessories" (icon: wrench, sort 8)
-- `drone` — "Drones & Aerial" (icon: plane / drone, sort 9)
+Add 3 new categories alongside existing ones (carwash, parts already exist):
 
-`other` keeps sort 10. RLS already allows public read and admin manage — no policy changes needed. (Schema-only change → migration.)
+| Slug | Name | Icon |
+|---|---|---|
+| `repair` | Repair Shop | wrench |
+| `bodyshop` | Body Shop | spray-can |
+| `salvage` | Auto Salvage | recycle |
 
-**2. Sell form (`src/routes/sell.tsx`)**
-- Add the three slugs to the `CATEGORIES` array.
-- Add a category-specific Details section for each (rendered like the existing `towing` branch). Stored on `listings.attributes` (jsonb), no new columns:
-  - **Car Wash**: services offered (multi-select: Basic wash, Detailing, Interior, Engine wash, Ceramic coating, Motorcycle wash), pricing tier (Budget / Mid / Premium), starting price ₱, accepts walk-ins (bool), open 24/7 (bool), operating hours free-text.
-  - **Parts**: part type (Engine, Body, Suspension, Electrical, Tires & Wheels, Accessories, Other), brand, condition (already in form), fits make/model/year (free text), OEM/aftermarket toggle, in-stock quantity.
-  - **Drones**: business type (Sales / Aerial photography service / Repair / Training), drone brands carried (free text), services offered (Photo, Video, Mapping, Inspection, Agriculture), licensed operator (bool), coverage regions (comma-separated, like towing).
-- For Car Wash and Drones, the listing is location-anchored (the existing LocationPicker covers this — no change). Parts uses the same location for shop/pickup point.
-- Skip the vehicle make/model picker for these three; keep title/price/photos/location.
+DB: insert into `categories`, push "Other" to sort 13.
 
-**3. Browse page (`src/routes/browse.$category.tsx`)**
-- Extend `CATEGORY_LABEL` with: `carwash: "Car Wash"`, `parts: "Parts & Accessories"`, `drone: "Drones & Aerial"`.
-- No filter logic changes needed — the existing region/province/city/keyword/price filters apply.
+## 2. Service tag system (the core idea)
 
-**4. Home page (`src/routes/index.tsx`)**
-- Add the three slugs to the `CATEGORIES` const with Lucide icons: `Droplets` (car wash), `Wrench` (parts), `Send` or `Plane` repurposed (drones — we'll use `Send` since `Plane` is taken by airplanes).
-- They appear in the hero category select and the chip row automatically.
+Instead of a fixed dropdown per category, every service-type listing gets a **multi-select tag picker** grouped by theme. One unified tag library, but each category shows a relevant default group expanded.
 
-**5. Listing detail page**
-The existing `listing.$id.tsx` renders attributes generically — confirmed during exploration that towing-specific attributes already display via the attributes block, so the new category attributes show up without changes. Only verify the headline/breadcrumb labels read correctly (driven by `CATEGORY_LABEL`, which we're updating).
+**Tag groups (chips, alphabetized within each group):**
 
-## Files touched
+- **Parts sold** — Wiper blades, Tires, Wheels, Batteries, Brake pads, Filters, Belts & hoses, Lights & bulbs, Spark plugs, Fluids & oils, Body panels, Glass, Mirrors, Bumpers, Engines, Transmissions, Suspension, Exhaust, Electrical, Interior trim
+- **Vehicle scope** — Cars, Motorcycles, Trucks, SUVs, Vans, Heavy duty / Commercial, Diesel, EV / Hybrid, Boats, Heavy equipment
+- **Repair services** — Oil change, Tune-up, Brake service, Tire mounting & balancing, Wheel alignment, AC service, Battery service, Diagnostics, Engine repair, Transmission, Electrical, Suspension, Exhaust, Pre-purchase inspection, Roadside assist
+- **Body & paint** — Collision repair, Dent removal (PDR), Painting, Bumper repair, Frame straightening, Glass replacement, Detailing, Ceramic coating, Window tinting, Rust repair
+- **Wash services** — (existing carwash list, kept as a tag group)
+- **Salvage / parts sourcing** — Used parts, OEM, Aftermarket, Rebuilt, Core buyback, Vehicle buyback, Parts shipping, Pick-a-part yard
 
-- `supabase` migration: insert 3 rows into `categories`.
-- `src/routes/sell.tsx`: extend CATEGORIES, add 3 new conditional Details sections, extend submit handler to persist their attributes.
-- `src/routes/browse.$category.tsx`: extend `CATEGORY_LABEL`.
-- `src/routes/index.tsx`: extend `CATEGORIES` with icons.
+Stored on `listings.attributes.tags` as a flat string array. The grouping is purely UI — searchable as one set.
 
-## Out of scope (call out for later if wanted)
+**Default expanded group per category:**
+- repair → Repair services + Vehicle scope
+- bodyshop → Body & paint + Vehicle scope
+- parts → Parts sold + Vehicle scope
+- salvage → Salvage / parts sourcing + Parts sold
+- carwash → Wash services
+- All groups remain available via "+ Show more" so a parts store can also tag repair services it offers.
 
-- No dedicated booking/quote flow for car wash or drones (towing has bids; these would just use the messaging system for now).
-- No parts-specific catalog/SKU search — uses regular keyword search.
-- No category-specific filter chips in browse (e.g. filter parts by part type). Can be added later.
+## 3. Sell form changes (`src/routes/sell.tsx`)
 
-Ready to implement on approval.
+- Add 3 categories to `CATEGORIES` array.
+- New constant `TAG_GROUPS` (keyed by group label → tag array).
+- For service-type categories (`repair`, `bodyshop`, `salvage`, plus existing `carwash`, `parts`), render a single **TagPicker** component:
+  - Shows default groups expanded as clickable chips (toggle on/off).
+  - Other groups behind a "Show more services" link.
+  - Selected tags shown as a row of removable chips at the top with a count.
+  - Clean, minimal — matches existing form styling (no new design tokens).
+- Repair / Body Shop / Salvage details: business hours, walk-ins (boolean), starting price (optional), brands serviced (free text), warranty (free text). Skip vehicle make/model picker.
+- Submit handler writes `attributes.tags = [...]` and category-specific fields.
+
+## 4. Browse + cards
+
+- `browse.$category.tsx`: extend `CATEGORY_LABEL` with the 3 new entries.
+- `index.tsx`: add 3 new entries to `CATEGORIES` with `Wrench`, `SprayCan`, `Recycle` icons.
+- `listing-card.tsx`:
+  - Extend `CATEGORY_META` with the 3 categories.
+  - Extend `summarizeAttributes` so service-type listings show first 2-3 tags (e.g. "Brake service • Tires +4").
+- `listing.$id.tsx`: render the full tag list as chips when `attributes.tags` is present.
+
+## 5. Browse filtering by tag (lightweight)
+
+On `browse.$category.tsx` for service categories, render the relevant tag groups as filter chips above the grid. Selecting one or more filters the query client-side using `attributes->tags ?| array[...]` via `.contains()` / `.overlaps()`. No new indexes — existing dataset is small. Out of scope: full-text tag search across all categories.
+
+## Technical details
+
+- DB migration: 3 `INSERT INTO categories`, update sort_order for "other".
+- New file `src/components/tag-picker.tsx` — controlled component, props: `groups`, `defaultExpanded`, `value`, `onChange`. Pure Tailwind + existing Badge/Button.
+- Tag library lives in `src/data/service-tags.ts` (single source of truth shared by sell, browse, listing-card).
+- Tags stored as `string[]` in `listings.attributes.tags`. No schema change to listings — `attributes` is already jsonb.
+- Listings `select(...)` already pulls `attributes` (added in prior step), so cards/detail pages get tags for free.
+
+## Files to be touched
+
+- DB migration (3 categories, sort_order shuffle)
+- `src/data/service-tags.ts` (new — tag library + groups)
+- `src/components/tag-picker.tsx` (new)
+- `src/components/listing-card.tsx` (extend `CATEGORY_META` + `summarizeAttributes`)
+- `src/routes/sell.tsx` (3 categories + TagPicker integration + service details fields)
+- `src/routes/browse.$category.tsx` (extend `CATEGORY_LABEL` + tag filter chips)
+- `src/routes/index.tsx` (3 home tiles)
+- `src/routes/listing.$id.tsx` (render tag chips when present)
+
+## Out of scope
+
+- Booking / quote / appointment flows
+- Multi-location management for one business (each location = one listing)
+- Inventory / SKU search inside parts stores
+- Map view of service locations

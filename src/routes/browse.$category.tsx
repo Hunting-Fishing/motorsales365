@@ -32,6 +32,7 @@ const CATEGORY_LABEL: Record<string, string> = {
   airplane: "Airplanes", equipment: "Heavy Equipment",
   towing: "Towing & Trucking",
   carwash: "Car Wash", parts: "Parts & Accessories", drone: "Drones & Aerial",
+  repair: "Repair Shops", bodyshop: "Body Shops", salvage: "Auto Salvage",
   other: "Other Transport",
 };
 

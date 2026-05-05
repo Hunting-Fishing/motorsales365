@@ -234,15 +234,27 @@ function ListingDetailPage() {
             <div className="text-3xl font-bold text-primary md:text-4xl">{formatPHP(listing.price_php)}</div>
           </div>
 
+          {/* Service tags */}
+          {Array.isArray(listing.attributes?.tags) && listing.attributes.tags.length > 0 && (
+            <div className="mt-6 rounded-xl border border-border bg-card p-5">
+              <h2 className="mb-3 font-display text-lg font-semibold">Services & offerings</h2>
+              <div className="flex flex-wrap gap-1.5">
+                {(listing.attributes.tags as string[]).map((t) => (
+                  <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Specs */}
-          {Object.keys(listing.attributes ?? {}).length > 0 && (
+          {Object.keys(listing.attributes ?? {}).filter((k) => k !== "tags").length > 0 && (
             <div className="mt-6 rounded-xl border border-border bg-card p-5">
               <h2 className="mb-3 font-display text-lg font-semibold">Specifications</h2>
               <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {Object.entries(listing.attributes).map(([k, v]) => (
+                {Object.entries(listing.attributes).filter(([k]) => k !== "tags").map(([k, v]) => (
                   <div key={k} className="flex justify-between gap-3 border-b border-border/60 pb-2 text-sm">
                     <dt className="capitalize text-muted-foreground">{k.replace(/_/g, " ")}</dt>
-                    <dd className="font-medium">{String(v)}</dd>
+                    <dd className="font-medium text-right">{Array.isArray(v) ? v.join(", ") : String(v)}</dd>
                   </div>
                 ))}
               </dl>
