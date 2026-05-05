@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, Camera, Video, Star, Droplets, Wrench, Send } from "lucide-react";
+import { MapPin, Camera, Video, Star, Droplets, Wrench, Send, SprayCan, Recycle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { VerifiedBadge } from "@/components/verified-badge";
 import { formatPHP } from "@/lib/format";
@@ -27,6 +27,9 @@ const CATEGORY_META: Record<string, { label: string; Icon: typeof Droplets }> = 
   carwash: { label: "Car Wash", Icon: Droplets },
   parts: { label: "Parts", Icon: Wrench },
   drone: { label: "Drones", Icon: Send },
+  repair: { label: "Repair Shop", Icon: Wrench },
+  bodyshop: { label: "Body Shop", Icon: SprayCan },
+  salvage: { label: "Salvage", Icon: Recycle },
 };
 
 function summarizeAttributes(slug: string, attrs?: Record<string, any> | null): string | null {
@@ -36,6 +39,10 @@ function summarizeAttributes(slug: string, attrs?: Record<string, any> | null): 
     const head = v.slice(0, 2).join(", ");
     return v.length > 2 ? `${head} +${v.length - 2}` : head;
   };
+  // Prefer unified tag list when present (service-type listings).
+  if (Array.isArray(attrs.tags) && attrs.tags.length > 0) {
+    return list(attrs.tags);
+  }
   if (slug === "carwash") {
     const parts = [list(attrs.services), attrs.pricing_tier].filter(Boolean);
     return parts.join(" • ") || null;
