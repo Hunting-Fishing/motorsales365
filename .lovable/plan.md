@@ -1,89 +1,107 @@
-# Service Locations + Service Tags
+# Launch Readiness — 365 MotorSales Philippines
 
-Expand the marketplace to support automotive service businesses posting their **locations** with selectable **tags** describing what they do or sell. Builds on the existing Car Wash / Parts / Drones pattern.
+Below is what the site is still missing before you can confidently advertise and open it to the public in the Philippines. I've grouped items by priority so we can tackle them in passes.
 
-## 1. New categories
+---
 
-Add 3 new categories alongside existing ones (carwash, parts already exist):
+## 1. Legal & Trust (REQUIRED before any paid ads)
 
-| Slug | Name | Icon |
-|---|---|---|
-| `repair` | Repair Shop | wrench |
-| `bodyshop` | Body Shop | spray-can |
-| `salvage` | Auto Salvage | recycle |
+Ad networks (Meta, Google, TikTok) will reject a marketplace without these, and the Philippines' **Data Privacy Act (RA 10173)** legally requires them.
 
-DB: insert into `categories`, push "Other" to sort 13.
+- **Terms of Service** page (`/terms`) — listing rules, prohibited items, dispute policy, fees.
+- **Privacy Policy** page (`/privacy`) — DPA-compliant, names a Data Protection Officer contact.
+- **Cookie / consent banner** (simple accept/decline).
+- **Acceptable Use / Community Guidelines** (`/guidelines`) — no stolen vehicles, no scams, ID verification rules.
+- **Refund & Boost policy** (linked from `/pricing`).
+- **Contact page upgrade** — physical address or registered business name, support email, PH mobile number.
+- Footer links to all of the above on every page.
 
-## 2. Service tag system (the core idea)
+## 2. Payments (currently missing)
 
-Instead of a fixed dropdown per category, every service-type listing gets a **multi-select tag picker** grouped by theme. One unified tag library, but each category shows a relevant default group expanded.
+`/pricing` shows plans but there is no checkout. Decide and wire one of:
 
-**Tag groups (chips, alphabetized within each group):**
+- **PayMongo** or **Xendit** (PH-native: GCash, Maya, cards, bank transfer) — recommended for PH market.
+- **Stripe** (cards only, no GCash) — easier but loses ~70% of PH buyers who prefer e-wallets.
 
-- **Parts sold** — Wiper blades, Tires, Wheels, Batteries, Brake pads, Filters, Belts & hoses, Lights & bulbs, Spark plugs, Fluids & oils, Body panels, Glass, Mirrors, Bumpers, Engines, Transmissions, Suspension, Exhaust, Electrical, Interior trim
-- **Vehicle scope** — Cars, Motorcycles, Trucks, SUVs, Vans, Heavy duty / Commercial, Diesel, EV / Hybrid, Boats, Heavy equipment
-- **Repair services** — Oil change, Tune-up, Brake service, Tire mounting & balancing, Wheel alignment, AC service, Battery service, Diagnostics, Engine repair, Transmission, Electrical, Suspension, Exhaust, Pre-purchase inspection, Roadside assist
-- **Body & paint** — Collision repair, Dent removal (PDR), Painting, Bumper repair, Frame straightening, Glass replacement, Detailing, Ceramic coating, Window tinting, Rust repair
-- **Wash services** — (existing carwash list, kept as a tag group)
-- **Salvage / parts sourcing** — Used parts, OEM, Aftermarket, Rebuilt, Core buyback, Vehicle buyback, Parts shipping, Pick-a-part yard
+Needed flows: pay-to-post, boost a listing, subscribe to a plan, receipts/invoices, refund handling.
 
-Stored on `listings.attributes.tags` as a flat string array. The grouping is purely UI — searchable as one set.
+## 3. Identity & Anti-Fraud
 
-**Default expanded group per category:**
-- repair → Repair services + Vehicle scope
-- bodyshop → Body & paint + Vehicle scope
-- parts → Parts sold + Vehicle scope
-- salvage → Salvage / parts sourcing + Parts sold
-- carwash → Wash services
-- All groups remain available via "+ Show more" so a parts store can also tag repair services it offers.
+A vehicle marketplace lives or dies on trust.
 
-## 3. Sell form changes (`src/routes/sell.tsx`)
+- **Seller verification** beyond email — phone OTP (PH numbers), optional government ID upload (already partially scaffolded under `dashboard.verification`).
+- **Report listing / report user** flow visible on every listing.
+- **Admin moderation queue** for new listings (you have `admin.listings` — confirm "pending review" gate works before going live).
+- **Rate limiting** on signup, listing creation, and messages to stop spam.
+- **Block list / shadow-ban** for repeat offenders.
 
-- Add 3 categories to `CATEGORIES` array.
-- New constant `TAG_GROUPS` (keyed by group label → tag array).
-- For service-type categories (`repair`, `bodyshop`, `salvage`, plus existing `carwash`, `parts`), render a single **TagPicker** component:
-  - Shows default groups expanded as clickable chips (toggle on/off).
-  - Other groups behind a "Show more services" link.
-  - Selected tags shown as a row of removable chips at the top with a count.
-  - Clean, minimal — matches existing form styling (no new design tokens).
-- Repair / Body Shop / Salvage details: business hours, walk-ins (boolean), starting price (optional), brands serviced (free text), warranty (free text). Skip vehicle make/model picker.
-- Submit handler writes `attributes.tags = [...]` and category-specific fields.
+## 4. Communication
 
-## 4. Browse + cards
+- **In-app messaging** between buyer and seller (`dashboard.messages` exists — verify it actually sends + notifies).
+- **Email notifications** (new message, listing approved, boost expiring, password reset). Needs an email domain + sender setup.
+- **SMS OTP** for PH phone verification (Semaphore or Movider are cheapest in PH).
 
-- `browse.$category.tsx`: extend `CATEGORY_LABEL` with the 3 new entries.
-- `index.tsx`: add 3 new entries to `CATEGORIES` with `Wrench`, `SprayCan`, `Recycle` icons.
-- `listing-card.tsx`:
-  - Extend `CATEGORY_META` with the 3 categories.
-  - Extend `summarizeAttributes` so service-type listings show first 2-3 tags (e.g. "Brake service • Tires +4").
-- `listing.$id.tsx`: render the full tag list as chips when `attributes.tags` is present.
+## 5. Discoverability & SEO
 
-## 5. Browse filtering by tag (lightweight)
+- **Per-category meta tags** on `browse.$category.tsx` (currently uses root meta).
+- **Per-listing meta tags + og:image** = the cover photo on `listing.$id.tsx`. Critical for Facebook/Messenger shares, which is how 80% of PH buyers share listings.
+- **sitemap.xml** generated from active listings.
+- **robots.txt** allowing crawl, blocking `/dashboard`, `/admin`.
+- **JSON-LD** `Vehicle` / `Product` / `LocalBusiness` schema on listing and service pages.
+- **Canonical tags** on listing pages.
 
-On `browse.$category.tsx` for service categories, render the relevant tag groups as filter chips above the grid. Selecting one or more filters the query client-side using `attributes->tags ?| array[...]` via `.contains()` / `.overlaps()`. No new indexes — existing dataset is small. Out of scope: full-text tag search across all categories.
+## 6. Content for Launch
 
-## Technical details
+You have categories but no listings (`SELECT count(*) FROM listings` → 0).
 
-- DB migration: 3 `INSERT INTO categories`, update sort_order for "other".
-- New file `src/components/tag-picker.tsx` — controlled component, props: `groups`, `defaultExpanded`, `value`, `onChange`. Pure Tailwind + existing Badge/Button.
-- Tag library lives in `src/data/service-tags.ts` (single source of truth shared by sell, browse, listing-card).
-- Tags stored as `string[]` in `listings.attributes.tags`. No schema change to listings — `attributes` is already jsonb.
-- Listings `select(...)` already pulls `attributes` (added in prior step), so cards/detail pages get tags for free.
+- **Seed 30–100 demo listings** across cars, motorcycles, parts, car wash, repair shops, etc. so the homepage and category pages don't look empty on day one. Mark them clearly as demo or partner with 2–3 real dealers/shops to post first.
+- **Featured cities**: pre-fill Metro Manila, Cebu, Davao, Iloilo, Cagayan de Oro on the homepage.
+- **About page** needs a real story, team, and mission (current copy is one paragraph).
 
-## Files to be touched
+## 7. Analytics & Ops
 
-- DB migration (3 categories, sort_order shuffle)
-- `src/data/service-tags.ts` (new — tag library + groups)
-- `src/components/tag-picker.tsx` (new)
-- `src/components/listing-card.tsx` (extend `CATEGORY_META` + `summarizeAttributes`)
-- `src/routes/sell.tsx` (3 categories + TagPicker integration + service details fields)
-- `src/routes/browse.$category.tsx` (extend `CATEGORY_LABEL` + tag filter chips)
-- `src/routes/index.tsx` (3 home tiles)
-- `src/routes/listing.$id.tsx` (render tag chips when present)
+- **Analytics**: Google Analytics 4 + Meta Pixel (you'll need the Pixel for FB/IG ads).
+- **Error monitoring**: Sentry or similar.
+- **Backups**: confirm Lovable Cloud backups are on.
+- **Uptime monitoring**: UptimeRobot ping on the homepage.
 
-## Out of scope
+## 8. Mobile & Performance
 
-- Booking / quote / appointment flows
-- Multi-location management for one business (each location = one listing)
-- Inventory / SKU search inside parts stores
-- Map view of service locations
+- Re-test all flows at 360px width — most PH traffic is mobile.
+- Image optimization on uploads (resize to ≤1600px, WebP) — saves data on PH mobile plans.
+- Lazy-load listing images on browse pages.
+- PWA install prompt (optional but high impact in PH where users avoid app stores).
+
+## 9. Marketing Assets (for the ads themselves)
+
+- **Logo** in SVG + PNG (square + horizontal).
+- **Open Graph share image** (1200×630) for the homepage and each major category.
+- **Favicon set** + Apple touch icon.
+- **Brand kit**: 1 paragraph tagline, 5 short value props for ad copy.
+- **Landing pages** per ad campaign (e.g. `/sell-your-car`, `/find-a-mechanic`) — higher conversion than sending traffic to `/`.
+- **Demo video** (15–30s) for Reels/TikTok.
+
+## 10. Business Setup (offline)
+
+- DTI / SEC business registration in PH if collecting payments.
+- BIR registration for invoices.
+- Bank account for payout reconciliation.
+- Customer support channel: at minimum a Messenger inbox (PH default), ideally also email.
+
+---
+
+## Suggested order of work
+
+1. **Pass 1 (this week)**: Terms, Privacy, Cookie banner, footer links, Contact upgrade, robots/sitemap, per-listing OG image. → unlocks ad approval.
+2. **Pass 2**: Payments (PayMongo), email notifications, phone OTP, seed listings.
+3. **Pass 3**: Analytics + Pixel, demo video, landing pages, PWA.
+
+---
+
+## Questions before I start building
+
+1. Which payment provider do you want — **PayMongo**, **Xendit**, or **Stripe**?
+2. Do you have a registered business name + address to put in the footer and Privacy Policy, or should I use placeholders?
+3. Want me to start with **Pass 1 (legal + SEO)** so you can submit ads, or jump straight to **payments**?
+
+Pick what you want and I'll build it.
