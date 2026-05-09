@@ -10,11 +10,15 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TowRouteImport } from './routes/tow'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as GuidelinesRouteImport } from './routes/guidelines'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -32,6 +36,8 @@ import { Route as DashboardMessagesRouteImport } from './routes/dashboard.messag
 import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favorites'
 import { Route as DashboardBillingRouteImport } from './routes/dashboard.billing'
 import { Route as BrowseCategoryRouteImport } from './routes/browse.$category'
+import { Route as ApiSitemapDotxmlRouteImport } from './routes/api/sitemap[.]xml'
+import { Route as ApiRobotsDottxtRouteImport } from './routes/api/robots[.]txt'
 import { Route as AdminVerificationsRouteImport } from './routes/admin.verifications'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
@@ -43,6 +49,11 @@ import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
 const TowRoute = TowRouteImport.update({
   id: '/tow',
   path: '/tow',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignupRoute = SignupRouteImport.update({
@@ -60,6 +71,16 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RefundPolicyRoute = RefundPolicyRouteImport.update({
+  id: '/refund-policy',
+  path: '/refund-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
@@ -68,6 +89,11 @@ const PricingRoute = PricingRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuidelinesRoute = GuidelinesRouteImport.update({
+  id: '/guidelines',
+  path: '/guidelines',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -155,6 +181,16 @@ const BrowseCategoryRoute = BrowseCategoryRouteImport.update({
   path: '/browse/$category',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiSitemapDotxmlRoute = ApiSitemapDotxmlRouteImport.update({
+  id: '/api/sitemap.xml',
+  path: '/api/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiRobotsDottxtRoute = ApiRobotsDottxtRouteImport.update({
+  id: '/api/robots.txt',
+  path: '/api/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminVerificationsRoute = AdminVerificationsRouteImport.update({
   id: '/verifications',
   path: '/verifications',
@@ -197,11 +233,15 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/guidelines': typeof GuidelinesRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
+  '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -209,6 +249,8 @@ export interface FileRoutesByFullPath {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
+  '/api/robots.txt': typeof ApiRobotsDottxtRoute
+  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
@@ -227,11 +269,15 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/guidelines': typeof GuidelinesRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
+  '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -239,6 +285,8 @@ export interface FileRoutesByTo {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
+  '/api/robots.txt': typeof ApiRobotsDottxtRoute
+  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
@@ -260,11 +308,15 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/guidelines': typeof GuidelinesRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
+  '/privacy': typeof PrivacyRoute
+  '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sell': typeof SellRoute
   '/signup': typeof SignupRoute
+  '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -272,6 +324,8 @@ export interface FileRoutesById {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
+  '/api/robots.txt': typeof ApiRobotsDottxtRoute
+  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
@@ -294,11 +348,15 @@ export interface FileRouteTypes {
     | '/admin'
     | '/contact'
     | '/dashboard'
+    | '/guidelines'
     | '/login'
     | '/pricing'
+    | '/privacy'
+    | '/refund-policy'
     | '/reset-password'
     | '/sell'
     | '/signup'
+    | '/terms'
     | '/tow'
     | '/admin/listings'
     | '/admin/performance'
@@ -306,6 +364,8 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/users'
     | '/admin/verifications'
+    | '/api/robots.txt'
+    | '/api/sitemap.xml'
     | '/browse/$category'
     | '/dashboard/billing'
     | '/dashboard/favorites'
@@ -324,11 +384,15 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/contact'
+    | '/guidelines'
     | '/login'
     | '/pricing'
+    | '/privacy'
+    | '/refund-policy'
     | '/reset-password'
     | '/sell'
     | '/signup'
+    | '/terms'
     | '/tow'
     | '/admin/listings'
     | '/admin/performance'
@@ -336,6 +400,8 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/users'
     | '/admin/verifications'
+    | '/api/robots.txt'
+    | '/api/sitemap.xml'
     | '/browse/$category'
     | '/dashboard/billing'
     | '/dashboard/favorites'
@@ -356,11 +422,15 @@ export interface FileRouteTypes {
     | '/admin'
     | '/contact'
     | '/dashboard'
+    | '/guidelines'
     | '/login'
     | '/pricing'
+    | '/privacy'
+    | '/refund-policy'
     | '/reset-password'
     | '/sell'
     | '/signup'
+    | '/terms'
     | '/tow'
     | '/admin/listings'
     | '/admin/performance'
@@ -368,6 +438,8 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/users'
     | '/admin/verifications'
+    | '/api/robots.txt'
+    | '/api/sitemap.xml'
     | '/browse/$category'
     | '/dashboard/billing'
     | '/dashboard/favorites'
@@ -389,12 +461,18 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  GuidelinesRoute: typeof GuidelinesRoute
   LoginRoute: typeof LoginRoute
   PricingRoute: typeof PricingRoute
+  PrivacyRoute: typeof PrivacyRoute
+  RefundPolicyRoute: typeof RefundPolicyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SellRoute: typeof SellRoute
   SignupRoute: typeof SignupRoute
+  TermsRoute: typeof TermsRoute
   TowRoute: typeof TowRoute
+  ApiRobotsDottxtRoute: typeof ApiRobotsDottxtRoute
+  ApiSitemapDotxmlRoute: typeof ApiSitemapDotxmlRoute
   BrowseCategoryRoute: typeof BrowseCategoryRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   SellerIdRoute: typeof SellerIdRoute
@@ -407,6 +485,13 @@ declare module '@tanstack/react-router' {
       path: '/tow'
       fullPath: '/tow'
       preLoaderRoute: typeof TowRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signup': {
@@ -430,6 +515,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/refund-policy': {
+      id: '/refund-policy'
+      path: '/refund-policy'
+      fullPath: '/refund-policy'
+      preLoaderRoute: typeof RefundPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pricing': {
       id: '/pricing'
       path: '/pricing'
@@ -442,6 +541,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guidelines': {
+      id: '/guidelines'
+      path: '/guidelines'
+      fullPath: '/guidelines'
+      preLoaderRoute: typeof GuidelinesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -563,6 +669,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BrowseCategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/sitemap.xml': {
+      id: '/api/sitemap.xml'
+      path: '/api/sitemap.xml'
+      fullPath: '/api/sitemap.xml'
+      preLoaderRoute: typeof ApiSitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/robots.txt': {
+      id: '/api/robots.txt'
+      path: '/api/robots.txt'
+      fullPath: '/api/robots.txt'
+      preLoaderRoute: typeof ApiRobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/verifications': {
       id: '/admin/verifications'
       path: '/verifications'
@@ -681,12 +801,18 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  GuidelinesRoute: GuidelinesRoute,
   LoginRoute: LoginRoute,
   PricingRoute: PricingRoute,
+  PrivacyRoute: PrivacyRoute,
+  RefundPolicyRoute: RefundPolicyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SellRoute: SellRoute,
   SignupRoute: SignupRoute,
+  TermsRoute: TermsRoute,
   TowRoute: TowRoute,
+  ApiRobotsDottxtRoute: ApiRobotsDottxtRoute,
+  ApiSitemapDotxmlRoute: ApiSitemapDotxmlRoute,
   BrowseCategoryRoute: BrowseCategoryRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   SellerIdRoute: SellerIdRoute,
