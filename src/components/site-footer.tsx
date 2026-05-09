@@ -50,9 +50,19 @@ export function SiteFooter() {
             <li><Link to="/contact" className="hover:text-foreground">Contact</Link></li>
           </ul>
         </div>
+        <div>
+          <h4 className="mb-3 text-sm font-semibold">Legal</h4>
+          <ul className="space-y-2 text-sm text-muted-foreground">
+            <li><Link to="/terms" className="hover:text-foreground">Terms of Service</Link></li>
+            <li><Link to="/privacy" className="hover:text-foreground">Privacy Policy</Link></li>
+            <li><Link to="/guidelines" className="hover:text-foreground">Community Guidelines</Link></li>
+            <li><Link to="/refund-policy" className="hover:text-foreground">Refund Policy</Link></li>
+          </ul>
+        </div>
       </div>
-      <div className="border-t border-border py-4 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} 365 MotorSales Philippines. Prices in ₱ PHP.
+      <div className="border-t border-border px-4 py-4 text-center text-xs text-muted-foreground">
+        <p>© {new Date().getFullYear()} 365 MotorSales Philippines. All prices in ₱ PHP.</p>
+        <p className="mt-1">Registered in the Philippines · Metro Manila · DPA-compliant.</p>
       </div>
     </footer>
   );
