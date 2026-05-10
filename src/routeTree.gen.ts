@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TowRouteImport } from './routes/tow'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SignupRouteImport } from './routes/signup'
@@ -53,6 +54,11 @@ import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lova
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 
+const UnsubscribeRoute = UnsubscribeRouteImport.update({
+  id: '/unsubscribe',
+  path: '/unsubscribe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TowRoute = TowRouteImport.update({
   id: '/tow',
   path: '/tow',
@@ -289,6 +295,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
@@ -332,6 +339,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
@@ -378,6 +386,7 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
+  '/unsubscribe': typeof UnsubscribeRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
@@ -425,6 +434,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/terms'
     | '/tow'
+    | '/unsubscribe'
     | '/admin/listings'
     | '/admin/performance'
     | '/admin/pricing'
@@ -468,6 +478,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/terms'
     | '/tow'
+    | '/unsubscribe'
     | '/admin/listings'
     | '/admin/performance'
     | '/admin/pricing'
@@ -513,6 +524,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/terms'
     | '/tow'
+    | '/unsubscribe'
     | '/admin/listings'
     | '/admin/performance'
     | '/admin/pricing'
@@ -559,6 +571,7 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   TermsRoute: typeof TermsRoute
   TowRoute: typeof TowRoute
+  UnsubscribeRoute: typeof UnsubscribeRoute
   ApiRobotsDottxtRoute: typeof ApiRobotsDottxtRoute
   ApiSitemapDotxmlRoute: typeof ApiSitemapDotxmlRoute
   BrowseCategoryRoute: typeof BrowseCategoryRoute
@@ -574,6 +587,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/unsubscribe': {
+      id: '/unsubscribe'
+      path: '/unsubscribe'
+      fullPath: '/unsubscribe'
+      preLoaderRoute: typeof UnsubscribeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tow': {
       id: '/tow'
       path: '/tow'
@@ -955,6 +975,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   TermsRoute: TermsRoute,
   TowRoute: TowRoute,
+  UnsubscribeRoute: UnsubscribeRoute,
   ApiRobotsDottxtRoute: ApiRobotsDottxtRoute,
   ApiSitemapDotxmlRoute: ApiSitemapDotxmlRoute,
   BrowseCategoryRoute: BrowseCategoryRoute,
@@ -970,12 +991,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
