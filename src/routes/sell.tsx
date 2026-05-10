@@ -754,7 +754,14 @@ function SellPage() {
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Plan</h2>
-            <RadioGroup value={plan} onValueChange={(v: any) => setPlan(v)} className="grid gap-3 sm:grid-cols-2">
+            <RadioGroup value={plan} onValueChange={(v: any) => setPlan(v)} className="grid gap-3 sm:grid-cols-3">
+              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 hover:bg-secondary/50">
+                <RadioGroupItem value="free" className="mt-1" />
+                <div>
+                  <div className="font-medium">Free — ₱0</div>
+                  <div className="text-xs text-muted-foreground">1 photo, no video. Limit 1 listing per week.</div>
+                </div>
+              </label>
               <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 hover:bg-secondary/50">
                 <RadioGroupItem value="standard" className="mt-1" />
                 <div>
