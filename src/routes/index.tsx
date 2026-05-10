@@ -160,7 +160,7 @@ function Index() {
         <div className="container mx-auto grid gap-6 px-4 py-8 md:grid-cols-3">
           {[
             { Icon: ShieldCheck, t: "Trusted listings", d: "Private and business sellers, with badges and reports." },
-            { Icon: Tag, t: "Fair pricing", d: "Standard ₱20 listings. Boost or upgrade only when you want to." },
+            { Icon: Tag, t: "Free to start", d: "1 free listing per week (1 photo). Standard ₱20 listings. Upgrade or boost when you want." },
             { Icon: Zap, t: "Reach the whole country", d: "From Metro Manila to Mindanao — buyers find your ad." },
           ].map(({ Icon, t, d }) => (
             <div key={t} className="flex items-start gap-3">
