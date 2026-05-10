@@ -5,19 +5,21 @@ export interface TemplateEntry {
   subject: string | ((data: Record<string, any>) => string)
   displayName?: string
   previewData?: Record<string, any>
-  /** Fixed recipient — overrides caller-provided recipientEmail when set. */
   to?: string
 }
 
-/**
- * Template registry — maps template names to their React Email components.
- * Import and register new templates here after creating them in this directory.
- *
- * Example:
- *   import { template as welcomeTemplate } from './welcome'
- *   // then add to TEMPLATES: 'welcome': welcomeTemplate
- */
+import { template as signupWelcome } from './signup-welcome'
+import { template as paymentReceipt } from './payment-receipt'
+import { template as paymentFailed } from './payment-failed'
+import { template as refundIssued } from './refund-issued'
+import { template as subscriptionRenewed } from './subscription-renewed'
+import { template as subscriptionCancelled } from './subscription-cancelled'
+
 export const TEMPLATES: Record<string, TemplateEntry> = {
-  // Add templates here as they are created, e.g.:
-  // 'welcome': welcomeTemplate,
+  'signup-welcome': signupWelcome,
+  'payment-receipt': paymentReceipt,
+  'payment-failed': paymentFailed,
+  'refund-issued': refundIssued,
+  'subscription-renewed': subscriptionRenewed,
+  'subscription-cancelled': subscriptionCancelled,
 }
