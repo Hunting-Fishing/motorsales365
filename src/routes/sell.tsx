@@ -398,24 +398,27 @@ function SellPage() {
         return;
       }
 
-      // Create pending payment record (only once — guarded by a select first).
-      const { data: existingPayments } = await supabase
-        .from("payments")
-        .select("id")
-        .eq("listing_id", lid)
-        .limit(1);
-      if (!existingPayments || existingPayments.length === 0) {
-        await supabase.from("payments").insert({
-          user_id: user.id,
-          listing_id: lid,
-          kind: plan === "upgraded" ? "upgrade" : "listing",
-          amount_php: totalFee,
-          status: "pending",
-          method: "manual",
-        });
+      if (plan !== "free") {
+        // Create pending payment record (only once — guarded by a select first).
+        const { data: existingPayments } = await supabase
+          .from("payments")
+          .select("id")
+          .eq("listing_id", lid)
+          .limit(1);
+        if (!existingPayments || existingPayments.length === 0) {
+          await supabase.from("payments").insert({
+            user_id: user.id,
+            listing_id: lid,
+            kind: plan === "upgraded" ? "upgrade" : "listing",
+            amount_php: totalFee,
+            status: "pending",
+            method: "manual",
+          });
+        }
+        toast.success("Listing submitted! Awaiting payment confirmation.");
+      } else {
+        toast.success("Free listing published!");
       }
-
-      toast.success("Listing submitted! Awaiting payment confirmation.");
       navigate({ to: "/dashboard" });
     } catch (err: any) {
       toast.error(err.message ?? "Failed to publish listing");
