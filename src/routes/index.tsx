@@ -216,15 +216,16 @@ function Index() {
         <div className="overflow-hidden rounded-2xl border border-border bg-card p-10 shadow-[var(--shadow-card)]">
           <div className="grid gap-8 md:grid-cols-2 md:items-center">
             <div>
-              <h3 className="font-display text-3xl font-bold">Selling? It only takes a minute.</h3>
-              <p className="mt-2 text-muted-foreground">Up to 5 photos and 1 video for ₱20 per listing. Upgrade for more, or boost to top of search.</p>
+              <h3 className="font-display text-3xl font-bold">Selling? Start free.</h3>
+              <p className="mt-2 text-muted-foreground">Post 1 free listing per week with 1 photo — no card required. Need more? Standard ₱20 listings give you 5 photos and a video.</p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Button asChild size="lg"><Link to="/sell">Post a listing</Link></Button>
+                <Button asChild size="lg"><Link to="/sell">Post free listing</Link></Button>
                 <Button asChild size="lg" variant="outline"><Link to="/pricing">See pricing</Link></Button>
               </div>
             </div>
             <ul className="grid gap-3 text-sm">
               {[
+                "Free listing — 1 photo, 1 free post per week",
                 "Standard listing — ₱20, up to 5 photos and 1 video",
                 "Upgraded listing — up to 20 photos and 3 videos",
                 "Boost — pin to the top of search and renew the ad",
