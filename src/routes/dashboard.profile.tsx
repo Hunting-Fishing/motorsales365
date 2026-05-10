@@ -13,15 +13,81 @@ export const Route = createFileRoute("/dashboard/profile")({
   component: ProfilePage,
 });
 
+function normalizePhPhone(input: string): string | null {
+  const digits = input.replace(/\D/g, "");
+  if (digits.startsWith("63") && digits.length === 12) return `+${digits}`;
+  if (digits.startsWith("0") && digits.length === 11) return `+63${digits.slice(1)}`;
+  if (digits.startsWith("9") && digits.length === 10) return `+63${digits}`;
+  return null;
+}
+
 function ProfilePage() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [saving, setSaving] = useState(false);
 
+  // Phone verification state
+  const [phoneInput, setPhoneInput] = useState("");
+  const [otpCode, setOtpCode] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [phoneSubmitting, setPhoneSubmitting] = useState(false);
+
   useEffect(() => {
     if (!user) return;
     supabase.from("profiles").select("*").eq("id", user.id).maybeSingle().then(({ data }) => setProfile(data ?? {}));
   }, [user]);
+
+  const sendPhoneOtp = async () => {
+    const e164 = normalizePhPhone(phoneInput);
+    if (!e164) return toast.error("Enter a valid PH phone number (e.g. 0917...)");
+    setPhoneSubmitting(true);
+    // Rate-limit: 3 sends per phone per hour
+    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const { count } = await supabase
+      .from("otp_send_log")
+      .select("id", { count: "exact", head: true })
+      .eq("phone", e164)
+      .gte("sent_at", oneHourAgo);
+    if ((count ?? 0) >= 3) {
+      setPhoneSubmitting(false);
+      return toast.error("Too many attempts. Try again in an hour.");
+    }
+    const { error } = await supabase.auth.updateUser({ phone: e164 });
+    if (!error && user) {
+      await supabase.from("otp_send_log").insert({ user_id: user.id, phone: e164, purpose: "verify" });
+    }
+    setPhoneSubmitting(false);
+    if (error) return toast.error(error.message);
+    setOtpSent(true);
+    toast.success("OTP sent to your phone.");
+  };
+
+  const verifyPhoneOtp = async () => {
+    const e164 = normalizePhPhone(phoneInput);
+    if (!e164 || !user) return;
+    setPhoneSubmitting(true);
+    const { error } = await supabase.auth.verifyOtp({ phone: e164, token: otpCode, type: "phone_change" });
+    if (!error) {
+      await supabase.from("profiles").update({
+        phone_e164: e164,
+        phone_verified_at: new Date().toISOString(),
+      }).eq("id", user.id);
+      setProfile((p: any) => ({ ...p, phone_e164: e164, phone_verified_at: new Date().toISOString() }));
+    }
+    setPhoneSubmitting(false);
+    if (error) return toast.error(error.message);
+    toast.success("Phone verified — recovery via SMS is now enabled.");
+    setOtpSent(false);
+    setOtpCode("");
+    setPhoneInput("");
+  };
+
+  const removePhone = async () => {
+    if (!user) return;
+    await supabase.from("profiles").update({ phone_e164: null, phone_verified_at: null }).eq("id", user.id);
+    setProfile((p: any) => ({ ...p, phone_e164: null, phone_verified_at: null }));
+    toast.success("Phone removed.");
+  };
 
   const save = async () => {
     if (!user || !profile) return;
@@ -93,6 +159,63 @@ function ProfilePage() {
           </>
         )}
         <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save profile"}</Button>
+      </div>
+
+      {/* Security: phone verification */}
+      <div className="mt-6 space-y-4 rounded-xl border border-border bg-card p-6">
+        <div>
+          <h2 className="font-display text-lg font-bold">Security — Phone verification</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Add a verified PH mobile number to recover your account by SMS if you lose access to your email.
+          </p>
+        </div>
+
+        {profile.phone_verified_at && profile.phone_e164 ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3">
+            <div>
+              <div className="text-sm font-semibold">Verified: {profile.phone_e164}</div>
+              <div className="text-xs text-muted-foreground">
+                Verified {new Date(profile.phone_verified_at).toLocaleDateString()} — SMS recovery enabled.
+              </div>
+            </div>
+            <Button variant="outline" size="sm" onClick={removePhone}>Remove</Button>
+          </div>
+        ) : !otpSent ? (
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="phone-verify">PH mobile number</Label>
+              <Input
+                id="phone-verify"
+                placeholder="09XX XXX XXXX"
+                value={phoneInput}
+                onChange={(e) => setPhoneInput(e.target.value)}
+              />
+              <p className="mt-1 text-xs text-muted-foreground">Format: 09XX XXX XXXX or +63 9XX XXX XXXX.</p>
+            </div>
+            <Button onClick={sendPhoneOtp} disabled={phoneSubmitting} variant="secondary">
+              {phoneSubmitting ? "Sending…" : "Send verification code"}
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="phone-otp">6-digit code sent to {phoneInput}</Label>
+              <Input
+                id="phone-otp"
+                inputMode="numeric"
+                maxLength={6}
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={verifyPhoneOtp} disabled={phoneSubmitting}>
+                {phoneSubmitting ? "Verifying…" : "Verify"}
+              </Button>
+              <Button variant="ghost" onClick={() => { setOtpSent(false); setOtpCode(""); }}>Cancel</Button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

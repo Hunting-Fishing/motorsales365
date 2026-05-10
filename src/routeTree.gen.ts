@@ -19,6 +19,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as GuidelinesRouteImport } from './routes/guidelines'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -45,6 +46,7 @@ import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
+import { Route as ApiPublicPaymentEventsRouteImport } from './routes/api/public/payment-events'
 
 const TowRoute = TowRouteImport.update({
   id: '/tow',
@@ -94,6 +96,11 @@ const LoginRoute = LoginRouteImport.update({
 const GuidelinesRoute = GuidelinesRouteImport.update({
   id: '/guidelines',
   path: '/guidelines',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -226,6 +233,11 @@ const ListingIdEditRoute = ListingIdEditRouteImport.update({
   path: '/edit',
   getParentRoute: () => ListingIdRoute,
 } as any)
+const ApiPublicPaymentEventsRoute = ApiPublicPaymentEventsRouteImport.update({
+  id: '/api/public/payment-events',
+  path: '/api/public/payment-events',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -233,6 +245,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
@@ -263,12 +276,14 @@ export interface FileRoutesByFullPath {
   '/seller/$id': typeof SellerIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
@@ -299,6 +314,7 @@ export interface FileRoutesByTo {
   '/seller/$id': typeof SellerIdRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
 }
 export interface FileRoutesById {
@@ -308,6 +324,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
@@ -338,6 +355,7 @@ export interface FileRoutesById {
   '/seller/$id': typeof SellerIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
 }
 export interface FileRouteTypes {
@@ -348,6 +366,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/contact'
     | '/dashboard'
+    | '/forgot-password'
     | '/guidelines'
     | '/login'
     | '/pricing'
@@ -378,12 +397,14 @@ export interface FileRouteTypes {
     | '/seller/$id'
     | '/admin/'
     | '/dashboard/'
+    | '/api/public/payment-events'
     | '/listing/$id/edit'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/contact'
+    | '/forgot-password'
     | '/guidelines'
     | '/login'
     | '/pricing'
@@ -414,6 +435,7 @@ export interface FileRouteTypes {
     | '/seller/$id'
     | '/admin'
     | '/dashboard'
+    | '/api/public/payment-events'
     | '/listing/$id/edit'
   id:
     | '__root__'
@@ -422,6 +444,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/contact'
     | '/dashboard'
+    | '/forgot-password'
     | '/guidelines'
     | '/login'
     | '/pricing'
@@ -452,6 +475,7 @@ export interface FileRouteTypes {
     | '/seller/$id'
     | '/admin/'
     | '/dashboard/'
+    | '/api/public/payment-events'
     | '/listing/$id/edit'
   fileRoutesById: FileRoutesById
 }
@@ -461,6 +485,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   GuidelinesRoute: typeof GuidelinesRoute
   LoginRoute: typeof LoginRoute
   PricingRoute: typeof PricingRoute
@@ -476,6 +501,7 @@ export interface RootRouteChildren {
   BrowseCategoryRoute: typeof BrowseCategoryRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   SellerIdRoute: typeof SellerIdRoute
+  ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -548,6 +574,13 @@ declare module '@tanstack/react-router' {
       path: '/guidelines'
       fullPath: '/guidelines'
       preLoaderRoute: typeof GuidelinesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -732,6 +765,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListingIdEditRouteImport
       parentRoute: typeof ListingIdRoute
     }
+    '/api/public/payment-events': {
+      id: '/api/public/payment-events'
+      path: '/api/public/payment-events'
+      fullPath: '/api/public/payment-events'
+      preLoaderRoute: typeof ApiPublicPaymentEventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -801,6 +841,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   GuidelinesRoute: GuidelinesRoute,
   LoginRoute: LoginRoute,
   PricingRoute: PricingRoute,
@@ -816,16 +857,8 @@ const rootRouteChildren: RootRouteChildren = {
   BrowseCategoryRoute: BrowseCategoryRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   SellerIdRoute: SellerIdRoute,
+  ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

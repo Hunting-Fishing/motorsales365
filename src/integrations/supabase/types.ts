@@ -229,6 +229,30 @@ export type Database = {
           },
         ]
       }
+      otp_send_log: {
+        Row: {
+          id: string
+          phone: string
+          purpose: string
+          sent_at: string
+          user_id: string | null
+        }
+        Insert: {
+          id?: string
+          phone: string
+          purpose: string
+          sent_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          id?: string
+          phone?: string
+          purpose?: string
+          sent_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount_php: number
@@ -321,6 +345,8 @@ export type Database = {
           full_name: string | null
           id: string
           phone: string | null
+          phone_e164: string | null
+          phone_verified_at: string | null
           seller_type: Database["public"]["Enums"]["seller_type"]
           updated_at: string
           verification_status: Database["public"]["Enums"]["verification_status"]
@@ -343,6 +369,8 @@ export type Database = {
           full_name?: string | null
           id: string
           phone?: string | null
+          phone_e164?: string | null
+          phone_verified_at?: string | null
           seller_type?: Database["public"]["Enums"]["seller_type"]
           updated_at?: string
           verification_status?: Database["public"]["Enums"]["verification_status"]
@@ -365,6 +393,8 @@ export type Database = {
           full_name?: string | null
           id?: string
           phone?: string | null
+          phone_e164?: string | null
+          phone_verified_at?: string | null
           seller_type?: Database["public"]["Enums"]["seller_type"]
           updated_at?: string
           verification_status?: Database["public"]["Enums"]["verification_status"]
