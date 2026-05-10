@@ -969,11 +969,15 @@ export type Database = {
           read_ct: number
         }[]
       }
+      user_has_paid_subscription: {
+        Args: { _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       app_role: "admin" | "user"
       business_kind: "repair_shop" | "insurance" | "dealer" | "other"
-      listing_plan: "standard" | "upgraded"
+      listing_plan: "free" | "standard" | "upgraded"
       listing_status:
         | "draft"
         | "pending_payment"
@@ -1121,7 +1125,7 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "user"],
       business_kind: ["repair_shop", "insurance", "dealer", "other"],
-      listing_plan: ["standard", "upgraded"],
+      listing_plan: ["free", "standard", "upgraded"],
       listing_status: [
         "draft",
         "pending_payment",
