@@ -39,15 +39,16 @@ function PricingPage() {
         </div>
       </section>
 
-      <section className="container mx-auto grid gap-4 px-4 py-12 sm:grid-cols-3">
+      <section className="container mx-auto grid gap-4 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
         {[
+          { t: "Free listing", p: 0, d: "1 photo, no video. 1 free listing per week." },
           { t: "Standard listing", p: settings.listing_fee_php ?? 20, d: "5 photos, 1 video. Stays live for 60 days." },
           { t: "Upgraded listing", p: (settings.listing_fee_php ?? 20) + (settings.upgrade_fee_php ?? 100), d: "20 photos, 3 videos. Stand out from the crowd." },
           { t: "Boost", p: settings.boost_fee_php ?? 150, d: `Pin to top of search and renew the ad every ${settings.boost_renewal_days ?? 14} days.` },
         ].map((c) => (
           <div key={c.t} className="rounded-xl border border-border bg-card p-6">
             <div className="text-sm font-semibold text-muted-foreground">{c.t}</div>
-            <div className="mt-2 font-display text-3xl font-bold text-primary">{formatPHP(c.p)}</div>
+            <div className="mt-2 font-display text-3xl font-bold text-primary">{c.p === 0 ? "Free" : formatPHP(c.p)}</div>
             <p className="mt-2 text-sm text-muted-foreground">{c.d}</p>
           </div>
         ))}
