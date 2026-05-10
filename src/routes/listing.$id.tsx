@@ -19,6 +19,7 @@ import {
 import { formatPHP, formatDate } from "@/lib/format";
 import placeholderCar from "@/assets/placeholder-car.png";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
+import { ListingQr } from "@/components/listing-qr";
 
 const REPORT_REASONS = [
   "Suspected scam or fraud",
@@ -357,6 +358,14 @@ function ListingDetailPage() {
                 <Heart className={`mr-2 h-4 w-4 ${favorited ? "fill-destructive text-destructive" : ""}`} />
                 {favorited ? "Saved" : "Save listing"}
               </Button>
+              <ListingQr
+                listingId={listing.id}
+                title={listing.title}
+                pricePhp={listing.price_php}
+                location={[listing.city, listing.region].filter(Boolean).join(", ") || null}
+                coverUrl={photos[0]?.url ?? null}
+                className="w-full"
+              />
               {listing.category_slug !== "towing" && (
                 <Button asChild variant="outline" className="w-full">
                   <Link to="/tow" search={{ listing: listing.id }}>

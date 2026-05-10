@@ -19,6 +19,7 @@ import {
 import { formatPHP, formatDate } from "@/lib/format";
 import placeholderCar from "@/assets/placeholder-car.png";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
+import { ListingQr } from "@/components/listing-qr";
 
 export const Route = createFileRoute("/dashboard/")({
   component: MyListings,
@@ -233,6 +234,13 @@ function MyListings() {
                       <Edit className="h-4 w-4" />
                     </Link>
                   </Button>
+                  <ListingQr
+                    listingId={l.id}
+                    title={l.title}
+                    pricePhp={l.price_php}
+                    coverUrl={photo?.url ?? null}
+                    compact
+                  />
                   <Button
                     variant="outline"
                     size="sm"
