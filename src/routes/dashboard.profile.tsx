@@ -160,6 +160,63 @@ function ProfilePage() {
         )}
         <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save profile"}</Button>
       </div>
+
+      {/* Security: phone verification */}
+      <div className="mt-6 space-y-4 rounded-xl border border-border bg-card p-6">
+        <div>
+          <h2 className="font-display text-lg font-bold">Security — Phone verification</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Add a verified PH mobile number to recover your account by SMS if you lose access to your email.
+          </p>
+        </div>
+
+        {profile.phone_verified_at && profile.phone_e164 ? (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3">
+            <div>
+              <div className="text-sm font-semibold">Verified: {profile.phone_e164}</div>
+              <div className="text-xs text-muted-foreground">
+                Verified {new Date(profile.phone_verified_at).toLocaleDateString()} — SMS recovery enabled.
+              </div>
+            </div>
+            <Button variant="outline" size="sm" onClick={removePhone}>Remove</Button>
+          </div>
+        ) : !otpSent ? (
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="phone-verify">PH mobile number</Label>
+              <Input
+                id="phone-verify"
+                placeholder="09XX XXX XXXX"
+                value={phoneInput}
+                onChange={(e) => setPhoneInput(e.target.value)}
+              />
+              <p className="mt-1 text-xs text-muted-foreground">Format: 09XX XXX XXXX or +63 9XX XXX XXXX.</p>
+            </div>
+            <Button onClick={sendPhoneOtp} disabled={phoneSubmitting} variant="secondary">
+              {phoneSubmitting ? "Sending…" : "Send verification code"}
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <div>
+              <Label htmlFor="phone-otp">6-digit code sent to {phoneInput}</Label>
+              <Input
+                id="phone-otp"
+                inputMode="numeric"
+                maxLength={6}
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value)}
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button onClick={verifyPhoneOtp} disabled={phoneSubmitting}>
+                {phoneSubmitting ? "Verifying…" : "Verify"}
+              </Button>
+              <Button variant="ghost" onClick={() => { setOtpSent(false); setOtpCode(""); }}>Cancel</Button>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
