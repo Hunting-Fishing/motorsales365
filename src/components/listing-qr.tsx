@@ -153,9 +153,15 @@ export function ListingQr({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant={triggerVariant} className={className}>
-          <QrCode className="mr-2 h-4 w-4" /> {triggerLabel}
-        </Button>
+        {compact ? (
+          <Button variant={triggerVariant} size="sm" className={className} title="QR code & printable poster">
+            <QrCode className="h-4 w-4" />
+          </Button>
+        ) : (
+          <Button variant={triggerVariant} className={className}>
+            <QrCode className="mr-2 h-4 w-4" /> {triggerLabel}
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="max-w-md">
         <DialogHeader>
