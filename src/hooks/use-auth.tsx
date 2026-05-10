@@ -83,6 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .eq("role", "admin")
           .maybeSingle()
           .then(({ data: roleData }) => setIsAdmin(!!roleData));
+        maybeSendWelcomeEmail(data.session.user);
       }
     });
 
