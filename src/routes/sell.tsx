@@ -163,9 +163,11 @@ function SellPage() {
     });
   }, []);
 
-  const maxPhotos = plan === "upgraded" ? 20 : 5;
-  const maxVideos = plan === "upgraded" ? 3 : 1;
-  const totalFee = (pricing.listing_fee_php ?? 20) + (plan === "upgraded" ? (pricing.upgrade_fee_php ?? 100) : 0);
+  const maxPhotos = plan === "upgraded" ? 20 : plan === "standard" ? 5 : 1;
+  const maxVideos = plan === "upgraded" ? 3 : plan === "standard" ? 1 : 0;
+  const totalFee = plan === "free"
+    ? 0
+    : (pricing.listing_fee_php ?? 20) + (plan === "upgraded" ? (pricing.upgrade_fee_php ?? 100) : 0);
 
   const handlePhotos = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
