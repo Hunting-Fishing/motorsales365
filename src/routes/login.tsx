@@ -55,7 +55,7 @@ function LoginPage() {
           <div>
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <Link to="/reset-password" className="text-xs text-primary hover:underline">Forgot?</Link>
+              <Link to="/forgot-password" className="text-xs text-primary hover:underline">Forgot?</Link>
             </div>
             <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
