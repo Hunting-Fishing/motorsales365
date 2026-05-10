@@ -89,7 +89,7 @@ function SellPage() {
   const [condition, setCondition] = useState("Used");
   const [phone, setPhone] = useState("");
   const [sellerType, setSellerType] = useState<"private" | "business">("private");
-  const [plan, setPlan] = useState<"standard" | "upgraded">("standard");
+  const [plan, setPlan] = useState<"free" | "standard" | "upgraded">("free");
   const [year, setYear] = useState("");
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
@@ -163,9 +163,11 @@ function SellPage() {
     });
   }, []);
 
-  const maxPhotos = plan === "upgraded" ? 20 : 5;
-  const maxVideos = plan === "upgraded" ? 3 : 1;
-  const totalFee = (pricing.listing_fee_php ?? 20) + (plan === "upgraded" ? (pricing.upgrade_fee_php ?? 100) : 0);
+  const maxPhotos = plan === "upgraded" ? 20 : plan === "standard" ? 5 : 1;
+  const maxVideos = plan === "upgraded" ? 3 : plan === "standard" ? 1 : 0;
+  const totalFee = plan === "free"
+    ? 0
+    : (pricing.listing_fee_php ?? 20) + (plan === "upgraded" ? (pricing.upgrade_fee_php ?? 100) : 0);
 
   const handlePhotos = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
@@ -368,7 +370,8 @@ function SellPage() {
           plan,
           contact_phone: phone || null,
           attributes,
-          status: "pending_payment",
+          status: plan === "free" ? "active" : "pending_payment",
+          published_at: plan === "free" ? new Date().toISOString() : null,
           expires_at: expires.toISOString(),
         }).select().single();
 
@@ -395,24 +398,27 @@ function SellPage() {
         return;
       }
 
-      // Create pending payment record (only once — guarded by a select first).
-      const { data: existingPayments } = await supabase
-        .from("payments")
-        .select("id")
-        .eq("listing_id", lid)
-        .limit(1);
-      if (!existingPayments || existingPayments.length === 0) {
-        await supabase.from("payments").insert({
-          user_id: user.id,
-          listing_id: lid,
-          kind: plan === "upgraded" ? "upgrade" : "listing",
-          amount_php: totalFee,
-          status: "pending",
-          method: "manual",
-        });
+      if (plan !== "free") {
+        // Create pending payment record (only once — guarded by a select first).
+        const { data: existingPayments } = await supabase
+          .from("payments")
+          .select("id")
+          .eq("listing_id", lid)
+          .limit(1);
+        if (!existingPayments || existingPayments.length === 0) {
+          await supabase.from("payments").insert({
+            user_id: user.id,
+            listing_id: lid,
+            kind: plan === "upgraded" ? "upgrade" : "listing",
+            amount_php: totalFee,
+            status: "pending",
+            method: "manual",
+          });
+        }
+        toast.success("Listing submitted! Awaiting payment confirmation.");
+      } else {
+        toast.success("Free listing published!");
       }
-
-      toast.success("Listing submitted! Awaiting payment confirmation.");
       navigate({ to: "/dashboard" });
     } catch (err: any) {
       toast.error(err.message ?? "Failed to publish listing");
@@ -748,7 +754,14 @@ function SellPage() {
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Plan</h2>
-            <RadioGroup value={plan} onValueChange={(v: any) => setPlan(v)} className="grid gap-3 sm:grid-cols-2">
+            <RadioGroup value={plan} onValueChange={(v: any) => setPlan(v)} className="grid gap-3 sm:grid-cols-3">
+              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 hover:bg-secondary/50">
+                <RadioGroupItem value="free" className="mt-1" />
+                <div>
+                  <div className="font-medium">Free — ₱0</div>
+                  <div className="text-xs text-muted-foreground">1 photo, no video. Limit 1 listing per week.</div>
+                </div>
+              </label>
               <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 hover:bg-secondary/50">
                 <RadioGroupItem value="standard" className="mt-1" />
                 <div>
