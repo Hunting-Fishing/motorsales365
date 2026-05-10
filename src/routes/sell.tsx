@@ -89,7 +89,7 @@ function SellPage() {
   const [condition, setCondition] = useState("Used");
   const [phone, setPhone] = useState("");
   const [sellerType, setSellerType] = useState<"private" | "business">("private");
-  const [plan, setPlan] = useState<"standard" | "upgraded">("standard");
+  const [plan, setPlan] = useState<"free" | "standard" | "upgraded">("free");
   const [year, setYear] = useState("");
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
