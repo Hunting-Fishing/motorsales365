@@ -20,6 +20,7 @@ interface ListingQrProps {
   triggerVariant?: "default" | "outline" | "ghost" | "secondary";
   triggerLabel?: string;
   className?: string;
+  compact?: boolean;
 }
 
 function getListingUrl(id: string, baseUrl?: string) {
@@ -39,6 +40,7 @@ export function ListingQr({
   triggerVariant = "outline",
   triggerLabel = "QR & Poster",
   className,
+  compact = false,
 }: ListingQrProps) {
   const [open, setOpen] = useState(false);
   const [qrDataUrl, setQrDataUrl] = useState<string>("");
