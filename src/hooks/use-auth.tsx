@@ -55,14 +55,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(newSession);
       setUser(newSession?.user ?? null);
       if (newSession?.user) {
+        const u = newSession.user;
         setTimeout(async () => {
           const { data } = await supabase
             .from("user_roles")
             .select("role")
-            .eq("user_id", newSession.user.id)
+            .eq("user_id", u.id)
             .eq("role", "admin")
             .maybeSingle();
           setIsAdmin(!!data);
+          maybeSendWelcomeEmail(u);
         }, 0);
       } else {
         setIsAdmin(false);
