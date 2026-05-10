@@ -91,18 +91,6 @@ function Index() {
 
   return (
     <SiteLayout>
-      {/* Brand banner */}
-      <section className="bg-white">
-        <div className="container mx-auto px-0 sm:px-4">
-          <img
-            src={bannerImage}
-            alt="365 Motor Sales — Buy, Sell, List Vehicles & Equipment across the Philippines"
-            className="h-auto w-full"
-            loading="eager"
-          />
-        </div>
-      </section>
-
       {/* Hero */}
       <section
         className="relative overflow-hidden text-white"
