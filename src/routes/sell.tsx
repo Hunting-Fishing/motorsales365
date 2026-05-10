@@ -370,7 +370,8 @@ function SellPage() {
           plan,
           contact_phone: phone || null,
           attributes,
-          status: "pending_payment",
+          status: plan === "free" ? "active" : "pending_payment",
+          published_at: plan === "free" ? new Date().toISOString() : null,
           expires_at: expires.toISOString(),
         }).select().single();
 
