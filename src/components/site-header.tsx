@@ -1,7 +1,8 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Car, Menu, Plus, Heart, MessageSquare, LogOut, Shield, User as UserIcon } from "lucide-react";
+import { Menu, Plus, Heart, MessageSquare, LogOut, Shield, User as UserIcon } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/brand-logo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,13 +38,11 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="container mx-auto flex h-16 items-center justify-between gap-4 px-4">
         <div className="flex items-center gap-6">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <Car className="h-5 w-5" />
-            </div>
-            <div className="flex flex-col leading-none">
+          <Link to="/" className="flex items-center gap-2" aria-label="365 MotorSales Philippines home">
+            <BrandLogo size={44} className="shrink-0" />
+            <div className="hidden flex-col leading-none sm:flex">
               <span className="font-display text-lg font-bold tracking-tight">365 MotorSales</span>
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-accent-foreground/70">Philippines</span>
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Philippines</span>
             </div>
           </Link>
 
