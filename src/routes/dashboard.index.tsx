@@ -25,12 +25,60 @@ export const Route = createFileRoute("/dashboard/")({
   component: MyListings,
 });
 
+type Stats = {
+  likes: number;
+  saves: number;
+  messages: number;
+  views7: number;
+  viewsPrev7: number;
+  views30: number;
+  viewsPrev30: number;
+  spark: number[]; // last 7 days view counts oldest→newest
+};
+
 function MyListings() {
   const { user } = useAuth();
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [pricing, setPricing] = useState<Record<string, number>>({});
   const [soldTarget, setSoldTarget] = useState<{ id: string; title: string } | null>(null);
+  const [stats, setStats] = useState<Record<string, Stats>>({});
+
+  const loadStats = async (ids: string[]) => {
+    if (ids.length === 0) return;
+    const now = Date.now();
+    const day = 24 * 60 * 60 * 1000;
+    const since30 = new Date(now - 30 * day).toISOString();
+    const since60 = new Date(now - 60 * day).toISOString();
+
+    const [likesRes, savesRes, msgsRes, viewsRes] = await Promise.all([
+      supabase.from("listing_likes").select("listing_id").in("listing_id", ids),
+      supabase.from("favorites").select("listing_id").in("listing_id", ids),
+      supabase.from("messages").select("listing_id").in("listing_id", ids),
+      supabase.from("listing_views").select("listing_id,created_at").in("listing_id", ids).gte("created_at", since60),
+    ]);
+
+    const map: Record<string, Stats> = {};
+    ids.forEach((id) => {
+      map[id] = { likes: 0, saves: 0, messages: 0, views7: 0, viewsPrev7: 0, views30: 0, viewsPrev30: 0, spark: Array(7).fill(0) };
+    });
+    (likesRes.data ?? []).forEach((r: any) => { if (map[r.listing_id]) map[r.listing_id].likes++; });
+    (savesRes.data ?? []).forEach((r: any) => { if (map[r.listing_id]) map[r.listing_id].saves++; });
+    (msgsRes.data ?? []).forEach((r: any) => { if (map[r.listing_id]) map[r.listing_id].messages++; });
+    (viewsRes.data ?? []).forEach((r: any) => {
+      const s = map[r.listing_id]; if (!s) return;
+      const age = now - new Date(r.created_at).getTime();
+      if (age < 7 * day) s.views7++;
+      else if (age < 14 * day) s.viewsPrev7++;
+      if (age < 30 * day) s.views30++;
+      else if (age < 60 * day) s.viewsPrev30++;
+      if (age < 7 * day) {
+        const dayIdx = 6 - Math.floor(age / day);
+        if (dayIdx >= 0 && dayIdx < 7) s.spark[dayIdx]++;
+      }
+    });
+    setStats(map);
+  };
 
   const load = async () => {
     if (!user) return;
@@ -42,6 +90,7 @@ function MyListings() {
       .order("created_at", { ascending: false });
     setListings(data ?? []);
     setLoading(false);
+    await loadStats((data ?? []).map((l: any) => l.id));
   };
 
   useEffect(() => {
