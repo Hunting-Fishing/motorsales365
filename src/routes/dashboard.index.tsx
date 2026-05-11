@@ -374,3 +374,51 @@ function MyListings() {
     </div>
   );
 }
+
+function trendPct(now: number, prev: number): { pct: number; up: boolean } | null {
+  if (prev === 0 && now === 0) return null;
+  if (prev === 0) return { pct: 100, up: true };
+  const diff = ((now - prev) / prev) * 100;
+  return { pct: Math.round(Math.abs(diff)), up: diff >= 0 };
+}
+
+function Sparkline({ values }: { values: number[] }) {
+  const max = Math.max(1, ...values);
+  const w = 60, h = 18, step = w / Math.max(1, values.length - 1);
+  const points = values.map((v, i) => `${(i * step).toFixed(1)},${(h - (v / max) * h).toFixed(1)}`).join(" ");
+  return (
+    <svg width={w} height={h} className="text-primary" aria-hidden>
+      <polyline fill="none" stroke="currentColor" strokeWidth="1.5" points={points} />
+    </svg>
+  );
+}
+
+function ListingStats({ stats }: { stats?: Stats }) {
+  if (!stats) return null;
+  const t7 = trendPct(stats.views7, stats.viewsPrev7);
+  const t30 = trendPct(stats.views30, stats.viewsPrev30);
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3 py-2 text-xs">
+      <span className="flex items-center gap-1 font-medium"><Heart className="h-3 w-3 text-destructive" />{stats.likes} likes</span>
+      <span className="flex items-center gap-1 font-medium"><Bookmark className="h-3 w-3 text-primary" />{stats.saves} saves</span>
+      <span className="flex items-center gap-1 font-medium"><MessageSquare className="h-3 w-3" />{stats.messages} messages</span>
+      <span className="flex items-center gap-1.5 text-muted-foreground">
+        <Sparkline values={stats.spark} />
+        <span>7d</span>
+        {t7 ? (
+          <span className={`inline-flex items-center gap-0.5 font-medium ${t7.up ? "text-success" : "text-destructive"}`}>
+            {t7.up ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}{t7.pct}%
+          </span>
+        ) : <span>—</span>}
+      </span>
+      <span className="flex items-center gap-1 text-muted-foreground">
+        <span>30d</span>
+        {t30 ? (
+          <span className={`inline-flex items-center gap-0.5 font-medium ${t30.up ? "text-success" : "text-destructive"}`}>
+            {t30.up ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}{t30.pct}%
+          </span>
+        ) : <span>—</span>}
+      </span>
+    </div>
+  );
+}
