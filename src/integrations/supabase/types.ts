@@ -455,6 +455,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          account_status: Database["public"]["Enums"]["account_status"]
           avatar_url: string | null
           business_address: string | null
           business_barangay: string | null
@@ -468,8 +469,10 @@ export type Database = {
           business_province: string | null
           business_region: string | null
           created_at: string
+          founding_member_number: number | null
           full_name: string | null
           id: string
+          is_founding_member: boolean
           phone: string | null
           phone_e164: string | null
           phone_verified_at: string | null
@@ -480,6 +483,7 @@ export type Database = {
           welcome_email_sent_at: string | null
         }
         Insert: {
+          account_status?: Database["public"]["Enums"]["account_status"]
           avatar_url?: string | null
           business_address?: string | null
           business_barangay?: string | null
@@ -493,8 +497,10 @@ export type Database = {
           business_province?: string | null
           business_region?: string | null
           created_at?: string
+          founding_member_number?: number | null
           full_name?: string | null
           id: string
+          is_founding_member?: boolean
           phone?: string | null
           phone_e164?: string | null
           phone_verified_at?: string | null
@@ -505,6 +511,7 @@ export type Database = {
           welcome_email_sent_at?: string | null
         }
         Update: {
+          account_status?: Database["public"]["Enums"]["account_status"]
           avatar_url?: string | null
           business_address?: string | null
           business_barangay?: string | null
@@ -518,8 +525,10 @@ export type Database = {
           business_province?: string | null
           business_region?: string | null
           created_at?: string
+          founding_member_number?: number | null
           full_name?: string | null
           id?: string
+          is_founding_member?: boolean
           phone?: string | null
           phone_e164?: string | null
           phone_verified_at?: string | null
@@ -666,6 +675,7 @@ export type Database = {
           features: Json
           id: string
           listings_per_month: number | null
+          max_photos_per_listing: number
           name: string
           price_php: number
           sort_order: number
@@ -676,6 +686,7 @@ export type Database = {
           features?: Json
           id?: string
           listings_per_month?: number | null
+          max_photos_per_listing?: number
           name: string
           price_php: number
           sort_order?: number
@@ -686,6 +697,7 @@ export type Database = {
           features?: Json
           id?: string
           listings_per_month?: number | null
+          max_photos_per_listing?: number
           name?: string
           price_php?: number
           sort_order?: number
@@ -694,25 +706,37 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          complimentary: boolean
           created_at: string
           current_period_end: string | null
+          discount_percent: number
           id: string
+          notes: string | null
+          paused_at: string | null
           plan_id: string
           status: string
           user_id: string
         }
         Insert: {
+          complimentary?: boolean
           created_at?: string
           current_period_end?: string | null
+          discount_percent?: number
           id?: string
+          notes?: string | null
+          paused_at?: string | null
           plan_id: string
           status?: string
           user_id: string
         }
         Update: {
+          complimentary?: boolean
           created_at?: string
           current_period_end?: string | null
+          discount_percent?: number
           id?: string
+          notes?: string | null
+          paused_at?: string | null
           plan_id?: string
           status?: string
           user_id?: string
@@ -1018,7 +1042,8 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "user"
+      account_status: "active" | "paused" | "banned"
+      app_role: "admin" | "user" | "sales"
       business_kind: "repair_shop" | "insurance" | "dealer" | "other"
       listing_plan: "free" | "standard" | "upgraded"
       listing_status:
@@ -1166,7 +1191,8 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "user"],
+      account_status: ["active", "paused", "banned"],
+      app_role: ["admin", "user", "sales"],
       business_kind: ["repair_shop", "insurance", "dealer", "other"],
       listing_plan: ["free", "standard", "upgraded"],
       listing_status: [

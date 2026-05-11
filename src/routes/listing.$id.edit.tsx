@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LocationPicker } from "@/components/location-picker";
+import { getUserPlanLimits, FREE_PLAN_LIMITS, type PlanLimits } from "@/lib/plan-limits";
 
 export const Route = createFileRoute("/listing/$id/edit")({
   component: EditListingPage,
@@ -25,6 +26,11 @@ function EditListingPage() {
   const [saving, setSaving] = useState(false);
   const [listing, setListing] = useState<any>(null);
   const [media, setMedia] = useState<any[]>([]);
+  const [planLimits, setPlanLimits] = useState<PlanLimits>(FREE_PLAN_LIMITS);
+
+  useEffect(() => {
+    if (user?.id) getUserPlanLimits(user.id).then(setPlanLimits);
+  }, [user?.id]);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -109,7 +115,8 @@ function EditListingPage() {
 
   const addPhotos = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!user || !listing) return;
-    const maxPhotos = listing.plan === "upgraded" ? 20 : 5;
+    const planMax = planLimits.maxPhotosPerListing;
+    const maxPhotos = listing.plan === "upgraded" ? Math.max(20, planMax) : Math.max(5, planMax);
     const currentCount = media.filter((m) => m.type === "photo").length;
     const files = Array.from(e.target.files ?? []).slice(0, maxPhotos - currentCount);
     for (let i = 0; i < files.length; i++) {
@@ -158,7 +165,7 @@ function EditListingPage() {
 
   const photos = media.filter((m) => m.type === "photo");
   const videos = media.filter((m) => m.type === "video");
-  const maxPhotos = listing.plan === "upgraded" ? 20 : 5;
+  const maxPhotos = listing.plan === "upgraded" ? Math.max(20, planLimits.maxPhotosPerListing) : Math.max(5, planLimits.maxPhotosPerListing);
 
   return (
     <SiteLayout>

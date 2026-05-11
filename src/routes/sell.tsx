@@ -20,6 +20,7 @@ import { VehiclePicker } from "@/components/vehicle-picker";
 import { TagPicker } from "@/components/tag-picker";
 import { CATEGORY_DEFAULT_GROUPS, SERVICE_CATEGORIES } from "@/data/service-tags";
 import { uploadWithRetry } from "@/lib/storage-upload";
+import { getUserPlanLimits, FREE_PLAN_LIMITS, type PlanLimits } from "@/lib/plan-limits";
 
 export const Route = createFileRoute("/sell")({
   component: SellPage,
@@ -150,6 +151,7 @@ function SellPage() {
   const [listingId, setListingId] = useState<string | null>(null);
 
   const [pricing, setPricing] = useState<Record<string, number>>({});
+  const [planLimits, setPlanLimits] = useState<PlanLimits>(FREE_PLAN_LIMITS);
 
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/login" });
@@ -163,7 +165,13 @@ function SellPage() {
     });
   }, []);
 
-  const maxPhotos = plan === "upgraded" ? 20 : plan === "standard" ? 5 : 1;
+  useEffect(() => {
+    if (user?.id) getUserPlanLimits(user.id).then(setPlanLimits);
+  }, [user?.id]);
+
+  // Photo limit comes from the user's subscription plan; upgraded listings still bump to 20
+  const planPhotoMax = planLimits.maxPhotosPerListing;
+  const maxPhotos = plan === "upgraded" ? Math.max(20, planPhotoMax) : plan === "standard" ? Math.max(5, planPhotoMax) : planPhotoMax;
   const maxVideos = plan === "upgraded" ? 3 : plan === "standard" ? 1 : 0;
   const totalFee = plan === "free"
     ? 0
