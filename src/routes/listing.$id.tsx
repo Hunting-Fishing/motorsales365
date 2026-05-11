@@ -88,7 +88,7 @@ function ListingDetailPage() {
       setSeller(p);
 
       // Increment view count via RPC (counts every page load, anon allowed)
-      supabase.rpc("increment_listing_view", { _listing_id: id, _viewer_id: user?.id ?? null });
+      supabase.rpc("increment_listing_view", { _listing_id: id, _viewer_id: user?.id ?? undefined });
 
       // Like count (public)
       const { count: likes } = await supabase
