@@ -115,7 +115,8 @@ function EditListingPage() {
 
   const addPhotos = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!user || !listing) return;
-    const maxPhotos = listing.plan === "upgraded" ? 20 : 5;
+    const planMax = planLimits.maxPhotosPerListing;
+    const maxPhotos = listing.plan === "upgraded" ? Math.max(20, planMax) : Math.max(5, planMax);
     const currentCount = media.filter((m) => m.type === "photo").length;
     const files = Array.from(e.target.files ?? []).slice(0, maxPhotos - currentCount);
     for (let i = 0; i < files.length; i++) {
