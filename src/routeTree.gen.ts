@@ -50,6 +50,7 @@ import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
+import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
 import { Route as ApiPublicPaymentEventsRouteImport } from './routes/api/public/payment-events'
@@ -262,6 +263,11 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAccountsRoute = AdminAccountsRouteImport.update({
+  id: '/accounts',
+  path: '/accounts',
+  getParentRoute: () => AdminRoute,
+} as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
@@ -315,6 +321,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/admin/accounts': typeof AdminAccountsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -362,6 +369,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/admin/accounts': typeof AdminAccountsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -412,6 +420,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/admin/accounts': typeof AdminAccountsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -463,6 +472,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tow'
     | '/unsubscribe'
+    | '/admin/accounts'
     | '/admin/analytics'
     | '/admin/listings'
     | '/admin/performance'
@@ -510,6 +520,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tow'
     | '/unsubscribe'
+    | '/admin/accounts'
     | '/admin/analytics'
     | '/admin/listings'
     | '/admin/performance'
@@ -559,6 +570,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tow'
     | '/unsubscribe'
+    | '/admin/accounts'
     | '/admin/analytics'
     | '/admin/listings'
     | '/admin/performance'
@@ -911,6 +923,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/accounts': {
+      id: '/admin/accounts'
+      path: '/accounts'
+      fullPath: '/admin/accounts'
+      preLoaderRoute: typeof AdminAccountsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
@@ -957,6 +976,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminAccountsRoute: typeof AdminAccountsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminListingsRoute: typeof AdminListingsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
@@ -968,6 +988,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAccountsRoute: AdminAccountsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminListingsRoute: AdminListingsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
