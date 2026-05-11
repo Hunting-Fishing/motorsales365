@@ -165,7 +165,7 @@ function EditListingPage() {
 
   const photos = media.filter((m) => m.type === "photo");
   const videos = media.filter((m) => m.type === "video");
-  const maxPhotos = listing.plan === "upgraded" ? 20 : 5;
+  const maxPhotos = listing.plan === "upgraded" ? Math.max(20, planLimits.maxPhotosPerListing) : Math.max(5, planLimits.maxPhotosPerListing);
 
   return (
     <SiteLayout>
