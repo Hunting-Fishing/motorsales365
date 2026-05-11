@@ -39,10 +39,10 @@ function FavoritesPage() {
 
   return (
     <div>
-      <h1 className="mb-6 font-display text-2xl font-bold">Favorites</h1>
+      <h1 className="mb-6 font-display text-2xl font-bold">Saved listings</h1>
       {items.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
-          No saved listings yet.
+          No saved listings yet. Tap the bookmark on any ad to save it here.
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
