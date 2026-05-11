@@ -1,64 +1,79 @@
+## Goal
 
-# Phone OTP + Lifecycle Emails
+Give every listing real engagement signals: a view counter, a public **Like** button (social-style count), a private **Save** bookmark, and an owner-facing analytics view (totals + 7/30 day trend).
 
-Two related additions: (1) optional phone-number 2FA that is **required** for password recovery, using Supabase's built-in phone auth backed by Twilio, and (2) branded transactional emails for signup welcome plus all critical payment events. No payment provider is wired yet, so payment emails will be triggered from the webhook handler we add when Stripe/PayMongo lands — this plan stubs the trigger points so they're ready.
+## 1. Database changes
 
-## What you'll get
+**New table `listing_likes`** (public counts)
+- `listing_id`, `user_id`, `created_at`
+- Primary key `(listing_id, user_id)` to prevent double-likes
+- RLS: anyone can SELECT (so counts work for non-owners), users INSERT/DELETE only their own row
 
-**Phone (optional 2FA, required for recovery)**
-- Profile → Security panel: "Add phone number" with PH format helper (`+63 9XX XXX XXXX`), sends 6-digit OTP, verifies, stores on `auth.users.phone`.
-- New `profiles.phone_verified_at` + `phone_e164` mirror columns for display.
-- Password recovery flow change: if a user has a verified phone, `/forgot-password` requires SMS OTP (not just email link). If no phone on file, falls back to email link with a banner suggesting they add a phone after recovery.
-- Login stays email+password; phone OTP is **not** required at login (user picked "optional 2FA"). A future toggle "Require OTP at every login" is left as a TODO comment.
-- Rate-limited: max 3 OTP sends per phone per hour (enforced via a small `otp_send_log` table + RLS check).
+**New table `listing_views`** (raw event log for trend charts)
+- `id`, `listing_id`, `viewer_id` (nullable for anon), `created_at`
+- Index on `(listing_id, created_at)` for fast trend queries
+- RLS: only the listing owner + admins can SELECT; anyone can INSERT (anon views allowed)
 
-**Emails (Lovable Emails on your domain)**
-Templates created and registered:
-1. `signup-welcome` — sent after email verification completes, intros the marketplace, links to first-listing flow.
-2. `payment-receipt` — successful payment (boost, featured, subscription charge). Includes amount, listing, invoice ID.
-3. `payment-failed` — declined card / insufficient funds. CTA to update payment method.
-4. `refund-issued` — refund processed. Amount + reason.
-5. `subscription-renewed` — recurring renewal receipt.
-6. `subscription-cancelled` — cancellation confirmed, end-of-period date.
+**Reuse existing**
+- `listings.view_count` already exists → keep as fast denormalized counter
+- `favorites` table already exists → this is the **Save** feature, no changes needed
 
-All templates inherit the site's brand (Plus Jakarta Sans display, Inter body, primary token from `styles.css`), white body background, and the system-managed unsubscribe footer.
+**Trigger / function**
+- `increment_listing_view(listing_id, viewer_id)` security-definer function: inserts into `listing_views` AND increments `listings.view_count`. Called from the listing page on every load (per user's choice).
 
-Trigger wiring:
-- `signup-welcome` fires from a Supabase auth webhook on `email_confirmed`.
-- Payment templates fire from a single `payment-events` server route that the future Stripe/PayMongo webhook will POST to. Each event maps 1:1 to a template via `idempotencyKey = ${provider}-${event_id}`.
+## 2. UI — Listing detail page (`src/routes/listing.$id.tsx`)
 
-## What I need from you before building
+Add an action bar near the title:
 
-1. **Sender domain** — you said you'd specify a different one. Reply with the exact domain (e.g. `mail.yourbrand.ph`) so I can kick off DNS setup. Templates and triggers can be built in parallel; emails just won't send until DNS verifies.
-2. **Twilio credentials** — Supabase phone auth needs your Twilio Account SID, Auth Token, and a Messaging Service SID (or sender number). I'll request them via the secrets prompt when implementation starts. Twilio PH SMS runs ~$0.05–0.08 per message; budget accordingly. I'll also flag SMS Pumping Protection + Geo Permissions (PH-only) in your Twilio console — critical to avoid fraud bills.
-
-## Technical details
-
-- **Phone verification**: `supabase.auth.updateUser({ phone })` → triggers Supabase to send OTP via Twilio → `supabase.auth.verifyOtp({ phone, token, type: 'phone_change' })`.
-- **Recovery via SMS**: custom server fn `requestPhoneRecovery({ phone })` sends OTP via `signInWithOtp({ phone })`; on verify, issues a short-lived session and redirects to `/reset-password`.
-- **Auth config**: `supabase--configure_auth` to enable phone provider; Twilio creds entered in Cloud → Auth (or via secrets if we proxy through an edge function).
-- **Email infra**: `setup_email_infra` then `scaffold_transactional_email`; templates added to `src/lib/email-templates/registry.ts`; `sendTransactionalEmail` helper at `src/lib/email/send.ts`.
-- **Auth email hook**: `scaffold_auth_email_templates` so the existing email-confirmation email is also branded.
-- **Payment webhook stub**: `src/routes/api/public/payment-events.ts` with HMAC verification placeholder — concrete signature check added when payment provider is chosen.
-- **New tables**: `otp_send_log(user_id, phone, sent_at)` with RLS (users can only see their own).
-
-## Files touched
-
-```
-src/routes/dashboard.profile.tsx              — phone add/verify UI
-src/routes/login.tsx                          — "Forgot password?" → /forgot-password
-src/routes/forgot-password.tsx                — NEW (email or SMS choice)
-src/routes/reset-password.tsx                 — accept SMS-issued session
-src/lib/email-templates/                      — 6 new .tsx templates + registry
-src/lib/email-templates/registry.ts           — register all 6
-src/lib/email/send.ts                         — NEW helper
-src/routes/api/public/payment-events.ts       — NEW webhook stub
-src/routes/unsubscribe.tsx                    — NEW branded unsubscribe page
-supabase/migrations/...                       — otp_send_log + profiles.phone_e164
+```text
+👁 1,234 views   ❤ 56 Likes   🔖 Save
 ```
 
-## Out of scope (for this pass)
+- **View**: fires `increment_listing_view` once on mount (every page load, per user's choice).
+- **Like button**: heart icon + count. Logged-out users → toast "Sign in to like". Optimistic toggle.
+- **Save button**: bookmark icon. Already partially exists via `favorites` — wire it to a clear "Save / Saved" button. Logged-out → sign-in prompt.
 
-- Choosing/wiring an actual payment provider — separate Pass 2 task.
-- TOTP/authenticator-app 2FA.
-- SMS notifications for messages/listings (only auth + payments here).
+## 3. UI — Listing card (`src/components/listing-card.tsx`)
+
+Small footer row showing `👁 views · ❤ likes`, plus a compact save (bookmark) icon in the corner. Keeps the social-proof visible in browse/search results.
+
+## 4. Owner analytics
+
+**Per-listing stats card** on `dashboard.index.tsx` (My Listings):
+Each listing row gets a stats strip:
+```text
+Views: 1,234  ·  Likes: 56  ·  Saves: 12  ·  Messages: 8
+[7d ▲ 23%]  [30d ▲ 110%]
+```
+- Trend = compare last 7 days vs previous 7 days (and 30 vs previous 30) using `listing_views` for views, `created_at` filters for likes/saves/messages.
+- Tiny inline sparkline (7-day daily counts) using a lightweight inline SVG — no new dep.
+
+Data fetched via a single server function `getListingStats(listingIds[])` that returns `{ views, likes, saves, messages, views7d, views_prev7d, ... }` for each ID.
+
+## 5. Saved/Liked pages in user profile
+
+- `dashboard.favorites.tsx` already exists → rename label to **"Saved"** in nav.
+- Add new `dashboard.likes.tsx` showing listings the user has liked (joins `listing_likes` → `listings`).
+- Footer/sidebar nav entries: **Saved** and **Liked**.
+
+## 6. Files touched
+
+**New**
+- migration: `listing_likes`, `listing_views`, `increment_listing_view` function, RLS policies
+- `src/routes/dashboard.likes.tsx`
+- `src/lib/listing-stats.functions.ts` (server fn for owner analytics)
+
+**Edited**
+- `src/routes/listing.$id.tsx` — view ping + Like + Save buttons
+- `src/components/listing-card.tsx` — view/like counters + save icon
+- `src/routes/dashboard.index.tsx` — per-listing stats strip
+- `src/routes/dashboard.tsx` — add "Liked" nav item, rename "Favorites" → "Saved"
+- `src/routes/dashboard.favorites.tsx` — relabel page heading to "Saved listings"
+
+## Out of scope
+
+- Bot/scraper filtering on views (you chose every-load counting)
+- Push notifications when someone likes your ad
+- Public "people who liked this" list — only the count is shown
+
+Ready to build when you approve.

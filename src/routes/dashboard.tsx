@@ -10,7 +10,8 @@ export const Route = createFileRoute("/dashboard")({
 
 const NAV: { to: string; label: string; Icon: any; exact?: boolean }[] = [
   { to: "/dashboard", label: "My listings", Icon: LayoutGrid, exact: true },
-  { to: "/dashboard/favorites", label: "Favorites", Icon: Heart },
+  { to: "/dashboard/favorites", label: "Saved", Icon: Bookmark },
+  { to: "/dashboard/likes", label: "Liked", Icon: Heart },
   { to: "/dashboard/searches", label: "Saved searches", Icon: Bookmark },
   { to: "/dashboard/messages", label: "Messages", Icon: MessageSquare },
   { to: "/dashboard/tow", label: "Tow requests", Icon: Truck },

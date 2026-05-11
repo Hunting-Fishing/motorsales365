@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Star, Eye, Rocket, RefreshCcw, CheckCircle2, Edit, Undo2, Clock } from "lucide-react";
+import { Plus, Trash2, Star, Eye, Rocket, RefreshCcw, CheckCircle2, Edit, Undo2, Clock, Heart, Bookmark, MessageSquare, TrendingUp, TrendingDown } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -25,12 +25,60 @@ export const Route = createFileRoute("/dashboard/")({
   component: MyListings,
 });
 
+type Stats = {
+  likes: number;
+  saves: number;
+  messages: number;
+  views7: number;
+  viewsPrev7: number;
+  views30: number;
+  viewsPrev30: number;
+  spark: number[]; // last 7 days view counts oldest→newest
+};
+
 function MyListings() {
   const { user } = useAuth();
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [pricing, setPricing] = useState<Record<string, number>>({});
   const [soldTarget, setSoldTarget] = useState<{ id: string; title: string } | null>(null);
+  const [stats, setStats] = useState<Record<string, Stats>>({});
+
+  const loadStats = async (ids: string[]) => {
+    if (ids.length === 0) return;
+    const now = Date.now();
+    const day = 24 * 60 * 60 * 1000;
+    const since30 = new Date(now - 30 * day).toISOString();
+    const since60 = new Date(now - 60 * day).toISOString();
+
+    const [likesRes, savesRes, msgsRes, viewsRes] = await Promise.all([
+      supabase.from("listing_likes").select("listing_id").in("listing_id", ids),
+      supabase.from("favorites").select("listing_id").in("listing_id", ids),
+      supabase.from("messages").select("listing_id").in("listing_id", ids),
+      supabase.from("listing_views").select("listing_id,created_at").in("listing_id", ids).gte("created_at", since60),
+    ]);
+
+    const map: Record<string, Stats> = {};
+    ids.forEach((id) => {
+      map[id] = { likes: 0, saves: 0, messages: 0, views7: 0, viewsPrev7: 0, views30: 0, viewsPrev30: 0, spark: Array(7).fill(0) };
+    });
+    (likesRes.data ?? []).forEach((r: any) => { if (map[r.listing_id]) map[r.listing_id].likes++; });
+    (savesRes.data ?? []).forEach((r: any) => { if (map[r.listing_id]) map[r.listing_id].saves++; });
+    (msgsRes.data ?? []).forEach((r: any) => { if (map[r.listing_id]) map[r.listing_id].messages++; });
+    (viewsRes.data ?? []).forEach((r: any) => {
+      const s = map[r.listing_id]; if (!s) return;
+      const age = now - new Date(r.created_at).getTime();
+      if (age < 7 * day) s.views7++;
+      else if (age < 14 * day) s.viewsPrev7++;
+      if (age < 30 * day) s.views30++;
+      else if (age < 60 * day) s.viewsPrev30++;
+      if (age < 7 * day) {
+        const dayIdx = 6 - Math.floor(age / day);
+        if (dayIdx >= 0 && dayIdx < 7) s.spark[dayIdx]++;
+      }
+    });
+    setStats(map);
+  };
 
   const load = async () => {
     if (!user) return;
@@ -42,6 +90,7 @@ function MyListings() {
       .order("created_at", { ascending: false });
     setListings(data ?? []);
     setLoading(false);
+    await loadStats((data ?? []).map((l: any) => l.id));
   };
 
   useEffect(() => {
@@ -227,6 +276,7 @@ function MyListings() {
                     <span>Created {formatDate(l.created_at)}</span>
                     {l.expires_at && <span>Expires {formatDate(l.expires_at)}</span>}
                   </div>
+                  <ListingStats stats={stats[l.id]} />
                 </div>
                 <div className="flex shrink-0 flex-wrap gap-2 sm:flex-col">
                   <Button asChild variant="outline" size="sm">
@@ -321,6 +371,54 @@ function MyListings() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+    </div>
+  );
+}
+
+function trendPct(now: number, prev: number): { pct: number; up: boolean } | null {
+  if (prev === 0 && now === 0) return null;
+  if (prev === 0) return { pct: 100, up: true };
+  const diff = ((now - prev) / prev) * 100;
+  return { pct: Math.round(Math.abs(diff)), up: diff >= 0 };
+}
+
+function Sparkline({ values }: { values: number[] }) {
+  const max = Math.max(1, ...values);
+  const w = 60, h = 18, step = w / Math.max(1, values.length - 1);
+  const points = values.map((v, i) => `${(i * step).toFixed(1)},${(h - (v / max) * h).toFixed(1)}`).join(" ");
+  return (
+    <svg width={w} height={h} className="text-primary" aria-hidden>
+      <polyline fill="none" stroke="currentColor" strokeWidth="1.5" points={points} />
+    </svg>
+  );
+}
+
+function ListingStats({ stats }: { stats?: Stats }) {
+  if (!stats) return null;
+  const t7 = trendPct(stats.views7, stats.viewsPrev7);
+  const t30 = trendPct(stats.views30, stats.viewsPrev30);
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3 py-2 text-xs">
+      <span className="flex items-center gap-1 font-medium"><Heart className="h-3 w-3 text-destructive" />{stats.likes} likes</span>
+      <span className="flex items-center gap-1 font-medium"><Bookmark className="h-3 w-3 text-primary" />{stats.saves} saves</span>
+      <span className="flex items-center gap-1 font-medium"><MessageSquare className="h-3 w-3" />{stats.messages} messages</span>
+      <span className="flex items-center gap-1.5 text-muted-foreground">
+        <Sparkline values={stats.spark} />
+        <span>7d</span>
+        {t7 ? (
+          <span className={`inline-flex items-center gap-0.5 font-medium ${t7.up ? "text-success" : "text-destructive"}`}>
+            {t7.up ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}{t7.pct}%
+          </span>
+        ) : <span>—</span>}
+      </span>
+      <span className="flex items-center gap-1 text-muted-foreground">
+        <span>30d</span>
+        {t30 ? (
+          <span className={`inline-flex items-center gap-0.5 font-medium ${t30.up ? "text-success" : "text-destructive"}`}>
+            {t30.up ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}{t30.pct}%
+          </span>
+        ) : <span>—</span>}
+      </span>
     </div>
   );
 }

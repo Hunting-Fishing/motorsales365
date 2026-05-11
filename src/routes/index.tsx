@@ -42,7 +42,7 @@ function Index() {
     const load = async () => {
       const { data: boostedRows } = await supabase
         .from("listings")
-        .select("id,title,price_php,region,city,seller_type,boost_until,status,category_slug,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status)")
+        .select("id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status)")
         .in("status", ["active","pending_sale"])
         .gt("boost_until", new Date().toISOString())
         .order("boost_until", { ascending: false })
@@ -50,7 +50,7 @@ function Index() {
 
       const { data: recentRows } = await supabase
         .from("listings")
-        .select("id,title,price_php,region,city,seller_type,boost_until,status,category_slug,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status)")
+        .select("id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status)")
         .in("status", ["active","pending_sale"])
         .order("published_at", { ascending: false, nullsFirst: false })
         .limit(12);
@@ -67,7 +67,7 @@ function Index() {
             city: r.city,
             seller_type: r.seller_type,
             boost_until: r.boost_until,
-            category_slug: r.category_slug,
+            category_slug: r.category_slug, view_count: r.view_count ?? 0,
             cover_url: photos[0]?.url ?? null,
             photo_count: photos.length,
             has_video: videos.length > 0,

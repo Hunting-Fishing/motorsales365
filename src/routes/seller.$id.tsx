@@ -26,7 +26,7 @@ function SellerProfilePage() {
         supabase
           .from("listings")
           .select(
-            "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,listing_media(url,type)",
+            "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,listing_media(url,type)",
           )
           .eq("user_id", id)
           .in("status", ["active","pending_sale"])
@@ -46,7 +46,7 @@ function SellerProfilePage() {
             city: l.city,
             seller_type: l.seller_type,
             boost_until: l.boost_until,
-            category_slug: l.category_slug,
+            category_slug: l.category_slug, view_count: l.view_count ?? 0,
             cover_url: photos[0]?.url ?? null,
             photo_count: photos.length,
             has_video: videos.length > 0,
