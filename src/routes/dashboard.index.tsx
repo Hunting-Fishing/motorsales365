@@ -276,6 +276,7 @@ function MyListings() {
                     <span>Created {formatDate(l.created_at)}</span>
                     {l.expires_at && <span>Expires {formatDate(l.expires_at)}</span>}
                   </div>
+                  <ListingStats stats={stats[l.id]} />
                 </div>
                 <div className="flex shrink-0 flex-wrap gap-2 sm:flex-col">
                   <Button asChild variant="outline" size="sm">
