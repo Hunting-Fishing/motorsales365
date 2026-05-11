@@ -261,6 +261,31 @@ function ListingDetailPage() {
             <div className="text-3xl font-bold text-primary md:text-4xl">{formatPHP(listing.price_php)}</div>
           </div>
 
+          {/* Engagement bar */}
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-sm text-muted-foreground">
+              <Eye className="h-4 w-4" /> {(listing.view_count ?? 0).toLocaleString()} views
+            </span>
+            <Button
+              variant={liked ? "default" : "outline"}
+              size="sm"
+              onClick={toggleLike}
+              className="rounded-full"
+            >
+              <Heart className={`mr-1.5 h-4 w-4 ${liked ? "fill-current" : ""}`} />
+              {likeCount.toLocaleString()} {likeCount === 1 ? "Like" : "Likes"}
+            </Button>
+            <Button
+              variant={favorited ? "default" : "outline"}
+              size="sm"
+              onClick={toggleFavorite}
+              className="rounded-full"
+            >
+              <Bookmark className={`mr-1.5 h-4 w-4 ${favorited ? "fill-current" : ""}`} />
+              {favorited ? "Saved" : "Save"}
+            </Button>
+          </div>
+
           {/* Service tags */}
           {Array.isArray(listing.attributes?.tags) && listing.attributes.tags.length > 0 && (
             <div className="mt-6 rounded-xl border border-border bg-card p-5">
