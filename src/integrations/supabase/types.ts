@@ -148,6 +148,24 @@ export type Database = {
           },
         ]
       }
+      listing_likes: {
+        Row: {
+          created_at: string
+          listing_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          listing_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          listing_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       listing_media: {
         Row: {
           created_at: string
@@ -185,6 +203,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      listing_views: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          viewer_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          viewer_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          viewer_id?: string | null
+        }
+        Relationships: []
       }
       listings: {
         Row: {
@@ -950,6 +989,10 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      increment_listing_view: {
+        Args: { _listing_id: string; _viewer_id?: string }
+        Returns: undefined
       }
       is_towing_provider: { Args: { _user_id: string }; Returns: boolean }
       move_to_dlq: {
