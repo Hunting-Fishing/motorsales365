@@ -26,6 +26,11 @@ function EditListingPage() {
   const [saving, setSaving] = useState(false);
   const [listing, setListing] = useState<any>(null);
   const [media, setMedia] = useState<any[]>([]);
+  const [planLimits, setPlanLimits] = useState<PlanLimits>(FREE_PLAN_LIMITS);
+
+  useEffect(() => {
+    if (user?.id) getUserPlanLimits(user.id).then(setPlanLimits);
+  }, [user?.id]);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
