@@ -1,79 +1,105 @@
-## Goal
+# Tiered Plans, Founding Members & Sales Console
 
-Give every listing real engagement signals: a view counter, a public **Like** button (social-style count), a private **Save** bookmark, and an owner-facing analytics view (totals + 7/30 day trend).
+## 1. Rename plans + bump Free perks
 
-## 1. Database changes
+Update `subscription_plans` rows (keep IDs, just rename + adjust):
 
-**New table `listing_likes`** (public counts)
-- `listing_id`, `user_id`, `created_at`
-- Primary key `(listing_id, user_id)` to prevent double-likes
-- RLS: anyone can SELECT (so counts work for non-owners), users INSERT/DELETE only their own row
+| Old name | New name | Price (₱) | Listings/mo | Photos/listing |
+|---|---|---|---|---|
+| Free | Free | 0 | 1/week | **3** (was 1) |
+| Starter | Bronze | 80 | 5 | 5 |
+| Growth | Silver | 150 | 10 | 8 |
+| Pro | Gold | 280 | 20 | 12 |
+| Unlimited | Platinum | 500 | ∞ | 20 |
+| — | **Business** (new) | 1,200 | ∞ | 20 + multi-user, priority badge |
 
-**New table `listing_views`** (raw event log for trend charts)
-- `id`, `listing_id`, `viewer_id` (nullable for anon), `created_at`
-- Index on `(listing_id, created_at)` for fast trend queries
-- RLS: only the listing owner + admins can SELECT; anyone can INSERT (anon views allowed)
+Add `max_photos_per_listing` column to `subscription_plans` so the limits are data-driven instead of hardcoded.
 
-**Reuse existing**
-- `listings.view_count` already exists → keep as fast denormalized counter
-- `favorites` table already exists → this is the **Save** feature, no changes needed
+## 2. Founding Members (first 1,000 users)
 
-**Trigger / function**
-- `increment_listing_view(listing_id, viewer_id)` security-definer function: inserts into `listing_views` AND increments `listings.view_count`. Called from the listing page on every load (per user's choice).
+- Add boolean `profiles.is_founding_member` + `founding_member_number` (int).
+- Trigger on profile insert: if total founding members < 1000, set `is_founding_member=true` and assign next number.
+- Auto-create a lifetime **Bronze** subscription (status `active`, `current_period_end = null`, `price_php = 0` override flag).
+- New column `subscriptions.complimentary` (bool) so we know it's a perk, not paid.
+- Profile/dashboard shows a "Founding Member #123" badge.
 
-## 2. UI — Listing detail page (`src/routes/listing.$id.tsx`)
+## 3. Photo limits — make data-driven
 
-Add an action bar near the title:
+Replace hardcoded `maxPhotos` in `src/routes/sell.tsx` and `src/routes/listing.$id.edit.tsx` with a helper `getUserPlanLimits()` that reads the user's active subscription plan (falls back to Free = 3 photos).
 
-```text
-👁 1,234 views   ❤ 56 Likes   🔖 Save
+## 4. New `sales` role
+
+- Add `'sales'` to `app_role` enum.
+- New helper `has_role(uid,'sales')`.
+- RLS: sales can SELECT all profiles, subscriptions, payments, listings; can UPDATE `subscriptions` (change plan, apply discount, pause), `profiles.account_status`, but cannot grant roles or edit `pricing_settings` / `subscription_plans`.
+
+## 5. Account pause
+
+- Add `profiles.account_status` enum: `active | paused | banned`.
+- RLS update on `listings`: public SELECT requires owner's `account_status='active'`.
+- Pausing flips status; unpausing restores. Listings rows are not modified.
+
+## 6. Per-account discounts
+
+- New `subscriptions.discount_percent` (numeric, 0–100) — sales-editable.
+- Billing UI shows discounted price; payments table records the applied discount.
+
+## 7. Sales/Admin Accounts console
+
+New route **`/admin/accounts`** (visible to admin + sales) with:
+- Searchable table: name, email, plan tier badge, founding-member badge, status, joined, MRR, lifetime spend.
+- Filters: tier, status, founding member, business kind, region.
+- Per-row actions:
+  - Change plan (dropdown of tiers)
+  - Apply discount % (with reason note)
+  - Pause / Unpause account
+  - Add complimentary months
+  - View activity (link to existing analytics)
+- CSV export.
+
+Add "Accounts" entry in `src/routes/admin.tsx` nav. Hide admin-only items (Make admin, Pricing edit) for sales role.
+
+## 8. Auth context
+
+Extend `use-auth.tsx` to expose `isSales` alongside `isAdmin`. Admin route guard accepts admin OR sales.
+
+---
+
+## Technical changes
+
+**Migration 1 — schema:**
+```sql
+ALTER TYPE app_role ADD VALUE 'sales';
+CREATE TYPE account_status AS ENUM ('active','paused','banned');
+ALTER TABLE profiles
+  ADD COLUMN account_status account_status NOT NULL DEFAULT 'active',
+  ADD COLUMN is_founding_member boolean NOT NULL DEFAULT false,
+  ADD COLUMN founding_member_number int UNIQUE;
+ALTER TABLE subscription_plans ADD COLUMN max_photos_per_listing int DEFAULT 5;
+ALTER TABLE subscriptions
+  ADD COLUMN complimentary boolean NOT NULL DEFAULT false,
+  ADD COLUMN discount_percent numeric NOT NULL DEFAULT 0,
+  ADD COLUMN paused_at timestamptz,
+  ADD COLUMN notes text;
 ```
 
-- **View**: fires `increment_listing_view` once on mount (every page load, per user's choice).
-- **Like button**: heart icon + count. Logged-out users → toast "Sign in to like". Optimistic toggle.
-- **Save button**: bookmark icon. Already partially exists via `favorites` — wire it to a clear "Save / Saved" button. Logged-out → sign-in prompt.
+**Migration 2 — data:** rename plans, set `max_photos_per_listing` (Free=3, Bronze=5, Silver=8, Gold=12, Platinum=20, Business=20), insert Business plan.
 
-## 3. UI — Listing card (`src/components/listing-card.tsx`)
+**Migration 3 — founding member trigger** on `profiles` AFTER INSERT; assigns number if count<1000 and inserts complimentary Bronze subscription.
 
-Small footer row showing `👁 views · ❤ likes`, plus a compact save (bookmark) icon in the corner. Keeps the social-proof visible in browse/search results.
+**Migration 4 — RLS:** update `listings` public-read policy to require active owner; add sales policies on profiles/subscriptions/payments; update `has_role` is unchanged but called with `'sales'`.
 
-## 4. Owner analytics
-
-**Per-listing stats card** on `dashboard.index.tsx` (My Listings):
-Each listing row gets a stats strip:
-```text
-Views: 1,234  ·  Likes: 56  ·  Saves: 12  ·  Messages: 8
-[7d ▲ 23%]  [30d ▲ 110%]
-```
-- Trend = compare last 7 days vs previous 7 days (and 30 vs previous 30) using `listing_views` for views, `created_at` filters for likes/saves/messages.
-- Tiny inline sparkline (7-day daily counts) using a lightweight inline SVG — no new dep.
-
-Data fetched via a single server function `getListingStats(listingIds[])` that returns `{ views, likes, saves, messages, views7d, views_prev7d, ... }` for each ID.
-
-## 5. Saved/Liked pages in user profile
-
-- `dashboard.favorites.tsx` already exists → rename label to **"Saved"** in nav.
-- Add new `dashboard.likes.tsx` showing listings the user has liked (joins `listing_likes` → `listings`).
-- Footer/sidebar nav entries: **Saved** and **Liked**.
-
-## 6. Files touched
-
-**New**
-- migration: `listing_likes`, `listing_views`, `increment_listing_view` function, RLS policies
-- `src/routes/dashboard.likes.tsx`
-- `src/lib/listing-stats.functions.ts` (server fn for owner analytics)
-
-**Edited**
-- `src/routes/listing.$id.tsx` — view ping + Like + Save buttons
-- `src/components/listing-card.tsx` — view/like counters + save icon
-- `src/routes/dashboard.index.tsx` — per-listing stats strip
-- `src/routes/dashboard.tsx` — add "Liked" nav item, rename "Favorites" → "Saved"
-- `src/routes/dashboard.favorites.tsx` — relabel page heading to "Saved listings"
+**Files to edit / create:**
+- `src/hooks/use-auth.tsx` — add `isSales`
+- `src/routes/admin.tsx` — guard accepts sales, conditional nav
+- `src/routes/admin.accounts.tsx` (new) — accounts console
+- `src/routes/sell.tsx`, `src/routes/listing.$id.edit.tsx` — read photo limit from plan
+- `src/lib/plan-limits.ts` (new) — `getUserPlanLimits(userId)` helper
+- `src/routes/dashboard.profile.tsx` — show Founding Member badge
+- `src/routes/pricing.tsx`, `src/components/site-footer.tsx` — new tier names
+- `src/routes/admin.users.tsx` — allow sales (read-only verify/role buttons hidden)
 
 ## Out of scope
-
-- Bot/scraper filtering on views (you chose every-load counting)
-- Push notifications when someone likes your ad
-- Public "people who liked this" list — only the count is shown
-
-Ready to build when you approve.
+- Actual payment processor changes for the new Business tier (will use existing manual-payment flow).
+- Email notifications when sales pauses/discounts an account (can add later).
+- Multi-user seats for Business tier (stub the feature flag only).
