@@ -21,26 +21,31 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean; adminOnly?: 
 ];
 
 function AdminLayout() {
-  const { user, isAdmin, loading } = useAuth();
+  const { user, isAdmin, isSales, loading } = useAuth();
   const navigate = useNavigate();
+  const hasAccess = isAdmin || isSales;
 
   useEffect(() => {
     if (loading) return;
     if (!user) navigate({ to: "/login" });
-    else if (!isAdmin) navigate({ to: "/dashboard" });
-  }, [user, isAdmin, loading, navigate]);
+    else if (!hasAccess) navigate({ to: "/dashboard" });
+  }, [user, hasAccess, loading, navigate]);
 
-  if (loading || !user || !isAdmin) {
+  if (loading || !user || !hasAccess) {
     return <SiteLayout><div className="p-12 text-center text-muted-foreground">Checking access…</div></SiteLayout>;
   }
+
+  const visibleNav = NAV.filter((n) => isAdmin || !n.adminOnly);
 
   return (
     <SiteLayout>
       <div className="container mx-auto grid gap-6 px-4 py-8 lg:grid-cols-[240px_1fr]">
         <aside className="rounded-xl border border-border bg-card p-2 lg:sticky lg:top-20 lg:self-start">
-          <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Admin</div>
+          <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            {isAdmin ? "Admin" : "Sales"}
+          </div>
           <nav className="flex flex-row gap-1 overflow-x-auto lg:flex-col">
-            {NAV.map(({ to, label, Icon, exact }) => (
+            {visibleNav.map(({ to, label, Icon, exact }) => (
               <Link key={to} to={to} activeOptions={{ exact: !!exact }}
                 activeProps={{ className: "bg-primary text-primary-foreground" }}
                 className="flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary">
