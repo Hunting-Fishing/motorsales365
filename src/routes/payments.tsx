@@ -1,0 +1,134 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { Check, Clock, CreditCard, Smartphone, Building2, Wallet, Banknote, QrCode } from "lucide-react";
+import { SiteLayout } from "@/components/site-layout";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+
+export const Route = createFileRoute("/payments")({
+  head: () => ({
+    meta: [
+      { title: "Payments — 365 MotorSales Philippines" },
+      { name: "description", content: "Pay listing fees, boosts, and subscriptions with GCash, Maya, GrabPay, cards, and bank transfer. Track which methods are live." },
+    ],
+  }),
+  component: PaymentsPage,
+});
+
+type Status = "live" | "soon" | "planned";
+
+type Method = {
+  name: string;
+  desc: string;
+  icon: React.ComponentType<{ className?: string }>;
+  status: Status;
+  provider?: string;
+};
+
+const METHODS: { group: string; items: Method[] }[] = [
+  {
+    group: "E-wallets (Philippines)",
+    items: [
+      { name: "GCash", desc: "Pay instantly from your GCash wallet.", icon: Smartphone, status: "soon", provider: "PayMongo" },
+      { name: "Maya", desc: "Pay with Maya wallet or Maya credit.", icon: Wallet, status: "soon", provider: "PayMongo" },
+      { name: "GrabPay", desc: "Pay using your GrabPay balance.", icon: Wallet, status: "soon", provider: "PayMongo" },
+      { name: "ShopeePay", desc: "Pay from your ShopeePay wallet.", icon: Wallet, status: "planned" },
+    ],
+  },
+  {
+    group: "Cards",
+    items: [
+      { name: "Visa / Mastercard", desc: "Credit and debit cards, local and international.", icon: CreditCard, status: "soon", provider: "PayMongo" },
+      { name: "JCB / AMEX", desc: "Additional card networks.", icon: CreditCard, status: "planned" },
+    ],
+  },
+  {
+    group: "Bank & QR",
+    items: [
+      { name: "InstaPay / PESONet", desc: "Direct bank transfer from any PH bank.", icon: Building2, status: "soon", provider: "PayMongo" },
+      { name: "QR Ph", desc: "Scan-to-pay using the national QR standard.", icon: QrCode, status: "planned" },
+      { name: "Online Banking (BPI, BDO, UnionBank)", desc: "Log in to your bank to pay.", icon: Building2, status: "planned" },
+    ],
+  },
+  {
+    group: "Cash & Over-the-Counter",
+    items: [
+      { name: "7-Eleven / Cebuana / M Lhuillier", desc: "Pay cash at any partner outlet.", icon: Banknote, status: "planned" },
+      { name: "Manual Bank Deposit", desc: "Deposit to our bank account and upload proof.", icon: Banknote, status: "planned" },
+    ],
+  },
+];
+
+const STATUS_META: Record<Status, { label: string; cls: string; icon: React.ComponentType<{ className?: string }> }> = {
+  live: { label: "Live", cls: "bg-primary/15 text-primary border-primary/30", icon: Check },
+  soon: { label: "Coming soon", cls: "bg-amber-500/15 text-amber-600 border-amber-500/30 dark:text-amber-400", icon: Clock },
+  planned: { label: "Planned", cls: "bg-muted text-muted-foreground border-border", icon: Clock },
+};
+
+function PaymentsPage() {
+  const all = METHODS.flatMap((g) => g.items);
+  const live = all.filter((m) => m.status === "live").length;
+  const soon = all.filter((m) => m.status === "soon").length;
+  const planned = all.filter((m) => m.status === "planned").length;
+
+  return (
+    <SiteLayout>
+      <section className="bg-secondary/40 py-12">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="font-display text-4xl font-bold">Payments</h1>
+          <p className="mt-2 max-w-2xl mx-auto text-muted-foreground">
+            All the ways you'll be able to pay listing fees, boosts, and subscriptions on 365 MotorSales. We're rolling these out one by one — track progress here.
+          </p>
+          <div className="mt-6 flex flex-wrap justify-center gap-2">
+            <Badge variant="outline" className={STATUS_META.live.cls}>{live} live</Badge>
+            <Badge variant="outline" className={STATUS_META.soon.cls}>{soon} coming soon</Badge>
+            <Badge variant="outline" className={STATUS_META.planned.cls}>{planned} planned</Badge>
+          </div>
+        </div>
+      </section>
+
+      <section className="container mx-auto px-4 py-12 space-y-10">
+        {METHODS.map((group) => (
+          <div key={group.group}>
+            <h2 className="mb-4 font-display text-xl font-semibold">{group.group}</h2>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {group.items.map((m) => {
+                const meta = STATUS_META[m.status];
+                const Icon = m.icon;
+                const StatusIcon = meta.icon;
+                return (
+                  <div key={m.name} className="rounded-xl border border-border bg-card p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="rounded-lg bg-secondary p-2"><Icon className="h-5 w-5" /></div>
+                        <div className="font-display font-semibold">{m.name}</div>
+                      </div>
+                      <Badge variant="outline" className={meta.cls}>
+                        <StatusIcon className="mr-1 h-3 w-3" />{meta.label}
+                      </Badge>
+                    </div>
+                    <p className="mt-3 text-sm text-muted-foreground">{m.desc}</p>
+                    {m.provider && (
+                      <p className="mt-2 text-xs text-muted-foreground">via {m.provider}</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+
+        <div className="rounded-xl border border-border bg-card p-6 text-center">
+          <h3 className="font-display text-lg font-semibold">Need to pay now?</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            While we finish wiring online payments, you can post a free listing or contact us for manual payment instructions.
+          </p>
+          <div className="mt-4 flex flex-wrap justify-center gap-3">
+            <Button asChild><Link to="/sell">Post a free listing</Link></Button>
+            <Button asChild variant="outline"><Link to="/contact">Contact support</Link></Button>
+            <Button asChild variant="ghost"><Link to="/pricing">See pricing</Link></Button>
+          </div>
+        </div>
+      </section>
+    </SiteLayout>
+  );
+}
