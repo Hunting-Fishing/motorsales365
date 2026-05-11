@@ -105,9 +105,15 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
           <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{summary}</p>
         )}
         <div className="mt-2 text-xl font-bold text-primary">{formatPHP(listing.price_php)}</div>
-        <div className="mt-auto flex items-center gap-1 pt-3 text-xs text-muted-foreground">
-          <MapPin className="h-3 w-3" />
-          <span className="truncate">{[listing.city, listing.region].filter(Boolean).join(", ") || "Philippines"}</span>
+        <div className="mt-auto flex items-center justify-between gap-2 pt-3 text-xs text-muted-foreground">
+          <span className="flex min-w-0 items-center gap-1">
+            <MapPin className="h-3 w-3" />
+            <span className="truncate">{[listing.city, listing.region].filter(Boolean).join(", ") || "Philippines"}</span>
+          </span>
+          <span className="flex shrink-0 items-center gap-2">
+            <span className="inline-flex items-center gap-0.5"><Eye className="h-3 w-3" />{(listing.view_count ?? 0).toLocaleString()}</span>
+            <span className="inline-flex items-center gap-0.5"><Heart className="h-3 w-3" />{(listing.like_count ?? 0).toLocaleString()}</span>
+          </span>
         </div>
       </div>
     </Link>
