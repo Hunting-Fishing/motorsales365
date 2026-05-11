@@ -65,6 +65,8 @@ function ListingDetailPage() {
   const [loading, setLoading] = useState(true);
   const [activeIdx, setActiveIdx] = useState(0);
   const [favorited, setFavorited] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
@@ -85,12 +87,23 @@ function ListingDetailPage() {
       const { data: p } = await supabase.from("profiles").select("*").eq("id", l.user_id).maybeSingle();
       setSeller(p);
 
-      // Increment view count
-      await supabase.from("listings").update({ view_count: (l.view_count ?? 0) + 1 }).eq("id", id);
+      // Increment view count via RPC (counts every page load, anon allowed)
+      supabase.rpc("increment_listing_view", { _listing_id: id, _viewer_id: user?.id ?? null });
+
+      // Like count (public)
+      const { count: likes } = await supabase
+        .from("listing_likes")
+        .select("listing_id", { count: "exact", head: true })
+        .eq("listing_id", id);
+      setLikeCount(likes ?? 0);
 
       if (user) {
-        const { data: fav } = await supabase.from("favorites").select("listing_id").eq("user_id", user.id).eq("listing_id", id).maybeSingle();
+        const [{ data: fav }, { data: lk }] = await Promise.all([
+          supabase.from("favorites").select("listing_id").eq("user_id", user.id).eq("listing_id", id).maybeSingle(),
+          supabase.from("listing_likes").select("listing_id").eq("user_id", user.id).eq("listing_id", id).maybeSingle(),
+        ]);
         setFavorited(!!fav);
+        setLiked(!!lk);
       }
       setLoading(false);
     };
@@ -105,7 +118,20 @@ function ListingDetailPage() {
     } else {
       await supabase.from("favorites").insert({ user_id: user.id, listing_id: id });
       setFavorited(true);
-      toast.success("Saved to favorites");
+      toast.success("Saved to your bookmarks");
+    }
+  };
+
+  const toggleLike = async () => {
+    if (!user) { toast.error("Sign in to like this listing"); navigate({ to: "/login" }); return; }
+    if (liked) {
+      setLiked(false); setLikeCount((c) => Math.max(0, c - 1));
+      const { error } = await supabase.from("listing_likes").delete().eq("user_id", user.id).eq("listing_id", id);
+      if (error) { setLiked(true); setLikeCount((c) => c + 1); toast.error(error.message); }
+    } else {
+      setLiked(true); setLikeCount((c) => c + 1);
+      const { error } = await supabase.from("listing_likes").insert({ user_id: user.id, listing_id: id });
+      if (error) { setLiked(false); setLikeCount((c) => Math.max(0, c - 1)); toast.error(error.message); }
     }
   };
 
