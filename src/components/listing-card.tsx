@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, Camera, Video, Star, Droplets, Wrench, Send, SprayCan, Recycle } from "lucide-react";
+import { MapPin, Camera, Video, Star, Droplets, Wrench, Send, SprayCan, Recycle, Eye, Heart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { VerifiedBadge } from "@/components/verified-badge";
 import { formatPHP } from "@/lib/format";
@@ -21,6 +21,8 @@ export interface ListingCardData {
   seller_verified?: boolean;
   status?: string;
   attributes?: Record<string, any> | null;
+  view_count?: number;
+  like_count?: number;
 }
 
 const CATEGORY_META: Record<string, { label: string; Icon: typeof Droplets }> = {
