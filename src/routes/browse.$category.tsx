@@ -118,7 +118,7 @@ function BrowsePage() {
         return {
           id: r.id, title: r.title, price_php: Number(r.price_php),
           region: r.region, city: r.city, seller_type: r.seller_type,
-          boost_until: r.boost_until, category_slug: r.category_slug,
+          boost_until: r.boost_until, category_slug: r.category_slug, view_count: r.view_count ?? 0,
           cover_url: photos[0]?.url ?? null,
           photo_count: photos.length, has_video: videos.length > 0,
           seller_verified: r.profiles?.verification_status === "verified", status: r.status, attributes: r.attributes,

@@ -46,7 +46,7 @@ function SellerProfilePage() {
             city: l.city,
             seller_type: l.seller_type,
             boost_until: l.boost_until,
-            category_slug: l.category_slug,
+            category_slug: l.category_slug, view_count: l.view_count ?? 0,
             cover_url: photos[0]?.url ?? null,
             photo_count: photos.length,
             has_video: videos.length > 0,

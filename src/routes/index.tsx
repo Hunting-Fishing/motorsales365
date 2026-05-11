@@ -67,7 +67,7 @@ function Index() {
             city: r.city,
             seller_type: r.seller_type,
             boost_until: r.boost_until,
-            category_slug: r.category_slug,
+            category_slug: r.category_slug, view_count: r.view_count ?? 0,
             cover_url: photos[0]?.url ?? null,
             photo_count: photos.length,
             has_video: videos.length > 0,
