@@ -76,9 +76,9 @@ function SubmitBusinessPage() {
         city: resolved.city ?? prev.city,
         barangay: barangayish ?? prev.barangay,
       }));
-      if (a.road && !streetAddressRef.current) {
+      if (a.road) {
         const street = [a.house_number, a.road].filter(Boolean).join(" ");
-        if (street) setStreetAddress(street);
+        if (street) setStreetAddress((prev) => prev.trim() ? prev : street);
       }
     } catch {
       /* silent — user can still type fields manually */
