@@ -1,6 +1,8 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 import { AuthProvider } from "@/hooks/use-auth";
 import { CurrencyProvider } from "@/lib/currency";
+import { FeatureFlagProvider } from "@/lib/feature-flags";
+import { SandboxBanner } from "@/components/sandbox-banner";
 import { Toaster } from "@/components/ui/sonner";
 
 import appCss from "../styles.css?url";
@@ -74,10 +76,13 @@ function RootShell({ children }: { children: React.ReactNode }) {
 function RootComponent() {
   return (
     <AuthProvider>
-      <CurrencyProvider>
-        <Outlet />
-        <Toaster richColors position="top-right" />
-      </CurrencyProvider>
+      <FeatureFlagProvider>
+        <CurrencyProvider>
+          <SandboxBanner />
+          <Outlet />
+          <Toaster richColors position="top-right" />
+        </CurrencyProvider>
+      </FeatureFlagProvider>
     </AuthProvider>
   );
 }

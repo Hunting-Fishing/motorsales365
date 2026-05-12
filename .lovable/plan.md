@@ -1,60 +1,80 @@
-## What's already shipped
 
-- **Tables** — `staff_referrals`, `qr_scans`, `referral_visits`, `user_referrals`, `staff_promotions` with RLS for admin / sales / self-read.
-- **RPC** `record_qr_scan` with per-visitor dedupe (one credited scan per device).
-- **Signup trigger** `attach_signup_referral` writes first-touch credit on new auth users.
-- **Storage** public `qr-codes` bucket.
-- **Admin page** `/admin/referrals`: create/edit/delete staff QR, auto-generate PNG, copy link, download QR, KPI cards (codes / visitors / signups / conversion), top performers bar, per-row stats.
-- **Public landing** `/r/$code`: scan recording, "new vs repeat" badge with tooltip, per-device visit history, active promotions list.
-- **Signup form** reads `mref_credit` cookie + visible "Have a referral code?" field, passes to user metadata.
-- **Promotions dialog** (admin) — list / create / toggle active / delete.
+## Current state
 
-## What's still missing
+- One profile exists in the database: **Jordi Bailey** (`a3999f39-…`), with only the `user` role. That's why nothing under `/admin` is unlocked.
+- `useAuth` reads roles from `public.user_roles`. RLS on `user_roles` allows admins to manage and admin-only nav already exists at `/admin/users` (role toggles per user) and per-section role gating in `src/routes/admin.tsx`.
+- There is **no** feature-flag / role-simulation system today.
 
-### 1. Staff personal dashboard (planned, not built)
-New route `src/routes/staff.referral.tsx` for staff to self-serve:
-- Their QR (download + print poster), referral URL with copy.
-- Stats: scans, unique visitors, credited signups, conversion %, 7/30/90-day filter.
-- Read-only list of their attached promotions.
-- Visible only when the signed-in user's email matches a `staff_referrals.email` row (RLS already supports this).
-- Add nav entry in `src/routes/dashboard.tsx` shown conditionally.
+## Goal
 
-### 2. Edit promotions
-Current `PromoDialog` only creates / toggles / deletes. Add an inline edit form (title, description, kind, percent_off / flat_amount_php, applies_to, starts_at, ends_at, terms).
+1. Make sure the signed-in account is a proper Admin in the database.
+2. Give Admin a single Sandbox page to:
+   - Simulate any role (admin / sales / moderator / support / advertising / user) for the current session, so they can preview every gated screen without changing the real DB role.
+   - Toggle app feature flags on/off globally for testing.
 
-### 3. Admin reporting polish
-- Date-range filter (7 / 30 / 90 / all) on `/admin/referrals`, filtering the `qr_scans` and `user_referrals` aggregates.
-- CSV export button (staff rows + stats).
-- Add "Listings by referred users" metric: join `user_referrals.user_id` → `listings.user_id`.
+## Step 1 — Grant admin to the current user (DB)
 
-### 4. QR regeneration on code change
-When admin edits `referral_code`, the old PNG at `<old_code>.png` is orphaned. Either:
-- Delete the old object before re-uploading, or
-- Key storage path by `staff_referral_id` (`<id>.png`) so renames are safe.
+Insert the admin role for Jordi Bailey via a data insert (idempotent):
 
-### 5. Printable poster
-"Download poster" action that renders an A4 PDF (or print-ready PNG) with the QR, staff name, code, and a tagline — useful for physical placement. Use `qrcode` + a simple canvas/SVG template.
+```sql
+INSERT INTO public.user_roles (user_id, role)
+VALUES ('a3999f39-3641-4e16-a11b-f2b6563b8a8f', 'admin')
+ON CONFLICT (user_id, role) DO NOTHING;
+```
 
-### 6. Storage RLS for `qr-codes`
-Bucket is public-read but currently has no explicit write policies. Add admin-only insert/update/delete on `storage.objects` for `bucket_id = 'qr-codes'` so non-admins can't overwrite QR PNGs.
+After this they'll see the full admin nav on next page load.
 
-### 7. Promo redemption tracking (optional, was deferred)
-Add `referral_redemptions` table to log when a credited signup uses an attached `staff_promotions` row at checkout — needed before any auto-discount wiring on `subscriptions` / `payments`.
+## Step 2 — Role simulation in `useAuth`
 
-### 8. Verification pass
-Run the scenarios from `.lovable/plan.md` §9:
-- Anon scan → cookie + scan row + promos visible.
-- Sign up in same browser → `user_referrals.credited_referral_code` set, admin shows +1.
-- Scan two codes → first-touch sticks.
-- Deactivate code → scans logged, no credit.
-- `./scripts/verify-security.sh` — add `record_qr_scan` + `attach_signup_referral` to the SECURITY DEFINER allow-list with reason comments.
+Extend `src/hooks/use-auth.tsx`:
 
-## Suggested build order
+- Keep `realRoles` (from DB) and add `simulatedRoles` (from `localStorage["sandbox.roles"]`).
+- Only the **real admin** is allowed to simulate. For anyone else, simulation is ignored.
+- Exposed `isAdmin / isSales / …` reflect the **effective** roles (simulated if set, else real).
+- Also expose `realIsAdmin`, `simulatedRoles`, `setSimulatedRoles(roles[] | null)` so the Sandbox UI can drive it.
+- An on-screen banner ("Simulating: sales — exit") appears site-wide when simulation is active.
 
-1. Storage RLS on `qr-codes` + fix QR rename orphaning (quick wins, ~1 step).
-2. Edit-promotion form + date-range filter + CSV export (admin UX).
-3. Staff personal dashboard `/staff/referral`.
-4. Printable poster.
-5. Optional: `referral_redemptions` table + verification pass.
+This is purely client-side; RLS in the DB is untouched, so simulation only changes what the UI renders / which admin pages are reachable. It does **not** grant DB privileges they don't really have.
 
-Want me to implement these in that order, or pick a subset to start with?
+## Step 3 — Feature flags
+
+Create `src/lib/feature-flags.tsx`:
+
+- A small `FeatureFlagProvider` + `useFeatureFlag(key)` hook.
+- Default flags (e.g. `towing`, `referrals`, `multiCurrency`, `adsInquiry`, `boosts`, `pendingSaleAutoExpire`). All default `true`.
+- Persisted in `localStorage["sandbox.flags"]`.
+- Admin-only toggling. Other users read defaults.
+
+Integration: wrap the app in `src/routes/__root.tsx` next to `CurrencyProvider`. Gate a few obvious entry points (e.g. nav links to Towing / Referrals) with `useFeatureFlag` so toggles are visibly testable. No business-logic changes beyond rendering gates.
+
+## Step 4 — Admin Sandbox page
+
+New route `src/routes/admin.sandbox.tsx` (admin-only via the existing gate):
+
+- **Role simulator** — checkboxes for each role + "Reset to my real roles" button. Shows a warning that this is UI only.
+- **Feature flags** — switch per flag with description. Buttons: "Enable all", "Reset to defaults".
+- **My account** — shows current user id, real roles, effective roles, with a "Copy" helper.
+
+Add it to the admin nav in `src/routes/admin.tsx`:
+
+```ts
+{ to: "/admin/sandbox", label: "Sandbox", Icon: FlaskConical, roles: ["admin"] }
+```
+
+## Files touched
+
+- migration/insert: grant admin role
+- `src/hooks/use-auth.tsx` — add simulation
+- `src/lib/feature-flags.tsx` — new
+- `src/routes/__root.tsx` — wrap with `FeatureFlagProvider`
+- `src/routes/admin.tsx` — add Sandbox nav entry
+- `src/routes/admin.sandbox.tsx` — new page
+- `src/components/sandbox-banner.tsx` — small banner shown when simulating
+- A couple of nav components updated to consume `useFeatureFlag` for demo gating
+
+## Out of scope
+
+- Persisting simulated roles or flags server-side (intentionally local-only).
+- Changing RLS or backend role checks — simulation is UI-only by design.
+
+Confirm and I'll implement.

@@ -48,6 +48,7 @@ import { Route as ApiSitemapDotxmlRouteImport } from './routes/api/sitemap[.]xml
 import { Route as ApiRobotsDottxtRouteImport } from './routes/api/robots[.]txt'
 import { Route as AdminVerificationsRouteImport } from './routes/admin.verifications'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminSandboxRouteImport } from './routes/admin.sandbox'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminReferralsRouteImport } from './routes/admin.referrals'
 import { Route as AdminRedemptionsRouteImport } from './routes/admin.redemptions'
@@ -263,6 +264,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSandboxRoute = AdminSandboxRouteImport.update({
+  id: '/sandbox',
+  path: '/sandbox',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminReportsRoute = AdminReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -392,6 +398,7 @@ export interface FileRoutesByFullPath {
   '/admin/redemptions': typeof AdminRedemptionsRouteWithChildren
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/sandbox': typeof AdminSandboxRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
   '/api/robots.txt': typeof ApiRobotsDottxtRoute
@@ -450,6 +457,7 @@ export interface FileRoutesByTo {
   '/admin/redemptions': typeof AdminRedemptionsRouteWithChildren
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/sandbox': typeof AdminSandboxRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
   '/api/robots.txt': typeof ApiRobotsDottxtRoute
@@ -511,6 +519,7 @@ export interface FileRoutesById {
   '/admin/redemptions': typeof AdminRedemptionsRouteWithChildren
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/sandbox': typeof AdminSandboxRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
   '/api/robots.txt': typeof ApiRobotsDottxtRoute
@@ -573,6 +582,7 @@ export interface FileRouteTypes {
     | '/admin/redemptions'
     | '/admin/referrals'
     | '/admin/reports'
+    | '/admin/sandbox'
     | '/admin/users'
     | '/admin/verifications'
     | '/api/robots.txt'
@@ -631,6 +641,7 @@ export interface FileRouteTypes {
     | '/admin/redemptions'
     | '/admin/referrals'
     | '/admin/reports'
+    | '/admin/sandbox'
     | '/admin/users'
     | '/admin/verifications'
     | '/api/robots.txt'
@@ -691,6 +702,7 @@ export interface FileRouteTypes {
     | '/admin/redemptions'
     | '/admin/referrals'
     | '/admin/reports'
+    | '/admin/sandbox'
     | '/admin/users'
     | '/admin/verifications'
     | '/api/robots.txt'
@@ -1033,6 +1045,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/sandbox': {
+      id: '/admin/sandbox'
+      path: '/sandbox'
+      fullPath: '/admin/sandbox'
+      preLoaderRoute: typeof AdminSandboxRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/reports': {
       id: '/admin/reports'
       path: '/reports'
@@ -1191,6 +1210,7 @@ interface AdminRouteChildren {
   AdminRedemptionsRoute: typeof AdminRedemptionsRouteWithChildren
   AdminReferralsRoute: typeof AdminReferralsRoute
   AdminReportsRoute: typeof AdminReportsRoute
+  AdminSandboxRoute: typeof AdminSandboxRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVerificationsRoute: typeof AdminVerificationsRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -1207,6 +1227,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminRedemptionsRoute: AdminRedemptionsRouteWithChildren,
   AdminReferralsRoute: AdminReferralsRoute,
   AdminReportsRoute: AdminReportsRoute,
+  AdminSandboxRoute: AdminSandboxRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminVerificationsRoute: AdminVerificationsRoute,
   AdminIndexRoute: AdminIndexRoute,

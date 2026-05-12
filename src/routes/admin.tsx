@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Settings, ListChecks, Users, Flag, CreditCard, ShieldCheck, Gauge, BarChart3, UserCog, Megaphone, QrCode, Ticket, Globe } from "lucide-react";
+import { Settings, ListChecks, Users, Flag, CreditCard, ShieldCheck, Gauge, BarChart3, UserCog, Megaphone, QrCode, Ticket, Globe, FlaskConical } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 
@@ -24,6 +24,7 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean; roles: Role[
   { to: "/admin/verifications", label: "Verifications", Icon: ShieldCheck, roles: ["admin","moderator"] },
   { to: "/admin/users", label: "Users", Icon: Users, roles: ["admin"] },
   { to: "/admin/reports", label: "Reports", Icon: Flag, roles: ["admin","moderator","support"] },
+  { to: "/admin/sandbox", label: "Sandbox", Icon: FlaskConical, roles: ["admin"] },
 ];
 
 function AdminLayout() {
