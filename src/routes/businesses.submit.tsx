@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LocationDrilldown, type LocationValue } from "@/components/businesses/location-drilldown";
+import { LocationPicker } from "@/components/businesses/location-picker";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/businesses/submit")({
@@ -60,6 +61,27 @@ function SubmitBusinessPage() {
       (pos) => { setLat(pos.coords.latitude.toFixed(6)); setLng(pos.coords.longitude.toFixed(6)); toast.success("Location captured"); },
       () => toast.error("Could not get your location"),
     );
+  };
+
+  const geocodeAddress = async () => {
+    const parts = [streetAddress, loc.barangay, loc.city, loc.province, loc.region, "Philippines"]
+      .filter(Boolean).join(", ");
+    if (!parts.trim()) { toast.error("Enter an address or pick a location first"); return; }
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ph&q=${encodeURIComponent(parts)}`, {
+        headers: { "Accept": "application/json" },
+      });
+      const json = await res.json();
+      if (Array.isArray(json) && json[0]) {
+        setLat(Number(json[0].lat).toFixed(6));
+        setLng(Number(json[0].lon).toFixed(6));
+        toast.success("Found location on map");
+      } else {
+        toast.error("No match — drop the pin manually");
+      }
+    } catch {
+      toast.error("Geocoding failed — drop the pin manually");
+    }
   };
 
   const submit = async () => {
@@ -155,11 +177,23 @@ function SubmitBusinessPage() {
           </div>
 
           <div>
-            <Label>Map coordinates (optional, recommended)</Label>
-            <div className="mt-1 grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <Label>Pin your business on the map</Label>
+              <div className="flex flex-wrap gap-2">
+                <Button type="button" variant="outline" size="sm" onClick={geocodeAddress}>Find on map</Button>
+                <Button type="button" variant="outline" size="sm" onClick={useMyLocation}>Use my location</Button>
+              </div>
+            </div>
+            <p className="mb-2 mt-1 text-xs text-muted-foreground">Click the map or drag the pin to set the exact spot. Coordinates are saved with your listing.</p>
+            <LocationPicker
+              lat={lat ? Number(lat) : null}
+              lng={lng ? Number(lng) : null}
+              region={loc.region}
+              onChange={(la, ln) => { setLat(la.toFixed(6)); setLng(ln.toFixed(6)); }}
+            />
+            <div className="mt-2 grid gap-2 sm:grid-cols-2">
               <Input placeholder="Latitude" value={lat} onChange={(e) => setLat(e.target.value)} />
               <Input placeholder="Longitude" value={lng} onChange={(e) => setLng(e.target.value)} />
-              <Button type="button" variant="outline" onClick={useMyLocation}>Use my location</Button>
             </div>
           </div>
 
