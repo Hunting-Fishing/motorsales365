@@ -51,6 +51,7 @@ import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
+import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising'
 import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
@@ -269,6 +270,11 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAdvertisingRoute = AdminAdvertisingRouteImport.update({
+  id: '/advertising',
+  path: '/advertising',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAccountsRoute = AdminAccountsRouteImport.update({
   id: '/accounts',
   path: '/accounts',
@@ -329,6 +335,7 @@ export interface FileRoutesByFullPath {
   '/tow': typeof TowRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/accounts': typeof AdminAccountsRoute
+  '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -378,6 +385,7 @@ export interface FileRoutesByTo {
   '/tow': typeof TowRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/accounts': typeof AdminAccountsRoute
+  '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -430,6 +438,7 @@ export interface FileRoutesById {
   '/tow': typeof TowRoute
   '/unsubscribe': typeof UnsubscribeRoute
   '/admin/accounts': typeof AdminAccountsRoute
+  '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -483,6 +492,7 @@ export interface FileRouteTypes {
     | '/tow'
     | '/unsubscribe'
     | '/admin/accounts'
+    | '/admin/advertising'
     | '/admin/analytics'
     | '/admin/listings'
     | '/admin/performance'
@@ -532,6 +542,7 @@ export interface FileRouteTypes {
     | '/tow'
     | '/unsubscribe'
     | '/admin/accounts'
+    | '/admin/advertising'
     | '/admin/analytics'
     | '/admin/listings'
     | '/admin/performance'
@@ -583,6 +594,7 @@ export interface FileRouteTypes {
     | '/tow'
     | '/unsubscribe'
     | '/admin/accounts'
+    | '/admin/advertising'
     | '/admin/analytics'
     | '/admin/listings'
     | '/admin/performance'
@@ -943,6 +955,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/advertising': {
+      id: '/admin/advertising'
+      path: '/advertising'
+      fullPath: '/admin/advertising'
+      preLoaderRoute: typeof AdminAdvertisingRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/accounts': {
       id: '/admin/accounts'
       path: '/accounts'
@@ -997,6 +1016,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminAccountsRoute: typeof AdminAccountsRoute
+  AdminAdvertisingRoute: typeof AdminAdvertisingRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminListingsRoute: typeof AdminListingsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
@@ -1009,6 +1029,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAccountsRoute: AdminAccountsRoute,
+  AdminAdvertisingRoute: AdminAdvertisingRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminListingsRoute: AdminListingsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
