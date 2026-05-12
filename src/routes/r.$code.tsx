@@ -88,11 +88,33 @@ function ReferralLanding() {
           </div>
         ) : (
           <div className="rounded-xl border border-border bg-card p-8">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground">Referred by</p>
-            <h1 className="font-display mt-1 text-3xl font-bold">{staffName} sent you here</h1>
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs uppercase tracking-wider text-muted-foreground">Referred by</p>
+                <h1 className="font-display mt-1 text-3xl font-bold">{staffName} sent you here</h1>
+              </div>
+              {counted !== null && (
+                <span
+                  className={
+                    "shrink-0 rounded-full px-2.5 py-1 text-xs font-medium " +
+                    (counted
+                      ? "bg-primary/15 text-primary"
+                      : "bg-secondary text-muted-foreground")
+                  }
+                  title={
+                    counted
+                      ? "First scan from this device — counted toward this staff member's stats."
+                      : "You've already scanned this code before — not counted again."
+                  }
+                >
+                  {counted ? "New scan counted" : "Repeat scan"}
+                </span>
+              )}
+            </div>
             <p className="mt-2 text-muted-foreground">
-              Your visit is credited to {staffName}. Sign up in this browser within 90 days and they’ll
-              receive credit for your account.
+              {counted === false
+                ? `Welcome back! Your original visit is still credited to ${staffName}.`
+                : `Your visit is credited to ${staffName}. Sign up in this browser within 90 days and they'll receive credit for your account.`}
             </p>
 
             {promos.length > 0 && (
