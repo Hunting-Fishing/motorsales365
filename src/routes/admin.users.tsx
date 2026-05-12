@@ -64,7 +64,6 @@ function AdminUsers() {
       <h1 className="mb-6 font-display text-2xl font-bold">Users</h1>
       <div className="space-y-2">
         {users.map((u) => {
-          const isAdmin = u.roles.includes("admin");
           const isVerified = u.verification_status === "verified";
           return (
             <div key={u.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
@@ -77,15 +76,29 @@ function AdminUsers() {
                   {u.seller_type} · joined {formatDate(u.created_at)}
                   {u.verification_status && u.verification_status !== "unverified" && ` · ${u.verification_status}`}
                 </div>
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {STAFF_ROLES.map((role) => {
+                    const has = u.roles.includes(role);
+                    return (
+                      <button
+                        key={role}
+                        onClick={() => toggleRole(u.id, role, has)}
+                        className={`rounded-full border px-2 py-0.5 text-[11px] font-medium transition ${
+                          has
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border bg-background text-muted-foreground hover:border-primary/50"
+                        }`}
+                      >
+                        {has ? "✓ " : "+ "}{role}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                {isAdmin && <Badge>Admin</Badge>}
                 {isVerified
                   ? <Button size="sm" variant="outline" onClick={() => revokeVerification(u.id)}>Revoke verified</Button>
                   : <Button size="sm" variant="outline" onClick={() => verifyUser(u.id)}>Mark verified</Button>}
-                {isAdmin
-                  ? <Button size="sm" variant="outline" onClick={() => revokeAdmin(u.id)}>Revoke admin</Button>
-                  : <Button size="sm" variant="outline" onClick={() => grantAdmin(u.id)}>Make admin</Button>}
               </div>
             </div>
           );
