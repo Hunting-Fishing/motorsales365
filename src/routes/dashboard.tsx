@@ -23,7 +23,7 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean }[] = [
 ];
 
 function DashboardLayout() {
-  const { user, loading } = useAuth();
+  const { user, loading, isStaff, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [hasReferral, setHasReferral] = useState(false);
 
@@ -45,9 +45,11 @@ function DashboardLayout() {
 
   if (loading || !user) return <SiteLayout><div className="p-12 text-center">Loading…</div></SiteLayout>;
 
-  const nav = hasReferral
-    ? [...NAV, { to: "/staff/referral", label: "My referral", Icon: QrCode }]
-    : NAV;
+  const nav = [
+    ...NAV,
+    ...(hasReferral ? [{ to: "/staff/referral", label: "My referral", Icon: QrCode }] : []),
+    ...(isStaff ? [{ to: "/admin", label: isAdmin ? "Admin" : "Staff console", Icon: Shield }] : []),
+  ];
 
   return (
     <SiteLayout>
