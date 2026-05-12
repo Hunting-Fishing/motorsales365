@@ -172,6 +172,28 @@ function AdminReferrals() {
     else load();
   };
 
+  const totals = useMemo(() => {
+    const codes = rows.length;
+    const active = rows.filter((r) => r.active).length;
+    let scans = 0;
+    let visitors = 0;
+    let signups = 0;
+    Object.values(stats).forEach((s) => {
+      scans += s.scans;
+      visitors += s.visitors;
+      signups += s.signups;
+    });
+    const conversion = visitors > 0 ? Math.round((signups / visitors) * 1000) / 10 : 0;
+    return { codes, active, scans, visitors, signups, conversion };
+  }, [rows, stats]);
+
+  const topPerformers = useMemo(() => {
+    return rows
+      .map((r) => ({ row: r, s: stats[r.id] || { scans: 0, signups: 0, visitors: 0 } }))
+      .sort((a, b) => b.s.visitors - a.s.visitors)
+      .slice(0, 5);
+  }, [rows, stats]);
+
   return (
     <div className="space-y-6">
       <header className="flex items-center justify-between">
@@ -185,6 +207,62 @@ function AdminReferrals() {
           <Plus className="mr-2 h-4 w-4" /> New staff QR
         </Button>
       </header>
+
+      <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
+        <KpiCard
+          icon={<Users className="h-4 w-4" />}
+          label="Active codes"
+          value={`${totals.active}/${totals.codes}`}
+          hint="Codes currently crediting signups"
+        />
+        <KpiCard
+          icon={<MousePointerClick className="h-4 w-4" />}
+          label="Unique visitors"
+          value={totals.visitors.toLocaleString()}
+          hint={`${totals.scans.toLocaleString()} total scans (dedup applied)`}
+        />
+        <KpiCard
+          icon={<UserPlus className="h-4 w-4" />}
+          label="Credited signups"
+          value={totals.signups.toLocaleString()}
+          hint="First-touch attribution within 90 days"
+        />
+        <KpiCard
+          icon={<Percent className="h-4 w-4" />}
+          label="Conversion"
+          value={`${totals.conversion}%`}
+          hint="Signups ÷ unique visitors"
+        />
+      </section>
+
+      {topPerformers.length > 0 && totals.visitors > 0 && (
+        <section className="rounded-xl border border-border bg-card p-4">
+          <h2 className="mb-3 text-sm font-semibold">Top performers</h2>
+          <ul className="space-y-2">
+            {topPerformers.map(({ row, s }) => {
+              const max = topPerformers[0].s.visitors || 1;
+              const pct = Math.round((s.visitors / max) * 100);
+              return (
+                <li key={row.id} className="flex items-center gap-3 text-sm">
+                  <div className="w-32 shrink-0 truncate font-medium">{row.full_name}</div>
+                  <div className="w-20 shrink-0 truncate font-mono text-xs text-muted-foreground">
+                    {row.referral_code}
+                  </div>
+                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
+                    <div
+                      className="h-full rounded-full bg-primary transition-all"
+                      style={{ width: `${pct}%` }}
+                    />
+                  </div>
+                  <div className="w-32 shrink-0 text-right text-xs text-muted-foreground">
+                    {s.visitors} visitors · {s.signups} signups
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
 
       <div className="rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
