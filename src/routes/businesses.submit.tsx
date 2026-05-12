@@ -63,6 +63,27 @@ function SubmitBusinessPage() {
     );
   };
 
+  const geocodeAddress = async () => {
+    const parts = [streetAddress, loc.barangay, loc.city, loc.province, loc.region, "Philippines"]
+      .filter(Boolean).join(", ");
+    if (!parts.trim()) { toast.error("Enter an address or pick a location first"); return; }
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ph&q=${encodeURIComponent(parts)}`, {
+        headers: { "Accept": "application/json" },
+      });
+      const json = await res.json();
+      if (Array.isArray(json) && json[0]) {
+        setLat(Number(json[0].lat).toFixed(6));
+        setLng(Number(json[0].lon).toFixed(6));
+        toast.success("Found location on map");
+      } else {
+        toast.error("No match — drop the pin manually");
+      }
+    } catch {
+      toast.error("Geocoding failed — drop the pin manually");
+    }
+  };
+
   const submit = async () => {
     if (!user) return;
     if (!name.trim() || !typeSlug) { toast.error("Name and business type are required"); return; }
