@@ -79,13 +79,20 @@ function sinceFor(range: RangeKey): string | null {
 }
 
 function AdminReferrals() {
+  const { user } = useAuth();
   const [rows, setRows] = useState<StaffRow[]>([]);
+  const [roles, setRoles] = useState<Record<string, string[]>>({});
+  const [actors, setActors] = useState<Record<string, { name: string; email: string }>>({});
   const [stats, setStats] = useState<Record<string, { scans: number; signups: number; visitors: number; listings: number }>>({});
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState<RangeKey>("30");
   const [newOpen, setNewOpen] = useState(false);
   const [editing, setEditing] = useState<StaffRow | null>(null);
   const [promosFor, setPromosFor] = useState<StaffRow | null>(null);
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [audit, setAudit] = useState<AuditEntry[]>([]);
+  const [showAudit, setShowAudit] = useState(false);
 
   const load = async (rangeKey: RangeKey = range) => {
     setLoading(true);
