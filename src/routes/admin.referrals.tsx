@@ -13,7 +13,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   Download, Copy, QrCode, Tag, Plus, Trash2, Users, MousePointerClick,
   UserPlus, Percent, Pencil, Printer, FileSpreadsheet, Calendar, RefreshCw,
+  Power, History,
 } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/admin/referrals")({
   component: AdminReferrals,
@@ -28,6 +30,17 @@ type StaffRow = {
   qr_storage_path: string | null;
   active: boolean;
   notes: string | null;
+  staff_user_id: string | null;
+};
+
+type AuditEntry = {
+  id: string;
+  staff_referral_id: string | null;
+  staff_email: string | null;
+  actor_id: string | null;
+  action: string;
+  details: any;
+  created_at: string;
 };
 
 type Promo = {
@@ -66,13 +79,20 @@ function sinceFor(range: RangeKey): string | null {
 }
 
 function AdminReferrals() {
+  const { user } = useAuth();
   const [rows, setRows] = useState<StaffRow[]>([]);
+  const [roles, setRoles] = useState<Record<string, string[]>>({});
+  const [actors, setActors] = useState<Record<string, { name: string; email: string }>>({});
   const [stats, setStats] = useState<Record<string, { scans: number; signups: number; visitors: number; listings: number }>>({});
   const [loading, setLoading] = useState(true);
   const [range, setRange] = useState<RangeKey>("30");
   const [newOpen, setNewOpen] = useState(false);
   const [editing, setEditing] = useState<StaffRow | null>(null);
   const [promosFor, setPromosFor] = useState<StaffRow | null>(null);
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [audit, setAudit] = useState<AuditEntry[]>([]);
+  const [showAudit, setShowAudit] = useState(false);
 
   const load = async (rangeKey: RangeKey = range) => {
     setLoading(true);
@@ -83,6 +103,19 @@ function AdminReferrals() {
     if (error) toast.error(error.message);
     const staffRows = (data as StaffRow[]) || [];
     setRows(staffRows);
+
+    // Fetch roles for each staff_user_id
+    const userIds = staffRows.map((r) => r.staff_user_id).filter(Boolean) as string[];
+    if (userIds.length > 0) {
+      const { data: ur } = await sb.from("user_roles").select("user_id, role").in("user_id", userIds);
+      const map: Record<string, string[]> = {};
+      ((ur as any[] | null) || []).forEach((x) => {
+        (map[x.user_id] ||= []).push(x.role);
+      });
+      setRoles(map);
+    } else {
+      setRoles({});
+    }
 
     const since = sinceFor(rangeKey);
 
@@ -217,9 +250,55 @@ function AdminReferrals() {
     if (row.qr_storage_path) {
       await supabase.storage.from("qr-codes").remove([row.qr_storage_path]).catch(() => {});
     }
+    if (user) {
+      await sb.from("staff_referral_audit").insert({
+        staff_referral_id: row.id, staff_email: row.email, actor_id: user.id,
+        action: "deleted",
+        details: { referral_code: row.referral_code, full_name: row.full_name },
+      });
+    }
     const { error } = await sb.from("staff_referrals").delete().eq("id", row.id);
     if (error) toast.error(error.message);
     else load();
+  };
+
+  const toggleActive = async (row: StaffRow) => {
+    const next = !row.active;
+    const { error } = await sb.from("staff_referrals").update({ active: next }).eq("id", row.id);
+    if (error) { toast.error(error.message); return; }
+    toast.success(next ? "Reactivated" : "Deactivated");
+    load();
+    if (showAudit) loadAudit();
+  };
+
+  const loadAudit = async () => {
+    const { data } = await sb
+      .from("staff_referral_audit")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(100);
+    const entries = (data as AuditEntry[]) || [];
+    setAudit(entries);
+    const actorIds = Array.from(new Set(entries.map((e) => e.actor_id).filter(Boolean) as string[]));
+    if (actorIds.length > 0) {
+      const { data: profs } = await sb.from("profiles").select("id, full_name").in("id", actorIds);
+      const map: Record<string, { name: string; email: string }> = {};
+      ((profs as any[] | null) || []).forEach((p) => {
+        map[p.id] = { name: p.full_name || "", email: "" };
+      });
+      setActors(map);
+    }
+  };
+
+  useEffect(() => { if (showAudit) loadAudit(); /* eslint-disable-next-line */ }, [showAudit]);
+
+  const logSync = async (count: number) => {
+    if (!user) return;
+    await sb.from("staff_referral_audit").insert({
+      actor_id: user.id,
+      action: "sync_run",
+      details: { synced_count: count },
+    });
   };
 
   const totals = useMemo(() => {
@@ -239,6 +318,22 @@ function AdminReferrals() {
       .sort((a, b) => b.s.visitors - a.s.visitors)
       .slice(0, 5);
   }, [rows, stats]);
+
+  const filteredRows = useMemo(() => {
+    return rows.filter((r) => {
+      if (statusFilter === "active" && !r.active) return false;
+      if (statusFilter === "inactive" && r.active) return false;
+      if (roleFilter !== "all") {
+        const ur = r.staff_user_id ? roles[r.staff_user_id] || [] : [];
+        if (roleFilter === "none") {
+          if (ur.length > 0) return false;
+        } else if (!ur.includes(roleFilter)) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [rows, roles, roleFilter, statusFilter]);
 
   const exportCsv = () => {
     const header = ["full_name", "email", "code", "active", "scans", "visitors", "signups", "listings", "conversion_pct", "url"];
@@ -298,18 +393,24 @@ function AdminReferrals() {
           <Button variant="outline" onClick={async () => {
             const { data, error } = await sb.rpc("sync_staff_referrals");
             if (error) { toast.error(error.message); return; }
-            toast.success(`Synced ${data ?? 0} staff`);
+            const count = (data as number) ?? 0;
+            toast.success(`Synced ${count} staff`);
+            await logSync(count);
             // Generate QR codes for any newly created rows that don't have one yet
             const { data: missing } = await sb
               .from("staff_referrals")
-              .select("id,referral_code,qr_storage_path,full_name,email,phone,active,notes")
+              .select("id,referral_code,qr_storage_path,full_name,email,phone,active,notes,staff_user_id")
               .is("qr_storage_path", null);
             for (const m of (missing as StaffRow[]) || []) {
               await generateQrFor(m);
             }
             load();
+            if (showAudit) loadAudit();
           }}>
             <RefreshCw className="mr-2 h-4 w-4" /> Sync staff
+          </Button>
+          <Button variant={showAudit ? "default" : "outline"} onClick={() => setShowAudit((v) => !v)}>
+            <History className="mr-2 h-4 w-4" /> Audit log
           </Button>
           <Button onClick={() => setNewOpen(true)}>
             <Plus className="mr-2 h-4 w-4" /> New staff QR
@@ -370,11 +471,44 @@ function AdminReferrals() {
         </section>
       )}
 
+      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-3">
+        <div className="flex items-center gap-2">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Role</Label>
+          <Select value={roleFilter} onValueChange={setRoleFilter}>
+            <SelectTrigger className="h-8 w-[140px]"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All roles</SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="moderator">Moderator</SelectItem>
+              <SelectItem value="support">Support</SelectItem>
+              <SelectItem value="sales">Sales</SelectItem>
+              <SelectItem value="advertising">Advertising</SelectItem>
+              <SelectItem value="none">No role / external</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-center gap-2">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Status</Label>
+          <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
+            <SelectTrigger className="h-8 w-[130px]"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="active">Active only</SelectItem>
+              <SelectItem value="inactive">Inactive only</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="ml-auto text-xs text-muted-foreground">
+          Showing {filteredRows.length} of {rows.length}
+        </div>
+      </div>
+
       <div className="rounded-xl border border-border bg-card overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-muted/40">
             <tr className="text-left">
               <th className="px-4 py-2">Staff</th>
+              <th className="px-4 py-2">Role</th>
               <th className="px-4 py-2">Code</th>
               <th className="px-4 py-2">Scans</th>
               <th className="px-4 py-2">Visitors</th>
@@ -386,20 +520,32 @@ function AdminReferrals() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={8} className="p-6 text-center text-muted-foreground">Loading…</td></tr>
-            ) : rows.length === 0 ? (
-              <tr><td colSpan={8} className="p-6 text-center text-muted-foreground">No staff referrals yet.</td></tr>
+              <tr><td colSpan={9} className="p-6 text-center text-muted-foreground">Loading…</td></tr>
+            ) : filteredRows.length === 0 ? (
+              <tr><td colSpan={9} className="p-6 text-center text-muted-foreground">No staff referrals match your filters.</td></tr>
             ) : (
-              rows.map((r) => {
+              filteredRows.map((r) => {
                 const s = stats[r.id] || { scans: 0, signups: 0, visitors: 0, listings: 0 };
                 const qr = publicQrUrl(r.qr_storage_path);
                 const link = `${PUBLIC_BASE}/r/${r.referral_code}`;
                 const posterUrl = `${PUBLIC_BASE}/r/${r.referral_code}/poster`;
+                const userRoles = r.staff_user_id ? roles[r.staff_user_id] || [] : [];
                 return (
                   <tr key={r.id} className="border-b border-border last:border-0">
                     <td className="px-4 py-3">
                       <div className="font-medium">{r.full_name}</div>
                       <div className="text-xs text-muted-foreground">{r.email}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      {userRoles.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {userRoles.map((ro) => (
+                            <span key={ro} className="rounded bg-secondary px-1.5 py-0.5 text-xs uppercase">{ro}</span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-3 font-mono text-xs">{r.referral_code}</td>
                     <td className="px-4 py-3">{s.scans}</td>
@@ -428,6 +574,14 @@ function AdminReferrals() {
                         <Button size="sm" variant="ghost" title="Promotions" onClick={() => setPromosFor(r)}>
                           <Tag className="h-4 w-4" />
                         </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          title={r.active ? "Deactivate" : "Reactivate"}
+                          onClick={() => toggleActive(r)}
+                        >
+                          <Power className={`h-4 w-4 ${r.active ? "text-primary" : "text-muted-foreground"}`} />
+                        </Button>
                         <Button size="sm" variant="ghost" title="Edit" onClick={() => setEditing(r)}>
                           <Pencil className="h-4 w-4" />
                         </Button>
@@ -443,6 +597,58 @@ function AdminReferrals() {
           </tbody>
         </table>
       </div>
+
+      {showAudit && (
+        <section className="rounded-xl border border-border bg-card p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <h2 className="font-display text-lg font-semibold">Audit log</h2>
+              <p className="text-xs text-muted-foreground">Most recent 100 staff referral changes (creates, activations, QR generations, sync runs).</p>
+            </div>
+            <Button size="sm" variant="ghost" onClick={loadAudit}><RefreshCw className="mr-1 h-3 w-3" /> Refresh</Button>
+          </div>
+          {audit.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No audit entries yet.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead className="border-b border-border bg-muted/40">
+                  <tr className="text-left">
+                    <th className="px-3 py-2">When</th>
+                    <th className="px-3 py-2">Action</th>
+                    <th className="px-3 py-2">Staff</th>
+                    <th className="px-3 py-2">Admin</th>
+                    <th className="px-3 py-2">Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {audit.map((e) => (
+                    <tr key={e.id} className="border-b border-border last:border-0">
+                      <td className="px-3 py-2 whitespace-nowrap text-muted-foreground">
+                        {new Date(e.created_at).toLocaleString()}
+                      </td>
+                      <td className="px-3 py-2">
+                        <span className="rounded bg-secondary px-1.5 py-0.5 uppercase">{e.action}</span>
+                      </td>
+                      <td className="px-3 py-2">{e.staff_email || <span className="text-muted-foreground">—</span>}</td>
+                      <td className="px-3 py-2 font-mono text-[10px]">
+                        {e.actor_id
+                          ? (actors[e.actor_id]?.name || e.actor_id.slice(0, 8))
+                          : <span className="text-muted-foreground">system</span>}
+                      </td>
+                      <td className="px-3 py-2 font-mono text-[10px] text-muted-foreground">
+                        {e.details && Object.keys(e.details).length > 0
+                          ? JSON.stringify(e.details)
+                          : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      )}
 
       {newOpen && <StaffDialog onClose={() => setNewOpen(false)} onSubmit={handleCreate} />}
       {editing && (
