@@ -34,9 +34,29 @@ const PLACEMENTS = [
   { value: "other", label: "Something else" },
 ] as const;
 
+const todayIso = () => new Date().toISOString().slice(0, 10);
+
+const inquirySchema = z.object({
+  contact_name: z.string().trim().min(1, "Required").max(100, "Max 100 characters"),
+  company: z.string().trim().max(120, "Max 120 characters").optional().or(z.literal("")),
+  email: z.string().trim().toLowerCase().email("Invalid email").max(255),
+  phone: z.string().trim().max(30, "Max 30 characters")
+    .regex(/^[+\d][\d\s\-().]*$/u, "Digits, spaces, + - ( ) only").optional().or(z.literal("")),
+  placement: z.enum(PLACEMENTS.map((p) => p.value) as [string, ...string[]]),
+  budget_range: z.string().trim().max(60, "Max 60 characters").optional().or(z.literal("")),
+  start_date: z.string().trim().refine(
+    (v) => !v || v >= todayIso(),
+    "Start date must be today or later",
+  ).optional().or(z.literal("")),
+  message: z.string().trim().min(10, "At least 10 characters").max(2000, "Max 2000 characters"),
+});
+
+type FieldErrors = Partial<Record<keyof z.infer<typeof inquirySchema>, string>>;
+
 function AdvertisePage() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const [errors, setErrors] = useState<FieldErrors>({});
   const [form, setForm] = useState({
     contact_name: "",
     company: "",
@@ -48,25 +68,36 @@ function AdvertisePage() {
     message: "",
   });
 
-  const update = (k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }));
+  const update = (k: keyof typeof form, v: string) => {
+    setForm((f) => ({ ...f, [k]: v }));
+    setErrors((er) => ({ ...er, [k]: undefined }));
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.contact_name || !form.email || !form.message) {
-      toast.error("Please fill in your name, email, and a short message.");
+    const parsed = inquirySchema.safeParse(form);
+    if (!parsed.success) {
+      const fe: FieldErrors = {};
+      for (const issue of parsed.error.issues) {
+        const key = issue.path[0] as keyof FieldErrors;
+        if (key && !fe[key]) fe[key] = issue.message;
+      }
+      setErrors(fe);
+      toast.error("Please correct the highlighted fields.");
       return;
     }
+    const v = parsed.data;
     setSubmitting(true);
     const { data: userData } = await supabase.auth.getUser();
     const { error } = await supabase.from("ad_inquiries").insert({
-      contact_name: form.contact_name,
-      company: form.company || null,
-      email: form.email,
-      phone: form.phone || null,
-      placement: form.placement,
-      budget_range: form.budget_range || null,
-      start_date: form.start_date || null,
-      message: form.message,
+      contact_name: v.contact_name,
+      company: v.company || null,
+      email: v.email,
+      phone: v.phone || null,
+      placement: v.placement as (typeof PLACEMENTS)[number]["value"],
+      budget_range: v.budget_range || null,
+      start_date: v.start_date || null,
+      message: v.message,
       submitter_user_id: userData.user?.id ?? null,
       source_url: typeof window !== "undefined" ? window.location.href : null,
     });
