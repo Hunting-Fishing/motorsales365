@@ -332,7 +332,7 @@ function AdminRedemptions() {
                         {share.toFixed(1)}%
                       </td>
                       <td className="px-3 py-2 text-right tabular-nums text-primary">
-                        −{formatPHP(d.discount)}
+                        −{fmtMoney(d.discount)}
                       </td>
                     </tr>
                   );
