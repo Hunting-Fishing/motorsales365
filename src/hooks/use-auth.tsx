@@ -72,6 +72,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState<string[]>([]);
+  const [simulatedRoles, setSimulatedRolesState] = useState<AppRole[] | null>(() => loadSim());
 
   useEffect(() => {
     const loadRoles = async (uid: string) => {
