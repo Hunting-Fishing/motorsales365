@@ -204,9 +204,15 @@ function SubmitBusinessPage() {
             <div><Label>Messenger / FB</Label><Input value={messengerUrl} onChange={(e) => setMessengerUrl(e.target.value)} placeholder="https://m.me/…" /></div>
           </div>
 
-          <div>
-            <Label>Street address</Label>
-            <Input value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} maxLength={200} />
+          <div className="grid gap-3 sm:grid-cols-[1fr_160px]">
+            <div>
+              <Label>Street address</Label>
+              <Input value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} maxLength={200} />
+            </div>
+            <div>
+              <Label>Postal code</Label>
+              <Input value={postalCode} onChange={(e) => setPostalCode(e.target.value)} maxLength={10} />
+            </div>
           </div>
 
           <div>
