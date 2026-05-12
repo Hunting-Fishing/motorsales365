@@ -32,6 +32,7 @@ function AdminAdvertising() {
   const hasAccess = isAdmin || isAdvertising;
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [filter, setFilter] = useState<Status | "all">("new");
+  const [mineOnly, setMineOnly] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [reply, setReply] = useState("");
@@ -40,6 +41,7 @@ function AdminAdvertising() {
   const load = async () => {
     let q = supabase.from("ad_inquiries").select("*").order("created_at", { ascending: false });
     if (filter !== "all") q = q.eq("status", filter);
+    if (mineOnly && user?.id) q = q.eq("assigned_to", user.id);
     const { data, error } = await q;
     if (error) { toast.error(error.message); return; }
     setInquiries(data ?? []);
@@ -53,7 +55,7 @@ function AdminAdvertising() {
     setNotes(cur.internal_notes ?? "");
   };
 
-  useEffect(() => { if (hasAccess) load(); /* eslint-disable-next-line */ }, [filter, hasAccess]);
+  useEffect(() => { if (hasAccess) load(); /* eslint-disable-next-line */ }, [filter, mineOnly, hasAccess]);
 
   const active = useMemo(() => inquiries.find((i) => i.id === activeId), [inquiries, activeId]);
 
@@ -69,6 +71,14 @@ function AdminAdvertising() {
     const { error } = await supabase.from("ad_inquiries").update({ internal_notes: notes }).eq("id", active.id);
     if (error) return toast.error(error.message);
     toast.success("Notes saved");
+    load();
+  };
+
+  const assignToMe = async () => {
+    if (!active || !user?.id) return;
+    const { error } = await supabase.from("ad_inquiries").update({ assigned_to: user.id }).eq("id", active.id);
+    if (error) return toast.error(error.message);
+    toast.success("Assigned to you");
     load();
   };
 
