@@ -320,12 +320,12 @@ function EditAccountDialog({
     try {
       // 1) Subscription upsert
       if (row.subscription) {
-        const patch: Record<string, any> = {
+        const patch = {
           discount_percent: cleanDiscount,
           complimentary,
           notes: notes || null,
+          ...(planId && planId !== row.subscription.plan_id ? { plan_id: planId } : {}),
         };
-        if (planId && planId !== row.subscription.plan_id) patch.plan_id = planId;
         const { error } = await supabase
           .from("subscriptions")
           .update(patch)
