@@ -295,6 +295,22 @@ function AdminReferrals() {
           <Button variant="outline" onClick={exportCsv} disabled={rows.length === 0}>
             <FileSpreadsheet className="mr-2 h-4 w-4" /> Export CSV
           </Button>
+          <Button variant="outline" onClick={async () => {
+            const { data, error } = await sb.rpc("sync_staff_referrals");
+            if (error) { toast.error(error.message); return; }
+            toast.success(`Synced ${data ?? 0} staff`);
+            // Generate QR codes for any newly created rows that don't have one yet
+            const { data: missing } = await sb
+              .from("staff_referrals")
+              .select("id,referral_code,qr_storage_path,full_name,email,phone,active,notes")
+              .is("qr_storage_path", null);
+            for (const m of (missing as StaffRow[]) || []) {
+              await generateQrFor(m);
+            }
+            load();
+          }}>
+            <RefreshCw className="mr-2 h-4 w-4" /> Sync staff
+          </Button>
           <Button onClick={() => setNewOpen(true)}>
             <Plus className="mr-2 h-4 w-4" /> New staff QR
           </Button>
