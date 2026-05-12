@@ -12,7 +12,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Download, Copy, QrCode, Tag, Plus, Trash2, Users, MousePointerClick,
-  UserPlus, Percent, Pencil, Printer, FileSpreadsheet, Calendar,
+  UserPlus, Percent, Pencil, Printer, FileSpreadsheet, Calendar, RefreshCw,
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/referrals")({
