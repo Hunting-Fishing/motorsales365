@@ -24,6 +24,7 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean; roles: Role[
   { to: "/admin/verifications", label: "Verifications", Icon: ShieldCheck, roles: ["admin","moderator"] },
   { to: "/admin/users", label: "Users", Icon: Users, roles: ["admin"] },
   { to: "/admin/reports", label: "Reports", Icon: Flag, roles: ["admin","moderator","support"] },
+  { to: "/admin/sandbox", label: "Sandbox", Icon: FlaskConical, roles: ["admin"] },
 ];
 
 function AdminLayout() {
