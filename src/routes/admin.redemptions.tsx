@@ -241,13 +241,29 @@ function AdminRedemptions() {
       </section>
 
       <section className="rounded-xl border border-border bg-card p-4">
-        <div className="mb-3 flex items-center justify-between">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-display text-sm font-semibold uppercase tracking-wider">
             Breakdown by kind
           </h2>
-          <span className="text-xs text-muted-foreground">
-            Counts (bars) and total discount (₱) for current filters
-          </span>
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-muted-foreground">Discount in</span>
+            <div className="inline-flex overflow-hidden rounded-md border border-border">
+              <button
+                type="button"
+                onClick={() => setDisplayCode("PHP")}
+                className={`px-2 py-1 font-mono ${isPhp ? "bg-primary text-primary-foreground" : "hover:bg-secondary"}`}
+              >
+                PHP
+              </button>
+              <button
+                type="button"
+                onClick={() => setDisplayCode(globalCode === "PHP" ? "USD" : globalCode)}
+                className={`px-2 py-1 font-mono ${!isPhp ? "bg-primary text-primary-foreground" : "hover:bg-secondary"}`}
+              >
+                {globalCode === "PHP" ? "USD" : globalCode}
+              </button>
+            </div>
+          </div>
         </div>
         {byKindChart.length === 0 ? (
           <div className="py-10 text-center text-sm text-muted-foreground">
