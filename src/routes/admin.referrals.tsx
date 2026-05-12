@@ -720,15 +720,58 @@ function AdminReferrals() {
 
       {showAudit && (
         <section className="rounded-xl border border-border bg-card p-4">
-          <div className="mb-3 flex items-center justify-between">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 className="font-display text-lg font-semibold">Audit log</h2>
-              <p className="text-xs text-muted-foreground">Most recent 100 staff referral changes (creates, activations, QR generations, sync runs).</p>
+              <p className="text-xs text-muted-foreground">Up to 200 most recent matching staff referral changes.</p>
             </div>
             <Button size="sm" variant="ghost" onClick={loadAudit}><RefreshCw className="mr-1 h-3 w-3" /> Refresh</Button>
           </div>
+          <div className="mb-3 flex flex-wrap items-end gap-2">
+            <div className="flex flex-col gap-1">
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Action</Label>
+              <Select value={auditAction} onValueChange={setAuditAction}>
+                <SelectTrigger className="h-8 w-[160px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All actions</SelectItem>
+                  <SelectItem value="created">created</SelectItem>
+                  <SelectItem value="activated">activated</SelectItem>
+                  <SelectItem value="deactivated">deactivated</SelectItem>
+                  <SelectItem value="qr_generated">qr_generated</SelectItem>
+                  <SelectItem value="sync_run">sync_run</SelectItem>
+                  <SelectItem value="deleted">deleted</SelectItem>
+                  <SelectItem value="reason_logged">reason_logged</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Admin</Label>
+              <Select value={auditActor} onValueChange={setAuditActor}>
+                <SelectTrigger className="h-8 w-[180px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All admins</SelectItem>
+                  {auditActorOptions.map((a) => (
+                    <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">From</Label>
+              <Input type="date" value={auditFrom} onChange={(e) => setAuditFrom(e.target.value)} className="h-8 w-[150px]" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">To</Label>
+              <Input type="date" value={auditTo} onChange={(e) => setAuditTo(e.target.value)} className="h-8 w-[150px]" />
+            </div>
+            {(auditAction !== "all" || auditActor !== "all" || auditFrom || auditTo) && (
+              <Button size="sm" variant="ghost" onClick={() => { setAuditAction("all"); setAuditActor("all"); setAuditFrom(""); setAuditTo(""); }}>
+                Clear
+              </Button>
+            )}
+          </div>
           {audit.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No audit entries yet.</p>
+            <p className="text-sm text-muted-foreground">No audit entries match these filters.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
@@ -770,6 +813,40 @@ function AdminReferrals() {
         </section>
       )}
 
+      <AlertDialog open={!!confirmToggle} onOpenChange={(o) => { if (!o) { setConfirmToggle(null); setConfirmReason(""); } }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {confirmToggle?.active ? "Deactivate" : "Reactivate"} {confirmToggle?.full_name}?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmToggle?.active
+                ? "Inactive codes still log scans but won't credit signups."
+                : "This code will resume crediting signups for new visitors."}
+              {" "}Code: <span className="font-mono">{confirmToggle?.referral_code}</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2">
+            <Label className="text-xs">Reason (required, logged in audit)</Label>
+            <Textarea
+              value={confirmReason}
+              onChange={(e) => setConfirmReason(e.target.value)}
+              placeholder="e.g. Staff offboarded, QR misprinted, suspected abuse…"
+              rows={3}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={confirmBusy}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={confirmBusy || confirmReason.trim().length < 3}
+              onClick={(e) => { e.preventDefault(); submitToggle(); }}
+            >
+              {confirmToggle?.active ? "Deactivate" : "Reactivate"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {newOpen && <StaffDialog onClose={() => setNewOpen(false)} onSubmit={handleCreate} />}
       {editing && (
         <StaffDialog
@@ -780,6 +857,30 @@ function AdminReferrals() {
       )}
       {promosFor && <PromoDialog staff={promosFor} onClose={() => setPromosFor(null)} />}
     </div>
+  );
+}
+
+function SortableTh({
+  label, k, sortKey, sortDir, onSort,
+}: {
+  label: string;
+  k: "name" | "email" | "code" | "status" | "scans" | "visitors" | "signups" | "listings";
+  sortKey: string;
+  sortDir: "asc" | "desc";
+  onSort: (k: any) => void;
+}) {
+  const active = sortKey === k;
+  return (
+    <th className="px-4 py-2">
+      <button
+        type="button"
+        onClick={() => onSort(k)}
+        className={`inline-flex items-center gap-1 hover:text-foreground ${active ? "text-foreground" : "text-muted-foreground"}`}
+      >
+        {label}
+        {active ? (sortDir === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3 opacity-50" />}
+      </button>
+    </th>
   );
 }
 
