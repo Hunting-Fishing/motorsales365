@@ -47,6 +47,7 @@ function ReferralLanding() {
       }
       setStaffName(data.first_name || data.staff_name || null);
       setActive(Boolean(data.active));
+      setCounted(data.active ? Boolean(data.counted) : null);
       if (data.active) recordTouch(code);
 
       // Look up the staff_referral_id, then load active promos.
