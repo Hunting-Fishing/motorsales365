@@ -55,6 +55,18 @@ function isoDaysAgo(n: number) {
 }
 
 function AdminRedemptions() {
+  const { code: globalCode, current: globalCur, format: fmtCur, convert: convCur } = useCurrency();
+  const [displayCode, setDisplayCode] = useState<string>("PHP");
+  useEffect(() => {
+    // default to the user's global currency on first load
+    if (globalCode && globalCode !== "PHP") setDisplayCode(globalCode);
+  }, [globalCode]);
+  const isPhp = displayCode === "PHP";
+  const fmtMoney = (n: number) => (isPhp ? formatPHP(n) : fmtCur(n, displayCode));
+  const tickMoney = (n: number) =>
+    isPhp
+      ? `₱${Number(n).toLocaleString()}`
+      : `${globalCur.symbol}${Math.round(convCur(Number(n), displayCode)).toLocaleString()}`;
   const [rows, setRows] = useState<Row[]>([]);
   const [staffMap, setStaffMap] = useState<Record<string, Staff>>({});
   const [promoMap, setPromoMap] = useState<Record<string, Promo>>({});
