@@ -40,7 +40,7 @@ function AdminPricing() {
     const userIds = Array.from(new Set(list.map((r: any) => r.user_id)));
     const planIds = Array.from(new Set(list.map((r: any) => r.plan_id)));
     const [{ data: profs }, { data: pls }] = await Promise.all([
-      userIds.length ? supabase.from("profiles").select("id, full_name, email").in("id", userIds) : Promise.resolve({ data: [] as any[] }),
+      userIds.length ? supabase.from("profiles").select("id, full_name").in("id", userIds) : Promise.resolve({ data: [] as any[] }),
       planIds.length ? supabase.from("subscription_plans").select("id, name, price_php").in("id", planIds) : Promise.resolve({ data: [] as any[] }),
     ]);
     const profMap: Record<string, any> = {};
