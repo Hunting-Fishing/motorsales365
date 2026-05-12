@@ -49,19 +49,20 @@ function ReferralLanding() {
       if (data.active) recordTouch(code);
 
       // Look up the staff_referral_id, then load active promos.
-      const { data: staff } = await supabase
-        .from("staff_referrals" as any)
+      const sb = supabase as any;
+      const { data: staff } = await sb
+        .from("staff_referrals")
         .select("id")
         .eq("referral_code", code)
         .maybeSingle();
       if (staff?.id) {
         const nowIso = new Date().toISOString();
-        const { data: pr } = await supabase
-          .from("staff_promotions" as any)
+        const { data: pr } = await sb
+          .from("staff_promotions")
           .select("id,title,description,kind,percent_off,flat_amount_php,applies_to,ends_at,terms,starts_at,active")
           .eq("staff_referral_id", staff.id)
           .eq("active", true);
-        const filtered = (pr || []).filter((p: any) =>
+        const filtered = ((pr as any[]) || []).filter((p) =>
           (!p.starts_at || p.starts_at <= nowIso) && (!p.ends_at || p.ends_at >= nowIso),
         );
         setPromos(filtered as Promo[]);

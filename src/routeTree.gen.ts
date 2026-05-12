@@ -31,6 +31,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
+import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as DashboardVerificationRouteImport } from './routes/dashboard.verification'
@@ -168,6 +169,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const SellerIdRoute = SellerIdRouteImport.update({
   id: '/seller/$id',
   path: '/seller/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RCodeRoute = RCodeRouteImport.update({
+  id: '/r/$code',
+  path: '/r/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ListingIdRoute = ListingIdRouteImport.update({
@@ -356,6 +362,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
+  '/r/$code': typeof RCodeRoute
   '/seller/$id': typeof SellerIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -406,6 +413,7 @@ export interface FileRoutesByTo {
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
+  '/r/$code': typeof RCodeRoute
   '/seller/$id': typeof SellerIdRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -459,6 +467,7 @@ export interface FileRoutesById {
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
+  '/r/$code': typeof RCodeRoute
   '/seller/$id': typeof SellerIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -513,6 +522,7 @@ export interface FileRouteTypes {
     | '/dashboard/verification'
     | '/email/unsubscribe'
     | '/listing/$id'
+    | '/r/$code'
     | '/seller/$id'
     | '/admin/'
     | '/dashboard/'
@@ -563,6 +573,7 @@ export interface FileRouteTypes {
     | '/dashboard/verification'
     | '/email/unsubscribe'
     | '/listing/$id'
+    | '/r/$code'
     | '/seller/$id'
     | '/admin'
     | '/dashboard'
@@ -615,6 +626,7 @@ export interface FileRouteTypes {
     | '/dashboard/verification'
     | '/email/unsubscribe'
     | '/listing/$id'
+    | '/r/$code'
     | '/seller/$id'
     | '/admin/'
     | '/dashboard/'
@@ -651,6 +663,7 @@ export interface RootRouteChildren {
   BrowseCategoryRoute: typeof BrowseCategoryRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
+  RCodeRoute: typeof RCodeRoute
   SellerIdRoute: typeof SellerIdRoute
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
@@ -813,6 +826,13 @@ declare module '@tanstack/react-router' {
       path: '/seller/$id'
       fullPath: '/seller/$id'
       preLoaderRoute: typeof SellerIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/r/$code': {
+      id: '/r/$code'
+      path: '/r/$code'
+      fullPath: '/r/$code'
+      preLoaderRoute: typeof RCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/listing/$id': {
@@ -1107,6 +1127,7 @@ const rootRouteChildren: RootRouteChildren = {
   BrowseCategoryRoute: BrowseCategoryRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
+  RCodeRoute: RCodeRoute,
   SellerIdRoute: SellerIdRoute,
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
@@ -1117,12 +1138,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
