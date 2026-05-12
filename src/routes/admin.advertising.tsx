@@ -35,8 +35,11 @@ function AdminAdvertising() {
   const [mineOnly, setMineOnly] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
+  const [audit, setAudit] = useState<any[]>([]);
   const [reply, setReply] = useState("");
   const [notes, setNotes] = useState("");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkStatus, setBulkStatus] = useState<Status>("in_review");
 
   const load = async () => {
     let q = supabase.from("ad_inquiries").select("*").order("created_at", { ascending: false });
@@ -45,12 +48,21 @@ function AdminAdvertising() {
     const { data, error } = await q;
     if (error) { toast.error(error.message); return; }
     setInquiries(data ?? []);
+    setSelected((prev) => {
+      const next = new Set<string>();
+      (data ?? []).forEach((i: any) => { if (prev.has(i.id)) next.add(i.id); });
+      return next;
+    });
   };
 
   const loadThread = async (id: string) => {
     setActiveId(id);
-    const { data } = await supabase.from("ad_inquiry_messages").select("*").eq("inquiry_id", id).order("created_at");
-    setMessages(data ?? []);
+    const [{ data: msgs }, { data: aud }] = await Promise.all([
+      supabase.from("ad_inquiry_messages").select("*").eq("inquiry_id", id).order("created_at"),
+      supabase.from("ad_inquiry_audit").select("*").eq("inquiry_id", id).order("created_at", { ascending: false }).limit(50),
+    ]);
+    setMessages(msgs ?? []);
+    setAudit(aud ?? []);
     const cur = (inquiries.find((i) => i.id === id) ?? {}) as any;
     setNotes(cur.internal_notes ?? "");
   };
@@ -79,6 +91,35 @@ function AdminAdvertising() {
     const { error } = await supabase.from("ad_inquiries").update({ assigned_to: user.id }).eq("id", active.id);
     if (error) return toast.error(error.message);
     toast.success("Assigned to you");
+    load();
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+  const selectAllVisible = () => setSelected(new Set(inquiries.map((i) => i.id)));
+  const clearSelection = () => setSelected(new Set());
+
+  const bulkApplyStatus = async () => {
+    if (selected.size === 0) return;
+    const ids = Array.from(selected);
+    const { error } = await supabase.from("ad_inquiries").update({ status: bulkStatus }).in("id", ids);
+    if (error) return toast.error(error.message);
+    toast.success(`Updated ${ids.length} inquiry(ies) → ${bulkStatus}`);
+    clearSelection();
+    load();
+  };
+  const bulkAssignToMe = async () => {
+    if (selected.size === 0 || !user?.id) return;
+    const ids = Array.from(selected);
+    const { error } = await supabase.from("ad_inquiries").update({ assigned_to: user.id }).in("id", ids);
+    if (error) return toast.error(error.message);
+    toast.success(`Assigned ${ids.length} to you`);
+    clearSelection();
     load();
   };
 
@@ -124,6 +165,22 @@ function AdminAdvertising() {
         </div>
       </div>
 
+      {selected.size > 0 && (
+        <div className="mb-3 flex flex-wrap items-center gap-2 rounded-lg border border-primary/40 bg-primary/5 p-3 text-sm">
+          <span className="font-medium">{selected.size} selected</span>
+          <Select value={bulkStatus} onValueChange={(v) => setBulkStatus(v as Status)}>
+            <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Button size="sm" onClick={bulkApplyStatus}>Apply status</Button>
+          <Button size="sm" variant="outline" onClick={bulkAssignToMe}>Assign to me</Button>
+          <Button size="sm" variant="ghost" onClick={clearSelection}>Clear</Button>
+          <Button size="sm" variant="ghost" onClick={selectAllVisible}>Select all visible</Button>
+        </div>
+      )}
+
       <div className="grid gap-4 lg:grid-cols-[340px_1fr]">
         <div className="space-y-2">
           {inquiries.length === 0 && (
@@ -132,28 +189,36 @@ function AdminAdvertising() {
             </div>
           )}
           {inquiries.map((i) => (
-            <button
+            <div
               key={i.id}
-              onClick={() => loadThread(i.id)}
-              className={`w-full rounded-lg border p-3 text-left transition ${
+              className={`flex gap-2 rounded-lg border p-3 transition ${
                 activeId === i.id ? "border-primary bg-primary/5" : "border-border bg-card hover:bg-secondary/50"
               }`}
             >
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-medium">{i.contact_name}</span>
-                <Badge className={STATUS_TONE[i.status as Status]}>{i.status}</Badge>
-              </div>
-              <div className="text-xs text-muted-foreground">{i.company || i.email}</div>
-              <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">{i.message}</div>
-              <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
-                <span>{formatDate(i.created_at)} · {i.placement}</span>
-                {i.assigned_to && (
-                  <span className={i.assigned_to === user?.id ? "text-primary font-semibold" : ""}>
-                    {i.assigned_to === user?.id ? "You" : "Assigned"}
-                  </span>
-                )}
-              </div>
-            </button>
+              <input
+                type="checkbox"
+                className="mt-1 h-4 w-4 cursor-pointer accent-primary"
+                checked={selected.has(i.id)}
+                onChange={() => toggleSelect(i.id)}
+                aria-label="Select inquiry"
+              />
+              <button onClick={() => loadThread(i.id)} className="flex-1 text-left">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium">{i.contact_name}</span>
+                  <Badge className={STATUS_TONE[i.status as Status]}>{i.status}</Badge>
+                </div>
+                <div className="text-xs text-muted-foreground">{i.company || i.email}</div>
+                <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">{i.message}</div>
+                <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
+                  <span>{formatDate(i.created_at)} · {i.placement}</span>
+                  {i.assigned_to && (
+                    <span className={i.assigned_to === user?.id ? "text-primary font-semibold" : ""}>
+                      {i.assigned_to === user?.id ? "You" : "Assigned"}
+                    </span>
+                  )}
+                </div>
+              </button>
+            </div>
           ))}
         </div>
 
@@ -229,6 +294,26 @@ function AdminAdvertising() {
                 <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Internal notes</h3>
                 <Textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Visible only to staff" />
                 <Button size="sm" variant="outline" className="mt-2" onClick={saveNotes}>Save notes</Button>
+              </div>
+
+              <div>
+                <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Activity log</h3>
+                {audit.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">No activity yet.</p>
+                ) : (
+                  <ul className="space-y-1 rounded-lg border border-border bg-background p-3 text-xs">
+                    {audit.map((a) => (
+                      <li key={a.id} className="flex justify-between gap-2">
+                        <span>
+                          <span className="font-semibold">{a.action.replace(/_/g, " ")}</span>
+                          {a.from_value && <> · <span className="text-muted-foreground">{a.from_value}</span> → </>}
+                          {a.to_value && <span className="text-primary">{a.to_value}</span>}
+                        </span>
+                        <span className="text-muted-foreground">{formatDate(a.created_at)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
           )}

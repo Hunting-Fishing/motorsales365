@@ -6,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { formatDate, formatPHP } from "@/lib/format";
 
 export const Route = createFileRoute("/admin/pricing")({
   component: AdminPricing,
@@ -16,6 +19,8 @@ function AdminPricing() {
   const [plans, setPlans] = useState<any[]>([]);
   const [promos, setPromos] = useState<any[]>([]);
   const [newPromo, setNewPromo] = useState({ code: "", percent_off: 10 });
+  const [subs, setSubs] = useState<any[]>([]);
+  const [subFilter, setSubFilter] = useState<string>("pending");
 
   const load = async () => {
     const [{ data: s }, { data: p }, { data: pr }] = await Promise.all([
@@ -25,7 +30,34 @@ function AdminPricing() {
     ]);
     setSettings(s ?? []); setPlans(p ?? []); setPromos(pr ?? []);
   };
+
+  const loadSubs = async () => {
+    let q = supabase.from("subscriptions").select("*").order("created_at", { ascending: false }).limit(100);
+    if (subFilter !== "all") q = q.eq("status", subFilter);
+    const { data: rows, error } = await q;
+    if (error) { toast.error(error.message); return; }
+    const list = rows ?? [];
+    const userIds = Array.from(new Set(list.map((r: any) => r.user_id)));
+    const planIds = Array.from(new Set(list.map((r: any) => r.plan_id)));
+    const [{ data: profs }, { data: pls }] = await Promise.all([
+      userIds.length ? supabase.from("profiles").select("id, full_name").in("id", userIds) : Promise.resolve({ data: [] as any[] }),
+      planIds.length ? supabase.from("subscription_plans").select("id, name, price_php").in("id", planIds) : Promise.resolve({ data: [] as any[] }),
+    ]);
+    const profMap: Record<string, any> = {};
+    (profs ?? []).forEach((p: any) => { profMap[p.id] = p; });
+    const planMap: Record<string, any> = {};
+    (pls ?? []).forEach((p: any) => { planMap[p.id] = p; });
+    setSubs(list.map((r: any) => ({ ...r, profiles: profMap[r.user_id], subscription_plans: planMap[r.plan_id] })));
+  };
+
   useEffect(() => { load(); }, []);
+  useEffect(() => { loadSubs(); /* eslint-disable-next-line */ }, [subFilter]);
+
+  const updateSub = async (id: string, patch: any) => {
+    const { error } = await supabase.from("subscriptions").update(patch).eq("id", id);
+    if (error) toast.error(error.message);
+    else { toast.success("Subscription updated"); loadSubs(); }
+  };
 
   const saveSetting = async (key: string, value: number) => {
     const { error } = await supabase.from("pricing_settings").update({ value }).eq("key", key);
@@ -123,6 +155,70 @@ function AdminPricing() {
           ))}
           {promos.length === 0 && <div className="text-sm text-muted-foreground">No promo codes yet.</div>}
         </div>
+      </section>
+
+      <section className="rounded-xl border border-border bg-card p-6">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-display text-lg font-semibold">Subscription requests</h2>
+          <Select value={subFilter} onValueChange={setSubFilter}>
+            <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="paused">Paused</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        {subs.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+            No subscriptions in this state.
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {subs.map((s: any) => {
+              const plan = s.subscription_plans;
+              const prof = s.profiles;
+              return (
+                <div key={s.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border p-3 text-sm">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold">{prof?.full_name || s.user_id.slice(0, 8)}</span>
+                      <Badge variant="outline" className="uppercase">{s.status}</Badge>
+                      {s.complimentary && <Badge variant="secondary">comp</Badge>}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {plan?.name ?? "Plan"} · {plan ? formatPHP(plan.price_php) + "/mo" : ""} · requested {formatDate(s.created_at)}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {s.status === "pending" && (
+                      <Button size="sm" onClick={() => updateSub(s.id, { status: "active", current_period_end: new Date(Date.now() + 31 * 86400000).toISOString() })}>
+                        Approve
+                      </Button>
+                    )}
+                    {s.status === "active" && (
+                      <Button size="sm" variant="outline" onClick={() => updateSub(s.id, { status: "paused", paused_at: new Date().toISOString() })}>
+                        Pause
+                      </Button>
+                    )}
+                    {s.status === "paused" && (
+                      <Button size="sm" onClick={() => updateSub(s.id, { status: "active", paused_at: null })}>
+                        Resume
+                      </Button>
+                    )}
+                    {s.status !== "cancelled" && (
+                      <Button size="sm" variant="ghost" onClick={() => updateSub(s.id, { status: "cancelled" })}>
+                        Cancel
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </section>
     </div>
   );
