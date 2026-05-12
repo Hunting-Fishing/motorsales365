@@ -39,6 +39,10 @@ interface AuthContextValue {
   loading: boolean;
   isAdmin: boolean;
   isSales: boolean;
+  isModerator: boolean;
+  isSupport: boolean;
+  isAdvertising: boolean;
+  isStaff: boolean;
   signOut: () => Promise<void>;
 }
 
@@ -48,20 +52,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(false);
-
-  const [isSales, setIsSales] = useState(false);
+  const [roles, setRoles] = useState<string[]>([]);
 
   useEffect(() => {
     const loadRoles = async (uid: string) => {
       const { data } = await supabase
         .from("user_roles")
         .select("role")
-        .eq("user_id", uid)
-        .in("role", ["admin", "sales"]);
-      const roles = (data ?? []).map((r: any) => r.role);
-      setIsAdmin(roles.includes("admin"));
-      setIsSales(roles.includes("sales"));
+        .eq("user_id", uid);
+      setRoles((data ?? []).map((r: any) => r.role));
     };
 
     // Listener FIRST
@@ -75,8 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           maybeSendWelcomeEmail(u);
         }, 0);
       } else {
-        setIsAdmin(false);
-        setIsSales(false);
+        setRoles([]);
       }
     });
 
@@ -97,8 +95,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
   };
 
+  const isAdmin = roles.includes("admin");
+  const isSales = roles.includes("sales");
+  const isModerator = roles.includes("moderator");
+  const isSupport = roles.includes("support");
+  const isAdvertising = roles.includes("advertising");
+  const isStaff = isAdmin || isSales || isModerator || isSupport || isAdvertising;
+
   return (
-    <AuthContext.Provider value={{ user, session, loading, isAdmin, isSales, signOut }}>
+    <AuthContext.Provider
+      value={{ user, session, loading, isAdmin, isSales, isModerator, isSupport, isAdvertising, isStaff, signOut }}
+    >
       {children}
     </AuthContext.Provider>
   );
