@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, Copy, QrCode, Tag, Plus, Trash2 } from "lucide-react";
+import { Download, Copy, QrCode, Tag, Plus, Trash2, Users, MousePointerClick, UserPlus, Percent } from "lucide-react";
 
 export const Route = createFileRoute("/admin/referrals")({
   component: AdminReferrals,
