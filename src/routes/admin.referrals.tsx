@@ -10,7 +10,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Download, Copy, QrCode, Tag, Plus, Trash2, Users, MousePointerClick, UserPlus, Percent } from "lucide-react";
+import {
+  Download, Copy, QrCode, Tag, Plus, Trash2, Users, MousePointerClick,
+  UserPlus, Percent, Pencil, Printer, FileSpreadsheet, Calendar,
+} from "lucide-react";
 
 export const Route = createFileRoute("/admin/referrals")({
   component: AdminReferrals,
@@ -52,59 +55,103 @@ const PUBLIC_BASE =
 
 const sb = supabase as any;
 
+type RangeKey = "7" | "30" | "90" | "all";
+const RANGE_LABELS: Record<RangeKey, string> = { "7": "7 days", "30": "30 days", "90": "90 days", all: "All time" };
+
+function sinceFor(range: RangeKey): string | null {
+  if (range === "all") return null;
+  const d = new Date();
+  d.setDate(d.getDate() - Number(range));
+  return d.toISOString();
+}
+
 function AdminReferrals() {
   const [rows, setRows] = useState<StaffRow[]>([]);
-  const [stats, setStats] = useState<Record<string, { scans: number; signups: number; visitors: number }>>({});
+  const [stats, setStats] = useState<Record<string, { scans: number; signups: number; visitors: number; listings: number }>>({});
   const [loading, setLoading] = useState(true);
+  const [range, setRange] = useState<RangeKey>("30");
   const [newOpen, setNewOpen] = useState(false);
   const [editing, setEditing] = useState<StaffRow | null>(null);
   const [promosFor, setPromosFor] = useState<StaffRow | null>(null);
 
-  const load = async () => {
+  const load = async (rangeKey: RangeKey = range) => {
     setLoading(true);
     const { data, error } = await sb
       .from("staff_referrals")
       .select("*")
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
-    setRows((data as StaffRow[]) || []);
+    const staffRows = (data as StaffRow[]) || [];
+    setRows(staffRows);
 
-    // aggregate stats
-    const { data: scans } = await sb.from("qr_scans").select("referral_code,visitor_id");
-    const { data: signups } = await sb.from("user_referrals").select("referred_by_staff_id");
-    const s: Record<string, { scans: number; signups: number; visitors: number }> = {};
-    (data as StaffRow[] | null)?.forEach((r) => (s[r.id] = { scans: 0, signups: 0, visitors: 0 }));
+    const since = sinceFor(rangeKey);
+
+    let scansQ = sb.from("qr_scans").select("referral_code,visitor_id,scanned_at");
+    if (since) scansQ = scansQ.gte("scanned_at", since);
+    const { data: scans } = await scansQ;
+
+    let signupsQ = sb.from("user_referrals").select("referred_by_staff_id,user_id,signup_date");
+    if (since) signupsQ = signupsQ.gte("signup_date", since);
+    const { data: signups } = await signupsQ;
+
+    // Listings created by referred users (any time). We map listings -> staff via user_referrals.
+    const referredUserIds = ((signups as any[] | null) || []).map((s) => s.user_id).filter(Boolean);
+    let listingsByUser: Record<string, number> = {};
+    if (referredUserIds.length > 0) {
+      const { data: ls } = await sb
+        .from("listings")
+        .select("user_id")
+        .in("user_id", referredUserIds);
+      ((ls as any[] | null) || []).forEach((l) => {
+        listingsByUser[l.user_id] = (listingsByUser[l.user_id] || 0) + 1;
+      });
+    }
+
+    const s: Record<string, { scans: number; signups: number; visitors: number; listings: number }> = {};
+    staffRows.forEach((r) => (s[r.id] = { scans: 0, signups: 0, visitors: 0, listings: 0 }));
     const visitorSet: Record<string, Set<string>> = {};
-    (scans as any[] | null)?.forEach((x) => {
-      const row = (data as StaffRow[] | null)?.find((r) => r.referral_code === x.referral_code);
+    ((scans as any[] | null) || []).forEach((x) => {
+      const row = staffRows.find((r) => r.referral_code === x.referral_code);
       if (!row) return;
       s[row.id].scans++;
       visitorSet[row.id] ||= new Set();
       if (x.visitor_id) visitorSet[row.id].add(x.visitor_id);
     });
     Object.keys(visitorSet).forEach((k) => (s[k].visitors = visitorSet[k].size));
-    (signups as any[] | null)?.forEach((x) => {
-      if (x.referred_by_staff_id && s[x.referred_by_staff_id]) s[x.referred_by_staff_id].signups++;
+    ((signups as any[] | null) || []).forEach((x) => {
+      if (!x.referred_by_staff_id || !s[x.referred_by_staff_id]) return;
+      s[x.referred_by_staff_id].signups++;
+      s[x.referred_by_staff_id].listings += listingsByUser[x.user_id] || 0;
     });
     setStats(s);
     setLoading(false);
   };
 
   useEffect(() => {
-    load();
-  }, []);
+    load(range);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [range]);
 
-  const generateQrFor = async (row: StaffRow) => {
+  const generateQrFor = async (row: StaffRow, oldCode?: string) => {
     const url = `${PUBLIC_BASE}/r/${row.referral_code}`;
     const dataUrl = await QRCode.toDataURL(url, { width: 600, margin: 2 });
     const blob = await (await fetch(dataUrl)).blob();
-    const path = `${row.referral_code}.png`;
+    // Key storage path by staff id so referral_code renames don't orphan PNGs.
+    const path = `${row.id}.png`;
     const { error: upErr } = await supabase.storage
       .from("qr-codes")
       .upload(path, blob, { contentType: "image/png", upsert: true });
     if (upErr) {
       toast.error("Could not upload QR: " + upErr.message);
       return null;
+    }
+    // Clean up legacy code-keyed object if it exists.
+    const legacyPaths = [
+      oldCode ? `${oldCode}.png` : null,
+      row.qr_storage_path && row.qr_storage_path !== path ? row.qr_storage_path : null,
+    ].filter(Boolean) as string[];
+    if (legacyPaths.length > 0) {
+      await supabase.storage.from("qr-codes").remove(legacyPaths).catch(() => {});
     }
     await sb.from("staff_referrals").update({ qr_storage_path: path }).eq("id", row.id);
     return path;
@@ -143,7 +190,7 @@ function AdminReferrals() {
     load();
   };
 
-  const handleUpdate = async (row: StaffRow) => {
+  const handleUpdate = async (row: StaffRow, oldCode?: string) => {
     const { error } = await sb
       .from("staff_referrals")
       .update({
@@ -159,7 +206,7 @@ function AdminReferrals() {
       toast.error(error.message);
       return;
     }
-    await generateQrFor(row);
+    await generateQrFor(row, oldCode);
     toast.success("Saved");
     setEditing(null);
     load();
@@ -167,6 +214,9 @@ function AdminReferrals() {
 
   const handleDelete = async (row: StaffRow) => {
     if (!confirm(`Delete ${row.full_name}'s referral?`)) return;
+    if (row.qr_storage_path) {
+      await supabase.storage.from("qr-codes").remove([row.qr_storage_path]).catch(() => {});
+    }
     const { error } = await sb.from("staff_referrals").delete().eq("id", row.id);
     if (error) toast.error(error.message);
     else load();
@@ -175,37 +225,80 @@ function AdminReferrals() {
   const totals = useMemo(() => {
     const codes = rows.length;
     const active = rows.filter((r) => r.active).length;
-    let scans = 0;
-    let visitors = 0;
-    let signups = 0;
+    let scans = 0, visitors = 0, signups = 0, listings = 0;
     Object.values(stats).forEach((s) => {
-      scans += s.scans;
-      visitors += s.visitors;
-      signups += s.signups;
+      scans += s.scans; visitors += s.visitors; signups += s.signups; listings += s.listings;
     });
     const conversion = visitors > 0 ? Math.round((signups / visitors) * 1000) / 10 : 0;
-    return { codes, active, scans, visitors, signups, conversion };
+    return { codes, active, scans, visitors, signups, listings, conversion };
   }, [rows, stats]);
 
   const topPerformers = useMemo(() => {
     return rows
-      .map((r) => ({ row: r, s: stats[r.id] || { scans: 0, signups: 0, visitors: 0 } }))
+      .map((r) => ({ row: r, s: stats[r.id] || { scans: 0, signups: 0, visitors: 0, listings: 0 } }))
       .sort((a, b) => b.s.visitors - a.s.visitors)
       .slice(0, 5);
   }, [rows, stats]);
 
+  const exportCsv = () => {
+    const header = ["full_name", "email", "code", "active", "scans", "visitors", "signups", "listings", "conversion_pct", "url"];
+    const lines = [header.join(",")];
+    rows.forEach((r) => {
+      const s = stats[r.id] || { scans: 0, signups: 0, visitors: 0, listings: 0 };
+      const conv = s.visitors > 0 ? Math.round((s.signups / s.visitors) * 1000) / 10 : 0;
+      const row = [
+        JSON.stringify(r.full_name),
+        JSON.stringify(r.email),
+        r.referral_code,
+        r.active ? "yes" : "no",
+        s.scans,
+        s.visitors,
+        s.signups,
+        s.listings,
+        conv,
+        `${PUBLIC_BASE}/r/${r.referral_code}`,
+      ];
+      lines.push(row.join(","));
+    });
+    const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `staff-referrals-${range}d-${new Date().toISOString().slice(0, 10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between">
+      <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-bold">Staff QR Referrals</h1>
           <p className="text-sm text-muted-foreground">
             Personal referral codes, QR posters, and offers per staff member.
           </p>
         </div>
-        <Button onClick={() => setNewOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" /> New staff QR
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2 rounded-md border border-border bg-card px-2 py-1">
+            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <Select value={range} onValueChange={(v) => setRange(v as RangeKey)}>
+              <SelectTrigger className="h-7 w-[120px] border-0 bg-transparent p-0 text-sm focus:ring-0">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {(Object.keys(RANGE_LABELS) as RangeKey[]).map((k) => (
+                  <SelectItem key={k} value={k}>{RANGE_LABELS[k]}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Button variant="outline" onClick={exportCsv} disabled={rows.length === 0}>
+            <FileSpreadsheet className="mr-2 h-4 w-4" /> Export CSV
+          </Button>
+          <Button onClick={() => setNewOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" /> New staff QR
+          </Button>
+        </div>
       </header>
 
       <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -219,13 +312,13 @@ function AdminReferrals() {
           icon={<MousePointerClick className="h-4 w-4" />}
           label="Unique visitors"
           value={totals.visitors.toLocaleString()}
-          hint={`${totals.scans.toLocaleString()} total scans (dedup applied)`}
+          hint={`${totals.scans.toLocaleString()} scans in ${RANGE_LABELS[range].toLowerCase()}`}
         />
         <KpiCard
           icon={<UserPlus className="h-4 w-4" />}
           label="Credited signups"
           value={totals.signups.toLocaleString()}
-          hint="First-touch attribution within 90 days"
+          hint={`${totals.listings.toLocaleString()} listings by referred users`}
         />
         <KpiCard
           icon={<Percent className="h-4 w-4" />}
@@ -237,7 +330,7 @@ function AdminReferrals() {
 
       {topPerformers.length > 0 && totals.visitors > 0 && (
         <section className="rounded-xl border border-border bg-card p-4">
-          <h2 className="mb-3 text-sm font-semibold">Top performers</h2>
+          <h2 className="mb-3 text-sm font-semibold">Top performers ({RANGE_LABELS[range].toLowerCase()})</h2>
           <ul className="space-y-2">
             {topPerformers.map(({ row, s }) => {
               const max = topPerformers[0].s.visitors || 1;
@@ -249,12 +342,9 @@ function AdminReferrals() {
                     {row.referral_code}
                   </div>
                   <div className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full rounded-full bg-primary transition-all"
-                      style={{ width: `${pct}%` }}
-                    />
+                    <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${pct}%` }} />
                   </div>
-                  <div className="w-32 shrink-0 text-right text-xs text-muted-foreground">
+                  <div className="w-40 shrink-0 text-right text-xs text-muted-foreground">
                     {s.visitors} visitors · {s.signups} signups
                   </div>
                 </li>
@@ -264,7 +354,7 @@ function AdminReferrals() {
         </section>
       )}
 
-      <div className="rounded-xl border border-border bg-card">
+      <div className="rounded-xl border border-border bg-card overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-muted/40">
             <tr className="text-left">
@@ -273,20 +363,22 @@ function AdminReferrals() {
               <th className="px-4 py-2">Scans</th>
               <th className="px-4 py-2">Visitors</th>
               <th className="px-4 py-2">Signups</th>
+              <th className="px-4 py-2">Listings</th>
               <th className="px-4 py-2">Status</th>
               <th className="px-4 py-2 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={7} className="p-6 text-center text-muted-foreground">Loading…</td></tr>
+              <tr><td colSpan={8} className="p-6 text-center text-muted-foreground">Loading…</td></tr>
             ) : rows.length === 0 ? (
-              <tr><td colSpan={7} className="p-6 text-center text-muted-foreground">No staff referrals yet.</td></tr>
+              <tr><td colSpan={8} className="p-6 text-center text-muted-foreground">No staff referrals yet.</td></tr>
             ) : (
               rows.map((r) => {
-                const s = stats[r.id] || { scans: 0, signups: 0, visitors: 0 };
+                const s = stats[r.id] || { scans: 0, signups: 0, visitors: 0, listings: 0 };
                 const qr = publicQrUrl(r.qr_storage_path);
                 const link = `${PUBLIC_BASE}/r/${r.referral_code}`;
+                const posterUrl = `${PUBLIC_BASE}/r/${r.referral_code}/poster`;
                 return (
                   <tr key={r.id} className="border-b border-border last:border-0">
                     <td className="px-4 py-3">
@@ -297,6 +389,7 @@ function AdminReferrals() {
                     <td className="px-4 py-3">{s.scans}</td>
                     <td className="px-4 py-3">{s.visitors}</td>
                     <td className="px-4 py-3">{s.signups}</td>
+                    <td className="px-4 py-3">{s.listings}</td>
                     <td className="px-4 py-3">
                       <span className={`rounded-full px-2 py-0.5 text-xs ${r.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
                         {r.active ? "Active" : "Inactive"}
@@ -313,11 +406,14 @@ function AdminReferrals() {
                             <Button size="sm" variant="ghost"><Download className="h-4 w-4" /></Button>
                           </a>
                         )}
+                        <a href={posterUrl} target="_blank" rel="noreferrer" title="Print poster">
+                          <Button size="sm" variant="ghost"><Printer className="h-4 w-4" /></Button>
+                        </a>
                         <Button size="sm" variant="ghost" title="Promotions" onClick={() => setPromosFor(r)}>
                           <Tag className="h-4 w-4" />
                         </Button>
                         <Button size="sm" variant="ghost" title="Edit" onClick={() => setEditing(r)}>
-                          <QrCode className="h-4 w-4" />
+                          <Pencil className="h-4 w-4" />
                         </Button>
                         <Button size="sm" variant="ghost" title="Delete" onClick={() => handleDelete(r)}>
                           <Trash2 className="h-4 w-4" />
@@ -337,7 +433,7 @@ function AdminReferrals() {
         <StaffDialog
           initial={editing}
           onClose={() => setEditing(null)}
-          onSubmit={(v) => handleUpdate({ ...editing, ...v })}
+          onSubmit={(v) => handleUpdate({ ...editing, ...v }, editing.referral_code)}
         />
       )}
       {promosFor && <PromoDialog staff={promosFor} onClose={() => setPromosFor(null)} />}
@@ -398,12 +494,15 @@ function StaffDialog({
   );
 }
 
+const EMPTY_PROMO: Partial<Promo> = {
+  title: "", description: "", kind: "promo", applies_to: "any", active: true,
+  percent_off: null, flat_amount_php: null, starts_at: null, ends_at: null, terms: "",
+};
+
 function PromoDialog({ staff, onClose }: { staff: StaffRow; onClose: () => void }) {
   const [promos, setPromos] = useState<Promo[]>([]);
-  const [creating, setCreating] = useState(false);
-  const [form, setForm] = useState<Partial<Promo>>({
-    title: "", description: "", kind: "promo", applies_to: "any", active: true,
-  });
+  const [editingId, setEditingId] = useState<string | "new" | null>(null);
+  const [form, setForm] = useState<Partial<Promo>>(EMPTY_PROMO);
 
   const load = async () => {
     const { data } = await sb.from("staff_promotions").select("*")
@@ -412,23 +511,43 @@ function PromoDialog({ staff, onClose }: { staff: StaffRow; onClose: () => void 
   };
   useEffect(() => { load(); }, [staff.id]);
 
+  const startEdit = (p: Promo) => {
+    setEditingId(p.id);
+    setForm({ ...p });
+  };
+  const startCreate = () => {
+    setEditingId("new");
+    setForm(EMPTY_PROMO);
+  };
+  const cancelEdit = () => {
+    setEditingId(null);
+    setForm(EMPTY_PROMO);
+  };
+
   const submit = async () => {
-    const { error } = await sb.from("staff_promotions").insert({
-      staff_referral_id: staff.id,
-      title: form.title,
+    const payload = {
+      title: form.title!,
       description: form.description || null,
-      kind: form.kind,
+      kind: form.kind || "promo",
       percent_off: form.percent_off || null,
       flat_amount_php: form.flat_amount_php || null,
       applies_to: form.applies_to || "any",
       starts_at: form.starts_at || null,
       ends_at: form.ends_at || null,
       terms: form.terms || null,
-      active: true,
-    });
-    if (error) { toast.error(error.message); return; }
-    setCreating(false);
-    setForm({ title: "", description: "", kind: "promo", applies_to: "any", active: true });
+    };
+    if (editingId === "new") {
+      const { error } = await sb.from("staff_promotions").insert({
+        staff_referral_id: staff.id, active: true, ...payload,
+      });
+      if (error) { toast.error(error.message); return; }
+      toast.success("Promotion added");
+    } else if (editingId) {
+      const { error } = await sb.from("staff_promotions").update(payload).eq("id", editingId);
+      if (error) { toast.error(error.message); return; }
+      toast.success("Promotion saved");
+    }
+    cancelEdit();
     load();
   };
 
@@ -444,20 +563,32 @@ function PromoDialog({ staff, onClose }: { staff: StaffRow; onClose: () => void 
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader><DialogTitle>Promotions for {staff.full_name}</DialogTitle></DialogHeader>
         <div className="space-y-3">
-          {promos.length === 0 && !creating && <p className="text-sm text-muted-foreground">No offers attached yet.</p>}
-          {promos.map((p) => (
+          {promos.length === 0 && editingId !== "new" && (
+            <p className="text-sm text-muted-foreground">No offers attached yet.</p>
+          )}
+          {promos.map((p) => editingId === p.id ? (
+            <PromoForm key={p.id} form={form} setForm={setForm} onCancel={cancelEdit} onSubmit={submit} submitLabel="Save" />
+          ) : (
             <div key={p.id} className="rounded-md border p-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="font-medium">{p.title} <span className="ml-1 rounded bg-secondary px-1.5 py-0.5 text-xs">{p.kind}</span></div>
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="font-medium">
+                    {p.title}
+                    <span className="ml-2 rounded bg-secondary px-1.5 py-0.5 text-xs uppercase">{p.kind}</span>
+                    {!p.active && <span className="ml-2 rounded bg-muted px-1.5 py-0.5 text-xs">paused</span>}
+                  </div>
                   <p className="text-xs text-muted-foreground">
-                    {p.percent_off ? `${p.percent_off}% off · ` : ""}{p.flat_amount_php ? `₱${p.flat_amount_php} · ` : ""}applies to {p.applies_to}
+                    {p.percent_off ? `${p.percent_off}% off · ` : ""}
+                    {p.flat_amount_php ? `₱${p.flat_amount_php} · ` : ""}
+                    applies to {p.applies_to}
+                    {p.ends_at ? ` · ends ${new Date(p.ends_at).toLocaleDateString()}` : ""}
                   </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex shrink-0 gap-1">
+                  <Button size="sm" variant="ghost" title="Edit" onClick={() => startEdit(p)}><Pencil className="h-4 w-4" /></Button>
                   <Button size="sm" variant="outline" onClick={() => toggle(p)}>{p.active ? "Pause" : "Resume"}</Button>
                   <Button size="sm" variant="ghost" onClick={() => del(p)}><Trash2 className="h-4 w-4" /></Button>
                 </div>
@@ -465,54 +596,68 @@ function PromoDialog({ staff, onClose }: { staff: StaffRow; onClose: () => void 
             </div>
           ))}
 
-          {creating ? (
-            <div className="rounded-md border p-3 space-y-3">
-              <div><Label>Title</Label><Input value={form.title || ""} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
-              <div><Label>Description</Label><Textarea value={form.description || ""} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label>Kind</Label>
-                  <Select value={form.kind} onValueChange={(v) => setForm({ ...form, kind: v })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="promo">Promo</SelectItem>
-                      <SelectItem value="deal">Deal</SelectItem>
-                      <SelectItem value="rate">Rate</SelectItem>
-                      <SelectItem value="incentive">Incentive</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Applies to</Label>
-                  <Select value={form.applies_to} onValueChange={(v) => setForm({ ...form, applies_to: v })}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="any">Any</SelectItem>
-                      <SelectItem value="listing_fee">Listing fee</SelectItem>
-                      <SelectItem value="subscription">Subscription</SelectItem>
-                      <SelectItem value="tow">Tow</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div><Label>% off</Label><Input type="number" value={form.percent_off ?? ""} onChange={(e) => setForm({ ...form, percent_off: e.target.value ? Number(e.target.value) : null })} /></div>
-                <div><Label>Flat ₱</Label><Input type="number" value={form.flat_amount_php ?? ""} onChange={(e) => setForm({ ...form, flat_amount_php: e.target.value ? Number(e.target.value) : null })} /></div>
-                <div><Label>Starts</Label><Input type="date" value={form.starts_at?.slice(0, 10) || ""} onChange={(e) => setForm({ ...form, starts_at: e.target.value || null })} /></div>
-                <div><Label>Ends</Label><Input type="date" value={form.ends_at?.slice(0, 10) || ""} onChange={(e) => setForm({ ...form, ends_at: e.target.value || null })} /></div>
-              </div>
-              <div><Label>Terms</Label><Textarea value={form.terms || ""} onChange={(e) => setForm({ ...form, terms: e.target.value })} /></div>
-              <div className="flex justify-end gap-2">
-                <Button variant="outline" onClick={() => setCreating(false)}>Cancel</Button>
-                <Button onClick={submit} disabled={!form.title}>Add</Button>
-              </div>
-            </div>
-          ) : (
-            <Button variant="outline" onClick={() => setCreating(true)}><Plus className="mr-2 h-4 w-4" /> Add promotion</Button>
-          )}
+          {editingId === "new" ? (
+            <PromoForm form={form} setForm={setForm} onCancel={cancelEdit} onSubmit={submit} submitLabel="Add" />
+          ) : editingId === null ? (
+            <Button variant="outline" onClick={startCreate}><Plus className="mr-2 h-4 w-4" /> Add promotion</Button>
+          ) : null}
         </div>
         <DialogFooter><Button onClick={onClose}>Done</Button></DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function PromoForm({
+  form, setForm, onCancel, onSubmit, submitLabel,
+}: {
+  form: Partial<Promo>;
+  setForm: (f: Partial<Promo>) => void;
+  onCancel: () => void;
+  onSubmit: () => void;
+  submitLabel: string;
+}) {
+  return (
+    <div className="rounded-md border p-3 space-y-3 bg-muted/20">
+      <div><Label>Title</Label><Input value={form.title || ""} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
+      <div><Label>Description</Label><Textarea value={form.description || ""} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <Label>Kind</Label>
+          <Select value={form.kind || "promo"} onValueChange={(v) => setForm({ ...form, kind: v })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="promo">Promo</SelectItem>
+              <SelectItem value="deal">Deal</SelectItem>
+              <SelectItem value="rate">Rate</SelectItem>
+              <SelectItem value="incentive">Incentive</SelectItem>
+              <SelectItem value="other">Other</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label>Applies to</Label>
+          <Select value={form.applies_to || "any"} onValueChange={(v) => setForm({ ...form, applies_to: v })}>
+            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="any">Any</SelectItem>
+              <SelectItem value="listing_fee">Listing fee</SelectItem>
+              <SelectItem value="subscription">Subscription</SelectItem>
+              <SelectItem value="tow">Tow</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div><Label>% off</Label><Input type="number" value={form.percent_off ?? ""} onChange={(e) => setForm({ ...form, percent_off: e.target.value ? Number(e.target.value) : null })} /></div>
+        <div><Label>Flat ₱</Label><Input type="number" value={form.flat_amount_php ?? ""} onChange={(e) => setForm({ ...form, flat_amount_php: e.target.value ? Number(e.target.value) : null })} /></div>
+        <div><Label>Starts</Label><Input type="date" value={form.starts_at?.slice(0, 10) || ""} onChange={(e) => setForm({ ...form, starts_at: e.target.value || null })} /></div>
+        <div><Label>Ends</Label><Input type="date" value={form.ends_at?.slice(0, 10) || ""} onChange={(e) => setForm({ ...form, ends_at: e.target.value || null })} /></div>
+      </div>
+      <div><Label>Terms</Label><Textarea value={form.terms || ""} onChange={(e) => setForm({ ...form, terms: e.target.value })} /></div>
+      <div className="flex justify-end gap-2">
+        <Button variant="outline" onClick={onCancel}>Cancel</Button>
+        <Button onClick={onSubmit} disabled={!form.title}>{submitLabel}</Button>
+      </div>
+    </div>
   );
 }
 
