@@ -92,8 +92,20 @@ function AdminReferrals() {
   const [promosFor, setPromosFor] = useState<StaffRow | null>(null);
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState<"name" | "email" | "code" | "status" | "scans" | "visitors" | "signups" | "listings">("name");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
   const [audit, setAudit] = useState<AuditEntry[]>([]);
   const [showAudit, setShowAudit] = useState(false);
+  const [auditAction, setAuditAction] = useState<string>("all");
+  const [auditActor, setAuditActor] = useState<string>("all");
+  const [auditFrom, setAuditFrom] = useState<string>("");
+  const [auditTo, setAuditTo] = useState<string>("");
+  const [confirmToggle, setConfirmToggle] = useState<StaffRow | null>(null);
+  const [confirmReason, setConfirmReason] = useState("");
+  const [confirmBusy, setConfirmBusy] = useState(false);
 
   const load = async (rangeKey: RangeKey = range) => {
     setLoading(true);
