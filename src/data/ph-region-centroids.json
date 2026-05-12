@@ -1,0 +1,20 @@
+{
+  "NCR — National Capital Region": { "lat": 14.5995, "lng": 120.9842, "zoom": 11 },
+  "CAR — Cordillera Administrative Region": { "lat": 17.35, "lng": 121.17, "zoom": 8 },
+  "Region I — Ilocos Region": { "lat": 16.62, "lng": 120.32, "zoom": 8 },
+  "Region II — Cagayan Valley": { "lat": 17.0, "lng": 121.74, "zoom": 8 },
+  "Region III — Central Luzon": { "lat": 15.48, "lng": 120.71, "zoom": 8 },
+  "Region IV-A — CALABARZON": { "lat": 14.16, "lng": 121.25, "zoom": 8 },
+  "MIMAROPA Region": { "lat": 12.4, "lng": 121.0, "zoom": 7 },
+  "Region V — Bicol Region": { "lat": 13.42, "lng": 123.41, "zoom": 8 },
+  "Region VI — Western Visayas": { "lat": 11.0, "lng": 122.55, "zoom": 8 },
+  "NIR — Negros Island Region": { "lat": 10.0, "lng": 123.0, "zoom": 8 },
+  "Region VII — Central Visayas": { "lat": 10.31, "lng": 123.89, "zoom": 8 },
+  "Region VIII — Eastern Visayas": { "lat": 11.5, "lng": 124.9, "zoom": 8 },
+  "Region IX — Zamboanga Peninsula": { "lat": 8.15, "lng": 123.26, "zoom": 8 },
+  "Region X — Northern Mindanao": { "lat": 8.48, "lng": 124.65, "zoom": 8 },
+  "Region XI — Davao Region": { "lat": 7.07, "lng": 125.61, "zoom": 8 },
+  "Region XII — SOCCSKSARGEN": { "lat": 6.5, "lng": 124.85, "zoom": 8 },
+  "Region XIII — Caraga": { "lat": 9.05, "lng": 125.5, "zoom": 8 },
+  "BARMM — Bangsamoro Autonomous Region in Muslim Mindanao": { "lat": 7.22, "lng": 124.25, "zoom": 8 }
+}
