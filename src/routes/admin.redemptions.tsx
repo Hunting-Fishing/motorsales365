@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Download, Ticket, Percent, Coins, Users } from "lucide-react";
 import { formatPHP } from "@/lib/format";
+import { useCurrency } from "@/lib/currency";
 import {
   Bar,
   BarChart,
@@ -54,6 +55,18 @@ function isoDaysAgo(n: number) {
 }
 
 function AdminRedemptions() {
+  const { code: globalCode, current: globalCur, format: fmtCur, convert: convCur } = useCurrency();
+  const [displayCode, setDisplayCode] = useState<string>("PHP");
+  useEffect(() => {
+    // default to the user's global currency on first load
+    if (globalCode && globalCode !== "PHP") setDisplayCode(globalCode);
+  }, [globalCode]);
+  const isPhp = displayCode === "PHP";
+  const fmtMoney = (n: number) => (isPhp ? formatPHP(n) : fmtCur(n, displayCode));
+  const tickMoney = (n: number) =>
+    isPhp
+      ? `₱${Number(n).toLocaleString()}`
+      : `${globalCur.symbol}${Math.round(convCur(Number(n), displayCode)).toLocaleString()}`;
   const [rows, setRows] = useState<Row[]>([]);
   const [staffMap, setStaffMap] = useState<Record<string, Staff>>({});
   const [promoMap, setPromoMap] = useState<Record<string, Promo>>({});
@@ -228,13 +241,29 @@ function AdminRedemptions() {
       </section>
 
       <section className="rounded-xl border border-border bg-card p-4">
-        <div className="mb-3 flex items-center justify-between">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-display text-sm font-semibold uppercase tracking-wider">
             Breakdown by kind
           </h2>
-          <span className="text-xs text-muted-foreground">
-            Counts (bars) and total discount (₱) for current filters
-          </span>
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-muted-foreground">Discount in</span>
+            <div className="inline-flex overflow-hidden rounded-md border border-border">
+              <button
+                type="button"
+                onClick={() => setDisplayCode("PHP")}
+                className={`px-2 py-1 font-mono ${isPhp ? "bg-primary text-primary-foreground" : "hover:bg-secondary"}`}
+              >
+                PHP
+              </button>
+              <button
+                type="button"
+                onClick={() => setDisplayCode(globalCode === "PHP" ? "USD" : globalCode)}
+                className={`px-2 py-1 font-mono ${!isPhp ? "bg-primary text-primary-foreground" : "hover:bg-secondary"}`}
+              >
+                {globalCode === "PHP" ? "USD" : globalCode}
+              </button>
+            </div>
+          </div>
         </div>
         {byKindChart.length === 0 ? (
           <div className="py-10 text-center text-sm text-muted-foreground">
@@ -257,7 +286,7 @@ function AdminRedemptions() {
                   orientation="right"
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={12}
-                  tickFormatter={(v) => `₱${Number(v).toLocaleString()}`}
+                  tickFormatter={(v) => tickMoney(Number(v))}
                 />
                 <Tooltip
                   contentStyle={{
@@ -268,7 +297,7 @@ function AdminRedemptions() {
                   }}
                   formatter={(value: any, name: any) =>
                     name === "discount"
-                      ? [formatPHP(Number(value)), "Discount"]
+                      ? [fmtMoney(Number(value)), "Discount"]
                       : [Number(value).toLocaleString(), "Redemptions"]
                   }
                 />
@@ -303,7 +332,7 @@ function AdminRedemptions() {
                         {share.toFixed(1)}%
                       </td>
                       <td className="px-3 py-2 text-right tabular-nums text-primary">
-                        −{formatPHP(d.discount)}
+                        −{fmtMoney(d.discount)}
                       </td>
                     </tr>
                   );
@@ -315,7 +344,7 @@ function AdminRedemptions() {
                   <td className="px-3 py-2 text-right tabular-nums">{rows.length.toLocaleString()}</td>
                   <td className="px-3 py-2 text-right tabular-nums text-muted-foreground">100%</td>
                   <td className="px-3 py-2 text-right tabular-nums text-primary">
-                    −{formatPHP(totals.disc)}
+                    −{fmtMoney(totals.disc)}
                   </td>
                 </tr>
               </tfoot>

@@ -54,6 +54,7 @@ import { Route as AdminRedemptionsRouteImport } from './routes/admin.redemptions
 import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
+import { Route as AdminCurrenciesRouteImport } from './routes/admin.currencies'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising'
 import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
@@ -65,6 +66,7 @@ import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.rede
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
+import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
 
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
@@ -291,6 +293,11 @@ const AdminListingsRoute = AdminListingsRouteImport.update({
   path: '/listings',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminCurrenciesRoute = AdminCurrenciesRouteImport.update({
+  id: '/currencies',
+  path: '/currencies',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -349,6 +356,11 @@ const LovableEmailQueueProcessRoute =
     path: '/lovable/email/queue/process',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicFxRefreshRoute = ApiPublicFxRefreshRouteImport.update({
+  id: '/api/public/fx/refresh',
+  path: '/api/public/fx/refresh',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -373,6 +385,7 @@ export interface FileRoutesByFullPath {
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
@@ -404,6 +417,7 @@ export interface FileRoutesByFullPath {
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/r/$code/poster': typeof RCodePosterRoute
+  '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -429,6 +443,7 @@ export interface FileRoutesByTo {
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
@@ -460,6 +475,7 @@ export interface FileRoutesByTo {
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/r/$code/poster': typeof RCodePosterRoute
+  '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -488,6 +504,7 @@ export interface FileRoutesById {
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
@@ -519,6 +536,7 @@ export interface FileRoutesById {
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/r/$code/poster': typeof RCodePosterRoute
+  '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -548,6 +566,7 @@ export interface FileRouteTypes {
     | '/admin/accounts'
     | '/admin/advertising'
     | '/admin/analytics'
+    | '/admin/currencies'
     | '/admin/listings'
     | '/admin/performance'
     | '/admin/pricing'
@@ -579,6 +598,7 @@ export interface FileRouteTypes {
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/r/$code/poster'
+    | '/api/public/fx/refresh'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
@@ -604,6 +624,7 @@ export interface FileRouteTypes {
     | '/admin/accounts'
     | '/admin/advertising'
     | '/admin/analytics'
+    | '/admin/currencies'
     | '/admin/listings'
     | '/admin/performance'
     | '/admin/pricing'
@@ -635,6 +656,7 @@ export interface FileRouteTypes {
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/r/$code/poster'
+    | '/api/public/fx/refresh'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
@@ -662,6 +684,7 @@ export interface FileRouteTypes {
     | '/admin/accounts'
     | '/admin/advertising'
     | '/admin/analytics'
+    | '/admin/currencies'
     | '/admin/listings'
     | '/admin/performance'
     | '/admin/pricing'
@@ -693,6 +716,7 @@ export interface FileRouteTypes {
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/r/$code/poster'
+    | '/api/public/fx/refresh'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
@@ -728,6 +752,7 @@ export interface RootRouteChildren {
   StaffReferralRoute: typeof StaffReferralRoute
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ApiPublicFxRefreshRoute: typeof ApiPublicFxRefreshRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
   LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
@@ -1050,6 +1075,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminListingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/currencies': {
+      id: '/admin/currencies'
+      path: '/currencies'
+      fullPath: '/admin/currencies'
+      preLoaderRoute: typeof AdminCurrenciesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/analytics': {
       id: '/admin/analytics'
       path: '/analytics'
@@ -1127,6 +1159,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailQueueProcessRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/fx/refresh': {
+      id: '/api/public/fx/refresh'
+      path: '/api/public/fx/refresh'
+      fullPath: '/api/public/fx/refresh'
+      preLoaderRoute: typeof ApiPublicFxRefreshRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1145,6 +1184,7 @@ interface AdminRouteChildren {
   AdminAccountsRoute: typeof AdminAccountsRoute
   AdminAdvertisingRoute: typeof AdminAdvertisingRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminCurrenciesRoute: typeof AdminCurrenciesRoute
   AdminListingsRoute: typeof AdminListingsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
   AdminPricingRoute: typeof AdminPricingRoute
@@ -1160,6 +1200,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAccountsRoute: AdminAccountsRoute,
   AdminAdvertisingRoute: AdminAdvertisingRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminCurrenciesRoute: AdminCurrenciesRoute,
   AdminListingsRoute: AdminListingsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
   AdminPricingRoute: AdminPricingRoute,
@@ -1253,6 +1294,7 @@ const rootRouteChildren: RootRouteChildren = {
   StaffReferralRoute: StaffReferralRoute,
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ApiPublicFxRefreshRoute: ApiPublicFxRefreshRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
   LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,

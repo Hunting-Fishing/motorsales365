@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Settings, ListChecks, Users, Flag, CreditCard, ShieldCheck, Gauge, BarChart3, UserCog, Megaphone, QrCode, Ticket } from "lucide-react";
+import { Settings, ListChecks, Users, Flag, CreditCard, ShieldCheck, Gauge, BarChart3, UserCog, Megaphone, QrCode, Ticket, Globe } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 
@@ -18,6 +18,7 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean; roles: Role[
   { to: "/admin/referrals", label: "Staff QR Referrals", Icon: QrCode, roles: ["admin","sales"] },
   { to: "/admin/redemptions", label: "Referral Redemptions", Icon: Ticket, roles: ["admin","sales"] },
   { to: "/admin/pricing", label: "Pricing & plans", Icon: CreditCard, roles: ["admin"] },
+  { to: "/admin/currencies", label: "Currencies", Icon: Globe, roles: ["admin"] },
   { to: "/admin/performance", label: "Performance", Icon: Gauge, roles: ["admin"] },
   { to: "/admin/listings", label: "Listings", Icon: ListChecks, roles: ["admin","moderator","support"] },
   { to: "/admin/verifications", label: "Verifications", Icon: ShieldCheck, roles: ["admin","moderator"] },

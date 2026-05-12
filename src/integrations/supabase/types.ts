@@ -207,6 +207,45 @@ export type Database = {
         }
         Relationships: []
       }
+      currencies: {
+        Row: {
+          active: boolean
+          auto_update: boolean
+          code: string
+          created_at: string
+          decimals: number
+          last_updated_at: string
+          name: string
+          rate_to_php: number
+          sort_order: number
+          symbol: string
+        }
+        Insert: {
+          active?: boolean
+          auto_update?: boolean
+          code: string
+          created_at?: string
+          decimals?: number
+          last_updated_at?: string
+          name: string
+          rate_to_php: number
+          sort_order?: number
+          symbol: string
+        }
+        Update: {
+          active?: boolean
+          auto_update?: boolean
+          code?: string
+          created_at?: string
+          decimals?: number
+          last_updated_at?: string
+          name?: string
+          rate_to_php?: number
+          sort_order?: number
+          symbol?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -1524,6 +1563,7 @@ export type Database = {
         }
         Returns: Json
       }
+      upsert_currency_rates: { Args: { _rates: Json }; Returns: number }
       user_has_paid_subscription: {
         Args: { _user_id: string }
         Returns: boolean
