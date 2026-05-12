@@ -13,7 +13,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   Download, Copy, QrCode, Tag, Plus, Trash2, Users, MousePointerClick,
   UserPlus, Percent, Pencil, Printer, FileSpreadsheet, Calendar, RefreshCw,
+  Power, History,
 } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/admin/referrals")({
   component: AdminReferrals,
