@@ -180,38 +180,41 @@ function AdvertisePage() {
                 </Button>
               </div>
             ) : (
-              <form onSubmit={submit} className="space-y-4">
+              <form onSubmit={submit} className="space-y-4" noValidate>
                 <h2 className="font-display text-2xl font-bold">Tell us about your campaign</h2>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <Field label="Your name *">
+                  <Field label="Your name *" error={errors.contact_name}>
                     <Input
-                      required
                       value={form.contact_name}
+                      maxLength={100}
                       onChange={(e) => update("contact_name", e.target.value)}
                     />
                   </Field>
-                  <Field label="Company">
+                  <Field label="Company" error={errors.company}>
                     <Input
                       value={form.company}
+                      maxLength={120}
                       onChange={(e) => update("company", e.target.value)}
                     />
                   </Field>
-                  <Field label="Email *">
+                  <Field label="Email *" error={errors.email}>
                     <Input
-                      required
                       type="email"
                       value={form.email}
+                      maxLength={255}
                       onChange={(e) => update("email", e.target.value)}
                     />
                   </Field>
-                  <Field label="Phone">
+                  <Field label="Phone" error={errors.phone}>
                     <Input
                       value={form.phone}
+                      maxLength={30}
+                      placeholder="+63 917 555 0100"
                       onChange={(e) => update("phone", e.target.value)}
                     />
                   </Field>
                 </div>
-                <Field label="Placement">
+                <Field label="Placement" error={errors.placement}>
                   <Select
                     value={form.placement}
                     onValueChange={(v) => update("placement", v)}
@@ -229,29 +232,32 @@ function AdvertisePage() {
                   </Select>
                 </Field>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <Field label="Monthly budget (₱)">
+                  <Field label="Monthly budget (₱)" error={errors.budget_range}>
                     <Input
                       placeholder="e.g. 20,000–50,000"
                       value={form.budget_range}
+                      maxLength={60}
                       onChange={(e) => update("budget_range", e.target.value)}
                     />
                   </Field>
-                  <Field label="Ideal start date">
+                  <Field label="Ideal start date" error={errors.start_date}>
                     <Input
                       type="date"
+                      min={todayIso()}
                       value={form.start_date}
                       onChange={(e) => update("start_date", e.target.value)}
                     />
                   </Field>
                 </div>
-                <Field label="What are you trying to achieve? *">
+                <Field label="What are you trying to achieve? *" error={errors.message}>
                   <Textarea
-                    required
                     rows={4}
                     value={form.message}
+                    maxLength={2000}
                     onChange={(e) => update("message", e.target.value)}
                     placeholder="Audience, goals, creatives you have ready, etc."
                   />
+                  <p className="text-[11px] text-muted-foreground">{form.message.length}/2000</p>
                 </Field>
                 <Button type="submit" disabled={submitting} className="w-full">
                   {submitting ? "Sending…" : "Request a proposal"}
@@ -281,11 +287,12 @@ function Feature({ icon, title, body }: { icon: React.ReactNode; title: string; 
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
       <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</Label>
       {children}
+      {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
 }
