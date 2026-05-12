@@ -275,21 +275,53 @@ function AdminReferrals() {
     else load();
   };
 
-  const toggleActive = async (row: StaffRow) => {
+  const requestToggle = (row: StaffRow) => {
+    setConfirmReason("");
+    setConfirmToggle(row);
+  };
+
+  const submitToggle = async () => {
+    if (!confirmToggle) return;
+    if (confirmReason.trim().length < 3) { toast.error("Please provide a reason (min 3 chars)"); return; }
+    setConfirmBusy(true);
+    const row = confirmToggle;
     const next = !row.active;
     const { error } = await sb.from("staff_referrals").update({ active: next }).eq("id", row.id);
-    if (error) { toast.error(error.message); return; }
+    if (error) { toast.error(error.message); setConfirmBusy(false); return; }
+    if (user) {
+      await sb.from("staff_referral_audit").insert({
+        staff_referral_id: row.id, staff_email: row.email, actor_id: user.id,
+        action: "reason_logged",
+        details: {
+          for_action: next ? "activated" : "deactivated",
+          reason: confirmReason.trim(),
+          referral_code: row.referral_code,
+          full_name: row.full_name,
+        },
+      });
+    }
     toast.success(next ? "Reactivated" : "Deactivated");
+    setConfirmBusy(false);
+    setConfirmToggle(null);
+    setConfirmReason("");
     load();
     if (showAudit) loadAudit();
   };
 
   const loadAudit = async () => {
-    const { data } = await sb
+    let q = sb
       .from("staff_referral_audit")
       .select("*")
       .order("created_at", { ascending: false })
-      .limit(100);
+      .limit(200);
+    if (auditAction !== "all") q = q.eq("action", auditAction);
+    if (auditActor !== "all") q = q.eq("actor_id", auditActor);
+    if (auditFrom) q = q.gte("created_at", new Date(auditFrom).toISOString());
+    if (auditTo) {
+      const t = new Date(auditTo); t.setHours(23, 59, 59, 999);
+      q = q.lte("created_at", t.toISOString());
+    }
+    const { data } = await q;
     const entries = (data as AuditEntry[]) || [];
     setAudit(entries);
     const actorIds = Array.from(new Set(entries.map((e) => e.actor_id).filter(Boolean) as string[]));
@@ -303,7 +335,7 @@ function AdminReferrals() {
     }
   };
 
-  useEffect(() => { if (showAudit) loadAudit(); /* eslint-disable-next-line */ }, [showAudit]);
+  useEffect(() => { if (showAudit) loadAudit(); /* eslint-disable-next-line */ }, [showAudit, auditAction, auditActor, auditFrom, auditTo]);
 
   const logSync = async (count: number) => {
     if (!user) return;
