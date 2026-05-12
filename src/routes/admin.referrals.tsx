@@ -377,18 +377,24 @@ function AdminReferrals() {
           <Button variant="outline" onClick={async () => {
             const { data, error } = await sb.rpc("sync_staff_referrals");
             if (error) { toast.error(error.message); return; }
-            toast.success(`Synced ${data ?? 0} staff`);
+            const count = (data as number) ?? 0;
+            toast.success(`Synced ${count} staff`);
+            await logSync(count);
             // Generate QR codes for any newly created rows that don't have one yet
             const { data: missing } = await sb
               .from("staff_referrals")
-              .select("id,referral_code,qr_storage_path,full_name,email,phone,active,notes")
+              .select("id,referral_code,qr_storage_path,full_name,email,phone,active,notes,staff_user_id")
               .is("qr_storage_path", null);
             for (const m of (missing as StaffRow[]) || []) {
               await generateQrFor(m);
             }
             load();
+            if (showAudit) loadAudit();
           }}>
             <RefreshCw className="mr-2 h-4 w-4" /> Sync staff
+          </Button>
+          <Button variant={showAudit ? "default" : "outline"} onClick={() => setShowAudit((v) => !v)}>
+            <History className="mr-2 h-4 w-4" /> Audit log
           </Button>
           <Button onClick={() => setNewOpen(true)}>
             <Plus className="mr-2 h-4 w-4" /> New staff QR
