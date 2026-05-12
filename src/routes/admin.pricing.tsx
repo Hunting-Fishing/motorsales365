@@ -184,7 +184,7 @@ function AdminPricing() {
                 <div key={s.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border p-3 text-sm">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold">{prof?.full_name || prof?.email || s.user_id.slice(0, 8)}</span>
+                      <span className="font-semibold">{prof?.full_name || s.user_id.slice(0, 8)}</span>
                       <Badge variant="outline" className="uppercase">{s.status}</Badge>
                       {s.complimentary && <Badge variant="secondary">comp</Badge>}
                     </div>
