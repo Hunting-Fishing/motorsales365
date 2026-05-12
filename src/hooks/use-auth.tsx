@@ -33,6 +33,8 @@ async function maybeSendWelcomeEmail(user: User) {
   }
 }
 
+export type AppRole = "admin" | "sales" | "moderator" | "support" | "advertising" | "user";
+
 interface AuthContextValue {
   user: User | null;
   session: Session | null;
@@ -43,7 +45,24 @@ interface AuthContextValue {
   isSupport: boolean;
   isAdvertising: boolean;
   isStaff: boolean;
+  realRoles: AppRole[];
+  effectiveRoles: AppRole[];
+  realIsAdmin: boolean;
+  simulatedRoles: AppRole[] | null;
+  setSimulatedRoles: (roles: AppRole[] | null) => void;
   signOut: () => Promise<void>;
+}
+
+const SIM_KEY = "sandbox.roles";
+function loadSim(): AppRole[] | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(SIM_KEY);
+    if (!raw) return null;
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) return null;
+    return arr.filter((r) => typeof r === "string") as AppRole[];
+  } catch { return null; }
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
