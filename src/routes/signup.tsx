@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SiteLayout } from "@/components/site-layout";
+import { getCreditedCode } from "@/lib/referral";
 
 export const Route = createFileRoute("/signup")({
   component: SignupPage,
@@ -19,7 +20,13 @@ function SignupPage() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [refCode, setRefCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const c = getCreditedCode();
+    if (c) setRefCode(c);
+  }, []);
 
   useEffect(() => {
     if (!loading && user) navigate({ to: "/dashboard" });
@@ -33,7 +40,7 @@ function SignupPage() {
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: { full_name: fullName, referral_code: refCode || undefined },
         emailRedirectTo: window.location.origin,
       },
     });
