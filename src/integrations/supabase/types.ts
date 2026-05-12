@@ -326,6 +326,7 @@ export type Database = {
           owner_id: string | null
           phone: string | null
           photos: Json
+          postal_code: string | null
           province: string | null
           rating_avg: number
           rating_count: number
@@ -355,6 +356,7 @@ export type Database = {
           owner_id?: string | null
           phone?: string | null
           photos?: Json
+          postal_code?: string | null
           province?: string | null
           rating_avg?: number
           rating_count?: number
@@ -384,6 +386,7 @@ export type Database = {
           owner_id?: string | null
           phone?: string | null
           photos?: Json
+          postal_code?: string | null
           province?: string | null
           rating_avg?: number
           rating_count?: number

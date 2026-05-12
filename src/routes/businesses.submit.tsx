@@ -40,6 +40,7 @@ function SubmitBusinessPage() {
   const [loc, setLoc] = useState<LocationValue>({ region: null, province: null, city: null, barangay: null });
   const [lat, setLat] = useState("");
   const [lng, setLng] = useState("");
+  const [postalCode, setPostalCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -69,17 +70,18 @@ function SubmitBusinessPage() {
       const regionish = a.region || a.state || null;
       const barangayish: string | null =
         a.neighbourhood || a.quarter || a.hamlet || a.suburb || a.village || null;
+      const postcode: string | null = a.postcode || null;
+      const street = [a.house_number, a.road].filter(Boolean).join(" ").trim() || null;
       const resolved = resolvePsgc({ region: regionish, province: provinceish, city: cityish });
+      // Only overwrite empty fields — never clobber what the user already typed.
       setLoc((prev) => ({
-        region: resolved.region ?? prev.region,
-        province: resolved.province ?? prev.province,
-        city: resolved.city ?? prev.city,
-        barangay: barangayish ?? prev.barangay,
+        region: prev.region ?? resolved.region ?? null,
+        province: prev.province ?? resolved.province ?? null,
+        city: prev.city ?? resolved.city ?? null,
+        barangay: prev.barangay ?? barangayish ?? null,
       }));
-      if (a.road) {
-        const street = [a.house_number, a.road].filter(Boolean).join(" ");
-        if (street) setStreetAddress((prev) => prev.trim() ? prev : street);
-      }
+      if (street) setStreetAddress((prev) => (prev.trim() ? prev : street));
+      if (postcode) setPostalCode((prev) => (prev.trim() ? prev : postcode));
     } catch {
       /* silent — user can still type fields manually */
     }
@@ -131,6 +133,7 @@ function SubmitBusinessPage() {
       website: website.trim() || null, messenger_url: messengerUrl.trim() || null,
       street_address: streetAddress.trim() || null,
       region: loc.region, province: loc.province, city: loc.city, barangay: loc.barangay,
+      postal_code: postalCode.trim() || null,
       lat: lat ? Number(lat) : null, lng: lng ? Number(lng) : null,
       status: "pending",
     };
@@ -201,9 +204,15 @@ function SubmitBusinessPage() {
             <div><Label>Messenger / FB</Label><Input value={messengerUrl} onChange={(e) => setMessengerUrl(e.target.value)} placeholder="https://m.me/…" /></div>
           </div>
 
-          <div>
-            <Label>Street address</Label>
-            <Input value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} maxLength={200} />
+          <div className="grid gap-3 sm:grid-cols-[1fr_160px]">
+            <div>
+              <Label>Street address</Label>
+              <Input value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} maxLength={200} />
+            </div>
+            <div>
+              <Label>Postal code</Label>
+              <Input value={postalCode} onChange={(e) => setPostalCode(e.target.value)} maxLength={10} />
+            </div>
           </div>
 
           <div>
