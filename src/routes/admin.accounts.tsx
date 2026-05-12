@@ -20,6 +20,34 @@ export const Route = createFileRoute("/admin/accounts")({
   component: AccountsConsole,
 });
 
+async function logAudit(
+  targetUserId: string,
+  field: string,
+  oldValue: unknown,
+  newValue: unknown,
+  note: string | null,
+  isAdmin: boolean,
+) {
+  const { data: u } = await supabase.auth.getUser();
+  const actorId = u.user?.id;
+  if (!actorId) return;
+  await supabase.from("account_audit_log").insert({
+    target_user_id: targetUserId,
+    actor_id: actorId,
+    actor_role: isAdmin ? "admin" : "sales",
+    field,
+    old_value: oldValue === undefined ? null : (oldValue as any),
+    new_value: newValue === undefined ? null : (newValue as any),
+    note,
+  });
+}
+
+function formatVal(v: unknown): string {
+  if (v === null || v === undefined || v === "") return "∅";
+  if (typeof v === "boolean") return v ? "yes" : "no";
+  return String(v);
+}
+
 type Plan = { id: string; name: string; price_php: number };
 type Sub = {
   id: string;
@@ -134,8 +162,10 @@ function AccountsConsole() {
   const togglePause = async (row: Row) => {
     const next = row.account_status === "paused" ? "active" : "paused";
     const { error } = await supabase.from("profiles").update({ account_status: next }).eq("id", row.id);
-    if (error) toast.error(error.message);
-    else { toast.success(next === "paused" ? "Account paused" : "Account reactivated"); load(); }
+    if (error) { toast.error(error.message); return; }
+    await logAudit(row.id, "account_status", row.account_status, next, null, isAdmin);
+    toast.success(next === "paused" ? "Account paused" : "Account reactivated");
+    load();
   };
 
   const exportCsv = () => {
@@ -304,7 +334,22 @@ function EditAccountDialog({
   const [complimentary, setComplimentary] = useState<boolean>(row.subscription?.complimentary ?? false);
   const [notes, setNotes] = useState<string>(row.subscription?.notes ?? "");
   const [paused, setPaused] = useState<boolean>(row.account_status === "paused");
+  const [reason, setReason] = useState<string>("");
   const [saving, setSaving] = useState(false);
+  const [history, setHistory] = useState<Array<{
+    id: string; field: string; old_value: any; new_value: any;
+    note: string | null; actor_role: string; created_at: string;
+  }>>([]);
+
+  useEffect(() => {
+    supabase
+      .from("account_audit_log")
+      .select("id, field, old_value, new_value, note, actor_role, created_at")
+      .eq("target_user_id", row.id)
+      .order("created_at", { ascending: false })
+      .limit(10)
+      .then(({ data }) => setHistory((data ?? []) as any));
+  }, [row.id]);
 
   const planChanged = planId !== (row.plan?.id ?? "");
   const selectedPlan = plans.find((p) => p.id === planId);
@@ -316,9 +361,17 @@ function EditAccountDialog({
 
   const save = async () => {
     const cleanDiscount = Math.min(100, Math.max(0, Number(discount) || 0));
+    const prevDiscount = row.subscription?.discount_percent ?? 0;
+    const prevComp = row.subscription?.complimentary ?? false;
+    const prevNotes = row.subscription?.notes ?? "";
+    const prevPlanId = row.subscription?.plan_id ?? null;
+    const prevPlanName = row.plan?.name ?? "Free";
+    const prevStatus = row.account_status;
+    const nextStatus = paused ? "paused" : "active";
+    const note = reason.trim() || null;
+
     setSaving(true);
     try {
-      // 1) Subscription upsert
       if (row.subscription) {
         const patch = {
           discount_percent: cleanDiscount,
@@ -343,9 +396,7 @@ function EditAccountDialog({
         if (error) throw error;
       }
 
-      // 2) Account pause toggle (only if changed)
-      const nextStatus = paused ? "paused" : "active";
-      if (nextStatus !== row.account_status) {
+      if (nextStatus !== prevStatus) {
         const { error } = await supabase
           .from("profiles")
           .update({ account_status: nextStatus })
@@ -353,7 +404,26 @@ function EditAccountDialog({
         if (error) throw error;
       }
 
-      toast.success("Account updated");
+      // Audit entries — one per changed field
+      const entries: Promise<unknown>[] = [];
+      if (planId && planId !== prevPlanId) {
+        entries.push(logAudit(row.id, "plan", prevPlanName, selectedPlan?.name ?? null, note, isAdmin));
+      }
+      if (cleanDiscount !== Number(prevDiscount)) {
+        entries.push(logAudit(row.id, "discount_percent", prevDiscount, cleanDiscount, note, isAdmin));
+      }
+      if (complimentary !== prevComp) {
+        entries.push(logAudit(row.id, "complimentary", prevComp, complimentary, note, isAdmin));
+      }
+      if ((notes || "") !== (prevNotes || "")) {
+        entries.push(logAudit(row.id, "notes", prevNotes, notes, note, isAdmin));
+      }
+      if (nextStatus !== prevStatus) {
+        entries.push(logAudit(row.id, "account_status", prevStatus, nextStatus, note, isAdmin));
+      }
+      await Promise.all(entries);
+
+      toast.success(entries.length ? `Saved · ${entries.length} change(s) logged` : "No changes");
       onSaved();
     } catch (e: any) {
       toast.error(e.message ?? "Failed to save");
@@ -428,16 +498,47 @@ function EditAccountDialog({
           <div>
             <label className="mb-1 block text-sm font-medium">Internal notes</label>
             <Textarea
-              rows={3}
+              rows={2}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Reason for discount, comp grant, pause, etc."
+              placeholder="Persistent note shown on the subscription"
             />
           </div>
 
+          <div>
+            <label className="mb-1 block text-sm font-medium">Reason for this change <span className="text-muted-foreground">(audit trail)</span></label>
+            <Input
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="e.g. 6-month loyalty discount; paused on customer request"
+            />
+          </div>
+
+          {history.length > 0 && (
+            <div className="rounded-md border border-border bg-muted/30 p-2">
+              <div className="mb-1 text-xs font-medium text-muted-foreground">Recent activity</div>
+              <ul className="max-h-40 space-y-1 overflow-y-auto text-xs">
+                {history.map((h) => (
+                  <li key={h.id} className="flex flex-col gap-0.5 border-b border-border/60 pb-1 last:border-0">
+                    <div>
+                      <span className="font-medium">{h.field}</span>:{" "}
+                      <span className="text-muted-foreground">{formatVal(h.old_value)}</span>
+                      {" → "}
+                      <span>{formatVal(h.new_value)}</span>
+                    </div>
+                    <div className="text-[10px] text-muted-foreground">
+                      {h.actor_role} · {formatDate(h.created_at)}
+                      {h.note ? ` · ${h.note}` : ""}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {!isAdmin && (
             <div className="rounded-md bg-muted p-2 text-xs text-muted-foreground">
-              Sales role: changes are visible to admins.
+              Sales role: every change is logged with your name.
             </div>
           )}
         </div>
