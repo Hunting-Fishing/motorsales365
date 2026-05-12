@@ -50,6 +50,104 @@ export type Database = {
         }
         Relationships: []
       }
+      ad_inquiries: {
+        Row: {
+          assigned_to: string | null
+          budget_range: string | null
+          company: string | null
+          contact_name: string
+          created_at: string
+          email: string
+          id: string
+          internal_notes: string | null
+          message: string
+          phone: string | null
+          placement: Database["public"]["Enums"]["ad_placement"]
+          source_url: string | null
+          start_date: string | null
+          status: Database["public"]["Enums"]["ad_inquiry_status"]
+          submitter_user_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          budget_range?: string | null
+          company?: string | null
+          contact_name: string
+          created_at?: string
+          email: string
+          id?: string
+          internal_notes?: string | null
+          message: string
+          phone?: string | null
+          placement?: Database["public"]["Enums"]["ad_placement"]
+          source_url?: string | null
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["ad_inquiry_status"]
+          submitter_user_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          budget_range?: string | null
+          company?: string | null
+          contact_name?: string
+          created_at?: string
+          email?: string
+          id?: string
+          internal_notes?: string | null
+          message?: string
+          phone?: string | null
+          placement?: Database["public"]["Enums"]["ad_placement"]
+          source_url?: string | null
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["ad_inquiry_status"]
+          submitter_user_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ad_inquiry_messages: {
+        Row: {
+          body: string
+          created_at: string
+          from_staff: boolean
+          id: string
+          inquiry_id: string
+          sender_email: string | null
+          sender_id: string | null
+          sender_name: string | null
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          from_staff?: boolean
+          id?: string
+          inquiry_id: string
+          sender_email?: string | null
+          sender_id?: string | null
+          sender_name?: string | null
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          from_staff?: boolean
+          id?: string
+          inquiry_id?: string
+          sender_email?: string | null
+          sender_id?: string | null
+          sender_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_inquiry_messages_inquiry_id_fkey"
+            columns: ["inquiry_id"]
+            isOneToOne: false
+            referencedRelation: "ad_inquiries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           icon: string | null
@@ -1034,6 +1132,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      can_manage_ads: { Args: { _user_id: string }; Returns: boolean }
+      can_moderate: { Args: { _user_id: string }; Returns: boolean }
+      can_support: { Args: { _user_id: string }; Returns: boolean }
+      current_plan_tier: { Args: { _user_id: string }; Returns: string }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -1054,6 +1156,8 @@ export type Database = {
         Args: { _listing_id: string; _viewer_id?: string }
         Returns: undefined
       }
+      is_business_account: { Args: { _user_id: string }; Returns: boolean }
+      is_staff: { Args: { _user_id: string }; Returns: boolean }
       is_towing_provider: { Args: { _user_id: string }; Returns: boolean }
       move_to_dlq: {
         Args: {
@@ -1079,7 +1183,27 @@ export type Database = {
     }
     Enums: {
       account_status: "active" | "paused" | "banned"
-      app_role: "admin" | "user" | "sales"
+      ad_inquiry_status:
+        | "new"
+        | "in_review"
+        | "quoted"
+        | "won"
+        | "lost"
+        | "spam"
+      ad_placement:
+        | "homepage_banner"
+        | "category_banner"
+        | "listing_sidebar"
+        | "newsletter"
+        | "sponsored_post"
+        | "other"
+      app_role:
+        | "admin"
+        | "user"
+        | "sales"
+        | "moderator"
+        | "support"
+        | "advertising"
       business_kind: "repair_shop" | "insurance" | "dealer" | "other"
       listing_plan: "free" | "standard" | "upgraded"
       listing_status:
@@ -1228,7 +1352,23 @@ export const Constants = {
   public: {
     Enums: {
       account_status: ["active", "paused", "banned"],
-      app_role: ["admin", "user", "sales"],
+      ad_inquiry_status: ["new", "in_review", "quoted", "won", "lost", "spam"],
+      ad_placement: [
+        "homepage_banner",
+        "category_banner",
+        "listing_sidebar",
+        "newsletter",
+        "sponsored_post",
+        "other",
+      ],
+      app_role: [
+        "admin",
+        "user",
+        "sales",
+        "moderator",
+        "support",
+        "advertising",
+      ],
       business_kind: ["repair_shop", "insurance", "dealer", "other"],
       listing_plan: ["free", "standard", "upgraded"],
       listing_status: [
