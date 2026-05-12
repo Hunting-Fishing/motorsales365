@@ -115,16 +115,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
   };
 
-  const isAdmin = roles.includes("admin");
-  const isSales = roles.includes("sales");
-  const isModerator = roles.includes("moderator");
-  const isSupport = roles.includes("support");
-  const isAdvertising = roles.includes("advertising");
+  const realRoles = roles as AppRole[];
+  const realIsAdmin = realRoles.includes("admin");
+  const effectiveRoles: AppRole[] = realIsAdmin && simulatedRoles ? simulatedRoles : realRoles;
+
+  const setSimulatedRoles = (next: AppRole[] | null) => {
+    setSimulatedRolesState(next);
+    try {
+      if (next && next.length > 0) window.localStorage.setItem(SIM_KEY, JSON.stringify(next));
+      else window.localStorage.removeItem(SIM_KEY);
+    } catch {}
+  };
+
+  const isAdmin = effectiveRoles.includes("admin");
+  const isSales = effectiveRoles.includes("sales");
+  const isModerator = effectiveRoles.includes("moderator");
+  const isSupport = effectiveRoles.includes("support");
+  const isAdvertising = effectiveRoles.includes("advertising");
   const isStaff = isAdmin || isSales || isModerator || isSupport || isAdvertising;
 
   return (
     <AuthContext.Provider
-      value={{ user, session, loading, isAdmin, isSales, isModerator, isSupport, isAdvertising, isStaff, signOut }}
+      value={{ user, session, loading, isAdmin, isSales, isModerator, isSupport, isAdvertising, isStaff, realRoles, effectiveRoles, realIsAdmin, simulatedRoles, setSimulatedRoles, signOut }}
     >
       {children}
     </AuthContext.Provider>
