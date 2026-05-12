@@ -107,6 +107,44 @@ export type Database = {
         }
         Relationships: []
       }
+      ad_inquiry_audit: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          from_value: string | null
+          id: string
+          inquiry_id: string
+          to_value: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          from_value?: string | null
+          id?: string
+          inquiry_id: string
+          to_value?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          from_value?: string | null
+          id?: string
+          inquiry_id?: string
+          to_value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_inquiry_audit_inquiry_id_fkey"
+            columns: ["inquiry_id"]
+            isOneToOne: false
+            referencedRelation: "ad_inquiries"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ad_inquiry_messages: {
         Row: {
           body: string
@@ -849,6 +887,7 @@ export type Database = {
           paused_at: string | null
           plan_id: string
           status: string
+          updated_at: string
           user_id: string
         }
         Insert: {
@@ -861,6 +900,7 @@ export type Database = {
           paused_at?: string | null
           plan_id: string
           status?: string
+          updated_at?: string
           user_id: string
         }
         Update: {
@@ -873,6 +913,7 @@ export type Database = {
           paused_at?: string | null
           plan_id?: string
           status?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
