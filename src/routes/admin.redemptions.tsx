@@ -297,7 +297,7 @@ function AdminRedemptions() {
                   }}
                   formatter={(value: any, name: any) =>
                     name === "discount"
-                      ? [formatPHP(Number(value)), "Discount"]
+                      ? [fmtMoney(Number(value)), "Discount"]
                       : [Number(value).toLocaleString(), "Redemptions"]
                   }
                 />
