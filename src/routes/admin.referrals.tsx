@@ -455,11 +455,44 @@ function AdminReferrals() {
         </section>
       )}
 
+      <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-3">
+        <div className="flex items-center gap-2">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Role</Label>
+          <Select value={roleFilter} onValueChange={setRoleFilter}>
+            <SelectTrigger className="h-8 w-[140px]"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All roles</SelectItem>
+              <SelectItem value="admin">Admin</SelectItem>
+              <SelectItem value="moderator">Moderator</SelectItem>
+              <SelectItem value="support">Support</SelectItem>
+              <SelectItem value="sales">Sales</SelectItem>
+              <SelectItem value="advertising">Advertising</SelectItem>
+              <SelectItem value="none">No role / external</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-center gap-2">
+          <Label className="text-xs uppercase tracking-wider text-muted-foreground">Status</Label>
+          <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
+            <SelectTrigger className="h-8 w-[130px]"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="active">Active only</SelectItem>
+              <SelectItem value="inactive">Inactive only</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="ml-auto text-xs text-muted-foreground">
+          Showing {filteredRows.length} of {rows.length}
+        </div>
+      </div>
+
       <div className="rounded-xl border border-border bg-card overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-muted/40">
             <tr className="text-left">
               <th className="px-4 py-2">Staff</th>
+              <th className="px-4 py-2">Role</th>
               <th className="px-4 py-2">Code</th>
               <th className="px-4 py-2">Scans</th>
               <th className="px-4 py-2">Visitors</th>
@@ -471,20 +504,32 @@ function AdminReferrals() {
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={8} className="p-6 text-center text-muted-foreground">Loading…</td></tr>
-            ) : rows.length === 0 ? (
-              <tr><td colSpan={8} className="p-6 text-center text-muted-foreground">No staff referrals yet.</td></tr>
+              <tr><td colSpan={9} className="p-6 text-center text-muted-foreground">Loading…</td></tr>
+            ) : filteredRows.length === 0 ? (
+              <tr><td colSpan={9} className="p-6 text-center text-muted-foreground">No staff referrals match your filters.</td></tr>
             ) : (
-              rows.map((r) => {
+              filteredRows.map((r) => {
                 const s = stats[r.id] || { scans: 0, signups: 0, visitors: 0, listings: 0 };
                 const qr = publicQrUrl(r.qr_storage_path);
                 const link = `${PUBLIC_BASE}/r/${r.referral_code}`;
                 const posterUrl = `${PUBLIC_BASE}/r/${r.referral_code}/poster`;
+                const userRoles = r.staff_user_id ? roles[r.staff_user_id] || [] : [];
                 return (
                   <tr key={r.id} className="border-b border-border last:border-0">
                     <td className="px-4 py-3">
                       <div className="font-medium">{r.full_name}</div>
                       <div className="text-xs text-muted-foreground">{r.email}</div>
+                    </td>
+                    <td className="px-4 py-3">
+                      {userRoles.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {userRoles.map((ro) => (
+                            <span key={ro} className="rounded bg-secondary px-1.5 py-0.5 text-xs uppercase">{ro}</span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
                     </td>
                     <td className="px-4 py-3 font-mono text-xs">{r.referral_code}</td>
                     <td className="px-4 py-3">{s.scans}</td>
@@ -512,6 +557,14 @@ function AdminReferrals() {
                         </a>
                         <Button size="sm" variant="ghost" title="Promotions" onClick={() => setPromosFor(r)}>
                           <Tag className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          title={r.active ? "Deactivate" : "Reactivate"}
+                          onClick={() => toggleActive(r)}
+                        >
+                          <Power className={`h-4 w-4 ${r.active ? "text-primary" : "text-muted-foreground"}`} />
                         </Button>
                         <Button size="sm" variant="ghost" title="Edit" onClick={() => setEditing(r)}>
                           <Pencil className="h-4 w-4" />
