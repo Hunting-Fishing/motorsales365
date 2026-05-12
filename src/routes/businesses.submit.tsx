@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LocationDrilldown, type LocationValue } from "@/components/businesses/location-drilldown";
 import { LocationPicker } from "@/components/businesses/location-picker";
+import { resolvePsgc } from "@/lib/psgc";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/businesses/submit")({
@@ -55,10 +56,45 @@ function SubmitBusinessPage() {
     })();
   }, []);
 
+  const reverseGeocode = async (la: number, ln: number) => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${la}&lon=${ln}&zoom=18&addressdetails=1`,
+        { headers: { "Accept": "application/json", "Accept-Language": "en" } },
+      );
+      const json = await res.json();
+      const a = json?.address ?? {};
+      const cityish = a.city || a.town || a.municipality || a.village || a.suburb || null;
+      const provinceish = a.province || a.state_district || a.state || null;
+      const regionish = a.region || a.state || null;
+      const barangayish: string | null =
+        a.neighbourhood || a.quarter || a.hamlet || a.suburb || a.village || null;
+      const resolved = resolvePsgc({ region: regionish, province: provinceish, city: cityish });
+      setLoc((prev) => ({
+        region: resolved.region ?? prev.region,
+        province: resolved.province ?? prev.province,
+        city: resolved.city ?? prev.city,
+        barangay: barangayish ?? prev.barangay,
+      }));
+      if (a.road) {
+        const street = [a.house_number, a.road].filter(Boolean).join(" ");
+        if (street) setStreetAddress((prev) => prev.trim() ? prev : street);
+      }
+    } catch {
+      /* silent — user can still type fields manually */
+    }
+  };
+
+  const setCoords = (la: number, ln: number, opts?: { reverse?: boolean }) => {
+    setLat(la.toFixed(6));
+    setLng(ln.toFixed(6));
+    if (opts?.reverse !== false) void reverseGeocode(la, ln);
+  };
+
   const useMyLocation = () => {
     if (!navigator.geolocation) { toast.error("Geolocation not supported"); return; }
     navigator.geolocation.getCurrentPosition(
-      (pos) => { setLat(pos.coords.latitude.toFixed(6)); setLng(pos.coords.longitude.toFixed(6)); toast.success("Location captured"); },
+      (pos) => { setCoords(pos.coords.latitude, pos.coords.longitude); toast.success("Location captured"); },
       () => toast.error("Could not get your location"),
     );
   };
@@ -73,8 +109,7 @@ function SubmitBusinessPage() {
       });
       const json = await res.json();
       if (Array.isArray(json) && json[0]) {
-        setLat(Number(json[0].lat).toFixed(6));
-        setLng(Number(json[0].lon).toFixed(6));
+        setCoords(Number(json[0].lat), Number(json[0].lon), { reverse: false });
         toast.success("Found location on map");
       } else {
         toast.error("No match — drop the pin manually");
@@ -189,7 +224,7 @@ function SubmitBusinessPage() {
               lat={lat ? Number(lat) : null}
               lng={lng ? Number(lng) : null}
               region={loc.region}
-              onChange={(la, ln) => { setLat(la.toFixed(6)); setLng(ln.toFixed(6)); }}
+              onChange={(la, ln) => setCoords(la, ln)}
             />
             <div className="mt-2 grid gap-2 sm:grid-cols-2">
               <Input placeholder="Latitude" value={lat} onChange={(e) => setLat(e.target.value)} />
