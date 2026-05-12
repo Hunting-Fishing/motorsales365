@@ -25,6 +25,7 @@ function PricingPage() {
   const [plans, setPlans] = useState<any[]>([]);
   const [mySub, setMySub] = useState<any | null>(null);
   const [requesting, setRequesting] = useState<string | null>(null);
+  const [discounts, setDiscounts] = useState<Record<string, any>>({});
 
   const loadSub = async (uid: string) => {
     const { data } = await supabase
@@ -48,6 +49,22 @@ function PricingPage() {
     if (user?.id) loadSub(user.id);
   }, [user?.id]);
 
+  // Preview discounts per plan once we have plans + a signed-in user
+  useEffect(() => {
+    if (!user?.id || plans.length === 0) return;
+    (async () => {
+      const out: Record<string, any> = {};
+      await Promise.all(plans.map(async (p) => {
+        const { data } = await (supabase as any).rpc("preview_referral_discount", {
+          _kind: "subscription",
+          _base_amount: Number(p.price_php) || 0,
+        });
+        if (data?.ok) out[p.id] = data;
+      }));
+      setDiscounts(out);
+    })();
+  }, [user?.id, plans]);
+
   const requestPlan = async (planId: string) => {
     if (!user) {
       navigate({ to: "/signup" });
@@ -58,14 +75,29 @@ function PricingPage() {
       return;
     }
     setRequesting(planId);
-    const { error } = await supabase.from("subscriptions").insert({
+    const plan = plans.find((p) => p.id === planId);
+    const base = Number(plan?.price_php) || 0;
+    const { data: sub, error } = await supabase.from("subscriptions").insert({
       user_id: user.id,
       plan_id: planId,
       status: "pending",
+    }).select("id").maybeSingle();
+    if (error) { setRequesting(null); return toast.error(error.message); }
+
+    // Record referral redemption if eligible
+    const { data: redemption } = await (supabase as any).rpc("apply_referral_redemption", {
+      _kind: "subscription",
+      _base_amount: base,
+      _subscription_id: sub?.id ?? null,
     });
     setRequesting(null);
-    if (error) return toast.error(error.message);
-    toast.success("Subscription requested — our team will reach out shortly.");
+    if (redemption?.ok) {
+      toast.success(
+        `Referral discount applied — ₱${redemption.discount_amount_php} off. Final: ₱${redemption.final_amount_php}.`
+      );
+    } else {
+      toast.success("Subscription requested — our team will reach out shortly.");
+    }
     loadSub(user.id);
   };
 
@@ -105,10 +137,25 @@ function PricingPage() {
           {plans.map((p) => {
             const isCurrent = mySub?.plan_id === p.id;
             const hasOther = mySub && !isCurrent && ["pending","active","paused"].includes(mySub.status);
+            const d = discounts[p.id];
             return (
               <div key={p.id} className={`flex flex-col rounded-xl border bg-card p-6 ${isCurrent ? "border-primary ring-2 ring-primary/30" : "border-border"}`}>
                 <div className="font-display text-lg font-semibold">{p.name}</div>
-                <div className="mt-2 font-display text-3xl font-bold">{formatPHP(p.price_php)}<span className="text-sm font-normal text-muted-foreground">/mo</span></div>
+                {d ? (
+                  <div className="mt-2">
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-display text-3xl font-bold text-primary">{formatPHP(d.final_amount_php)}</span>
+                      <span className="text-sm text-muted-foreground line-through">{formatPHP(p.price_php)}</span>
+                      <span className="text-sm font-normal text-muted-foreground">/mo</span>
+                    </div>
+                    <div className="mt-1 inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                      Referral discount: −{formatPHP(d.discount_amount_php)}
+                      {d.percent_off ? ` (${d.percent_off}% off)` : ""}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-2 font-display text-3xl font-bold">{formatPHP(p.price_php)}<span className="text-sm font-normal text-muted-foreground">/mo</span></div>
+                )}
                 <div className="mt-1 text-sm text-muted-foreground">
                   {p.listings_per_month ?? "Unlimited"} listings/month
                 </div>
