@@ -32,16 +32,22 @@ function AdminPricing() {
   };
 
   const loadSubs = async () => {
-    let q = supabase.from("subscriptions").select("*, subscription_plans(name, price_php), profiles!subscriptions_user_id_fkey(full_name, email)").order("created_at", { ascending: false }).limit(100);
+    let q = supabase.from("subscriptions").select("*").order("created_at", { ascending: false }).limit(100);
     if (subFilter !== "all") q = q.eq("status", subFilter);
-    const { data, error } = await q;
-    if (error) {
-      // fallback: profiles join may not be wired by name; query separately
-      const { data: raw } = await supabase.from("subscriptions").select("*").order("created_at", { ascending: false }).limit(100);
-      setSubs(raw ?? []);
-    } else {
-      setSubs(data ?? []);
-    }
+    const { data: rows, error } = await q;
+    if (error) { toast.error(error.message); return; }
+    const list = rows ?? [];
+    const userIds = Array.from(new Set(list.map((r: any) => r.user_id)));
+    const planIds = Array.from(new Set(list.map((r: any) => r.plan_id)));
+    const [{ data: profs }, { data: pls }] = await Promise.all([
+      userIds.length ? supabase.from("profiles").select("id, full_name, email").in("id", userIds) : Promise.resolve({ data: [] as any[] }),
+      planIds.length ? supabase.from("subscription_plans").select("id, name, price_php").in("id", planIds) : Promise.resolve({ data: [] as any[] }),
+    ]);
+    const profMap: Record<string, any> = {};
+    (profs ?? []).forEach((p: any) => { profMap[p.id] = p; });
+    const planMap: Record<string, any> = {};
+    (pls ?? []).forEach((p: any) => { planMap[p.id] = p; });
+    setSubs(list.map((r: any) => ({ ...r, profiles: profMap[r.user_id], subscription_plans: planMap[r.plan_id] })));
   };
 
   useEffect(() => { load(); }, []);
