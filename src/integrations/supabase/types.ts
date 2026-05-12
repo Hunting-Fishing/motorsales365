@@ -1726,6 +1726,7 @@ export type Database = {
         Returns: number
       }
       expire_stale_pending_sales: { Args: never; Returns: number }
+      gen_referral_code: { Args: { _name: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1785,6 +1786,7 @@ export type Database = {
         }
         Returns: Json
       }
+      sync_staff_referrals: { Args: never; Returns: number }
       upsert_currency_rates: { Args: { _rates: Json }; Returns: number }
       user_has_paid_subscription: {
         Args: { _user_id: string }
