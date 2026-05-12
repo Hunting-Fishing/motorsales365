@@ -365,6 +365,7 @@ function AdminReferrals() {
   }, [rows, stats]);
 
   const filteredRows = useMemo(() => {
+    const q = search.trim().toLowerCase();
     return rows.filter((r) => {
       if (statusFilter === "active" && !r.active) return false;
       if (statusFilter === "inactive" && r.active) return false;
@@ -376,9 +377,56 @@ function AdminReferrals() {
           return false;
         }
       }
+      if (q) {
+        const hay = `${r.full_name} ${r.email} ${r.referral_code}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
       return true;
     });
-  }, [rows, roles, roleFilter, statusFilter]);
+  }, [rows, roles, roleFilter, statusFilter, search]);
+
+  const sortedRows = useMemo(() => {
+    const arr = [...filteredRows];
+    const dir = sortDir === "asc" ? 1 : -1;
+    arr.sort((a, b) => {
+      const sa = stats[a.id] || { scans: 0, visitors: 0, signups: 0, listings: 0 };
+      const sb_ = stats[b.id] || { scans: 0, visitors: 0, signups: 0, listings: 0 };
+      let av: any, bv: any;
+      switch (sortKey) {
+        case "name": av = a.full_name?.toLowerCase() || ""; bv = b.full_name?.toLowerCase() || ""; break;
+        case "email": av = a.email?.toLowerCase() || ""; bv = b.email?.toLowerCase() || ""; break;
+        case "code": av = a.referral_code; bv = b.referral_code; break;
+        case "status": av = a.active ? 1 : 0; bv = b.active ? 1 : 0; break;
+        case "scans": av = sa.scans; bv = sb_.scans; break;
+        case "visitors": av = sa.visitors; bv = sb_.visitors; break;
+        case "signups": av = sa.signups; bv = sb_.signups; break;
+        case "listings": av = sa.listings; bv = sb_.listings; break;
+      }
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
+    });
+    return arr;
+  }, [filteredRows, sortKey, sortDir, stats]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedRows.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const pagedRows = useMemo(
+    () => sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize),
+    [sortedRows, currentPage, pageSize],
+  );
+
+  useEffect(() => { setPage(1); }, [search, roleFilter, statusFilter, sortKey, sortDir, pageSize]);
+
+  const toggleSort = (k: typeof sortKey) => {
+    if (sortKey === k) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortKey(k); setSortDir("asc"); }
+  };
+
+  const auditActorOptions = useMemo(() => {
+    const ids = Array.from(new Set(audit.map((e) => e.actor_id).filter(Boolean) as string[]));
+    return ids.map((id) => ({ id, name: actors[id]?.name || id.slice(0, 8) }));
+  }, [audit, actors]);
 
   const exportCsv = () => {
     const header = ["full_name", "email", "code", "active", "scans", "visitors", "signups", "listings", "conversion_pct", "url"];
