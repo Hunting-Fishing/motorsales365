@@ -344,7 +344,7 @@ function AdminRedemptions() {
                   <td className="px-3 py-2 text-right tabular-nums">{rows.length.toLocaleString()}</td>
                   <td className="px-3 py-2 text-right tabular-nums text-muted-foreground">100%</td>
                   <td className="px-3 py-2 text-right tabular-nums text-primary">
-                    −{formatPHP(totals.disc)}
+                    −{fmtMoney(totals.disc)}
                   </td>
                 </tr>
               </tfoot>
