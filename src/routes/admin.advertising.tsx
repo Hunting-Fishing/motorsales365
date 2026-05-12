@@ -171,12 +171,21 @@ function AdminAdvertising() {
                     {active.company && <>{active.company} · </>}submitted {formatDate(active.created_at)}
                   </div>
                 </div>
-                <Select value={active.status} onValueChange={(v) => setStatus(active.id, v as Status)}>
-                  <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant={active.assigned_to === user?.id ? "default" : "outline"}
+                    onClick={assignToMe}
+                  >
+                    {active.assigned_to === user?.id ? "Assigned to you" : "Assign to me"}
+                  </Button>
+                  <Select value={active.status} onValueChange={(v) => setStatus(active.id, v as Status)}>
+                    <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="grid gap-2 text-sm sm:grid-cols-2">
