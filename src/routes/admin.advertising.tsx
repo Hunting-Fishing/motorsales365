@@ -106,13 +106,22 @@ function AdminAdvertising() {
         <h1 className="flex items-center gap-2 font-display text-2xl font-bold">
           <Megaphone className="h-6 w-6" /> Advertising inquiries
         </h1>
-        <Select value={filter} onValueChange={(v) => setFilter(v as any)}>
-          <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            {STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-          </SelectContent>
-        </Select>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            variant={mineOnly ? "default" : "outline"}
+            onClick={() => setMineOnly((v) => !v)}
+          >
+            Assigned to me
+          </Button>
+          <Select value={filter} onValueChange={(v) => setFilter(v as any)}>
+            <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              {STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[340px_1fr]">
@@ -136,7 +145,14 @@ function AdminAdvertising() {
               </div>
               <div className="text-xs text-muted-foreground">{i.company || i.email}</div>
               <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">{i.message}</div>
-              <div className="mt-1 text-[11px] text-muted-foreground">{formatDate(i.created_at)} · {i.placement}</div>
+              <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
+                <span>{formatDate(i.created_at)} · {i.placement}</span>
+                {i.assigned_to && (
+                  <span className={i.assigned_to === user?.id ? "text-primary font-semibold" : ""}>
+                    {i.assigned_to === user?.id ? "You" : "Assigned"}
+                  </span>
+                )}
+              </div>
             </button>
           ))}
         </div>
