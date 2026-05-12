@@ -20,6 +20,28 @@ export const Route = createFileRoute("/admin/accounts")({
   component: AccountsConsole,
 });
 
+async function logAudit(
+  targetUserId: string,
+  field: string,
+  oldValue: unknown,
+  newValue: unknown,
+  note: string | null,
+  isAdmin: boolean,
+) {
+  const { data: u } = await supabase.auth.getUser();
+  const actorId = u.user?.id;
+  if (!actorId) return;
+  await supabase.from("account_audit_log").insert({
+    target_user_id: targetUserId,
+    actor_id: actorId,
+    actor_role: isAdmin ? "admin" : "sales",
+    field,
+    old_value: oldValue === undefined ? null : (oldValue as any),
+    new_value: newValue === undefined ? null : (newValue as any),
+    note,
+  });
+}
+
 type Plan = { id: string; name: string; price_php: number };
 type Sub = {
   id: string;
