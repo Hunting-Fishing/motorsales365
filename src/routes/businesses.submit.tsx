@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LocationDrilldown, type LocationValue } from "@/components/businesses/location-drilldown";
+import { LocationPicker } from "@/components/businesses/location-picker";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/businesses/submit")({
