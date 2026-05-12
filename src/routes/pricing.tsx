@@ -1,7 +1,9 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Check } from "lucide-react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { formatPHP } from "@/lib/format";
@@ -17,8 +19,23 @@ export const Route = createFileRoute("/pricing")({
 });
 
 function PricingPage() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [settings, setSettings] = useState<Record<string, number>>({});
   const [plans, setPlans] = useState<any[]>([]);
+  const [mySub, setMySub] = useState<any | null>(null);
+  const [requesting, setRequesting] = useState<string | null>(null);
+
+  const loadSub = async (uid: string) => {
+    const { data } = await supabase
+      .from("subscriptions")
+      .select("*")
+      .eq("user_id", uid)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    setMySub(data ?? null);
+  };
 
   useEffect(() => {
     supabase.from("pricing_settings").select("key,value").then(({ data }) => {
@@ -28,7 +45,29 @@ function PricingPage() {
     });
     supabase.from("subscription_plans").select("*").eq("active", true).order("sort_order")
       .then(({ data }) => setPlans(data ?? []));
-  }, []);
+    if (user?.id) loadSub(user.id);
+  }, [user?.id]);
+
+  const requestPlan = async (planId: string) => {
+    if (!user) {
+      navigate({ to: "/signup" });
+      return;
+    }
+    if (mySub && ["pending", "active", "paused"].includes(mySub.status)) {
+      toast.info("You already have a subscription on file. Visit Billing to view it.");
+      return;
+    }
+    setRequesting(planId);
+    const { error } = await supabase.from("subscriptions").insert({
+      user_id: user.id,
+      plan_id: planId,
+      status: "pending",
+    });
+    setRequesting(null);
+    if (error) return toast.error(error.message);
+    toast.success("Subscription requested — our team will reach out shortly.");
+    loadSub(user.id);
+  };
 
   return (
     <SiteLayout>
