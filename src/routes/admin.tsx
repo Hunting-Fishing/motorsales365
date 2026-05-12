@@ -16,6 +16,7 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean; roles: Role[
   { to: "/admin/analytics", label: "Analytics", Icon: BarChart3, roles: ["admin","sales","support"] },
   { to: "/admin/advertising", label: "Advertising", Icon: Megaphone, roles: ["admin","advertising"] },
   { to: "/admin/referrals", label: "Staff QR Referrals", Icon: QrCode, roles: ["admin","sales"] },
+  { to: "/admin/redemptions", label: "Referral Redemptions", Icon: Ticket, roles: ["admin","sales"] },
   { to: "/admin/pricing", label: "Pricing & plans", Icon: CreditCard, roles: ["admin"] },
   { to: "/admin/performance", label: "Performance", Icon: Gauge, roles: ["admin"] },
   { to: "/admin/listings", label: "Listings", Icon: ListChecks, roles: ["admin","moderator","support"] },
