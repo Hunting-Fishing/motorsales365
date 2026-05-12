@@ -1289,6 +1289,36 @@ export type Database = {
           },
         ]
       }
+      staff_referral_audit: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          details: Json
+          id: string
+          staff_email: string | null
+          staff_referral_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          staff_email?: string | null
+          staff_referral_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          staff_email?: string | null
+          staff_referral_id?: string | null
+        }
+        Relationships: []
+      }
       staff_referrals: {
         Row: {
           active: boolean
