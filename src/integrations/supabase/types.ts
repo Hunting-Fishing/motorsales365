@@ -186,6 +186,225 @@ export type Database = {
           },
         ]
       }
+      business_reviews: {
+        Row: {
+          body: string | null
+          business_id: string
+          created_at: string
+          id: string
+          rating: number
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          business_id: string
+          created_at?: string
+          id?: string
+          rating: number
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          business_id?: string
+          created_at?: string
+          id?: string
+          rating?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_reviews_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_tag_links: {
+        Row: {
+          business_id: string
+          tag_slug: string
+        }
+        Insert: {
+          business_id: string
+          tag_slug: string
+        }
+        Update: {
+          business_id?: string
+          tag_slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_tag_links_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_tag_links_tag_slug_fkey"
+            columns: ["tag_slug"]
+            isOneToOne: false
+            referencedRelation: "business_tags"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      business_tags: {
+        Row: {
+          label: string
+          slug: string
+          sort_order: number
+          type_slug: string | null
+        }
+        Insert: {
+          label: string
+          slug: string
+          sort_order?: number
+          type_slug?: string | null
+        }
+        Update: {
+          label?: string
+          slug?: string
+          sort_order?: number
+          type_slug?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_tags_type_slug_fkey"
+            columns: ["type_slug"]
+            isOneToOne: false
+            referencedRelation: "business_types"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      business_types: {
+        Row: {
+          icon: string | null
+          label: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          icon?: string | null
+          label: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          icon?: string | null
+          label?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      businesses: {
+        Row: {
+          barangay: string | null
+          city: string | null
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          email: string | null
+          featured: boolean
+          hours: Json | null
+          id: string
+          lat: number | null
+          lng: number | null
+          logo_url: string | null
+          messenger_url: string | null
+          name: string
+          owner_id: string | null
+          phone: string | null
+          photos: Json
+          province: string | null
+          rating_avg: number
+          rating_count: number
+          region: string | null
+          slug: string
+          status: Database["public"]["Enums"]["business_status"]
+          street_address: string | null
+          type_slug: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          barangay?: string | null
+          city?: string | null
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          featured?: boolean
+          hours?: Json | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          logo_url?: string | null
+          messenger_url?: string | null
+          name: string
+          owner_id?: string | null
+          phone?: string | null
+          photos?: Json
+          province?: string | null
+          rating_avg?: number
+          rating_count?: number
+          region?: string | null
+          slug: string
+          status?: Database["public"]["Enums"]["business_status"]
+          street_address?: string | null
+          type_slug: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          barangay?: string | null
+          city?: string | null
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          email?: string | null
+          featured?: boolean
+          hours?: Json | null
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          logo_url?: string | null
+          messenger_url?: string | null
+          name?: string
+          owner_id?: string | null
+          phone?: string | null
+          photos?: Json
+          province?: string | null
+          rating_avg?: number
+          rating_count?: number
+          region?: string | null
+          slug?: string
+          status?: Database["public"]["Enums"]["business_status"]
+          street_address?: string | null
+          type_slug?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "businesses_type_slug_fkey"
+            columns: ["type_slug"]
+            isOneToOne: false
+            referencedRelation: "business_types"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       categories: {
         Row: {
           icon: string | null
@@ -1593,6 +1812,7 @@ export type Database = {
         | "support"
         | "advertising"
       business_kind: "repair_shop" | "insurance" | "dealer" | "other"
+      business_status: "pending" | "active" | "rejected" | "hidden"
       listing_plan: "free" | "standard" | "upgraded"
       listing_status:
         | "draft"
@@ -1759,6 +1979,7 @@ export const Constants = {
         "advertising",
       ],
       business_kind: ["repair_shop", "insurance", "dealer", "other"],
+      business_status: ["pending", "active", "rejected", "hidden"],
       listing_plan: ["free", "standard", "upgraded"],
       listing_status: [
         "draft",
