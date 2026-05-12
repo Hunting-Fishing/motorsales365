@@ -9,11 +9,12 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Download, Copy, QrCode, Tag, Plus, Trash2, Users, MousePointerClick,
   UserPlus, Percent, Pencil, Printer, FileSpreadsheet, Calendar, RefreshCw,
-  Power, History,
+  Power, History, ArrowUp, ArrowDown, ArrowUpDown, Search,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -91,8 +92,20 @@ function AdminReferrals() {
   const [promosFor, setPromosFor] = useState<StaffRow | null>(null);
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
+  const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState<"name" | "email" | "code" | "status" | "scans" | "visitors" | "signups" | "listings">("name");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(25);
   const [audit, setAudit] = useState<AuditEntry[]>([]);
   const [showAudit, setShowAudit] = useState(false);
+  const [auditAction, setAuditAction] = useState<string>("all");
+  const [auditActor, setAuditActor] = useState<string>("all");
+  const [auditFrom, setAuditFrom] = useState<string>("");
+  const [auditTo, setAuditTo] = useState<string>("");
+  const [confirmToggle, setConfirmToggle] = useState<StaffRow | null>(null);
+  const [confirmReason, setConfirmReason] = useState("");
+  const [confirmBusy, setConfirmBusy] = useState(false);
 
   const load = async (rangeKey: RangeKey = range) => {
     setLoading(true);
@@ -262,21 +275,53 @@ function AdminReferrals() {
     else load();
   };
 
-  const toggleActive = async (row: StaffRow) => {
+  const requestToggle = (row: StaffRow) => {
+    setConfirmReason("");
+    setConfirmToggle(row);
+  };
+
+  const submitToggle = async () => {
+    if (!confirmToggle) return;
+    if (confirmReason.trim().length < 3) { toast.error("Please provide a reason (min 3 chars)"); return; }
+    setConfirmBusy(true);
+    const row = confirmToggle;
     const next = !row.active;
     const { error } = await sb.from("staff_referrals").update({ active: next }).eq("id", row.id);
-    if (error) { toast.error(error.message); return; }
+    if (error) { toast.error(error.message); setConfirmBusy(false); return; }
+    if (user) {
+      await sb.from("staff_referral_audit").insert({
+        staff_referral_id: row.id, staff_email: row.email, actor_id: user.id,
+        action: "reason_logged",
+        details: {
+          for_action: next ? "activated" : "deactivated",
+          reason: confirmReason.trim(),
+          referral_code: row.referral_code,
+          full_name: row.full_name,
+        },
+      });
+    }
     toast.success(next ? "Reactivated" : "Deactivated");
+    setConfirmBusy(false);
+    setConfirmToggle(null);
+    setConfirmReason("");
     load();
     if (showAudit) loadAudit();
   };
 
   const loadAudit = async () => {
-    const { data } = await sb
+    let q = sb
       .from("staff_referral_audit")
       .select("*")
       .order("created_at", { ascending: false })
-      .limit(100);
+      .limit(200);
+    if (auditAction !== "all") q = q.eq("action", auditAction);
+    if (auditActor !== "all") q = q.eq("actor_id", auditActor);
+    if (auditFrom) q = q.gte("created_at", new Date(auditFrom).toISOString());
+    if (auditTo) {
+      const t = new Date(auditTo); t.setHours(23, 59, 59, 999);
+      q = q.lte("created_at", t.toISOString());
+    }
+    const { data } = await q;
     const entries = (data as AuditEntry[]) || [];
     setAudit(entries);
     const actorIds = Array.from(new Set(entries.map((e) => e.actor_id).filter(Boolean) as string[]));
@@ -290,7 +335,7 @@ function AdminReferrals() {
     }
   };
 
-  useEffect(() => { if (showAudit) loadAudit(); /* eslint-disable-next-line */ }, [showAudit]);
+  useEffect(() => { if (showAudit) loadAudit(); /* eslint-disable-next-line */ }, [showAudit, auditAction, auditActor, auditFrom, auditTo]);
 
   const logSync = async (count: number) => {
     if (!user) return;
@@ -320,6 +365,7 @@ function AdminReferrals() {
   }, [rows, stats]);
 
   const filteredRows = useMemo(() => {
+    const q = search.trim().toLowerCase();
     return rows.filter((r) => {
       if (statusFilter === "active" && !r.active) return false;
       if (statusFilter === "inactive" && r.active) return false;
@@ -331,9 +377,56 @@ function AdminReferrals() {
           return false;
         }
       }
+      if (q) {
+        const hay = `${r.full_name} ${r.email} ${r.referral_code}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
       return true;
     });
-  }, [rows, roles, roleFilter, statusFilter]);
+  }, [rows, roles, roleFilter, statusFilter, search]);
+
+  const sortedRows = useMemo(() => {
+    const arr = [...filteredRows];
+    const dir = sortDir === "asc" ? 1 : -1;
+    arr.sort((a, b) => {
+      const sa = stats[a.id] || { scans: 0, visitors: 0, signups: 0, listings: 0 };
+      const sb_ = stats[b.id] || { scans: 0, visitors: 0, signups: 0, listings: 0 };
+      let av: any, bv: any;
+      switch (sortKey) {
+        case "name": av = a.full_name?.toLowerCase() || ""; bv = b.full_name?.toLowerCase() || ""; break;
+        case "email": av = a.email?.toLowerCase() || ""; bv = b.email?.toLowerCase() || ""; break;
+        case "code": av = a.referral_code; bv = b.referral_code; break;
+        case "status": av = a.active ? 1 : 0; bv = b.active ? 1 : 0; break;
+        case "scans": av = sa.scans; bv = sb_.scans; break;
+        case "visitors": av = sa.visitors; bv = sb_.visitors; break;
+        case "signups": av = sa.signups; bv = sb_.signups; break;
+        case "listings": av = sa.listings; bv = sb_.listings; break;
+      }
+      if (av < bv) return -1 * dir;
+      if (av > bv) return 1 * dir;
+      return 0;
+    });
+    return arr;
+  }, [filteredRows, sortKey, sortDir, stats]);
+
+  const totalPages = Math.max(1, Math.ceil(sortedRows.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const pagedRows = useMemo(
+    () => sortedRows.slice((currentPage - 1) * pageSize, currentPage * pageSize),
+    [sortedRows, currentPage, pageSize],
+  );
+
+  useEffect(() => { setPage(1); }, [search, roleFilter, statusFilter, sortKey, sortDir, pageSize]);
+
+  const toggleSort = (k: typeof sortKey) => {
+    if (sortKey === k) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setSortKey(k); setSortDir("asc"); }
+  };
+
+  const auditActorOptions = useMemo(() => {
+    const ids = Array.from(new Set(audit.map((e) => e.actor_id).filter(Boolean) as string[]));
+    return ids.map((id) => ({ id, name: actors[id]?.name || id.slice(0, 8) }));
+  }, [audit, actors]);
 
   const exportCsv = () => {
     const header = ["full_name", "email", "code", "active", "scans", "visitors", "signups", "listings", "conversion_pct", "url"];
@@ -472,6 +565,15 @@ function AdminReferrals() {
       )}
 
       <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-3">
+        <div className="relative w-full sm:w-auto sm:min-w-[260px]">
+          <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search name, email, or code"
+            className="h-8 pl-8"
+          />
+        </div>
         <div className="flex items-center gap-2">
           <Label className="text-xs uppercase tracking-wider text-muted-foreground">Role</Label>
           <Select value={roleFilter} onValueChange={setRoleFilter}>
@@ -499,7 +601,7 @@ function AdminReferrals() {
           </Select>
         </div>
         <div className="ml-auto text-xs text-muted-foreground">
-          Showing {filteredRows.length} of {rows.length}
+          Showing {sortedRows.length} of {rows.length}
         </div>
       </div>
 
@@ -507,24 +609,24 @@ function AdminReferrals() {
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-muted/40">
             <tr className="text-left">
-              <th className="px-4 py-2">Staff</th>
+              <SortableTh label="Staff" k="name" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
               <th className="px-4 py-2">Role</th>
-              <th className="px-4 py-2">Code</th>
-              <th className="px-4 py-2">Scans</th>
-              <th className="px-4 py-2">Visitors</th>
-              <th className="px-4 py-2">Signups</th>
-              <th className="px-4 py-2">Listings</th>
-              <th className="px-4 py-2">Status</th>
+              <SortableTh label="Code" k="code" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
+              <SortableTh label="Scans" k="scans" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
+              <SortableTh label="Visitors" k="visitors" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
+              <SortableTh label="Signups" k="signups" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
+              <SortableTh label="Listings" k="listings" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
+              <SortableTh label="Status" k="status" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
               <th className="px-4 py-2 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr><td colSpan={9} className="p-6 text-center text-muted-foreground">Loading…</td></tr>
-            ) : filteredRows.length === 0 ? (
+            ) : pagedRows.length === 0 ? (
               <tr><td colSpan={9} className="p-6 text-center text-muted-foreground">No staff referrals match your filters.</td></tr>
             ) : (
-              filteredRows.map((r) => {
+              pagedRows.map((r) => {
                 const s = stats[r.id] || { scans: 0, signups: 0, visitors: 0, listings: 0 };
                 const qr = publicQrUrl(r.qr_storage_path);
                 const link = `${PUBLIC_BASE}/r/${r.referral_code}`;
@@ -578,7 +680,7 @@ function AdminReferrals() {
                           size="sm"
                           variant="ghost"
                           title={r.active ? "Deactivate" : "Reactivate"}
-                          onClick={() => toggleActive(r)}
+                          onClick={() => requestToggle(r)}
                         >
                           <Power className={`h-4 w-4 ${r.active ? "text-primary" : "text-muted-foreground"}`} />
                         </Button>
@@ -596,19 +698,80 @@ function AdminReferrals() {
             )}
           </tbody>
         </table>
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border px-4 py-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <span>Rows per page</span>
+            <Select value={String(pageSize)} onValueChange={(v) => setPageSize(Number(v))}>
+              <SelectTrigger className="h-7 w-[80px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {[10, 25, 50, 100].map((n) => (
+                  <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2">
+            <span>Page {currentPage} of {totalPages}</span>
+            <Button size="sm" variant="outline" disabled={currentPage <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>Prev</Button>
+            <Button size="sm" variant="outline" disabled={currentPage >= totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>Next</Button>
+          </div>
+        </div>
       </div>
 
       {showAudit && (
         <section className="rounded-xl border border-border bg-card p-4">
-          <div className="mb-3 flex items-center justify-between">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 className="font-display text-lg font-semibold">Audit log</h2>
-              <p className="text-xs text-muted-foreground">Most recent 100 staff referral changes (creates, activations, QR generations, sync runs).</p>
+              <p className="text-xs text-muted-foreground">Up to 200 most recent matching staff referral changes.</p>
             </div>
             <Button size="sm" variant="ghost" onClick={loadAudit}><RefreshCw className="mr-1 h-3 w-3" /> Refresh</Button>
           </div>
+          <div className="mb-3 flex flex-wrap items-end gap-2">
+            <div className="flex flex-col gap-1">
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Action</Label>
+              <Select value={auditAction} onValueChange={setAuditAction}>
+                <SelectTrigger className="h-8 w-[160px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All actions</SelectItem>
+                  <SelectItem value="created">created</SelectItem>
+                  <SelectItem value="activated">activated</SelectItem>
+                  <SelectItem value="deactivated">deactivated</SelectItem>
+                  <SelectItem value="qr_generated">qr_generated</SelectItem>
+                  <SelectItem value="sync_run">sync_run</SelectItem>
+                  <SelectItem value="deleted">deleted</SelectItem>
+                  <SelectItem value="reason_logged">reason_logged</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Admin</Label>
+              <Select value={auditActor} onValueChange={setAuditActor}>
+                <SelectTrigger className="h-8 w-[180px]"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All admins</SelectItem>
+                  {auditActorOptions.map((a) => (
+                    <SelectItem key={a.id} value={a.id}>{a.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">From</Label>
+              <Input type="date" value={auditFrom} onChange={(e) => setAuditFrom(e.target.value)} className="h-8 w-[150px]" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">To</Label>
+              <Input type="date" value={auditTo} onChange={(e) => setAuditTo(e.target.value)} className="h-8 w-[150px]" />
+            </div>
+            {(auditAction !== "all" || auditActor !== "all" || auditFrom || auditTo) && (
+              <Button size="sm" variant="ghost" onClick={() => { setAuditAction("all"); setAuditActor("all"); setAuditFrom(""); setAuditTo(""); }}>
+                Clear
+              </Button>
+            )}
+          </div>
           {audit.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No audit entries yet.</p>
+            <p className="text-sm text-muted-foreground">No audit entries match these filters.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
@@ -650,6 +813,40 @@ function AdminReferrals() {
         </section>
       )}
 
+      <AlertDialog open={!!confirmToggle} onOpenChange={(o) => { if (!o) { setConfirmToggle(null); setConfirmReason(""); } }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {confirmToggle?.active ? "Deactivate" : "Reactivate"} {confirmToggle?.full_name}?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirmToggle?.active
+                ? "Inactive codes still log scans but won't credit signups."
+                : "This code will resume crediting signups for new visitors."}
+              {" "}Code: <span className="font-mono">{confirmToggle?.referral_code}</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-2">
+            <Label className="text-xs">Reason (required, logged in audit)</Label>
+            <Textarea
+              value={confirmReason}
+              onChange={(e) => setConfirmReason(e.target.value)}
+              placeholder="e.g. Staff offboarded, QR misprinted, suspected abuse…"
+              rows={3}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={confirmBusy}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={confirmBusy || confirmReason.trim().length < 3}
+              onClick={(e) => { e.preventDefault(); submitToggle(); }}
+            >
+              {confirmToggle?.active ? "Deactivate" : "Reactivate"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {newOpen && <StaffDialog onClose={() => setNewOpen(false)} onSubmit={handleCreate} />}
       {editing && (
         <StaffDialog
@@ -660,6 +857,30 @@ function AdminReferrals() {
       )}
       {promosFor && <PromoDialog staff={promosFor} onClose={() => setPromosFor(null)} />}
     </div>
+  );
+}
+
+function SortableTh({
+  label, k, sortKey, sortDir, onSort,
+}: {
+  label: string;
+  k: "name" | "email" | "code" | "status" | "scans" | "visitors" | "signups" | "listings";
+  sortKey: string;
+  sortDir: "asc" | "desc";
+  onSort: (k: any) => void;
+}) {
+  const active = sortKey === k;
+  return (
+    <th className="px-4 py-2">
+      <button
+        type="button"
+        onClick={() => onSort(k)}
+        className={`inline-flex items-center gap-1 hover:text-foreground ${active ? "text-foreground" : "text-muted-foreground"}`}
+      >
+        {label}
+        {active ? (sortDir === "asc" ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />) : <ArrowUpDown className="h-3 w-3 opacity-50" />}
+      </button>
+    </th>
   );
 }
 
