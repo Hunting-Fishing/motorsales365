@@ -40,6 +40,25 @@ reviewed.
   one counter. It cannot read or modify anything else. It has
   `SET search_path = public`.
 
+### 3. Role / tier / business helpers (`is_staff`, `can_moderate`, `can_support`, `can_manage_ads`, `current_plan_tier`, `is_business_account`)
+
+- **Warning:** `0029 — Signed-In Users Can Execute SECURITY DEFINER Function`
+  (one per function).
+- **Why they're `SECURITY DEFINER`:** they read `public.user_roles`,
+  `public.subscriptions`, `public.subscription_plans`, and `public.profiles`,
+  all RLS-protected. Without definer rights, calling them inside another
+  policy would recurse (or fail for signed-in users without direct access
+  to those rows).
+- **Why `authenticated` must keep EXECUTE:** they back RLS policies on
+  `listings`, `reports`, `verification_requests`, `account_audit_log`,
+  `ad_inquiries`, and `ad_inquiry_messages`, plus client-side gating in the
+  admin console.
+- **Why this is safe:** each returns a boolean (or the plan name) derived
+  from the caller-supplied `_user_id`; none of them write data or return
+  bulk rows. They are `STABLE` with `SET search_path = public`, and EXECUTE
+  is revoked from `PUBLIC` and `anon` (allow-list enforced by
+  `scripts/verify-security.sh`).
+
 ## Functions that are NOT public
 
 Every other `SECURITY DEFINER` function in `public` has had EXECUTE revoked
@@ -49,10 +68,7 @@ from `PUBLIC`, `anon`, and `authenticated`. They run only as triggers, as
 
 ## How to re-verify
 
-1. `supabase--linter` — should return exactly 3 warnings, all matching the
-   two functions above.
-2. `SELECT proname, has_function_privilege('anon', oid, 'EXECUTE'),
-   has_function_privilege('authenticated', oid, 'EXECUTE')
-   FROM pg_proc WHERE pronamespace='public'::regnamespace AND prosecdef;`
-   — only `has_role` (auth only) and `increment_listing_view` (anon + auth)
-   should show `true`.
+1. `./scripts/verify-security.sh` — should print `PASS` with every
+   allow-listed function showing `OK`.
+2. `supabase--linter` — remaining warnings should map 1:1 to the functions
+   above. Any other warning is drift.

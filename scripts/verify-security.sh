@@ -49,6 +49,12 @@ rows=$(psql -At -c "$SQL" 2>/dev/null) || {
 declare -A EXPECTED=(
   ["has_role"]="false|true"
   ["increment_listing_view"]="true|true"
+  ["is_staff"]="false|true"
+  ["can_moderate"]="false|true"
+  ["can_support"]="false|true"
+  ["can_manage_ads"]="false|true"
+  ["current_plan_tier"]="false|true"
+  ["is_business_account"]="false|true"
 )
 
 fail=0

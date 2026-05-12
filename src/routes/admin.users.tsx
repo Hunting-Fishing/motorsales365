@@ -26,13 +26,20 @@ function AdminUsers() {
   };
   useEffect(() => { load(); }, []);
 
-  const grantAdmin = async (userId: string) => {
-    const { error } = await supabase.from("user_roles").insert({ user_id: userId, role: "admin" });
-    if (error) toast.error(error.message); else { toast.success("Admin granted"); load(); }
-  };
-  const revokeAdmin = async (userId: string) => {
-    await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", "admin");
-    toast.success("Admin revoked"); load();
+  const STAFF_ROLES = ["admin", "moderator", "support", "sales", "advertising"] as const;
+  type StaffRole = (typeof STAFF_ROLES)[number];
+
+  const toggleRole = async (userId: string, role: StaffRole, has: boolean) => {
+    if (has) {
+      const { error } = await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", role);
+      if (error) return toast.error(error.message);
+      toast.success(`${role} revoked`);
+    } else {
+      const { error } = await supabase.from("user_roles").insert({ user_id: userId, role: role as any });
+      if (error) return toast.error(error.message);
+      toast.success(`${role} granted`);
+    }
+    load();
   };
 
   const verifyUser = async (userId: string) => {
@@ -57,7 +64,6 @@ function AdminUsers() {
       <h1 className="mb-6 font-display text-2xl font-bold">Users</h1>
       <div className="space-y-2">
         {users.map((u) => {
-          const isAdmin = u.roles.includes("admin");
           const isVerified = u.verification_status === "verified";
           return (
             <div key={u.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
@@ -70,15 +76,29 @@ function AdminUsers() {
                   {u.seller_type} · joined {formatDate(u.created_at)}
                   {u.verification_status && u.verification_status !== "unverified" && ` · ${u.verification_status}`}
                 </div>
+                <div className="mt-2 flex flex-wrap gap-1">
+                  {STAFF_ROLES.map((role) => {
+                    const has = u.roles.includes(role);
+                    return (
+                      <button
+                        key={role}
+                        onClick={() => toggleRole(u.id, role, has)}
+                        className={`rounded-full border px-2 py-0.5 text-[11px] font-medium transition ${
+                          has
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border bg-background text-muted-foreground hover:border-primary/50"
+                        }`}
+                      >
+                        {has ? "✓ " : "+ "}{role}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                {isAdmin && <Badge>Admin</Badge>}
                 {isVerified
                   ? <Button size="sm" variant="outline" onClick={() => revokeVerification(u.id)}>Revoke verified</Button>
                   : <Button size="sm" variant="outline" onClick={() => verifyUser(u.id)}>Mark verified</Button>}
-                {isAdmin
-                  ? <Button size="sm" variant="outline" onClick={() => revokeAdmin(u.id)}>Revoke admin</Button>
-                  : <Button size="sm" variant="outline" onClick={() => grantAdmin(u.id)}>Make admin</Button>}
               </div>
             </div>
           );
