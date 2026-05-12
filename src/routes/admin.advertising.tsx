@@ -32,6 +32,7 @@ function AdminAdvertising() {
   const hasAccess = isAdmin || isAdvertising;
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [filter, setFilter] = useState<Status | "all">("new");
+  const [mineOnly, setMineOnly] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [reply, setReply] = useState("");
@@ -40,6 +41,7 @@ function AdminAdvertising() {
   const load = async () => {
     let q = supabase.from("ad_inquiries").select("*").order("created_at", { ascending: false });
     if (filter !== "all") q = q.eq("status", filter);
+    if (mineOnly && user?.id) q = q.eq("assigned_to", user.id);
     const { data, error } = await q;
     if (error) { toast.error(error.message); return; }
     setInquiries(data ?? []);
@@ -53,7 +55,7 @@ function AdminAdvertising() {
     setNotes(cur.internal_notes ?? "");
   };
 
-  useEffect(() => { if (hasAccess) load(); /* eslint-disable-next-line */ }, [filter, hasAccess]);
+  useEffect(() => { if (hasAccess) load(); /* eslint-disable-next-line */ }, [filter, mineOnly, hasAccess]);
 
   const active = useMemo(() => inquiries.find((i) => i.id === activeId), [inquiries, activeId]);
 
@@ -69,6 +71,14 @@ function AdminAdvertising() {
     const { error } = await supabase.from("ad_inquiries").update({ internal_notes: notes }).eq("id", active.id);
     if (error) return toast.error(error.message);
     toast.success("Notes saved");
+    load();
+  };
+
+  const assignToMe = async () => {
+    if (!active || !user?.id) return;
+    const { error } = await supabase.from("ad_inquiries").update({ assigned_to: user.id }).eq("id", active.id);
+    if (error) return toast.error(error.message);
+    toast.success("Assigned to you");
     load();
   };
 
@@ -96,13 +106,22 @@ function AdminAdvertising() {
         <h1 className="flex items-center gap-2 font-display text-2xl font-bold">
           <Megaphone className="h-6 w-6" /> Advertising inquiries
         </h1>
-        <Select value={filter} onValueChange={(v) => setFilter(v as any)}>
-          <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All</SelectItem>
-            {STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-          </SelectContent>
-        </Select>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            variant={mineOnly ? "default" : "outline"}
+            onClick={() => setMineOnly((v) => !v)}
+          >
+            Assigned to me
+          </Button>
+          <Select value={filter} onValueChange={(v) => setFilter(v as any)}>
+            <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              {STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[340px_1fr]">
@@ -126,7 +145,14 @@ function AdminAdvertising() {
               </div>
               <div className="text-xs text-muted-foreground">{i.company || i.email}</div>
               <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">{i.message}</div>
-              <div className="mt-1 text-[11px] text-muted-foreground">{formatDate(i.created_at)} · {i.placement}</div>
+              <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
+                <span>{formatDate(i.created_at)} · {i.placement}</span>
+                {i.assigned_to && (
+                  <span className={i.assigned_to === user?.id ? "text-primary font-semibold" : ""}>
+                    {i.assigned_to === user?.id ? "You" : "Assigned"}
+                  </span>
+                )}
+              </div>
             </button>
           ))}
         </div>
@@ -145,12 +171,21 @@ function AdminAdvertising() {
                     {active.company && <>{active.company} · </>}submitted {formatDate(active.created_at)}
                   </div>
                 </div>
-                <Select value={active.status} onValueChange={(v) => setStatus(active.id, v as Status)}>
-                  <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
-                  </SelectContent>
-                </Select>
+                <div className="flex items-center gap-2">
+                  <Button
+                    size="sm"
+                    variant={active.assigned_to === user?.id ? "default" : "outline"}
+                    onClick={assignToMe}
+                  >
+                    {active.assigned_to === user?.id ? "Assigned to you" : "Assign to me"}
+                  </Button>
+                  <Select value={active.status} onValueChange={(v) => setStatus(active.id, v as Status)}>
+                    <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      {STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="grid gap-2 text-sm sm:grid-cols-2">

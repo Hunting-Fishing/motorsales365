@@ -1,90 +1,51 @@
-# Finish security for staff, users, businesses, tiers + Advertiser intake
+## Plan: finish the Advertiser inquiry channel
 
-The four chips you saw are minor follow-ups. The bigger gap is that the project only has three roles (`admin`, `user`, `sales`) and no structured way for advertisers to ask about ad space. This plan finishes the role model, tightens RLS around tiers and business accounts, and adds an Advertiser inquiry flow.
+The `/advertise` page and `/admin/advertising` inbox already exist. Four follow-up tasks remain to make the channel production-ready:
 
-## 1. Expand staff roles
+### 1. Stricter form validation on `/advertise`
+- Add a Zod schema in `src/routes/advertise.tsx`:
+  - `contact_name`: trimmed, 1–100 chars
+  - `company`: optional, ≤120 chars
+  - `email`: valid email, ≤255 chars
+  - `phone`: optional, ≤30 chars, basic digit/`+`/space regex
+  - `placement`: enum from `PLACEMENTS`
+  - `budget_range`: optional, ≤60 chars
+  - `start_date`: optional ISO date, must be today or later
+  - `message`: 10–2000 chars
+- Show inline field errors (per-field state) and disable submit while invalid.
+- Mirror length caps in a DB trigger on `ad_inquiries` so server-side enforcement matches client.
 
-Extend the `app_role` enum so different staff can do different jobs without all getting full admin:
+### 2. Inquiry status flow polish (admin panel)
+The status select already exists; tighten it:
+- Restrict valid transitions in a `BEFORE UPDATE` trigger on `ad_inquiries`:
+  - `new → in_review | spam`
+  - `in_review → quoted | lost | spam`
+  - `quoted → won | lost`
+  - `won`, `lost`, `spam` are terminal (admin override only)
+- Auto-bump `new → in_review` already happens on first staff reply — keep it.
+- Add an "Assign to me" button that sets `assigned_to = auth.uid()`; show assignee chip on each row.
+- Add a small filter for "Assigned to me" alongside the status filter.
 
-- `admin` — full access (existing)
-- `moderator` — review listings, reports, verifications; cannot change billing/roles
-- `support` — read‑only across users + listings + messages; can add notes; cannot change billing/roles
-- `sales` — Accounts console (already used) — keep; can change plan/discount/comp/notes/pause; cannot grant roles
-- `advertising` — new; manages the Advertiser inquiry inbox + ad placements
-- `user` — default end user (existing)
+### 3. Email notifications
+Two new templates registered in `src/lib/email-templates/registry.ts`:
+- `ad-inquiry-received` — sent to the advertiser confirming submission (uses `contact_name`, `placement`, summary of next steps).
+- `ad-inquiry-staff-notice` — sent to a staff distro (`partners@365motorsales.ph`) with submitter details + link to `/admin/advertising`.
+- `ad-inquiry-reply` — sent to the advertiser whenever a staff reply is inserted into `ad_inquiry_messages`.
 
-Add helper SQL functions so RLS reads stay simple:
-- `is_staff(uid)` → true for any non‑`user` role
-- `can_moderate(uid)` → admin or moderator
-- `can_support(uid)` → admin, moderator, support, sales
+Wiring:
+- On insert into `ad_inquiries`, a Postgres trigger calls `enqueue_email` (already exists) with both the confirmation and staff-notice payloads.
+- On insert into `ad_inquiry_messages` where `from_staff = true`, a trigger enqueues the reply email to the inquiry's submitter email.
+- Re-use the existing email queue worker — no new edge function needed.
 
-## 2. Tighten existing RLS using the new roles
+### 4. Discoverability
+- Add an "Advertise with us" link in `src/components/site-footer.tsx` (Partners column) and a subtle CTA card on the homepage's secondary section.
+- Add the `/advertise` route to `src/routes/api/sitemap[.]xml.tsx`.
 
-Replace blanket `has_role(uid,'admin')` on read-only admin surfaces with the narrower helpers so support/moderator can do their jobs without being admins:
+### Out of scope
+- Ad serving, impression tracking, online ad-space checkout.
+- Public advertiser self-serve dashboard beyond the existing "submitter reads own thread" RLS.
 
-- `listings`, `reports`, `verification_requests`, `messages` (admin view), `account_audit_log` → readable by `can_support`
-- `listings` moderation actions (status change, takedown) → `can_moderate`
-- `subscriptions`, `payments`, `pricing_settings`, `subscription_plans`, `user_roles` → **admin only** (unchanged)
-- `account_audit_log` inserts from the Accounts console → allow `admin` + `sales` (current behavior, just made explicit)
-
-## 3. Business accounts + tier-level checks
-
-Today tier is inferred ad‑hoc from `subscriptions` joined to `subscription_plans`. Add a single source of truth so policies/UI stop duplicating the join:
-
-- New SQL function `current_plan_tier(uid)` returning the plan name (`Free`/`Bronze`/`Silver`/`Gold`/`Platinum`/`Business`) for the user's active, non-expired subscription, falling back to `Free`.
-- New SQL function `is_business_account(uid)` → `verification_status='verified'` AND `business_kind IN ('dealer','repair_shop','insurance')`.
-- Use these in:
-  - Free-listing quota trigger (already exists) — keep, but switch the bypass check to `current_plan_tier(uid) <> 'Free'`.
-  - Featured/boost eligibility on `promotions` — only `Silver`+ can create paid boosts.
-  - Business-only listing categories (e.g. dealer inventory bulk upload) — gated by `is_business_account`.
-
-No data migration is needed — existing rows keep working; this is just consolidating the rules.
-
-## 4. Advertiser inquiry channel ("buy ad space")
-
-New public-facing intake so brands/agencies can ask about ad placements, plus a staff inbox for the `advertising` role.
-
-New table `ad_inquiries`:
-- contact name, company, email, phone (optional)
-- desired placement (enum: `homepage_banner`, `category_banner`, `listing_sidebar`, `newsletter`, `other`)
-- budget range, start date, message
-- status (`new` / `in_review` / `quoted` / `won` / `lost` / `spam`)
-- assigned_to (staff uid), internal_notes
-- created_at / updated_at
-
-RLS:
-- **Anyone (anon + authenticated)** can INSERT (rate-limited via a simple per-IP/email check at the form level).
-- **Submitter** can read their own inquiry only if signed in (matched by email on the auth user).
-- **Staff with `admin` or `advertising`** can read/update all.
-- No one can DELETE except `admin`.
-
-New table `ad_inquiry_messages` (threaded replies between staff and the advertiser, reusing the same RLS pattern), so advertisers and staff can keep the conversation in one place instead of email tag.
-
-## 5. UI surfaces
-
-Frontend (presentation only, no business logic beyond wiring):
-
-- **Public "Advertise with us" page** at `/advertise` — short pitch + inquiry form posting to `ad_inquiries`. Linked from footer.
-- **Contact CTA on homepage / footer**: "Buy ad space" → `/advertise`.
-- **Admin → Advertising inbox** at `/admin/advertising` — list, filter by status, open thread, reply, change status, assign. Visible to `admin` and `advertising` roles.
-- **Admin → Roles tab** on `/admin/users` — admin can grant/revoke any staff role (chips for moderator / support / sales / advertising / admin). Already partly present for admin role; extend to all new roles.
-- **Sidebar visibility** in `/admin` adapts to role using the new helpers (support sees Users/Listings/Reports read‑only; moderator adds takedown actions; advertising sees only the Advertising inbox; sales sees Accounts; admin sees everything).
-
-## 6. Security verification
-
-- Extend `scripts/verify-security.sh` allow-list with any new `SECURITY DEFINER` helpers (`is_staff`, `can_moderate`, `can_support`, `current_plan_tier`, `is_business_account`) — each declared `STABLE` with `SET search_path = public`, EXECUTE granted only to `authenticated`.
-- Update `docs/SECURITY.md` to document them.
-- Re-run the Supabase linter; expected warnings remain the same two intentional ones (`has_role`, `increment_listing_view`) plus any new authenticated‑only definer helpers we add (which the script will accept).
-
-## Technical notes
-
-- Enum changes in Postgres can't drop values, so we only ADD: `ALTER TYPE app_role ADD VALUE 'moderator'`, etc. Done in a single migration before any policy uses them.
-- All new helpers are `SECURITY DEFINER STABLE SET search_path = public`, with `EXECUTE` revoked from `PUBLIC`/`anon` and granted to `authenticated` only (same hardening pattern already in the codebase).
-- `ad_inquiries` INSERT-from-anon is intentional and noted in `@security-memory` so the scanner doesn't re‑flag it.
-- No edits to `auth`, `storage`, `realtime`, `supabase_functions`, or `vault` schemas.
-
-## Out of scope (call out if you want them next)
-
-- Ad serving / impression tracking (this plan only handles the *inquiry* pipeline).
-- Paying for ad space online (Stripe/Paddle checkout for ads).
-- Public advertiser self-serve dashboard beyond reading their own inquiry thread.
+### Verification
+- Manually submit an inquiry as anon and as a logged-in user; confirm both rows land and the confirmation email is queued.
+- Flip statuses through the legal transitions and assert that invalid jumps are rejected by the trigger.
+- Re-run `./scripts/verify-security.sh` (allow-list unchanged — no new SECURITY DEFINER functions are introduced beyond existing helpers).

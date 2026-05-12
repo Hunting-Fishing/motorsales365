@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { z } from "zod";
 import { Megaphone, Target, BarChart3, Mail } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
@@ -33,9 +34,29 @@ const PLACEMENTS = [
   { value: "other", label: "Something else" },
 ] as const;
 
+const todayIso = () => new Date().toISOString().slice(0, 10);
+
+const inquirySchema = z.object({
+  contact_name: z.string().trim().min(1, "Required").max(100, "Max 100 characters"),
+  company: z.string().trim().max(120, "Max 120 characters").optional().or(z.literal("")),
+  email: z.string().trim().toLowerCase().email("Invalid email").max(255),
+  phone: z.string().trim().max(30, "Max 30 characters")
+    .regex(/^[+\d][\d\s\-().]*$/u, "Digits, spaces, + - ( ) only").optional().or(z.literal("")),
+  placement: z.enum(PLACEMENTS.map((p) => p.value) as [string, ...string[]]),
+  budget_range: z.string().trim().max(60, "Max 60 characters").optional().or(z.literal("")),
+  start_date: z.string().trim().refine(
+    (v) => !v || v >= todayIso(),
+    "Start date must be today or later",
+  ).optional().or(z.literal("")),
+  message: z.string().trim().min(10, "At least 10 characters").max(2000, "Max 2000 characters"),
+});
+
+type FieldErrors = Partial<Record<keyof z.infer<typeof inquirySchema>, string>>;
+
 function AdvertisePage() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
+  const [errors, setErrors] = useState<FieldErrors>({});
   const [form, setForm] = useState({
     contact_name: "",
     company: "",
@@ -47,25 +68,36 @@ function AdvertisePage() {
     message: "",
   });
 
-  const update = (k: keyof typeof form, v: string) => setForm((f) => ({ ...f, [k]: v }));
+  const update = (k: keyof typeof form, v: string) => {
+    setForm((f) => ({ ...f, [k]: v }));
+    setErrors((er) => ({ ...er, [k]: undefined }));
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.contact_name || !form.email || !form.message) {
-      toast.error("Please fill in your name, email, and a short message.");
+    const parsed = inquirySchema.safeParse(form);
+    if (!parsed.success) {
+      const fe: FieldErrors = {};
+      for (const issue of parsed.error.issues) {
+        const key = issue.path[0] as keyof FieldErrors;
+        if (key && !fe[key]) fe[key] = issue.message;
+      }
+      setErrors(fe);
+      toast.error("Please correct the highlighted fields.");
       return;
     }
+    const v = parsed.data;
     setSubmitting(true);
     const { data: userData } = await supabase.auth.getUser();
     const { error } = await supabase.from("ad_inquiries").insert({
-      contact_name: form.contact_name,
-      company: form.company || null,
-      email: form.email,
-      phone: form.phone || null,
-      placement: form.placement,
-      budget_range: form.budget_range || null,
-      start_date: form.start_date || null,
-      message: form.message,
+      contact_name: v.contact_name,
+      company: v.company || null,
+      email: v.email,
+      phone: v.phone || null,
+      placement: v.placement as (typeof PLACEMENTS)[number]["value"],
+      budget_range: v.budget_range || null,
+      start_date: v.start_date || null,
+      message: v.message,
       submitter_user_id: userData.user?.id ?? null,
       source_url: typeof window !== "undefined" ? window.location.href : null,
     });
@@ -148,38 +180,41 @@ function AdvertisePage() {
                 </Button>
               </div>
             ) : (
-              <form onSubmit={submit} className="space-y-4">
+              <form onSubmit={submit} className="space-y-4" noValidate>
                 <h2 className="font-display text-2xl font-bold">Tell us about your campaign</h2>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <Field label="Your name *">
+                  <Field label="Your name *" error={errors.contact_name}>
                     <Input
-                      required
                       value={form.contact_name}
+                      maxLength={100}
                       onChange={(e) => update("contact_name", e.target.value)}
                     />
                   </Field>
-                  <Field label="Company">
+                  <Field label="Company" error={errors.company}>
                     <Input
                       value={form.company}
+                      maxLength={120}
                       onChange={(e) => update("company", e.target.value)}
                     />
                   </Field>
-                  <Field label="Email *">
+                  <Field label="Email *" error={errors.email}>
                     <Input
-                      required
                       type="email"
                       value={form.email}
+                      maxLength={255}
                       onChange={(e) => update("email", e.target.value)}
                     />
                   </Field>
-                  <Field label="Phone">
+                  <Field label="Phone" error={errors.phone}>
                     <Input
                       value={form.phone}
+                      maxLength={30}
+                      placeholder="+63 917 555 0100"
                       onChange={(e) => update("phone", e.target.value)}
                     />
                   </Field>
                 </div>
-                <Field label="Placement">
+                <Field label="Placement" error={errors.placement}>
                   <Select
                     value={form.placement}
                     onValueChange={(v) => update("placement", v)}
@@ -197,29 +232,32 @@ function AdvertisePage() {
                   </Select>
                 </Field>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <Field label="Monthly budget (₱)">
+                  <Field label="Monthly budget (₱)" error={errors.budget_range}>
                     <Input
                       placeholder="e.g. 20,000–50,000"
                       value={form.budget_range}
+                      maxLength={60}
                       onChange={(e) => update("budget_range", e.target.value)}
                     />
                   </Field>
-                  <Field label="Ideal start date">
+                  <Field label="Ideal start date" error={errors.start_date}>
                     <Input
                       type="date"
+                      min={todayIso()}
                       value={form.start_date}
                       onChange={(e) => update("start_date", e.target.value)}
                     />
                   </Field>
                 </div>
-                <Field label="What are you trying to achieve? *">
+                <Field label="What are you trying to achieve? *" error={errors.message}>
                   <Textarea
-                    required
                     rows={4}
                     value={form.message}
+                    maxLength={2000}
                     onChange={(e) => update("message", e.target.value)}
                     placeholder="Audience, goals, creatives you have ready, etc."
                   />
+                  <p className="text-[11px] text-muted-foreground">{form.message.length}/2000</p>
                 </Field>
                 <Button type="submit" disabled={submitting} className="w-full">
                   {submitting ? "Sending…" : "Request a proposal"}
@@ -249,11 +287,12 @@ function Feature({ icon, title, body }: { icon: React.ReactNode; title: string; 
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
       <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</Label>
       {children}
+      {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
 }
