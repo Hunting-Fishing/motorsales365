@@ -75,14 +75,29 @@ function PricingPage() {
       return;
     }
     setRequesting(planId);
-    const { error } = await supabase.from("subscriptions").insert({
+    const plan = plans.find((p) => p.id === planId);
+    const base = Number(plan?.price_php) || 0;
+    const { data: sub, error } = await supabase.from("subscriptions").insert({
       user_id: user.id,
       plan_id: planId,
       status: "pending",
+    }).select("id").maybeSingle();
+    if (error) { setRequesting(null); return toast.error(error.message); }
+
+    // Record referral redemption if eligible
+    const { data: redemption } = await (supabase as any).rpc("apply_referral_redemption", {
+      _kind: "subscription",
+      _base_amount: base,
+      _subscription_id: sub?.id ?? null,
     });
     setRequesting(null);
-    if (error) return toast.error(error.message);
-    toast.success("Subscription requested — our team will reach out shortly.");
+    if (redemption?.ok) {
+      toast.success(
+        `Referral discount applied — ₱${redemption.discount_amount_php} off. Final: ₱${redemption.final_amount_php}.`
+      );
+    } else {
+      toast.success("Subscription requested — our team will reach out shortly.");
+    }
     loadSub(user.id);
   };
 
