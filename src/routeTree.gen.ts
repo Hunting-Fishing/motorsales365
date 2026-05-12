@@ -30,6 +30,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as StaffReferralRouteImport } from './routes/staff.referral'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
@@ -166,6 +167,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const StaffReferralRoute = StaffReferralRouteImport.update({
+  id: '/staff/referral',
+  path: '/staff/referral',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const SellerIdRoute = SellerIdRouteImport.update({
   id: '/seller/$id',
@@ -371,6 +377,7 @@ export interface FileRoutesByFullPath {
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/r/$code': typeof RCodeRoute
   '/seller/$id': typeof SellerIdRoute
+  '/staff/referral': typeof StaffReferralRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
@@ -423,6 +430,7 @@ export interface FileRoutesByTo {
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/r/$code': typeof RCodeRoute
   '/seller/$id': typeof SellerIdRoute
+  '/staff/referral': typeof StaffReferralRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
@@ -478,6 +486,7 @@ export interface FileRoutesById {
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/r/$code': typeof RCodeRoute
   '/seller/$id': typeof SellerIdRoute
+  '/staff/referral': typeof StaffReferralRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
@@ -534,6 +543,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/r/$code'
     | '/seller/$id'
+    | '/staff/referral'
     | '/admin/'
     | '/dashboard/'
     | '/api/public/payment-events'
@@ -586,6 +596,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/r/$code'
     | '/seller/$id'
+    | '/staff/referral'
     | '/admin'
     | '/dashboard'
     | '/api/public/payment-events'
@@ -640,6 +651,7 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/r/$code'
     | '/seller/$id'
+    | '/staff/referral'
     | '/admin/'
     | '/dashboard/'
     | '/api/public/payment-events'
@@ -677,6 +689,7 @@ export interface RootRouteChildren {
   ListingIdRoute: typeof ListingIdRouteWithChildren
   RCodeRoute: typeof RCodeRoute
   SellerIdRoute: typeof SellerIdRoute
+  StaffReferralRoute: typeof StaffReferralRoute
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -832,6 +845,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/staff/referral': {
+      id: '/staff/referral'
+      path: '/staff/referral'
+      fullPath: '/staff/referral'
+      preLoaderRoute: typeof StaffReferralRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/seller/$id': {
       id: '/seller/$id'
@@ -1150,6 +1170,7 @@ const rootRouteChildren: RootRouteChildren = {
   ListingIdRoute: ListingIdRouteWithChildren,
   RCodeRoute: RCodeRoute,
   SellerIdRoute: SellerIdRoute,
+  StaffReferralRoute: StaffReferralRoute,
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
