@@ -70,17 +70,18 @@ function SubmitBusinessPage() {
       const regionish = a.region || a.state || null;
       const barangayish: string | null =
         a.neighbourhood || a.quarter || a.hamlet || a.suburb || a.village || null;
+      const postcode: string | null = a.postcode || null;
+      const street = [a.house_number, a.road].filter(Boolean).join(" ").trim() || null;
       const resolved = resolvePsgc({ region: regionish, province: provinceish, city: cityish });
+      // Only overwrite empty fields — never clobber what the user already typed.
       setLoc((prev) => ({
-        region: resolved.region ?? prev.region,
-        province: resolved.province ?? prev.province,
-        city: resolved.city ?? prev.city,
-        barangay: barangayish ?? prev.barangay,
+        region: prev.region ?? resolved.region ?? null,
+        province: prev.province ?? resolved.province ?? null,
+        city: prev.city ?? resolved.city ?? null,
+        barangay: prev.barangay ?? barangayish ?? null,
       }));
-      if (a.road) {
-        const street = [a.house_number, a.road].filter(Boolean).join(" ");
-        if (street) setStreetAddress((prev) => prev.trim() ? prev : street);
-      }
+      if (street) setStreetAddress((prev) => (prev.trim() ? prev : street));
+      if (postcode) setPostalCode((prev) => (prev.trim() ? prev : postcode));
     } catch {
       /* silent — user can still type fields manually */
     }
