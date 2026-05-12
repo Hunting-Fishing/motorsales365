@@ -28,6 +28,7 @@ function ReferralLanding() {
   const [active, setActive] = useState<boolean | null>(null);
   const [promos, setPromos] = useState<Promo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [counted, setCounted] = useState<boolean | null>(null);
 
   useEffect(() => {
     (async () => {
