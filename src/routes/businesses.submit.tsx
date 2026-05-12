@@ -224,7 +224,7 @@ function SubmitBusinessPage() {
               lat={lat ? Number(lat) : null}
               lng={lng ? Number(lng) : null}
               region={loc.region}
-              onChange={(la, ln) => { setLat(la.toFixed(6)); setLng(ln.toFixed(6)); }}
+              onChange={(la, ln) => setCoords(la, ln)}
             />
             <div className="mt-2 grid gap-2 sm:grid-cols-2">
               <Input placeholder="Latitude" value={lat} onChange={(e) => setLat(e.target.value)} />
