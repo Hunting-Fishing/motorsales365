@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Download, Ticket, Percent, Coins, Users } from "lucide-react";
 import { formatPHP } from "@/lib/format";
+import { useCurrency } from "@/lib/currency";
 import {
   Bar,
   BarChart,
