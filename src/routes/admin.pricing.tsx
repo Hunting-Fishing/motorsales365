@@ -150,6 +150,70 @@ function AdminPricing() {
           {promos.length === 0 && <div className="text-sm text-muted-foreground">No promo codes yet.</div>}
         </div>
       </section>
+
+      <section className="rounded-xl border border-border bg-card p-6">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 className="font-display text-lg font-semibold">Subscription requests</h2>
+          <Select value={subFilter} onValueChange={setSubFilter}>
+            <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="paused">Paused</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        {subs.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+            No subscriptions in this state.
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {subs.map((s: any) => {
+              const plan = s.subscription_plans;
+              const prof = s.profiles;
+              return (
+                <div key={s.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border p-3 text-sm">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold">{prof?.full_name || prof?.email || s.user_id.slice(0, 8)}</span>
+                      <Badge variant="outline" className="uppercase">{s.status}</Badge>
+                      {s.complimentary && <Badge variant="secondary">comp</Badge>}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {plan?.name ?? "Plan"} · {plan ? formatPHP(plan.price_php) + "/mo" : ""} · requested {formatDate(s.created_at)}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {s.status === "pending" && (
+                      <Button size="sm" onClick={() => updateSub(s.id, { status: "active", current_period_end: new Date(Date.now() + 31 * 86400000).toISOString() })}>
+                        Approve
+                      </Button>
+                    )}
+                    {s.status === "active" && (
+                      <Button size="sm" variant="outline" onClick={() => updateSub(s.id, { status: "paused", paused_at: new Date().toISOString() })}>
+                        Pause
+                      </Button>
+                    )}
+                    {s.status === "paused" && (
+                      <Button size="sm" onClick={() => updateSub(s.id, { status: "active", paused_at: null })}>
+                        Resume
+                      </Button>
+                    )}
+                    {s.status !== "cancelled" && (
+                      <Button size="sm" variant="ghost" onClick={() => updateSub(s.id, { status: "cancelled" })}>
+                        Cancel
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
