@@ -5,6 +5,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Download, Ticket, Percent, Coins, Users } from "lucide-react";
 import { formatPHP } from "@/lib/format";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 export const Route = createFileRoute("/admin/redemptions")({
   component: AdminRedemptions,
@@ -105,6 +114,21 @@ function AdminRedemptions() {
     return { base, disc, fin, uniqueUsers };
   }, [rows]);
 
+  const byKindChart = useMemo(() => {
+    const buckets = ["subscription", "listing", "upgrade", "boost", "other"] as const;
+    const map = new Map<string, { count: number; discount: number }>();
+    buckets.forEach((b) => map.set(b, { count: 0, discount: 0 }));
+    rows.forEach((r) => {
+      const k = (buckets as readonly string[]).includes(r.kind) ? r.kind : "other";
+      const cur = map.get(k)!;
+      cur.count += 1;
+      cur.discount += Number(r.discount_amount_php || 0);
+    });
+    return buckets
+      .map((k) => ({ kind: k, count: map.get(k)!.count, discount: Math.round(map.get(k)!.discount) }))
+      .filter((d) => d.count > 0 || d.discount > 0);
+  }, [rows]);
+
   const exportCsv = () => {
     const headers = [
       "created_at","staff_name","referral_code","user_name","user_id",
@@ -201,6 +225,59 @@ function AdminRedemptions() {
         <Kpi icon={<Users className="h-4 w-4" />} label="Unique users" value={totals.uniqueUsers.toLocaleString()} />
         <Kpi icon={<Percent className="h-4 w-4" />} label="Total discounted" value={formatPHP(totals.disc)} />
         <Kpi icon={<Coins className="h-4 w-4" />} label="Final billed" value={formatPHP(totals.fin)} />
+      </section>
+
+      <section className="rounded-xl border border-border bg-card p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-display text-sm font-semibold uppercase tracking-wider">
+            Breakdown by kind
+          </h2>
+          <span className="text-xs text-muted-foreground">
+            Counts (bars) and total discount (₱) for current filters
+          </span>
+        </div>
+        {byKindChart.length === 0 ? (
+          <div className="py-10 text-center text-sm text-muted-foreground">
+            No data in this range.
+          </div>
+        ) : (
+          <div className="h-72 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={byKindChart} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="kind" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <YAxis
+                  yAxisId="left"
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  allowDecimals={false}
+                />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  tickFormatter={(v) => `₱${Number(v).toLocaleString()}`}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: 8,
+                    fontSize: 12,
+                  }}
+                  formatter={(value: any, name: any) =>
+                    name === "discount"
+                      ? [formatPHP(Number(value)), "Discount"]
+                      : [Number(value).toLocaleString(), "Redemptions"]
+                  }
+                />
+                <Bar yAxisId="left" dataKey="count" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                <Bar yAxisId="right" dataKey="discount" fill="hsl(var(--accent))" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </section>
 
       <section className="rounded-xl border border-border bg-card">
