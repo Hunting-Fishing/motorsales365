@@ -492,16 +492,47 @@ function EditAccountDialog({
           <div>
             <label className="mb-1 block text-sm font-medium">Internal notes</label>
             <Textarea
-              rows={3}
+              rows={2}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Reason for discount, comp grant, pause, etc."
+              placeholder="Persistent note shown on the subscription"
             />
           </div>
 
+          <div>
+            <label className="mb-1 block text-sm font-medium">Reason for this change <span className="text-muted-foreground">(audit trail)</span></label>
+            <Input
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="e.g. 6-month loyalty discount; paused on customer request"
+            />
+          </div>
+
+          {history.length > 0 && (
+            <div className="rounded-md border border-border bg-muted/30 p-2">
+              <div className="mb-1 text-xs font-medium text-muted-foreground">Recent activity</div>
+              <ul className="max-h-40 space-y-1 overflow-y-auto text-xs">
+                {history.map((h) => (
+                  <li key={h.id} className="flex flex-col gap-0.5 border-b border-border/60 pb-1 last:border-0">
+                    <div>
+                      <span className="font-medium">{h.field}</span>:{" "}
+                      <span className="text-muted-foreground">{formatVal(h.old_value)}</span>
+                      {" → "}
+                      <span>{formatVal(h.new_value)}</span>
+                    </div>
+                    <div className="text-[10px] text-muted-foreground">
+                      {h.actor_role} · {formatDate(h.created_at)}
+                      {h.note ? ` · ${h.note}` : ""}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           {!isAdmin && (
             <div className="rounded-md bg-muted p-2 text-xs text-muted-foreground">
-              Sales role: changes are visible to admins.
+              Sales role: every change is logged with your name.
             </div>
           )}
         </div>
