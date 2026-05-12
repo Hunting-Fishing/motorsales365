@@ -63,6 +63,7 @@ export function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-2">
+          <CurrencySwitcher />
           <Button asChild className="hidden sm:inline-flex" variant="default">
             <Link to="/sell"><Plus className="mr-1 h-4 w-4" /> Post a listing</Link>
           </Button>
