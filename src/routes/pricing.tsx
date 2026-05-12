@@ -94,24 +94,43 @@ function PricingPage() {
       </section>
 
       <section className="container mx-auto px-4 pb-16">
-        <h2 className="mb-6 text-center font-display text-2xl font-bold">Business subscriptions</h2>
+        <h2 className="mb-2 text-center font-display text-2xl font-bold">Business subscriptions</h2>
+        {mySub && (
+          <p className="mb-6 text-center text-sm text-muted-foreground">
+            You have a <span className="font-semibold uppercase">{mySub.status}</span> subscription on file.{" "}
+            <Link to="/dashboard/billing" className="text-primary underline">View billing →</Link>
+          </p>
+        )}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {plans.map((p) => (
-            <div key={p.id} className="flex flex-col rounded-xl border border-border bg-card p-6">
-              <div className="font-display text-lg font-semibold">{p.name}</div>
-              <div className="mt-2 font-display text-3xl font-bold">{formatPHP(p.price_php)}<span className="text-sm font-normal text-muted-foreground">/mo</span></div>
-              <div className="mt-1 text-sm text-muted-foreground">
-                {p.listings_per_month ?? "Unlimited"} listings/month
+          {plans.map((p) => {
+            const isCurrent = mySub?.plan_id === p.id;
+            const hasOther = mySub && !isCurrent && ["pending","active","paused"].includes(mySub.status);
+            return (
+              <div key={p.id} className={`flex flex-col rounded-xl border bg-card p-6 ${isCurrent ? "border-primary ring-2 ring-primary/30" : "border-border"}`}>
+                <div className="font-display text-lg font-semibold">{p.name}</div>
+                <div className="mt-2 font-display text-3xl font-bold">{formatPHP(p.price_php)}<span className="text-sm font-normal text-muted-foreground">/mo</span></div>
+                <div className="mt-1 text-sm text-muted-foreground">
+                  {p.listings_per_month ?? "Unlimited"} listings/month
+                </div>
+                <ul className="mt-4 space-y-2 text-sm">
+                  {(p.features ?? []).map((f: string) => (
+                    <li key={f} className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-primary" />{f}</li>
+                  ))}
+                </ul>
+                <Button
+                  className="mt-6"
+                  disabled={requesting === p.id || isCurrent || hasOther}
+                  onClick={() => requestPlan(p.id)}
+                >
+                  {isCurrent ? `Current (${mySub.status})` : hasOther ? "Subscription on file" : user ? "Request this plan" : "Sign up to subscribe"}
+                </Button>
               </div>
-              <ul className="mt-4 space-y-2 text-sm">
-                {(p.features ?? []).map((f: string) => (
-                  <li key={f} className="flex items-start gap-2"><Check className="mt-0.5 h-4 w-4 text-primary" />{f}</li>
-                ))}
-              </ul>
-              <Button asChild className="mt-6"><Link to="/signup">Get started</Link></Button>
-            </div>
-          ))}
+            );
+          })}
         </div>
+        <p className="mx-auto mt-6 max-w-2xl text-center text-xs text-muted-foreground">
+          Requests are reviewed manually by our sales team — you'll receive an email once it's activated. Live card payments are coming soon.
+        </p>
       </section>
     </SiteLayout>
   );
