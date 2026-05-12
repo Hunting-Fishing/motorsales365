@@ -114,6 +114,21 @@ function AdminRedemptions() {
     return { base, disc, fin, uniqueUsers };
   }, [rows]);
 
+  const byKindChart = useMemo(() => {
+    const buckets = ["subscription", "listing", "upgrade", "boost", "other"] as const;
+    const map = new Map<string, { count: number; discount: number }>();
+    buckets.forEach((b) => map.set(b, { count: 0, discount: 0 }));
+    rows.forEach((r) => {
+      const k = (buckets as readonly string[]).includes(r.kind) ? r.kind : "other";
+      const cur = map.get(k)!;
+      cur.count += 1;
+      cur.discount += Number(r.discount_amount_php || 0);
+    });
+    return buckets
+      .map((k) => ({ kind: k, count: map.get(k)!.count, discount: Math.round(map.get(k)!.discount) }))
+      .filter((d) => d.count > 0 || d.discount > 0);
+  }, [rows]);
+
   const exportCsv = () => {
     const headers = [
       "created_at","staff_name","referral_code","user_name","user_id",
