@@ -1,105 +1,90 @@
-# Tiered Plans, Founding Members & Sales Console
+# Finish security for staff, users, businesses, tiers + Advertiser intake
 
-## 1. Rename plans + bump Free perks
+The four chips you saw are minor follow-ups. The bigger gap is that the project only has three roles (`admin`, `user`, `sales`) and no structured way for advertisers to ask about ad space. This plan finishes the role model, tightens RLS around tiers and business accounts, and adds an Advertiser inquiry flow.
 
-Update `subscription_plans` rows (keep IDs, just rename + adjust):
+## 1. Expand staff roles
 
-| Old name | New name | Price (₱) | Listings/mo | Photos/listing |
-|---|---|---|---|---|
-| Free | Free | 0 | 1/week | **3** (was 1) |
-| Starter | Bronze | 80 | 5 | 5 |
-| Growth | Silver | 150 | 10 | 8 |
-| Pro | Gold | 280 | 20 | 12 |
-| Unlimited | Platinum | 500 | ∞ | 20 |
-| — | **Business** (new) | 1,200 | ∞ | 20 + multi-user, priority badge |
+Extend the `app_role` enum so different staff can do different jobs without all getting full admin:
 
-Add `max_photos_per_listing` column to `subscription_plans` so the limits are data-driven instead of hardcoded.
+- `admin` — full access (existing)
+- `moderator` — review listings, reports, verifications; cannot change billing/roles
+- `support` — read‑only across users + listings + messages; can add notes; cannot change billing/roles
+- `sales` — Accounts console (already used) — keep; can change plan/discount/comp/notes/pause; cannot grant roles
+- `advertising` — new; manages the Advertiser inquiry inbox + ad placements
+- `user` — default end user (existing)
 
-## 2. Founding Members (first 1,000 users)
+Add helper SQL functions so RLS reads stay simple:
+- `is_staff(uid)` → true for any non‑`user` role
+- `can_moderate(uid)` → admin or moderator
+- `can_support(uid)` → admin, moderator, support, sales
 
-- Add boolean `profiles.is_founding_member` + `founding_member_number` (int).
-- Trigger on profile insert: if total founding members < 1000, set `is_founding_member=true` and assign next number.
-- Auto-create a lifetime **Bronze** subscription (status `active`, `current_period_end = null`, `price_php = 0` override flag).
-- New column `subscriptions.complimentary` (bool) so we know it's a perk, not paid.
-- Profile/dashboard shows a "Founding Member #123" badge.
+## 2. Tighten existing RLS using the new roles
 
-## 3. Photo limits — make data-driven
+Replace blanket `has_role(uid,'admin')` on read-only admin surfaces with the narrower helpers so support/moderator can do their jobs without being admins:
 
-Replace hardcoded `maxPhotos` in `src/routes/sell.tsx` and `src/routes/listing.$id.edit.tsx` with a helper `getUserPlanLimits()` that reads the user's active subscription plan (falls back to Free = 3 photos).
+- `listings`, `reports`, `verification_requests`, `messages` (admin view), `account_audit_log` → readable by `can_support`
+- `listings` moderation actions (status change, takedown) → `can_moderate`
+- `subscriptions`, `payments`, `pricing_settings`, `subscription_plans`, `user_roles` → **admin only** (unchanged)
+- `account_audit_log` inserts from the Accounts console → allow `admin` + `sales` (current behavior, just made explicit)
 
-## 4. New `sales` role
+## 3. Business accounts + tier-level checks
 
-- Add `'sales'` to `app_role` enum.
-- New helper `has_role(uid,'sales')`.
-- RLS: sales can SELECT all profiles, subscriptions, payments, listings; can UPDATE `subscriptions` (change plan, apply discount, pause), `profiles.account_status`, but cannot grant roles or edit `pricing_settings` / `subscription_plans`.
+Today tier is inferred ad‑hoc from `subscriptions` joined to `subscription_plans`. Add a single source of truth so policies/UI stop duplicating the join:
 
-## 5. Account pause
+- New SQL function `current_plan_tier(uid)` returning the plan name (`Free`/`Bronze`/`Silver`/`Gold`/`Platinum`/`Business`) for the user's active, non-expired subscription, falling back to `Free`.
+- New SQL function `is_business_account(uid)` → `verification_status='verified'` AND `business_kind IN ('dealer','repair_shop','insurance')`.
+- Use these in:
+  - Free-listing quota trigger (already exists) — keep, but switch the bypass check to `current_plan_tier(uid) <> 'Free'`.
+  - Featured/boost eligibility on `promotions` — only `Silver`+ can create paid boosts.
+  - Business-only listing categories (e.g. dealer inventory bulk upload) — gated by `is_business_account`.
 
-- Add `profiles.account_status` enum: `active | paused | banned`.
-- RLS update on `listings`: public SELECT requires owner's `account_status='active'`.
-- Pausing flips status; unpausing restores. Listings rows are not modified.
+No data migration is needed — existing rows keep working; this is just consolidating the rules.
 
-## 6. Per-account discounts
+## 4. Advertiser inquiry channel ("buy ad space")
 
-- New `subscriptions.discount_percent` (numeric, 0–100) — sales-editable.
-- Billing UI shows discounted price; payments table records the applied discount.
+New public-facing intake so brands/agencies can ask about ad placements, plus a staff inbox for the `advertising` role.
 
-## 7. Sales/Admin Accounts console
+New table `ad_inquiries`:
+- contact name, company, email, phone (optional)
+- desired placement (enum: `homepage_banner`, `category_banner`, `listing_sidebar`, `newsletter`, `other`)
+- budget range, start date, message
+- status (`new` / `in_review` / `quoted` / `won` / `lost` / `spam`)
+- assigned_to (staff uid), internal_notes
+- created_at / updated_at
 
-New route **`/admin/accounts`** (visible to admin + sales) with:
-- Searchable table: name, email, plan tier badge, founding-member badge, status, joined, MRR, lifetime spend.
-- Filters: tier, status, founding member, business kind, region.
-- Per-row actions:
-  - Change plan (dropdown of tiers)
-  - Apply discount % (with reason note)
-  - Pause / Unpause account
-  - Add complimentary months
-  - View activity (link to existing analytics)
-- CSV export.
+RLS:
+- **Anyone (anon + authenticated)** can INSERT (rate-limited via a simple per-IP/email check at the form level).
+- **Submitter** can read their own inquiry only if signed in (matched by email on the auth user).
+- **Staff with `admin` or `advertising`** can read/update all.
+- No one can DELETE except `admin`.
 
-Add "Accounts" entry in `src/routes/admin.tsx` nav. Hide admin-only items (Make admin, Pricing edit) for sales role.
+New table `ad_inquiry_messages` (threaded replies between staff and the advertiser, reusing the same RLS pattern), so advertisers and staff can keep the conversation in one place instead of email tag.
 
-## 8. Auth context
+## 5. UI surfaces
 
-Extend `use-auth.tsx` to expose `isSales` alongside `isAdmin`. Admin route guard accepts admin OR sales.
+Frontend (presentation only, no business logic beyond wiring):
 
----
+- **Public "Advertise with us" page** at `/advertise` — short pitch + inquiry form posting to `ad_inquiries`. Linked from footer.
+- **Contact CTA on homepage / footer**: "Buy ad space" → `/advertise`.
+- **Admin → Advertising inbox** at `/admin/advertising` — list, filter by status, open thread, reply, change status, assign. Visible to `admin` and `advertising` roles.
+- **Admin → Roles tab** on `/admin/users` — admin can grant/revoke any staff role (chips for moderator / support / sales / advertising / admin). Already partly present for admin role; extend to all new roles.
+- **Sidebar visibility** in `/admin` adapts to role using the new helpers (support sees Users/Listings/Reports read‑only; moderator adds takedown actions; advertising sees only the Advertising inbox; sales sees Accounts; admin sees everything).
 
-## Technical changes
+## 6. Security verification
 
-**Migration 1 — schema:**
-```sql
-ALTER TYPE app_role ADD VALUE 'sales';
-CREATE TYPE account_status AS ENUM ('active','paused','banned');
-ALTER TABLE profiles
-  ADD COLUMN account_status account_status NOT NULL DEFAULT 'active',
-  ADD COLUMN is_founding_member boolean NOT NULL DEFAULT false,
-  ADD COLUMN founding_member_number int UNIQUE;
-ALTER TABLE subscription_plans ADD COLUMN max_photos_per_listing int DEFAULT 5;
-ALTER TABLE subscriptions
-  ADD COLUMN complimentary boolean NOT NULL DEFAULT false,
-  ADD COLUMN discount_percent numeric NOT NULL DEFAULT 0,
-  ADD COLUMN paused_at timestamptz,
-  ADD COLUMN notes text;
-```
+- Extend `scripts/verify-security.sh` allow-list with any new `SECURITY DEFINER` helpers (`is_staff`, `can_moderate`, `can_support`, `current_plan_tier`, `is_business_account`) — each declared `STABLE` with `SET search_path = public`, EXECUTE granted only to `authenticated`.
+- Update `docs/SECURITY.md` to document them.
+- Re-run the Supabase linter; expected warnings remain the same two intentional ones (`has_role`, `increment_listing_view`) plus any new authenticated‑only definer helpers we add (which the script will accept).
 
-**Migration 2 — data:** rename plans, set `max_photos_per_listing` (Free=3, Bronze=5, Silver=8, Gold=12, Platinum=20, Business=20), insert Business plan.
+## Technical notes
 
-**Migration 3 — founding member trigger** on `profiles` AFTER INSERT; assigns number if count<1000 and inserts complimentary Bronze subscription.
+- Enum changes in Postgres can't drop values, so we only ADD: `ALTER TYPE app_role ADD VALUE 'moderator'`, etc. Done in a single migration before any policy uses them.
+- All new helpers are `SECURITY DEFINER STABLE SET search_path = public`, with `EXECUTE` revoked from `PUBLIC`/`anon` and granted to `authenticated` only (same hardening pattern already in the codebase).
+- `ad_inquiries` INSERT-from-anon is intentional and noted in `@security-memory` so the scanner doesn't re‑flag it.
+- No edits to `auth`, `storage`, `realtime`, `supabase_functions`, or `vault` schemas.
 
-**Migration 4 — RLS:** update `listings` public-read policy to require active owner; add sales policies on profiles/subscriptions/payments; update `has_role` is unchanged but called with `'sales'`.
+## Out of scope (call out if you want them next)
 
-**Files to edit / create:**
-- `src/hooks/use-auth.tsx` — add `isSales`
-- `src/routes/admin.tsx` — guard accepts sales, conditional nav
-- `src/routes/admin.accounts.tsx` (new) — accounts console
-- `src/routes/sell.tsx`, `src/routes/listing.$id.edit.tsx` — read photo limit from plan
-- `src/lib/plan-limits.ts` (new) — `getUserPlanLimits(userId)` helper
-- `src/routes/dashboard.profile.tsx` — show Founding Member badge
-- `src/routes/pricing.tsx`, `src/components/site-footer.tsx` — new tier names
-- `src/routes/admin.users.tsx` — allow sales (read-only verify/role buttons hidden)
-
-## Out of scope
-- Actual payment processor changes for the new Business tier (will use existing manual-payment flow).
-- Email notifications when sales pauses/discounts an account (can add later).
-- Multi-user seats for Business tier (stub the feature flag only).
+- Ad serving / impression tracking (this plan only handles the *inquiry* pipeline).
+- Paying for ad space online (Stripe/Paddle checkout for ads).
+- Public advertiser self-serve dashboard beyond reading their own inquiry thread.
