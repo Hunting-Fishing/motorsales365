@@ -61,6 +61,7 @@ import { Route as RCodePosterRouteImport } from './routes/r.$code.poster'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
 import { Route as ApiPublicPaymentEventsRouteImport } from './routes/api/public/payment-events'
+import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions.$staffId'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -325,6 +326,11 @@ const ApiPublicPaymentEventsRoute = ApiPublicPaymentEventsRouteImport.update({
   path: '/api/public/payment-events',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRedemptionsStaffIdRoute = AdminRedemptionsStaffIdRouteImport.update({
+  id: '/$staffId',
+  path: '/$staffId',
+  getParentRoute: () => AdminRedemptionsRoute,
+} as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -370,7 +376,7 @@ export interface FileRoutesByFullPath {
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
-  '/admin/redemptions': typeof AdminRedemptionsRoute
+  '/admin/redemptions': typeof AdminRedemptionsRouteWithChildren
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -393,6 +399,7 @@ export interface FileRoutesByFullPath {
   '/staff/referral': typeof StaffReferralRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -425,7 +432,7 @@ export interface FileRoutesByTo {
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
-  '/admin/redemptions': typeof AdminRedemptionsRoute
+  '/admin/redemptions': typeof AdminRedemptionsRouteWithChildren
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -448,6 +455,7 @@ export interface FileRoutesByTo {
   '/staff/referral': typeof StaffReferralRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -483,7 +491,7 @@ export interface FileRoutesById {
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
-  '/admin/redemptions': typeof AdminRedemptionsRoute
+  '/admin/redemptions': typeof AdminRedemptionsRouteWithChildren
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
@@ -506,6 +514,7 @@ export interface FileRoutesById {
   '/staff/referral': typeof StaffReferralRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -565,6 +574,7 @@ export interface FileRouteTypes {
     | '/staff/referral'
     | '/admin/'
     | '/dashboard/'
+    | '/admin/redemptions/$staffId'
     | '/api/public/payment-events'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
@@ -620,6 +630,7 @@ export interface FileRouteTypes {
     | '/staff/referral'
     | '/admin'
     | '/dashboard'
+    | '/admin/redemptions/$staffId'
     | '/api/public/payment-events'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
@@ -677,6 +688,7 @@ export interface FileRouteTypes {
     | '/staff/referral'
     | '/admin/'
     | '/dashboard/'
+    | '/admin/redemptions/$staffId'
     | '/api/public/payment-events'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
@@ -1087,6 +1099,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentEventsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/redemptions/$staffId': {
+      id: '/admin/redemptions/$staffId'
+      path: '/$staffId'
+      fullPath: '/admin/redemptions/$staffId'
+      preLoaderRoute: typeof AdminRedemptionsStaffIdRouteImport
+      parentRoute: typeof AdminRedemptionsRoute
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -1111,6 +1130,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AdminRedemptionsRouteChildren {
+  AdminRedemptionsStaffIdRoute: typeof AdminRedemptionsStaffIdRoute
+}
+
+const AdminRedemptionsRouteChildren: AdminRedemptionsRouteChildren = {
+  AdminRedemptionsStaffIdRoute: AdminRedemptionsStaffIdRoute,
+}
+
+const AdminRedemptionsRouteWithChildren =
+  AdminRedemptionsRoute._addFileChildren(AdminRedemptionsRouteChildren)
+
 interface AdminRouteChildren {
   AdminAccountsRoute: typeof AdminAccountsRoute
   AdminAdvertisingRoute: typeof AdminAdvertisingRoute
@@ -1118,7 +1148,7 @@ interface AdminRouteChildren {
   AdminListingsRoute: typeof AdminListingsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
   AdminPricingRoute: typeof AdminPricingRoute
-  AdminRedemptionsRoute: typeof AdminRedemptionsRoute
+  AdminRedemptionsRoute: typeof AdminRedemptionsRouteWithChildren
   AdminReferralsRoute: typeof AdminReferralsRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminUsersRoute: typeof AdminUsersRoute
@@ -1133,7 +1163,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminListingsRoute: AdminListingsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
   AdminPricingRoute: AdminPricingRoute,
-  AdminRedemptionsRoute: AdminRedemptionsRoute,
+  AdminRedemptionsRoute: AdminRedemptionsRouteWithChildren,
   AdminReferralsRoute: AdminReferralsRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminUsersRoute: AdminUsersRoute,
@@ -1230,12 +1260,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
