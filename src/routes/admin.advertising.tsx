@@ -35,8 +35,11 @@ function AdminAdvertising() {
   const [mineOnly, setMineOnly] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
+  const [audit, setAudit] = useState<any[]>([]);
   const [reply, setReply] = useState("");
   const [notes, setNotes] = useState("");
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkStatus, setBulkStatus] = useState<Status>("in_review");
 
   const load = async () => {
     let q = supabase.from("ad_inquiries").select("*").order("created_at", { ascending: false });
@@ -45,12 +48,21 @@ function AdminAdvertising() {
     const { data, error } = await q;
     if (error) { toast.error(error.message); return; }
     setInquiries(data ?? []);
+    setSelected((prev) => {
+      const next = new Set<string>();
+      (data ?? []).forEach((i: any) => { if (prev.has(i.id)) next.add(i.id); });
+      return next;
+    });
   };
 
   const loadThread = async (id: string) => {
     setActiveId(id);
-    const { data } = await supabase.from("ad_inquiry_messages").select("*").eq("inquiry_id", id).order("created_at");
-    setMessages(data ?? []);
+    const [{ data: msgs }, { data: aud }] = await Promise.all([
+      supabase.from("ad_inquiry_messages").select("*").eq("inquiry_id", id).order("created_at"),
+      supabase.from("ad_inquiry_audit").select("*").eq("inquiry_id", id).order("created_at", { ascending: false }).limit(50),
+    ]);
+    setMessages(msgs ?? []);
+    setAudit(aud ?? []);
     const cur = (inquiries.find((i) => i.id === id) ?? {}) as any;
     setNotes(cur.internal_notes ?? "");
   };
@@ -79,6 +91,35 @@ function AdminAdvertising() {
     const { error } = await supabase.from("ad_inquiries").update({ assigned_to: user.id }).eq("id", active.id);
     if (error) return toast.error(error.message);
     toast.success("Assigned to you");
+    load();
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+  const selectAllVisible = () => setSelected(new Set(inquiries.map((i) => i.id)));
+  const clearSelection = () => setSelected(new Set());
+
+  const bulkApplyStatus = async () => {
+    if (selected.size === 0) return;
+    const ids = Array.from(selected);
+    const { error } = await supabase.from("ad_inquiries").update({ status: bulkStatus }).in("id", ids);
+    if (error) return toast.error(error.message);
+    toast.success(`Updated ${ids.length} inquiry(ies) → ${bulkStatus}`);
+    clearSelection();
+    load();
+  };
+  const bulkAssignToMe = async () => {
+    if (selected.size === 0 || !user?.id) return;
+    const ids = Array.from(selected);
+    const { error } = await supabase.from("ad_inquiries").update({ assigned_to: user.id }).in("id", ids);
+    if (error) return toast.error(error.message);
+    toast.success(`Assigned ${ids.length} to you`);
+    clearSelection();
     load();
   };
 
