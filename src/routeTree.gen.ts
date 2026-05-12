@@ -29,6 +29,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
+import { Route as BusinessesIndexRouteImport } from './routes/businesses.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as StaffReferralRouteImport } from './routes/staff.referral'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
@@ -42,7 +43,10 @@ import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile
 import { Route as DashboardMessagesRouteImport } from './routes/dashboard.messages'
 import { Route as DashboardLikesRouteImport } from './routes/dashboard.likes'
 import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favorites'
+import { Route as DashboardBusinessesRouteImport } from './routes/dashboard.businesses'
 import { Route as DashboardBillingRouteImport } from './routes/dashboard.billing'
+import { Route as BusinessesSubmitRouteImport } from './routes/businesses.submit'
+import { Route as BusinessesSlugRouteImport } from './routes/businesses.$slug'
 import { Route as BrowseCategoryRouteImport } from './routes/browse.$category'
 import { Route as ApiSitemapDotxmlRouteImport } from './routes/api/sitemap[.]xml'
 import { Route as ApiRobotsDottxtRouteImport } from './routes/api/robots[.]txt'
@@ -56,6 +60,7 @@ import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
 import { Route as AdminCurrenciesRouteImport } from './routes/admin.currencies'
+import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising'
 import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
@@ -169,6 +174,11 @@ const DashboardIndexRoute = DashboardIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardRoute,
 } as any)
+const BusinessesIndexRoute = BusinessesIndexRouteImport.update({
+  id: '/businesses/',
+  path: '/businesses/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -234,10 +244,25 @@ const DashboardFavoritesRoute = DashboardFavoritesRouteImport.update({
   path: '/favorites',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardBusinessesRoute = DashboardBusinessesRouteImport.update({
+  id: '/businesses',
+  path: '/businesses',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardBillingRoute = DashboardBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
   getParentRoute: () => DashboardRoute,
+} as any)
+const BusinessesSubmitRoute = BusinessesSubmitRouteImport.update({
+  id: '/businesses/submit',
+  path: '/businesses/submit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BusinessesSlugRoute = BusinessesSlugRouteImport.update({
+  id: '/businesses/$slug',
+  path: '/businesses/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const BrowseCategoryRoute = BrowseCategoryRouteImport.update({
   id: '/browse/$category',
@@ -302,6 +327,11 @@ const AdminListingsRoute = AdminListingsRouteImport.update({
 const AdminCurrenciesRoute = AdminCurrenciesRouteImport.update({
   id: '/currencies',
   path: '/currencies',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBusinessesRoute = AdminBusinessesRouteImport.update({
+  id: '/businesses',
+  path: '/businesses',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
@@ -391,6 +421,7 @@ export interface FileRoutesByFullPath {
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -404,7 +435,10 @@ export interface FileRoutesByFullPath {
   '/api/robots.txt': typeof ApiRobotsDottxtRoute
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/browse/$category': typeof BrowseCategoryRoute
+  '/businesses/$slug': typeof BusinessesSlugRoute
+  '/businesses/submit': typeof BusinessesSubmitRoute
   '/dashboard/billing': typeof DashboardBillingRoute
+  '/dashboard/businesses': typeof DashboardBusinessesRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
@@ -418,6 +452,7 @@ export interface FileRoutesByFullPath {
   '/seller/$id': typeof SellerIdRoute
   '/staff/referral': typeof StaffReferralRoute
   '/admin/': typeof AdminIndexRoute
+  '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
@@ -450,6 +485,7 @@ export interface FileRoutesByTo {
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -463,7 +499,10 @@ export interface FileRoutesByTo {
   '/api/robots.txt': typeof ApiRobotsDottxtRoute
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/browse/$category': typeof BrowseCategoryRoute
+  '/businesses/$slug': typeof BusinessesSlugRoute
+  '/businesses/submit': typeof BusinessesSubmitRoute
   '/dashboard/billing': typeof DashboardBillingRoute
+  '/dashboard/businesses': typeof DashboardBusinessesRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
@@ -477,6 +516,7 @@ export interface FileRoutesByTo {
   '/seller/$id': typeof SellerIdRoute
   '/staff/referral': typeof StaffReferralRoute
   '/admin': typeof AdminIndexRoute
+  '/businesses': typeof BusinessesIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
@@ -512,6 +552,7 @@ export interface FileRoutesById {
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -525,7 +566,10 @@ export interface FileRoutesById {
   '/api/robots.txt': typeof ApiRobotsDottxtRoute
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/browse/$category': typeof BrowseCategoryRoute
+  '/businesses/$slug': typeof BusinessesSlugRoute
+  '/businesses/submit': typeof BusinessesSubmitRoute
   '/dashboard/billing': typeof DashboardBillingRoute
+  '/dashboard/businesses': typeof DashboardBusinessesRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
@@ -539,6 +583,7 @@ export interface FileRoutesById {
   '/seller/$id': typeof SellerIdRoute
   '/staff/referral': typeof StaffReferralRoute
   '/admin/': typeof AdminIndexRoute
+  '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
@@ -575,6 +620,7 @@ export interface FileRouteTypes {
     | '/admin/accounts'
     | '/admin/advertising'
     | '/admin/analytics'
+    | '/admin/businesses'
     | '/admin/currencies'
     | '/admin/listings'
     | '/admin/performance'
@@ -588,7 +634,10 @@ export interface FileRouteTypes {
     | '/api/robots.txt'
     | '/api/sitemap.xml'
     | '/browse/$category'
+    | '/businesses/$slug'
+    | '/businesses/submit'
     | '/dashboard/billing'
+    | '/dashboard/businesses'
     | '/dashboard/favorites'
     | '/dashboard/likes'
     | '/dashboard/messages'
@@ -602,6 +651,7 @@ export interface FileRouteTypes {
     | '/seller/$id'
     | '/staff/referral'
     | '/admin/'
+    | '/businesses/'
     | '/dashboard/'
     | '/admin/redemptions/$staffId'
     | '/api/public/payment-events'
@@ -634,6 +684,7 @@ export interface FileRouteTypes {
     | '/admin/accounts'
     | '/admin/advertising'
     | '/admin/analytics'
+    | '/admin/businesses'
     | '/admin/currencies'
     | '/admin/listings'
     | '/admin/performance'
@@ -647,7 +698,10 @@ export interface FileRouteTypes {
     | '/api/robots.txt'
     | '/api/sitemap.xml'
     | '/browse/$category'
+    | '/businesses/$slug'
+    | '/businesses/submit'
     | '/dashboard/billing'
+    | '/dashboard/businesses'
     | '/dashboard/favorites'
     | '/dashboard/likes'
     | '/dashboard/messages'
@@ -661,6 +715,7 @@ export interface FileRouteTypes {
     | '/seller/$id'
     | '/staff/referral'
     | '/admin'
+    | '/businesses'
     | '/dashboard'
     | '/admin/redemptions/$staffId'
     | '/api/public/payment-events'
@@ -695,6 +750,7 @@ export interface FileRouteTypes {
     | '/admin/accounts'
     | '/admin/advertising'
     | '/admin/analytics'
+    | '/admin/businesses'
     | '/admin/currencies'
     | '/admin/listings'
     | '/admin/performance'
@@ -708,7 +764,10 @@ export interface FileRouteTypes {
     | '/api/robots.txt'
     | '/api/sitemap.xml'
     | '/browse/$category'
+    | '/businesses/$slug'
+    | '/businesses/submit'
     | '/dashboard/billing'
+    | '/dashboard/businesses'
     | '/dashboard/favorites'
     | '/dashboard/likes'
     | '/dashboard/messages'
@@ -722,6 +781,7 @@ export interface FileRouteTypes {
     | '/seller/$id'
     | '/staff/referral'
     | '/admin/'
+    | '/businesses/'
     | '/dashboard/'
     | '/admin/redemptions/$staffId'
     | '/api/public/payment-events'
@@ -757,11 +817,14 @@ export interface RootRouteChildren {
   ApiRobotsDottxtRoute: typeof ApiRobotsDottxtRoute
   ApiSitemapDotxmlRoute: typeof ApiSitemapDotxmlRoute
   BrowseCategoryRoute: typeof BrowseCategoryRoute
+  BusinessesSlugRoute: typeof BusinessesSlugRoute
+  BusinessesSubmitRoute: typeof BusinessesSubmitRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   RCodeRoute: typeof RCodeRouteWithChildren
   SellerIdRoute: typeof SellerIdRoute
   StaffReferralRoute: typeof StaffReferralRoute
+  BusinessesIndexRoute: typeof BusinessesIndexRoute
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicFxRefreshRoute: typeof ApiPublicFxRefreshRoute
@@ -912,6 +975,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardIndexRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/businesses/': {
+      id: '/businesses/'
+      path: '/businesses'
+      fullPath: '/businesses/'
+      preLoaderRoute: typeof BusinessesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/': {
       id: '/admin/'
       path: '/'
@@ -1003,12 +1073,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardFavoritesRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/businesses': {
+      id: '/dashboard/businesses'
+      path: '/businesses'
+      fullPath: '/dashboard/businesses'
+      preLoaderRoute: typeof DashboardBusinessesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/billing': {
       id: '/dashboard/billing'
       path: '/billing'
       fullPath: '/dashboard/billing'
       preLoaderRoute: typeof DashboardBillingRouteImport
       parentRoute: typeof DashboardRoute
+    }
+    '/businesses/submit': {
+      id: '/businesses/submit'
+      path: '/businesses/submit'
+      fullPath: '/businesses/submit'
+      preLoaderRoute: typeof BusinessesSubmitRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/businesses/$slug': {
+      id: '/businesses/$slug'
+      path: '/businesses/$slug'
+      fullPath: '/businesses/$slug'
+      preLoaderRoute: typeof BusinessesSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/browse/$category': {
       id: '/browse/$category'
@@ -1099,6 +1190,13 @@ declare module '@tanstack/react-router' {
       path: '/currencies'
       fullPath: '/admin/currencies'
       preLoaderRoute: typeof AdminCurrenciesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/businesses': {
+      id: '/admin/businesses'
+      path: '/businesses'
+      fullPath: '/admin/businesses'
+      preLoaderRoute: typeof AdminBusinessesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/analytics': {
@@ -1203,6 +1301,7 @@ interface AdminRouteChildren {
   AdminAccountsRoute: typeof AdminAccountsRoute
   AdminAdvertisingRoute: typeof AdminAdvertisingRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminBusinessesRoute: typeof AdminBusinessesRoute
   AdminCurrenciesRoute: typeof AdminCurrenciesRoute
   AdminListingsRoute: typeof AdminListingsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
@@ -1220,6 +1319,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAccountsRoute: AdminAccountsRoute,
   AdminAdvertisingRoute: AdminAdvertisingRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminBusinessesRoute: AdminBusinessesRoute,
   AdminCurrenciesRoute: AdminCurrenciesRoute,
   AdminListingsRoute: AdminListingsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
@@ -1237,6 +1337,7 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface DashboardRouteChildren {
   DashboardBillingRoute: typeof DashboardBillingRoute
+  DashboardBusinessesRoute: typeof DashboardBusinessesRoute
   DashboardFavoritesRoute: typeof DashboardFavoritesRoute
   DashboardLikesRoute: typeof DashboardLikesRoute
   DashboardMessagesRoute: typeof DashboardMessagesRoute
@@ -1249,6 +1350,7 @@ interface DashboardRouteChildren {
 
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardBillingRoute: DashboardBillingRoute,
+  DashboardBusinessesRoute: DashboardBusinessesRoute,
   DashboardFavoritesRoute: DashboardFavoritesRoute,
   DashboardLikesRoute: DashboardLikesRoute,
   DashboardMessagesRoute: DashboardMessagesRoute,
@@ -1308,11 +1410,14 @@ const rootRouteChildren: RootRouteChildren = {
   ApiRobotsDottxtRoute: ApiRobotsDottxtRoute,
   ApiSitemapDotxmlRoute: ApiSitemapDotxmlRoute,
   BrowseCategoryRoute: BrowseCategoryRoute,
+  BusinessesSlugRoute: BusinessesSlugRoute,
+  BusinessesSubmitRoute: BusinessesSubmitRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   RCodeRoute: RCodeRouteWithChildren,
   SellerIdRoute: SellerIdRoute,
   StaffReferralRoute: StaffReferralRoute,
+  BusinessesIndexRoute: BusinessesIndexRoute,
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicFxRefreshRoute: ApiPublicFxRefreshRoute,

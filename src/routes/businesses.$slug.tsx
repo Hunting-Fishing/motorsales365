@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { MapPin, Phone, Mail, Globe, MessageCircle, Star, Store as StoreIcon, Clock } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
