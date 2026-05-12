@@ -319,6 +319,22 @@ function AdminReferrals() {
       .slice(0, 5);
   }, [rows, stats]);
 
+  const filteredRows = useMemo(() => {
+    return rows.filter((r) => {
+      if (statusFilter === "active" && !r.active) return false;
+      if (statusFilter === "inactive" && r.active) return false;
+      if (roleFilter !== "all") {
+        const ur = r.staff_user_id ? roles[r.staff_user_id] || [] : [];
+        if (roleFilter === "none") {
+          if (ur.length > 0) return false;
+        } else if (!ur.includes(roleFilter)) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [rows, roles, roleFilter, statusFilter]);
+
   const exportCsv = () => {
     const header = ["full_name", "email", "code", "active", "scans", "visitors", "signups", "listings", "conversion_pct", "url"];
     const lines = [header.join(",")];
