@@ -227,6 +227,59 @@ function AdminRedemptions() {
         <Kpi icon={<Coins className="h-4 w-4" />} label="Final billed" value={formatPHP(totals.fin)} />
       </section>
 
+      <section className="rounded-xl border border-border bg-card p-4">
+        <div className="mb-3 flex items-center justify-between">
+          <h2 className="font-display text-sm font-semibold uppercase tracking-wider">
+            Breakdown by kind
+          </h2>
+          <span className="text-xs text-muted-foreground">
+            Counts (bars) and total discount (₱) for current filters
+          </span>
+        </div>
+        {byKindChart.length === 0 ? (
+          <div className="py-10 text-center text-sm text-muted-foreground">
+            No data in this range.
+          </div>
+        ) : (
+          <div className="h-72 w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={byKindChart} margin={{ top: 8, right: 16, left: 8, bottom: 8 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                <XAxis dataKey="kind" stroke="hsl(var(--muted-foreground))" fontSize={12} />
+                <YAxis
+                  yAxisId="left"
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  allowDecimals={false}
+                />
+                <YAxis
+                  yAxisId="right"
+                  orientation="right"
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  tickFormatter={(v) => `₱${Number(v).toLocaleString()}`}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: 8,
+                    fontSize: 12,
+                  }}
+                  formatter={(value: any, name: any) =>
+                    name === "discount"
+                      ? [formatPHP(Number(value)), "Discount"]
+                      : [Number(value).toLocaleString(), "Redemptions"]
+                  }
+                />
+                <Bar yAxisId="left" dataKey="count" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
+                <Bar yAxisId="right" dataKey="discount" fill="hsl(var(--accent))" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
+      </section>
+
       <section className="rounded-xl border border-border bg-card">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
