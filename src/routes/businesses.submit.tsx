@@ -177,11 +177,23 @@ function SubmitBusinessPage() {
           </div>
 
           <div>
-            <Label>Map coordinates (optional, recommended)</Label>
-            <div className="mt-1 grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <Label>Pin your business on the map</Label>
+              <div className="flex flex-wrap gap-2">
+                <Button type="button" variant="outline" size="sm" onClick={geocodeAddress}>Find on map</Button>
+                <Button type="button" variant="outline" size="sm" onClick={useMyLocation}>Use my location</Button>
+              </div>
+            </div>
+            <p className="mb-2 mt-1 text-xs text-muted-foreground">Click the map or drag the pin to set the exact spot. Coordinates are saved with your listing.</p>
+            <LocationPicker
+              lat={lat ? Number(lat) : null}
+              lng={lng ? Number(lng) : null}
+              region={loc.region}
+              onChange={(la, ln) => { setLat(la.toFixed(6)); setLng(ln.toFixed(6)); }}
+            />
+            <div className="mt-2 grid gap-2 sm:grid-cols-2">
               <Input placeholder="Latitude" value={lat} onChange={(e) => setLat(e.target.value)} />
               <Input placeholder="Longitude" value={lng} onChange={(e) => setLng(e.target.value)} />
-              <Button type="button" variant="outline" onClick={useMyLocation}>Use my location</Button>
             </div>
           </div>
 
