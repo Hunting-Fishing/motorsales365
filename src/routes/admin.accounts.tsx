@@ -42,6 +42,11 @@ async function logAudit(
   });
 }
 
+function formatVal(v: unknown): string {
+  if (v === null || v === undefined || v === "") return "∅";
+  if (typeof v === "boolean") return v ? "yes" : "no";
+  return String(v);
+
 type Plan = { id: string; name: string; price_php: number };
 type Sub = {
   id: string;
