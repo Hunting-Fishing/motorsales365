@@ -30,6 +30,17 @@ type StaffRow = {
   qr_storage_path: string | null;
   active: boolean;
   notes: string | null;
+  staff_user_id: string | null;
+};
+
+type AuditEntry = {
+  id: string;
+  staff_referral_id: string | null;
+  staff_email: string | null;
+  actor_id: string | null;
+  action: string;
+  details: any;
+  created_at: string;
 };
 
 type Promo = {
