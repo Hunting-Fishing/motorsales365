@@ -137,10 +137,25 @@ function PricingPage() {
           {plans.map((p) => {
             const isCurrent = mySub?.plan_id === p.id;
             const hasOther = mySub && !isCurrent && ["pending","active","paused"].includes(mySub.status);
+            const d = discounts[p.id];
             return (
               <div key={p.id} className={`flex flex-col rounded-xl border bg-card p-6 ${isCurrent ? "border-primary ring-2 ring-primary/30" : "border-border"}`}>
                 <div className="font-display text-lg font-semibold">{p.name}</div>
-                <div className="mt-2 font-display text-3xl font-bold">{formatPHP(p.price_php)}<span className="text-sm font-normal text-muted-foreground">/mo</span></div>
+                {d ? (
+                  <div className="mt-2">
+                    <div className="flex items-baseline gap-2">
+                      <span className="font-display text-3xl font-bold text-primary">{formatPHP(d.final_amount_php)}</span>
+                      <span className="text-sm text-muted-foreground line-through">{formatPHP(p.price_php)}</span>
+                      <span className="text-sm font-normal text-muted-foreground">/mo</span>
+                    </div>
+                    <div className="mt-1 inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                      Referral discount: −{formatPHP(d.discount_amount_php)}
+                      {d.percent_off ? ` (${d.percent_off}% off)` : ""}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-2 font-display text-3xl font-bold">{formatPHP(p.price_php)}<span className="text-sm font-normal text-muted-foreground">/mo</span></div>
+                )}
                 <div className="mt-1 text-sm text-muted-foreground">
                   {p.listings_per_month ?? "Unlimited"} listings/month
                 </div>
