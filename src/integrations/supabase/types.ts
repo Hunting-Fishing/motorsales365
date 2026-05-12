@@ -805,6 +805,66 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_redemptions: {
+        Row: {
+          applies_to: string
+          base_amount_php: number
+          created_at: string
+          discount_amount_php: number
+          final_amount_php: number
+          flat_amount_php: number | null
+          id: string
+          kind: string
+          listing_id: string | null
+          metadata: Json
+          payment_id: string | null
+          percent_off: number | null
+          promotion_id: string
+          referral_code: string
+          staff_referral_id: string
+          subscription_id: string | null
+          user_id: string
+        }
+        Insert: {
+          applies_to: string
+          base_amount_php: number
+          created_at?: string
+          discount_amount_php?: number
+          final_amount_php: number
+          flat_amount_php?: number | null
+          id?: string
+          kind: string
+          listing_id?: string | null
+          metadata?: Json
+          payment_id?: string | null
+          percent_off?: number | null
+          promotion_id: string
+          referral_code: string
+          staff_referral_id: string
+          subscription_id?: string | null
+          user_id: string
+        }
+        Update: {
+          applies_to?: string
+          base_amount_php?: number
+          created_at?: string
+          discount_amount_php?: number
+          final_amount_php?: number
+          flat_amount_php?: number | null
+          id?: string
+          kind?: string
+          listing_id?: string | null
+          metadata?: Json
+          payment_id?: string | null
+          percent_off?: number | null
+          promotion_id?: string
+          referral_code?: string
+          staff_referral_id?: string
+          subscription_id?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       referral_visits: {
         Row: {
           credited_referral_code: string | null
@@ -1381,6 +1441,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_referral_redemption: {
+        Args: {
+          _base_amount: number
+          _kind: string
+          _listing_id?: string
+          _metadata?: Json
+          _payment_id?: string
+          _subscription_id?: string
+        }
+        Returns: Json
+      }
       can_manage_ads: { Args: { _user_id: string }; Returns: boolean }
       can_moderate: { Args: { _user_id: string }; Returns: boolean }
       can_support: { Args: { _user_id: string }; Returns: boolean }
@@ -1416,6 +1487,23 @@ export type Database = {
           source_queue: string
         }
         Returns: number
+      }
+      pick_referral_promo: {
+        Args: { _base_amount: number; _kind: string; _user_id: string }
+        Returns: {
+          applies_to: string
+          discount_amount_php: number
+          final_amount_php: number
+          flat_amount_php: number
+          percent_off: number
+          promotion_id: string
+          referral_code: string
+          staff_referral_id: string
+        }[]
+      }
+      preview_referral_discount: {
+        Args: { _base_amount: number; _kind: string }
+        Returns: Json
       }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
