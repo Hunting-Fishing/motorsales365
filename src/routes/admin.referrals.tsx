@@ -565,6 +565,15 @@ function AdminReferrals() {
       )}
 
       <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border bg-card p-3">
+        <div className="relative w-full sm:w-auto sm:min-w-[260px]">
+          <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search name, email, or code"
+            className="h-8 pl-8"
+          />
+        </div>
         <div className="flex items-center gap-2">
           <Label className="text-xs uppercase tracking-wider text-muted-foreground">Role</Label>
           <Select value={roleFilter} onValueChange={setRoleFilter}>
@@ -592,7 +601,7 @@ function AdminReferrals() {
           </Select>
         </div>
         <div className="ml-auto text-xs text-muted-foreground">
-          Showing {filteredRows.length} of {rows.length}
+          Showing {sortedRows.length} of {rows.length}
         </div>
       </div>
 
@@ -600,24 +609,24 @@ function AdminReferrals() {
         <table className="w-full text-sm">
           <thead className="border-b border-border bg-muted/40">
             <tr className="text-left">
-              <th className="px-4 py-2">Staff</th>
+              <SortableTh label="Staff" k="name" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
               <th className="px-4 py-2">Role</th>
-              <th className="px-4 py-2">Code</th>
-              <th className="px-4 py-2">Scans</th>
-              <th className="px-4 py-2">Visitors</th>
-              <th className="px-4 py-2">Signups</th>
-              <th className="px-4 py-2">Listings</th>
-              <th className="px-4 py-2">Status</th>
+              <SortableTh label="Code" k="code" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
+              <SortableTh label="Scans" k="scans" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
+              <SortableTh label="Visitors" k="visitors" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
+              <SortableTh label="Signups" k="signups" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
+              <SortableTh label="Listings" k="listings" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
+              <SortableTh label="Status" k="status" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
               <th className="px-4 py-2 text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {loading ? (
               <tr><td colSpan={9} className="p-6 text-center text-muted-foreground">Loading…</td></tr>
-            ) : filteredRows.length === 0 ? (
+            ) : pagedRows.length === 0 ? (
               <tr><td colSpan={9} className="p-6 text-center text-muted-foreground">No staff referrals match your filters.</td></tr>
             ) : (
-              filteredRows.map((r) => {
+              pagedRows.map((r) => {
                 const s = stats[r.id] || { scans: 0, signups: 0, visitors: 0, listings: 0 };
                 const qr = publicQrUrl(r.qr_storage_path);
                 const link = `${PUBLIC_BASE}/r/${r.referral_code}`;
@@ -671,7 +680,7 @@ function AdminReferrals() {
                           size="sm"
                           variant="ghost"
                           title={r.active ? "Deactivate" : "Reactivate"}
-                          onClick={() => toggleActive(r)}
+                          onClick={() => requestToggle(r)}
                         >
                           <Power className={`h-4 w-4 ${r.active ? "text-primary" : "text-muted-foreground"}`} />
                         </Button>
@@ -689,6 +698,24 @@ function AdminReferrals() {
             )}
           </tbody>
         </table>
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border px-4 py-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <span>Rows per page</span>
+            <Select value={String(pageSize)} onValueChange={(v) => setPageSize(Number(v))}>
+              <SelectTrigger className="h-7 w-[80px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {[10, 25, 50, 100].map((n) => (
+                  <SelectItem key={n} value={String(n)}>{n}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2">
+            <span>Page {currentPage} of {totalPages}</span>
+            <Button size="sm" variant="outline" disabled={currentPage <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))}>Prev</Button>
+            <Button size="sm" variant="outline" disabled={currentPage >= totalPages} onClick={() => setPage((p) => Math.min(totalPages, p + 1))}>Next</Button>
+          </div>
+        </div>
       </div>
 
       {showAudit && (
