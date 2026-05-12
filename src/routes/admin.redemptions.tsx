@@ -229,8 +229,14 @@ function AdminRedemptions() {
                   <tr key={r.id} className="border-t border-border">
                     <td className="px-3 py-2 whitespace-nowrap">{new Date(r.created_at).toLocaleString()}</td>
                     <td className="px-3 py-2">
-                      <div className="font-medium">{s?.full_name ?? "—"}</div>
-                      <div className="font-mono text-xs text-muted-foreground">{r.referral_code}</div>
+                      <Link
+                        to="/admin/redemptions/$staffId"
+                        params={{ staffId: r.staff_referral_id }}
+                        className="block hover:underline"
+                      >
+                        <div className="font-medium text-primary">{s?.full_name ?? "—"}</div>
+                        <div className="font-mono text-xs text-muted-foreground">{r.referral_code}</div>
+                      </Link>
                     </td>
                     <td className="px-3 py-2">
                       <div className="font-medium">{userMap[r.user_id]?.full_name ?? "—"}</div>
