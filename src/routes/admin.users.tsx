@@ -26,13 +26,20 @@ function AdminUsers() {
   };
   useEffect(() => { load(); }, []);
 
-  const grantAdmin = async (userId: string) => {
-    const { error } = await supabase.from("user_roles").insert({ user_id: userId, role: "admin" });
-    if (error) toast.error(error.message); else { toast.success("Admin granted"); load(); }
-  };
-  const revokeAdmin = async (userId: string) => {
-    await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", "admin");
-    toast.success("Admin revoked"); load();
+  const STAFF_ROLES = ["admin", "moderator", "support", "sales", "advertising"] as const;
+  type StaffRole = (typeof STAFF_ROLES)[number];
+
+  const toggleRole = async (userId: string, role: StaffRole, has: boolean) => {
+    if (has) {
+      const { error } = await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", role);
+      if (error) return toast.error(error.message);
+      toast.success(`${role} revoked`);
+    } else {
+      const { error } = await supabase.from("user_roles").insert({ user_id: userId, role: role as any });
+      if (error) return toast.error(error.message);
+      toast.success(`${role} granted`);
+    }
+    load();
   };
 
   const verifyUser = async (userId: string) => {
