@@ -104,6 +104,19 @@ function AdminReferrals() {
     const staffRows = (data as StaffRow[]) || [];
     setRows(staffRows);
 
+    // Fetch roles for each staff_user_id
+    const userIds = staffRows.map((r) => r.staff_user_id).filter(Boolean) as string[];
+    if (userIds.length > 0) {
+      const { data: ur } = await sb.from("user_roles").select("user_id, role").in("user_id", userIds);
+      const map: Record<string, string[]> = {};
+      ((ur as any[] | null) || []).forEach((x) => {
+        (map[x.user_id] ||= []).push(x.role);
+      });
+      setRoles(map);
+    } else {
+      setRoles({});
+    }
+
     const since = sinceFor(rangeKey);
 
     let scansQ = sb.from("qr_scans").select("referral_code,visitor_id,scanned_at");
