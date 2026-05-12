@@ -13,6 +13,7 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
 } from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 import { formatDate, formatPHP } from "@/lib/format";
 
 export const Route = createFileRoute("/admin/accounts")({
@@ -302,18 +303,33 @@ function EditAccountDialog({
   const [discount, setDiscount] = useState<number>(row.subscription?.discount_percent ?? 0);
   const [complimentary, setComplimentary] = useState<boolean>(row.subscription?.complimentary ?? false);
   const [notes, setNotes] = useState<string>(row.subscription?.notes ?? "");
+  const [paused, setPaused] = useState<boolean>(row.account_status === "paused");
   const [saving, setSaving] = useState(false);
 
+  const planChanged = planId !== (row.plan?.id ?? "");
+  const selectedPlan = plans.find((p) => p.id === planId);
+  const effectivePrice = selectedPlan
+    ? complimentary
+      ? 0
+      : Math.max(0, Number(selectedPlan.price_php) * (1 - Math.min(100, Math.max(0, discount)) / 100))
+    : 0;
+
   const save = async () => {
+    const cleanDiscount = Math.min(100, Math.max(0, Number(discount) || 0));
     setSaving(true);
     try {
+      // 1) Subscription upsert
       if (row.subscription) {
-        const { error } = await supabase.from("subscriptions").update({
-          plan_id: planId || row.subscription.plan_id,
-          discount_percent: discount,
+        const patch = {
+          discount_percent: cleanDiscount,
           complimentary,
-          notes,
-        }).eq("id", row.subscription.id);
+          notes: notes || null,
+          ...(planId && planId !== row.subscription.plan_id ? { plan_id: planId } : {}),
+        };
+        const { error } = await supabase
+          .from("subscriptions")
+          .update(patch)
+          .eq("id", row.subscription.id);
         if (error) throw error;
       } else if (planId) {
         const { error } = await supabase.from("subscriptions").insert({
@@ -321,15 +337,26 @@ function EditAccountDialog({
           plan_id: planId,
           status: "active",
           complimentary,
-          discount_percent: discount,
-          notes,
+          discount_percent: cleanDiscount,
+          notes: notes || null,
         });
         if (error) throw error;
       }
+
+      // 2) Account pause toggle (only if changed)
+      const nextStatus = paused ? "paused" : "active";
+      if (nextStatus !== row.account_status) {
+        const { error } = await supabase
+          .from("profiles")
+          .update({ account_status: nextStatus })
+          .eq("id", row.id);
+        if (error) throw error;
+      }
+
       toast.success("Account updated");
       onSaved();
     } catch (e: any) {
-      toast.error(e.message);
+      toast.error(e.message ?? "Failed to save");
     } finally {
       setSaving(false);
     }
@@ -337,37 +364,88 @@ function EditAccountDialog({
 
   return (
     <Dialog open onOpenChange={(o) => !o && onClose()}>
-      <DialogContent>
+      <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>{row.full_name ?? "Account"}</DialogTitle>
+          <DialogTitle>{row.full_name ?? row.business_name ?? "Account"}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div>
             <label className="mb-1 block text-sm font-medium">Plan tier</label>
             <Select value={planId} onValueChange={setPlanId}>
-              <SelectTrigger><SelectValue placeholder="Select plan" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="Free (no subscription)" /></SelectTrigger>
               <SelectContent>
-                {plans.map((p) => <SelectItem key={p.id} value={p.id}>{p.name} — {formatPHP(p.price_php)}/mo</SelectItem>)}
+                {plans.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.name} — {formatPHP(p.price_php)}/mo
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
+            {planChanged && row.subscription && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                Will switch from {row.plan?.name ?? "Free"} → {selectedPlan?.name}.
+              </p>
+            )}
           </div>
-          <div>
-            <label className="mb-1 block text-sm font-medium">Discount % (0–100)</label>
-            <Input type="number" min={0} max={100} value={discount} onChange={(e) => setDiscount(Number(e.target.value))} />
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="mb-1 block text-sm font-medium">Discount %</label>
+              <Input
+                type="number"
+                min={0}
+                max={100}
+                value={discount}
+                onChange={(e) => setDiscount(Number(e.target.value))}
+              />
+            </div>
+            <div>
+              <label className="mb-1 block text-sm font-medium">Effective price</label>
+              <div className="flex h-9 items-center rounded-md border border-input bg-muted px-3 text-sm">
+                {formatPHP(effectivePrice)}/mo
+              </div>
+            </div>
           </div>
+
           <label className="flex items-center gap-2 text-sm">
-            <input type="checkbox" checked={complimentary} onChange={(e) => setComplimentary(e.target.checked)} />
-            Complimentary (no charge)
+            <input
+              type="checkbox"
+              checked={complimentary}
+              onChange={(e) => setComplimentary(e.target.checked)}
+            />
+            Complimentary (free, override price)
           </label>
+
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={paused}
+              onChange={(e) => setPaused(e.target.checked)}
+            />
+            Pause account (hides listings, login still works)
+          </label>
+
           <div>
-            <label className="mb-1 block text-sm font-medium">Notes (internal)</label>
-            <Input value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Reason for discount, etc." />
+            <label className="mb-1 block text-sm font-medium">Internal notes</label>
+            <Textarea
+              rows={3}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Reason for discount, comp grant, pause, etc."
+            />
           </div>
-          {!isAdmin && <div className="rounded-md bg-muted p-2 text-xs text-muted-foreground">Sales role: changes are logged.</div>}
+
+          {!isAdmin && (
+            <div className="rounded-md bg-muted p-2 text-xs text-muted-foreground">
+              Sales role: changes are visible to admins.
+            </div>
+          )}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save"}</Button>
+          <Button variant="outline" onClick={onClose} disabled={saving}>Cancel</Button>
+          <Button onClick={save} disabled={saving}>
+            {saving ? "Saving…" : "Save changes"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
