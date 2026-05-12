@@ -1,8 +1,9 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { LayoutGrid, Heart, MessageSquare, User as UserIcon, CreditCard, Bookmark, ShieldCheck, Truck } from "lucide-react";
+import { useEffect, useState } from "react";
+import { LayoutGrid, Heart, MessageSquare, User as UserIcon, CreditCard, Bookmark, ShieldCheck, Truck, QrCode } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardLayout,
@@ -23,19 +24,36 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean }[] = [
 function DashboardLayout() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [hasReferral, setHasReferral] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
   }, [user, loading, navigate]);
 
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await (supabase as any)
+        .from("staff_referrals")
+        .select("id")
+        .or(`staff_user_id.eq.${user.id},email.eq.${user.email?.toLowerCase()}`)
+        .maybeSingle();
+      setHasReferral(Boolean(data));
+    })();
+  }, [user]);
+
   if (loading || !user) return <SiteLayout><div className="p-12 text-center">Loading…</div></SiteLayout>;
+
+  const nav = hasReferral
+    ? [...NAV, { to: "/staff/referral", label: "My referral", Icon: QrCode }]
+    : NAV;
 
   return (
     <SiteLayout>
       <div className="container mx-auto grid gap-6 px-4 py-8 lg:grid-cols-[240px_1fr]">
         <aside className="rounded-xl border border-border bg-card p-2 lg:sticky lg:top-20 lg:self-start">
           <nav className="flex flex-row gap-1 overflow-x-auto lg:flex-col">
-            {NAV.map(({ to, label, Icon, exact }) => (
+            {nav.map(({ to, label, Icon, exact }) => (
               <Link
                 key={to}
                 to={to}
