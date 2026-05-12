@@ -49,6 +49,22 @@ function PricingPage() {
     if (user?.id) loadSub(user.id);
   }, [user?.id]);
 
+  // Preview discounts per plan once we have plans + a signed-in user
+  useEffect(() => {
+    if (!user?.id || plans.length === 0) return;
+    (async () => {
+      const out: Record<string, any> = {};
+      await Promise.all(plans.map(async (p) => {
+        const { data } = await (supabase as any).rpc("preview_referral_discount", {
+          _kind: "subscription",
+          _base_amount: Number(p.price_php) || 0,
+        });
+        if (data?.ok) out[p.id] = data;
+      }));
+      setDiscounts(out);
+    })();
+  }, [user?.id, plans]);
+
   const requestPlan = async (planId: string) => {
     if (!user) {
       navigate({ to: "/signup" });
