@@ -133,6 +133,7 @@ function SubmitBusinessPage() {
       website: website.trim() || null, messenger_url: messengerUrl.trim() || null,
       street_address: streetAddress.trim() || null,
       region: loc.region, province: loc.province, city: loc.city, barangay: loc.barangay,
+      postal_code: postalCode.trim() || null,
       lat: lat ? Number(lat) : null, lng: lng ? Number(lng) : null,
       status: "pending",
     };
