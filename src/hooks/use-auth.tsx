@@ -75,6 +75,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [simulatedRoles, setSimulatedRolesState] = useState<AppRole[] | null>(() => loadSim());
 
   useEffect(() => {
+    let lastUid: string | null = null;
+    const welcomeChecked = new Set<string>();
+
     const loadRoles = async (uid: string) => {
       const { data } = await supabase
         .from("user_roles")
@@ -83,29 +86,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setRoles((data ?? []).map((r: any) => r.role));
     };
 
-    // Listener FIRST
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+    const handleSession = (newSession: Session | null) => {
       setSession(newSession);
       setUser(newSession?.user ?? null);
-      if (newSession?.user) {
-        const u = newSession.user;
+      const uid = newSession?.user?.id ?? null;
+      if (uid && uid !== lastUid) {
+        lastUid = uid;
+        const u = newSession!.user;
         setTimeout(() => {
-          loadRoles(u.id);
-          maybeSendWelcomeEmail(u);
+          loadRoles(uid);
+          if (!welcomeChecked.has(uid)) {
+            welcomeChecked.add(uid);
+            maybeSendWelcomeEmail(u);
+          }
         }, 0);
-      } else {
+      } else if (!uid) {
+        lastUid = null;
         setRoles([]);
       }
+    };
+
+    // Listener FIRST
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      handleSession(newSession);
     });
 
     supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
+      handleSession(data.session);
       setLoading(false);
-      if (data.session?.user) {
-        loadRoles(data.session.user.id);
-        maybeSendWelcomeEmail(data.session.user);
-      }
     });
 
     return () => sub.subscription.unsubscribe();
