@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 
 const STATIC_PATHS = [
-  "/", "/about", "/contact", "/pricing", "/sell", "/tow",
+  "/", "/about", "/contact", "/pricing", "/sell", "/tow", "/advertise",
   "/terms", "/privacy", "/guidelines", "/refund-policy",
   "/browse/car", "/browse/motorcycle", "/browse/boat", "/browse/airplane",
   "/browse/equipment", "/browse/towing", "/browse/carwash", "/browse/parts",
