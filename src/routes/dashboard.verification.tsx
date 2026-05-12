@@ -127,7 +127,7 @@ function VerificationPage() {
     if (!user) return;
     const parsed = formSchema.safeParse(form);
     if (!parsed.success) {
-      toast.error(parsed.error.errors[0]?.message ?? "Invalid form");
+      toast.error(parsed.error.issues[0]?.message ?? "Invalid form");
       return;
     }
     if (docs.length === 0) {
