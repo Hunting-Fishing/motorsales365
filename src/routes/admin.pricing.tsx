@@ -16,6 +16,8 @@ function AdminPricing() {
   const [plans, setPlans] = useState<any[]>([]);
   const [promos, setPromos] = useState<any[]>([]);
   const [newPromo, setNewPromo] = useState({ code: "", percent_off: 10 });
+  const [subs, setSubs] = useState<any[]>([]);
+  const [subFilter, setSubFilter] = useState<string>("pending");
 
   const load = async () => {
     const [{ data: s }, { data: p }, { data: pr }] = await Promise.all([
@@ -25,7 +27,28 @@ function AdminPricing() {
     ]);
     setSettings(s ?? []); setPlans(p ?? []); setPromos(pr ?? []);
   };
+
+  const loadSubs = async () => {
+    let q = supabase.from("subscriptions").select("*, subscription_plans(name, price_php), profiles!subscriptions_user_id_fkey(full_name, email)").order("created_at", { ascending: false }).limit(100);
+    if (subFilter !== "all") q = q.eq("status", subFilter);
+    const { data, error } = await q;
+    if (error) {
+      // fallback: profiles join may not be wired by name; query separately
+      const { data: raw } = await supabase.from("subscriptions").select("*").order("created_at", { ascending: false }).limit(100);
+      setSubs(raw ?? []);
+    } else {
+      setSubs(data ?? []);
+    }
+  };
+
   useEffect(() => { load(); }, []);
+  useEffect(() => { loadSubs(); /* eslint-disable-next-line */ }, [subFilter]);
+
+  const updateSub = async (id: string, patch: any) => {
+    const { error } = await supabase.from("subscriptions").update(patch).eq("id", id);
+    if (error) toast.error(error.message);
+    else { toast.success("Subscription updated"); loadSubs(); }
+  };
 
   const saveSetting = async (key: string, value: number) => {
     const { error } = await supabase.from("pricing_settings").update({ value }).eq("key", key);
