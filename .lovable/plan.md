@@ -1,80 +1,71 @@
-
-## Current state
-
-- One profile exists in the database: **Jordi Bailey** (`a3999f39-…`), with only the `user` role. That's why nothing under `/admin` is unlocked.
-- `useAuth` reads roles from `public.user_roles`. RLS on `user_roles` allows admins to manage and admin-only nav already exists at `/admin/users` (role toggles per user) and per-section role gating in `src/routes/admin.tsx`.
-- There is **no** feature-flag / role-simulation system today.
-
 ## Goal
 
-1. Make sure the signed-in account is a proper Admin in the database.
-2. Give Admin a single Sandbox page to:
-   - Simulate any role (admin / sales / moderator / support / advertising / user) for the current session, so they can preview every gated screen without changing the real DB role.
-   - Toggle app feature flags on/off globally for testing.
+Add a public **Businesses** section accessible from the site menu. Users can browse, search, and filter local businesses (dealerships, repair shops, parts, towing, insurance) by type and tags, see them pinned on a multi-layered Philippines map (region → province → city → barangay), open detailed profiles, leave reviews, and submit/claim a business.
 
-## Step 1 — Grant admin to the current user (DB)
+## New routes
 
-Insert the admin role for Jordi Bailey via a data insert (idempotent):
+- `/businesses` — directory: search bar, type filter, tag multi-select, region/province/city/barangay drill-down, results list + map side-by-side (stacked on mobile).
+- `/businesses/$slug` — business profile: cover/logo, description, type, tags, hours, contact, address, embedded map, photos, reviews list + form.
+- `/businesses/submit` — owner submission form (auth required). Status `pending` until admin approves.
+- `/dashboard/businesses` — owner's businesses (edit/manage).
+- `/admin/businesses` — admin moderation queue (approve / reject / feature / hide).
 
-```sql
-INSERT INTO public.user_roles (user_id, role)
-VALUES ('a3999f39-3641-4e16-a11b-f2b6563b8a8f', 'admin')
-ON CONFLICT (user_id, role) DO NOTHING;
-```
+## Database (new tables)
 
-After this they'll see the full admin nav on next page load.
+1. **`business_types`** (seed): `slug` (PK), `label`, `icon`, `sort_order`.
+   Seed: `dealership`, `repair_shop`, `parts_accessories`, `towing`, `insurance`.
+2. **`business_tags`** (seed): `slug` (PK), `label`, `type_slug` (nullable; tag can be type-scoped or global).
+   E.g. `oil-change`, `body-paint`, `24-7`, `oem-parts`, `motorcycle-only`, `comprehensive-insurance`…
+3. **`businesses`**:
+   - `id`, `owner_id` (nullable, references auth user — null for admin-created listings), `slug` (unique), `name`, `type_slug` (FK business_types), `description`, `logo_url`, `cover_url`, `photos` (jsonb url array), `phone`, `email`, `website`, `messenger_url`, `hours` (jsonb), `region`, `province`, `city`, `barangay`, `street_address`, `lat`, `lng`, `status` (`pending`/`active`/`rejected`/`hidden`), `featured` (bool), `rating_avg` (numeric, computed via trigger), `rating_count` (int), `created_at`, `updated_at`.
+4. **`business_tag_links`**: `business_id`, `tag_slug`. Composite PK.
+5. **`business_reviews`**: `id`, `business_id`, `user_id`, `rating` (1–5), `body`, `status` (`active`/`hidden`), `created_at`. Unique `(business_id, user_id)` so one review per user.
 
-## Step 2 — Role simulation in `useAuth`
+RLS:
+- `business_types`, `business_tags`: public read; admins manage.
+- `businesses`: public read where `status='active'`; owner reads own (any status); owner inserts (status forced to `pending`); owner updates own (cannot self-approve); admins/moderators full manage.
+- `business_tag_links`: public read; owner manages own; admins manage.
+- `business_reviews`: public read where `status='active'`; auth users insert own (rating constraint); user updates/deletes own; moderators hide.
 
-Extend `src/hooks/use-auth.tsx`:
+Trigger: recompute `rating_avg`/`rating_count` on review insert/update/delete.
 
-- Keep `realRoles` (from DB) and add `simulatedRoles` (from `localStorage["sandbox.roles"]`).
-- Only the **real admin** is allowed to simulate. For anyone else, simulation is ignored.
-- Exposed `isAdmin / isSales / …` reflect the **effective** roles (simulated if set, else real).
-- Also expose `realIsAdmin`, `simulatedRoles`, `setSimulatedRoles(roles[] | null)` so the Sandbox UI can drive it.
-- An on-screen banner ("Simulating: sales — exit") appears site-wide when simulation is active.
+## Map (multi-layered)
 
-This is purely client-side; RLS in the DB is untouched, so simulation only changes what the UI renders / which admin pages are reachable. It does **not** grant DB privileges they don't really have.
+Use **Leaflet + react-leaflet** with free OpenStreetMap tiles (no API key).
+- Default view: Philippines bounds.
+- Pins clustered with `react-leaflet-cluster`.
+- Layer hierarchy is filter-driven (not GeoJSON polygons in v1): selecting Region zooms to that region's bounds (use a static `phRegionBounds` map), Province zooms to province bounds (computed from PSGC city centroids), City zooms to that city, Barangay further narrows results.
+- Each business pin uses its `lat`/`lng`; clicking opens a popup with name, type chip, rating, and a "View" link.
+- For `/businesses/$slug`, a small single-pin map shows the address.
 
-## Step 3 — Feature flags
+Coordinates for region/province/city centroids: bundle a compact lookup `src/data/ph-centroids.json` (generated from existing PSGC data + a public coords dataset). For barangay layer: barangay free-text + a "Use my location" button (geolocation) refines the map view; we won't bundle barangay polygons in v1 (too heavy) — barangay acts as a text filter and lat/lng store.
 
-Create `src/lib/feature-flags.tsx`:
+## Files to create
 
-- A small `FeatureFlagProvider` + `useFeatureFlag(key)` hook.
-- Default flags (e.g. `towing`, `referrals`, `multiCurrency`, `adsInquiry`, `boosts`, `pendingSaleAutoExpire`). All default `true`.
-- Persisted in `localStorage["sandbox.flags"]`.
-- Admin-only toggling. Other users read defaults.
+- migration: tables, RLS, trigger, seed types & starter tags.
+- `src/lib/businesses.functions.ts` — `listBusinesses`, `getBusinessBySlug`, `submitBusiness`, `updateBusiness`, `addReview`, admin `moderateBusiness`.
+- `src/components/businesses/business-map.tsx` — Leaflet map with clustered pins, accepts `businesses[]` + active region/province/city.
+- `src/components/businesses/business-card.tsx` — list row.
+- `src/components/businesses/business-filters.tsx` — type, tags, region/province/city/barangay drill-down (reuses PSGC helpers).
+- `src/components/businesses/review-form.tsx` + `review-list.tsx`.
+- `src/components/businesses/location-drilldown.tsx` — wraps the 4-level cascading selects.
+- `src/data/ph-centroids.json` — region+province+city → lat/lng + bounds.
+- `src/routes/businesses.index.tsx`, `src/routes/businesses.$slug.tsx`, `src/routes/businesses.submit.tsx`.
+- `src/routes/dashboard.businesses.tsx`.
+- `src/routes/admin.businesses.tsx`.
 
-Integration: wrap the app in `src/routes/__root.tsx` next to `CurrencyProvider`. Gate a few obvious entry points (e.g. nav links to Towing / Referrals) with `useFeatureFlag` so toggles are visibly testable. No business-logic changes beyond rendering gates.
+## Files to edit
 
-## Step 4 — Admin Sandbox page
+- `src/components/site-header.tsx` — add **Businesses** entry in desktop nav and mobile sheet (between Equipment and Towing per screenshot order, or after Towing — your call).
+- `src/routes/admin.tsx` — add Businesses admin nav entry (icon `Store`, roles `["admin","moderator"]`).
+- `src/routes/dashboard.tsx` — add "My Businesses" nav entry.
+- `package.json` — add `leaflet`, `react-leaflet`, `react-leaflet-cluster`, `@types/leaflet`.
 
-New route `src/routes/admin.sandbox.tsx` (admin-only via the existing gate):
+## Out of scope (v1)
 
-- **Role simulator** — checkboxes for each role + "Reset to my real roles" button. Shows a warning that this is UI only.
-- **Feature flags** — switch per flag with description. Buttons: "Enable all", "Reset to defaults".
-- **My account** — shows current user id, real roles, effective roles, with a "Copy" helper.
+- Real barangay polygon overlays (would require ~42k features). Barangay is a text/location filter only.
+- Business messaging inbox (reuse existing `messages` table later if needed — for now contact is phone/email/website/messenger link).
+- Paid business plans / boosting (can layer on existing subscription tables later).
+- Bulk import / CSV onboarding.
 
-Add it to the admin nav in `src/routes/admin.tsx`:
-
-```ts
-{ to: "/admin/sandbox", label: "Sandbox", Icon: FlaskConical, roles: ["admin"] }
-```
-
-## Files touched
-
-- migration/insert: grant admin role
-- `src/hooks/use-auth.tsx` — add simulation
-- `src/lib/feature-flags.tsx` — new
-- `src/routes/__root.tsx` — wrap with `FeatureFlagProvider`
-- `src/routes/admin.tsx` — add Sandbox nav entry
-- `src/routes/admin.sandbox.tsx` — new page
-- `src/components/sandbox-banner.tsx` — small banner shown when simulating
-- A couple of nav components updated to consume `useFeatureFlag` for demo gating
-
-## Out of scope
-
-- Persisting simulated roles or flags server-side (intentionally local-only).
-- Changing RLS or backend role checks — simulation is UI-only by design.
-
-Confirm and I'll implement.
+Approve and I'll build it.
