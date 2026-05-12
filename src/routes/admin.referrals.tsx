@@ -515,3 +515,26 @@ function PromoDialog({ staff, onClose }: { staff: StaffRow; onClose: () => void 
     </Dialog>
   );
 }
+
+function KpiCard({
+  icon,
+  label,
+  value,
+  hint,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  hint?: string;
+}) {
+  return (
+    <div className="rounded-xl border border-border bg-card p-4">
+      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+        <span className="text-primary">{icon}</span>
+        <span className="uppercase tracking-wider">{label}</span>
+      </div>
+      <div className="font-display mt-2 text-2xl font-bold">{value}</div>
+      {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
+    </div>
+  );
+}
