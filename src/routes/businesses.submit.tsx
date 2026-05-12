@@ -40,6 +40,7 @@ function SubmitBusinessPage() {
   const [loc, setLoc] = useState<LocationValue>({ region: null, province: null, city: null, barangay: null });
   const [lat, setLat] = useState("");
   const [lng, setLng] = useState("");
+  const [postalCode, setPostalCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
