@@ -278,6 +278,50 @@ function AdminRedemptions() {
             </ResponsiveContainer>
           </div>
         )}
+
+        {byKindChart.length > 0 && (
+          <div className="mt-4 overflow-x-auto rounded-lg border border-border">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/40 text-left text-xs uppercase tracking-wider text-muted-foreground">
+                <tr>
+                  <th className="px-3 py-2">Kind</th>
+                  <th className="px-3 py-2 text-right">Redemptions</th>
+                  <th className="px-3 py-2 text-right">Share</th>
+                  <th className="px-3 py-2 text-right">Total discount</th>
+                </tr>
+              </thead>
+              <tbody>
+                {byKindChart.map((d) => {
+                  const share = rows.length ? (d.count / rows.length) * 100 : 0;
+                  return (
+                    <tr key={d.kind} className="border-t border-border">
+                      <td className="px-3 py-2">
+                        <span className="rounded bg-secondary px-2 py-0.5 text-xs uppercase">{d.kind}</span>
+                      </td>
+                      <td className="px-3 py-2 text-right tabular-nums">{d.count.toLocaleString()}</td>
+                      <td className="px-3 py-2 text-right tabular-nums text-muted-foreground">
+                        {share.toFixed(1)}%
+                      </td>
+                      <td className="px-3 py-2 text-right tabular-nums text-primary">
+                        −{formatPHP(d.discount)}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                <tr className="border-t border-border bg-muted/20 font-semibold">
+                  <td className="px-3 py-2">Total</td>
+                  <td className="px-3 py-2 text-right tabular-nums">{rows.length.toLocaleString()}</td>
+                  <td className="px-3 py-2 text-right tabular-nums text-muted-foreground">100%</td>
+                  <td className="px-3 py-2 text-right tabular-nums text-primary">
+                    −{formatPHP(totals.disc)}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        )}
       </section>
 
       <section className="rounded-xl border border-border bg-card">
