@@ -25,6 +25,7 @@ function PricingPage() {
   const [plans, setPlans] = useState<any[]>([]);
   const [mySub, setMySub] = useState<any | null>(null);
   const [requesting, setRequesting] = useState<string | null>(null);
+  const [discounts, setDiscounts] = useState<Record<string, any>>({});
 
   const loadSub = async (uid: string) => {
     const { data } = await supabase
