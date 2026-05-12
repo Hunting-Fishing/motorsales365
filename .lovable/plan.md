@@ -1,51 +1,88 @@
-## Plan: finish the Advertiser inquiry channel
+## Plan: Staff QR Referral Tracking + Promo Linking
 
-The `/advertise` page and `/admin/advertising` inbox already exist. Four follow-up tasks remain to make the channel production-ready:
+Build a complete staff referral system in admin, with each staff member tied to a personal QR code (keyed by company email), durable first-touch attribution on signup, and the ability to attach special promotions/offers/rates to each staff code.
 
-### 1. Stricter form validation on `/advertise`
-- Add a Zod schema in `src/routes/advertise.tsx`:
-  - `contact_name`: trimmed, 1–100 chars
-  - `company`: optional, ≤120 chars
-  - `email`: valid email, ≤255 chars
-  - `phone`: optional, ≤30 chars, basic digit/`+`/space regex
-  - `placement`: enum from `PLACEMENTS`
-  - `budget_range`: optional, ≤60 chars
-  - `start_date`: optional ISO date, must be today or later
-  - `message`: 10–2000 chars
-- Show inline field errors (per-field state) and disable submit while invalid.
-- Mirror length caps in a DB trigger on `ad_inquiries` so server-side enforcement matches client.
+### 1. Database (new migration)
 
-### 2. Inquiry status flow polish (admin panel)
-The status select already exists; tighten it:
-- Restrict valid transitions in a `BEFORE UPDATE` trigger on `ad_inquiries`:
-  - `new → in_review | spam`
-  - `in_review → quoted | lost | spam`
-  - `quoted → won | lost`
-  - `won`, `lost`, `spam` are terminal (admin override only)
-- Auto-bump `new → in_review` already happens on first staff reply — keep it.
-- Add an "Assign to me" button that sets `assigned_to = auth.uid()`; show assignee chip on each row.
-- Add a small filter for "Assigned to me" alongside the status filter.
+New tables (all RLS-enabled, indexed on referral_code, staff_user_id, visitor_id):
 
-### 3. Email notifications
-Two new templates registered in `src/lib/email-templates/registry.ts`:
-- `ad-inquiry-received` — sent to the advertiser confirming submission (uses `contact_name`, `placement`, summary of next steps).
-- `ad-inquiry-staff-notice` — sent to a staff distro (`partners@365motorsales.ph`) with submitter details + link to `/admin/advertising`.
-- `ad-inquiry-reply` — sent to the advertiser whenever a staff reply is inserted into `ad_inquiry_messages`.
+- `staff_referrals` — one row per staff QR profile.
+  - `staff_user_id` (FK to profiles.id, nullable for non-account staff), `email` (company email, unique), `full_name`, `phone`, `referral_code` (unique, slug), `qr_storage_path`, `active` (bool), `notes`.
+- `referral_visits` — durable visitor record.
+  - `visitor_id` (uuid, client-issued), `first_referral_code`, `last_referral_code`, `credited_referral_code`, `first_seen_at`, `last_seen_at`, `landing_page`, `user_agent`, `ip_hash`.
+- `qr_scans` — append-only event log.
+  - `referral_code`, `visitor_id`, `device_type`, `browser`, `country` (optional), `scanned_at`.
+- `user_referrals` — credit attached to an auth user on signup.
+  - `user_id` (unique FK to profiles), `referred_by_staff_id`, `first_referral_code`, `last_referral_code`, `credited_referral_code`, `signup_date`.
+- `staff_promotions` — promos/deals/rates owned by a staff code.
+  - `staff_referral_id`, `title`, `description`, `kind` (`promo|deal|rate|incentive|other`), `percent_off` (nullable), `flat_amount_php` (nullable), `applies_to` (text — `listing_fee | subscription | tow | any`), `starts_at`, `ends_at`, `active`, `terms`.
+- Optional `referral_redemptions` — log when a referred user redeems a `staff_promotions` row (for reporting).
 
-Wiring:
-- On insert into `ad_inquiries`, a Postgres trigger calls `enqueue_email` (already exists) with both the confirmation and staff-notice payloads.
-- On insert into `ad_inquiry_messages` where `from_staff = true`, a trigger enqueues the reply email to the inquiry's submitter email.
-- Re-use the existing email queue worker — no new edge function needed.
+Enums: `referral_kind` (`promo|deal|rate|incentive|other`).
 
-### 4. Discoverability
-- Add an "Advertise with us" link in `src/components/site-footer.tsx` (Partners column) and a subtle CTA card on the homepage's secondary section.
-- Add the `/advertise` route to `src/routes/api/sitemap[.]xml.tsx`.
+RLS:
+- `staff_referrals`, `staff_promotions`, `referral_visits`, `qr_scans`, `user_referrals`: admin full manage; sales read; the staff member themselves can read their own row + their own promotions + aggregate stats via a SECURITY DEFINER function.
+- Public `INSERT` on `qr_scans` and `referral_visits` is allowed via a SECURITY DEFINER RPC `record_qr_scan(code, visitor_id, ua, landing)` — never direct table insert from anon.
+- Active `staff_promotions` readable publicly when `active = true` and within date range (so a referred visitor can see the offer attached to their code).
 
-### Out of scope
-- Ad serving, impression tracking, online ad-space checkout.
-- Public advertiser self-serve dashboard beyond the existing "submitter reads own thread" RLS.
+Triggers/functions:
+- `tg_set_updated_at` on new tables.
+- `on_auth_user_signup_attach_referral()` AFTER INSERT on `profiles`: reads visitor cookie via a `pending_signup_referral` token table OR via the signup form's hidden field passed through user_metadata, then writes `user_referrals` row using **first-touch** attribution (do not overwrite `first_referral_code`).
+- `generate_referral_code(full_name)` helper to suggest `juan001`-style slugs.
 
-### Verification
-- Manually submit an inquiry as anon and as a logged-in user; confirm both rows land and the confirmation email is queued.
-- Flip statuses through the legal transitions and assert that invalid jumps are rejected by the trigger.
-- Re-run `./scripts/verify-security.sh` (allow-list unchanged — no new SECURITY DEFINER functions are introduced beyond existing helpers).
+### 2. Routes & UI
+
+- **`/r/$code` (public)** — `src/routes/r.$code.tsx`. Server loader:
+  1. Reads code, validates active.
+  2. Calls RPC `record_qr_scan`.
+  3. Sets a 90-day first-party cookie `mref_first`, `mref_last`, `mref_credit` (first-touch rule).
+  4. Writes the same to `localStorage` client-side, plus a stable `visitor_id`.
+  5. Renders a quick landing card ("Referred by {first_name}. Here are their current offers:") listing active `staff_promotions` for that code, then redirects to `/` after a short delay (or to a `?next=` target).
+- **`/admin/referrals` (admin + sales)** — `src/routes/admin.referrals.tsx`:
+  - Staff list with columns: name, email, code, status, scans (7d/all), unique visitors, signups, listings, conversion %.
+  - "New staff QR" dialog → name, company email, phone, auto-suggested code (editable, unique check). On save, generate QR PNG via `qrcode` npm pkg, upload to `qr-codes` storage bucket (new, public), store path.
+  - Row actions: edit, deactivate, **Download QR**, **Copy URL**, **Manage promotions**.
+  - Promotions drawer — list + create/edit/archive `staff_promotions` rows tied to that staff code.
+- **`/staff/referral` (any staff with a `staff_referrals` row keyed by their auth email)** — personal dashboard: their QR, link, scan/signup stats, and a read-only view of promos attached.
+- **Signup form (`src/routes/signup.tsx`)** — read `mref_credit` from cookie/localStorage, send as `referral_code` in `signUp` `options.data` (user_metadata) + an optional visible "Have a referral code?" input. Trigger reads it on profile insert.
+
+### 3. Storage
+
+- New public bucket `qr-codes` (read-public, write admin-only via RLS policies).
+
+### 4. Libraries
+
+- `bun add qrcode` (pure-JS, Worker-safe) for server-side PNG generation in a `createServerFn`.
+- `bun add nanoid` for `visitor_id` if not already present (fallback to `crypto.randomUUID()`).
+
+### 5. Attribution & cookie rules
+
+- Cookie names: `mref_first`, `mref_last`, `mref_credit`, `mref_vid`. 90-day expiry, `SameSite=Lax`, `Secure`, path `/`.
+- First-touch: never overwrite `mref_first` / `mref_credit` if present. Always update `mref_last` + push a row into `qr_scans`.
+- Deactivated codes: scan still logged but `credited_referral_code` is not set; show "this code is no longer active" on the landing card.
+
+### 6. Admin/staff security
+
+- Only `admin` can create/edit `staff_referrals` and `staff_promotions`.
+- `sales` can read all referral stats.
+- A staff member can see only their own row + promotions (matched by `email = auth.jwt().email` OR `staff_user_id = auth.uid()`).
+- Public never sees staff email — only the referral code in URLs.
+
+### 7. Reporting (admin)
+
+- Per-staff KPI cards: scans, unique visitors, signups, listings created by referred users (`listings` joined via `user_referrals.credited_referral_code`), conversion %.
+- Date range filter (7/30/90/all).
+- CSV export.
+
+### 8. Out of scope
+
+- Auto-applying promo discounts at checkout (we surface them on the landing card and admin reporting; wiring them into the actual `subscriptions` / `payments` flow is a follow-up).
+- Server-side device-fingerprint dedupe beyond `ip_hash` + `visitor_id`.
+
+### 9. Verification
+
+- Scan `/r/test001` anon → cookie set, row in `qr_scans`, landing card lists active promos.
+- Sign up in same browser → `user_referrals.credited_referral_code = test001`, admin dashboard shows +1 signup.
+- Scan `/r/test001`, then `/r/test002`, then sign up → first-touch credit stays `test001`, `last_referral_code = test002`.
+- Deactivate `test001` → new scans logged but no credit applied.
+- Run `./scripts/verify-security.sh` — add new SECURITY DEFINER functions to the allow-list with reason comments.

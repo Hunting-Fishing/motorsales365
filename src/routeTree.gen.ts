@@ -31,6 +31,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
+import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as DashboardVerificationRouteImport } from './routes/dashboard.verification'
@@ -47,6 +48,7 @@ import { Route as ApiRobotsDottxtRouteImport } from './routes/api/robots[.]txt'
 import { Route as AdminVerificationsRouteImport } from './routes/admin.verifications'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
+import { Route as AdminReferralsRouteImport } from './routes/admin.referrals'
 import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
@@ -170,6 +172,11 @@ const SellerIdRoute = SellerIdRouteImport.update({
   path: '/seller/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RCodeRoute = RCodeRouteImport.update({
+  id: '/r/$code',
+  path: '/r/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ListingIdRoute = ListingIdRouteImport.update({
   id: '/listing/$id',
   path: '/listing/$id',
@@ -248,6 +255,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
 const AdminReportsRoute = AdminReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminReferralsRoute = AdminReferralsRouteImport.update({
+  id: '/referrals',
+  path: '/referrals',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminPricingRoute = AdminPricingRouteImport.update({
@@ -340,6 +352,7 @@ export interface FileRoutesByFullPath {
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
+  '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
@@ -356,6 +369,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
+  '/r/$code': typeof RCodeRoute
   '/seller/$id': typeof SellerIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -390,6 +404,7 @@ export interface FileRoutesByTo {
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
+  '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
@@ -406,6 +421,7 @@ export interface FileRoutesByTo {
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
+  '/r/$code': typeof RCodeRoute
   '/seller/$id': typeof SellerIdRoute
   '/admin': typeof AdminIndexRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -443,6 +459,7 @@ export interface FileRoutesById {
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
+  '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
@@ -459,6 +476,7 @@ export interface FileRoutesById {
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
+  '/r/$code': typeof RCodeRoute
   '/seller/$id': typeof SellerIdRoute
   '/admin/': typeof AdminIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -497,6 +515,7 @@ export interface FileRouteTypes {
     | '/admin/listings'
     | '/admin/performance'
     | '/admin/pricing'
+    | '/admin/referrals'
     | '/admin/reports'
     | '/admin/users'
     | '/admin/verifications'
@@ -513,6 +532,7 @@ export interface FileRouteTypes {
     | '/dashboard/verification'
     | '/email/unsubscribe'
     | '/listing/$id'
+    | '/r/$code'
     | '/seller/$id'
     | '/admin/'
     | '/dashboard/'
@@ -547,6 +567,7 @@ export interface FileRouteTypes {
     | '/admin/listings'
     | '/admin/performance'
     | '/admin/pricing'
+    | '/admin/referrals'
     | '/admin/reports'
     | '/admin/users'
     | '/admin/verifications'
@@ -563,6 +584,7 @@ export interface FileRouteTypes {
     | '/dashboard/verification'
     | '/email/unsubscribe'
     | '/listing/$id'
+    | '/r/$code'
     | '/seller/$id'
     | '/admin'
     | '/dashboard'
@@ -599,6 +621,7 @@ export interface FileRouteTypes {
     | '/admin/listings'
     | '/admin/performance'
     | '/admin/pricing'
+    | '/admin/referrals'
     | '/admin/reports'
     | '/admin/users'
     | '/admin/verifications'
@@ -615,6 +638,7 @@ export interface FileRouteTypes {
     | '/dashboard/verification'
     | '/email/unsubscribe'
     | '/listing/$id'
+    | '/r/$code'
     | '/seller/$id'
     | '/admin/'
     | '/dashboard/'
@@ -651,6 +675,7 @@ export interface RootRouteChildren {
   BrowseCategoryRoute: typeof BrowseCategoryRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
+  RCodeRoute: typeof RCodeRoute
   SellerIdRoute: typeof SellerIdRoute
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
@@ -815,6 +840,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SellerIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/r/$code': {
+      id: '/r/$code'
+      path: '/r/$code'
+      fullPath: '/r/$code'
+      preLoaderRoute: typeof RCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/listing/$id': {
       id: '/listing/$id'
       path: '/listing/$id'
@@ -927,6 +959,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminReportsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/referrals': {
+      id: '/admin/referrals'
+      path: '/referrals'
+      fullPath: '/admin/referrals'
+      preLoaderRoute: typeof AdminReferralsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/pricing': {
       id: '/admin/pricing'
       path: '/pricing'
@@ -1021,6 +1060,7 @@ interface AdminRouteChildren {
   AdminListingsRoute: typeof AdminListingsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
   AdminPricingRoute: typeof AdminPricingRoute
+  AdminReferralsRoute: typeof AdminReferralsRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVerificationsRoute: typeof AdminVerificationsRoute
@@ -1034,6 +1074,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminListingsRoute: AdminListingsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
   AdminPricingRoute: AdminPricingRoute,
+  AdminReferralsRoute: AdminReferralsRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminVerificationsRoute: AdminVerificationsRoute,
@@ -1107,6 +1148,7 @@ const rootRouteChildren: RootRouteChildren = {
   BrowseCategoryRoute: BrowseCategoryRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
+  RCodeRoute: RCodeRoute,
   SellerIdRoute: SellerIdRoute,
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
@@ -1117,3 +1159,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

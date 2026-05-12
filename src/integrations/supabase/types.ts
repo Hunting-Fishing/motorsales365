@@ -775,6 +775,75 @@ export type Database = {
         }
         Relationships: []
       }
+      qr_scans: {
+        Row: {
+          browser: string | null
+          country: string | null
+          device_type: string | null
+          id: string
+          referral_code: string
+          scanned_at: string
+          visitor_id: string | null
+        }
+        Insert: {
+          browser?: string | null
+          country?: string | null
+          device_type?: string | null
+          id?: string
+          referral_code: string
+          scanned_at?: string
+          visitor_id?: string | null
+        }
+        Update: {
+          browser?: string | null
+          country?: string | null
+          device_type?: string | null
+          id?: string
+          referral_code?: string
+          scanned_at?: string
+          visitor_id?: string | null
+        }
+        Relationships: []
+      }
+      referral_visits: {
+        Row: {
+          credited_referral_code: string | null
+          first_referral_code: string | null
+          first_seen_at: string
+          id: string
+          ip_hash: string | null
+          landing_page: string | null
+          last_referral_code: string | null
+          last_seen_at: string
+          user_agent: string | null
+          visitor_id: string
+        }
+        Insert: {
+          credited_referral_code?: string | null
+          first_referral_code?: string | null
+          first_seen_at?: string
+          id?: string
+          ip_hash?: string | null
+          landing_page?: string | null
+          last_referral_code?: string | null
+          last_seen_at?: string
+          user_agent?: string | null
+          visitor_id: string
+        }
+        Update: {
+          credited_referral_code?: string | null
+          first_referral_code?: string | null
+          first_seen_at?: string
+          id?: string
+          ip_hash?: string | null
+          landing_page?: string | null
+          last_referral_code?: string | null
+          last_seen_at?: string
+          user_agent?: string | null
+          visitor_id?: string
+        }
+        Relationships: []
+      }
       reports: {
         Row: {
           created_at: string
@@ -837,6 +906,107 @@ export type Database = {
           name?: string
           query?: Json
           user_id?: string
+        }
+        Relationships: []
+      }
+      staff_promotions: {
+        Row: {
+          active: boolean
+          applies_to: string
+          created_at: string
+          description: string | null
+          ends_at: string | null
+          flat_amount_php: number | null
+          id: string
+          kind: Database["public"]["Enums"]["referral_kind"]
+          percent_off: number | null
+          staff_referral_id: string
+          starts_at: string | null
+          terms: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          applies_to?: string
+          created_at?: string
+          description?: string | null
+          ends_at?: string | null
+          flat_amount_php?: number | null
+          id?: string
+          kind?: Database["public"]["Enums"]["referral_kind"]
+          percent_off?: number | null
+          staff_referral_id: string
+          starts_at?: string | null
+          terms?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          applies_to?: string
+          created_at?: string
+          description?: string | null
+          ends_at?: string | null
+          flat_amount_php?: number | null
+          id?: string
+          kind?: Database["public"]["Enums"]["referral_kind"]
+          percent_off?: number | null
+          staff_referral_id?: string
+          starts_at?: string | null
+          terms?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_promotions_staff_referral_id_fkey"
+            columns: ["staff_referral_id"]
+            isOneToOne: false
+            referencedRelation: "staff_referrals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_referrals: {
+        Row: {
+          active: boolean
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          notes: string | null
+          phone: string | null
+          qr_storage_path: string | null
+          referral_code: string
+          staff_user_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          qr_storage_path?: string | null
+          referral_code: string
+          staff_user_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          phone?: string | null
+          qr_storage_path?: string | null
+          referral_code?: string
+          staff_user_id?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1075,6 +1245,44 @@ export type Database = {
         }
         Relationships: []
       }
+      user_referrals: {
+        Row: {
+          credited_referral_code: string | null
+          first_referral_code: string | null
+          id: string
+          last_referral_code: string | null
+          referred_by_staff_id: string | null
+          signup_date: string
+          user_id: string
+        }
+        Insert: {
+          credited_referral_code?: string | null
+          first_referral_code?: string | null
+          id?: string
+          last_referral_code?: string | null
+          referred_by_staff_id?: string | null
+          signup_date?: string
+          user_id: string
+        }
+        Update: {
+          credited_referral_code?: string | null
+          first_referral_code?: string | null
+          id?: string
+          last_referral_code?: string | null
+          referred_by_staff_id?: string | null
+          signup_date?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_referrals_referred_by_staff_id_fkey"
+            columns: ["referred_by_staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_referrals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -1217,6 +1425,17 @@ export type Database = {
           read_ct: number
         }[]
       }
+      record_qr_scan: {
+        Args: {
+          _browser?: string
+          _code: string
+          _device?: string
+          _landing?: string
+          _user_agent?: string
+          _visitor_id: string
+        }
+        Returns: Json
+      }
       user_has_paid_subscription: {
         Args: { _user_id: string }
         Returns: boolean
@@ -1258,6 +1477,7 @@ export type Database = {
       media_type: "photo" | "video"
       payment_kind: "listing" | "upgrade" | "boost" | "subscription"
       payment_status: "pending" | "paid" | "failed" | "refunded"
+      referral_kind: "promo" | "deal" | "rate" | "incentive" | "other"
       seller_type: "private" | "business"
       verification_request_status:
         | "pending"
@@ -1424,6 +1644,7 @@ export const Constants = {
       media_type: ["photo", "video"],
       payment_kind: ["listing", "upgrade", "boost", "subscription"],
       payment_status: ["pending", "paid", "failed", "refunded"],
+      referral_kind: ["promo", "deal", "rate", "incentive", "other"],
       seller_type: ["private", "business"],
       verification_request_status: [
         "pending",
