@@ -250,9 +250,55 @@ function AdminReferrals() {
     if (row.qr_storage_path) {
       await supabase.storage.from("qr-codes").remove([row.qr_storage_path]).catch(() => {});
     }
+    if (user) {
+      await sb.from("staff_referral_audit").insert({
+        staff_referral_id: row.id, staff_email: row.email, actor_id: user.id,
+        action: "deleted",
+        details: { referral_code: row.referral_code, full_name: row.full_name },
+      });
+    }
     const { error } = await sb.from("staff_referrals").delete().eq("id", row.id);
     if (error) toast.error(error.message);
     else load();
+  };
+
+  const toggleActive = async (row: StaffRow) => {
+    const next = !row.active;
+    const { error } = await sb.from("staff_referrals").update({ active: next }).eq("id", row.id);
+    if (error) { toast.error(error.message); return; }
+    toast.success(next ? "Reactivated" : "Deactivated");
+    load();
+    if (showAudit) loadAudit();
+  };
+
+  const loadAudit = async () => {
+    const { data } = await sb
+      .from("staff_referral_audit")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(100);
+    const entries = (data as AuditEntry[]) || [];
+    setAudit(entries);
+    const actorIds = Array.from(new Set(entries.map((e) => e.actor_id).filter(Boolean) as string[]));
+    if (actorIds.length > 0) {
+      const { data: profs } = await sb.from("profiles").select("id, full_name").in("id", actorIds);
+      const map: Record<string, { name: string; email: string }> = {};
+      ((profs as any[] | null) || []).forEach((p) => {
+        map[p.id] = { name: p.full_name || "", email: "" };
+      });
+      setActors(map);
+    }
+  };
+
+  useEffect(() => { if (showAudit) loadAudit(); /* eslint-disable-next-line */ }, [showAudit]);
+
+  const logSync = async (count: number) => {
+    if (!user) return;
+    await sb.from("staff_referral_audit").insert({
+      actor_id: user.id,
+      action: "sync_run",
+      details: { synced_count: count },
+    });
   };
 
   const totals = useMemo(() => {
