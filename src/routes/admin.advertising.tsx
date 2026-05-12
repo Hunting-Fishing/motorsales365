@@ -295,6 +295,26 @@ function AdminAdvertising() {
                 <Textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Visible only to staff" />
                 <Button size="sm" variant="outline" className="mt-2" onClick={saveNotes}>Save notes</Button>
               </div>
+
+              <div>
+                <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Activity log</h3>
+                {audit.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">No activity yet.</p>
+                ) : (
+                  <ul className="space-y-1 rounded-lg border border-border bg-background p-3 text-xs">
+                    {audit.map((a) => (
+                      <li key={a.id} className="flex justify-between gap-2">
+                        <span>
+                          <span className="font-semibold">{a.action.replace(/_/g, " ")}</span>
+                          {a.from_value && <> · <span className="text-muted-foreground">{a.from_value}</span> → </>}
+                          {a.to_value && <span className="text-primary">{a.to_value}</span>}
+                        </span>
+                        <span className="text-muted-foreground">{formatDate(a.created_at)}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
             </div>
           )}
         </div>
