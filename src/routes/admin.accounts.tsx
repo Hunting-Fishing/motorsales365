@@ -328,7 +328,22 @@ function EditAccountDialog({
   const [complimentary, setComplimentary] = useState<boolean>(row.subscription?.complimentary ?? false);
   const [notes, setNotes] = useState<string>(row.subscription?.notes ?? "");
   const [paused, setPaused] = useState<boolean>(row.account_status === "paused");
+  const [reason, setReason] = useState<string>("");
   const [saving, setSaving] = useState(false);
+  const [history, setHistory] = useState<Array<{
+    id: string; field: string; old_value: any; new_value: any;
+    note: string | null; actor_role: string; created_at: string;
+  }>>([]);
+
+  useEffect(() => {
+    supabase
+      .from("account_audit_log")
+      .select("id, field, old_value, new_value, note, actor_role, created_at")
+      .eq("target_user_id", row.id)
+      .order("created_at", { ascending: false })
+      .limit(10)
+      .then(({ data }) => setHistory((data ?? []) as any));
+  }, [row.id]);
 
   const planChanged = planId !== (row.plan?.id ?? "");
   const selectedPlan = plans.find((p) => p.id === planId);
@@ -340,9 +355,17 @@ function EditAccountDialog({
 
   const save = async () => {
     const cleanDiscount = Math.min(100, Math.max(0, Number(discount) || 0));
+    const prevDiscount = row.subscription?.discount_percent ?? 0;
+    const prevComp = row.subscription?.complimentary ?? false;
+    const prevNotes = row.subscription?.notes ?? "";
+    const prevPlanId = row.subscription?.plan_id ?? null;
+    const prevPlanName = row.plan?.name ?? "Free";
+    const prevStatus = row.account_status;
+    const nextStatus = paused ? "paused" : "active";
+    const note = reason.trim() || null;
+
     setSaving(true);
     try {
-      // 1) Subscription upsert
       if (row.subscription) {
         const patch = {
           discount_percent: cleanDiscount,
@@ -367,9 +390,7 @@ function EditAccountDialog({
         if (error) throw error;
       }
 
-      // 2) Account pause toggle (only if changed)
-      const nextStatus = paused ? "paused" : "active";
-      if (nextStatus !== row.account_status) {
+      if (nextStatus !== prevStatus) {
         const { error } = await supabase
           .from("profiles")
           .update({ account_status: nextStatus })
@@ -377,7 +398,26 @@ function EditAccountDialog({
         if (error) throw error;
       }
 
-      toast.success("Account updated");
+      // Audit entries — one per changed field
+      const entries: Promise<unknown>[] = [];
+      if (planId && planId !== prevPlanId) {
+        entries.push(logAudit(row.id, "plan", prevPlanName, selectedPlan?.name ?? null, note, isAdmin));
+      }
+      if (cleanDiscount !== Number(prevDiscount)) {
+        entries.push(logAudit(row.id, "discount_percent", prevDiscount, cleanDiscount, note, isAdmin));
+      }
+      if (complimentary !== prevComp) {
+        entries.push(logAudit(row.id, "complimentary", prevComp, complimentary, note, isAdmin));
+      }
+      if ((notes || "") !== (prevNotes || "")) {
+        entries.push(logAudit(row.id, "notes", prevNotes, notes, note, isAdmin));
+      }
+      if (nextStatus !== prevStatus) {
+        entries.push(logAudit(row.id, "account_status", prevStatus, nextStatus, note, isAdmin));
+      }
+      await Promise.all(entries);
+
+      toast.success(entries.length ? `Saved · ${entries.length} change(s) logged` : "No changes");
       onSaved();
     } catch (e: any) {
       toast.error(e.message ?? "Failed to save");
