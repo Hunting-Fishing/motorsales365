@@ -286,7 +286,7 @@ function AdminRedemptions() {
                   orientation="right"
                   stroke="hsl(var(--muted-foreground))"
                   fontSize={12}
-                  tickFormatter={(v) => `₱${Number(v).toLocaleString()}`}
+                  tickFormatter={(v) => tickMoney(Number(v))}
                 />
                 <Tooltip
                   contentStyle={{
