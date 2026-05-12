@@ -598,6 +598,58 @@ function AdminReferrals() {
         </table>
       </div>
 
+      {showAudit && (
+        <section className="rounded-xl border border-border bg-card p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <h2 className="font-display text-lg font-semibold">Audit log</h2>
+              <p className="text-xs text-muted-foreground">Most recent 100 staff referral changes (creates, activations, QR generations, sync runs).</p>
+            </div>
+            <Button size="sm" variant="ghost" onClick={loadAudit}><RefreshCw className="mr-1 h-3 w-3" /> Refresh</Button>
+          </div>
+          {audit.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No audit entries yet.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead className="border-b border-border bg-muted/40">
+                  <tr className="text-left">
+                    <th className="px-3 py-2">When</th>
+                    <th className="px-3 py-2">Action</th>
+                    <th className="px-3 py-2">Staff</th>
+                    <th className="px-3 py-2">Admin</th>
+                    <th className="px-3 py-2">Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {audit.map((e) => (
+                    <tr key={e.id} className="border-b border-border last:border-0">
+                      <td className="px-3 py-2 whitespace-nowrap text-muted-foreground">
+                        {new Date(e.created_at).toLocaleString()}
+                      </td>
+                      <td className="px-3 py-2">
+                        <span className="rounded bg-secondary px-1.5 py-0.5 uppercase">{e.action}</span>
+                      </td>
+                      <td className="px-3 py-2">{e.staff_email || <span className="text-muted-foreground">—</span>}</td>
+                      <td className="px-3 py-2 font-mono text-[10px]">
+                        {e.actor_id
+                          ? (actors[e.actor_id]?.name || e.actor_id.slice(0, 8))
+                          : <span className="text-muted-foreground">system</span>}
+                      </td>
+                      <td className="px-3 py-2 font-mono text-[10px] text-muted-foreground">
+                        {e.details && Object.keys(e.details).length > 0
+                          ? JSON.stringify(e.details)
+                          : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </section>
+      )}
+
       {newOpen && <StaffDialog onClose={() => setNewOpen(false)} onSubmit={handleCreate} />}
       {editing && (
         <StaffDialog
