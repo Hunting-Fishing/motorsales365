@@ -134,8 +134,10 @@ function AccountsConsole() {
   const togglePause = async (row: Row) => {
     const next = row.account_status === "paused" ? "active" : "paused";
     const { error } = await supabase.from("profiles").update({ account_status: next }).eq("id", row.id);
-    if (error) toast.error(error.message);
-    else { toast.success(next === "paused" ? "Account paused" : "Account reactivated"); load(); }
+    if (error) { toast.error(error.message); return; }
+    await logAudit(row.id, "account_status", row.account_status, next, null, isAdmin);
+    toast.success(next === "paused" ? "Account paused" : "Account reactivated");
+    load();
   };
 
   const exportCsv = () => {
