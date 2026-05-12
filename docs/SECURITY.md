@@ -66,9 +66,35 @@ from `PUBLIC`, `anon`, and `authenticated`. They run only as triggers, as
 `service_role` (queue workers, edge functions), or via `pg_cron`. See
 `supabase/migrations/` for the exact REVOKE statements.
 
+## Accepted RLS warnings
+
+### `ad_inquiries` — `"Anyone can submit ad inquiry"` (`INSERT WITH CHECK (true)`)
+
+- **Warning:** `0024 — RLS Policy Always True`
+- **Why it's intentional:** the `/advertise` page is a public lead-capture
+  form. Anonymous visitors must be able to submit an inquiry without
+  signing up first. There is no per-row identity to check at INSERT time,
+  so `WITH CHECK (true)` is correct.
+- **Why this is safe:**
+  - Server-side validation trigger (`validate_ad_inquiry`) enforces length
+    caps, email format, and `start_date >= today` for every row, so
+    payload abuse cannot bypass field rules.
+  - SELECT is locked down: only ad staff (`can_manage_ads`) and the
+    submitter themselves (via JWT email match) can read inquiries.
+  - UPDATE / DELETE are restricted to ad staff and admins respectively.
+  - Status transitions are enforced by the
+    `enforce_ad_inquiry_status_transitions` trigger, so a submitter cannot
+    move a row to `won`/`quoted` even if they could update (they cannot).
+
 ## How to re-verify
 
 1. `./scripts/verify-security.sh` — should print `PASS` with every
    allow-listed function showing `OK`.
-2. `supabase--linter` — remaining warnings should map 1:1 to the functions
-   above. Any other warning is drift.
+2. `supabase--linter` — remaining warnings should be:
+   - 1× `0024` on `ad_inquiries / Anyone can submit ad inquiry`
+   - 1× `0028` on `increment_listing_view`
+   - 8× `0029` on `has_role`, `increment_listing_view`, `is_staff`,
+     `can_moderate`, `can_support`, `can_manage_ads`, `current_plan_tier`,
+     `is_business_account`
+   Any other warning is drift.
+
