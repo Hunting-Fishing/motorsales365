@@ -56,6 +56,7 @@ import { Route as AdminListingsRouteImport } from './routes/admin.listings'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising'
 import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
+import { Route as RCodePosterRouteImport } from './routes/r.$code.poster'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
 import { Route as ApiPublicPaymentEventsRouteImport } from './routes/api/public/payment-events'
@@ -298,6 +299,11 @@ const AdminAccountsRoute = AdminAccountsRouteImport.update({
   path: '/accounts',
   getParentRoute: () => AdminRoute,
 } as any)
+const RCodePosterRoute = RCodePosterRouteImport.update({
+  id: '/poster',
+  path: '/poster',
+  getParentRoute: () => RCodeRoute,
+} as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
@@ -375,7 +381,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
-  '/r/$code': typeof RCodeRoute
+  '/r/$code': typeof RCodeRouteWithChildren
   '/seller/$id': typeof SellerIdRoute
   '/staff/referral': typeof StaffReferralRoute
   '/admin/': typeof AdminIndexRoute
@@ -383,6 +389,7 @@ export interface FileRoutesByFullPath {
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/r/$code/poster': typeof RCodePosterRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -428,7 +435,7 @@ export interface FileRoutesByTo {
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
-  '/r/$code': typeof RCodeRoute
+  '/r/$code': typeof RCodeRouteWithChildren
   '/seller/$id': typeof SellerIdRoute
   '/staff/referral': typeof StaffReferralRoute
   '/admin': typeof AdminIndexRoute
@@ -436,6 +443,7 @@ export interface FileRoutesByTo {
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/r/$code/poster': typeof RCodePosterRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -484,7 +492,7 @@ export interface FileRoutesById {
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
-  '/r/$code': typeof RCodeRoute
+  '/r/$code': typeof RCodeRouteWithChildren
   '/seller/$id': typeof SellerIdRoute
   '/staff/referral': typeof StaffReferralRoute
   '/admin/': typeof AdminIndexRoute
@@ -492,6 +500,7 @@ export interface FileRoutesById {
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/r/$code/poster': typeof RCodePosterRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
@@ -549,6 +558,7 @@ export interface FileRouteTypes {
     | '/api/public/payment-events'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
+    | '/r/$code/poster'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
@@ -602,6 +612,7 @@ export interface FileRouteTypes {
     | '/api/public/payment-events'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
+    | '/r/$code/poster'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
@@ -657,6 +668,7 @@ export interface FileRouteTypes {
     | '/api/public/payment-events'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
+    | '/r/$code/poster'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
@@ -687,7 +699,7 @@ export interface RootRouteChildren {
   BrowseCategoryRoute: typeof BrowseCategoryRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
-  RCodeRoute: typeof RCodeRoute
+  RCodeRoute: typeof RCodeRouteWithChildren
   SellerIdRoute: typeof SellerIdRoute
   StaffReferralRoute: typeof StaffReferralRoute
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
@@ -1028,6 +1040,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAccountsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/r/$code/poster': {
+      id: '/r/$code/poster'
+      path: '/poster'
+      fullPath: '/r/$code/poster'
+      preLoaderRoute: typeof RCodePosterRouteImport
+      parentRoute: typeof RCodeRoute
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
@@ -1143,6 +1162,16 @@ const ListingIdRouteWithChildren = ListingIdRoute._addFileChildren(
   ListingIdRouteChildren,
 )
 
+interface RCodeRouteChildren {
+  RCodePosterRoute: typeof RCodePosterRoute
+}
+
+const RCodeRouteChildren: RCodeRouteChildren = {
+  RCodePosterRoute: RCodePosterRoute,
+}
+
+const RCodeRouteWithChildren = RCodeRoute._addFileChildren(RCodeRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
@@ -1168,7 +1197,7 @@ const rootRouteChildren: RootRouteChildren = {
   BrowseCategoryRoute: BrowseCategoryRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
-  RCodeRoute: RCodeRoute,
+  RCodeRoute: RCodeRouteWithChildren,
   SellerIdRoute: SellerIdRoute,
   StaffReferralRoute: StaffReferralRoute,
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
