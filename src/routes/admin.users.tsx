@@ -90,8 +90,8 @@ function AdminUsers() {
         );
       }
 
-      const from = page * PAGE_SIZE;
-      const to = from + PAGE_SIZE - 1;
+      const from = page * pageSize;
+      const to = from + pageSize - 1;
       const { data: profs, count, error } = await q.range(from, to);
       if (error) { toast.error(error.message); setLoading(false); return; }
 
@@ -157,9 +157,9 @@ function AdminUsers() {
     }
   };
 
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const rangeStart = total === 0 ? 0 : page * PAGE_SIZE + 1;
-  const rangeEnd = Math.min(total, (page + 1) * PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const rangeStart = total === 0 ? 0 : page * pageSize + 1;
+  const rangeEnd = Math.min(total, (page + 1) * pageSize);
 
   return (
     <div>
@@ -272,7 +272,7 @@ function AdminUsers() {
         })}
       </div>
 
-      {total > PAGE_SIZE && (
+      {total > pageSize && (
         <div className="mt-4 flex items-center justify-between gap-2">
           <Button size="sm" variant="outline" disabled={page === 0 || loading} onClick={() => setPage((p) => Math.max(0, p - 1))}>
             <ChevronLeft className="mr-1 h-4 w-4" />Previous
