@@ -262,8 +262,8 @@ function AdminUsers() {
               <div className="flex flex-wrap items-center gap-2">
                 <EditUserDialog user={u} onSaved={load} />
                 {isVerified
-                  ? <Button size="sm" variant="outline" onClick={() => revokeVerification(u.id)}>Revoke verified</Button>
-                  : <Button size="sm" variant="outline" onClick={() => verifyUser(u.id)}>Mark verified</Button>}
+                  ? <Button size="sm" variant="outline" onClick={() => revokeVerification(u.id, u.verification_status)}>Revoke verified</Button>
+                  : <Button size="sm" variant="outline" onClick={() => verifyUser(u.id, u.verification_status)}>Mark verified</Button>}
               </div>
             </div>
           );
