@@ -274,16 +274,49 @@ function AdminUsers() {
       </div>
 
       {total > pageSize && (
-        <div className="mt-4 flex items-center justify-between gap-2">
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <span>Rows per page</span>
+          <Select value={String(pageSize)} onValueChange={(v) => setPageSize(Number(v))}>
+            <SelectTrigger className="h-8 w-[80px]"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {PAGE_SIZE_OPTIONS.map((n) => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" disabled={page === 0 || loading} onClick={() => setPage(0)}>First</Button>
           <Button size="sm" variant="outline" disabled={page === 0 || loading} onClick={() => setPage((p) => Math.max(0, p - 1))}>
-            <ChevronLeft className="mr-1 h-4 w-4" />Previous
+            <ChevronLeft className="mr-1 h-4 w-4" />Prev
           </Button>
-          <span className="text-xs text-muted-foreground">Page {page + 1} of {totalPages}</span>
+          <span className="text-xs text-muted-foreground whitespace-nowrap">Page {page + 1} of {totalPages}</span>
           <Button size="sm" variant="outline" disabled={page + 1 >= totalPages || loading} onClick={() => setPage((p) => p + 1)}>
             Next<ChevronRight className="ml-1 h-4 w-4" />
           </Button>
+          <Button size="sm" variant="outline" disabled={page + 1 >= totalPages || loading} onClick={() => setPage(totalPages - 1)}>Last</Button>
         </div>
-      )}
+        <form
+          className="flex items-center gap-2 text-xs text-muted-foreground"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const n = parseInt(pageInput, 10);
+            if (!isNaN(n) && n >= 1 && n <= totalPages) { setPage(n - 1); setPageInput(""); }
+            else toast.error(`Enter a page between 1 and ${totalPages}`);
+          }}
+        >
+          <span>Jump to</span>
+          <Input
+            type="number"
+            min={1}
+            max={totalPages}
+            value={pageInput}
+            onChange={(e) => setPageInput(e.target.value)}
+            placeholder={String(page + 1)}
+            className="h-8 w-20"
+          />
+          <Button size="sm" variant="outline" type="submit">Go</Button>
+        </form>
+      </div>
     </div>
   );
 }
