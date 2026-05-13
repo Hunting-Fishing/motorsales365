@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Info, Search, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Info, Search, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,48 +15,106 @@ export const Route = createFileRoute("/admin/users")({
   component: AdminUsers,
 });
 
+const STAFF_ROLES = ["admin", "moderator", "support", "sales", "advertising"] as const;
+type StaffRole = (typeof STAFF_ROLES)[number];
+const PAGE_SIZE = 50;
+
 function AdminUsers() {
   const [users, setUsers] = useState<any[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+
+  const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [sellerFilter, setSellerFilter] = useState<string>("all");
   const [verFilter, setVerFilter] = useState<string>("all");
 
+  // Debounce search input
+  useEffect(() => {
+    const t = setTimeout(() => { setSearch(searchInput); setPage(0); }, 300);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  // Reset to first page when filters change
+  useEffect(() => { setPage(0); }, [roleFilter, sellerFilter, verFilter]);
+
   const load = async () => {
-    const { data: profs } = await supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(200);
-    const ids = (profs ?? []).map((p) => p.id);
-    const { data: roles } = await supabase.from("user_roles").select("user_id,role").in("user_id", ids);
-    const roleMap = new Map<string, string[]>();
-    (roles ?? []).forEach((r: any) => {
-      const arr = roleMap.get(r.user_id) ?? []; arr.push(r.role); roleMap.set(r.user_id, arr);
-    });
-    setUsers((profs ?? []).map((p) => ({ ...p, roles: roleMap.get(p.id) ?? [] })));
-  };
-  useEffect(() => { load(); }, []);
-
-  const STAFF_ROLES = ["admin", "moderator", "support", "sales", "advertising"] as const;
-  type StaffRole = (typeof STAFF_ROLES)[number];
-
-  const filtered = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    return users.filter((u) => {
-      if (q) {
-        const hay = `${u.full_name ?? ""} ${u.business_name ?? ""} ${u.phone ?? ""} ${u.phone_e164 ?? ""}`.toLowerCase();
-        if (!hay.includes(q)) return false;
-      }
+    setLoading(true);
+    try {
+      // Resolve role filter to a user_id allow/deny list first
+      let restrictIds: string[] | null = null;
+      let excludeIds: string[] | null = null;
       if (roleFilter !== "all") {
         if (roleFilter === "user_only") {
-          if ((u.roles ?? []).some((r: string) => (STAFF_ROLES as readonly string[]).includes(r))) return false;
-        } else if (!u.roles?.includes(roleFilter)) return false;
+          const { data: staffRows } = await supabase
+            .from("user_roles")
+            .select("user_id")
+            .in("role", STAFF_ROLES as unknown as any);
+          excludeIds = Array.from(new Set((staffRows ?? []).map((r: any) => r.user_id)));
+        } else {
+          const { data: roleRows } = await supabase
+            .from("user_roles")
+            .select("user_id")
+            .eq("role", roleFilter as any);
+          restrictIds = Array.from(new Set((roleRows ?? []).map((r: any) => r.user_id)));
+          if (restrictIds.length === 0) {
+            setUsers([]); setTotal(0); setLoading(false); return;
+          }
+        }
       }
-      if (sellerFilter !== "all" && u.seller_type !== sellerFilter) return false;
-      if (verFilter !== "all" && (u.verification_status ?? "unverified") !== verFilter) return false;
-      return true;
-    });
-  }, [users, search, roleFilter, sellerFilter, verFilter]);
+
+      let q = supabase
+        .from("profiles")
+        .select("*", { count: "exact" })
+        .order("created_at", { ascending: false });
+
+      if (restrictIds) q = q.in("id", restrictIds);
+      if (excludeIds && excludeIds.length > 0) q = q.not("id", "in", `(${excludeIds.join(",")})`);
+      if (sellerFilter !== "all") q = q.eq("seller_type", sellerFilter as any);
+      if (verFilter !== "all") {
+        if (verFilter === "unverified") {
+          q = q.or("verification_status.is.null,verification_status.eq.unverified");
+        } else {
+          q = q.eq("verification_status", verFilter as any);
+        }
+      }
+      if (search.trim()) {
+        const s = search.trim().replace(/[%,()]/g, "");
+        q = q.or(
+          `full_name.ilike.%${s}%,business_name.ilike.%${s}%,phone.ilike.%${s}%,phone_e164.ilike.%${s}%`
+        );
+      }
+
+      const from = page * PAGE_SIZE;
+      const to = from + PAGE_SIZE - 1;
+      const { data: profs, count, error } = await q.range(from, to);
+      if (error) { toast.error(error.message); setLoading(false); return; }
+
+      const ids = (profs ?? []).map((p) => p.id);
+      let roleMap = new Map<string, string[]>();
+      if (ids.length > 0) {
+        const { data: roles } = await supabase.from("user_roles").select("user_id,role").in("user_id", ids);
+        (roles ?? []).forEach((r: any) => {
+          const arr = roleMap.get(r.user_id) ?? []; arr.push(r.role); roleMap.set(r.user_id, arr);
+        });
+      }
+      setUsers((profs ?? []).map((p) => ({ ...p, roles: roleMap.get(p.id) ?? [] })));
+      setTotal(count ?? 0);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { load(); }, [page, search, roleFilter, sellerFilter, verFilter]);
 
   const hasFilters = search || roleFilter !== "all" || sellerFilter !== "all" || verFilter !== "all";
-  const clearFilters = () => { setSearch(""); setRoleFilter("all"); setSellerFilter("all"); setVerFilter("all"); };
+  const clearFilters = () => {
+    setSearchInput(""); setSearch("");
+    setRoleFilter("all"); setSellerFilter("all"); setVerFilter("all");
+    setPage(0);
+  };
 
   const toggleRole = async (userId: string, role: StaffRole, has: boolean) => {
     if (has) {
@@ -88,6 +146,10 @@ function AdminUsers() {
     else { toast.success("Verification revoked"); load(); }
   };
 
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const rangeStart = total === 0 ? 0 : page * PAGE_SIZE + 1;
+  const rangeEnd = Math.min(total, (page + 1) * PAGE_SIZE);
+
   return (
     <div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -106,8 +168,8 @@ function AdminUsers() {
           <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             placeholder="Search name, business, phone…"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
             className="pl-8"
           />
         </div>
@@ -142,7 +204,7 @@ function AdminUsers() {
       </div>
 
       <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
-        <span>Showing {filtered.length} of {users.length}</span>
+        <span>{loading ? "Loading…" : `Showing ${rangeStart}–${rangeEnd} of ${total}`}</span>
         {hasFilters && (
           <Button size="sm" variant="ghost" onClick={clearFilters}>
             <X className="mr-1 h-3.5 w-3.5" />Clear filters
@@ -151,12 +213,12 @@ function AdminUsers() {
       </div>
 
       <div className="space-y-2">
-        {filtered.length === 0 && (
+        {!loading && users.length === 0 && (
           <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
             No users match these filters.
           </div>
         )}
-        {filtered.map((u) => {
+        {users.map((u) => {
           const isVerified = u.verification_status === "verified";
           return (
             <div key={u.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
@@ -198,6 +260,18 @@ function AdminUsers() {
           );
         })}
       </div>
+
+      {total > PAGE_SIZE && (
+        <div className="mt-4 flex items-center justify-between gap-2">
+          <Button size="sm" variant="outline" disabled={page === 0 || loading} onClick={() => setPage((p) => Math.max(0, p - 1))}>
+            <ChevronLeft className="mr-1 h-4 w-4" />Previous
+          </Button>
+          <span className="text-xs text-muted-foreground">Page {page + 1} of {totalPages}</span>
+          <Button size="sm" variant="outline" disabled={page + 1 >= totalPages || loading} onClick={() => setPage((p) => p + 1)}>
+            Next<ChevronRight className="ml-1 h-4 w-4" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
