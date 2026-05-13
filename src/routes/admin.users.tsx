@@ -37,6 +37,27 @@ function AdminUsers() {
   const STAFF_ROLES = ["admin", "moderator", "support", "sales", "advertising"] as const;
   type StaffRole = (typeof STAFF_ROLES)[number];
 
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return users.filter((u) => {
+      if (q) {
+        const hay = `${u.full_name ?? ""} ${u.business_name ?? ""} ${u.phone ?? ""} ${u.phone_e164 ?? ""}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      if (roleFilter !== "all") {
+        if (roleFilter === "user_only") {
+          if ((u.roles ?? []).some((r: string) => (STAFF_ROLES as readonly string[]).includes(r))) return false;
+        } else if (!u.roles?.includes(roleFilter)) return false;
+      }
+      if (sellerFilter !== "all" && u.seller_type !== sellerFilter) return false;
+      if (verFilter !== "all" && (u.verification_status ?? "unverified") !== verFilter) return false;
+      return true;
+    });
+  }, [users, search, roleFilter, sellerFilter, verFilter]);
+
+  const hasFilters = search || roleFilter !== "all" || sellerFilter !== "all" || verFilter !== "all";
+  const clearFilters = () => { setSearch(""); setRoleFilter("all"); setSellerFilter("all"); setVerFilter("all"); };
+
   const toggleRole = async (userId: string, role: StaffRole, has: boolean) => {
     if (has) {
       const { error } = await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", role);
