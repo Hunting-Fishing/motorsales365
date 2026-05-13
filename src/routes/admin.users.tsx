@@ -10,6 +10,7 @@ import { VerifiedBadge } from "@/components/verified-badge";
 import { formatDate } from "@/lib/format";
 import { AddUserDialog } from "@/components/admin/add-user-dialog";
 import { EditUserDialog } from "@/components/admin/edit-user-dialog";
+import { logAdminAudit } from "@/lib/admin-audit";
 
 export const Route = createFileRoute("/admin/users")({
   component: AdminUsers,
