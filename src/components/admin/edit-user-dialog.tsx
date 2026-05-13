@@ -70,6 +70,20 @@ export function EditUserDialog({
       const { error: pErr } = await supabase.from("profiles").update(profileUpdate).eq("id", user.id);
       if (pErr) throw pErr;
 
+      // Audit log entries (best-effort, never blocks)
+      const auditRows: AdminAuditEntry[] = [];
+      toAdd.forEach((r) => auditRows.push({ actor_id: "", target_user_id: user.id, action: "role_granted", field: "role", old_value: null, new_value: r }));
+      toRemove.forEach((r) => auditRows.push({ actor_id: "", target_user_id: user.id, action: "role_revoked", field: "role", old_value: r, new_value: null }));
+      const prevVer = (user.verification_status as VerificationStatus) ?? "unverified";
+      if (prevVer !== verification) {
+        auditRows.push({ actor_id: "", target_user_id: user.id, action: "verification_changed", field: "verification_status", old_value: prevVer, new_value: verification });
+      }
+      const prevSeller = (user.seller_type as SellerType) ?? "private";
+      if (prevSeller !== sellerType) {
+        auditRows.push({ actor_id: "", target_user_id: user.id, action: "seller_type_changed", field: "seller_type", old_value: prevSeller, new_value: sellerType });
+      }
+      if (auditRows.length) await logAdminAudit(auditRows);
+
       toast.success("User updated");
       onSaved?.();
       setOpen(false);
