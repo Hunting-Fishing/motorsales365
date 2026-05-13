@@ -18,7 +18,7 @@ export const Route = createFileRoute("/admin/users")({
 
 const STAFF_ROLES = ["admin", "moderator", "support", "sales", "advertising"] as const;
 type StaffRole = (typeof STAFF_ROLES)[number];
-const PAGE_SIZE = 50;
+const PAGE_SIZE_OPTIONS = [25, 50, 100, 200] as const;
 
 function AdminUsers() {
   const [users, setUsers] = useState<any[]>([]);
