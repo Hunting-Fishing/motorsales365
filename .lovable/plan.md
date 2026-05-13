@@ -1,32 +1,58 @@
-## Goal
-Improve the Staff QR Referrals admin page with safer status changes, better at-scale management, and a more usable audit log.
+## Add User feature + Admin tab info tooltips
 
-## Changes (all in `src/routes/admin.referrals.tsx` unless noted)
+### 1. "+ Add User" button (Admin → Users and Admin → Accounts)
 
-### 1. Confirm + reason dialog for activate/deactivate
-- Replace the direct `toggleActive` call on the Power button with an `AlertDialog` that:
-  - Shows the staff name, code, and the action ("Deactivate" / "Reactivate").
-  - Includes a required `Textarea` for **reason** (min 3 chars).
-  - On confirm: update `staff_referrals.active`, then insert a manual row into `staff_referral_audit` with `action = 'deactivated' | 'activated'` and `details = { reason, referral_code, full_name }`.
-  - The existing `tg_staff_referral_audit` trigger also logs activation changes, so the manual insert uses a distinct action label suffix (e.g. `deactivated_with_reason`) OR we keep one entry by adding the reason via the trigger path. Simpler: keep trigger entry + insert a second `reason_logged` entry containing the reason (no DB migration needed).
-- Toast on success/failure.
+Add a button at the top of both `/admin/users` and `/admin/accounts` that opens a modal to create a fully-active user. The modal collects:
 
-### 2. Search box for staff list
-- Add a debounced text input above the table that filters `filteredRows` by case-insensitive match on `full_name`, `email`, or `referral_code`.
+- Email (required)
+- Full name
+- Temporary password (auto-generated, with copy button; admin can regenerate)
+- Account type: **Staff** or **Business/Customer**
+- If Staff → multi-select roles (admin, moderator, support, sales, advertising)
+- If Business → seller_type (private/dealer/repair_shop/insurance) + business name; option to mark verified
+- Send welcome/invite email toggle (default on)
 
-### 3. Sortable columns + pagination on Staff table
-- Add `sortKey` (`name | email | code | role | status | created`) and `sortDir` (`asc | desc`) state. Clickable `TableHead` with arrow indicator.
-- Add `page` + `pageSize` (default 25; selector for 25/50/100). Render `Page X of Y`, Prev/Next buttons. Resets to page 1 when filters/search/sort change.
-- Sorting/pagination applied after filter+search on the existing `filteredRows` memo.
+### 2. Backend: server function for provisioning
 
-### 4. Audit log filters
-- Add controls in the audit panel:
-  - Action type select (all, created, activated, deactivated, qr_generated, sync_run, deleted, reason_logged).
-  - Admin actor select (populated from distinct `actor_id`s in current audit set, displayed via profiles map already available — fetch profile names for actors).
-  - Date range: two date inputs (from / to).
-- Re-query `staff_referral_audit` using `.gte/.lte('created_at', …)` and `.eq('action', …)` / `.eq('actor_id', …)` server-side; keep limit 200. Refetch when filters change.
+Because creating an `auth.users` row requires the service role, add a TanStack server function:
 
-## Technical notes
-- No database migration needed. All audit entries continue to flow through existing triggers + manual inserts; the reason is stored in `details` JSONB.
-- All new UI uses existing shadcn primitives: `AlertDialog`, `Textarea`, `Input`, `Select`, `Button`, `Table`.
-- Keep work scoped to `src/routes/admin.referrals.tsx`.
+- `src/lib/admin-users.functions.ts` → `createAdminUser` server fn
+  - Middleware: `requireSupabaseAuth` + verify caller has `admin` role
+  - Uses `supabaseAdmin` (service role) to:
+    1. `auth.admin.createUser({ email, password, email_confirm: true, user_metadata: { full_name } })`
+    2. The existing `handle_new_user` trigger creates the profile + default `user` role
+    3. Insert any additional roles into `user_roles` (triggers `tg_create_staff_referral` automatically — staff get a QR row)
+    4. If business: update profile `seller_type`, `business_name`, `business_kind`, optionally `verification_status='verified'`
+    5. Optionally enqueue invite email via existing `enqueue_email`
+  - Returns `{ userId, tempPassword }`
+
+No DB migration needed — reuses existing tables, RLS, and triggers. Roles go through `user_roles`, so RLS policies (`has_role`, `can_moderate`, etc.) work immediately.
+
+### 3. Frontend wiring
+
+- `src/components/admin/add-user-dialog.tsx` — reusable dialog component
+- Mount in `admin.users.tsx` and `admin.accounts.tsx` headers
+- After success: toast with temp password (copyable), refresh the list
+
+### 4. Info tooltips on every admin tab
+
+Add a small `(i)` info icon next to each nav item in `src/routes/admin.tsx` using the existing `Tooltip` component, with a one-line description, e.g.:
+
+- Overview — "Snapshot of platform health and KPIs"
+- Accounts — "Manage customer & business subscriptions, plans, discounts"
+- Users — "Create staff/business accounts and assign roles"
+- Staff QR Referrals — "QR codes & referral codes for staff and admins"
+- Verifications — "Approve business verification requests"
+- Reports — "User-submitted reports of listings or messages"
+- …(one line per tab)
+
+Also add a header info banner on the Users and Accounts pages explaining the difference:
+- **Users** = create/manage all accounts and assign roles
+- **Accounts** = subscription, billing, and account-status management
+
+### Technical notes
+
+- Use existing `supabaseAdmin` from `src/integrations/supabase/client.server.ts`.
+- Use `useServerFn` to invoke from the dialog (auth-protected, called from a component, not a loader).
+- Temp password: 16-char random via `crypto.getRandomValues`.
+- No schema/RLS changes — relies on existing `handle_new_user`, `tg_create_staff_referral`, and `user_roles` setup.
