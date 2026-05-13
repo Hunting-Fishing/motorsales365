@@ -18,12 +18,14 @@ export const Route = createFileRoute("/admin/users")({
 
 const STAFF_ROLES = ["admin", "moderator", "support", "sales", "advertising"] as const;
 type StaffRole = (typeof STAFF_ROLES)[number];
-const PAGE_SIZE = 50;
+const PAGE_SIZE_OPTIONS = [25, 50, 100, 200] as const;
 
 function AdminUsers() {
   const [users, setUsers] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState<number>(50);
+  const [pageInput, setPageInput] = useState("");
   const [loading, setLoading] = useState(false);
 
   const [searchInput, setSearchInput] = useState("");
@@ -88,8 +90,8 @@ function AdminUsers() {
         );
       }
 
-      const from = page * PAGE_SIZE;
-      const to = from + PAGE_SIZE - 1;
+      const from = page * pageSize;
+      const to = from + pageSize - 1;
       const { data: profs, count, error } = await q.range(from, to);
       if (error) { toast.error(error.message); setLoading(false); return; }
 
@@ -108,7 +110,8 @@ function AdminUsers() {
     }
   };
 
-  useEffect(() => { load(); }, [page, search, roleFilter, sellerFilter, verFilter]);
+  useEffect(() => { load(); }, [page, pageSize, search, roleFilter, sellerFilter, verFilter]);
+  useEffect(() => { setPage(0); }, [pageSize]);
 
   const hasFilters = search || roleFilter !== "all" || sellerFilter !== "all" || verFilter !== "all";
   const clearFilters = () => {
@@ -155,9 +158,9 @@ function AdminUsers() {
     }
   };
 
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const rangeStart = total === 0 ? 0 : page * PAGE_SIZE + 1;
-  const rangeEnd = Math.min(total, (page + 1) * PAGE_SIZE);
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const rangeStart = total === 0 ? 0 : page * pageSize + 1;
+  const rangeEnd = Math.min(total, (page + 1) * pageSize);
 
   return (
     <div>
@@ -270,16 +273,50 @@ function AdminUsers() {
         })}
       </div>
 
-      {total > PAGE_SIZE && (
-        <div className="mt-4 flex items-center justify-between gap-2">
+      {total > 0 && (
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <span>Rows per page</span>
+          <Select value={String(pageSize)} onValueChange={(v) => setPageSize(Number(v))}>
+            <SelectTrigger className="h-8 w-[80px]"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              {PAGE_SIZE_OPTIONS.map((n) => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="outline" disabled={page === 0 || loading} onClick={() => setPage(0)}>First</Button>
           <Button size="sm" variant="outline" disabled={page === 0 || loading} onClick={() => setPage((p) => Math.max(0, p - 1))}>
-            <ChevronLeft className="mr-1 h-4 w-4" />Previous
+            <ChevronLeft className="mr-1 h-4 w-4" />Prev
           </Button>
-          <span className="text-xs text-muted-foreground">Page {page + 1} of {totalPages}</span>
+          <span className="text-xs text-muted-foreground whitespace-nowrap">Page {page + 1} of {totalPages}</span>
           <Button size="sm" variant="outline" disabled={page + 1 >= totalPages || loading} onClick={() => setPage((p) => p + 1)}>
             Next<ChevronRight className="ml-1 h-4 w-4" />
           </Button>
+          <Button size="sm" variant="outline" disabled={page + 1 >= totalPages || loading} onClick={() => setPage(totalPages - 1)}>Last</Button>
         </div>
+        <form
+          className="flex items-center gap-2 text-xs text-muted-foreground"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const n = parseInt(pageInput, 10);
+            if (!isNaN(n) && n >= 1 && n <= totalPages) { setPage(n - 1); setPageInput(""); }
+            else toast.error(`Enter a page between 1 and ${totalPages}`);
+          }}
+        >
+          <span>Jump to</span>
+          <Input
+            type="number"
+            min={1}
+            max={totalPages}
+            value={pageInput}
+            onChange={(e) => setPageInput(e.target.value)}
+            placeholder={String(page + 1)}
+            className="h-8 w-20"
+          />
+          <Button size="sm" variant="outline" type="submit">Go</Button>
+        </form>
+      </div>
       )}
     </div>
   );
