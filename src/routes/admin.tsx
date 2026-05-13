@@ -1,8 +1,9 @@
 import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Settings, ListChecks, Users, Flag, CreditCard, ShieldCheck, Gauge, BarChart3, UserCog, Megaphone, QrCode, Ticket, Globe, FlaskConical, Store } from "lucide-react";
+import { Settings, ListChecks, Users, Flag, CreditCard, ShieldCheck, Gauge, BarChart3, UserCog, Megaphone, QrCode, Ticket, Globe, FlaskConical, Store, Info } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
@@ -10,22 +11,22 @@ export const Route = createFileRoute("/admin")({
 
 type Role = "admin" | "sales" | "moderator" | "support" | "advertising";
 
-const NAV: { to: string; label: string; Icon: any; exact?: boolean; roles: Role[] }[] = [
-  { to: "/admin", label: "Overview", Icon: Settings, exact: true, roles: ["admin","sales","moderator","support","advertising"] },
-  { to: "/admin/accounts", label: "Accounts", Icon: UserCog, roles: ["admin","sales","support"] },
-  { to: "/admin/analytics", label: "Analytics", Icon: BarChart3, roles: ["admin","sales","support"] },
-  { to: "/admin/advertising", label: "Advertising", Icon: Megaphone, roles: ["admin","advertising"] },
-  { to: "/admin/referrals", label: "Staff QR Referrals", Icon: QrCode, roles: ["admin","sales"] },
-  { to: "/admin/redemptions", label: "Referral Redemptions", Icon: Ticket, roles: ["admin","sales"] },
-  { to: "/admin/pricing", label: "Pricing & plans", Icon: CreditCard, roles: ["admin"] },
-  { to: "/admin/currencies", label: "Currencies", Icon: Globe, roles: ["admin"] },
-  { to: "/admin/performance", label: "Performance", Icon: Gauge, roles: ["admin"] },
-  { to: "/admin/listings", label: "Listings", Icon: ListChecks, roles: ["admin","moderator","support"] },
-  { to: "/admin/businesses", label: "Businesses", Icon: Store, roles: ["admin","moderator"] },
-  { to: "/admin/verifications", label: "Verifications", Icon: ShieldCheck, roles: ["admin","moderator"] },
-  { to: "/admin/users", label: "Users", Icon: Users, roles: ["admin"] },
-  { to: "/admin/reports", label: "Reports", Icon: Flag, roles: ["admin","moderator","support"] },
-  { to: "/admin/sandbox", label: "Sandbox", Icon: FlaskConical, roles: ["admin"] },
+const NAV: { to: string; label: string; Icon: any; exact?: boolean; roles: Role[]; info: string }[] = [
+  { to: "/admin", label: "Overview", Icon: Settings, exact: true, roles: ["admin","sales","moderator","support","advertising"], info: "Snapshot of platform health, KPIs and quick links." },
+  { to: "/admin/accounts", label: "Accounts", Icon: UserCog, roles: ["admin","sales","support"], info: "Manage existing customer & business subscriptions: plans, discounts, pause/ban, lifetime spend." },
+  { to: "/admin/analytics", label: "Analytics", Icon: BarChart3, roles: ["admin","sales","support"], info: "Traffic, listings, conversions and other platform analytics." },
+  { to: "/admin/advertising", label: "Advertising", Icon: Megaphone, roles: ["admin","advertising"], info: "Ad inquiries, placements and advertiser CRM." },
+  { to: "/admin/referrals", label: "Staff QR Referrals", Icon: QrCode, roles: ["admin","sales"], info: "QR codes & referral codes for every staff member, including admins." },
+  { to: "/admin/redemptions", label: "Referral Redemptions", Icon: Ticket, roles: ["admin","sales"], info: "Discounts redeemed via staff referral codes." },
+  { to: "/admin/pricing", label: "Pricing & plans", Icon: CreditCard, roles: ["admin"], info: "Subscription plans, listing fees and global pricing settings." },
+  { to: "/admin/currencies", label: "Currencies", Icon: Globe, roles: ["admin"], info: "Currency list, FX rates and auto-update settings." },
+  { to: "/admin/performance", label: "Performance", Icon: Gauge, roles: ["admin"], info: "Performance flags and image/CDN tuning." },
+  { to: "/admin/listings", label: "Listings", Icon: ListChecks, roles: ["admin","moderator","support"], info: "Moderate vehicle/service listings: approve, hide, edit." },
+  { to: "/admin/businesses", label: "Businesses", Icon: Store, roles: ["admin","moderator"], info: "Approve and moderate the Business directory." },
+  { to: "/admin/verifications", label: "Verifications", Icon: ShieldCheck, roles: ["admin","moderator"], info: "Approve or reject business verification requests." },
+  { to: "/admin/users", label: "Users", Icon: Users, roles: ["admin"], info: "Create new users (staff or business) and assign roles. For billing/status use Accounts." },
+  { to: "/admin/reports", label: "Reports", Icon: Flag, roles: ["admin","moderator","support"], info: "User-submitted reports of listings, messages or scams." },
+  { to: "/admin/sandbox", label: "Sandbox", Icon: FlaskConical, roles: ["admin"], info: "Internal sandbox for testing flows without affecting production data." },
 ];
 
 function AdminLayout() {
@@ -51,23 +52,36 @@ function AdminLayout() {
 
   return (
     <SiteLayout>
-      <div className="container mx-auto grid gap-6 px-4 py-8 lg:grid-cols-[240px_1fr]">
-        <aside className="rounded-xl border border-border bg-card p-2 lg:sticky lg:top-20 lg:self-start">
-          <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {label}
-          </div>
-          <nav className="flex flex-row gap-1 overflow-x-auto lg:flex-col">
-            {visibleNav.map(({ to, label, Icon, exact }) => (
-              <Link key={to} to={to} activeOptions={{ exact: !!exact }}
-                activeProps={{ className: "bg-primary text-primary-foreground" }}
-                className="flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary">
-                <Icon className="h-4 w-4" />{label}
-              </Link>
-            ))}
-          </nav>
-        </aside>
-        <div><Outlet /></div>
-      </div>
+      <TooltipProvider delayDuration={200}>
+        <div className="container mx-auto grid gap-6 px-4 py-8 lg:grid-cols-[240px_1fr]">
+          <aside className="rounded-xl border border-border bg-card p-2 lg:sticky lg:top-20 lg:self-start">
+            <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {label}
+            </div>
+            <nav className="flex flex-row gap-1 overflow-x-auto lg:flex-col">
+              {visibleNav.map(({ to, label, Icon, exact, info }) => (
+                <div key={to} className="group flex shrink-0 items-center gap-1">
+                  <Link to={to} activeOptions={{ exact: !!exact }}
+                    activeProps={{ className: "bg-primary text-primary-foreground" }}
+                    className="flex flex-1 shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary">
+                    <Icon className="h-4 w-4" />{label}
+                  </Link>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button type="button" aria-label={`About ${label}`}
+                        className="rounded-md p-1 text-muted-foreground hover:bg-secondary hover:text-foreground">
+                        <Info className="h-3.5 w-3.5" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-xs">{info}</TooltipContent>
+                  </Tooltip>
+                </div>
+              ))}
+            </nav>
+          </aside>
+          <div><Outlet /></div>
+        </div>
+      </TooltipProvider>
     </SiteLayout>
   );
 }
