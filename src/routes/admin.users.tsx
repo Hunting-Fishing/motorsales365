@@ -317,6 +317,7 @@ function AdminUsers() {
           <Button size="sm" variant="outline" type="submit">Go</Button>
         </form>
       </div>
+      )}
     </div>
   );
 }
