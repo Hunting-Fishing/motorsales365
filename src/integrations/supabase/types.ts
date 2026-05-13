@@ -186,6 +186,42 @@ export type Database = {
           },
         ]
       }
+      admin_audit_log: {
+        Row: {
+          action: string
+          actor_id: string
+          created_at: string
+          field: string
+          id: string
+          new_value: string | null
+          note: string | null
+          old_value: string | null
+          target_user_id: string
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          created_at?: string
+          field: string
+          id?: string
+          new_value?: string | null
+          note?: string | null
+          old_value?: string | null
+          target_user_id: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          created_at?: string
+          field?: string
+          id?: string
+          new_value?: string | null
+          note?: string | null
+          old_value?: string | null
+          target_user_id?: string
+        }
+        Relationships: []
+      }
       business_reviews: {
         Row: {
           body: string | null
