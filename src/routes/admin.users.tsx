@@ -24,6 +24,8 @@ function AdminUsers() {
   const [users, setUsers] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
+  const [pageSize, setPageSize] = useState<number>(50);
+  const [pageInput, setPageInput] = useState("");
   const [loading, setLoading] = useState(false);
 
   const [searchInput, setSearchInput] = useState("");
