@@ -100,8 +100,63 @@ function AdminUsers() {
           <strong className="text-foreground">Users</strong> = create accounts and assign staff roles (admin, moderator, support, sales, advertising) or verify business accounts. For subscription, billing, and pause/ban controls use <strong className="text-foreground">Accounts</strong>.
         </div>
       </div>
+
+      <div className="mb-4 grid gap-2 rounded-lg border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="relative lg:col-span-2">
+          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search name, business, phone…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-8"
+          />
+        </div>
+        <Select value={roleFilter} onValueChange={setRoleFilter}>
+          <SelectTrigger><SelectValue placeholder="Role" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All roles</SelectItem>
+            <SelectItem value="user_only">Standard users only</SelectItem>
+            {STAFF_ROLES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={sellerFilter} onValueChange={setSellerFilter}>
+          <SelectTrigger><SelectValue placeholder="Seller type" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All seller types</SelectItem>
+            <SelectItem value="private">Private</SelectItem>
+            <SelectItem value="dealer">Dealer</SelectItem>
+            <SelectItem value="repair_shop">Repair shop</SelectItem>
+            <SelectItem value="insurance">Insurance</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={verFilter} onValueChange={setVerFilter}>
+          <SelectTrigger><SelectValue placeholder="Verification" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All verification</SelectItem>
+            <SelectItem value="unverified">Unverified</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="verified">Verified</SelectItem>
+            <SelectItem value="rejected">Rejected</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
+        <span>Showing {filtered.length} of {users.length}</span>
+        {hasFilters && (
+          <Button size="sm" variant="ghost" onClick={clearFilters}>
+            <X className="mr-1 h-3.5 w-3.5" />Clear filters
+          </Button>
+        )}
+      </div>
+
       <div className="space-y-2">
-        {users.map((u) => {
+        {filtered.length === 0 && (
+          <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+            No users match these filters.
+          </div>
+        )}
+        {filtered.map((u) => {
           const isVerified = u.verification_status === "verified";
           return (
             <div key={u.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
