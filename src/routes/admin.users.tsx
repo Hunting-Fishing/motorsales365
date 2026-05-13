@@ -17,6 +17,10 @@ export const Route = createFileRoute("/admin/users")({
 
 function AdminUsers() {
   const [users, setUsers] = useState<any[]>([]);
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [sellerFilter, setSellerFilter] = useState<string>("all");
+  const [verFilter, setVerFilter] = useState<string>("all");
 
   const load = async () => {
     const { data: profs } = await supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(200);
