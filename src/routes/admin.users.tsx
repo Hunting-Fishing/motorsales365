@@ -121,30 +121,38 @@ function AdminUsers() {
     if (has) {
       const { error } = await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", role);
       if (error) return toast.error(error.message);
+      await logAdminAudit({ actor_id: "", target_user_id: userId, action: "role_revoked", field: "role", old_value: role, new_value: null });
       toast.success(`${role} revoked`);
     } else {
       const { error } = await supabase.from("user_roles").insert({ user_id: userId, role: role as any });
       if (error) return toast.error(error.message);
+      await logAdminAudit({ actor_id: "", target_user_id: userId, action: "role_granted", field: "role", old_value: null, new_value: role });
       toast.success(`${role} granted`);
     }
     load();
   };
 
-  const verifyUser = async (userId: string) => {
+  const verifyUser = async (userId: string, prev?: string | null) => {
     const { error } = await supabase
       .from("profiles")
       .update({ verification_status: "verified", verified_at: new Date().toISOString() })
       .eq("id", userId);
     if (error) toast.error(error.message);
-    else { toast.success("Marked verified"); load(); }
+    else {
+      await logAdminAudit({ actor_id: "", target_user_id: userId, action: "verification_changed", field: "verification_status", old_value: prev ?? "unverified", new_value: "verified" });
+      toast.success("Marked verified"); load();
+    }
   };
-  const revokeVerification = async (userId: string) => {
+  const revokeVerification = async (userId: string, prev?: string | null) => {
     const { error } = await supabase
       .from("profiles")
       .update({ verification_status: "unverified", verified_at: null })
       .eq("id", userId);
     if (error) toast.error(error.message);
-    else { toast.success("Verification revoked"); load(); }
+    else {
+      await logAdminAudit({ actor_id: "", target_user_id: userId, action: "verification_changed", field: "verification_status", old_value: prev ?? "verified", new_value: "unverified" });
+      toast.success("Verification revoked"); load();
+    }
   };
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
