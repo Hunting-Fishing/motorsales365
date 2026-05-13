@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Search, Pause, Play, Sparkles, Percent, ArrowUpDown, Download } from "lucide-react";
+import { Search, Pause, Play, Sparkles, Percent, ArrowUpDown, Download, Info } from "lucide-react";
+import { AddUserDialog } from "@/components/admin/add-user-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -203,7 +204,17 @@ function AccountsConsole() {
             {stats.total} accounts · {stats.founding}/1000 founding members · {stats.paying} paying · {stats.paused} paused
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={exportCsv}><Download className="mr-2 h-4 w-4" />Export CSV</Button>
+        <div className="flex items-center gap-2">
+          <AddUserDialog onCreated={load} />
+          <Button variant="outline" size="sm" onClick={exportCsv}><Download className="mr-2 h-4 w-4" />Export CSV</Button>
+        </div>
+      </div>
+
+      <div className="mb-4 flex items-start gap-2 rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
+        <Info className="mt-0.5 h-4 w-4 shrink-0" />
+        <div>
+          <strong className="text-foreground">Accounts</strong> = manage subscriptions, plans, discounts, pausing and account status for existing customers. To create a new user or assign staff roles, use <strong className="text-foreground">Users</strong>.
+        </div>
       </div>
 
       <div className="mb-4 grid gap-2 md:grid-cols-[1fr_auto_auto_auto_auto]">
