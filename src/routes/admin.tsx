@@ -25,6 +25,7 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean; roles: Role[
   { to: "/admin/businesses", label: "Businesses", Icon: Store, roles: ["admin","moderator"], info: "Approve and moderate the Business directory." },
   { to: "/admin/verifications", label: "Verifications", Icon: ShieldCheck, roles: ["admin","moderator"], info: "Approve or reject business verification requests." },
   { to: "/admin/users", label: "Users", Icon: Users, roles: ["admin"], info: "Create new users (staff or business) and assign roles. For billing/status use Accounts." },
+  { to: "/admin/audit", label: "Audit log", Icon: ShieldAlert, roles: ["admin","support"], info: "Timestamped record of every role grant/revoke and verification status change made via the admin panel." },
   { to: "/admin/reports", label: "Reports", Icon: Flag, roles: ["admin","moderator","support"], info: "User-submitted reports of listings, messages or scams." },
   { to: "/admin/sandbox", label: "Sandbox", Icon: FlaskConical, roles: ["admin"], info: "Internal sandbox for testing flows without affecting production data." },
 ];
