@@ -51,7 +51,7 @@ function AdminUsers() {
           const { data: staffRows } = await supabase
             .from("user_roles")
             .select("user_id")
-            .in("role", STAFF_ROLES as unknown as string[]);
+            .in("role", STAFF_ROLES as unknown as any);
           excludeIds = Array.from(new Set((staffRows ?? []).map((r: any) => r.user_id)));
         } else {
           const { data: roleRows } = await supabase
