@@ -273,7 +273,7 @@ function AdminUsers() {
         })}
       </div>
 
-      {total > pageSize && (
+      {total > 0 && (
       <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <span>Rows per page</span>
