@@ -43,8 +43,10 @@ export function EditUserDialog({
     setSaving(true);
     try {
       // Sync roles: compute add/remove vs current
-      const current = new Set(((user.roles ?? []) as string[]).filter((r) => (STAFF_ROLES as string[]).includes(r)));
-      const next = new Set(roles);
+      const current = new Set<StaffRole>(
+        ((user.roles ?? []) as string[]).filter((r): r is StaffRole => (STAFF_ROLES as string[]).includes(r)),
+      );
+      const next = new Set<StaffRole>(roles);
       const toAdd = [...next].filter((r) => !current.has(r));
       const toRemove = [...current].filter((r) => !next.has(r));
 
