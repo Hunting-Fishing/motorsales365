@@ -61,6 +61,7 @@ import { Route as AdminPerformanceRouteImport } from './routes/admin.performance
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
 import { Route as AdminCurrenciesRouteImport } from './routes/admin.currencies'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
+import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising'
 import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
@@ -335,6 +336,11 @@ const AdminBusinessesRoute = AdminBusinessesRouteImport.update({
   path: '/businesses',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -427,6 +433,7 @@ export interface FileRoutesByFullPath {
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/listings': typeof AdminListingsRoute
@@ -492,6 +499,7 @@ export interface FileRoutesByTo {
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/listings': typeof AdminListingsRoute
@@ -560,6 +568,7 @@ export interface FileRoutesById {
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/listings': typeof AdminListingsRoute
@@ -629,6 +638,7 @@ export interface FileRouteTypes {
     | '/admin/accounts'
     | '/admin/advertising'
     | '/admin/analytics'
+    | '/admin/audit'
     | '/admin/businesses'
     | '/admin/currencies'
     | '/admin/listings'
@@ -694,6 +704,7 @@ export interface FileRouteTypes {
     | '/admin/accounts'
     | '/admin/advertising'
     | '/admin/analytics'
+    | '/admin/audit'
     | '/admin/businesses'
     | '/admin/currencies'
     | '/admin/listings'
@@ -761,6 +772,7 @@ export interface FileRouteTypes {
     | '/admin/accounts'
     | '/admin/advertising'
     | '/admin/analytics'
+    | '/admin/audit'
     | '/admin/businesses'
     | '/admin/currencies'
     | '/admin/listings'
@@ -1212,6 +1224,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBusinessesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/audit': {
+      id: '/admin/audit'
+      path: '/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/analytics': {
       id: '/admin/analytics'
       path: '/analytics'
@@ -1321,6 +1340,7 @@ interface AdminRouteChildren {
   AdminAccountsRoute: typeof AdminAccountsRoute
   AdminAdvertisingRoute: typeof AdminAdvertisingRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminAuditRoute: typeof AdminAuditRoute
   AdminBusinessesRoute: typeof AdminBusinessesRoute
   AdminCurrenciesRoute: typeof AdminCurrenciesRoute
   AdminListingsRoute: typeof AdminListingsRoute
@@ -1339,6 +1359,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAccountsRoute: AdminAccountsRoute,
   AdminAdvertisingRoute: AdminAdvertisingRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminAuditRoute: AdminAuditRoute,
   AdminBusinessesRoute: AdminBusinessesRoute,
   AdminCurrenciesRoute: AdminCurrenciesRoute,
   AdminListingsRoute: AdminListingsRoute,
