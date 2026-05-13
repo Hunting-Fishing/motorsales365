@@ -110,7 +110,8 @@ function AdminUsers() {
     }
   };
 
-  useEffect(() => { load(); }, [page, search, roleFilter, sellerFilter, verFilter]);
+  useEffect(() => { load(); }, [page, pageSize, search, roleFilter, sellerFilter, verFilter]);
+  useEffect(() => { setPage(0); }, [pageSize]);
 
   const hasFilters = search || roleFilter !== "all" || sellerFilter !== "all" || verFilter !== "all";
   const clearFilters = () => {
