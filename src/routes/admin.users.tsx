@@ -1,11 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { VerifiedBadge } from "@/components/verified-badge";
 import { formatDate } from "@/lib/format";
+import { AddUserDialog } from "@/components/admin/add-user-dialog";
 
 export const Route = createFileRoute("/admin/users")({
   component: AdminUsers,
@@ -61,7 +63,16 @@ function AdminUsers() {
 
   return (
     <div>
-      <h1 className="mb-6 font-display text-2xl font-bold">Users</h1>
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-display text-2xl font-bold">Users</h1>
+        <AddUserDialog onCreated={load} />
+      </div>
+      <div className="mb-4 flex items-start gap-2 rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
+        <Info className="mt-0.5 h-4 w-4 shrink-0" />
+        <div>
+          <strong className="text-foreground">Users</strong> = create accounts and assign staff roles (admin, moderator, support, sales, advertising) or verify business accounts. For subscription, billing, and pause/ban controls use <strong className="text-foreground">Accounts</strong>.
+        </div>
+      </div>
       <div className="space-y-2">
         {users.map((u) => {
           const isVerified = u.verification_status === "verified";

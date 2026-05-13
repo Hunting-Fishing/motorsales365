@@ -68,6 +68,7 @@ import { Route as RCodePosterRouteImport } from './routes/r.$code.poster'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
 import { Route as ApiPublicPaymentEventsRouteImport } from './routes/api/public/payment-events'
+import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
 import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions.$staffId'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -369,6 +370,11 @@ const ApiPublicPaymentEventsRoute = ApiPublicPaymentEventsRouteImport.update({
   path: '/api/public/payment-events',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminCreateUserRoute = ApiAdminCreateUserRouteImport.update({
+  id: '/api/admin/create-user',
+  path: '/api/admin/create-user',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRedemptionsStaffIdRoute = AdminRedemptionsStaffIdRouteImport.update({
   id: '/$staffId',
   path: '/$staffId',
@@ -455,6 +461,7 @@ export interface FileRoutesByFullPath {
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
+  '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -519,6 +526,7 @@ export interface FileRoutesByTo {
   '/businesses': typeof BusinessesIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
+  '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -586,6 +594,7 @@ export interface FileRoutesById {
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
+  '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
@@ -654,6 +663,7 @@ export interface FileRouteTypes {
     | '/businesses/'
     | '/dashboard/'
     | '/admin/redemptions/$staffId'
+    | '/api/admin/create-user'
     | '/api/public/payment-events'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
@@ -718,6 +728,7 @@ export interface FileRouteTypes {
     | '/businesses'
     | '/dashboard'
     | '/admin/redemptions/$staffId'
+    | '/api/admin/create-user'
     | '/api/public/payment-events'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
@@ -784,6 +795,7 @@ export interface FileRouteTypes {
     | '/businesses/'
     | '/dashboard/'
     | '/admin/redemptions/$staffId'
+    | '/api/admin/create-user'
     | '/api/public/payment-events'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
@@ -825,6 +837,7 @@ export interface RootRouteChildren {
   SellerIdRoute: typeof SellerIdRoute
   StaffReferralRoute: typeof StaffReferralRoute
   BusinessesIndexRoute: typeof BusinessesIndexRoute
+  ApiAdminCreateUserRoute: typeof ApiAdminCreateUserRoute
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicFxRefreshRoute: typeof ApiPublicFxRefreshRoute
@@ -1248,6 +1261,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentEventsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/create-user': {
+      id: '/api/admin/create-user'
+      path: '/api/admin/create-user'
+      fullPath: '/api/admin/create-user'
+      preLoaderRoute: typeof ApiAdminCreateUserRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/redemptions/$staffId': {
       id: '/admin/redemptions/$staffId'
       path: '/$staffId'
@@ -1418,6 +1438,7 @@ const rootRouteChildren: RootRouteChildren = {
   SellerIdRoute: SellerIdRoute,
   StaffReferralRoute: StaffReferralRoute,
   BusinessesIndexRoute: BusinessesIndexRoute,
+  ApiAdminCreateUserRoute: ApiAdminCreateUserRoute,
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicFxRefreshRoute: ApiPublicFxRefreshRoute,
