@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { VerifiedBadge } from "@/components/verified-badge";
 import { formatDate } from "@/lib/format";
 import { AddUserDialog } from "@/components/admin/add-user-dialog";
+import { EditUserDialog } from "@/components/admin/edit-user-dialog";
 
 export const Route = createFileRoute("/admin/users")({
   component: AdminUsers,
@@ -107,6 +108,7 @@ function AdminUsers() {
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2">
+                <EditUserDialog user={u} onSaved={load} />
                 {isVerified
                   ? <Button size="sm" variant="outline" onClick={() => revokeVerification(u.id)}>Revoke verified</Button>
                   : <Button size="sm" variant="outline" onClick={() => verifyUser(u.id)}>Mark verified</Button>}
