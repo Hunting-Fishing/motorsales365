@@ -1,10 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Info } from "lucide-react";
+import { Info, Search, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { VerifiedBadge } from "@/components/verified-badge";
 import { formatDate } from "@/lib/format";
 import { AddUserDialog } from "@/components/admin/add-user-dialog";
@@ -16,6 +17,10 @@ export const Route = createFileRoute("/admin/users")({
 
 function AdminUsers() {
   const [users, setUsers] = useState<any[]>([]);
+  const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
+  const [sellerFilter, setSellerFilter] = useState<string>("all");
+  const [verFilter, setVerFilter] = useState<string>("all");
 
   const load = async () => {
     const { data: profs } = await supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(200);
@@ -31,6 +36,27 @@ function AdminUsers() {
 
   const STAFF_ROLES = ["admin", "moderator", "support", "sales", "advertising"] as const;
   type StaffRole = (typeof STAFF_ROLES)[number];
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return users.filter((u) => {
+      if (q) {
+        const hay = `${u.full_name ?? ""} ${u.business_name ?? ""} ${u.phone ?? ""} ${u.phone_e164 ?? ""}`.toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      if (roleFilter !== "all") {
+        if (roleFilter === "user_only") {
+          if ((u.roles ?? []).some((r: string) => (STAFF_ROLES as readonly string[]).includes(r))) return false;
+        } else if (!u.roles?.includes(roleFilter)) return false;
+      }
+      if (sellerFilter !== "all" && u.seller_type !== sellerFilter) return false;
+      if (verFilter !== "all" && (u.verification_status ?? "unverified") !== verFilter) return false;
+      return true;
+    });
+  }, [users, search, roleFilter, sellerFilter, verFilter]);
+
+  const hasFilters = search || roleFilter !== "all" || sellerFilter !== "all" || verFilter !== "all";
+  const clearFilters = () => { setSearch(""); setRoleFilter("all"); setSellerFilter("all"); setVerFilter("all"); };
 
   const toggleRole = async (userId: string, role: StaffRole, has: boolean) => {
     if (has) {
@@ -74,8 +100,63 @@ function AdminUsers() {
           <strong className="text-foreground">Users</strong> = create accounts and assign staff roles (admin, moderator, support, sales, advertising) or verify business accounts. For subscription, billing, and pause/ban controls use <strong className="text-foreground">Accounts</strong>.
         </div>
       </div>
+
+      <div className="mb-4 grid gap-2 rounded-lg border border-border bg-card p-3 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="relative lg:col-span-2">
+          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search name, business, phone…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-8"
+          />
+        </div>
+        <Select value={roleFilter} onValueChange={setRoleFilter}>
+          <SelectTrigger><SelectValue placeholder="Role" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All roles</SelectItem>
+            <SelectItem value="user_only">Standard users only</SelectItem>
+            {STAFF_ROLES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={sellerFilter} onValueChange={setSellerFilter}>
+          <SelectTrigger><SelectValue placeholder="Seller type" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All seller types</SelectItem>
+            <SelectItem value="private">Private</SelectItem>
+            <SelectItem value="dealer">Dealer</SelectItem>
+            <SelectItem value="repair_shop">Repair shop</SelectItem>
+            <SelectItem value="insurance">Insurance</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={verFilter} onValueChange={setVerFilter}>
+          <SelectTrigger><SelectValue placeholder="Verification" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All verification</SelectItem>
+            <SelectItem value="unverified">Unverified</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="verified">Verified</SelectItem>
+            <SelectItem value="rejected">Rejected</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
+        <span>Showing {filtered.length} of {users.length}</span>
+        {hasFilters && (
+          <Button size="sm" variant="ghost" onClick={clearFilters}>
+            <X className="mr-1 h-3.5 w-3.5" />Clear filters
+          </Button>
+        )}
+      </div>
+
       <div className="space-y-2">
-        {users.map((u) => {
+        {filtered.length === 0 && (
+          <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+            No users match these filters.
+          </div>
+        )}
+        {filtered.map((u) => {
           const isVerified = u.verification_status === "verified";
           return (
             <div key={u.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
