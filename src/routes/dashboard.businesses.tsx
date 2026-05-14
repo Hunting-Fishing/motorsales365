@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ShareQr } from "@/components/share-qr";
 
 export const Route = createFileRoute("/dashboard/businesses")({
   component: MyBusinessesPage,
@@ -61,7 +62,18 @@ function MyBusinessesPage() {
                 </div>
                 <div className="text-xs text-muted-foreground">{[b.city, b.region].filter(Boolean).join(" · ")}</div>
               </div>
-              <div className="text-xs text-muted-foreground">{b.rating_count} review{b.rating_count === 1 ? "" : "s"}</div>
+              <div className="flex shrink-0 items-center gap-2">
+                <span className="text-xs text-muted-foreground">{b.rating_count} review{b.rating_count === 1 ? "" : "s"}</span>
+                {b.status === "active" && (
+                  <ShareQr
+                    url={`${typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com"}/businesses/${b.slug}`}
+                    title={b.name}
+                    subtitle={[b.city, b.region].filter(Boolean).join(", ") || null}
+                    fileSlug={b.slug}
+                    compact
+                  />
+                )}
+              </div>
             </Card>
           ))}
         </div>
