@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ShareQr } from "@/components/share-qr";
 
 export const Route = createFileRoute("/dashboard/businesses")({
   component: MyBusinessesPage,
