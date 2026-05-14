@@ -31,7 +31,6 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as BusinessesIndexRouteImport } from './routes/businesses.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as StaffReferralRouteImport } from './routes/staff.referral'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
@@ -39,6 +38,7 @@ import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe
 import { Route as DashboardVerificationRouteImport } from './routes/dashboard.verification'
 import { Route as DashboardTowRouteImport } from './routes/dashboard.tow'
 import { Route as DashboardSearchesRouteImport } from './routes/dashboard.searches'
+import { Route as DashboardReferralRouteImport } from './routes/dashboard.referral'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
 import { Route as DashboardMessagesRouteImport } from './routes/dashboard.messages'
 import { Route as DashboardLikesRouteImport } from './routes/dashboard.likes'
@@ -186,11 +186,6 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
-const StaffReferralRoute = StaffReferralRouteImport.update({
-  id: '/staff/referral',
-  path: '/staff/referral',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SellerIdRoute = SellerIdRouteImport.update({
   id: '/seller/$id',
   path: '/seller/$id',
@@ -224,6 +219,11 @@ const DashboardTowRoute = DashboardTowRouteImport.update({
 const DashboardSearchesRoute = DashboardSearchesRouteImport.update({
   id: '/searches',
   path: '/searches',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardReferralRoute = DashboardReferralRouteImport.update({
+  id: '/referral',
+  path: '/referral',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardProfileRoute = DashboardProfileRouteImport.update({
@@ -456,6 +456,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
@@ -463,7 +464,6 @@ export interface FileRoutesByFullPath {
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/r/$code': typeof RCodeRouteWithChildren
   '/seller/$id': typeof SellerIdRoute
-  '/staff/referral': typeof StaffReferralRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -522,6 +522,7 @@ export interface FileRoutesByTo {
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
@@ -529,7 +530,6 @@ export interface FileRoutesByTo {
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/r/$code': typeof RCodeRouteWithChildren
   '/seller/$id': typeof SellerIdRoute
-  '/staff/referral': typeof StaffReferralRoute
   '/admin': typeof AdminIndexRoute
   '/businesses': typeof BusinessesIndexRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -591,6 +591,7 @@ export interface FileRoutesById {
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
@@ -598,7 +599,6 @@ export interface FileRoutesById {
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/r/$code': typeof RCodeRouteWithChildren
   '/seller/$id': typeof SellerIdRoute
-  '/staff/referral': typeof StaffReferralRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -661,6 +661,7 @@ export interface FileRouteTypes {
     | '/dashboard/likes'
     | '/dashboard/messages'
     | '/dashboard/profile'
+    | '/dashboard/referral'
     | '/dashboard/searches'
     | '/dashboard/tow'
     | '/dashboard/verification'
@@ -668,7 +669,6 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/r/$code'
     | '/seller/$id'
-    | '/staff/referral'
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
@@ -727,6 +727,7 @@ export interface FileRouteTypes {
     | '/dashboard/likes'
     | '/dashboard/messages'
     | '/dashboard/profile'
+    | '/dashboard/referral'
     | '/dashboard/searches'
     | '/dashboard/tow'
     | '/dashboard/verification'
@@ -734,7 +735,6 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/r/$code'
     | '/seller/$id'
-    | '/staff/referral'
     | '/admin'
     | '/businesses'
     | '/dashboard'
@@ -795,6 +795,7 @@ export interface FileRouteTypes {
     | '/dashboard/likes'
     | '/dashboard/messages'
     | '/dashboard/profile'
+    | '/dashboard/referral'
     | '/dashboard/searches'
     | '/dashboard/tow'
     | '/dashboard/verification'
@@ -802,7 +803,6 @@ export interface FileRouteTypes {
     | '/listing/$id'
     | '/r/$code'
     | '/seller/$id'
-    | '/staff/referral'
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
@@ -847,7 +847,6 @@ export interface RootRouteChildren {
   ListingIdRoute: typeof ListingIdRouteWithChildren
   RCodeRoute: typeof RCodeRouteWithChildren
   SellerIdRoute: typeof SellerIdRoute
-  StaffReferralRoute: typeof StaffReferralRoute
   BusinessesIndexRoute: typeof BusinessesIndexRoute
   ApiAdminCreateUserRoute: typeof ApiAdminCreateUserRoute
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
@@ -1014,13 +1013,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/staff/referral': {
-      id: '/staff/referral'
-      path: '/staff/referral'
-      fullPath: '/staff/referral'
-      preLoaderRoute: typeof StaffReferralRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/seller/$id': {
       id: '/seller/$id'
       path: '/seller/$id'
@@ -1068,6 +1060,13 @@ declare module '@tanstack/react-router' {
       path: '/searches'
       fullPath: '/dashboard/searches'
       preLoaderRoute: typeof DashboardSearchesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/referral': {
+      id: '/dashboard/referral'
+      path: '/referral'
+      fullPath: '/dashboard/referral'
+      preLoaderRoute: typeof DashboardReferralRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/profile': {
@@ -1383,6 +1382,7 @@ interface DashboardRouteChildren {
   DashboardLikesRoute: typeof DashboardLikesRoute
   DashboardMessagesRoute: typeof DashboardMessagesRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
+  DashboardReferralRoute: typeof DashboardReferralRoute
   DashboardSearchesRoute: typeof DashboardSearchesRoute
   DashboardTowRoute: typeof DashboardTowRoute
   DashboardVerificationRoute: typeof DashboardVerificationRoute
@@ -1396,6 +1396,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardLikesRoute: DashboardLikesRoute,
   DashboardMessagesRoute: DashboardMessagesRoute,
   DashboardProfileRoute: DashboardProfileRoute,
+  DashboardReferralRoute: DashboardReferralRoute,
   DashboardSearchesRoute: DashboardSearchesRoute,
   DashboardTowRoute: DashboardTowRoute,
   DashboardVerificationRoute: DashboardVerificationRoute,
@@ -1457,7 +1458,6 @@ const rootRouteChildren: RootRouteChildren = {
   ListingIdRoute: ListingIdRouteWithChildren,
   RCodeRoute: RCodeRouteWithChildren,
   SellerIdRoute: SellerIdRoute,
-  StaffReferralRoute: StaffReferralRoute,
   BusinessesIndexRoute: BusinessesIndexRoute,
   ApiAdminCreateUserRoute: ApiAdminCreateUserRoute,
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,

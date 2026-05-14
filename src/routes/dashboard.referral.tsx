@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Copy, Download, Printer, MousePointerClick, UserPlus, Percent, Users } from "lucide-react";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/staff/referral")({
+export const Route = createFileRoute("/dashboard/referral")({
   component: StaffReferral,
 });
 
