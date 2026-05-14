@@ -47,7 +47,7 @@ function DashboardLayout() {
 
   const nav = [
     ...NAV,
-    ...(hasReferral ? [{ to: "/staff/referral", label: "My referral", Icon: QrCode }] : []),
+    ...(hasReferral ? [{ to: "/dashboard/referral", label: "My referral", Icon: QrCode }] : []),
     ...(isStaff ? [{ to: "/admin", label: isAdmin ? "Admin" : "Staff console", Icon: Shield }] : []),
   ];
 
