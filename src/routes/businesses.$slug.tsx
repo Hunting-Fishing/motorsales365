@@ -138,6 +138,15 @@ function BusinessProfilePage() {
                 {biz.email && <Button size="sm" variant="outline" asChild><a href={`mailto:${biz.email}`}><Mail className="mr-1 h-4 w-4" />Email</a></Button>}
                 {biz.website && <Button size="sm" variant="outline" asChild><a href={biz.website} target="_blank" rel="noreferrer"><Globe className="mr-1 h-4 w-4" />Website</a></Button>}
                 {biz.messenger_url && <Button size="sm" variant="outline" asChild><a href={biz.messenger_url} target="_blank" rel="noreferrer"><MessageCircle className="mr-1 h-4 w-4" />Messenger</a></Button>}
+                <ShareQr
+                  url={`${typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com"}/businesses/${biz.slug}`}
+                  title={biz.name}
+                  subtitle={location || null}
+                  coverUrl={biz.cover_url || biz.logo_url || null}
+                  accent={typeLabel || null}
+                  fileSlug={biz.slug}
+                  triggerLabel="QR & Poster"
+                />
               </div>
               {tagLabels.length > 0 && (
                 <div className="mt-3 flex flex-wrap gap-1">
