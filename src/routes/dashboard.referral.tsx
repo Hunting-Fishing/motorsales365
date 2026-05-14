@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { SiteLayout } from "@/components/site-layout";
+
 import { Button } from "@/components/ui/button";
 import { Copy, Download, Printer, MousePointerClick, UserPlus, Percent, Users } from "lucide-react";
 import { toast } from "sonner";
@@ -121,29 +121,24 @@ function StaffReferral() {
   const conversion = stats.visitors > 0 ? Math.round((stats.signups / stats.visitors) * 1000) / 10 : 0;
 
   if (authLoading || loading) {
-    return <SiteLayout><div className="p-12 text-center text-muted-foreground">Loading…</div></SiteLayout>;
+    return <div className="p-12 text-center text-muted-foreground">Loading…</div>;
   }
 
   if (notFound) {
     return (
-      <SiteLayout>
-        <div className="container mx-auto max-w-xl px-4 py-12">
-          <div className="rounded-xl border border-border bg-card p-8 text-center">
-            <h1 className="font-display text-2xl font-bold">No referral code yet</h1>
-            <p className="mt-2 text-muted-foreground">
-              Your account doesn’t have a personal QR referral set up. Ask an admin to create one tied to your company email.
-            </p>
-          </div>
-        </div>
-      </SiteLayout>
+      <div className="rounded-xl border border-border bg-card p-8 text-center">
+        <h1 className="font-display text-2xl font-bold">No referral code yet</h1>
+        <p className="mt-2 text-muted-foreground">
+          Your account doesn’t have a personal QR referral set up. Ask an admin to create one tied to your company email.
+        </p>
+      </div>
     );
   }
 
   if (!staff) return null;
 
   return (
-    <SiteLayout>
-      <div className="container mx-auto max-w-5xl px-4 py-8 space-y-6">
+    <div className="space-y-6">
         <header className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h1 className="font-display text-2xl font-bold">My referral</h1>
@@ -245,7 +240,6 @@ function StaffReferral() {
           )}
         </section>
       </div>
-    </SiteLayout>
   );
 }
 
