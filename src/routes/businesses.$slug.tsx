@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { BusinessMap } from "@/components/businesses/business-map";
+import { ShareQr } from "@/components/share-qr";
 
 export const Route = createFileRoute("/businesses/$slug")({
   component: BusinessProfilePage,
