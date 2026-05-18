@@ -44,13 +44,14 @@ interface Props {
 
 export function AccountTypeGrid({ value, onChange }: Props) {
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+    <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
       {SIGNUP_TYPES.map((t) => (
         <AccountTypeCard
           key={t.id}
           icon={t.icon}
           label={t.label}
           description={t.description}
+          badge={t.badge}
           selected={value === t.id}
           onSelect={() => onChange(t.id)}
         />
