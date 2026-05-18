@@ -125,6 +125,7 @@ function ProfilePage() {
   return (
     <div className="max-w-2xl">
       <h1 className="mb-6 font-display text-2xl font-bold">Profile</h1>
+      <ProfileCompletion profile={profile} />
       {profile.is_founding_member && (
         <div className="mb-4 flex items-center gap-3 rounded-xl border border-amber-500/40 bg-amber-500/5 p-4">
           <span className="text-2xl">✨</span>
