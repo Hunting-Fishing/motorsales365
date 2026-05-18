@@ -14,6 +14,7 @@ import { LocationPicker } from "@/components/businesses/location-picker";
 import { resolvePsgc } from "@/lib/psgc";
 import { toast } from "sonner";
 import { useDynamicMeta } from "@/hooks/use-dynamic-meta";
+import { useDynamicJsonLd } from "@/hooks/use-dynamic-jsonld";
 
 export const Route = createFileRoute("/businesses/submit")({
   head: () => ({
