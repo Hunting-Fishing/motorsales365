@@ -83,7 +83,9 @@ function VerificationPage() {
     setProfile(prof);
     if (req) {
       setForm({
-        business_kind: req.business_kind,
+        business_kind: (["repair_shop", "insurance", "dealer", "other"].includes(req.business_kind as string)
+          ? (req.business_kind as "repair_shop" | "insurance" | "dealer" | "other")
+          : "other"),
         legal_name: req.legal_name ?? "",
         dti_sec_registration: req.dti_sec_registration ?? "",
         tax_id: req.tax_id ?? "",
