@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft, Download, Ticket, Percent, Coins, Users } from "lucide-react";
 import { formatPHP } from "@/lib/format";
 
-export const Route = createFileRoute("/admin/redemptions/$staffId")({
+export const Route = createFileRoute("/admin/redemptions_/$staffId")({
   component: StaffRedemptionDetail,
 });
 
