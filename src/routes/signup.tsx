@@ -131,6 +131,12 @@ function SignupPage() {
             )}
           </div>
           <AccountTypeGrid value={intent} onChange={setIntent} />
+          {intent && intentMeta?.note && (
+            <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm text-foreground">
+              <p className="font-semibold text-primary">Heads up</p>
+              <p className="mt-1 text-muted-foreground">{intentMeta.note}</p>
+            </div>
+          )}
         </section>
 
         <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-border bg-card p-6 shadow-sm">
