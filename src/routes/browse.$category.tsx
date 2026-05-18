@@ -38,12 +38,22 @@ const CATEGORY_LABEL: Record<string, string> = {
 
 export const Route = createFileRoute("/browse/$category")({
   validateSearch: searchSchema,
-  head: ({ params }) => ({
-    meta: [
-      { title: `${CATEGORY_LABEL[params.category] ?? "Listings"} for sale — 365 MotorSales Philippines` },
-      { name: "description", content: `Browse ${CATEGORY_LABEL[params.category] ?? "vehicles"} for sale across the Philippines.` },
-    ],
-  }),
+  head: ({ params }) => {
+    const label = CATEGORY_LABEL[params.category] ?? "Listings";
+    const url = `https://365motorsales.com/browse/${params.category}`;
+    const title = `${label} for sale — 365 MotorSales Philippines`;
+    const desc = `Browse ${label.toLowerCase()} for sale across the Philippines. Trusted private and business sellers on 365 MotorSales.`;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:url", content: url },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   component: BrowsePage,
 });
 

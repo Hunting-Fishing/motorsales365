@@ -1,58 +1,107 @@
-## Add User feature + Admin tab info tooltips
+## 365 MotorSales — Go-Live Readiness Audit
 
-### 1. "+ Add User" button (Admin → Users and Admin → Accounts)
+Excluding payments (already known TODO), here is what's still missing or risky before public launch. Items are grouped by severity.
 
-Add a button at the top of both `/admin/users` and `/admin/accounts` that opens a modal to create a fully-active user. The modal collects:
+---
 
-- Email (required)
-- Full name
-- Temporary password (auto-generated, with copy button; admin can regenerate)
-- Account type: **Staff** or **Business/Customer**
-- If Staff → multi-select roles (admin, moderator, support, sales, advertising)
-- If Business → seller_type (private/dealer/repair_shop/insurance) + business name; option to mark verified
-- Send welcome/invite email toggle (default on)
+### 🔴 Blockers (must fix before launch)
 
-### 2. Backend: server function for provisioning
+1. **No sitemap.xml / robots.txt**
+   - No `src/routes/sitemap[.]xml.ts` and no `public/robots.txt`.
+   - Google can't discover listings, businesses, or category pages → no organic traffic.
+   - Need a server-route sitemap that includes static pages + dynamic rows from `listings`, `businesses`, `browse.$category`.
 
-Because creating an `auth.users` row requires the service role, add a TanStack server function:
+2. **Email infrastructure not finished**
+   - Templates exist (`src/lib/email-templates/*`) and `enqueue_email` triggers fire on signup, ad-inquiries, etc., but the comment in `src/lib/email/send.ts` says: *"emails will fail-soft (logged) until that's done"*.
+   - Need: verified custom email domain (DNS), `setup_email_infra`, and `scaffold_auth_email_templates` so password reset / signup confirmation actually land in inboxes.
 
-- `src/lib/admin-users.functions.ts` → `createAdminUser` server fn
-  - Middleware: `requireSupabaseAuth` + verify caller has `admin` role
-  - Uses `supabaseAdmin` (service role) to:
-    1. `auth.admin.createUser({ email, password, email_confirm: true, user_metadata: { full_name } })`
-    2. The existing `handle_new_user` trigger creates the profile + default `user` role
-    3. Insert any additional roles into `user_roles` (triggers `tg_create_staff_referral` automatically — staff get a QR row)
-    4. If business: update profile `seller_type`, `business_name`, `business_kind`, optionally `verification_status='verified'`
-    5. Optionally enqueue invite email via existing `enqueue_email`
-  - Returns `{ userId, tempPassword }`
+3. **Payment webhook signature verification is a stub**
+   - `src/routes/api/public/payment-events.tsx:48` — *"TODO: replace with real Stripe / PayMongo signature verification"*. Even if payments are out of scope, this endpoint is publicly callable and will accept forged events. Either lock it down or remove it until payments ship.
 
-No DB migration needed — reuses existing tables, RLS, and triggers. Roles go through `user_roles`, so RLS policies (`has_role`, `can_moderate`, etc.) work immediately.
+4. **Production domain still unverified for SEO assets**
+   - `og:image` points to `storage.googleapis.com/gpt-engineer-file-uploads/...` (Lovable staging asset). Will work but is unbranded and could break. Move to a CDN/Supabase storage URL under your domain.
+   - Custom domains `www.365motorsales.com` / `365motorsales.com` listed — confirm they're actually pointed and SSL is active.
 
-### 3. Frontend wiring
+---
 
-- `src/components/admin/add-user-dialog.tsx` — reusable dialog component
-- Mount in `admin.users.tsx` and `admin.accounts.tsx` headers
-- After success: toast with temp password (copyable), refresh the list
+### 🟠 High priority (launch quality)
 
-### 4. Info tooltips on every admin tab
+5. **Auth hardening**
+   - Verify HIBP leaked-password protection is enabled (`configure_auth password_hibp_enabled: true`).
+   - Confirm email auto-confirm is **off** (users must verify) — required since the schema relies on `auth.users.email`.
+   - Google OAuth: confirm it's actually enabled in the provider config (the codebase has the `lovable.auth.signInWithOAuth("google")` wiring).
+   - Password-reset route `/reset-password` exists ✅ — re-test end-to-end once email domain is live.
 
-Add a small `(i)` info icon next to each nav item in `src/routes/admin.tsx` using the existing `Tooltip` component, with a one-line description, e.g.:
+6. **SEO per-route metadata audit**
+   - Root `__root.tsx` has good defaults, but leaf routes (`listing.$id`, `businesses.$slug`, `browse.$category`, `seller.$id`) need to derive `title`, `description`, and `og:image` from loader data. Listing detail page must use the cover photo as `og:image` (per `tanstack-start` rules). Without this, social shares look generic.
 
-- Overview — "Snapshot of platform health and KPIs"
-- Accounts — "Manage customer & business subscriptions, plans, discounts"
-- Users — "Create staff/business accounts and assign roles"
-- Staff QR Referrals — "QR codes & referral codes for staff and admins"
-- Verifications — "Approve business verification requests"
-- Reports — "User-submitted reports of listings or messages"
-- …(one line per tab)
+7. **Cron / scheduled jobs**
+   - `expire_stale_pending_sales()` and listing expiry exist as SQL functions but I see no pg_cron schedule wiring them. Listings will accumulate stale status without it.
+   - Currency FX refresh (`api/public/fx/refresh`) — confirm a cron is hitting it.
 
-Also add a header info banner on the Users and Accounts pages explaining the difference:
-- **Users** = create/manage all accounts and assign roles
-- **Accounts** = subscription, billing, and account-status management
+8. **Storage bucket policies**
+   - `verification-docs` is private ✅. But re-verify RLS on `listing-photos`, `listing-videos`, `avatars`, `business-logos`, `qr-codes` — they're public buckets; ensure upload paths are scoped to `user_id` so users can't overwrite each other's files.
 
-### Technical notes
+9. **Run the full security scan**
+   - `security--run_security_scan` + `supabase--linter` haven't been re-run in context. Required before publishing to catch missing RLS, overly permissive policies, exposed SECURITY DEFINER funcs beyond the 3 documented in `docs/SECURITY.md`.
 
-- Use existing `supabaseAdmin` from `src/integrations/supabase/client.server.ts`.
-- Use `useServerFn` to invoke from the dialog (auth-protected, called from a component, not a loader).
-- Temp password: 16-char random via `crypto.getRandomValues`.
-- No schema/RLS changes — relies on existing `handle_new_user`, `tg_create_staff_referral`, and `user_roles` setup.
+10. **Rate limiting & abuse**
+    - No rate limiting on: signup, login, contact form, ad-inquiry submission, tow request creation, messages. PH spam will arrive day one. Add per-IP / per-user throttling either at the DB (trigger counting recent rows) or in front of `createServerFn` handlers.
+
+---
+
+### 🟡 Medium priority (polish & ops)
+
+11. **Legal / compliance**
+    - `/privacy`, `/terms`, `/refund-policy`, `/guidelines` routes exist — confirm content is final (not placeholder lorem ipsum), reflects PH Data Privacy Act 2012 (NPC), and lists the data controller.
+    - Cookie banner (`src/components/cookie-banner.tsx`) is present ✅ — verify it actually blocks non-essential scripts until consent.
+
+12. **Error monitoring & logs**
+    - No Sentry / error tracking wired. `console.warn`/`console.error` in email send paths just disappear in production.
+    - Add a structured logger or at least a server route that records uncaught errors.
+
+13. **Analytics**
+    - `admin.analytics.tsx` exists but no GA4 / Plausible / Posthog tag is in `__root.tsx`. You'll launch blind on funnel data.
+
+14. **Performance**
+    - Leaflet maps (`business-map`, `location-picker`) are eagerly loaded on routes that use them — check they're code-split.
+    - Font is loaded via blocking `<link rel="stylesheet">` to Google Fonts — switch to `preload` + `display=swap` or self-host to improve LCP.
+    - No `og:image` on leaf routes means scrapers also hit a 1MB social image; add per-route smaller variants.
+
+15. **Admin operational tools**
+    - No CSV/Excel export on admin listings/users/audit pages. Useful for audits.
+    - Audit log exists ✅ but no retention policy.
+
+16. **Backup & recovery**
+    - Confirm Supabase point-in-time recovery is enabled at the chosen instance size, and document the restore runbook.
+
+17. **404 / empty states**
+    - Root `notFoundComponent` ✅. Verify dynamic routes (`listing.$id`, `businesses.$slug`, `seller.$id`) have `notFoundComponent` that handles "row not found" cleanly instead of crashing the loader.
+
+18. **Mobile QA pass**
+    - Viewport-specific testing on `sell.tsx`, listing detail gallery, business map, dashboard sidebar collapse — these are the heavy pages.
+
+---
+
+### 🟢 Nice-to-have (post-launch)
+
+- Saved-search email digests (`dashboard.searches` exists; no scheduled email).
+- Push / web-push notifications for new messages and tow bids.
+- Image optimization pipeline (WebP/AVIF variants for listing photos at upload time).
+- Sitemap ping on new listing publish.
+- A/B framework for pricing page.
+- Multi-language (PH locale + Tagalog/Cebuano).
+
+---
+
+### Recommended launch sequence
+
+1. Fix blockers 1–4 (sitemap, email domain, webhook stub, og:image).
+2. Run `security--run_security_scan` + `supabase--linter`; resolve everything ≥ warn.
+3. Wire pg_cron for `expire_stale_pending_sales` and FX refresh.
+4. Add per-route SEO metadata on the four dynamic routes.
+5. Smoke-test full flows on the custom domain: signup → email verify → list → message → admin moderate.
+6. Enable analytics + error monitoring.
+7. Publish.
+
+Want me to start executing this list (e.g. begin with the sitemap + per-route SEO + security scan)? I can tackle them in small batches.

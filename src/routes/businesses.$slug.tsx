@@ -13,6 +13,54 @@ import { BusinessMap } from "@/components/businesses/business-map";
 import { ShareQr } from "@/components/share-qr";
 
 export const Route = createFileRoute("/businesses/$slug")({
+  loader: async ({ params }) => {
+    try {
+      const { data } = await (supabase as any)
+        .from("businesses")
+        .select("name,description,city,region,logo_url,cover_url")
+        .eq("slug", params.slug)
+        .eq("status", "active")
+        .maybeSingle();
+      return { seo: data ?? null };
+    } catch {
+      return { seo: null };
+    }
+  },
+  head: ({ params, loaderData }) => {
+    const b: any = loaderData?.seo;
+    const url = `https://365motorsales.com/businesses/${params.slug}`;
+    if (!b) {
+      return {
+        meta: [
+          { title: "Business — 365 MotorSales Philippines" },
+          { property: "og:url", content: url },
+        ],
+        links: [{ rel: "canonical", href: url }],
+      };
+    }
+    const loc = [b.city, b.region].filter(Boolean).join(", ");
+    const title = `${b.name}${loc ? ` — ${loc}` : ""} | 365 MotorSales`;
+    const desc = (b.description ?? `${b.name}${loc ? ` in ${loc}` : ""} — automotive business profile on 365 MotorSales Philippines.`).slice(0, 155);
+    const img = b.cover_url ?? b.logo_url ?? null;
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "website" },
+        { property: "og:url", content: url },
+        ...(img ? [
+          { property: "og:image", content: img },
+          { name: "twitter:image", content: img },
+        ] : []),
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   component: BusinessProfilePage,
 });
 

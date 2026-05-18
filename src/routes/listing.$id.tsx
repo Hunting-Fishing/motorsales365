@@ -31,6 +31,73 @@ const REPORT_REASONS = [
 ];
 
 export const Route = createFileRoute("/listing/$id")({
+  loader: async ({ params }) => {
+    try {
+      const { data: l } = await supabase
+        .from("listings")
+        .select("id,title,description,price_php,region,city,category_slug,status")
+        .eq("id", params.id)
+        .in("status", ["active", "pending_sale"])
+        .maybeSingle();
+      if (!l) return { seo: null };
+      const { data: media } = await supabase
+        .from("listing_media")
+        .select("url,type")
+        .eq("listing_id", params.id)
+        .eq("type", "photo")
+        .order("position", { ascending: true })
+        .limit(1);
+      return {
+        seo: {
+          id: (l as any).id,
+          title: (l as any).title as string,
+          description: ((l as any).description as string | null) ?? null,
+          price: Number((l as any).price_php),
+          region: (l as any).region as string | null,
+          city: (l as any).city as string | null,
+          cover: (media?.[0] as any)?.url ?? null,
+        },
+      };
+    } catch {
+      return { seo: null };
+    }
+  },
+  head: ({ params, loaderData }) => {
+    const seo = loaderData?.seo;
+    const url = `https://365motorsales.com/listing/${params.id}`;
+    if (!seo) {
+      return {
+        meta: [
+          { title: "Listing — 365 MotorSales Philippines" },
+          { name: "description", content: "View vehicle listing on 365 MotorSales Philippines." },
+          { property: "og:url", content: url },
+        ],
+        links: [{ rel: "canonical", href: url }],
+      };
+    }
+    const loc = [seo.city, seo.region].filter(Boolean).join(", ");
+    const price = new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP", maximumFractionDigits: 0 }).format(seo.price);
+    const title = `${seo.title} — ${price}${loc ? ` · ${loc}` : ""} | 365 MotorSales`;
+    const desc = (seo.description ?? `${seo.title} for sale${loc ? ` in ${loc}` : ""} on 365 MotorSales Philippines.`).slice(0, 155);
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:type", content: "product" },
+        { property: "og:url", content: url },
+        ...(seo.cover ? [
+          { property: "og:image", content: seo.cover },
+          { name: "twitter:image", content: seo.cover },
+        ] : []),
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   component: ListingDetailPage,
 });
 

@@ -9,6 +9,48 @@ import { ListingCard, type ListingCardData } from "@/components/listing-card";
 import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/seller/$id")({
+  loader: async ({ params }) => {
+    try {
+      const { data } = await supabase
+        .from("profiles")
+        .select("full_name,avatar_url,seller_type,business_name,city,region")
+        .eq("id", params.id)
+        .maybeSingle();
+      return { seo: data ?? null };
+    } catch {
+      return { seo: null };
+    }
+  },
+  head: ({ params, loaderData }) => {
+    const p: any = loaderData?.seo;
+    const url = `https://365motorsales.com/seller/${params.id}`;
+    if (!p) {
+      return {
+        meta: [{ title: "Seller — 365 MotorSales Philippines" }, { property: "og:url", content: url }],
+        links: [{ rel: "canonical", href: url }],
+      };
+    }
+    const name = p.business_name || p.full_name || "Seller";
+    const loc = [p.city, p.region].filter(Boolean).join(", ");
+    const title = `${name}${loc ? ` — ${loc}` : ""} | 365 MotorSales`;
+    const desc = `Listings from ${name}${loc ? ` in ${loc}` : ""} on 365 MotorSales Philippines.`.slice(0, 155);
+    return {
+      meta: [
+        { title },
+        { name: "description", content: desc },
+        { property: "og:title", content: title },
+        { property: "og:description", content: desc },
+        { property: "og:url", content: url },
+        ...(p.avatar_url ? [
+          { property: "og:image", content: p.avatar_url },
+          { name: "twitter:image", content: p.avatar_url },
+        ] : []),
+        { name: "twitter:title", content: title },
+        { name: "twitter:description", content: desc },
+      ],
+      links: [{ rel: "canonical", href: url }],
+    };
+  },
   component: SellerProfilePage,
 });
 
