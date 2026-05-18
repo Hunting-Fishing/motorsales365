@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/use-auth";
@@ -83,6 +83,9 @@ function SignupPage() {
   const [refCode, setRefCode] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const markTouched = (k: string) => setTouched((t) => (t[k] ? t : { ...t, [k]: true }));
 
   const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
 
@@ -92,6 +95,38 @@ function SignupPage() {
     () => BUSINESS_KIND_OPTIONS.filter((o) => !o.forIntent || o.forIntent === intent),
     [intent],
   );
+
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  const phoneNormalized = phone.trim() ? normalizePhPhone(phone) : "";
+  const phoneValid = phoneNormalized !== null;
+
+  type Issue = { field: string; label: string; message: string };
+  const issues = useMemo<Issue[]>(() => {
+    const list: Issue[] = [];
+    if (!intent) list.push({ field: "intent", label: "Account type", message: "Choose what kind of account you'd like." });
+    if (!firstName.trim()) list.push({ field: "firstName", label: "First name", message: "Enter your first name." });
+    if (!lastName.trim()) list.push({ field: "lastName", label: "Last name", message: "Enter your last name." });
+    if (!email.trim()) list.push({ field: "email", label: "Email", message: "Enter your email address." });
+    else if (!emailValid) list.push({ field: "email", label: "Email", message: "Enter a valid email address." });
+    if (phone.trim() && !phoneValid) list.push({ field: "phone", label: "Mobile", message: "Use a PH mobile format like 09XX XXX XXXX, or leave it blank." });
+    if (!location.city) list.push({ field: "city", label: "City / Town", message: "Choose your city or town." });
+    if (isBusinessLike && !businessName.trim()) {
+      list.push({ field: "businessName", label: intent === "service_provider" ? "Service name" : "Business name", message: "Required for business and service accounts." });
+    }
+    if (isBusinessLike && !businessKind) {
+      list.push({ field: "businessKind", label: "Category", message: "Pick the category that best describes your business." });
+    }
+    if (!password) list.push({ field: "password", label: "Password", message: "Choose a password." });
+    else if (password.length < 8) list.push({ field: "password", label: "Password", message: "Password must be at least 8 characters." });
+    if (!agreed) list.push({ field: "terms", label: "Terms", message: "Agree to the Terms and Privacy Policy to continue." });
+    return list;
+  }, [intent, firstName, lastName, email, emailValid, phone, phoneValid, location.city, isBusinessLike, businessName, businessKind, password, agreed]);
+
+  const errorFor = (field: string) => {
+    if (!submitAttempted && !touched[field]) return null;
+    return issues.find((i) => i.field === field)?.message ?? null;
+  };
+  const invalidCls = (field: string) => (errorFor(field) ? "border-destructive focus-visible:ring-destructive" : "");
 
   useEffect(() => {
     const c = getCreditedCode();
@@ -129,16 +164,16 @@ function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!intent) { toast.error("Please choose what kind of account you'd like."); return; }
-    if (!firstName.trim() || !lastName.trim()) { toast.error("Please enter your first and last name."); return; }
-    if (password.length < 8) { toast.error("Password must be at least 8 characters."); return; }
-    if (isBusinessLike && !businessName.trim()) { toast.error("Please enter your business name."); return; }
-    if (!location.city) { toast.error("Please choose your city or town."); return; }
-    if (phone.trim() && !normalizePhPhone(phone)) {
-      toast.error("Please enter a valid Philippine mobile number, or leave it blank.");
+    setSubmitAttempted(true);
+    if (issues.length > 0) {
+      toast.error(`Please fix ${issues.length} ${issues.length === 1 ? "field" : "fields"} before continuing.`);
+      // scroll to first error
+      const first = issues[0].field;
+      const el = document.getElementById(`field-${first}`) ?? document.getElementById(first);
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
-    if (!agreed) { toast.error("Please agree to the Terms and Privacy Policy."); return; }
+    if (!intent) return;
 
     setSubmitting(true);
     stashPendingProfile();
@@ -215,21 +250,28 @@ function SignupPage() {
           )}
           aria-disabled={!intent}
         >
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">2. Your details</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">2. Your details</h2>
+            <span className="text-xs text-muted-foreground">
+              <span className="text-destructive">*</span> required
+            </span>
+          </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <Label htmlFor="first-name">First name</Label>
-              <Input id="first-name" required value={firstName} onChange={(e) => setFirstName(e.target.value)} autoComplete="given-name" />
+            <div id="field-firstName">
+              <Label htmlFor="first-name">First name <span className="text-destructive">*</span></Label>
+              <Input id="first-name" required value={firstName} onChange={(e) => setFirstName(e.target.value)} onBlur={() => markTouched("firstName")} autoComplete="given-name" aria-invalid={!!errorFor("firstName")} className={invalidCls("firstName")} />
+              {errorFor("firstName") && <p className="mt-1 text-xs text-destructive">{errorFor("firstName")}</p>}
             </div>
-            <div>
-              <Label htmlFor="last-name">Last name</Label>
-              <Input id="last-name" required value={lastName} onChange={(e) => setLastName(e.target.value)} autoComplete="family-name" />
+            <div id="field-lastName">
+              <Label htmlFor="last-name">Last name <span className="text-destructive">*</span></Label>
+              <Input id="last-name" required value={lastName} onChange={(e) => setLastName(e.target.value)} onBlur={() => markTouched("lastName")} autoComplete="family-name" aria-invalid={!!errorFor("lastName")} className={invalidCls("lastName")} />
+              {errorFor("lastName") && <p className="mt-1 text-xs text-destructive">{errorFor("lastName")}</p>}
             </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <div>
+            <div id="field-phone">
               <Label htmlFor="phone">Mobile (optional)</Label>
               <Input
                 id="phone"
@@ -237,19 +279,31 @@ function SignupPage() {
                 placeholder="09XX XXX XXXX"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
+                onBlur={() => markTouched("phone")}
                 autoComplete="tel"
+                aria-invalid={!!errorFor("phone")}
+                className={invalidCls("phone")}
               />
-              <p className="mt-1 text-xs text-muted-foreground">PH mobile format — we'll store it as +63.</p>
+              {errorFor("phone") ? (
+                <p className="mt-1 text-xs text-destructive">{errorFor("phone")}</p>
+              ) : (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  PH mobile format — we'll store it as +63.
+                  {phone.trim() && phoneValid && <span className="ml-1 text-emerald-600">✓ {phoneNormalized}</span>}
+                </p>
+              )}
             </div>
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
+            <div id="field-email">
+              <Label htmlFor="email">Email <span className="text-destructive">*</span></Label>
+              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} onBlur={() => markTouched("email")} autoComplete="email" aria-invalid={!!errorFor("email")} className={invalidCls("email")} />
+              {errorFor("email") && <p className="mt-1 text-xs text-destructive">{errorFor("email")}</p>}
             </div>
           </div>
 
-          <div>
-            <Label className="mb-2 block">City / Town</Label>
-            <LocationPicker value={location} onChange={setLocation} showBarangay={false} />
+          <div id="field-city">
+            <Label className="mb-2 block">City / Town <span className="text-destructive">*</span></Label>
+            <LocationPicker value={location} onChange={(v) => { setLocation(v); markTouched("city"); }} showBarangay={false} />
+            {errorFor("city") && <p className="mt-1 text-xs text-destructive">{errorFor("city")}</p>}
           </div>
 
           {isBusinessLike && (
@@ -257,22 +311,26 @@ function SignupPage() {
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Business details</p>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <div>
+                <div id="field-businessName">
                   <Label htmlFor="business-name">
-                    {intent === "service_provider" ? "Service name" : "Business / dealer name"}
+                    {intent === "service_provider" ? "Service name" : "Business / dealer name"} <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="business-name"
                     required
                     value={businessName}
                     onChange={(e) => setBusinessName(e.target.value)}
+                    onBlur={() => markTouched("businessName")}
                     placeholder={intent === "service_provider" ? "e.g. Reyes Towing Services" : "e.g. Manila Auto Hub"}
+                    aria-invalid={!!errorFor("businessName")}
+                    className={invalidCls("businessName")}
                   />
+                  {errorFor("businessName") && <p className="mt-1 text-xs text-destructive">{errorFor("businessName")}</p>}
                 </div>
-                <div>
-                  <Label htmlFor="business-kind">Category</Label>
-                  <Select value={businessKind} onValueChange={setBusinessKind}>
-                    <SelectTrigger id="business-kind">
+                <div id="field-businessKind">
+                  <Label htmlFor="business-kind">Category <span className="text-destructive">*</span></Label>
+                  <Select value={businessKind} onValueChange={(v) => { setBusinessKind(v); markTouched("businessKind"); }}>
+                    <SelectTrigger id="business-kind" aria-invalid={!!errorFor("businessKind")} className={invalidCls("businessKind")}>
                       <SelectValue placeholder="Choose a category" />
                     </SelectTrigger>
                     <SelectContent>
@@ -281,6 +339,7 @@ function SignupPage() {
                       ))}
                     </SelectContent>
                   </Select>
+                  {errorFor("businessKind") && <p className="mt-1 text-xs text-destructive">{errorFor("businessKind")}</p>}
                 </div>
               </div>
 
@@ -300,8 +359,8 @@ function SignupPage() {
             </div>
           )}
 
-          <div>
-            <Label htmlFor="password">Password</Label>
+          <div id="field-password">
+            <Label htmlFor="password">Password <span className="text-destructive">*</span></Label>
             <div className="relative">
               <Input
                 id="password"
@@ -310,8 +369,10 @@ function SignupPage() {
                 minLength={8}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onBlur={() => markTouched("password")}
                 autoComplete="new-password"
-                className="pr-10"
+                aria-invalid={!!errorFor("password")}
+                className={cn("pr-10", invalidCls("password"))}
               />
               <button
                 type="button"
@@ -322,17 +383,48 @@ function SignupPage() {
                 {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
               </button>
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">At least 8 characters. Use a mix of letters and numbers.</p>
+            {errorFor("password") ? (
+              <p className="mt-1 text-xs text-destructive">{errorFor("password")}</p>
+            ) : (
+              <p className="mt-1 text-xs text-muted-foreground">At least 8 characters. Use a mix of letters and numbers.</p>
+            )}
           </div>
 
-          <div className="flex items-start gap-3 rounded-lg border border-border bg-muted/30 p-3">
-            <Checkbox id="terms" checked={agreed} onCheckedChange={(v) => setAgreed(v === true)} className="mt-0.5" />
-            <Label htmlFor="terms" className="text-sm font-normal leading-relaxed text-muted-foreground">
-              I agree to the{" "}
-              <Link to="/terms" className="font-medium text-primary underline">Terms</Link> and{" "}
-              <Link to="/privacy" className="font-medium text-primary underline">Privacy Policy</Link>.
-            </Label>
+          <div id="field-terms" className={cn("flex items-start gap-3 rounded-lg border bg-muted/30 p-3", errorFor("terms") ? "border-destructive" : "border-border")}>
+            <Checkbox id="terms" checked={agreed} onCheckedChange={(v) => { setAgreed(v === true); markTouched("terms"); }} className="mt-0.5" />
+            <div className="flex-1">
+              <Label htmlFor="terms" className="text-sm font-normal leading-relaxed text-muted-foreground">
+                I agree to the{" "}
+                <Link to="/terms" className="font-medium text-primary underline">Terms</Link> and{" "}
+                <Link to="/privacy" className="font-medium text-primary underline">Privacy Policy</Link>.
+              </Label>
+              {errorFor("terms") && <p className="mt-1 text-xs text-destructive">{errorFor("terms")}</p>}
+            </div>
           </div>
+
+          {intent && (
+            issues.length > 0 ? (
+              <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-sm" role="alert" aria-live="polite">
+                <div className="flex items-center gap-2 font-semibold text-destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  Before you can create your {intentMeta?.label.toLowerCase()} account
+                </div>
+                <ul className="mt-2 space-y-1 text-foreground">
+                  {issues.map((i) => (
+                    <li key={i.field} className="flex gap-2">
+                      <span className="text-destructive">•</span>
+                      <span><span className="font-medium">{i.label}:</span> <span className="text-muted-foreground">{i.message}</span></span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 rounded-lg border border-emerald-500/40 bg-emerald-500/5 p-3 text-sm text-emerald-700 dark:text-emerald-400">
+                <CheckCircle2 className="h-4 w-4" />
+                All set — you're ready to create your account.
+              </div>
+            )
+          )}
 
           <Button type="submit" disabled={submitting || !intent} className="w-full" size="lg">
             {submitting ? "Creating account…" : intent ? `Create ${intentMeta?.label.toLowerCase()} account` : "Choose an account type to continue"}
