@@ -181,31 +181,38 @@ function SignupPage() {
           </div>
 
           <div>
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
-          </div>
-
-          <div>
             <Label className="mb-2 block">City / Town</Label>
             <LocationPicker value={location} onChange={setLocation} showBarangay={false} />
           </div>
 
           {isBusinessLike && (
-            <div>
-              <Label htmlFor="business-name">
-                {intent === "service_provider" ? "Business / service name" : "Business / dealer name"}
-              </Label>
-              <Input
-                id="business-name"
-                required
-                value={businessName}
-                onChange={(e) => setBusinessName(e.target.value)}
-                placeholder={intent === "service_provider" ? "e.g. Reyes Towing Services" : "e.g. Manila Auto Hub"}
-              />
-              <p className="mt-1 text-xs text-muted-foreground">
-                You'll finish your full business profile after signup.
-              </p>
-            </div>
+            <>
+              <div>
+                <Label htmlFor="business-name">
+                  {intent === "service_provider" ? "Business / service name" : "Business / dealer name"}
+                </Label>
+                <Input
+                  id="business-name"
+                  required
+                  value={businessName}
+                  onChange={(e) => setBusinessName(e.target.value)}
+                  placeholder={intent === "service_provider" ? "e.g. Reyes Towing Services" : "e.g. Manila Auto Hub"}
+                />
+              </div>
+              <div>
+                <Label htmlFor="business-address">Street address (optional)</Label>
+                <Input
+                  id="business-address"
+                  value={businessAddress}
+                  onChange={(e) => setBusinessAddress(e.target.value)}
+                  placeholder="e.g. 123 Rizal Ave, Brgy. San Jose"
+                  autoComplete="street-address"
+                />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  You can skip this for now, but your account won't go live or appear in the directory until a business address is saved.
+                </p>
+              </div>
+            </>
           )}
 
           <div>
