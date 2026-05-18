@@ -3,6 +3,43 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { sendTransactionalEmail } from "@/lib/email/send";
 
+async function maybeApplyPendingSignup(user: User) {
+  if (typeof window === "undefined") return;
+  let raw: string | null = null;
+  try { raw = window.localStorage.getItem("signup.pending"); } catch { return; }
+  if (!raw) return;
+  try {
+    const pending = JSON.parse(raw) as {
+      intent?: "buyer" | "private_seller" | "business" | "service_provider";
+      full_name?: string;
+      phone?: string;
+      business_name?: string;
+      region?: string;
+      province?: string;
+      city?: string;
+      is_business?: boolean;
+    };
+    const update: Record<string, unknown> = {};
+    if (pending.intent) update.signup_intent = pending.intent;
+    if (pending.city) update.signup_city = pending.city;
+    if (pending.full_name) update.full_name = pending.full_name;
+    if (pending.phone) update.phone = pending.phone;
+    if (pending.is_business) {
+      update.seller_type = "business";
+      if (pending.business_name) update.business_name = pending.business_name;
+      if (pending.region) update.business_region = pending.region;
+      if (pending.province) update.business_province = pending.province;
+      if (pending.city) update.business_city = pending.city;
+    }
+    if (Object.keys(update).length > 0) {
+      await supabase.from("profiles").update(update).eq("id", user.id);
+    }
+    window.localStorage.removeItem("signup.pending");
+  } catch (err) {
+    console.warn("[signup.pending] failed", err);
+  }
+}
+
 async function maybeSendWelcomeEmail(user: User) {
   if (!user.email || !user.email_confirmed_at) return;
   try {
