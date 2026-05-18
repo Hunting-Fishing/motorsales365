@@ -1117,6 +1117,8 @@ export type Database = {
           seller_type: Database["public"]["Enums"]["seller_type"]
           signup_city: string | null
           signup_intent: string | null
+          signup_province: string | null
+          signup_region: string | null
           updated_at: string
           verification_status: Database["public"]["Enums"]["verification_status"]
           verified_at: string | null
@@ -1149,6 +1151,8 @@ export type Database = {
           seller_type?: Database["public"]["Enums"]["seller_type"]
           signup_city?: string | null
           signup_intent?: string | null
+          signup_province?: string | null
+          signup_region?: string | null
           updated_at?: string
           verification_status?: Database["public"]["Enums"]["verification_status"]
           verified_at?: string | null
@@ -1181,6 +1185,8 @@ export type Database = {
           seller_type?: Database["public"]["Enums"]["seller_type"]
           signup_city?: string | null
           signup_intent?: string | null
+          signup_province?: string | null
+          signup_region?: string | null
           updated_at?: string
           verification_status?: Database["public"]["Enums"]["verification_status"]
           verified_at?: string | null
