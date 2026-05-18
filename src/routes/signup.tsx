@@ -164,16 +164,16 @@ function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!intent) { toast.error("Please choose what kind of account you'd like."); return; }
-    if (!firstName.trim() || !lastName.trim()) { toast.error("Please enter your first and last name."); return; }
-    if (password.length < 8) { toast.error("Password must be at least 8 characters."); return; }
-    if (isBusinessLike && !businessName.trim()) { toast.error("Please enter your business name."); return; }
-    if (!location.city) { toast.error("Please choose your city or town."); return; }
-    if (phone.trim() && !normalizePhPhone(phone)) {
-      toast.error("Please enter a valid Philippine mobile number, or leave it blank.");
+    setSubmitAttempted(true);
+    if (issues.length > 0) {
+      toast.error(`Please fix ${issues.length} ${issues.length === 1 ? "field" : "fields"} before continuing.`);
+      // scroll to first error
+      const first = issues[0].field;
+      const el = document.getElementById(`field-${first}`) ?? document.getElementById(first);
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
-    if (!agreed) { toast.error("Please agree to the Terms and Privacy Policy."); return; }
+    if (!intent) return;
 
     setSubmitting(true);
     stashPendingProfile();
