@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import { Search } from "lucide-react";
 import { LocationDrilldown, type LocationValue } from "@/components/businesses/location-drilldown";
 import { LocationPicker } from "@/components/businesses/location-picker";
 import { resolvePsgc } from "@/lib/psgc";
@@ -39,7 +41,7 @@ function SubmitBusinessPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [types, setTypes] = useState<{ slug: string; label: string }[]>([]);
-  const [tags, setTags] = useState<{ slug: string; label: string; type_slug: string | null }[]>([]);
+  const [tags, setTags] = useState<{ slug: string; label: string; type_slug: string | null; category: string | null; is_popular: boolean }[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [name, setName] = useState("");
   const [typeSlug, setTypeSlug] = useState<string>("");
@@ -54,6 +56,8 @@ function SubmitBusinessPage() {
   const [lng, setLng] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [tagsOpen, setTagsOpen] = useState(false);
+  const [tagSearch, setTagSearch] = useState("");
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
@@ -63,7 +67,7 @@ function SubmitBusinessPage() {
     (async () => {
       const [{ data: t1 }, { data: t2 }] = await Promise.all([
         (supabase as any).from("business_types").select("slug,label").order("sort_order"),
-        (supabase as any).from("business_tags").select("slug,label,type_slug,sort_order").order("sort_order"),
+        (supabase as any).from("business_tags").select("slug,label,type_slug,category,sort_order,is_popular").order("sort_order"),
       ]);
       setTypes(t1 ?? []); setTags(t2 ?? []);
     })();
@@ -212,6 +216,31 @@ function SubmitBusinessPage() {
   };
 
   const visibleTags = typeSlug ? tags.filter((t) => t.type_slug === null || t.type_slug === typeSlug) : tags.filter((t) => t.type_slug === null);
+  const popularTags = visibleTags.filter((t) => t.is_popular).slice(0, 10);
+  const popularSet = new Set(popularTags.map((t) => t.slug));
+  const extraSelected = visibleTags.filter((t) => selectedTags.includes(t.slug) && !popularSet.has(t.slug));
+  const inlineTags = [...popularTags, ...extraSelected];
+
+  const toggleTag = (slug: string) =>
+    setSelectedTags((prev) => prev.includes(slug) ? prev.filter((x) => x !== slug) : [...prev, slug]);
+
+  const prettyCategory = (k: string | null) => {
+    if (!k) return "Other";
+    return k.split("_").map((w) => w[0].toUpperCase() + w.slice(1)).join(" & ").replace("Vehicle & Scope", "Vehicle scope").replace("Service & Mode", "Service mode");
+  };
+
+  const filteredDialogTags = visibleTags.filter((t) => {
+    if (!tagSearch.trim()) return true;
+    const q = tagSearch.toLowerCase();
+    return t.label.toLowerCase().includes(q) || (t.category ?? "").toLowerCase().includes(q);
+  });
+  const grouped: Record<string, typeof visibleTags> = {};
+  for (const t of filteredDialogTags) {
+    const key = t.category ?? "other";
+    (grouped[key] = grouped[key] ?? []).push(t);
+  }
+  const groupKeys = Object.keys(grouped).sort();
+
 
   if (loading || !user) return <SiteLayout><div className="p-12 text-center">Loading…</div></SiteLayout>;
 
@@ -240,15 +269,68 @@ function SubmitBusinessPage() {
 
           {visibleTags.length > 0 && (
             <div>
-              <Label>Tags</Label>
-              <div className="mt-1 flex flex-wrap gap-2">
-                {visibleTags.map((t) => {
+              <div className="mb-1 flex items-center justify-between gap-2">
+                <Label>Tags {selectedTags.length > 0 && <span className="ml-1 text-xs text-muted-foreground">({selectedTags.length} selected)</span>}</Label>
+                <Dialog open={tagsOpen} onOpenChange={setTagsOpen}>
+                  <DialogTrigger asChild>
+                    <Button type="button" variant="outline" size="sm">Browse all tags</Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-h-[85vh] max-w-2xl overflow-hidden p-0">
+                    <DialogHeader className="border-b p-4">
+                      <DialogTitle>Browse all tags</DialogTitle>
+                    </DialogHeader>
+                    <div className="border-b p-4">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                          autoFocus
+                          placeholder="Search tags…"
+                          value={tagSearch}
+                          onChange={(e) => setTagSearch(e.target.value)}
+                          className="pl-9"
+                        />
+                      </div>
+                    </div>
+                    <div className="max-h-[55vh] space-y-5 overflow-y-auto p-4">
+                      {groupKeys.length === 0 && (
+                        <p className="py-8 text-center text-sm text-muted-foreground">No tags match "{tagSearch}"</p>
+                      )}
+                      {groupKeys.map((k) => (
+                        <div key={k}>
+                          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            {prettyCategory(k)}
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {grouped[k].map((t) => {
+                              const on = selectedTags.includes(t.slug);
+                              return (
+                                <button
+                                  type="button" key={t.slug}
+                                  onClick={() => toggleTag(t.slug)}
+                                  className={`rounded-full border px-3 py-1 text-xs transition ${on ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}
+                                >{t.label}</button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <DialogFooter className="border-t p-4">
+                      <span className="mr-auto self-center text-xs text-muted-foreground">{selectedTags.length} selected</span>
+                      <Button type="button" onClick={() => { setTagsOpen(false); setTagSearch(""); }}>Done</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              <p className="mb-2 text-xs text-muted-foreground">Top {popularTags.length} popular tags shown — use "Browse all tags" for the full library.</p>
+              <div className="flex flex-wrap gap-2">
+                {inlineTags.map((t) => {
                   const on = selectedTags.includes(t.slug);
                   return (
                     <button
                       type="button" key={t.slug}
-                      onClick={() => setSelectedTags((prev) => on ? prev.filter((x) => x !== t.slug) : [...prev, t.slug])}
-                      className={`rounded-full border px-3 py-1 text-xs transition ${on ? "border-foreground bg-foreground text-background" : "border-border hover:bg-secondary"}`}
+                      onClick={() => toggleTag(t.slug)}
+                      className={`rounded-full border px-3 py-1 text-xs transition ${on ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}
                     >{t.label}</button>
                   );
                 })}
