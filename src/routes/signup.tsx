@@ -1,12 +1,22 @@
 import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState, useEffect, useMemo } from "react";
 import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 import { SiteLayout } from "@/components/site-layout";
 import { getCreditedCode } from "@/lib/referral";
 import { AccountTypeGrid, SIGNUP_TYPES, type SignupIntent } from "@/components/signup/account-type-grid";
@@ -30,6 +40,30 @@ const POST_SIGNUP_ROUTE: Record<SignupIntent, string> = {
   service_provider: "/businesses/submit",
 };
 
+const BUSINESS_KIND_OPTIONS: { value: string; label: string; forIntent?: SignupIntent }[] = [
+  { value: "dealer", label: "Dealership / Showroom", forIntent: "business" },
+  { value: "parts_shop", label: "Parts shop", forIntent: "business" },
+  { value: "rental", label: "Rental", forIntent: "business" },
+  { value: "repair_shop", label: "Repair shop", forIntent: "service_provider" },
+  { value: "towing", label: "Towing", forIntent: "service_provider" },
+  { value: "body_shop", label: "Body shop", forIntent: "service_provider" },
+  { value: "carwash", label: "Carwash / detailing", forIntent: "service_provider" },
+  { value: "salvage", label: "Salvage yard", forIntent: "service_provider" },
+  { value: "insurance", label: "Insurance" },
+  { value: "corporate", label: "Corporate / fleet" },
+  { value: "other", label: "Other" },
+];
+
+function normalizePhPhone(raw: string): string | null {
+  const d = raw.replace(/[^0-9+]/g, "");
+  if (!d) return null;
+  if (d.startsWith("+")) return /^\+\d{8,15}$/.test(d) ? d : null;
+  if (/^09\d{9}$/.test(d)) return "+63" + d.slice(1);
+  if (/^9\d{9}$/.test(d)) return "+63" + d;
+  if (/^63\d{10}$/.test(d)) return "+" + d;
+  return null;
+}
+
 function SignupPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
@@ -41,16 +75,23 @@ function SignupPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [businessName, setBusinessName] = useState("");
   const [businessAddress, setBusinessAddress] = useState("");
+  const [businessKind, setBusinessKind] = useState<string>("");
   const [location, setLocation] = useState<LocationValue>({ region: null, province: null, city: null, barangay: null });
   const [refCode, setRefCode] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
 
   const isBusinessLike = intent === "business" || intent === "service_provider";
   const intentMeta = useMemo(() => SIGNUP_TYPES.find((s) => s.id === intent), [intent]);
+  const kindOptions = useMemo(
+    () => BUSINESS_KIND_OPTIONS.filter((o) => !o.forIntent || o.forIntent === intent),
+    [intent],
+  );
 
   useEffect(() => {
     const c = getCreditedCode();
@@ -61,22 +102,26 @@ function SignupPage() {
     if (!loading && user) navigate({ to: "/dashboard" });
   }, [user, loading, navigate]);
 
-  const stashPendingProfile = (overrides?: { intent?: SignupIntent; businessName?: string }) => {
+  // Reset business_kind when switching intent
+  useEffect(() => {
+    setBusinessKind("");
+  }, [intent]);
+
+  const stashPendingProfile = () => {
     try {
       const payload = {
-        intent: overrides?.intent ?? intent,
+        intent,
         full_name: fullName || undefined,
-        first_name: firstName || undefined,
-        last_name: lastName || undefined,
-        phone: phone || undefined,
-        business_name: overrides?.businessName ?? (isBusinessLike ? businessName : undefined),
-        business_address: isBusinessLike ? (businessAddress || undefined) : undefined,
+        first_name: firstName.trim() || undefined,
+        last_name: lastName.trim() || undefined,
+        phone: phone.trim() || undefined,
+        business_name: isBusinessLike ? businessName.trim() || undefined : undefined,
+        business_address: isBusinessLike ? businessAddress.trim() || undefined : undefined,
+        business_kind: isBusinessLike ? businessKind || undefined : undefined,
         region: location.region ?? undefined,
         province: location.province ?? undefined,
         city: location.city ?? undefined,
-        is_business: overrides?.intent
-          ? overrides.intent === "business" || overrides.intent === "service_provider"
-          : isBusinessLike,
+        is_business: isBusinessLike,
       };
       window.localStorage.setItem("signup.pending", JSON.stringify(payload));
     } catch {}
@@ -85,10 +130,15 @@ function SignupPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!intent) { toast.error("Please choose what kind of account you'd like."); return; }
-    if (password.length < 6) { toast.error("Password must be at least 6 characters"); return; }
     if (!firstName.trim() || !lastName.trim()) { toast.error("Please enter your first and last name."); return; }
+    if (password.length < 8) { toast.error("Password must be at least 8 characters."); return; }
     if (isBusinessLike && !businessName.trim()) { toast.error("Please enter your business name."); return; }
     if (!location.city) { toast.error("Please choose your city or town."); return; }
+    if (phone.trim() && !normalizePhPhone(phone)) {
+      toast.error("Please enter a valid Philippine mobile number, or leave it blank.");
+      return;
+    }
+    if (!agreed) { toast.error("Please agree to the Terms and Privacy Policy."); return; }
 
     setSubmitting(true);
     stashPendingProfile();
@@ -100,9 +150,10 @@ function SignupPage() {
           full_name: fullName,
           first_name: firstName.trim(),
           last_name: lastName.trim(),
-          phone: phone || undefined,
+          phone: phone.trim() || undefined,
           business_name: isBusinessLike ? businessName.trim() : undefined,
           business_address: isBusinessLike ? (businessAddress.trim() || undefined) : undefined,
+          business_kind: isBusinessLike ? (businessKind || undefined) : undefined,
           signup_city: location.city ?? undefined,
           signup_region: location.region ?? undefined,
           signup_province: location.province ?? undefined,
@@ -120,6 +171,7 @@ function SignupPage() {
 
   const handleGoogle = async () => {
     if (!intent) { toast.error("Please choose what kind of account you'd like first."); return; }
+    if (!agreed) { toast.error("Please agree to the Terms and Privacy Policy first."); return; }
     stashPendingProfile();
     const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
     if (result.error) { toast.error("Could not sign up with Google"); return; }
@@ -155,7 +207,14 @@ function SignupPage() {
           )}
         </section>
 
-        <form onSubmit={handleSubmit} className="space-y-5 rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <form
+          onSubmit={handleSubmit}
+          className={cn(
+            "space-y-5 rounded-2xl border border-border bg-card p-6 shadow-sm transition-opacity",
+            !intent && "pointer-events-none opacity-50",
+          )}
+          aria-disabled={!intent}
+        >
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">2. Your details</h2>
 
           <div className="grid gap-4 sm:grid-cols-2">
@@ -171,12 +230,20 @@ function SignupPage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <Label htmlFor="phone">Phone (optional)</Label>
-              <Input id="phone" type="tel" placeholder="+63 9XX XXX XXXX" value={phone} onChange={(e) => setPhone(e.target.value)} />
+              <Label htmlFor="phone">Mobile (optional)</Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="09XX XXX XXXX"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                autoComplete="tel"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">PH mobile format — we'll store it as +63.</p>
             </div>
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
             </div>
           </div>
 
@@ -186,19 +253,37 @@ function SignupPage() {
           </div>
 
           {isBusinessLike && (
-            <>
-              <div>
-                <Label htmlFor="business-name">
-                  {intent === "service_provider" ? "Business / service name" : "Business / dealer name"}
-                </Label>
-                <Input
-                  id="business-name"
-                  required
-                  value={businessName}
-                  onChange={(e) => setBusinessName(e.target.value)}
-                  placeholder={intent === "service_provider" ? "e.g. Reyes Towing Services" : "e.g. Manila Auto Hub"}
-                />
+            <div className="space-y-4 rounded-xl border border-dashed border-border bg-muted/30 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Business details</p>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <Label htmlFor="business-name">
+                    {intent === "service_provider" ? "Service name" : "Business / dealer name"}
+                  </Label>
+                  <Input
+                    id="business-name"
+                    required
+                    value={businessName}
+                    onChange={(e) => setBusinessName(e.target.value)}
+                    placeholder={intent === "service_provider" ? "e.g. Reyes Towing Services" : "e.g. Manila Auto Hub"}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="business-kind">Category</Label>
+                  <Select value={businessKind} onValueChange={setBusinessKind}>
+                    <SelectTrigger id="business-kind">
+                      <SelectValue placeholder="Choose a category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {kindOptions.map((o) => (
+                        <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
+
               <div>
                 <Label htmlFor="business-address">Street address (optional)</Label>
                 <Input
@@ -212,13 +297,41 @@ function SignupPage() {
                   You can skip this for now, but your account won't go live or appear in the directory until a business address is saved.
                 </p>
               </div>
-            </>
+            </div>
           )}
 
           <div>
             <Label htmlFor="password">Password</Label>
-            <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
-            <p className="mt-1 text-xs text-muted-foreground">At least 6 characters.</p>
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                required
+                minLength={8}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            <p className="mt-1 text-xs text-muted-foreground">At least 8 characters. Use a mix of letters and numbers.</p>
+          </div>
+
+          <div className="flex items-start gap-3 rounded-lg border border-border bg-muted/30 p-3">
+            <Checkbox id="terms" checked={agreed} onCheckedChange={(v) => setAgreed(v === true)} className="mt-0.5" />
+            <Label htmlFor="terms" className="text-sm font-normal leading-relaxed text-muted-foreground">
+              I agree to the{" "}
+              <Link to="/terms" className="font-medium text-primary underline">Terms</Link> and{" "}
+              <Link to="/privacy" className="font-medium text-primary underline">Privacy Policy</Link>.
+            </Label>
           </div>
 
           <Button type="submit" disabled={submitting || !intent} className="w-full" size="lg">
@@ -234,12 +347,6 @@ function SignupPage() {
           <Button type="button" variant="outline" onClick={handleGoogle} disabled={!intent} className="w-full">
             Continue with Google
           </Button>
-
-          <p className="text-center text-xs text-muted-foreground">
-            By creating an account, you agree to our{" "}
-            <Link to="/terms" className="underline">Terms</Link> and{" "}
-            <Link to="/privacy" className="underline">Privacy Policy</Link>.
-          </p>
         </form>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
