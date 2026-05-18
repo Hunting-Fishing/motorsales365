@@ -280,7 +280,49 @@ function SubmitBusinessPage() {
           </div>
 
           <div>
-            <Label>Business type *</Label>
+            <div className="mb-1 flex items-center justify-between gap-2">
+              <Label>Business type *</Label>
+              <Dialog open={suggestOpen} onOpenChange={setSuggestOpen}>
+                <DialogTrigger asChild>
+                  <Button type="button" variant="outline" size="sm">+ Add</Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Suggest a new business type</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Don't see your type? Suggest it below. Our admin team will review and either add it to the list or merge it with an existing type.
+                    </p>
+                    <div>
+                      <Label>Type name *</Label>
+                      <Input
+                        value={suggestLabel}
+                        onChange={(e) => setSuggestLabel(e.target.value)}
+                        maxLength={80}
+                        placeholder="e.g. Tire shop, Window tinting, Truck rental"
+                      />
+                    </div>
+                    <div>
+                      <Label>Notes (optional)</Label>
+                      <Textarea
+                        value={suggestNotes}
+                        onChange={(e) => setSuggestNotes(e.target.value)}
+                        maxLength={500}
+                        rows={3}
+                        placeholder="Briefly describe what businesses this type covers."
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button type="button" variant="ghost" onClick={() => setSuggestOpen(false)}>Cancel</Button>
+                    <Button type="button" onClick={submitTypeSuggestion} disabled={suggestSubmitting}>
+                      {suggestSubmitting ? "Sending…" : "Send to admin"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
             <Select value={typeSlug} onValueChange={(v) => { setTypeSlug(v); setSelectedTags([]); }}>
               <SelectTrigger><SelectValue placeholder="Choose a type" /></SelectTrigger>
               <SelectContent>
