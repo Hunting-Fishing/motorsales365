@@ -24,12 +24,14 @@ export const SIGNUP_TYPES: {
     description: "Dealership, parts shop, or rental — listed in our professional directory.",
     icon: Building2,
     badge: "Popular for Pros",
+    note: "Your business will appear in our professional directory with a dedicated profile, verified badge eligibility, and bulk listing tools. You'll complete your full business profile right after signup.",
   },
   {
     id: "service_provider",
     label: "Service provider",
     description: "Towing, repair, body shop, carwash, or salvage specialist.",
     icon: Wrench,
+    note: "You'll be listed in our services directory so drivers can find you for towing, repairs, and roadside help. Complete your service profile after signup to start receiving requests.",
   },
 ];
 
