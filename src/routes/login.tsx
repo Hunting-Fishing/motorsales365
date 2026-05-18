@@ -29,7 +29,16 @@ function LoginPage() {
     setSubmitting(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setSubmitting(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      const msg = error.message.toLowerCase();
+      if (msg.includes("confirm") || msg.includes("not confirmed")) {
+        toast.error("Please verify your email first.");
+        navigate({ to: "/verify-email", search: { email, intent: undefined } });
+        return;
+      }
+      toast.error(error.message);
+      return;
+    }
     toast.success("Welcome back!");
     navigate({ to: "/dashboard" });
   };
