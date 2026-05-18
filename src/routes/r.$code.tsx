@@ -8,6 +8,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { CheckCircle2, RotateCcw, Info } from "lucide-react";
 
 export const Route = createFileRoute("/r/$code")({
+  head: () => ({
+    meta: [
+      { title: "Referral — 365 MotorSales Philippines" },
+      { name: "description", content: "You've been invited to 365 MotorSales Philippines. Sign up via this referral link to unlock rewards." },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
   component: ReferralLanding,
 });
 

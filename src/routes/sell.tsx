@@ -23,6 +23,16 @@ import { uploadWithRetry } from "@/lib/storage-upload";
 import { getUserPlanLimits, FREE_PLAN_LIMITS, type PlanLimits } from "@/lib/plan-limits";
 
 export const Route = createFileRoute("/sell")({
+  head: () => ({
+    meta: [
+      { title: "Sell your vehicle — 365 MotorSales Philippines" },
+      { name: "description", content: "Post your car, motorcycle, truck, or parts for sale on 365 MotorSales. Free listings, fast reach across the Philippines." },
+      { property: "og:title", content: "Sell your vehicle — 365 MotorSales Philippines" },
+      { property: "og:description", content: "Post your car, motorcycle, truck, or parts for sale on 365 MotorSales. Free listings, fast reach across the Philippines." },
+      { property: "og:url", content: "https://www.365motorsales.com/sell" },
+    ],
+    links: [{ rel: "canonical", href: "https://www.365motorsales.com/sell" }],
+  }),
   component: SellPage,
 });
 
