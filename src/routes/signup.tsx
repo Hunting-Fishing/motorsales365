@@ -96,6 +96,38 @@ function SignupPage() {
     [intent],
   );
 
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+  const phoneNormalized = phone.trim() ? normalizePhPhone(phone) : "";
+  const phoneValid = phoneNormalized !== null;
+
+  type Issue = { field: string; label: string; message: string };
+  const issues = useMemo<Issue[]>(() => {
+    const list: Issue[] = [];
+    if (!intent) list.push({ field: "intent", label: "Account type", message: "Choose what kind of account you'd like." });
+    if (!firstName.trim()) list.push({ field: "firstName", label: "First name", message: "Enter your first name." });
+    if (!lastName.trim()) list.push({ field: "lastName", label: "Last name", message: "Enter your last name." });
+    if (!email.trim()) list.push({ field: "email", label: "Email", message: "Enter your email address." });
+    else if (!emailValid) list.push({ field: "email", label: "Email", message: "Enter a valid email address." });
+    if (phone.trim() && !phoneValid) list.push({ field: "phone", label: "Mobile", message: "Use a PH mobile format like 09XX XXX XXXX, or leave it blank." });
+    if (!location.city) list.push({ field: "city", label: "City / Town", message: "Choose your city or town." });
+    if (isBusinessLike && !businessName.trim()) {
+      list.push({ field: "businessName", label: intent === "service_provider" ? "Service name" : "Business name", message: "Required for business and service accounts." });
+    }
+    if (isBusinessLike && !businessKind) {
+      list.push({ field: "businessKind", label: "Category", message: "Pick the category that best describes your business." });
+    }
+    if (!password) list.push({ field: "password", label: "Password", message: "Choose a password." });
+    else if (password.length < 8) list.push({ field: "password", label: "Password", message: "Password must be at least 8 characters." });
+    if (!agreed) list.push({ field: "terms", label: "Terms", message: "Agree to the Terms and Privacy Policy to continue." });
+    return list;
+  }, [intent, firstName, lastName, email, emailValid, phone, phoneValid, location.city, isBusinessLike, businessName, businessKind, password, agreed]);
+
+  const errorFor = (field: string) => {
+    if (!submitAttempted && !touched[field]) return null;
+    return issues.find((i) => i.field === field)?.message ?? null;
+  };
+  const invalidCls = (field: string) => (errorFor(field) ? "border-destructive focus-visible:ring-destructive" : "");
+
   useEffect(() => {
     const c = getCreditedCode();
     if (c) setRefCode(c);
