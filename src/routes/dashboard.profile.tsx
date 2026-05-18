@@ -8,6 +8,28 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { LocationPicker } from "@/components/location-picker";
+import { Progress } from "@/components/ui/progress";
+import { CheckCircle2, Circle, AlertCircle } from "lucide-react";
+
+type ChecklistItem = { label: string; done: boolean; required: boolean };
+
+function buildChecklist(profile: any): ChecklistItem[] {
+  const isBusiness = profile?.seller_type === "business" || profile?.seller_type === "dealer";
+  const has = (v: any) => typeof v === "string" ? v.trim().length > 0 : !!v;
+  const items: ChecklistItem[] = [
+    { label: "Name", done: has(profile?.full_name) || (has(profile?.first_name) && has(profile?.last_name)), required: true },
+    { label: "Phone number", done: has(profile?.phone) || has(profile?.phone_e164), required: true },
+    { label: "Verified phone (SMS recovery)", done: !!profile?.phone_verified_at, required: false },
+  ];
+  if (isBusiness) {
+    items.push(
+      { label: "Business name", done: has(profile?.business_name), required: true },
+      { label: "Business address", done: has(profile?.business_address), required: true },
+      { label: "Business location (region/province/city)", done: has(profile?.business_region) && has(profile?.business_province) && has(profile?.business_city), required: true },
+    );
+  }
+  return items;
+}
 
 export const Route = createFileRoute("/dashboard/profile")({
   component: ProfilePage,
