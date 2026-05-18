@@ -9,5 +9,8 @@ Disallow: /lovable/
 Disallow: /reset-password
 Disallow: /forgot-password
 Disallow: /unsubscribe
+Disallow: /email/
+Disallow: /r/
+Disallow: /listing/*/edit
 
-Sitemap: https://365motorsales.com/sitemap.xml
+Sitemap: https://www.365motorsales.com/sitemap.xml
