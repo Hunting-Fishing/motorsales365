@@ -3,6 +3,16 @@ import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { sendTransactionalEmail } from "@/lib/email/send";
 
+function normalizePhPhone(raw?: string): string | undefined {
+  if (!raw) return undefined;
+  const d = raw.replace(/[^0-9+]/g, "");
+  if (d.startsWith("+")) return d;
+  if (/^09\d{9}$/.test(d)) return "+63" + d.slice(1);
+  if (/^9\d{9}$/.test(d)) return "+63" + d;
+  if (/^63\d{10}$/.test(d)) return "+" + d;
+  return undefined;
+}
+
 async function maybeApplyPendingSignup(user: User) {
   if (typeof window === "undefined") return;
   let raw: string | null = null;
@@ -12,8 +22,12 @@ async function maybeApplyPendingSignup(user: User) {
     const pending = JSON.parse(raw) as {
       intent?: "buyer" | "private_seller" | "business" | "service_provider";
       full_name?: string;
+      first_name?: string;
+      last_name?: string;
       phone?: string;
       business_name?: string;
+      business_address?: string;
+      business_kind?: string;
       region?: string;
       province?: string;
       city?: string;
@@ -22,11 +36,21 @@ async function maybeApplyPendingSignup(user: User) {
     const update: Record<string, unknown> = {};
     if (pending.intent) update.signup_intent = pending.intent;
     if (pending.city) update.signup_city = pending.city;
+    if (pending.region) update.signup_region = pending.region;
+    if (pending.province) update.signup_province = pending.province;
     if (pending.full_name) update.full_name = pending.full_name;
-    if (pending.phone) update.phone = pending.phone;
+    if (pending.first_name) update.first_name = pending.first_name;
+    if (pending.last_name) update.last_name = pending.last_name;
+    if (pending.phone) {
+      update.phone = pending.phone;
+      const e164 = normalizePhPhone(pending.phone);
+      if (e164) update.phone_e164 = e164;
+    }
     if (pending.is_business) {
-      update.seller_type = "business";
+      update.seller_type = "dealer";
       if (pending.business_name) update.business_name = pending.business_name;
+      if (pending.business_address) update.business_address = pending.business_address;
+      if (pending.business_kind) update.business_kind = pending.business_kind;
       if (pending.region) update.business_region = pending.region;
       if (pending.province) update.business_province = pending.province;
       if (pending.city) update.business_city = pending.city;
