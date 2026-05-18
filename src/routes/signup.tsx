@@ -160,12 +160,23 @@ function SignupPage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <Label htmlFor="name">Full name</Label>
-              <Input id="name" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
+              <Label htmlFor="first-name">First name</Label>
+              <Input id="first-name" required value={firstName} onChange={(e) => setFirstName(e.target.value)} autoComplete="given-name" />
             </div>
+            <div>
+              <Label htmlFor="last-name">Last name</Label>
+              <Input id="last-name" required value={lastName} onChange={(e) => setLastName(e.target.value)} autoComplete="family-name" />
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <Label htmlFor="phone">Phone (optional)</Label>
               <Input id="phone" type="tel" placeholder="+63 9XX XXX XXXX" value={phone} onChange={(e) => setPhone(e.target.value)} />
+            </div>
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
           </div>
 
