@@ -710,6 +710,7 @@ export type Database = {
           id: string
           lat: number | null
           lng: number | null
+          organization_id: string | null
           plan: Database["public"]["Enums"]["listing_plan"]
           price_php: number
           province: string | null
@@ -737,6 +738,7 @@ export type Database = {
           id?: string
           lat?: number | null
           lng?: number | null
+          organization_id?: string | null
           plan?: Database["public"]["Enums"]["listing_plan"]
           price_php?: number
           province?: string | null
@@ -764,6 +766,7 @@ export type Database = {
           id?: string
           lat?: number | null
           lng?: number | null
+          organization_id?: string | null
           plan?: Database["public"]["Enums"]["listing_plan"]
           price_php?: number
           province?: string | null
@@ -783,6 +786,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "categories"
             referencedColumns: ["slug"]
+          },
+          {
+            foreignKeyName: "listings_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -823,6 +833,163 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      organization_invites: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          invited_by: string
+          organization_id: string
+          role: Database["public"]["Enums"]["org_role"]
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          invited_by: string
+          organization_id: string
+          role?: Database["public"]["Enums"]["org_role"]
+          token?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          invited_by?: string
+          organization_id?: string
+          role?: Database["public"]["Enums"]["org_role"]
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_invites_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_members: {
+        Row: {
+          id: string
+          invited_by: string | null
+          joined_at: string
+          organization_id: string
+          role: Database["public"]["Enums"]["org_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          invited_by?: string | null
+          joined_at?: string
+          organization_id: string
+          role?: Database["public"]["Enums"]["org_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          invited_by?: string | null
+          joined_at?: string
+          organization_id?: string
+          role?: Database["public"]["Enums"]["org_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_members_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organizations: {
+        Row: {
+          barangay: string | null
+          city: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          email: string | null
+          id: string
+          kind: Database["public"]["Enums"]["business_kind"]
+          lat: number | null
+          lng: number | null
+          logo_url: string | null
+          name: string
+          phone: string | null
+          postal_code: string | null
+          province: string | null
+          region: string | null
+          slug: string
+          status: string
+          street_address: string | null
+          updated_at: string
+          verification_status: Database["public"]["Enums"]["verification_status"]
+          verified_at: string | null
+          website: string | null
+        }
+        Insert: {
+          barangay?: string | null
+          city?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["business_kind"]
+          lat?: number | null
+          lng?: number | null
+          logo_url?: string | null
+          name: string
+          phone?: string | null
+          postal_code?: string | null
+          province?: string | null
+          region?: string | null
+          slug: string
+          status?: string
+          street_address?: string | null
+          updated_at?: string
+          verification_status?: Database["public"]["Enums"]["verification_status"]
+          verified_at?: string | null
+          website?: string | null
+        }
+        Update: {
+          barangay?: string | null
+          city?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          email?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["business_kind"]
+          lat?: number | null
+          lng?: number | null
+          logo_url?: string | null
+          name?: string
+          phone?: string | null
+          postal_code?: string | null
+          province?: string | null
+          region?: string | null
+          slug?: string
+          status?: string
+          street_address?: string | null
+          updated_at?: string
+          verification_status?: Database["public"]["Enums"]["verification_status"]
+          verified_at?: string | null
+          website?: string | null
+        }
+        Relationships: []
       }
       otp_send_log: {
         Row: {
@@ -1441,6 +1608,7 @@ export type Database = {
           discount_percent: number
           id: string
           notes: string | null
+          organization_id: string | null
           paused_at: string | null
           plan_id: string
           status: string
@@ -1454,6 +1622,7 @@ export type Database = {
           discount_percent?: number
           id?: string
           notes?: string | null
+          organization_id?: string | null
           paused_at?: string | null
           plan_id: string
           status?: string
@@ -1467,6 +1636,7 @@ export type Database = {
           discount_percent?: number
           id?: string
           notes?: string | null
+          organization_id?: string | null
           paused_at?: string | null
           plan_id?: string
           status?: string
@@ -1474,6 +1644,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "subscriptions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "subscriptions_plan_id_fkey"
             columns: ["plan_id"]
@@ -1780,6 +1957,10 @@ export type Database = {
         Returns: Json
       }
       can_manage_ads: { Args: { _user_id: string }; Returns: boolean }
+      can_manage_org: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
       can_moderate: { Args: { _user_id: string }; Returns: boolean }
       can_support: { Args: { _user_id: string }; Returns: boolean }
       current_plan_tier: { Args: { _user_id: string }; Returns: string }
@@ -1805,6 +1986,10 @@ export type Database = {
         Returns: undefined
       }
       is_business_account: { Args: { _user_id: string }; Returns: boolean }
+      is_org_member: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       is_towing_provider: { Args: { _user_id: string }; Returns: boolean }
       move_to_dlq: {
@@ -1816,6 +2001,7 @@ export type Database = {
         }
         Returns: number
       }
+      org_role: { Args: { _org_id: string; _user_id: string }; Returns: string }
       pick_referral_promo: {
         Args: { _base_amount: number; _kind: string; _user_id: string }
         Returns: {
@@ -1882,7 +2068,12 @@ export type Database = {
         | "moderator"
         | "support"
         | "advertising"
-      business_kind: "repair_shop" | "insurance" | "dealer" | "other"
+      business_kind:
+        | "repair_shop"
+        | "insurance"
+        | "dealer"
+        | "other"
+        | "corporate"
       business_status: "pending" | "active" | "rejected" | "hidden"
       listing_plan: "free" | "standard" | "upgraded"
       listing_status:
@@ -1894,6 +2085,7 @@ export type Database = {
         | "sold"
         | "pending_sale"
       media_type: "photo" | "video"
+      org_role: "owner" | "admin" | "member"
       payment_kind: "listing" | "upgrade" | "boost" | "subscription"
       payment_status: "pending" | "paid" | "failed" | "refunded"
       referral_kind: "promo" | "deal" | "rate" | "incentive" | "other"
@@ -2049,7 +2241,13 @@ export const Constants = {
         "support",
         "advertising",
       ],
-      business_kind: ["repair_shop", "insurance", "dealer", "other"],
+      business_kind: [
+        "repair_shop",
+        "insurance",
+        "dealer",
+        "other",
+        "corporate",
+      ],
       business_status: ["pending", "active", "rejected", "hidden"],
       listing_plan: ["free", "standard", "upgraded"],
       listing_status: [
@@ -2062,6 +2260,7 @@ export const Constants = {
         "pending_sale",
       ],
       media_type: ["photo", "video"],
+      org_role: ["owner", "admin", "member"],
       payment_kind: ["listing", "upgrade", "boost", "subscription"],
       payment_status: ["pending", "paid", "failed", "refunded"],
       referral_kind: ["promo", "deal", "rate", "incentive", "other"],
