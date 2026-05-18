@@ -134,7 +134,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           loadRoles(uid);
           if (!welcomeChecked.has(uid)) {
             welcomeChecked.add(uid);
-            maybeSendWelcomeEmail(u);
+            maybeApplyPendingSignup(u).finally(() => maybeSendWelcomeEmail(u));
           }
         }, 0);
       } else if (!uid) {
