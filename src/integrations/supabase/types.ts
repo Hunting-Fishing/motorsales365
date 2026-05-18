@@ -2092,6 +2092,12 @@ export type Database = {
         | "dealer"
         | "other"
         | "corporate"
+        | "parts_shop"
+        | "towing"
+        | "body_shop"
+        | "carwash"
+        | "salvage"
+        | "rental"
       business_status: "pending" | "active" | "rejected" | "hidden"
       listing_plan: "free" | "standard" | "upgraded"
       listing_status:
@@ -2265,6 +2271,12 @@ export const Constants = {
         "dealer",
         "other",
         "corporate",
+        "parts_shop",
+        "towing",
+        "body_shop",
+        "carwash",
+        "salvage",
+        "rental",
       ],
       business_status: ["pending", "active", "rejected", "hidden"],
       listing_plan: ["free", "standard", "upgraded"],
