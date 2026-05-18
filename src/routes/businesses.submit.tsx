@@ -58,6 +58,28 @@ function SubmitBusinessPage() {
   const [submitting, setSubmitting] = useState(false);
   const [tagsOpen, setTagsOpen] = useState(false);
   const [tagSearch, setTagSearch] = useState("");
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [suggestLabel, setSuggestLabel] = useState("");
+  const [suggestNotes, setSuggestNotes] = useState("");
+  const [suggestSubmitting, setSuggestSubmitting] = useState(false);
+
+  const submitTypeSuggestion = async () => {
+    const label = suggestLabel.trim();
+    if (label.length < 2) { toast.error("Please enter a type name (min 2 chars)."); return; }
+    if (label.length > 80) { toast.error("Type name is too long (max 80)."); return; }
+    if (!user) { toast.error("Please sign in first."); return; }
+    setSuggestSubmitting(true);
+    const { error } = await (supabase as any).from("business_type_suggestions").insert({
+      proposed_label: label,
+      notes: suggestNotes.trim() || null,
+      submitter_id: user.id,
+      submitter_email: user.email ?? null,
+    });
+    setSuggestSubmitting(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Thanks! Your suggestion was sent to admin for review.");
+    setSuggestLabel(""); setSuggestNotes(""); setSuggestOpen(false);
+  };
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
@@ -258,7 +280,49 @@ function SubmitBusinessPage() {
           </div>
 
           <div>
-            <Label>Business type *</Label>
+            <div className="mb-1 flex items-center justify-between gap-2">
+              <Label>Business type *</Label>
+              <Dialog open={suggestOpen} onOpenChange={setSuggestOpen}>
+                <DialogTrigger asChild>
+                  <Button type="button" variant="outline" size="sm">+ Add</Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Suggest a new business type</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Don't see your type? Suggest it below. Our admin team will review and either add it to the list or merge it with an existing type.
+                    </p>
+                    <div>
+                      <Label>Type name *</Label>
+                      <Input
+                        value={suggestLabel}
+                        onChange={(e) => setSuggestLabel(e.target.value)}
+                        maxLength={80}
+                        placeholder="e.g. Tire shop, Window tinting, Truck rental"
+                      />
+                    </div>
+                    <div>
+                      <Label>Notes (optional)</Label>
+                      <Textarea
+                        value={suggestNotes}
+                        onChange={(e) => setSuggestNotes(e.target.value)}
+                        maxLength={500}
+                        rows={3}
+                        placeholder="Briefly describe what businesses this type covers."
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button type="button" variant="ghost" onClick={() => setSuggestOpen(false)}>Cancel</Button>
+                    <Button type="button" onClick={submitTypeSuggestion} disabled={suggestSubmitting}>
+                      {suggestSubmitting ? "Sending…" : "Send to admin"}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
             <Select value={typeSlug} onValueChange={(v) => { setTypeSlug(v); setSelectedTags([]); }}>
               <SelectTrigger><SelectValue placeholder="Choose a type" /></SelectTrigger>
               <SelectContent>
