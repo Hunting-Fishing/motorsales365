@@ -32,7 +32,7 @@ async function maybeApplyPendingSignup(user: User) {
       if (pending.city) update.business_city = pending.city;
     }
     if (Object.keys(update).length > 0) {
-      await supabase.from("profiles").update(update).eq("id", user.id);
+      await supabase.from("profiles").update(update as never).eq("id", user.id);
     }
     window.localStorage.removeItem("signup.pending");
   } catch (err) {
