@@ -8,6 +8,28 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { LocationPicker } from "@/components/location-picker";
+import { Progress } from "@/components/ui/progress";
+import { CheckCircle2, Circle, AlertCircle } from "lucide-react";
+
+type ChecklistItem = { label: string; done: boolean; required: boolean };
+
+function buildChecklist(profile: any): ChecklistItem[] {
+  const isBusiness = profile?.seller_type === "business" || profile?.seller_type === "dealer";
+  const has = (v: any) => typeof v === "string" ? v.trim().length > 0 : !!v;
+  const items: ChecklistItem[] = [
+    { label: "Name", done: has(profile?.full_name) || (has(profile?.first_name) && has(profile?.last_name)), required: true },
+    { label: "Phone number", done: has(profile?.phone) || has(profile?.phone_e164), required: true },
+    { label: "Verified phone (SMS recovery)", done: !!profile?.phone_verified_at, required: false },
+  ];
+  if (isBusiness) {
+    items.push(
+      { label: "Business name", done: has(profile?.business_name), required: true },
+      { label: "Business address", done: has(profile?.business_address), required: true },
+      { label: "Business location (region/province/city)", done: has(profile?.business_region) && has(profile?.business_province) && has(profile?.business_city), required: true },
+    );
+  }
+  return items;
+}
 
 export const Route = createFileRoute("/dashboard/profile")({
   component: ProfilePage,
@@ -103,6 +125,7 @@ function ProfilePage() {
   return (
     <div className="max-w-2xl">
       <h1 className="mb-6 font-display text-2xl font-bold">Profile</h1>
+      <ProfileCompletion profile={profile} />
       {profile.is_founding_member && (
         <div className="mb-4 flex items-center gap-3 rounded-xl border border-amber-500/40 bg-amber-500/5 p-4">
           <span className="text-2xl">✨</span>
@@ -230,6 +253,65 @@ function ProfilePage() {
           </div>
         )}
       </div>
+    </div>
+  );
+}
+
+function ProfileCompletion({ profile }: { profile: any }) {
+  const items = buildChecklist(profile);
+  const required = items.filter((i) => i.required);
+  const requiredDone = required.filter((i) => i.done).length;
+  const totalDone = items.filter((i) => i.done).length;
+  const percent = Math.round((totalDone / items.length) * 100);
+  const missingRequired = required.length - requiredDone;
+  const isLive = missingRequired === 0;
+  const isBusiness = profile?.seller_type === "business" || profile?.seller_type === "dealer";
+
+  return (
+    <div className="mb-6 rounded-xl border border-border bg-card p-6">
+      <div className="mb-3 flex items-start justify-between gap-4">
+        <div>
+          <h2 className="font-display text-lg font-bold">Profile completion</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {isLive
+              ? isBusiness
+                ? "Your business profile is complete and eligible to be listed."
+                : "Your profile is complete."
+              : `Complete ${missingRequired} required item${missingRequired === 1 ? "" : "s"} ${isBusiness ? "to go live in the directory" : "to finish setup"}.`}
+          </p>
+        </div>
+        <div className="text-right">
+          <div className="font-display text-2xl font-bold">{percent}%</div>
+          <div className="text-xs text-muted-foreground">{totalDone} of {items.length}</div>
+        </div>
+      </div>
+      <Progress value={percent} className="mb-4 h-2" />
+      {!isLive && isBusiness && (
+        <div className="mb-4 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm">
+          <AlertCircle className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400" />
+          <span className="text-amber-700 dark:text-amber-300">
+            Your account isn't live yet. Add the missing required info below so drivers can find you.
+          </span>
+        </div>
+      )}
+      <ul className="space-y-2">
+        {items.map((item) => (
+          <li key={item.label} className="flex items-center gap-2 text-sm">
+            {item.done ? (
+              <CheckCircle2 className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+            ) : (
+              <Circle className={`size-4 shrink-0 ${item.required ? "text-amber-500" : "text-muted-foreground"}`} />
+            )}
+            <span className={item.done ? "text-muted-foreground line-through" : ""}>{item.label}</span>
+            {!item.done && !item.required && (
+              <span className="text-xs text-muted-foreground">(optional)</span>
+            )}
+            {!item.done && item.required && (
+              <span className="text-xs font-medium text-amber-600 dark:text-amber-400">Required</span>
+            )}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
