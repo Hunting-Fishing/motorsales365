@@ -15,6 +15,16 @@ import { resolvePsgc } from "@/lib/psgc";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/businesses/submit")({
+  head: () => ({
+    meta: [
+      { title: "List your business — 365 MotorSales Philippines" },
+      { name: "description", content: "Add your dealership, shop, or auto service to the 365 MotorSales Philippines directory. Reach buyers and sellers nationwide." },
+      { property: "og:title", content: "List your business — 365 MotorSales Philippines" },
+      { property: "og:description", content: "Add your dealership, shop, or auto service to the 365 MotorSales Philippines directory." },
+      { property: "og:url", content: "https://www.365motorsales.com/businesses/submit" },
+    ],
+    links: [{ rel: "canonical", href: "https://www.365motorsales.com/businesses/submit" }],
+  }),
   component: SubmitBusinessPage,
 });
 
