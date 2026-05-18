@@ -86,6 +86,40 @@ function SubmitBusinessPage() {
     description: dynDesc,
     canonical: "https://www.365motorsales.com/businesses/submit",
   });
+  useDynamicJsonLd("businesses-submit-page", {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: dynTitle,
+    description: dynDesc,
+    url: "https://www.365motorsales.com/businesses/submit",
+    inLanguage: "en-PH",
+    isPartOf: {
+      "@type": "WebSite",
+      name: "365 MotorSales Philippines",
+      url: "https://www.365motorsales.com",
+    },
+    ...(selectedTypeLabel
+      ? {
+          about: {
+            "@type": "LocalBusiness",
+            name: selectedTypeLabel,
+            ...(selectedTags.length > 0
+              ? {
+                  knowsAbout: selectedTags
+                    .map((s) => tags.find((t) => t.slug === s)?.label)
+                    .filter(Boolean),
+                }
+              : {}),
+            areaServed: { "@type": "Country", name: "Philippines" },
+          },
+        }
+      : {}),
+    potentialAction: {
+      "@type": "RegisterAction",
+      name: selectedTypeLabel ? `List a ${selectedTypeLabel.toLowerCase()}` : "List your business",
+      target: "https://www.365motorsales.com/businesses/submit",
+    },
+  });
 
   const reverseGeocode = async (la: number, ln: number) => {
     try {
