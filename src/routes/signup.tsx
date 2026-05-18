@@ -83,6 +83,9 @@ function SignupPage() {
   const [refCode, setRefCode] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const markTouched = (k: string) => setTouched((t) => (t[k] ? t : { ...t, [k]: true }));
 
   const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
 
