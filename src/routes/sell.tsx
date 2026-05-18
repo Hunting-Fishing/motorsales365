@@ -22,6 +22,7 @@ import { CATEGORY_DEFAULT_GROUPS, SERVICE_CATEGORIES } from "@/data/service-tags
 import { uploadWithRetry } from "@/lib/storage-upload";
 import { getUserPlanLimits, FREE_PLAN_LIMITS, type PlanLimits } from "@/lib/plan-limits";
 import { useDynamicMeta } from "@/hooks/use-dynamic-meta";
+import { useDynamicJsonLd } from "@/hooks/use-dynamic-jsonld";
 
 const SELL_SEO: Record<string, { title: string; description: string }> = {
   car: { title: "Sell your car in the Philippines — 365 MotorSales", description: "Post your car for sale and reach Filipino buyers nationwide. Free listings, photos, and instant messaging on 365 MotorSales." },
@@ -197,10 +198,34 @@ function SellPage() {
   }, [user?.id]);
 
   const sellSeo = SELL_SEO[category] ?? SELL_SEO.other;
+  const sellCategoryLabel = CATEGORIES.find((c) => c.slug === category)?.name ?? "Vehicle";
   useDynamicMeta({
     title: sellSeo.title,
     description: sellSeo.description,
     canonical: "https://www.365motorsales.com/sell",
+  });
+  useDynamicJsonLd("sell-page", {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: sellSeo.title,
+    description: sellSeo.description,
+    url: "https://www.365motorsales.com/sell",
+    inLanguage: "en-PH",
+    isPartOf: {
+      "@type": "WebSite",
+      name: "365 MotorSales Philippines",
+      url: "https://www.365motorsales.com",
+    },
+    about: {
+      "@type": "Thing",
+      name: sellCategoryLabel,
+      identifier: category,
+    },
+    potentialAction: {
+      "@type": "CreateAction",
+      name: `Post a ${sellCategoryLabel.toLowerCase()} listing`,
+      target: "https://www.365motorsales.com/sell",
+    },
   });
 
   // Photo limit comes from the user's subscription plan; upgraded listings still bump to 20
