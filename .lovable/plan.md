@@ -1,96 +1,75 @@
-## Pre-Launch Readiness — 365 MotorSales
+## Goal
 
-Audit of routes, RLS, storage, email, cron, SEO and webhooks against current state. Grouped by severity. Payments untouched (per your earlier note).
+Replace the generic `/signup` form with a purpose-built flow that lets users pick **what kind of account** they want before filling in the form, so the rest of the product (dashboard CTAs, onboarding, listing flow) can adapt to who they are.
 
----
+## Account types (top of page, 4 icon cards in a grid)
 
-### P0 — Block go-live
+| Card | Icon | Sub-text | Maps to |
+|------|------|----------|---------|
+| **Buyer / Browser** | Search | "Browse listings, save favorites, message sellers" | `seller_type = private`, `signup_intent = 'buyer'` |
+| **Private seller** | Tag | "Sell your own vehicle, equipment or parts" | `seller_type = private`, `signup_intent = 'private_seller'` |
+| **Business / Dealer** | Building2 | "Dealership, parts shop, rental — listed in Businesses directory" | `seller_type = business`, `signup_intent = 'business'` |
+| **Service provider** | Wrench | "Towing, repair, body shop, carwash, salvage" | `seller_type = business`, `signup_intent = 'service_provider'` |
 
-**1. Payment webhook is broken code (will break first payment)**
-`src/routes/api/public/payment-events.tsx` enqueues email via `fetch("/lovable/email/transactional/send", "http://localhost")` — invalid in the Worker runtime, will 404 the moment payments are enabled. Replace with direct `supabase.rpc('enqueue_email', ...)` (same pattern as auth webhook) and add suppression check.
+Selection is required before submit. One card is highlighted at a time (ring + bg tint via design tokens). Pre-select from `?type=` query param if present (so we can deep-link from CTAs like "List your business").
 
-**2. Storage buckets allow listing (privacy leak)**
-All 5 public buckets (`listing-photos`, `listing-videos`, `avatars`, `business-logos`, `qr-codes`) have broad `SELECT USING (bucket_id='X')`. Anyone can list every file path. Replace with scoped policies (path-prefix or signed URLs).
+## Page layout (single page, card-grid on top, form below)
 
-**3. RLS policy always-true (linter WARN #1)**
-One non-SELECT policy uses `USING (true)` / `WITH CHECK (true)`. Identify and tighten in a single migration.
+```text
+┌─────────────────────────────────────────────────┐
+│  Create your 365 MotorSales account             │
+│  Pick what brings you here — we'll tailor it.   │
+├─────────────────────────────────────────────────┤
+│ [Buyer] [Private] [Business] [Service]          │   ← required, 4-up on md+, 2-up on mobile
+├─────────────────────────────────────────────────┤
+│ Full name                                       │
+│ Email                                           │
+│ Phone (optional, PH format)                     │
+│ City / Town          [+ region auto from city]  │
+│ Password                                        │
+│                                                 │
+│ ─ if Business or Service ─                      │
+│   Business name                                 │
+│                                                 │
+│ [ Create account ]                              │
+│ ─── or ───                                      │
+│ [ Continue with Google ]                        │
+│                                                 │
+│ Terms · Privacy · Already have an account?      │
+└─────────────────────────────────────────────────┘
+```
 
-**4. SECURITY DEFINER functions exposed to `anon`/`authenticated` (linter WARN #3–12+)**
-10+ definer functions executable by anon/public. Audit each; for non-public ones, `REVOKE EXECUTE FROM anon, public` and grant only where needed (or switch to INVOKER).
+- City uses the existing `LocationPicker` (PSGC-aware, already in the codebase) reduced to city level; region/province are derived from the PSGC pick, no extra typing.
+- "Phone" stays optional at signup; verification still happens later in dashboard.
+- For Business / Service, an inline **Business name** field appears (no full business profile here — that still happens on `/businesses/submit`).
+- Google OAuth keeps working; the selected card is stashed in `localStorage` (`signup.intent`) before the OAuth redirect, then consumed on return so the chosen intent still saves to the profile.
 
-**5. Auth hardening — verify before launch**
-- Confirm leaked-password protection (HIBP) is ON
-- Confirm email confirmation required (no auto-confirm)
-- OTP expiry ≤ 1 hour, password min 8
+## Post-signup routing
 
-**6. Canonical / OG at root**
-`__root.tsx` has only 1 occurrence of `og:url|canonical` — add both with `https://www.365motorsales.com` consistently. Verify per-route leafs already emit www.
+- Buyer → `/dashboard`
+- Private seller → `/sell` (pre-empts "now go list something")
+- Business → `/businesses/submit?prefill=1` (passes business name + city)
+- Service provider → `/businesses/submit?prefill=1&service=1` (same form, service-tag tab pre-opened)
 
----
+## Data model
 
-### P1 — Important, week 1
+Migration adds two nullable columns to `profiles`:
 
-**7. Cron jobs not scheduled**
-- `expire_stale_pending_sales()` — exists, never called. Schedule daily 02:00 UTC.
-- FX rate refresh route exists but unscheduled. Schedule hourly.
-- Verify `process-email-queue` (5s) still active.
+- `signup_intent text` — one of `buyer | private_seller | business | service_provider`
+- `signup_city text` — denormalized PSGC city label for analytics / pre-fill (region/province also written to existing business_* fields when business/service is chosen)
 
-**8. SEO meta missing on ~14 routes**
-Routes without per-route `head()` (fall back to root): `payments`, `sell`, `refund-policy`, `businesses.submit`, `r.$code`. Add title/description/og.
+Existing `seller_type` continues to be the source of truth for listing UI; `signup_intent` is the finer-grained marketing/onboarding signal. No RLS changes — `profiles` already has correct policies.
 
-**9. JSON-LD structured data**
-- Root: `Organization` schema
-- `listing.$id`: `Vehicle`/`Product` with offers + image
-- `businesses.$slug`: `LocalBusiness` with address/geo
-Major win for Google rich results on a marketplace.
+## Files to add / change
 
-**10. Error & not-found boundaries on loaders**
-Loader routes (`listing.$id`, `businesses.$slug`, `seller.$id`, `browse.$category`, `r.$code`) need `errorComponent` + `notFoundComponent`. Router needs `defaultErrorComponent`.
+- **edit** `src/routes/signup.tsx` — new layout, card grid, conditional business-name field, intent → routing logic, OAuth intent persistence.
+- **new** `src/components/signup/account-type-card.tsx` — single icon-card component (icon, label, description, selected state) using design tokens.
+- **new** `src/components/signup/account-type-grid.tsx` — the 4-card grid + selection state.
+- **edit** `src/hooks/use-auth.tsx` — after first sign-in, if `localStorage.signup.intent` exists, write it (+ city) to the user's profile row once, then clear it. Keeps Google OAuth flow honest.
+- **migration** add `signup_intent` and `signup_city` to `profiles`.
 
-**11. Sitemap gaps**
-`src/routes/sitemap[.]xml.ts` missing dynamic entries for active listings, businesses, sellers. BASE_URL should match canonical host (www).
+## Out of scope
 
-**12. Robots.txt**
-Add `Disallow: /listing/*/edit`, `Disallow: /email/`, `Disallow: /r/` (referral redirects shouldn't be indexed).
-
-**13. Suppression webhook**
-Verify the provider is wired to `/lovable/email/suppression`. Without it, bounces/complaints never populate `suppressed_emails`.
-
----
-
-### P2 — Polish
-
-**14. Cookie banner mounted?**
-Component exists at `src/components/cookie-banner.tsx`. Confirm it's actually rendered in `__root.tsx` (required for PH Data Privacy Act if you add analytics later).
-
-**15. Sandbox banner leaks to prod**
-Gate `<SandboxBanner />` on `import.meta.env.MODE !== 'production'`.
-
-**16. Performance**
-Google Fonts loaded via render-blocking `<link rel="stylesheet">`. Move to preload-then-load pattern or self-host via `@fontsource`. Confirm listing/business hero images use `fetchpriority="high"` and below-fold use `loading="lazy"`.
-
-**17. Account types (open from earlier convo)**
-You haven't yet decided on the Organizations model (corporate / business teams / multi-user accounts). Not strictly launch-blocking — current single-user "private | business" model works for v1 — but worth deciding before marketing the corporate use case.
-
----
-
-### What's already good ✅
-- Auth flow with email + Google
-- Email queue infra (pgmq + cron dispatcher) wired
-- Admin/dashboard RLS roles in place
-- Verification workflow + business kinds
-- Referral/QR attribution system
-- Listing expiry/pending-sale logic
-- Cookie banner & legal pages exist
-- Robots.txt blocks admin/dashboard/api
-
----
-
-### Recommended order
-1. P0 #1 (payment webhook) + P0 #2 (storage policies) + P0 #3-5 (RLS/SECDEF/auth) — one migration batch
-2. P0 #6 (OG/canonical) — single file edit
-3. P1 #7 (cron) + #13 (suppression) — backend hardening
-4. P1 #8-11 (SEO batch) — single sweep across routes
-5. P2 polish
-
-Want me to proceed with the P0 batch first?
+- Full business profile creation (still on `/businesses/submit`).
+- Phone OTP verification at signup (stays in dashboard).
+- Role-based admin/staff signup (admins are still provisioned via admin tools).
