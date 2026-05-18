@@ -328,6 +328,51 @@ export type Database = {
           },
         ]
       }
+      business_type_suggestions: {
+        Row: {
+          admin_note: string | null
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          id: string
+          merged_into_slug: string | null
+          notes: string | null
+          proposed_label: string
+          status: string
+          submitter_email: string | null
+          submitter_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          admin_note?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          merged_into_slug?: string | null
+          notes?: string | null
+          proposed_label: string
+          status?: string
+          submitter_email?: string | null
+          submitter_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          admin_note?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          merged_into_slug?: string | null
+          notes?: string | null
+          proposed_label?: string
+          status?: string
+          submitter_email?: string | null
+          submitter_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       business_types: {
         Row: {
           icon: string | null
