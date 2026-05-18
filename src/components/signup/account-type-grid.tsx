@@ -8,29 +8,31 @@ export const SIGNUP_TYPES: {
   label: string;
   description: string;
   icon: typeof Search;
+  badge?: string;
 }[] = [
   {
     id: "buyer",
     label: "Buyer / Browser",
-    description: "Browse listings, save favorites, message sellers.",
+    description: "Browse listings, save favorites, and message sellers directly.",
     icon: Search,
   },
   {
     id: "private_seller",
     label: "Private seller",
-    description: "Sell your own vehicle, equipment, or parts.",
+    description: "Sell your own vehicle, equipment, or spare parts quickly.",
     icon: Tag,
   },
   {
     id: "business",
     label: "Business / Dealer",
-    description: "Dealership, parts shop, rental — listed in the directory.",
+    description: "Dealership, parts shop, or rental — listed in our professional directory.",
     icon: Building2,
+    badge: "Popular for Pros",
   },
   {
     id: "service_provider",
     label: "Service provider",
-    description: "Towing, repair, body shop, carwash, salvage.",
+    description: "Towing, repair, body shop, carwash, or salvage specialist.",
     icon: Wrench,
   },
 ];
@@ -42,13 +44,14 @@ interface Props {
 
 export function AccountTypeGrid({ value, onChange }: Props) {
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+    <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
       {SIGNUP_TYPES.map((t) => (
         <AccountTypeCard
           key={t.id}
           icon={t.icon}
           label={t.label}
           description={t.description}
+          badge={t.badge}
           selected={value === t.id}
           onSelect={() => onChange(t.id)}
         />
