@@ -1,13 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { createClient } from "@supabase/supabase-js";
 
 /**
  * Webhook receiver for payment events (Stripe / PayMongo / Xendit).
- * Maps incoming event types to email templates and forwards to the
- * transactional email queue. Each event is idempotent on `${provider}-${event_id}`.
+ * Maps incoming event types to email templates and enqueues them to the
+ * transactional email queue via supabase.rpc('enqueue_email').
  *
- * SECURITY: Replace the placeholder signature check with the real provider
- * verification when wiring Stripe / PayMongo. Right now the route returns 401
- * unless a debug token matches PAYMENT_WEBHOOK_DEBUG_TOKEN (server env).
+ * SECURITY: This route is hard-disabled until real provider signature
+ * verification is wired. Enable by setting PAYMENT_WEBHOOK_ENABLED=1 AND
+ * replacing the debug-token check with HMAC signature verification from
+ * the chosen provider.
  */
 
 type PaymentEvent =
@@ -25,28 +27,22 @@ const TEMPLATE_BY_TYPE: Record<PaymentEvent["type"], string> = {
   "subscription.cancelled": "subscription-cancelled",
 };
 
-async function enqueueEmail(template: string, recipient: string, data: Record<string, any>, idempotencyKey: string) {
-  const url = `${process.env.SUPABASE_URL ?? ""}`;
-  // Best-effort: hit the local server-route so it lives behind the same auth layer.
-  // When email infra is set up by setup_email_infra, this route exists at /lovable/email/transactional/send.
-  const res = await fetch(new URL("/lovable/email/transactional/send", "http://localhost"), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ templateName: template, recipientEmail: recipient, templateData: data, idempotencyKey }),
-  }).catch(() => null);
-  return res?.ok ?? false;
-  void url;
-}
+const SUBJECT_BY_TYPE: Record<PaymentEvent["type"], string> = {
+  "payment.succeeded": "Payment received",
+  "payment.failed": "Payment failed",
+  "refund.issued": "Refund issued",
+  "subscription.renewed": "Subscription renewed",
+  "subscription.cancelled": "Subscription cancelled",
+};
+
+const SITE_NAME = "365 MotorSales";
+const FROM_DOMAIN = "365motorsales.com";
+const SENDER_DOMAIN = "notify.365motorsales.com";
 
 export const Route = createFileRoute("/api/public/payment-events")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        // Hard-disabled until real provider signature verification is wired up
-        // (Stripe / PayMongo / Xendit). Enable by setting PAYMENT_WEBHOOK_ENABLED=1
-        // AND replacing the debug-token check below with the provider's HMAC
-        // signature verification. Until then we refuse all traffic so a forged
-        // request cannot enqueue emails or mutate billing state.
         if (process.env.PAYMENT_WEBHOOK_ENABLED !== "1") {
           return new Response("Payment webhook disabled", { status: 503 });
         }
@@ -67,9 +63,62 @@ export const Route = createFileRoute("/api/public/payment-events")({
         const template = TEMPLATE_BY_TYPE[body.type];
         if (!template) return new Response("Unknown event type", { status: 400 });
 
+        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+        const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (!supabaseUrl || !supabaseServiceKey) {
+          return new Response("Server config error", { status: 500 });
+        }
+        const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+        // Suppression check
+        const { data: suppressed } = await supabase
+          .from("suppressed_emails")
+          .select("email")
+          .eq("email", body.email.toLowerCase())
+          .maybeSingle();
+        if (suppressed) {
+          return Response.json({ ok: false, suppressed: true });
+        }
+
         const idempotencyKey = `${body.provider}-${body.event_id}`;
-        const ok = await enqueueEmail(template, body.email, body, idempotencyKey);
-        return Response.json({ ok, idempotencyKey });
+        const messageId = crypto.randomUUID();
+
+        await supabase.from("email_send_log").insert({
+          message_id: messageId,
+          template_name: template,
+          recipient_email: body.email,
+          status: "pending",
+        });
+
+        const { error } = await supabase.rpc("enqueue_email", {
+          queue_name: "transactional_emails",
+          payload: {
+            message_id: messageId,
+            idempotency_key: idempotencyKey,
+            template,
+            template_data: body,
+            to: body.email,
+            from: `${SITE_NAME} <noreply@${FROM_DOMAIN}>`,
+            sender_domain: SENDER_DOMAIN,
+            subject: SUBJECT_BY_TYPE[body.type],
+            purpose: "transactional",
+            label: template,
+            queued_at: new Date().toISOString(),
+          },
+        });
+
+        if (error) {
+          await supabase.from("email_send_log").insert({
+            message_id: messageId,
+            template_name: template,
+            recipient_email: body.email,
+            status: "failed",
+            error_message: error.message,
+          });
+          return new Response("Failed to enqueue", { status: 500 });
+        }
+
+        return Response.json({ ok: true, idempotencyKey });
       },
     },
   },
