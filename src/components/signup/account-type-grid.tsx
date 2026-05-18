@@ -1,4 +1,4 @@
-import { Search, Tag, Building2, Wrench } from "lucide-react";
+import { Building2, UserRound, Wrench, Search } from "lucide-react";
 import { AccountTypeCard } from "./account-type-card";
 
 export type SignupIntent = "buyer" | "private_seller" | "business" | "service_provider";
@@ -9,18 +9,14 @@ export const SIGNUP_TYPES: {
   description: string;
   icon: typeof Search;
   badge?: string;
+  note?: string;
 }[] = [
   {
     id: "buyer",
-    label: "Buyer / Browser",
-    description: "Browse listings, save favorites, and message sellers directly.",
-    icon: Search,
-  },
-  {
-    id: "private_seller",
-    label: "Private seller",
-    description: "Sell your own vehicle, equipment, or spare parts quickly.",
-    icon: Tag,
+    label: "Buyer & Private Seller",
+    description: "Browse listings, save favorites, message sellers — and list your own vehicle, equipment, or parts when you're ready.",
+    icon: UserRound,
+    note: "This personal account lets you do both: shop the marketplace and post private listings from your dashboard. Pick a business account below if you sell professionally.",
   },
   {
     id: "business",
@@ -44,7 +40,7 @@ interface Props {
 
 export function AccountTypeGrid({ value, onChange }: Props) {
   return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:gap-6">
       {SIGNUP_TYPES.map((t) => (
         <AccountTypeCard
           key={t.id}
