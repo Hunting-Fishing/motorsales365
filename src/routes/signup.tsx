@@ -177,7 +177,7 @@ function SignupPage() {
 
     setSubmitting(true);
     stashPendingProfile();
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -195,12 +195,22 @@ function SignupPage() {
           referral_code: refCode || undefined,
           signup_intent: intent,
         },
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: `${window.location.origin}/verify-email?intent=${intent}`,
       },
     });
     setSubmitting(false);
     if (error) { toast.error(error.message); return; }
-    toast.success("Account created — check your email to verify.");
+    // If email confirmation is required, no session is returned — send to pending screen.
+    if (!data.session) {
+      toast.success("Account created — check your email to verify.");
+      navigate({
+        to: "/verify-email",
+        search: { email, intent },
+      });
+      return;
+    }
+    // Edge case: confirmations disabled, session is live immediately.
+    toast.success("Account created!");
     navigate({ to: POST_SIGNUP_ROUTE[intent] });
   };
 

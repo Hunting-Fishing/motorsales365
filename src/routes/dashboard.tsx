@@ -51,9 +51,28 @@ function DashboardLayout() {
     ...(isStaff ? [{ to: "/admin", label: isAdmin ? "Admin" : "Staff console", Icon: Shield }] : []),
   ];
 
+  const needsVerify = !user.email_confirmed_at;
+
   return (
     <SiteLayout>
-      <div className="container mx-auto grid gap-6 px-4 py-8 lg:grid-cols-[240px_1fr]">
+      <div className="container mx-auto px-4 pt-4">
+        {needsVerify && (
+          <div className="mb-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
+            <p className="font-semibold">Verify your email to go live</p>
+            <p className="mt-1">
+              Your account is created but not yet verified. Publishing listings and being publicly listed are paused until you confirm your email.{" "}
+              <Link
+                to="/verify-email"
+                search={{ email: user.email ?? undefined, intent: undefined }}
+                className="font-medium underline"
+              >
+                Resend verification
+              </Link>
+            </p>
+          </div>
+        )}
+      </div>
+      <div className="container mx-auto grid gap-6 px-4 py-4 lg:grid-cols-[240px_1fr]">
         <aside className="rounded-xl border border-border bg-card p-2 lg:sticky lg:top-20 lg:self-start">
           <nav className="flex flex-row gap-1 overflow-x-auto lg:flex-col">
             {nav.map(({ to, label, Icon, exact }) => (

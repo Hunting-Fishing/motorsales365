@@ -1,79 +1,48 @@
-# Signup Audit & Proposed Fixes
+## Goal
+After signup, instead of dumping the user on the Sign in page, show a clear "Pending Email Verification" screen. Once they click the verification link in their email, they're automatically signed in and the account unlocks.
 
-## What's working well
+## Why it's happening now
+Supabase Auth requires email confirmation (correct — we don't want to disable that). When confirmation is required, `supabase.auth.signUp()` does **not** return a session. The code then calls `navigate({ to: POST_SIGNUP_ROUTE[intent] })` which points at `/dashboard/...` — a protected route — so the `_authenticated` guard bounces them to `/login`. That's the "redirected to Sign in" behavior you saw.
 
-- **Account type step** is clear, professional, and the "Heads up" note per type sets expectations.
-- **Name split** (first/last) is in place on the form and persisted on `profiles` via the trigger.
-- **Server trigger `handle_new_user`** runs SECURITY DEFINER and composes `full_name` correctly.
-- **Routing after signup** is tailored per intent (`POST_SIGNUP_ROUTE`).
-- **Referral code capture** via `getCreditedCode()` is wired.
+The email click *does* sign them in (Supabase exchanges the recovery/verify token for a session on the redirect URL), but our app has no dedicated landing for that moment, and meanwhile the signup tab is sitting on `/login` looking broken.
 
-## Bugs / gaps found
+## Plan
 
-### 1. Data leaks into `business_*` columns for non-business accounts (HIGH)
-`handle_new_user` unconditionally inserts `business_region`, `business_province`, `business_city` from the signup location metadata — even for **buyer** / **private_seller**. That pollutes the business directory schema with personal city data and makes the profile-completion "business location" check meaningless.
+### 1. Add a `/verify-email` route (public)
+A friendly pending screen shown immediately after signup:
+- Headline: "Check your email to activate your account"
+- Shows the email address used, with a "Resend verification email" button (calls `supabase.auth.resend({ type: 'signup', email })`, throttled).
+- Explains what they can/can't do until verified.
+- Detects via `onAuthStateChange` when a session appears (i.e. they clicked the link in another tab or returned to this one) and auto-redirects to the correct post-signup dashboard route based on their stashed `signup_intent`.
+- "Wrong email? Start over" link back to `/signup`.
 
-**Fix:** In the trigger, only populate `business_name/address/region/province/city` when `v_intent IN ('business','service_provider')`.
+### 2. Update signup submit flow (`src/routes/signup.tsx`)
+- After successful `signUp()`, check whether a session was returned:
+  - **No session (verification required, expected path):** navigate to `/verify-email?email=…&intent=…` instead of the dashboard. Stash pending profile as today.
+  - **Session present (edge case — confirmations disabled):** keep current behavior, go straight to dashboard.
+- Same change for Google OAuth path is not needed (OAuth returns a session immediately).
 
-### 2. `useAuth` fallback is inconsistent with the trigger (MED)
-`maybeApplyPendingSignup` in `src/hooks/use-auth.tsx`:
-- Sets `seller_type = 'business'` (string), but the trigger sets `'dealer'`. Different values for the same user depending on which path ran.
-- Doesn't apply `business_address` (it's stashed but never written) — so Google OAuth signups for business/service_provider lose the address.
-- Reads `pending.region/province/city` keys, but the stash writes those same keys — OK, just confirming.
+### 3. Handle the verification click landing
+Supabase's verify link currently redirects to `window.location.origin` (root). Two small touches:
+- Change `emailRedirectTo` to `${window.location.origin}/verify-email` so the user lands back on the pending screen, which already listens for the new session and forwards them to their dashboard.
+- In `/verify-email`, on mount, run `maybeApplyPendingSignup()` (already exists in `use-auth`) so business address / kind / phone normalization is persisted to the profile right when they become live.
 
-**Fix:** Align `seller_type` to `'dealer'`, apply `business_address`, and only set business_* fields when `is_business` is true.
+### 4. Light "pending verification" gating (optional, recommended)
+On the dashboard, if `user.email_confirmed_at` is null, show a top banner: "Verify your email to publish listings / go live." For service providers and businesses this matches the existing "not live yet" messaging. No new routes — just a banner in `dashboard.tsx` layout.
 
-### 3. Phone is captured raw, never normalized (MED)
-`profiles.phone_e164` exists but is never set. The `phone` field is stored as typed, which breaks downstream phone verification and the dashboard "Verified phone" checklist item.
+### 5. Polish
+- Login page: if a user tries to sign in but `email_confirmed_at` is null, show a clear toast linking back to `/verify-email?email=…` with a resend button instead of the generic "Invalid login credentials" / "Email not confirmed" error.
 
-**Fix:** Normalize PH numbers to E.164 in the trigger (simple `+63` prefixing for `09…`/`9…`) and write to `phone_e164` as well as `phone`.
+## Files to touch
+- **new** `src/routes/verify-email.tsx` — pending screen + resend + auto-forward on session.
+- **edit** `src/routes/signup.tsx` — branch on `data.session`; redirect to `/verify-email`; update `emailRedirectTo`.
+- **edit** `src/routes/login.tsx` — friendlier "email not confirmed" handling.
+- **edit** `src/routes/dashboard.tsx` (or shared dashboard shell) — top banner when `email_confirmed_at` is null.
 
-### 4. `signup_province` is collected but dropped for non-business (LOW)
-The form's LocationPicker captures region/province/city, but only `signup_city` is stored on `profiles`. There's no `signup_region`/`signup_province` column. Either add them or stop collecting them in the signup payload.
+## What we are NOT doing
+- Not enabling auto-confirm (would skip verification — you don't want that).
+- Not changing the DB trigger or profile schema — already correct from the previous pass.
+- Not changing what data is captured at signup.
 
-**Fix:** Add `signup_region` and `signup_province` columns to `profiles` (small, non-breaking) so personal-account location is fully captured.
-
-### 5. UX / professionalism polish (LOW)
-- No password visibility toggle.
-- No confirm-password field; 6-char minimum is below modern norms — bump to 8.
-- No explicit "I agree to Terms" checkbox (currently inline implicit consent).
-- "Business address" sits before the password field but is optional with a long note — fine, but could move into a collapsible "Business details" subsection so the form feels lighter for personal accounts.
-- Empty-state on the form before an account type is chosen: the form is fully visible and the CTA reads "Choose an account type to continue", which is OK but the form could be visually dimmed/disabled until step 1 is done.
-- No inline email-format validation feedback (relies on browser default).
-- For `service_provider` / `business`, no `business_kind` selector — `profiles.business_kind` stays NULL forever even though it's used by the directory.
-
-## Database changes (single migration)
-
-```text
-ALTER TABLE profiles
-  ADD COLUMN IF NOT EXISTS signup_region   text,
-  ADD COLUMN IF NOT EXISTS signup_province text;
-
--- Rewrite handle_new_user:
---   * only fill business_* when intent is business/service_provider
---   * write signup_region / signup_province for personal accounts
---   * normalize PH phone to phone_e164
-```
-
-No RLS changes needed (profiles policies already cover insert/update by `auth.uid() = id`).
-
-## Code changes
-
-- `src/hooks/use-auth.tsx` — align `seller_type` to `'dealer'`, apply `business_address`, guard business-only fields behind `is_business`, write `phone_e164`.
-- `src/routes/signup.tsx` —
-  - Add password visibility toggle, bump `minLength` to 8, add inline strength hint.
-  - Add explicit Terms checkbox (required) instead of implicit consent.
-  - Add `business_kind` select for business/service_provider (Dealer, Parts, Repair, Towing, Body shop, Carwash, Salvage, Other).
-  - Send `signup_region`, `signup_province`, `business_kind` in `options.data` and in the stash payload.
-  - Visually dim/disable step 2 form until an intent is selected.
-- `src/components/signup/account-type-grid.tsx` — no functional changes.
-
-## Out of scope (call out only)
-
-- Phone OTP verification at signup — keep as post-signup task in dashboard.
-- Email change confirmation flow — already handled elsewhere.
-- Address geocoding for business — handled in `/businesses/submit`.
-
----
-
-If you approve, I'll implement all of the above in one pass: one migration + the two file edits.
+## Confirm before I build
+Sound right? Specifically: keep email verification required, add the pending screen + auto-login on link click, and gate "go live" on `email_confirmed_at`?
