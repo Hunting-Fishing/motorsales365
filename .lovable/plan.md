@@ -1,85 +1,141 @@
-# Go-Live Batch 2 — Email + Storage Lockdown
 
-Acting on your answers:
-- **#1 Email sender domain**: `notify.365motorsales.com`
-- **#2 Custom domain**: `www.365motorsales.com` (already configured, will verify)
-- **#6 Storage lockdown**: restrict writes so users can only write under their own `user_id/` prefix in public buckets
+# Pre-Launch Inspection — 365 MotorSales
 
-Skipping for now (no answer yet): branded og:image (#3), analytics provider (#4), Sentry (#5), pg_cron schedules (#7) — happy to do those in the next batch.
+I audited routes, DB, storage, email, cron, SEO, and webhooks against the work already shipped in earlier batches. Below is everything still incomplete, missing, or risky — grouped by severity. Nothing here changes payments (per your earlier instruction).
 
 ---
 
-## 1. Email infrastructure — `notify.365motorsales.com`
+## P0 — Must fix before going live
 
-**Step 1 — Provision the sender domain**
-Open the email setup dialog so you can add `notify.365motorsales.com` and Lovable can provision the NS delegation + DKIM/SPF/MX automatically.
+### 1. Canonical domain & OG image still wrong
+- `src/routes/__root.tsx` still ships the staging `storage.googleapis.com` OG image and has **no `og:url` / canonical** at the root.
+- Per-route head() updates from Batch 1 (`listing.$id`, `businesses.$slug`, `seller.$id`, `browse.$category`) need verification that they emit `https://www.365motorsales.com/...` URLs and that listing/business images flow into `og:image`.
+- **Fix:** generate a branded 1200×630 PNG, host under `/og-default.png` in `public/`, point root `og:image` + `twitter:image` to `https://www.365motorsales.com/og-default.png`, and add `og:url` to root + every leaf route.
 
-**Step 2 — Set up the queue infrastructure**
-Run `setup_email_infra` to create the pgmq queues, send log, suppression list, unsubscribe tokens, and the `process-email-queue` cron job. (The DB already has `enqueue_email`, `read_email_batch`, etc. from earlier work — this just ensures the dispatcher is wired.)
+### 2. Payment webhook is dead code
+- `src/routes/api/public/payment-events.tsx` is correctly hard-disabled, BUT `enqueueEmail()` calls `fetch("/lovable/email/transactional/send", "http://localhost")` — that URL is wrong for the Worker runtime and would 404 the moment payments are enabled.
+- **Fix:** replace the inter-route HTTP hop with a direct `supabase.rpc('enqueue_email', { queue_name: 'transactional_emails', payload: {...} })` call (same pattern as `auth/webhook.ts`). Also enqueue with the suppression check.
 
-**Step 3 — Scaffold auth email templates**
-Run `scaffold_auth_email_templates` so password reset, magic link, signup confirmation, email change, and reauthentication emails all come from `notify.365motorsales.com` with 365 MotorSales branding instead of the generic Lovable defaults.
+### 3. Storage listing exposure (linter WARN #2–6)
+- All 5 public buckets still have a broad `SELECT … USING (bucket_id='X')` policy, which lets anyone **list** every object path (privacy leak even though contents are public).
+- **Fix:** replace public SELECT with a policy that only allows known prefixes the app actually serves (or move public access to signed URLs / `getPublicUrl`). At minimum, drop the broad SELECT on `avatars`, `business-logos`, `qr-codes` and re-allow per-known-path reads.
 
-**Step 4 — Wire transactional templates to the queue**
-The existing templates in `src/lib/email-templates/` (signup-welcome, payment-receipt, ad-inquiry-*, refund-issued, subscription-*) are already registered. I'll confirm `src/routes/lovable/email/transactional/send.ts` uses the correct `SENDER_DOMAIN = "notify.365motorsales.com"` and the registry is complete.
+### 4. RLS Policy Always True (linter WARN #1)
+- One INSERT/UPDATE/DELETE policy still has `USING (true)` / `WITH CHECK (true)`. Need to identify and tighten. **Action:** I'll grep migrations and pinpoint the offender, then write the targeted policy fix.
 
-**Step 5 — DNS / verification**
-You'll need to add the NS records shown in the setup dialog at your domain registrar. Verification can take up to 72h but scaffolding doesn't need to wait — emails will start flowing automatically once DNS propagates. Status is visible in **Cloud → Emails**.
+### 5. SECURITY DEFINER functions exposed to anon (linter WARN #7–12+)
+- 6+ `security definer` functions are EXECUTE-able by `anon`/`public`. Several are expected (e.g. `has_role`), but each one needs to either:
+  - have `REVOKE EXECUTE … FROM anon, public` + targeted GRANT to `authenticated`, or
+  - be converted to `SECURITY INVOKER`.
+- **Action:** I'll enumerate them, classify each, and ship one migration.
 
----
-
-## 2. Custom domain verification (`www.365motorsales.com`)
-
-The project URLs already list `www.365motorsales.com` and `365motorsales.com` as active custom domains, so this looks healthy. I'll just:
-- Confirm both root + www are marked Active in Project Settings → Domains
-- Update the root `og:image`, `canonical`, and any hardcoded `lovable.app` URLs in `__root.tsx` / sitemap / robots.txt to use `https://www.365motorsales.com` as the canonical origin
-
----
-
-## 3. Storage bucket lockdown (per-user write prefix)
-
-Public buckets today: `listing-photos`, `listing-videos`, `avatars`, `business-logos`, `qr-codes`. Private: `verification-docs`.
-
-Tighten RLS on `storage.objects` so writes (INSERT / UPDATE / DELETE) require the first path segment to equal `auth.uid()`. Public SELECT stays open for public buckets so listings/avatars still render.
-
-Migration sketch (one policy set per bucket):
-
-```sql
--- Example for listing-photos (repeat per public bucket)
-DROP POLICY IF EXISTS "listing-photos public read" ON storage.objects;
-CREATE POLICY "listing-photos public read"
-  ON storage.objects FOR SELECT
-  USING (bucket_id = 'listing-photos');
-
-DROP POLICY IF EXISTS "listing-photos owner write" ON storage.objects;
-CREATE POLICY "listing-photos owner insert"
-  ON storage.objects FOR INSERT TO authenticated
-  WITH CHECK (
-    bucket_id = 'listing-photos'
-    AND auth.uid()::text = (storage.foldername(name))[1]
-  );
-CREATE POLICY "listing-photos owner update"
-  ON storage.objects FOR UPDATE TO authenticated
-  USING (bucket_id = 'listing-photos' AND auth.uid()::text = (storage.foldername(name))[1]);
-CREATE POLICY "listing-photos owner delete"
-  ON storage.objects FOR DELETE TO authenticated
-  USING (bucket_id = 'listing-photos' AND auth.uid()::text = (storage.foldername(name))[1]);
-```
-
-Applied to: `listing-photos`, `listing-videos`, `avatars`, `business-logos`, `qr-codes`.
-For `qr-codes`, staff-generated QR codes go through a SECURITY DEFINER function or admin-only path, so I'll add an exception for admins via `has_role(auth.uid(),'admin')`.
-`verification-docs` stays private with existing policies.
-
-**Risk check before migrating**: I'll grep `src/lib/storage-upload.ts` and every upload call site to confirm all uploads already use a `${userId}/...` path prefix. If any path doesn't, I'll fix it in the same batch so the new policy doesn't break uploads.
+### 6. Auth hardening
+- Confirm **leaked-password (HIBP)** protection is on (`supabase--configure_auth { password_hibp_enabled: true }`).
+- Confirm email confirmation is **required** before login (no auto-confirm).
+- Add password min length ≥ 8, set OTP expiry to ≤ 1 hour.
 
 ---
 
-## Order of execution
+## P1 — Important, ship in first week
 
-1. Show the email domain setup dialog → you add NS records
-2. Run `setup_email_infra` + `scaffold_auth_email_templates` (no DNS wait needed)
-3. Audit upload paths → migration to lock storage buckets
-4. Update canonical URL / og config to `www.365motorsales.com`
-5. Report back what's left for the next batch (og:image, analytics, Sentry, pg_cron)
+### 7. Cron jobs not scheduled
+- `expire_stale_pending_sales()` exists but no cron job is calling it.
+- No `refresh_fx_rates` function exists; `src/routes/api/public/fx/refresh.tsx` is unscheduled.
+- `process-email-queue` cron created by `setup_email_infra` — needs re-verification it survived.
+- **Fix:** schedule via `cron.schedule`:
+  - `expire-stale-pending-sales` — daily 02:00 UTC
+  - `refresh-fx-rates` — hourly hitting `/api/public/fx/refresh`
+  - Verify `process-email-queue` still runs every 5s
 
-Approve and I'll start with the email domain dialog.
+### 8. Sitemap gaps
+- `src/routes/sitemap[.]xml.ts` indexes static + categories, but missing routes: `/listing/$id`, `/businesses/$slug`, `/seller/$id`, `/r/$code`. Loader must pull from `listings` (active only), `businesses` (active only), `profiles` (sellers with active listings).
+- BASE_URL is `https://365motorsales.com` — should be `https://www.365motorsales.com` to match primary canonical (or pick one and redirect the other).
+
+### 9. SEO meta still default on these routes
+Routes with NO `head()` override (default to root title — bad for SEO + share):
+`about`, `contact`, `pricing`, `payments`, `advertise`, `sell`, `tow`, `guidelines`, `privacy`, `terms`, `refund-policy`, `businesses.index`, `businesses.submit`, `r.$code`.
+- **Fix:** add per-route `head()` with title/description/og fields for each.
+
+### 10. JSON-LD structured data missing
+- `__root.tsx`: add Organization schema (name, url, logo, sameAs).
+- `listing.$id.tsx`: add `Vehicle` / `Product` schema with offers + image.
+- `businesses.$slug.tsx`: add `LocalBusiness` schema with geo + address.
+- Major win for Google rich results on a marketplace.
+
+### 11. Error & not-found boundaries
+- Root has `notFoundComponent` ✓.
+- Routes with loaders (`listing.$id`, `businesses.$slug`, `seller.$id`, `browse.$category`, `r.$code`) need `errorComponent` + `notFoundComponent` so a bad ID doesn't crash to a blank page.
+- Router needs `defaultErrorComponent`.
+
+### 12. Email infra finishing touches
+- `payment-events.tsx` → wire to queue (see P0 #2).
+- Verify `process-email-queue` pg_cron job exists (re-run `setup_email_infra` if not — idempotent).
+- Suppression-list webhook (`/lovable/email/suppression`) — confirm provider is sending bounces here.
+- Add a sandbox-only banner check so password reset emails in preview don't accidentally hit real users.
+
+### 13. Robots.txt
+- Already disallows admin/dashboard/api — good.
+- Missing: `Disallow: /listing/*/edit`, `Disallow: /email/`, `Disallow: /r/` (referral codes shouldn't be indexed since they redirect + set cookies).
+
+---
+
+## P2 — Nice to have for launch polish
+
+### 14. Analytics + monitoring (still open from earlier list)
+- No analytics provider wired. Pick one: GA4 (script in `__root.tsx`), Plausible, or PostHog (also gives funnels/replays).
+- No error monitoring. Recommend Sentry — DSN as a secret, init in `src/router.tsx` + worker entry.
+
+### 15. Cookie banner
+- `src/components/cookie-banner.tsx` exists — verify it's mounted in `__root.tsx` (I don't see it). Required for PH Data Privacy Act compliance if you ship GA4.
+
+### 16. Performance
+- Root preloads Google Fonts via `<link rel="stylesheet">` (render-blocking). Switch to `<link rel="preload" as="style" onload>` pattern, or self-host via `@fontsource`.
+- Listing/business pages — confirm hero images use `loading="eager" fetchpriority="high"` and below-fold use `loading="lazy"`.
+
+### 17. Sandbox banner in production
+- `<SandboxBanner />` is always mounted. Verify it only renders when `import.meta.env.MODE !== 'production'` or behind a feature flag — otherwise it ships to real users.
+
+### 18. Test pages on the production sitemap?
+- `/admin.sandbox`, `/admin.performance` are dev-only — confirm they're behind `requireAdmin` AND not indexed (covered by `/admin` disallow ✓).
+
+### 19. Missing public pages typical for a marketplace
+- No `/faq`, `/help`, `/safety-tips`, `/how-it-works`. SEO + trust impact. Optional but recommended.
+
+### 20. Email DNS still pending action
+- `notify.365motorsales.com` is **Verified** ✓ — no action needed.
+
+---
+
+## Proposed execution order
+
+1. **P0 batch (this loop after approval):**
+   - Branded OG image (gen + host) + root canonical/og:url
+   - Fix `payment-events.tsx` enqueue
+   - Storage SELECT lockdown migration
+   - Identify + fix the `USING (true)` policy
+   - Audit + revoke EXECUTE on SECURITY DEFINER functions
+   - `configure_auth`: HIBP on, OTP expiry, min length
+
+2. **P1 batch:**
+   - Cron jobs (expire + fx + verify email-queue)
+   - Sitemap dynamic loaders + BASE_URL fix
+   - Per-route `head()` on the ~14 static pages
+   - JSON-LD on root + listing + business
+   - Error/not-found boundaries on loader routes
+
+3. **P2 batch (after you pick analytics + monitoring providers):**
+   - GA4/Plausible/PostHog wiring
+   - Sentry wiring
+   - Cookie banner mount + font perf
+   - Sandbox banner gating
+
+---
+
+## Open questions before I start P0
+
+1. **Analytics provider** — GA4, Plausible, or PostHog? (needed for P2)
+2. **Sentry** — yes/no? If yes, I'll request the DSN secret.
+3. **Canonical host** — `www.365motorsales.com` or apex `365motorsales.com`? I'll standardize sitemap, canonicals, and og:url to whichever you pick.
+4. **OG image style** — branded logo on dark gradient with tagline, or hero photo of a vehicle? I'll generate either at 1200×630.
+
+Approve and I'll start the P0 batch (analytics/Sentry can wait for your answers on #1–2).
