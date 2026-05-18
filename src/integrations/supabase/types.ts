@@ -295,18 +295,24 @@ export type Database = {
       }
       business_tags: {
         Row: {
+          category: string | null
+          is_popular: boolean
           label: string
           slug: string
           sort_order: number
           type_slug: string | null
         }
         Insert: {
+          category?: string | null
+          is_popular?: boolean
           label: string
           slug: string
           sort_order?: number
           type_slug?: string | null
         }
         Update: {
+          category?: string | null
+          is_popular?: boolean
           label?: string
           slug?: string
           sort_order?: number
