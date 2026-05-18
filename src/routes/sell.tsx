@@ -196,6 +196,13 @@ function SellPage() {
     if (user?.id) getUserPlanLimits(user.id).then(setPlanLimits);
   }, [user?.id]);
 
+  const sellSeo = SELL_SEO[category] ?? SELL_SEO.other;
+  useDynamicMeta({
+    title: sellSeo.title,
+    description: sellSeo.description,
+    canonical: "https://www.365motorsales.com/sell",
+  });
+
   // Photo limit comes from the user's subscription plan; upgraded listings still bump to 20
   const planPhotoMax = planLimits.maxPhotosPerListing;
   const maxPhotos = plan === "upgraded" ? Math.max(20, planPhotoMax) : plan === "standard" ? Math.max(5, planPhotoMax) : planPhotoMax;
