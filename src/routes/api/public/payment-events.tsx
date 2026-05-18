@@ -42,6 +42,14 @@ export const Route = createFileRoute("/api/public/payment-events")({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        // Hard-disabled until real provider signature verification is wired up
+        // (Stripe / PayMongo / Xendit). Enable by setting PAYMENT_WEBHOOK_ENABLED=1
+        // AND replacing the debug-token check below with the provider's HMAC
+        // signature verification. Until then we refuse all traffic so a forged
+        // request cannot enqueue emails or mutate billing state.
+        if (process.env.PAYMENT_WEBHOOK_ENABLED !== "1") {
+          return new Response("Payment webhook disabled", { status: 503 });
+        }
         const debugToken = process.env.PAYMENT_WEBHOOK_DEBUG_TOKEN;
         const auth = request.headers.get("x-debug-token");
         if (!debugToken || auth !== debugToken) {
