@@ -216,6 +216,31 @@ function SubmitBusinessPage() {
   };
 
   const visibleTags = typeSlug ? tags.filter((t) => t.type_slug === null || t.type_slug === typeSlug) : tags.filter((t) => t.type_slug === null);
+  const popularTags = visibleTags.filter((t) => t.is_popular).slice(0, 10);
+  const popularSet = new Set(popularTags.map((t) => t.slug));
+  const extraSelected = visibleTags.filter((t) => selectedTags.includes(t.slug) && !popularSet.has(t.slug));
+  const inlineTags = [...popularTags, ...extraSelected];
+
+  const toggleTag = (slug: string) =>
+    setSelectedTags((prev) => prev.includes(slug) ? prev.filter((x) => x !== slug) : [...prev, slug]);
+
+  const prettyCategory = (k: string | null) => {
+    if (!k) return "Other";
+    return k.split("_").map((w) => w[0].toUpperCase() + w.slice(1)).join(" & ").replace("Vehicle & Scope", "Vehicle scope").replace("Service & Mode", "Service mode");
+  };
+
+  const filteredDialogTags = visibleTags.filter((t) => {
+    if (!tagSearch.trim()) return true;
+    const q = tagSearch.toLowerCase();
+    return t.label.toLowerCase().includes(q) || (t.category ?? "").toLowerCase().includes(q);
+  });
+  const grouped: Record<string, typeof visibleTags> = {};
+  for (const t of filteredDialogTags) {
+    const key = t.category ?? "other";
+    (grouped[key] = grouped[key] ?? []).push(t);
+  }
+  const groupKeys = Object.keys(grouped).sort();
+
 
   if (loading || !user) return <SiteLayout><div className="p-12 text-center">Loading…</div></SiteLayout>;
 
