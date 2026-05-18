@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TowRouteImport } from './routes/tow'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -79,6 +80,11 @@ import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/em
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
 
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
   id: '/unsubscribe',
   path: '/unsubscribe',
@@ -449,6 +455,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -518,6 +525,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -590,6 +598,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/verify-email': typeof VerifyEmailRoute
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -663,6 +672,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tow'
     | '/unsubscribe'
+    | '/verify-email'
     | '/admin/accounts'
     | '/admin/advertising'
     | '/admin/analytics'
@@ -732,6 +742,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tow'
     | '/unsubscribe'
+    | '/verify-email'
     | '/admin/accounts'
     | '/admin/advertising'
     | '/admin/analytics'
@@ -803,6 +814,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tow'
     | '/unsubscribe'
+    | '/verify-email'
     | '/admin/accounts'
     | '/admin/advertising'
     | '/admin/analytics'
@@ -875,6 +887,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   TowRoute: typeof TowRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
   ApiRobotsDottxtRoute: typeof ApiRobotsDottxtRoute
   ApiSitemapDotxmlRoute: typeof ApiSitemapDotxmlRoute
   BrowseCategoryRoute: typeof BrowseCategoryRoute
@@ -898,6 +911,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/unsubscribe': {
       id: '/unsubscribe'
       path: '/unsubscribe'
@@ -1501,6 +1521,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   TowRoute: TowRoute,
   UnsubscribeRoute: UnsubscribeRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
   ApiRobotsDottxtRoute: ApiRobotsDottxtRoute,
   ApiSitemapDotxmlRoute: ApiSitemapDotxmlRoute,
   BrowseCategoryRoute: BrowseCategoryRoute,
