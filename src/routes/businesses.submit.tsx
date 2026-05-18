@@ -58,6 +58,28 @@ function SubmitBusinessPage() {
   const [submitting, setSubmitting] = useState(false);
   const [tagsOpen, setTagsOpen] = useState(false);
   const [tagSearch, setTagSearch] = useState("");
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [suggestLabel, setSuggestLabel] = useState("");
+  const [suggestNotes, setSuggestNotes] = useState("");
+  const [suggestSubmitting, setSuggestSubmitting] = useState(false);
+
+  const submitTypeSuggestion = async () => {
+    const label = suggestLabel.trim();
+    if (label.length < 2) { toast.error("Please enter a type name (min 2 chars)."); return; }
+    if (label.length > 80) { toast.error("Type name is too long (max 80)."); return; }
+    if (!user) { toast.error("Please sign in first."); return; }
+    setSuggestSubmitting(true);
+    const { error } = await (supabase as any).from("business_type_suggestions").insert({
+      proposed_label: label,
+      notes: suggestNotes.trim() || null,
+      submitter_id: user.id,
+      submitter_email: user.email ?? null,
+    });
+    setSuggestSubmitting(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Thanks! Your suggestion was sent to admin for review.");
+    setSuggestLabel(""); setSuggestNotes(""); setSuggestOpen(false);
+  };
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
