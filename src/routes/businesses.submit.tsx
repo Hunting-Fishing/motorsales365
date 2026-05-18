@@ -269,15 +269,68 @@ function SubmitBusinessPage() {
 
           {visibleTags.length > 0 && (
             <div>
-              <Label>Tags</Label>
-              <div className="mt-1 flex flex-wrap gap-2">
-                {visibleTags.map((t) => {
+              <div className="mb-1 flex items-center justify-between gap-2">
+                <Label>Tags {selectedTags.length > 0 && <span className="ml-1 text-xs text-muted-foreground">({selectedTags.length} selected)</span>}</Label>
+                <Dialog open={tagsOpen} onOpenChange={setTagsOpen}>
+                  <DialogTrigger asChild>
+                    <Button type="button" variant="outline" size="sm">Browse all tags</Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-h-[85vh] max-w-2xl overflow-hidden p-0">
+                    <DialogHeader className="border-b p-4">
+                      <DialogTitle>Browse all tags</DialogTitle>
+                    </DialogHeader>
+                    <div className="border-b p-4">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                        <Input
+                          autoFocus
+                          placeholder="Search tags…"
+                          value={tagSearch}
+                          onChange={(e) => setTagSearch(e.target.value)}
+                          className="pl-9"
+                        />
+                      </div>
+                    </div>
+                    <div className="max-h-[55vh] space-y-5 overflow-y-auto p-4">
+                      {groupKeys.length === 0 && (
+                        <p className="py-8 text-center text-sm text-muted-foreground">No tags match "{tagSearch}"</p>
+                      )}
+                      {groupKeys.map((k) => (
+                        <div key={k}>
+                          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                            {prettyCategory(k)}
+                          </div>
+                          <div className="flex flex-wrap gap-1.5">
+                            {grouped[k].map((t) => {
+                              const on = selectedTags.includes(t.slug);
+                              return (
+                                <button
+                                  type="button" key={t.slug}
+                                  onClick={() => toggleTag(t.slug)}
+                                  className={`rounded-full border px-3 py-1 text-xs transition ${on ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}
+                                >{t.label}</button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <DialogFooter className="border-t p-4">
+                      <span className="mr-auto self-center text-xs text-muted-foreground">{selectedTags.length} selected</span>
+                      <Button type="button" onClick={() => { setTagsOpen(false); setTagSearch(""); }}>Done</Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              <p className="mb-2 text-xs text-muted-foreground">Top {popularTags.length} popular tags shown — use "Browse all tags" for the full library.</p>
+              <div className="flex flex-wrap gap-2">
+                {inlineTags.map((t) => {
                   const on = selectedTags.includes(t.slug);
                   return (
                     <button
                       type="button" key={t.slug}
-                      onClick={() => setSelectedTags((prev) => on ? prev.filter((x) => x !== t.slug) : [...prev, t.slug])}
-                      className={`rounded-full border px-3 py-1 text-xs transition ${on ? "border-foreground bg-foreground text-background" : "border-border hover:bg-secondary"}`}
+                      onClick={() => toggleTag(t.slug)}
+                      className={`rounded-full border px-3 py-1 text-xs transition ${on ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}
                     >{t.label}</button>
                   );
                 })}
