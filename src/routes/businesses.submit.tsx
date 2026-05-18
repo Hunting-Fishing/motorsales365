@@ -41,7 +41,7 @@ function SubmitBusinessPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [types, setTypes] = useState<{ slug: string; label: string }[]>([]);
-  const [tags, setTags] = useState<{ slug: string; label: string; type_slug: string | null }[]>([]);
+  const [tags, setTags] = useState<{ slug: string; label: string; type_slug: string | null; category: string | null; is_popular: boolean }[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [name, setName] = useState("");
   const [typeSlug, setTypeSlug] = useState<string>("");
