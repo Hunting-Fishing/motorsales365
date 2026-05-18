@@ -66,8 +66,11 @@ function SignupPage() {
       const payload = {
         intent: overrides?.intent ?? intent,
         full_name: fullName || undefined,
+        first_name: firstName || undefined,
+        last_name: lastName || undefined,
         phone: phone || undefined,
         business_name: overrides?.businessName ?? (isBusinessLike ? businessName : undefined),
+        business_address: isBusinessLike ? (businessAddress || undefined) : undefined,
         region: location.region ?? undefined,
         province: location.province ?? undefined,
         city: location.city ?? undefined,
@@ -83,6 +86,7 @@ function SignupPage() {
     e.preventDefault();
     if (!intent) { toast.error("Please choose what kind of account you'd like."); return; }
     if (password.length < 6) { toast.error("Password must be at least 6 characters"); return; }
+    if (!firstName.trim() || !lastName.trim()) { toast.error("Please enter your first and last name."); return; }
     if (isBusinessLike && !businessName.trim()) { toast.error("Please enter your business name."); return; }
     if (!location.city) { toast.error("Please choose your city or town."); return; }
 
@@ -94,6 +98,14 @@ function SignupPage() {
       options: {
         data: {
           full_name: fullName,
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          phone: phone || undefined,
+          business_name: isBusinessLike ? businessName.trim() : undefined,
+          business_address: isBusinessLike ? (businessAddress.trim() || undefined) : undefined,
+          signup_city: location.city ?? undefined,
+          signup_region: location.region ?? undefined,
+          signup_province: location.province ?? undefined,
           referral_code: refCode || undefined,
           signup_intent: intent,
         },
