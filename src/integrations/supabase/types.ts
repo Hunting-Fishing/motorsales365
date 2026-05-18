@@ -1105,10 +1105,12 @@ export type Database = {
           business_province: string | null
           business_region: string | null
           created_at: string
+          first_name: string | null
           founding_member_number: number | null
           full_name: string | null
           id: string
           is_founding_member: boolean
+          last_name: string | null
           phone: string | null
           phone_e164: string | null
           phone_verified_at: string | null
@@ -1135,10 +1137,12 @@ export type Database = {
           business_province?: string | null
           business_region?: string | null
           created_at?: string
+          first_name?: string | null
           founding_member_number?: number | null
           full_name?: string | null
           id: string
           is_founding_member?: boolean
+          last_name?: string | null
           phone?: string | null
           phone_e164?: string | null
           phone_verified_at?: string | null
@@ -1165,10 +1169,12 @@ export type Database = {
           business_province?: string | null
           business_region?: string | null
           created_at?: string
+          first_name?: string | null
           founding_member_number?: number | null
           full_name?: string | null
           id?: string
           is_founding_member?: boolean
+          last_name?: string | null
           phone?: string | null
           phone_e164?: string | null
           phone_verified_at?: string | null

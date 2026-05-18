@@ -36,14 +36,18 @@ function SignupPage() {
   const search = useSearch({ from: "/signup" });
 
   const [intent, setIntent] = useState<SignupIntent | null>(search.type ?? null);
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [businessName, setBusinessName] = useState("");
+  const [businessAddress, setBusinessAddress] = useState("");
   const [location, setLocation] = useState<LocationValue>({ region: null, province: null, city: null, barangay: null });
   const [refCode, setRefCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
 
   const isBusinessLike = intent === "business" || intent === "service_provider";
   const intentMeta = useMemo(() => SIGNUP_TYPES.find((s) => s.id === intent), [intent]);
@@ -62,8 +66,11 @@ function SignupPage() {
       const payload = {
         intent: overrides?.intent ?? intent,
         full_name: fullName || undefined,
+        first_name: firstName || undefined,
+        last_name: lastName || undefined,
         phone: phone || undefined,
         business_name: overrides?.businessName ?? (isBusinessLike ? businessName : undefined),
+        business_address: isBusinessLike ? (businessAddress || undefined) : undefined,
         region: location.region ?? undefined,
         province: location.province ?? undefined,
         city: location.city ?? undefined,
@@ -79,6 +86,7 @@ function SignupPage() {
     e.preventDefault();
     if (!intent) { toast.error("Please choose what kind of account you'd like."); return; }
     if (password.length < 6) { toast.error("Password must be at least 6 characters"); return; }
+    if (!firstName.trim() || !lastName.trim()) { toast.error("Please enter your first and last name."); return; }
     if (isBusinessLike && !businessName.trim()) { toast.error("Please enter your business name."); return; }
     if (!location.city) { toast.error("Please choose your city or town."); return; }
 
@@ -90,6 +98,14 @@ function SignupPage() {
       options: {
         data: {
           full_name: fullName,
+          first_name: firstName.trim(),
+          last_name: lastName.trim(),
+          phone: phone || undefined,
+          business_name: isBusinessLike ? businessName.trim() : undefined,
+          business_address: isBusinessLike ? (businessAddress.trim() || undefined) : undefined,
+          signup_city: location.city ?? undefined,
+          signup_region: location.region ?? undefined,
+          signup_province: location.province ?? undefined,
           referral_code: refCode || undefined,
           signup_intent: intent,
         },
@@ -144,18 +160,24 @@ function SignupPage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <Label htmlFor="name">Full name</Label>
-              <Input id="name" required value={fullName} onChange={(e) => setFullName(e.target.value)} />
+              <Label htmlFor="first-name">First name</Label>
+              <Input id="first-name" required value={firstName} onChange={(e) => setFirstName(e.target.value)} autoComplete="given-name" />
             </div>
+            <div>
+              <Label htmlFor="last-name">Last name</Label>
+              <Input id="last-name" required value={lastName} onChange={(e) => setLastName(e.target.value)} autoComplete="family-name" />
+            </div>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <Label htmlFor="phone">Phone (optional)</Label>
               <Input id="phone" type="tel" placeholder="+63 9XX XXX XXXX" value={phone} onChange={(e) => setPhone(e.target.value)} />
             </div>
-          </div>
-
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            <div>
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            </div>
           </div>
 
           <div>
@@ -164,21 +186,33 @@ function SignupPage() {
           </div>
 
           {isBusinessLike && (
-            <div>
-              <Label htmlFor="business-name">
-                {intent === "service_provider" ? "Business / service name" : "Business / dealer name"}
-              </Label>
-              <Input
-                id="business-name"
-                required
-                value={businessName}
-                onChange={(e) => setBusinessName(e.target.value)}
-                placeholder={intent === "service_provider" ? "e.g. Reyes Towing Services" : "e.g. Manila Auto Hub"}
-              />
-              <p className="mt-1 text-xs text-muted-foreground">
-                You'll finish your full business profile after signup.
-              </p>
-            </div>
+            <>
+              <div>
+                <Label htmlFor="business-name">
+                  {intent === "service_provider" ? "Business / service name" : "Business / dealer name"}
+                </Label>
+                <Input
+                  id="business-name"
+                  required
+                  value={businessName}
+                  onChange={(e) => setBusinessName(e.target.value)}
+                  placeholder={intent === "service_provider" ? "e.g. Reyes Towing Services" : "e.g. Manila Auto Hub"}
+                />
+              </div>
+              <div>
+                <Label htmlFor="business-address">Street address (optional)</Label>
+                <Input
+                  id="business-address"
+                  value={businessAddress}
+                  onChange={(e) => setBusinessAddress(e.target.value)}
+                  placeholder="e.g. 123 Rizal Ave, Brgy. San Jose"
+                  autoComplete="street-address"
+                />
+                <p className="mt-1 text-xs text-muted-foreground">
+                  You can skip this for now, but your account won't go live or appear in the directory until a business address is saved.
+                </p>
+              </div>
+            </>
           )}
 
           <div>
