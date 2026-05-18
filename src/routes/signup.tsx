@@ -36,14 +36,18 @@ function SignupPage() {
   const search = useSearch({ from: "/signup" });
 
   const [intent, setIntent] = useState<SignupIntent | null>(search.type ?? null);
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [businessName, setBusinessName] = useState("");
+  const [businessAddress, setBusinessAddress] = useState("");
   const [location, setLocation] = useState<LocationValue>({ region: null, province: null, city: null, barangay: null });
   const [refCode, setRefCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
 
   const isBusinessLike = intent === "business" || intent === "service_provider";
   const intentMeta = useMemo(() => SIGNUP_TYPES.find((s) => s.id === intent), [intent]);
