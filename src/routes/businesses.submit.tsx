@@ -13,6 +13,7 @@ import { LocationDrilldown, type LocationValue } from "@/components/businesses/l
 import { LocationPicker } from "@/components/businesses/location-picker";
 import { resolvePsgc } from "@/lib/psgc";
 import { toast } from "sonner";
+import { useDynamicMeta } from "@/hooks/use-dynamic-meta";
 
 export const Route = createFileRoute("/businesses/submit")({
   head: () => ({
@@ -66,6 +67,24 @@ function SubmitBusinessPage() {
       setTypes(t1 ?? []); setTags(t2 ?? []);
     })();
   }, []);
+
+  const selectedTypeLabel = types.find((t) => t.slug === typeSlug)?.label;
+  const selectedTagLabels = selectedTags
+    .map((s) => tags.find((t) => t.slug === s)?.label)
+    .filter(Boolean)
+    .slice(0, 3)
+    .join(", ");
+  const dynTitle = selectedTypeLabel
+    ? `List your ${selectedTypeLabel.toLowerCase()} — 365 MotorSales Philippines`
+    : "List your business — 365 MotorSales Philippines";
+  const dynDesc = selectedTypeLabel
+    ? `Add your ${selectedTypeLabel.toLowerCase()}${selectedTagLabels ? ` (${selectedTagLabels})` : ""} to the 365 MotorSales Philippines directory and reach buyers and sellers nationwide.`
+    : "Add your dealership, shop, or auto service to the 365 MotorSales Philippines directory.";
+  useDynamicMeta({
+    title: dynTitle,
+    description: dynDesc,
+    canonical: "https://www.365motorsales.com/businesses/submit",
+  });
 
   const reverseGeocode = async (la: number, ln: number) => {
     try {

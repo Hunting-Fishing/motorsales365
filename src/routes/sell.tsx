@@ -21,6 +21,23 @@ import { TagPicker } from "@/components/tag-picker";
 import { CATEGORY_DEFAULT_GROUPS, SERVICE_CATEGORIES } from "@/data/service-tags";
 import { uploadWithRetry } from "@/lib/storage-upload";
 import { getUserPlanLimits, FREE_PLAN_LIMITS, type PlanLimits } from "@/lib/plan-limits";
+import { useDynamicMeta } from "@/hooks/use-dynamic-meta";
+
+const SELL_SEO: Record<string, { title: string; description: string }> = {
+  car: { title: "Sell your car in the Philippines — 365 MotorSales", description: "Post your car for sale and reach Filipino buyers nationwide. Free listings, photos, and instant messaging on 365 MotorSales." },
+  motorcycle: { title: "Sell your motorcycle in the Philippines — 365 MotorSales", description: "List your motorcycle or scooter for sale across the Philippines. Free posting with photos and direct buyer messaging." },
+  boat: { title: "Sell your boat in the Philippines — 365 MotorSales", description: "Reach Filipino boat and watercraft buyers. Post your boat for sale with photos and contact details on 365 MotorSales." },
+  airplane: { title: "Sell aircraft in the Philippines — 365 MotorSales", description: "List airplanes and light aircraft for sale to qualified buyers in the Philippines." },
+  equipment: { title: "Sell heavy equipment — 365 MotorSales Philippines", description: "Post backhoes, excavators, loaders, and other heavy equipment for sale across the Philippines." },
+  towing: { title: "List your towing & trucking service — 365 MotorSales", description: "Offer flatbed, wrecker, and roadside towing services to drivers across the Philippines." },
+  carwash: { title: "List your car wash business — 365 MotorSales Philippines", description: "Promote your car wash, detailing, or ceramic coating services to local customers in the Philippines." },
+  parts: { title: "Sell auto parts & accessories — 365 MotorSales Philippines", description: "List OEM and aftermarket vehicle parts, tires, wheels, and accessories for Filipino buyers." },
+  drone: { title: "List drone services & sales — 365 MotorSales Philippines", description: "Sell drones or offer aerial photography, mapping, and inspection services in the Philippines." },
+  repair: { title: "List your auto repair shop — 365 MotorSales Philippines", description: "Promote your mechanical, electrical, or general auto repair shop to drivers across the Philippines." },
+  bodyshop: { title: "List your body shop — 365 MotorSales Philippines", description: "Reach customers needing collision repair, paint, and bodywork services in the Philippines." },
+  salvage: { title: "List your auto salvage yard — 365 MotorSales Philippines", description: "Connect with buyers looking for salvage parts and recycled auto components in the Philippines." },
+  other: { title: "Post a listing — 365 MotorSales Philippines", description: "Post any vehicle, part, or auto-related service for sale on 365 MotorSales Philippines." },
+};
 
 export const Route = createFileRoute("/sell")({
   head: () => ({
@@ -178,6 +195,13 @@ function SellPage() {
   useEffect(() => {
     if (user?.id) getUserPlanLimits(user.id).then(setPlanLimits);
   }, [user?.id]);
+
+  const sellSeo = SELL_SEO[category] ?? SELL_SEO.other;
+  useDynamicMeta({
+    title: sellSeo.title,
+    description: sellSeo.description,
+    canonical: "https://www.365motorsales.com/sell",
+  });
 
   // Photo limit comes from the user's subscription plan; upgraded listings still bump to 20
   const planPhotoMax = planLimits.maxPhotosPerListing;
