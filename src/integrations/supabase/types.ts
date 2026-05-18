@@ -1113,6 +1113,8 @@ export type Database = {
           phone_e164: string | null
           phone_verified_at: string | null
           seller_type: Database["public"]["Enums"]["seller_type"]
+          signup_city: string | null
+          signup_intent: string | null
           updated_at: string
           verification_status: Database["public"]["Enums"]["verification_status"]
           verified_at: string | null
@@ -1141,6 +1143,8 @@ export type Database = {
           phone_e164?: string | null
           phone_verified_at?: string | null
           seller_type?: Database["public"]["Enums"]["seller_type"]
+          signup_city?: string | null
+          signup_intent?: string | null
           updated_at?: string
           verification_status?: Database["public"]["Enums"]["verification_status"]
           verified_at?: string | null
@@ -1169,6 +1173,8 @@ export type Database = {
           phone_e164?: string | null
           phone_verified_at?: string | null
           seller_type?: Database["public"]["Enums"]["seller_type"]
+          signup_city?: string | null
+          signup_intent?: string | null
           updated_at?: string
           verification_status?: Database["public"]["Enums"]["verification_status"]
           verified_at?: string | null
