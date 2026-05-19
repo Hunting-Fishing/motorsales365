@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatPHP, formatDate } from "@/lib/format";
 import { CheckCircle2, AlertTriangle, ArrowUpRight, TrendingUp, Calendar } from "lucide-react";
+import { Bar, BarChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 export const Route = createFileRoute("/dashboard/billing")({
   component: BillingPage,
