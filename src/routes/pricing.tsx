@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Check, ArrowRight, ArrowDown, Minus, Sparkles } from "lucide-react";
+import { Check, ArrowRight, ArrowDown, Minus, Sparkles, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -16,6 +16,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { formatPHP } from "@/lib/format";
+import { useStripeCheckout } from "@/hooks/useStripeCheckout";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 
 type UsageMonth = { key: string; label: string; count: number };
 
@@ -37,11 +39,13 @@ type Plan = {
   max_photos_per_listing: number | null;
   features: string[] | null;
   sort_order?: number | null;
+  stripe_lookup_key?: string | null;
 };
 
 function PricingPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { openCheckout, closeCheckout, isOpen: checkoutOpen, checkoutElement } = useStripeCheckout();
   const [settings, setSettings] = useState<Record<string, number>>({});
   const [plans, setPlans] = useState<Plan[]>([]);
   const [mySub, setMySub] = useState<any | null>(null);
@@ -223,6 +227,7 @@ function PricingPage() {
 
   return (
     <SiteLayout>
+      <PaymentTestModeBanner />
       <section className="bg-secondary/40 py-12">
         <div className="container mx-auto px-4 text-center">
           <h1 className="font-display text-4xl font-bold">Simple pricing</h1>
@@ -562,22 +567,45 @@ function PricingPage() {
                   <Button
                     disabled={requesting === plan.id}
                     onClick={async () => {
-                      await submitPlanChange(plan.id, kind);
-                      setConfirmPlan(null);
+                      if (Number(plan.price_php) > 0 && plan.stripe_lookup_key) {
+                        setConfirmPlan(null);
+                        openCheckout({
+                          priceId: plan.stripe_lookup_key,
+                          returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
+                        });
+                      } else {
+                        await submitPlanChange(plan.id, kind);
+                        setConfirmPlan(null);
+                      }
                     }}
                   >
+                    <CreditCard className="mr-2 h-4 w-4" />
                     {requesting === plan.id
                       ? "Activating…"
-                      : kind === "upgrade"
-                        ? `Confirm upgrade — ${formatPHP(due)}`
-                        : kind === "downgrade"
-                          ? `Confirm switch — ${formatPHP(due)}`
-                          : `Confirm — ${formatPHP(due)}`}
+                      : Number(plan.price_php) > 0
+                        ? `Continue to payment — ${formatPHP(due)}`
+                        : kind === "upgrade"
+                          ? `Confirm upgrade — ${formatPHP(due)}`
+                          : kind === "downgrade"
+                            ? `Confirm switch — ${formatPHP(due)}`
+                            : `Confirm — ${formatPHP(due)}`}
                   </Button>
                 </DialogFooter>
               </>
             );
           })()}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={checkoutOpen} onOpenChange={(o) => !o && closeCheckout()}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Complete your payment</DialogTitle>
+            <DialogDescription>
+              Your card will be saved securely for future renewals. You can manage it any time from billing.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[70vh] overflow-y-auto">{checkoutElement}</div>
         </DialogContent>
       </Dialog>
     </SiteLayout>

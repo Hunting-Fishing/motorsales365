@@ -47,6 +47,7 @@ import { Route as DashboardLikesRouteImport } from './routes/dashboard.likes'
 import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favorites'
 import { Route as DashboardBusinessesRouteImport } from './routes/dashboard.businesses'
 import { Route as DashboardBillingRouteImport } from './routes/dashboard.billing'
+import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as BusinessesSubmitRouteImport } from './routes/businesses.submit'
 import { Route as BusinessesSlugRouteImport } from './routes/businesses.$slug'
 import { Route as BrowseCategoryRouteImport } from './routes/browse.$category'
@@ -80,6 +81,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
@@ -272,6 +274,11 @@ const DashboardBillingRoute = DashboardBillingRouteImport.update({
   path: '/billing',
   getParentRoute: () => DashboardRoute,
 } as any)
+const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
+  id: '/checkout/return',
+  path: '/checkout/return',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BusinessesSubmitRoute = BusinessesSubmitRouteImport.update({
   id: '/businesses/submit',
   path: '/businesses/submit',
@@ -440,6 +447,12 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicFxRefreshRoute = ApiPublicFxRefreshRouteImport.update({
   id: '/api/public/fx/refresh',
   path: '/api/public/fx/refresh',
@@ -489,6 +502,7 @@ export interface FileRoutesByFullPath {
   '/browse/$category': typeof BrowseCategoryRoute
   '/businesses/$slug': typeof BusinessesSlugRoute
   '/businesses/submit': typeof BusinessesSubmitRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
@@ -514,6 +528,7 @@ export interface FileRoutesByFullPath {
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -561,6 +576,7 @@ export interface FileRoutesByTo {
   '/browse/$category': typeof BrowseCategoryRoute
   '/businesses/$slug': typeof BusinessesSlugRoute
   '/businesses/submit': typeof BusinessesSubmitRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
@@ -586,6 +602,7 @@ export interface FileRoutesByTo {
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -636,6 +653,7 @@ export interface FileRoutesById {
   '/browse/$category': typeof BrowseCategoryRoute
   '/businesses/$slug': typeof BusinessesSlugRoute
   '/businesses/submit': typeof BusinessesSubmitRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
@@ -661,6 +679,7 @@ export interface FileRoutesById {
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -712,6 +731,7 @@ export interface FileRouteTypes {
     | '/browse/$category'
     | '/businesses/$slug'
     | '/businesses/submit'
+    | '/checkout/return'
     | '/dashboard/billing'
     | '/dashboard/businesses'
     | '/dashboard/favorites'
@@ -737,6 +757,7 @@ export interface FileRouteTypes {
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/api/public/fx/refresh'
+    | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -784,6 +805,7 @@ export interface FileRouteTypes {
     | '/browse/$category'
     | '/businesses/$slug'
     | '/businesses/submit'
+    | '/checkout/return'
     | '/dashboard/billing'
     | '/dashboard/businesses'
     | '/dashboard/favorites'
@@ -809,6 +831,7 @@ export interface FileRouteTypes {
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/api/public/fx/refresh'
+    | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -858,6 +881,7 @@ export interface FileRouteTypes {
     | '/browse/$category'
     | '/businesses/$slug'
     | '/businesses/submit'
+    | '/checkout/return'
     | '/dashboard/billing'
     | '/dashboard/businesses'
     | '/dashboard/favorites'
@@ -883,6 +907,7 @@ export interface FileRouteTypes {
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/api/public/fx/refresh'
+    | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -917,6 +942,7 @@ export interface RootRouteChildren {
   BrowseCategoryRoute: typeof BrowseCategoryRoute
   BusinessesSlugRoute: typeof BusinessesSlugRoute
   BusinessesSubmitRoute: typeof BusinessesSubmitRoute
+  CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   RCodeRoute: typeof RCodeRouteWithChildren
@@ -926,6 +952,7 @@ export interface RootRouteChildren {
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicFxRefreshRoute: typeof ApiPublicFxRefreshRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -1201,6 +1228,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardBillingRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/checkout/return': {
+      id: '/checkout/return'
+      path: '/checkout/return'
+      fullPath: '/checkout/return'
+      preLoaderRoute: typeof CheckoutReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/businesses/submit': {
       id: '/businesses/submit'
       path: '/businesses/submit'
@@ -1432,6 +1466,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/fx/refresh': {
       id: '/api/public/fx/refresh'
       path: '/api/public/fx/refresh'
@@ -1579,6 +1620,7 @@ const rootRouteChildren: RootRouteChildren = {
   BrowseCategoryRoute: BrowseCategoryRoute,
   BusinessesSlugRoute: BusinessesSlugRoute,
   BusinessesSubmitRoute: BusinessesSubmitRoute,
+  CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   RCodeRoute: RCodeRouteWithChildren,
@@ -1588,6 +1630,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicFxRefreshRoute: ApiPublicFxRefreshRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
