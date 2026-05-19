@@ -436,7 +436,7 @@ function PricingPage() {
                       )}
                       {kind === "downgrade" && (
                         <li className="border-t border-border pt-1 text-muted-foreground">
-                          Takes effect at next renewal — no charge today.
+                          Takes effect immediately — your next bill matches the new plan.
                         </li>
                       )}
                     </ul>
