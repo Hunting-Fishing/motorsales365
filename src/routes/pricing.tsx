@@ -61,14 +61,17 @@ function PricingPage() {
   const [usage, setUsage] = useState<UsageMonth[]>([]);
 
   const loadSub = async (uid: string) => {
+    const env = getStripeEnvironment();
     const { data } = await supabase
       .from("subscriptions")
       .select("*")
       .eq("user_id", uid)
+      .or(`environment.eq.${env},environment.is.null`)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
     setMySub(data ?? null);
+
 
     if (data?.id) {
       const { data: pay } = await supabase
