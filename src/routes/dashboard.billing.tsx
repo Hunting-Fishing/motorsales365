@@ -6,8 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { formatPHP, formatDate } from "@/lib/format";
-import { CheckCircle2, AlertTriangle, ArrowUpRight, TrendingUp, Calendar, Check } from "lucide-react";
+import { CheckCircle2, AlertTriangle, ArrowUpRight, TrendingUp, Calendar, Check, CreditCard, Receipt, XCircle, RotateCcw, ExternalLink } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { toast } from "sonner";
+import { getStripeEnvironment } from "@/lib/stripe";
+import {
+  cancelSubscription,
+  reactivateSubscription,
+  createPortalSession,
+  listInvoices,
+} from "@/utils/payments.functions";
+
 
 export const Route = createFileRoute("/dashboard/billing")({
   component: BillingPage,
