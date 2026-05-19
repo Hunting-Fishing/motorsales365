@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { sendTransactionalEmail } from "@/lib/email/send";
@@ -111,6 +111,7 @@ interface AuthContextValue {
   realIsAdmin: boolean;
   simulatedRoles: AppRole[] | null;
   setSimulatedRoles: (roles: AppRole[] | null) => void;
+  refreshSession: (session?: Session | null) => Promise<Session | null>;
   signOut: () => Promise<void>;
 }
 
@@ -134,54 +135,62 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState<string[]>([]);
   const [simulatedRoles, setSimulatedRolesState] = useState<AppRole[] | null>(() => loadSim());
+  const lastUidRef = useRef<string | null>(null);
+  const welcomeCheckedRef = useRef(new Set<string>());
 
-  useEffect(() => {
-    let lastUid: string | null = null;
-    const welcomeChecked = new Set<string>();
-
-    const loadRoles = async (uid: string) => {
+  const loadRoles = useCallback(async (uid: string) => {
       const { data } = await supabase
         .from("user_roles")
         .select("role")
         .eq("user_id", uid);
       setRoles((data ?? []).map((r: any) => r.role));
-    };
+  }, []);
 
-    const handleSession = (newSession: Session | null) => {
-      setSession(newSession);
-      setUser(newSession?.user ?? null);
-      const uid = newSession?.user?.id ?? null;
-      if (uid && uid !== lastUid) {
-        lastUid = uid;
-        const u = newSession!.user;
-        setTimeout(() => {
-          loadRoles(uid);
-          if (!welcomeChecked.has(uid)) {
-            welcomeChecked.add(uid);
-            maybeApplyPendingSignup(u).finally(() => maybeSendWelcomeEmail(u));
-          }
-        }, 0);
-      } else if (!uid) {
-        lastUid = null;
-        setRoles([]);
-      }
-    };
+  const handleSession = useCallback((newSession: Session | null) => {
+    setSession(newSession);
+    setUser(newSession?.user ?? null);
+    const uid = newSession?.user?.id ?? null;
+    if (uid && uid !== lastUidRef.current) {
+      lastUidRef.current = uid;
+      const u = newSession!.user;
+      setTimeout(() => {
+        loadRoles(uid);
+        if (!welcomeCheckedRef.current.has(uid)) {
+          welcomeCheckedRef.current.add(uid);
+          maybeApplyPendingSignup(u).finally(() => maybeSendWelcomeEmail(u));
+        }
+      }, 0);
+    } else if (!uid) {
+      lastUidRef.current = null;
+      setRoles([]);
+    }
+  }, [loadRoles]);
+
+  const refreshSession = useCallback(async (providedSession?: Session | null) => {
+    const nextSession = providedSession !== undefined
+      ? providedSession
+      : (await supabase.auth.getSession()).data.session;
+    handleSession(nextSession ?? null);
+    setLoading(false);
+    return nextSession ?? null;
+  }, [handleSession]);
+
+  useEffect(() => {
 
     // Listener FIRST
     const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
       handleSession(newSession);
     });
 
-    supabase.auth.getSession().then(({ data }) => {
-      handleSession(data.session);
-      setLoading(false);
-    });
+    refreshSession();
 
     return () => sub.subscription.unsubscribe();
-  }, []);
+  }, [handleSession, refreshSession]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    handleSession(null);
+    setLoading(false);
   };
 
   const realRoles = roles as AppRole[];
@@ -205,7 +214,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, session, loading, isAdmin, isSales, isModerator, isSupport, isAdvertising, isStaff, realRoles, effectiveRoles, realIsAdmin, simulatedRoles, setSimulatedRoles, signOut }}
+      value={{ user, session, loading, isAdmin, isSales, isModerator, isSupport, isAdvertising, isStaff, realRoles, effectiveRoles, realIsAdmin, simulatedRoles, setSimulatedRoles, refreshSession, signOut }}
     >
       {children}
     </AuthContext.Provider>
