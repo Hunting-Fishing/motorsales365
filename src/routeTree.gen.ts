@@ -54,6 +54,7 @@ import { Route as ApiSitemapDotxmlRouteImport } from './routes/api/sitemap[.]xml
 import { Route as ApiRobotsDottxtRouteImport } from './routes/api/robots[.]txt'
 import { Route as AdminVerificationsRouteImport } from './routes/admin.verifications'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
+import { Route as AdminTypeSuggestionsRouteImport } from './routes/admin.type-suggestions'
 import { Route as AdminSandboxRouteImport } from './routes/admin.sandbox'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminReferralsRouteImport } from './routes/admin.referrals'
@@ -305,6 +306,11 @@ const AdminUsersRoute = AdminUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminTypeSuggestionsRoute = AdminTypeSuggestionsRouteImport.update({
+  id: '/type-suggestions',
+  path: '/type-suggestions',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSandboxRoute = AdminSandboxRouteImport.update({
   id: '/sandbox',
   path: '/sandbox',
@@ -469,6 +475,7 @@ export interface FileRoutesByFullPath {
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
+  '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
   '/api/robots.txt': typeof ApiRobotsDottxtRoute
@@ -539,6 +546,7 @@ export interface FileRoutesByTo {
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
+  '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
   '/api/robots.txt': typeof ApiRobotsDottxtRoute
@@ -612,6 +620,7 @@ export interface FileRoutesById {
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
+  '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
   '/api/robots.txt': typeof ApiRobotsDottxtRoute
@@ -686,6 +695,7 @@ export interface FileRouteTypes {
     | '/admin/referrals'
     | '/admin/reports'
     | '/admin/sandbox'
+    | '/admin/type-suggestions'
     | '/admin/users'
     | '/admin/verifications'
     | '/api/robots.txt'
@@ -756,6 +766,7 @@ export interface FileRouteTypes {
     | '/admin/referrals'
     | '/admin/reports'
     | '/admin/sandbox'
+    | '/admin/type-suggestions'
     | '/admin/users'
     | '/admin/verifications'
     | '/api/robots.txt'
@@ -828,6 +839,7 @@ export interface FileRouteTypes {
     | '/admin/referrals'
     | '/admin/reports'
     | '/admin/sandbox'
+    | '/admin/type-suggestions'
     | '/admin/users'
     | '/admin/verifications'
     | '/api/robots.txt'
@@ -1226,6 +1238,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/type-suggestions': {
+      id: '/admin/type-suggestions'
+      path: '/type-suggestions'
+      fullPath: '/admin/type-suggestions'
+      preLoaderRoute: typeof AdminTypeSuggestionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/sandbox': {
       id: '/admin/sandbox'
       path: '/sandbox'
@@ -1418,6 +1437,7 @@ interface AdminRouteChildren {
   AdminReferralsRoute: typeof AdminReferralsRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminSandboxRoute: typeof AdminSandboxRoute
+  AdminTypeSuggestionsRoute: typeof AdminTypeSuggestionsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVerificationsRoute: typeof AdminVerificationsRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -1438,6 +1458,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminReferralsRoute: AdminReferralsRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminSandboxRoute: AdminSandboxRoute,
+  AdminTypeSuggestionsRoute: AdminTypeSuggestionsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminVerificationsRoute: AdminVerificationsRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -1545,12 +1566,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
