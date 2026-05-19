@@ -413,6 +413,96 @@ function TypeSuggestionsAdmin() {
   );
 }
 
+function AuditTrail({
+  items,
+  deciders,
+}: {
+  items: Suggestion[];
+  deciders: Record<string, DeciderProfile>;
+}) {
+  const [trailQuery, setTrailQuery] = useState("");
+  const decided = useMemo(() => {
+    const list = items.filter((i) => i.status !== "pending" && i.decided_at);
+    list.sort(
+      (a, b) =>
+        new Date(b.decided_at ?? 0).getTime() - new Date(a.decided_at ?? 0).getTime(),
+    );
+    const q = trailQuery.trim().toLowerCase();
+    if (!q) return list;
+    return list.filter((i) => {
+      const decider = i.decided_by ? deciders[i.decided_by] : null;
+      return (
+        i.proposed_label.toLowerCase().includes(q) ||
+        (i.admin_note ?? "").toLowerCase().includes(q) ||
+        (i.merged_into_slug ?? "").toLowerCase().includes(q) ||
+        (i.submitter_email ?? "").toLowerCase().includes(q) ||
+        (decider?.full_name ?? "").toLowerCase().includes(q) ||
+        (i.decided_by ?? "").toLowerCase().includes(q)
+      );
+    });
+  }, [items, deciders, trailQuery]);
+
+  return (
+    <section className="rounded-xl border border-border bg-card p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="font-display text-lg font-semibold">Audit trail</h2>
+          <p className="text-sm text-muted-foreground">
+            Every approve, merge, and reject decision with admin note, timestamp, and decider.
+          </p>
+        </div>
+        <div className="relative w-full sm:w-72">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={trailQuery}
+            onChange={(e) => setTrailQuery(e.target.value)}
+            placeholder="Search audit trail…"
+            className="pl-9"
+          />
+        </div>
+      </div>
+
+      {decided.length === 0 ? (
+        <p className="mt-4 text-sm text-muted-foreground">
+          No decisions yet. Approving, merging, or rejecting a suggestion will appear here.
+        </p>
+      ) : (
+        <ol className="mt-4 space-y-2">
+          {decided.map((s) => {
+            const decider = s.decided_by ? deciders[s.decided_by] : null;
+            const deciderLabel = decider?.full_name || (s.decided_by ? s.decided_by.slice(0, 8) + "…" : "unknown");
+            return (
+              <li
+                key={s.id}
+                className="rounded-lg border border-border bg-background/40 p-3 text-sm"
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  <StatusBadge status={s.status} />
+                  <span className="font-medium">{s.proposed_label}</span>
+                  {s.merged_into_slug && (
+                    <Badge variant="outline" className="text-xs">→ {s.merged_into_slug}</Badge>
+                  )}
+                </div>
+                <div className="mt-1 text-xs text-muted-foreground">
+                  {s.decided_at ? new Date(s.decided_at).toLocaleString() : "—"} ·{" "}
+                  decided by <span className="font-medium text-foreground">{deciderLabel}</span>
+                  {s.submitter_email && <> · submitted by {s.submitter_email}</>}
+                </div>
+                {s.admin_note && (
+                  <div className="mt-2 rounded-md bg-muted/50 p-2 text-xs whitespace-pre-wrap">
+                    <span className="font-medium">Admin note:</span> {s.admin_note}
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ol>
+      )}
+    </section>
+  );
+}
+
+
 function StatusBadge({ status }: { status: Status }) {
   const map: Record<Status, string> = {
     pending: "bg-amber-500/15 text-amber-600 border-amber-500/30",
