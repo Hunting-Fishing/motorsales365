@@ -1,12 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Check, ArrowRight, ArrowDown, Minus } from "lucide-react";
+import { Check, ArrowRight, ArrowDown, Minus, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { formatPHP } from "@/lib/format";
+
+type UsageMonth = { key: string; label: string; count: number };
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
@@ -38,6 +41,7 @@ function PricingPage() {
   const [discounts, setDiscounts] = useState<Record<string, any>>({});
 
   const [lastPayment, setLastPayment] = useState<any | null>(null);
+  const [usage, setUsage] = useState<UsageMonth[]>([]);
 
   const loadSub = async (uid: string) => {
     const { data } = await supabase
@@ -49,7 +53,6 @@ function PricingPage() {
       .maybeSingle();
     setMySub(data ?? null);
 
-    // Latest paid subscription payment — source of truth for proration inputs
     if (data?.id) {
       const { data: pay } = await supabase
         .from("payments")
@@ -67,6 +70,36 @@ function PricingPage() {
     }
   };
 
+  // Last 6 months of listing activity (published_at, falling back to created_at)
+  const loadUsage = async (uid: string) => {
+    const sinceDate = new Date();
+    sinceDate.setMonth(sinceDate.getMonth() - 5);
+    sinceDate.setDate(1);
+    sinceDate.setHours(0, 0, 0, 0);
+    const { data } = await supabase
+      .from("listings")
+      .select("created_at, published_at")
+      .eq("user_id", uid)
+      .gte("created_at", sinceDate.toISOString());
+    const buckets = new Map<string, UsageMonth>();
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date();
+      d.setMonth(d.getMonth() - i);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const label = d.toLocaleDateString("en-PH", { month: "short", year: "2-digit" });
+      buckets.set(key, { key, label, count: 0 });
+    }
+    (data ?? []).forEach((row: any) => {
+      const ts = row.published_at ?? row.created_at;
+      if (!ts) return;
+      const d = new Date(ts);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const b = buckets.get(key);
+      if (b) b.count++;
+    });
+    setUsage(Array.from(buckets.values()));
+  };
+
   useEffect(() => {
     supabase.from("pricing_settings").select("key,value").then(({ data }) => {
       const m: Record<string, number> = {};
@@ -75,7 +108,10 @@ function PricingPage() {
     });
     supabase.from("subscription_plans").select("*").eq("active", true).order("sort_order")
       .then(({ data }) => setPlans((data as any) ?? []));
-    if (user?.id) loadSub(user.id);
+    if (user?.id) {
+      loadSub(user.id);
+      loadUsage(user.id);
+    }
   }, [user?.id]);
 
   // Preview discounts per plan once we have plans + a signed-in user
@@ -127,40 +163,41 @@ function PricingPage() {
     setRequesting(planId);
     const plan = plans.find((p) => p.id === planId);
     const base = Number(plan?.price_php) || 0;
-    const note =
-      kind === "new"
-        ? null
-        : kind === "upgrade"
-          ? `Upgrade from ${currentPlan?.name ?? "current plan"} — prorated credit ₱${proratedCredit}`
-          : kind === "downgrade"
-            ? `Downgrade from ${currentPlan?.name ?? "current plan"} — takes effect next renewal`
-            : `Switch from ${currentPlan?.name ?? "current plan"}`;
-    const { data: sub, error } = await supabase
-      .from("subscriptions")
-      .insert({ user_id: user.id, plan_id: planId, status: "pending", notes: note })
-      .select("id")
-      .maybeSingle();
-    if (error) { setRequesting(null); return toast.error(error.message); }
 
-    const { data: redemption } = await (supabase as any).rpc("apply_referral_redemption", {
+    const { data: result, error } = await (supabase as any).rpc("self_serve_change_plan", {
+      _plan_id: planId,
+    });
+    if (error) { setRequesting(null); return toast.error(error.message); }
+    if (!result?.ok) {
+      setRequesting(null);
+      return toast.info(result?.reason === "already_on_plan" ? "You're already on this plan." : "Could not change plan.");
+    }
+
+    // Best-effort referral discount application on the new payment
+    await (supabase as any).rpc("apply_referral_redemption", {
       _kind: "subscription",
       _base_amount: base,
-      _subscription_id: sub?.id ?? null,
+      _subscription_id: result.subscription_id ?? null,
     });
+
     setRequesting(null);
-    if (redemption?.ok) {
-      toast.success(`Referral discount applied — ₱${redemption.discount_amount_php} off. Final: ₱${redemption.final_amount_php}.`);
-    } else if (kind === "upgrade") {
-      toast.success(`Upgrade requested — pay ₱${Math.max(0, base - proratedCredit)} now (₱${proratedCredit} prorated credit applied).`);
-    } else if (kind === "downgrade") {
-      toast.success(`Downgrade to ${plan?.name} requested — takes effect at next renewal.`);
-    } else if (kind === "switch") {
-      toast.success(`Switch to ${plan?.name} requested — our team will reach out.`);
-    } else {
-      toast.success("Subscription requested — our team will reach out shortly.");
-    }
+    const net = Number(result.net_php ?? base);
+    const credit = Number(result.credit_php ?? 0);
+    toast.success(
+      kind === "upgrade" && credit > 0
+        ? `${plan?.name} activated — ${formatPHP(net)} due now (${formatPHP(credit)} prorated credit applied).`
+        : kind === "downgrade"
+          ? `Switched to ${plan?.name} — ${formatPHP(net)} due now, takes effect immediately.`
+          : `${plan?.name} activated — ${formatPHP(net)} due now.`,
+    );
     loadSub(user.id);
   };
+
+  // Usage helpers — current month vs current plan limit
+  const thisMonthCount = usage.length ? usage[usage.length - 1].count : 0;
+  const monthMax = Math.max(1, ...usage.map((u) => u.count));
+  const planLimit = currentPlan?.listings_per_month ?? null;
+  const usagePct = planLimit ? Math.min(100, Math.round((thisMonthCount / planLimit) * 100)) : 0;
 
   return (
     <SiteLayout>
@@ -194,6 +231,81 @@ function PricingPage() {
             <Link to="/dashboard/billing" className="text-primary underline">View billing →</Link>
           </p>
         )}
+
+        {user && (
+          <div className="mx-auto mb-8 max-w-3xl rounded-2xl border border-border bg-card p-6">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h3 className="font-display text-lg font-semibold">Your listing usage</h3>
+              <span className="text-xs text-muted-foreground">
+                {currentPlan ? `On ${currentPlan.name}` : "On Free plan"}
+              </span>
+            </div>
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="font-display text-3xl font-bold">{thisMonthCount}</span>
+              <span className="text-sm text-muted-foreground">
+                listing{thisMonthCount === 1 ? "" : "s"} this month
+                {planLimit !== null ? ` of ${planLimit} included` : " — unlimited on your plan"}
+              </span>
+            </div>
+            {planLimit !== null && (
+              <Progress value={usagePct} className="mt-2 h-2" />
+            )}
+
+            <div className="mt-5">
+              <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Last 6 months
+              </div>
+              <div className="flex items-end gap-2 h-24">
+                {usage.map((m) => {
+                  const h = monthMax > 0 ? Math.max(6, Math.round((m.count / monthMax) * 88)) : 6;
+                  const over = planLimit !== null && m.count > planLimit;
+                  return (
+                    <div key={m.key} className="flex flex-1 flex-col items-center gap-1">
+                      <div
+                        className={`w-full rounded-t ${over ? "bg-amber-500" : "bg-primary/70"}`}
+                        style={{ height: `${h}px` }}
+                        title={`${m.label}: ${m.count}`}
+                      />
+                      <div className="text-[10px] text-muted-foreground">{m.label}</div>
+                      <div className="text-[11px] font-semibold">{m.count}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {(() => {
+              const silver = plans.find((p) => /silver/i.test(p.name));
+              if (!silver) return null;
+              const silverLimit = silver.listings_per_month;
+              const isCurrentSilver = currentPlan?.id === silver.id;
+              if (isCurrentSilver) return null;
+              const overran = usage.some(
+                (m) => planLimit !== null && m.count > (planLimit ?? 0),
+              );
+              const wouldFitSilver =
+                silverLimit === null ||
+                usage.every((m) => m.count <= silverLimit);
+              if (!overran && (silverLimit === null || thisMonthCount * 2 <= silverLimit)) return null;
+              return (
+                <div className="mt-5 flex items-start gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm">
+                  <Sparkles className="mt-0.5 h-4 w-4 text-primary" />
+                  <div>
+                    <div className="font-medium text-foreground">
+                      {silver.name} fits your activity{wouldFitSilver ? " every month" : " better"}.
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      You'd get {silverLimit ?? "unlimited"} listings/mo and up to{" "}
+                      {silver.max_photos_per_listing ?? "more"} photos per listing for {formatPHP(silver.price_php)}/mo.
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        )}
+
+
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {plans.map((p) => {
             const isCurrent = currentPlan?.id === p.id;
@@ -234,12 +346,12 @@ function PricingPage() {
                 : !user
                   ? "Sign up to subscribe"
                   : kind === "upgrade"
-                    ? `Upgrade — pay ${formatPHP(upgradeNet)} now`
+                    ? `Upgrade now — ${formatPHP(upgradeNet)}`
                     : kind === "downgrade"
-                      ? `Switch to ${p.name}`
+                      ? `Switch to ${p.name} — ${formatPHP(p.price_php)}`
                       : kind === "switch"
                         ? `Switch to ${p.name}`
-                        : "Request this plan";
+                        : `Activate ${p.name} — ${formatPHP(p.price_php)}`;
 
             return (
               <div
@@ -324,7 +436,7 @@ function PricingPage() {
                       )}
                       {kind === "downgrade" && (
                         <li className="border-t border-border pt-1 text-muted-foreground">
-                          Takes effect at next renewal — no charge today.
+                          Takes effect immediately — your next bill matches the new plan.
                         </li>
                       )}
                     </ul>
@@ -351,7 +463,7 @@ function PricingPage() {
           })}
         </div>
         <p className="mx-auto mt-6 max-w-2xl text-center text-xs text-muted-foreground">
-          Requests are reviewed manually by our sales team — you'll receive an email once it's activated. Live card payments are coming soon.
+          Plan changes activate instantly. Any unused portion of your current plan is applied as a prorated credit on your next invoice. Live card payments are coming soon.
         </p>
       </section>
     </SiteLayout>
