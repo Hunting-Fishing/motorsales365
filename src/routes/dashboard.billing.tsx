@@ -64,13 +64,29 @@ function BillingPage() {
   const [mediaCounts, setMediaCounts] = useState<Record<string, { photo: number; video: number }>>({});
   const [chartRange, setChartRange] = useState<"daily" | "weekly">("daily");
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [invoices, setInvoices] = useState<any[]>([]);
+
+  const env = getStripeEnvironment();
+
+  const reloadSubs = () => {
+    if (!user) return;
+    supabase.from("subscriptions").select("*").eq("user_id", user.id)
+      .or(`environment.eq.${env},environment.is.null`)
+      .order("created_at", { ascending: false })
+      .then(({ data }) => setSubs(data ?? []));
+  };
 
   useEffect(() => {
     if (!user) return;
     supabase.from("payments").select("*").eq("user_id", user.id).order("created_at", { ascending: false })
       .then(({ data }) => setPayments(data ?? []));
-    supabase.from("subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false })
-      .then(({ data }) => setSubs(data ?? []));
+    reloadSubs();
+    listInvoices({ data: { environment: env, limit: 20 } })
+      .then((res) => setInvoices(res.invoices ?? []))
+      .catch(() => setInvoices([]));
+
     supabase.from("subscription_plans").select("*").eq("active", true).order("sort_order")
       .then(({ data }) => {
         const list = (data ?? []) as Plan[];
