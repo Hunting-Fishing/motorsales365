@@ -46,6 +46,11 @@ function PricingPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [mySub, setMySub] = useState<any | null>(null);
   const [requesting, setRequesting] = useState<string | null>(null);
+  const [confirmPlan, setConfirmPlan] = useState<{
+    plan: Plan;
+    kind: "new" | "upgrade" | "downgrade" | "switch";
+    upgradeNet: number;
+  } | null>(null);
   const [discounts, setDiscounts] = useState<Record<string, any>>({});
 
   const [lastPayment, setLastPayment] = useState<any | null>(null);
