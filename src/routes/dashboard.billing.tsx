@@ -327,12 +327,100 @@ function BillingPage() {
               </div>
             </div>
             {!recommendation.matches && (
-              <Button asChild size="sm">
-                <Link to="/pricing">View plans</Link>
-              </Button>
+              recommendation.upgrade && currentPlan ? (
+                <Button size="sm" onClick={() => setConfirmOpen(true)}>Review upgrade</Button>
+              ) : (
+                <Button asChild size="sm">
+                  <Link to="/pricing">View plans</Link>
+                </Button>
+              )
             )}
           </div>
         </section>
+      )}
+
+      {/* Upgrade confirmation dialog */}
+      {recommendation?.upgrade && currentPlan && (
+        <Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+          <DialogContent className="sm:max-w-lg">
+            <DialogHeader>
+              <DialogTitle>Confirm upgrade to {recommendation.plan.name}</DialogTitle>
+              <DialogDescription>
+                Review the prorated charge and what changes on your account immediately.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4 text-sm">
+              <div className="rounded-lg border border-border bg-muted/30 p-3">
+                <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  Prorated charge today
+                </div>
+                <dl className="space-y-1.5">
+                  <div className="flex justify-between">
+                    <dt className="text-muted-foreground">{recommendation.plan.name} (monthly)</dt>
+                    <dd className="font-medium">{formatPHP(recommendation.plan.price_php)}</dd>
+                  </div>
+                  {recommendation.proratedCredit > 0 && (
+                    <div className="flex justify-between text-emerald-600">
+                      <dt>
+                        Credit for unused {currentPlan.name}
+                        {renewalDays !== null && renewalDays > 0
+                          ? ` (${renewalDays} day${renewalDays === 1 ? "" : "s"} left)`
+                          : ""}
+                      </dt>
+                      <dd className="font-medium">− {formatPHP(recommendation.proratedCredit)}</dd>
+                    </div>
+                  )}
+                  <div className="mt-2 flex justify-between border-t border-border pt-2 text-base">
+                    <dt className="font-semibold">Due now</dt>
+                    <dd className="font-semibold">{formatPHP(recommendation.upgradeNet)}</dd>
+                  </div>
+                </dl>
+              </div>
+
+              <div>
+                <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  What changes immediately
+                </div>
+                <ul className="space-y-1.5">
+                  <li className="flex items-start gap-2">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                    <span>
+                      Listing cap increases to{" "}
+                      <span className="font-medium">
+                        {recommendation.plan.listings_per_month ?? "unlimited"}
+                      </span>{" "}
+                      /month (from {currentPlan.listings_per_month ?? "unlimited"}).
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                    <span>
+                      Photo limit increases to{" "}
+                      <span className="font-medium">{recommendation.plan.max_photos_per_listing}</span> per listing
+                      (from {currentPlan.max_photos_per_listing}).
+                    </span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                    <span>New billing cycle starts today; next renewal in 30 days.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
+                    <span>Active listings and boosts stay live — no relisting needed.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setConfirmOpen(false)}>Cancel</Button>
+              <Button asChild>
+                <Link to="/pricing">Continue to checkout</Link>
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
 
 
