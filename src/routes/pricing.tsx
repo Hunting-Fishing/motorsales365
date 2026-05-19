@@ -37,6 +37,8 @@ function PricingPage() {
   const [requesting, setRequesting] = useState<string | null>(null);
   const [discounts, setDiscounts] = useState<Record<string, any>>({});
 
+  const [lastPayment, setLastPayment] = useState<any | null>(null);
+
   const loadSub = async (uid: string) => {
     const { data } = await supabase
       .from("subscriptions")
@@ -46,6 +48,23 @@ function PricingPage() {
       .limit(1)
       .maybeSingle();
     setMySub(data ?? null);
+
+    // Latest paid subscription payment — source of truth for proration inputs
+    if (data?.id) {
+      const { data: pay } = await supabase
+        .from("payments")
+        .select("period_start, period_end, paid_at, credit_calculated_at, plan_price_php")
+        .eq("user_id", uid)
+        .eq("kind", "subscription" as any)
+        .eq("status", "paid" as any)
+        .not("period_end", "is", null)
+        .order("paid_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      setLastPayment(pay ?? null);
+    } else {
+      setLastPayment(null);
+    }
   };
 
   useEffect(() => {
