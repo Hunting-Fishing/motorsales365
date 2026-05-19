@@ -35,6 +35,11 @@ async function resolveOrCreateCustomer(
   return created.id;
 }
 
+function validateEnv(env: StripeEnv): StripeEnv {
+  if (env !== "sandbox" && env !== "live") throw new Error("Invalid environment");
+  return env;
+}
+
 export const createCheckoutSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: {
@@ -44,9 +49,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     environment: StripeEnv;
   }) => {
     if (!/^[a-zA-Z0-9_-]+$/.test(data.priceId)) throw new Error("Invalid priceId");
-    if (data.environment !== "sandbox" && data.environment !== "live") {
-      throw new Error("Invalid environment");
-    }
+    validateEnv(data.environment);
     return data;
   })
   .handler(async ({ data, context }) => {
@@ -59,16 +62,13 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     const isRecurring = stripePrice.type === "recurring";
 
     const email = (claims as any)?.email as string | undefined;
-
     const customerId = await resolveOrCreateCustomer(stripe, { email, userId });
 
-    // Try to load profile for billing details
     const { data: profile } = await supabase
       .from("profiles")
       .select("full_name")
       .eq("id", userId)
       .maybeSingle();
-
     if (profile?.full_name) {
       await stripe.customers.update(customerId, { name: profile.full_name });
     }
@@ -89,12 +89,175 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     return session.client_secret;
   });
 
+/**
+ * Modify an EXISTING Stripe subscription to a new plan.
+ * - Upgrade: invoices the prorated difference immediately and charges the saved card.
+ * - Downgrade: switches immediately, the unused portion is credited toward the next invoice.
+ */
+export const updateSubscriptionPlan = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: {
+    priceId: string;
+    environment: StripeEnv;
+    mode: "upgrade" | "downgrade" | "switch";
+  }) => {
+    if (!/^[a-zA-Z0-9_-]+$/.test(data.priceId)) throw new Error("Invalid priceId");
+    validateEnv(data.environment);
+    if (!["upgrade", "downgrade", "switch"].includes(data.mode)) {
+      throw new Error("Invalid mode");
+    }
+    return data;
+  })
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const stripe = createStripeClient(data.environment);
+
+    const { data: sub } = await supabase
+      .from("subscriptions")
+      .select("stripe_subscription_id")
+      .eq("user_id", userId)
+      .eq("environment", data.environment)
+      .not("stripe_subscription_id", "is", null)
+      .in("status", ["active", "trialing", "past_due"])
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!sub?.stripe_subscription_id) {
+      throw new Error("No active Stripe subscription to modify");
+    }
+
+    const prices = await stripe.prices.list({ lookup_keys: [data.priceId] });
+    if (!prices.data.length) throw new Error("Price not found");
+    const stripePrice = prices.data[0];
+
+    const stripeSub = await stripe.subscriptions.retrieve(sub.stripe_subscription_id);
+    const itemId = stripeSub.items.data[0]?.id;
+    if (!itemId) throw new Error("Subscription has no items");
+
+    // Upgrades invoice the diff immediately; downgrades/switches create
+    // a credit on the customer balance that applies to the next invoice.
+    const prorationBehavior = data.mode === "upgrade" ? "always_invoice" : "create_prorations";
+
+    const updated = await stripe.subscriptions.update(sub.stripe_subscription_id, {
+      items: [{ id: itemId, price: stripePrice.id }],
+      proration_behavior: prorationBehavior,
+      payment_behavior: "error_if_incomplete",
+      metadata: {
+        ...(stripeSub.metadata || {}),
+        userId,
+        lookup_key: data.priceId,
+      },
+    });
+
+    return { ok: true, subscriptionId: updated.id, status: updated.status };
+  });
+
+export const cancelSubscription = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { environment: StripeEnv; immediate?: boolean }) => {
+    validateEnv(data.environment);
+    return data;
+  })
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const stripe = createStripeClient(data.environment);
+
+    const { data: sub } = await supabase
+      .from("subscriptions")
+      .select("stripe_subscription_id")
+      .eq("user_id", userId)
+      .eq("environment", data.environment)
+      .not("stripe_subscription_id", "is", null)
+      .in("status", ["active", "trialing", "past_due"])
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!sub?.stripe_subscription_id) throw new Error("No active subscription");
+
+    if (data.immediate) {
+      await stripe.subscriptions.cancel(sub.stripe_subscription_id);
+    } else {
+      await stripe.subscriptions.update(sub.stripe_subscription_id, {
+        cancel_at_period_end: true,
+      });
+    }
+    return { ok: true };
+  });
+
+export const reactivateSubscription = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { environment: StripeEnv }) => {
+    validateEnv(data.environment);
+    return data;
+  })
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const stripe = createStripeClient(data.environment);
+
+    const { data: sub } = await supabase
+      .from("subscriptions")
+      .select("stripe_subscription_id")
+      .eq("user_id", userId)
+      .eq("environment", data.environment)
+      .not("stripe_subscription_id", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!sub?.stripe_subscription_id) throw new Error("No subscription to reactivate");
+
+    await stripe.subscriptions.update(sub.stripe_subscription_id, {
+      cancel_at_period_end: false,
+    });
+    return { ok: true };
+  });
+
+export const listInvoices = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { environment: StripeEnv; limit?: number }) => {
+    validateEnv(data.environment);
+    return data;
+  })
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const stripe = createStripeClient(data.environment);
+
+    const { data: sub } = await supabase
+      .from("subscriptions")
+      .select("stripe_customer_id")
+      .eq("user_id", userId)
+      .eq("environment", data.environment)
+      .not("stripe_customer_id", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!sub?.stripe_customer_id) return { invoices: [] };
+
+    const invoices = await stripe.invoices.list({
+      customer: sub.stripe_customer_id,
+      limit: Math.min(data.limit ?? 20, 50),
+    });
+    return {
+      invoices: invoices.data.map((inv) => ({
+        id: inv.id,
+        number: inv.number,
+        amount_paid: inv.amount_paid,
+        currency: inv.currency,
+        status: inv.status,
+        created: inv.created,
+        hosted_invoice_url: inv.hosted_invoice_url,
+        invoice_pdf: inv.invoice_pdf,
+      })),
+    };
+  });
+
 export const createPortalSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { returnUrl?: string; environment: StripeEnv }) => {
-    if (data.environment !== "sandbox" && data.environment !== "live") {
-      throw new Error("Invalid environment");
-    }
+    validateEnv(data.environment);
     return data;
   })
   .handler(async ({ data, context }) => {

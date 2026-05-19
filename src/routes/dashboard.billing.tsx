@@ -6,8 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { formatPHP, formatDate } from "@/lib/format";
-import { CheckCircle2, AlertTriangle, ArrowUpRight, TrendingUp, Calendar, Check } from "lucide-react";
+import { CheckCircle2, AlertTriangle, ArrowUpRight, TrendingUp, Calendar, Check, CreditCard, Receipt, XCircle, RotateCcw, ExternalLink } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { toast } from "sonner";
+import { getStripeEnvironment } from "@/lib/stripe";
+import {
+  cancelSubscription,
+  reactivateSubscription,
+  createPortalSession,
+  listInvoices,
+} from "@/utils/payments.functions";
+
 
 export const Route = createFileRoute("/dashboard/billing")({
   component: BillingPage,
@@ -55,13 +64,29 @@ function BillingPage() {
   const [mediaCounts, setMediaCounts] = useState<Record<string, { photo: number; video: number }>>({});
   const [chartRange, setChartRange] = useState<"daily" | "weekly">("daily");
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [invoices, setInvoices] = useState<any[]>([]);
+
+  const env = getStripeEnvironment();
+
+  const reloadSubs = () => {
+    if (!user) return;
+    supabase.from("subscriptions").select("*").eq("user_id", user.id)
+      .or(`environment.eq.${env},environment.is.null`)
+      .order("created_at", { ascending: false })
+      .then(({ data }) => setSubs(data ?? []));
+  };
 
   useEffect(() => {
     if (!user) return;
     supabase.from("payments").select("*").eq("user_id", user.id).order("created_at", { ascending: false })
       .then(({ data }) => setPayments(data ?? []));
-    supabase.from("subscriptions").select("*").eq("user_id", user.id).order("created_at", { ascending: false })
-      .then(({ data }) => setSubs(data ?? []));
+    reloadSubs();
+    listInvoices({ data: { environment: env, limit: 20 } })
+      .then((res) => setInvoices(res.invoices ?? []))
+      .catch(() => setInvoices([]));
+
     supabase.from("subscription_plans").select("*").eq("active", true).order("sort_order")
       .then(({ data }) => {
         const list = (data ?? []) as Plan[];
@@ -462,8 +487,145 @@ function BillingPage() {
         </Dialog>
       )}
 
+      {/* Manage subscription (Stripe-backed) */}
+      {activeSub?.stripe_subscription_id && (
+        <section className="mb-8 rounded-xl border border-border bg-card p-4">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <h2 className="font-display text-lg font-semibold">Manage subscription</h2>
+              <p className="text-xs text-muted-foreground">
+                Card on file is charged automatically each cycle.
+                {activeSub.cancel_at_period_end && (
+                  <> · <span className="font-medium text-amber-600">Cancels on {formatDate(activeSub.current_period_end)}</span></>
+                )}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={busy === "portal"}
+                onClick={async () => {
+                  setBusy("portal");
+                  try {
+                    const url = await createPortalSession({
+                      data: { environment: env, returnUrl: window.location.href },
+                    });
+                    window.open(url, "_blank", "noopener,noreferrer");
+                  } catch (e: any) {
+                    toast.error(e?.message ?? "Could not open billing portal");
+                  } finally { setBusy(null); }
+                }}
+              >
+                <CreditCard className="mr-2 h-4 w-4" />
+                {busy === "portal" ? "Opening…" : "Manage payment method"}
+              </Button>
+              {activeSub.cancel_at_period_end ? (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  disabled={busy === "reactivate"}
+                  onClick={async () => {
+                    setBusy("reactivate");
+                    try {
+                      await reactivateSubscription({ data: { environment: env } });
+                      toast.success("Subscription resumed.");
+                      reloadSubs();
+                    } catch (e: any) {
+                      toast.error(e?.message ?? "Could not resume");
+                    } finally { setBusy(null); }
+                  }}
+                >
+                  <RotateCcw className="mr-2 h-4 w-4" />
+                  Resume subscription
+                </Button>
+              ) : (
+                <Button variant="ghost" size="sm" onClick={() => setCancelOpen(true)}>
+                  <XCircle className="mr-2 h-4 w-4" />
+                  Cancel subscription
+                </Button>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Cancel confirmation */}
+      <Dialog open={cancelOpen} onOpenChange={setCancelOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel subscription?</DialogTitle>
+            <DialogDescription>
+              You'll keep access until {activeSub?.current_period_end ? formatDate(activeSub.current_period_end) : "the end of your current period"}.
+              No more charges after that. You can resume anytime before then.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCancelOpen(false)}>Keep subscription</Button>
+            <Button
+              variant="destructive"
+              disabled={busy === "cancel"}
+              onClick={async () => {
+                setBusy("cancel");
+                try {
+                  await cancelSubscription({ data: { environment: env, immediate: false } });
+                  toast.success("Subscription will end at the period end.");
+                  setCancelOpen(false);
+                  reloadSubs();
+                } catch (e: any) {
+                  toast.error(e?.message ?? "Could not cancel");
+                } finally { setBusy(null); }
+              }}
+            >
+              {busy === "cancel" ? "Cancelling…" : "Confirm cancellation"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Invoice history from Stripe */}
+      {invoices.length > 0 && (
+        <section className="mb-8 rounded-xl border border-border bg-card p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="font-display text-lg font-semibold">Invoices</h2>
+            <Receipt className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <div className="divide-y divide-border text-sm">
+            {invoices.map((inv) => (
+              <div key={inv.id} className="flex flex-wrap items-center justify-between gap-2 py-2">
+                <div>
+                  <div className="font-medium">
+                    {inv.number ?? inv.id}{" "}
+                    <Badge variant={inv.status === "paid" ? "default" : "secondary"} className="ml-1 text-[10px]">
+                      {inv.status}
+                    </Badge>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {formatDate(new Date(inv.created * 1000).toISOString())} · {(inv.currency ?? "php").toUpperCase()} {(inv.amount_paid / 100).toFixed(2)}
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  {inv.hosted_invoice_url && (
+                    <Button asChild variant="outline" size="sm">
+                      <a href={inv.hosted_invoice_url} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="mr-1 h-3 w-3" /> View
+                      </a>
+                    </Button>
+                  )}
+                  {inv.invoice_pdf && (
+                    <Button asChild variant="ghost" size="sm">
+                      <a href={inv.invoice_pdf} target="_blank" rel="noopener noreferrer">PDF</a>
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Posting activity chart */}
+
       <section className="mb-8">
         <div className="mb-2 flex items-center justify-between">
           <h2 className="font-display text-lg font-semibold">Posting activity</h2>

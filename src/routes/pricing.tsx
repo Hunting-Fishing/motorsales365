@@ -17,7 +17,10 @@ import {
 } from "@/components/ui/dialog";
 import { formatPHP } from "@/lib/format";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
+import { getStripeEnvironment } from "@/lib/stripe";
+import { updateSubscriptionPlan } from "@/utils/payments.functions";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+
 
 type UsageMonth = { key: string; label: string; count: number };
 
@@ -61,14 +64,17 @@ function PricingPage() {
   const [usage, setUsage] = useState<UsageMonth[]>([]);
 
   const loadSub = async (uid: string) => {
+    const env = getStripeEnvironment();
     const { data } = await supabase
       .from("subscriptions")
       .select("*")
       .eq("user_id", uid)
+      .or(`environment.eq.${env},environment.is.null`)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
     setMySub(data ?? null);
+
 
     if (data?.id) {
       const { data: pay } = await supabase
@@ -567,29 +573,73 @@ function PricingPage() {
                   <Button
                     disabled={requesting === plan.id}
                     onClick={async () => {
-                      if (Number(plan.price_php) > 0 && plan.stripe_lookup_key) {
+                      const hasStripeSub = !!mySub?.stripe_subscription_id &&
+                        ["active", "trialing", "past_due"].includes(mySub?.status);
+                      const isPaid = Number(plan.price_php) > 0 && !!plan.stripe_lookup_key;
+
+                      // Existing Stripe subscriber switching to another paid plan →
+                      // modify the sub server-side (Stripe charges prorated diff for
+                      // upgrades, credits the balance for downgrades). No new checkout.
+                      if (isPaid && hasStripeSub && kind !== "new") {
+                        try {
+                          setRequesting(plan.id);
+                          await updateSubscriptionPlan({
+                            data: {
+                              priceId: plan.stripe_lookup_key!,
+                              environment: getStripeEnvironment(),
+                              mode: kind,
+                            },
+                          });
+                          toast.success(
+                            kind === "upgrade"
+                              ? `Upgraded to ${plan.name} — prorated charge applied to your saved card.`
+                              : kind === "downgrade"
+                                ? `Switched to ${plan.name} — credit will apply to your next invoice.`
+                                : `Switched to ${plan.name}.`
+                          );
+                          setConfirmPlan(null);
+                          if (user?.id) loadSub(user.id);
+                        } catch (err: any) {
+                          toast.error(err?.message ?? "Could not update subscription");
+                        } finally {
+                          setRequesting(null);
+                        }
+                        return;
+                      }
+
+                      // New paid subscriber → embedded Stripe checkout (saves card)
+                      if (isPaid) {
                         setConfirmPlan(null);
                         openCheckout({
-                          priceId: plan.stripe_lookup_key,
+                          priceId: plan.stripe_lookup_key!,
                           returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
                         });
-                      } else {
-                        await submitPlanChange(plan.id, kind);
-                        setConfirmPlan(null);
+                        return;
                       }
+
+                      // Free plan or complimentary path
+                      await submitPlanChange(plan.id, kind);
+                      setConfirmPlan(null);
                     }}
                   >
                     <CreditCard className="mr-2 h-4 w-4" />
                     {requesting === plan.id
-                      ? "Activating…"
-                      : Number(plan.price_php) > 0
-                        ? `Continue to payment — ${formatPHP(due)}`
-                        : kind === "upgrade"
-                          ? `Confirm upgrade — ${formatPHP(due)}`
+                      ? "Processing…"
+                      : mySub?.stripe_subscription_id && Number(plan.price_php) > 0 && kind !== "new"
+                        ? kind === "upgrade"
+                          ? `Charge ${formatPHP(due)} prorated`
                           : kind === "downgrade"
-                            ? `Confirm switch — ${formatPHP(due)}`
-                            : `Confirm — ${formatPHP(due)}`}
+                            ? `Switch — credit ${formatPHP(proratedCredit)} applied`
+                            : `Switch to ${plan.name}`
+                        : Number(plan.price_php) > 0
+                          ? `Continue to payment — ${formatPHP(plan.price_php)}`
+                          : kind === "upgrade"
+                            ? `Confirm upgrade — ${formatPHP(due)}`
+                            : kind === "downgrade"
+                              ? `Confirm switch — ${formatPHP(due)}`
+                              : `Confirm — ${formatPHP(due)}`}
                   </Button>
+
                 </DialogFooter>
               </>
             );
