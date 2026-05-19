@@ -336,6 +336,10 @@ function TypeSuggestionsAdmin() {
         </>
       )}
 
+      <AuditTrail items={items} deciders={deciders} />
+
+
+
       <Dialog open={!!action} onOpenChange={(o) => { if (!o) closeAction(); }}>
         <DialogContent>
           {action && (
