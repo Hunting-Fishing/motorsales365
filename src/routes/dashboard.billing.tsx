@@ -280,15 +280,38 @@ function BillingPage() {
           <div className="mt-1 text-xs text-muted-foreground">across all your listings</div>
         </div>
         <div className="rounded-xl border border-border bg-card p-4">
-          <div className="text-xs uppercase text-muted-foreground">Renewal</div>
-          {renewalDays !== null ? (
+          <div className="flex items-center justify-between">
+            <div className="text-xs uppercase text-muted-foreground">Renewal countdown</div>
+            {proratedCredit > 0 && (
+              <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600">
+                {formatPHP(proratedCredit)} credit
+              </span>
+            )}
+          </div>
+          {countdown ? (
             <>
-              <div className="mt-1 font-display text-2xl font-bold">
-                {renewalDays > 0 ? `${renewalDays}d` : "Due"}
+              <div
+                className="mt-1 flex items-baseline gap-1 font-display text-2xl font-bold tabular-nums"
+                aria-live="polite"
+                title={`Renews ${formatDate(activeSub.current_period_end)}`}
+              >
+                {countdown.due ? (
+                  <span>Due now</span>
+                ) : (
+                  <>
+                    <span>{countdown.d}</span><span className="text-sm font-medium text-muted-foreground">d</span>
+                    <span className="ml-1">{String(countdown.h).padStart(2, "0")}</span><span className="text-sm font-medium text-muted-foreground">h</span>
+                    <span className="ml-1">{String(countdown.m).padStart(2, "0")}</span><span className="text-sm font-medium text-muted-foreground">m</span>
+                    <span className="ml-1">{String(countdown.s).padStart(2, "0")}</span><span className="text-sm font-medium text-muted-foreground">s</span>
+                  </>
+                )}
               </div>
               <div className="mt-1 text-xs text-muted-foreground">
                 <Calendar className="mr-1 inline h-3 w-3" />
-                {formatDate(activeSub.current_period_end)}
+                Renews {formatDate(activeSub.current_period_end)}
+                {proratedCredit > 0 && (
+                  <> · Upgrade now to get back <span className="font-medium text-emerald-600">{formatPHP(proratedCredit)}</span></>
+                )}
               </div>
             </>
           ) : (
