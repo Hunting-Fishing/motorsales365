@@ -86,10 +86,27 @@ function TypeSuggestionsAdmin() {
 
   useEffect(() => { load(); }, [load]);
 
-  const filtered = useMemo(
-    () => filter === "all" ? items : items.filter((i) => i.status === filter),
-    [items, filter],
+  const filtered = useMemo(() => {
+    const base = filter === "all" ? items : items.filter((i) => i.status === filter);
+    const q = query.trim().toLowerCase();
+    if (!q) return base;
+    return base.filter(
+      (i) =>
+        i.proposed_label.toLowerCase().includes(q) ||
+        (i.submitter_email ?? "").toLowerCase().includes(q) ||
+        (i.notes ?? "").toLowerCase().includes(q) ||
+        (i.merged_into_slug ?? "").toLowerCase().includes(q),
+    );
+  }, [items, filter, query]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const paged = useMemo(
+    () => filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize),
+    [filtered, currentPage],
   );
+
+  useEffect(() => { setPage(1); }, [filter, query]);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = { all: items.length, pending: 0, approved: 0, merged: 0, rejected: 0 };
