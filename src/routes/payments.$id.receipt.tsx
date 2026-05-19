@@ -118,8 +118,19 @@ function ReceiptPage() {
             const credit = Number(payment.prorated_credit_php ?? 0);
             const gross = Number(payment.gross_amount_php ?? 0);
             const net = Number(payment.amount_php ?? 0);
-            const hasBreakdown = credit > 0 || gross > 0;
-            const subtotal = gross > 0 ? gross : net;
+            const planPrice = Number(payment.plan_price_php ?? 0);
+            const boost = Number(payment.boost_amount_php ?? 0);
+            const addons = Number(payment.addons_amount_php ?? 0);
+            const hasSplit = planPrice > 0 || boost > 0 || addons > 0;
+            const subtotal = hasSplit
+              ? planPrice + boost + addons
+              : gross > 0
+                ? gross
+                : net;
+            const hasBreakdown = credit > 0 || gross > 0 || hasSplit;
+            const planLabel = payment.new_plan
+              ? `Plan — ${payment.new_plan}`
+              : payment.kind?.replace(/_/g, " ") ?? "Plan";
             return (
               <table className="w-full border-t border-border text-sm">
                 <thead>
@@ -129,27 +140,68 @@ function ReceiptPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-t border-border">
-                    <td className="py-3">
-                      <div className="font-medium capitalize">
-                        {payment.new_plan
-                          ? `Plan upgrade — ${payment.new_plan}`
-                          : payment.kind?.replace(/_/g, " ")}
-                      </div>
-                      {payment.previous_plan && (
-                        <div className="text-xs text-muted-foreground">
-                          Changed from {payment.previous_plan}
-                          {payment.new_plan ? ` to ${payment.new_plan}` : ""}
-                        </div>
+                  {hasSplit ? (
+                    <>
+                      {planPrice > 0 && (
+                        <tr className="border-t border-border">
+                          <td className="py-3">
+                            <div className="font-medium capitalize">{planLabel}</div>
+                            {payment.previous_plan && payment.new_plan && (
+                              <div className="text-xs text-muted-foreground">
+                                Changed from {payment.previous_plan} to {payment.new_plan}
+                              </div>
+                            )}
+                            <div className="text-xs text-muted-foreground">Monthly plan price</div>
+                          </td>
+                          <td className="py-3 text-right font-medium">{formatPHP(planPrice)}</td>
+                        </tr>
                       )}
-                      {listing ? (
-                        <div className="text-xs text-muted-foreground">For listing: {listing.title}</div>
-                      ) : payment.notes ? (
-                        <div className="text-xs text-muted-foreground">{payment.notes}</div>
-                      ) : null}
-                    </td>
-                    <td className="py-3 text-right font-medium">{formatPHP(subtotal)}</td>
-                  </tr>
+                      {boost > 0 && (
+                        <tr className="border-t border-border">
+                          <td className="py-3">
+                            <div className="font-medium">Boosted listing renewal</div>
+                            {listing && (
+                              <div className="text-xs text-muted-foreground">For listing: {listing.title}</div>
+                            )}
+                          </td>
+                          <td className="py-3 text-right font-medium">{formatPHP(boost)}</td>
+                        </tr>
+                      )}
+                      {addons > 0 && (
+                        <tr className="border-t border-border">
+                          <td className="py-3">
+                            <div className="font-medium">Add-ons</div>
+                            {payment.addons_description && (
+                              <div className="text-xs text-muted-foreground">{payment.addons_description}</div>
+                            )}
+                          </td>
+                          <td className="py-3 text-right font-medium">{formatPHP(addons)}</td>
+                        </tr>
+                      )}
+                    </>
+                  ) : (
+                    <tr className="border-t border-border">
+                      <td className="py-3">
+                        <div className="font-medium capitalize">
+                          {payment.new_plan
+                            ? `Plan upgrade — ${payment.new_plan}`
+                            : payment.kind?.replace(/_/g, " ")}
+                        </div>
+                        {payment.previous_plan && (
+                          <div className="text-xs text-muted-foreground">
+                            Changed from {payment.previous_plan}
+                            {payment.new_plan ? ` to ${payment.new_plan}` : ""}
+                          </div>
+                        )}
+                        {listing ? (
+                          <div className="text-xs text-muted-foreground">For listing: {listing.title}</div>
+                        ) : payment.notes ? (
+                          <div className="text-xs text-muted-foreground">{payment.notes}</div>
+                        ) : null}
+                      </td>
+                      <td className="py-3 text-right font-medium">{formatPHP(subtotal)}</td>
+                    </tr>
+                  )}
                   {credit > 0 && (() => {
                     const periodStart = payment.period_start ? new Date(payment.period_start) : null;
                     const periodEnd = payment.period_end ? new Date(payment.period_end) : null;
