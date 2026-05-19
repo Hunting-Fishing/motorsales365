@@ -292,6 +292,30 @@ function TypeSuggestionsAdmin() {
             </li>
           ))}
         </ul>
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" /> Prev
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Next <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+        </>
       )}
 
       <Dialog open={!!action} onOpenChange={(o) => { if (!o) closeAction(); }}>
