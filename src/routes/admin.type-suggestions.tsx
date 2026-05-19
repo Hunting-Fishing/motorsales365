@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Loader2, Check, GitMerge, X, Sparkles } from "lucide-react";
+import { Loader2, Check, GitMerge, X, Sparkles, Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -53,6 +53,9 @@ function TypeSuggestionsAdmin() {
   const [types, setTypes] = useState<BusinessType[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Status | "all">("pending");
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   // Action dialog state
   const [action, setAction] = useState<null | {
@@ -83,10 +86,27 @@ function TypeSuggestionsAdmin() {
 
   useEffect(() => { load(); }, [load]);
 
-  const filtered = useMemo(
-    () => filter === "all" ? items : items.filter((i) => i.status === filter),
-    [items, filter],
+  const filtered = useMemo(() => {
+    const base = filter === "all" ? items : items.filter((i) => i.status === filter);
+    const q = query.trim().toLowerCase();
+    if (!q) return base;
+    return base.filter(
+      (i) =>
+        i.proposed_label.toLowerCase().includes(q) ||
+        (i.submitter_email ?? "").toLowerCase().includes(q) ||
+        (i.notes ?? "").toLowerCase().includes(q) ||
+        (i.merged_into_slug ?? "").toLowerCase().includes(q),
+    );
+  }, [items, filter, query]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const paged = useMemo(
+    () => filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize),
+    [filtered, currentPage],
   );
+
+  useEffect(() => { setPage(1); }, [filter, query]);
 
   const counts = useMemo(() => {
     const c: Record<string, number> = { all: items.length, pending: 0, approved: 0, merged: 0, rejected: 0 };
@@ -208,17 +228,31 @@ function TypeSuggestionsAdmin() {
         </div>
       </div>
 
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search by proposed label, submitter email, notes, or merged slug…"
+          className="pl-9"
+        />
+      </div>
+
       {loading ? (
         <div className="flex items-center gap-2 p-6 text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" /> Loading suggestions…
         </div>
       ) : filtered.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-10 text-center text-muted-foreground">
-          No {filter === "all" ? "" : filter} suggestions.
+          {query ? `No suggestions match "${query}".` : `No ${filter === "all" ? "" : filter} suggestions.`}
         </div>
       ) : (
+        <>
+        <div className="text-xs text-muted-foreground">
+          Showing {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, filtered.length)} of {filtered.length}
+        </div>
         <ul className="space-y-3">
-          {filtered.map((s) => (
+          {paged.map((s) => (
             <li key={s.id} className="rounded-xl border border-border bg-card p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
@@ -258,6 +292,30 @@ function TypeSuggestionsAdmin() {
             </li>
           ))}
         </ul>
+        {totalPages > 1 && (
+          <div className="flex items-center justify-center gap-2 pt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft className="h-4 w-4" /> Prev
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              Page {currentPage} of {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Next <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
+        </>
       )}
 
       <Dialog open={!!action} onOpenChange={(o) => { if (!o) closeAction(); }}>
