@@ -1066,6 +1066,65 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_line_items: {
+        Row: {
+          amount_php: number
+          created_at: string
+          credit_calculated_at: string | null
+          description: string | null
+          id: string
+          kind: string
+          label: string
+          metadata: Json
+          payment_id: string
+          period_end: string | null
+          period_start: string | null
+          previous_amount_php: number | null
+          prorated_credit_php: number | null
+          sort_order: number
+        }
+        Insert: {
+          amount_php?: number
+          created_at?: string
+          credit_calculated_at?: string | null
+          description?: string | null
+          id?: string
+          kind: string
+          label: string
+          metadata?: Json
+          payment_id: string
+          period_end?: string | null
+          period_start?: string | null
+          previous_amount_php?: number | null
+          prorated_credit_php?: number | null
+          sort_order?: number
+        }
+        Update: {
+          amount_php?: number
+          created_at?: string
+          credit_calculated_at?: string | null
+          description?: string | null
+          id?: string
+          kind?: string
+          label?: string
+          metadata?: Json
+          payment_id?: string
+          period_end?: string | null
+          period_start?: string | null
+          previous_amount_php?: number | null
+          prorated_credit_php?: number | null
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_line_items_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           addons_amount_php: number | null
