@@ -54,6 +54,7 @@ function BillingPage() {
   const [listings, setListings] = useState<Listing[]>([]);
   const [mediaCounts, setMediaCounts] = useState<Record<string, { photo: number; video: number }>>({});
   const [chartRange, setChartRange] = useState<"daily" | "weekly">("daily");
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
