@@ -228,17 +228,31 @@ function TypeSuggestionsAdmin() {
         </div>
       </div>
 
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+        <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search by proposed label, submitter email, notes, or merged slug…"
+          className="pl-9"
+        />
+      </div>
+
       {loading ? (
         <div className="flex items-center gap-2 p-6 text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" /> Loading suggestions…
         </div>
       ) : filtered.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-10 text-center text-muted-foreground">
-          No {filter === "all" ? "" : filter} suggestions.
+          {query ? `No suggestions match "${query}".` : `No ${filter === "all" ? "" : filter} suggestions.`}
         </div>
       ) : (
+        <>
+        <div className="text-xs text-muted-foreground">
+          Showing {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, filtered.length)} of {filtered.length}
+        </div>
         <ul className="space-y-3">
-          {filtered.map((s) => (
+          {paged.map((s) => (
             <li key={s.id} className="rounded-xl border border-border bg-card p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
