@@ -1773,6 +1773,7 @@ export type Database = {
           complimentary: boolean
           created_at: string
           current_period_end: string | null
+          current_period_start: string | null
           discount_percent: number
           environment: string
           id: string
@@ -1792,6 +1793,7 @@ export type Database = {
           complimentary?: boolean
           created_at?: string
           current_period_end?: string | null
+          current_period_start?: string | null
           discount_percent?: number
           environment?: string
           id?: string
@@ -1811,6 +1813,7 @@ export type Database = {
           complimentary?: boolean
           created_at?: string
           current_period_end?: string | null
+          current_period_start?: string | null
           discount_percent?: number
           environment?: string
           id?: string
