@@ -53,6 +53,9 @@ function TypeSuggestionsAdmin() {
   const [types, setTypes] = useState<BusinessType[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Status | "all">("pending");
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   // Action dialog state
   const [action, setAction] = useState<null | {
