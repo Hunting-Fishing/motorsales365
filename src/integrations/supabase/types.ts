@@ -1070,6 +1070,7 @@ export type Database = {
         Row: {
           amount_php: number
           created_at: string
+          credit_calculated_at: string | null
           gross_amount_php: number | null
           id: string
           kind: Database["public"]["Enums"]["payment_kind"]
@@ -1078,7 +1079,10 @@ export type Database = {
           new_plan: string | null
           notes: string | null
           paid_at: string | null
+          period_end: string | null
+          period_start: string | null
           previous_plan: string | null
+          previous_plan_price_php: number | null
           prorated_credit_php: number | null
           reference: string | null
           status: Database["public"]["Enums"]["payment_status"]
@@ -1087,6 +1091,7 @@ export type Database = {
         Insert: {
           amount_php: number
           created_at?: string
+          credit_calculated_at?: string | null
           gross_amount_php?: number | null
           id?: string
           kind: Database["public"]["Enums"]["payment_kind"]
@@ -1095,7 +1100,10 @@ export type Database = {
           new_plan?: string | null
           notes?: string | null
           paid_at?: string | null
+          period_end?: string | null
+          period_start?: string | null
           previous_plan?: string | null
+          previous_plan_price_php?: number | null
           prorated_credit_php?: number | null
           reference?: string | null
           status?: Database["public"]["Enums"]["payment_status"]
@@ -1104,6 +1112,7 @@ export type Database = {
         Update: {
           amount_php?: number
           created_at?: string
+          credit_calculated_at?: string | null
           gross_amount_php?: number | null
           id?: string
           kind?: Database["public"]["Enums"]["payment_kind"]
@@ -1112,7 +1121,10 @@ export type Database = {
           new_plan?: string | null
           notes?: string | null
           paid_at?: string | null
+          period_end?: string | null
+          period_start?: string | null
           previous_plan?: string | null
+          previous_plan_price_php?: number | null
           prorated_credit_php?: number | null
           reference?: string | null
           status?: Database["public"]["Enums"]["payment_status"]
