@@ -270,8 +270,7 @@ function ReceiptPage() {
               </table>
             );
           })() : (
-
-          {(() => {
+          (() => {
             const credit = Number(payment.prorated_credit_php ?? 0);
             const gross = Number(payment.gross_amount_php ?? 0);
             const net = Number(payment.amount_php ?? 0);
