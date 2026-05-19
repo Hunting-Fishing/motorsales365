@@ -1,12 +1,15 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Check, ArrowRight, ArrowDown, Minus } from "lucide-react";
+import { Check, ArrowRight, ArrowDown, Minus, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { formatPHP } from "@/lib/format";
+
+type UsageMonth = { key: string; label: string; count: number };
 
 export const Route = createFileRoute("/pricing")({
   head: () => ({
