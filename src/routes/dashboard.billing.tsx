@@ -50,6 +50,7 @@ function BillingPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [plansById, setPlansById] = useState<Record<string, Plan>>({});
   const [listings, setListings] = useState<Listing[]>([]);
+  const [mediaCounts, setMediaCounts] = useState<Record<string, { photo: number; video: number }>>({});
 
   useEffect(() => {
     if (!user) return;
@@ -70,7 +71,23 @@ function BillingPage() {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(50)
-      .then(({ data }) => setListings((data ?? []) as Listing[]));
+      .then(async ({ data }) => {
+        const rows = (data ?? []) as Listing[];
+        setListings(rows);
+        if (rows.length === 0) return;
+        const ids = rows.map((r) => r.id);
+        const { data: media } = await supabase
+          .from("listing_media")
+          .select("listing_id,type")
+          .in("listing_id", ids);
+        const counts: Record<string, { photo: number; video: number }> = {};
+        (media ?? []).forEach((m: any) => {
+          if (!counts[m.listing_id]) counts[m.listing_id] = { photo: 0, video: 0 };
+          if (m.type === "video") counts[m.listing_id].video += 1;
+          else counts[m.listing_id].photo += 1;
+        });
+        setMediaCounts(counts);
+      });
   }, [user]);
 
   const activeSub = useMemo(
