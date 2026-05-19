@@ -463,7 +463,7 @@ function PricingPage() {
           })}
         </div>
         <p className="mx-auto mt-6 max-w-2xl text-center text-xs text-muted-foreground">
-          Requests are reviewed manually by our sales team — you'll receive an email once it's activated. Live card payments are coming soon.
+          Plan changes activate instantly. Any unused portion of your current plan is applied as a prorated credit on your next invoice. Live card payments are coming soon.
         </p>
       </section>
     </SiteLayout>
