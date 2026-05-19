@@ -1739,6 +1739,7 @@ export type Database = {
           name: string
           price_php: number
           sort_order: number
+          stripe_lookup_key: string | null
         }
         Insert: {
           active?: boolean
@@ -1750,6 +1751,7 @@ export type Database = {
           name: string
           price_php: number
           sort_order?: number
+          stripe_lookup_key?: string | null
         }
         Update: {
           active?: boolean
@@ -1761,49 +1763,65 @@ export type Database = {
           name?: string
           price_php?: number
           sort_order?: number
+          stripe_lookup_key?: string | null
         }
         Relationships: []
       }
       subscriptions: {
         Row: {
+          cancel_at_period_end: boolean
           complimentary: boolean
           created_at: string
           current_period_end: string | null
           discount_percent: number
+          environment: string
           id: string
           notes: string | null
           organization_id: string | null
           paused_at: string | null
           plan_id: string
           status: string
+          stripe_customer_id: string | null
+          stripe_price_id: string | null
+          stripe_subscription_id: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
+          cancel_at_period_end?: boolean
           complimentary?: boolean
           created_at?: string
           current_period_end?: string | null
           discount_percent?: number
+          environment?: string
           id?: string
           notes?: string | null
           organization_id?: string | null
           paused_at?: string | null
           plan_id: string
           status?: string
+          stripe_customer_id?: string | null
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
+          cancel_at_period_end?: boolean
           complimentary?: boolean
           created_at?: string
           current_period_end?: string | null
           discount_percent?: number
+          environment?: string
           id?: string
           notes?: string | null
           organization_id?: string | null
           paused_at?: string | null
           plan_id?: string
           status?: string
+          stripe_customer_id?: string | null
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
           updated_at?: string
           user_id?: string
         }
