@@ -50,6 +50,7 @@ function BillingPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [plansById, setPlansById] = useState<Record<string, Plan>>({});
   const [listings, setListings] = useState<Listing[]>([]);
+  const [mediaCounts, setMediaCounts] = useState<Record<string, { photo: number; video: number }>>({});
 
   useEffect(() => {
     if (!user) return;
@@ -70,7 +71,23 @@ function BillingPage() {
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(50)
-      .then(({ data }) => setListings((data ?? []) as Listing[]));
+      .then(async ({ data }) => {
+        const rows = (data ?? []) as Listing[];
+        setListings(rows);
+        if (rows.length === 0) return;
+        const ids = rows.map((r) => r.id);
+        const { data: media } = await supabase
+          .from("listing_media")
+          .select("listing_id,type")
+          .in("listing_id", ids);
+        const counts: Record<string, { photo: number; video: number }> = {};
+        (media ?? []).forEach((m: any) => {
+          if (!counts[m.listing_id]) counts[m.listing_id] = { photo: 0, video: 0 };
+          if (m.type === "video") counts[m.listing_id].video += 1;
+          else counts[m.listing_id].photo += 1;
+        });
+        setMediaCounts(counts);
+      });
   }, [user]);
 
   const activeSub = useMemo(
@@ -269,6 +286,7 @@ function BillingPage() {
                 <tr>
                   <th className="p-3">Listing</th>
                   <th className="p-3">Plan</th>
+                  <th className="p-3">Media</th>
                   <th className="p-3">Posted</th>
                   <th className="p-3">Expires</th>
                   <th className="p-3">Views</th>
@@ -278,6 +296,10 @@ function BillingPage() {
               <tbody>
                 {listings.slice(0, 20).map((l) => {
                   const expDays = l.expires_at ? daysBetween(now, new Date(l.expires_at)) : null;
+                  const photoCap = currentPlan?.max_photos_per_listing ?? 3;
+                  const mc = mediaCounts[l.id] ?? { photo: 0, video: 0 };
+                  const overPhoto = mc.photo > photoCap;
+                  const nearPhoto = !overPhoto && photoCap > 0 && mc.photo / photoCap >= 0.8;
                   return (
                     <tr key={l.id} className="border-t border-border">
                       <td className="p-3">
@@ -291,6 +313,14 @@ function BillingPage() {
                         {l.boost_until && new Date(l.boost_until) > now && (
                           <Badge variant="secondary" className="ml-1 text-[10px]">BOOST</Badge>
                         )}
+                      </td>
+                      <td className="p-3">
+                        <div className={`text-xs font-medium ${overPhoto ? "text-destructive" : nearPhoto ? "text-amber-600" : ""}`}>
+                          {mc.photo} / {photoCap} photos
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {mc.video} video{mc.video === 1 ? "" : "s"}
+                        </div>
                       </td>
                       <td className="p-3 text-muted-foreground">{formatDate(l.published_at ?? l.created_at)}</td>
                       <td className="p-3 text-muted-foreground">
