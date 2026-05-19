@@ -119,9 +119,21 @@ function BillingPage() {
   );
 
   // Renewal countdown
+  const renewalMs = activeSub?.current_period_end
+    ? new Date(activeSub.current_period_end).getTime() - now.getTime()
+    : null;
   const renewalDays = activeSub?.current_period_end
     ? daysBetween(now, new Date(activeSub.current_period_end))
     : null;
+  const countdown = useMemo(() => {
+    if (renewalMs === null) return null;
+    const ms = Math.max(0, renewalMs);
+    const d = Math.floor(ms / 86_400_000);
+    const h = Math.floor((ms % 86_400_000) / 3_600_000);
+    const m = Math.floor((ms % 3_600_000) / 60_000);
+    const s = Math.floor((ms % 60_000) / 1000);
+    return { d, h, m, s, due: ms === 0 };
+  }, [renewalMs]);
 
   // Plan usage percentage
   const monthlyCap = currentPlan?.listings_per_month ?? null;
