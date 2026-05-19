@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { formatPHP, formatDate } from "@/lib/format";
 import { Printer, ArrowLeft } from "lucide-react";
+import { buildReceiptLines, assertReceiptOrder } from "@/lib/receipt-lines";
 
 export const Route = createFileRoute("/payments/$id/receipt")({
   component: ReceiptPage,
@@ -131,6 +132,25 @@ function ReceiptPage() {
             const planLabel = payment.new_plan
               ? `Plan — ${payment.new_plan}`
               : payment.kind?.replace(/_/g, " ") ?? "Plan";
+
+            // Automated ordering check: in dev, throw if a future edit ever
+            // reorders charges/credit/net incorrectly. Silent in production.
+            if (import.meta.env.DEV) {
+              try {
+                assertReceiptOrder(
+                  buildReceiptLines({
+                    plan_price_php: planPrice,
+                    boost_amount_php: boost,
+                    addons_amount_php: addons,
+                    gross_amount_php: gross,
+                    prorated_credit_php: credit,
+                    amount_php: net,
+                  }),
+                );
+              } catch (e) {
+                console.error("[receipt] ordering check failed:", e);
+              }
+            }
             return (
               <table className="w-full border-t border-border text-sm">
                 <thead>
