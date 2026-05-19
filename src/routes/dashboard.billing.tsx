@@ -100,7 +100,11 @@ function BillingPage() {
   );
   const currentPlan: Plan | null = activeSub ? plansById[activeSub.plan_id] ?? null : null;
 
-  const now = new Date();
+  const [now, setNow] = useState<Date>(() => new Date());
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
   const monthStart = startOfMonth(now);
 
   const thisMonthListings = useMemo(
