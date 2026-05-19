@@ -163,40 +163,41 @@ function PricingPage() {
     setRequesting(planId);
     const plan = plans.find((p) => p.id === planId);
     const base = Number(plan?.price_php) || 0;
-    const note =
-      kind === "new"
-        ? null
-        : kind === "upgrade"
-          ? `Upgrade from ${currentPlan?.name ?? "current plan"} — prorated credit ₱${proratedCredit}`
-          : kind === "downgrade"
-            ? `Downgrade from ${currentPlan?.name ?? "current plan"} — takes effect next renewal`
-            : `Switch from ${currentPlan?.name ?? "current plan"}`;
-    const { data: sub, error } = await supabase
-      .from("subscriptions")
-      .insert({ user_id: user.id, plan_id: planId, status: "pending", notes: note })
-      .select("id")
-      .maybeSingle();
-    if (error) { setRequesting(null); return toast.error(error.message); }
 
-    const { data: redemption } = await (supabase as any).rpc("apply_referral_redemption", {
+    const { data: result, error } = await (supabase as any).rpc("self_serve_change_plan", {
+      _plan_id: planId,
+    });
+    if (error) { setRequesting(null); return toast.error(error.message); }
+    if (!result?.ok) {
+      setRequesting(null);
+      return toast.info(result?.reason === "already_on_plan" ? "You're already on this plan." : "Could not change plan.");
+    }
+
+    // Best-effort referral discount application on the new payment
+    await (supabase as any).rpc("apply_referral_redemption", {
       _kind: "subscription",
       _base_amount: base,
-      _subscription_id: sub?.id ?? null,
+      _subscription_id: result.subscription_id ?? null,
     });
+
     setRequesting(null);
-    if (redemption?.ok) {
-      toast.success(`Referral discount applied — ₱${redemption.discount_amount_php} off. Final: ₱${redemption.final_amount_php}.`);
-    } else if (kind === "upgrade") {
-      toast.success(`Upgrade requested — pay ₱${Math.max(0, base - proratedCredit)} now (₱${proratedCredit} prorated credit applied).`);
-    } else if (kind === "downgrade") {
-      toast.success(`Downgrade to ${plan?.name} requested — takes effect at next renewal.`);
-    } else if (kind === "switch") {
-      toast.success(`Switch to ${plan?.name} requested — our team will reach out.`);
-    } else {
-      toast.success("Subscription requested — our team will reach out shortly.");
-    }
+    const net = Number(result.net_php ?? base);
+    const credit = Number(result.credit_php ?? 0);
+    toast.success(
+      kind === "upgrade" && credit > 0
+        ? `${plan?.name} activated — ${formatPHP(net)} due now (${formatPHP(credit)} prorated credit applied).`
+        : kind === "downgrade"
+          ? `Switched to ${plan?.name} — ${formatPHP(net)} due now, takes effect immediately.`
+          : `${plan?.name} activated — ${formatPHP(net)} due now.`,
+    );
     loadSub(user.id);
   };
+
+  // Usage helpers — current month vs current plan limit
+  const thisMonthCount = usage.length ? usage[usage.length - 1].count : 0;
+  const monthMax = Math.max(1, ...usage.map((u) => u.count));
+  const planLimit = currentPlan?.listings_per_month ?? null;
+  const usagePct = planLimit ? Math.min(100, Math.round((thisMonthCount / planLimit) * 100)) : 0;
 
   return (
     <SiteLayout>
