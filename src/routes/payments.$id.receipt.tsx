@@ -126,6 +126,151 @@ function ReceiptPage() {
             </div>
           </section>
 
+          {lineItems.length > 0 ? (() => {
+            const net = Number(payment.amount_php ?? 0);
+            const itemsTotal = lineItems.reduce((s, it) => s + Number(it.amount_php ?? 0), 0);
+            const itemsCredit = lineItems.reduce(
+              (s, it) => s + Number(it.prorated_credit_php ?? 0),
+              0,
+            );
+            const DAY = 86_400_000;
+            return (
+              <table className="w-full border-t border-border text-sm">
+                <thead>
+                  <tr className="text-left text-xs uppercase text-muted-foreground">
+                    <th className="py-3">Description</th>
+                    <th className="py-3 text-right">Charge</th>
+                    <th className="py-3 text-right">Credit</th>
+                    <th className="py-3 text-right">Net</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {lineItems.map((it) => {
+                    const amount = Number(it.amount_php ?? 0);
+                    const itemCredit = Number(it.prorated_credit_php ?? 0);
+                    const itemNet = Math.max(0, Math.round(amount - itemCredit));
+                    const periodStart = it.period_start ? new Date(it.period_start) : null;
+                    const periodEnd = it.period_end ? new Date(it.period_end) : null;
+                    const calcAt = it.credit_calculated_at
+                      ? new Date(it.credit_calculated_at)
+                      : payment.paid_at
+                        ? new Date(payment.paid_at)
+                        : null;
+                    const prevAmount = Number(it.previous_amount_php ?? 0);
+                    const totalDays = periodStart && periodEnd
+                      ? Math.max(1, Math.round((periodEnd.getTime() - periodStart.getTime()) / DAY))
+                      : null;
+                    const remainingDays = periodEnd && calcAt
+                      ? Math.max(0, Math.round((periodEnd.getTime() - calcAt.getTime()) / DAY))
+                      : null;
+                    const canExpand = itemCredit > 0 && periodStart && periodEnd && prevAmount > 0;
+                    const isOpen = !!expanded[it.id];
+                    return (
+                      <>
+                        <tr key={it.id} className="border-t border-border align-top">
+                          <td className="py-3">
+                            <div className="flex items-start gap-2">
+                              {canExpand ? (
+                                <button
+                                  type="button"
+                                  onClick={() => toggle(it.id)}
+                                  aria-expanded={isOpen}
+                                  aria-label={isOpen ? "Hide breakdown" : "Show breakdown"}
+                                  className="mt-0.5 text-muted-foreground hover:text-foreground print:hidden"
+                                >
+                                  {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                                </button>
+                              ) : (
+                                <span className="w-4 print:hidden" />
+                              )}
+                              <div>
+                                <div className="font-medium capitalize">{it.label}</div>
+                                <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{it.kind}</div>
+                                {it.description && (
+                                  <div className="text-xs text-muted-foreground">{it.description}</div>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-3 text-right font-medium">{formatPHP(amount)}</td>
+                          <td className="py-3 text-right text-emerald-600">
+                            {itemCredit > 0 ? `− ${formatPHP(itemCredit)}` : "—"}
+                          </td>
+                          <td className="py-3 text-right font-medium">{formatPHP(itemNet)}</td>
+                        </tr>
+                        {canExpand && (isOpen || typeof window === "undefined") && (
+                          <tr key={`${it.id}-detail`} className="border-t border-dashed border-border bg-muted/30 print:table-row">
+                            <td colSpan={4} className="py-3">
+                              <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                                Proration breakdown — {it.label}
+                              </div>
+                              <dl className="mt-2 grid gap-x-6 gap-y-2 text-xs sm:grid-cols-2">
+                                <div>
+                                  <dt className="text-muted-foreground">Period start</dt>
+                                  <dd className="font-mono">{formatDate(periodStart)}</dd>
+                                  <dd className="font-mono text-[10px] text-muted-foreground/70 break-all">{it.period_start}</dd>
+                                </div>
+                                <div>
+                                  <dt className="text-muted-foreground">Period end</dt>
+                                  <dd className="font-mono">{formatDate(periodEnd)}</dd>
+                                  <dd className="font-mono text-[10px] text-muted-foreground/70 break-all">{it.period_end}</dd>
+                                </div>
+                                <div>
+                                  <dt className="text-muted-foreground">
+                                    {it.credit_calculated_at ? "Calculated at" : "Paid at"}
+                                  </dt>
+                                  <dd className="font-mono">{calcAt ? formatDate(calcAt) : "—"}</dd>
+                                  <dd className="font-mono text-[10px] text-muted-foreground/70 break-all">
+                                    {it.credit_calculated_at ?? payment.paid_at ?? ""}
+                                  </dd>
+                                </div>
+                                <div>
+                                  <dt className="text-muted-foreground">Previous amount</dt>
+                                  <dd className="font-mono">{formatPHP(prevAmount)}</dd>
+                                  <dd className="font-mono text-[10px] text-muted-foreground/70">raw: {prevAmount}</dd>
+                                </div>
+                                <div>
+                                  <dt className="text-muted-foreground">totalDays</dt>
+                                  <dd className="font-mono">{totalDays}</dd>
+                                </div>
+                                <div>
+                                  <dt className="text-muted-foreground">remainingDays</dt>
+                                  <dd className="font-mono">{remainingDays}</dd>
+                                </div>
+                              </dl>
+                              {totalDays && remainingDays !== null && (
+                                <div className="mt-2 font-mono text-xs text-muted-foreground">
+                                  {formatPHP(prevAmount)} × {remainingDays} ÷ {totalDays} ={" "}
+                                  <span className="text-emerald-600">{formatPHP(itemCredit)}</span>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        )}
+                      </>
+                    );
+                  })}
+                </tbody>
+                <tfoot>
+                  <tr className="border-t border-border text-xs text-muted-foreground">
+                    <td className="py-2 text-right uppercase" colSpan={1}>Subtotal</td>
+                    <td className="py-2 text-right">{formatPHP(itemsTotal)}</td>
+                    <td className="py-2 text-right text-emerald-600">
+                      {itemsCredit > 0 ? `− ${formatPHP(itemsCredit)}` : "—"}
+                    </td>
+                    <td className="py-2 text-right">{formatPHP(Math.max(0, itemsTotal - itemsCredit))}</td>
+                  </tr>
+                  <tr className="border-t border-border">
+                    <td colSpan={3} className="py-3 text-right text-xs uppercase text-muted-foreground">
+                      Net due
+                    </td>
+                    <td className="py-3 text-right font-display text-lg font-bold">{formatPHP(net)}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            );
+          })() : (
+
           {(() => {
             const credit = Number(payment.prorated_credit_php ?? 0);
             const gross = Number(payment.gross_amount_php ?? 0);
