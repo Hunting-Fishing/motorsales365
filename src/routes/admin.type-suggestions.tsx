@@ -81,8 +81,24 @@ function TypeSuggestionsAdmin() {
     ]);
     if (s.error) toast.error(s.error.message);
     if (t.error) toast.error(t.error.message);
-    setItems((s.data ?? []) as Suggestion[]);
+    const suggestions = (s.data ?? []) as Suggestion[];
+    setItems(suggestions);
     setTypes((t.data ?? []) as BusinessType[]);
+
+    const deciderIds = Array.from(
+      new Set(suggestions.map((x) => x.decided_by).filter((x): x is string => !!x)),
+    );
+    if (deciderIds.length) {
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("id,full_name")
+        .in("id", deciderIds);
+      const map: Record<string, DeciderProfile> = {};
+      for (const p of (profs ?? []) as DeciderProfile[]) map[p.id] = p;
+      setDeciders(map);
+    } else {
+      setDeciders({});
+    }
     setLoading(false);
   }, []);
 
