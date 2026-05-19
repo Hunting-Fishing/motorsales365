@@ -69,6 +69,7 @@ import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising'
 import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
 import { Route as RCodePosterRouteImport } from './routes/r.$code.poster'
+import { Route as PaymentsIdReceiptRouteImport } from './routes/payments.$id.receipt'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
 import { Route as ApiPublicPaymentEventsRouteImport } from './routes/api/public/payment-events'
@@ -381,6 +382,11 @@ const RCodePosterRoute = RCodePosterRouteImport.update({
   path: '/poster',
   getParentRoute: () => RCodeRoute,
 } as any)
+const PaymentsIdReceiptRoute = PaymentsIdReceiptRouteImport.update({
+  id: '/$id/receipt',
+  path: '/$id/receipt',
+  getParentRoute: () => PaymentsRoute,
+} as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
@@ -450,7 +456,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
   '/login': typeof LoginRoute
-  '/payments': typeof PaymentsRoute
+  '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
@@ -505,6 +511,7 @@ export interface FileRoutesByFullPath {
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -521,7 +528,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
   '/login': typeof LoginRoute
-  '/payments': typeof PaymentsRoute
+  '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
@@ -576,6 +583,7 @@ export interface FileRoutesByTo {
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -595,7 +603,7 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
   '/login': typeof LoginRoute
-  '/payments': typeof PaymentsRoute
+  '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
@@ -650,6 +658,7 @@ export interface FileRoutesById {
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -725,6 +734,7 @@ export interface FileRouteTypes {
     | '/api/public/payment-events'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
+    | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/api/public/fx/refresh'
     | '/lovable/email/auth/preview'
@@ -796,6 +806,7 @@ export interface FileRouteTypes {
     | '/api/public/payment-events'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
+    | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/api/public/fx/refresh'
     | '/lovable/email/auth/preview'
@@ -869,6 +880,7 @@ export interface FileRouteTypes {
     | '/api/public/payment-events'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
+    | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/api/public/fx/refresh'
     | '/lovable/email/auth/preview'
@@ -888,7 +900,7 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   GuidelinesRoute: typeof GuidelinesRoute
   LoginRoute: typeof LoginRoute
-  PaymentsRoute: typeof PaymentsRoute
+  PaymentsRoute: typeof PaymentsRouteWithChildren
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
@@ -1343,6 +1355,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RCodePosterRouteImport
       parentRoute: typeof RCodeRoute
     }
+    '/payments/$id/receipt': {
+      id: '/payments/$id/receipt'
+      path: '/$id/receipt'
+      fullPath: '/payments/$id/receipt'
+      preLoaderRoute: typeof PaymentsIdReceiptRouteImport
+      parentRoute: typeof PaymentsRoute
+    }
     '/lovable/email/suppression': {
       id: '/lovable/email/suppression'
       path: '/lovable/email/suppression'
@@ -1499,6 +1518,18 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
   DashboardRouteChildren,
 )
 
+interface PaymentsRouteChildren {
+  PaymentsIdReceiptRoute: typeof PaymentsIdReceiptRoute
+}
+
+const PaymentsRouteChildren: PaymentsRouteChildren = {
+  PaymentsIdReceiptRoute: PaymentsIdReceiptRoute,
+}
+
+const PaymentsRouteWithChildren = PaymentsRoute._addFileChildren(
+  PaymentsRouteChildren,
+)
+
 interface ListingIdRouteChildren {
   ListingIdEditRoute: typeof ListingIdEditRoute
 }
@@ -1531,7 +1562,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   GuidelinesRoute: GuidelinesRoute,
   LoginRoute: LoginRoute,
-  PaymentsRoute: PaymentsRoute,
+  PaymentsRoute: PaymentsRouteWithChildren,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
   RefundPolicyRoute: RefundPolicyRoute,

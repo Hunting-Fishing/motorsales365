@@ -493,11 +493,13 @@ function BillingPage() {
                   <th className="p-3">Listing</th>
                   <th className="p-3">Amount</th>
                   <th className="p-3">Status</th>
+                  <th className="p-3">Receipt</th>
                 </tr>
               </thead>
               <tbody>
                 {payments.map((p) => {
                   const linked = p.listing_id ? listings.find((l) => l.id === p.listing_id) : null;
+                  const docLabel = p.status === "paid" ? "Receipt" : "Invoice";
                   return (
                     <tr key={p.id} className="border-t border-border">
                       <td className="p-3">{formatDate(p.created_at)}</td>
@@ -517,6 +519,16 @@ function BillingPage() {
                       <td className="p-3">
                         <Badge variant={p.status === "paid" ? "default" : "secondary"}>{p.status}</Badge>
                       </td>
+                      <td className="p-3">
+                        <Link
+                          to="/payments/$id/receipt"
+                          params={{ id: p.id }}
+                          target="_blank"
+                          className="text-primary hover:underline"
+                        >
+                          {docLabel} ↗
+                        </Link>
+                      </td>
                     </tr>
                   );
                 })}
@@ -525,6 +537,7 @@ function BillingPage() {
           </div>
         )}
       </section>
+
 
       {overCap && (
         <div className="mt-6 flex items-start gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm">
