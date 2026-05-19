@@ -2202,6 +2202,7 @@ export type Database = {
         }
         Returns: Json
       }
+      self_serve_change_plan: { Args: { _plan_id: string }; Returns: Json }
       sync_staff_referrals: { Args: never; Returns: number }
       upsert_currency_rates: { Args: { _rates: Json }; Returns: number }
       user_has_paid_subscription: {
