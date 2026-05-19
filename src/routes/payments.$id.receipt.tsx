@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { formatPHP, formatDate } from "@/lib/format";
-import { Printer, ArrowLeft } from "lucide-react";
+import { Printer, ArrowLeft, ChevronDown, ChevronRight } from "lucide-react";
 import { buildReceiptLines, assertReceiptOrder } from "@/lib/receipt-lines";
 
 export const Route = createFileRoute("/payments/$id/receipt")({
