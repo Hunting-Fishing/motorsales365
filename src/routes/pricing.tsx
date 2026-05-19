@@ -45,6 +45,7 @@ type Plan = {
 function PricingPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { openCheckout, closeCheckout, isOpen: checkoutOpen, checkoutElement } = useStripeCheckout();
   const [settings, setSettings] = useState<Record<string, number>>({});
   const [plans, setPlans] = useState<Plan[]>([]);
   const [mySub, setMySub] = useState<any | null>(null);
