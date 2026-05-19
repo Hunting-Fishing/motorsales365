@@ -114,33 +114,77 @@ function ReceiptPage() {
             </div>
           </section>
 
-          <table className="w-full border-t border-border text-sm">
-            <thead>
-              <tr className="text-left text-xs uppercase text-muted-foreground">
-                <th className="py-3">Description</th>
-                <th className="py-3 text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr className="border-t border-border">
-                <td className="py-3">
-                  <div className="font-medium capitalize">{payment.kind?.replace(/_/g, " ")}</div>
-                  {listing ? (
-                    <div className="text-xs text-muted-foreground">For listing: {listing.title}</div>
-                  ) : payment.notes ? (
-                    <div className="text-xs text-muted-foreground">{payment.notes}</div>
-                  ) : null}
-                </td>
-                <td className="py-3 text-right font-medium">{formatPHP(payment.amount_php)}</td>
-              </tr>
-            </tbody>
-            <tfoot>
-              <tr className="border-t border-border">
-                <td className="py-3 text-right text-xs uppercase text-muted-foreground">Total</td>
-                <td className="py-3 text-right font-display text-lg font-bold">{formatPHP(payment.amount_php)}</td>
-              </tr>
-            </tfoot>
-          </table>
+          {(() => {
+            const credit = Number(payment.prorated_credit_php ?? 0);
+            const gross = Number(payment.gross_amount_php ?? 0);
+            const net = Number(payment.amount_php ?? 0);
+            const hasBreakdown = credit > 0 || gross > 0;
+            const subtotal = gross > 0 ? gross : net;
+            return (
+              <table className="w-full border-t border-border text-sm">
+                <thead>
+                  <tr className="text-left text-xs uppercase text-muted-foreground">
+                    <th className="py-3">Description</th>
+                    <th className="py-3 text-right">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-t border-border">
+                    <td className="py-3">
+                      <div className="font-medium capitalize">
+                        {payment.new_plan
+                          ? `Plan upgrade — ${payment.new_plan}`
+                          : payment.kind?.replace(/_/g, " ")}
+                      </div>
+                      {payment.previous_plan && (
+                        <div className="text-xs text-muted-foreground">
+                          Changed from {payment.previous_plan}
+                          {payment.new_plan ? ` to ${payment.new_plan}` : ""}
+                        </div>
+                      )}
+                      {listing ? (
+                        <div className="text-xs text-muted-foreground">For listing: {listing.title}</div>
+                      ) : payment.notes ? (
+                        <div className="text-xs text-muted-foreground">{payment.notes}</div>
+                      ) : null}
+                    </td>
+                    <td className="py-3 text-right font-medium">{formatPHP(subtotal)}</td>
+                  </tr>
+                  {credit > 0 && (
+                    <tr className="border-t border-border text-emerald-600">
+                      <td className="py-3">
+                        <div className="font-medium">Prorated credit</div>
+                        <div className="text-xs text-emerald-700/80">
+                          Unused days from {payment.previous_plan ?? "previous plan"}
+                        </div>
+                      </td>
+                      <td className="py-3 text-right font-medium">− {formatPHP(credit)}</td>
+                    </tr>
+                  )}
+                </tbody>
+                <tfoot>
+                  {hasBreakdown && (
+                    <tr className="border-t border-border text-xs text-muted-foreground">
+                      <td className="py-2 text-right uppercase">Subtotal</td>
+                      <td className="py-2 text-right">{formatPHP(subtotal)}</td>
+                    </tr>
+                  )}
+                  {credit > 0 && (
+                    <tr className="text-xs text-muted-foreground">
+                      <td className="py-1 text-right uppercase">Credit applied</td>
+                      <td className="py-1 text-right text-emerald-600">− {formatPHP(credit)}</td>
+                    </tr>
+                  )}
+                  <tr className="border-t border-border">
+                    <td className="py-3 text-right text-xs uppercase text-muted-foreground">
+                      {credit > 0 ? "Net due" : "Total"}
+                    </td>
+                    <td className="py-3 text-right font-display text-lg font-bold">{formatPHP(net)}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            );
+          })()}
 
           <footer className="mt-8 border-t border-border pt-4 text-xs text-muted-foreground">
             Thank you for using 365 Motorsales. For questions about this {docLabel.toLowerCase()},
