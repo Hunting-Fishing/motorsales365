@@ -494,6 +494,92 @@ function PricingPage() {
           Plan changes activate instantly. Any unused portion of your current plan is applied as a prorated credit on your next invoice. Live card payments are coming soon.
         </p>
       </section>
+
+      <Dialog open={!!confirmPlan} onOpenChange={(o) => !o && setConfirmPlan(null)}>
+        <DialogContent>
+          {confirmPlan && (() => {
+            const { plan, kind, upgradeNet } = confirmPlan;
+            const due =
+              kind === "upgrade"
+                ? upgradeNet
+                : Number(plan.price_php) || 0;
+            const title =
+              kind === "upgrade"
+                ? `Upgrade to ${plan.name}?`
+                : kind === "downgrade"
+                  ? `Switch down to ${plan.name}?`
+                  : kind === "switch"
+                    ? `Switch to ${plan.name}?`
+                    : `Activate ${plan.name}?`;
+            return (
+              <>
+                <DialogHeader>
+                  <DialogTitle>{title}</DialogTitle>
+                  <DialogDescription>
+                    {currentPlan
+                      ? `You're currently on ${currentPlan.name} (${formatPHP(currentPlan.price_php)}/mo).`
+                      : "Review the plan details before activating."}
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-4 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">New plan</span>
+                    <span className="font-semibold">{plan.name} — {formatPHP(plan.price_php)}/mo</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Listings / month</span>
+                    <span className="font-medium">{plan.listings_per_month ?? "Unlimited"}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Photos / listing</span>
+                    <span className="font-medium">{plan.max_photos_per_listing ?? "—"}</span>
+                  </div>
+
+                  {kind === "upgrade" && proratedCredit > 0 && (
+                    <div className="flex items-center justify-between border-t border-border pt-2 text-emerald-600">
+                      <span>Prorated credit from {currentPlan?.name}</span>
+                      <span className="font-medium">− {formatPHP(proratedCredit)}</span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between border-t border-border pt-2 text-base">
+                    <span className="font-semibold">You pay now</span>
+                    <span className="font-display text-xl font-bold text-primary">{formatPHP(due)}</span>
+                  </div>
+
+                  {kind === "downgrade" && (
+                    <p className="text-xs text-muted-foreground">
+                      Takes effect immediately. Any unused portion of your current plan is credited to your account.
+                    </p>
+                  )}
+                </div>
+
+                <DialogFooter className="gap-2 sm:gap-2">
+                  <Button variant="outline" onClick={() => setConfirmPlan(null)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    disabled={requesting === plan.id}
+                    onClick={async () => {
+                      await submitPlanChange(plan.id, kind);
+                      setConfirmPlan(null);
+                    }}
+                  >
+                    {requesting === plan.id
+                      ? "Activating…"
+                      : kind === "upgrade"
+                        ? `Confirm upgrade — ${formatPHP(due)}`
+                        : kind === "downgrade"
+                          ? `Confirm switch — ${formatPHP(due)}`
+                          : `Confirm — ${formatPHP(due)}`}
+                  </Button>
+                </DialogFooter>
+              </>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
     </SiteLayout>
   );
 }
