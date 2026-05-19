@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { Check, ArrowRight, ArrowDown, Minus, Sparkles } from "lucide-react";
+import { Check, ArrowRight, ArrowDown, Minus, Sparkles, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -16,6 +16,8 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { formatPHP } from "@/lib/format";
+import { useStripeCheckout } from "@/hooks/useStripeCheckout";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 
 type UsageMonth = { key: string; label: string; count: number };
 
@@ -37,6 +39,7 @@ type Plan = {
   max_photos_per_listing: number | null;
   features: string[] | null;
   sort_order?: number | null;
+  stripe_lookup_key?: string | null;
 };
 
 function PricingPage() {
