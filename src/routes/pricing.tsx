@@ -231,6 +231,81 @@ function PricingPage() {
             <Link to="/dashboard/billing" className="text-primary underline">View billing →</Link>
           </p>
         )}
+
+        {user && (
+          <div className="mx-auto mb-8 max-w-3xl rounded-2xl border border-border bg-card p-6">
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <h3 className="font-display text-lg font-semibold">Your listing usage</h3>
+              <span className="text-xs text-muted-foreground">
+                {currentPlan ? `On ${currentPlan.name}` : "On Free plan"}
+              </span>
+            </div>
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="font-display text-3xl font-bold">{thisMonthCount}</span>
+              <span className="text-sm text-muted-foreground">
+                listing{thisMonthCount === 1 ? "" : "s"} this month
+                {planLimit !== null ? ` of ${planLimit} included` : " — unlimited on your plan"}
+              </span>
+            </div>
+            {planLimit !== null && (
+              <Progress value={usagePct} className="mt-2 h-2" />
+            )}
+
+            <div className="mt-5">
+              <div className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Last 6 months
+              </div>
+              <div className="flex items-end gap-2 h-24">
+                {usage.map((m) => {
+                  const h = monthMax > 0 ? Math.max(6, Math.round((m.count / monthMax) * 88)) : 6;
+                  const over = planLimit !== null && m.count > planLimit;
+                  return (
+                    <div key={m.key} className="flex flex-1 flex-col items-center gap-1">
+                      <div
+                        className={`w-full rounded-t ${over ? "bg-amber-500" : "bg-primary/70"}`}
+                        style={{ height: `${h}px` }}
+                        title={`${m.label}: ${m.count}`}
+                      />
+                      <div className="text-[10px] text-muted-foreground">{m.label}</div>
+                      <div className="text-[11px] font-semibold">{m.count}</div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {(() => {
+              const silver = plans.find((p) => /silver/i.test(p.name));
+              if (!silver) return null;
+              const silverLimit = silver.listings_per_month;
+              const isCurrentSilver = currentPlan?.id === silver.id;
+              if (isCurrentSilver) return null;
+              const overran = usage.some(
+                (m) => planLimit !== null && m.count > (planLimit ?? 0),
+              );
+              const wouldFitSilver =
+                silverLimit === null ||
+                usage.every((m) => m.count <= silverLimit);
+              if (!overran && (silverLimit === null || thisMonthCount * 2 <= silverLimit)) return null;
+              return (
+                <div className="mt-5 flex items-start gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm">
+                  <Sparkles className="mt-0.5 h-4 w-4 text-primary" />
+                  <div>
+                    <div className="font-medium text-foreground">
+                      {silver.name} fits your activity{wouldFitSilver ? " every month" : " better"}.
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      You'd get {silverLimit ?? "unlimited"} listings/mo and up to{" "}
+                      {silver.max_photos_per_listing ?? "more"} photos per listing for {formatPHP(silver.price_php)}/mo.
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+        )}
+
+
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {plans.map((p) => {
             const isCurrent = currentPlan?.id === p.id;
