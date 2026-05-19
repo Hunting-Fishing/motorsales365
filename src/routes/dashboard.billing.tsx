@@ -52,6 +52,7 @@ function BillingPage() {
   const [plansById, setPlansById] = useState<Record<string, Plan>>({});
   const [listings, setListings] = useState<Listing[]>([]);
   const [mediaCounts, setMediaCounts] = useState<Record<string, { photo: number; video: number }>>({});
+  const [chartRange, setChartRange] = useState<"daily" | "weekly">("daily");
 
   useEffect(() => {
     if (!user) return;
