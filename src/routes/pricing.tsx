@@ -346,12 +346,12 @@ function PricingPage() {
                 : !user
                   ? "Sign up to subscribe"
                   : kind === "upgrade"
-                    ? `Upgrade — pay ${formatPHP(upgradeNet)} now`
+                    ? `Upgrade now — ${formatPHP(upgradeNet)}`
                     : kind === "downgrade"
-                      ? `Switch to ${p.name}`
+                      ? `Switch to ${p.name} — ${formatPHP(p.price_php)}`
                       : kind === "switch"
                         ? `Switch to ${p.name}`
-                        : "Request this plan";
+                        : `Activate ${p.name} — ${formatPHP(p.price_php)}`;
 
             return (
               <div
