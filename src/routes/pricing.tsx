@@ -468,7 +468,13 @@ function PricingPage() {
                 <Button
                   className="mt-6"
                   disabled={requesting === p.id || isCurrent || isPendingThis}
-                  onClick={() => submitPlanChange(p.id, kind)}
+                  onClick={() => {
+                    if (!user) {
+                      navigate({ to: "/signup" });
+                      return;
+                    }
+                    setConfirmPlan({ plan: p, kind, upgradeNet });
+                  }}
                 >
                   {ctaLabel}
                 </Button>
