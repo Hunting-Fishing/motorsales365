@@ -176,16 +176,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [handleSession]);
 
   useEffect(() => {
+    let cancelled = false;
 
-    // Listener FIRST
+    // Listener FIRST — also clears loading so we render as soon as
+    // Supabase emits INITIAL_SESSION from the persisted storage token.
     const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
+      if (cancelled) return;
       handleSession(newSession);
+      setLoading(false);
     });
 
-    refreshSession();
+    // Hydrate immediately from the persisted session (localStorage) so
+    // refreshes don't flash the loading state.
+    supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) return;
+      handleSession(data.session ?? null);
+      setLoading(false);
+    });
 
-    return () => sub.subscription.unsubscribe();
-  }, [handleSession, refreshSession]);
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
+  }, [handleSession]);
 
   const signOut = async () => {
     await supabase.auth.signOut();
