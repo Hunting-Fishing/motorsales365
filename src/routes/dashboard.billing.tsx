@@ -238,6 +238,132 @@ function BillingPage() {
         </section>
       )}
 
+      {/* Posting activity chart */}
+      <section className="mb-8">
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="font-display text-lg font-semibold">Posting activity</h2>
+          <div className="inline-flex rounded-md border border-border bg-card p-0.5 text-xs">
+            <button
+              type="button"
+              onClick={() => setChartRange("daily")}
+              className={`rounded px-3 py-1 ${chartRange === "daily" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+            >
+              Daily · 30d
+            </button>
+            <button
+              type="button"
+              onClick={() => setChartRange("weekly")}
+              className={`rounded px-3 py-1 ${chartRange === "weekly" ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+            >
+              Weekly · 12w
+            </button>
+          </div>
+        </div>
+        <div className="rounded-xl border border-border bg-card p-4">
+          {(() => {
+            const buckets: { key: string; label: string; start: Date; end: Date }[] = [];
+            if (chartRange === "daily") {
+              for (let i = 29; i >= 0; i--) {
+                const d = new Date(now);
+                d.setHours(0, 0, 0, 0);
+                d.setDate(d.getDate() - i);
+                const end = new Date(d);
+                end.setDate(end.getDate() + 1);
+                buckets.push({
+                  key: d.toISOString().slice(0, 10),
+                  label: d.toLocaleDateString("en-PH", { month: "short", day: "numeric" }),
+                  start: d,
+                  end,
+                });
+              }
+            } else {
+              const start = new Date(now);
+              start.setHours(0, 0, 0, 0);
+              start.setDate(start.getDate() - start.getDay()); // Sunday
+              for (let i = 11; i >= 0; i--) {
+                const s = new Date(start);
+                s.setDate(s.getDate() - i * 7);
+                const e = new Date(s);
+                e.setDate(e.getDate() + 7);
+                buckets.push({
+                  key: s.toISOString().slice(0, 10),
+                  label: s.toLocaleDateString("en-PH", { month: "short", day: "numeric" }),
+                  start: s,
+                  end: e,
+                });
+              }
+            }
+            const data = buckets.map((b) => ({
+              label: b.label,
+              posted: listings.filter((l) => {
+                const t = new Date(l.created_at).getTime();
+                return t >= b.start.getTime() && t < b.end.getTime();
+              }).length,
+            }));
+            const capLine =
+              monthlyCap !== null
+                ? chartRange === "daily"
+                  ? monthlyCap / 30
+                  : (monthlyCap / 30) * 7
+                : null;
+            const maxY = Math.max(1, ...data.map((d) => d.posted), capLine ?? 0);
+            return (
+              <>
+                <div className="h-64 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                      <XAxis
+                        dataKey="label"
+                        tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                        interval={chartRange === "daily" ? 4 : 0}
+                      />
+                      <YAxis
+                        allowDecimals={false}
+                        domain={[0, Math.ceil(maxY * 1.1)]}
+                        tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                      />
+                      <Tooltip
+                        cursor={{ fill: "hsl(var(--muted) / 0.5)" }}
+                        contentStyle={{
+                          background: "hsl(var(--background))",
+                          border: "1px solid hsl(var(--border))",
+                          borderRadius: 8,
+                          fontSize: 12,
+                        }}
+                        formatter={(v: any) => [`${v} listing${v === 1 ? "" : "s"}`, "Posted"]}
+                      />
+                      <Bar dataKey="posted" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                      {capLine !== null && (
+                        <ReferenceLine
+                          y={capLine}
+                          stroke="hsl(var(--destructive))"
+                          strokeDasharray="4 4"
+                          label={{
+                            value: `Cap ~${capLine.toFixed(1)}/${chartRange === "daily" ? "day" : "wk"}`,
+                            position: "insideTopRight",
+                            fill: "hsl(var(--destructive))",
+                            fontSize: 10,
+                          }}
+                        />
+                      )}
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="mt-2 text-xs text-muted-foreground">
+                  {monthlyCap !== null
+                    ? `Dashed line shows your plan's average cap of ${monthlyCap} listings/month, prorated ${chartRange === "daily" ? "per day" : "per week"}.`
+                    : currentPlan
+                      ? "Your current plan has no monthly cap."
+                      : "Start a plan to see your posting cap on this chart."}
+                </div>
+              </>
+            );
+          })()}
+        </div>
+      </section>
+
+
       {/* Subscriptions */}
       <section className="mb-8">
         <div className="mb-2 flex items-center justify-between">
