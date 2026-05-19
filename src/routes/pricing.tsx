@@ -144,24 +144,33 @@ function PricingPage() {
   }, [mySub, plans]);
 
   // Prorated credit from the user's current paid subscription period.
-  // Uses the exact period_start/period_end and credit_calculated_at/paid_at
-  // recorded on the latest paid subscription payment — no 30-day estimate.
+  // Prefer the exact period_start/period_end + credit_calculated_at on the latest
+  // paid payment row. Fall back to the subscription's own created_at →
+  // current_period_end window (with now() as reference) when no payment row
+  // exists — e.g. admin-approved or complimentary subs that never recorded
+  // a payment.
   const proratedCredit = useMemo(() => {
-    if (!currentPlan || !lastPayment) return 0;
-    const planPrice = Number(lastPayment.plan_price_php ?? currentPlan.price_php ?? 0);
+    if (!currentPlan) return 0;
+    if (mySub?.complimentary) return 0;
+
+    const planPrice = Number(lastPayment?.plan_price_php ?? currentPlan.price_php ?? 0);
     if (planPrice <= 0) return 0;
-    const startRaw = lastPayment.period_start;
-    const endRaw = lastPayment.period_end;
+
+    const startRaw = lastPayment?.period_start ?? mySub?.created_at ?? null;
+    const endRaw = lastPayment?.period_end ?? mySub?.current_period_end ?? null;
     if (!startRaw || !endRaw) return 0;
+
     const start = new Date(startRaw).getTime();
     const end = new Date(endRaw).getTime();
     const totalMs = end - start;
     if (totalMs <= 0) return 0;
-    const refRaw = lastPayment.credit_calculated_at ?? lastPayment.paid_at ?? new Date().toISOString();
+
+    const refRaw =
+      lastPayment?.credit_calculated_at ?? lastPayment?.paid_at ?? new Date().toISOString();
     const ref = new Date(refRaw).getTime();
     const remainingMs = Math.max(0, Math.min(totalMs, end - ref));
     return Math.round((planPrice * remainingMs) / totalMs);
-  }, [currentPlan, lastPayment]);
+  }, [currentPlan, lastPayment, mySub]);
 
   const submitPlanChange = async (planId: string, kind: "new" | "upgrade" | "downgrade" | "switch") => {
     if (!user) {
