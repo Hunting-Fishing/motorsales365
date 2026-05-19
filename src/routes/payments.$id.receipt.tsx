@@ -150,17 +150,82 @@ function ReceiptPage() {
                     </td>
                     <td className="py-3 text-right font-medium">{formatPHP(subtotal)}</td>
                   </tr>
-                  {credit > 0 && (
-                    <tr className="border-t border-border text-emerald-600">
-                      <td className="py-3">
-                        <div className="font-medium">Prorated credit</div>
-                        <div className="text-xs text-emerald-700/80">
-                          Unused days from {payment.previous_plan ?? "previous plan"}
-                        </div>
-                      </td>
-                      <td className="py-3 text-right font-medium">− {formatPHP(credit)}</td>
-                    </tr>
-                  )}
+                  {credit > 0 && (() => {
+                    const periodStart = payment.period_start ? new Date(payment.period_start) : null;
+                    const periodEnd = payment.period_end ? new Date(payment.period_end) : null;
+                    const calcAt = payment.credit_calculated_at
+                      ? new Date(payment.credit_calculated_at)
+                      : payment.paid_at
+                        ? new Date(payment.paid_at)
+                        : null;
+                    const prevPrice = Number(payment.previous_plan_price_php ?? 0);
+                    const DAY = 86_400_000;
+                    const totalDays = periodStart && periodEnd
+                      ? Math.max(1, Math.round((periodEnd.getTime() - periodStart.getTime()) / DAY))
+                      : null;
+                    const remainingDays = periodEnd && calcAt
+                      ? Math.max(0, Math.round((periodEnd.getTime() - calcAt.getTime()) / DAY))
+                      : null;
+                    const hasInputs = periodStart && periodEnd && prevPrice > 0;
+                    return (
+                      <>
+                        <tr className="border-t border-border text-emerald-600">
+                          <td className="py-3">
+                            <div className="font-medium">Prorated credit</div>
+                            <div className="text-xs text-emerald-700/80">
+                              Unused days from {payment.previous_plan ?? "previous plan"}
+                            </div>
+                          </td>
+                          <td className="py-3 text-right font-medium">− {formatPHP(credit)}</td>
+                        </tr>
+                        {hasInputs && (
+                          <tr className="border-t border-dashed border-border bg-muted/30">
+                            <td colSpan={2} className="py-3">
+                              <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                                Proration calculation
+                              </div>
+                              <dl className="mt-2 grid gap-x-6 gap-y-1 text-xs sm:grid-cols-2">
+                                <div className="flex justify-between sm:block">
+                                  <dt className="text-muted-foreground">Billing cycle start</dt>
+                                  <dd className="font-mono">{formatDate(periodStart)}</dd>
+                                </div>
+                                <div className="flex justify-between sm:block">
+                                  <dt className="text-muted-foreground">Billing cycle end</dt>
+                                  <dd className="font-mono">{formatDate(periodEnd)}</dd>
+                                </div>
+                                <div className="flex justify-between sm:block">
+                                  <dt className="text-muted-foreground">Days in cycle</dt>
+                                  <dd className="font-mono">{totalDays}</dd>
+                                </div>
+                                <div className="flex justify-between sm:block">
+                                  <dt className="text-muted-foreground">Unused days remaining</dt>
+                                  <dd className="font-mono">{remainingDays}</dd>
+                                </div>
+                                <div className="flex justify-between sm:block">
+                                  <dt className="text-muted-foreground">
+                                    {payment.previous_plan ?? "Previous plan"} monthly
+                                  </dt>
+                                  <dd className="font-mono">{formatPHP(prevPrice)}</dd>
+                                </div>
+                                {calcAt && (
+                                  <div className="flex justify-between sm:block">
+                                    <dt className="text-muted-foreground">Calculated at</dt>
+                                    <dd className="font-mono">{formatDate(calcAt)}</dd>
+                                  </div>
+                                )}
+                              </dl>
+                              {totalDays && remainingDays !== null && (
+                                <div className="mt-2 font-mono text-xs text-muted-foreground">
+                                  {formatPHP(prevPrice)} × {remainingDays} ÷ {totalDays} ={" "}
+                                  <span className="text-emerald-600">{formatPHP(credit)}</span>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        )}
+                      </>
+                    );
+                  })()}
                 </tbody>
                 <tfoot>
                   {hasBreakdown && (
