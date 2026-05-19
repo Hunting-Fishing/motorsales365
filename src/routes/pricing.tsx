@@ -7,6 +7,14 @@ import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { formatPHP } from "@/lib/format";
 
 type UsageMonth = { key: string; label: string; count: number };
@@ -38,6 +46,11 @@ function PricingPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [mySub, setMySub] = useState<any | null>(null);
   const [requesting, setRequesting] = useState<string | null>(null);
+  const [confirmPlan, setConfirmPlan] = useState<{
+    plan: Plan;
+    kind: "new" | "upgrade" | "downgrade" | "switch";
+    upgradeNet: number;
+  } | null>(null);
   const [discounts, setDiscounts] = useState<Record<string, any>>({});
 
   const [lastPayment, setLastPayment] = useState<any | null>(null);
@@ -136,24 +149,33 @@ function PricingPage() {
   }, [mySub, plans]);
 
   // Prorated credit from the user's current paid subscription period.
-  // Uses the exact period_start/period_end and credit_calculated_at/paid_at
-  // recorded on the latest paid subscription payment — no 30-day estimate.
+  // Prefer the exact period_start/period_end + credit_calculated_at on the latest
+  // paid payment row. Fall back to the subscription's own created_at →
+  // current_period_end window (with now() as reference) when no payment row
+  // exists — e.g. admin-approved or complimentary subs that never recorded
+  // a payment.
   const proratedCredit = useMemo(() => {
-    if (!currentPlan || !lastPayment) return 0;
-    const planPrice = Number(lastPayment.plan_price_php ?? currentPlan.price_php ?? 0);
+    if (!currentPlan) return 0;
+    if (mySub?.complimentary) return 0;
+
+    const planPrice = Number(lastPayment?.plan_price_php ?? currentPlan.price_php ?? 0);
     if (planPrice <= 0) return 0;
-    const startRaw = lastPayment.period_start;
-    const endRaw = lastPayment.period_end;
+
+    const startRaw = lastPayment?.period_start ?? mySub?.created_at ?? null;
+    const endRaw = lastPayment?.period_end ?? mySub?.current_period_end ?? null;
     if (!startRaw || !endRaw) return 0;
+
     const start = new Date(startRaw).getTime();
     const end = new Date(endRaw).getTime();
     const totalMs = end - start;
     if (totalMs <= 0) return 0;
-    const refRaw = lastPayment.credit_calculated_at ?? lastPayment.paid_at ?? new Date().toISOString();
+
+    const refRaw =
+      lastPayment?.credit_calculated_at ?? lastPayment?.paid_at ?? new Date().toISOString();
     const ref = new Date(refRaw).getTime();
     const remainingMs = Math.max(0, Math.min(totalMs, end - ref));
     return Math.round((planPrice * remainingMs) / totalMs);
-  }, [currentPlan, lastPayment]);
+  }, [currentPlan, lastPayment, mySub]);
 
   const submitPlanChange = async (planId: string, kind: "new" | "upgrade" | "downgrade" | "switch") => {
     if (!user) {
@@ -446,7 +468,13 @@ function PricingPage() {
                 <Button
                   className="mt-6"
                   disabled={requesting === p.id || isCurrent || isPendingThis}
-                  onClick={() => submitPlanChange(p.id, kind)}
+                  onClick={() => {
+                    if (!user) {
+                      navigate({ to: "/signup" });
+                      return;
+                    }
+                    setConfirmPlan({ plan: p, kind, upgradeNet });
+                  }}
                 >
                   {ctaLabel}
                 </Button>
@@ -466,6 +494,92 @@ function PricingPage() {
           Plan changes activate instantly. Any unused portion of your current plan is applied as a prorated credit on your next invoice. Live card payments are coming soon.
         </p>
       </section>
+
+      <Dialog open={!!confirmPlan} onOpenChange={(o) => !o && setConfirmPlan(null)}>
+        <DialogContent>
+          {confirmPlan && (() => {
+            const { plan, kind, upgradeNet } = confirmPlan;
+            const due =
+              kind === "upgrade"
+                ? upgradeNet
+                : Number(plan.price_php) || 0;
+            const title =
+              kind === "upgrade"
+                ? `Upgrade to ${plan.name}?`
+                : kind === "downgrade"
+                  ? `Switch down to ${plan.name}?`
+                  : kind === "switch"
+                    ? `Switch to ${plan.name}?`
+                    : `Activate ${plan.name}?`;
+            return (
+              <>
+                <DialogHeader>
+                  <DialogTitle>{title}</DialogTitle>
+                  <DialogDescription>
+                    {currentPlan
+                      ? `You're currently on ${currentPlan.name} (${formatPHP(currentPlan.price_php)}/mo).`
+                      : "Review the plan details before activating."}
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-4 text-sm">
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">New plan</span>
+                    <span className="font-semibold">{plan.name} — {formatPHP(plan.price_php)}/mo</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Listings / month</span>
+                    <span className="font-medium">{plan.listings_per_month ?? "Unlimited"}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Photos / listing</span>
+                    <span className="font-medium">{plan.max_photos_per_listing ?? "—"}</span>
+                  </div>
+
+                  {kind === "upgrade" && proratedCredit > 0 && (
+                    <div className="flex items-center justify-between border-t border-border pt-2 text-emerald-600">
+                      <span>Prorated credit from {currentPlan?.name}</span>
+                      <span className="font-medium">− {formatPHP(proratedCredit)}</span>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between border-t border-border pt-2 text-base">
+                    <span className="font-semibold">You pay now</span>
+                    <span className="font-display text-xl font-bold text-primary">{formatPHP(due)}</span>
+                  </div>
+
+                  {kind === "downgrade" && (
+                    <p className="text-xs text-muted-foreground">
+                      Takes effect immediately. Any unused portion of your current plan is credited to your account.
+                    </p>
+                  )}
+                </div>
+
+                <DialogFooter className="gap-2 sm:gap-2">
+                  <Button variant="outline" onClick={() => setConfirmPlan(null)}>
+                    Cancel
+                  </Button>
+                  <Button
+                    disabled={requesting === plan.id}
+                    onClick={async () => {
+                      await submitPlanChange(plan.id, kind);
+                      setConfirmPlan(null);
+                    }}
+                  >
+                    {requesting === plan.id
+                      ? "Activating…"
+                      : kind === "upgrade"
+                        ? `Confirm upgrade — ${formatPHP(due)}`
+                        : kind === "downgrade"
+                          ? `Confirm switch — ${formatPHP(due)}`
+                          : `Confirm — ${formatPHP(due)}`}
+                  </Button>
+                </DialogFooter>
+              </>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
     </SiteLayout>
   );
 }
