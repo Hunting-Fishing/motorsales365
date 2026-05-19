@@ -37,6 +37,7 @@ type Suggestion = {
 };
 
 type BusinessType = { slug: string; label: string };
+type DeciderProfile = { id: string; full_name: string | null };
 
 function slugify(s: string) {
   return s
