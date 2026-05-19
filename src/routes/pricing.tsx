@@ -99,21 +99,25 @@ function PricingPage() {
     return plans.find((p) => p.id === mySub.plan_id) ?? null;
   }, [mySub, plans]);
 
-  // Prorated credit from current plan for unused remainder of the cycle.
-  // Fallback: assume a 30-day cycle ending at current_period_end.
+  // Prorated credit from the user's current paid subscription period.
+  // Uses the exact period_start/period_end and credit_calculated_at/paid_at
+  // recorded on the latest paid subscription payment — no 30-day estimate.
   const proratedCredit = useMemo(() => {
-    if (!currentPlan || (currentPlan.price_php ?? 0) <= 0) return 0;
-    const endRaw = (mySub as any)?.current_period_end;
-    if (!endRaw) return 0;
+    if (!currentPlan || !lastPayment) return 0;
+    const planPrice = Number(lastPayment.plan_price_php ?? currentPlan.price_php ?? 0);
+    if (planPrice <= 0) return 0;
+    const startRaw = lastPayment.period_start;
+    const endRaw = lastPayment.period_end;
+    if (!startRaw || !endRaw) return 0;
+    const start = new Date(startRaw).getTime();
     const end = new Date(endRaw).getTime();
-    const startRaw = (mySub as any)?.current_period_start;
-    const start = startRaw ? new Date(startRaw).getTime() : end - 30 * 24 * 60 * 60 * 1000;
-    const now = Date.now();
     const totalMs = end - start;
-    const remainingMs = Math.max(0, end - now);
     if (totalMs <= 0) return 0;
-    return Math.round((currentPlan.price_php * remainingMs) / totalMs);
-  }, [mySub, currentPlan]);
+    const refRaw = lastPayment.credit_calculated_at ?? lastPayment.paid_at ?? new Date().toISOString();
+    const ref = new Date(refRaw).getTime();
+    const remainingMs = Math.max(0, Math.min(totalMs, end - ref));
+    return Math.round((planPrice * remainingMs) / totalMs);
+  }, [currentPlan, lastPayment]);
 
   const submitPlanChange = async (planId: string, kind: "new" | "upgrade" | "downgrade" | "switch") => {
     if (!user) {
