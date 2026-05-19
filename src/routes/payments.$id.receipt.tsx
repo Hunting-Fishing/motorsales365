@@ -256,35 +256,53 @@ function ReceiptPage() {
                               <div className="text-xs uppercase tracking-wide text-muted-foreground">
                                 Proration calculation
                               </div>
-                              <dl className="mt-2 grid gap-x-6 gap-y-1 text-xs sm:grid-cols-2">
-                                <div className="flex justify-between sm:block">
+                              <dl className="mt-2 grid gap-x-6 gap-y-2 text-xs sm:grid-cols-2">
+                                <div>
                                   <dt className="text-muted-foreground">Billing cycle start</dt>
                                   <dd className="font-mono">{formatDate(periodStart)}</dd>
+                                  <dd className="font-mono text-[10px] text-muted-foreground/70 break-all">
+                                    {payment.period_start}
+                                  </dd>
                                 </div>
-                                <div className="flex justify-between sm:block">
+                                <div>
                                   <dt className="text-muted-foreground">Billing cycle end</dt>
                                   <dd className="font-mono">{formatDate(periodEnd)}</dd>
+                                  <dd className="font-mono text-[10px] text-muted-foreground/70 break-all">
+                                    {payment.period_end}
+                                  </dd>
                                 </div>
-                                <div className="flex justify-between sm:block">
-                                  <dt className="text-muted-foreground">Days in cycle</dt>
-                                  <dd className="font-mono">{totalDays}</dd>
+                                <div>
+                                  <dt className="text-muted-foreground">
+                                    {payment.credit_calculated_at ? "Calculated at" : "Paid at"}
+                                  </dt>
+                                  <dd className="font-mono">{calcAt ? formatDate(calcAt) : "—"}</dd>
+                                  <dd className="font-mono text-[10px] text-muted-foreground/70 break-all">
+                                    {payment.credit_calculated_at ?? payment.paid_at ?? ""}
+                                  </dd>
                                 </div>
-                                <div className="flex justify-between sm:block">
-                                  <dt className="text-muted-foreground">Unused days remaining</dt>
-                                  <dd className="font-mono">{remainingDays}</dd>
-                                </div>
-                                <div className="flex justify-between sm:block">
+                                <div>
                                   <dt className="text-muted-foreground">
                                     {payment.previous_plan ?? "Previous plan"} monthly
                                   </dt>
                                   <dd className="font-mono">{formatPHP(prevPrice)}</dd>
+                                  <dd className="font-mono text-[10px] text-muted-foreground/70">
+                                    raw: {prevPrice}
+                                  </dd>
                                 </div>
-                                {calcAt && (
-                                  <div className="flex justify-between sm:block">
-                                    <dt className="text-muted-foreground">Calculated at</dt>
-                                    <dd className="font-mono">{formatDate(calcAt)}</dd>
-                                  </div>
-                                )}
+                                <div>
+                                  <dt className="text-muted-foreground">totalDays</dt>
+                                  <dd className="font-mono">{totalDays}</dd>
+                                  <dd className="font-mono text-[10px] text-muted-foreground/70">
+                                    (period_end − period_start) ÷ 86 400 000 ms
+                                  </dd>
+                                </div>
+                                <div>
+                                  <dt className="text-muted-foreground">remainingDays</dt>
+                                  <dd className="font-mono">{remainingDays}</dd>
+                                  <dd className="font-mono text-[10px] text-muted-foreground/70">
+                                    (period_end − {payment.credit_calculated_at ? "credit_calculated_at" : "paid_at"}) ÷ 86 400 000 ms
+                                  </dd>
+                                </div>
                               </dl>
                               {totalDays && remainingDays !== null && (
                                 <div className="mt-2 font-mono text-xs text-muted-foreground">
