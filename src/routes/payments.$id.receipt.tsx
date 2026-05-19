@@ -15,6 +15,8 @@ function ReceiptPage() {
   const [payment, setPayment] = useState<any>(null);
   const [listing, setListing] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
+  const [lineItems, setLineItems] = useState<any[]>([]);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -27,17 +29,26 @@ function ReceiptPage() {
         return;
       }
       setPayment(data);
-      const [{ data: prof }, listingResp] = await Promise.all([
+      const [{ data: prof }, listingResp, { data: items }] = await Promise.all([
         supabase.from("profiles").select("full_name,business_name,business_address,phone,first_name,last_name").eq("id", data.user_id).maybeSingle(),
         data.listing_id
           ? supabase.from("listings").select("id,title,price_php").eq("id", data.listing_id).maybeSingle()
           : Promise.resolve({ data: null } as any),
+        supabase
+          .from("payment_line_items")
+          .select("*")
+          .eq("payment_id", data.id)
+          .order("sort_order", { ascending: true })
+          .order("created_at", { ascending: true }),
       ]);
       setProfile(prof);
       setListing((listingResp as any).data);
+      setLineItems(items ?? []);
       setLoading(false);
     })();
   }, [id]);
+
+  const toggle = (key: string) => setExpanded((m) => ({ ...m, [key]: !m[key] }));
 
   if (loading) {
     return <div className="mx-auto max-w-3xl p-8 text-sm text-muted-foreground">Loading receipt…</div>;
