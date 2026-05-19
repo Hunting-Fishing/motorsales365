@@ -4,8 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { formatPHP, formatDate } from "@/lib/format";
-import { CheckCircle2, AlertTriangle, ArrowUpRight, TrendingUp, Calendar } from "lucide-react";
+import { CheckCircle2, AlertTriangle, ArrowUpRight, TrendingUp, Calendar, Check } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 export const Route = createFileRoute("/dashboard/billing")({
