@@ -123,24 +123,102 @@ function BillingPage() {
   const overCap = monthlyCap !== null && thisMonthListings.length > monthlyCap;
   const nearCap = monthlyCap !== null && !overCap && thisMonthListings.length / monthlyCap >= 0.8;
 
-  // Recommendation
+  // Max photos used on any listing this month (signals media-limit pressure)
+  const maxPhotosUsed = useMemo(() => {
+    let max = 0;
+    for (const l of thisMonthListings) {
+      const c = mediaCounts[l.id]?.photo ?? 0;
+      if (c > max) max = c;
+    }
+    return max;
+  }, [thisMonthListings, mediaCounts]);
+
+  // Prorated credit from current paid plan for the unused remainder of the billing cycle
+  const proratedCredit = useMemo(() => {
+    if (!activeSub || !currentPlan || (currentPlan.price_php ?? 0) <= 0) return 0;
+    const start = activeSub.current_period_start ? new Date(activeSub.current_period_start) : null;
+    const end = activeSub.current_period_end ? new Date(activeSub.current_period_end) : null;
+    if (!start || !end || end <= start) return 0;
+    const totalMs = end.getTime() - start.getTime();
+    const remainingMs = Math.max(0, end.getTime() - now.getTime());
+    return Math.round((currentPlan.price_php * remainingMs) / totalMs);
+  }, [activeSub, currentPlan, now]);
+
+  // Score-based recommendation considering listings, boosted listings, and photo limits
   const recommendation = useMemo(() => {
     if (plans.length === 0) return null;
     const usage = thisMonthListings.length;
-    // Find smallest plan that comfortably covers usage (cap >= usage * 1.25, or unlimited)
-    const target = usage === 0 ? 1 : Math.ceil(usage * 1.25);
-    const sorted = [...plans].sort((a, b) => a.price_php - b.price_php);
-    const fit = sorted.find((p) => p.listings_per_month === null || p.listings_per_month >= target);
+    // Boosts indicate the user wants visibility — target a plan with at least 25% extra room
+    const listingTarget = Math.max(1, Math.ceil((usage + boostedCount * 0.5) * 1.25));
+    const photoTarget = Math.max(3, maxPhotosUsed);
+
+    const scored = plans
+      .map((p) => {
+        const listingCap = p.listings_per_month ?? Number.POSITIVE_INFINITY;
+        const photoCap = p.max_photos_per_listing ?? 3;
+        const listingFit = listingCap >= listingTarget;
+        const photoFit = photoCap >= photoTarget;
+        return { plan: p, listingCap, photoCap, listingFit, photoFit, fits: listingFit && photoFit };
+      })
+      .sort((a, b) => a.plan.price_php - b.plan.price_php);
+
+    const fit = scored.find((s) => s.fits) ?? scored[scored.length - 1];
     if (!fit) return null;
-    if (!currentPlan) return { plan: fit, reason: `Based on ${usage} listing${usage === 1 ? "" : "s"} this month, ${fit.name} fits your usage.` };
-    if (fit.id === currentPlan.id) {
-      return { plan: fit, reason: "Your current plan matches your usage well.", matches: true };
+
+    const usagePieces: string[] = [`${usage} listing${usage === 1 ? "" : "s"} this month`];
+    if (boostedCount > 0) usagePieces.push(`${boostedCount} boosted`);
+    if (maxPhotosUsed > 0) usagePieces.push(`up to ${maxPhotosUsed} photos/listing`);
+    const usageSummary = usagePieces.join(" · ");
+
+    if (!currentPlan) {
+      return {
+        plan: fit.plan,
+        reason: `Based on ${usageSummary}, ${fit.plan.name} fits your usage.`,
+        upgradeNet: fit.plan.price_php,
+        proratedCredit: 0,
+      };
     }
-    if (fit.price_php < currentPlan.price_php) {
-      return { plan: fit, reason: `You're using less than your plan allows. ${fit.name} could save you ${formatPHP(currentPlan.price_php - fit.price_php)}/mo.`, downgrade: true };
+
+    if (fit.plan.id === currentPlan.id) {
+      return {
+        plan: fit.plan,
+        reason: `Your current plan covers your usage (${usageSummary}).`,
+        matches: true,
+        upgradeNet: 0,
+        proratedCredit: 0,
+      };
     }
-    return { plan: fit, reason: `You're close to or over your plan cap. ${fit.name} gives you more room.`, upgrade: true };
-  }, [plans, currentPlan, thisMonthListings.length]);
+
+    if (fit.plan.price_php < currentPlan.price_php) {
+      return {
+        plan: fit.plan,
+        reason: `You're under-using ${currentPlan.name}. ${fit.plan.name} still covers ${usageSummary} and saves ${formatPHP(currentPlan.price_php - fit.plan.price_php)}/mo.`,
+        downgrade: true,
+        upgradeNet: 0,
+        proratedCredit: 0,
+      };
+    }
+
+    // Upgrade — explain why and apply prorated credit
+    const reasons: string[] = [];
+    const curListingCap = currentPlan.listings_per_month ?? Number.POSITIVE_INFINITY;
+    const curPhotoCap = currentPlan.max_photos_per_listing ?? 3;
+    if (usage > curListingCap) reasons.push(`you're over your ${curListingCap}/mo listing cap`);
+    else if (usage + boostedCount * 0.5 >= curListingCap * 0.8) reasons.push("you're nearing your monthly listing cap");
+    if (maxPhotosUsed > curPhotoCap) reasons.push(`some listings need more than ${curPhotoCap} photos`);
+    if (boostedCount > 0 && fit.listingCap > curListingCap) reasons.push(`${boostedCount} boosted listing${boostedCount === 1 ? "" : "s"} suggest you want more reach`);
+    if (reasons.length === 0) reasons.push(`${fit.plan.name} better matches your activity (${usageSummary})`);
+
+    const upgradeNet = Math.max(0, fit.plan.price_php - proratedCredit);
+    return {
+      plan: fit.plan,
+      reason: `${reasons.join(", ")}.`,
+      upgrade: true,
+      upgradeNet,
+      proratedCredit,
+    };
+  }, [plans, currentPlan, thisMonthListings.length, boostedCount, maxPhotosUsed, proratedCredit]);
+
 
   const subTone = (s: string) =>
     s === "active" ? "default" : s === "pending" ? "secondary" : s === "paused" ? "outline" : "secondary";
@@ -222,11 +300,28 @@ function BillingPage() {
               ) : (
                 <ArrowUpRight className="mt-0.5 h-5 w-5 text-primary" />
               )}
-              <div>
+              <div className="flex-1">
                 <div className="font-semibold">
                   {recommendation.matches ? "Your plan is a good fit" : `Suggested plan: ${recommendation.plan.name}`}
                 </div>
                 <div className="mt-0.5 text-sm text-muted-foreground">{recommendation.reason}</div>
+                {recommendation.upgrade && currentPlan && (
+                  <div className="mt-3 rounded-lg border border-border bg-background/60 p-3 text-xs">
+                    <div className="mb-1 font-medium uppercase tracking-wide text-muted-foreground">Prorated upgrade</div>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                      <span>{recommendation.plan.name}: <span className="font-medium text-foreground">{formatPHP(recommendation.plan.price_php)}</span>/mo</span>
+                      {recommendation.proratedCredit > 0 && (
+                        <span className="text-emerald-600">
+                          − {formatPHP(recommendation.proratedCredit)} credit from {currentPlan.name}
+                          {renewalDays !== null && renewalDays > 0 ? ` (${renewalDays} day${renewalDays === 1 ? "" : "s"} unused)` : ""}
+                        </span>
+                      )}
+                      <span className="font-semibold text-foreground">
+                        = Pay now: {formatPHP(recommendation.upgradeNet)}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             {!recommendation.matches && (
@@ -237,6 +332,7 @@ function BillingPage() {
           </div>
         </section>
       )}
+
 
       {/* Posting activity chart */}
       <section className="mb-8">
