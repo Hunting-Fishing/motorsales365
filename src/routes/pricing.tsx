@@ -227,6 +227,7 @@ function PricingPage() {
 
   return (
     <SiteLayout>
+      <PaymentTestModeBanner />
       <section className="bg-secondary/40 py-12">
         <div className="container mx-auto px-4 text-center">
           <h1 className="font-display text-4xl font-bold">Simple pricing</h1>
@@ -566,17 +567,28 @@ function PricingPage() {
                   <Button
                     disabled={requesting === plan.id}
                     onClick={async () => {
-                      await submitPlanChange(plan.id, kind);
-                      setConfirmPlan(null);
+                      if (Number(plan.price_php) > 0 && plan.stripe_lookup_key) {
+                        setConfirmPlan(null);
+                        openCheckout({
+                          priceId: plan.stripe_lookup_key,
+                          returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
+                        });
+                      } else {
+                        await submitPlanChange(plan.id, kind);
+                        setConfirmPlan(null);
+                      }
                     }}
                   >
+                    <CreditCard className="mr-2 h-4 w-4" />
                     {requesting === plan.id
                       ? "Activating…"
-                      : kind === "upgrade"
-                        ? `Confirm upgrade — ${formatPHP(due)}`
-                        : kind === "downgrade"
-                          ? `Confirm switch — ${formatPHP(due)}`
-                          : `Confirm — ${formatPHP(due)}`}
+                      : Number(plan.price_php) > 0
+                        ? `Continue to payment — ${formatPHP(due)}`
+                        : kind === "upgrade"
+                          ? `Confirm upgrade — ${formatPHP(due)}`
+                          : kind === "downgrade"
+                            ? `Confirm switch — ${formatPHP(due)}`
+                            : `Confirm — ${formatPHP(due)}`}
                   </Button>
                 </DialogFooter>
               </>
