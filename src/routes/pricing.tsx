@@ -41,6 +41,7 @@ function PricingPage() {
   const [discounts, setDiscounts] = useState<Record<string, any>>({});
 
   const [lastPayment, setLastPayment] = useState<any | null>(null);
+  const [usage, setUsage] = useState<UsageMonth[]>([]);
 
   const loadSub = async (uid: string) => {
     const { data } = await supabase
@@ -52,7 +53,6 @@ function PricingPage() {
       .maybeSingle();
     setMySub(data ?? null);
 
-    // Latest paid subscription payment — source of truth for proration inputs
     if (data?.id) {
       const { data: pay } = await supabase
         .from("payments")
@@ -70,6 +70,36 @@ function PricingPage() {
     }
   };
 
+  // Last 6 months of listing activity (published_at, falling back to created_at)
+  const loadUsage = async (uid: string) => {
+    const sinceDate = new Date();
+    sinceDate.setMonth(sinceDate.getMonth() - 5);
+    sinceDate.setDate(1);
+    sinceDate.setHours(0, 0, 0, 0);
+    const { data } = await supabase
+      .from("listings")
+      .select("created_at, published_at")
+      .eq("user_id", uid)
+      .gte("created_at", sinceDate.toISOString());
+    const buckets = new Map<string, UsageMonth>();
+    for (let i = 5; i >= 0; i--) {
+      const d = new Date();
+      d.setMonth(d.getMonth() - i);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const label = d.toLocaleDateString("en-PH", { month: "short", year: "2-digit" });
+      buckets.set(key, { key, label, count: 0 });
+    }
+    (data ?? []).forEach((row: any) => {
+      const ts = row.published_at ?? row.created_at;
+      if (!ts) return;
+      const d = new Date(ts);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const b = buckets.get(key);
+      if (b) b.count++;
+    });
+    setUsage(Array.from(buckets.values()));
+  };
+
   useEffect(() => {
     supabase.from("pricing_settings").select("key,value").then(({ data }) => {
       const m: Record<string, number> = {};
@@ -78,7 +108,10 @@ function PricingPage() {
     });
     supabase.from("subscription_plans").select("*").eq("active", true).order("sort_order")
       .then(({ data }) => setPlans((data as any) ?? []));
-    if (user?.id) loadSub(user.id);
+    if (user?.id) {
+      loadSub(user.id);
+      loadUsage(user.id);
+    }
   }, [user?.id]);
 
   // Preview discounts per plan once we have plans + a signed-in user
