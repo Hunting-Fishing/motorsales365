@@ -300,11 +300,28 @@ function BillingPage() {
               ) : (
                 <ArrowUpRight className="mt-0.5 h-5 w-5 text-primary" />
               )}
-              <div>
+              <div className="flex-1">
                 <div className="font-semibold">
                   {recommendation.matches ? "Your plan is a good fit" : `Suggested plan: ${recommendation.plan.name}`}
                 </div>
                 <div className="mt-0.5 text-sm text-muted-foreground">{recommendation.reason}</div>
+                {recommendation.upgrade && currentPlan && (
+                  <div className="mt-3 rounded-lg border border-border bg-background/60 p-3 text-xs">
+                    <div className="mb-1 font-medium uppercase tracking-wide text-muted-foreground">Prorated upgrade</div>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                      <span>{recommendation.plan.name}: <span className="font-medium text-foreground">{formatPHP(recommendation.plan.price_php)}</span>/mo</span>
+                      {recommendation.proratedCredit > 0 && (
+                        <span className="text-emerald-600">
+                          − {formatPHP(recommendation.proratedCredit)} credit from {currentPlan.name}
+                          {renewalDays !== null && renewalDays > 0 ? ` (${renewalDays} day${renewalDays === 1 ? "" : "s"} unused)` : ""}
+                        </span>
+                      )}
+                      <span className="font-semibold text-foreground">
+                        = Pay now: {formatPHP(recommendation.upgradeNet)}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             {!recommendation.matches && (
@@ -315,6 +332,7 @@ function BillingPage() {
           </div>
         </section>
       )}
+
 
       {/* Posting activity chart */}
       <section className="mb-8">
