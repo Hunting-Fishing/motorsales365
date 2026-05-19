@@ -52,6 +52,7 @@ function TypeSuggestionsAdmin() {
   const { user, isAdmin, loading: authLoading } = useAuth();
   const [items, setItems] = useState<Suggestion[]>([]);
   const [types, setTypes] = useState<BusinessType[]>([]);
+  const [deciders, setDeciders] = useState<Record<string, DeciderProfile>>({});
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<Status | "all">("pending");
   const [query, setQuery] = useState("");
