@@ -596,6 +596,18 @@ function PricingPage() {
           })()}
         </DialogContent>
       </Dialog>
+
+      <Dialog open={checkoutOpen} onOpenChange={(o) => !o && closeCheckout()}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Complete your payment</DialogTitle>
+            <DialogDescription>
+              Your card will be saved securely for future renewals. You can manage it any time from billing.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="max-h-[70vh] overflow-y-auto">{checkoutElement}</div>
+        </DialogContent>
+      </Dialog>
     </SiteLayout>
   );
 }
