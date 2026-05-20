@@ -36,7 +36,7 @@ function LoginPage() {
     redirectTimerRef.current = window.setTimeout(() => {
       window.location.replace("/dashboard");
     }, 1200);
-    void navigate({ to: "/dashboard" }).finally(() => {
+    void navigate({ to: "/dashboard", replace: true }).finally(() => {
       if (redirectTimerRef.current) window.clearTimeout(redirectTimerRef.current);
     });
   };
