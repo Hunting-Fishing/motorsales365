@@ -98,8 +98,8 @@ function LoginPage() {
             </div>
             <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
-          <Button type="submit" disabled={submitting} className="w-full">
-            {submitting ? "Signing in…" : "Sign in"}
+          <Button type="submit" disabled={authBusy} aria-busy={submitting} className="w-full">
+            {submitting ? "Signing in…" : loading ? "Loading…" : "Sign in"}
           </Button>
         </form>
 
@@ -109,8 +109,8 @@ function LoginPage() {
           <div className="h-px flex-1 bg-border" />
         </div>
 
-        <Button variant="outline" onClick={handleGoogle} className="w-full">
-          Continue with Google
+        <Button variant="outline" onClick={handleGoogle} disabled={authBusy} aria-busy={googleSubmitting} className="w-full">
+          {googleSubmitting ? "Connecting to Google…" : "Continue with Google"}
         </Button>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
