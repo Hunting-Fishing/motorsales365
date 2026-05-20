@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Menu, Plus, Heart, MessageSquare, LogOut, Shield, User as UserIcon } from "lucide-react";
-import { useAuth } from "@/hooks/use-auth";
+import { Menu, Plus, Heart, MessageSquare, LogOut, Shield, User as UserIcon, Eye } from "lucide-react";
+import { useAuth, type SellerType } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/brand-logo";
 import { CurrencySwitcher } from "@/components/currency-switcher";
