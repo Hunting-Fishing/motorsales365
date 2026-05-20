@@ -87,6 +87,35 @@ export function SiteHeader() {
             <Link to="/sell"><Plus className="mr-1 h-4 w-4" /> Post a listing</Link>
           </Button>
 
+          {user && isStaff && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <Eye className="h-4 w-4" />
+                  <span className="hidden md:inline">View as: {SELLER_VIEW_OPTIONS.find((o) => o.value === effectiveSellerType)?.label ?? effectiveSellerType}</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                {SELLER_VIEW_OPTIONS.map((o) => (
+                  <DropdownMenuItem
+                    key={o.value}
+                    onClick={() => setSimulatedSellerType(o.value === realSellerType ? null : o.value)}
+                  >
+                    {effectiveSellerType === o.value ? "✓ " : "  "}{o.label}
+                  </DropdownMenuItem>
+                ))}
+                {simulatedSellerType && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => setSimulatedSellerType(null)}>
+                      Reset to my account ({realSellerType})
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
