@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { useAuth, type AppRole } from "@/hooks/use-auth";
+import { useAuth, type AppRole, type SellerType } from "@/hooks/use-auth";
 import { useFeatureFlags, FEATURE_FLAG_META } from "@/lib/feature-flags";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -10,10 +10,17 @@ export const Route = createFileRoute("/admin/sandbox")({
 });
 
 const ALL_ROLES: AppRole[] = ["admin", "sales", "moderator", "support", "advertising", "user"];
+const SELLER_TYPES: { value: SellerType; label: string }[] = [
+  { value: "private", label: "Private seller" },
+  { value: "dealer", label: "Dealer" },
+  { value: "repair_shop", label: "Repair shop" },
+  { value: "insurance", label: "Insurance" },
+];
 
 function SandboxPage() {
   const {
     user, realRoles, effectiveRoles, realIsAdmin, simulatedRoles, setSimulatedRoles,
+    isStaff, realSellerType, effectiveSellerType, simulatedSellerType, setSimulatedSellerType,
   } = useAuth();
   const { flags, setFlag, setAll, reset } = useFeatureFlags();
 
