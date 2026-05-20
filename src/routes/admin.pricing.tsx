@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { CheckCircle2, XCircle, AlertTriangle, Minus, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +11,18 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatDate, formatPHP } from "@/lib/format";
+import { verifyStripePlans } from "@/utils/payments.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
+
+type VerifyRow = {
+  planId: string;
+  name: string;
+  lookupKey: string | null;
+  status: "ok" | "missing" | "inactive" | "no_key";
+  stripePriceId?: string;
+  stripeAmount?: number;
+  stripeCurrency?: string;
+};
 
 export const Route = createFileRoute("/admin/pricing")({
   component: AdminPricing,
