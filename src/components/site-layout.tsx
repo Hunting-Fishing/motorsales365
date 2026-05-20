@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { SiteHeader } from "./site-header";
 import { SiteFooter } from "./site-footer";
 import { CookieBanner } from "./cookie-banner";
-import bannerImage from "@/assets/banner.png";
+import bannerImage from "@/assets/banner.webp";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   return (

@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,7 @@ export const Route = createFileRoute("/login")({
 function LoginPage() {
   const { user, loading, refreshSession } = useAuth();
   const navigate = useNavigate();
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -23,18 +24,34 @@ function LoginPage() {
   // Single-flight lock: survives re-renders and guarantees only one in-flight
   // auth request at a time, even if React batches state updates.
   const inFlightRef = useRef(false);
+  const redirectTimerRef = useRef<number | null>(null);
 
   // Disable all auth actions while: a request is in flight, the auth hook is
   // still initializing (header shows the loading spinner), or we already have
   // a session and are about to redirect.
   const authBusy = submitting || googleSubmitting || loading || !!user;
 
+  const goToDashboard = () => {
+    if (redirectTimerRef.current) window.clearTimeout(redirectTimerRef.current);
+    redirectTimerRef.current = window.setTimeout(() => {
+      window.location.replace("/dashboard");
+    }, 1200);
+    void navigate({ to: "/dashboard", replace: true }).finally(() => {
+      if (redirectTimerRef.current) window.clearTimeout(redirectTimerRef.current);
+    });
+  };
+
+  useEffect(() => {
+    void router.preloadRoute({ to: "/dashboard" });
+  }, [router]);
+
   useEffect(() => {
     if (!loading && user) {
-      // Hard-navigate so we don't wait on a stale dynamic chunk and so every
-      // subscriber (header, dashboard, etc.) renders against the new session.
-      window.location.replace("/dashboard");
+      goToDashboard();
     }
+    return () => {
+      if (redirectTimerRef.current) window.clearTimeout(redirectTimerRef.current);
+    };
   }, [user, loading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,9 +73,7 @@ function LoginPage() {
       }
       await refreshSession(data.session);
       toast.success("Welcome back!");
-      // Full page load avoids the stale-chunk hang where the dashboard route
-      // would take 15–20s (or never) to dynamically import after sign-in.
-      window.location.replace("/dashboard");
+      goToDashboard();
     } finally {
       inFlightRef.current = false;
       setSubmitting(false);
@@ -73,7 +88,7 @@ function LoginPage() {
       const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
       if (result.error) { toast.error("Could not sign in with Google"); return; }
       if (result.redirected) return;
-      window.location.replace("/dashboard");
+      goToDashboard();
     } finally {
       inFlightRef.current = false;
       setGoogleSubmitting(false);

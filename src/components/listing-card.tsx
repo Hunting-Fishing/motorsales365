@@ -3,7 +3,7 @@ import { MapPin, Camera, Video, Star, Droplets, Wrench, Send, SprayCan, Recycle,
 import { Badge } from "@/components/ui/badge";
 import { VerifiedBadge } from "@/components/verified-badge";
 import { formatPHP } from "@/lib/format";
-import placeholderCar from "@/assets/placeholder-car.png";
+import placeholderCar from "@/assets/placeholder-car.webp";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 
 export interface ListingCardData {
