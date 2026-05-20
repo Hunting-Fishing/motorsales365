@@ -19,6 +19,15 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [googleSubmitting, setGoogleSubmitting] = useState(false);
+  // Single-flight lock: survives re-renders and guarantees only one in-flight
+  // auth request at a time, even if React batches state updates.
+  const inFlightRef = useRef(false);
+
+  // Disable all auth actions while: a request is in flight, the auth hook is
+  // still initializing (header shows the loading spinner), or we already have
+  // a session and are about to redirect.
+  const authBusy = submitting || googleSubmitting || loading || !!user;
 
   useEffect(() => {
     if (!loading && user) {
@@ -30,31 +39,45 @@ function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (inFlightRef.current || authBusy) return;
+    inFlightRef.current = true;
     setSubmitting(true);
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setSubmitting(false);
-      const msg = error.message.toLowerCase();
-      if (msg.includes("confirm") || msg.includes("not confirmed")) {
-        toast.error("Please verify your email first.");
-        navigate({ to: "/verify-email", search: { email, intent: undefined } });
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        const msg = error.message.toLowerCase();
+        if (msg.includes("confirm") || msg.includes("not confirmed")) {
+          toast.error("Please verify your email first.");
+          navigate({ to: "/verify-email", search: { email, intent: undefined } });
+          return;
+        }
+        toast.error(error.message);
         return;
       }
-      toast.error(error.message);
-      return;
+      await refreshSession(data.session);
+      toast.success("Welcome back!");
+      // Full page load avoids the stale-chunk hang where the dashboard route
+      // would take 15–20s (or never) to dynamically import after sign-in.
+      window.location.replace("/dashboard");
+    } finally {
+      inFlightRef.current = false;
+      setSubmitting(false);
     }
-    await refreshSession(data.session);
-    toast.success("Welcome back!");
-    // Full page load avoids the stale-chunk hang where the dashboard route
-    // would take 15–20s (or never) to dynamically import after sign-in.
-    window.location.replace("/dashboard");
   };
 
   const handleGoogle = async () => {
-    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-    if (result.error) { toast.error("Could not sign in with Google"); return; }
-    if (result.redirected) return;
-    window.location.replace("/dashboard");
+    if (inFlightRef.current || authBusy) return;
+    inFlightRef.current = true;
+    setGoogleSubmitting(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
+      if (result.error) { toast.error("Could not sign in with Google"); return; }
+      if (result.redirected) return;
+      window.location.replace("/dashboard");
+    } finally {
+      inFlightRef.current = false;
+      setGoogleSubmitting(false);
+    }
   };
 
   return (
