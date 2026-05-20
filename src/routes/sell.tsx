@@ -104,7 +104,7 @@ const DRONE_SERVICES = [
 ];
 
 function SellPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, effectiveSellerType } = useAuth();
   const navigate = useNavigate();
 
   const [category, setCategory] = useState("car");
