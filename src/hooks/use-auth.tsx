@@ -95,6 +95,7 @@ async function maybeSendWelcomeEmail(user: User) {
 }
 
 export type AppRole = "admin" | "sales" | "moderator" | "support" | "advertising" | "user";
+export type SellerType = "private" | "dealer" | "repair_shop" | "insurance";
 
 interface AuthContextValue {
   user: User | null;
@@ -111,11 +112,18 @@ interface AuthContextValue {
   realIsAdmin: boolean;
   simulatedRoles: AppRole[] | null;
   setSimulatedRoles: (roles: AppRole[] | null) => void;
+  realSellerType: SellerType;
+  effectiveSellerType: SellerType;
+  simulatedSellerType: SellerType | null;
+  setSimulatedSellerType: (next: SellerType | null) => void;
   refreshSession: (session?: Session | null) => Promise<Session | null>;
   signOut: () => Promise<void>;
 }
 
 const SIM_KEY = "sandbox.roles";
+const SIM_SELLER_KEY = "sandbox.sellerType";
+const VALID_SELLER_TYPES: SellerType[] = ["private", "dealer", "repair_shop", "insurance"];
+
 function loadSim(): AppRole[] | null {
   if (typeof window === "undefined") return null;
   try {
@@ -124,6 +132,15 @@ function loadSim(): AppRole[] | null {
     const arr = JSON.parse(raw);
     if (!Array.isArray(arr)) return null;
     return arr.filter((r) => typeof r === "string") as AppRole[];
+  } catch { return null; }
+}
+
+function loadSimSellerType(): SellerType | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(SIM_SELLER_KEY);
+    if (!raw) return null;
+    return VALID_SELLER_TYPES.includes(raw as SellerType) ? (raw as SellerType) : null;
   } catch { return null; }
 }
 
