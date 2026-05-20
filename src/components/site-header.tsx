@@ -37,7 +37,7 @@ const SELLER_VIEW_OPTIONS: { value: SellerType; label: string }[] = [
 
 export function SiteHeader() {
   const {
-    user, isAdmin, isStaff, signOut,
+    user, loading, isAdmin, isStaff, signOut,
     realSellerType, effectiveSellerType, simulatedSellerType, setSimulatedSellerType,
   } = useAuth();
   const navigate = useNavigate();
@@ -116,7 +116,18 @@ export function SiteHeader() {
             </DropdownMenu>
           )}
 
-          {user ? (
+          {loading ? (
+            <div
+              className="flex items-center gap-2 rounded-md border border-border bg-secondary/40 px-3 py-1.5"
+              aria-live="polite"
+              aria-busy="true"
+            >
+              <span className="h-3 w-3 animate-spin rounded-full border-2 border-muted-foreground border-t-transparent" />
+              <span className="hidden text-xs font-medium text-muted-foreground sm:inline">
+                Signing you in…
+              </span>
+            </div>
+          ) : user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-2">
