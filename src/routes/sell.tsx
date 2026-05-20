@@ -104,7 +104,7 @@ const DRONE_SERVICES = [
 ];
 
 function SellPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, effectiveSellerType } = useAuth();
   const navigate = useNavigate();
 
   const [category, setCategory] = useState("car");
@@ -117,7 +117,14 @@ function SellPage() {
   const [barangay, setBarangay] = useState<string | null>(null);
   const [condition, setCondition] = useState("Used");
   const [phone, setPhone] = useState("");
-  const [sellerType, setSellerType] = useState<"private" | "business">("private");
+  const [sellerType, setSellerType] = useState<"private" | "business">(
+    effectiveSellerType === "private" ? "private" : "business",
+  );
+  // Keep the form's seller-type radio in sync when staff flip the "View as"
+  // simulator, so previewing the dealer flow actually shows the dealer fields.
+  useEffect(() => {
+    setSellerType(effectiveSellerType === "private" ? "private" : "business");
+  }, [effectiveSellerType]);
   const [plan, setPlan] = useState<"free" | "standard" | "upgraded">("free");
   const [year, setYear] = useState("");
   const [make, setMake] = useState("");

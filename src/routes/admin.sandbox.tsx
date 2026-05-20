@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { useAuth, type AppRole } from "@/hooks/use-auth";
+import { useAuth, type AppRole, type SellerType } from "@/hooks/use-auth";
 import { useFeatureFlags, FEATURE_FLAG_META } from "@/lib/feature-flags";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -10,10 +10,17 @@ export const Route = createFileRoute("/admin/sandbox")({
 });
 
 const ALL_ROLES: AppRole[] = ["admin", "sales", "moderator", "support", "advertising", "user"];
+const SELLER_TYPES: { value: SellerType; label: string }[] = [
+  { value: "private", label: "Private seller" },
+  { value: "dealer", label: "Dealer" },
+  { value: "repair_shop", label: "Repair shop" },
+  { value: "insurance", label: "Insurance" },
+];
 
 function SandboxPage() {
   const {
     user, realRoles, effectiveRoles, realIsAdmin, simulatedRoles, setSimulatedRoles,
+    isStaff, realSellerType, effectiveSellerType, simulatedSellerType, setSimulatedSellerType,
   } = useAuth();
   const { flags, setFlag, setAll, reset } = useFeatureFlags();
 
@@ -83,6 +90,59 @@ function SandboxPage() {
           <div><span className="font-semibold text-foreground">Effective roles:</span> {effectiveRoles.join(", ") || "user"}</div>
         </div>
       </section>
+
+      <section className="rounded-xl border border-border bg-card p-5">
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-semibold">Seller-type simulator</h2>
+            <p className="text-xs text-muted-foreground">
+              Preview the app as a Private seller, Dealer, Repair shop, or Insurance account
+              so you can guide users through their screens. UI only — RLS unchanged.
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => { setSimulatedSellerType(null); toast.success("Restored real seller type"); }}
+            disabled={!simulatedSellerType}
+          >
+            Reset
+          </Button>
+        </div>
+
+        {!isStaff && (
+          <div className="mb-3 rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-700">
+            Only staff (admin, sales, support, moderator, advertising) can simulate seller types.
+          </div>
+        )}
+
+        <div className="flex flex-wrap gap-2">
+          {SELLER_TYPES.map(({ value, label }) => {
+            const active = (simulatedSellerType ?? realSellerType) === value;
+            return (
+              <button
+                key={value}
+                onClick={() => setSimulatedSellerType(value === realSellerType ? null : value)}
+                disabled={!isStaff}
+                className={`rounded-full border px-3 py-1 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                  active
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-background text-muted-foreground hover:border-primary/50"
+                }`}
+              >
+                {active ? "✓ " : "+ "}{label}
+              </button>
+            );
+          })}
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-2 text-xs text-muted-foreground sm:grid-cols-2">
+          <div><span className="font-semibold text-foreground">Real seller type:</span> {realSellerType}</div>
+          <div><span className="font-semibold text-foreground">Effective seller type:</span> {effectiveSellerType}</div>
+        </div>
+      </section>
+
+
 
       <section className="rounded-xl border border-border bg-card p-5">
         <div className="mb-4 flex items-center justify-between">
