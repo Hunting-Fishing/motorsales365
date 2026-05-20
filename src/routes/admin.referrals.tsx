@@ -638,7 +638,14 @@ function AdminReferrals() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         {qr ? (
-                          <img src={qr} alt="" className="h-12 w-12 shrink-0 rounded border border-border bg-white object-contain p-0.5" />
+                          <button
+                            type="button"
+                            onClick={() => setQrPreview(r)}
+                            title="Click to enlarge QR"
+                            className="shrink-0 rounded border border-border bg-white p-0.5 transition hover:ring-2 hover:ring-primary"
+                          >
+                            <img src={qr} alt={`QR for ${r.full_name}`} className="h-12 w-12 object-contain" />
+                          </button>
                         ) : (
                           <button
                             type="button"
