@@ -151,16 +151,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState<string[]>([]);
+  const [realSellerType, setRealSellerType] = useState<SellerType>("private");
   const [simulatedRoles, setSimulatedRolesState] = useState<AppRole[] | null>(() => loadSim());
+  const [simulatedSellerType, setSimulatedSellerTypeState] = useState<SellerType | null>(() => loadSimSellerType());
   const lastUidRef = useRef<string | null>(null);
   const welcomeCheckedRef = useRef(new Set<string>());
 
   const loadRoles = useCallback(async (uid: string) => {
-      const { data } = await supabase
-        .from("user_roles")
-        .select("role")
-        .eq("user_id", uid);
-      setRoles((data ?? []).map((r: any) => r.role));
+      const [{ data: roleRows }, { data: profileRow }] = await Promise.all([
+        supabase.from("user_roles").select("role").eq("user_id", uid),
+        supabase.from("profiles").select("seller_type").eq("id", uid).maybeSingle(),
+      ]);
+      setRoles((roleRows ?? []).map((r: any) => r.role));
+      const st = (profileRow as any)?.seller_type;
+      setRealSellerType(VALID_SELLER_TYPES.includes(st) ? (st as SellerType) : "private");
   }, []);
 
   const handleSession = useCallback((newSession: Session | null) => {
@@ -180,6 +184,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } else if (!uid) {
       lastUidRef.current = null;
       setRoles([]);
+      setRealSellerType("private");
     }
   }, [loadRoles]);
 
@@ -242,9 +247,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const isAdvertising = effectiveRoles.includes("advertising");
   const isStaff = isAdmin || isSales || isModerator || isSupport || isAdvertising;
 
+  // Seller-type simulation is allowed for any staff role (admin, sales, support,
+  // moderator, advertising). It's a view-only override — RLS is unaffected.
+  const realIsStaff = realRoles.some((r) => ["admin", "sales", "moderator", "support", "advertising"].includes(r));
+  const effectiveSellerType: SellerType =
+    realIsStaff && simulatedSellerType ? simulatedSellerType : realSellerType;
+
+  const setSimulatedSellerType = (next: SellerType | null) => {
+    setSimulatedSellerTypeState(next);
+    try {
+      if (next) window.localStorage.setItem(SIM_SELLER_KEY, next);
+      else window.localStorage.removeItem(SIM_SELLER_KEY);
+    } catch {}
+  };
+
   return (
     <AuthContext.Provider
-      value={{ user, session, loading, isAdmin, isSales, isModerator, isSupport, isAdvertising, isStaff, realRoles, effectiveRoles, realIsAdmin, simulatedRoles, setSimulatedRoles, refreshSession, signOut }}
+      value={{
+        user, session, loading,
+        isAdmin, isSales, isModerator, isSupport, isAdvertising, isStaff,
+        realRoles, effectiveRoles, realIsAdmin,
+        simulatedRoles, setSimulatedRoles,
+        realSellerType, effectiveSellerType, simulatedSellerType, setSimulatedSellerType,
+        refreshSession, signOut,
+      }}
     >
       {children}
     </AuthContext.Provider>
