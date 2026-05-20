@@ -37,7 +37,7 @@ const SELLER_VIEW_OPTIONS: { value: SellerType; label: string }[] = [
 
 export function SiteHeader() {
   const {
-    user, isAdmin, isStaff, signOut,
+    user, loading, isAdmin, isStaff, signOut,
     realSellerType, effectiveSellerType, simulatedSellerType, setSimulatedSellerType,
   } = useAuth();
   const navigate = useNavigate();
