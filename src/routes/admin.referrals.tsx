@@ -106,6 +106,7 @@ function AdminReferrals() {
   const [confirmToggle, setConfirmToggle] = useState<StaffRow | null>(null);
   const [confirmReason, setConfirmReason] = useState("");
   const [confirmBusy, setConfirmBusy] = useState(false);
+  const [qrPreview, setQrPreview] = useState<StaffRow | null>(null);
 
   const load = async (rangeKey: RangeKey = range) => {
     setLoading(true);
