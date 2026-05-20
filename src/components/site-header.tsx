@@ -28,8 +28,18 @@ const NAV = [
 
 const BUSINESSES_LINK = { to: "/businesses", label: "Businesses" } as const;
 
+const SELLER_VIEW_OPTIONS: { value: SellerType; label: string }[] = [
+  { value: "private", label: "Private seller" },
+  { value: "dealer", label: "Dealer" },
+  { value: "repair_shop", label: "Repair shop" },
+  { value: "insurance", label: "Insurance" },
+];
+
 export function SiteHeader() {
-  const { user, isAdmin, signOut } = useAuth();
+  const {
+    user, isAdmin, isStaff, signOut,
+    realSellerType, effectiveSellerType, simulatedSellerType, setSimulatedSellerType,
+  } = useAuth();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
