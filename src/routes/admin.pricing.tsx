@@ -173,6 +173,58 @@ function AdminPricing() {
       </section>
 
       <section className="rounded-xl border border-border bg-card p-6">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-display text-lg font-semibold">Stripe price verification</h2>
+            <p className="text-sm text-muted-foreground">
+              Confirms every paid plan's lookup key resolves to an active price in Stripe ({getStripeEnvironment()}).
+              Run this before announcing pricing changes — missing keys cause checkout to fail.
+            </p>
+          </div>
+          <Button onClick={runVerify} disabled={verifying}>
+            {verifying ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying…</> : "Verify Stripe prices"}
+          </Button>
+        </div>
+        {verifyRows && (
+          <div className="space-y-2">
+            <div className={`rounded-md border p-2 text-sm ${verifyAllOk ? "border-emerald-500/40 bg-emerald-500/10" : "border-destructive/40 bg-destructive/10"}`}>
+              {verifyAllOk
+                ? "All paid plans are wired up correctly."
+                : "One or more paid plans cannot be charged. Fix Stripe before allowing checkouts."}
+            </div>
+            {verifyRows.map((r) => {
+              const Icon = r.status === "ok" ? CheckCircle2 : r.status === "no_key" ? Minus : r.status === "inactive" ? AlertTriangle : XCircle;
+              const color = r.status === "ok" ? "text-emerald-600" : r.status === "no_key" ? "text-muted-foreground" : r.status === "inactive" ? "text-amber-600" : "text-destructive";
+              const label =
+                r.status === "ok" ? "OK" :
+                r.status === "no_key" ? "No key (free plan)" :
+                r.status === "inactive" ? "Inactive in Stripe" :
+                "Missing in Stripe";
+              return (
+                <div key={r.planId} className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border p-3 text-sm">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Icon className={`h-4 w-4 shrink-0 ${color}`} />
+                    <span className="font-semibold">{r.name}</span>
+                    {r.lookupKey && <code className="text-xs text-muted-foreground">{r.lookupKey}</code>}
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    {r.stripeAmount != null && r.stripeCurrency && (
+                      <span className="text-muted-foreground">
+                        {(r.stripeAmount / 100).toFixed(2)} {r.stripeCurrency.toUpperCase()}
+                      </span>
+                    )}
+                    <Badge variant={r.status === "ok" ? "secondary" : r.status === "no_key" ? "outline" : "destructive"}>{label}</Badge>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+
+
+      <section className="rounded-xl border border-border bg-card p-6">
         <h2 className="mb-4 font-display text-lg font-semibold">Promo codes</h2>
         <div className="flex flex-wrap items-end gap-3">
           <div><Label>Code</Label><Input value={newPromo.code} onChange={(e) => setNewPromo({ ...newPromo, code: e.target.value.toUpperCase() })} /></div>
