@@ -35,6 +35,25 @@ function AdminPricing() {
   const [newPromo, setNewPromo] = useState({ code: "", percent_off: 10 });
   const [subs, setSubs] = useState<any[]>([]);
   const [subFilter, setSubFilter] = useState<string>("pending");
+  const [verifyRows, setVerifyRows] = useState<VerifyRow[] | null>(null);
+  const [verifying, setVerifying] = useState(false);
+  const [verifyAllOk, setVerifyAllOk] = useState<boolean | null>(null);
+  const verifyFn = useServerFn(verifyStripePlans);
+
+  const runVerify = async () => {
+    setVerifying(true);
+    try {
+      const res = await verifyFn({ data: { environment: getStripeEnvironment() } });
+      setVerifyRows(res.results as VerifyRow[]);
+      setVerifyAllOk(res.ok);
+      if (res.ok) toast.success("All paid plans resolve to active Stripe prices.");
+      else toast.error("Some plans are missing or inactive in Stripe — checkout will fail for those.");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Verification failed");
+    } finally {
+      setVerifying(false);
+    }
+  };
 
   const load = async () => {
     const [{ data: s }, { data: p }, { data: pr }] = await Promise.all([
