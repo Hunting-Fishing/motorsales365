@@ -282,3 +282,99 @@ export const createPortalSession = createServerFn({ method: "POST" })
     });
     return portal.url;
   });
+
+/**
+ * Admin-only: verify every active subscription plan's stripe_lookup_key
+ * resolves to a real Stripe price in the given environment.
+ * Returns one row per plan with status: ok | missing | inactive | no_key.
+ */
+export const verifyStripePlans = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { environment: StripeEnv }) => {
+    validateEnv(data.environment);
+    return data;
+  })
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: isAdmin, error: roleErr } = await supabase.rpc("has_role", {
+      _user_id: userId,
+      _role: "admin",
+    });
+    if (roleErr) throw new Error(roleErr.message);
+    if (!isAdmin) throw new Error("Admin access required");
+
+    const { data: plans, error: planErr } = await supabase
+      .from("subscription_plans")
+      .select("id, name, stripe_lookup_key, active, price_php")
+      .order("sort_order");
+    if (planErr) throw new Error(planErr.message);
+
+    const stripe = createStripeClient(data.environment);
+    const results: Array<{
+      planId: string;
+      name: string;
+      lookupKey: string | null;
+      status: "ok" | "missing" | "inactive" | "no_key";
+      stripePriceId?: string;
+      stripeAmount?: number;
+      stripeCurrency?: string;
+    }> = [];
+
+    let allOk = true;
+    for (const plan of plans ?? []) {
+      if (!plan.stripe_lookup_key) {
+        // Free / unpriced plans are fine without a Stripe key.
+        results.push({
+          planId: plan.id,
+          name: plan.name,
+          lookupKey: null,
+          status: "no_key",
+        });
+        continue;
+      }
+      const prices = await stripe.prices.list({
+        lookup_keys: [plan.stripe_lookup_key],
+        active: true,
+        limit: 1,
+      });
+      if (!prices.data.length) {
+        const inactive = await stripe.prices.list({
+          lookup_keys: [plan.stripe_lookup_key],
+          active: false,
+          limit: 1,
+        });
+        if (inactive.data.length) {
+          allOk = false;
+          results.push({
+            planId: plan.id,
+            name: plan.name,
+            lookupKey: plan.stripe_lookup_key,
+            status: "inactive",
+            stripePriceId: inactive.data[0].id,
+          });
+        } else {
+          allOk = false;
+          results.push({
+            planId: plan.id,
+            name: plan.name,
+            lookupKey: plan.stripe_lookup_key,
+            status: "missing",
+          });
+        }
+      } else {
+        const price = prices.data[0];
+        results.push({
+          planId: plan.id,
+          name: plan.name,
+          lookupKey: plan.stripe_lookup_key,
+          status: "ok",
+          stripePriceId: price.id,
+          stripeAmount: price.unit_amount ?? undefined,
+          stripeCurrency: price.currency,
+        });
+      }
+    }
+
+    return { ok: allOk, environment: data.environment, results };
+  });
