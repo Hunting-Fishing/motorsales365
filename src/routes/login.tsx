@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useRouter } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,7 @@ export const Route = createFileRoute("/login")({
 function LoginPage() {
   const { user, loading, refreshSession } = useAuth();
   const navigate = useNavigate();
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -39,6 +40,10 @@ function LoginPage() {
       if (redirectTimerRef.current) window.clearTimeout(redirectTimerRef.current);
     });
   };
+
+  useEffect(() => {
+    void router.preloadRoute({ to: "/dashboard" });
+  }, [router]);
 
   useEffect(() => {
     if (!loading && user) {
