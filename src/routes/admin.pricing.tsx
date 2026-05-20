@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { CheckCircle2, XCircle, AlertTriangle, Minus, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +11,18 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatDate, formatPHP } from "@/lib/format";
+import { verifyStripePlans } from "@/utils/payments.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
+
+type VerifyRow = {
+  planId: string;
+  name: string;
+  lookupKey: string | null;
+  status: "ok" | "missing" | "inactive" | "no_key";
+  stripePriceId?: string;
+  stripeAmount?: number;
+  stripeCurrency?: string;
+};
 
 export const Route = createFileRoute("/admin/pricing")({
   component: AdminPricing,
@@ -21,6 +35,25 @@ function AdminPricing() {
   const [newPromo, setNewPromo] = useState({ code: "", percent_off: 10 });
   const [subs, setSubs] = useState<any[]>([]);
   const [subFilter, setSubFilter] = useState<string>("pending");
+  const [verifyRows, setVerifyRows] = useState<VerifyRow[] | null>(null);
+  const [verifying, setVerifying] = useState(false);
+  const [verifyAllOk, setVerifyAllOk] = useState<boolean | null>(null);
+  const verifyFn = useServerFn(verifyStripePlans);
+
+  const runVerify = async () => {
+    setVerifying(true);
+    try {
+      const res = await verifyFn({ data: { environment: getStripeEnvironment() } });
+      setVerifyRows(res.results as VerifyRow[]);
+      setVerifyAllOk(res.ok);
+      if (res.ok) toast.success("All paid plans resolve to active Stripe prices.");
+      else toast.error("Some plans are missing or inactive in Stripe — checkout will fail for those.");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Verification failed");
+    } finally {
+      setVerifying(false);
+    }
+  };
 
   const load = async () => {
     const [{ data: s }, { data: p }, { data: pr }] = await Promise.all([
@@ -138,6 +171,58 @@ function AdminPricing() {
           ))}
         </div>
       </section>
+
+      <section className="rounded-xl border border-border bg-card p-6">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h2 className="font-display text-lg font-semibold">Stripe price verification</h2>
+            <p className="text-sm text-muted-foreground">
+              Confirms every paid plan's lookup key resolves to an active price in Stripe ({getStripeEnvironment()}).
+              Run this before announcing pricing changes — missing keys cause checkout to fail.
+            </p>
+          </div>
+          <Button onClick={runVerify} disabled={verifying}>
+            {verifying ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying…</> : "Verify Stripe prices"}
+          </Button>
+        </div>
+        {verifyRows && (
+          <div className="space-y-2">
+            <div className={`rounded-md border p-2 text-sm ${verifyAllOk ? "border-emerald-500/40 bg-emerald-500/10" : "border-destructive/40 bg-destructive/10"}`}>
+              {verifyAllOk
+                ? "All paid plans are wired up correctly."
+                : "One or more paid plans cannot be charged. Fix Stripe before allowing checkouts."}
+            </div>
+            {verifyRows.map((r) => {
+              const Icon = r.status === "ok" ? CheckCircle2 : r.status === "no_key" ? Minus : r.status === "inactive" ? AlertTriangle : XCircle;
+              const color = r.status === "ok" ? "text-emerald-600" : r.status === "no_key" ? "text-muted-foreground" : r.status === "inactive" ? "text-amber-600" : "text-destructive";
+              const label =
+                r.status === "ok" ? "OK" :
+                r.status === "no_key" ? "No key (free plan)" :
+                r.status === "inactive" ? "Inactive in Stripe" :
+                "Missing in Stripe";
+              return (
+                <div key={r.planId} className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border p-3 text-sm">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <Icon className={`h-4 w-4 shrink-0 ${color}`} />
+                    <span className="font-semibold">{r.name}</span>
+                    {r.lookupKey && <code className="text-xs text-muted-foreground">{r.lookupKey}</code>}
+                  </div>
+                  <div className="flex items-center gap-2 text-xs">
+                    {r.stripeAmount != null && r.stripeCurrency && (
+                      <span className="text-muted-foreground">
+                        {(r.stripeAmount / 100).toFixed(2)} {r.stripeCurrency.toUpperCase()}
+                      </span>
+                    )}
+                    <Badge variant={r.status === "ok" ? "secondary" : r.status === "no_key" ? "outline" : "destructive"}>{label}</Badge>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+
 
       <section className="rounded-xl border border-border bg-card p-6">
         <h2 className="mb-4 font-display text-lg font-semibold">Promo codes</h2>
