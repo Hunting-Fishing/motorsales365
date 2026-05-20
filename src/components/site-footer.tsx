@@ -71,11 +71,7 @@ export function SiteFooter() {
             <li><Link to="/advertise" className="hover:text-foreground">Advertise / buy ad space</Link></li>
             {referralCode && (
               <li>
-                <Link
-                  to="/r/$code/poster"
-                  params={{ code: referralCode }}
-                  className="hover:text-foreground"
-                >
+                <Link to="/my-qr" className="hover:text-foreground">
                   My QR Code
                 </Link>
               </li>
