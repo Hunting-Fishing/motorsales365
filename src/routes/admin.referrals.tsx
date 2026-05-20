@@ -106,6 +106,7 @@ function AdminReferrals() {
   const [confirmToggle, setConfirmToggle] = useState<StaffRow | null>(null);
   const [confirmReason, setConfirmReason] = useState("");
   const [confirmBusy, setConfirmBusy] = useState(false);
+  const [qrPreview, setQrPreview] = useState<StaffRow | null>(null);
 
   const load = async (rangeKey: RangeKey = range) => {
     setLoading(true);
@@ -637,7 +638,14 @@ function AdminReferrals() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         {qr ? (
-                          <img src={qr} alt="" className="h-12 w-12 shrink-0 rounded border border-border bg-white object-contain p-0.5" />
+                          <button
+                            type="button"
+                            onClick={() => setQrPreview(r)}
+                            title="Click to enlarge QR"
+                            className="shrink-0 rounded border border-border bg-white p-0.5 transition hover:ring-2 hover:ring-primary"
+                          >
+                            <img src={qr} alt={`QR for ${r.full_name}`} className="h-12 w-12 object-contain" />
+                          </button>
                         ) : (
                           <button
                             type="button"
@@ -862,6 +870,51 @@ function AdminReferrals() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Dialog open={!!qrPreview} onOpenChange={(o) => { if (!o) setQrPreview(null); }}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{qrPreview?.full_name}</DialogTitle>
+          </DialogHeader>
+          {qrPreview && (() => {
+            const qr = publicQrUrl(qrPreview.qr_storage_path);
+            const link = `${PUBLIC_BASE}/r/${qrPreview.referral_code}`;
+            return (
+              <div className="flex flex-col items-center gap-4">
+                {qr ? (
+                  <img
+                    src={qr}
+                    alt={`Scannable QR for ${qrPreview.full_name}`}
+                    className="h-[360px] w-[360px] rounded-md border border-border bg-white object-contain p-3"
+                  />
+                ) : (
+                  <div className="flex h-[360px] w-[360px] items-center justify-center rounded-md border border-dashed border-border bg-muted text-sm text-muted-foreground">
+                    No QR generated yet.
+                  </div>
+                )}
+                <div className="w-full text-center">
+                  <div className="text-xs uppercase tracking-wider text-muted-foreground">Code</div>
+                  <div className="font-mono text-sm">{qrPreview.referral_code}</div>
+                  <a href={link} target="_blank" rel="noreferrer" className="mt-1 inline-block break-all text-xs text-primary hover:underline">{link}</a>
+                </div>
+                <div className="flex flex-wrap justify-center gap-2">
+                  <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(link); toast.success("Link copied"); }}>
+                    <Copy className="mr-1 h-4 w-4" /> Copy link
+                  </Button>
+                  {qr && (
+                    <a href={qr} download={`${qrPreview.referral_code}.png`}>
+                      <Button size="sm" variant="outline"><Download className="mr-1 h-4 w-4" /> Download</Button>
+                    </a>
+                  )}
+                  <a href={`${PUBLIC_BASE}/r/${qrPreview.referral_code}/poster`} target="_blank" rel="noreferrer">
+                    <Button size="sm" variant="outline"><Printer className="mr-1 h-4 w-4" /> Poster</Button>
+                  </a>
+                </div>
+              </div>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
 
       {newOpen && <StaffDialog onClose={() => setNewOpen(false)} onSubmit={handleCreate} />}
       {editing && (

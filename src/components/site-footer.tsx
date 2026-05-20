@@ -1,7 +1,28 @@
 import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
+import { useAuth } from "@/hooks/use-auth";
+import { supabase } from "@/integrations/supabase/client";
 
 export function SiteFooter() {
+  const { user } = useAuth();
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!user) { setReferralCode(null); return; }
+    (async () => {
+      const { data } = await (supabase as any)
+        .from("staff_referrals")
+        .select("referral_code, active")
+        .eq("staff_user_id", user.id)
+        .eq("active", true)
+        .maybeSingle();
+      if (!cancelled) setReferralCode(data?.referral_code ?? null);
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
+
   return (
     <footer className="mt-16 border-t border-border bg-secondary/40">
       <div className="container mx-auto grid gap-8 px-4 py-12 md:grid-cols-4">
@@ -48,6 +69,17 @@ export function SiteFooter() {
             <li><Link to="/about" className="hover:text-foreground">About</Link></li>
             <li><Link to="/contact" className="hover:text-foreground">Contact</Link></li>
             <li><Link to="/advertise" className="hover:text-foreground">Advertise / buy ad space</Link></li>
+            {referralCode && (
+              <li>
+                <Link
+                  to="/r/$code/poster"
+                  params={{ code: referralCode }}
+                  className="hover:text-foreground"
+                >
+                  My QR Code
+                </Link>
+              </li>
+            )}
           </ul>
         </div>
         <div>
