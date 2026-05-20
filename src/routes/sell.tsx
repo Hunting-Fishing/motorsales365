@@ -120,6 +120,11 @@ function SellPage() {
   const [sellerType, setSellerType] = useState<"private" | "business">(
     effectiveSellerType === "private" ? "private" : "business",
   );
+  // Keep the form's seller-type radio in sync when staff flip the "View as"
+  // simulator, so previewing the dealer flow actually shows the dealer fields.
+  useEffect(() => {
+    setSellerType(effectiveSellerType === "private" ? "private" : "business");
+  }, [effectiveSellerType]);
   const [plan, setPlan] = useState<"free" | "standard" | "upgraded">("free");
   const [year, setYear] = useState("");
   const [make, setMake] = useState("");
