@@ -21,15 +21,19 @@ function LoginPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (!loading && user) navigate({ to: "/dashboard" });
-  }, [user, loading, navigate]);
+    if (!loading && user) {
+      // Hard-navigate so we don't wait on a stale dynamic chunk and so every
+      // subscriber (header, dashboard, etc.) renders against the new session.
+      window.location.replace("/dashboard");
+    }
+  }, [user, loading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    setSubmitting(false);
     if (error) {
+      setSubmitting(false);
       const msg = error.message.toLowerCase();
       if (msg.includes("confirm") || msg.includes("not confirmed")) {
         toast.error("Please verify your email first.");
@@ -41,14 +45,16 @@ function LoginPage() {
     }
     await refreshSession(data.session);
     toast.success("Welcome back!");
-    navigate({ to: "/dashboard" });
+    // Full page load avoids the stale-chunk hang where the dashboard route
+    // would take 15–20s (or never) to dynamically import after sign-in.
+    window.location.replace("/dashboard");
   };
 
   const handleGoogle = async () => {
     const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
     if (result.error) { toast.error("Could not sign in with Google"); return; }
     if (result.redirected) return;
-    navigate({ to: "/dashboard" });
+    window.location.replace("/dashboard");
   };
 
   return (
