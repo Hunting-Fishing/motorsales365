@@ -404,10 +404,32 @@ function SubmitBusinessPage() {
             </div>
           )}
 
+          {["parts_accessories", "repair_shop", "body_paint", "salvage"].includes(typeSlug) && (
+            <div>
+              <Label>Brands carried / serviced</Label>
+              <Input
+                value={brandsCarried}
+                onChange={(e) => setBrandsCarried(e.target.value)}
+                maxLength={300}
+                placeholder={
+                  typeSlug === "parts_accessories"
+                    ? "e.g. Bosch, Denso, NGK, Michelin, Yokohama"
+                    : typeSlug === "salvage"
+                    ? "e.g. Toyota, Honda, Mitsubishi, Isuzu"
+                    : "e.g. Toyota, Honda, Mitsubishi, Ford"
+                }
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Comma-separated. Helps buyers find you when searching for specific brands.
+              </p>
+            </div>
+          )}
+
           <div>
             <Label>Description</Label>
             <Textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} maxLength={2000} />
           </div>
+
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div><Label>Phone</Label><Input value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
