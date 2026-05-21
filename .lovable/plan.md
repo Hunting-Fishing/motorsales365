@@ -1,65 +1,89 @@
-# Import from Facebook Marketplace
+# Build: Cardomain-style "My Rides" feature
 
-Let signed-in users paste a Facebook Marketplace listing (or FB profile) link, extract the data, verify they actually own that FB profile, and create a draft listing under their account.
+A vehicle profile system where users showcase their cars/bikes/trucks — specs, mods, service history, ownership history, photo gallery — with a public `/rides` hub and tie-in to marketplace listings.
 
-## User flow
+## What gets built
 
-1. On `/sell` (and "New listing" in dashboard), add an **"Import from Facebook"** button next to the manual form.
-2. User pastes a FB Marketplace item URL (e.g. `facebook.com/marketplace/item/123…`) **or** a FB profile/page URL.
-3. Backend scrapes the page → returns `{ title, price, description, location, photos[], sellerProfileUrl, sellerName }` for preview.
-4. **Ownership verification** (must pass before publishing — anti-scammer gate):
-   - **Option A — Verification code:** We generate a short code (e.g. `MS365-AB12CD`). User must add it to their FB profile bio / intro / a public post for ~2 minutes. We re-scrape the profile and confirm the code is present.
-   - **Option B — Profile link match:** User adds a link to their motorsales365 profile in their FB "About" section; we verify it points back to their account.
-   - User picks one. Once verified, we store `profiles.fb_profile_url` + `fb_verified_at` so future imports from the same FB profile skip re-verification (valid 90 days).
-5. Preview screen: user reviews extracted fields, edits, picks category, sets PHP price, confirms location → **Publish**.
-6. Listing is created under their `user_id` with a `source: 'facebook_import'` tag and a link back to the original FB post (admin-visible only).
+### 1. Database (one migration)
 
-## What we extract
+New tables (all RLS-enabled, public read for `published`, owner-write):
 
-- Title, description, price (converted to PHP if needed), condition guess, photos (downloaded → uploaded to `listing-photos` bucket), seller name, seller profile URL, posted-at date, FB location string (mapped to PSGC region/province/city via fuzzy match → user confirms).
+- **`rides`** — one row per vehicle
+  - Owner: `user_id`
+  - Identity: `slug`, `name` (nickname like "Project Stancekipo"), `year`, `make`, `model`, `trim`, `color`
+  - Drivetrain: `engine`, `transmission`, `drivetrain`, `mileage_km`, `vehicle_type` (car/truck/motorcycle/etc.)
+  - Story: `description` (long form), `cover_photo_url`
+  - Status: `status` (`draft` / `published` / `archived`), `is_for_sale`, `linked_listing_id` (nullable → `listings.id`)
+  - Social: `view_count`, `like_count`
+  - Standard: `created_at`, `updated_at`, `published_at`
+- **`ride_photos`** — gallery (url, caption, sort_order, ride_id)
+- **`ride_mods`** — modifications (category enum: engine/suspension/wheels/exterior/interior/audio/electronics/other, part_name, brand, cost_php, installed_on, notes)
+- **`ride_service_log`** — maintenance/milestones (date, type, mileage_km, notes, photo_url, cost_php)
+- **`ride_ownership`** — chain of ownership (owner_name, acquired_on, sold_on, notes)
+- **`ride_likes`** — `(ride_id, user_id)` for hearts on the hub
+- Storage bucket **`ride-media`** (public) + RLS policies (owner-write, public-read)
 
-## Scraping approach
+### 2. Routes
 
-- **Firecrawl connector** (already documented in this stack) — `scrape` with `formats: ['markdown','html','json']` and a JSON schema for the marketplace fields. Falls back to OG/meta tags for profile pages.
-- Server function `importFacebookListing` (`src/lib/facebook-import.functions.ts`) protected by `requireSupabaseAuth`, calls Firecrawl with `FIRECRAWL_API_KEY` from env.
-- Rate-limit per user (e.g. 10 imports/day) to control Firecrawl spend.
+| Route | Purpose |
+|---|---|
+| `/rides` | Public hub: grid of published rides, filter by make/model/year/region/vehicle_type, sort by newest/most-liked, featured row up top |
+| `/rides/$slug` | Public ride profile: cover hero, spec sheet, photo gallery, mods table, service timeline, ownership chain, owner card, "For sale" CTA when linked |
+| `/dashboard/rides` | List of my rides + "Add a ride" button |
+| `/dashboard/rides/new` | Create wizard (basics → photos → mods → publish) |
+| `/dashboard/rides/$id/edit` | Tabbed editor: Details · Photos · Mods · Service log · Ownership · Settings (link/unlink listing, archive) |
 
-## Anti-abuse rules
+### 3. Listing ↔ Ride linkage (both directions)
 
-- Verification required **once per FB profile per user** (re-verify after 90 days or if FB URL changes).
-- Same FB profile cannot be claimed by two different users — first verified wins; second user sees "This FB profile is already linked to another account. Contact support."
-- Admin can revoke verification from `/admin/verifications`.
-- Imported listings get a small **"Imported from Facebook · Verified seller"** badge on the listing card.
-- Listings are flagged for moderation if photos fail to download or price seems off (>10× category median).
+- **From ride editor**: "List this ride for sale" button → opens `/sell` prefilled with year/make/model/trim/color/mileage/photos/description from the ride, and on submit sets `rides.linked_listing_id` + `is_for_sale = true`.
+- **From `/sell`**: when user has rides, show "Or list from one of your rides →" picker that prefills the form.
+- When the linked listing transitions to `sold`, auto-clear `is_for_sale` (DB trigger) and surface "Sold!" badge on the ride.
 
-## Database changes (new migration)
+### 4. UI building blocks (new components)
 
-- `profiles`: add `fb_profile_url text`, `fb_profile_id text unique`, `fb_verified_at timestamptz`, `fb_verification_method text`.
-- `listings`: add `source text default 'manual'` (values: `manual`, `facebook_import`), `source_url text` (admin-visible).
-- `fb_import_jobs` table — track scrape attempts, status, error, for debugging and rate limiting (`user_id`, `url`, `status`, `extracted_payload jsonb`, `error`, `created_at`).
-- RLS: users see only their own `fb_import_jobs`; profiles' FB fields readable by owner + admins; `fb_profile_id` unique constraint enforces "one FB profile, one account".
+- `ride-card.tsx` — hub grid card (cover, name, year/make/model, owner, like count)
+- `ride-spec-sheet.tsx` — formatted spec table
+- `ride-mod-table.tsx` — editable mod list (used in dashboard) + read-only variant for public page
+- `ride-service-timeline.tsx` — vertical timeline
+- `ride-ownership-list.tsx` — ownership chain
+- `ride-photo-gallery.tsx` — lightbox-capable gallery
+- `ride-form-*` editors (one per tab)
 
-## Files to add/change
+Reuse existing: `vehicle-picker`, `location-picker`, `tag-picker`, `image-with-skeleton`, `verified-badge`, shadcn primitives.
 
-- `src/lib/facebook-import.functions.ts` — `startFbImport`, `verifyFbOwnership`, `finalizeFbImport` server fns.
-- `src/lib/facebook-import.server.ts` — Firecrawl call + HTML parsing helpers.
-- `src/routes/sell.import.tsx` — new wizard route (paste URL → verify → preview → publish).
-- `src/components/sell/fb-import-button.tsx` — entry button on `/sell`.
-- `src/routes/dashboard.profile.tsx` — show "Facebook profile: verified ✓" once linked.
-- New migration (above).
-- Firecrawl connector link (`standard_connectors--connect` with `connector_id: firecrawl`).
+### 5. SEO
 
-## Out of scope for v1
+Each `/rides/$slug` gets its own `head()` — title `"{year} {make} {model} — {nickname} | 365 MotorSales"`, og:image = cover photo, JSON-LD `Vehicle` schema. `/rides` hub gets a hub-level meta. Sitemap includes all published rides.
 
-- Importing entire FB profile/page in bulk (only one listing at a time).
-- Importing from FB Groups (private content, blocked).
-- Auto-syncing future edits from FB back to motorsales365.
+### 6. Profile integration
 
----
+On `/seller/$id` add a "Rides" tab showing the user's published rides above their listings.
 
-## Questions before I build
+## Out of scope (v1)
 
-1. **Verification method** — offer both A (code in bio) and B (link in About), or pick one to ship first?
-2. **Bulk import** — start with one-listing-at-a-time, or do you want "import all my active FB Marketplace listings" from day one?
-3. **Profile pages** — should pasting a *profile* URL list all that seller's marketplace items for them to pick, or only accept direct item URLs?
-4. **Firecrawl** — OK to add the Firecrawl connector (paid per scrape) as the extraction backend?
+- Comments / replies on rides (likes only)
+- Build journal / dated posts (we picked single profile, not journal)
+- Follow / subscribe to a builder
+- VIN decoder
+- Importing rides from Instagram/FB
+
+These can be added later without schema changes (except journal posts).
+
+## Technical notes
+
+- All write paths go through `createServerFn` with `requireSupabaseAuth` (slug generation, listing-link operations, like toggling).
+- Public reads on `/rides` and `/rides/$slug` use the browser client with RLS (`status = 'published'`).
+- Slugs auto-generated server-side: `{year}-{make}-{model}-{6char}` (collision-safe).
+- Photo uploads via the same `storage-upload.ts` helper used by listings.
+- Like toggling is optimistic in the UI, persisted server-side.
+
+## Build order
+
+1. Migration (tables + bucket + RLS + sold-trigger)
+2. Dashboard CRUD (`/dashboard/rides`, new, edit tabs) — so users can create data
+3. Public ride profile `/rides/$slug` with SEO
+4. Public hub `/rides` with filters + likes
+5. Listing ↔ ride linkage (both directions)
+6. Profile tab on `/seller/$id` + sitemap entry
+
+After approval I'll run the migration first, wait for your sign-off, then build the routes/components.

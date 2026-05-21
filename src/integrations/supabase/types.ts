@@ -1638,6 +1638,289 @@ export type Database = {
           },
         ]
       }
+      ride_likes: {
+        Row: {
+          created_at: string
+          ride_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ride_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ride_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ride_likes_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ride_mods: {
+        Row: {
+          brand: string | null
+          category: Database["public"]["Enums"]["ride_mod_category"]
+          cost_php: number | null
+          created_at: string
+          id: string
+          installed_on: string | null
+          notes: string | null
+          part_name: string
+          ride_id: string
+          sort_order: number
+        }
+        Insert: {
+          brand?: string | null
+          category?: Database["public"]["Enums"]["ride_mod_category"]
+          cost_php?: number | null
+          created_at?: string
+          id?: string
+          installed_on?: string | null
+          notes?: string | null
+          part_name: string
+          ride_id: string
+          sort_order?: number
+        }
+        Update: {
+          brand?: string | null
+          category?: Database["public"]["Enums"]["ride_mod_category"]
+          cost_php?: number | null
+          created_at?: string
+          id?: string
+          installed_on?: string | null
+          notes?: string | null
+          part_name?: string
+          ride_id?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ride_mods_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ride_ownership: {
+        Row: {
+          acquired_on: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          owner_name: string
+          ride_id: string
+          sold_on: string | null
+          sort_order: number
+        }
+        Insert: {
+          acquired_on?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          owner_name: string
+          ride_id: string
+          sold_on?: string | null
+          sort_order?: number
+        }
+        Update: {
+          acquired_on?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          owner_name?: string
+          ride_id?: string
+          sold_on?: string | null
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ride_ownership_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ride_photos: {
+        Row: {
+          caption: string | null
+          created_at: string
+          id: string
+          ride_id: string
+          sort_order: number
+          storage_path: string | null
+          url: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          ride_id: string
+          sort_order?: number
+          storage_path?: string | null
+          url: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          ride_id?: string
+          sort_order?: number
+          storage_path?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ride_photos_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ride_service_log: {
+        Row: {
+          cost_php: number | null
+          created_at: string
+          id: string
+          mileage_km: number | null
+          notes: string | null
+          photo_url: string | null
+          ride_id: string
+          service_date: string
+          service_type: string
+        }
+        Insert: {
+          cost_php?: number | null
+          created_at?: string
+          id?: string
+          mileage_km?: number | null
+          notes?: string | null
+          photo_url?: string | null
+          ride_id: string
+          service_date: string
+          service_type: string
+        }
+        Update: {
+          cost_php?: number | null
+          created_at?: string
+          id?: string
+          mileage_km?: number | null
+          notes?: string | null
+          photo_url?: string | null
+          ride_id?: string
+          service_date?: string
+          service_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ride_service_log_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rides: {
+        Row: {
+          city: string | null
+          color: string | null
+          cover_photo_url: string | null
+          created_at: string
+          description: string | null
+          drivetrain: string | null
+          engine: string | null
+          id: string
+          is_for_sale: boolean
+          like_count: number
+          linked_listing_id: string | null
+          make: string | null
+          mileage_km: number | null
+          model: string | null
+          name: string
+          published_at: string | null
+          region: string | null
+          slug: string
+          status: Database["public"]["Enums"]["ride_status"]
+          transmission: string | null
+          trim: string | null
+          updated_at: string
+          user_id: string
+          vehicle_type: Database["public"]["Enums"]["ride_vehicle_type"]
+          view_count: number
+          year: number | null
+        }
+        Insert: {
+          city?: string | null
+          color?: string | null
+          cover_photo_url?: string | null
+          created_at?: string
+          description?: string | null
+          drivetrain?: string | null
+          engine?: string | null
+          id?: string
+          is_for_sale?: boolean
+          like_count?: number
+          linked_listing_id?: string | null
+          make?: string | null
+          mileage_km?: number | null
+          model?: string | null
+          name: string
+          published_at?: string | null
+          region?: string | null
+          slug: string
+          status?: Database["public"]["Enums"]["ride_status"]
+          transmission?: string | null
+          trim?: string | null
+          updated_at?: string
+          user_id: string
+          vehicle_type?: Database["public"]["Enums"]["ride_vehicle_type"]
+          view_count?: number
+          year?: number | null
+        }
+        Update: {
+          city?: string | null
+          color?: string | null
+          cover_photo_url?: string | null
+          created_at?: string
+          description?: string | null
+          drivetrain?: string | null
+          engine?: string | null
+          id?: string
+          is_for_sale?: boolean
+          like_count?: number
+          linked_listing_id?: string | null
+          make?: string | null
+          mileage_km?: number | null
+          model?: string | null
+          name?: string
+          published_at?: string | null
+          region?: string | null
+          slug?: string
+          status?: Database["public"]["Enums"]["ride_status"]
+          transmission?: string | null
+          trim?: string | null
+          updated_at?: string
+          user_id?: string
+          vehicle_type?: Database["public"]["Enums"]["ride_vehicle_type"]
+          view_count?: number
+          year?: number | null
+        }
+        Relationships: []
+      }
       saved_searches: {
         Row: {
           category_slug: string | null
@@ -2349,6 +2632,30 @@ export type Database = {
       payment_kind: "listing" | "upgrade" | "boost" | "subscription"
       payment_status: "pending" | "paid" | "failed" | "refunded"
       referral_kind: "promo" | "deal" | "rate" | "incentive" | "other"
+      ride_mod_category:
+        | "engine"
+        | "drivetrain"
+        | "suspension"
+        | "wheels_tires"
+        | "brakes"
+        | "exterior"
+        | "interior"
+        | "audio_electronics"
+        | "lighting"
+        | "tuning"
+        | "other"
+      ride_status: "draft" | "published" | "archived"
+      ride_vehicle_type:
+        | "car"
+        | "truck"
+        | "suv"
+        | "van"
+        | "motorcycle"
+        | "scooter"
+        | "atv"
+        | "utv"
+        | "boat"
+        | "other"
       seller_type: "private" | "business"
       verification_request_status:
         | "pending"
@@ -2530,6 +2837,32 @@ export const Constants = {
       payment_kind: ["listing", "upgrade", "boost", "subscription"],
       payment_status: ["pending", "paid", "failed", "refunded"],
       referral_kind: ["promo", "deal", "rate", "incentive", "other"],
+      ride_mod_category: [
+        "engine",
+        "drivetrain",
+        "suspension",
+        "wheels_tires",
+        "brakes",
+        "exterior",
+        "interior",
+        "audio_electronics",
+        "lighting",
+        "tuning",
+        "other",
+      ],
+      ride_status: ["draft", "published", "archived"],
+      ride_vehicle_type: [
+        "car",
+        "truck",
+        "suv",
+        "van",
+        "motorcycle",
+        "scooter",
+        "atv",
+        "utv",
+        "boat",
+        "other",
+      ],
       seller_type: ["private", "business"],
       verification_request_status: [
         "pending",
