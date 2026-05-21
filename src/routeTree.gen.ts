@@ -44,6 +44,7 @@ import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe
 import { Route as DashboardVerificationRouteImport } from './routes/dashboard.verification'
 import { Route as DashboardTowRouteImport } from './routes/dashboard.tow'
 import { Route as DashboardSearchesRouteImport } from './routes/dashboard.searches'
+import { Route as DashboardRidesRouteImport } from './routes/dashboard.rides'
 import { Route as DashboardReferralRouteImport } from './routes/dashboard.referral'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
 import { Route as DashboardMessagesRouteImport } from './routes/dashboard.messages'
@@ -77,6 +78,7 @@ import { Route as RCodePosterRouteImport } from './routes/r.$code.poster'
 import { Route as PaymentsIdReceiptRouteImport } from './routes/payments.$id.receipt'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
+import { Route as DashboardRidesNewRouteImport } from './routes/dashboard.rides_.new'
 import { Route as ApiPublicPaymentEventsRouteImport } from './routes/api/public/payment-events'
 import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
 import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions_.$staffId'
@@ -85,6 +87,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as DashboardRidesIdEditRouteImport } from './routes/dashboard.rides_.$id.edit'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
 
@@ -263,6 +266,11 @@ const DashboardSearchesRoute = DashboardSearchesRouteImport.update({
   path: '/searches',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardRidesRoute = DashboardRidesRouteImport.update({
+  id: '/rides',
+  path: '/rides',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardReferralRoute = DashboardReferralRouteImport.update({
   id: '/referral',
   path: '/referral',
@@ -428,6 +436,11 @@ const ListingIdEditRoute = ListingIdEditRouteImport.update({
   path: '/edit',
   getParentRoute: () => ListingIdRoute,
 } as any)
+const DashboardRidesNewRoute = DashboardRidesNewRouteImport.update({
+  id: '/rides_/new',
+  path: '/rides/new',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const ApiPublicPaymentEventsRoute = ApiPublicPaymentEventsRouteImport.update({
   id: '/api/public/payment-events',
   path: '/api/public/payment-events',
@@ -470,6 +483,11 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   id: '/lovable/email/auth/preview',
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRidesIdEditRoute = DashboardRidesIdEditRouteImport.update({
+  id: '/rides_/$id/edit',
+  path: '/rides/$id/edit',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
@@ -535,6 +553,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/referral': typeof DashboardReferralRoute
+  '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
@@ -551,12 +570,14 @@ export interface FileRoutesByFullPath {
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
+  '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -613,6 +634,7 @@ export interface FileRoutesByTo {
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/referral': typeof DashboardReferralRoute
+  '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
@@ -629,12 +651,14 @@ export interface FileRoutesByTo {
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
+  '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -694,6 +718,7 @@ export interface FileRoutesById {
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
   '/dashboard/referral': typeof DashboardReferralRoute
+  '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
@@ -710,12 +735,14 @@ export interface FileRoutesById {
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
+  '/dashboard/rides_/new': typeof DashboardRidesNewRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/dashboard/rides_/$id/edit': typeof DashboardRidesIdEditRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -776,6 +803,7 @@ export interface FileRouteTypes {
     | '/dashboard/messages'
     | '/dashboard/profile'
     | '/dashboard/referral'
+    | '/dashboard/rides'
     | '/dashboard/searches'
     | '/dashboard/tow'
     | '/dashboard/verification'
@@ -792,12 +820,14 @@ export interface FileRouteTypes {
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/payment-events'
+    | '/dashboard/rides/new'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/api/public/fx/refresh'
     | '/api/public/payments/webhook'
+    | '/dashboard/rides/$id/edit'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -854,6 +884,7 @@ export interface FileRouteTypes {
     | '/dashboard/messages'
     | '/dashboard/profile'
     | '/dashboard/referral'
+    | '/dashboard/rides'
     | '/dashboard/searches'
     | '/dashboard/tow'
     | '/dashboard/verification'
@@ -870,12 +901,14 @@ export interface FileRouteTypes {
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/payment-events'
+    | '/dashboard/rides/new'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/api/public/fx/refresh'
     | '/api/public/payments/webhook'
+    | '/dashboard/rides/$id/edit'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -934,6 +967,7 @@ export interface FileRouteTypes {
     | '/dashboard/messages'
     | '/dashboard/profile'
     | '/dashboard/referral'
+    | '/dashboard/rides'
     | '/dashboard/searches'
     | '/dashboard/tow'
     | '/dashboard/verification'
@@ -950,12 +984,14 @@ export interface FileRouteTypes {
     | '/admin/redemptions_/$staffId'
     | '/api/admin/create-user'
     | '/api/public/payment-events'
+    | '/dashboard/rides_/new'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/api/public/fx/refresh'
     | '/api/public/payments/webhook'
+    | '/dashboard/rides_/$id/edit'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1258,6 +1294,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardSearchesRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/rides': {
+      id: '/dashboard/rides'
+      path: '/rides'
+      fullPath: '/dashboard/rides'
+      preLoaderRoute: typeof DashboardRidesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/referral': {
       id: '/dashboard/referral'
       path: '/referral'
@@ -1489,6 +1532,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListingIdEditRouteImport
       parentRoute: typeof ListingIdRoute
     }
+    '/dashboard/rides_/new': {
+      id: '/dashboard/rides_/new'
+      path: '/rides/new'
+      fullPath: '/dashboard/rides/new'
+      preLoaderRoute: typeof DashboardRidesNewRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/api/public/payment-events': {
       id: '/api/public/payment-events'
       path: '/api/public/payment-events'
@@ -1544,6 +1594,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/lovable/email/auth/preview'
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/rides_/$id/edit': {
+      id: '/dashboard/rides_/$id/edit'
+      path: '/rides/$id/edit'
+      fullPath: '/dashboard/rides/$id/edit'
+      preLoaderRoute: typeof DashboardRidesIdEditRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
@@ -1614,10 +1671,13 @@ interface DashboardRouteChildren {
   DashboardMessagesRoute: typeof DashboardMessagesRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
   DashboardReferralRoute: typeof DashboardReferralRoute
+  DashboardRidesRoute: typeof DashboardRidesRoute
   DashboardSearchesRoute: typeof DashboardSearchesRoute
   DashboardTowRoute: typeof DashboardTowRoute
   DashboardVerificationRoute: typeof DashboardVerificationRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardRidesNewRoute: typeof DashboardRidesNewRoute
+  DashboardRidesIdEditRoute: typeof DashboardRidesIdEditRoute
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
@@ -1628,10 +1688,13 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardMessagesRoute: DashboardMessagesRoute,
   DashboardProfileRoute: DashboardProfileRoute,
   DashboardReferralRoute: DashboardReferralRoute,
+  DashboardRidesRoute: DashboardRidesRoute,
   DashboardSearchesRoute: DashboardSearchesRoute,
   DashboardTowRoute: DashboardTowRoute,
   DashboardVerificationRoute: DashboardVerificationRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardRidesNewRoute: DashboardRidesNewRoute,
+  DashboardRidesIdEditRoute: DashboardRidesIdEditRoute,
 }
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(

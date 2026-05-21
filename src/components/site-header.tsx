@@ -27,6 +27,7 @@ const NAV = [
 ] as const;
 
 const BUSINESSES_LINK = { to: "/businesses", label: "Businesses" } as const;
+const RIDES_LINK = { to: "/rides", label: "Rides" } as const;
 
 const SELLER_VIEW_OPTIONS: { value: SellerType; label: string }[] = [
   { value: "private", label: "Private seller" },
@@ -77,6 +78,13 @@ export function SiteHeader() {
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               {BUSINESSES_LINK.label}
+            </Link>
+            <Link
+              to={RIDES_LINK.to}
+              className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              activeProps={{ className: "bg-secondary text-foreground" }}
+            >
+              {RIDES_LINK.label}
             </Link>
           </nav>
         </div>
@@ -175,6 +183,7 @@ export function SiteHeader() {
                   </Link>
                 ))}
                 <Link to={BUSINESSES_LINK.to} className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">{BUSINESSES_LINK.label}</Link>
+                <Link to={RIDES_LINK.to} className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">{RIDES_LINK.label}</Link>
                 <Link to="/sell" className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">Post a listing</Link>
                 {!user && (
                   <>
