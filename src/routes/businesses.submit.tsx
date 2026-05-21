@@ -55,6 +55,7 @@ function SubmitBusinessPage() {
   const [lat, setLat] = useState("");
   const [lng, setLng] = useState("");
   const [postalCode, setPostalCode] = useState("");
+  const [brandsCarried, setBrandsCarried] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [tagsOpen, setTagsOpen] = useState(false);
   const [tagSearch, setTagSearch] = useState("");
