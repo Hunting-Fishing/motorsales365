@@ -671,6 +671,47 @@ export type Database = {
           },
         ]
       }
+      fb_import_jobs: {
+        Row: {
+          created_at: string
+          error: string | null
+          extracted_payload: Json | null
+          id: string
+          listing_id: string | null
+          status: string
+          url: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error?: string | null
+          extracted_payload?: Json | null
+          id?: string
+          listing_id?: string | null
+          status?: string
+          url: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error?: string | null
+          extracted_payload?: Json | null
+          id?: string
+          listing_id?: string | null
+          status?: string
+          url?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fb_import_jobs_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listing_likes: {
         Row: {
           created_at: string
@@ -771,6 +812,8 @@ export type Database = {
           published_at: string | null
           region: string | null
           seller_type: Database["public"]["Enums"]["seller_type"]
+          source: string
+          source_url: string | null
           status: Database["public"]["Enums"]["listing_status"]
           title: string
           updated_at: string
@@ -799,6 +842,8 @@ export type Database = {
           published_at?: string | null
           region?: string | null
           seller_type?: Database["public"]["Enums"]["seller_type"]
+          source?: string
+          source_url?: string | null
           status?: Database["public"]["Enums"]["listing_status"]
           title: string
           updated_at?: string
@@ -827,6 +872,8 @@ export type Database = {
           published_at?: string | null
           region?: string | null
           seller_type?: Database["public"]["Enums"]["seller_type"]
+          source?: string
+          source_url?: string | null
           status?: Database["public"]["Enums"]["listing_status"]
           title?: string
           updated_at?: string
@@ -1254,6 +1301,12 @@ export type Database = {
           business_province: string | null
           business_region: string | null
           created_at: string
+          fb_profile_id: string | null
+          fb_profile_url: string | null
+          fb_verification_code: string | null
+          fb_verification_code_expires_at: string | null
+          fb_verification_method: string | null
+          fb_verified_at: string | null
           first_name: string | null
           founding_member_number: number | null
           full_name: string | null
@@ -1288,6 +1341,12 @@ export type Database = {
           business_province?: string | null
           business_region?: string | null
           created_at?: string
+          fb_profile_id?: string | null
+          fb_profile_url?: string | null
+          fb_verification_code?: string | null
+          fb_verification_code_expires_at?: string | null
+          fb_verification_method?: string | null
+          fb_verified_at?: string | null
           first_name?: string | null
           founding_member_number?: number | null
           full_name?: string | null
@@ -1322,6 +1381,12 @@ export type Database = {
           business_province?: string | null
           business_region?: string | null
           created_at?: string
+          fb_profile_id?: string | null
+          fb_profile_url?: string | null
+          fb_verification_code?: string | null
+          fb_verification_code_expires_at?: string | null
+          fb_verification_method?: string | null
+          fb_verified_at?: string | null
           first_name?: string | null
           founding_member_number?: number | null
           full_name?: string | null
