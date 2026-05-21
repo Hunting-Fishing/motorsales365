@@ -397,6 +397,7 @@ export type Database = {
       businesses: {
         Row: {
           barangay: string | null
+          brands_carried: string | null
           city: string | null
           cover_url: string | null
           created_at: string
@@ -427,6 +428,7 @@ export type Database = {
         }
         Insert: {
           barangay?: string | null
+          brands_carried?: string | null
           city?: string | null
           cover_url?: string | null
           created_at?: string
@@ -457,6 +459,7 @@ export type Database = {
         }
         Update: {
           barangay?: string | null
+          brands_carried?: string | null
           city?: string | null
           cover_url?: string | null
           created_at?: string
