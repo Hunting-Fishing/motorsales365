@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RideCard, type RideCardData } from "@/components/rides/ride-card";
 
-export const Route = createFileRoute("/rides")({
+export const Route = createFileRoute("/rides/")({
   head: () => ({
     meta: [
       { title: "Rides — Filipino car & bike builds | 365 MotorSales" },

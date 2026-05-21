@@ -31,11 +31,13 @@ import { Route as AdvertiseRouteImport } from './routes/advertise'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as RidesIndexRouteImport } from './routes/rides.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as BusinessesIndexRouteImport } from './routes/businesses.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
 import { Route as SellImportRouteImport } from './routes/sell.import'
+import { Route as RidesSlugRouteImport } from './routes/rides.$slug'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
@@ -196,6 +198,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RidesIndexRoute = RidesIndexRouteImport.update({
+  id: '/rides/',
+  path: '/rides/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -220,6 +227,11 @@ const SellImportRoute = SellImportRouteImport.update({
   id: '/import',
   path: '/import',
   getParentRoute: () => SellRoute,
+} as any)
+const RidesSlugRoute = RidesSlugRouteImport.update({
+  id: '/rides/$slug',
+  path: '/rides/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const RCodeRoute = RCodeRouteImport.update({
   id: '/r/$code',
@@ -529,11 +541,13 @@ export interface FileRoutesByFullPath {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/r/$code': typeof RCodeRouteWithChildren
+  '/rides/$slug': typeof RidesSlugRoute
   '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/rides/': typeof RidesIndexRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
@@ -605,11 +619,13 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/r/$code': typeof RCodeRouteWithChildren
+  '/rides/$slug': typeof RidesSlugRoute
   '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
   '/admin': typeof AdminIndexRoute
   '/businesses': typeof BusinessesIndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/rides': typeof RidesIndexRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
@@ -684,11 +700,13 @@ export interface FileRoutesById {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/r/$code': typeof RCodeRouteWithChildren
+  '/rides/$slug': typeof RidesSlugRoute
   '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/rides/': typeof RidesIndexRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
@@ -764,11 +782,13 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/listing/$id'
     | '/r/$code'
+    | '/rides/$slug'
     | '/sell/import'
     | '/seller/$id'
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
+    | '/rides/'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/payment-events'
@@ -840,11 +860,13 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/listing/$id'
     | '/r/$code'
+    | '/rides/$slug'
     | '/sell/import'
     | '/seller/$id'
     | '/admin'
     | '/businesses'
     | '/dashboard'
+    | '/rides'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/payment-events'
@@ -918,11 +940,13 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/listing/$id'
     | '/r/$code'
+    | '/rides/$slug'
     | '/sell/import'
     | '/seller/$id'
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
+    | '/rides/'
     | '/admin/redemptions_/$staffId'
     | '/api/admin/create-user'
     | '/api/public/payment-events'
@@ -971,8 +995,10 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   RCodeRoute: typeof RCodeRouteWithChildren
+  RidesSlugRoute: typeof RidesSlugRoute
   SellerIdRoute: typeof SellerIdRoute
   BusinessesIndexRoute: typeof BusinessesIndexRoute
+  RidesIndexRoute: typeof RidesIndexRoute
   ApiAdminCreateUserRoute: typeof ApiAdminCreateUserRoute
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
@@ -1141,6 +1167,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/rides/': {
+      id: '/rides/'
+      path: '/rides'
+      fullPath: '/rides/'
+      preLoaderRoute: typeof RidesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/': {
       id: '/dashboard/'
       path: '/'
@@ -1175,6 +1208,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/sell/import'
       preLoaderRoute: typeof SellImportRouteImport
       parentRoute: typeof SellRoute
+    }
+    '/rides/$slug': {
+      id: '/rides/$slug'
+      path: '/rides/$slug'
+      fullPath: '/rides/$slug'
+      preLoaderRoute: typeof RidesSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/r/$code': {
       id: '/r/$code'
@@ -1674,8 +1714,10 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   RCodeRoute: RCodeRouteWithChildren,
+  RidesSlugRoute: RidesSlugRoute,
   SellerIdRoute: SellerIdRoute,
   BusinessesIndexRoute: BusinessesIndexRoute,
+  RidesIndexRoute: RidesIndexRoute,
   ApiAdminCreateUserRoute: ApiAdminCreateUserRoute,
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
