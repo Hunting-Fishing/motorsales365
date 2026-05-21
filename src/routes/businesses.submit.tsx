@@ -225,6 +225,7 @@ function SubmitBusinessPage() {
       street_address: streetAddress.trim() || null,
       region: loc.region, province: loc.province, city: loc.city, barangay: loc.barangay,
       postal_code: postalCode.trim() || null,
+      brands_carried: brandsCarried.trim() || null,
       lat: lat ? Number(lat) : null, lng: lng ? Number(lng) : null,
       status: "pending",
     };
