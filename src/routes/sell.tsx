@@ -509,6 +509,18 @@ function SellPage() {
         <h1 className="font-display text-3xl font-bold">Post a listing</h1>
         <p className="text-muted-foreground">Reach buyers across the Philippines.</p>
 
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4">
+          <div>
+            <div className="font-semibold">Already selling on Facebook Marketplace?</div>
+            <p className="text-sm text-muted-foreground">Import a listing in seconds — we verify your FB profile so buyers know it's the real you.</p>
+          </div>
+          <Button asChild variant="default" size="sm">
+            <Link to="/sell/import">Import from Facebook</Link>
+          </Button>
+        </div>
+
+
+
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Category & basics</h2>
