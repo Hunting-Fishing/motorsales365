@@ -35,6 +35,7 @@ import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as BusinessesIndexRouteImport } from './routes/businesses.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
+import { Route as SellImportRouteImport } from './routes/sell.import'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
@@ -214,6 +215,11 @@ const SellerIdRoute = SellerIdRouteImport.update({
   id: '/seller/$id',
   path: '/seller/$id',
   getParentRoute: () => rootRouteImport,
+} as any)
+const SellImportRoute = SellImportRouteImport.update({
+  id: '/import',
+  path: '/import',
+  getParentRoute: () => SellRoute,
 } as any)
 const RCodeRoute = RCodeRouteImport.update({
   id: '/r/$code',
@@ -481,7 +487,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/sell': typeof SellRoute
+  '/sell': typeof SellRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -523,6 +529,7 @@ export interface FileRoutesByFullPath {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/r/$code': typeof RCodeRouteWithChildren
+  '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
@@ -556,7 +563,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/sell': typeof SellRoute
+  '/sell': typeof SellRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -598,6 +605,7 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/r/$code': typeof RCodeRouteWithChildren
+  '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
   '/admin': typeof AdminIndexRoute
   '/businesses': typeof BusinessesIndexRoute
@@ -634,7 +642,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/sell': typeof SellRoute
+  '/sell': typeof SellRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
@@ -676,6 +684,7 @@ export interface FileRoutesById {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/r/$code': typeof RCodeRouteWithChildren
+  '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
@@ -755,6 +764,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/listing/$id'
     | '/r/$code'
+    | '/sell/import'
     | '/seller/$id'
     | '/admin/'
     | '/businesses/'
@@ -830,6 +840,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/listing/$id'
     | '/r/$code'
+    | '/sell/import'
     | '/seller/$id'
     | '/admin'
     | '/businesses'
@@ -907,6 +918,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/listing/$id'
     | '/r/$code'
+    | '/sell/import'
     | '/seller/$id'
     | '/admin/'
     | '/businesses/'
@@ -943,7 +955,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
-  SellRoute: typeof SellRoute
+  SellRoute: typeof SellRouteWithChildren
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
@@ -1156,6 +1168,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/seller/$id'
       preLoaderRoute: typeof SellerIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/sell/import': {
+      id: '/sell/import'
+      path: '/import'
+      fullPath: '/sell/import'
+      preLoaderRoute: typeof SellImportRouteImport
+      parentRoute: typeof SellRoute
     }
     '/r/$code': {
       id: '/r/$code'
@@ -1591,6 +1610,16 @@ const PaymentsRouteWithChildren = PaymentsRoute._addFileChildren(
   PaymentsRouteChildren,
 )
 
+interface SellRouteChildren {
+  SellImportRoute: typeof SellImportRoute
+}
+
+const SellRouteChildren: SellRouteChildren = {
+  SellImportRoute: SellImportRoute,
+}
+
+const SellRouteWithChildren = SellRoute._addFileChildren(SellRouteChildren)
+
 interface ListingIdRouteChildren {
   ListingIdEditRoute: typeof ListingIdEditRoute
 }
@@ -1629,7 +1658,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   RefundPolicyRoute: RefundPolicyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
-  SellRoute: SellRoute,
+  SellRoute: SellRouteWithChildren,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
