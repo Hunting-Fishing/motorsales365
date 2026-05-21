@@ -42,7 +42,7 @@ const POST_SIGNUP_ROUTE: Record<SignupIntent, string> = {
 
 const BUSINESS_KIND_OPTIONS: { value: string; label: string; forIntent?: SignupIntent }[] = [
   { value: "dealer", label: "Dealership / Showroom", forIntent: "business" },
-  { value: "parts_shop", label: "Parts shop", forIntent: "business" },
+  { value: "parts_shop", label: "Parts shop", forIntent: "service_provider" },
   { value: "rental", label: "Rental", forIntent: "business" },
   { value: "repair_shop", label: "Repair shop", forIntent: "service_provider" },
   { value: "towing", label: "Towing", forIntent: "service_provider" },

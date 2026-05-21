@@ -21,17 +21,17 @@ export const SIGNUP_TYPES: {
   {
     id: "business",
     label: "Business / Dealer",
-    description: "Dealership, parts shop, or rental — listed in our professional directory.",
+    description: "Dealership or vehicle rental — sell or rent out cars, trucks, and equipment.",
     icon: Building2,
     badge: "Popular for Pros",
-    note: "Your business will appear in our professional directory with a dedicated profile, verified badge eligibility, and bulk listing tools. You'll complete your full business profile right after signup.",
+    note: "For businesses that list vehicles for sale or rent. You'll get a professional directory profile, verified badge eligibility, and bulk listing tools. Complete your business profile right after signup.",
   },
   {
     id: "service_provider",
     label: "Service provider",
-    description: "Towing, repair, body shop, carwash, or salvage specialist.",
+    description: "Parts shop, repair, towing, body shop, carwash, or salvage specialist.",
     icon: Wrench,
-    note: "You'll be listed in our services directory so drivers can find you for towing, repairs, and roadside help. Complete your service profile after signup to start receiving requests.",
+    note: "For shops and specialists that serve drivers — parts, repairs, roadside, detailing, salvage. You'll be listed in our services directory. Complete your service profile after signup to start receiving requests.",
   },
 ];
 
