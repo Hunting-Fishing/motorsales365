@@ -14,9 +14,9 @@ import { useGarage, formatVehicle } from "@/lib/garage";
 import { X } from "lucide-react";
 
 const shopSearch = z.object({
-  make: fallback(z.string().optional(), undefined),
-  model: fallback(z.string().optional(), undefined),
-  year: fallback(z.number().optional(), undefined),
+  make: fallback(z.string(), "").default(""),
+  model: fallback(z.string(), "").default(""),
+  year: fallback(z.number().optional(), undefined).default(undefined),
 });
 
 export const Route = createFileRoute("/shop/")({
@@ -60,12 +60,12 @@ function ShopIndex() {
 
   const onPickVehicle = (v: { category: "car" | "motorcycle"; make: string; model: string; year?: number }) => {
     setGarageState(v);
-    navigate({ search: { make: v.make, model: v.model, year: v.year } });
+    navigate({ search: () => ({ make: v.make, model: v.model, year: v.year }) });
   };
 
   const clearVehicle = () => {
     setGarageState(null);
-    navigate({ search: {} });
+    navigate({ search: () => ({ make: "", model: "", year: undefined }) });
   };
 
   return (

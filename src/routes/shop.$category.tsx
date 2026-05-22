@@ -10,9 +10,9 @@ import { useGarage, formatVehicle } from "@/lib/garage";
 import { Badge } from "@/components/ui/badge";
 
 const catSearch = z.object({
-  make: fallback(z.string().optional(), undefined),
-  model: fallback(z.string().optional(), undefined),
-  year: fallback(z.number().optional(), undefined),
+  make: fallback(z.string(), "").default(""),
+  model: fallback(z.string(), "").default(""),
+  year: fallback(z.number().optional(), undefined).default(undefined),
 });
 
 export const Route = createFileRoute("/shop/$category")({
