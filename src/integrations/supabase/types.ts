@@ -2761,6 +2761,10 @@ export type Database = {
         | "newsletter"
         | "sponsored_post"
         | "other"
+        | "home_carousel"
+        | "browse_top"
+        | "rides_top"
+        | "export_top"
       ad_status: "draft" | "scheduled" | "active" | "paused" | "ended"
       app_role:
         | "admin"
@@ -2964,6 +2968,10 @@ export const Constants = {
         "newsletter",
         "sponsored_post",
         "other",
+        "home_carousel",
+        "browse_top",
+        "rides_top",
+        "export_top",
       ],
       ad_status: ["draft", "scheduled", "active", "paused", "ended"],
       app_role: [
