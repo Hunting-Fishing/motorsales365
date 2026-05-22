@@ -104,8 +104,10 @@ function EditRidePage() {
   };
   const saveLog = async (s: any) => {
     const { error } = await (supabase as any).from("ride_service_log").update({
-      service_date: s.service_date, service_type: s.service_type, mileage_km: s.mileage_km, cost_php: s.cost_php, notes: s.notes, photo_url: s.photo_url,
+      service_date: s.service_date, service_type: s.service_type, mileage_km: s.mileage_km, cost_php: s.cost_php, notes: s.notes,
     }).eq("id", s.id);
+    if (error) toast.error(error.message);
+  };
     if (error) toast.error(error.message);
   };
   const delLog = async (lid: string) => { await (supabase as any).from("ride_service_log").delete().eq("id", lid); setLogs(logs.filter((x) => x.id !== lid)); };
