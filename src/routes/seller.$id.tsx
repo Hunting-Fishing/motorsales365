@@ -6,6 +6,8 @@ import { SiteLayout } from "@/components/site-layout";
 import { Badge } from "@/components/ui/badge";
 import { VerifiedBadge } from "@/components/verified-badge";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
+import { RideCard, type RideCardData } from "@/components/rides/ride-card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/seller/$id")({
@@ -58,12 +60,13 @@ function SellerProfilePage() {
   const { id } = Route.useParams();
   const [profile, setProfile] = useState<any>(null);
   const [listings, setListings] = useState<ListingCardData[]>([]);
+  const [rides, setRides] = useState<RideCardData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const [{ data: p }, { data: ls }] = await Promise.all([
+      const [{ data: p }, { data: ls }, { data: rs }] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", id).maybeSingle(),
         supabase
           .from("listings")
@@ -73,9 +76,16 @@ function SellerProfilePage() {
           .eq("user_id", id)
           .in("status", ["active","pending_sale"])
           .order("created_at", { ascending: false }),
+        (supabase as any)
+          .from("rides")
+          .select("id,slug,name,year,make,model,cover_photo_url,like_count,is_for_sale,city,vehicle_type")
+          .eq("user_id", id)
+          .eq("status", "published")
+          .order("published_at", { ascending: false }),
       ]);
       setProfile(p);
       const verified = p?.verification_status === "verified";
+      const ownerName = p?.business_name || p?.full_name || null;
       setListings(
         (ls ?? []).map((l: any) => {
           const photos = (l.listing_media ?? []).filter((m: any) => m.type === "photo");
@@ -96,6 +106,7 @@ function SellerProfilePage() {
           };
         }),
       );
+      setRides(((rs ?? []) as any[]).map((r) => ({ ...r, owner_name: ownerName })));
       setLoading(false);
     };
     load();
@@ -161,6 +172,7 @@ function SellerProfilePage() {
               )}
               <div className="mt-2 text-sm text-muted-foreground">
                 {listings.length} active {listings.length === 1 ? "listing" : "listings"}
+                {rides.length > 0 && <> · {rides.length} {rides.length === 1 ? "ride" : "rides"}</>}
               </div>
             </div>
           </div>
@@ -168,18 +180,38 @@ function SellerProfilePage() {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <h2 className="mb-4 font-display text-xl font-semibold">Listings from this seller</h2>
-        {listings.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
-            No active listings.
-          </div>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {listings.map((l) => (
-              <ListingCard key={l.id} listing={l} />
-            ))}
-          </div>
-        )}
+        <Tabs defaultValue="listings">
+          <TabsList>
+            <TabsTrigger value="listings">Listings ({listings.length})</TabsTrigger>
+            <TabsTrigger value="rides">Rides ({rides.length})</TabsTrigger>
+          </TabsList>
+          <TabsContent value="listings" className="mt-6">
+            {listings.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
+                No active listings.
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {listings.map((l) => (
+                  <ListingCard key={l.id} listing={l} />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+          <TabsContent value="rides" className="mt-6">
+            {rides.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
+                No published rides yet.
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {rides.map((r) => (
+                  <RideCard key={r.id} ride={r} />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </SiteLayout>
   );
