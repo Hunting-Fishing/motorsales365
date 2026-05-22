@@ -92,13 +92,20 @@ export const getShopProduct = createServerFn({ method: "GET" })
       .eq("active", true)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    if (!product) return { product: null, links: [] };
-    const { data: links } = await supabaseAdmin
-      .from("shop_product_links")
-      .select("id, url, sku, network:affiliate_networks(id, slug, name, tag_param, tag_value, deeplink_template, active)")
-      .eq("product_id", product.id);
+    if (!product) return { product: null, links: [], fitment: [] };
+    const [{ data: links }, { data: fitment }] = await Promise.all([
+      supabaseAdmin
+        .from("shop_product_links")
+        .select("id, url, sku, network:affiliate_networks(id, slug, name, tag_param, tag_value, deeplink_template, active)")
+        .eq("product_id", product.id),
+      supabaseAdmin
+        .from("shop_product_fitment")
+        .select("id, category, make, model, year_start, year_end, notes")
+        .eq("product_id", product.id)
+        .order("make", { ascending: true }),
+    ]);
     const visible = (links ?? []).filter((l: any) => l.network?.active);
-    return { product, links: visible };
+    return { product, links: visible, fitment: fitment ?? [] };
   });
 
 // ============ ADMIN ============
@@ -115,6 +122,7 @@ const productSchema = z.object({
   tags: z.array(z.string().max(60)).max(20).optional(),
   featured: z.boolean().optional(),
   active: z.boolean().optional(),
+  universal_fit: z.boolean().optional(),
 });
 
 export const adminListProducts = createServerFn({ method: "GET" })
