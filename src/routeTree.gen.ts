@@ -25,6 +25,7 @@ import { Route as MyQrRouteImport } from './routes/my-qr'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as GuidelinesRouteImport } from './routes/guidelines'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as ExportRouteImport } from './routes/export'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AdvertiseRouteImport } from './routes/advertise'
@@ -169,6 +170,11 @@ const GuidelinesRoute = GuidelinesRouteImport.update({
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExportRoute = ExportRouteImport.update({
+  id: '/export',
+  path: '/export',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -508,6 +514,7 @@ export interface FileRoutesByFullPath {
   '/advertise': typeof AdvertiseRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/export': typeof ExportRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
   '/login': typeof LoginRoute
@@ -589,6 +596,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/advertise': typeof AdvertiseRoute
   '/contact': typeof ContactRoute
+  '/export': typeof ExportRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
   '/login': typeof LoginRoute
@@ -673,6 +681,7 @@ export interface FileRoutesById {
   '/advertise': typeof AdvertiseRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/export': typeof ExportRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
   '/login': typeof LoginRoute
@@ -758,6 +767,7 @@ export interface FileRouteTypes {
     | '/advertise'
     | '/contact'
     | '/dashboard'
+    | '/export'
     | '/forgot-password'
     | '/guidelines'
     | '/login'
@@ -839,6 +849,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/advertise'
     | '/contact'
+    | '/export'
     | '/forgot-password'
     | '/guidelines'
     | '/login'
@@ -922,6 +933,7 @@ export interface FileRouteTypes {
     | '/advertise'
     | '/contact'
     | '/dashboard'
+    | '/export'
     | '/forgot-password'
     | '/guidelines'
     | '/login'
@@ -1006,6 +1018,7 @@ export interface RootRouteChildren {
   AdvertiseRoute: typeof AdvertiseRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  ExportRoute: typeof ExportRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   GuidelinesRoute: typeof GuidelinesRoute
   LoginRoute: typeof LoginRoute
@@ -1159,6 +1172,13 @@ declare module '@tanstack/react-router' {
       path: '/forgot-password'
       fullPath: '/forgot-password'
       preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/export': {
+      id: '/export'
+      path: '/export'
+      fullPath: '/export'
+      preLoaderRoute: typeof ExportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -1752,6 +1772,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdvertiseRoute: AdvertiseRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  ExportRoute: ExportRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   GuidelinesRoute: GuidelinesRoute,
   LoginRoute: LoginRoute,
