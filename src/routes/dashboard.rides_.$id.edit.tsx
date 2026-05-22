@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { RidePhotoUploader } from "@/components/rides/ride-photo-uploader";
+import { ServiceLogPhotoUploader } from "@/components/rides/service-log-photo-uploader";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { linkRideToListing, publishRide } from "@/lib/rides.functions";
