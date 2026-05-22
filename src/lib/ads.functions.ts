@@ -3,7 +3,7 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-const placementSchema = z.enum(["home_carousel", "browse_top", "rides_top", "listing_sidebar", "export_top"]);
+const placementSchema = z.enum(["home_carousel", "browse_top", "rides_top", "listing_sidebar", "export_top", "shop_top", "shop_sidebar"]);
 const statusSchema = z.enum(["draft", "scheduled", "active", "paused", "ended"]);
 
 // PUBLIC: fetch active ads for a placement

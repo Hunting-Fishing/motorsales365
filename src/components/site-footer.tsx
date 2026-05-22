@@ -61,6 +61,7 @@ export function SiteFooter() {
             <li><Link to="/sell" className="hover:text-foreground">Post a listing</Link></li>
             <li><Link to="/pricing" className="hover:text-foreground">Pricing & plans</Link></li>
             <li><Link to="/payments" className="hover:text-foreground">Payment methods</Link></li>
+            <li><Link to="/shop" className="hover:text-foreground">Shop</Link></li>
           </ul>
         </div>
         <div>
@@ -91,6 +92,7 @@ export function SiteFooter() {
       <div className="border-t border-border px-4 py-4 text-center text-xs text-muted-foreground">
         <p>© {new Date().getFullYear()} 365 MotorSales Philippines. All prices in ₱ PHP.</p>
         <p className="mt-1">Registered in the Philippines · Metro Manila · DPA-compliant.</p>
+        <p className="mt-1">As an affiliate, 365 MotorSales earns from qualifying purchases made through outbound Shop links.</p>
       </div>
     </footer>
   );

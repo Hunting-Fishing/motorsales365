@@ -32,15 +32,18 @@ import { Route as AdvertiseRouteImport } from './routes/advertise'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as RidesIndexRouteImport } from './routes/rides.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as BusinessesIndexRouteImport } from './routes/businesses.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as ShopCategoryRouteImport } from './routes/shop.$category'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
 import { Route as SellImportRouteImport } from './routes/sell.import'
 import { Route as RidesSlugRouteImport } from './routes/rides.$slug'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
+import { Route as GoProductIdRouteImport } from './routes/go.$productId'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as DashboardVerificationRouteImport } from './routes/dashboard.verification'
 import { Route as DashboardTowRouteImport } from './routes/dashboard.tow'
@@ -62,6 +65,7 @@ import { Route as ApiRobotsDottxtRouteImport } from './routes/api/robots[.]txt'
 import { Route as AdminVerificationsRouteImport } from './routes/admin.verifications'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTypeSuggestionsRouteImport } from './routes/admin.type-suggestions'
+import { Route as AdminShopRouteImport } from './routes/admin.shop'
 import { Route as AdminSandboxRouteImport } from './routes/admin.sandbox'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminReferralsRouteImport } from './routes/admin.referrals'
@@ -75,6 +79,7 @@ import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising'
 import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
+import { Route as ShopPSlugRouteImport } from './routes/shop.p.$slug'
 import { Route as RCodePosterRouteImport } from './routes/r.$code.poster'
 import { Route as PaymentsIdReceiptRouteImport } from './routes/payments.$id.receipt'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
@@ -207,6 +212,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopIndexRoute = ShopIndexRouteImport.update({
+  id: '/shop/',
+  path: '/shop/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RidesIndexRoute = RidesIndexRouteImport.update({
   id: '/rides/',
   path: '/rides/',
@@ -226,6 +236,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const ShopCategoryRoute = ShopCategoryRouteImport.update({
+  id: '/shop/$category',
+  path: '/shop/$category',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const SellerIdRoute = SellerIdRouteImport.update({
   id: '/seller/$id',
@@ -250,6 +265,11 @@ const RCodeRoute = RCodeRouteImport.update({
 const ListingIdRoute = ListingIdRouteImport.update({
   id: '/listing/$id',
   path: '/listing/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GoProductIdRoute = GoProductIdRouteImport.update({
+  id: '/go/$productId',
+  path: '/go/$productId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
@@ -357,6 +377,11 @@ const AdminTypeSuggestionsRoute = AdminTypeSuggestionsRouteImport.update({
   path: '/type-suggestions',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminShopRoute = AdminShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSandboxRoute = AdminSandboxRouteImport.update({
   id: '/sandbox',
   path: '/sandbox',
@@ -421,6 +446,11 @@ const AdminAccountsRoute = AdminAccountsRouteImport.update({
   id: '/accounts',
   path: '/accounts',
   getParentRoute: () => AdminRoute,
+} as any)
+const ShopPSlugRoute = ShopPSlugRouteImport.update({
+  id: '/shop/p/$slug',
+  path: '/shop/p/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const RCodePosterRoute = RCodePosterRouteImport.update({
   id: '/poster',
@@ -544,6 +574,7 @@ export interface FileRoutesByFullPath {
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
+  '/admin/shop': typeof AdminShopRoute
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
@@ -565,15 +596,18 @@ export interface FileRoutesByFullPath {
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/go/$productId': typeof GoProductIdRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
   '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
+  '/shop/$category': typeof ShopCategoryRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/rides/': typeof RidesIndexRoute
+  '/shop/': typeof ShopIndexRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
@@ -582,6 +616,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
+  '/shop/p/$slug': typeof ShopPSlugRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
@@ -626,6 +661,7 @@ export interface FileRoutesByTo {
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
+  '/admin/shop': typeof AdminShopRoute
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
@@ -647,15 +683,18 @@ export interface FileRoutesByTo {
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/go/$productId': typeof GoProductIdRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
   '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
+  '/shop/$category': typeof ShopCategoryRoute
   '/admin': typeof AdminIndexRoute
   '/businesses': typeof BusinessesIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/rides': typeof RidesIndexRoute
+  '/shop': typeof ShopIndexRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
@@ -664,6 +703,7 @@ export interface FileRoutesByTo {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
+  '/shop/p/$slug': typeof ShopPSlugRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
@@ -711,6 +751,7 @@ export interface FileRoutesById {
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
+  '/admin/shop': typeof AdminShopRoute
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
@@ -732,15 +773,18 @@ export interface FileRoutesById {
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/go/$productId': typeof GoProductIdRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
   '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
+  '/shop/$category': typeof ShopCategoryRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/rides/': typeof RidesIndexRoute
+  '/shop/': typeof ShopIndexRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
@@ -749,6 +793,7 @@ export interface FileRoutesById {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
+  '/shop/p/$slug': typeof ShopPSlugRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/dashboard/rides_/$id/edit': typeof DashboardRidesIdEditRoute
@@ -797,6 +842,7 @@ export interface FileRouteTypes {
     | '/admin/referrals'
     | '/admin/reports'
     | '/admin/sandbox'
+    | '/admin/shop'
     | '/admin/type-suggestions'
     | '/admin/users'
     | '/admin/verifications'
@@ -818,15 +864,18 @@ export interface FileRouteTypes {
     | '/dashboard/tow'
     | '/dashboard/verification'
     | '/email/unsubscribe'
+    | '/go/$productId'
     | '/listing/$id'
     | '/r/$code'
     | '/rides/$slug'
     | '/sell/import'
     | '/seller/$id'
+    | '/shop/$category'
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
     | '/rides/'
+    | '/shop/'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/payment-events'
@@ -835,6 +884,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
+    | '/shop/p/$slug'
     | '/api/public/fx/refresh'
     | '/api/public/payments/webhook'
     | '/dashboard/rides/$id/edit'
@@ -879,6 +929,7 @@ export interface FileRouteTypes {
     | '/admin/referrals'
     | '/admin/reports'
     | '/admin/sandbox'
+    | '/admin/shop'
     | '/admin/type-suggestions'
     | '/admin/users'
     | '/admin/verifications'
@@ -900,15 +951,18 @@ export interface FileRouteTypes {
     | '/dashboard/tow'
     | '/dashboard/verification'
     | '/email/unsubscribe'
+    | '/go/$productId'
     | '/listing/$id'
     | '/r/$code'
     | '/rides/$slug'
     | '/sell/import'
     | '/seller/$id'
+    | '/shop/$category'
     | '/admin'
     | '/businesses'
     | '/dashboard'
     | '/rides'
+    | '/shop'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/payment-events'
@@ -917,6 +971,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
+    | '/shop/p/$slug'
     | '/api/public/fx/refresh'
     | '/api/public/payments/webhook'
     | '/dashboard/rides/$id/edit'
@@ -963,6 +1018,7 @@ export interface FileRouteTypes {
     | '/admin/referrals'
     | '/admin/reports'
     | '/admin/sandbox'
+    | '/admin/shop'
     | '/admin/type-suggestions'
     | '/admin/users'
     | '/admin/verifications'
@@ -984,15 +1040,18 @@ export interface FileRouteTypes {
     | '/dashboard/tow'
     | '/dashboard/verification'
     | '/email/unsubscribe'
+    | '/go/$productId'
     | '/listing/$id'
     | '/r/$code'
     | '/rides/$slug'
     | '/sell/import'
     | '/seller/$id'
+    | '/shop/$category'
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
     | '/rides/'
+    | '/shop/'
     | '/admin/redemptions_/$staffId'
     | '/api/admin/create-user'
     | '/api/public/payment-events'
@@ -1001,6 +1060,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
+    | '/shop/p/$slug'
     | '/api/public/fx/refresh'
     | '/api/public/payments/webhook'
     | '/dashboard/rides_/$id/edit'
@@ -1042,15 +1102,19 @@ export interface RootRouteChildren {
   BusinessesSubmitRoute: typeof BusinessesSubmitRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  GoProductIdRoute: typeof GoProductIdRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   RCodeRoute: typeof RCodeRouteWithChildren
   RidesSlugRoute: typeof RidesSlugRoute
   SellerIdRoute: typeof SellerIdRoute
+  ShopCategoryRoute: typeof ShopCategoryRoute
   BusinessesIndexRoute: typeof BusinessesIndexRoute
   RidesIndexRoute: typeof RidesIndexRoute
+  ShopIndexRoute: typeof ShopIndexRoute
   ApiAdminCreateUserRoute: typeof ApiAdminCreateUserRoute
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ShopPSlugRoute: typeof ShopPSlugRoute
   ApiPublicFxRefreshRoute: typeof ApiPublicFxRefreshRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -1223,6 +1287,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shop/': {
+      id: '/shop/'
+      path: '/shop'
+      fullPath: '/shop/'
+      preLoaderRoute: typeof ShopIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rides/': {
       id: '/rides/'
       path: '/rides'
@@ -1250,6 +1321,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/shop/$category': {
+      id: '/shop/$category'
+      path: '/shop/$category'
+      fullPath: '/shop/$category'
+      preLoaderRoute: typeof ShopCategoryRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/seller/$id': {
       id: '/seller/$id'
@@ -1284,6 +1362,13 @@ declare module '@tanstack/react-router' {
       path: '/listing/$id'
       fullPath: '/listing/$id'
       preLoaderRoute: typeof ListingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/go/$productId': {
+      id: '/go/$productId'
+      path: '/go/$productId'
+      fullPath: '/go/$productId'
+      preLoaderRoute: typeof GoProductIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/email/unsubscribe': {
@@ -1433,6 +1518,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTypeSuggestionsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/shop': {
+      id: '/admin/shop'
+      path: '/shop'
+      fullPath: '/admin/shop'
+      preLoaderRoute: typeof AdminShopRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/sandbox': {
       id: '/admin/sandbox'
       path: '/sandbox'
@@ -1523,6 +1615,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/accounts'
       preLoaderRoute: typeof AdminAccountsRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/shop/p/$slug': {
+      id: '/shop/p/$slug'
+      path: '/shop/p/$slug'
+      fullPath: '/shop/p/$slug'
+      preLoaderRoute: typeof ShopPSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/r/$code/poster': {
       id: '/r/$code/poster'
@@ -1653,6 +1752,7 @@ interface AdminRouteChildren {
   AdminReferralsRoute: typeof AdminReferralsRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminSandboxRoute: typeof AdminSandboxRoute
+  AdminShopRoute: typeof AdminShopRoute
   AdminTypeSuggestionsRoute: typeof AdminTypeSuggestionsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVerificationsRoute: typeof AdminVerificationsRoute
@@ -1674,6 +1774,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminReferralsRoute: AdminReferralsRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminSandboxRoute: AdminSandboxRoute,
+  AdminShopRoute: AdminShopRoute,
   AdminTypeSuggestionsRoute: AdminTypeSuggestionsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminVerificationsRoute: AdminVerificationsRoute,
@@ -1796,15 +1897,19 @@ const rootRouteChildren: RootRouteChildren = {
   BusinessesSubmitRoute: BusinessesSubmitRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  GoProductIdRoute: GoProductIdRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   RCodeRoute: RCodeRouteWithChildren,
   RidesSlugRoute: RidesSlugRoute,
   SellerIdRoute: SellerIdRoute,
+  ShopCategoryRoute: ShopCategoryRoute,
   BusinessesIndexRoute: BusinessesIndexRoute,
   RidesIndexRoute: RidesIndexRoute,
+  ShopIndexRoute: ShopIndexRoute,
   ApiAdminCreateUserRoute: ApiAdminCreateUserRoute,
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ShopPSlugRoute: ShopPSlugRoute,
   ApiPublicFxRefreshRoute: ApiPublicFxRefreshRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,

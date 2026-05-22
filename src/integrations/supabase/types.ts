@@ -317,6 +317,45 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliate_networks: {
+        Row: {
+          active: boolean
+          created_at: string
+          deeplink_template: string | null
+          id: string
+          name: string
+          slug: string
+          sort_order: number
+          tag_param: string | null
+          tag_value: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          deeplink_template?: string | null
+          id?: string
+          name: string
+          slug: string
+          sort_order?: number
+          tag_param?: string | null
+          tag_value?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          deeplink_template?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          sort_order?: number
+          tag_param?: string | null
+          tag_value?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       business_reviews: {
         Row: {
           body: string | null
@@ -2111,6 +2150,203 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_categories: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: []
+      }
+      shop_clicks: {
+        Row: {
+          created_at: string
+          id: string
+          network_id: string | null
+          product_id: string
+          referrer: string | null
+          user_agent: string | null
+          user_id: string | null
+          visitor_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          network_id?: string | null
+          product_id: string
+          referrer?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          visitor_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          network_id?: string | null
+          product_id?: string
+          referrer?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          visitor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_clicks_network_id_fkey"
+            columns: ["network_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_networks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_clicks_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "shop_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_product_links: {
+        Row: {
+          created_at: string
+          id: string
+          last_checked_at: string | null
+          network_id: string
+          product_id: string
+          sku: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_checked_at?: string | null
+          network_id: string
+          product_id: string
+          sku?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_checked_at?: string | null
+          network_id?: string
+          product_id?: string
+          sku?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_product_links_network_id_fkey"
+            columns: ["network_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_networks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_product_links_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "shop_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_products: {
+        Row: {
+          active: boolean
+          brand: string | null
+          category_id: string | null
+          click_count: number
+          created_at: string
+          created_by: string | null
+          currency: string
+          description: string | null
+          featured: boolean
+          gallery: Json
+          id: string
+          image_url: string | null
+          price_php: number | null
+          slug: string
+          tags: string[]
+          title: string
+          updated_at: string
+          view_count: number
+        }
+        Insert: {
+          active?: boolean
+          brand?: string | null
+          category_id?: string | null
+          click_count?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string | null
+          featured?: boolean
+          gallery?: Json
+          id?: string
+          image_url?: string | null
+          price_php?: number | null
+          slug: string
+          tags?: string[]
+          title: string
+          updated_at?: string
+          view_count?: number
+        }
+        Update: {
+          active?: boolean
+          brand?: string | null
+          category_id?: string | null
+          click_count?: number
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string | null
+          featured?: boolean
+          gallery?: Json
+          id?: string
+          image_url?: string | null
+          price_php?: number | null
+          slug?: string
+          tags?: string[]
+          title?: string
+          updated_at?: string
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "shop_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       staff_promotions: {
         Row: {
           active: boolean
@@ -2660,6 +2896,7 @@ export type Database = {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
       }
+      can_manage_shop: { Args: { _user_id: string }; Returns: boolean }
       can_moderate: { Args: { _user_id: string }; Returns: boolean }
       can_support: { Args: { _user_id: string }; Returns: boolean }
       current_plan_tier: { Args: { _user_id: string }; Returns: string }
@@ -2765,6 +3002,8 @@ export type Database = {
         | "browse_top"
         | "rides_top"
         | "export_top"
+        | "shop_top"
+        | "shop_sidebar"
       ad_status: "draft" | "scheduled" | "active" | "paused" | "ended"
       app_role:
         | "admin"
@@ -2972,6 +3211,8 @@ export const Constants = {
         "browse_top",
         "rides_top",
         "export_top",
+        "shop_top",
+        "shop_sidebar",
       ],
       ad_status: ["draft", "scheduled", "active", "paused", "ended"],
       app_role: [

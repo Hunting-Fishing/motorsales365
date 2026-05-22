@@ -11,7 +11,7 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
-type Placement = "home_carousel" | "browse_top" | "rides_top" | "listing_sidebar" | "export_top";
+type Placement = "home_carousel" | "browse_top" | "rides_top" | "listing_sidebar" | "export_top" | "shop_top" | "shop_sidebar";
 
 interface AdCarouselProps {
   placement: Placement;

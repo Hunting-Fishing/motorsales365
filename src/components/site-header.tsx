@@ -86,6 +86,13 @@ export function SiteHeader() {
             >
               {RIDES_LINK.label}
             </Link>
+            <Link
+              to="/shop"
+              className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              activeProps={{ className: "bg-secondary text-foreground" }}
+            >
+              Shop
+            </Link>
           </nav>
         </div>
 
@@ -184,6 +191,7 @@ export function SiteHeader() {
                 ))}
                 <Link to={BUSINESSES_LINK.to} className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">{BUSINESSES_LINK.label}</Link>
                 <Link to={RIDES_LINK.to} className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">{RIDES_LINK.label}</Link>
+                <Link to="/shop" className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">Shop</Link>
                 <Link to="/sell" className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">Post a listing</Link>
                 {!user && (
                   <>

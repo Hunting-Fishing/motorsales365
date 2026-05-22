@@ -1,0 +1,53 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { SiteLayout } from "@/components/site-layout";
+import { AdCarousel } from "@/components/ads/ad-carousel";
+import { listShopCategories, listShopProducts } from "@/lib/shop.functions";
+import { ProductGrid } from "./shop.index";
+
+export const Route = createFileRoute("/shop/$category")({
+  component: ShopCategory,
+  head: ({ params }) => ({
+    meta: [
+      { title: `${params.category} — Shop | 365 MotorSales` },
+      { name: "description", content: `Browse ${params.category} products curated for Filipino car enthusiasts.` },
+    ],
+  }),
+});
+
+function ShopCategory() {
+  const { category } = Route.useParams();
+  const { data: catData } = useQuery({ queryKey: ["shop-cats"], queryFn: () => listShopCategories() });
+  const cat = catData?.categories.find((c) => c.slug === category);
+
+  const { data } = useQuery({
+    queryKey: ["shop-cat", category],
+    queryFn: () => listShopProducts({ data: { categorySlug: category, limit: 60 } }),
+  });
+  const products = data?.products ?? [];
+
+  return (
+    <SiteLayout>
+      <div className="container mx-auto px-4 py-8 space-y-8">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <Link to="/shop" className="hover:text-foreground">Shop</Link>
+          <span>/</span>
+          <span className="text-foreground">{cat?.name ?? category}</span>
+        </div>
+
+        <h1 className="font-display text-3xl md:text-4xl">{cat?.name ?? category}</h1>
+        {cat?.description && <p className="text-muted-foreground">{cat.description}</p>}
+
+        <AdCarousel placement="shop_top" />
+
+        {products.length === 0
+          ? <p className="text-muted-foreground">No products in this category yet.</p>
+          : <ProductGrid products={products} />}
+
+        <p className="rounded-md border bg-muted/40 p-4 text-xs text-muted-foreground">
+          Disclosure: 365 MotorSales earns a commission on qualifying purchases.
+        </p>
+      </div>
+    </SiteLayout>
+  );
+}
