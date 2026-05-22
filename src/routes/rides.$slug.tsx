@@ -157,10 +157,17 @@ function RideProfilePage() {
                     </p>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Button onClick={handleLike} variant={liked ? "default" : "outline"} className="gap-1.5">
                     <Heart className={liked ? "h-4 w-4 fill-current" : "h-4 w-4"} /> {likeCount}
                   </Button>
+                  {isOwner && !(linkedListing && linkedListing.status !== "sold") && (
+                    <Button asChild>
+                      <Link to="/sell" search={{ from_ride: ride.id } as never}>
+                        <Tag className="mr-1 h-4 w-4" /> List this ride for sale
+                      </Link>
+                    </Button>
+                  )}
                   {isOwner && (
                     <Button asChild variant="outline">
                       <Link to="/dashboard/rides/$id/edit" params={{ id: ride.id }}>
