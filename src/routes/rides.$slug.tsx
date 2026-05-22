@@ -72,6 +72,7 @@ function RideProfilePage() {
   const [photos, setPhotos] = useState<any[]>([]);
   const [mods, setMods] = useState<any[]>([]);
   const [logs, setLogs] = useState<any[]>([]);
+  const [logPhotos, setLogPhotos] = useState<Record<string, any[]>>({});
   const [ownership, setOwnership] = useState<any[]>([]);
   const [linkedListing, setLinkedListing] = useState<any>(null);
   const [liked, setLiked] = useState(false);
@@ -93,6 +94,19 @@ function RideProfilePage() {
       supabase.from("profiles").select("id,full_name,business_name,avatar_url,business_logo_url,seller_type,verification_status").eq("id", r.user_id).maybeSingle(),
     ]);
     setPhotos(p ?? []); setMods(m ?? []); setLogs(l ?? []); setOwnership(o ?? []); setOwner(prof);
+    const logIds = (l ?? []).map((x: any) => x.id);
+    if (logIds.length) {
+      const { data: lp } = await (supabase as any)
+        .from("ride_service_log_photos")
+        .select("*")
+        .in("log_id", logIds)
+        .order("sort_order");
+      const grouped: Record<string, any[]> = {};
+      for (const ph of lp ?? []) (grouped[ph.log_id] ||= []).push(ph);
+      setLogPhotos(grouped);
+    } else {
+      setLogPhotos({});
+    }
     if (r.linked_listing_id) {
       const { data: ll } = await supabase.from("listings").select("id,title,price_php,status").eq("id", r.linked_listing_id).maybeSingle();
       setLinkedListing(ll);
@@ -284,7 +298,21 @@ function RideProfilePage() {
                         {s.cost_php != null && formatPHP(s.cost_php)}
                       </div>
                       {s.notes && <p className="mt-2 text-sm">{s.notes}</p>}
-                      {s.photo_url && <img src={s.photo_url} alt="" className="mt-2 max-h-48 rounded" />}
+                      {(() => {
+                        const gallery = logPhotos[s.id] ?? [];
+                        const legacy = s.photo_url ? [{ id: `legacy-${s.id}`, url: s.photo_url }] : [];
+                        const all = [...gallery, ...legacy];
+                        if (!all.length) return null;
+                        return (
+                          <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
+                            {all.map((ph: any) => (
+                              <a key={ph.id} href={ph.url} target="_blank" rel="noreferrer" className="block overflow-hidden rounded-md border border-border bg-muted">
+                                <img src={ph.url} alt="" className="aspect-square h-full w-full object-cover" loading="lazy" />
+                              </a>
+                            ))}
+                          </div>
+                        );
+                      })()}
                     </div>
                   </li>
                 ))}

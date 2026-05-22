@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { RidePhotoUploader } from "@/components/rides/ride-photo-uploader";
+import { ServiceLogPhotoUploader } from "@/components/rides/service-log-photo-uploader";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { linkRideToListing, publishRide } from "@/lib/rides.functions";
@@ -30,6 +31,7 @@ function EditRidePage() {
   const [photos, setPhotos] = useState<any[]>([]);
   const [mods, setMods] = useState<any[]>([]);
   const [logs, setLogs] = useState<any[]>([]);
+  const [logPhotos, setLogPhotos] = useState<Record<string, any[]>>({});
   const [owners, setOwners] = useState<any[]>([]);
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,6 +50,21 @@ function EditRidePage() {
       supabase.from("listings").select("id,title,status").eq("user_id", user.id).in("status", ["draft","active","pending_sale"]),
     ]);
     setPhotos(p ?? []); setMods(m ?? []); setLogs(l ?? []); setOwners(o ?? []); setListings(ls ?? []);
+    const logIds = (l ?? []).map((x: any) => x.id);
+    if (logIds.length) {
+      const { data: lp } = await (supabase as any)
+        .from("ride_service_log_photos")
+        .select("*")
+        .in("log_id", logIds)
+        .order("sort_order");
+      const grouped: Record<string, any[]> = {};
+      for (const ph of lp ?? []) {
+        (grouped[ph.log_id] ||= []).push(ph);
+      }
+      setLogPhotos(grouped);
+    } else {
+      setLogPhotos({});
+    }
     setLoading(false);
   };
 
@@ -87,7 +104,7 @@ function EditRidePage() {
   };
   const saveLog = async (s: any) => {
     const { error } = await (supabase as any).from("ride_service_log").update({
-      service_date: s.service_date, service_type: s.service_type, mileage_km: s.mileage_km, cost_php: s.cost_php, notes: s.notes, photo_url: s.photo_url,
+      service_date: s.service_date, service_type: s.service_type, mileage_km: s.mileage_km, cost_php: s.cost_php, notes: s.notes,
     }).eq("id", s.id);
     if (error) toast.error(error.message);
   };
@@ -205,6 +222,15 @@ function EditRidePage() {
               <Input type="number" placeholder="Cost ₱" value={s.cost_php ?? ""} onChange={(e) => setLogs(logs.map((x, j) => j === i ? { ...x, cost_php: e.target.value ? Number(e.target.value) : null } : x))} onBlur={() => saveLog(s)} />
               <Button variant="ghost" size="icon" onClick={() => delLog(s.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
               <Textarea placeholder="Notes" rows={2} value={s.notes ?? ""} onChange={(e) => setLogs(logs.map((x, j) => j === i ? { ...x, notes: e.target.value } : x))} onBlur={() => saveLog(s)} className="sm:col-span-6" />
+              <div className="sm:col-span-6">
+                <ServiceLogPhotoUploader
+                  logId={s.id}
+                  rideId={id}
+                  userId={user!.id}
+                  photos={logPhotos[s.id] ?? []}
+                  onChange={load}
+                />
+              </div>
             </div>
           ))}
         </TabsContent>

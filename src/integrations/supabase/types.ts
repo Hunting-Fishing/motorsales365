@@ -2036,6 +2036,41 @@ export type Database = {
           },
         ]
       }
+      ride_service_log_photos: {
+        Row: {
+          created_at: string
+          id: string
+          log_id: string
+          sort_order: number
+          storage_path: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          log_id: string
+          sort_order?: number
+          storage_path?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          log_id?: string
+          sort_order?: number
+          storage_path?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ride_service_log_photos_log_id_fkey"
+            columns: ["log_id"]
+            isOneToOne: false
+            referencedRelation: "ride_service_log"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       rides: {
         Row: {
           city: string | null
