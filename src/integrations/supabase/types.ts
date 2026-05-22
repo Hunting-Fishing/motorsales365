@@ -50,6 +50,41 @@ export type Database = {
         }
         Relationships: []
       }
+      ad_events: {
+        Row: {
+          ad_id: string
+          created_at: string
+          event_type: string
+          id: string
+          user_id: string | null
+          visitor_id: string | null
+        }
+        Insert: {
+          ad_id: string
+          created_at?: string
+          event_type: string
+          id?: string
+          user_id?: string | null
+          visitor_id?: string | null
+        }
+        Update: {
+          ad_id?: string
+          created_at?: string
+          event_type?: string
+          id?: string
+          user_id?: string | null
+          visitor_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_events_ad_id_fkey"
+            columns: ["ad_id"]
+            isOneToOne: false
+            referencedRelation: "advertisements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ad_inquiries: {
         Row: {
           assigned_to: string | null
@@ -219,6 +254,66 @@ export type Database = {
           note?: string | null
           old_value?: string | null
           target_user_id?: string
+        }
+        Relationships: []
+      }
+      advertisements: {
+        Row: {
+          advertiser_email: string | null
+          advertiser_name: string | null
+          caption: string | null
+          clicks_count: number
+          created_at: string
+          created_by: string | null
+          ends_at: string | null
+          id: string
+          image_url: string
+          impressions_count: number
+          placement: Database["public"]["Enums"]["ad_placement"]
+          priority: number
+          starts_at: string | null
+          status: Database["public"]["Enums"]["ad_status"]
+          target_url: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          advertiser_email?: string | null
+          advertiser_name?: string | null
+          caption?: string | null
+          clicks_count?: number
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          id?: string
+          image_url: string
+          impressions_count?: number
+          placement: Database["public"]["Enums"]["ad_placement"]
+          priority?: number
+          starts_at?: string | null
+          status?: Database["public"]["Enums"]["ad_status"]
+          target_url: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          advertiser_email?: string | null
+          advertiser_name?: string | null
+          caption?: string | null
+          clicks_count?: number
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string | null
+          id?: string
+          image_url?: string
+          impressions_count?: number
+          placement?: Database["public"]["Enums"]["ad_placement"]
+          priority?: number
+          starts_at?: string | null
+          status?: Database["public"]["Enums"]["ad_status"]
+          target_url?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -645,6 +740,71 @@ export type Database = {
         }
         Relationships: []
       }
+      export_inquiries: {
+        Row: {
+          assigned_to: string | null
+          budget_usd: number | null
+          buyer_email: string
+          buyer_name: string
+          buyer_phone: string | null
+          country: string
+          created_at: string
+          destination_port: string | null
+          id: string
+          internal_notes: string | null
+          listing_id: string | null
+          message: string
+          status: Database["public"]["Enums"]["export_inquiry_status"]
+          submitter_user_id: string | null
+          updated_at: string
+          vehicle_interest: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          budget_usd?: number | null
+          buyer_email: string
+          buyer_name: string
+          buyer_phone?: string | null
+          country: string
+          created_at?: string
+          destination_port?: string | null
+          id?: string
+          internal_notes?: string | null
+          listing_id?: string | null
+          message: string
+          status?: Database["public"]["Enums"]["export_inquiry_status"]
+          submitter_user_id?: string | null
+          updated_at?: string
+          vehicle_interest?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          budget_usd?: number | null
+          buyer_email?: string
+          buyer_name?: string
+          buyer_phone?: string | null
+          country?: string
+          created_at?: string
+          destination_port?: string | null
+          id?: string
+          internal_notes?: string | null
+          listing_id?: string | null
+          message?: string
+          status?: Database["public"]["Enums"]["export_inquiry_status"]
+          submitter_user_id?: string | null
+          updated_at?: string
+          vehicle_interest?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "export_inquiries_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           created_at: string
@@ -802,6 +962,7 @@ export type Database = {
           created_at: string
           description: string | null
           expires_at: string | null
+          export_available: boolean
           id: string
           lat: number | null
           lng: number | null
@@ -832,6 +993,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           expires_at?: string | null
+          export_available?: boolean
           id?: string
           lat?: number | null
           lng?: number | null
@@ -862,6 +1024,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           expires_at?: string | null
+          export_available?: boolean
           id?: string
           lat?: number | null
           lng?: number | null
@@ -2598,6 +2761,11 @@ export type Database = {
         | "newsletter"
         | "sponsored_post"
         | "other"
+        | "home_carousel"
+        | "browse_top"
+        | "rides_top"
+        | "export_top"
+      ad_status: "draft" | "scheduled" | "active" | "paused" | "ended"
       app_role:
         | "admin"
         | "user"
@@ -2618,6 +2786,7 @@ export type Database = {
         | "salvage"
         | "rental"
       business_status: "pending" | "active" | "rejected" | "hidden"
+      export_inquiry_status: "new" | "qualified" | "quoted" | "won" | "lost"
       listing_plan: "free" | "standard" | "upgraded"
       listing_status:
         | "draft"
@@ -2799,7 +2968,12 @@ export const Constants = {
         "newsletter",
         "sponsored_post",
         "other",
+        "home_carousel",
+        "browse_top",
+        "rides_top",
+        "export_top",
       ],
+      ad_status: ["draft", "scheduled", "active", "paused", "ended"],
       app_role: [
         "admin",
         "user",
@@ -2822,6 +2996,7 @@ export const Constants = {
         "rental",
       ],
       business_status: ["pending", "active", "rejected", "hidden"],
+      export_inquiry_status: ["new", "qualified", "quoted", "won", "lost"],
       listing_plan: ["free", "standard", "upgraded"],
       listing_status: [
         "draft",
