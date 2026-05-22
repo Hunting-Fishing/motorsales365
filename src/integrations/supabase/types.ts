@@ -2231,6 +2231,50 @@ export type Database = {
           },
         ]
       }
+      shop_product_fitment: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          make: string | null
+          model: string | null
+          notes: string | null
+          product_id: string
+          year_end: number | null
+          year_start: number | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          make?: string | null
+          model?: string | null
+          notes?: string | null
+          product_id: string
+          year_end?: number | null
+          year_start?: number | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          make?: string | null
+          model?: string | null
+          notes?: string | null
+          product_id?: string
+          year_end?: number | null
+          year_start?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_product_fitment_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "shop_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_product_links: {
         Row: {
           created_at: string
@@ -2294,6 +2338,7 @@ export type Database = {
           slug: string
           tags: string[]
           title: string
+          universal_fit: boolean
           updated_at: string
           view_count: number
         }
@@ -2314,6 +2359,7 @@ export type Database = {
           slug: string
           tags?: string[]
           title: string
+          universal_fit?: boolean
           updated_at?: string
           view_count?: number
         }
@@ -2334,6 +2380,7 @@ export type Database = {
           slug?: string
           tags?: string[]
           title?: string
+          universal_fit?: boolean
           updated_at?: string
           view_count?: number
         }

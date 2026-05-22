@@ -1,18 +1,31 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { z } from "zod";
 import { SiteLayout } from "@/components/site-layout";
 import { AdCarousel } from "@/components/ads/ad-carousel";
 import { listShopCategories, listShopProducts } from "@/lib/shop.functions";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { VehicleFitmentPicker } from "@/components/shop/vehicle-fitment-picker";
+import { useGarage, formatVehicle } from "@/lib/garage";
+import { X } from "lucide-react";
+
+const shopSearch = z.object({
+  make: fallback(z.string().optional(), undefined),
+  model: fallback(z.string().optional(), undefined),
+  year: fallback(z.number().optional(), undefined),
+});
 
 export const Route = createFileRoute("/shop/")({
   component: ShopIndex,
+  validateSearch: zodValidator(shopSearch),
   head: () => ({
     meta: [
       { title: "Shop — Car detailing, tools & parts | 365 MotorSales" },
-      { name: "description", content: "Curated car detailing products, mechanic tools, parts and accessories from Shopee, Lazada and AliExpress." },
+      { name: "description", content: "Curated car detailing products, mechanic tools, parts and accessories. Search by your vehicle's make and model to find parts that fit." },
       { property: "og:title", content: "365 MotorSales Shop" },
       { property: "og:description", content: "Detailing, tools, parts and accessories — best prices from top PH marketplaces." },
     ],
@@ -21,23 +34,62 @@ export const Route = createFileRoute("/shop/")({
 });
 
 function ShopIndex() {
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: "/shop" });
+  const [garage, setGarageState] = useGarage();
+
+  // Sync URL <-> garage
+  const activeVehicle = search.make && search.model
+    ? { category: "car" as const, make: search.make, model: search.model, year: search.year }
+    : garage;
+
   const { data: catData } = useQuery({ queryKey: ["shop-cats"], queryFn: () => listShopCategories() });
-  const { data: featData } = useQuery({ queryKey: ["shop-featured"], queryFn: () => listShopProducts({ data: { featured: true, limit: 12 } }) });
-  const { data: latestData } = useQuery({ queryKey: ["shop-latest"], queryFn: () => listShopProducts({ data: { limit: 24 } }) });
+  const filterArgs = activeVehicle ? { make: activeVehicle.make, model: activeVehicle.model, year: activeVehicle.year } : {};
+  const { data: featData } = useQuery({
+    queryKey: ["shop-featured", filterArgs],
+    queryFn: () => listShopProducts({ data: { featured: true, limit: 12, ...filterArgs } }),
+  });
+  const { data: latestData } = useQuery({
+    queryKey: ["shop-latest", filterArgs],
+    queryFn: () => listShopProducts({ data: { limit: 24, ...filterArgs } }),
+  });
 
   const cats = catData?.categories ?? [];
   const featured = featData?.products ?? [];
   const latest = latestData?.products ?? [];
 
+  const onPickVehicle = (v: { category: "car" | "motorcycle"; make: string; model: string; year?: number }) => {
+    setGarageState(v);
+    navigate({ search: { make: v.make, model: v.model, year: v.year } });
+  };
+
+  const clearVehicle = () => {
+    setGarageState(null);
+    navigate({ search: {} });
+  };
+
   return (
     <SiteLayout>
       <section className="border-b bg-gradient-to-b from-primary/10 to-background">
-        <div className="container mx-auto px-4 py-12 md:py-16">
+        <div className="container mx-auto px-4 py-10 md:py-14">
           <Badge className="mb-3">Shop</Badge>
-          <h1 className="font-display text-4xl md:text-5xl tracking-tight">Tools, parts & detailing</h1>
+          <h1 className="font-display text-4xl md:text-5xl tracking-tight">Tools, parts &amp; detailing</h1>
           <p className="mt-3 max-w-2xl text-muted-foreground">
             Curated picks from Shopee, Lazada and AliExpress. Buy direct from the seller — we earn a small commission so the site stays free for you.
           </p>
+
+          <div className="mt-6 rounded-xl border bg-card p-4 shadow-sm">
+            <p className="mb-3 text-sm font-semibold">🔧 Shop by your vehicle</p>
+            <VehicleFitmentPicker initial={activeVehicle} onSubmit={onPickVehicle} />
+            {activeVehicle && (
+              <div className="mt-3 flex items-center gap-2 text-sm">
+                <Badge variant="secondary" className="gap-1">
+                  Showing parts for: <strong>{formatVehicle(activeVehicle)}</strong>
+                </Badge>
+                <Button size="sm" variant="ghost" onClick={clearVehicle}><X className="h-4 w-4" /> Clear</Button>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
@@ -50,6 +102,7 @@ function ShopIndex() {
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
               {cats.map((c) => (
                 <Link key={c.id} to="/shop/$category" params={{ category: c.slug }}
+                  search={activeVehicle ? { make: activeVehicle.make, model: activeVehicle.model, year: activeVehicle.year } : {}}
                   className="group rounded-xl border bg-card p-5 transition hover:border-primary hover:shadow-md">
                   <p className="font-semibold group-hover:text-primary">{c.name}</p>
                   {c.description && <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{c.description}</p>}
@@ -62,15 +115,17 @@ function ShopIndex() {
         {featured.length > 0 && (
           <section>
             <h2 className="mb-4 text-xl font-semibold">Featured</h2>
-            <ProductGrid products={featured} />
+            <ProductGrid products={featured} vehicle={activeVehicle} />
           </section>
         )}
 
         <section>
-          <h2 className="mb-4 text-xl font-semibold">Latest products</h2>
+          <h2 className="mb-4 text-xl font-semibold">{activeVehicle ? "Matching products" : "Latest products"}</h2>
           {latest.length === 0
-            ? <p className="text-muted-foreground">No products yet — check back soon.</p>
-            : <ProductGrid products={latest} />}
+            ? <p className="text-muted-foreground">
+                {activeVehicle ? `No products found for ${formatVehicle(activeVehicle)} yet. Try clearing your vehicle filter.` : "No products yet — check back soon."}
+              </p>
+            : <ProductGrid products={latest} vehicle={activeVehicle} />}
         </section>
 
         <p className="rounded-md border bg-muted/40 p-4 text-xs text-muted-foreground">
@@ -81,7 +136,7 @@ function ShopIndex() {
   );
 }
 
-export function ProductGrid({ products }: { products: any[] }) {
+export function ProductGrid({ products, vehicle }: { products: any[]; vehicle?: { make: string; model: string; year?: number } | null }) {
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
       {products.map((p) => (
@@ -95,7 +150,11 @@ export function ProductGrid({ products }: { products: any[] }) {
             <CardContent className="p-3">
               <p className="line-clamp-2 text-sm font-medium group-hover:text-primary">{p.title}</p>
               {p.brand && <p className="text-xs text-muted-foreground">{p.brand}</p>}
-              {p.price_php && <p className="mt-1 text-sm font-bold">₱{Number(p.price_php).toLocaleString()}</p>}
+              <div className="mt-1 flex items-center justify-between gap-1">
+                {p.price_php ? <p className="text-sm font-bold">₱{Number(p.price_php).toLocaleString()}</p> : <span />}
+                {vehicle && !p.universal_fit && <Badge variant="secondary" className="text-[10px]">Fits {vehicle.model}</Badge>}
+                {p.universal_fit && <Badge variant="outline" className="text-[10px]">Universal</Badge>}
+              </div>
             </CardContent>
           </Card>
         </Link>
