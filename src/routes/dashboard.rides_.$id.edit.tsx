@@ -31,6 +31,7 @@ function EditRidePage() {
   const [photos, setPhotos] = useState<any[]>([]);
   const [mods, setMods] = useState<any[]>([]);
   const [logs, setLogs] = useState<any[]>([]);
+  const [logPhotos, setLogPhotos] = useState<Record<string, any[]>>({});
   const [owners, setOwners] = useState<any[]>([]);
   const [listings, setListings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
