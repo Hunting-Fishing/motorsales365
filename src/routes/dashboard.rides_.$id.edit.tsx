@@ -108,8 +108,6 @@ function EditRidePage() {
     }).eq("id", s.id);
     if (error) toast.error(error.message);
   };
-    if (error) toast.error(error.message);
-  };
   const delLog = async (lid: string) => { await (supabase as any).from("ride_service_log").delete().eq("id", lid); setLogs(logs.filter((x) => x.id !== lid)); };
 
   const addOwner = async () => {
