@@ -98,20 +98,24 @@ function ExportPage() {
           </CardContent></Card>
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {listings.map((l) => (
-              <Link key={l.id} to="/listing/$id" params={{ id: l.id }} className="group block overflow-hidden rounded-lg border bg-card hover:shadow-md transition">
-                <ImageWithSkeleton
-                  src={(l.photos as string[] | null)?.[0] ?? ""}
-                  alt={l.title}
-                  className="aspect-[4/3] w-full object-cover group-hover:scale-[1.02] transition-transform"
-                />
-                <div className="p-3">
-                  <p className="font-medium line-clamp-1">{l.title}</p>
-                  <p className="text-sm text-muted-foreground">{l.year} {l.make} {l.model}</p>
-                  <p className="mt-1 text-sm">{l.region}</p>
-                </div>
-              </Link>
-            ))}
+            {listings.map((l) => {
+              const attrs = (l.attributes ?? {}) as Record<string, any>;
+              const cover = attrs.cover_url || (Array.isArray(attrs.photos) ? attrs.photos[0] : "") || "";
+              return (
+                <Link key={l.id} to="/listing/$id" params={{ id: l.id }} className="group block overflow-hidden rounded-lg border bg-card hover:shadow-md transition">
+                  <ImageWithSkeleton
+                    src={cover}
+                    alt={l.title}
+                    className="aspect-[4/3] w-full object-cover group-hover:scale-[1.02] transition-transform"
+                  />
+                  <div className="p-3">
+                    <p className="font-medium line-clamp-1">{l.title}</p>
+                    <p className="text-sm text-muted-foreground">{[attrs.year, attrs.make, attrs.model].filter(Boolean).join(" ")}</p>
+                    <p className="mt-1 text-sm">{l.region}</p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </section>
