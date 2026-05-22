@@ -50,6 +50,21 @@ function EditRidePage() {
       supabase.from("listings").select("id,title,status").eq("user_id", user.id).in("status", ["draft","active","pending_sale"]),
     ]);
     setPhotos(p ?? []); setMods(m ?? []); setLogs(l ?? []); setOwners(o ?? []); setListings(ls ?? []);
+    const logIds = (l ?? []).map((x: any) => x.id);
+    if (logIds.length) {
+      const { data: lp } = await (supabase as any)
+        .from("ride_service_log_photos")
+        .select("*")
+        .in("log_id", logIds)
+        .order("sort_order");
+      const grouped: Record<string, any[]> = {};
+      for (const ph of lp ?? []) {
+        (grouped[ph.log_id] ||= []).push(ph);
+      }
+      setLogPhotos(grouped);
+    } else {
+      setLogPhotos({});
+    }
     setLoading(false);
   };
 
