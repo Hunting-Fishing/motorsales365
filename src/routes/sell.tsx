@@ -204,6 +204,42 @@ function SellPage() {
     if (user?.id) getUserPlanLimits(user.id).then(setPlanLimits);
   }, [user?.id]);
 
+  // Prefill from a ride profile via ?from_ride=<id>
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const sp = new URLSearchParams(window.location.search);
+    const rideId = sp.get("from_ride");
+    if (!rideId) return;
+    (async () => {
+      const { data: r } = await (supabase as any)
+        .from("rides")
+        .select("name,year,make,model,trim,mileage_km,transmission,description,vehicle_type,region,province,city,barangay")
+        .eq("id", rideId)
+        .maybeSingle();
+      if (!r) return;
+      const typeMap: Record<string, string> = {
+        car: "car", suv: "car", truck: "car", van: "car",
+        motorcycle: "motorcycle", scooter: "motorcycle",
+        boat: "boat", atv: "other", utv: "other", other: "other",
+      };
+      setCategory(typeMap[r.vehicle_type] ?? "car");
+      const vehicle = [r.year, r.make, r.model, r.trim].filter(Boolean).join(" ");
+      setTitle(r.name ? (vehicle ? `${vehicle} — ${r.name}` : r.name) : vehicle);
+      if (r.year) setYear(String(r.year));
+      if (r.make) setMake(r.make);
+      if (r.model) setModel(r.model);
+      if (r.mileage_km != null) setMileage(String(r.mileage_km));
+      if (r.transmission) setTransmission(r.transmission);
+      if (r.description) setDescription(r.description);
+      if (r.region) setRegion(r.region);
+      if (r.province) setProvince(r.province);
+      if (r.city) setCity(r.city);
+      if (r.barangay) setBarangay(r.barangay);
+      toast.success("Prefilled from your ride profile");
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const sellSeo = SELL_SEO[category] ?? SELL_SEO.other;
   const sellCategoryLabel = CATEGORIES.find((c) => c.slug === category)?.name ?? "Vehicle";
   useDynamicMeta({
