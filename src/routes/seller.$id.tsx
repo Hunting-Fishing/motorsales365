@@ -60,12 +60,13 @@ function SellerProfilePage() {
   const { id } = Route.useParams();
   const [profile, setProfile] = useState<any>(null);
   const [listings, setListings] = useState<ListingCardData[]>([]);
+  const [rides, setRides] = useState<RideCardData[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
-      const [{ data: p }, { data: ls }] = await Promise.all([
+      const [{ data: p }, { data: ls }, { data: rs }] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", id).maybeSingle(),
         supabase
           .from("listings")
@@ -75,9 +76,16 @@ function SellerProfilePage() {
           .eq("user_id", id)
           .in("status", ["active","pending_sale"])
           .order("created_at", { ascending: false }),
+        (supabase as any)
+          .from("rides")
+          .select("id,slug,name,year,make,model,cover_photo_url,like_count,is_for_sale,city,vehicle_type")
+          .eq("user_id", id)
+          .eq("status", "published")
+          .order("published_at", { ascending: false }),
       ]);
       setProfile(p);
       const verified = p?.verification_status === "verified";
+      const ownerName = p?.business_name || p?.full_name || null;
       setListings(
         (ls ?? []).map((l: any) => {
           const photos = (l.listing_media ?? []).filter((m: any) => m.type === "photo");
@@ -98,6 +106,7 @@ function SellerProfilePage() {
           };
         }),
       );
+      setRides(((rs ?? []) as any[]).map((r) => ({ ...r, owner_name: ownerName })));
       setLoading(false);
     };
     load();
