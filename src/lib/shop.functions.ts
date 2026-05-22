@@ -245,3 +245,52 @@ export const adminProductLinks = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return { links: rows ?? [] };
   });
+
+// ============ FITMENT ============
+
+const fitmentSchema = z.object({
+  id: z.string().uuid().optional(),
+  product_id: z.string().uuid(),
+  category: z.enum(["car", "motorcycle"]).default("car"),
+  make: z.string().max(80).optional().nullable(),
+  model: z.string().max(120).optional().nullable(),
+  year_start: z.number().int().min(1900).max(2100).optional().nullable(),
+  year_end: z.number().int().min(1900).max(2100).optional().nullable(),
+  notes: z.string().max(500).optional().nullable(),
+});
+
+export const adminListFitment = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { productId: string }) => z.object({ productId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase
+      .from("shop_product_fitment")
+      .select("*")
+      .eq("product_id", data.productId)
+      .order("make", { ascending: true });
+    if (error) throw new Error(error.message);
+    return { fitment: rows ?? [] };
+  });
+
+export const adminUpsertFitment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => fitmentSchema.parse(input))
+  .handler(async ({ data, context }) => {
+    if (data.id) {
+      const { error } = await context.supabase.from("shop_product_fitment").update(data).eq("id", data.id);
+      if (error) throw new Error(error.message);
+      return { id: data.id };
+    }
+    const { data: row, error } = await context.supabase.from("shop_product_fitment").insert(data).select("id").single();
+    if (error) throw new Error(error.message);
+    return { id: row.id };
+  });
+
+export const adminDeleteFitment = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase.from("shop_product_fitment").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
