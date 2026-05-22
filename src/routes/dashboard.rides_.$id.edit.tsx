@@ -222,6 +222,15 @@ function EditRidePage() {
               <Input type="number" placeholder="Cost ₱" value={s.cost_php ?? ""} onChange={(e) => setLogs(logs.map((x, j) => j === i ? { ...x, cost_php: e.target.value ? Number(e.target.value) : null } : x))} onBlur={() => saveLog(s)} />
               <Button variant="ghost" size="icon" onClick={() => delLog(s.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
               <Textarea placeholder="Notes" rows={2} value={s.notes ?? ""} onChange={(e) => setLogs(logs.map((x, j) => j === i ? { ...x, notes: e.target.value } : x))} onBlur={() => saveLog(s)} className="sm:col-span-6" />
+              <div className="sm:col-span-6">
+                <ServiceLogPhotoUploader
+                  logId={s.id}
+                  rideId={id}
+                  userId={user!.id}
+                  photos={logPhotos[s.id] ?? []}
+                  onChange={load}
+                />
+              </div>
             </div>
           ))}
         </TabsContent>
