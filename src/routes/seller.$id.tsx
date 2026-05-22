@@ -172,6 +172,7 @@ function SellerProfilePage() {
               )}
               <div className="mt-2 text-sm text-muted-foreground">
                 {listings.length} active {listings.length === 1 ? "listing" : "listings"}
+                {rides.length > 0 && <> · {rides.length} {rides.length === 1 ? "ride" : "rides"}</>}
               </div>
             </div>
           </div>
@@ -179,18 +180,38 @@ function SellerProfilePage() {
       </div>
 
       <div className="container mx-auto px-4 py-8">
-        <h2 className="mb-4 font-display text-xl font-semibold">Listings from this seller</h2>
-        {listings.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
-            No active listings.
-          </div>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {listings.map((l) => (
-              <ListingCard key={l.id} listing={l} />
-            ))}
-          </div>
-        )}
+        <Tabs defaultValue="listings">
+          <TabsList>
+            <TabsTrigger value="listings">Listings ({listings.length})</TabsTrigger>
+            <TabsTrigger value="rides">Rides ({rides.length})</TabsTrigger>
+          </TabsList>
+          <TabsContent value="listings" className="mt-6">
+            {listings.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
+                No active listings.
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {listings.map((l) => (
+                  <ListingCard key={l.id} listing={l} />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+          <TabsContent value="rides" className="mt-6">
+            {rides.length === 0 ? (
+              <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
+                No published rides yet.
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {rides.map((r) => (
+                  <RideCard key={r.id} ride={r} />
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </SiteLayout>
   );
