@@ -21,6 +21,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { Pencil, Trash2, Plus, Link as LinkIcon, ExternalLink } from "lucide-react";
+import { AD_NETWORKS, AFFILIATE_PROGRAMS, type DirectoryEntry } from "@/lib/monetization-directory";
 
 export const Route = createFileRoute("/admin/shop")({
   component: AdminShop,
@@ -37,10 +38,79 @@ function AdminShop() {
         <TabsList>
           <TabsTrigger value="products">Products</TabsTrigger>
           <TabsTrigger value="networks">Networks</TabsTrigger>
+          <TabsTrigger value="directory">Sign-up directory</TabsTrigger>
         </TabsList>
         <TabsContent value="products" className="mt-4"><ProductsTab /></TabsContent>
         <TabsContent value="networks" className="mt-4"><NetworksTab /></TabsContent>
+        <TabsContent value="directory" className="mt-4"><DirectoryTab /></TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+function DirectoryTab() {
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Advertisement networks — earn from ads on our pages</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Sign up as a publisher. Once approved, drop their script into the site and earn passive CPM/CPC revenue from impressions and clicks — no user payments required.
+          </p>
+        </CardHeader>
+        <CardContent><DirectoryTable entries={AD_NETWORKS} /></CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Affiliate programs — earn commission on outbound clicks</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Sign up, get your tracking ID, then add it under <strong>Networks</strong> as <code>tag_value</code>. The shop redirector (<code>/go/$productId</code>) automatically appends it to outbound URLs.
+          </p>
+        </CardHeader>
+        <CardContent><DirectoryTable entries={AFFILIATE_PROGRAMS} /></CardContent>
+      </Card>
+    </div>
+  );
+}
+
+function DirectoryTable({ entries }: { entries: DirectoryEntry[] }) {
+  const diffColor = (d: string) =>
+    d === "easy" ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+      : d === "medium" ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+      : "bg-rose-500/15 text-rose-700 dark:text-rose-400";
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead className="border-b text-left text-xs uppercase text-muted-foreground">
+          <tr>
+            <th className="p-2">Program</th>
+            <th className="p-2">Category</th>
+            <th className="p-2">Region</th>
+            <th className="p-2">Payout</th>
+            <th className="p-2">Approval</th>
+            <th className="p-2">Notes</th>
+            <th className="p-2"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {entries.map((e) => (
+            <tr key={e.name} className="border-b align-top">
+              <td className="p-2 font-medium">{e.name}</td>
+              <td className="p-2 text-muted-foreground">{e.category}</td>
+              <td className="p-2 text-muted-foreground">{e.region}</td>
+              <td className="p-2">{e.payout}</td>
+              <td className="p-2"><span className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${diffColor(e.difficulty)}`}>{e.difficulty}</span></td>
+              <td className="p-2 text-xs text-muted-foreground max-w-md">{e.notes}</td>
+              <td className="p-2">
+                <a href={e.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline whitespace-nowrap">
+                  Sign up <ExternalLink className="h-3 w-3" />
+                </a>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 }
