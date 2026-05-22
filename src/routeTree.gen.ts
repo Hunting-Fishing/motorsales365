@@ -65,6 +65,7 @@ import { Route as ApiRobotsDottxtRouteImport } from './routes/api/robots[.]txt'
 import { Route as AdminVerificationsRouteImport } from './routes/admin.verifications'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTypeSuggestionsRouteImport } from './routes/admin.type-suggestions'
+import { Route as AdminShopRouteImport } from './routes/admin.shop'
 import { Route as AdminSandboxRouteImport } from './routes/admin.sandbox'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminReferralsRouteImport } from './routes/admin.referrals'
@@ -376,6 +377,11 @@ const AdminTypeSuggestionsRoute = AdminTypeSuggestionsRouteImport.update({
   path: '/type-suggestions',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminShopRoute = AdminShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSandboxRoute = AdminSandboxRouteImport.update({
   id: '/sandbox',
   path: '/sandbox',
@@ -568,6 +574,7 @@ export interface FileRoutesByFullPath {
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
+  '/admin/shop': typeof AdminShopRoute
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
@@ -654,6 +661,7 @@ export interface FileRoutesByTo {
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
+  '/admin/shop': typeof AdminShopRoute
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
@@ -743,6 +751,7 @@ export interface FileRoutesById {
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
+  '/admin/shop': typeof AdminShopRoute
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
@@ -833,6 +842,7 @@ export interface FileRouteTypes {
     | '/admin/referrals'
     | '/admin/reports'
     | '/admin/sandbox'
+    | '/admin/shop'
     | '/admin/type-suggestions'
     | '/admin/users'
     | '/admin/verifications'
@@ -919,6 +929,7 @@ export interface FileRouteTypes {
     | '/admin/referrals'
     | '/admin/reports'
     | '/admin/sandbox'
+    | '/admin/shop'
     | '/admin/type-suggestions'
     | '/admin/users'
     | '/admin/verifications'
@@ -1007,6 +1018,7 @@ export interface FileRouteTypes {
     | '/admin/referrals'
     | '/admin/reports'
     | '/admin/sandbox'
+    | '/admin/shop'
     | '/admin/type-suggestions'
     | '/admin/users'
     | '/admin/verifications'
@@ -1506,6 +1518,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTypeSuggestionsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/shop': {
+      id: '/admin/shop'
+      path: '/shop'
+      fullPath: '/admin/shop'
+      preLoaderRoute: typeof AdminShopRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/sandbox': {
       id: '/admin/sandbox'
       path: '/sandbox'
@@ -1733,6 +1752,7 @@ interface AdminRouteChildren {
   AdminReferralsRoute: typeof AdminReferralsRoute
   AdminReportsRoute: typeof AdminReportsRoute
   AdminSandboxRoute: typeof AdminSandboxRoute
+  AdminShopRoute: typeof AdminShopRoute
   AdminTypeSuggestionsRoute: typeof AdminTypeSuggestionsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVerificationsRoute: typeof AdminVerificationsRoute
@@ -1754,6 +1774,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminReferralsRoute: AdminReferralsRoute,
   AdminReportsRoute: AdminReportsRoute,
   AdminSandboxRoute: AdminSandboxRoute,
+  AdminShopRoute: AdminShopRoute,
   AdminTypeSuggestionsRoute: AdminTypeSuggestionsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminVerificationsRoute: AdminVerificationsRoute,
