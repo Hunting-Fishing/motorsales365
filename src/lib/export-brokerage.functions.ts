@@ -37,13 +37,13 @@ export const listExportListings = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     let q = supabaseAdmin
       .from("listings")
-      .select("id, title, year, make, model, trim, price_php, region, city, photos, slug, view_count")
+      .select("id, title, price_php, region, city, attributes, view_count")
       .eq("export_available", true)
       .eq("status", "active")
       .order("created_at", { ascending: false })
       .limit(data.limit ?? 24);
     if (data.search) {
-      q = q.or(`title.ilike.%${data.search}%,make.ilike.%${data.search}%,model.ilike.%${data.search}%`);
+      q = q.ilike("title", `%${data.search}%`);
     }
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
