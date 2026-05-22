@@ -41,6 +41,7 @@ function ProductPage() {
   }
   const p = data.product as any;
   const links = data.links as any[];
+  const fitment = (data.fitment ?? []) as any[];
 
   return (
     <SiteLayout>
@@ -87,6 +88,33 @@ function ProductPage() {
             </p>
           </div>
         </div>
+
+        {(p.universal_fit || fitment.length > 0) && (
+          <div className="mt-10 rounded-xl border bg-card p-5">
+            <h2 className="mb-3 text-lg font-semibold">Fitment</h2>
+            {p.universal_fit ? (
+              <p className="text-sm text-muted-foreground">✅ Universal fit — works with any vehicle.</p>
+            ) : (
+              <ul className="grid gap-2 text-sm sm:grid-cols-2">
+                {fitment.map((f) => {
+                  const yr = f.year_start || f.year_end
+                    ? ` (${f.year_start ?? "…"}–${f.year_end ?? "present"})`
+                    : "";
+                  const label = [f.make ?? "Any make", f.model ?? "Any model"].join(" ") + yr;
+                  return (
+                    <li key={f.id} className="flex items-start gap-2">
+                      <span>•</span>
+                      <span>
+                        <strong>{label}</strong>
+                        {f.notes && <span className="block text-xs text-muted-foreground">{f.notes}</span>}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        )}
 
         <div className="mt-12">
           <AdCarousel placement="shop_sidebar" />
