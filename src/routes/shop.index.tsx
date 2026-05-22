@@ -7,7 +7,7 @@ import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-export const Route = createFileRoute("/shop")({
+export const Route = createFileRoute("/shop/")({
   component: ShopIndex,
   head: () => ({
     meta: [
