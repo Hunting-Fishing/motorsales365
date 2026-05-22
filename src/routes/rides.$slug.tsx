@@ -94,6 +94,19 @@ function RideProfilePage() {
       supabase.from("profiles").select("id,full_name,business_name,avatar_url,business_logo_url,seller_type,verification_status").eq("id", r.user_id).maybeSingle(),
     ]);
     setPhotos(p ?? []); setMods(m ?? []); setLogs(l ?? []); setOwnership(o ?? []); setOwner(prof);
+    const logIds = (l ?? []).map((x: any) => x.id);
+    if (logIds.length) {
+      const { data: lp } = await (supabase as any)
+        .from("ride_service_log_photos")
+        .select("*")
+        .in("log_id", logIds)
+        .order("sort_order");
+      const grouped: Record<string, any[]> = {};
+      for (const ph of lp ?? []) (grouped[ph.log_id] ||= []).push(ph);
+      setLogPhotos(grouped);
+    } else {
+      setLogPhotos({});
+    }
     if (r.linked_listing_id) {
       const { data: ll } = await supabase.from("listings").select("id,title,price_php,status").eq("id", r.linked_listing_id).maybeSingle();
       setLinkedListing(ll);
