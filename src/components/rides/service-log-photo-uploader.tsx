@@ -12,7 +12,7 @@ export type ServiceLogPhoto = {
   sort_order: number;
 };
 
-const MAX_PHOTOS = 100;
+const MAX_PHOTOS = 20;
 
 export function ServiceLogPhotoUploader({
   logId,
