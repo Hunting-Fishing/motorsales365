@@ -6,6 +6,8 @@ import { SiteLayout } from "@/components/site-layout";
 import { Badge } from "@/components/ui/badge";
 import { VerifiedBadge } from "@/components/verified-badge";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
+import { RideCard, type RideCardData } from "@/components/rides/ride-card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/seller/$id")({
