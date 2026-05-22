@@ -108,15 +108,18 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  const [queryClient] = useState(() => new QueryClient());
   return (
-    <AuthProvider>
-      <FeatureFlagProvider>
-        <CurrencyProvider>
-          <SandboxBanner />
-          <Outlet />
-          <Toaster richColors position="top-right" />
-        </CurrencyProvider>
-      </FeatureFlagProvider>
-    </AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <FeatureFlagProvider>
+          <CurrencyProvider>
+            <SandboxBanner />
+            <Outlet />
+            <Toaster richColors position="top-right" />
+          </CurrencyProvider>
+        </FeatureFlagProvider>
+      </AuthProvider>
+    </QueryClientProvider>
   );
 }
