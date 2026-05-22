@@ -72,6 +72,7 @@ function RideProfilePage() {
   const [photos, setPhotos] = useState<any[]>([]);
   const [mods, setMods] = useState<any[]>([]);
   const [logs, setLogs] = useState<any[]>([]);
+  const [logPhotos, setLogPhotos] = useState<Record<string, any[]>>({});
   const [ownership, setOwnership] = useState<any[]>([]);
   const [linkedListing, setLinkedListing] = useState<any>(null);
   const [liked, setLiked] = useState(false);
