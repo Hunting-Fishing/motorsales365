@@ -55,21 +55,39 @@ function DirectoryTab() {
         <CardHeader>
           <CardTitle>Advertisement networks — earn from ads on our pages</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Sign up as a publisher. Once approved, drop their script into the site and earn passive CPM/CPC revenue from impressions and clicks — no user payments required.
+            Sign up as a publisher. Once approved, drop their script into the site and earn passive CPM/CPC revenue from impressions and clicks — no user payments required. Grouped by primary market, Philippines first.
           </p>
         </CardHeader>
-        <CardContent><DirectoryTable entries={AD_NETWORKS} /></CardContent>
+        <CardContent><GroupedDirectory entries={AD_NETWORKS} /></CardContent>
       </Card>
 
       <Card>
         <CardHeader>
           <CardTitle>Affiliate programs — earn commission on outbound clicks</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Sign up, get your tracking ID, then add it under <strong>Networks</strong> as <code>tag_value</code>. The shop redirector (<code>/go/$productId</code>) automatically appends it to outbound URLs.
+            Sign up, get your tracking ID, then add it under <strong>Networks</strong> as <code>tag_value</code>. The shop redirector (<code>/go/$productId</code>) automatically appends it to outbound URLs. Grouped by primary market for our PH-first → international rollout.
           </p>
         </CardHeader>
-        <CardContent><DirectoryTable entries={AFFILIATE_PROGRAMS} /></CardContent>
+        <CardContent><GroupedDirectory entries={AFFILIATE_PROGRAMS} /></CardContent>
       </Card>
+    </div>
+  );
+}
+
+function GroupedDirectory({ entries }: { entries: DirectoryEntry[] }) {
+  const grouped = COUNTRY_ORDER
+    .map((country) => ({ country, items: entries.filter((e) => e.country === country) }))
+    .filter((g) => g.items.length > 0);
+  return (
+    <div className="space-y-8">
+      {grouped.map((g) => (
+        <div key={g.country}>
+          <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            {g.country} <span className="text-xs font-normal">({g.items.length})</span>
+          </h3>
+          <DirectoryTable entries={g.items} />
+        </div>
+      ))}
     </div>
   );
 }
@@ -86,7 +104,6 @@ function DirectoryTable({ entries }: { entries: DirectoryEntry[] }) {
           <tr>
             <th className="p-2">Program</th>
             <th className="p-2">Category</th>
-            <th className="p-2">Region</th>
             <th className="p-2">Payout</th>
             <th className="p-2">Approval</th>
             <th className="p-2">Notes</th>
@@ -98,7 +115,6 @@ function DirectoryTable({ entries }: { entries: DirectoryEntry[] }) {
             <tr key={e.name} className="border-b align-top">
               <td className="p-2 font-medium">{e.name}</td>
               <td className="p-2 text-muted-foreground">{e.category}</td>
-              <td className="p-2 text-muted-foreground">{e.region}</td>
               <td className="p-2">{e.payout}</td>
               <td className="p-2"><span className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${diffColor(e.difficulty)}`}>{e.difficulty}</span></td>
               <td className="p-2 text-xs text-muted-foreground max-w-md">{e.notes}</td>
@@ -114,6 +130,7 @@ function DirectoryTable({ entries }: { entries: DirectoryEntry[] }) {
     </div>
   );
 }
+
 
 function ProductsTab() {
   const qc = useQueryClient();
