@@ -1,66 +1,117 @@
 // Curated directory of advertisement networks and affiliate programs
-// for the Philippines / SEA / global market. Used in /admin/shop directory tab.
+// organized by country. Philippines first (primary market), then SEA,
+// then global/multi-country networks. Used in /admin/shop directory tab.
 
 export type DirectoryEntry = {
   name: string;
   url: string;
   category: string;
-  region: string;
+  country: string; // primary country/region of use
   payout: string;
   notes: string;
-  difficulty: "easy" | "medium" | "hard"; // approval difficulty
+  difficulty: "easy" | "medium" | "hard";
 };
 
+// Country display order — Philippines first, then expansion markets.
+export const COUNTRY_ORDER = [
+  "Philippines",
+  "Singapore",
+  "Malaysia",
+  "Indonesia",
+  "Thailand",
+  "Vietnam",
+  "Japan",
+  "United States",
+  "United Kingdom",
+  "Global / Multi-country",
+];
+
 export const AD_NETWORKS: DirectoryEntry[] = [
-  { name: "Google AdSense", url: "https://www.google.com/adsense/start/", category: "Display ads", region: "Global", payout: "CPC / CPM", notes: "Industry standard. Requires original content + decent traffic. Pays via bank/wire.", difficulty: "medium" },
-  { name: "Ezoic", url: "https://www.ezoic.com/", category: "Display ads", region: "Global", payout: "CPM (EPMV)", notes: "AI ad optimization. No traffic minimum (Access Now tier). Higher RPM than AdSense.", difficulty: "easy" },
-  { name: "Mediavine", url: "https://www.mediavine.com/", category: "Display ads (premium)", region: "Global", payout: "CPM", notes: "Premium network. Requires 50k sessions/month. Best RPMs in industry.", difficulty: "hard" },
-  { name: "Raptive (AdThrive)", url: "https://raptive.com/", category: "Display ads (premium)", region: "Global", payout: "CPM", notes: "Premium. Requires 100k pageviews/month. Top-tier earnings.", difficulty: "hard" },
-  { name: "Media.net", url: "https://www.media.net/", category: "Contextual ads", region: "Global", payout: "CPC", notes: "Yahoo/Bing ad network. Good AdSense alternative/complement.", difficulty: "medium" },
-  { name: "Monumetric", url: "https://monumetric.com/", category: "Display ads", region: "Global", payout: "CPM", notes: "Requires 10k pageviews/month. $99 setup fee under 80k views.", difficulty: "medium" },
-  { name: "PropellerAds", url: "https://propellerads.com/", category: "Push / pop / native", region: "Global", payout: "CPM / CPC / CPA", notes: "No traffic minimum. Accepts most sites. Lower quality but easy approval.", difficulty: "easy" },
-  { name: "Adsterra", url: "https://adsterra.com/", category: "Display / popunder / native", region: "Global", payout: "CPM / CPA", notes: "No minimum traffic. 100% fill rate. Pays weekly.", difficulty: "easy" },
-  { name: "Infolinks", url: "https://www.infolinks.com/", category: "In-text ads", region: "Global", payout: "CPC / CPM", notes: "Non-intrusive in-text ads. Works alongside AdSense. No minimum traffic.", difficulty: "easy" },
-  { name: "Outbrain", url: "https://www.outbrain.com/publishers/", category: "Native content recommendations", region: "Global", payout: "CPC", notes: "Premium native ads. Requires steady traffic.", difficulty: "medium" },
-  { name: "Taboola", url: "https://www.taboola.com/publishers", category: "Native content recommendations", region: "Global", payout: "CPC", notes: "Largest native ad network. Min ~500k monthly pageviews.", difficulty: "hard" },
-  { name: "Revcontent", url: "https://www.revcontent.com/", category: "Native ads", region: "Global", payout: "CPC", notes: "Quality native network. Requires 50k+ monthly views.", difficulty: "medium" },
-  { name: "Sovrn (//Commerce)", url: "https://www.sovrn.com/", category: "Display + commerce", region: "Global", payout: "CPM + affiliate", notes: "Auto-affiliates outbound links. Pairs well with AdSense.", difficulty: "easy" },
-  { name: "Setupad", url: "https://setupad.com/", category: "Header bidding", region: "Global", payout: "CPM", notes: "Header bidding wrapper. ~100k pageviews minimum.", difficulty: "medium" },
-  { name: "Snigel", url: "https://snigel.com/", category: "Header bidding", region: "Global", payout: "CPM", notes: "Premium header bidding. 50k pageviews minimum.", difficulty: "medium" },
+  // Philippines — networks that pay PH publishers reliably (PayPal/Payoneer/bank)
+  { name: "Google AdSense (PH)", url: "https://www.google.com/adsense/start/", category: "Display ads", country: "Philippines", payout: "CPC / CPM", notes: "Pays PH publishers via bank transfer (PHP). Most trusted. Needs original content + steady traffic.", difficulty: "medium" },
+  { name: "Ezoic", url: "https://www.ezoic.com/", category: "Display ads (AI optimized)", country: "Philippines", payout: "CPM (EPMV)", notes: "Open to PH publishers. No traffic minimum on Access Now tier. Higher RPM than AdSense.", difficulty: "easy" },
+  { name: "Media.net", url: "https://www.media.net/", category: "Contextual ads", country: "Philippines", payout: "CPC", notes: "Yahoo/Bing-powered. Accepts PH sites. Pays via PayPal/wire.", difficulty: "medium" },
+  { name: "PropellerAds", url: "https://propellerads.com/", category: "Push / pop / native", country: "Philippines", payout: "CPM / CPC / CPA", notes: "Accepts PH publishers, no traffic minimum. Pays via Payoneer, Webmoney, wire.", difficulty: "easy" },
+  { name: "Adsterra", url: "https://adsterra.com/", category: "Display / popunder / native", country: "Philippines", payout: "CPM / CPA", notes: "Open to PH. 100% fill. Weekly payouts via Paxum, Payoneer, USDT, wire.", difficulty: "easy" },
+  { name: "Infolinks", url: "https://www.infolinks.com/", category: "In-text / in-fold ads", country: "Philippines", payout: "CPC / CPM", notes: "Works alongside AdSense. Open to PH. Pays via PayPal/bank.", difficulty: "easy" },
+  { name: "Adcash", url: "https://adcash.com/", category: "Display / popunder", country: "Philippines", payout: "CPM / CPC / CPA", notes: "Estonia-based, accepts PH publishers. Pays via Payoneer, Skrill, wire.", difficulty: "easy" },
+  { name: "RevenueHits", url: "https://www.revenuehits.com/", category: "Performance ads (CPA)", country: "Philippines", payout: "CPA", notes: "No minimum traffic. PH-friendly. Pays via PayPal/wire.", difficulty: "easy" },
+  { name: "Monetag", url: "https://monetag.com/", category: "Multi-format (push/native/pop)", country: "Philippines", payout: "CPM / CPA", notes: "Formerly PropellerAds publisher arm. PH accepted. Weekly payouts.", difficulty: "easy" },
+
+  // Global / Multi-country (premium tiers — require scale)
+  { name: "Mediavine", url: "https://www.mediavine.com/", category: "Display ads (premium)", country: "Global / Multi-country", payout: "CPM", notes: "Premium. Requires 50k sessions/month. Best RPMs in the industry once approved.", difficulty: "hard" },
+  { name: "Raptive (AdThrive)", url: "https://raptive.com/", category: "Display ads (premium)", country: "Global / Multi-country", payout: "CPM", notes: "Premium. Requires 100k pageviews/month. Top-tier earnings.", difficulty: "hard" },
+  { name: "Monumetric", url: "https://monumetric.com/", category: "Display ads", country: "Global / Multi-country", payout: "CPM", notes: "10k pageviews/month minimum. $99 setup fee under 80k views.", difficulty: "medium" },
+  { name: "Taboola", url: "https://www.taboola.com/publishers", category: "Native content recommendations", country: "Global / Multi-country", payout: "CPC", notes: "Largest native ad network. ~500k monthly pageviews minimum.", difficulty: "hard" },
+  { name: "Outbrain", url: "https://www.outbrain.com/publishers/", category: "Native content recommendations", country: "Global / Multi-country", payout: "CPC", notes: "Premium native ads. Requires steady traffic to qualify.", difficulty: "medium" },
+  { name: "Setupad", url: "https://setupad.com/", category: "Header bidding wrapper", country: "Global / Multi-country", payout: "CPM", notes: "Header bidding. ~100k pageviews minimum.", difficulty: "medium" },
+  { name: "Snigel", url: "https://snigel.com/", category: "Header bidding wrapper", country: "Global / Multi-country", payout: "CPM", notes: "Premium header bidding. 50k pageviews minimum.", difficulty: "medium" },
+  { name: "Sovrn //Commerce", url: "https://www.sovrn.com/", category: "Display + commerce links", country: "Global / Multi-country", payout: "CPM + affiliate", notes: "Auto-affiliates outbound links. Pairs well with AdSense.", difficulty: "easy" },
 ];
 
 export const AFFILIATE_PROGRAMS: DirectoryEntry[] = [
-  // PH / SEA marketplaces
-  { name: "Shopee Affiliate Program (PH)", url: "https://affiliate.shopee.ph/", category: "Marketplace", region: "Philippines", payout: "Up to 13% commission", notes: "Top PH marketplace. Wide product range. Easy approval.", difficulty: "easy" },
-  { name: "Lazada Affiliate Program (PH)", url: "https://www.lazada.com.ph/wow/i/ph/affiliate/landing", category: "Marketplace", region: "Philippines", payout: "Up to 10% commission", notes: "Major PH marketplace. Run via Involve Asia or Accesstrade.", difficulty: "easy" },
-  { name: "TikTok Shop Affiliate (PH)", url: "https://affiliate-ph.tiktok.com/", category: "Marketplace / video", region: "Philippines", payout: "5–20% commission", notes: "Fastest growing channel in PH. Video-first affiliate program.", difficulty: "easy" },
-  { name: "AliExpress Portals", url: "https://portals.aliexpress.com/", category: "Marketplace", region: "Global", payout: "Up to 9% commission", notes: "Run by AliExpress directly. Global shipping. Good for car parts/tools.", difficulty: "easy" },
-  { name: "Amazon Associates", url: "https://affiliate-program.amazon.com/", category: "Marketplace", region: "Global", payout: "1–10% commission", notes: "Trusted brand. Auto-approval. Must make 3 sales in 180 days.", difficulty: "easy" },
-  { name: "Zalora Affiliate", url: "https://www.zalora.com.ph/about/affiliate-program/", category: "Fashion", region: "SEA", payout: "Up to 12% commission", notes: "Fashion + accessories. Run via Involve Asia.", difficulty: "easy" },
+  // ===== Philippines =====
+  { name: "Shopee Affiliate Program (PH)", url: "https://affiliate.shopee.ph/", category: "Marketplace", country: "Philippines", payout: "Up to 13% commission", notes: "#1 PH marketplace. Wide product range incl. car care/tools. Easy approval.", difficulty: "easy" },
+  { name: "Lazada Affiliate Program (PH)", url: "https://www.lazada.com.ph/wow/i/ph/affiliate/landing", category: "Marketplace", country: "Philippines", payout: "Up to 10% commission", notes: "Major PH marketplace. Apply direct or via Involve Asia / Accesstrade.", difficulty: "easy" },
+  { name: "TikTok Shop Affiliate (PH)", url: "https://affiliate-ph.tiktok.com/", category: "Marketplace / video", country: "Philippines", payout: "5–20% commission", notes: "Fastest-growing channel in PH. Video-first.", difficulty: "easy" },
+  { name: "Zalora Affiliate (PH)", url: "https://www.zalora.com.ph/about/affiliate-program/", category: "Fashion / lifestyle", country: "Philippines", payout: "Up to 12% commission", notes: "Run via Involve Asia. Apparel + accessories.", difficulty: "easy" },
+  { name: "Accesstrade Philippines", url: "https://accesstrade.com.ph/", category: "Affiliate aggregator", country: "Philippines", payout: "Varies by merchant", notes: "PH-focused aggregator. Lazada, Shopee, GCash, telco, banks, e-wallets.", difficulty: "easy" },
+  { name: "Carousell PH", url: "https://www.carousell.ph/", category: "Marketplace partnerships", country: "Philippines", payout: "Varies", notes: "Used cars + parts marketplace. Partner via business team for cross-promotion.", difficulty: "medium" },
+  { name: "Globe Rewards / GoTyme partner deals", url: "https://www.globe.com.ph/business.html", category: "Telco / fintech", country: "Philippines", payout: "Custom", notes: "Co-marketing and affiliate-style deals via business partnerships.", difficulty: "hard" },
+  { name: "GCash Partner", url: "https://www.gcash.com/about-us/partner-with-gcash/", category: "Fintech / payments", country: "Philippines", payout: "Custom / CPA", notes: "Cash-in, QR, billers. Apply via partnerships team.", difficulty: "medium" },
+  { name: "Maya Business Partner", url: "https://www.maya.ph/business", category: "Fintech / payments", country: "Philippines", payout: "Custom / CPA", notes: "Payments + crypto. PH-only.", difficulty: "medium" },
 
-  // Affiliate aggregators (PH-friendly)
-  { name: "Involve Asia", url: "https://www.involve.asia/", category: "Affiliate network (aggregator)", region: "SEA / PH", payout: "Varies by merchant", notes: "Best PH-focused aggregator. Access to Lazada, Shopee, Zalora, Klook, hundreds more.", difficulty: "easy" },
-  { name: "Accesstrade PH", url: "https://accesstrade.com.ph/", category: "Affiliate network (aggregator)", region: "Philippines / SEA", payout: "Varies", notes: "Strong in PH/VN/TH. Lazada, Shopee, telco, e-wallet offers.", difficulty: "easy" },
-  { name: "Rakuten Advertising", url: "https://rakutenadvertising.com/", category: "Affiliate network", region: "Global", payout: "Varies", notes: "Premium brands. Walmart, Macy's, etc. More selective approval.", difficulty: "medium" },
-  { name: "Awin", url: "https://www.awin.com/", category: "Affiliate network", region: "Global", payout: "Varies", notes: "Huge European/UK presence + global brands. $5 signup deposit (refunded).", difficulty: "medium" },
-  { name: "CJ Affiliate (Commission Junction)", url: "https://www.cj.com/", category: "Affiliate network", region: "Global", payout: "Varies", notes: "Major US network. GoDaddy, Lowe's, Office Depot, etc.", difficulty: "medium" },
-  { name: "Impact", url: "https://impact.com/", category: "Affiliate network", region: "Global", payout: "Varies", notes: "Modern partnership platform. Uber, Airbnb, Walmart, Adidas.", difficulty: "medium" },
-  { name: "ShareASale", url: "https://www.shareasale.com/", category: "Affiliate network", region: "Global", payout: "Varies", notes: "10k+ merchants. Strong in lifestyle/DIY/tools niches.", difficulty: "easy" },
-  { name: "FlexOffers", url: "https://www.flexoffers.com/", category: "Affiliate network", region: "Global", payout: "Varies", notes: "12k+ advertisers. Aggregates other networks.", difficulty: "easy" },
-  { name: "PartnerStack", url: "https://partnerstack.com/", category: "SaaS affiliate", region: "Global", payout: "Recurring commission", notes: "B2B SaaS focus. Recurring monthly commissions.", difficulty: "easy" },
-  { name: "ClickBank", url: "https://www.clickbank.com/", category: "Digital products", region: "Global", payout: "Up to 75% commission", notes: "Digital products & courses. High commissions but quality varies.", difficulty: "easy" },
-  { name: "Indoleads", url: "https://indoleads.com/", category: "Affiliate network", region: "SEA / Global", payout: "Varies", notes: "SEA-focused with global reach. Good for travel/finance offers.", difficulty: "easy" },
+  // ===== Singapore / SEA aggregators usable from PH =====
+  { name: "Involve Asia", url: "https://www.involve.asia/", category: "Affiliate aggregator", country: "Singapore", payout: "Varies by merchant", notes: "Best SEA aggregator for PH publishers. Lazada, Shopee, Zalora, Klook, Agoda, hundreds more.", difficulty: "easy" },
+  { name: "Indoleads", url: "https://indoleads.com/", category: "Affiliate aggregator", country: "Singapore", payout: "Varies", notes: "SEA-focused. Good for travel/finance/crypto offers.", difficulty: "easy" },
+  { name: "Klook Affiliate", url: "https://affiliate.klook.com/", category: "Travel / experiences", country: "Singapore", payout: "Up to 5%", notes: "HQ in HK/SG. Tours, car rentals, airport transfers. Big in PH.", difficulty: "easy" },
+  { name: "Agoda Partners", url: "https://partners.agoda.com/", category: "Travel / hotels", country: "Singapore", payout: "Up to 7%", notes: "Strong in SEA inventory.", difficulty: "easy" },
+  { name: "Shopback Partner", url: "https://www.shopback.com.ph/", category: "Cashback partner", country: "Singapore", payout: "Custom", notes: "SG-HQ, PH-active. Cross-promotion + referral revenue.", difficulty: "medium" },
 
-  // Automotive-specific
-  { name: "AutoZone Affiliate", url: "https://www.autozone.com/landing/page/affiliate-program.html", category: "Automotive parts", region: "US", payout: "3% commission", notes: "Auto parts giant. Via CJ Affiliate.", difficulty: "medium" },
-  { name: "Advance Auto Parts", url: "https://shop.advanceautoparts.com/o/affiliate-program", category: "Automotive parts", region: "US", payout: "3–4% commission", notes: "Via CJ Affiliate.", difficulty: "medium" },
-  { name: "RockAuto", url: "https://www.rockauto.com/", category: "Automotive parts", region: "Global", payout: "Varies", notes: "Massive online parts catalog. Ships internationally.", difficulty: "medium" },
-  { name: "eBay Partner Network", url: "https://partnernetwork.ebay.com/", category: "Marketplace", region: "Global", payout: "1–4% commission", notes: "Huge for used parts, motors, collectibles.", difficulty: "easy" },
-  { name: "CarParts.com Affiliate", url: "https://www.carparts.com/affiliates", category: "Automotive parts", region: "US", payout: "Up to 8%", notes: "Aftermarket parts. Via Impact.", difficulty: "medium" },
+  // ===== Malaysia =====
+  { name: "Shopee Affiliate (MY)", url: "https://affiliate.shopee.com.my/", category: "Marketplace", country: "Malaysia", payout: "Up to 13%", notes: "For MY-targeted content.", difficulty: "easy" },
+  { name: "Lazada Affiliate (MY)", url: "https://www.lazada.com.my/wow/i/my/affiliate/landing", category: "Marketplace", country: "Malaysia", payout: "Up to 10%", notes: "MY market.", difficulty: "easy" },
 
-  // Travel / fuel / insurance (cross-sell to motorists)
-  { name: "Klook Affiliate", url: "https://affiliate.klook.com/", category: "Travel / experiences", region: "SEA / Global", payout: "Up to 5%", notes: "Tours, car rentals, airport transfers. Big in PH.", difficulty: "easy" },
-  { name: "Booking.com Affiliate", url: "https://www.booking.com/affiliate-program/v2/index.html", category: "Travel / hotels", region: "Global", payout: "25–40% of commission", notes: "Hotel bookings — good cross-sell for road-trip content.", difficulty: "easy" },
-  { name: "Agoda Partners", url: "https://partners.agoda.com/", category: "Travel / hotels", region: "Global", payout: "Up to 7%", notes: "Strong in SEA.", difficulty: "easy" },
-  { name: "DiscoverCars Affiliate", url: "https://www.discovercars.com/affiliate-program", category: "Car rental", region: "Global", payout: "Up to 70% of profit", notes: "Highest car-rental affiliate payout.", difficulty: "easy" },
+  // ===== Indonesia =====
+  { name: "Tokopedia Affiliate", url: "https://www.tokopedia.com/", category: "Marketplace", country: "Indonesia", payout: "Varies", notes: "Largest ID marketplace. Apply via Accesstrade ID or Involve Asia.", difficulty: "easy" },
+  { name: "Shopee Affiliate (ID)", url: "https://affiliate.shopee.co.id/", category: "Marketplace", country: "Indonesia", payout: "Up to 13%", notes: "Top ID marketplace.", difficulty: "easy" },
+
+  // ===== Thailand =====
+  { name: "Lazada Affiliate (TH)", url: "https://www.lazada.co.th/wow/i/th/affiliate/landing", category: "Marketplace", country: "Thailand", payout: "Up to 10%", notes: "TH market.", difficulty: "easy" },
+  { name: "Shopee Affiliate (TH)", url: "https://affiliate.shopee.co.th/", category: "Marketplace", country: "Thailand", payout: "Up to 13%", notes: "TH market.", difficulty: "easy" },
+
+  // ===== Vietnam =====
+  { name: "Accesstrade Vietnam", url: "https://accesstrade.vn/", category: "Affiliate aggregator", country: "Vietnam", payout: "Varies", notes: "Largest VN affiliate network. Tiki, Shopee, Lazada, banks.", difficulty: "easy" },
+  { name: "Shopee Affiliate (VN)", url: "https://affiliate.shopee.vn/", category: "Marketplace", country: "Vietnam", payout: "Up to 13%", notes: "VN market.", difficulty: "easy" },
+
+  // ===== Japan (relevant — used-car exporters like BE FORWARD, Nikkyo) =====
+  { name: "BE FORWARD Affiliate", url: "https://www.beforward.jp/affiliate/", category: "Used car export", country: "Japan", payout: "Per-sale commission", notes: "JP used-car exporter to PH and worldwide. Direct affiliate program — ideal partner for our export division.", difficulty: "easy" },
+  { name: "SBT Japan Affiliate", url: "https://www.sbtjapan.com/", category: "Used car export", country: "Japan", payout: "Per-sale commission", notes: "Used car exporter. Contact for affiliate/referral terms.", difficulty: "medium" },
+  { name: "CAR FROM JAPAN", url: "https://carfromjapan.com/", category: "Used car export", country: "Japan", payout: "Per-sale commission", notes: "Exports JP used cars globally incl. PH. Referral program available.", difficulty: "medium" },
+  { name: "Rakuten Advertising Japan", url: "https://rakutenadvertising.com/", category: "Affiliate network", country: "Japan", payout: "Varies", notes: "Premium JP + global brands.", difficulty: "medium" },
+  { name: "A8.net", url: "https://www.a8.net/", category: "Affiliate network", country: "Japan", payout: "Varies", notes: "Largest JP affiliate network. JP language required.", difficulty: "medium" },
+
+  // ===== United States =====
+  { name: "Amazon Associates (US)", url: "https://affiliate-program.amazon.com/", category: "Marketplace", country: "United States", payout: "1–10% commission", notes: "Easy approval. Must make 3 sales in 180 days.", difficulty: "easy" },
+  { name: "eBay Partner Network", url: "https://partnernetwork.ebay.com/", category: "Marketplace", country: "United States", payout: "1–4% commission", notes: "Huge for used parts, motors, collectibles.", difficulty: "easy" },
+  { name: "AutoZone Affiliate", url: "https://www.autozone.com/landing/page/affiliate-program.html", category: "Automotive parts", country: "United States", payout: "3% commission", notes: "Via CJ Affiliate.", difficulty: "medium" },
+  { name: "Advance Auto Parts", url: "https://shop.advanceautoparts.com/o/affiliate-program", category: "Automotive parts", country: "United States", payout: "3–4% commission", notes: "Via CJ Affiliate.", difficulty: "medium" },
+  { name: "CarParts.com", url: "https://www.carparts.com/affiliates", category: "Automotive parts", country: "United States", payout: "Up to 8%", notes: "Aftermarket parts. Via Impact.", difficulty: "medium" },
+  { name: "RockAuto", url: "https://www.rockauto.com/", category: "Automotive parts", country: "United States", payout: "Varies", notes: "Massive parts catalog, ships globally.", difficulty: "medium" },
+  { name: "ClickBank", url: "https://www.clickbank.com/", category: "Digital products", country: "United States", payout: "Up to 75% commission", notes: "High commissions, quality varies.", difficulty: "easy" },
+  { name: "ShareASale (Awin)", url: "https://www.shareasale.com/", category: "Affiliate network", country: "United States", payout: "Varies", notes: "10k+ merchants. Strong in lifestyle/DIY/tools.", difficulty: "easy" },
+  { name: "FlexOffers", url: "https://www.flexoffers.com/", category: "Affiliate aggregator", country: "United States", payout: "Varies", notes: "12k+ advertisers. Aggregates other networks.", difficulty: "easy" },
+
+  // ===== United Kingdom =====
+  { name: "Awin", url: "https://www.awin.com/", category: "Affiliate network", country: "United Kingdom", payout: "Varies", notes: "Huge UK/EU + global brands. $5 refundable deposit.", difficulty: "medium" },
+  { name: "Amazon Associates (UK)", url: "https://affiliate-program.amazon.co.uk/", category: "Marketplace", country: "United Kingdom", payout: "1–10%", notes: "Separate account needed for UK-targeted content.", difficulty: "easy" },
+
+  // ===== Global / Multi-country =====
+  { name: "AliExpress Portals", url: "https://portals.aliexpress.com/", category: "Marketplace", country: "Global / Multi-country", payout: "Up to 9% commission", notes: "Run by AliExpress directly. Global shipping incl. PH. Great for car parts/tools.", difficulty: "easy" },
+  { name: "CJ Affiliate (Commission Junction)", url: "https://www.cj.com/", category: "Affiliate network", country: "Global / Multi-country", payout: "Varies", notes: "Major US-led network with global brands.", difficulty: "medium" },
+  { name: "Impact", url: "https://impact.com/", category: "Affiliate network", country: "Global / Multi-country", payout: "Varies", notes: "Modern partnership platform. Uber, Airbnb, Walmart, Adidas.", difficulty: "medium" },
+  { name: "PartnerStack", url: "https://partnerstack.com/", category: "SaaS affiliate", country: "Global / Multi-country", payout: "Recurring commission", notes: "B2B SaaS. Recurring monthly commissions.", difficulty: "easy" },
+  { name: "Booking.com Affiliate", url: "https://www.booking.com/affiliate-program/v2/index.html", category: "Travel / hotels", country: "Global / Multi-country", payout: "25–40% of commission", notes: "Hotels worldwide. Good cross-sell for road-trip content.", difficulty: "easy" },
+  { name: "DiscoverCars Affiliate", url: "https://www.discovercars.com/affiliate-program", category: "Car rental", country: "Global / Multi-country", payout: "Up to 70% of profit", notes: "Highest car-rental affiliate payout.", difficulty: "easy" },
+  { name: "Tradedoubler", url: "https://www.tradedoubler.com/", category: "Affiliate network", country: "Global / Multi-country", payout: "Varies", notes: "EU-focused global network.", difficulty: "medium" },
 ];
