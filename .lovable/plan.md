@@ -1,89 +1,85 @@
-# Build: Cardomain-style "My Rides" feature
+# Pivot: Free accounts, ad-supported revenue, Export brokerage division
 
-A vehicle profile system where users showcase their cars/bikes/trucks — specs, mods, service history, ownership history, photo gallery — with a public `/rides` hub and tie-in to marketplace listings.
+Shift the business model away from charging users for listings/subscriptions. Revenue moves to (1) ad inventory we sell to brands, (2) optional boosts, and (3) an international export brokerage for verified vehicles (Nikkyo / BeForward style).
 
-## What gets built
+## 1. Pricing changes
 
-### 1. Database (one migration)
+**Personal accounts — permanently free**
+- All listing limits removed (no weekly cap, no photo cap).
+- Hide "upgrade" CTAs from personal dashboards.
 
-New tables (all RLS-enabled, public read for `published`, owner-write):
+**Business accounts — free for 6 months from signup**
+- Auto-grant a complimentary "Business 6-Month" subscription at business signup / verification.
+- Show countdown banner in their dashboard ("Free until {date}").
+- After 6 months: account stays active and can list, but loses business-only perks (priority placement, multi-seat, analytics) until they convert. No hard paywall on basic listings.
 
-- **`rides`** — one row per vehicle
-  - Owner: `user_id`
-  - Identity: `slug`, `name` (nickname like "Project Stancekipo"), `year`, `make`, `model`, `trim`, `color`
-  - Drivetrain: `engine`, `transmission`, `drivetrain`, `mileage_km`, `vehicle_type` (car/truck/motorcycle/etc.)
-  - Story: `description` (long form), `cover_photo_url`
-  - Status: `status` (`draft` / `published` / `archived`), `is_for_sale`, `linked_listing_id` (nullable → `listings.id`)
-  - Social: `view_count`, `like_count`
-  - Standard: `created_at`, `updated_at`, `published_at`
-- **`ride_photos`** — gallery (url, caption, sort_order, ride_id)
-- **`ride_mods`** — modifications (category enum: engine/suspension/wheels/exterior/interior/audio/electronics/other, part_name, brand, cost_php, installed_on, notes)
-- **`ride_service_log`** — maintenance/milestones (date, type, mileage_km, notes, photo_url, cost_php)
-- **`ride_ownership`** — chain of ownership (owner_name, acquired_on, sold_on, notes)
-- **`ride_likes`** — `(ride_id, user_id)` for hearts on the hub
-- Storage bucket **`ride-media`** (public) + RLS policies (owner-write, public-read)
+**Boosts — paid (kept)**
+- Listing boosts / featured placement remain pay-per-use through existing Stripe flow.
 
-### 2. Routes
+**Subscriptions table**
+- Keep schema. Existing paid plans become legacy/optional. Free + Business-6mo are the defaults shown on /pricing.
 
-| Route | Purpose |
-|---|---|
-| `/rides` | Public hub: grid of published rides, filter by make/model/year/region/vehicle_type, sort by newest/most-liked, featured row up top |
-| `/rides/$slug` | Public ride profile: cover hero, spec sheet, photo gallery, mods table, service timeline, ownership chain, owner card, "For sale" CTA when linked |
-| `/dashboard/rides` | List of my rides + "Add a ride" button |
-| `/dashboard/rides/new` | Create wizard (basics → photos → mods → publish) |
-| `/dashboard/rides/$id/edit` | Tabbed editor: Details · Photos · Mods · Service log · Ownership · Settings (link/unlink listing, archive) |
+## 2. Advertising revenue (replaces subscription pressure)
 
-### 3. Listing ↔ Ride linkage (both directions)
+**Homepage + browse carousel**
+- New `advertisements` table: title, image, target_url, placement (home_carousel, browse_top, listing_sidebar, rides_top), starts_at, ends_at, priority, active, impressions, clicks, advertiser contact.
+- New `<AdCarousel>` component on `/`, `/browse/$category`, `/rides`.
+- Click + impression tracking written to `ad_events`.
 
-- **From ride editor**: "List this ride for sale" button → opens `/sell` prefilled with year/make/model/trim/color/mileage/photos/description from the ride, and on submit sets `rides.linked_listing_id` + `is_for_sale = true`.
-- **From `/sell`**: when user has rides, show "Or list from one of your rides →" picker that prefills the form.
-- When the linked listing transitions to `sold`, auto-clear `is_for_sale` (DB trigger) and surface "Sold!" badge on the ride.
+**Admin advertising console**
+- Extend existing `/admin/advertising` to manage ad inventory (CRUD ads, schedule campaigns, see CTR).
+- Existing `ad_inquiries` flow (brands contacting us) remains the lead funnel.
 
-### 4. UI building blocks (new components)
+**Public "Advertise with us" page**
+- `/advertise` already exists — rewrite copy around new pitch: "We do not charge our users. Reach our audience instead." Show placements + sample sizes.
 
-- `ride-card.tsx` — hub grid card (cover, name, year/make/model, owner, like count)
-- `ride-spec-sheet.tsx` — formatted spec table
-- `ride-mod-table.tsx` — editable mod list (used in dashboard) + read-only variant for public page
-- `ride-service-timeline.tsx` — vertical timeline
-- `ride-ownership-list.tsx` — ownership chain
-- `ride-photo-gallery.tsx` — lightbox-capable gallery
-- `ride-form-*` editors (one per tab)
+## 3. Export Brokerage division ("365 Export")
 
-Reuse existing: `vehicle-picker`, `location-picker`, `tag-picker`, `image-with-skeleton`, `verified-badge`, shadcn primitives.
+International buyers can purchase verified vehicles from PH sellers, brokered by us — modeled on Nikkyo Cars Japan / BeForward.
 
-### 5. SEO
+**New surface: `/export`**
+- Landing page explaining the program (how we ship, inspection, documentation, payment in USD/JPY).
+- Searchable catalog of "export-ready" listings (filter by make / model / year / price USD).
+- Lead capture form (country, port, vehicle interest) → routed to staff.
 
-Each `/rides/$slug` gets its own `head()` — title `"{year} {make} {model} — {nickname} | 365 MotorSales"`, og:image = cover photo, JSON-LD `Vehicle` schema. `/rides` hub gets a hub-level meta. Sitemap includes all published rides.
+**Eligibility**
+- A listing is export-ready only if: owner has `verification_status = 'verified'`, `export_available = true` flag on the listing, photos count ≥ N, has VIN/chassis.
+- New `listings.export_available` boolean + opt-in toggle in the listing editor.
+- Verified sellers see an "Offer for export" banner on their listings.
 
-### 6. Profile integration
+**Inquiry pipeline**
+- New table `export_inquiries`: buyer_name, country, port, listing_id, message, status (new/qualified/quoted/won/lost), assigned_to.
+- Notifies staff via existing email queue.
 
-On `/seller/$id` add a "Rides" tab showing the user's published rides above their listings.
+**Admin console: `/admin/export`**
+- Inbox of export inquiries, kanban by status, assign to broker, internal notes, audit trail (mirrors `ad_inquiries` pattern).
 
-## Out of scope (v1)
+## 4. UI / messaging cleanup
 
-- Comments / replies on rides (likes only)
-- Build journal / dated posts (we picked single profile, not journal)
-- Follow / subscribe to a builder
-- VIN decoder
-- Importing rides from Instagram/FB
-
-These can be added later without schema changes (except journal posts).
-
-## Technical notes
-
-- All write paths go through `createServerFn` with `requireSupabaseAuth` (slug generation, listing-link operations, like toggling).
-- Public reads on `/rides` and `/rides/$slug` use the browser client with RLS (`status = 'published'`).
-- Slugs auto-generated server-side: `{year}-{make}-{model}-{6char}` (collision-safe).
-- Photo uploads via the same `storage-upload.ts` helper used by listings.
-- Like toggling is optimistic in the UI, persisted server-side.
+- Update `/pricing` to: Personal Free, Business Free 6mo, Boosts (pay-per-use), Advertise with us, Export brokerage.
+- Remove paywall friction from `/sell`.
+- Update marketing copy on `/`, `/about`, `/advertise` to reflect "free for users, ad + brokerage funded".
 
 ## Build order
 
-1. Migration (tables + bucket + RLS + sold-trigger)
-2. Dashboard CRUD (`/dashboard/rides`, new, edit tabs) — so users can create data
-3. Public ride profile `/rides/$slug` with SEO
-4. Public hub `/rides` with filters + likes
-5. Listing ↔ ride linkage (both directions)
-6. Profile tab on `/seller/$id` + sitemap entry
+1. **DB migration** — `advertisements`, `ad_events`, `export_inquiries`, `listings.export_available`, trigger to grant Business-6mo complimentary sub on business signup, remove free-listing quota trigger.
+2. **Free everything** — drop free-plan weekly cap; raise/remove photo cap for personal; complimentary Business sub auto-grant.
+3. **Ad system** — admin CRUD + `<AdCarousel>` placements + tracking.
+4. **Export division** — `/export` landing + catalog, `export_available` flag, inquiry form, admin inbox.
+5. **Pricing + marketing pages** rewrite.
 
-After approval I'll run the migration first, wait for your sign-off, then build the routes/components.
+## Technical notes
+
+- All write paths via `createServerFn` + `requireSupabaseAuth` (ad CRUD = admin gated via `has_role`; export inquiries = public submit with rate limiting).
+- Ad images stored in new public bucket `ad-media`.
+- Impression tracking debounced client-side (1 per ad per session) to keep `ad_events` small.
+- Business 6-month grant implemented as a row in `subscriptions` with `complimentary=true`, `current_period_end = signup + 6 months`, plan = new "Business Trial" plan row.
+- `current_plan_tier()` already handles complimentary subs — no change needed.
+- Existing Stripe boost flow untouched.
+
+## Out of scope (v1)
+
+- Actual shipping/logistics integration for export (manual broker workflow first).
+- Multi-currency checkout for export buyers (collect leads, quote offline).
+- Programmatic ad bidding (manual sales only).
+- Migrating existing paid subscribers — they keep their plan until it ends, then drop to free.
