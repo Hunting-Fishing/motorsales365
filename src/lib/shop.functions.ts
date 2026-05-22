@@ -16,12 +16,19 @@ export const listShopCategories = createServerFn({ method: "GET" }).handler(asyn
 });
 
 export const listShopProducts = createServerFn({ method: "GET" })
-  .inputValidator((input: { categorySlug?: string; featured?: boolean; search?: string; limit?: number } = {}) =>
+  .inputValidator((input: {
+    categorySlug?: string; featured?: boolean; search?: string; limit?: number;
+    make?: string; model?: string; year?: number; includeUniversal?: boolean;
+  } = {}) =>
     z.object({
       categorySlug: z.string().max(80).optional(),
       featured: z.boolean().optional(),
       search: z.string().max(120).optional(),
       limit: z.number().int().min(1).max(60).optional(),
+      make: z.string().max(80).optional(),
+      model: z.string().max(120).optional(),
+      year: z.number().int().min(1900).max(2100).optional(),
+      includeUniversal: z.boolean().optional(),
     }).parse(input),
   )
   .handler(async ({ data }) => {
@@ -31,9 +38,32 @@ export const listShopProducts = createServerFn({ method: "GET" })
       cat = c?.id ?? null;
       if (!cat) return { products: [] };
     }
+
+    // Vehicle fitment filter: find matching product_ids first, then filter.
+    let allowedIds: Set<string> | null = null;
+    if (data.make && data.model) {
+      let fq = supabaseAdmin
+        .from("shop_product_fitment")
+        .select("product_id, make, model, year_start, year_end");
+      // make matches or is null (any-make rule)
+      fq = fq.or(`make.is.null,make.ilike.${data.make}`);
+      const { data: rows, error: fErr } = await fq.limit(5000);
+      if (fErr) throw new Error(fErr.message);
+      const matched = (rows ?? []).filter((r: any) => {
+        const modelOk = !r.model || r.model.toLowerCase() === data.model!.toLowerCase();
+        if (!modelOk) return false;
+        if (data.year) {
+          if (r.year_start && data.year < r.year_start) return false;
+          if (r.year_end && data.year > r.year_end) return false;
+        }
+        return true;
+      });
+      allowedIds = new Set(matched.map((r: any) => r.product_id));
+    }
+
     let q = supabaseAdmin
       .from("shop_products")
-      .select("id, slug, title, brand, image_url, price_php, currency, featured, category_id, click_count")
+      .select("id, slug, title, brand, image_url, price_php, currency, featured, category_id, click_count, universal_fit")
       .eq("active", true);
     if (cat) q = q.eq("category_id", cat);
     if (data.featured) q = q.eq("featured", true);
@@ -43,7 +73,13 @@ export const listShopProducts = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(data.limit ?? 24);
     if (error) throw new Error(error.message);
-    return { products: rows ?? [] };
+
+    let products = rows ?? [];
+    if (allowedIds) {
+      const includeU = data.includeUniversal ?? true;
+      products = products.filter((p: any) => allowedIds!.has(p.id) || (includeU && p.universal_fit));
+    }
+    return { products };
   });
 
 export const getShopProduct = createServerFn({ method: "GET" })
