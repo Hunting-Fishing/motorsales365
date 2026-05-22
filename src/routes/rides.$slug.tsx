@@ -298,7 +298,21 @@ function RideProfilePage() {
                         {s.cost_php != null && formatPHP(s.cost_php)}
                       </div>
                       {s.notes && <p className="mt-2 text-sm">{s.notes}</p>}
-                      {s.photo_url && <img src={s.photo_url} alt="" className="mt-2 max-h-48 rounded" />}
+                      {(() => {
+                        const gallery = logPhotos[s.id] ?? [];
+                        const legacy = s.photo_url ? [{ id: `legacy-${s.id}`, url: s.photo_url }] : [];
+                        const all = [...gallery, ...legacy];
+                        if (!all.length) return null;
+                        return (
+                          <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
+                            {all.map((ph: any) => (
+                              <a key={ph.id} href={ph.url} target="_blank" rel="noreferrer" className="block overflow-hidden rounded-md border border-border bg-muted">
+                                <img src={ph.url} alt="" className="aspect-square h-full w-full object-cover" loading="lazy" />
+                              </a>
+                            ))}
+                          </div>
+                        );
+                      })()}
                     </div>
                   </li>
                 ))}
