@@ -1,75 +1,75 @@
-# Application audit — what is not fully set up
 
-Scanned the full codebase, routes, server fns, migrations, and integrations. The app itself is largely complete (listings, rides, businesses + map, dashboard, admin, auth, email, referral, QR, brokerage). Below are the genuinely incomplete or half-wired surfaces, grouped by severity.
+# Stripe scaffold — ready for keys
 
----
+Goal: every Stripe code path is wired and production-shaped. The only thing missing on go-live night is pasting 4 secrets + flipping a flag. Then move on to map polish + about copy already done.
 
-## 1. Payments — biggest gap
+## What's already in place (no work needed)
+- `src/lib/stripe.server.ts` — gateway client (`createStripeClient`)
+- `src/lib/stripe.ts` — `getStripe()` + env detection
+- `src/components/StripeEmbeddedCheckout.tsx` + `useStripeCheckout` hook
+- `src/components/PaymentTestModeBanner.tsx`
+- `src/utils/payments.functions.ts` — `createCheckoutSession` server fn
+- `src/routes/api/public/payments/webhook.ts` — Stripe subscription webhook
+- `src/routes/checkout.return.tsx` — return page
+- `.env.development` has `VITE_PAYMENTS_CLIENT_TOKEN` (sandbox `pk_test_…`)
 
-The payments stack is scaffolded but effectively non-functional in production.
+## What I'll scaffold now
 
-**`/payments` page (`src/routes/payments.tsx`)**
-- 0 methods are marked `live`. Every wallet, card, bank, and OTC option is `"soon"` or `"planned"`. The page advertises "while we finish wiring online payments…" with no live path.
+### 1. Products & prices (test env, auto-syncs to live)
+Use `payments--batch_create_product` to register the catalog so `lookup_keys` resolve in checkout. Based on `/pricing` + boost UI:
+- `plan_pro` → `pro_monthly`, `pro_yearly`
+- `plan_business` → `business_monthly`, `business_yearly`
+- `listing_boost_7d` → `boost_7d` (one-time)
+- `listing_boost_30d` → `boost_30d` (one-time)
+- `featured_business_30d` → `featured_business_30d` (one-time)
 
-**Stripe checkout (`src/lib/stripe.server.ts`, `src/components/StripeEmbeddedCheckout.tsx`, `src/routes/api/public/payments/webhook.ts`)**
-- Code is fully written, but requires 4 secrets that don't appear to be set: `STRIPE_SANDBOX_API_KEY`, `STRIPE_LIVE_API_KEY`, `PAYMENTS_SANDBOX_WEBHOOK_SECRET`, `PAYMENTS_LIVE_WEBHOOK_SECRET`. Plus client token `VITE_PAYMENTS_CLIENT_TOKEN` (used to detect test mode).
-- Without these, any plan upgrade / boost purchase will throw at the server fn boundary.
+All set `tax_code: txcd_10000000` (general digital). Quantity 1/1.
 
-**Payment-events email webhook (`src/routes/api/public/payment-events.tsx`)**
-- Hard-disabled: returns 503 unless `PAYMENT_WEBHOOK_ENABLED=1`.
-- Even when enabled, signature verification is a debug-token placeholder with `// TODO: replace with real Stripe / PayMongo signature verification`.
-- This means payment receipts / failed / refund / subscription emails never go out automatically.
+### 2. Add `verifyWebhook` to `stripe.server.ts`
+Currently `payments/webhook.ts` exists but I'll verify it uses the canonical HMAC verifier (`verifyWebhook`) and the subscriptions table shape. Add the helper if missing.
 
-**PaymongO / GCash / Maya / GrabPay**
-- Listed in UI but no provider code exists. Either implement via Stripe (Stripe supports GCash/GrabPay/Maya in PH) or remove from `/payments` to stop overpromising.
+### 3. `subscriptions` table migration
+Confirm/create `public.subscriptions` with the canonical schema (user_id, stripe_subscription_id, price_id, status, environment, period dates, RLS + `has_active_subscription()` RPC). Skip if already present.
 
-## 2. Map polish — small gaps
+### 4. Wire `/payments` page
+- Flip CC + GCash + GrabPay + Maya rows from `soon` → `live` (all handled by Stripe in PH).
+- Drop methods we won't ship (PayMongo standalone, raw bank transfer "planned").
+- Remove "while we finish wiring online payments…" banner.
+- Gate live display on `STRIPE_SANDBOX_API_KEY` presence — until secrets land, keep methods labeled "sandbox testing" with the orange `PaymentTestModeBanner` visible.
 
-`/map` route works (Google Maps, Places Autocomplete, radius circle, type filters, price pins, admin import), but the original plan also mentioned:
-- **Clustered pins** at high counts (currently 500-row cap, no clustering — gets noisy in Metro Manila).
-- **Deep-linkable URL params** (`?lat=…&lng=…&r=10&types=…`). Not yet wired — refreshing `/map` loses the filter / center state.
-- **Hover sync** between sidebar row and map pin.
+### 5. Wire checkout into billing/boost CTAs
+- `dashboard.billing.tsx` upgrade buttons → `openCheckout({ priceId: 'pro_monthly', userId, customerEmail })`
+- Listing boost buttons → `openCheckout({ priceId: 'boost_7d' | 'boost_30d' })`
+- Featured business CTA → `openCheckout({ priceId: 'featured_business_30d' })`
 
-## 3. Email infra — works but partial wiring
+### 6. Payment-events email webhook
+Replace the debug-token placeholder in `src/routes/api/public/payment-events.tsx` with real Stripe signature verification (reuse `verifyWebhook`). Keep `PAYMENT_WEBHOOK_ENABLED` gate — defaults off until go-live night.
 
-- Auth + transactional email templates exist and the queue table is in place.
-- Payment-related templates (`payment-receipt`, `payment-failed`, `refund-issued`, `subscription-renewed`, `subscription-cancelled`) are referenced in `payment-events.tsx` but never fire (see #1).
-- Consider adding a test send / preview UI in admin to verify each template before turning the webhook on.
+### 7. Secrets checklist (documented, not requested tonight)
+Add a short admin-visible note listing what's needed when you're ready:
+- `STRIPE_SANDBOX_API_KEY`
+- `STRIPE_LIVE_API_KEY`
+- `PAYMENTS_SANDBOX_WEBHOOK_SECRET`
+- `PAYMENTS_LIVE_WEBHOOK_SECRET`
+- `.env.production` `VITE_PAYMENTS_CLIENT_TOKEN` (`pk_live_…`)
+- `PAYMENT_WEBHOOK_ENABLED=1`
 
-## 4. SEO — private routes only
+Won't call `add_secret` tonight per your instruction.
 
-All public routes have proper `head()` with title + description. Admin and dashboard routes do not, which is correct (they should be `noindex`). No action needed unless you want explicit `<meta name="robots" content="noindex">` on those.
+## Out of scope tonight
+- Actually entering keys / hitting Stripe live
+- Activating `managed_payments` (decide at go-live: +3.5% vs +0.5% `automatic_tax`)
+- Map clustering (separate task)
 
-## 5. Minor / cosmetic
-- `src/routes/about.tsx` says "Coming soon: a directory of trusted repair shops…" — but that directory now ships at `/businesses` and `/map`. Update the copy.
-- `src/components/listing-card.tsx` and `src/routes/listing.$id.tsx` use `alt="Vehicle photo coming soon"` as a placeholder alt — fine, but could be more descriptive for SEO.
+## Files touched
+- `supabase/migrations/*` — subscriptions table (if missing)
+- `src/lib/stripe.server.ts` — add `verifyWebhook`
+- `src/routes/api/public/payments/webhook.ts` — verify canonical shape
+- `src/routes/api/public/payment-events.tsx` — real signature verify
+- `src/routes/payments.tsx` — flip live methods, drop placeholders
+- `src/routes/dashboard.billing.tsx` — wire `useStripeCheckout`
+- `src/routes/listing.$id.tsx` (+ boost UI) — wire boost checkout
+- `src/components/site-layout.tsx` — mount `<PaymentTestModeBanner />` if not already
+- New: `docs/STRIPE_GOLIVE.md` — the 4-secret checklist
 
----
-
-## What is fully working (for reference)
-
-- Listings CRUD + browse + categories + saved searches + favorites + likes
-- Rides board (`/rides`, create, edit)
-- Tow request flow + dashboard tow board
-- Businesses directory + `/map` with Google Places autocomplete, radius search, type filters, price labels, admin import
-- Auth (email/password + Google via Lovable broker), verification, password reset
-- Referral / QR / poster system
-- Admin: users, accounts, listings, businesses, verifications, currencies, pricing, ads, analytics, reports, audit, sandbox, type-suggestions, redemptions
-- Dashboard: index, profile, billing UI, businesses, rides, tow, favorites, likes, messages (with realtime), searches, referral, verification
-- Export brokerage
-- Facebook Marketplace import (via Firecrawl)
-- Currency switcher + FX refresh endpoint
-- Sitemap + robots
-
----
-
-## Suggested next priority
-
-Tackle them in this order:
-
-1. **Decide payments provider** (Stripe-only is simplest — it covers PH cards + GCash + GrabPay + Maya). Add the 4 Stripe secrets, set `VITE_PAYMENTS_CLIENT_TOKEN`, mark those methods `live` in `payments.tsx`, drop the "planned" rows we won't ship.
-2. **Wire the payment-events webhook for real** — replace the debug-token check with Stripe signature verification, set `PAYMENT_WEBHOOK_ENABLED=1`, point Stripe at the `/api/public/payment-events` URL.
-3. **Map URL state + clustering** — quick wins for the `/map` UX.
-4. **About page copy** — 30-second fix.
-
-Want me to start with #1 (Stripe go-live)?
+After approval I'll also call `payments--batch_create_product` to register the catalog.

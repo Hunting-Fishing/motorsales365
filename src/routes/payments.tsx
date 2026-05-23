@@ -26,26 +26,26 @@ type Method = {
 
 const METHODS: { group: string; items: Method[] }[] = [
   {
-    group: "E-wallets (Philippines)",
+    group: "Cards",
     items: [
-      { name: "GCash", desc: "Pay instantly from your GCash wallet.", icon: Smartphone, status: "soon", provider: "PayMongo" },
-      { name: "Maya", desc: "Pay with Maya wallet or Maya credit.", icon: Wallet, status: "soon", provider: "PayMongo" },
-      { name: "GrabPay", desc: "Pay using your GrabPay balance.", icon: Wallet, status: "soon", provider: "PayMongo" },
-      { name: "ShopeePay", desc: "Pay from your ShopeePay wallet.", icon: Wallet, status: "planned" },
+      { name: "Visa / Mastercard", desc: "Credit and debit cards, local and international. 3D Secure supported.", icon: CreditCard, status: "live", provider: "Stripe" },
+      { name: "JCB / AMEX", desc: "Additional card networks accepted at checkout.", icon: CreditCard, status: "live", provider: "Stripe" },
     ],
   },
   {
-    group: "Cards",
+    group: "E-wallets (Philippines)",
     items: [
-      { name: "Visa / Mastercard", desc: "Credit and debit cards, local and international.", icon: CreditCard, status: "soon", provider: "PayMongo" },
-      { name: "JCB / AMEX", desc: "Additional card networks.", icon: CreditCard, status: "planned" },
+      { name: "GCash", desc: "Pay instantly from your GCash wallet at checkout.", icon: Smartphone, status: "live", provider: "Stripe" },
+      { name: "GrabPay", desc: "Pay using your GrabPay balance.", icon: Wallet, status: "live", provider: "Stripe" },
+      { name: "Maya", desc: "Pay with Maya wallet or Maya credit.", icon: Wallet, status: "soon", provider: "Stripe" },
+      { name: "ShopeePay", desc: "Pay from your ShopeePay wallet.", icon: Wallet, status: "planned" },
     ],
   },
   {
     group: "Bank & QR",
     items: [
-      { name: "InstaPay / PESONet", desc: "Direct bank transfer from any PH bank.", icon: Building2, status: "soon", provider: "PayMongo" },
-      { name: "QR Ph", desc: "Scan-to-pay using the national QR standard.", icon: QrCode, status: "planned" },
+      { name: "QR Ph", desc: "Scan-to-pay using the national QR standard.", icon: QrCode, status: "soon", provider: "Stripe" },
+      { name: "InstaPay / PESONet", desc: "Direct bank transfer from any PH bank.", icon: Building2, status: "planned" },
       { name: "Online Banking (BPI, BDO, UnionBank)", desc: "Log in to your bank to pay.", icon: Building2, status: "planned" },
     ],
   },
@@ -76,7 +76,7 @@ function PaymentsPage() {
         <div className="container mx-auto px-4 text-center">
           <h1 className="font-display text-4xl font-bold">Payments</h1>
           <p className="mt-2 max-w-2xl mx-auto text-muted-foreground">
-            All the ways you'll be able to pay listing fees, boosts, and subscriptions on 365 MotorSales. We're rolling these out one by one — track progress here.
+            Pay listing fees, boosts, and subscriptions on 365 MotorSales using cards and Philippine e-wallets. All payments are processed securely by Stripe.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-2">
             <Badge variant="outline" className={STATUS_META.live.cls}>{live} live</Badge>
@@ -118,14 +118,14 @@ function PaymentsPage() {
         ))}
 
         <div className="rounded-xl border border-border bg-card p-6 text-center">
-          <h3 className="font-display text-lg font-semibold">Need to pay now?</h3>
+          <h3 className="font-display text-lg font-semibold">Ready to upgrade?</h3>
           <p className="mt-1 text-sm text-muted-foreground">
-            While we finish wiring online payments, you can post a free listing or contact us for manual payment instructions.
+            See plans and pricing, or post a free listing to get started.
           </p>
           <div className="mt-4 flex flex-wrap justify-center gap-3">
-            <Button asChild><Link to="/sell">Post a free listing</Link></Button>
-            <Button asChild variant="outline"><Link to="/contact">Contact support</Link></Button>
-            <Button asChild variant="ghost"><Link to="/pricing">See pricing</Link></Button>
+            <Button asChild><Link to="/pricing">See pricing</Link></Button>
+            <Button asChild variant="outline"><Link to="/sell">Post a free listing</Link></Button>
+            <Button asChild variant="ghost"><Link to="/contact">Contact support</Link></Button>
           </div>
         </div>
       </section>
