@@ -56,6 +56,7 @@ function SubmitBusinessPage() {
   const [lng, setLng] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [brandsCarried, setBrandsCarried] = useState("");
+  const [priceLabel, setPriceLabel] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [tagsOpen, setTagsOpen] = useState(false);
   const [tagSearch, setTagSearch] = useState("");
@@ -226,6 +227,7 @@ function SubmitBusinessPage() {
       region: loc.region, province: loc.province, city: loc.city, barangay: loc.barangay,
       postal_code: postalCode.trim() || null,
       brands_carried: brandsCarried.trim() || null,
+      price_label: priceLabel.trim() || null,
       lat: lat ? Number(lat) : null, lng: lng ? Number(lng) : null,
       status: "pending",
     };
@@ -428,6 +430,16 @@ function SubmitBusinessPage() {
           <div>
             <Label>Description</Label>
             <Textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} maxLength={2000} />
+          </div>
+
+          <div>
+            <Label>Price / rate label <span className="text-xs font-normal text-muted-foreground">(optional, shown on map and profile)</span></Label>
+            <Input
+              value={priceLabel}
+              onChange={(e) => setPriceLabel(e.target.value)}
+              maxLength={40}
+              placeholder="e.g. ₱65/L, From ₱500, Free estimate"
+            />
           </div>
 
 
