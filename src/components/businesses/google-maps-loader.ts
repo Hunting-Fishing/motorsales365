@@ -1,3 +1,4 @@
+/// <reference types="google.maps" />
 // Singleton loader for the Google Maps JavaScript API.
 // Must use loading=async + callback (per project rules); never set mapId.
 

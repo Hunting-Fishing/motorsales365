@@ -1,3 +1,4 @@
+/// <reference types="google.maps" />
 import { useEffect, useRef, useState } from "react";
 import { loadGoogleMaps, colorForType } from "./google-maps-loader";
 
