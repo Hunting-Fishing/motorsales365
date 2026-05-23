@@ -233,7 +233,7 @@ function BusinessProfilePage() {
                 type_slug: biz.type_slug, type_label: typeLabel,
                 lat: Number(biz.lat), lng: Number(biz.lng), rating_avg: Number(biz.rating_avg),
                 rating_count: biz.rating_count, city: biz.city, featured: biz.featured,
-                price_label: (biz as any).price_label ?? null,
+                price_label: biz.price_label,
               }] : []}
             />
           </div>
