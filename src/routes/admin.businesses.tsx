@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { toast } from "sonner";
+import { ImportPlacesPanel } from "@/components/admin/import-places-panel";
 
 export const Route = createFileRoute("/admin/businesses")({
   component: AdminBusinessesPage,
@@ -51,7 +52,13 @@ function AdminBusinessesPage() {
           <TabsTrigger value="active">Active</TabsTrigger>
           <TabsTrigger value="rejected">Rejected</TabsTrigger>
           <TabsTrigger value="hidden">Hidden</TabsTrigger>
+          <TabsTrigger value="import">Import nearby</TabsTrigger>
         </TabsList>
+        {tab === "import" ? (
+          <TabsContent value="import" className="mt-4">
+            <ImportPlacesPanel />
+          </TabsContent>
+        ) : (
         <TabsContent value={tab} className="mt-4">
           {loading ? (
             <Card className="p-6 text-sm text-muted-foreground">Loading…</Card>
@@ -91,6 +98,7 @@ function AdminBusinessesPage() {
             </div>
           )}
         </TabsContent>
+        )}
       </Tabs>
     </div>
   );
