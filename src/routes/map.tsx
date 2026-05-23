@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { z } from "zod";
 import { Star, Store as StoreIcon, MapPin } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,7 +11,16 @@ import { GoogleBusinessMap, type GMapBusiness } from "@/components/businesses/go
 import { MapFilterBar, type CenterPoint } from "@/components/businesses/map-filter-bar";
 import { haversineKm } from "@/components/businesses/google-maps-loader";
 
+const searchSchema = z.object({
+  lat: z.coerce.number().min(-90).max(90).optional(),
+  lng: z.coerce.number().min(-180).max(180).optional(),
+  r: z.coerce.number().min(1).max(500).optional(),
+  type: z.string().max(64).optional(),
+  q: z.string().max(200).optional(),
+});
+
 export const Route = createFileRoute("/map")({
+  validateSearch: searchSchema,
   head: () => ({
     meta: [
       { title: "Business Map — 365 MotorSales Philippines" },
@@ -33,12 +43,33 @@ type Row = {
 
 function MapPage() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const [types, setTypes] = useState<BusinessType[]>([]);
   const [items, setItems] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
-  const [typeSlug, setTypeSlug] = useState<string | null>(null);
-  const [center, setCenter] = useState<CenterPoint>(null);
-  const [radiusKm, setRadiusKm] = useState<number | null>(null);
+  const [typeSlug, setTypeSlug] = useState<string | null>(search.type ?? null);
+  const [center, setCenter] = useState<CenterPoint>(
+    search.lat != null && search.lng != null
+      ? { lat: search.lat, lng: search.lng, label: search.q }
+      : null,
+  );
+  const [radiusKm, setRadiusKm] = useState<number | null>(search.r ?? null);
+  const [hoverId, setHoverId] = useState<string | null>(null);
+
+  // Sync URL with state (replaceState-style so back button isn't spammed)
+  useEffect(() => {
+    navigate({
+      to: "/map",
+      search: {
+        ...(center ? { lat: Number(center.lat.toFixed(5)), lng: Number(center.lng.toFixed(5)) } : {}),
+        ...(center && radiusKm ? { r: radiusKm } : {}),
+        ...(typeSlug ? { type: typeSlug } : {}),
+        ...(center?.label ? { q: center.label } : {}),
+      },
+      replace: true,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [center, radiusKm, typeSlug]);
 
   useEffect(() => {
     (async () => {
@@ -92,6 +123,7 @@ function MapPage() {
     lat: b.lat ? Number(b.lat) : null, lng: b.lng ? Number(b.lng) : null,
     rating_avg: Number(b.rating_avg), rating_count: b.rating_count,
     city: b.city, featured: b.featured, price_label: b.price_label,
+    highlighted: hoverId === b.id,
   }));
 
   return (
@@ -133,7 +165,9 @@ function MapPage() {
                   <Card
                     key={b.id}
                     onClick={() => navigate({ to: "/businesses/$slug", params: { slug: b.slug } })}
-                    className="cursor-pointer p-3 transition hover:border-primary"
+                    onMouseEnter={() => setHoverId(b.id)}
+                    onMouseLeave={() => setHoverId((id) => (id === b.id ? null : id))}
+                    className={`cursor-pointer p-3 transition hover:border-primary ${hoverId === b.id ? "border-primary ring-1 ring-primary/40" : ""}`}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="min-w-0">
@@ -165,9 +199,9 @@ function MapPage() {
               })
             )}
           </div>
-          <div>
+          <div className="h-[480px] lg:h-[640px]">
             <GoogleBusinessMap
-              height={typeof window !== "undefined" && window.innerWidth >= 1024 ? 640 : 480}
+              height="100%"
               businesses={mapBusinesses}
               center={center ? { lat: center.lat, lng: center.lng } : null}
               radiusKm={radiusKm}
