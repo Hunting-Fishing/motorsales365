@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { BusinessMap, type MapBusiness } from "@/components/businesses/business-map";
+import { GoogleBusinessMap, type GMapBusiness } from "@/components/businesses/google-business-map";
+import { MapFilterBar, type CenterPoint } from "@/components/businesses/map-filter-bar";
+import { haversineKm } from "@/components/businesses/google-maps-loader";
 import { LocationDrilldown, type LocationValue } from "@/components/businesses/location-drilldown";
 
 export const Route = createFileRoute("/businesses/")({
@@ -28,6 +30,7 @@ type BusinessRow = {
   logo_url: string | null; region: string | null; province: string | null; city: string | null;
   barangay: string | null; lat: number | null; lng: number | null;
   rating_avg: number; rating_count: number; featured: boolean;
+  price_label: string | null;
 };
 
 function BusinessesIndex() {
@@ -43,6 +46,8 @@ function BusinessesIndex() {
   const [typeSlug, setTypeSlug] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [loc, setLoc] = useState<LocationValue>({ region: null, province: null, city: null, barangay: null });
+  const [center, setCenter] = useState<CenterPoint>(null);
+  const [radiusKm, setRadiusKm] = useState<number | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -60,7 +65,7 @@ function BusinessesIndex() {
     (async () => {
       let query = (supabase as any)
         .from("businesses")
-        .select("id,slug,name,type_slug,description,logo_url,region,province,city,barangay,lat,lng,rating_avg,rating_count,featured")
+        .select("id,slug,name,type_slug,description,logo_url,region,province,city,barangay,lat,lng,rating_avg,rating_count,featured,price_label")
         .eq("status", "active")
         .order("featured", { ascending: false })
         .order("rating_avg", { ascending: false })
@@ -111,12 +116,20 @@ function BusinessesIndex() {
     return tags.filter((t) => t.type_slug === null || t.type_slug === typeSlug);
   }, [tags, typeSlug]);
 
-  const mapBusinesses: MapBusiness[] = items.map((b) => ({
+  const filteredByRadius = useMemo(() => {
+    if (!center || !radiusKm) return items;
+    return items.filter((b) => {
+      if (b.lat == null || b.lng == null) return false;
+      return haversineKm({ lat: center.lat, lng: center.lng }, { lat: Number(b.lat), lng: Number(b.lng) }) <= radiusKm;
+    });
+  }, [items, center, radiusKm]);
+
+  const mapBusinesses: GMapBusiness[] = filteredByRadius.map((b) => ({
     id: b.id, slug: b.slug, name: b.name,
-    type_label: typeLabel(b.type_slug),
+    type_slug: b.type_slug, type_label: typeLabel(b.type_slug),
     lat: b.lat ? Number(b.lat) : null, lng: b.lng ? Number(b.lng) : null,
     rating_avg: Number(b.rating_avg), rating_count: b.rating_count,
-    city: b.city, featured: b.featured,
+    city: b.city, featured: b.featured, price_label: b.price_label,
   }));
 
   return (
