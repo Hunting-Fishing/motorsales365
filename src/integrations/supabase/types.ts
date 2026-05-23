@@ -549,11 +549,15 @@ export type Database = {
           phone: string | null
           photos: Json
           postal_code: string | null
+          price_label: string | null
+          price_updated_at: string | null
           province: string | null
           rating_avg: number
           rating_count: number
           region: string | null
           slug: string
+          source: string
+          source_external_id: string | null
           status: Database["public"]["Enums"]["business_status"]
           street_address: string | null
           type_slug: string
@@ -580,11 +584,15 @@ export type Database = {
           phone?: string | null
           photos?: Json
           postal_code?: string | null
+          price_label?: string | null
+          price_updated_at?: string | null
           province?: string | null
           rating_avg?: number
           rating_count?: number
           region?: string | null
           slug: string
+          source?: string
+          source_external_id?: string | null
           status?: Database["public"]["Enums"]["business_status"]
           street_address?: string | null
           type_slug: string
@@ -611,11 +619,15 @@ export type Database = {
           phone?: string | null
           photos?: Json
           postal_code?: string | null
+          price_label?: string | null
+          price_updated_at?: string | null
           province?: string | null
           rating_avg?: number
           rating_count?: number
           region?: string | null
           slug?: string
+          source?: string
+          source_external_id?: string | null
           status?: Database["public"]["Enums"]["business_status"]
           street_address?: string | null
           type_slug?: string
