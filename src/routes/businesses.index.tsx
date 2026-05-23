@@ -249,11 +249,24 @@ function BusinessesIndex() {
               ))
             )}
           </div>
-          <div className="md:sticky md:top-20 md:self-start">
-            <BusinessMap
+          <div className="space-y-3 md:sticky md:top-20 md:self-start">
+            <Card className="p-3">
+              <MapFilterBar
+                types={types}
+                selectedType={typeSlug}
+                onSelectType={setTypeSlug}
+                center={center}
+                onChangeCenter={setCenter}
+                radiusKm={radiusKm}
+                onChangeRadius={setRadiusKm}
+              />
+            </Card>
+            <GoogleBusinessMap
+              height={520}
               businesses={mapBusinesses}
-              region={loc.region}
-              onPinClick={(slug) => navigate({ to: "/businesses/$slug", params: { slug } })}
+              center={center ? { lat: center.lat, lng: center.lng } : null}
+              radiusKm={radiusKm}
+              onPinClick={(slug: string) => navigate({ to: "/businesses/$slug", params: { slug } })}
             />
           </div>
         </div>
