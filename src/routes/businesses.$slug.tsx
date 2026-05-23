@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
-import { BusinessMap } from "@/components/businesses/business-map";
+import { GoogleBusinessMap } from "@/components/businesses/google-business-map";
 import { ShareQr } from "@/components/share-qr";
 
 export const Route = createFileRoute("/businesses/$slug")({
@@ -221,12 +221,15 @@ function BusinessProfilePage() {
             )}
           </Card>
           <div>
-            <BusinessMap
-              region={biz.region}
+            <GoogleBusinessMap
+              height={420}
+              center={biz.lat && biz.lng ? { lat: Number(biz.lat), lng: Number(biz.lng) } : null}
               businesses={biz.lat && biz.lng ? [{
-                id: biz.id, slug: biz.slug, name: biz.name, type_label: typeLabel,
+                id: biz.id, slug: biz.slug, name: biz.name,
+                type_slug: biz.type_slug, type_label: typeLabel,
                 lat: Number(biz.lat), lng: Number(biz.lng), rating_avg: Number(biz.rating_avg),
                 rating_count: biz.rating_count, city: biz.city, featured: biz.featured,
+                price_label: (biz as any).price_label ?? null,
               }] : []}
             />
           </div>
