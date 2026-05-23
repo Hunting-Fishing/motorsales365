@@ -18,7 +18,8 @@ export const Route = createFileRoute("/about")({
           serving private sellers and businesses alike with a clean, modern experience.
         </p>
         <p className="mt-4 text-muted-foreground">
-          Coming soon: a directory of trusted repair shops and insurance providers across the country, so you can find help wherever you are.
+          Explore our directory of dealerships, gas stations, repair shops, parts suppliers, and more on the{" "}
+          <Link to="/map" className="underline">business map</Link> — find trusted help wherever you are in the Philippines.
         </p>
         <Button asChild className="mt-6"><Link to="/sell">Post a listing</Link></Button>
       </div>

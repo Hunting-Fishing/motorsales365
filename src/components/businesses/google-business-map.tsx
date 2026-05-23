@@ -15,18 +15,19 @@ export type GMapBusiness = {
   city: string | null;
   featured: boolean;
   price_label?: string | null;
+  highlighted?: boolean;
 };
 
 const PH_CENTER = { lat: 12.8797, lng: 121.774 };
 
-function pinIcon(color: string, featured: boolean): google.maps.Symbol {
+function pinIcon(color: string, featured: boolean, highlighted = false): google.maps.Symbol {
   return {
     path: "M12 0C5.4 0 0 5.4 0 12c0 9 12 22 12 22s12-13 12-22C24 5.4 18.6 0 12 0z",
     fillColor: color,
     fillOpacity: 1,
-    strokeColor: "#ffffff",
-    strokeWeight: featured ? 3 : 2,
-    scale: featured ? 1.4 : 1.1,
+    strokeColor: highlighted ? "#0ea5e9" : "#ffffff",
+    strokeWeight: highlighted ? 4 : featured ? 3 : 2,
+    scale: highlighted ? 1.6 : featured ? 1.4 : 1.1,
     anchor: new google.maps.Point(12, 34),
     labelOrigin: new google.maps.Point(12, 12),
   };
@@ -40,7 +41,7 @@ export function GoogleBusinessMap({
   onPinClick,
 }: {
   businesses: GMapBusiness[];
-  height?: number;
+  height?: number | string;
   center?: { lat: number; lng: number } | null;
   radiusKm?: number | null;
   onPinClick?: (slug: string) => void;
@@ -99,7 +100,8 @@ export function GoogleBusinessMap({
         position: { lat: Number(b.lat), lng: Number(b.lng) },
         map,
         title: b.name,
-        icon: pinIcon(color, b.featured),
+        icon: pinIcon(color, b.featured, b.highlighted),
+        zIndex: b.highlighted ? 1000 : b.featured ? 500 : 1,
       });
       marker.addListener("click", () => {
         const rating =

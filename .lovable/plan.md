@@ -1,80 +1,75 @@
-## Goal
+# Application audit — what is not fully set up
 
-Turn the current `/businesses` Leaflet map into a real "find businesses near me" experience powered by Google Maps, and add a full-screen `/map` page. Show pins for every approved business with type-based icons, radius search, and price/rate badges. Add a tool to import nearby places from Google to seed the directory (deduped against existing businesses).
+Scanned the full codebase, routes, server fns, migrations, and integrations. The app itself is largely complete (listings, rides, businesses + map, dashboard, admin, auth, email, referral, QR, brokerage). Below are the genuinely incomplete or half-wired surfaces, grouped by severity.
 
-## What you'll see
+---
 
-**Upgraded `/businesses` (list-first)**
-- Current results list stays.
-- Map panel switches from Leaflet to Google Maps (gated by the existing region filter).
-- "Use my location" + radius slider (1, 5, 10, 25, 50 km). Pins outside the radius hide.
-- Type filter chips (Dealership, Gas station, Parts, Repair, Tires, Towing, etc. — sourced from `business_types`).
-- Pins colored by type; clicking opens a card with name, rating, city, and a price/rate badge when available.
+## 1. Payments — biggest gap
 
-**New `/map` (full-screen)**
-- Header + footer trimmed; map fills the viewport.
-- Left sidebar: search box (Google Places autocomplete for location), radius slider, type filter chips, list of visible businesses sorted by distance.
-- Map: clustered pins, hover highlights the matching list row.
-- Deep-linkable: `?lat=…&lng=…&r=10&types=fuel_station,dealership`.
+The payments stack is scaffolded but effectively non-functional in production.
 
-**Admin: Import from Google Places (`/admin/businesses` → new "Import nearby" tab)**
-- Pick a center point + radius + type.
-- Calls Google Places (New) `searchNearby` through the connector gateway.
-- Shows results with dedup status (matched by place_id or name+coords within 100m of an existing business).
-- Admin selects which to import as `pending` business rows (owner_id null, source = "google_places", `source_external_id` = place_id).
+**`/payments` page (`src/routes/payments.tsx`)**
+- 0 methods are marked `live`. Every wallet, card, bank, and OTC option is `"soon"` or `"planned"`. The page advertises "while we finish wiring online payments…" with no live path.
 
-## Data model changes
+**Stripe checkout (`src/lib/stripe.server.ts`, `src/components/StripeEmbeddedCheckout.tsx`, `src/routes/api/public/payments/webhook.ts`)**
+- Code is fully written, but requires 4 secrets that don't appear to be set: `STRIPE_SANDBOX_API_KEY`, `STRIPE_LIVE_API_KEY`, `PAYMENTS_SANDBOX_WEBHOOK_SECRET`, `PAYMENTS_LIVE_WEBHOOK_SECRET`. Plus client token `VITE_PAYMENTS_CLIENT_TOKEN` (used to detect test mode).
+- Without these, any plan upgrade / boost purchase will throw at the server fn boundary.
 
-Add to `businesses`:
-- `price_label` text — short rate/price shown on pin (e.g. "Diesel ₱58.20", "Oil change ₱1,200"). Optional, owner-editable.
-- `price_updated_at` timestamptz.
-- `source` text default 'manual' — 'manual' | 'google_places' | 'facebook'.
-- `source_external_id` text — Google place_id when imported.
-- Unique index on `(source, source_external_id)` where `source_external_id is not null` (dedup).
+**Payment-events email webhook (`src/routes/api/public/payment-events.tsx`)**
+- Hard-disabled: returns 503 unless `PAYMENT_WEBHOOK_ENABLED=1`.
+- Even when enabled, signature verification is a debug-token placeholder with `// TODO: replace with real Stripe / PayMongo signature verification`.
+- This means payment receipts / failed / refund / subscription emails never go out automatically.
 
-Existing `lat`, `lng`, `type_slug`, `status`, `rating_avg`, `featured` are reused.
+**PaymongO / GCash / Maya / GrabPay**
+- Listed in UI but no provider code exists. Either implement via Stripe (Stripe supports GCash/GrabPay/Maya in PH) or remove from `/payments` to stop overpromising.
 
-## Technical details
+## 2. Map polish — small gaps
 
-**Connector**
-- Use the existing Google Maps Platform connector (already documented in the prompt). Browser key `VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY` powers the Maps JS API + Places autocomplete in the browser. Server-side Places `searchNearby` and geocoding go through `https://connector-gateway.lovable.dev/google_maps` from a TanStack server function (`src/lib/places.functions.ts` + `places.server.ts`). If the connector isn't linked yet, I'll prompt with `standard_connectors--connect`.
+`/map` route works (Google Maps, Places Autocomplete, radius circle, type filters, price pins, admin import), but the original plan also mentioned:
+- **Clustered pins** at high counts (currently 500-row cap, no clustering — gets noisy in Metro Manila).
+- **Deep-linkable URL params** (`?lat=…&lng=…&r=10&types=…`). Not yet wired — refreshing `/map` loses the filter / center state.
+- **Hover sync** between sidebar row and map pin.
 
-**New files**
-- `src/components/businesses/google-business-map.tsx` — wraps Maps JS API loader (`loading=async&callback=…`), renders `google.maps.Marker` per business, color by type, info windows with price badge. No `mapId` (per house rule).
-- `src/components/businesses/map-filter-bar.tsx` — type chips + radius slider + "Use my location" + Places autocomplete (`AutocompleteSuggestion.fetchAutocompleteSuggestions`).
-- `src/components/businesses/business-list-sidebar.tsx` — sorted-by-distance list for `/map`.
-- `src/routes/map.tsx` — full-screen route; reads/writes query params for shareability; `head()` with proper title/description.
-- `src/lib/places.functions.ts` + `places.server.ts` — server fns: `searchNearbyPlaces({lat,lng,radius_m,type})`, `importPlaces({place_ids})` (admin-gated via `has_role(admin)`).
-- `src/components/admin/import-places-panel.tsx` — admin UI tab.
+## 3. Email infra — works but partial wiring
 
-**Edited files**
-- `src/routes/businesses.index.tsx` — swap `BusinessMap` for `GoogleBusinessMap`, add filter bar, apply haversine filter when radius is set.
-- `src/routes/businesses.$slug.tsx` — same swap (single pin map).
-- `src/components/site-header.tsx` — add "Map" nav link.
-- `src/routes/admin.businesses.tsx` — add "Import nearby" tab.
-- `src/lib/format.ts` — add `haversineKm(a, b)` helper.
+- Auth + transactional email templates exist and the queue table is in place.
+- Payment-related templates (`payment-receipt`, `payment-failed`, `refund-issued`, `subscription-renewed`, `subscription-cancelled`) are referenced in `payment-events.tsx` but never fire (see #1).
+- Consider adding a test send / preview UI in admin to verify each template before turning the webhook on.
 
-**Dedup logic (server)**
-- For each Google result: match if `source='google_places' AND source_external_id=place_id` OR there's a business within 100m whose normalized name matches (case-insensitive, strip punctuation). Mark as "already imported" vs "new".
+## 4. SEO — private routes only
 
-**RLS / security**
-- `businesses` policies are unchanged; `price_label`/`source*` updates allowed by existing owner/admin policies.
-- Admin-only `importPlaces` server fn uses `requireSupabaseAuth` + role check.
-- Public read of new columns is fine (no PII).
+All public routes have proper `head()` with title + description. Admin and dashboard routes do not, which is correct (they should be `noindex`). No action needed unless you want explicit `<meta name="robots" content="noindex">` on those.
 
-**Removed**
-- Leaflet stays installed (still used in `location-picker-inner.tsx` for the submit form picker); only the public map components migrate to Google Maps. We can migrate the picker later if you want.
+## 5. Minor / cosmetic
+- `src/routes/about.tsx` says "Coming soon: a directory of trusted repair shops…" — but that directory now ships at `/businesses` and `/map`. Update the copy.
+- `src/components/listing-card.tsx` and `src/routes/listing.$id.tsx` use `alt="Vehicle photo coming soon"` as a placeholder alt — fine, but could be more descriptive for SEO.
 
-## Out of scope (ask separately if you want them)
-- Mobile native geofencing/push.
-- Owner-side bulk price update tool.
-- Migrating `LocationPicker` submit form to Google Maps.
-- Rating/review redesign on pin popups.
+---
 
-## Migration order
-1. DB migration (new columns + index).
-2. Confirm Google Maps connector linked (prompt if not).
-3. Build `GoogleBusinessMap` + filter bar; swap into `/businesses` and `/businesses/$slug`.
-4. Add `/map` full-screen route + sidebar.
-5. Add admin import panel + server fns.
-6. Add header nav link.
+## What is fully working (for reference)
+
+- Listings CRUD + browse + categories + saved searches + favorites + likes
+- Rides board (`/rides`, create, edit)
+- Tow request flow + dashboard tow board
+- Businesses directory + `/map` with Google Places autocomplete, radius search, type filters, price labels, admin import
+- Auth (email/password + Google via Lovable broker), verification, password reset
+- Referral / QR / poster system
+- Admin: users, accounts, listings, businesses, verifications, currencies, pricing, ads, analytics, reports, audit, sandbox, type-suggestions, redemptions
+- Dashboard: index, profile, billing UI, businesses, rides, tow, favorites, likes, messages (with realtime), searches, referral, verification
+- Export brokerage
+- Facebook Marketplace import (via Firecrawl)
+- Currency switcher + FX refresh endpoint
+- Sitemap + robots
+
+---
+
+## Suggested next priority
+
+Tackle them in this order:
+
+1. **Decide payments provider** (Stripe-only is simplest — it covers PH cards + GCash + GrabPay + Maya). Add the 4 Stripe secrets, set `VITE_PAYMENTS_CLIENT_TOKEN`, mark those methods `live` in `payments.tsx`, drop the "planned" rows we won't ship.
+2. **Wire the payment-events webhook for real** — replace the debug-token check with Stripe signature verification, set `PAYMENT_WEBHOOK_ENABLED=1`, point Stripe at the `/api/public/payment-events` URL.
+3. **Map URL state + clustering** — quick wins for the `/map` UX.
+4. **About page copy** — 30-second fix.
+
+Want me to start with #1 (Stripe go-live)?
