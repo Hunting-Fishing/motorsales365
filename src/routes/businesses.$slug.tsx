@@ -72,6 +72,7 @@ type Business = {
   region: string | null; province: string | null; city: string | null; barangay: string | null; street_address: string | null;
   lat: number | null; lng: number | null;
   rating_avg: number; rating_count: number; featured: boolean;
+  price_label: string | null;
 };
 type Review = { id: string; user_id: string; rating: number; body: string | null; created_at: string };
 
@@ -166,6 +167,9 @@ function BusinessProfilePage() {
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="font-display text-2xl font-bold">{biz.name}</h1>
                 {biz.featured && <Badge>Featured</Badge>}
+                {biz.price_label && (
+                  <Badge variant="secondary" className="font-semibold">{biz.price_label}</Badge>
+                )}
               </div>
               <div className="text-sm text-muted-foreground">{typeLabel}</div>
               {biz.rating_count > 0 && (

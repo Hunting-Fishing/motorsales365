@@ -1,24 +1,88 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Store as StoreIcon, Plus } from "lucide-react";
+import { Store as StoreIcon, Plus, Check, X, Pencil, Tag } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ShareQr } from "@/components/share-qr";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/dashboard/businesses")({
   component: MyBusinessesPage,
 });
 
-type Row = { id: string; slug: string; name: string; type_slug: string; status: string; city: string | null; region: string | null; rating_avg: number; rating_count: number };
+type Row = {
+  id: string; slug: string; name: string; type_slug: string; status: string;
+  city: string | null; region: string | null;
+  rating_avg: number; rating_count: number;
+  price_label: string | null;
+};
 
 function statusBadge(s: string) {
   if (s === "active") return <Badge className="bg-emerald-600">Active</Badge>;
   if (s === "pending") return <Badge variant="secondary">Pending review</Badge>;
   if (s === "rejected") return <Badge variant="destructive">Rejected</Badge>;
   return <Badge variant="outline">{s}</Badge>;
+}
+
+function PriceEditor({ row, onSaved }: { row: Row; onSaved: (val: string | null) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(row.price_label ?? "");
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    setSaving(true);
+    const next = value.trim() || null;
+    const { error } = await (supabase as any)
+      .from("businesses")
+      .update({ price_label: next, price_updated_at: new Date().toISOString() })
+      .eq("id", row.id);
+    setSaving(false);
+    if (error) { toast.error(error.message); return; }
+    toast.success("Price updated");
+    onSaved(next);
+    setEditing(false);
+  };
+
+  if (!editing) {
+    return (
+      <button
+        type="button"
+        onClick={() => { setValue(row.price_label ?? ""); setEditing(true); }}
+        className="inline-flex items-center gap-1 rounded-md border border-dashed border-border px-2 py-1 text-xs text-muted-foreground hover:border-primary hover:text-foreground"
+      >
+        <Tag className="h-3 w-3" />
+        {row.price_label ? <span className="font-medium text-foreground">{row.price_label}</span> : "Add price / rate"}
+        <Pencil className="h-3 w-3 opacity-60" />
+      </button>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-1">
+      <Input
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        maxLength={40}
+        placeholder="₱65/L, From ₱500…"
+        className="h-7 w-40 text-xs"
+        autoFocus
+        onKeyDown={(e) => {
+          if (e.key === "Enter") save();
+          if (e.key === "Escape") setEditing(false);
+        }}
+      />
+      <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={save} disabled={saving}>
+        <Check className="h-3.5 w-3.5" />
+      </Button>
+      <Button size="sm" variant="ghost" className="h-7 w-7 p-0" onClick={() => setEditing(false)}>
+        <X className="h-3.5 w-3.5" />
+      </Button>
+    </div>
+  );
 }
 
 function MyBusinessesPage() {
@@ -31,7 +95,7 @@ function MyBusinessesPage() {
     (async () => {
       const { data } = await (supabase as any)
         .from("businesses")
-        .select("id,slug,name,type_slug,status,city,region,rating_avg,rating_count")
+        .select("id,slug,name,type_slug,status,city,region,rating_avg,rating_count,price_label")
         .eq("owner_id", user.id)
         .order("created_at", { ascending: false });
       setRows(data ?? []); setLoading(false);
@@ -54,13 +118,19 @@ function MyBusinessesPage() {
       ) : (
         <div className="space-y-2">
           {rows.map((b) => (
-            <Card key={b.id} className="flex items-center justify-between gap-3 p-4">
+            <Card key={b.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <Link to="/businesses/$slug" params={{ slug: b.slug }} className="truncate font-semibold hover:underline">{b.name}</Link>
                   {statusBadge(b.status)}
                 </div>
                 <div className="text-xs text-muted-foreground">{[b.city, b.region].filter(Boolean).join(" · ")}</div>
+                <div className="mt-2">
+                  <PriceEditor
+                    row={b}
+                    onSaved={(val) => setRows((prev) => prev.map((r) => r.id === b.id ? { ...r, price_label: val } : r))}
+                  />
+                </div>
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 <span className="text-xs text-muted-foreground">{b.rating_count} review{b.rating_count === 1 ? "" : "s"}</span>
