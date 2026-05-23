@@ -2,11 +2,13 @@ import type { ReactNode } from "react";
 import { SiteHeader } from "./site-header";
 import { SiteFooter } from "./site-footer";
 import { CookieBanner } from "./cookie-banner";
+import { PaymentTestModeBanner } from "./PaymentTestModeBanner";
 import bannerImage from "@/assets/banner.webp";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
+      <PaymentTestModeBanner />
       <a href="/" aria-label="365 Motor Sales home" className="block bg-white">
         <img
           src={bannerImage}
