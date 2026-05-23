@@ -86,6 +86,7 @@ import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/em
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
 import { Route as DashboardRidesNewRouteImport } from './routes/dashboard.rides_.new'
 import { Route as ApiPublicPaymentEventsRouteImport } from './routes/api/public/payment-events'
+import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocode'
 import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
 import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions_.$staffId'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
@@ -482,6 +483,11 @@ const ApiPublicPaymentEventsRoute = ApiPublicPaymentEventsRouteImport.update({
   path: '/api/public/payment-events',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicGeocodeRoute = ApiPublicGeocodeRouteImport.update({
+  id: '/api/public/geocode',
+  path: '/api/public/geocode',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAdminCreateUserRoute = ApiAdminCreateUserRouteImport.update({
   id: '/api/admin/create-user',
   path: '/api/admin/create-user',
@@ -610,6 +616,7 @@ export interface FileRoutesByFullPath {
   '/shop/': typeof ShopIndexRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
+  '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
@@ -697,6 +704,7 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopIndexRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
+  '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
@@ -787,6 +795,7 @@ export interface FileRoutesById {
   '/shop/': typeof ShopIndexRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
+  '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/dashboard/rides_/new': typeof DashboardRidesNewRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
@@ -878,6 +887,7 @@ export interface FileRouteTypes {
     | '/shop/'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
+    | '/api/public/geocode'
     | '/api/public/payment-events'
     | '/dashboard/rides/new'
     | '/listing/$id/edit'
@@ -965,6 +975,7 @@ export interface FileRouteTypes {
     | '/shop'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
+    | '/api/public/geocode'
     | '/api/public/payment-events'
     | '/dashboard/rides/new'
     | '/listing/$id/edit'
@@ -1054,6 +1065,7 @@ export interface FileRouteTypes {
     | '/shop/'
     | '/admin/redemptions_/$staffId'
     | '/api/admin/create-user'
+    | '/api/public/geocode'
     | '/api/public/payment-events'
     | '/dashboard/rides_/new'
     | '/listing/$id/edit'
@@ -1112,6 +1124,7 @@ export interface RootRouteChildren {
   RidesIndexRoute: typeof RidesIndexRoute
   ShopIndexRoute: typeof ShopIndexRoute
   ApiAdminCreateUserRoute: typeof ApiAdminCreateUserRoute
+  ApiPublicGeocodeRoute: typeof ApiPublicGeocodeRoute
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ShopPSlugRoute: typeof ShopPSlugRoute
@@ -1665,6 +1678,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentEventsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/geocode': {
+      id: '/api/public/geocode'
+      path: '/api/public/geocode'
+      fullPath: '/api/public/geocode'
+      preLoaderRoute: typeof ApiPublicGeocodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/admin/create-user': {
       id: '/api/admin/create-user'
       path: '/api/admin/create-user'
@@ -1907,6 +1927,7 @@ const rootRouteChildren: RootRouteChildren = {
   RidesIndexRoute: RidesIndexRoute,
   ShopIndexRoute: ShopIndexRoute,
   ApiAdminCreateUserRoute: ApiAdminCreateUserRoute,
+  ApiPublicGeocodeRoute: ApiPublicGeocodeRoute,
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ShopPSlugRoute: ShopPSlugRoute,
