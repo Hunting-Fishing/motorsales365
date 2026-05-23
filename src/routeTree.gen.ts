@@ -22,6 +22,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PaymentsRouteImport } from './routes/payments'
 import { Route as MyQrRouteImport } from './routes/my-qr'
+import { Route as MapRouteImport } from './routes/map'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as GuidelinesRouteImport } from './routes/guidelines'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
@@ -161,6 +162,11 @@ const PaymentsRoute = PaymentsRouteImport.update({
 const MyQrRoute = MyQrRouteImport.update({
   id: '/my-qr',
   path: '/my-qr',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MapRoute = MapRouteImport.update({
+  id: '/map',
+  path: '/map',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -554,6 +560,7 @@ export interface FileRoutesByFullPath {
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
   '/login': typeof LoginRoute
+  '/map': typeof MapRoute
   '/my-qr': typeof MyQrRoute
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -642,6 +649,7 @@ export interface FileRoutesByTo {
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
   '/login': typeof LoginRoute
+  '/map': typeof MapRoute
   '/my-qr': typeof MyQrRoute
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -733,6 +741,7 @@ export interface FileRoutesById {
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
   '/login': typeof LoginRoute
+  '/map': typeof MapRoute
   '/my-qr': typeof MyQrRoute
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -825,6 +834,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/guidelines'
     | '/login'
+    | '/map'
     | '/my-qr'
     | '/payments'
     | '/pricing'
@@ -913,6 +923,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/guidelines'
     | '/login'
+    | '/map'
     | '/my-qr'
     | '/payments'
     | '/pricing'
@@ -1003,6 +1014,7 @@ export interface FileRouteTypes {
     | '/forgot-password'
     | '/guidelines'
     | '/login'
+    | '/map'
     | '/my-qr'
     | '/payments'
     | '/pricing'
@@ -1094,6 +1106,7 @@ export interface RootRouteChildren {
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   GuidelinesRoute: typeof GuidelinesRoute
   LoginRoute: typeof LoginRoute
+  MapRoute: typeof MapRoute
   MyQrRoute: typeof MyQrRoute
   PaymentsRoute: typeof PaymentsRouteWithChildren
   PricingRoute: typeof PricingRoute
@@ -1228,6 +1241,13 @@ declare module '@tanstack/react-router' {
       path: '/my-qr'
       fullPath: '/my-qr'
       preLoaderRoute: typeof MyQrRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/map': {
+      id: '/map'
+      path: '/map'
+      fullPath: '/map'
+      preLoaderRoute: typeof MapRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -1897,6 +1917,7 @@ const rootRouteChildren: RootRouteChildren = {
   ForgotPasswordRoute: ForgotPasswordRoute,
   GuidelinesRoute: GuidelinesRoute,
   LoginRoute: LoginRoute,
+  MapRoute: MapRoute,
   MyQrRoute: MyQrRoute,
   PaymentsRoute: PaymentsRouteWithChildren,
   PricingRoute: PricingRoute,
