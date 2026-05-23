@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Crosshair, MapPin, X } from "lucide-react";
+import { Crosshair, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { PlacesAutocomplete } from "./places-autocomplete";
 
 export type CenterPoint = { lat: number; lng: number; label?: string } | null;
 
@@ -48,23 +48,6 @@ export function MapFilterBar({
     );
   };
 
-  const geocodeSearch = async () => {
-    const q = search.trim();
-    if (!q) return;
-    try {
-      const res = await fetch(`/api/public/geocode?q=${encodeURIComponent(q)}`);
-      const json = await res.json();
-      if (!res.ok || !json?.lat) {
-        toast.error(json?.error || "Location not found");
-        return;
-      }
-      onChangeCenter({ lat: json.lat, lng: json.lng, label: json.label ?? q });
-      if (!radiusKm) onChangeRadius(10);
-    } catch {
-      toast.error("Geocoding failed");
-    }
-  };
-
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap gap-2">
@@ -86,22 +69,14 @@ export function MapFilterBar({
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex flex-1 items-center gap-2 min-w-[240px]">
-          <MapPin className="h-4 w-4 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                geocodeSearch();
-              }
-            }}
-            placeholder="Search a city, barangay or address…"
-            className="h-9"
-          />
-          <Button size="sm" variant="outline" onClick={geocodeSearch}>Go</Button>
-        </div>
+        <PlacesAutocomplete
+          value={search}
+          onChange={setSearch}
+          onPick={(p) => {
+            onChangeCenter({ lat: p.lat, lng: p.lng, label: p.label });
+            if (!radiusKm) onChangeRadius(10);
+          }}
+        />
         <Button size="sm" variant="outline" onClick={useMyLocation} disabled={locating}>
           <Crosshair className="mr-1 h-4 w-4" />
           {locating ? "Locating…" : "Use my location"}
