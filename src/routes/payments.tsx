@@ -26,26 +26,26 @@ type Method = {
 
 const METHODS: { group: string; items: Method[] }[] = [
   {
-    group: "E-wallets (Philippines)",
+    group: "Cards",
     items: [
-      { name: "GCash", desc: "Pay instantly from your GCash wallet.", icon: Smartphone, status: "soon", provider: "PayMongo" },
-      { name: "Maya", desc: "Pay with Maya wallet or Maya credit.", icon: Wallet, status: "soon", provider: "PayMongo" },
-      { name: "GrabPay", desc: "Pay using your GrabPay balance.", icon: Wallet, status: "soon", provider: "PayMongo" },
-      { name: "ShopeePay", desc: "Pay from your ShopeePay wallet.", icon: Wallet, status: "planned" },
+      { name: "Visa / Mastercard", desc: "Credit and debit cards, local and international. 3D Secure supported.", icon: CreditCard, status: "live", provider: "Stripe" },
+      { name: "JCB / AMEX", desc: "Additional card networks accepted at checkout.", icon: CreditCard, status: "live", provider: "Stripe" },
     ],
   },
   {
-    group: "Cards",
+    group: "E-wallets (Philippines)",
     items: [
-      { name: "Visa / Mastercard", desc: "Credit and debit cards, local and international.", icon: CreditCard, status: "soon", provider: "PayMongo" },
-      { name: "JCB / AMEX", desc: "Additional card networks.", icon: CreditCard, status: "planned" },
+      { name: "GCash", desc: "Pay instantly from your GCash wallet at checkout.", icon: Smartphone, status: "live", provider: "Stripe" },
+      { name: "GrabPay", desc: "Pay using your GrabPay balance.", icon: Wallet, status: "live", provider: "Stripe" },
+      { name: "Maya", desc: "Pay with Maya wallet or Maya credit.", icon: Wallet, status: "soon", provider: "Stripe" },
+      { name: "ShopeePay", desc: "Pay from your ShopeePay wallet.", icon: Wallet, status: "planned" },
     ],
   },
   {
     group: "Bank & QR",
     items: [
-      { name: "InstaPay / PESONet", desc: "Direct bank transfer from any PH bank.", icon: Building2, status: "soon", provider: "PayMongo" },
-      { name: "QR Ph", desc: "Scan-to-pay using the national QR standard.", icon: QrCode, status: "planned" },
+      { name: "QR Ph", desc: "Scan-to-pay using the national QR standard.", icon: QrCode, status: "soon", provider: "Stripe" },
+      { name: "InstaPay / PESONet", desc: "Direct bank transfer from any PH bank.", icon: Building2, status: "planned" },
       { name: "Online Banking (BPI, BDO, UnionBank)", desc: "Log in to your bank to pay.", icon: Building2, status: "planned" },
     ],
   },
