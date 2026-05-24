@@ -5,6 +5,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { formatPHP, formatDate } from "@/lib/format";
 import { Input } from "@/components/ui/input";
 import { CheckCircle2, AlertTriangle, ArrowUpRight, TrendingUp, Calendar, Check, CreditCard, Receipt, XCircle, RotateCcw, ExternalLink, Search } from "lucide-react";
