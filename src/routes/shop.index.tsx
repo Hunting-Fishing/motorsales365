@@ -197,6 +197,11 @@ function ShopIndex() {
             : <ProductGrid products={latest} vehicle={activeVehicle} />}
         </section>
 
+        <section aria-label="Shop profile">
+          <h2 className="mb-4 text-xl font-semibold">Visit our shop</h2>
+          <ShopProfile />
+        </section>
+
         <p className="rounded-md border bg-muted/40 p-4 text-xs text-muted-foreground">
           Disclosure: 365 MotorSales earns a commission on qualifying purchases. Prices and availability are set by the seller.
         </p>
