@@ -91,4 +91,24 @@ const TableCaption = React.forwardRef<
 ));
 TableCaption.displayName = "TableCaption";
 
-export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption };
+/**
+ * TableScroll — wraps a raw <table> so it scrolls horizontally on narrow
+ * viewports instead of overflowing the page. Use around plain <table> usages
+ * inside admin / dashboard pages.
+ */
+const TableScroll = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement> & { minWidth?: string }>(
+  ({ className, children, minWidth = "640px", ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn("-mx-4 overflow-x-auto sm:mx-0 print:mx-0 print:overflow-visible", className)}
+      {...props}
+    >
+      <div style={{ minWidth }} className="px-4 sm:px-0 print:px-0 print:min-w-0">
+        {children}
+      </div>
+    </div>
+  ),
+);
+TableScroll.displayName = "TableScroll";
+
+export { Table, TableHeader, TableBody, TableFooter, TableHead, TableRow, TableCell, TableCaption, TableScroll };

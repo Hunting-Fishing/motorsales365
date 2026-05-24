@@ -222,7 +222,7 @@ function StaffRedemptionDetail() {
             <h2 className="font-display text-sm font-semibold uppercase tracking-wider">By plan kind</h2>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[640px] text-sm">
               <thead className="bg-muted/40 text-left text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th className="px-3 py-2">Kind</th>
@@ -252,7 +252,7 @@ function StaffRedemptionDetail() {
             <h2 className="font-display text-sm font-semibold uppercase tracking-wider">Top users</h2>
           </div>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[640px] text-sm">
               <thead className="bg-muted/40 text-left text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th className="px-3 py-2">User</th>
@@ -286,7 +286,7 @@ function StaffRedemptionDetail() {
           <h2 className="font-display text-sm font-semibold uppercase tracking-wider">All redemptions</h2>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[640px] text-sm">
             <thead className="bg-muted/40 text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th className="px-3 py-2">Date</th>

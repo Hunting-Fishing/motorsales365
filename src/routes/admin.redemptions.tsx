@@ -310,7 +310,7 @@ function AdminRedemptions() {
 
         {byKindChart.length > 0 && (
           <div className="mt-4 overflow-x-auto rounded-lg border border-border">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[640px] text-sm">
               <thead className="bg-muted/40 text-left text-xs uppercase tracking-wider text-muted-foreground">
                 <tr>
                   <th className="px-3 py-2">Kind</th>
@@ -355,7 +355,7 @@ function AdminRedemptions() {
 
       <section className="rounded-xl border border-border bg-card">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[640px] text-sm">
             <thead className="bg-muted/40 text-left text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th className="px-3 py-2">Date</th>

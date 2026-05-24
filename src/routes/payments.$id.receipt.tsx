@@ -135,7 +135,9 @@ function ReceiptPage() {
             );
             const DAY = 86_400_000;
             return (
-              <table className="w-full border-t border-border text-sm">
+              <div className="-mx-2 overflow-x-auto sm:mx-0 print:mx-0 print:overflow-visible">
+              <table className="w-full min-w-[520px] border-t border-border text-sm print:min-w-0">
+
                 <thead>
                   <tr className="text-left text-xs uppercase text-muted-foreground">
                     <th className="py-3">Description</th>
@@ -268,8 +270,10 @@ function ReceiptPage() {
                   </tr>
                 </tfoot>
               </table>
+              </div>
             );
           })() : (
+
           (() => {
             const credit = Number(payment.prorated_credit_php ?? 0);
             const gross = Number(payment.gross_amount_php ?? 0);
@@ -307,7 +311,9 @@ function ReceiptPage() {
               }
             }
             return (
-              <table className="w-full border-t border-border text-sm">
+              <div className="-mx-2 overflow-x-auto sm:mx-0 print:mx-0 print:overflow-visible">
+              <table className="w-full min-w-[520px] border-t border-border text-sm print:min-w-0">
+
                 <thead>
                   <tr className="text-left text-xs uppercase text-muted-foreground">
                     <th className="py-3">Description</th>
@@ -493,7 +499,9 @@ function ReceiptPage() {
                   </tr>
                 </tfoot>
               </table>
+              </div>
             );
+
           })()
           )}
 

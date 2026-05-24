@@ -575,10 +575,10 @@ function AdminReferrals() {
             className="h-8 pl-8"
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full items-center gap-2 sm:w-auto">
           <Label className="text-xs uppercase tracking-wider text-muted-foreground">Role</Label>
           <Select value={roleFilter} onValueChange={setRoleFilter}>
-            <SelectTrigger className="h-8 w-[140px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="h-8 w-full sm:w-[140px]"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All roles</SelectItem>
               <SelectItem value="admin">Admin</SelectItem>
@@ -590,10 +590,10 @@ function AdminReferrals() {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full items-center gap-2 sm:w-auto">
           <Label className="text-xs uppercase tracking-wider text-muted-foreground">Status</Label>
           <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
-            <SelectTrigger className="h-8 w-[130px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="h-8 w-full sm:w-[130px]"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
               <SelectItem value="active">Active only</SelectItem>
@@ -601,13 +601,14 @@ function AdminReferrals() {
             </SelectContent>
           </Select>
         </div>
+
         <div className="ml-auto text-xs text-muted-foreground">
           Showing {sortedRows.length} of {rows.length}
         </div>
       </div>
 
       <div className="rounded-xl border border-border bg-card overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full min-w-[640px] text-sm">
           <thead className="border-b border-border bg-muted/40">
             <tr className="text-left">
               <SortableTh label="Staff" k="name" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
@@ -752,10 +753,10 @@ function AdminReferrals() {
             <Button size="sm" variant="ghost" onClick={loadAudit}><RefreshCw className="mr-1 h-3 w-3" /> Refresh</Button>
           </div>
           <div className="mb-3 flex flex-wrap items-end gap-2">
-            <div className="flex flex-col gap-1">
+            <div className="flex w-full flex-col gap-1 sm:w-auto">
               <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Action</Label>
               <Select value={auditAction} onValueChange={setAuditAction}>
-                <SelectTrigger className="h-8 w-[160px]"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-8 w-full sm:w-[160px]"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All actions</SelectItem>
                   <SelectItem value="created">created</SelectItem>
@@ -768,10 +769,10 @@ function AdminReferrals() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex w-full flex-col gap-1 sm:w-auto">
               <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Admin</Label>
               <Select value={auditActor} onValueChange={setAuditActor}>
-                <SelectTrigger className="h-8 w-[180px]"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-8 w-full sm:w-[180px]"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All admins</SelectItem>
                   {auditActorOptions.map((a) => (
@@ -780,14 +781,15 @@ function AdminReferrals() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex w-full flex-col gap-1 sm:w-auto">
               <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">From</Label>
-              <Input type="date" value={auditFrom} onChange={(e) => setAuditFrom(e.target.value)} className="h-8 w-[150px]" />
+              <Input type="date" value={auditFrom} onChange={(e) => setAuditFrom(e.target.value)} className="h-8 w-full sm:w-[150px]" />
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex w-full flex-col gap-1 sm:w-auto">
               <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">To</Label>
-              <Input type="date" value={auditTo} onChange={(e) => setAuditTo(e.target.value)} className="h-8 w-[150px]" />
+              <Input type="date" value={auditTo} onChange={(e) => setAuditTo(e.target.value)} className="h-8 w-full sm:w-[150px]" />
             </div>
+
             {(auditAction !== "all" || auditActor !== "all" || auditFrom || auditTo) && (
               <Button size="sm" variant="ghost" onClick={() => { setAuditAction("all"); setAuditActor("all"); setAuditFrom(""); setAuditTo(""); }}>
                 Clear
@@ -798,7 +800,7 @@ function AdminReferrals() {
             <p className="text-sm text-muted-foreground">No audit entries match these filters.</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-xs">
+              <table className="w-full min-w-[640px] text-xs">
                 <thead className="border-b border-border bg-muted/40">
                   <tr className="text-left">
                     <th className="px-3 py-2">When</th>

@@ -842,7 +842,7 @@ function BillingPage() {
           </div>
         ) : (
           <div className="overflow-x-auto rounded-xl border border-border bg-card">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[640px] text-sm">
               <thead className="bg-secondary/50 text-left">
                 <tr>
                   <th className="p-3">Listing</th>
@@ -1085,7 +1085,7 @@ function BillingPage() {
           </div>
         ) : (
           <div className="overflow-x-auto rounded-xl border border-border bg-card">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[640px] text-sm">
               <thead className="bg-secondary/50 text-left">
                 <tr>
                   <th className="p-3">Date</th>
@@ -1168,7 +1168,7 @@ function BillingPage() {
           <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">No payments yet.</div>
         ) : (
           <div className="overflow-x-auto rounded-xl border border-border bg-card">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[640px] text-sm">
               <thead className="bg-secondary/50 text-left">
                 <tr>
                   <th className="p-3">Date</th>
