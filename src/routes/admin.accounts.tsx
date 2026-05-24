@@ -217,13 +217,13 @@ function AccountsConsole() {
         </div>
       </div>
 
-      <div className="mb-4 grid gap-2 md:grid-cols-[1fr_auto_auto_auto_auto]">
-        <div className="relative">
+      <div className="mb-4 grid gap-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-[1fr_auto_auto_auto_auto]">
+        <div className="relative sm:col-span-2 md:col-span-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input className="pl-9" placeholder="Search name, business, ID…" value={search} onChange={(e) => setSearch(e.target.value)} />
         </div>
         <Select value={tierFilter} onValueChange={setTierFilter}>
-          <SelectTrigger className="w-[140px]"><SelectValue placeholder="Tier" /></SelectTrigger>
+          <SelectTrigger className="w-full md:w-[140px]"><SelectValue placeholder="Tier" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All tiers</SelectItem>
             <SelectItem value="Free">Free</SelectItem>
@@ -231,7 +231,7 @@ function AccountsConsole() {
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[130px]"><SelectValue placeholder="Status" /></SelectTrigger>
+          <SelectTrigger className="w-full md:w-[130px]"><SelectValue placeholder="Status" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All status</SelectItem>
             <SelectItem value="active">Active</SelectItem>
@@ -240,7 +240,7 @@ function AccountsConsole() {
           </SelectContent>
         </Select>
         <Select value={foundingFilter} onValueChange={setFoundingFilter}>
-          <SelectTrigger className="w-[150px]"><SelectValue placeholder="Founding" /></SelectTrigger>
+          <SelectTrigger className="w-full md:w-[150px]"><SelectValue placeholder="Founding" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All members</SelectItem>
             <SelectItem value="yes">Founding only</SelectItem>
@@ -248,7 +248,7 @@ function AccountsConsole() {
           </SelectContent>
         </Select>
         <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
-          <SelectTrigger className="w-[140px]"><ArrowUpDown className="mr-1 h-4 w-4" /><SelectValue /></SelectTrigger>
+          <SelectTrigger className="w-full md:w-[140px]"><ArrowUpDown className="mr-1 h-4 w-4" /><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="joined">Recently joined</SelectItem>
             <SelectItem value="spend">Lifetime spend</SelectItem>
@@ -256,6 +256,7 @@ function AccountsConsole() {
           </SelectContent>
         </Select>
       </div>
+
 
       {loading ? (
         <div className="p-12 text-center text-muted-foreground">Loading…</div>
