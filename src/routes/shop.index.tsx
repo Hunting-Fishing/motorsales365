@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { VehicleFitmentPicker } from "@/components/shop/vehicle-fitment-picker";
 import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
+import { ShopFavoriteButton } from "@/components/shop/shop-favorite-button";
 import { useGarage, formatVehicle } from "@/lib/garage";
 import { X } from "lucide-react";
 
