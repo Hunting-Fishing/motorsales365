@@ -5,9 +5,10 @@ import { useAuth } from "@/hooks/use-auth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { formatPHP, formatDate } from "@/lib/format";
 import { Input } from "@/components/ui/input";
-import { CheckCircle2, AlertTriangle, ArrowUpRight, TrendingUp, Calendar, Check, CreditCard, Receipt, XCircle, RotateCcw, ExternalLink, Search } from "lucide-react";
+import { CheckCircle2, AlertTriangle, ArrowUpRight, TrendingUp, Calendar, Check, CreditCard, Receipt, XCircle, RotateCcw, ExternalLink, Search, FileText } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
 import { getStripeEnvironment } from "@/lib/stripe";
@@ -19,6 +20,7 @@ import {
   listPaymentMethods,
   setDefaultPaymentMethod,
   detachPaymentMethod,
+  getInvoiceDetails,
 } from "@/utils/payments.functions";
 
 
@@ -74,6 +76,9 @@ function BillingPage() {
   const [invoiceStatusFilter, setInvoiceStatusFilter] = useState<"all" | "paid" | "open">("all");
   const [invoiceDateFilter, setInvoiceDateFilter] = useState<"all" | "30d" | "90d">("all");
   const [invoiceSearch, setInvoiceSearch] = useState("");
+  const [invoiceDrawerOpen, setInvoiceDrawerOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<any | null>(null);
+  const [loadingInvoice, setLoadingInvoice] = useState(false);
   const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
   const [defaultPmId, setDefaultPmId] = useState<string | null>(null);
 
@@ -1092,7 +1097,25 @@ function BillingPage() {
               </thead>
               <tbody>
                 {filteredInvoices.map((inv) => (
-                  <tr key={inv.id} className="border-t border-border">
+                  <tr
+                    key={inv.id}
+                    className="border-t border-border cursor-pointer hover:bg-muted/40 transition-colors"
+                    onClick={async () => {
+                      try {
+                        setLoadingInvoice(true);
+                        setInvoiceDrawerOpen(true);
+                        const details = await getInvoiceDetails({
+                          data: { invoiceId: inv.id, environment: env },
+                        });
+                        setSelectedInvoice(details);
+                      } catch (e: any) {
+                        toast.error(e?.message ?? "Could not load invoice details");
+                        setInvoiceDrawerOpen(false);
+                      } finally {
+                        setLoadingInvoice(false);
+                      }
+                    }}
+                  >
                     <td className="p-3">{formatDate(new Date(inv.created * 1000).toISOString())}</td>
                     <td className="p-3 font-mono text-xs">{inv.number ?? inv.id}</td>
                     <td className="p-3 font-medium">
@@ -1107,11 +1130,23 @@ function BillingPage() {
                     </td>
                     <td className="p-3">
                       {inv.hosted_invoice_url ? (
-                        <a href={inv.hosted_invoice_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                        <a
+                          href={inv.hosted_invoice_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           View ↗
                         </a>
                       ) : inv.invoice_pdf ? (
-                        <a href={inv.invoice_pdf} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                        <a
+                          href={inv.invoice_pdf}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           PDF ↗
                         </a>
                       ) : (
@@ -1196,6 +1231,156 @@ function BillingPage() {
           </div>
         </div>
       )}
+
+      {/* Invoice Details Drawer */}
+      <Sheet open={invoiceDrawerOpen} onOpenChange={setInvoiceDrawerOpen}>
+        <SheetContent className="w-full sm:max-w-md overflow-y-auto">
+          <SheetHeader className="pb-4">
+            <SheetTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-muted-foreground" />
+              Invoice details
+            </SheetTitle>
+          </SheetHeader>
+          {loadingInvoice ? (
+            <div className="space-y-3 py-6">
+              <div className="h-4 w-1/3 rounded bg-muted animate-pulse" />
+              <div className="h-4 w-1/2 rounded bg-muted animate-pulse" />
+              <div className="h-20 rounded bg-muted animate-pulse" />
+            </div>
+          ) : selectedInvoice ? (
+            <div className="space-y-6 py-2">
+              {/* Header info */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Invoice</span>
+                  <span className="font-mono text-sm">{selectedInvoice.number ?? selectedInvoice.id}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Status</span>
+                  <Badge variant={selectedInvoice.status === "paid" ? "default" : "secondary"} className="capitalize">
+                    {selectedInvoice.status ?? "—"}
+                  </Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Date</span>
+                  <span className="text-sm">{selectedInvoice.created ? formatDate(new Date(selectedInvoice.created * 1000).toISOString()) : "—"}</span>
+                </div>
+                {selectedInvoice.due_date && (
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">Due</span>
+                    <span className="text-sm">{formatDate(new Date(selectedInvoice.due_date * 1000).toISOString())}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Line items */}
+              <div className="rounded-xl border border-border">
+                <div className="bg-secondary/40 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Line items
+                </div>
+                <div className="divide-y divide-border">
+                  {selectedInvoice.lines.map((line: any) => (
+                    <div key={line.id} className="flex items-start justify-between gap-3 px-4 py-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium">{line.description || "—"}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {line.quantity} × {(selectedInvoice.currency ?? "").toUpperCase() === "PHP"
+                            ? formatPHP(line.unit_amount)
+                            : `${line.unit_amount.toFixed(2)} ${(selectedInvoice.currency ?? "").toUpperCase()}`}
+                        </div>
+                        {line.period_start && line.period_end && (
+                          <div className="text-xs text-muted-foreground">
+                            {formatDate(new Date(line.period_start * 1000).toISOString())} — {formatDate(new Date(line.period_end * 1000).toISOString())}
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-sm font-medium whitespace-nowrap">
+                        {(selectedInvoice.currency ?? "").toUpperCase() === "PHP"
+                          ? formatPHP(line.amount)
+                          : `${line.amount.toFixed(2)} ${(selectedInvoice.currency ?? "").toUpperCase()}`}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Totals */}
+              <div className="space-y-2 rounded-xl border border-border p-4">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-muted-foreground">Subtotal</span>
+                  <span>
+                    {(selectedInvoice.currency ?? "").toUpperCase() === "PHP"
+                      ? formatPHP(selectedInvoice.subtotal)
+                      : `${selectedInvoice.subtotal.toFixed(2)} ${(selectedInvoice.currency ?? "").toUpperCase()}`}
+                  </span>
+                </div>
+                {selectedInvoice.total !== selectedInvoice.subtotal && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">Tax / adjustments</span>
+                    <span>
+                      {(selectedInvoice.currency ?? "").toUpperCase() === "PHP"
+                        ? formatPHP(selectedInvoice.total - selectedInvoice.subtotal)
+                        : `${(selectedInvoice.total - selectedInvoice.subtotal).toFixed(2)} ${(selectedInvoice.currency ?? "").toUpperCase()}`}
+                    </span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between border-t border-border pt-2 font-semibold">
+                  <span>Total</span>
+                  <span>
+                    {(selectedInvoice.currency ?? "").toUpperCase() === "PHP"
+                      ? formatPHP(selectedInvoice.total)
+                      : `${selectedInvoice.total.toFixed(2)} ${(selectedInvoice.currency ?? "").toUpperCase()}`}
+                  </span>
+                </div>
+                {selectedInvoice.amount_paid > 0 && (
+                  <div className="flex items-center justify-between text-sm text-emerald-600">
+                    <span>Paid</span>
+                    <span>
+                      {(selectedInvoice.currency ?? "").toUpperCase() === "PHP"
+                        ? formatPHP(selectedInvoice.amount_paid)
+                        : `${selectedInvoice.amount_paid.toFixed(2)} ${(selectedInvoice.currency ?? "").toUpperCase()}`}
+                    </span>
+                  </div>
+                )}
+                {selectedInvoice.amount_remaining > 0 && (
+                  <div className="flex items-center justify-between text-sm text-amber-600">
+                    <span>Remaining</span>
+                    <span>
+                      {(selectedInvoice.currency ?? "").toUpperCase() === "PHP"
+                        ? formatPHP(selectedInvoice.amount_remaining)
+                        : `${selectedInvoice.amount_remaining.toFixed(2)} ${(selectedInvoice.currency ?? "").toUpperCase()}`}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-2">
+                {selectedInvoice.hosted_invoice_url && (
+                  <Button asChild variant="outline" className="flex-1">
+                    <a href={selectedInvoice.hosted_invoice_url} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="mr-1.5 h-4 w-4" />
+                      View on Stripe
+                    </a>
+                  </Button>
+                )}
+                {selectedInvoice.invoice_pdf && (
+                  <Button asChild variant="outline" className="flex-1">
+                    <a href={selectedInvoice.invoice_pdf} target="_blank" rel="noopener noreferrer">
+                      <Receipt className="mr-1.5 h-4 w-4" />
+                      Download PDF
+                    </a>
+                  </Button>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="py-10 text-center text-sm text-muted-foreground">
+              Select an invoice to see details.
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
