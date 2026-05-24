@@ -1,47 +1,5 @@
-/// <reference types="google.maps" />
-// Singleton loader for the Google Maps JavaScript API.
-// Must use loading=async + callback (per project rules); never set mapId.
-
-let loaderPromise: Promise<typeof google> | null = null;
-
-declare global {
-  interface Window {
-    __gmapsInit?: () => void;
-    google: typeof google;
-  }
-}
-
-export function loadGoogleMaps(): Promise<typeof google> {
-  if (typeof window === "undefined") {
-    return Promise.reject(new Error("Google Maps can only load in the browser"));
-  }
-  if (window.google?.maps) return Promise.resolve(window.google);
-  if (loaderPromise) return loaderPromise;
-
-  const key = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_BROWSER_KEY as string | undefined;
-  const channel = import.meta.env.VITE_LOVABLE_CONNECTOR_GOOGLE_MAPS_TRACKING_ID as string | undefined;
-  if (!key) return Promise.reject(new Error("Google Maps browser key is not configured"));
-
-  loaderPromise = new Promise((resolve, reject) => {
-    window.__gmapsInit = () => resolve(window.google);
-    const script = document.createElement("script");
-    const params = new URLSearchParams({
-      key,
-      loading: "async",
-      libraries: "places,marker",
-      callback: "__gmapsInit",
-    });
-    if (channel) params.set("channel", channel);
-    script.src = `https://maps.googleapis.com/maps/api/js?${params.toString()}`;
-    script.async = true;
-    script.onerror = () => {
-      loaderPromise = null;
-      reject(new Error("Failed to load Google Maps script"));
-    };
-    document.head.appendChild(script);
-  });
-  return loaderPromise;
-}
+// Kept for backward compatibility: shared helpers used across the map UI.
+// The map now uses Leaflet + OpenStreetMap (no API key required).
 
 // Haversine distance in km between two lat/lng points.
 export function haversineKm(
