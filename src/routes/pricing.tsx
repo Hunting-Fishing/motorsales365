@@ -19,7 +19,6 @@ import { formatPHP } from "@/lib/format";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { updateSubscriptionPlan } from "@/utils/payments.functions";
-import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 
 
 type UsageMonth = { key: string; label: string; count: number };
