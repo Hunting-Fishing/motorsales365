@@ -3,17 +3,18 @@ import { SiteHeader } from "./site-header";
 import { SiteFooter } from "./site-footer";
 import { CookieBanner } from "./cookie-banner";
 import { PaymentTestModeBanner } from "./PaymentTestModeBanner";
+import { MobileTabBar } from "./mobile-tab-bar";
 import bannerImage from "@/assets/banner.webp";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col pb-[calc(64px+env(safe-area-inset-bottom))] md:pb-0">
       <PaymentTestModeBanner />
       <a href="/" aria-label="365 Motor Sales home" className="block bg-white">
         <img
           src={bannerImage}
           alt="365 Motor Sales — Buy, Sell, List Vehicles & Equipment across the Philippines"
-          className="h-auto w-full max-h-[180px] md:max-h-[220px] object-cover object-center"
+          className="h-auto w-full max-h-[88px] sm:max-h-[140px] md:max-h-[220px] object-cover object-center"
           loading="eager"
         />
       </a>
@@ -23,6 +24,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <main className="brand-watermark flex-1">{children}</main>
       <SiteFooter />
       <CookieBanner />
+      <MobileTabBar />
     </div>
   );
 }
