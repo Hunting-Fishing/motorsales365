@@ -128,10 +128,10 @@ function MapPage() {
 
   return (
     <SiteLayout>
-      <div className="container mx-auto px-4 py-4">
+      <div className="container mx-auto px-3 py-3 sm:px-4 sm:py-4">
         <div className="mb-3">
-          <h1 className="font-display text-2xl font-bold tracking-tight">Business Map</h1>
-          <p className="text-sm text-muted-foreground">Search a radius around any location. Click a pin for details.</p>
+          <h1 className="font-display text-xl font-bold tracking-tight sm:text-2xl">Business Map</h1>
+          <p className="text-xs text-muted-foreground sm:text-sm">Search a radius around any location. Tap a pin for details.</p>
         </div>
         <Card className="mb-3 p-3">
           <MapFilterBar
@@ -144,8 +144,21 @@ function MapPage() {
             onChangeRadius={setRadiusKm}
           />
         </Card>
-        <div className="grid gap-4 lg:grid-cols-[360px_1fr]">
-          <div className="space-y-2 lg:max-h-[calc(100dvh-260px)] lg:overflow-y-auto lg:pr-1">
+
+        <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[360px_1fr]">
+          {/* Map — appears first on mobile, second on desktop */}
+          <div className="order-1 h-[55vh] min-h-[320px] overflow-hidden rounded-lg lg:order-2 lg:h-[640px]">
+            <GoogleBusinessMap
+              height="100%"
+              businesses={mapBusinesses}
+              center={center ? { lat: center.lat, lng: center.lng } : null}
+              radiusKm={radiusKm}
+              onPinClick={(slug: string) => navigate({ to: "/businesses/$slug", params: { slug } })}
+            />
+          </div>
+
+          {/* List */}
+          <div className="order-2 space-y-2 lg:order-1 lg:max-h-[calc(100dvh-260px)] lg:overflow-y-auto lg:pr-1">
             <div className="text-xs text-muted-foreground">
               {loading ? "Loading…" : `${sorted.length} result${sorted.length === 1 ? "" : "s"}${center && radiusKm ? ` within ${radiusKm} km` : ""}`}
             </div>
@@ -167,10 +180,10 @@ function MapPage() {
                     onClick={() => navigate({ to: "/businesses/$slug", params: { slug: b.slug } })}
                     onMouseEnter={() => setHoverId(b.id)}
                     onMouseLeave={() => setHoverId((id) => (id === b.id ? null : id))}
-                    className={`cursor-pointer p-3 transition hover:border-primary ${hoverId === b.id ? "border-primary ring-1 ring-primary/40" : ""}`}
+                    className={`cursor-pointer p-3 transition hover:border-primary active:scale-[0.99] ${hoverId === b.id ? "border-primary ring-1 ring-primary/40" : ""}`}
                   >
                     <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <h3 className="truncate text-sm font-semibold">{b.name}</h3>
                           {b.featured && <Badge variant="default" className="shrink-0 text-[10px]">Featured</Badge>}
@@ -178,8 +191,8 @@ function MapPage() {
                         <div className="text-[11px] text-muted-foreground">{typeLabel(b.type_slug)}</div>
                         {(b.city || b.barangay) && (
                           <div className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
-                            <MapPin className="h-3 w-3" />
-                            {[b.barangay, b.city].filter(Boolean).join(", ")}
+                            <MapPin className="h-3 w-3 shrink-0" />
+                            <span className="truncate">{[b.barangay, b.city].filter(Boolean).join(", ")}</span>
                           </div>
                         )}
                       </div>
@@ -198,15 +211,6 @@ function MapPage() {
                 );
               })
             )}
-          </div>
-          <div className="h-[480px] lg:h-[640px]">
-            <GoogleBusinessMap
-              height="100%"
-              businesses={mapBusinesses}
-              center={center ? { lat: center.lat, lng: center.lng } : null}
-              radiusKm={radiusKm}
-              onPinClick={(slug: string) => navigate({ to: "/businesses/$slug", params: { slug } })}
-            />
           </div>
         </div>
       </div>
