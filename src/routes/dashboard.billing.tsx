@@ -351,7 +351,7 @@ function BillingPage() {
           <div className="mt-1 text-xs text-muted-foreground">across all your listings</div>
         </div>
         <div className="rounded-xl border border-border bg-card p-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="text-xs uppercase text-muted-foreground">Renewal countdown</div>
             {proratedCredit > 0 && (
               <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-medium text-emerald-600">
@@ -632,7 +632,7 @@ function BillingPage() {
       {/* Invoice history from Stripe */}
       {invoices.length > 0 && (
         <section className="mb-8 rounded-xl border border-border bg-card p-4">
-          <div className="mb-3 flex items-center justify-between">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-display text-lg font-semibold">Invoices</h2>
             <Receipt className="h-4 w-4 text-muted-foreground" />
           </div>
@@ -673,7 +673,7 @@ function BillingPage() {
       {/* Posting activity chart */}
 
       <section className="mb-8">
-        <div className="mb-2 flex items-center justify-between">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-display text-lg font-semibold">Posting activity</h2>
           <div className="inline-flex rounded-md border border-border bg-card p-0.5 text-xs">
             <button
@@ -799,7 +799,7 @@ function BillingPage() {
 
       {/* Subscriptions */}
       <section className="mb-8">
-        <div className="mb-2 flex items-center justify-between">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-display text-lg font-semibold">Subscriptions</h2>
           <Button asChild size="sm" variant="outline"><Link to="/pricing">Browse plans</Link></Button>
         </div>
@@ -832,7 +832,7 @@ function BillingPage() {
 
       {/* Recent listings */}
       <section className="mb-8">
-        <div className="mb-2 flex items-center justify-between">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-display text-lg font-semibold">Recent listings</h2>
           <Button asChild size="sm" variant="outline"><Link to="/dashboard">My listings</Link></Button>
         </div>
@@ -913,7 +913,7 @@ function BillingPage() {
 
       {/* Payment methods */}
       <section className="mb-8">
-        <div className="mb-2 flex items-center justify-between">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-display text-lg font-semibold">Payment methods</h2>
           <Button
             size="sm"
@@ -1251,22 +1251,22 @@ function BillingPage() {
             <div className="space-y-6 py-2">
               {/* Header info */}
               <div className="space-y-1">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-sm text-muted-foreground">Invoice</span>
                   <span className="font-mono text-sm">{selectedInvoice.number ?? selectedInvoice.id}</span>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-sm text-muted-foreground">Status</span>
                   <Badge variant={selectedInvoice.status === "paid" ? "default" : "secondary"} className="capitalize">
                     {selectedInvoice.status ?? "—"}
                   </Badge>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-sm text-muted-foreground">Date</span>
                   <span className="text-sm">{selectedInvoice.created ? formatDate(new Date(selectedInvoice.created * 1000).toISOString()) : "—"}</span>
                 </div>
                 {selectedInvoice.due_date && (
-                  <div className="flex items-center justify-between">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="text-sm text-muted-foreground">Due</span>
                     <span className="text-sm">{formatDate(new Date(selectedInvoice.due_date * 1000).toISOString())}</span>
                   </div>
