@@ -42,19 +42,43 @@ type Row = {
   price_label: string | null;
 };
 
+const LS_KEY = "map:last-search";
+type StoredSearch = { lat: number; lng: number; label?: string; radiusKm?: number | null };
+
+function readStoredSearch(): StoredSearch | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(LS_KEY);
+    if (!raw) return null;
+    const v = JSON.parse(raw);
+    if (typeof v?.lat === "number" && typeof v?.lng === "number") return v;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 function MapPage() {
   const navigate = useNavigate();
   const search = Route.useSearch();
   const [types, setTypes] = useState<BusinessType[]>([]);
   const [items, setItems] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // URL wins as source of truth; fall back to localStorage when URL is bare.
+  const stored = search.lat == null || search.lng == null ? readStoredSearch() : null;
+
   const [typeSlug, setTypeSlug] = useState<string | null>(search.type ?? null);
   const [center, setCenter] = useState<CenterPoint>(
     search.lat != null && search.lng != null
       ? { lat: search.lat, lng: search.lng, label: search.q }
-      : null,
+      : stored
+        ? { lat: stored.lat, lng: stored.lng, label: stored.label }
+        : null,
   );
-  const [radiusKm, setRadiusKm] = useState<number | null>(search.r ?? null);
+  const [radiusKm, setRadiusKm] = useState<number | null>(
+    search.r ?? (stored?.radiusKm ?? null),
+  );
   const [hoverId, setHoverId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -68,6 +92,24 @@ function MapPage() {
       },
       replace: true,
     });
+
+    if (typeof window !== "undefined") {
+      try {
+        if (center) {
+          const payload: StoredSearch = {
+            lat: center.lat,
+            lng: center.lng,
+            label: center.label,
+            radiusKm: radiusKm ?? null,
+          };
+          window.localStorage.setItem(LS_KEY, JSON.stringify(payload));
+        } else {
+          window.localStorage.removeItem(LS_KEY);
+        }
+      } catch {
+        // ignore quota / private-mode errors
+      }
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [center, radiusKm, typeSlug]);
 
