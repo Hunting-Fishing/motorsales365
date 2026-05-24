@@ -19,7 +19,6 @@ import { formatPHP } from "@/lib/format";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { updateSubscriptionPlan } from "@/utils/payments.functions";
-import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 
 
 type UsageMonth = { key: string; label: string; count: number };
@@ -233,7 +232,6 @@ function PricingPage() {
 
   return (
     <SiteLayout>
-      <PaymentTestModeBanner />
       <section className="bg-secondary/40 py-12">
         <div className="container mx-auto px-4 text-center">
           <h1 className="font-display text-4xl font-bold">Simple pricing</h1>

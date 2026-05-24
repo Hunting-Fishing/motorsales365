@@ -109,10 +109,7 @@ export function SiteHeader() {
             <CurrencySwitcher />
           </div>
 
-          {/* Mobile compact Sell CTA */}
-          <Button asChild size="icon" variant="default" className="sm:hidden h-9 w-9" aria-label="Post a listing">
-            <Link to="/sell"><Plus className="h-5 w-5" /></Link>
-          </Button>
+          {/* Sell CTA — desktop only; mobile uses bottom tab bar */}
           <Button asChild className="hidden sm:inline-flex" variant="default">
             <Link to="/sell"><Plus className="mr-1 h-4 w-4" /> Post a listing</Link>
           </Button>
