@@ -320,3 +320,59 @@ export const adminDeleteFitment = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// ============ SHOP FAVORITES ============
+
+export const listShopFavoriteIds = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data, error } = await supabase
+      .from("shop_favorites")
+      .select("product_id")
+      .eq("user_id", userId);
+    if (error) throw new Error(error.message);
+    return { ids: (data ?? []).map((r: any) => r.product_id as string) };
+  });
+
+export const listShopFavoriteProducts = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data, error } = await supabase
+      .from("shop_favorites")
+      .select("created_at, product:shop_products(id, slug, title, brand, image_url, price_php, currency, featured, universal_fit, active)")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    const products = (data ?? [])
+      .map((r: any) => r.product)
+      .filter((p: any) => p && p.active);
+    return { products };
+  });
+
+export const toggleShopFavorite = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { productId: string; favorite: boolean }) =>
+    z.object({
+      productId: z.string().uuid(),
+      favorite: z.boolean(),
+    }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    if (data.favorite) {
+      const { error } = await supabase
+        .from("shop_favorites")
+        .upsert({ user_id: userId, product_id: data.productId }, { onConflict: "user_id,product_id" });
+      if (error) throw new Error(error.message);
+    } else {
+      const { error } = await supabase
+        .from("shop_favorites")
+        .delete()
+        .eq("user_id", userId)
+        .eq("product_id", data.productId);
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true, favorite: data.favorite };
+  });

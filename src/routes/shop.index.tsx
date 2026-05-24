@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { VehicleFitmentPicker } from "@/components/shop/vehicle-fitment-picker";
 import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
+import { ShopFavoriteButton } from "@/components/shop/shop-favorite-button";
 import { useGarage, formatVehicle } from "@/lib/garage";
 import { X } from "lucide-react";
 
@@ -206,7 +207,13 @@ export function ProductGrid({ products, vehicle }: { products: any[]; vehicle?: 
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
       {products.map((p) => (
-        <Link key={p.id} to="/shop/p/$slug" params={{ slug: p.slug }} className="group">
+        <div key={p.id} className="group relative">
+          <ShopFavoriteButton
+            productId={p.id}
+            className="absolute right-2 top-2 z-10"
+            size="md"
+          />
+          <Link to="/shop/p/$slug" params={{ slug: p.slug }} className="block">
           <Card className="overflow-hidden transition hover:shadow-lg">
             {p.image_url ? (
               <ImageWithSkeleton src={p.image_url} alt={p.title} className="aspect-square w-full object-cover transition-transform group-hover:scale-105" />
@@ -223,7 +230,8 @@ export function ProductGrid({ products, vehicle }: { products: any[]; vehicle?: 
               </div>
             </CardContent>
           </Card>
-        </Link>
+          </Link>
+        </div>
       ))}
     </div>
   );

@@ -2278,6 +2278,24 @@ export type Database = {
           },
         ]
       }
+      shop_favorites: {
+        Row: {
+          created_at: string
+          product_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          product_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          product_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       shop_product_fitment: {
         Row: {
           category: string

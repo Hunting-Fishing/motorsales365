@@ -8,6 +8,7 @@ import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
+import { ShopFavoriteButton } from "@/components/shop/shop-favorite-button";
 
 function getVisitorId(): string {
   if (typeof window === "undefined") return "";
@@ -64,6 +65,9 @@ function ProductPage() {
             {p.brand && <Badge variant="secondary">{p.brand}</Badge>}
             <h1 className="font-display text-2xl sm:text-3xl md:text-4xl">{p.title}</h1>
             {p.price_php && <p className="text-2xl font-bold">₱{Number(p.price_php).toLocaleString()} <span className="text-sm font-normal text-muted-foreground">approx.</span></p>}
+            <div className="pt-1">
+              <ShopFavoriteButton productId={p.id} variant="label" />
+            </div>
             {p.description && <p className="whitespace-pre-line text-muted-foreground">{p.description}</p>}
 
             <div className="space-y-2 pt-4">

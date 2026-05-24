@@ -48,6 +48,7 @@ import { Route as GoProductIdRouteImport } from './routes/go.$productId'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as DashboardVerificationRouteImport } from './routes/dashboard.verification'
 import { Route as DashboardTowRouteImport } from './routes/dashboard.tow'
+import { Route as DashboardShopFavoritesRouteImport } from './routes/dashboard.shop-favorites'
 import { Route as DashboardSearchesRouteImport } from './routes/dashboard.searches'
 import { Route as DashboardRidesRouteImport } from './routes/dashboard.rides'
 import { Route as DashboardReferralRouteImport } from './routes/dashboard.referral'
@@ -292,6 +293,11 @@ const DashboardVerificationRoute = DashboardVerificationRouteImport.update({
 const DashboardTowRoute = DashboardTowRouteImport.update({
   id: '/tow',
   path: '/tow',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardShopFavoritesRoute = DashboardShopFavoritesRouteImport.update({
+  id: '/shop-favorites',
+  path: '/shop-favorites',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardSearchesRoute = DashboardSearchesRouteImport.update({
@@ -606,6 +612,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
+  '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -695,6 +702,7 @@ export interface FileRoutesByTo {
   '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
+  '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -787,6 +795,7 @@ export interface FileRoutesById {
   '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
+  '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -880,6 +889,7 @@ export interface FileRouteTypes {
     | '/dashboard/referral'
     | '/dashboard/rides'
     | '/dashboard/searches'
+    | '/dashboard/shop-favorites'
     | '/dashboard/tow'
     | '/dashboard/verification'
     | '/email/unsubscribe'
@@ -969,6 +979,7 @@ export interface FileRouteTypes {
     | '/dashboard/referral'
     | '/dashboard/rides'
     | '/dashboard/searches'
+    | '/dashboard/shop-favorites'
     | '/dashboard/tow'
     | '/dashboard/verification'
     | '/email/unsubscribe'
@@ -1060,6 +1071,7 @@ export interface FileRouteTypes {
     | '/dashboard/referral'
     | '/dashboard/rides'
     | '/dashboard/searches'
+    | '/dashboard/shop-favorites'
     | '/dashboard/tow'
     | '/dashboard/verification'
     | '/email/unsubscribe'
@@ -1423,6 +1435,13 @@ declare module '@tanstack/react-router' {
       path: '/tow'
       fullPath: '/dashboard/tow'
       preLoaderRoute: typeof DashboardTowRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/shop-favorites': {
+      id: '/dashboard/shop-favorites'
+      path: '/shop-favorites'
+      fullPath: '/dashboard/shop-favorites'
+      preLoaderRoute: typeof DashboardShopFavoritesRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/searches': {
@@ -1834,6 +1853,7 @@ interface DashboardRouteChildren {
   DashboardReferralRoute: typeof DashboardReferralRoute
   DashboardRidesRoute: typeof DashboardRidesRoute
   DashboardSearchesRoute: typeof DashboardSearchesRoute
+  DashboardShopFavoritesRoute: typeof DashboardShopFavoritesRoute
   DashboardTowRoute: typeof DashboardTowRoute
   DashboardVerificationRoute: typeof DashboardVerificationRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -1851,6 +1871,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardReferralRoute: DashboardReferralRoute,
   DashboardRidesRoute: DashboardRidesRoute,
   DashboardSearchesRoute: DashboardSearchesRoute,
+  DashboardShopFavoritesRoute: DashboardShopFavoritesRoute,
   DashboardTowRoute: DashboardTowRoute,
   DashboardVerificationRoute: DashboardVerificationRoute,
   DashboardIndexRoute: DashboardIndexRoute,
