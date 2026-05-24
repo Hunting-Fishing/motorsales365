@@ -10,6 +10,7 @@ import { useGarage, formatVehicle } from "@/lib/garage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
+import { ShopMobileCtaBar } from "@/components/shop/shop-mobile-cta-bar";
 import { X } from "lucide-react";
 
 const catSearch = z.object({
