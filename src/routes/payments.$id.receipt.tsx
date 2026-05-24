@@ -72,7 +72,7 @@ function ReceiptPage() {
     "Customer";
 
   return (
-    <div className="min-h-screen bg-muted/30 py-8 print:bg-white print:py-0">
+    <div className="min-h-dvh bg-muted/30 py-8 print:bg-white print:py-0">
       <div className="mx-auto max-w-3xl px-4">
         <div className="mb-4 flex items-center justify-between print:hidden">
           <Button asChild variant="ghost" size="sm">

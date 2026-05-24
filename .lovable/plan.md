@@ -1,50 +1,87 @@
-# Mobile Responsiveness Sweep — Remaining Gaps
+# Final Mobile Responsiveness Pass — All User Types
 
-After the earlier rework, a scan of the codebase shows the global chrome (header, footer, layout, tab bar, PWA) is in good shape, but several routes still have raw desktop-only patterns that break at 360px. This plan addresses what's left.
+A targeted audit and fix sweep covering every user role at 360×644 (phone) and 768×1024 (tablet). Builds on the prior chrome + admin table work; this pass is about the remaining detail issues across each user journey.
 
-## Findings & Fixes
+## A. By user type — audit & fixes
 
-### 1. Admin tables still desktop-only
-Raw `<table>` with no horizontal scroll wrapper or `<md` card fallback:
-- `admin.referrals.tsx` (3 tables, filter row uses fixed `w-[120/130/140/150/160/180px]` selects + `w-[150px]` date inputs — overflows 360px)
-- `admin.redemptions.tsx` (2 tables) and `admin.redemptions_.$staffId.tsx`
-- `admin.currencies.tsx`, `admin.audit.tsx`, `admin.shop.tsx` (3 tables), `admin.accounts.tsx` (filter selects `w-[130–150px]` row)
-- `admin.users.tsx`, `admin.advertising.tsx`, `admin.verifications.tsx`, `admin.type-suggestions.tsx`, `admin.pricing.tsx`
+### 1. Guest / buyer
+- `index.tsx` (home): re-verify hero clamp, marquee strips, category card grid; confirm sticky CTA doesn't collide with mobile tab bar.
+- `browse.$category.tsx`: filter sheet trigger, sort dropdown, listing card grid (already `grid-cols-1 sm:grid-cols-2`), pagination row.
+- `listing.$id.tsx` (525 lines): gallery (full-bleed), seller card stacking, contact button full-width on mobile, sticky CTA above tab bar.
+- `seller.$id.tsx`: avatar + meta header stacks, listings grid.
+- `map.tsx`: already `lg:grid-cols-[360px_1fr]` (stacks below lg). Ensure map height isn't `100vh` (would clip behind tab bar) — use `h-[calc(100dvh-64px-env(safe-area-inset-bottom))]`.
+- `pricing.tsx`, `about.tsx`, `contact.tsx`, `guidelines.tsx`, `privacy.tsx`, `terms.tsx`, `refund-policy.tsx`: confirm typographic clamps + single-column flow.
+- `signup.tsx`, `login.tsx`, `forgot-password.tsx`, `reset-password.tsx`, `verify-email.tsx`: form rows stacked, account-type cards full-width under `sm`.
 
-Fix: wrap each `<table>` in `<div className="-mx-4 overflow-x-auto sm:mx-0">` with a `min-w-[640px]` on the inner table; collapse filter toolbars to `flex-wrap gap-2` with `w-full sm:w-[140px]` on each Select/Input so they stack cleanly under 640px.
+### 2. Seller (private + business listings)
+- `sell.tsx` (1014-line wizard): each step's two-column rows → `grid-cols-1 sm:grid-cols-2`; primary "Continue" full-width on mobile; sticky bottom action bar above tab bar.
+- `sell.import.tsx` (Facebook import flow): URL input + button stack, results list responsive.
+- `listing.$id.edit.tsx`: same form-row treatment; image manager grid `grid-cols-2 sm:grid-cols-3 md:grid-cols-4`.
+- `my-qr.tsx`: QR size already responsive.
 
-### 2. Dashboard billing leftover tables
-`dashboard.billing.tsx` still has three raw tables (invoices, payment methods detail, ledger) at lines 845/1088/1171. Convert to the same responsive-table pattern (scroll wrapper at `<md`, native table at `md+`), and ensure the invoice details drawer trigger row remains tappable (min 44px).
+### 3. Business owner
+- `businesses.submit.tsx` (497 lines): hours grid, tag picker, `LocationPicker` (300px+ map) — wrap in container with `min-w-0`; "Save" full-width on mobile.
+- `businesses.$slug.tsx`: hero, hours `dl grid-cols-2` (fine), map embed responsive height, contact buttons stack.
+- `businesses.index.tsx`: directory grid + filter chips wrap.
 
-### 3. Payments receipt
-`payments.$id.receipt.tsx` has two tables (line items, totals). Add horizontal scroll wrapper; ensure the print path is unaffected (`print:overflow-visible`).
+### 4. Rider / vehicle owner
+- `rides.index.tsx`, `rides.$slug.tsx`: timeline / service log card layouts.
+- `dashboard.rides.tsx`, `dashboard.rides_.$id.edit.tsx`, `dashboard.rides_.new.tsx`: form rows + photo uploader grid.
+- `dashboard.tow.tsx` (852 lines): rate card grid, coverage map, request form.
 
-### 4. Big user-facing routes — spot pass
-Walk through and fix obvious overflows / multi-column grids that don't collapse, and stack toolbars:
-- `sell.tsx` (1014 lines, stepper wizard)
-- `dashboard.tow.tsx`, `dashboard.index.tsx`, `dashboard.profile.tsx`, `dashboard.verification.tsx`, `dashboard.messages.tsx` (thread list + conversation split)
-- `businesses.submit.tsx`, `businesses.$slug.tsx`, `businesses.index.tsx`
-- `listing.$id.tsx`, `listing.$id.edit.tsx`, `signup.tsx`, `seller.$id.tsx`, `rides.$slug.tsx`
-- `map.tsx` — confirm the slide-up results sheet is in place at `<md`
-- `pricing.tsx`, `advertise.tsx`, `index.tsx` (home hero)
+### 5. Account / billing / messaging
+- `dashboard.tsx`: pill-bar nav (done) — verify scroll snap.
+- `dashboard.index.tsx` (424 lines): KPI grid `grid-cols-2 md:grid-cols-4`, recent activity list.
+- `dashboard.profile.tsx`: two-column rows stack; avatar uploader full-width.
+- `dashboard.billing.tsx`: invoice details drawer (verify on 360), payment-method cards stack with full-width remove button.
+- `dashboard.verification.tsx`: document upload tiles `grid-cols-1 sm:grid-cols-2`, the existing `flex items-center justify-between` doc rows — switch to `flex flex-wrap gap-2`.
+- `dashboard.messages.tsx`: already `lg:grid-cols-[320px_1fr]`. Below lg, ensure conversation view replaces (rather than stacks under) the thread list; add a back button to return.
+- `dashboard.favorites.tsx`, `dashboard.likes.tsx`, `dashboard.searches.tsx`, `dashboard.businesses.tsx`: listing-card grids responsive.
+- `payments.tsx`, `payments.$id.receipt.tsx`: receipt scroll wrappers (done last pass) — re-verify print path.
+- `checkout.return.tsx`: status card full-width on mobile.
 
-Standard fixes per page: clamp hero/h1 with `text-3xl sm:text-4xl md:text-5xl`, switch `grid-cols-2/3/4` → `grid-cols-1 sm:grid-cols-2 md:grid-cols-3`, full-width primary buttons under `sm`, stack two-column form rows.
+### 6. Tow operator + public tow
+- `tow.tsx` public landing: hero, coverage CTA.
+- `dashboard.tow.tsx`: covered already in seller section.
 
-### 5. Dialogs on small screens
-Several dialogs use `max-w-md` / default width with no `<sm` adaptation (`admin.accounts EditAccountDialog`, `admin.type-suggestions`, edit/add user dialogs). Add `className="max-w-md sm:max-w-md w-[calc(100vw-2rem)]"` and `max-h-[90vh] overflow-y-auto` so long forms scroll inside the dialog instead of clipping the footer.
+### 7. Referral / staff
+- `r.$code.tsx` (referral landing), `r.$code.poster.tsx` (print poster — fine).
+- `dashboard.referral.tsx`: stats grid + QR.
 
-### 6. Components with fixed minimums
-- `places-autocomplete.tsx` uses `min-w-[240px]` — drop to `min-w-0 flex-1` so it shrinks on 360px headers.
-- `admin/import-places-panel.tsx` `min-w-[220px]` columns → `min-w-0`.
-- `location-picker.tsx` popover `min-w-[260px]` is fine (popover, not inline).
+### 8. Admin (mostly handled — finish remaining)
+- Verify `admin.index.tsx`, `admin.analytics.tsx`, `admin.businesses.tsx`, `admin.listings.tsx`, `admin.reports.tsx`, `admin.sandbox.tsx`, `admin.performance.tsx` haven't been missed (KPI grids, chart heights, table wrappers).
+- `admin.tsx` shell: section `Select` dropdown — confirm full-width on `<md`.
+- `EditAccountDialog`, `add-user-dialog`, `edit-user-dialog`: now inherit `w-[calc(100vw-2rem)] max-h-[90dvh]` from the dialog primitive — re-test.
+- `import-places-panel`, `image-metrics-panel`: add `min-w-[640px]` to the diagnostic table.
 
-### 7. Verification
-Spot-check at 360×644 (current preview) and 768×1024 across: home, browse, listing detail, sell wizard step 1+2, dashboard billing (incl. invoice drawer), dashboard messages, admin referrals, admin redemptions, edit-account dialog. Confirm no horizontal scroll on `<body>` and that tab bar doesn't overlap CTAs (already padded via `pb-[calc(64px+env(safe-area-inset-bottom))]`).
+## B. Cross-cutting polish
+
+- **Header/heading rows**: Audit every `flex items-center justify-between` in `dashboard.billing`, `dashboard.index`, `admin.audit`, `admin.users`, `admin.pricing`, `dashboard.verification` — switch to `flex flex-wrap items-center justify-between gap-2` so a long heading wraps before pushing the action button off-screen.
+- **Sticky CTAs**: any page using `fixed bottom-0` or `sticky bottom-0` must add `bottom-[calc(64px+env(safe-area-inset-bottom))] md:bottom-0` so it sits above the mobile tab bar.
+- **Touch targets**: re-verify icon-only buttons in listing cards, photo uploaders, and message thread rows reach 44×44 (the global CSS rule covers `<button>` but not all `<a>` icon links).
+- **Inputs**: 16px font on mobile already enforced in `styles.css` — spot-check date inputs and the search input in the header drawer.
+- **`100vh` audit**: any `h-screen` or `min-h-screen` should be `h-dvh` / `min-h-dvh` to avoid the iOS Safari URL bar pushing content under the tab bar. Convert where found.
+- **Horizontal overflow guard**: add `overflow-x-hidden` to `<body>` (in `__root.tsx`) as a safety net so any stray wide element scrolls inside its container, never the page.
+
+## C. Verification matrix
+
+Browser-test at 360×644 and 768×1024 for each user-type smoke flow:
+1. Guest: home → browse → listing detail → contact seller modal
+2. Buyer: signup → email verify → dashboard
+3. Seller: sell wizard step 1–4 → listing edit → my listings
+4. Business: businesses.submit (with location picker) → public business page
+5. Rider: dashboard.rides → ride edit → photo upload
+6. Account: dashboard.profile, dashboard.billing (incl. invoice drawer + remove payment method), dashboard.messages (open a thread on mobile)
+7. Admin: admin home → users → accounts (open EditAccountDialog) → referrals → audit
+
+Pass criteria: no horizontal page scroll, tab bar never overlaps a primary CTA, all dialogs scroll internally, all tables either fit or scroll horizontally inside their card.
 
 ## Out of scope
-No business logic, server function, schema, or auth changes. No new pages. PWA manifest/icons unchanged.
+
+No business logic, server function, database, auth, or copy changes. No new pages or features. PWA manifest/icons unchanged.
 
 ## Technical notes
-- Reusable wrapper: introduce `<TableScroll>` in `src/components/ui/table.tsx` (thin div wrapper) so admin pages stay terse.
-- Toolbar pattern: `flex flex-wrap items-center gap-2 [&>*]:w-full sm:[&>*]:w-auto` applied to filter rows.
-- Dialog pattern: extend `DialogContent` defaults? No — apply per-instance to avoid regressing existing dialogs already sized correctly.
+
+- New utility (only if needed): a `.stacking-flex` class isn't worth adding — prefer inline `flex-wrap gap-2`.
+- For `dashboard.messages.tsx`, the mobile "thread vs conversation" toggle is local state, not a route change — no router work.
+- `__root.tsx` overflow-x-hidden goes on `<body>`, not `<html>`, to keep `position: sticky` working in the header.

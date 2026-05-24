@@ -147,7 +147,7 @@ function ProductsTab() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
         <CardTitle>Products ({data?.products?.length ?? 0})</CardTitle>
         <Button onClick={() => setEditing({})}><Plus className="mr-1 h-4 w-4" />New product</Button>
       </CardHeader>
@@ -310,7 +310,7 @@ function NetworksTab() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
+      <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
         <CardTitle>Affiliate networks</CardTitle>
         <Button onClick={() => setEditing({})}><Plus className="mr-1 h-4 w-4" />New network</Button>
       </CardHeader>

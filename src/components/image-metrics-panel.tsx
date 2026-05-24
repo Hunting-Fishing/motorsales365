@@ -149,7 +149,7 @@ function BreakdownTable({
       {rows.length === 0 ? (
         <div className="px-4 py-6 text-center text-xs text-muted-foreground">No data</div>
       ) : (
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto"><table className="w-full min-w-[480px] text-sm">
           <thead className="text-xs uppercase tracking-wide text-muted-foreground">
             <tr>
               <th className="px-4 py-2 text-left">{keyHeader}</th>
@@ -170,7 +170,8 @@ function BreakdownTable({
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
+
       )}
     </div>
   );
