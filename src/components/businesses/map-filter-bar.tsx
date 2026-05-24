@@ -48,27 +48,39 @@ export function MapFilterBar({
     );
   };
 
+  const chipBase =
+    "snap-start shrink-0 inline-flex items-center justify-center rounded-full border font-medium transition active:scale-[0.97] " +
+    "min-h-11 px-4 py-2.5 text-sm sm:min-h-9 sm:px-3 sm:py-1.5 sm:text-xs";
+  const chipActive = "border-primary bg-primary text-primary-foreground shadow-sm";
+  const chipIdle = "border-border bg-card hover:bg-secondary";
+
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap gap-2">
+      {/* Type chips — swipeable strip on mobile, wraps on sm+ */}
+      <div className="-mx-3 flex gap-2 overflow-x-auto px-3 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:px-0 sm:overflow-visible">
         <button
+          type="button"
+          aria-pressed={selectedType === null}
           onClick={() => onSelectType(null)}
-          className={`rounded-full border px-3 py-1 text-xs font-medium transition ${selectedType === null ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}
+          className={`${chipBase} ${selectedType === null ? chipActive : chipIdle}`}
         >
           All types
         </button>
         {types.map((t) => (
           <button
             key={t.slug}
+            type="button"
+            aria-pressed={selectedType === t.slug}
             onClick={() => onSelectType(selectedType === t.slug ? null : t.slug)}
-            className={`rounded-full border px-3 py-1 text-xs font-medium transition ${selectedType === t.slug ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}
+            className={`${chipBase} ${selectedType === t.slug ? chipActive : chipIdle}`}
           >
             {t.label}
           </button>
         ))}
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
+      {/* Search + locate — stacked full-width on mobile, inline on sm+ */}
+      <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:items-center">
         <PlacesAutocomplete
           value={search}
           onChange={setSearch}
@@ -77,34 +89,53 @@ export function MapFilterBar({
             if (!radiusKm) onChangeRadius(10);
           }}
         />
-        <Button size="sm" variant="outline" onClick={useMyLocation} disabled={locating}>
-          <Crosshair className="mr-1 h-4 w-4" />
+        <Button
+          variant="outline"
+          onClick={useMyLocation}
+          disabled={locating}
+          className="h-11 w-full justify-center text-base sm:h-9 sm:w-auto sm:text-sm"
+        >
+          <Crosshair className="mr-1.5 h-5 w-5 sm:h-4 sm:w-4" />
           {locating ? "Locating…" : "Use my location"}
         </Button>
       </div>
 
       {center && (
-        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-secondary/40 px-3 py-2 text-xs">
-          <span className="font-medium text-foreground">Centered on {center.label ?? `${center.lat.toFixed(4)}, ${center.lng.toFixed(4)}`}</span>
-          <span className="ml-2 text-muted-foreground">Radius:</span>
-          {RADIUS_OPTIONS.map((km) => (
+        <div className="rounded-lg border border-border bg-secondary/40 p-3 text-xs">
+          <div className="flex items-start gap-2">
+            <span className="min-w-0 flex-1 text-sm font-medium text-foreground sm:text-xs">
+              Centered on {center.label ?? `${center.lat.toFixed(4)}, ${center.lng.toFixed(4)}`}
+            </span>
             <button
-              key={km}
-              onClick={() => onChangeRadius(km)}
-              className={`rounded-full border px-2 py-0.5 text-[11px] transition ${radiusKm === km ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}
+              type="button"
+              aria-label="Clear location"
+              onClick={() => {
+                onChangeCenter(null);
+                onChangeRadius(null);
+              }}
+              className="-mr-1 -mt-1 inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary hover:text-foreground sm:h-7 sm:w-7"
             >
-              {km} km
+              <X className="h-4 w-4" />
             </button>
-          ))}
-          <button
-            onClick={() => {
-              onChangeCenter(null);
-              onChangeRadius(null);
-            }}
-            className="ml-auto inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
-          >
-            <X className="h-3 w-3" /> Clear
-          </button>
+          </div>
+          <div className="mt-2 flex items-center gap-2">
+            <span className="shrink-0 text-muted-foreground">Radius</span>
+            <div className="-mx-1 flex gap-1.5 overflow-x-auto px-1 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:overflow-visible sm:flex-wrap">
+              {RADIUS_OPTIONS.map((km) => (
+                <button
+                  key={km}
+                  type="button"
+                  aria-pressed={radiusKm === km}
+                  onClick={() => onChangeRadius(km)}
+                  className={`snap-start shrink-0 inline-flex items-center justify-center rounded-full border min-h-10 min-w-14 px-3 text-sm font-medium transition active:scale-[0.97] sm:min-h-7 sm:min-w-0 sm:px-2 sm:py-0.5 sm:text-[11px] ${
+                    radiusKm === km ? chipActive : chipIdle
+                  }`}
+                >
+                  {km} km
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>

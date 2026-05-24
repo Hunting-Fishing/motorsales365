@@ -1,34 +1,31 @@
-# Mobile Responsiveness — Car Domain & Admin Pass
+# Mobile-friendly Map UI
 
-Targeted audit of `listing.*`, `sell.*`, `browse.*`, `seller.*`, and all `admin.*` routes. Most pages are already mobile-clean (tables wrapped in `overflow-x-auto`, grids use `sm:`/`md:` breakpoints, headers use `flex-wrap`). Remaining gaps:
+The `/map` page currently uses very small chips (`px-3 py-1 text-xs`, ~24 px tall), radius pills (~20 px), and a vertically stacked list under the map. Apple/Material guidance is 44 px minimum tap targets, and the current map feels desktop-first on a 360 px screen.
 
-## Car domain
+## Changes
 
-Verified clean: `listing.$id.tsx`, `listing.$id.edit.tsx`, `sell.tsx`, `sell.import.tsx`, `browse.$category.tsx`, `seller.$id.tsx`. No fixes needed — gallery thumb strips scroll horizontally, photo grids step `grid-cols-3 sm:grid-cols-5`, filter sidebars stack on mobile, title/price wrap.
+### 1. `src/components/businesses/map-filter-bar.tsx` — bigger, swipe-scrollable controls
+- **Type chips**: turn the `flex flex-wrap` row into a horizontal **swipeable strip** on mobile (`overflow-x-auto snap-x snap-mandatory -mx-3 px-3 [scrollbar-width:none]`, items `snap-start shrink-0`), keep wrap on `sm:`. Bump each chip from `px-3 py-1 text-xs` to `min-h-11 px-4 py-2.5 text-sm` on mobile, `sm:min-h-9 sm:py-1.5 sm:text-xs`. Active chip gets a subtle shadow so it's obvious during scroll.
+- **Search + "Use my location"**: stack full-width on mobile (`grid grid-cols-1 sm:flex`), make the location button `size="lg"` mobile-only (44 px tall), with the crosshair icon enlarged. PlacesAutocomplete input gets `h-11 text-base` on mobile to avoid iOS zoom.
+- **Radius row**: also a swipeable snap strip on mobile; each `km` pill becomes `min-h-10 min-w-12 px-3 text-sm`. Clear button becomes a full-tap-area icon-button (`h-10 w-10`) instead of inline text.
+- Add `aria-pressed` to all toggle chips for a11y.
 
-## Admin fixes
+### 2. `src/routes/map.tsx` — swipe-up bottom-sheet list on mobile
+- Replace the stacked map → list layout on mobile with: map fills `h-[calc(100dvh-180px)]` and a **draggable bottom sheet** sits over it with three snap points (peek ~88 px, half ~50dvh, full ~85dvh). Drag handle bar at top (`h-1.5 w-12 rounded-full bg-muted`).
+- Implementation: Framer Motion `<motion.div drag="y" dragConstraints dragSnapToOrigin={false}>` with snap points computed from viewport height; or a lightweight controlled `transform: translateY()` driven by pointer events. Tap the handle to cycle states. Keep `lg:` layout unchanged (side-by-side grid).
+- Result list inside the sheet: cards bumped from `p-3` to `p-4` with `min-h-16`, title from `text-sm` to `text-base`, meta from `text-[11px]` to `text-xs`. Whole card already a tap target; add `role="button"` + keyboard handler.
+- Result count + "X within Y km" line becomes a sticky header at the top of the sheet so it stays visible while scrolling cards.
 
-### 1. `admin.shop.tsx` — Affiliate networks table missing overflow wrapper
-Line 318: `<table className="w-full min-w-[640px] text-sm">` sits directly inside `CardContent` with no scroll container. At 360px the 640px min-width pushes the whole page sideways.
-
-**Fix:** Wrap with `<div className="overflow-x-auto">…</div>` (matches pattern used on the other two tables in the same file).
-
-### 2. `admin.reports.tsx` — Header row doesn't wrap
-Line 54: `<div className="mb-6 flex items-center justify-between">` holds H1 "Reports" + a 3-button filter chip group. At 360px the chip group can overflow.
-
-**Fix:** `flex flex-wrap items-center justify-between gap-3`.
-
-### 3. `admin.sandbox.tsx` — Section headers don't wrap (×3)
-Lines 46, 95, 148: each section uses `flex items-center justify-between` for a heading + description block next to a Reset / Enable-all button group. The heading wraps internally but the right-side button is forced onto the same row, clipping at 360px (esp. line 148 with three buttons).
-
-**Fix:** Change each to `flex flex-wrap items-center justify-between gap-3`.
-
-## Verification
-
-After edits, re-check at 360×644:
-- `/admin/shop` → "Affiliate networks" card scrolls its table internally, no page-level horizontal scroll.
-- `/admin/reports` → filter pills sit below the H1 if needed instead of clipping.
-- `/admin/sandbox` → each section's action buttons wrap below the heading on narrow widths.
+### 3. `src/components/businesses/google-business-map.tsx` — touch-friendly map controls
+- Pass `gestureHandling: "greedy"` to the Map so a single-finger drag pans instead of showing the "use two fingers" overlay. Enable `clickableIcons: false` to keep our pins primary. Hide `mapTypeControl` and `streetViewControl` on small screens (set on init based on `window.innerWidth < 768`), keep zoom buttons but enlarge via CSS override (`.gm-bundled-control button{width:44px;height:44px;}`).
+- Pin marker: bump default size (`scaledSize`) ~20% on touch devices so it's easier to tap.
 
 ## Out of scope
-No business logic, route, copy, or auth changes. No restructuring of layouts already verified clean.
+No data, route, or auth changes. Desktop (`lg:`) layout unchanged except for control sizing inheritance.
+
+## Verification at 360×644
+- Type filter strip scrolls horizontally with momentum and snaps; every chip ≥44 px.
+- Search field doesn't trigger iOS zoom.
+- Radius pills swipeable and ≥40 px tall.
+- Bottom sheet draggable between peek/half/full; map remains pannable with one finger.
+- Result cards ≥64 px tall, easy to tap without mis-hitting neighbors.
