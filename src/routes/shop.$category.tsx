@@ -16,6 +16,7 @@ const catSearch = z.object({
   make: fallback(z.string(), "").default(""),
   model: fallback(z.string(), "").default(""),
   year: fallback(z.number().optional(), undefined).default(undefined),
+  brand: fallback(z.string(), "").default(""),
 });
 
 export const Route = createFileRoute("/shop/$category")({
