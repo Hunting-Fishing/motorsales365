@@ -10,6 +10,7 @@ import { useGarage, formatVehicle } from "@/lib/garage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
+import { ShopMobileCtaBar } from "@/components/shop/shop-mobile-cta-bar";
 import { X } from "lucide-react";
 
 const catSearch = z.object({
@@ -144,6 +145,18 @@ function ShopCategory() {
           Disclosure: 365 MotorSales earns a commission on qualifying purchases.
         </p>
       </div>
+
+      <ShopMobileCtaBar
+        vehicle={activeVehicle}
+        onPickVehicle={(v) => {
+          setGarageState(v);
+          navigate({ search: (prev: any) => ({ ...prev, make: v.make, model: v.model, year: v.year }) });
+        }}
+        onClearVehicle={() => {
+          setGarageState(null);
+          navigate({ search: (prev: any) => ({ ...prev, make: "", model: "", year: undefined }) });
+        }}
+      />
     </SiteLayout>
   );
 }
