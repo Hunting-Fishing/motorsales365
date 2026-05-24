@@ -170,7 +170,8 @@ function BreakdownTable({
               </tr>
             ))}
           </tbody>
-        </table>
+        </table></div>
+
       )}
     </div>
   );
