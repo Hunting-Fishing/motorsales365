@@ -6,7 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { formatPHP, formatDate } from "@/lib/format";
-import { CheckCircle2, AlertTriangle, ArrowUpRight, TrendingUp, Calendar, Check, CreditCard, Receipt, XCircle, RotateCcw, ExternalLink } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { CheckCircle2, AlertTriangle, ArrowUpRight, TrendingUp, Calendar, Check, CreditCard, Receipt, XCircle, RotateCcw, ExternalLink, Search } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
 import { getStripeEnvironment } from "@/lib/stripe";
@@ -69,6 +70,9 @@ function BillingPage() {
   const [cancelOpen, setCancelOpen] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [invoices, setInvoices] = useState<any[]>([]);
+  const [invoiceStatusFilter, setInvoiceStatusFilter] = useState<"all" | "paid" | "open">("all");
+  const [invoiceDateFilter, setInvoiceDateFilter] = useState<"all" | "30d" | "90d">("all");
+  const [invoiceSearch, setInvoiceSearch] = useState("");
   const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
   const [defaultPmId, setDefaultPmId] = useState<string | null>(null);
 
@@ -275,6 +279,28 @@ function BillingPage() {
       proratedCredit,
     };
   }, [plans, currentPlan, thisMonthListings.length, boostedCount, maxPhotosUsed, proratedCredit]);
+
+  const filteredInvoices = useMemo(() => {
+    let rows = invoices;
+    if (invoiceStatusFilter !== "all") {
+      rows = rows.filter((inv) => inv.status === invoiceStatusFilter);
+    }
+    if (invoiceDateFilter !== "all") {
+      const days = invoiceDateFilter === "30d" ? 30 : 90;
+      const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+      rows = rows.filter((inv) => (inv.created ?? 0) * 1000 >= cutoff);
+    }
+    const term = invoiceSearch.trim().toLowerCase();
+    if (term) {
+      rows = rows.filter((inv) =>
+        ((inv.number ?? inv.id ?? "").toString().toLowerCase().includes(term) ||
+        ((inv.amount_paid ?? 0) / 100).toFixed(2).includes(term))
+      );
+    }
+    return rows;
+  }, [invoices, invoiceStatusFilter, invoiceDateFilter, invoiceSearch]);
+
+
 
 
   const subTone = (s: string) =>
@@ -967,10 +993,63 @@ function BillingPage() {
 
       {/* Stripe invoices */}
       <section className="mb-8">
-        <h2 className="mb-2 font-display text-lg font-semibold">Invoices</h2>
+        <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <h2 className="font-display text-lg font-semibold">Invoices</h2>
+          {invoices.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Search invoices..."
+                  value={invoiceSearch}
+                  onChange={(e) => setInvoiceSearch(e.target.value)}
+                  className="h-8 w-48 pl-8 text-sm"
+                />
+              </div>
+              <div className="flex rounded-md border border-border bg-card p-0.5">
+                {(["all", "paid", "open"] as const).map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setInvoiceStatusFilter(s)}
+                    className={`rounded px-2.5 py-1 text-xs font-medium transition-colors ${
+                      invoiceStatusFilter === s
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {s === "all" ? "All" : s.charAt(0).toUpperCase() + s.slice(1)}
+                  </button>
+                ))}
+              </div>
+              <div className="flex rounded-md border border-border bg-card p-0.5">
+                {([
+                  { key: "all", label: "All time" },
+                  { key: "30d", label: "Last 30 days" },
+                  { key: "90d", label: "Last 90 days" },
+                ] as const).map((d) => (
+                  <button
+                    key={d.key}
+                    onClick={() => setInvoiceDateFilter(d.key)}
+                    className={`rounded px-2.5 py-1 text-xs font-medium transition-colors ${
+                      invoiceDateFilter === d.key
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {d.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
         {invoices.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
             No invoices yet.
+          </div>
+        ) : filteredInvoices.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
+            No invoices match your filters.
           </div>
         ) : (
           <div className="overflow-x-auto rounded-xl border border-border bg-card">
@@ -985,7 +1064,7 @@ function BillingPage() {
                 </tr>
               </thead>
               <tbody>
-                {invoices.map((inv) => (
+                {filteredInvoices.map((inv) => (
                   <tr key={inv.id} className="border-t border-border">
                     <td className="p-3">{formatDate(new Date(inv.created * 1000).toISOString())}</td>
                     <td className="p-3 font-mono text-xs">{inv.number ?? inv.id}</td>
