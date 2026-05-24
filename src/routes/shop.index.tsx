@@ -47,7 +47,15 @@ function ShopIndex() {
     : garage;
 
   const { data: catData } = useQuery({ queryKey: ["shop-cats"], queryFn: () => listShopCategories() });
-  const filterArgs = activeVehicle ? { make: activeVehicle.make, model: activeVehicle.model, year: activeVehicle.year } : {};
+  const { data: brandData } = useQuery({
+    queryKey: ["shop-brands", search.category],
+    queryFn: () => listShopBrands({ data: search.category ? { categorySlug: search.category } : {} }),
+  });
+  const filterArgs = {
+    ...(activeVehicle ? { make: activeVehicle.make, model: activeVehicle.model, year: activeVehicle.year } : {}),
+    ...(search.brand ? { brand: search.brand } : {}),
+    ...(search.category ? { categorySlug: search.category } : {}),
+  };
   const { data: featData } = useQuery({
     queryKey: ["shop-featured", filterArgs],
     queryFn: () => listShopProducts({ data: { featured: true, limit: 12, ...filterArgs } }),
@@ -58,18 +66,35 @@ function ShopIndex() {
   });
 
   const cats = catData?.categories ?? [];
+  const brands = brandData?.brands ?? [];
   const featured = featData?.products ?? [];
   const latest = latestData?.products ?? [];
 
   const onPickVehicle = (v: { category: "car" | "motorcycle"; make: string; model: string; year?: number }) => {
     setGarageState(v);
-    navigate({ search: () => ({ make: v.make, model: v.model, year: v.year }) });
+    navigate({ search: (prev) => ({ ...prev, make: v.make, model: v.model, year: v.year }) });
   };
 
   const clearVehicle = () => {
     setGarageState(null);
-    navigate({ search: () => ({ make: "", model: "", year: undefined }) });
+    navigate({ search: (prev) => ({ ...prev, make: "", model: "", year: undefined }) });
   };
+
+  const onApplyFilters = (next: { categorySlug: string; brand: string; vehicle: typeof activeVehicle }) => {
+    if (next.vehicle) setGarageState(next.vehicle);
+    else setGarageState(null);
+    navigate({
+      search: () => ({
+        category: next.categorySlug,
+        brand: next.brand,
+        make: next.vehicle?.make ?? "",
+        model: next.vehicle?.model ?? "",
+        year: next.vehicle?.year,
+      }),
+    });
+  };
+
+  const hasAnyFilter = !!(search.brand || search.category || activeVehicle);
 
   return (
     <SiteLayout>
@@ -81,7 +106,7 @@ function ShopIndex() {
             Curated picks from Shopee, Lazada and AliExpress. Buy direct from the seller — we earn a small commission so the site stays free for you.
           </p>
 
-          <div className="mt-6 rounded-xl border bg-card p-4 shadow-sm">
+          <div className="mt-6 hidden rounded-xl border bg-card p-4 shadow-sm md:block">
             <p className="mb-3 text-sm font-semibold">🔧 Shop by your vehicle</p>
             <VehicleFitmentPicker initial={activeVehicle} onSubmit={onPickVehicle} />
             {activeVehicle && (
@@ -95,6 +120,44 @@ function ShopIndex() {
           </div>
         </div>
       </section>
+
+      {/* Sticky mobile filter bar */}
+      <div className="sticky top-14 z-30 border-b bg-background/95 backdrop-blur md:hidden">
+        <div className="container mx-auto flex items-center gap-2 px-4 py-2">
+          <ShopFilterDrawer
+            categories={cats}
+            brands={brands}
+            value={{ categorySlug: search.category, brand: search.brand, vehicle: activeVehicle }}
+            onApply={onApplyFilters}
+            triggerClassName="flex-1 justify-center"
+          />
+          {hasAnyFilter && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setGarageState(null);
+                navigate({ search: () => ({ make: "", model: "", year: undefined, brand: "", category: "" }) });
+              }}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+        {hasAnyFilter && (
+          <div className="container mx-auto flex flex-wrap gap-1.5 px-4 pb-2">
+            {search.category && (
+              <Badge variant="secondary" className="text-[10px]">
+                {cats.find((c) => c.slug === search.category)?.name ?? search.category}
+              </Badge>
+            )}
+            {search.brand && <Badge variant="secondary" className="text-[10px]">{search.brand}</Badge>}
+            {activeVehicle && (
+              <Badge variant="secondary" className="text-[10px]">{formatVehicle(activeVehicle)}</Badge>
+            )}
+          </div>
+        )}
+      </div>
 
       <div className="container mx-auto px-4 py-8 space-y-12">
         <AdCarousel placement="shop_top" />
@@ -126,7 +189,7 @@ function ShopIndex() {
           <h2 className="mb-4 text-xl font-semibold">{activeVehicle ? "Matching products" : "Latest products"}</h2>
           {latest.length === 0
             ? <p className="text-muted-foreground">
-                {activeVehicle ? `No products found for ${formatVehicle(activeVehicle)} yet. Try clearing your vehicle filter.` : "No products yet — check back soon."}
+                {hasAnyFilter ? "No products match your filters. Try clearing some." : "No products yet — check back soon."}
               </p>
             : <ProductGrid products={latest} vehicle={activeVehicle} />}
         </section>
