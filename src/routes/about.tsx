@@ -12,7 +12,7 @@ export const Route = createFileRoute("/about")({
   component: () => (
     <SiteLayout>
       <div className="container mx-auto max-w-3xl px-4 py-16">
-        <h1 className="font-display text-4xl font-bold">About 365 MotorSales Philippines</h1>
+        <h1 className="font-display text-3xl font-bold sm:text-4xl">About 365 MotorSales Philippines</h1>
         <p className="mt-4 text-muted-foreground">
           We're building the standard marketplace for buying and selling cars, motorcycles, boats, airplanes, and heavy equipment across the Philippines —
           serving private sellers and businesses alike with a clean, modern experience.
