@@ -4,12 +4,13 @@ import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { SiteLayout } from "@/components/site-layout";
 import { AdCarousel } from "@/components/ads/ad-carousel";
-import { listShopCategories, listShopProducts } from "@/lib/shop.functions";
+import { listShopCategories, listShopProducts, listShopBrands } from "@/lib/shop.functions";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { VehicleFitmentPicker } from "@/components/shop/vehicle-fitment-picker";
+import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
 import { useGarage, formatVehicle } from "@/lib/garage";
 import { X } from "lucide-react";
 
@@ -17,6 +18,8 @@ const shopSearch = z.object({
   make: fallback(z.string(), "").default(""),
   model: fallback(z.string(), "").default(""),
   year: fallback(z.number().optional(), undefined).default(undefined),
+  brand: fallback(z.string(), "").default(""),
+  category: fallback(z.string(), "").default(""),
 });
 
 export const Route = createFileRoute("/shop/")({
