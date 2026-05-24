@@ -18,6 +18,7 @@ import {
   listInvoices,
   listPaymentMethods,
   setDefaultPaymentMethod,
+  detachPaymentMethod,
 } from "@/utils/payments.functions";
 
 
