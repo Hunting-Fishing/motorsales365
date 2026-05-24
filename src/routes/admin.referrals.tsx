@@ -578,7 +578,7 @@ function AdminReferrals() {
         <div className="flex items-center gap-2">
           <Label className="text-xs uppercase tracking-wider text-muted-foreground">Role</Label>
           <Select value={roleFilter} onValueChange={setRoleFilter}>
-            <SelectTrigger className="h-8 w-[140px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="h-8 w-full sm:w-[140px]"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All roles</SelectItem>
               <SelectItem value="admin">Admin</SelectItem>
@@ -593,7 +593,7 @@ function AdminReferrals() {
         <div className="flex items-center gap-2">
           <Label className="text-xs uppercase tracking-wider text-muted-foreground">Status</Label>
           <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
-            <SelectTrigger className="h-8 w-[130px]"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="h-8 w-full sm:w-[130px]"><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
               <SelectItem value="active">Active only</SelectItem>
@@ -755,7 +755,7 @@ function AdminReferrals() {
             <div className="flex flex-col gap-1">
               <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Action</Label>
               <Select value={auditAction} onValueChange={setAuditAction}>
-                <SelectTrigger className="h-8 w-[160px]"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-8 w-full sm:w-[160px]"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All actions</SelectItem>
                   <SelectItem value="created">created</SelectItem>
@@ -771,7 +771,7 @@ function AdminReferrals() {
             <div className="flex flex-col gap-1">
               <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Admin</Label>
               <Select value={auditActor} onValueChange={setAuditActor}>
-                <SelectTrigger className="h-8 w-[180px]"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-8 w-full sm:w-[180px]"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All admins</SelectItem>
                   {auditActorOptions.map((a) => (
@@ -782,11 +782,11 @@ function AdminReferrals() {
             </div>
             <div className="flex flex-col gap-1">
               <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">From</Label>
-              <Input type="date" value={auditFrom} onChange={(e) => setAuditFrom(e.target.value)} className="h-8 w-[150px]" />
+              <Input type="date" value={auditFrom} onChange={(e) => setAuditFrom(e.target.value)} className="h-8 w-full sm:w-[150px]" />
             </div>
             <div className="flex flex-col gap-1">
               <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">To</Label>
-              <Input type="date" value={auditTo} onChange={(e) => setAuditTo(e.target.value)} className="h-8 w-[150px]" />
+              <Input type="date" value={auditTo} onChange={(e) => setAuditTo(e.target.value)} className="h-8 w-full sm:w-[150px]" />
             </div>
             {(auditAction !== "all" || auditActor !== "all" || auditFrom || auditTo) && (
               <Button size="sm" variant="ghost" onClick={() => { setAuditAction("all"); setAuditActor("all"); setAuditFrom(""); setAuditTo(""); }}>
