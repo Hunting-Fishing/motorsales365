@@ -70,6 +70,9 @@ function BillingPage() {
   const [cancelOpen, setCancelOpen] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [invoices, setInvoices] = useState<any[]>([]);
+  const [invoiceStatusFilter, setInvoiceStatusFilter] = useState<"all" | "paid" | "open">("all");
+  const [invoiceDateFilter, setInvoiceDateFilter] = useState<"all" | "30d" | "90d">("all");
+  const [invoiceSearch, setInvoiceSearch] = useState("");
   const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
   const [defaultPmId, setDefaultPmId] = useState<string | null>(null);
 
