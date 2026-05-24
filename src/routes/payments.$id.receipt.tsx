@@ -135,7 +135,9 @@ function ReceiptPage() {
             );
             const DAY = 86_400_000;
             return (
+              <div className="-mx-2 overflow-x-auto sm:mx-0 print:mx-0 print:overflow-visible">
               <table className="w-full min-w-[520px] border-t border-border text-sm print:min-w-0">
+
                 <thead>
                   <tr className="text-left text-xs uppercase text-muted-foreground">
                     <th className="py-3">Description</th>
