@@ -189,8 +189,8 @@ function MessagesPage() {
       ) : (
         <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
           {/* Conversation list */}
-          <div className="overflow-hidden rounded-xl border border-border bg-card">
-            <div className="max-h-[70vh] divide-y divide-border overflow-y-auto">
+          <div className={`overflow-hidden rounded-xl border border-border bg-card ${activeKey ? "hidden lg:block" : "block"}`}>
+            <div className="max-h-[70dvh] divide-y divide-border overflow-y-auto">
               {conversations.map((c) => (
                 <button
                   key={c.key}
@@ -216,20 +216,30 @@ function MessagesPage() {
           </div>
 
           {/* Thread */}
-          <div className="flex flex-col overflow-hidden rounded-xl border border-border bg-card">
+          <div className={`flex flex-col overflow-hidden rounded-xl border border-border bg-card ${activeKey ? "flex" : "hidden lg:flex"}`}>
             {activeConvo ? (
               <>
-                <div className="border-b border-border p-4">
-                  <div className="font-semibold">{activeConvo.other_name}</div>
-                  <Link
-                    to="/listing/$id"
-                    params={{ id: activeConvo.listing_id }}
-                    className="text-xs text-muted-foreground hover:text-primary"
+                <div className="flex items-start gap-2 border-b border-border p-4">
+                  <button
+                    type="button"
+                    onClick={() => setActiveKey(null)}
+                    className="-ml-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-secondary lg:hidden"
+                    aria-label="Back to conversations"
                   >
-                    Re: {activeConvo.listing_title}
-                  </Link>
+                    <ArrowLeft className="h-4 w-4" />
+                  </button>
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate font-semibold">{activeConvo.other_name}</div>
+                    <Link
+                      to="/listing/$id"
+                      params={{ id: activeConvo.listing_id }}
+                      className="block truncate text-xs text-muted-foreground hover:text-primary"
+                    >
+                      Re: {activeConvo.listing_title}
+                    </Link>
+                  </div>
                 </div>
-                <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto p-4" style={{ maxHeight: "55vh" }}>
+                <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto p-4 max-h-[55dvh]">
                   {thread.map((m) => {
                     const mine = m.sender_id === user?.id;
                     return (
@@ -271,10 +281,11 @@ function MessagesPage() {
                 </div>
               </>
             ) : (
-              <div className="p-12 text-center text-muted-foreground">Select a conversation</div>
+              <div className="hidden p-12 text-center text-muted-foreground lg:block">Select a conversation</div>
             )}
           </div>
         </div>
+
       )}
     </div>
   );
