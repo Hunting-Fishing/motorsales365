@@ -200,6 +200,12 @@ function ShopIndex() {
           Disclosure: 365 MotorSales earns a commission on qualifying purchases. Prices and availability are set by the seller.
         </p>
       </div>
+
+      <ShopMobileCtaBar
+        vehicle={activeVehicle}
+        onPickVehicle={onPickVehicle}
+        onClearVehicle={clearVehicle}
+      />
     </SiteLayout>
   );
 }
