@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { formatPHP, formatDate } from "@/lib/format";
 import { Input } from "@/components/ui/input";
-import { CheckCircle2, AlertTriangle, ArrowUpRight, TrendingUp, Calendar, Check, CreditCard, Receipt, XCircle, RotateCcw, ExternalLink, Search } from "lucide-react";
+import { CheckCircle2, AlertTriangle, ArrowUpRight, TrendingUp, Calendar, Check, CreditCard, Receipt, XCircle, RotateCcw, ExternalLink, Search, FileText } from "lucide-react";
 import { Bar, BarChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import { toast } from "sonner";
 import { getStripeEnvironment } from "@/lib/stripe";
