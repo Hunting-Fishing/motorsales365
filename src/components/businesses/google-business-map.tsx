@@ -20,14 +20,19 @@ export type GMapBusiness = {
 
 const PH_CENTER = { lat: 12.8797, lng: 121.774 };
 
+const isTouchDevice = () =>
+  typeof window !== "undefined" &&
+  (("ontouchstart" in window) || (navigator.maxTouchPoints ?? 0) > 0);
+
 function pinIcon(color: string, featured: boolean, highlighted = false): google.maps.Symbol {
+  const touchBoost = isTouchDevice() ? 1.2 : 1;
   return {
     path: "M12 0C5.4 0 0 5.4 0 12c0 9 12 22 12 22s12-13 12-22C24 5.4 18.6 0 12 0z",
     fillColor: color,
     fillOpacity: 1,
     strokeColor: highlighted ? "#0ea5e9" : "#ffffff",
     strokeWeight: highlighted ? 4 : featured ? 3 : 2,
-    scale: highlighted ? 1.6 : featured ? 1.4 : 1.1,
+    scale: (highlighted ? 1.6 : featured ? 1.4 : 1.1) * touchBoost,
     anchor: new google.maps.Point(12, 34),
     labelOrigin: new google.maps.Point(12, 12),
   };
