@@ -72,12 +72,12 @@ function ShopIndex() {
 
   const onPickVehicle = (v: { category: "car" | "motorcycle"; make: string; model: string; year?: number }) => {
     setGarageState(v);
-    navigate({ search: (prev) => ({ ...prev, make: v.make, model: v.model, year: v.year }) });
+    navigate({ search: (prev: any) => ({ ...prev, make: v.make, model: v.model, year: v.year }) });
   };
 
   const clearVehicle = () => {
     setGarageState(null);
-    navigate({ search: (prev) => ({ ...prev, make: "", model: "", year: undefined }) });
+    navigate({ search: (prev: any) => ({ ...prev, make: "", model: "", year: undefined }) });
   };
 
   const onApplyFilters = (next: { categorySlug: string; brand: string; vehicle: typeof activeVehicle }) => {
