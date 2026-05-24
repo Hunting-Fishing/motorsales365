@@ -89,6 +89,16 @@ function BillingPage() {
     listInvoices({ data: { environment: env, limit: 20 } })
       .then((res) => setInvoices(res.invoices ?? []))
       .catch(() => setInvoices([]));
+    listPaymentMethods({ data: { environment: env } })
+      .then((res) => {
+        setPaymentMethods(res.paymentMethods ?? []);
+        setDefaultPmId(res.defaultPaymentMethodId ?? null);
+      })
+      .catch(() => {
+        setPaymentMethods([]);
+        setDefaultPmId(null);
+      });
+
 
     supabase.from("subscription_plans").select("*").eq("active", true).order("sort_order")
       .then(({ data }) => {
