@@ -43,7 +43,7 @@ function SandboxPage() {
       </div>
 
       <section className="rounded-xl border border-border bg-card p-5">
-        <div className="mb-3 flex items-center justify-between">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold">Role simulator</h2>
             <p className="text-xs text-muted-foreground">
@@ -92,7 +92,7 @@ function SandboxPage() {
       </section>
 
       <section className="rounded-xl border border-border bg-card p-5">
-        <div className="mb-3 flex items-center justify-between">
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold">Seller-type simulator</h2>
             <p className="text-xs text-muted-foreground">
@@ -145,7 +145,7 @@ function SandboxPage() {
 
 
       <section className="rounded-xl border border-border bg-card p-5">
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold">Feature flags</h2>
             <p className="text-xs text-muted-foreground">Toggle on/off to preview gated UI. Saved per device.</p>

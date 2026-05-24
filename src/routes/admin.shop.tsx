@@ -333,6 +333,7 @@ function NetworksTab() {
             ))}
           </tbody>
         </table>
+        </div>
         <p className="mt-4 text-xs text-muted-foreground">
           Tag value is appended to outbound URLs via <code>tag_param</code>, or substituted into <code>deeplink_template</code> as <code>{`{{tag}}`}</code> and <code>{`{{url}}`}</code>.
         </p>
