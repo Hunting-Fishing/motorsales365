@@ -68,6 +68,8 @@ function BillingPage() {
   const [cancelOpen, setCancelOpen] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
   const [invoices, setInvoices] = useState<any[]>([]);
+  const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
+  const [defaultPmId, setDefaultPmId] = useState<string | null>(null);
 
   const env = getStripeEnvironment();
 
