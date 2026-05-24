@@ -142,6 +142,8 @@ function ShopCategory() {
             </p>
           : <ProductGrid products={products} vehicle={activeVehicle} />}
 
+        <ShopProfile />
+
         <p className="rounded-md border bg-muted/40 p-4 text-xs text-muted-foreground">
           Disclosure: 365 MotorSales earns a commission on qualifying purchases.
         </p>
