@@ -19,6 +19,7 @@ export const listShopProducts = createServerFn({ method: "GET" })
   .inputValidator((input: {
     categorySlug?: string; featured?: boolean; search?: string; limit?: number;
     make?: string; model?: string; year?: number; includeUniversal?: boolean;
+    brand?: string;
   } = {}) =>
     z.object({
       categorySlug: z.string().max(80).optional(),
@@ -29,6 +30,7 @@ export const listShopProducts = createServerFn({ method: "GET" })
       model: z.string().max(120).optional(),
       year: z.number().int().min(1900).max(2100).optional(),
       includeUniversal: z.boolean().optional(),
+      brand: z.string().max(120).optional(),
     }).parse(input),
   )
   .handler(async ({ data }) => {
@@ -68,6 +70,7 @@ export const listShopProducts = createServerFn({ method: "GET" })
     if (cat) q = q.eq("category_id", cat);
     if (data.featured) q = q.eq("featured", true);
     if (data.search) q = q.ilike("title", `%${data.search}%`);
+    if (data.brand) q = q.ilike("brand", data.brand);
     const { data: rows, error } = await q
       .order("featured", { ascending: false })
       .order("created_at", { ascending: false })
@@ -80,6 +83,29 @@ export const listShopProducts = createServerFn({ method: "GET" })
       products = products.filter((p: any) => allowedIds!.has(p.id) || (includeU && p.universal_fit));
     }
     return { products };
+  });
+
+export const listShopBrands = createServerFn({ method: "GET" })
+  .inputValidator((input: { categorySlug?: string } = {}) =>
+    z.object({ categorySlug: z.string().max(80).optional() }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    let cat: string | null = null;
+    if (data.categorySlug) {
+      const { data: c } = await supabaseAdmin.from("shop_categories").select("id").eq("slug", data.categorySlug).maybeSingle();
+      cat = c?.id ?? null;
+      if (!cat) return { brands: [] as string[] };
+    }
+    let q = supabaseAdmin.from("shop_products").select("brand").eq("active", true).not("brand", "is", null);
+    if (cat) q = q.eq("category_id", cat);
+    const { data: rows, error } = await q.limit(1000);
+    if (error) throw new Error(error.message);
+    const set = new Set<string>();
+    for (const r of rows ?? []) {
+      const b = (r as any).brand?.trim();
+      if (b) set.add(b);
+    }
+    return { brands: Array.from(set).sort((a, b) => a.localeCompare(b)) };
   });
 
 export const getShopProduct = createServerFn({ method: "GET" })
