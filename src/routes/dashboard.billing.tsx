@@ -1097,7 +1097,25 @@ function BillingPage() {
               </thead>
               <tbody>
                 {filteredInvoices.map((inv) => (
-                  <tr key={inv.id} className="border-t border-border">
+                  <tr
+                    key={inv.id}
+                    className="border-t border-border cursor-pointer hover:bg-muted/40 transition-colors"
+                    onClick={async () => {
+                      try {
+                        setLoadingInvoice(true);
+                        setInvoiceDrawerOpen(true);
+                        const details = await getInvoiceDetails({
+                          data: { invoiceId: inv.id, environment: env },
+                        });
+                        setSelectedInvoice(details);
+                      } catch (e: any) {
+                        toast.error(e?.message ?? "Could not load invoice details");
+                        setInvoiceDrawerOpen(false);
+                      } finally {
+                        setLoadingInvoice(false);
+                      }
+                    }}
+                  >
                     <td className="p-3">{formatDate(new Date(inv.created * 1000).toISOString())}</td>
                     <td className="p-3 font-mono text-xs">{inv.number ?? inv.id}</td>
                     <td className="p-3 font-medium">
@@ -1112,11 +1130,23 @@ function BillingPage() {
                     </td>
                     <td className="p-3">
                       {inv.hosted_invoice_url ? (
-                        <a href={inv.hosted_invoice_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                        <a
+                          href={inv.hosted_invoice_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           View ↗
                         </a>
                       ) : inv.invoice_pdf ? (
-                        <a href={inv.invoice_pdf} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                        <a
+                          href={inv.invoice_pdf}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-primary hover:underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
                           PDF ↗
                         </a>
                       ) : (
