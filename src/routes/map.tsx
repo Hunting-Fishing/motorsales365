@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GoogleBusinessMap, type GMapBusiness } from "@/components/businesses/google-business-map";
 import { MapFilterBar, type CenterPoint } from "@/components/businesses/map-filter-bar";
+import { MapBottomSheet } from "@/components/businesses/map-bottom-sheet";
 import { haversineKm } from "@/components/businesses/google-maps-loader";
 
 const searchSchema = z.object({
@@ -56,7 +57,6 @@ function MapPage() {
   const [radiusKm, setRadiusKm] = useState<number | null>(search.r ?? null);
   const [hoverId, setHoverId] = useState<string | null>(null);
 
-  // Sync URL with state (replaceState-style so back button isn't spammed)
   useEffect(() => {
     navigate({
       to: "/map",
@@ -126,10 +126,80 @@ function MapPage() {
     highlighted: hoverId === b.id,
   }));
 
+  const countLabel = loading
+    ? "Loading…"
+    : `${sorted.length} result${sorted.length === 1 ? "" : "s"}${center && radiusKm ? ` within ${radiusKm} km` : ""}`;
+
+  const resultsList = (
+    <>
+      {loading ? (
+        <div className="space-y-2">
+          {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-20 w-full" />)}
+        </div>
+      ) : sorted.length === 0 ? (
+        <Card className="p-4 text-center text-sm text-muted-foreground">
+          <StoreIcon className="mx-auto mb-2 h-5 w-5 opacity-60" />
+          No businesses in this area.
+        </Card>
+      ) : (
+        <div className="space-y-2">
+          {sorted.map((b) => {
+            const dist = center && b.lat != null && b.lng != null
+              ? haversineKm({ lat: center.lat, lng: center.lng }, { lat: Number(b.lat), lng: Number(b.lng) })
+              : null;
+            return (
+              <Card
+                key={b.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => navigate({ to: "/businesses/$slug", params: { slug: b.slug } })}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    navigate({ to: "/businesses/$slug", params: { slug: b.slug } });
+                  }
+                }}
+                onMouseEnter={() => setHoverId(b.id)}
+                onMouseLeave={() => setHoverId((id) => (id === b.id ? null : id))}
+                className={`min-h-16 cursor-pointer p-4 transition hover:border-primary active:scale-[0.99] ${hoverId === b.id ? "border-primary ring-1 ring-primary/40" : ""}`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <h3 className="truncate text-base font-semibold sm:text-sm">{b.name}</h3>
+                      {b.featured && <Badge variant="default" className="shrink-0 text-[10px]">Featured</Badge>}
+                    </div>
+                    <div className="text-xs text-muted-foreground">{typeLabel(b.type_slug)}</div>
+                    {(b.city || b.barangay) && (
+                      <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
+                        <MapPin className="h-3.5 w-3.5 shrink-0" />
+                        <span className="truncate">{[b.barangay, b.city].filter(Boolean).join(", ")}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex shrink-0 flex-col items-end gap-1 text-xs">
+                    {b.rating_count > 0 && (
+                      <div className="flex items-center gap-1 font-medium">
+                        <Star className="h-3.5 w-3.5 fill-yellow-500 text-yellow-500" />
+                        {Number(b.rating_avg).toFixed(1)}
+                      </div>
+                    )}
+                    {dist != null && <div className="text-muted-foreground">{dist.toFixed(1)} km</div>}
+                    {b.price_label && <Badge variant="secondary" className="text-[10px]">{b.price_label}</Badge>}
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      )}
+    </>
+  );
+
   return (
     <SiteLayout>
       <div className="container mx-auto px-3 py-3 sm:px-4 sm:py-4">
-        <div className="mb-3">
+        <div className="mb-3 lg:block">
           <h1 className="font-display text-xl font-bold tracking-tight sm:text-2xl">Business Map</h1>
           <p className="text-xs text-muted-foreground sm:text-sm">Search a radius around any location. Tap a pin for details.</p>
         </div>
@@ -145,9 +215,10 @@ function MapPage() {
           />
         </Card>
 
-        <div className="flex flex-col gap-4 lg:grid lg:grid-cols-[360px_1fr]">
-          {/* Map — appears first on mobile, second on desktop */}
-          <div className="order-1 h-[55vh] min-h-[320px] overflow-hidden rounded-lg lg:order-2 lg:h-[640px]">
+        {/* Mobile: full-bleed map + bottom sheet. Desktop: side-by-side grid. */}
+        <div className="lg:grid lg:grid-cols-[360px_1fr] lg:gap-4">
+          {/* Map */}
+          <div className="order-1 h-[calc(100dvh-280px)] min-h-[360px] overflow-hidden rounded-lg lg:order-2 lg:h-[640px]">
             <GoogleBusinessMap
               height="100%"
               businesses={mapBusinesses}
@@ -157,63 +228,28 @@ function MapPage() {
             />
           </div>
 
-          {/* List */}
-          <div className="order-2 space-y-2 lg:order-1 lg:max-h-[calc(100dvh-260px)] lg:overflow-y-auto lg:pr-1">
-            <div className="text-xs text-muted-foreground">
-              {loading ? "Loading…" : `${sorted.length} result${sorted.length === 1 ? "" : "s"}${center && radiusKm ? ` within ${radiusKm} km` : ""}`}
-            </div>
-            {loading ? (
-              <>{Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-20 w-full" />)}</>
-            ) : sorted.length === 0 ? (
-              <Card className="p-4 text-center text-sm text-muted-foreground">
-                <StoreIcon className="mx-auto mb-2 h-5 w-5 opacity-60" />
-                No businesses in this area.
-              </Card>
-            ) : (
-              sorted.map((b) => {
-                const dist = center && b.lat != null && b.lng != null
-                  ? haversineKm({ lat: center.lat, lng: center.lng }, { lat: Number(b.lat), lng: Number(b.lng) })
-                  : null;
-                return (
-                  <Card
-                    key={b.id}
-                    onClick={() => navigate({ to: "/businesses/$slug", params: { slug: b.slug } })}
-                    onMouseEnter={() => setHoverId(b.id)}
-                    onMouseLeave={() => setHoverId((id) => (id === b.id ? null : id))}
-                    className={`cursor-pointer p-3 transition hover:border-primary active:scale-[0.99] ${hoverId === b.id ? "border-primary ring-1 ring-primary/40" : ""}`}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <h3 className="truncate text-sm font-semibold">{b.name}</h3>
-                          {b.featured && <Badge variant="default" className="shrink-0 text-[10px]">Featured</Badge>}
-                        </div>
-                        <div className="text-[11px] text-muted-foreground">{typeLabel(b.type_slug)}</div>
-                        {(b.city || b.barangay) && (
-                          <div className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
-                            <MapPin className="h-3 w-3 shrink-0" />
-                            <span className="truncate">{[b.barangay, b.city].filter(Boolean).join(", ")}</span>
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex shrink-0 flex-col items-end gap-1 text-[11px]">
-                        {b.rating_count > 0 && (
-                          <div className="flex items-center gap-1 font-medium">
-                            <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                            {Number(b.rating_avg).toFixed(1)}
-                          </div>
-                        )}
-                        {dist != null && <div className="text-muted-foreground">{dist.toFixed(1)} km</div>}
-                        {b.price_label && <Badge variant="secondary" className="text-[10px]">{b.price_label}</Badge>}
-                      </div>
-                    </div>
-                  </Card>
-                );
-              })
-            )}
+          {/* Desktop list (sidebar) */}
+          <div className="hidden lg:order-1 lg:block lg:max-h-[calc(100dvh-260px)] lg:overflow-y-auto lg:pr-1">
+            <div className="mb-2 text-xs text-muted-foreground">{countLabel}</div>
+            {resultsList}
           </div>
         </div>
       </div>
+
+      {/* Spacer so peek sheet doesn't cover footer content on mobile */}
+      <div className="h-24 lg:hidden" aria-hidden />
+
+      {/* Mobile draggable bottom sheet */}
+      <MapBottomSheet
+        header={
+          <div className="flex items-center gap-2">
+            <span className="font-semibold">Results</span>
+            <span className="text-muted-foreground">· {countLabel}</span>
+          </div>
+        }
+      >
+        {resultsList}
+      </MapBottomSheet>
     </SiteLayout>
   );
 }
