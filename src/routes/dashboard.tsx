@@ -74,8 +74,8 @@ function DashboardLayout() {
           </div>
         )}
       </div>
-      <div className="container mx-auto grid gap-4 px-3 py-4 sm:gap-6 sm:px-4 lg:grid-cols-[240px_1fr]">
-        <aside className="rounded-xl border border-border bg-card p-2 lg:sticky lg:top-20 lg:self-start">
+      <div className="container mx-auto grid w-full max-w-full grid-cols-[minmax(0,1fr)] gap-4 overflow-x-hidden px-3 py-4 sm:gap-6 sm:px-4 lg:grid-cols-[240px_minmax(0,1fr)] lg:overflow-x-visible">
+        <aside className="min-w-0 max-w-full overflow-hidden rounded-xl border border-border bg-card p-2 lg:sticky lg:top-20 lg:self-start">
           <nav className="-mx-1 flex flex-row gap-1 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0">
             {nav.map(({ to, label, Icon, exact }) => (
               <Link
