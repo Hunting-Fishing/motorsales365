@@ -753,7 +753,7 @@ function AdminReferrals() {
             <Button size="sm" variant="ghost" onClick={loadAudit}><RefreshCw className="mr-1 h-3 w-3" /> Refresh</Button>
           </div>
           <div className="mb-3 flex flex-wrap items-end gap-2">
-            <div className="flex flex-col gap-1">
+            <div className="flex w-full flex-col gap-1 sm:w-auto">
               <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Action</Label>
               <Select value={auditAction} onValueChange={setAuditAction}>
                 <SelectTrigger className="h-8 w-full sm:w-[160px]"><SelectValue /></SelectTrigger>
@@ -769,7 +769,7 @@ function AdminReferrals() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex w-full flex-col gap-1 sm:w-auto">
               <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Admin</Label>
               <Select value={auditActor} onValueChange={setAuditActor}>
                 <SelectTrigger className="h-8 w-full sm:w-[180px]"><SelectValue /></SelectTrigger>
@@ -781,14 +781,15 @@ function AdminReferrals() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex w-full flex-col gap-1 sm:w-auto">
               <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">From</Label>
               <Input type="date" value={auditFrom} onChange={(e) => setAuditFrom(e.target.value)} className="h-8 w-full sm:w-[150px]" />
             </div>
-            <div className="flex flex-col gap-1">
+            <div className="flex w-full flex-col gap-1 sm:w-auto">
               <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">To</Label>
               <Input type="date" value={auditTo} onChange={(e) => setAuditTo(e.target.value)} className="h-8 w-full sm:w-[150px]" />
             </div>
+
             {(auditAction !== "all" || auditActor !== "all" || auditFrom || auditTo) && (
               <Button size="sm" variant="ghost" onClick={() => { setAuditAction("all"); setAuditActor("all"); setAuditFrom(""); setAuditTo(""); }}>
                 Clear
