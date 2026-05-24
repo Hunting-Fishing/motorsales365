@@ -261,7 +261,7 @@ function AccountsConsole() {
         <div className="p-12 text-center text-muted-foreground">Loading…</div>
       ) : (
         <div className="overflow-x-auto rounded-xl border border-border bg-card">
-          <table className="w-full text-sm">
+          <table className="w-full min-w-[640px] text-sm">
             <thead className="bg-secondary/50 text-left">
               <tr>
                 <th className="p-3">Account</th>

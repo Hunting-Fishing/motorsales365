@@ -607,7 +607,7 @@ function AdminReferrals() {
       </div>
 
       <div className="rounded-xl border border-border bg-card overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full min-w-[640px] text-sm">
           <thead className="border-b border-border bg-muted/40">
             <tr className="text-left">
               <SortableTh label="Staff" k="name" sortKey={sortKey} sortDir={sortDir} onSort={toggleSort} />
@@ -798,7 +798,7 @@ function AdminReferrals() {
             <p className="text-sm text-muted-foreground">No audit entries match these filters.</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-xs">
+              <table className="w-full min-w-[640px] text-xs">
                 <thead className="border-b border-border bg-muted/40">
                   <tr className="text-left">
                     <th className="px-3 py-2">When</th>

@@ -99,7 +99,7 @@ function DirectoryTable({ entries }: { entries: DirectoryEntry[] }) {
       : "bg-rose-500/15 text-rose-700 dark:text-rose-400";
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-sm">
+      <table className="w-full min-w-[640px] text-sm">
         <thead className="border-b text-left text-xs uppercase text-muted-foreground">
           <tr>
             <th className="p-2">Program</th>
@@ -154,7 +154,7 @@ function ProductsTab() {
       <CardContent>
         {isLoading ? <p className="text-muted-foreground">Loading…</p> : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[640px] text-sm">
               <thead className="border-b text-left text-xs uppercase text-muted-foreground">
                 <tr><th className="p-2">Title</th><th className="p-2">Category</th><th className="p-2">Price</th><th className="p-2">Clicks</th><th className="p-2">Status</th><th className="p-2"></th></tr>
               </thead>
@@ -315,7 +315,7 @@ function NetworksTab() {
         <Button onClick={() => setEditing({})}><Plus className="mr-1 h-4 w-4" />New network</Button>
       </CardHeader>
       <CardContent>
-        <table className="w-full text-sm">
+        <table className="w-full min-w-[640px] text-sm">
           <thead className="border-b text-left text-xs uppercase text-muted-foreground">
             <tr><th className="p-2">Name</th><th className="p-2">Slug</th><th className="p-2">Tag param</th><th className="p-2">Tag value</th><th className="p-2">Status</th><th className="p-2"></th></tr>
           </thead>
