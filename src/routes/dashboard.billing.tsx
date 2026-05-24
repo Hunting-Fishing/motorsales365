@@ -18,6 +18,7 @@ import {
   listInvoices,
   listPaymentMethods,
   setDefaultPaymentMethod,
+  detachPaymentMethod,
 } from "@/utils/payments.functions";
 
 
@@ -984,6 +985,32 @@ function BillingPage() {
                       Set as default
                     </Button>
                   )}
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-xs text-destructive hover:text-destructive"
+                    disabled={busy === `remove-${pm.id}`}
+                    onClick={async () => {
+                      try {
+                        setBusy(`remove-${pm.id}`);
+                        await detachPaymentMethod({
+                          data: { paymentMethodId: pm.id, environment: env },
+                        });
+                        toast.success("Payment method removed");
+                        // Refresh list
+                        const res = await listPaymentMethods({ data: { environment: env } });
+                        setPaymentMethods(res.paymentMethods ?? []);
+                        setDefaultPmId(res.defaultPaymentMethodId ?? null);
+                      } catch (e: any) {
+                        toast.error(e?.message ?? "Could not remove payment method");
+                      } finally {
+                        setBusy(null);
+                      }
+                    }}
+                  >
+                    <XCircle className="mr-1 h-3.5 w-3.5" />
+                    Remove
+                  </Button>
                 </div>
               </div>
             ))}

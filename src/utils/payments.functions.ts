@@ -464,3 +464,38 @@ export const setDefaultPaymentMethod = createServerFn({ method: "POST" })
 
     return { ok: true };
   });
+
+export const detachPaymentMethod = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { paymentMethodId: string; environment: StripeEnv }) => {
+    if (!data.paymentMethodId || !data.paymentMethodId.startsWith("pm_")) {
+      throw new Error("Invalid paymentMethodId");
+    }
+    validateEnv(data.environment);
+    return data;
+  })
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const stripe = createStripeClient(data.environment);
+
+    // Verify the payment method belongs to this user by checking the customer
+    const { data: sub } = await supabase
+      .from("subscriptions")
+      .select("stripe_customer_id")
+      .eq("user_id", userId)
+      .eq("environment", data.environment)
+      .not("stripe_customer_id", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!sub?.stripe_customer_id) throw new Error("No customer found");
+
+    const pm = await stripe.paymentMethods.retrieve(data.paymentMethodId);
+    if (typeof pm.customer !== "string" || pm.customer !== sub.stripe_customer_id) {
+      throw new Error("Payment method not found");
+    }
+
+    await stripe.paymentMethods.detach(data.paymentMethodId);
+    return { ok: true };
+  });
