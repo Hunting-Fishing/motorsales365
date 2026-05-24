@@ -169,7 +169,7 @@ export function ImportPlacesPanel() {
         </div>
 
         <div className="flex flex-wrap items-end gap-2">
-          <div className="flex-1 min-w-[220px]">
+          <div className="flex-1 min-w-0">
             <Label className="text-xs">…or search a place</Label>
             <div className="flex gap-2">
               <Input

@@ -126,7 +126,7 @@ export function PlacesAutocomplete({
   };
 
   return (
-    <div ref={containerRef} className="relative flex flex-1 items-center gap-2 min-w-[240px]">
+    <div ref={containerRef} className="relative flex flex-1 items-center gap-2 min-w-0">
       <MapPin className="h-4 w-4 text-muted-foreground" />
       <Input
         value={value}
