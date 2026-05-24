@@ -1,13 +1,16 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { SiteLayout } from "@/components/site-layout";
 import { AdCarousel } from "@/components/ads/ad-carousel";
-import { listShopCategories, listShopProducts } from "@/lib/shop.functions";
+import { listShopCategories, listShopProducts, listShopBrands } from "@/lib/shop.functions";
 import { ProductGrid } from "./shop.index";
 import { useGarage, formatVehicle } from "@/lib/garage";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
+import { X } from "lucide-react";
 
 const catSearch = z.object({
   make: fallback(z.string(), "").default(""),
