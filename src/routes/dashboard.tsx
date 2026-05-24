@@ -76,15 +76,20 @@ function DashboardLayout() {
         )}
       </div>
       <div className="container mx-auto grid w-full max-w-full grid-cols-[minmax(0,1fr)] gap-4 overflow-x-hidden px-3 py-4 sm:gap-6 sm:px-4 lg:grid-cols-[240px_minmax(0,1fr)] lg:overflow-x-visible">
-        <aside className="min-w-0 max-w-full overflow-hidden rounded-xl border border-border bg-card p-2 lg:sticky lg:top-20 lg:self-start">
-          <nav className="-mx-1 flex flex-row gap-1 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0">
+        {/* Mobile: dropdown menu */}
+        <div className="lg:hidden">
+          <MobileNavMenu nav={nav} />
+        </div>
+        {/* Desktop: sidebar */}
+        <aside className="hidden min-w-0 max-w-full overflow-hidden rounded-xl border border-border bg-card p-2 lg:sticky lg:top-20 lg:block lg:self-start">
+          <nav className="flex flex-col gap-1">
             {nav.map(({ to, label, Icon, exact }) => (
               <Link
                 key={to}
                 to={to}
                 activeOptions={{ exact: !!exact }}
                 activeProps={{ className: "bg-primary text-primary-foreground" }}
-                className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary"
+                className="flex items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary"
               >
                 <Icon className="h-4 w-4" />{label}
               </Link>
@@ -94,5 +99,43 @@ function DashboardLayout() {
         <div className="min-w-0"><Outlet /></div>
       </div>
     </SiteLayout>
+  );
+}
+
+function MobileNavMenu({ nav }: { nav: { to: string; label: string; Icon: any; exact?: boolean }[] }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const current =
+    [...nav]
+      .sort((a, b) => b.to.length - a.to.length)
+      .find((n) => (n.exact ? pathname === n.to : pathname === n.to || pathname.startsWith(n.to + "/"))) ?? nav[0];
+  const CurrentIcon = current.Icon;
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger className="flex w-full min-h-12 items-center justify-between gap-2 rounded-xl border border-border bg-card px-4 py-3 text-left text-sm font-semibold shadow-sm active:scale-[0.99]">
+        <span className="flex items-center gap-2 min-w-0">
+          <CurrentIcon className="h-5 w-5 shrink-0 text-primary" />
+          <span className="truncate">{current.label}</span>
+        </span>
+        <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" sideOffset={6} className="w-[calc(100vw-1.5rem)] max-h-[70vh] overflow-y-auto">
+        {nav.map(({ to, label, Icon, exact }) => {
+          const isActive = exact ? pathname === to : pathname === to || pathname.startsWith(to + "/");
+          return (
+            <DropdownMenuItem key={to} asChild className="min-h-11">
+              <Link
+                to={to}
+                activeOptions={{ exact: !!exact }}
+                className="flex w-full items-center gap-3 px-3 py-2.5 text-sm"
+              >
+                <Icon className="h-4 w-4 shrink-0 text-muted-foreground" />
+                <span className="flex-1 truncate">{label}</span>
+                {isActive && <Check className="h-4 w-4 text-primary" />}
+              </Link>
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
