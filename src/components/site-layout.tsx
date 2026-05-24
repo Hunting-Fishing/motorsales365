@@ -8,7 +8,7 @@ import bannerImage from "@/assets/banner.webp";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col pb-[calc(64px+env(safe-area-inset-bottom))] md:pb-0">
+    <div className="flex min-h-dvh flex-col pb-[calc(64px+env(safe-area-inset-bottom))] md:pb-0">
       <PaymentTestModeBanner />
       <a href="/" aria-label="365 Motor Sales home" className="block bg-white">
         <img

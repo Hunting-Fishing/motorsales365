@@ -35,7 +35,7 @@ function ReferralPoster() {
   }, [code]);
 
   return (
-    <div className="poster-page min-h-screen bg-background">
+    <div className="poster-page min-h-dvh bg-background">
       <style>{`
         @media print {
           .no-print { display: none !important; }
