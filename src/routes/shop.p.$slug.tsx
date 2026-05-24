@@ -8,6 +8,7 @@ import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
+import { ShopFavoriteButton } from "@/components/shop/shop-favorite-button";
 
 function getVisitorId(): string {
   if (typeof window === "undefined") return "";
