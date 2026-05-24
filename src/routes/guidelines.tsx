@@ -15,7 +15,7 @@ function GuidelinesPage() {
   return (
     <SiteLayout>
       <article className="container mx-auto max-w-3xl px-4 py-16 prose prose-sm dark:prose-invert">
-        <h1 className="font-display text-4xl font-bold">Community Guidelines</h1>
+        <h1 className="font-display text-3xl font-bold sm:text-4xl">Community Guidelines</h1>
         <p className="mt-4 text-muted-foreground">These rules keep the marketplace safe for everyone. Breaking them can result in listing removal, account suspension, or referral to authorities.</p>
 
         <h2 className="mt-8 text-xl font-semibold">For sellers</h2>

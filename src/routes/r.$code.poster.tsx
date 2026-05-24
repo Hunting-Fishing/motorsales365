@@ -54,7 +54,7 @@ function ReferralPoster() {
       <main className="mx-auto my-8 max-w-[210mm] rounded-xl border border-border bg-white p-10 text-black shadow-sm print:my-0 print:rounded-none print:border-0 print:shadow-none">
         <header className="text-center">
           <div className="text-xs uppercase tracking-[0.3em] text-neutral-500">365 Motorsales</div>
-          <h1 className="mt-3 font-display text-4xl font-bold leading-tight">
+          <h1 className="mt-3 font-display text-3xl font-bold sm:text-4xl leading-tight">
             Buy. Sell. Tow. <span className="text-primary">Get an exclusive offer.</span>
           </h1>
           <p className="mx-auto mt-3 max-w-md text-neutral-600">

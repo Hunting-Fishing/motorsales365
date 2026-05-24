@@ -15,7 +15,7 @@ function PrivacyPage() {
   return (
     <SiteLayout>
       <article className="container mx-auto max-w-3xl px-4 py-16 prose prose-sm dark:prose-invert">
-        <h1 className="font-display text-4xl font-bold">Privacy Policy</h1>
+        <h1 className="font-display text-3xl font-bold sm:text-4xl">Privacy Policy</h1>
         <p className="text-sm text-muted-foreground">Last updated: {new Date().toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" })}</p>
 
         <p className="mt-4 text-muted-foreground">365 MotorSales Philippines ("we", "us") respects your privacy and complies with the Philippines' <strong>Data Privacy Act of 2012 (RA 10173)</strong> and its Implementing Rules and Regulations.</p>

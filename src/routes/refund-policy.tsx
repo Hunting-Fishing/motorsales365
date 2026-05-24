@@ -15,7 +15,7 @@ function RefundPage() {
   return (
     <SiteLayout>
       <article className="container mx-auto max-w-3xl px-4 py-16 prose prose-sm dark:prose-invert">
-        <h1 className="font-display text-4xl font-bold">Refund Policy</h1>
+        <h1 className="font-display text-3xl font-bold sm:text-4xl">Refund Policy</h1>
 
         <h2 className="mt-6 text-xl font-semibold">Listing fees and boosts</h2>
         <p className="mt-2 text-muted-foreground">Listing fees and boost upgrades are <strong>non-refundable</strong> once the listing is published, since the placement and exposure are delivered immediately.</p>

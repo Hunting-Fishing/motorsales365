@@ -234,7 +234,7 @@ function PricingPage() {
     <SiteLayout>
       <section className="bg-secondary/40 py-12">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="font-display text-4xl font-bold">Simple pricing</h1>
+          <h1 className="font-display text-3xl font-bold sm:text-4xl">Simple pricing</h1>
           <p className="mt-2 text-muted-foreground">Pay per listing, or subscribe monthly. All prices in ₱ PHP.</p>
         </div>
       </section>

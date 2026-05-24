@@ -15,7 +15,7 @@ function TermsPage() {
   return (
     <SiteLayout>
       <article className="container mx-auto max-w-3xl px-4 py-16 prose prose-sm dark:prose-invert">
-        <h1 className="font-display text-4xl font-bold">Terms of Service</h1>
+        <h1 className="font-display text-3xl font-bold sm:text-4xl">Terms of Service</h1>
         <p className="text-sm text-muted-foreground">Last updated: {new Date().toLocaleDateString("en-PH", { year: "numeric", month: "long", day: "numeric" })}</p>
 
         <h2 className="mt-8 text-xl font-semibold">1. Who we are</h2>

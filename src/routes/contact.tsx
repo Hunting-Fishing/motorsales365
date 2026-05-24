@@ -16,7 +16,7 @@ function ContactPage() {
   return (
     <SiteLayout>
       <div className="container mx-auto max-w-4xl px-4 py-16">
-        <h1 className="font-display text-4xl font-bold">Get in touch</h1>
+        <h1 className="font-display text-3xl font-bold sm:text-4xl">Get in touch</h1>
         <p className="mt-3 max-w-2xl text-muted-foreground">
           We're based in the Philippines and reply in English or Tagalog. For listing-specific questions,
           please message the seller directly from the listing page.
