@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export function SiteFooter() {
   const { user } = useAuth();
@@ -23,72 +24,103 @@ export function SiteFooter() {
     return () => { cancelled = true; };
   }, [user]);
 
+  const sections = [
+    {
+      title: "Browse",
+      links: [
+        { to: "/browse/$category", params: { category: "car" }, label: "Cars" },
+        { to: "/browse/$category", params: { category: "motorcycle" }, label: "Motorcycles" },
+        { to: "/browse/$category", params: { category: "boat" }, label: "Boats" },
+        { to: "/browse/$category", params: { category: "airplane" }, label: "Airplanes" },
+        { to: "/browse/$category", params: { category: "equipment" }, label: "Equipment" },
+        { to: "/browse/$category", params: { category: "towing" }, label: "Towing & Trucking" },
+      ],
+    },
+    {
+      title: "Tow & deliver",
+      links: [{ to: "/tow", label: "Request a tow" }],
+    },
+    {
+      title: "Sell",
+      links: [
+        { to: "/sell", label: "Post a listing" },
+        { to: "/pricing", label: "Pricing & plans" },
+        { to: "/payments", label: "Payment methods" },
+        { to: "/shop", label: "Shop" },
+      ],
+    },
+    {
+      title: "Company",
+      links: [
+        { to: "/about", label: "About" },
+        { to: "/contact", label: "Contact" },
+        { to: "/advertise", label: "Advertise / buy ad space" },
+        ...(referralCode ? [{ to: "/my-qr", label: "My QR Code" }] : []),
+      ],
+    },
+    {
+      title: "Legal",
+      links: [
+        { to: "/terms", label: "Terms of Service" },
+        { to: "/privacy", label: "Privacy Policy" },
+        { to: "/guidelines", label: "Community Guidelines" },
+        { to: "/refund-policy", label: "Refund Policy" },
+      ],
+    },
+  ];
+
   return (
     <footer className="mt-16 border-t border-border bg-secondary/40">
-      <div className="container mx-auto grid gap-8 px-4 py-12 md:grid-cols-4">
-        <div>
-          <Link to="/" className="flex items-center gap-2" aria-label="365 MotorSales Philippines home">
-            <BrandLogo size={48} />
-            <div className="flex flex-col leading-none">
-              <span className="font-display text-lg font-bold">365 MotorSales</span>
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Philippines</span>
-            </div>
-          </Link>
-          <p className="mt-3 text-sm text-muted-foreground">
-            The standard for buying and selling vehicles across the Philippines.
-          </p>
-        </div>
-        <div>
-          <h4 className="mb-3 text-sm font-semibold">Browse</h4>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/browse/$category" params={{ category: "car" }} className="hover:text-foreground">Cars</Link></li>
-            <li><Link to="/browse/$category" params={{ category: "motorcycle" }} className="hover:text-foreground">Motorcycles</Link></li>
-            <li><Link to="/browse/$category" params={{ category: "boat" }} className="hover:text-foreground">Boats</Link></li>
-            <li><Link to="/browse/$category" params={{ category: "airplane" }} className="hover:text-foreground">Airplanes</Link></li>
-            <li><Link to="/browse/$category" params={{ category: "equipment" }} className="hover:text-foreground">Equipment</Link></li>
-            <li><Link to="/browse/$category" params={{ category: "towing" }} className="hover:text-foreground">Towing & Trucking</Link></li>
-          </ul>
-        </div>
-        <div>
-          <h4 className="mb-3 text-sm font-semibold">Tow & deliver</h4>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/tow" className="hover:text-foreground">Request a tow</Link></li>
-          </ul>
-        </div>
-        <div>
-          <h4 className="mb-3 text-sm font-semibold">Sell</h4>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/sell" className="hover:text-foreground">Post a listing</Link></li>
-            <li><Link to="/pricing" className="hover:text-foreground">Pricing & plans</Link></li>
-            <li><Link to="/payments" className="hover:text-foreground">Payment methods</Link></li>
-            <li><Link to="/shop" className="hover:text-foreground">Shop</Link></li>
-          </ul>
-        </div>
-        <div>
-          <h4 className="mb-3 text-sm font-semibold">Company</h4>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/about" className="hover:text-foreground">About</Link></li>
-            <li><Link to="/contact" className="hover:text-foreground">Contact</Link></li>
-            <li><Link to="/advertise" className="hover:text-foreground">Advertise / buy ad space</Link></li>
-            {referralCode && (
-              <li>
-                <Link to="/my-qr" className="hover:text-foreground">
-                  My QR Code
-                </Link>
-              </li>
-            )}
-          </ul>
-        </div>
-        <div>
-          <h4 className="mb-3 text-sm font-semibold">Legal</h4>
-          <ul className="space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/terms" className="hover:text-foreground">Terms of Service</Link></li>
-            <li><Link to="/privacy" className="hover:text-foreground">Privacy Policy</Link></li>
-            <li><Link to="/guidelines" className="hover:text-foreground">Community Guidelines</Link></li>
-            <li><Link to="/refund-policy" className="hover:text-foreground">Refund Policy</Link></li>
-          </ul>
-        </div>
+      {/* Brand block */}
+      <div className="container mx-auto px-4 pt-10 pb-2">
+        <Link to="/" className="flex items-center gap-2" aria-label="365 MotorSales Philippines home">
+          <BrandLogo size={48} />
+          <div className="flex flex-col leading-none">
+            <span className="font-display text-lg font-bold">365 MotorSales</span>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Philippines</span>
+          </div>
+        </Link>
+        <p className="mt-3 max-w-md text-sm text-muted-foreground">
+          The standard for buying and selling vehicles across the Philippines.
+        </p>
       </div>
+
+      {/* Mobile: accordion */}
+      <div className="container mx-auto px-4 py-4 md:hidden">
+        <Accordion type="multiple" className="w-full">
+          {sections.map((s) => (
+            <AccordionItem value={s.title} key={s.title}>
+              <AccordionTrigger className="text-sm font-semibold">{s.title}</AccordionTrigger>
+              <AccordionContent>
+                <ul className="space-y-1 text-sm text-muted-foreground">
+                  {s.links.map((l: any) => (
+                    <li key={l.label}>
+                      <Link to={l.to} params={l.params} className="block rounded px-1 py-2 hover:text-foreground">{l.label}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+      </div>
+
+      {/* Desktop: columns */}
+      <div className="container mx-auto hidden grid-cols-2 gap-8 px-4 py-8 md:grid md:grid-cols-5">
+        {sections.map((s) => (
+          <div key={s.title}>
+            <h4 className="mb-3 text-sm font-semibold">{s.title}</h4>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              {s.links.map((l: any) => (
+                <li key={l.label}>
+                  <Link to={l.to} params={l.params} className="hover:text-foreground">{l.label}</Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
       <div className="border-t border-border px-4 py-4 text-center text-xs text-muted-foreground">
         <p>© {new Date().getFullYear()} 365 MotorSales Philippines. All prices in ₱ PHP.</p>
         <p className="mt-1">Registered in the Philippines · Metro Manila · DPA-compliant.</p>

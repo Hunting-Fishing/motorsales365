@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Menu, Plus, Heart, MessageSquare, LogOut, Shield, User as UserIcon, Eye } from "lucide-react";
+import { Menu, Plus, Heart, MessageSquare, LogOut, Shield, User as UserIcon, Eye, X, LogIn, UserPlus } from "lucide-react";
 import { useAuth, type SellerType } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/brand-logo";
@@ -15,6 +15,7 @@ import {
   Sheet,
   SheetContent,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
 
 const NAV = [
@@ -50,10 +51,10 @@ export function SiteHeader() {
 
   return (
     <header className="w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-      <div className="container mx-auto flex h-16 items-center justify-between gap-4 px-4">
-        <div className="flex items-center gap-6">
+      <div className="container mx-auto flex h-14 items-center justify-between gap-2 px-3 sm:h-16 sm:gap-4 sm:px-4">
+        <div className="flex min-w-0 items-center gap-4 lg:gap-6">
           <Link to="/" className="flex items-center gap-2" aria-label="365 MotorSales Philippines home">
-            <BrandLogo size={44} className="shrink-0" />
+            <BrandLogo size={36} className="shrink-0 sm:[&]:!h-11 sm:[&]:!w-11" />
             <div className="hidden flex-col leading-none sm:flex">
               <span className="font-display text-lg font-bold tracking-tight">365 MotorSales</span>
               <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Philippines</span>
@@ -103,8 +104,15 @@ export function SiteHeader() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-2">
-          <CurrencySwitcher />
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <div className="hidden sm:block">
+            <CurrencySwitcher />
+          </div>
+
+          {/* Mobile compact Sell CTA */}
+          <Button asChild size="icon" variant="default" className="sm:hidden h-9 w-9" aria-label="Post a listing">
+            <Link to="/sell"><Plus className="h-5 w-5" /></Link>
+          </Button>
           <Button asChild className="hidden sm:inline-flex" variant="default">
             <Link to="/sell"><Plus className="mr-1 h-4 w-4" /> Post a listing</Link>
           </Button>
@@ -112,7 +120,7 @@ export function SiteHeader() {
           {user && isStaff && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
+                <Button variant="outline" size="sm" className="hidden md:inline-flex gap-2">
                   <Eye className="h-4 w-4" />
                   <span className="hidden md:inline">View as: {SELLER_VIEW_OPTIONS.find((o) => o.value === effectiveSellerType)?.label ?? effectiveSellerType}</span>
                 </Button>
@@ -152,7 +160,7 @@ export function SiteHeader() {
           ) : user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2">
+                <Button variant="outline" size="sm" className="hidden md:inline-flex gap-2">
                   <UserIcon className="h-4 w-4" />
                   <span className="hidden sm:inline">Account</span>
                 </Button>
@@ -173,39 +181,106 @@ export function SiteHeader() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <>
-              <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
-                <Link to="/login">Sign in</Link>
-              </Button>
-              <Button asChild variant="outline" size="sm">
-                <Link to="/signup">Sign up</Link>
-              </Button>
-            </>
+            <Button asChild variant="outline" size="sm" className="hidden md:inline-flex">
+              <Link to="/signup">Sign up</Link>
+            </Button>
           )}
 
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden">
+              <Button variant="ghost" size="icon" className="lg:hidden h-9 w-9" aria-label="Open menu">
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent>
-              <div className="mt-8 flex flex-col gap-1">
-                {NAV.map((n) => (
-                  <Link key={n.category} to="/browse/$category" params={{ category: n.category }} className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">
-                    {n.label}
+            <SheetContent side="right" className="w-[88vw] max-w-sm p-0 flex flex-col">
+              <div className="flex items-center justify-between border-b border-border px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <BrandLogo size={32} />
+                  <span className="font-display text-base font-bold">365 MotorSales</span>
+                </div>
+                <SheetClose asChild>
+                  <Button variant="ghost" size="icon" aria-label="Close menu"><X className="h-5 w-5" /></Button>
+                </SheetClose>
+              </div>
+
+              <div className="flex-1 overflow-y-auto px-3 py-4">
+                <SheetClose asChild>
+                  <Link to="/sell" className="mb-4 flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground shadow-sm">
+                    <Plus className="h-5 w-5" /> Post a listing
                   </Link>
-                ))}
-                <Link to={BUSINESSES_LINK.to} className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">{BUSINESSES_LINK.label}</Link>
-                <Link to={RIDES_LINK.to} className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">{RIDES_LINK.label}</Link>
-                <Link to="/map" className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">Map</Link>
-                <Link to="/shop" className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">Shop</Link>
-                <Link to="/sell" className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">Post a listing</Link>
-                {!user && (
+                </SheetClose>
+
+                <p className="px-3 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Browse</p>
+                <div className="flex flex-col gap-0.5">
+                  {NAV.map((n) => (
+                    <SheetClose asChild key={n.category}>
+                      <Link
+                        to="/browse/$category"
+                        params={{ category: n.category }}
+                        className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                        activeProps={{ className: "bg-secondary text-foreground" }}
+                      >
+                        {n.label}
+                      </Link>
+                    </SheetClose>
+                  ))}
+                </div>
+
+                <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Marketplace</p>
+                <div className="flex flex-col gap-0.5">
+                  <SheetClose asChild><Link to={BUSINESSES_LINK.to} className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">{BUSINESSES_LINK.label}</Link></SheetClose>
+                  <SheetClose asChild><Link to={RIDES_LINK.to} className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">{RIDES_LINK.label}</Link></SheetClose>
+                  <SheetClose asChild><Link to="/map" className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">Map</Link></SheetClose>
+                  <SheetClose asChild><Link to="/shop" className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">Shop</Link></SheetClose>
+                  <SheetClose asChild><Link to="/pricing" className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">Pricing</Link></SheetClose>
+                </div>
+
+                {user && (
                   <>
-                    <Link to="/login" className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">Sign in</Link>
-                    <Link to="/signup" className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">Sign up</Link>
+                    <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Account</p>
+                    <div className="flex flex-col gap-0.5">
+                      <SheetClose asChild><Link to="/dashboard" className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">My listings</Link></SheetClose>
+                      <SheetClose asChild><Link to="/dashboard/favorites" className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">Favorites</Link></SheetClose>
+                      <SheetClose asChild><Link to="/dashboard/messages" className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">Messages</Link></SheetClose>
+                      <SheetClose asChild><Link to="/dashboard/billing" className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">Billing</Link></SheetClose>
+                      <SheetClose asChild><Link to="/dashboard/profile" className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">Profile</Link></SheetClose>
+                    </div>
+                    {isAdmin && (
+                      <>
+                        <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Admin</p>
+                        <SheetClose asChild>
+                          <Link to="/admin" className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">
+                            <Shield className="h-4 w-4" /> Admin console
+                          </Link>
+                        </SheetClose>
+                      </>
+                    )}
                   </>
+                )}
+
+                <div className="mt-4 px-3">
+                  <CurrencySwitcher />
+                </div>
+              </div>
+
+              <div className="border-t border-border p-3">
+                {user ? (
+                  <Button variant="outline" className="w-full justify-center gap-2" onClick={handleSignOut}>
+                    <LogOut className="h-4 w-4" /> Sign out
+                  </Button>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2">
+                    <SheetClose asChild>
+                      <Button asChild variant="outline" className="w-full gap-2">
+                        <Link to="/login"><LogIn className="h-4 w-4" /> Sign in</Link>
+                      </Button>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Button asChild className="w-full gap-2">
+                        <Link to="/signup"><UserPlus className="h-4 w-4" /> Sign up</Link>
+                      </Button>
+                    </SheetClose>
+                  </div>
                 )}
               </div>
             </SheetContent>

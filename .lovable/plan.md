@@ -1,75 +1,75 @@
+## Goal
 
-# Stripe scaffold — ready for keys
+Make every screen feel native on phones (360px and up), tighten touch targets and typography, and make the site installable as a home-screen app — without breaking the Lovable preview.
 
-Goal: every Stripe code path is wired and production-shaped. The only thing missing on go-live night is pasting 4 secrets + flipping a flag. Then move on to map polish + about copy already done.
+## 1. Global chrome (header, footer, layout)
 
-## What's already in place (no work needed)
-- `src/lib/stripe.server.ts` — gateway client (`createStripeClient`)
-- `src/lib/stripe.ts` — `getStripe()` + env detection
-- `src/components/StripeEmbeddedCheckout.tsx` + `useStripeCheckout` hook
-- `src/components/PaymentTestModeBanner.tsx`
-- `src/utils/payments.functions.ts` — `createCheckoutSession` server fn
-- `src/routes/api/public/payments/webhook.ts` — Stripe subscription webhook
-- `src/routes/checkout.return.tsx` — return page
-- `.env.development` has `VITE_PAYMENTS_CLIENT_TOKEN` (sandbox `pk_test_…`)
+- **`site-layout.tsx`** — shrink the big banner image on mobile (cap to ~96px) so the fold isn't eaten by the banner; keep desktop intact.
+- **`site-header.tsx`**
+  - Move the **Post a listing** CTA into the mobile drawer as the top, primary-styled item; surface it as a compact `+` icon button on small screens.
+  - Make the mobile drawer (`Sheet`) full-height with grouped sections: Browse / Marketplace / Account / Admin, larger 44px touch targets, active route highlighting, and Sign in/Sign up pinned to the bottom.
+  - Hide the "View as" staff switcher behind the drawer on mobile.
+  - Add a sticky bottom **mobile tab bar** (Home, Browse, Sell, Messages, Account) visible only `< md`, with safe-area padding for iOS.
+- **`site-footer.tsx`** — collapse link columns into accordion sections on mobile.
 
-## What I'll scaffold now
+## 2. Public pages
 
-### 1. Products & prices (test env, auto-syncs to live)
-Use `payments--batch_create_product` to register the catalog so `lookup_keys` resolve in checkout. Based on `/pricing` + boost UI:
-- `plan_pro` → `pro_monthly`, `pro_yearly`
-- `plan_business` → `business_monthly`, `business_yearly`
-- `listing_boost_7d` → `boost_7d` (one-time)
-- `listing_boost_30d` → `boost_30d` (one-time)
-- `featured_business_30d` → `featured_business_30d` (one-time)
+For each: `index`, `browse.$category`, `listing.$id`, `shop.index`, `shop.$category`, `shop.p.$slug`, `rides.index`, `rides.$slug`, `businesses.index`, `businesses.$slug`, `map`, `pricing`, `sell`, `seller.$id`:
 
-All set `tax_code: txcd_10000000` (general digital). Quantity 1/1.
+- Convert multi-column grids to single column under `sm`, 2-col under `md`.
+- Filter/sort bars → bottom-sheet drawer triggered by a sticky "Filters" button on mobile.
+- Hero typography: clamp display sizes; tighten line-height; reduce vertical padding.
+- Listing cards: full-bleed image, price + title prominent, secondary meta truncated.
+- Listing detail: gallery becomes swipeable full-width; sticky bottom "Message seller / Call" CTA bar on mobile.
+- Map page: full-height map with a slide-up results sheet instead of side panel.
+- Sell wizard: stack steps vertically, larger inputs, mobile-friendly image uploader.
 
-### 2. Add `verifyWebhook` to `stripe.server.ts`
-Currently `payments/webhook.ts` exists but I'll verify it uses the canonical HMAC verifier (`verifyWebhook`) and the subscriptions table shape. Add the helper if missing.
+## 3. User dashboard
 
-### 3. `subscriptions` table migration
-Confirm/create `public.subscriptions` with the canonical schema (user_id, stripe_subscription_id, price_id, status, environment, period dates, RLS + `has_active_subscription()` RPC). Skip if already present.
+`dashboard.tsx` (layout) + child routes (`billing`, `profile`, `businesses`, `favorites`, `likes`, `messages`, `rides`, `searches`, `verification`, `referral`, `tow`):
 
-### 4. Wire `/payments` page
-- Flip CC + GCash + GrabPay + Maya rows from `soon` → `live` (all handled by Stripe in PH).
-- Drop methods we won't ship (PayMongo standalone, raw bank transfer "planned").
-- Remove "while we finish wiring online payments…" banner.
-- Gate live display on `STRIPE_SANDBOX_API_KEY` presence — until secrets land, keep methods labeled "sandbox testing" with the orange `PaymentTestModeBanner` visible.
+- Convert the dashboard side nav into a horizontally-scrollable pill bar on mobile + matching entry in the global drawer.
+- All data tables → responsive: native table at `md+`, card list at `<md` (each row becomes a card with label/value pairs).
+- Billing page specifically: invoice table → card list, invoice details drawer already works (just confirm width is `w-full sm:max-w-lg`), payment method cards stack with full-width action buttons.
+- Messages: thread list as full-width on mobile, conversation view as full-screen with back button.
 
-### 5. Wire checkout into billing/boost CTAs
-- `dashboard.billing.tsx` upgrade buttons → `openCheckout({ priceId: 'pro_monthly', userId, customerEmail })`
-- Listing boost buttons → `openCheckout({ priceId: 'boost_7d' | 'boost_30d' })`
-- Featured business CTA → `openCheckout({ priceId: 'featured_business_30d' })`
+## 4. Admin panel
 
-### 6. Payment-events email webhook
-Replace the debug-token placeholder in `src/routes/api/public/payment-events.tsx` with real Stripe signature verification (reuse `verifyWebhook`). Keep `PAYMENT_WEBHOOK_ENABLED` gate — defaults off until go-live night.
+`admin.tsx` + all `admin.*` child routes:
 
-### 7. Secrets checklist (documented, not requested tonight)
-Add a short admin-visible note listing what's needed when you're ready:
-- `STRIPE_SANDBOX_API_KEY`
-- `STRIPE_LIVE_API_KEY`
-- `PAYMENTS_SANDBOX_WEBHOOK_SECRET`
-- `PAYMENTS_LIVE_WEBHOOK_SECRET`
-- `.env.production` `VITE_PAYMENTS_CLIENT_TOKEN` (`pk_live_…`)
-- `PAYMENT_WEBHOOK_ENABLED=1`
+- Side nav → top-of-page `Select` dropdown on mobile (admins jump between sections quickly).
+- Wide data tables (users, listings, businesses, verifications, redemptions, audit, accounts, advertising) → wrap in `overflow-x-auto` containers with sticky first column AND a `<md` card fallback for the most-used screens (users, listings, verifications).
+- Charts (analytics, performance, reports) → set min-height, allow horizontal scroll on the chart container, hide secondary legends on mobile.
+- Forms (pricing, currencies, type-suggestions, shop) → single-column on mobile, full-width inputs.
 
-Won't call `add_secret` tonight per your instruction.
+## 5. Forms & inputs (project-wide)
 
-## Out of scope tonight
-- Actually entering keys / hitting Stripe live
-- Activating `managed_payments` (decide at go-live: +3.5% vs +0.5% `automatic_tax`)
-- Map clustering (separate task)
+- Ensure every text input has `text-base` (16px) on mobile to prevent iOS zoom-on-focus.
+- Buttons hit min 44×44px on mobile.
+- Date pickers / selects use mobile-native triggers where possible.
+- Modals/dialogs become bottom sheets on mobile (`<Sheet side="bottom">` wrapper variant).
 
-## Files touched
-- `supabase/migrations/*` — subscriptions table (if missing)
-- `src/lib/stripe.server.ts` — add `verifyWebhook`
-- `src/routes/api/public/payments/webhook.ts` — verify canonical shape
-- `src/routes/api/public/payment-events.tsx` — real signature verify
-- `src/routes/payments.tsx` — flip live methods, drop placeholders
-- `src/routes/dashboard.billing.tsx` — wire `useStripeCheckout`
-- `src/routes/listing.$id.tsx` (+ boost UI) — wire boost checkout
-- `src/components/site-layout.tsx` — mount `<PaymentTestModeBanner />` if not already
-- New: `docs/STRIPE_GOLIVE.md` — the 4-secret checklist
+## 6. PWA (installable, manifest-only — no service worker)
 
-After approval I'll also call `payments--batch_create_product` to register the catalog.
+Per Lovable guidance, ship a manifest + icons only. No `vite-plugin-pwa`, no service worker, so the editor preview stays unaffected.
+
+- `public/manifest.webmanifest` with name, short_name (`365 MotorSales`), `start_url: "/"`, `display: "standalone"`, `theme_color`, `background_color`, and icon set.
+- Generate app icons (192, 512, maskable 512) from the existing brand mark and place in `public/icons/`.
+- Add iOS Apple touch icons (180×180).
+- Wire manifest + theme-color + apple-mobile-web-app-capable meta tags in `src/routes/__root.tsx` head.
+
+> Note: PWA install works only on the published/custom-domain site, not inside the Lovable editor preview. Offline support is intentionally not included.
+
+## 7. Verification
+
+- Use the preview at 360×644 and 768×1024 to spot-check: header drawer, home, browse, listing detail, sell, dashboard billing, admin users, admin analytics.
+- Confirm Lighthouse "Installable" passes on the published URL after deploy.
+
+## Technical details
+
+- All breakpoints use Tailwind defaults (`sm 640`, `md 768`, `lg 1024`).
+- New mobile tab bar lives in `src/components/mobile-tab-bar.tsx`, mounted from `site-layout.tsx` with `md:hidden` and `pb-[env(safe-area-inset-bottom)]`.
+- Responsive table pattern extracted into `src/components/ui/responsive-table.tsx` (render-prop: `columns`, `rows`, optional `mobileCard`).
+- Bottom-sheet dialog variant added by reusing existing `Sheet` with `side="bottom"`; no new dep.
+- Icon generation via existing `imagegen` for 512×512 source + scripted resize into 192/180.
+- No business logic, no server function, no database changes.

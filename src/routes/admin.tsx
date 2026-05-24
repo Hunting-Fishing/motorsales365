@@ -1,9 +1,10 @@
-import { createFileRoute, Link, Outlet, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { Settings, ListChecks, Users, Flag, CreditCard, ShieldCheck, ShieldAlert, Gauge, BarChart3, UserCog, Megaphone, QrCode, Ticket, Globe, FlaskConical, Store, Sparkles, Info } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
@@ -56,12 +57,19 @@ function AdminLayout() {
   return (
     <SiteLayout>
       <TooltipProvider delayDuration={200}>
-        <div className="container mx-auto grid gap-6 px-4 py-8 lg:grid-cols-[240px_1fr]">
-          <aside className="rounded-xl border border-border bg-card p-2 lg:sticky lg:top-20 lg:self-start">
+        <div className="container mx-auto grid gap-4 px-3 py-4 sm:gap-6 sm:px-4 sm:py-8 lg:grid-cols-[240px_1fr]">
+          {/* Mobile: section selector */}
+          <div className="lg:hidden">
+            <div className="mb-1 px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label} console</div>
+            <AdminMobileSelect items={visibleNav} />
+          </div>
+
+          {/* Desktop: sidebar */}
+          <aside className="hidden rounded-xl border border-border bg-card p-2 lg:sticky lg:top-20 lg:block lg:self-start">
             <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               {label}
             </div>
-            <nav className="flex flex-row gap-1 overflow-x-auto lg:flex-col">
+            <nav className="flex flex-col gap-1">
               {visibleNav.map(({ to, label, Icon, exact, info }) => (
                 <div key={to} className="group flex shrink-0 items-center gap-1">
                   <Link to={to} activeOptions={{ exact: !!exact }}
@@ -82,9 +90,27 @@ function AdminLayout() {
               ))}
             </nav>
           </aside>
-          <div><Outlet /></div>
+          <div className="min-w-0"><Outlet /></div>
         </div>
       </TooltipProvider>
     </SiteLayout>
+  );
+}
+
+function AdminMobileSelect({ items }: { items: { to: string; label: string }[] }) {
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const current = items.find((i) => i.to === pathname)?.to ?? items[0]?.to;
+  return (
+    <Select value={current} onValueChange={(v) => navigate({ to: v as any })}>
+      <SelectTrigger className="w-full">
+        <SelectValue placeholder="Go to section" />
+      </SelectTrigger>
+      <SelectContent>
+        {items.map((i) => (
+          <SelectItem key={i.to} value={i.to}>{i.label}</SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }
