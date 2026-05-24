@@ -254,6 +254,60 @@ export const listInvoices = createServerFn({ method: "POST" })
     };
   });
 
+export const listPaymentMethods = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { environment: StripeEnv }) => {
+    validateEnv(data.environment);
+    return data;
+  })
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const stripe = createStripeClient(data.environment);
+
+    const { data: sub } = await supabase
+      .from("subscriptions")
+      .select("stripe_customer_id")
+      .eq("user_id", userId)
+      .eq("environment", data.environment)
+      .not("stripe_customer_id", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!sub?.stripe_customer_id) {
+      return { paymentMethods: [], defaultPaymentMethodId: null as string | null };
+    }
+
+    const customerId = sub.stripe_customer_id as string;
+    const [customer, methods] = await Promise.all([
+      stripe.customers.retrieve(customerId),
+      stripe.paymentMethods.list({ customer: customerId, limit: 20 }),
+    ]);
+
+    const defaultPmId =
+      !("deleted" in customer && customer.deleted)
+        ? ((customer as any).invoice_settings?.default_payment_method as string | null) ?? null
+        : null;
+
+    return {
+      defaultPaymentMethodId: defaultPmId,
+      paymentMethods: methods.data.map((pm) => ({
+        id: pm.id,
+        type: pm.type,
+        card: pm.card
+          ? {
+              brand: pm.card.brand,
+              last4: pm.card.last4,
+              exp_month: pm.card.exp_month,
+              exp_year: pm.card.exp_year,
+            }
+          : null,
+        billing_email: pm.billing_details?.email ?? null,
+        isDefault: pm.id === defaultPmId,
+      })),
+    };
+  });
+
 export const createPortalSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { returnUrl?: string; environment: StripeEnv }) => {
