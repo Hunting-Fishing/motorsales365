@@ -499,7 +499,9 @@ function ReceiptPage() {
                   </tr>
                 </tfoot>
               </table>
+              </div>
             );
+
           })()
           )}
 
