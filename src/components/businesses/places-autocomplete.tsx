@@ -1,16 +1,20 @@
-/// <reference types="google.maps" />
 import { useEffect, useMemo, useRef, useState } from "react";
 import { MapPin } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { loadGoogleMaps } from "./google-maps-loader";
 
 export type PlacePick = { lat: number; lng: number; label: string };
 
-// Philippines bias bounds
-const PH_BIAS = {
-  low: { latitude: 4.5, longitude: 116.0 },
-  high: { latitude: 21.5, longitude: 127.0 },
+type NominatimResult = {
+  place_id: number;
+  lat: string;
+  lon: string;
+  display_name: string;
+  name?: string;
+  address?: Record<string, string>;
 };
+
+// Philippines bounding box (lon_min, lat_min, lon_max, lat_max)
+const PH_VIEWBOX = "116.0,4.5,127.0,21.5";
 
 export function PlacesAutocomplete({
   value,
@@ -24,30 +28,13 @@ export function PlacesAutocomplete({
   placeholder?: string;
 }) {
   const [suggestions, setSuggestions] = useState<
-    { placeId: string; primary: string; secondary: string }[]
+    { id: string; primary: string; secondary: string; lat: number; lng: number; label: string }[]
   >([]);
   const [open, setOpen] = useState(false);
   const [highlight, setHighlight] = useState(0);
-  const sessionRef = useRef<google.maps.places.AutocompleteSessionToken | null>(null);
-  const placesLibRef = useRef<google.maps.PlacesLibrary | null>(null);
   const debounceRef = useRef<number | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
-
-  // Lazy-load Places library
-  useEffect(() => {
-    let cancelled = false;
-    loadGoogleMaps()
-      .then(async (g) => {
-        if (cancelled) return;
-        const lib = (await g.maps.importLibrary("places")) as google.maps.PlacesLibrary;
-        placesLibRef.current = lib;
-        sessionRef.current = new lib.AutocompleteSessionToken();
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   // Close on outside click
   useEffect(() => {
@@ -60,36 +47,46 @@ export function PlacesAutocomplete({
 
   const fetchSuggestions = useMemo(
     () => async (input: string) => {
-      const lib = placesLibRef.current;
-      if (!lib || !input.trim() || input.trim().length < 2) {
+      if (!input.trim() || input.trim().length < 2) {
         setSuggestions([]);
         return;
       }
+      abortRef.current?.abort();
+      const ctrl = new AbortController();
+      abortRef.current = ctrl;
       try {
-        const { suggestions: out } =
-          await lib.AutocompleteSuggestion.fetchAutocompleteSuggestions({
-            input,
-            sessionToken: sessionRef.current ?? undefined,
-            includedRegionCodes: ["ph"],
-            locationBias: { low: PH_BIAS.low, high: PH_BIAS.high } as any,
-          });
-        const mapped =
-          out
-            ?.map((s) => {
-              const p = s.placePrediction;
-              if (!p) return null;
-              return {
-                placeId: p.placeId,
-                primary: p.mainText?.toString() ?? p.text?.toString() ?? "",
-                secondary: p.secondaryText?.toString() ?? "",
-              };
-            })
-            .filter(Boolean) as { placeId: string; primary: string; secondary: string }[];
-        setSuggestions(mapped ?? []);
+        const url = new URL("https://nominatim.openstreetmap.org/search");
+        url.searchParams.set("q", input);
+        url.searchParams.set("format", "json");
+        url.searchParams.set("addressdetails", "1");
+        url.searchParams.set("limit", "7");
+        url.searchParams.set("countrycodes", "ph");
+        url.searchParams.set("viewbox", PH_VIEWBOX);
+        url.searchParams.set("bounded", "1");
+        const res = await fetch(url.toString(), {
+          signal: ctrl.signal,
+          headers: { Accept: "application/json" },
+        });
+        if (!res.ok) throw new Error("Geocoder error");
+        const data = (await res.json()) as NominatimResult[];
+        const mapped = data.map((r) => {
+          const parts = r.display_name.split(", ");
+          const primary = r.name || parts[0] || r.display_name;
+          const secondary = parts.slice(primary === parts[0] ? 1 : 0).join(", ");
+          return {
+            id: String(r.place_id),
+            primary,
+            secondary,
+            lat: Number(r.lat),
+            lng: Number(r.lon),
+            label: r.display_name,
+          };
+        });
+        setSuggestions(mapped);
         setOpen(true);
         setHighlight(0);
-      } catch {
-        setSuggestions([]);
+      } catch (e) {
+        if ((e as any)?.name !== "AbortError") setSuggestions([]);
       }
     },
     [],
@@ -98,31 +95,14 @@ export function PlacesAutocomplete({
   const handleChange = (v: string) => {
     onChange(v);
     if (debounceRef.current) window.clearTimeout(debounceRef.current);
-    debounceRef.current = window.setTimeout(() => fetchSuggestions(v), 220);
+    // Respect Nominatim usage policy: ~1 req/sec, debounce generously
+    debounceRef.current = window.setTimeout(() => fetchSuggestions(v), 350);
   };
 
-  const handlePick = async (s: { placeId: string; primary: string; secondary: string }) => {
-    const lib = placesLibRef.current;
-    if (!lib) return;
+  const handlePick = (s: (typeof suggestions)[number]) => {
     setOpen(false);
-    const label = s.secondary ? `${s.primary}, ${s.secondary}` : s.primary;
-    onChange(label);
-    try {
-      const place = new lib.Place({ id: s.placeId });
-      await place.fetchFields({ fields: ["location", "displayName", "formattedAddress"] });
-      const loc = place.location;
-      if (loc) {
-        onPick({
-          lat: typeof loc.lat === "function" ? loc.lat() : (loc as any).lat,
-          lng: typeof loc.lng === "function" ? loc.lng() : (loc as any).lng,
-          label: place.formattedAddress ?? label,
-        });
-      }
-      // Refresh session token after a pick
-      sessionRef.current = new lib.AutocompleteSessionToken();
-    } catch {
-      // ignore
-    }
+    onChange(s.secondary ? `${s.primary}, ${s.secondary}` : s.primary);
+    onPick({ lat: s.lat, lng: s.lng, label: s.label });
   };
 
   return (
@@ -155,7 +135,7 @@ export function PlacesAutocomplete({
         <ul className="absolute left-6 right-0 top-10 z-50 max-h-72 overflow-y-auto rounded-md border border-border bg-popover text-popover-foreground shadow-lg">
           {suggestions.map((s, i) => (
             <li
-              key={s.placeId}
+              key={s.id}
               onMouseDown={(e) => {
                 e.preventDefault();
                 handlePick(s);
