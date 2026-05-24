@@ -229,7 +229,8 @@ export function ProductGrid({ products, vehicle }: { products: any[]; vehicle?: 
               </div>
             </CardContent>
           </Card>
-        </Link>
+          </Link>
+        </div>
       ))}
     </div>
   );
