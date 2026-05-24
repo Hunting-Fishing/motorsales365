@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { VehicleFitmentPicker } from "@/components/shop/vehicle-fitment-picker";
 import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
 import { ShopFavoriteButton } from "@/components/shop/shop-favorite-button";
+import { ShopMobileCtaBar } from "@/components/shop/shop-mobile-cta-bar";
 import { useGarage, formatVehicle } from "@/lib/garage";
 import { X } from "lucide-react";
 
