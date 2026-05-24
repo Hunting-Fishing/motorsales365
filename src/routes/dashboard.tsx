@@ -73,23 +73,23 @@ function DashboardLayout() {
           </div>
         )}
       </div>
-      <div className="container mx-auto grid gap-6 px-4 py-4 lg:grid-cols-[240px_1fr]">
+      <div className="container mx-auto grid gap-4 px-3 py-4 sm:gap-6 sm:px-4 lg:grid-cols-[240px_1fr]">
         <aside className="rounded-xl border border-border bg-card p-2 lg:sticky lg:top-20 lg:self-start">
-          <nav className="flex flex-row gap-1 overflow-x-auto lg:flex-col">
+          <nav className="-mx-1 flex flex-row gap-1 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:mx-0 lg:flex-col lg:overflow-visible lg:px-0">
             {nav.map(({ to, label, Icon, exact }) => (
               <Link
                 key={to}
                 to={to}
                 activeOptions={{ exact: !!exact }}
                 activeProps={{ className: "bg-primary text-primary-foreground" }}
-                className="flex shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary"
+                className="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary"
               >
                 <Icon className="h-4 w-4" />{label}
               </Link>
             ))}
           </nav>
         </aside>
-        <div><Outlet /></div>
+        <div className="min-w-0"><Outlet /></div>
       </div>
     </SiteLayout>
   );
