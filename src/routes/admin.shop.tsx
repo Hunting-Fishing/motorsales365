@@ -315,6 +315,7 @@ function NetworksTab() {
         <Button onClick={() => setEditing({})}><Plus className="mr-1 h-4 w-4" />New network</Button>
       </CardHeader>
       <CardContent>
+        <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] text-sm">
           <thead className="border-b text-left text-xs uppercase text-muted-foreground">
             <tr><th className="p-2">Name</th><th className="p-2">Slug</th><th className="p-2">Tag param</th><th className="p-2">Tag value</th><th className="p-2">Status</th><th className="p-2"></th></tr>
