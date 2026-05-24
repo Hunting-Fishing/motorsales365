@@ -233,7 +233,6 @@ function PricingPage() {
 
   return (
     <SiteLayout>
-      <PaymentTestModeBanner />
       <section className="bg-secondary/40 py-12">
         <div className="container mx-auto px-4 text-center">
           <h1 className="font-display text-4xl font-bold">Simple pricing</h1>
