@@ -280,6 +280,28 @@ function BillingPage() {
     };
   }, [plans, currentPlan, thisMonthListings.length, boostedCount, maxPhotosUsed, proratedCredit]);
 
+  const filteredInvoices = useMemo(() => {
+    let rows = invoices;
+    if (invoiceStatusFilter !== "all") {
+      rows = rows.filter((inv) => inv.status === invoiceStatusFilter);
+    }
+    if (invoiceDateFilter !== "all") {
+      const days = invoiceDateFilter === "30d" ? 30 : 90;
+      const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+      rows = rows.filter((inv) => (inv.created ?? 0) * 1000 >= cutoff);
+    }
+    const term = invoiceSearch.trim().toLowerCase();
+    if (term) {
+      rows = rows.filter((inv) =>
+        ((inv.number ?? inv.id ?? "").toString().toLowerCase().includes(term) ||
+        ((inv.amount_paid ?? 0) / 100).toFixed(2).includes(term))
+      );
+    }
+    return rows;
+  }, [invoices, invoiceStatusFilter, invoiceDateFilter, invoiceSearch]);
+
+
+
 
   const subTone = (s: string) =>
     s === "active" ? "default" : s === "pending" ? "secondary" : s === "paused" ? "outline" : "secondary";
