@@ -51,7 +51,7 @@ function AdminReports() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-bold">Reports</h1>
         <div className="flex gap-1 rounded-md border border-border bg-card p-1">
           {(["open", "resolved", "all"] as const).map((f) => (

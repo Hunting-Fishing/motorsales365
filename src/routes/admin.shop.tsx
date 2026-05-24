@@ -315,6 +315,7 @@ function NetworksTab() {
         <Button onClick={() => setEditing({})}><Plus className="mr-1 h-4 w-4" />New network</Button>
       </CardHeader>
       <CardContent>
+        <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] text-sm">
           <thead className="border-b text-left text-xs uppercase text-muted-foreground">
             <tr><th className="p-2">Name</th><th className="p-2">Slug</th><th className="p-2">Tag param</th><th className="p-2">Tag value</th><th className="p-2">Status</th><th className="p-2"></th></tr>
@@ -332,6 +333,7 @@ function NetworksTab() {
             ))}
           </tbody>
         </table>
+        </div>
         <p className="mt-4 text-xs text-muted-foreground">
           Tag value is appended to outbound URLs via <code>tag_param</code>, or substituted into <code>deeplink_template</code> as <code>{`{{tag}}`}</code> and <code>{`{{url}}`}</code>.
         </p>

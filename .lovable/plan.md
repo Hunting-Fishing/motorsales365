@@ -1,42 +1,34 @@
-# Final Mobile Responsiveness Polish
+# Mobile Responsiveness — Car Domain & Admin Pass
 
-Targeted scan turned up a small set of remaining issues at 360px. Most of the app is already mobile-clean from prior passes — this addresses what's left.
+Targeted audit of `listing.*`, `sell.*`, `browse.*`, `seller.*`, and all `admin.*` routes. Most pages are already mobile-clean (tables wrapped in `overflow-x-auto`, grids use `sm:`/`md:` breakpoints, headers use `flex-wrap`). Remaining gaps:
 
-## Issues found
+## Car domain
 
-### 1. Overflowing QR code on admin referrals
-`src/routes/admin.referrals.tsx` (lines 890, 893) hardcodes `h-[360px] w-[360px]` for the QR image and its placeholder. At 360px viewport with container padding, this overflows horizontally.
+Verified clean: `listing.$id.tsx`, `listing.$id.edit.tsx`, `sell.tsx`, `sell.import.tsx`, `browse.$category.tsx`, `seller.$id.tsx`. No fixes needed — gallery thumb strips scroll horizontally, photo grids step `grid-cols-3 sm:grid-cols-5`, filter sidebars stack on mobile, title/price wrap.
 
-**Fix:** `h-auto w-full max-w-[360px] aspect-square`
+## Admin fixes
 
-### 2. `100vh` on map sidebar
-`src/routes/map.tsx` (line 148) uses `lg:max-h-[calc(100vh-260px)]`. While `lg:` only applies on desktop, switching to `dvh` is consistent with the rest of the app.
+### 1. `admin.shop.tsx` — Affiliate networks table missing overflow wrapper
+Line 318: `<table className="w-full min-w-[640px] text-sm">` sits directly inside `CardContent` with no scroll container. At 360px the 640px min-width pushes the whole page sideways.
 
-**Fix:** `lg:max-h-[calc(100dvh-260px)]`
+**Fix:** Wrap with `<div className="overflow-x-auto">…</div>` (matches pattern used on the other two tables in the same file).
 
-### 3. `min-h-screen` in router pending state
-`src/router.tsx` (line 8) uses `min-h-screen` for the pending fallback shell. iOS Safari URL bar can clip it.
+### 2. `admin.reports.tsx` — Header row doesn't wrap
+Line 54: `<div className="mb-6 flex items-center justify-between">` holds H1 "Reports" + a 3-button filter chip group. At 360px the chip group can overflow.
 
-**Fix:** `min-h-dvh`
+**Fix:** `flex flex-wrap items-center justify-between gap-3`.
 
-### 4. Static `text-4xl` and `text-7xl` headings
-Several legal/info pages (`about`, `contact`, `privacy`, `terms`, `guidelines`, `refund-policy`, `payments`, `pricing`) and the 404 page use a non-responsive heading size. At 360px, `text-4xl` is borderline; `text-7xl` (404) is too aggressive.
+### 3. `admin.sandbox.tsx` — Section headers don't wrap (×3)
+Lines 46, 95, 148: each section uses `flex items-center justify-between` for a heading + description block next to a Reset / Enable-all button group. The heading wraps internally but the right-side button is forced onto the same row, clipping at 360px (esp. line 148 with three buttons).
 
-**Fix:**
-- Legal/info `text-4xl font-bold` → `text-3xl sm:text-4xl font-bold`
-- 404 `text-7xl` → `text-5xl sm:text-7xl`
-
-### 5. Poster page heading
-`src/routes/r.$code.poster.tsx` (line 57) uses static `text-4xl`. Same treatment: `text-3xl sm:text-4xl`.
-
-## Out of scope
-
-- No business logic, route, server function, or content changes.
-- No restructuring of layouts already verified clean (browse, listing, sell wizard, dashboard, messages, admin tables — all use `min-w-[…] + overflow-x-auto` or wrap correctly).
+**Fix:** Change each to `flex flex-wrap items-center justify-between gap-3`.
 
 ## Verification
 
 After edits, re-check at 360×644:
-- Admin referrals page: QR card no longer pushes horizontal scroll.
-- Map page: no regression on mobile (no `lg:` styles apply).
-- Legal/404 headings render without wrap awkwardness.
+- `/admin/shop` → "Affiliate networks" card scrolls its table internally, no page-level horizontal scroll.
+- `/admin/reports` → filter pills sit below the H1 if needed instead of clipping.
+- `/admin/sandbox` → each section's action buttons wrap below the heading on narrow widths.
+
+## Out of scope
+No business logic, route, copy, or auth changes. No restructuring of layouts already verified clean.
