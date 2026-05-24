@@ -887,10 +887,10 @@ function AdminReferrals() {
                   <img
                     src={qr}
                     alt={`Scannable QR for ${qrPreview.full_name}`}
-                    className="h-[360px] w-[360px] rounded-md border border-border bg-white object-contain p-3"
+                    className="aspect-square h-auto w-full max-w-[360px] rounded-md border border-border bg-white object-contain p-3"
                   />
                 ) : (
-                  <div className="flex h-[360px] w-[360px] items-center justify-center rounded-md border border-dashed border-border bg-muted text-sm text-muted-foreground">
+                  <div className="flex aspect-square h-auto w-full max-w-[360px] items-center justify-center rounded-md border border-dashed border-border bg-muted text-sm text-muted-foreground">
                     No QR generated yet.
                   </div>
                 )}

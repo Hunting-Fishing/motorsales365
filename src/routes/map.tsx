@@ -145,7 +145,7 @@ function MapPage() {
           />
         </Card>
         <div className="grid gap-4 lg:grid-cols-[360px_1fr]">
-          <div className="space-y-2 lg:max-h-[calc(100vh-260px)] lg:overflow-y-auto lg:pr-1">
+          <div className="space-y-2 lg:max-h-[calc(100dvh-260px)] lg:overflow-y-auto lg:pr-1">
             <div className="text-xs text-muted-foreground">
               {loading ? "Loading…" : `${sorted.length} result${sorted.length === 1 ? "" : "s"}${center && radiusKm ? ` within ${radiusKm} km` : ""}`}
             </div>
