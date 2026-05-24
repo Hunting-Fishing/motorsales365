@@ -1,6 +1,7 @@
-/// <reference types="google.maps" />
 import { useEffect, useRef, useState } from "react";
-import { loadGoogleMaps, colorForType } from "./google-maps-loader";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { colorForType } from "./google-maps-loader";
 
 export type GMapBusiness = {
   id: string;
@@ -18,24 +19,32 @@ export type GMapBusiness = {
   highlighted?: boolean;
 };
 
-const PH_CENTER = { lat: 12.8797, lng: 121.774 };
+const PH_CENTER: [number, number] = [12.8797, 121.774];
 
 const isTouchDevice = () =>
   typeof window !== "undefined" &&
   (("ontouchstart" in window) || (navigator.maxTouchPoints ?? 0) > 0);
 
-function pinIcon(color: string, featured: boolean, highlighted = false): google.maps.Symbol {
+function pinDivIcon(color: string, featured: boolean, highlighted = false): L.DivIcon {
   const touchBoost = isTouchDevice() ? 1.2 : 1;
-  return {
-    path: "M12 0C5.4 0 0 5.4 0 12c0 9 12 22 12 22s12-13 12-22C24 5.4 18.6 0 12 0z",
-    fillColor: color,
-    fillOpacity: 1,
-    strokeColor: highlighted ? "#0ea5e9" : "#ffffff",
-    strokeWeight: highlighted ? 4 : featured ? 3 : 2,
-    scale: (highlighted ? 1.6 : featured ? 1.4 : 1.1) * touchBoost,
-    anchor: new google.maps.Point(12, 34),
-    labelOrigin: new google.maps.Point(12, 12),
-  };
+  const scale = (highlighted ? 1.6 : featured ? 1.4 : 1.1) * touchBoost;
+  const w = 24 * scale;
+  const h = 34 * scale;
+  const stroke = highlighted ? "#0ea5e9" : "#ffffff";
+  const strokeW = highlighted ? 4 : featured ? 3 : 2;
+  const html = `
+    <svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 24 34" style="display:block;filter:drop-shadow(0 2px 3px rgba(0,0,0,0.35))">
+      <path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 22 12 22s12-13 12-22C24 5.4 18.6 0 12 0z"
+            fill="${color}" stroke="${stroke}" stroke-width="${strokeW}"/>
+      <circle cx="12" cy="12" r="4" fill="#ffffff" opacity="0.95"/>
+    </svg>`;
+  return L.divIcon({
+    html,
+    className: "lovable-map-pin",
+    iconSize: [w, h],
+    iconAnchor: [w / 2, h],
+    popupAnchor: [0, -h + 6],
+  });
 }
 
 export function GoogleBusinessMap({
@@ -52,43 +61,38 @@ export function GoogleBusinessMap({
   onPinClick?: (slug: string) => void;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const mapRef = useRef<google.maps.Map | null>(null);
-  const markersRef = useRef<google.maps.Marker[]>([]);
-  const circleRef = useRef<google.maps.Circle | null>(null);
-  const infoRef = useRef<google.maps.InfoWindow | null>(null);
+  const mapRef = useRef<L.Map | null>(null);
+  const markersRef = useRef<L.Marker[]>([]);
+  const circleRef = useRef<L.Circle | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
 
   // Initialise map once
   useEffect(() => {
-    let disposed = false;
-    loadGoogleMaps()
-      .then((g) => {
-        if (disposed || !containerRef.current) return;
-        const isSmall = typeof window !== "undefined" && window.innerWidth < 768;
-        mapRef.current = new g.maps.Map(containerRef.current, {
-          center: PH_CENTER,
-          zoom: 6,
-          mapTypeControl: false,
-          streetViewControl: false,
-          fullscreenControl: !isSmall,
-          clickableIcons: false,
-          gestureHandling: "greedy",
-          zoomControl: true,
-          zoomControlOptions: isSmall
-            ? { position: g.maps.ControlPosition.RIGHT_CENTER }
-            : undefined,
-        });
-        infoRef.current = new g.maps.InfoWindow();
-        setReady(true);
-      })
-      .catch((e) => setError(e instanceof Error ? e.message : "Map failed to load"));
+    if (!containerRef.current) return;
+    try {
+      const map = L.map(containerRef.current, {
+        center: PH_CENTER,
+        zoom: 6,
+        zoomControl: true,
+        scrollWheelZoom: true,
+        attributionControl: true,
+      });
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+      }).addTo(map);
+      mapRef.current = map;
+      setReady(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Map failed to load");
+    }
     return () => {
-      disposed = true;
-      markersRef.current.forEach((m) => m.setMap(null));
+      markersRef.current.forEach((m) => m.remove());
       markersRef.current = [];
-      circleRef.current?.setMap(null);
+      circleRef.current?.remove();
       circleRef.current = null;
+      mapRef.current?.remove();
       mapRef.current = null;
     };
   }, []);
@@ -97,82 +101,86 @@ export function GoogleBusinessMap({
   useEffect(() => {
     const map = mapRef.current;
     if (!ready || !map) return;
-    const g = window.google;
 
-    markersRef.current.forEach((m) => m.setMap(null));
+    markersRef.current.forEach((m) => m.remove());
     markersRef.current = [];
 
     const valid = businesses.filter(
-      (b) => b.lat != null && b.lng != null && Number.isFinite(Number(b.lat)) && Number.isFinite(Number(b.lng)),
+      (b) =>
+        b.lat != null &&
+        b.lng != null &&
+        Number.isFinite(Number(b.lat)) &&
+        Number.isFinite(Number(b.lng)),
     );
 
     valid.forEach((b) => {
       const color = colorForType(b.type_slug);
-      const marker = new g.maps.Marker({
-        position: { lat: Number(b.lat), lng: Number(b.lng) },
-        map,
+      const marker = L.marker([Number(b.lat), Number(b.lng)], {
+        icon: pinDivIcon(color, b.featured, b.highlighted),
         title: b.name,
-        icon: pinIcon(color, b.featured, b.highlighted),
-        zIndex: b.highlighted ? 1000 : b.featured ? 500 : 1,
-      });
-      marker.addListener("click", () => {
-        const rating =
-          b.rating_count > 0
-            ? `★ ${Number(b.rating_avg).toFixed(1)} <span style="color:#64748b">(${b.rating_count})</span>`
-            : "";
-        const price = b.price_label
-          ? `<div style="margin-top:4px;display:inline-block;padding:2px 8px;border-radius:999px;background:#fef3c7;color:#92400e;font-weight:600;font-size:12px">${escapeHtml(b.price_label)}</div>`
+        zIndexOffset: b.highlighted ? 1000 : b.featured ? 500 : 0,
+      }).addTo(map);
+
+      const rating =
+        b.rating_count > 0
+          ? `★ ${Number(b.rating_avg).toFixed(1)} <span style="color:#64748b">(${b.rating_count})</span>`
           : "";
-        infoRef.current?.setContent(
-          `<div style="font-family:inherit;min-width:180px;max-width:240px">
-            <div style="font-weight:600;font-size:14px;margin-bottom:2px">${escapeHtml(b.name)}</div>
-            <div style="font-size:12px;color:#64748b">${escapeHtml(b.type_label)}${b.city ? " · " + escapeHtml(b.city) : ""}</div>
-            ${rating ? `<div style="font-size:12px;margin-top:2px">${rating}</div>` : ""}
-            ${price}
-            <div style="margin-top:6px"><a style="font-size:12px;font-weight:600;color:#0ea5e9;text-decoration:underline;cursor:pointer" href="/businesses/${encodeURIComponent(b.slug)}">View business →</a></div>
-          </div>`,
-        );
-        infoRef.current?.open({ map, anchor: marker });
-        onPinClick?.(b.slug);
-      });
+      const price = b.price_label
+        ? `<div style="margin-top:4px;display:inline-block;padding:2px 8px;border-radius:999px;background:#fef3c7;color:#92400e;font-weight:600;font-size:12px">${escapeHtml(b.price_label)}</div>`
+        : "";
+      const html = `<div style="font-family:inherit;min-width:180px;max-width:240px">
+        <div style="font-weight:600;font-size:14px;margin-bottom:2px">${escapeHtml(b.name)}</div>
+        <div style="font-size:12px;color:#64748b">${escapeHtml(b.type_label)}${b.city ? " · " + escapeHtml(b.city) : ""}</div>
+        ${rating ? `<div style="font-size:12px;margin-top:2px">${rating}</div>` : ""}
+        ${price}
+        <div style="margin-top:6px"><a style="font-size:12px;font-weight:600;color:#0ea5e9;text-decoration:underline;cursor:pointer" href="/businesses/${encodeURIComponent(b.slug)}">View business →</a></div>
+      </div>`;
+      marker.bindPopup(html, { closeButton: true, maxWidth: 260 });
+      marker.on("click", () => onPinClick?.(b.slug));
       markersRef.current.push(marker);
     });
 
     // Centre / fit logic
     if (center) {
-      map.setCenter(center);
       if (radiusKm && radiusKm > 0) {
-        // Approx zoom for given radius
         const zoom = Math.max(8, Math.round(14 - Math.log2(radiusKm)));
-        map.setZoom(zoom);
+        map.setView([center.lat, center.lng], zoom);
       } else {
-        map.setZoom(12);
+        map.setView([center.lat, center.lng], 12);
       }
     } else if (valid.length > 1) {
-      const bounds = new g.maps.LatLngBounds();
-      valid.forEach((b) => bounds.extend({ lat: Number(b.lat), lng: Number(b.lng) }));
-      map.fitBounds(bounds, 48);
+      const bounds = L.latLngBounds(valid.map((b) => [Number(b.lat), Number(b.lng)] as [number, number]));
+      map.fitBounds(bounds, { padding: [48, 48] });
     } else if (valid.length === 1) {
-      map.setCenter({ lat: Number(valid[0].lat), lng: Number(valid[0].lng) });
-      map.setZoom(14);
+      map.setView([Number(valid[0].lat), Number(valid[0].lng)], 14);
     }
 
     // Radius circle
-    circleRef.current?.setMap(null);
+    circleRef.current?.remove();
     circleRef.current = null;
     if (center && radiusKm && radiusKm > 0) {
-      circleRef.current = new g.maps.Circle({
-        map,
-        center,
+      circleRef.current = L.circle([center.lat, center.lng], {
         radius: radiusKm * 1000,
-        strokeColor: "#0ea5e9",
-        strokeOpacity: 0.6,
-        strokeWeight: 2,
+        color: "#0ea5e9",
+        opacity: 0.6,
+        weight: 2,
         fillColor: "#0ea5e9",
         fillOpacity: 0.08,
-      });
+      }).addTo(map);
     }
   }, [ready, businesses, center?.lat, center?.lng, radiusKm, onPinClick]);
+
+  // Invalidate size when container size changes (e.g. bottom sheet snaps)
+  useEffect(() => {
+    const map = mapRef.current;
+    const el = containerRef.current;
+    if (!map || !el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => {
+      map.invalidateSize();
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [ready]);
 
   if (error) {
     return (
