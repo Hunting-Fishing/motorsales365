@@ -81,7 +81,7 @@ export function ShopProfile() {
         href={MAPS_LINK}
         target="_blank"
         rel="noopener noreferrer"
-        className="relative block aspect-[16/9] w-full overflow-hidden border-y bg-muted sm:aspect-[21/9]"
+        className="relative block aspect-[4/3] w-full overflow-hidden border-y bg-muted sm:aspect-[16/9] lg:aspect-[21/9]"
         aria-label="Open location in Google Maps"
       >
         {embedUrl ? (
