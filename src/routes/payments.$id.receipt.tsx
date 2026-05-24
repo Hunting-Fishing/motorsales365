@@ -135,7 +135,7 @@ function ReceiptPage() {
             );
             const DAY = 86_400_000;
             return (
-              <table className="w-full border-t border-border text-sm">
+              <table className="w-full min-w-[520px] border-t border-border text-sm print:min-w-0">
                 <thead>
                   <tr className="text-left text-xs uppercase text-muted-foreground">
                     <th className="py-3">Description</th>
@@ -307,7 +307,7 @@ function ReceiptPage() {
               }
             }
             return (
-              <table className="w-full border-t border-border text-sm">
+              <table className="w-full min-w-[520px] border-t border-border text-sm print:min-w-0">
                 <thead>
                   <tr className="text-left text-xs uppercase text-muted-foreground">
                     <th className="py-3">Description</th>
