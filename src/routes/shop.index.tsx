@@ -73,7 +73,7 @@ function ShopIndex() {
       <section className="border-b bg-gradient-to-b from-primary/10 to-background">
         <div className="container mx-auto px-4 py-10 md:py-14">
           <Badge className="mb-3">Shop</Badge>
-          <h1 className="font-display text-4xl md:text-5xl tracking-tight">Tools, parts &amp; detailing</h1>
+          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl tracking-tight">Tools, parts &amp; detailing</h1>
           <p className="mt-3 max-w-2xl text-muted-foreground">
             Curated picks from Shopee, Lazada and AliExpress. Buy direct from the seller — we earn a small commission so the site stays free for you.
           </p>
@@ -82,9 +82,9 @@ function ShopIndex() {
             <p className="mb-3 text-sm font-semibold">🔧 Shop by your vehicle</p>
             <VehicleFitmentPicker initial={activeVehicle} onSubmit={onPickVehicle} />
             {activeVehicle && (
-              <div className="mt-3 flex items-center gap-2 text-sm">
-                <Badge variant="secondary" className="gap-1">
-                  Showing parts for: <strong>{formatVehicle(activeVehicle)}</strong>
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
+                <Badge variant="secondary" className="max-w-full gap-1">
+                  <span className="truncate">Showing parts for: <strong>{formatVehicle(activeVehicle)}</strong></span>
                 </Badge>
                 <Button size="sm" variant="ghost" onClick={clearVehicle}><X className="h-4 w-4" /> Clear</Button>
               </div>

@@ -62,7 +62,7 @@ function ProductPage() {
           </div>
           <div className="space-y-4">
             {p.brand && <Badge variant="secondary">{p.brand}</Badge>}
-            <h1 className="font-display text-3xl md:text-4xl">{p.title}</h1>
+            <h1 className="font-display text-2xl sm:text-3xl md:text-4xl">{p.title}</h1>
             {p.price_php && <p className="text-2xl font-bold">₱{Number(p.price_php).toLocaleString()} <span className="text-sm font-normal text-muted-foreground">approx.</span></p>}
             {p.description && <p className="whitespace-pre-line text-muted-foreground">{p.description}</p>}
 

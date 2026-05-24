@@ -54,7 +54,7 @@ function ShopCategory() {
         </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="font-display text-3xl md:text-4xl">{cat?.name ?? category}</h1>
+          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl">{cat?.name ?? category}</h1>
           {activeVehicle && (
             <Badge variant="secondary">Fits: {formatVehicle(activeVehicle)}</Badge>
           )}
