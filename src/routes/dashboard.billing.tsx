@@ -878,6 +878,117 @@ function BillingPage() {
         )}
       </section>
 
+      {/* Payment methods */}
+      <section className="mb-8">
+        <div className="mb-2 flex items-center justify-between">
+          <h2 className="font-display text-lg font-semibold">Payment methods</h2>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={async () => {
+              try {
+                setBusy("portal");
+                const url = await createPortalSession({
+                  data: { environment: env, returnUrl: window.location.href },
+                });
+                window.open(url, "_blank");
+              } catch (e: any) {
+                toast.error(e?.message ?? "Could not open billing portal");
+              } finally {
+                setBusy(null);
+              }
+            }}
+            disabled={busy === "portal"}
+          >
+            <CreditCard className="mr-1.5 h-4 w-4" />
+            Manage in portal
+          </Button>
+        </div>
+        {paymentMethods.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
+            No saved payment methods yet. They'll appear here after your first successful payment.
+          </div>
+        ) : (
+          <div className="grid gap-2 sm:grid-cols-2">
+            {paymentMethods.map((pm) => (
+              <div key={pm.id} className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-14 items-center justify-center rounded-md bg-secondary text-xs font-bold uppercase">
+                    {pm.card?.brand ?? pm.type}
+                  </div>
+                  <div>
+                    <div className="font-medium">
+                      {pm.card ? `•••• ${pm.card.last4}` : pm.type}
+                    </div>
+                    {pm.card && (
+                      <div className="text-xs text-muted-foreground">
+                        Expires {String(pm.card.exp_month).padStart(2, "0")}/{String(pm.card.exp_year).slice(-2)}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {pm.isDefault && <Badge variant="default">Default</Badge>}
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Stripe invoices */}
+      <section className="mb-8">
+        <h2 className="mb-2 font-display text-lg font-semibold">Invoices</h2>
+        {invoices.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-border bg-card p-8 text-center text-sm text-muted-foreground">
+            No invoices yet.
+          </div>
+        ) : (
+          <div className="overflow-x-auto rounded-xl border border-border bg-card">
+            <table className="w-full text-sm">
+              <thead className="bg-secondary/50 text-left">
+                <tr>
+                  <th className="p-3">Date</th>
+                  <th className="p-3">Invoice</th>
+                  <th className="p-3">Amount</th>
+                  <th className="p-3">Status</th>
+                  <th className="p-3">Document</th>
+                </tr>
+              </thead>
+              <tbody>
+                {invoices.map((inv) => (
+                  <tr key={inv.id} className="border-t border-border">
+                    <td className="p-3">{formatDate(new Date(inv.created * 1000).toISOString())}</td>
+                    <td className="p-3 font-mono text-xs">{inv.number ?? inv.id}</td>
+                    <td className="p-3 font-medium">
+                      {(inv.currency ?? "").toUpperCase() === "PHP"
+                        ? formatPHP(inv.amount_paid / 100)
+                        : `${(inv.amount_paid / 100).toFixed(2)} ${(inv.currency ?? "").toUpperCase()}`}
+                    </td>
+                    <td className="p-3">
+                      <Badge variant={inv.status === "paid" ? "default" : "secondary"} className="capitalize">
+                        {inv.status ?? "—"}
+                      </Badge>
+                    </td>
+                    <td className="p-3">
+                      {inv.hosted_invoice_url ? (
+                        <a href={inv.hosted_invoice_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                          View ↗
+                        </a>
+                      ) : inv.invoice_pdf ? (
+                        <a href={inv.invoice_pdf} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                          PDF ↗
+                        </a>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
       {/* Payments */}
       <section>
         <h2 className="mb-2 font-display text-lg font-semibold">Payments</h2>
