@@ -33,23 +33,81 @@ export const Route = createFileRoute("/shop/$category")({
 function ShopCategory() {
   const { category } = Route.useParams();
   const search = Route.useSearch();
-  const [garage] = useGarage();
+  const navigate = useNavigate({ from: "/shop/$category" });
+  const [garage, setGarageState] = useGarage();
   const activeVehicle = search.make && search.model
     ? { category: "car" as const, make: search.make, model: search.model, year: search.year }
     : garage;
 
   const { data: catData } = useQuery({ queryKey: ["shop-cats"], queryFn: () => listShopCategories() });
   const cat = catData?.categories.find((c) => c.slug === category);
+  const { data: brandData } = useQuery({
+    queryKey: ["shop-brands", category],
+    queryFn: () => listShopBrands({ data: { categorySlug: category } }),
+  });
+  const brands = brandData?.brands ?? [];
 
-  const filterArgs = activeVehicle ? { make: activeVehicle.make, model: activeVehicle.model, year: activeVehicle.year } : {};
+  const filterArgs = {
+    ...(activeVehicle ? { make: activeVehicle.make, model: activeVehicle.model, year: activeVehicle.year } : {}),
+    ...(search.brand ? { brand: search.brand } : {}),
+  };
   const { data } = useQuery({
     queryKey: ["shop-cat", category, filterArgs],
     queryFn: () => listShopProducts({ data: { categorySlug: category, limit: 60, ...filterArgs } }),
   });
   const products = data?.products ?? [];
 
+  const hasAnyFilter = !!(search.brand || activeVehicle);
+
+  const onApplyFilters = (next: { categorySlug: string; brand: string; vehicle: typeof activeVehicle }) => {
+    if (next.vehicle) setGarageState(next.vehicle);
+    else setGarageState(null);
+    navigate({
+      search: () => ({
+        brand: next.brand,
+        make: next.vehicle?.make ?? "",
+        model: next.vehicle?.model ?? "",
+        year: next.vehicle?.year,
+      }),
+    });
+  };
+
   return (
     <SiteLayout>
+      {/* Sticky mobile filter bar */}
+      <div className="sticky top-14 z-30 border-b bg-background/95 backdrop-blur md:hidden">
+        <div className="container mx-auto flex items-center gap-2 px-4 py-2">
+          <ShopFilterDrawer
+            categories={catData?.categories ?? []}
+            brands={brands}
+            value={{ categorySlug: category, brand: search.brand, vehicle: activeVehicle }}
+            onApply={onApplyFilters}
+            lockCategory
+            triggerClassName="flex-1 justify-center"
+          />
+          {hasAnyFilter && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setGarageState(null);
+                navigate({ search: () => ({ brand: "", make: "", model: "", year: undefined }) });
+              }}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+        {hasAnyFilter && (
+          <div className="container mx-auto flex flex-wrap gap-1.5 px-4 pb-2">
+            {search.brand && <Badge variant="secondary" className="text-[10px]">{search.brand}</Badge>}
+            {activeVehicle && (
+              <Badge variant="secondary" className="text-[10px]">{formatVehicle(activeVehicle)}</Badge>
+            )}
+          </div>
+        )}
+      </div>
+
       <div className="container mx-auto px-4 py-8 space-y-8">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Link to="/shop" className="hover:text-foreground">Shop</Link>
@@ -59,6 +117,15 @@ function ShopCategory() {
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="font-display text-2xl sm:text-3xl md:text-4xl">{cat?.name ?? category}</h1>
+          <div className="hidden md:block">
+            <ShopFilterDrawer
+              categories={catData?.categories ?? []}
+              brands={brands}
+              value={{ categorySlug: category, brand: search.brand, vehicle: activeVehicle }}
+              onApply={onApplyFilters}
+              lockCategory
+            />
+          </div>
           {activeVehicle && (
             <Badge variant="secondary">Fits: {formatVehicle(activeVehicle)}</Badge>
           )}
@@ -69,7 +136,7 @@ function ShopCategory() {
 
         {products.length === 0
           ? <p className="text-muted-foreground">
-              {activeVehicle ? `No products in this category fit your ${formatVehicle(activeVehicle)} yet.` : "No products in this category yet."}
+              {hasAnyFilter ? "No products match your filters in this category." : "No products in this category yet."}
             </p>
           : <ProductGrid products={products} vehicle={activeVehicle} />}
 
