@@ -575,7 +575,7 @@ function AdminReferrals() {
             className="h-8 pl-8"
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full items-center gap-2 sm:w-auto">
           <Label className="text-xs uppercase tracking-wider text-muted-foreground">Role</Label>
           <Select value={roleFilter} onValueChange={setRoleFilter}>
             <SelectTrigger className="h-8 w-full sm:w-[140px]"><SelectValue /></SelectTrigger>
@@ -590,7 +590,7 @@ function AdminReferrals() {
             </SelectContent>
           </Select>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full items-center gap-2 sm:w-auto">
           <Label className="text-xs uppercase tracking-wider text-muted-foreground">Status</Label>
           <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as any)}>
             <SelectTrigger className="h-8 w-full sm:w-[130px]"><SelectValue /></SelectTrigger>
@@ -601,6 +601,7 @@ function AdminReferrals() {
             </SelectContent>
           </Select>
         </div>
+
         <div className="ml-auto text-xs text-muted-foreground">
           Showing {sortedRows.length} of {rows.length}
         </div>
