@@ -432,3 +432,35 @@ export const verifyStripePlans = createServerFn({ method: "POST" })
 
     return { ok: allOk, environment: data.environment, results };
   });
+
+export const setDefaultPaymentMethod = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { paymentMethodId: string; environment: StripeEnv }) => {
+    if (!data.paymentMethodId || !data.paymentMethodId.startsWith("pm_")) {
+      throw new Error("Invalid paymentMethodId");
+    }
+    validateEnv(data.environment);
+    return data;
+  })
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const stripe = createStripeClient(data.environment);
+
+    const { data: sub } = await supabase
+      .from("subscriptions")
+      .select("stripe_customer_id")
+      .eq("user_id", userId)
+      .eq("environment", data.environment)
+      .not("stripe_customer_id", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!sub?.stripe_customer_id) throw new Error("No customer found");
+
+    await stripe.customers.update(sub.stripe_customer_id as string, {
+      invoice_settings: { default_payment_method: data.paymentMethodId },
+    });
+
+    return { ok: true };
+  });
