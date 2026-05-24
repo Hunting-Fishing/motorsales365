@@ -499,3 +499,81 @@ export const detachPaymentMethod = createServerFn({ method: "POST" })
     await stripe.paymentMethods.detach(data.paymentMethodId);
     return { ok: true };
   });
+
+export const getInvoiceDetails = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { invoiceId: string; environment: StripeEnv }) => {
+    if (!data.invoiceId || !data.invoiceId.startsWith("in_")) {
+      throw new Error("Invalid invoiceId");
+    }
+    validateEnv(data.environment);
+    return data;
+  })
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const stripe = createStripeClient(data.environment);
+
+    const { data: sub } = await supabase
+      .from("subscriptions")
+      .select("stripe_customer_id")
+      .eq("user_id", userId)
+      .eq("environment", data.environment)
+      .not("stripe_customer_id", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (!sub?.stripe_customer_id) throw new Error("No customer found");
+
+    const invoice = await stripe.invoices.retrieve(data.invoiceId, {
+      expand: ["lines.data.price"],
+    });
+
+    if (typeof invoice.customer === "string"
+      ? invoice.customer !== sub.stripe_customer_id
+      : invoice.customer?.id !== sub.stripe_customer_id) {
+      throw new Error("Invoice not found");
+    }
+
+    const ZERO_DECIMAL_CURRENCIES = new Set([
+      "bif", "clp", "djf", "gnf", "jpy", "kmf", "krw", "mga",
+      "pyg", "rwf", "ugx", "vnd", "vuv", "xaf", "xof", "xpf",
+    ]);
+    const THREE_DECIMAL_CURRENCIES = new Set(["bhd", "jod", "kwd", "omr", "tnd"]);
+
+    function toMajor(amount: number | null | undefined, currency: string): number {
+      const v = amount ?? 0;
+      const c = currency.toLowerCase();
+      if (ZERO_DECIMAL_CURRENCIES.has(c)) return v;
+      if (THREE_DECIMAL_CURRENCIES.has(c)) return v / 1000;
+      return v / 100;
+    }
+
+    return {
+      id: invoice.id,
+      number: invoice.number ?? null,
+      status: invoice.status ?? null,
+      currency: invoice.currency,
+      created: invoice.created ?? null,
+      due_date: invoice.due_date ?? null,
+      subtotal: toMajor(invoice.subtotal, invoice.currency),
+      total: toMajor(invoice.total, invoice.currency),
+      amount_paid: toMajor(invoice.amount_paid, invoice.currency),
+      amount_due: toMajor(invoice.amount_due, invoice.currency),
+      amount_remaining: toMajor(invoice.amount_remaining, invoice.currency),
+      hosted_invoice_url: invoice.hosted_invoice_url ?? null,
+      invoice_pdf: invoice.invoice_pdf ?? null,
+      period_start: (invoice.lines?.data?.[0] as any)?.period?.start ?? null,
+      period_end: (invoice.lines?.data?.[0] as any)?.period?.end ?? null,
+      lines: (invoice.lines?.data ?? []).map((line: any) => ({
+        id: line.id,
+        description: line.description ?? "",
+        quantity: line.quantity ?? 1,
+        unit_amount: toMajor(line.unit_amount, invoice.currency),
+        amount: toMajor(line.amount, invoice.currency),
+        currency: invoice.currency,
+        period_start: line.period?.start ?? null,
+        period_end: line.period?.end ?? null,
+      })),
+    };
+  });
