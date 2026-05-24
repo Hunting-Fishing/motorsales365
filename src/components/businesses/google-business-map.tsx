@@ -65,12 +65,19 @@ export function GoogleBusinessMap({
     loadGoogleMaps()
       .then((g) => {
         if (disposed || !containerRef.current) return;
+        const isSmall = typeof window !== "undefined" && window.innerWidth < 768;
         mapRef.current = new g.maps.Map(containerRef.current, {
           center: PH_CENTER,
           zoom: 6,
           mapTypeControl: false,
           streetViewControl: false,
-          fullscreenControl: true,
+          fullscreenControl: !isSmall,
+          clickableIcons: false,
+          gestureHandling: "greedy",
+          zoomControl: true,
+          zoomControlOptions: isSmall
+            ? { position: g.maps.ControlPosition.RIGHT_CENTER }
+            : undefined,
         });
         infoRef.current = new g.maps.InfoWindow();
         setReady(true);
