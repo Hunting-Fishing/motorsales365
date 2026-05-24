@@ -928,7 +928,37 @@ function BillingPage() {
                     )}
                   </div>
                 </div>
-                {pm.isDefault && <Badge variant="default">Default</Badge>}
+                <div className="flex items-center gap-2">
+                  {pm.isDefault ? (
+                    <Badge variant="default">Default</Badge>
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="text-xs"
+                      disabled={busy === `default-${pm.id}`}
+                      onClick={async () => {
+                        try {
+                          setBusy(`default-${pm.id}`);
+                          await setDefaultPaymentMethod({
+                            data: { paymentMethodId: pm.id, environment: env },
+                          });
+                          toast.success("Default payment method updated");
+                          // Refresh list
+                          const res = await listPaymentMethods({ data: { environment: env } });
+                          setPaymentMethods(res.paymentMethods ?? []);
+                          setDefaultPmId(res.defaultPaymentMethodId ?? null);
+                        } catch (e: any) {
+                          toast.error(e?.message ?? "Could not update default payment method");
+                        } finally {
+                          setBusy(null);
+                        }
+                      }}
+                    >
+                      Set as default
+                    </Button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
