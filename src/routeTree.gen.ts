@@ -48,6 +48,7 @@ import { Route as GoProductIdRouteImport } from './routes/go.$productId'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as DashboardVerificationRouteImport } from './routes/dashboard.verification'
 import { Route as DashboardTowRouteImport } from './routes/dashboard.tow'
+import { Route as DashboardTeamRouteImport } from './routes/dashboard.team'
 import { Route as DashboardShopFavoritesRouteImport } from './routes/dashboard.shop-favorites'
 import { Route as DashboardSearchesRouteImport } from './routes/dashboard.searches'
 import { Route as DashboardRidesRouteImport } from './routes/dashboard.rides'
@@ -84,11 +85,15 @@ import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising'
 import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
+import { Route as DashboardTeamIndexRouteImport } from './routes/dashboard.team.index'
 import { Route as ShopPSlugRouteImport } from './routes/shop.p.$slug'
 import { Route as RCodePosterRouteImport } from './routes/r.$code.poster'
 import { Route as PaymentsIdReceiptRouteImport } from './routes/payments.$id.receipt'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
+import { Route as DashboardTeamPerformanceRouteImport } from './routes/dashboard.team.performance'
+import { Route as DashboardTeamMembersRouteImport } from './routes/dashboard.team.members'
+import { Route as DashboardTeamLeadsRouteImport } from './routes/dashboard.team.leads'
 import { Route as DashboardRidesNewRouteImport } from './routes/dashboard.rides_.new'
 import { Route as ApiPublicPaymentEventsRouteImport } from './routes/api/public/payment-events'
 import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocode'
@@ -99,6 +104,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as DashboardTeamLeadsIdRouteImport } from './routes/dashboard.team.leads_.$id'
 import { Route as DashboardRidesIdEditRouteImport } from './routes/dashboard.rides_.$id.edit'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
@@ -298,6 +304,11 @@ const DashboardTowRoute = DashboardTowRouteImport.update({
   path: '/tow',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardTeamRoute = DashboardTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardShopFavoritesRoute = DashboardShopFavoritesRouteImport.update({
   id: '/shop-favorites',
   path: '/shop-favorites',
@@ -478,6 +489,11 @@ const AdminAccountsRoute = AdminAccountsRouteImport.update({
   path: '/accounts',
   getParentRoute: () => AdminRoute,
 } as any)
+const DashboardTeamIndexRoute = DashboardTeamIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardTeamRoute,
+} as any)
 const ShopPSlugRoute = ShopPSlugRouteImport.update({
   id: '/shop/p/$slug',
   path: '/shop/p/$slug',
@@ -502,6 +518,22 @@ const ListingIdEditRoute = ListingIdEditRouteImport.update({
   id: '/edit',
   path: '/edit',
   getParentRoute: () => ListingIdRoute,
+} as any)
+const DashboardTeamPerformanceRoute =
+  DashboardTeamPerformanceRouteImport.update({
+    id: '/performance',
+    path: '/performance',
+    getParentRoute: () => DashboardTeamRoute,
+  } as any)
+const DashboardTeamMembersRoute = DashboardTeamMembersRouteImport.update({
+  id: '/members',
+  path: '/members',
+  getParentRoute: () => DashboardTeamRoute,
+} as any)
+const DashboardTeamLeadsRoute = DashboardTeamLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => DashboardTeamRoute,
 } as any)
 const DashboardRidesNewRoute = DashboardRidesNewRouteImport.update({
   id: '/rides_/new',
@@ -555,6 +587,11 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   id: '/lovable/email/auth/preview',
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardTeamLeadsIdRoute = DashboardTeamLeadsIdRouteImport.update({
+  id: '/leads_/$id',
+  path: '/leads/$id',
+  getParentRoute: () => DashboardTeamRoute,
 } as any)
 const DashboardRidesIdEditRoute = DashboardRidesIdEditRouteImport.update({
   id: '/rides_/$id/edit',
@@ -634,6 +671,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
+  '/dashboard/team': typeof DashboardTeamRouteWithChildren
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -654,14 +692,19 @@ export interface FileRoutesByFullPath {
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
+  '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
+  '/dashboard/team/members': typeof DashboardTeamMembersRoute
+  '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
+  '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
+  '/dashboard/team/leads/$id': typeof DashboardTeamLeadsIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -747,14 +790,19 @@ export interface FileRoutesByTo {
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
+  '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
+  '/dashboard/team/members': typeof DashboardTeamMembersRoute
+  '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
+  '/dashboard/team': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
+  '/dashboard/team/leads/$id': typeof DashboardTeamLeadsIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -823,6 +871,7 @@ export interface FileRoutesById {
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
+  '/dashboard/team': typeof DashboardTeamRouteWithChildren
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -843,14 +892,19 @@ export interface FileRoutesById {
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/dashboard/rides_/new': typeof DashboardRidesNewRoute
+  '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
+  '/dashboard/team/members': typeof DashboardTeamMembersRoute
+  '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
+  '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/dashboard/rides_/$id/edit': typeof DashboardRidesIdEditRoute
+  '/dashboard/team/leads_/$id': typeof DashboardTeamLeadsIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -920,6 +974,7 @@ export interface FileRouteTypes {
     | '/dashboard/rides'
     | '/dashboard/searches'
     | '/dashboard/shop-favorites'
+    | '/dashboard/team'
     | '/dashboard/tow'
     | '/dashboard/verification'
     | '/email/unsubscribe'
@@ -940,14 +995,19 @@ export interface FileRouteTypes {
     | '/api/public/geocode'
     | '/api/public/payment-events'
     | '/dashboard/rides/new'
+    | '/dashboard/team/leads'
+    | '/dashboard/team/members'
+    | '/dashboard/team/performance'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/shop/p/$slug'
+    | '/dashboard/team/'
     | '/api/public/fx/refresh'
     | '/api/public/payments/webhook'
     | '/dashboard/rides/$id/edit'
+    | '/dashboard/team/leads/$id'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1033,14 +1093,19 @@ export interface FileRouteTypes {
     | '/api/public/geocode'
     | '/api/public/payment-events'
     | '/dashboard/rides/new'
+    | '/dashboard/team/leads'
+    | '/dashboard/team/members'
+    | '/dashboard/team/performance'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/shop/p/$slug'
+    | '/dashboard/team'
     | '/api/public/fx/refresh'
     | '/api/public/payments/webhook'
     | '/dashboard/rides/$id/edit'
+    | '/dashboard/team/leads/$id'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1108,6 +1173,7 @@ export interface FileRouteTypes {
     | '/dashboard/rides'
     | '/dashboard/searches'
     | '/dashboard/shop-favorites'
+    | '/dashboard/team'
     | '/dashboard/tow'
     | '/dashboard/verification'
     | '/email/unsubscribe'
@@ -1128,14 +1194,19 @@ export interface FileRouteTypes {
     | '/api/public/geocode'
     | '/api/public/payment-events'
     | '/dashboard/rides_/new'
+    | '/dashboard/team/leads'
+    | '/dashboard/team/members'
+    | '/dashboard/team/performance'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/shop/p/$slug'
+    | '/dashboard/team/'
     | '/api/public/fx/refresh'
     | '/api/public/payments/webhook'
     | '/dashboard/rides_/$id/edit'
+    | '/dashboard/team/leads_/$id'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1475,6 +1546,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTowRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/team': {
+      id: '/dashboard/team'
+      path: '/team'
+      fullPath: '/dashboard/team'
+      preLoaderRoute: typeof DashboardTeamRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/shop-favorites': {
       id: '/dashboard/shop-favorites'
       path: '/shop-favorites'
@@ -1727,6 +1805,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAccountsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/dashboard/team/': {
+      id: '/dashboard/team/'
+      path: '/'
+      fullPath: '/dashboard/team/'
+      preLoaderRoute: typeof DashboardTeamIndexRouteImport
+      parentRoute: typeof DashboardTeamRoute
+    }
     '/shop/p/$slug': {
       id: '/shop/p/$slug'
       path: '/shop/p/$slug'
@@ -1761,6 +1846,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/listing/$id/edit'
       preLoaderRoute: typeof ListingIdEditRouteImport
       parentRoute: typeof ListingIdRoute
+    }
+    '/dashboard/team/performance': {
+      id: '/dashboard/team/performance'
+      path: '/performance'
+      fullPath: '/dashboard/team/performance'
+      preLoaderRoute: typeof DashboardTeamPerformanceRouteImport
+      parentRoute: typeof DashboardTeamRoute
+    }
+    '/dashboard/team/members': {
+      id: '/dashboard/team/members'
+      path: '/members'
+      fullPath: '/dashboard/team/members'
+      preLoaderRoute: typeof DashboardTeamMembersRouteImport
+      parentRoute: typeof DashboardTeamRoute
+    }
+    '/dashboard/team/leads': {
+      id: '/dashboard/team/leads'
+      path: '/leads'
+      fullPath: '/dashboard/team/leads'
+      preLoaderRoute: typeof DashboardTeamLeadsRouteImport
+      parentRoute: typeof DashboardTeamRoute
     }
     '/dashboard/rides_/new': {
       id: '/dashboard/rides_/new'
@@ -1831,6 +1937,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/lovable/email/auth/preview'
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/team/leads_/$id': {
+      id: '/dashboard/team/leads_/$id'
+      path: '/leads/$id'
+      fullPath: '/dashboard/team/leads/$id'
+      preLoaderRoute: typeof DashboardTeamLeadsIdRouteImport
+      parentRoute: typeof DashboardTeamRoute
     }
     '/dashboard/rides_/$id/edit': {
       id: '/dashboard/rides_/$id/edit'
@@ -1904,6 +2017,26 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface DashboardTeamRouteChildren {
+  DashboardTeamLeadsRoute: typeof DashboardTeamLeadsRoute
+  DashboardTeamMembersRoute: typeof DashboardTeamMembersRoute
+  DashboardTeamPerformanceRoute: typeof DashboardTeamPerformanceRoute
+  DashboardTeamIndexRoute: typeof DashboardTeamIndexRoute
+  DashboardTeamLeadsIdRoute: typeof DashboardTeamLeadsIdRoute
+}
+
+const DashboardTeamRouteChildren: DashboardTeamRouteChildren = {
+  DashboardTeamLeadsRoute: DashboardTeamLeadsRoute,
+  DashboardTeamMembersRoute: DashboardTeamMembersRoute,
+  DashboardTeamPerformanceRoute: DashboardTeamPerformanceRoute,
+  DashboardTeamIndexRoute: DashboardTeamIndexRoute,
+  DashboardTeamLeadsIdRoute: DashboardTeamLeadsIdRoute,
+}
+
+const DashboardTeamRouteWithChildren = DashboardTeamRoute._addFileChildren(
+  DashboardTeamRouteChildren,
+)
+
 interface DashboardRouteChildren {
   DashboardBillingRoute: typeof DashboardBillingRoute
   DashboardBusinessesRoute: typeof DashboardBusinessesRoute
@@ -1915,6 +2048,7 @@ interface DashboardRouteChildren {
   DashboardRidesRoute: typeof DashboardRidesRoute
   DashboardSearchesRoute: typeof DashboardSearchesRoute
   DashboardShopFavoritesRoute: typeof DashboardShopFavoritesRoute
+  DashboardTeamRoute: typeof DashboardTeamRouteWithChildren
   DashboardTowRoute: typeof DashboardTowRoute
   DashboardVerificationRoute: typeof DashboardVerificationRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -1933,6 +2067,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardRidesRoute: DashboardRidesRoute,
   DashboardSearchesRoute: DashboardSearchesRoute,
   DashboardShopFavoritesRoute: DashboardShopFavoritesRoute,
+  DashboardTeamRoute: DashboardTeamRouteWithChildren,
   DashboardTowRoute: DashboardTowRoute,
   DashboardVerificationRoute: DashboardVerificationRoute,
   DashboardIndexRoute: DashboardIndexRoute,
@@ -2047,13 +2182,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

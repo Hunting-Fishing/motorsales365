@@ -1,84 +1,74 @@
-# Phase 1 — Done ✅
+# Phase 2B — Dealer SaaS
 
-- Plan rename + Stripe products
-- Free posting + 5-active cap trigger
-- Cancel-at-period-end via Stripe
-- Boost catalog (5 products live in Stripe + DB)
-- Boost Purchase UI (dialog + embedded checkout + webhook activation)
-- Service Inquiry leads (5 CTAs + admin inbox)
-- Homepage 3-CTA repositioning + free-posting trust strip
+Build multi-staff dealer tools on top of the existing `organizations` + `organization_members` infrastructure.
 
-# Phase 2 — Business Directory + Dealer SaaS
+## What's already in place
 
-I'll ship this as **three** approvable sub-passes so each lands clean.
+- `organizations`, `organization_members` (roles: owner/admin/…), `organization_invites`
+- `listings.organization_id` already exists
+- Helper fns: `is_org_member`, `can_manage_org`, `org_role`, `tg_org_add_creator_as_owner`
+- `messages` (listing inquiries), `service_inquiries`, `tow_requests` exist but are user-scoped, not org-scoped
 
-## 2A — Paid Business Directory (revenue lever, smallest scope)
+## Scope of this pass
 
-- Migration: add `subscription_tier` (`free | listed | featured | premium`) and `featured_until` to `businesses`. New `business_subscriptions` table (mirrors `subscriptions`: stripe_customer_id, stripe_subscription_id, status, current_period_end, environment, plan slug, business_id, owner_user_id).
-- Stripe products per `business_kind` (repair, towing, car-wash, parts, insurance, financing, trucking, equipment) at the tiers you specified (₱199 → ₱3,000). Create via `batch_create_product` with monthly recurring prices.
-- `createBusinessSubscriptionCheckout` server function (mirrors `createBoostCheckout`). Webhook handles `customer.subscription.*` with `metadata.kind="business"` → upserts `business_subscriptions` and sets `businesses.subscription_tier`.
-- UI: "Upgrade this listing" CTA on `/dashboard/businesses` rows; tier badge on `/businesses` index and `/businesses/$slug`; sort featured/premium first.
-- Listing page integration: "Need inspection, insurance, parts, transport, or financing?" service strip showing 3 random `featured`/`premium` businesses of the relevant kinds.
+### 1. Database migration
 
-## 2B — Dealer SaaS dashboard
+- **Add `organization_id`** (nullable, FK) to `businesses`.
+- **`leads`** table — unified inbox:
+  - `id`, `organization_id`, `source` enum (`listing_message`, `business_inquiry`, `service_inquiry`, `tow_request`), `source_id`, `listing_id?`, `business_id?`
+  - `customer_user_id?`, `customer_name`, `customer_email?`, `customer_phone?`
+  - `subject`, `preview` (first 280 chars)
+  - `status` enum (`new`, `in_progress`, `won`, `lost`)
+  - `assigned_to?` (FK profiles), `assigned_at?`
+  - `last_activity_at`, `created_at`, `updated_at`
+  - Unique `(source, source_id)` to dedupe.
+- **`lead_activities`** — append-only audit + notes timeline:
+  - `lead_id`, `actor_id`, `kind` (`created`, `assigned`, `status_changed`, `note`, `reply_sent`), `from_value?`, `to_value?`, `body?`, `created_at`.
+- **Triggers** auto-create leads:
+  - On `messages` insert where recipient owns a listing tied to an org → create/update lead (source=`listing_message`).
+  - On `service_inquiries` insert tied to a business with `organization_id` → lead.
+  - On `tow_requests` insert where provider listing belongs to an org → lead.
+- **RLS**:
+  - `leads` SELECT/UPDATE: org members (any role) of `organization_id`.
+  - `lead_activities` SELECT: org members; INSERT: org members for their org's leads.
+- Status-change + assign trigger writes `lead_activities` row automatically.
 
-- New layout route `/dealer` (gated by Dealer Starter/Pro/Enterprise plan).
-- **Unified lead inbox**: query joins `messages` (where recipient = dealer staff) + `service_inquiries` (where listing.user_id = dealer) into one chronological feed with status (new/in progress/won/lost), assignable to staff member.
-- **Multi-staff via `organizations` + `organization_members`** (already exists in DB). Add `dealer_organization_id` to `profiles`; an "Invite staff" form (email invite → join link). Roles: `owner | admin | sales`. Listings authored by any member roll up to the org.
-- **Sales-rep QR tracking**: each member gets a personal short link `/r/$memberSlug` that adds `?rep=` to all listing URLs they share; clicks/leads attributed in a new `rep_lead_attributions` table.
-- **Response-time alerts**: a SQL view + cron-style server fn surfaces unanswered leads >24h on the dashboard.
-- **CSV bulk upload + Facebook lead import**: reuses existing `facebook-import.functions.ts`; adds `/dealer/import` page with column mapper.
-- **Mark sold** + post-sale survey trigger (small).
+### 2. Server functions (`src/lib/leads.functions.ts`)
 
-## 2C — Plan gating + onboarding polish
+- `listOrgLeads({ orgId, status?, assignedTo?, source?, q? })`
+- `getLead({ id })` (lead + activities + members for the assign dropdown)
+- `assignLead({ id, userId | null })`
+- `updateLeadStatus({ id, status })`
+- `addLeadNote({ id, body })`
+- `getOrgPerformance({ orgId, since? })` → per-member counts of new/in_progress/won/lost + win-rate.
+- `listMyOrgs()` → orgs the current user belongs to (for org switcher).
 
-- `requireDealerPlan` middleware for server fns under `/dealer`.
-- "Upgrade to Dealer" upsell pages with feature matrix.
-- Auto-create organization on first Dealer plan checkout; auto-add buyer as `owner`.
+All use `requireSupabaseAuth`; org membership enforced by RLS + explicit `is_org_member` checks where we touch related tables.
 
-# Phase 3 — Transaction & Passive Income
+### 3. UI routes (under `_authenticated/dashboard/team/`)
 
-## 3A — Vehicle Passport
+- `team.tsx` (layout w/ org switcher + tabs: Leads / Members / Performance)
+- `team.leads.tsx` — inbox table: status pills, source icons, assignee avatar, filters, search
+- `team.leads.$id.tsx` — drawer/page: customer details, source link, status dropdown, assignee dropdown, activity timeline, "Add note"
+- `team.members.tsx` — current members + roles; invite by email (reuses `organization_invites`); promote/demote owner-only
+- `team.performance.tsx` — table of reps with new/in-progress/won/lost + win-rate, 30-day range
 
-- Extend existing `rides` table; add public route `/passport/$vin` (no auth). Free version shows: photos, basic specs, owner-provided service log entries (already in `ride_service_logs`).
-- Paid: ₱99 one-off "Premium PDF passport" (Stripe one-off, generated server-side via puppeteer-free HTML→PDF — use `@react-pdf/renderer` to avoid the workerd native-binary issue).
-- Paid: ₱299 "Verified inspection upload" — buyer uploads inspection PDF, partner inspector signs off via admin route.
-- New `passport_purchases` table; webhook activates on `metadata.kind="passport"`.
+Add a **Team** entry in the dashboard sidebar visible when the user belongs to ≥1 org.
 
-## 3B — Partner-wired lead routing
+### 4. Polish
 
-- Add `partners` table (`name`, `inquiry_types text[]`, `webhook_url`, `webhook_secret`, `commission_pct`, `active`).
-- `service_inquiries` insert trigger picks a partner round-robin within the matching `inquiry_type`; new `lead_commissions` row tracks payout.
-- Admin route `/admin/partners` for CRUD + webhook test button.
-- Webhook outbound: HMAC-signed POST to partner with inquiry payload; retries via pg_cron / queue.
+- Dashboard home shows a "Team inbox: N new leads" card when the user is in an org.
+- When a sales rep replies via the existing message thread on a listing inquiry, the trigger writes a `reply_sent` activity (so we get rep attribution).
 
-## 3C — Affiliate parts module
+## Out of scope (next passes)
 
-- New `affiliate_products` table (sku, title, category_match `text[]`, url, image, price, source). Seed with manual rows for top 20 categories.
-- `<AffiliateParts category="motorcycle" />` component rendered on every listing page below the description. Click → `/r/affiliate/$id` redirect logs `affiliate_clicks`.
-- Admin route `/admin/affiliates` for CRUD.
+- Multi-org per-listing assignment UI (we already have `listings.organization_id`; just expose it in the listing form).
+- Business → org binding UI for legacy businesses (will add a dropdown in `dashboard.businesses` to attach to an org after this migration lands).
+- Email/SMS notifications to assigned rep — relies on existing `enqueue_email` pipeline; add in next pass.
 
-## 3D — PayMongo / Xendit for local methods
+## Technical notes
 
-- New `src/lib/paymongo.server.ts` (analogue of `stripe.server.ts`) with gateway-routed client.
-- `createPaymongoCheckout` server fn returning their Checkout URL (redirect-based — PayMongo doesn't support embedded). Methods enabled: GCash, Maya, QR Ph, GrabPay, ShopeePay.
-- New `payment_intents` table tracking PayMongo source IDs.
-- Webhook at `/api/public/payments/paymongo-webhook` activates same `subscriptions` / `listing_boosts` / `passport_purchases` rows.
-- UI: payment-method picker on every checkout (`Card · GCash · Maya · QR Ph`). Defaults to Stripe Card.
-
-# Recommended order
-
-1. **2A** (directory SaaS) — ships visible revenue with the smallest blast radius (~1 build pass).
-2. **3D** (PayMongo) — unlocks Filipino payment methods that will boost all conversion rates. Touches checkout but no new business logic. (~1 pass)
-3. **2B + 2C** (dealer dashboard + gating) — biggest build, most product decisions. (~2 passes)
-4. **3A** (vehicle passport) — passive revenue, no partners needed. (~1 pass)
-5. **3B** (partner routing) — wire when first partner is signed. (~0.5 pass)
-6. **3C** (affiliate parts) — fastest passive revenue once published. (~0.5 pass)
-
-# Decisions I need before starting 2A
-
-1. **Directory tier names** — keep `listed / featured / premium`, or use `Basic / Featured / Top`?
-2. **Per-kind pricing** — confirm the ₱199–₱3,000 ranges from the roadmap, or rationalize to 3 standard tiers across all kinds (e.g. ₱299 / ₱699 / ₱1,499)?
-3. **Annual discount** — offer 2 months free on yearly billing?
-
-After answers I'll start with **2A**.
+- Lead dedup via `UNIQUE (source, source_id)` + `ON CONFLICT DO UPDATE SET last_activity_at = now()`.
+- For `listing_message` source, `source_id` = the listing thread key `LEAST(sender,recipient) || '|' || listing_id` so all messages in a thread roll up into one lead.
+- Assign + status changes go through server functions so we can write `lead_activities` in the same transaction.
+- Realtime: enable on `leads` so the inbox updates live.

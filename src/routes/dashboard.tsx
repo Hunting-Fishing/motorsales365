@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { LayoutGrid, Heart, MessageSquare, User as UserIcon, CreditCard, Bookmark, ShieldCheck, Truck, QrCode, Store, Shield, Car, ShoppingBag, ChevronDown, Check } from "lucide-react";
+import { LayoutGrid, Heart, MessageSquare, User as UserIcon, CreditCard, Bookmark, ShieldCheck, Truck, QrCode, Store, Shield, Car, ShoppingBag, ChevronDown, Check, Users } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,6 +29,7 @@ function DashboardLayout() {
   const { user, loading, isStaff, isAdmin } = useAuth();
   const navigate = useNavigate();
   const [hasReferral, setHasReferral] = useState(false);
+  const [hasOrg, setHasOrg] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
@@ -43,6 +44,12 @@ function DashboardLayout() {
         .or(`staff_user_id.eq.${user.id},email.eq.${user.email?.toLowerCase()}`)
         .maybeSingle();
       setHasReferral(Boolean(data));
+      const { data: orgs } = await (supabase as any)
+        .from("organization_members")
+        .select("organization_id")
+        .eq("user_id", user.id)
+        .limit(1);
+      setHasOrg(Boolean(orgs && orgs.length > 0));
     })();
   }, [user]);
 
@@ -50,6 +57,7 @@ function DashboardLayout() {
 
   const nav = [
     ...NAV,
+    ...(hasOrg ? [{ to: "/dashboard/team", label: "Team", Icon: Users }] : []),
     ...(hasReferral ? [{ to: "/dashboard/referral", label: "My referral", Icon: QrCode }] : []),
     ...(isStaff ? [{ to: "/admin", label: isAdmin ? "Admin" : "Staff console", Icon: Shield }] : []),
   ];
