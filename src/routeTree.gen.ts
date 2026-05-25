@@ -61,6 +61,7 @@ import { Route as DashboardBillingRouteImport } from './routes/dashboard.billing
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as BusinessesSubmitRouteImport } from './routes/businesses.submit'
 import { Route as BusinessesSlugRouteImport } from './routes/businesses.$slug'
+import { Route as BusinessCheckoutRouteImport } from './routes/business.checkout'
 import { Route as BrowseCategoryRouteImport } from './routes/browse.$category'
 import { Route as BoostCheckoutRouteImport } from './routes/boost.checkout'
 import { Route as ApiSitemapDotxmlRouteImport } from './routes/api/sitemap[.]xml'
@@ -362,6 +363,11 @@ const BusinessesSlugRoute = BusinessesSlugRouteImport.update({
   path: '/businesses/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BusinessCheckoutRoute = BusinessCheckoutRouteImport.update({
+  id: '/business/checkout',
+  path: '/business/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BrowseCategoryRoute = BrowseCategoryRouteImport.update({
   id: '/browse/$category',
   path: '/browse/$category',
@@ -614,6 +620,7 @@ export interface FileRoutesByFullPath {
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/boost/checkout': typeof BoostCheckoutRoute
   '/browse/$category': typeof BrowseCategoryRoute
+  '/business/checkout': typeof BusinessCheckoutRoute
   '/businesses/$slug': typeof BusinessesSlugRoute
   '/businesses/submit': typeof BusinessesSubmitRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -706,6 +713,7 @@ export interface FileRoutesByTo {
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/boost/checkout': typeof BoostCheckoutRoute
   '/browse/$category': typeof BrowseCategoryRoute
+  '/business/checkout': typeof BusinessCheckoutRoute
   '/businesses/$slug': typeof BusinessesSlugRoute
   '/businesses/submit': typeof BusinessesSubmitRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -801,6 +809,7 @@ export interface FileRoutesById {
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/boost/checkout': typeof BoostCheckoutRoute
   '/browse/$category': typeof BrowseCategoryRoute
+  '/business/checkout': typeof BusinessCheckoutRoute
   '/businesses/$slug': typeof BusinessesSlugRoute
   '/businesses/submit': typeof BusinessesSubmitRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -897,6 +906,7 @@ export interface FileRouteTypes {
     | '/api/sitemap.xml'
     | '/boost/checkout'
     | '/browse/$category'
+    | '/business/checkout'
     | '/businesses/$slug'
     | '/businesses/submit'
     | '/checkout/return'
@@ -989,6 +999,7 @@ export interface FileRouteTypes {
     | '/api/sitemap.xml'
     | '/boost/checkout'
     | '/browse/$category'
+    | '/business/checkout'
     | '/businesses/$slug'
     | '/businesses/submit'
     | '/checkout/return'
@@ -1083,6 +1094,7 @@ export interface FileRouteTypes {
     | '/api/sitemap.xml'
     | '/boost/checkout'
     | '/browse/$category'
+    | '/business/checkout'
     | '/businesses/$slug'
     | '/businesses/submit'
     | '/checkout/return'
@@ -1160,6 +1172,7 @@ export interface RootRouteChildren {
   ApiSitemapDotxmlRoute: typeof ApiSitemapDotxmlRoute
   BoostCheckoutRoute: typeof BoostCheckoutRoute
   BrowseCategoryRoute: typeof BrowseCategoryRoute
+  BusinessCheckoutRoute: typeof BusinessCheckoutRoute
   BusinessesSlugRoute: typeof BusinessesSlugRoute
   BusinessesSubmitRoute: typeof BusinessesSubmitRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
@@ -1551,6 +1564,13 @@ declare module '@tanstack/react-router' {
       path: '/businesses/$slug'
       fullPath: '/businesses/$slug'
       preLoaderRoute: typeof BusinessesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/business/checkout': {
+      id: '/business/checkout'
+      path: '/business/checkout'
+      fullPath: '/business/checkout'
+      preLoaderRoute: typeof BusinessCheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/browse/$category': {
@@ -1997,6 +2017,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiSitemapDotxmlRoute: ApiSitemapDotxmlRoute,
   BoostCheckoutRoute: BoostCheckoutRoute,
   BrowseCategoryRoute: BrowseCategoryRoute,
+  BusinessCheckoutRoute: BusinessCheckoutRoute,
   BusinessesSlugRoute: BusinessesSlugRoute,
   BusinessesSubmitRoute: BusinessesSubmitRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,

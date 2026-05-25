@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Store as StoreIcon, Plus, Check, X, Pencil, Tag } from "lucide-react";
+import { Store as StoreIcon, Plus, Check, X, Pencil, Tag, Sparkles } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ShareQr } from "@/components/share-qr";
+import { BusinessPlanDialog } from "@/components/business-plan-dialog";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/dashboard/businesses")({
@@ -19,7 +20,9 @@ type Row = {
   city: string | null; region: string | null;
   rating_avg: number; rating_count: number;
   price_label: string | null;
+  subscription_tier: "free" | "listed" | "featured" | "premium" | null;
 };
+
 
 function statusBadge(s: string) {
   if (s === "active") return <Badge className="bg-emerald-600">Active</Badge>;
