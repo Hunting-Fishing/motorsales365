@@ -101,7 +101,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
-import { Route as DashboardTeamLeadsIdRouteImport } from './routes/dashboard.team.leads.$id'
+import { Route as DashboardTeamLeadsIdRouteImport } from './routes/dashboard.team.leads_.$id'
 import { Route as DashboardRidesIdEditRouteImport } from './routes/dashboard.rides_.$id.edit'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
@@ -570,9 +570,9 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardTeamLeadsIdRoute = DashboardTeamLeadsIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => DashboardTeamLeadsRoute,
+  id: '/leads_/$id',
+  path: '/leads/$id',
+  getParentRoute: () => DashboardTeamRoute,
 } as any)
 const DashboardRidesIdEditRoute = DashboardRidesIdEditRouteImport.update({
   id: '/rides_/$id/edit',
@@ -673,7 +673,7 @@ export interface FileRoutesByFullPath {
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
-  '/dashboard/team/leads': typeof DashboardTeamLeadsRouteWithChildren
+  '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
@@ -769,7 +769,7 @@ export interface FileRoutesByTo {
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
-  '/dashboard/team/leads': typeof DashboardTeamLeadsRouteWithChildren
+  '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
@@ -868,7 +868,7 @@ export interface FileRoutesById {
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/dashboard/rides_/new': typeof DashboardRidesNewRoute
-  '/dashboard/team/leads': typeof DashboardTeamLeadsRouteWithChildren
+  '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
@@ -877,7 +877,7 @@ export interface FileRoutesById {
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/dashboard/rides_/$id/edit': typeof DashboardRidesIdEditRoute
-  '/dashboard/team/leads/$id': typeof DashboardTeamLeadsIdRoute
+  '/dashboard/team/leads_/$id': typeof DashboardTeamLeadsIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -1171,7 +1171,7 @@ export interface FileRouteTypes {
     | '/api/public/fx/refresh'
     | '/api/public/payments/webhook'
     | '/dashboard/rides_/$id/edit'
-    | '/dashboard/team/leads/$id'
+    | '/dashboard/team/leads_/$id'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1882,12 +1882,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/dashboard/team/leads/$id': {
-      id: '/dashboard/team/leads/$id'
-      path: '/$id'
+    '/dashboard/team/leads_/$id': {
+      id: '/dashboard/team/leads_/$id'
+      path: '/leads/$id'
       fullPath: '/dashboard/team/leads/$id'
       preLoaderRoute: typeof DashboardTeamLeadsIdRouteImport
-      parentRoute: typeof DashboardTeamLeadsRoute
+      parentRoute: typeof DashboardTeamRoute
     }
     '/dashboard/rides_/$id/edit': {
       id: '/dashboard/rides_/$id/edit'
@@ -1961,23 +1961,14 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
-interface DashboardTeamLeadsRouteChildren {
+interface DashboardTeamRouteChildren {
+  DashboardTeamLeadsRoute: typeof DashboardTeamLeadsRoute
   DashboardTeamLeadsIdRoute: typeof DashboardTeamLeadsIdRoute
 }
 
-const DashboardTeamLeadsRouteChildren: DashboardTeamLeadsRouteChildren = {
-  DashboardTeamLeadsIdRoute: DashboardTeamLeadsIdRoute,
-}
-
-const DashboardTeamLeadsRouteWithChildren =
-  DashboardTeamLeadsRoute._addFileChildren(DashboardTeamLeadsRouteChildren)
-
-interface DashboardTeamRouteChildren {
-  DashboardTeamLeadsRoute: typeof DashboardTeamLeadsRouteWithChildren
-}
-
 const DashboardTeamRouteChildren: DashboardTeamRouteChildren = {
-  DashboardTeamLeadsRoute: DashboardTeamLeadsRouteWithChildren,
+  DashboardTeamLeadsRoute: DashboardTeamLeadsRoute,
+  DashboardTeamLeadsIdRoute: DashboardTeamLeadsIdRoute,
 }
 
 const DashboardTeamRouteWithChildren = DashboardTeamRoute._addFileChildren(
@@ -2129,3 +2120,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
