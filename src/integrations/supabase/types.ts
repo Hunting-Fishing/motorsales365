@@ -356,6 +356,74 @@ export type Database = {
         }
         Relationships: []
       }
+      affiliate_parts: {
+        Row: {
+          active: boolean
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          image_url: string | null
+          make: string | null
+          model: string | null
+          network_slug: string | null
+          price_php: number | null
+          sort_order: number
+          target_url: string
+          title: string
+          updated_at: string
+          year_max: number | null
+          year_min: number | null
+        }
+        Insert: {
+          active?: boolean
+          category: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          make?: string | null
+          model?: string | null
+          network_slug?: string | null
+          price_php?: number | null
+          sort_order?: number
+          target_url: string
+          title: string
+          updated_at?: string
+          year_max?: number | null
+          year_min?: number | null
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          make?: string | null
+          model?: string | null
+          network_slug?: string | null
+          price_php?: number | null
+          sort_order?: number
+          target_url?: string
+          title?: string
+          updated_at?: string
+          year_max?: number | null
+          year_min?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "affiliate_parts_network_slug_fkey"
+            columns: ["network_slug"]
+            isOneToOne: false
+            referencedRelation: "affiliate_networks"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       boost_products: {
         Row: {
           active: boolean
@@ -1420,6 +1488,7 @@ export type Database = {
           title: string
           updated_at: string
           user_id: string
+          vehicle_id: string | null
           view_count: number
         }
         Insert: {
@@ -1451,6 +1520,7 @@ export type Database = {
           title: string
           updated_at?: string
           user_id: string
+          vehicle_id?: string | null
           view_count?: number
         }
         Update: {
@@ -1482,6 +1552,7 @@ export type Database = {
           title?: string
           updated_at?: string
           user_id?: string
+          vehicle_id?: string | null
           view_count?: number
         }
         Relationships: [
@@ -1497,6 +1568,13 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listings_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
             referencedColumns: ["id"]
           },
         ]
@@ -3367,6 +3445,145 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicle_part_clicks: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string | null
+          part_id: string
+          user_id: string | null
+          vehicle_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          part_id: string
+          user_id?: string | null
+          vehicle_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          part_id?: string
+          user_id?: string | null
+          vehicle_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_part_clicks_part_id_fkey"
+            columns: ["part_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_parts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicle_service_records: {
+        Row: {
+          cost_php: number | null
+          created_at: string
+          created_by: string
+          id: string
+          mileage_km: number | null
+          notes: string | null
+          performed_at: string
+          receipt_url: string | null
+          service_type: Database["public"]["Enums"]["service_record_type"]
+          shop_name: string | null
+          title: string
+          vehicle_id: string
+        }
+        Insert: {
+          cost_php?: number | null
+          created_at?: string
+          created_by: string
+          id?: string
+          mileage_km?: number | null
+          notes?: string | null
+          performed_at: string
+          receipt_url?: string | null
+          service_type?: Database["public"]["Enums"]["service_record_type"]
+          shop_name?: string | null
+          title: string
+          vehicle_id: string
+        }
+        Update: {
+          cost_php?: number | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          mileage_km?: number | null
+          notes?: string | null
+          performed_at?: string
+          receipt_url?: string | null
+          service_type?: Database["public"]["Enums"]["service_record_type"]
+          shop_name?: string | null
+          title?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_service_records_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicles: {
+        Row: {
+          color: string | null
+          cover_url: string | null
+          created_at: string
+          id: string
+          is_public: boolean
+          make: string
+          model: string
+          nickname: string | null
+          owner_user_id: string
+          passport_slug: string | null
+          plate_number: string | null
+          updated_at: string
+          vin: string | null
+          year: number | null
+        }
+        Insert: {
+          color?: string | null
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          make: string
+          model: string
+          nickname?: string | null
+          owner_user_id: string
+          passport_slug?: string | null
+          plate_number?: string | null
+          updated_at?: string
+          vin?: string | null
+          year?: number | null
+        }
+        Update: {
+          color?: string | null
+          cover_url?: string | null
+          created_at?: string
+          id?: string
+          is_public?: boolean
+          make?: string
+          model?: string
+          nickname?: string | null
+          owner_user_id?: string
+          passport_slug?: string | null
+          plate_number?: string | null
+          updated_at?: string
+          vin?: string | null
+          year?: number | null
+        }
+        Relationships: []
+      }
       verification_requests: {
         Row: {
           address: string | null
@@ -3744,6 +3961,18 @@ export type Database = {
         | "inspection"
         | "towing"
         | "other"
+      service_record_type:
+        | "oil_change"
+        | "tire_change"
+        | "brake_service"
+        | "battery"
+        | "tune_up"
+        | "transmission"
+        | "inspection"
+        | "registration"
+        | "insurance"
+        | "accident_repair"
+        | "other"
       verification_request_status:
         | "pending"
         | "approved"
@@ -3991,6 +4220,19 @@ export const Constants = {
         "title_transfer",
         "inspection",
         "towing",
+        "other",
+      ],
+      service_record_type: [
+        "oil_change",
+        "tire_change",
+        "brake_service",
+        "battery",
+        "tune_up",
+        "transmission",
+        "inspection",
+        "registration",
+        "insurance",
+        "accident_repair",
         "other",
       ],
       verification_request_status: [
