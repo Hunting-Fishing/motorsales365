@@ -1,187 +1,84 @@
+# Phase 1 — Done ✅
 
-# 365 Motor Sales — Monetization Roadmap
+- Plan rename + Stripe products
+- Free posting + 5-active cap trigger
+- Cancel-at-period-end via Stripe
+- Boost catalog (5 products live in Stripe + DB)
+- Boost Purchase UI (dialog + embedded checkout + webhook activation)
+- Service Inquiry leads (5 CTAs + admin inbox)
+- Homepage 3-CTA repositioning + free-posting trust strip
 
-Strategy: free for normal sellers, powerful for dealers, profitable through services around each transaction. Build in 3 phases. Phase 1 + the inquiry forms from Phase 3 ship in the first build pass; Phase 2 and 3 follow.
+# Phase 2 — Business Directory + Dealer SaaS
 
----
+I'll ship this as **three** approvable sub-passes so each lands clean.
 
-## Phase 1 — Free posting + plan restructure (build first)
+## 2A — Paid Business Directory (revenue lever, smallest scope)
 
-### 1.1 Rename plans (DB + UI)
+- Migration: add `subscription_tier` (`free | listed | featured | premium`) and `featured_until` to `businesses`. New `business_subscriptions` table (mirrors `subscriptions`: stripe_customer_id, stripe_subscription_id, status, current_period_end, environment, plan slug, business_id, owner_user_id).
+- Stripe products per `business_kind` (repair, towing, car-wash, parts, insurance, financing, trucking, equipment) at the tiers you specified (₱199 → ₱3,000). Create via `batch_create_product` with monthly recurring prices.
+- `createBusinessSubscriptionCheckout` server function (mirrors `createBoostCheckout`). Webhook handles `customer.subscription.*` with `metadata.kind="business"` → upserts `business_subscriptions` and sets `businesses.subscription_tier`.
+- UI: "Upgrade this listing" CTA on `/dashboard/businesses` rows; tier badge on `/businesses` index and `/businesses/$slug`; sort featured/premium first.
+- Listing page integration: "Need inspection, insurance, parts, transport, or financing?" service strip showing 3 random `featured`/`premium` businesses of the relevant kinds.
 
-Migration on `subscription_plans`:
+## 2B — Dealer SaaS dashboard
 
-| Old name  | New name        | Price (PHP/mo) | stripe_lookup_key      |
-| --------- | --------------- | -------------- | ---------------------- |
-| Free      | Private Seller  | 0              | —                      |
-| Bronze    | Verified Seller | 149            | verified_monthly       |
-| Silver    | Dealer Starter  | 499            | dealer_starter_monthly |
-| Gold      | Dealer Pro      | 1,499          | dealer_pro_monthly     |
-| Platinum  | (retire, grandfather)  | —       | —                      |
-| Business  | Enterprise (custom, contact sales) | — | —          |
+- New layout route `/dealer` (gated by Dealer Starter/Pro/Enterprise plan).
+- **Unified lead inbox**: query joins `messages` (where recipient = dealer staff) + `service_inquiries` (where listing.user_id = dealer) into one chronological feed with status (new/in progress/won/lost), assignable to staff member.
+- **Multi-staff via `organizations` + `organization_members`** (already exists in DB). Add `dealer_organization_id` to `profiles`; an "Invite staff" form (email invite → join link). Roles: `owner | admin | sales`. Listings authored by any member roll up to the org.
+- **Sales-rep QR tracking**: each member gets a personal short link `/r/$memberSlug` that adds `?rep=` to all listing URLs they share; clicks/leads attributed in a new `rep_lead_attributions` table.
+- **Response-time alerts**: a SQL view + cron-style server fn surfaces unanswered leads >24h on the dashboard.
+- **CSV bulk upload + Facebook lead import**: reuses existing `facebook-import.functions.ts`; adds `/dealer/import` page with column mapper.
+- **Mark sold** + post-sale survey trigger (small).
 
-- Update `listings_per_month`, `max_photos_per_listing`, `max_videos_per_listing` per spec.
-- Grandfather existing subscribers: keep their `plan_id`/price; only display name changes for them.
-- Add new Stripe products (`payments--batch_create_product`) with new `lookup_key`s in PHP/month, single-quantity, tax_code `txcd_10103001` (SaaS).
-- Update `src/routes/pricing.tsx`, `src/routes/dashboard.billing.tsx`, `src/lib/plan-limits.ts`, plan recommendation engine, `monetization-directory.ts` copy.
+## 2C — Plan gating + onboarding polish
 
-### 1.2 Free posting for everyone
+- `requireDealerPlan` middleware for server fns under `/dealer`.
+- "Upgrade to Dealer" upsell pages with feature matrix.
+- Auto-create organization on first Dealer plan checkout; auto-add buyer as `owner`.
 
-- Remove ₱20 standard listing fee and 1-photo free tier from `sell.tsx` flow and pricing config.
-- Default new listing → free, 12 photos, 1 video, 60-day duration.
-- Keep paid one-off **Boost** as a separate add-on (see 1.4); drop the "Upgraded" tier.
-- Update `enforce_free_listing_quota` trigger: Private Seller cap = 5 active (not 1/week).
+# Phase 3 — Transaction & Passive Income
 
-### 1.3 Cancel-at-period-end
+## 3A — Vehicle Passport
 
-- `cancelSubscription` server fn: set `cancel_at_period_end = true` in Stripe instead of immediate cancel.
-- Webhook already handles `customer.subscription.updated`; surface "Access until {date}" banner in `dashboard.billing.tsx`.
+- Extend existing `rides` table; add public route `/passport/$vin` (no auth). Free version shows: photos, basic specs, owner-provided service log entries (already in `ride_service_logs`).
+- Paid: ₱99 one-off "Premium PDF passport" (Stripe one-off, generated server-side via puppeteer-free HTML→PDF — use `@react-pdf/renderer` to avoid the workerd native-binary issue).
+- Paid: ₱299 "Verified inspection upload" — buyer uploads inspection PDF, partner inspector signs off via admin route.
+- New `passport_purchases` table; webhook activates on `metadata.kind="passport"`.
 
-### 1.4 Boost catalog (one-off + recurring)
+## 3B — Partner-wired lead routing
 
-New `boost_products` table seeded with:
+- Add `partners` table (`name`, `inquiry_types text[]`, `webhook_url`, `webhook_secret`, `commission_pct`, `active`).
+- `service_inquiries` insert trigger picks a partner round-robin within the matching `inquiry_type`; new `lead_commissions` row tracks payout.
+- Admin route `/admin/partners` for CRUD + webhook test button.
+- Webhook outbound: HMAC-signed POST to partner with inquiry payload; retries via pg_cron / queue.
 
-| Slug                | Label              | Price | Duration |
-| ------------------- | ------------------ | ----- | -------- |
-| search_boost        | Search Boost       | 99    | 7 days   |
-| province_boost      | Province Boost     | 199   | 7 days   |
-| homepage_spotlight  | Homepage Spotlight | 499   | 7 days   |
-| category_sponsor    | Category Sponsor   | 999   | monthly  |
-| dealer_of_the_week  | Dealer of the Week | 1500  | 7 days   |
+## 3C — Affiliate parts module
 
-- New table `listing_boosts(listing_id, product_slug, starts_at, ends_at, payment_id)`.
-- Stripe one-off + recurring prices via `payments--batch_create_product`.
-- "Boost this listing" CTA on `dashboard.index.tsx` and `listing.$id.edit.tsx`.
-- Homepage + browse pages read active boosts and sort/inject sponsored slots.
+- New `affiliate_products` table (sku, title, category_match `text[]`, url, image, price, source). Seed with manual rows for top 20 categories.
+- `<AffiliateParts category="motorcycle" />` component rendered on every listing page below the description. Click → `/r/affiliate/$id` redirect logs `affiliate_clicks`.
+- Admin route `/admin/affiliates` for CRUD.
 
-### 1.5 Homepage repositioning
+## 3D — PayMongo / Xendit for local methods
 
-Rework `src/routes/index.tsx` hero to 3 primary CTAs:
-- **Buy a Vehicle** → `/businesses` + category grid
-- **Sell for Free** → `/sell`
-- **Find Services** → `/businesses?type=services` (Phase 2 directory)
+- New `src/lib/paymongo.server.ts` (analogue of `stripe.server.ts`) with gateway-routed client.
+- `createPaymongoCheckout` server fn returning their Checkout URL (redirect-based — PayMongo doesn't support embedded). Methods enabled: GCash, Maya, QR Ph, GrabPay, ShopeePay.
+- New `payment_intents` table tracking PayMongo source IDs.
+- Webhook at `/api/public/payments/paymongo-webhook` activates same `subscriptions` / `listing_boosts` / `passport_purchases` rows.
+- UI: payment-method picker on every checkout (`Card · GCash · Maya · QR Ph`). Defaults to Stripe Card.
 
-Secondary nav row: Cars, Motorcycles, Trucks, Heavy Equipment, Boats, Parts, Repair Shops, Financing, Insurance, OR/CR Help.
+# Recommended order
 
-### 1.6 Lead-capture inquiry forms (from Phase 3, built now)
+1. **2A** (directory SaaS) — ships visible revenue with the smallest blast radius (~1 build pass).
+2. **3D** (PayMongo) — unlocks Filipino payment methods that will boost all conversion rates. Touches checkout but no new business logic. (~1 pass)
+3. **2B + 2C** (dealer dashboard + gating) — biggest build, most product decisions. (~2 passes)
+4. **3A** (vehicle passport) — passive revenue, no partners needed. (~1 pass)
+5. **3B** (partner routing) — wire when first partner is signed. (~0.5 pass)
+6. **3C** (affiliate parts) — fastest passive revenue once published. (~0.5 pass)
 
-New table `service_inquiries`:
-- `id, user_id (nullable), listing_id (nullable), inquiry_type, vehicle_summary, contact_name, email, phone, message, status, assigned_to, created_at`
-- `inquiry_type enum`: `financing | insurance | or_cr | title_transfer | inspection | towing`
-- RLS: insert public (rate-limited via trigger), select own / admin / sales role.
+# Decisions I need before starting 2A
 
-Buttons on every `listing.$id.tsx`:
-- Get Financing / Check Monthly Payment
-- Get Insurance Quote
-- OR/CR Renewal Help
-- Title Transfer Help
-- Request Inspection
+1. **Directory tier names** — keep `listed / featured / premium`, or use `Basic / Featured / Top`?
+2. **Per-kind pricing** — confirm the ₱199–₱3,000 ranges from the roadmap, or rationalize to 3 standard tiers across all kinds (e.g. ₱299 / ₱699 / ₱1,499)?
+3. **Annual discount** — offer 2 months free on yearly billing?
 
-Each opens a sheet/dialog with a Zod-validated form, posts to a `createServiceInquiry` server fn, emails `partners@365motorsales.ph` (reuse `enqueue_email` pattern).
-
-Admin route `/admin/inquiries` lists, assigns, marks status (`new → contacted → won/lost`). Partners get wired later — for now leads sit in the DB ready to monetize.
-
----
-
-## Phase 2 — Business directory + dealer SaaS
-
-### 2.1 Paid Business Directory
-
-Extend existing `businesses` table with `subscription_tier` (basic/featured/premium) and a `business_subscriptions` table mirroring `subscriptions`.
-
-Tiered monthly pricing per `business_kind`:
-
-| Type                            | Tier range (PHP/mo) |
-| ------------------------------- | ------------------- |
-| Repair shop / Tire / MC repair / Towing | 299 – 999  |
-| Car wash / detailing            | 199 – 699           |
-| Parts store                     | 499 – 1,499         |
-| Insurance agent                 | 499 – 1,499         |
-| Financing agent                 | 999 – 3,000         |
-| Trucking / logistics            | 499 – 1,499         |
-| Equipment rental                | 499 – 2,000         |
-
-- New Stripe products per kind/tier.
-- "Need inspection, insurance, parts, transport, or financing?" service strip injected on every listing page, sourcing from active directory subscribers in the same region.
-
-### 2.2 Dealer SaaS dashboard
-
-For Dealer Starter / Pro / Enterprise:
-- Multi-staff accounts (extend `organization_members`).
-- Lead inbox unifying `messages` + `service_inquiries` for the org.
-- Sales-rep QR tracking (reuse `staff_referrals` infra).
-- Response-time + unanswered-lead alerts.
-- Sold marking, conversion stats.
-- CSV bulk listing upload (Dealer Starter+).
-- Facebook lead import (reuse `facebook-import.functions.ts`).
-
-### 2.3 Sales-rep tracking
-
-Already partially built via `staff_referrals` + QR. Surface per-rep dashboards inside dealer org with leads → sales attribution.
-
----
-
-## Phase 3 — Transaction & passive income
-
-### 3.1 Partner-wired lead routing
-
-Once partners are signed (BPI/BDO, AXA/Pioneer, LTO runners):
-- Replace internal staff email with partner webhook per inquiry type.
-- Track per-lead commission in `lead_commissions` table.
-
-### 3.2 Vehicle Passport
-
-Extend `rides` (already exists) → public `/passport/$vin`:
-- Photos, repairs, upgrades, accident/restoration history, ownership count, sales history, maintenance records, inspection uploads.
-- Free basic page; ₱99–199 one-off premium PDF; ₱199–499 verified inspection upload.
-
-### 3.3 Affiliate parts expansion
-
-Already have `shop_products`, `shop_clicks`, `affiliate_networks`. Add per-listing affiliate module:
-- Motorcycle → helmets/gloves/tires
-- Car → dash cams/floor mats/covers
-- Truck → diesel additives/tools
-- Equipment → grease guns/safety lights
-
-Category-aware product picker on listing pages.
-
-### 3.4 Payments expansion
-
-Beyond Stripe cards:
-- PayMongo or Xendit for GCash / Maya / QR Ph / GrabPay / ShopeePay (PHP local methods).
-- Manual invoice + bank transfer flow for Enterprise.
-- Toggle in checkout based on amount + buyer preference.
-
----
-
-## Long-term revenue mix priority
-
-1. Dealer subscriptions (Starter/Pro/Enterprise)
-2. Finance + insurance lead commissions
-3. Sponsored placements / boost catalog
-4. Business directory subscriptions
-5. Affiliate parts/tools
-6. Vehicle Passport premium + inspections
-7. Transport/towing referrals
-8. Private seller boosts
-
----
-
-## Technical notes
-
-- All Stripe work uses existing `createStripeClient(env)` + gateway proxy; new products via `payments--batch_create_product` (sandbox auto-syncs to live on publish).
-- DB changes via `supabase--migration`; data seeds via `supabase--insert`.
-- All new server logic uses `createServerFn` + `requireSupabaseAuth`; public inquiry submit goes through a public server route under `/api/public/inquiries` with Zod + rate-limit.
-- Existing `subscriptions.environment` filter must be preserved on all reads.
-- Grandfather old plan names: don't delete rows, just relabel and stop offering them at signup.
-
-## What ships in the first build pass
-
-1. Plan rename migration + Stripe new products
-2. Free posting (remove ₱20, raise photo/duration limits, quota = 5 active)
-3. Cancel-at-period-end
-4. Boost catalog (DB + Stripe + UI on listing edit)
-5. Homepage 3-CTA repositioning
-6. `service_inquiries` table + 5 inquiry buttons on every listing + admin inbox
-
-Phase 2 and Phase 3 sections are roadmap only and queued for follow-up builds.
+After answers I'll start with **2A**.
