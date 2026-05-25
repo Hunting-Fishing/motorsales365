@@ -67,7 +67,7 @@ function SellerProfilePage() {
     const load = async () => {
       setLoading(true);
       const [{ data: p }, { data: ls }, { data: rs }] = await Promise.all([
-        supabase.from("profiles").select("*").eq("id", id).maybeSingle(),
+        supabase.from("public_profiles").select("*").eq("id", id).maybeSingle(),
         supabase
           .from("listings")
           .select(

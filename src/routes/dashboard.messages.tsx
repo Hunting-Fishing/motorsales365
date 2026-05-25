@@ -65,7 +65,7 @@ function MessagesPage() {
       setListingsById(map);
     }
     if (userIds.length) {
-      const { data: ps } = await supabase.from("profiles").select("id,full_name,business_name").in("id", userIds);
+      const { data: ps } = await supabase.from("public_profiles").select("id,full_name,business_name").in("id", userIds);
       const map: Record<string, { full_name: string | null; business_name: string | null }> = {};
       (ps ?? []).forEach((p: any) => (map[p.id] = { full_name: p.full_name, business_name: p.business_name }));
       setProfilesById(map);
