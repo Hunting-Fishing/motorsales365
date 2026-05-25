@@ -302,20 +302,20 @@ function Index() {
         <div className="overflow-hidden rounded-2xl border border-border bg-card p-10 shadow-[var(--shadow-card)]">
           <div className="grid gap-8 md:grid-cols-2 md:items-center">
             <div>
-              <h3 className="font-display text-3xl font-bold">Selling? Start free.</h3>
-              <p className="mt-2 text-muted-foreground">Post 1 free listing per week with 1 photo — no card required. Need more? Standard ₱20 listings give you 5 photos and a video.</p>
+              <h3 className="font-display text-3xl font-bold">Posting is free. Forever.</h3>
+              <p className="mt-2 text-muted-foreground">Private sellers get up to 5 active ads with 12 photos and 1 video each — no card required. Sell more? Upgrade to a Verified Seller or Dealer plan.</p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Button asChild size="lg"><Link to="/sell">Post free listing</Link></Button>
-                <Button asChild size="lg" variant="outline"><Link to="/pricing">See pricing</Link></Button>
+                <Button asChild size="lg"><Link to="/sell">Post a free ad</Link></Button>
+                <Button asChild size="lg" variant="outline"><Link to="/pricing">See seller plans</Link></Button>
               </div>
             </div>
             <ul className="grid gap-3 text-sm">
               {[
-                "Free listing — 1 photo, 1 free post per week",
-                "Standard listing — ₱20, up to 5 photos and 1 video",
-                "Upgraded listing — up to 20 photos and 3 videos",
-                "Boost — pin to the top of search and renew the ad",
-                "Subscriptions for businesses with multiple vehicles",
+                "Private Seller — Free. 5 active ads, 12 photos, 1 video, 60-day listing.",
+                "Verified Seller — ₱149/mo. Verified badge, more listings, priority placement.",
+                "Dealer Starter — ₱499/mo. 25 listings, lead inbox, sales-rep tracking.",
+                "Dealer Pro — ₱1,499/mo. Unlimited listings, bulk upload, premium support.",
+                "Boost any listing from ₱99 — pin to top of search or homepage spotlight.",
               ].map((t) => (
                 <li key={t} className="flex items-start gap-2">
                   <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary" />
@@ -323,6 +323,7 @@ function Index() {
                 </li>
               ))}
             </ul>
+
           </div>
         </div>
       </section>
