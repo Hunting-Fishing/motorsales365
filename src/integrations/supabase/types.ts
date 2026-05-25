@@ -2989,7 +2989,90 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_profiles: {
+        Row: {
+          avatar_url: string | null
+          business_address: string | null
+          business_barangay: string | null
+          business_city: string | null
+          business_hours: Json | null
+          business_kind: Database["public"]["Enums"]["business_kind"] | null
+          business_lat: number | null
+          business_lng: number | null
+          business_logo_url: string | null
+          business_name: string | null
+          business_province: string | null
+          business_region: string | null
+          created_at: string | null
+          fb_profile_id: string | null
+          fb_profile_url: string | null
+          fb_verified_at: string | null
+          founding_member_number: number | null
+          full_name: string | null
+          id: string | null
+          is_founding_member: boolean | null
+          seller_type: Database["public"]["Enums"]["seller_type"] | null
+          verification_status:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
+          verified_at: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          business_address?: string | null
+          business_barangay?: string | null
+          business_city?: string | null
+          business_hours?: Json | null
+          business_kind?: Database["public"]["Enums"]["business_kind"] | null
+          business_lat?: number | null
+          business_lng?: number | null
+          business_logo_url?: string | null
+          business_name?: string | null
+          business_province?: string | null
+          business_region?: string | null
+          created_at?: string | null
+          fb_profile_id?: string | null
+          fb_profile_url?: string | null
+          fb_verified_at?: string | null
+          founding_member_number?: number | null
+          full_name?: string | null
+          id?: string | null
+          is_founding_member?: boolean | null
+          seller_type?: Database["public"]["Enums"]["seller_type"] | null
+          verification_status?:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
+          verified_at?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          business_address?: string | null
+          business_barangay?: string | null
+          business_city?: string | null
+          business_hours?: Json | null
+          business_kind?: Database["public"]["Enums"]["business_kind"] | null
+          business_lat?: number | null
+          business_lng?: number | null
+          business_logo_url?: string | null
+          business_name?: string | null
+          business_province?: string | null
+          business_region?: string | null
+          created_at?: string | null
+          fb_profile_id?: string | null
+          fb_profile_url?: string | null
+          fb_verified_at?: string | null
+          founding_member_number?: number | null
+          full_name?: string | null
+          id?: string | null
+          is_founding_member?: boolean | null
+          seller_type?: Database["public"]["Enums"]["seller_type"] | null
+          verification_status?:
+            | Database["public"]["Enums"]["verification_status"]
+            | null
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       apply_referral_redemption: {
