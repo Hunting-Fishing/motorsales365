@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Search, Car, Bike, Ship, Plane, Truck, Caravan, ShieldCheck, Tag, Zap, Construction, Droplets, Wrench, Send, SprayCan, Recycle, Wrench as WrenchIcon } from "lucide-react";
+import { Search, Car, Bike, Ship, Plane, Truck, Caravan, ShieldCheck, Tag, Zap, Construction, Droplets, Wrench, Send, SprayCan, Recycle, Wrench as WrenchIcon, ShoppingBag, Megaphone, LifeBuoy, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/site-layout";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
@@ -15,21 +15,27 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const CATEGORIES = [
+const VEHICLE_CATEGORIES = [
   { slug: "car", name: "Cars", Icon: Car },
   { slug: "motorcycle", name: "Motorcycles", Icon: Bike },
   { slug: "boat", name: "Boats", Icon: Ship },
   { slug: "airplane", name: "Airplanes", Icon: Plane },
   { slug: "equipment", name: "Equipment", Icon: Construction },
-  { slug: "towing", name: "Towing & Trucking", Icon: Truck },
-  { slug: "carwash", name: "Car Wash", Icon: Droplets },
-  { slug: "parts", name: "Parts & Accessories", Icon: Wrench },
-  { slug: "drone", name: "Drones & Aerial", Icon: Send },
-  { slug: "repair", name: "Repair Shop", Icon: WrenchIcon },
-  { slug: "bodyshop", name: "Body Shop", Icon: SprayCan },
-  { slug: "salvage", name: "Auto Salvage", Icon: Recycle },
+  { slug: "drone", name: "Drones", Icon: Send },
   { slug: "other", name: "Other", Icon: Caravan },
 ] as const;
+
+const SERVICE_CATEGORIES = [
+  { slug: "towing", name: "Towing & Trucking", Icon: Truck },
+  { slug: "repair", name: "Repair Shop", Icon: WrenchIcon },
+  { slug: "bodyshop", name: "Body Shop", Icon: SprayCan },
+  { slug: "carwash", name: "Car Wash", Icon: Droplets },
+  { slug: "parts", name: "Parts & Accessories", Icon: Wrench },
+  { slug: "salvage", name: "Auto Salvage", Icon: Recycle },
+] as const;
+
+const CATEGORIES = [...VEHICLE_CATEGORIES, ...SERVICE_CATEGORIES];
+
 
 function Index() {
   const navigate = useNavigate();
@@ -91,6 +97,7 @@ function Index() {
 
   return (
     <SiteLayout>
+
       {/* Hero */}
       <section
         className="relative overflow-hidden text-white"
@@ -101,56 +108,134 @@ function Index() {
             "radial-gradient(circle at 20% 20%, white 1px, transparent 1px), radial-gradient(circle at 80% 60%, white 1px, transparent 1px)",
           backgroundSize: "60px 60px",
         }} />
-        <div className="container relative mx-auto px-4 py-20 md:py-28">
+        <div className="container relative mx-auto px-4 py-16 md:py-20">
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 rounded-full bg-accent/90 px-3 py-1 text-xs font-semibold text-accent-foreground">
               🇵🇭 The Philippines' vehicle marketplace
             </span>
             <h1 className="mt-4 font-display text-4xl font-extrabold leading-tight md:text-6xl">
-              Buy and sell anything that <span className="text-accent">moves</span>.
+              Buy, sell, and service anything that <span className="text-accent">moves</span>.
             </h1>
             <p className="mt-4 max-w-2xl text-lg text-white/85">
-              Cars, motorcycles, boats, airplanes, and heavy equipment — listed by trusted private sellers and businesses across the Philippines. Need it delivered? <Link to="/tow" className="underline underline-offset-2 hover:text-accent">Request a tow</Link>.
+              Free to post. Free to browse. Find trusted dealers, mechanics, towing, financing and insurance — all in one place.
             </p>
+          </div>
 
-            <form
-              onSubmit={handleSearch}
-              className="mt-8 flex flex-col gap-2 rounded-2xl bg-white p-2 text-foreground shadow-2xl sm:flex-row"
+          {/* 3 primary CTAs */}
+          <div className="mt-10 grid gap-4 md:grid-cols-3">
+            <Link
+              to="/browse/$category"
+              params={{ category: "car" }}
+              className="group flex flex-col gap-2 rounded-2xl border border-white/20 bg-white/10 p-6 backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/20"
             >
-              <Select value={category} onValueChange={setCategory}>
-                <SelectTrigger className="h-12 sm:w-44 border-none focus:ring-0">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CATEGORIES.map((c) => (
-                    <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  value={keyword}
-                  onChange={(e) => setKeyword(e.target.value)}
-                  placeholder="Search make, model, or keyword…"
-                  className="h-12 border-none pl-9 focus-visible:ring-0"
-                />
+              <div className="flex items-center gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-accent-foreground">
+                  <ShoppingBag className="h-5 w-5" />
+                </span>
+                <span className="font-display text-xl font-bold">Buy a vehicle</span>
               </div>
-              <Button type="submit" size="lg" className="h-12 sm:w-32">Search</Button>
-            </form>
+              <p className="text-sm text-white/80">
+                Cars, motorcycles, boats, trucks and heavy equipment from verified sellers.
+              </p>
+              <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-accent">
+                Start browsing <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+              </span>
+            </Link>
 
-            <div className="mt-8 flex flex-wrap gap-3">
-              {CATEGORIES.map(({ slug, name, Icon }) => (
-                <Link
-                  key={slug}
-                  to="/browse/$category"
-                  params={{ category: slug }}
-                  className="flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-medium backdrop-blur transition-colors hover:bg-white/20"
-                >
-                  <Icon className="h-4 w-4" />{name}
-                </Link>
-              ))}
+            <Link
+              to="/sell"
+              className="group flex flex-col gap-2 rounded-2xl border border-white/20 bg-white/10 p-6 backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/20"
+            >
+              <div className="flex items-center gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-accent-foreground">
+                  <Megaphone className="h-5 w-5" />
+                </span>
+                <span className="font-display text-xl font-bold">Sell your vehicle</span>
+              </div>
+              <p className="text-sm text-white/80">
+                Post free in under 2 minutes. Up to 12 photos and 1 video. No listing fee.
+              </p>
+              <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-accent">
+                Post a free ad <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+              </span>
+            </Link>
+
+            <Link
+              to="/businesses"
+              className="group flex flex-col gap-2 rounded-2xl border border-white/20 bg-white/10 p-6 backdrop-blur transition hover:-translate-y-0.5 hover:bg-white/20"
+            >
+              <div className="flex items-center gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent text-accent-foreground">
+                  <LifeBuoy className="h-5 w-5" />
+                </span>
+                <span className="font-display text-xl font-bold">Find services</span>
+              </div>
+              <p className="text-sm text-white/80">
+                Repair shops, towing, parts, financing, insurance and inspections near you.
+              </p>
+              <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-accent">
+                Explore services <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+              </span>
+            </Link>
+          </div>
+
+          {/* Search */}
+          <form
+            onSubmit={handleSearch}
+            className="mt-8 flex flex-col gap-2 rounded-2xl bg-white p-2 text-foreground shadow-2xl sm:flex-row"
+          >
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger className="h-12 sm:w-44 border-none focus:ring-0">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {CATEGORIES.map((c) => (
+                  <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={keyword}
+                onChange={(e) => setKeyword(e.target.value)}
+                placeholder="Search make, model, or keyword…"
+                className="h-12 border-none pl-9 focus-visible:ring-0"
+              />
             </div>
+            <Button type="submit" size="lg" className="h-12 sm:w-32">Search</Button>
+          </form>
+        </div>
+      </section>
+
+      {/* Category strip — vehicles + services */}
+      <section className="border-b border-border bg-card">
+        <div className="container mx-auto px-4 py-6">
+          <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Shop by category</div>
+          <div className="flex flex-wrap gap-2">
+            {VEHICLE_CATEGORIES.map(({ slug, name, Icon }) => (
+              <Link
+                key={slug}
+                to="/browse/$category"
+                params={{ category: slug }}
+                className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium transition hover:border-primary hover:text-primary"
+              >
+                <Icon className="h-4 w-4" />{name}
+              </Link>
+            ))}
+          </div>
+          <div className="mb-3 mt-5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Services & shops</div>
+          <div className="flex flex-wrap gap-2">
+            {SERVICE_CATEGORIES.map(({ slug, name, Icon }) => (
+              <Link
+                key={slug}
+                to="/browse/$category"
+                params={{ category: slug }}
+                className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium transition hover:border-primary hover:text-primary"
+              >
+                <Icon className="h-4 w-4" />{name}
+              </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -159,9 +244,9 @@ function Index() {
       <section className="border-b border-border bg-secondary/30">
         <div className="container mx-auto grid gap-6 px-4 py-8 md:grid-cols-3">
           {[
-            { Icon: ShieldCheck, t: "Trusted listings", d: "Private and business sellers, with badges and reports." },
-            { Icon: Tag, t: "Free to start", d: "1 free listing per week (1 photo). Standard ₱20 listings. Upgrade or boost when you want." },
-            { Icon: Zap, t: "Reach the whole country", d: "From Metro Manila to Mindanao — buyers find your ad." },
+            { Icon: ShieldCheck, t: "Verified sellers", d: "Private and business listings with verification badges and fraud reporting." },
+            { Icon: Tag, t: "100% free to post", d: "Up to 12 photos, 1 video, 60-day listings. No card required. Boost when you want more reach." },
+            { Icon: Zap, t: "Nationwide reach", d: "From Metro Manila to Mindanao — buyers, lenders, insurers and service partners in every region." },
           ].map(({ Icon, t, d }) => (
             <div key={t} className="flex items-start gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -175,6 +260,7 @@ function Index() {
           ))}
         </div>
       </section>
+
 
       {/* Featured */}
       {featured.length > 0 && (
@@ -216,20 +302,20 @@ function Index() {
         <div className="overflow-hidden rounded-2xl border border-border bg-card p-10 shadow-[var(--shadow-card)]">
           <div className="grid gap-8 md:grid-cols-2 md:items-center">
             <div>
-              <h3 className="font-display text-3xl font-bold">Selling? Start free.</h3>
-              <p className="mt-2 text-muted-foreground">Post 1 free listing per week with 1 photo — no card required. Need more? Standard ₱20 listings give you 5 photos and a video.</p>
+              <h3 className="font-display text-3xl font-bold">Posting is free. Forever.</h3>
+              <p className="mt-2 text-muted-foreground">Private sellers get up to 5 active ads with 12 photos and 1 video each — no card required. Sell more? Upgrade to a Verified Seller or Dealer plan.</p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Button asChild size="lg"><Link to="/sell">Post free listing</Link></Button>
-                <Button asChild size="lg" variant="outline"><Link to="/pricing">See pricing</Link></Button>
+                <Button asChild size="lg"><Link to="/sell">Post a free ad</Link></Button>
+                <Button asChild size="lg" variant="outline"><Link to="/pricing">See seller plans</Link></Button>
               </div>
             </div>
             <ul className="grid gap-3 text-sm">
               {[
-                "Free listing — 1 photo, 1 free post per week",
-                "Standard listing — ₱20, up to 5 photos and 1 video",
-                "Upgraded listing — up to 20 photos and 3 videos",
-                "Boost — pin to the top of search and renew the ad",
-                "Subscriptions for businesses with multiple vehicles",
+                "Private Seller — Free. 5 active ads, 12 photos, 1 video, 60-day listing.",
+                "Verified Seller — ₱149/mo. Verified badge, more listings, priority placement.",
+                "Dealer Starter — ₱499/mo. 25 listings, lead inbox, sales-rep tracking.",
+                "Dealer Pro — ₱1,499/mo. Unlimited listings, bulk upload, premium support.",
+                "Boost any listing from ₱99 — pin to top of search or homepage spotlight.",
               ].map((t) => (
                 <li key={t} className="flex items-start gap-2">
                   <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary" />
@@ -237,6 +323,7 @@ function Index() {
                 </li>
               ))}
             </ul>
+
           </div>
         </div>
       </section>
