@@ -27,6 +27,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatPHP } from "@/lib/format";
+import { PassportShareSection } from "@/components/passport-share-section";
 
 export const Route = createFileRoute("/dashboard/vehicles")({
   component: VehiclesPage,
