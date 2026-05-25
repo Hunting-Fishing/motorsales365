@@ -3381,6 +3381,8 @@ export type Database = {
         | "carwash"
         | "salvage"
         | "rental"
+        | "financing"
+        | "trucking"
       business_status: "pending" | "active" | "rejected" | "hidden"
       export_inquiry_status: "new" | "qualified" | "quoted" | "won" | "lost"
       listing_plan: "free" | "standard" | "upgraded"
@@ -3607,6 +3609,8 @@ export const Constants = {
         "carwash",
         "salvage",
         "rental",
+        "financing",
+        "trucking",
       ],
       business_status: ["pending", "active", "rejected", "hidden"],
       export_inquiry_status: ["new", "qualified", "quoted", "won", "lost"],
