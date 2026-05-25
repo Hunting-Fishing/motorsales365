@@ -2,8 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Car, Plus, ShieldCheck, Globe, Lock, Wrench, ExternalLink, Trash2 } from "lucide-react";
+import { Car, Plus, ShieldCheck, Globe, Lock, Wrench, ExternalLink, Trash2, QrCode } from "lucide-react";
 import { toast } from "sonner";
+import { QRCodeSVG } from "qrcode.react";
 import {
   listMyVehicles,
   createVehicle,
