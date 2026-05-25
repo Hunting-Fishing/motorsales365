@@ -62,6 +62,7 @@ import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as BusinessesSubmitRouteImport } from './routes/businesses.submit'
 import { Route as BusinessesSlugRouteImport } from './routes/businesses.$slug'
 import { Route as BrowseCategoryRouteImport } from './routes/browse.$category'
+import { Route as BoostCheckoutRouteImport } from './routes/boost.checkout'
 import { Route as ApiSitemapDotxmlRouteImport } from './routes/api/sitemap[.]xml'
 import { Route as ApiRobotsDottxtRouteImport } from './routes/api/robots[.]txt'
 import { Route as AdminVerificationsRouteImport } from './routes/admin.verifications'
@@ -366,6 +367,11 @@ const BrowseCategoryRoute = BrowseCategoryRouteImport.update({
   path: '/browse/$category',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BoostCheckoutRoute = BoostCheckoutRouteImport.update({
+  id: '/boost/checkout',
+  path: '/boost/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiSitemapDotxmlRoute = ApiSitemapDotxmlRouteImport.update({
   id: '/api/sitemap.xml',
   path: '/api/sitemap.xml',
@@ -606,6 +612,7 @@ export interface FileRoutesByFullPath {
   '/admin/verifications': typeof AdminVerificationsRoute
   '/api/robots.txt': typeof ApiRobotsDottxtRoute
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
+  '/boost/checkout': typeof BoostCheckoutRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/businesses/$slug': typeof BusinessesSlugRoute
   '/businesses/submit': typeof BusinessesSubmitRoute
@@ -697,6 +704,7 @@ export interface FileRoutesByTo {
   '/admin/verifications': typeof AdminVerificationsRoute
   '/api/robots.txt': typeof ApiRobotsDottxtRoute
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
+  '/boost/checkout': typeof BoostCheckoutRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/businesses/$slug': typeof BusinessesSlugRoute
   '/businesses/submit': typeof BusinessesSubmitRoute
@@ -791,6 +799,7 @@ export interface FileRoutesById {
   '/admin/verifications': typeof AdminVerificationsRoute
   '/api/robots.txt': typeof ApiRobotsDottxtRoute
   '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
+  '/boost/checkout': typeof BoostCheckoutRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/businesses/$slug': typeof BusinessesSlugRoute
   '/businesses/submit': typeof BusinessesSubmitRoute
@@ -886,6 +895,7 @@ export interface FileRouteTypes {
     | '/admin/verifications'
     | '/api/robots.txt'
     | '/api/sitemap.xml'
+    | '/boost/checkout'
     | '/browse/$category'
     | '/businesses/$slug'
     | '/businesses/submit'
@@ -977,6 +987,7 @@ export interface FileRouteTypes {
     | '/admin/verifications'
     | '/api/robots.txt'
     | '/api/sitemap.xml'
+    | '/boost/checkout'
     | '/browse/$category'
     | '/businesses/$slug'
     | '/businesses/submit'
@@ -1070,6 +1081,7 @@ export interface FileRouteTypes {
     | '/admin/verifications'
     | '/api/robots.txt'
     | '/api/sitemap.xml'
+    | '/boost/checkout'
     | '/browse/$category'
     | '/businesses/$slug'
     | '/businesses/submit'
@@ -1146,6 +1158,7 @@ export interface RootRouteChildren {
   VerifyEmailRoute: typeof VerifyEmailRoute
   ApiRobotsDottxtRoute: typeof ApiRobotsDottxtRoute
   ApiSitemapDotxmlRoute: typeof ApiSitemapDotxmlRoute
+  BoostCheckoutRoute: typeof BoostCheckoutRoute
   BrowseCategoryRoute: typeof BrowseCategoryRoute
   BusinessesSlugRoute: typeof BusinessesSlugRoute
   BusinessesSubmitRoute: typeof BusinessesSubmitRoute
@@ -1545,6 +1558,13 @@ declare module '@tanstack/react-router' {
       path: '/browse/$category'
       fullPath: '/browse/$category'
       preLoaderRoute: typeof BrowseCategoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/boost/checkout': {
+      id: '/boost/checkout'
+      path: '/boost/checkout'
+      fullPath: '/boost/checkout'
+      preLoaderRoute: typeof BoostCheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/sitemap.xml': {
@@ -1975,6 +1995,7 @@ const rootRouteChildren: RootRouteChildren = {
   VerifyEmailRoute: VerifyEmailRoute,
   ApiRobotsDottxtRoute: ApiRobotsDottxtRoute,
   ApiSitemapDotxmlRoute: ApiSitemapDotxmlRoute,
+  BoostCheckoutRoute: BoostCheckoutRoute,
   BrowseCategoryRoute: BrowseCategoryRoute,
   BusinessesSlugRoute: BusinessesSlugRoute,
   BusinessesSubmitRoute: BusinessesSubmitRoute,

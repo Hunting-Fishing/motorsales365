@@ -122,6 +122,72 @@ async function recordPaymentFromInvoice(env: StripeEnv, invoice: Stripe.Invoice)
   } as any);
 }
 
+async function activateBoostFromSession(env: StripeEnv, session: Stripe.Checkout.Session) {
+  const meta = session.metadata || {};
+  if (meta.kind !== "boost") return;
+  const userId = meta.userId as string | undefined;
+  const listingId = meta.listingId as string | undefined;
+  const boostSlug = meta.boostSlug as string | undefined;
+  if (!userId || !listingId || !boostSlug) {
+    console.error("[webhook] boost session missing metadata", session.id);
+    return;
+  }
+
+  // Idempotency: skip if we already activated this session
+  const { data: existing } = await supabaseAdmin
+    .from("listing_boosts")
+    .select("id")
+    .eq("listing_id", listingId)
+    .eq("product_slug", boostSlug)
+    .eq("user_id", userId)
+    .gte("ends_at", new Date().toISOString())
+    .maybeSingle();
+  if (existing) return;
+
+  // Look up duration
+  const { data: product } = await supabaseAdmin
+    .from("boost_products")
+    .select("duration_days")
+    .eq("slug", boostSlug)
+    .maybeSingle();
+  const days = ((product as any)?.duration_days as number | undefined) ?? 7;
+
+  const now = new Date();
+  const ends = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+
+  // Record the payment
+  const reference = `stripe_session:${session.id}`;
+  const { data: payRow } = await supabaseAdmin
+    .from("payments")
+    .insert({
+      user_id: userId,
+      listing_id: listingId,
+      kind: "boost" as any,
+      status: "paid" as any,
+      amount_php: (session.amount_total ?? 0) / 100,
+      method: "stripe",
+      reference,
+      paid_at: new Date().toISOString(),
+    } as any)
+    .select("id")
+    .maybeSingle();
+
+  await supabaseAdmin.from("listing_boosts").insert({
+    listing_id: listingId,
+    user_id: userId,
+    product_slug: boostSlug,
+    starts_at: now.toISOString(),
+    ends_at: ends.toISOString(),
+    payment_id: (payRow as any)?.id ?? null,
+  } as any);
+
+  // Mirror onto legacy boost_until so existing UI/search still sees the boost.
+  await supabaseAdmin
+    .from("listings")
+    .update({ boost_until: ends.toISOString() })
+    .eq("id", listingId);
+}
+
 async function handleEvent(env: StripeEnv, event: Stripe.Event) {
   switch (event.type) {
     case "customer.subscription.created":
@@ -132,6 +198,10 @@ async function handleEvent(env: StripeEnv, event: Stripe.Event) {
     }
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
+      if (session.metadata?.kind === "boost") {
+        await activateBoostFromSession(env, session);
+        break;
+      }
       if (session.mode === "subscription" && session.subscription) {
         const stripe = createStripeClient(env);
         const subId = typeof session.subscription === "string"
@@ -157,6 +227,7 @@ async function handleEvent(env: StripeEnv, event: Stripe.Event) {
       break;
   }
 }
+
 
 export const Route = createFileRoute("/api/public/payments/webhook")({
   server: {
