@@ -168,11 +168,15 @@ function BusinessProfilePage() {
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
                 <h1 className="font-display text-2xl font-bold">{biz.name}</h1>
-                {biz.featured && <Badge>Featured</Badge>}
+                {biz.subscription_tier === "premium" && <Badge className="bg-amber-500 text-amber-950">Premium</Badge>}
+                {biz.subscription_tier === "featured" && <Badge className="bg-primary">Featured</Badge>}
+                {biz.subscription_tier === "listed" && <Badge variant="secondary">Listed</Badge>}
+                {biz.featured && !biz.subscription_tier && <Badge>Featured</Badge>}
                 {biz.price_label && (
                   <Badge variant="secondary" className="font-semibold">{biz.price_label}</Badge>
                 )}
               </div>
+
               <div className="text-sm text-muted-foreground">{typeLabel}</div>
               {biz.rating_count > 0 && (
                 <div className="mt-1 flex items-center gap-1 text-sm">
