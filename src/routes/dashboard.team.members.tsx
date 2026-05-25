@@ -48,9 +48,9 @@ function MembersPage() {
     setInviting(true);
     try {
       const inv = await inviteFn({ data: { orgId, email: email.trim().toLowerCase(), role } });
-      const link = `${window.location.origin}/signup?invite=${inv.token}`;
+      const link = `${window.location.origin}/invites/${inv.token}`;
       await navigator.clipboard.writeText(link).catch(() => {});
-      toast.success("Invite created — link copied to clipboard");
+      toast.success("Invite sent — link also copied to clipboard");
       setEmail("");
       qc.invalidateQueries({ queryKey: ["org-invites", orgId] });
     } catch (e: any) {
@@ -104,7 +104,7 @@ function MembersPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    navigator.clipboard.writeText(`${window.location.origin}/signup?invite=${inv.token ?? ""}`);
+                    navigator.clipboard.writeText(`${window.location.origin}/invites/${inv.token ?? ""}`);
                     toast.success("Link copied");
                   }}
                 >
