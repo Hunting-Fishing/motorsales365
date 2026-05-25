@@ -14,8 +14,8 @@ export const Route = createFileRoute("/seller/$id")({
   loader: async ({ params }) => {
     try {
       const { data } = await supabase
-        .from("profiles")
-        .select("full_name,avatar_url,seller_type,business_name,city,region")
+        .from("public_profiles")
+        .select("full_name,avatar_url,seller_type,business_name,business_city,business_region")
         .eq("id", params.id)
         .maybeSingle();
       return { seo: data ?? null };
