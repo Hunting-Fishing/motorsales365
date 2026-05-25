@@ -76,7 +76,7 @@ function LeadsInbox() {
             return (
               <Link
                 key={l.id}
-                to="/dashboard/team/leads/$id"
+                to="/dashboard/team/leads_/$id"
                 params={{ id: l.id }}
                 search={{ orgId } as any}
                 className="flex items-start gap-3 p-4 hover:bg-secondary/50"
