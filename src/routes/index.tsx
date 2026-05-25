@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Search, Car, Bike, Ship, Plane, Truck, Caravan, ShieldCheck, Tag, Zap, Construction, Droplets, Wrench, Send, SprayCan, Recycle, Wrench as WrenchIcon } from "lucide-react";
+import { Search, Car, Bike, Ship, Plane, Truck, Caravan, ShieldCheck, Tag, Zap, Construction, Droplets, Wrench, Send, SprayCan, Recycle, Wrench as WrenchIcon, ShoppingBag, Megaphone, LifeBuoy, ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/site-layout";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
@@ -15,21 +15,27 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
-const CATEGORIES = [
+const VEHICLE_CATEGORIES = [
   { slug: "car", name: "Cars", Icon: Car },
   { slug: "motorcycle", name: "Motorcycles", Icon: Bike },
   { slug: "boat", name: "Boats", Icon: Ship },
   { slug: "airplane", name: "Airplanes", Icon: Plane },
   { slug: "equipment", name: "Equipment", Icon: Construction },
-  { slug: "towing", name: "Towing & Trucking", Icon: Truck },
-  { slug: "carwash", name: "Car Wash", Icon: Droplets },
-  { slug: "parts", name: "Parts & Accessories", Icon: Wrench },
-  { slug: "drone", name: "Drones & Aerial", Icon: Send },
-  { slug: "repair", name: "Repair Shop", Icon: WrenchIcon },
-  { slug: "bodyshop", name: "Body Shop", Icon: SprayCan },
-  { slug: "salvage", name: "Auto Salvage", Icon: Recycle },
+  { slug: "drone", name: "Drones", Icon: Send },
   { slug: "other", name: "Other", Icon: Caravan },
 ] as const;
+
+const SERVICE_CATEGORIES = [
+  { slug: "towing", name: "Towing & Trucking", Icon: Truck },
+  { slug: "repair", name: "Repair Shop", Icon: WrenchIcon },
+  { slug: "bodyshop", name: "Body Shop", Icon: SprayCan },
+  { slug: "carwash", name: "Car Wash", Icon: Droplets },
+  { slug: "parts", name: "Parts & Accessories", Icon: Wrench },
+  { slug: "salvage", name: "Auto Salvage", Icon: Recycle },
+] as const;
+
+const CATEGORIES = [...VEHICLE_CATEGORIES, ...SERVICE_CATEGORIES];
+
 
 function Index() {
   const navigate = useNavigate();
