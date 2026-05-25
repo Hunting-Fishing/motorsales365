@@ -356,6 +356,51 @@ export type Database = {
         }
         Relationships: []
       }
+      boost_products: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          duration_days: number
+          id: string
+          label: string
+          price_php: number
+          recurring: boolean
+          slug: string
+          sort_order: number
+          stripe_lookup_key: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          duration_days: number
+          id?: string
+          label: string
+          price_php: number
+          recurring?: boolean
+          slug: string
+          sort_order?: number
+          stripe_lookup_key?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          duration_days?: number
+          id?: string
+          label?: string
+          price_php?: number
+          recurring?: boolean
+          slug?: string
+          sort_order?: number
+          stripe_lookup_key?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       business_reviews: {
         Row: {
           body: string | null
@@ -920,6 +965,61 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "listings"
             referencedColumns: ["id"]
+          },
+        ]
+      }
+      listing_boosts: {
+        Row: {
+          created_at: string
+          ends_at: string
+          id: string
+          listing_id: string
+          payment_id: string | null
+          product_slug: string
+          starts_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          id?: string
+          listing_id: string
+          payment_id?: string | null
+          product_slug: string
+          starts_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          id?: string
+          listing_id?: string
+          payment_id?: string | null
+          product_slug?: string
+          starts_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_boosts_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_boosts_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_boosts_product_slug_fkey"
+            columns: ["product_slug"]
+            isOneToOne: false
+            referencedRelation: "boost_products"
+            referencedColumns: ["slug"]
           },
         ]
       }
@@ -2197,6 +2297,68 @@ export type Database = {
         }
         Relationships: []
       }
+      service_inquiries: {
+        Row: {
+          assigned_to: string | null
+          contact_name: string
+          created_at: string
+          email: string
+          id: string
+          inquiry_type: Database["public"]["Enums"]["service_inquiry_type"]
+          internal_notes: string | null
+          listing_id: string | null
+          message: string | null
+          phone: string | null
+          source_url: string | null
+          status: Database["public"]["Enums"]["service_inquiry_status"]
+          updated_at: string
+          user_id: string | null
+          vehicle_summary: string | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          contact_name: string
+          created_at?: string
+          email: string
+          id?: string
+          inquiry_type: Database["public"]["Enums"]["service_inquiry_type"]
+          internal_notes?: string | null
+          listing_id?: string | null
+          message?: string | null
+          phone?: string | null
+          source_url?: string | null
+          status?: Database["public"]["Enums"]["service_inquiry_status"]
+          updated_at?: string
+          user_id?: string | null
+          vehicle_summary?: string | null
+        }
+        Update: {
+          assigned_to?: string | null
+          contact_name?: string
+          created_at?: string
+          email?: string
+          id?: string
+          inquiry_type?: Database["public"]["Enums"]["service_inquiry_type"]
+          internal_notes?: string | null
+          listing_id?: string | null
+          message?: string | null
+          phone?: string | null
+          source_url?: string | null
+          status?: Database["public"]["Enums"]["service_inquiry_status"]
+          updated_at?: string
+          user_id?: string | null
+          vehicle_summary?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_inquiries_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_categories: {
         Row: {
           active: boolean
@@ -3260,6 +3422,21 @@ export type Database = {
         | "boat"
         | "other"
       seller_type: "private" | "business"
+      service_inquiry_status:
+        | "new"
+        | "contacted"
+        | "quoted"
+        | "won"
+        | "lost"
+        | "spam"
+      service_inquiry_type:
+        | "financing"
+        | "insurance"
+        | "or_cr"
+        | "title_transfer"
+        | "inspection"
+        | "towing"
+        | "other"
       verification_request_status:
         | "pending"
         | "approved"
@@ -3475,6 +3652,23 @@ export const Constants = {
         "other",
       ],
       seller_type: ["private", "business"],
+      service_inquiry_status: [
+        "new",
+        "contacted",
+        "quoted",
+        "won",
+        "lost",
+        "spam",
+      ],
+      service_inquiry_type: [
+        "financing",
+        "insurance",
+        "or_cr",
+        "title_transfer",
+        "inspection",
+        "towing",
+        "other",
+      ],
       verification_request_status: [
         "pending",
         "approved",
