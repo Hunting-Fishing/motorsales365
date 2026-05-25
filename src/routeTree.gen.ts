@@ -90,6 +90,7 @@ import { Route as RCodePosterRouteImport } from './routes/r.$code.poster'
 import { Route as PaymentsIdReceiptRouteImport } from './routes/payments.$id.receipt'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
+import { Route as DashboardTeamMembersRouteImport } from './routes/dashboard.team.members'
 import { Route as DashboardTeamLeadsRouteImport } from './routes/dashboard.team.leads'
 import { Route as DashboardRidesNewRouteImport } from './routes/dashboard.rides_.new'
 import { Route as ApiPublicPaymentEventsRouteImport } from './routes/api/public/payment-events'
@@ -511,6 +512,11 @@ const ListingIdEditRoute = ListingIdEditRouteImport.update({
   path: '/edit',
   getParentRoute: () => ListingIdRoute,
 } as any)
+const DashboardTeamMembersRoute = DashboardTeamMembersRouteImport.update({
+  id: '/members',
+  path: '/members',
+  getParentRoute: () => DashboardTeamRoute,
+} as any)
 const DashboardTeamLeadsRoute = DashboardTeamLeadsRouteImport.update({
   id: '/leads',
   path: '/leads',
@@ -674,6 +680,7 @@ export interface FileRoutesByFullPath {
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
+  '/dashboard/team/members': typeof DashboardTeamMembersRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
@@ -770,6 +777,7 @@ export interface FileRoutesByTo {
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
+  '/dashboard/team/members': typeof DashboardTeamMembersRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
@@ -869,6 +877,7 @@ export interface FileRoutesById {
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/dashboard/rides_/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
+  '/dashboard/team/members': typeof DashboardTeamMembersRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
@@ -969,6 +978,7 @@ export interface FileRouteTypes {
     | '/api/public/payment-events'
     | '/dashboard/rides/new'
     | '/dashboard/team/leads'
+    | '/dashboard/team/members'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
@@ -1065,6 +1075,7 @@ export interface FileRouteTypes {
     | '/api/public/payment-events'
     | '/dashboard/rides/new'
     | '/dashboard/team/leads'
+    | '/dashboard/team/members'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
@@ -1163,6 +1174,7 @@ export interface FileRouteTypes {
     | '/api/public/payment-events'
     | '/dashboard/rides_/new'
     | '/dashboard/team/leads'
+    | '/dashboard/team/members'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
@@ -1805,6 +1817,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListingIdEditRouteImport
       parentRoute: typeof ListingIdRoute
     }
+    '/dashboard/team/members': {
+      id: '/dashboard/team/members'
+      path: '/members'
+      fullPath: '/dashboard/team/members'
+      preLoaderRoute: typeof DashboardTeamMembersRouteImport
+      parentRoute: typeof DashboardTeamRoute
+    }
     '/dashboard/team/leads': {
       id: '/dashboard/team/leads'
       path: '/leads'
@@ -1963,11 +1982,13 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface DashboardTeamRouteChildren {
   DashboardTeamLeadsRoute: typeof DashboardTeamLeadsRoute
+  DashboardTeamMembersRoute: typeof DashboardTeamMembersRoute
   DashboardTeamLeadsIdRoute: typeof DashboardTeamLeadsIdRoute
 }
 
 const DashboardTeamRouteChildren: DashboardTeamRouteChildren = {
   DashboardTeamLeadsRoute: DashboardTeamLeadsRoute,
+  DashboardTeamMembersRoute: DashboardTeamMembersRoute,
   DashboardTeamLeadsIdRoute: DashboardTeamLeadsIdRoute,
 }
 
