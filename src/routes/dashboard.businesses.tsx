@@ -88,17 +88,28 @@ function PriceEditor({ row, onSaved }: { row: Row; onSaved: (val: string | null)
   );
 }
 
+function tierBadge(tier: Row["subscription_tier"]) {
+  if (!tier || tier === "free") return null;
+  const styles: Record<string, string> = {
+    listed: "bg-slate-600",
+    featured: "bg-primary",
+    premium: "bg-amber-500 text-amber-950",
+  };
+  return <Badge className={styles[tier] ?? ""}>{tier.charAt(0).toUpperCase() + tier.slice(1)}</Badge>;
+}
+
 function MyBusinessesPage() {
   const { user } = useAuth();
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
+  const [planTarget, setPlanTarget] = useState<Row | null>(null);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
       const { data } = await (supabase as any)
         .from("businesses")
-        .select("id,slug,name,type_slug,status,city,region,rating_avg,rating_count,price_label")
+        .select("id,slug,name,type_slug,status,city,region,rating_avg,rating_count,price_label,subscription_tier")
         .eq("owner_id", user.id)
         .order("created_at", { ascending: false });
       setRows(data ?? []); setLoading(false);
@@ -123,9 +134,10 @@ function MyBusinessesPage() {
           {rows.map((b) => (
             <Card key={b.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
               <div className="min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Link to="/businesses/$slug" params={{ slug: b.slug }} className="truncate font-semibold hover:underline">{b.name}</Link>
                   {statusBadge(b.status)}
+                  {tierBadge(b.subscription_tier)}
                 </div>
                 <div className="text-xs text-muted-foreground">{[b.city, b.region].filter(Boolean).join(" · ")}</div>
                 <div className="mt-2">
@@ -135,22 +147,40 @@ function MyBusinessesPage() {
                   />
                 </div>
               </div>
-              <div className="flex shrink-0 items-center gap-2">
+              <div className="flex shrink-0 flex-wrap items-center gap-2">
                 <span className="text-xs text-muted-foreground">{b.rating_count} review{b.rating_count === 1 ? "" : "s"}</span>
                 {b.status === "active" && (
-                  <ShareQr
-                    url={`${typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com"}/businesses/${b.slug}`}
-                    title={b.name}
-                    subtitle={[b.city, b.region].filter(Boolean).join(", ") || null}
-                    fileSlug={b.slug}
-                    compact
-                  />
+                  <>
+                    <Button size="sm" variant="outline" onClick={() => setPlanTarget(b)}>
+                      <Sparkles className="mr-1 h-3.5 w-3.5" />
+                      {b.subscription_tier && b.subscription_tier !== "free" ? "Change plan" : "Upgrade"}
+                    </Button>
+                    <ShareQr
+                      url={`${typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com"}/businesses/${b.slug}`}
+                      title={b.name}
+                      subtitle={[b.city, b.region].filter(Boolean).join(", ") || null}
+                      fileSlug={b.slug}
+                      compact
+                    />
+                  </>
                 )}
               </div>
             </Card>
           ))}
         </div>
       )}
+
+      {planTarget && (
+        <BusinessPlanDialog
+          open={!!planTarget}
+          onOpenChange={(open) => !open && setPlanTarget(null)}
+          businessId={planTarget.id}
+          businessName={planTarget.name}
+          typeSlug={planTarget.type_slug}
+          currentTier={planTarget.subscription_tier ?? "free"}
+        />
+      )}
     </div>
   );
 }
+
