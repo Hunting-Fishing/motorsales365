@@ -191,9 +191,9 @@ function PassportPage() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-border bg-background p-3 text-center">
+    <div className="rounded-lg border border-border bg-background p-3 text-center print:border-gray-200 print:bg-white">
       <p className="font-display text-lg font-semibold">{value}</p>
-      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="text-[10px] uppercase tracking-wide text-muted-foreground print:text-gray-500">{label}</p>
     </div>
   );
 }
