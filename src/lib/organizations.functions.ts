@@ -81,7 +81,7 @@ export const listOrgInvites = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { data: rows, error } = await supabase
       .from("organization_invites")
-      .select("id, email, role, expires_at, accepted_at, created_at")
+      .select("id, email, role, token, expires_at, accepted_at, created_at")
       .eq("organization_id", data.orgId)
       .is("accepted_at", null)
       .order("created_at", { ascending: false });

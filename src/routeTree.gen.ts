@@ -44,6 +44,7 @@ import { Route as SellImportRouteImport } from './routes/sell.import'
 import { Route as RidesSlugRouteImport } from './routes/rides.$slug'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
+import { Route as InvitesTokenRouteImport } from './routes/invites.$token'
 import { Route as GoProductIdRouteImport } from './routes/go.$productId'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as DashboardVerificationRouteImport } from './routes/dashboard.verification'
@@ -282,6 +283,11 @@ const RCodeRoute = RCodeRouteImport.update({
 const ListingIdRoute = ListingIdRouteImport.update({
   id: '/listing/$id',
   path: '/listing/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvitesTokenRoute = InvitesTokenRouteImport.update({
+  id: '/invites/$token',
+  path: '/invites/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GoProductIdRoute = GoProductIdRouteImport.update({
@@ -676,6 +682,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/go/$productId': typeof GoProductIdRoute
+  '/invites/$token': typeof InvitesTokenRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
@@ -774,6 +781,7 @@ export interface FileRoutesByTo {
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/go/$productId': typeof GoProductIdRoute
+  '/invites/$token': typeof InvitesTokenRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
@@ -876,6 +884,7 @@ export interface FileRoutesById {
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/go/$productId': typeof GoProductIdRoute
+  '/invites/$token': typeof InvitesTokenRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
@@ -979,6 +988,7 @@ export interface FileRouteTypes {
     | '/dashboard/verification'
     | '/email/unsubscribe'
     | '/go/$productId'
+    | '/invites/$token'
     | '/listing/$id'
     | '/r/$code'
     | '/rides/$slug'
@@ -1077,6 +1087,7 @@ export interface FileRouteTypes {
     | '/dashboard/verification'
     | '/email/unsubscribe'
     | '/go/$productId'
+    | '/invites/$token'
     | '/listing/$id'
     | '/r/$code'
     | '/rides/$slug'
@@ -1178,6 +1189,7 @@ export interface FileRouteTypes {
     | '/dashboard/verification'
     | '/email/unsubscribe'
     | '/go/$productId'
+    | '/invites/$token'
     | '/listing/$id'
     | '/r/$code'
     | '/rides/$slug'
@@ -1249,6 +1261,7 @@ export interface RootRouteChildren {
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   GoProductIdRoute: typeof GoProductIdRoute
+  InvitesTokenRoute: typeof InvitesTokenRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   RCodeRoute: typeof RCodeRouteWithChildren
   RidesSlugRoute: typeof RidesSlugRoute
@@ -1516,6 +1529,13 @@ declare module '@tanstack/react-router' {
       path: '/listing/$id'
       fullPath: '/listing/$id'
       preLoaderRoute: typeof ListingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invites/$token': {
+      id: '/invites/$token'
+      path: '/invites/$token'
+      fullPath: '/invites/$token'
+      preLoaderRoute: typeof InvitesTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/go/$productId': {
@@ -2158,6 +2178,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   GoProductIdRoute: GoProductIdRoute,
+  InvitesTokenRoute: InvitesTokenRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   RCodeRoute: RCodeRouteWithChildren,
   RidesSlugRoute: RidesSlugRoute,
