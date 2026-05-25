@@ -169,35 +169,8 @@ function MyListings() {
     }
   };
 
-  const boost = async (l: any) => {
-    if (!user) return;
-    const fee = pricing.boost_fee_php ?? 50;
-    const days = pricing.boost_renewal_days ?? 14;
-    const pendingEligible = (pricing.pending_sale_boost_eligible ?? 1) === 1;
-    if (l.status === "pending_sale" && !pendingEligible) {
-      toast.error("Boosting is disabled for Pending Sale listings.");
-      return;
-    }
-    if (!confirm(`Boost this listing for ${days} days at ${formatPHP(fee)}? Payment will be confirmed by admin.`)) return;
+  // Boost is now handled via <BoostDialog /> (Stripe-powered).
 
-    const until = new Date();
-    until.setDate(until.getDate() + days);
-    const { error } = await supabase.from("listings").update({ boost_until: until.toISOString() }).eq("id", l.id);
-    if (error) {
-      toast.error(error.message);
-      return;
-    }
-    await supabase.from("payments").insert({
-      user_id: user.id,
-      listing_id: l.id,
-      kind: "boost",
-      amount_php: fee,
-      status: "pending",
-      method: "manual",
-    });
-    toast.success(`Boost applied. Payment pending.`);
-    load();
-  };
 
   const statusColor: Record<string, string> = {
     active: "bg-success text-success-foreground",
