@@ -90,6 +90,7 @@ import { Route as RCodePosterRouteImport } from './routes/r.$code.poster'
 import { Route as PaymentsIdReceiptRouteImport } from './routes/payments.$id.receipt'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
+import { Route as DashboardTeamLeadsRouteImport } from './routes/dashboard.team.leads'
 import { Route as DashboardRidesNewRouteImport } from './routes/dashboard.rides_.new'
 import { Route as ApiPublicPaymentEventsRouteImport } from './routes/api/public/payment-events'
 import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocode'
@@ -509,6 +510,11 @@ const ListingIdEditRoute = ListingIdEditRouteImport.update({
   path: '/edit',
   getParentRoute: () => ListingIdRoute,
 } as any)
+const DashboardTeamLeadsRoute = DashboardTeamLeadsRouteImport.update({
+  id: '/leads',
+  path: '/leads',
+  getParentRoute: () => DashboardTeamRoute,
+} as any)
 const DashboardRidesNewRoute = DashboardRidesNewRouteImport.update({
   id: '/rides_/new',
   path: '/rides/new',
@@ -640,7 +646,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
-  '/dashboard/team': typeof DashboardTeamRoute
+  '/dashboard/team': typeof DashboardTeamRouteWithChildren
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -661,6 +667,7 @@ export interface FileRoutesByFullPath {
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
+  '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
@@ -734,7 +741,7 @@ export interface FileRoutesByTo {
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
-  '/dashboard/team': typeof DashboardTeamRoute
+  '/dashboard/team': typeof DashboardTeamRouteWithChildren
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -755,6 +762,7 @@ export interface FileRoutesByTo {
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
+  '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
@@ -831,7 +839,7 @@ export interface FileRoutesById {
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
-  '/dashboard/team': typeof DashboardTeamRoute
+  '/dashboard/team': typeof DashboardTeamRouteWithChildren
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -852,6 +860,7 @@ export interface FileRoutesById {
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/dashboard/rides_/new': typeof DashboardRidesNewRoute
+  '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
@@ -950,6 +959,7 @@ export interface FileRouteTypes {
     | '/api/public/geocode'
     | '/api/public/payment-events'
     | '/dashboard/rides/new'
+    | '/dashboard/team/leads'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
@@ -1044,6 +1054,7 @@ export interface FileRouteTypes {
     | '/api/public/geocode'
     | '/api/public/payment-events'
     | '/dashboard/rides/new'
+    | '/dashboard/team/leads'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
@@ -1140,6 +1151,7 @@ export interface FileRouteTypes {
     | '/api/public/geocode'
     | '/api/public/payment-events'
     | '/dashboard/rides_/new'
+    | '/dashboard/team/leads'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
@@ -1781,6 +1793,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListingIdEditRouteImport
       parentRoute: typeof ListingIdRoute
     }
+    '/dashboard/team/leads': {
+      id: '/dashboard/team/leads'
+      path: '/leads'
+      fullPath: '/dashboard/team/leads'
+      preLoaderRoute: typeof DashboardTeamLeadsRouteImport
+      parentRoute: typeof DashboardTeamRoute
+    }
     '/dashboard/rides_/new': {
       id: '/dashboard/rides_/new'
       path: '/rides/new'
@@ -1923,6 +1942,18 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface DashboardTeamRouteChildren {
+  DashboardTeamLeadsRoute: typeof DashboardTeamLeadsRoute
+}
+
+const DashboardTeamRouteChildren: DashboardTeamRouteChildren = {
+  DashboardTeamLeadsRoute: DashboardTeamLeadsRoute,
+}
+
+const DashboardTeamRouteWithChildren = DashboardTeamRoute._addFileChildren(
+  DashboardTeamRouteChildren,
+)
+
 interface DashboardRouteChildren {
   DashboardBillingRoute: typeof DashboardBillingRoute
   DashboardBusinessesRoute: typeof DashboardBusinessesRoute
@@ -1934,7 +1965,7 @@ interface DashboardRouteChildren {
   DashboardRidesRoute: typeof DashboardRidesRoute
   DashboardSearchesRoute: typeof DashboardSearchesRoute
   DashboardShopFavoritesRoute: typeof DashboardShopFavoritesRoute
-  DashboardTeamRoute: typeof DashboardTeamRoute
+  DashboardTeamRoute: typeof DashboardTeamRouteWithChildren
   DashboardTowRoute: typeof DashboardTowRoute
   DashboardVerificationRoute: typeof DashboardVerificationRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
@@ -1953,7 +1984,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardRidesRoute: DashboardRidesRoute,
   DashboardSearchesRoute: DashboardSearchesRoute,
   DashboardShopFavoritesRoute: DashboardShopFavoritesRoute,
-  DashboardTeamRoute: DashboardTeamRoute,
+  DashboardTeamRoute: DashboardTeamRouteWithChildren,
   DashboardTowRoute: DashboardTowRoute,
   DashboardVerificationRoute: DashboardVerificationRoute,
   DashboardIndexRoute: DashboardIndexRoute,
