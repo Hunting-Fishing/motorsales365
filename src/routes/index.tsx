@@ -97,17 +97,7 @@ function Index() {
 
   return (
     <SiteLayout>
-      {/* Hero */}
-      <section
-        className="relative overflow-hidden text-white"
-        style={{ backgroundImage: "var(--gradient-hero)" }}
-      >
-        <div className="absolute inset-0 opacity-10" style={{
-          backgroundImage:
-            "radial-gradient(circle at 20% 20%, white 1px, transparent 1px), radial-gradient(circle at 80% 60%, white 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-        }} />
-        <div className="container relative mx-auto px-4 py-20 md:py-28">
+
       {/* Hero */}
       <section
         className="relative overflow-hidden text-white"
