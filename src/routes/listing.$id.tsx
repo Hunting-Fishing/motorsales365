@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { MapPin, Heart, Flag, Star, Phone, MessageSquare, ChevronLeft, Truck, Eye, Bookmark } from "lucide-react";
+import { MapPin, Heart, Flag, Star, Phone, MessageSquare, ChevronLeft, Truck, Eye, Bookmark, Banknote, Shield, FileText, ClipboardCheck, Wrench } from "lucide-react";
+import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -500,6 +501,62 @@ function ListingDetailPage() {
               )}
             </div>
           </div>
+
+          {/* Services around this vehicle — revenue: lead-gen for finance/insurance/OR-CR partners */}
+          <div className="rounded-xl border border-border bg-card p-5">
+            <h3 className="font-display text-lg font-semibold">Services for this vehicle</h3>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Free quotes from partner providers. No commitment.
+            </p>
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              <ServiceInquiryDialog
+                inquiryType="financing"
+                listingId={listing.id}
+                vehicleSummary={listing.title}
+              >
+                <Button variant="outline" className="w-full justify-start">
+                  <Banknote className="mr-2 h-4 w-4" /> Get financing
+                </Button>
+              </ServiceInquiryDialog>
+              <ServiceInquiryDialog
+                inquiryType="insurance"
+                listingId={listing.id}
+                vehicleSummary={listing.title}
+              >
+                <Button variant="outline" className="w-full justify-start">
+                  <Shield className="mr-2 h-4 w-4" /> Get insurance quote
+                </Button>
+              </ServiceInquiryDialog>
+              <ServiceInquiryDialog
+                inquiryType="or_cr"
+                listingId={listing.id}
+                vehicleSummary={listing.title}
+              >
+                <Button variant="outline" className="w-full justify-start">
+                  <FileText className="mr-2 h-4 w-4" /> OR/CR renewal help
+                </Button>
+              </ServiceInquiryDialog>
+              <ServiceInquiryDialog
+                inquiryType="title_transfer"
+                listingId={listing.id}
+                vehicleSummary={listing.title}
+              >
+                <Button variant="outline" className="w-full justify-start">
+                  <ClipboardCheck className="mr-2 h-4 w-4" /> Title transfer help
+                </Button>
+              </ServiceInquiryDialog>
+              <ServiceInquiryDialog
+                inquiryType="inspection"
+                listingId={listing.id}
+                vehicleSummary={listing.title}
+              >
+                <Button variant="outline" className="w-full justify-start sm:col-span-2">
+                  <Wrench className="mr-2 h-4 w-4" /> Request a pre-purchase inspection
+                </Button>
+              </ServiceInquiryDialog>
+            </div>
+          </div>
+
 
           {listing.allow_messages && (
             <div className="rounded-xl border border-border bg-card p-5">
