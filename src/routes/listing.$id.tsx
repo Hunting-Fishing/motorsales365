@@ -354,6 +354,11 @@ function ListingDetailPage() {
             </Button>
           </div>
 
+          {/* Above-the-fold service CTA strip — revenue: lead-gen for finance/insurance/inspection partners */}
+          {listing.category_slug !== "towing" && listing.category_slug !== "services" && (
+            <ServiceStrip listingId={listing.id} vehicleSummary={listing.title} />
+          )}
+
           {/* Service tags */}
           {Array.isArray(listing.attributes?.tags) && listing.attributes.tags.length > 0 && (
             <div className="mt-6 rounded-xl border border-border bg-card p-5">
