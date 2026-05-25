@@ -401,6 +401,51 @@ export type Database = {
         }
         Relationships: []
       }
+      business_plans: {
+        Row: {
+          active: boolean
+          business_kind: Database["public"]["Enums"]["business_kind"]
+          created_at: string
+          description: string | null
+          id: string
+          interval: string
+          price_php: number
+          slug: string
+          sort_order: number
+          stripe_lookup_key: string
+          tier: Database["public"]["Enums"]["business_tier"]
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          business_kind: Database["public"]["Enums"]["business_kind"]
+          created_at?: string
+          description?: string | null
+          id?: string
+          interval: string
+          price_php: number
+          slug: string
+          sort_order?: number
+          stripe_lookup_key: string
+          tier: Database["public"]["Enums"]["business_tier"]
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          business_kind?: Database["public"]["Enums"]["business_kind"]
+          created_at?: string
+          description?: string | null
+          id?: string
+          interval?: string
+          price_php?: number
+          slug?: string
+          sort_order?: number
+          stripe_lookup_key?: string
+          tier?: Database["public"]["Enums"]["business_tier"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       business_reviews: {
         Row: {
           body: string | null
@@ -438,6 +483,78 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_subscriptions: {
+        Row: {
+          business_id: string
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          environment: string
+          id: string
+          metadata: Json
+          owner_user_id: string
+          plan_id: string | null
+          plan_slug: string | null
+          status: string
+          stripe_customer_id: string | null
+          stripe_price_id: string | null
+          stripe_subscription_id: string | null
+          tier: Database["public"]["Enums"]["business_tier"]
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          environment?: string
+          id?: string
+          metadata?: Json
+          owner_user_id: string
+          plan_id?: string | null
+          plan_slug?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          tier?: Database["public"]["Enums"]["business_tier"]
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          environment?: string
+          id?: string
+          metadata?: Json
+          owner_user_id?: string
+          plan_id?: string | null
+          plan_slug?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          tier?: Database["public"]["Enums"]["business_tier"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_subscriptions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_subscriptions_plan_id_fkey"
+            columns: ["plan_id"]
+            isOneToOne: false
+            referencedRelation: "business_plans"
             referencedColumns: ["id"]
           },
         ]
@@ -583,6 +700,7 @@ export type Database = {
           description: string | null
           email: string | null
           featured: boolean
+          featured_until: string | null
           hours: Json | null
           id: string
           lat: number | null
@@ -605,6 +723,7 @@ export type Database = {
           source_external_id: string | null
           status: Database["public"]["Enums"]["business_status"]
           street_address: string | null
+          subscription_tier: Database["public"]["Enums"]["business_tier"]
           type_slug: string
           updated_at: string
           website: string | null
@@ -618,6 +737,7 @@ export type Database = {
           description?: string | null
           email?: string | null
           featured?: boolean
+          featured_until?: string | null
           hours?: Json | null
           id?: string
           lat?: number | null
@@ -640,6 +760,7 @@ export type Database = {
           source_external_id?: string | null
           status?: Database["public"]["Enums"]["business_status"]
           street_address?: string | null
+          subscription_tier?: Database["public"]["Enums"]["business_tier"]
           type_slug: string
           updated_at?: string
           website?: string | null
@@ -653,6 +774,7 @@ export type Database = {
           description?: string | null
           email?: string | null
           featured?: boolean
+          featured_until?: string | null
           hours?: Json | null
           id?: string
           lat?: number | null
@@ -675,6 +797,7 @@ export type Database = {
           source_external_id?: string | null
           status?: Database["public"]["Enums"]["business_status"]
           street_address?: string | null
+          subscription_tier?: Database["public"]["Enums"]["business_tier"]
           type_slug?: string
           updated_at?: string
           website?: string | null
@@ -3384,6 +3507,7 @@ export type Database = {
         | "financing"
         | "trucking"
       business_status: "pending" | "active" | "rejected" | "hidden"
+      business_tier: "free" | "listed" | "featured" | "premium"
       export_inquiry_status: "new" | "qualified" | "quoted" | "won" | "lost"
       listing_plan: "free" | "standard" | "upgraded"
       listing_status:
@@ -3613,6 +3737,7 @@ export const Constants = {
         "trucking",
       ],
       business_status: ["pending", "active", "rejected", "hidden"],
+      business_tier: ["free", "listed", "featured", "premium"],
       export_inquiry_status: ["new", "qualified", "quoted", "won", "lost"],
       listing_plan: ["free", "standard", "upgraded"],
       listing_status: [
