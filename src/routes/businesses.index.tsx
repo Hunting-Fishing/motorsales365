@@ -31,7 +31,9 @@ type BusinessRow = {
   barangay: string | null; lat: number | null; lng: number | null;
   rating_avg: number; rating_count: number; featured: boolean;
   price_label: string | null;
+  subscription_tier: "free" | "listed" | "featured" | "premium" | null;
 };
+
 
 function BusinessesIndex() {
   const navigate = useNavigate();
