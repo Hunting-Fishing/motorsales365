@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { MapPin, Heart, Flag, Star, Phone, MessageSquare, ChevronLeft, Truck, Eye, Bookmark, Banknote, Shield, FileText, ClipboardCheck, Wrench } from "lucide-react";
 import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
 import { ServiceStrip } from "@/components/service-strip";
+import { AffiliatePartsSection } from "@/components/affiliate-parts-section";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -394,6 +395,17 @@ function ListingDetailPage() {
               {listing.description || "No description provided."}
             </p>
           </div>
+
+          {/* Affiliate parts — revenue: commission on partner shop checkouts */}
+          {listing.category_slug !== "towing" && listing.category_slug !== "services" && (
+            <AffiliatePartsSection
+              make={listing.attributes?.make ?? null}
+              model={listing.attributes?.model ?? null}
+              year={listing.attributes?.year ? Number(listing.attributes.year) : null}
+              listingId={listing.id}
+            />
+          )}
+
 
           <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
             <span>Listed {formatDate(listing.published_at)}</span>
