@@ -57,7 +57,7 @@ export const listOrgLeads = createServerFn({ method: "POST" })
     if (data.status !== "all") q = q.eq("status", data.status);
     if (data.assignedTo === "unassigned") q = q.is("assigned_to", null);
     else if (data.assignedTo !== "all") q = q.eq("assigned_to", data.assignedTo);
-    if (data.source) q = q.eq("source", data.source);
+    if (data.source) q = q.eq("source", data.source as any);
     if (data.q) q = q.or(`customer_name.ilike.%${data.q}%,subject.ilike.%${data.q}%,preview.ilike.%${data.q}%`);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
