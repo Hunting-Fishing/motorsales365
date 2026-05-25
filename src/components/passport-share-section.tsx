@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { QRCodeSVG } from "qrcode.react";
-import { Share2, Link2, Printer, Check, X } from "lucide-react";
+import { Share2, Link2, Printer, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
