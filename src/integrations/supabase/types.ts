@@ -711,6 +711,7 @@ export type Database = {
           logo_url: string | null
           messenger_url: string | null
           name: string
+          organization_id: string | null
           owner_id: string | null
           phone: string | null
           photos: Json
@@ -748,6 +749,7 @@ export type Database = {
           logo_url?: string | null
           messenger_url?: string | null
           name: string
+          organization_id?: string | null
           owner_id?: string | null
           phone?: string | null
           photos?: Json
@@ -785,6 +787,7 @@ export type Database = {
           logo_url?: string | null
           messenger_url?: string | null
           name?: string
+          organization_id?: string | null
           owner_id?: string | null
           phone?: string | null
           photos?: Json
@@ -806,6 +809,13 @@ export type Database = {
           website?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "businesses_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "businesses_type_slug_fkey"
             columns: ["type_slug"]
@@ -1090,6 +1100,160 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_activities: {
+        Row: {
+          actor_id: string | null
+          body: string | null
+          created_at: string
+          from_value: string | null
+          id: string
+          kind: Database["public"]["Enums"]["lead_activity_kind"]
+          lead_id: string
+          to_value: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          body?: string | null
+          created_at?: string
+          from_value?: string | null
+          id?: string
+          kind: Database["public"]["Enums"]["lead_activity_kind"]
+          lead_id: string
+          to_value?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          body?: string | null
+          created_at?: string
+          from_value?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["lead_activity_kind"]
+          lead_id?: string
+          to_value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_activities_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_activities_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_activities_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          assigned_at: string | null
+          assigned_to: string | null
+          business_id: string | null
+          created_at: string
+          customer_email: string | null
+          customer_name: string | null
+          customer_phone: string | null
+          customer_user_id: string | null
+          id: string
+          last_activity_at: string
+          listing_id: string | null
+          organization_id: string
+          preview: string | null
+          source: Database["public"]["Enums"]["lead_source"]
+          source_id: string
+          status: Database["public"]["Enums"]["lead_status"]
+          subject: string | null
+          updated_at: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_to?: string | null
+          business_id?: string | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          customer_user_id?: string | null
+          id?: string
+          last_activity_at?: string
+          listing_id?: string | null
+          organization_id: string
+          preview?: string | null
+          source: Database["public"]["Enums"]["lead_source"]
+          source_id: string
+          status?: Database["public"]["Enums"]["lead_status"]
+          subject?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_to?: string | null
+          business_id?: string | null
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string | null
+          customer_phone?: string | null
+          customer_user_id?: string | null
+          id?: string
+          last_activity_at?: string
+          listing_id?: string | null
+          organization_id?: string
+          preview?: string | null
+          source?: Database["public"]["Enums"]["lead_source"]
+          source_id?: string
+          status?: Database["public"]["Enums"]["lead_status"]
+          subject?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "leads_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "leads_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -3512,6 +3676,18 @@ export type Database = {
       business_status: "pending" | "active" | "rejected" | "hidden"
       business_tier: "free" | "listed" | "featured" | "premium"
       export_inquiry_status: "new" | "qualified" | "quoted" | "won" | "lost"
+      lead_activity_kind:
+        | "created"
+        | "assigned"
+        | "status_changed"
+        | "note"
+        | "reply_sent"
+      lead_source:
+        | "listing_message"
+        | "business_inquiry"
+        | "service_inquiry"
+        | "tow_request"
+      lead_status: "new" | "in_progress" | "won" | "lost"
       listing_plan: "free" | "standard" | "upgraded"
       listing_status:
         | "draft"
@@ -3742,6 +3918,20 @@ export const Constants = {
       business_status: ["pending", "active", "rejected", "hidden"],
       business_tier: ["free", "listed", "featured", "premium"],
       export_inquiry_status: ["new", "qualified", "quoted", "won", "lost"],
+      lead_activity_kind: [
+        "created",
+        "assigned",
+        "status_changed",
+        "note",
+        "reply_sent",
+      ],
+      lead_source: [
+        "listing_message",
+        "business_inquiry",
+        "service_inquiry",
+        "tow_request",
+      ],
+      lead_status: ["new", "in_progress", "won", "lost"],
       listing_plan: ["free", "standard", "upgraded"],
       listing_status: [
         "draft",
