@@ -150,7 +150,7 @@ export const getBusinessSubscription = createServerFn({ method: "GET" })
     const { supabase } = context;
     const { data: row, error } = await supabase
       .from("business_subscriptions")
-      .select("id, plan_slug, tier, status, current_period_end, cancel_at_period_end, interval:metadata, stripe_subscription_id")
+      .select("id, plan_slug, tier, status, current_period_end, cancel_at_period_end, metadata, stripe_subscription_id")
       .eq("business_id", data.businessId)
       .order("created_at", { ascending: false })
       .limit(1)
@@ -158,3 +158,4 @@ export const getBusinessSubscription = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return { subscription: row ?? null };
   });
+
