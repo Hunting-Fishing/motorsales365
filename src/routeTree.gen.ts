@@ -90,6 +90,7 @@ import { Route as RCodePosterRouteImport } from './routes/r.$code.poster'
 import { Route as PaymentsIdReceiptRouteImport } from './routes/payments.$id.receipt'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as ListingIdEditRouteImport } from './routes/listing.$id.edit'
+import { Route as DashboardTeamPerformanceRouteImport } from './routes/dashboard.team.performance'
 import { Route as DashboardTeamMembersRouteImport } from './routes/dashboard.team.members'
 import { Route as DashboardTeamLeadsRouteImport } from './routes/dashboard.team.leads'
 import { Route as DashboardRidesNewRouteImport } from './routes/dashboard.rides_.new'
@@ -512,6 +513,12 @@ const ListingIdEditRoute = ListingIdEditRouteImport.update({
   path: '/edit',
   getParentRoute: () => ListingIdRoute,
 } as any)
+const DashboardTeamPerformanceRoute =
+  DashboardTeamPerformanceRouteImport.update({
+    id: '/performance',
+    path: '/performance',
+    getParentRoute: () => DashboardTeamRoute,
+  } as any)
 const DashboardTeamMembersRoute = DashboardTeamMembersRouteImport.update({
   id: '/members',
   path: '/members',
@@ -681,6 +688,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
+  '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
@@ -778,6 +786,7 @@ export interface FileRoutesByTo {
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
+  '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
@@ -878,6 +887,7 @@ export interface FileRoutesById {
   '/dashboard/rides_/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
+  '/dashboard/team/performance': typeof DashboardTeamPerformanceRoute
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
@@ -979,6 +989,7 @@ export interface FileRouteTypes {
     | '/dashboard/rides/new'
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
+    | '/dashboard/team/performance'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
@@ -1076,6 +1087,7 @@ export interface FileRouteTypes {
     | '/dashboard/rides/new'
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
+    | '/dashboard/team/performance'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
@@ -1175,6 +1187,7 @@ export interface FileRouteTypes {
     | '/dashboard/rides_/new'
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
+    | '/dashboard/team/performance'
     | '/listing/$id/edit'
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
@@ -1817,6 +1830,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListingIdEditRouteImport
       parentRoute: typeof ListingIdRoute
     }
+    '/dashboard/team/performance': {
+      id: '/dashboard/team/performance'
+      path: '/performance'
+      fullPath: '/dashboard/team/performance'
+      preLoaderRoute: typeof DashboardTeamPerformanceRouteImport
+      parentRoute: typeof DashboardTeamRoute
+    }
     '/dashboard/team/members': {
       id: '/dashboard/team/members'
       path: '/members'
@@ -1983,12 +2003,14 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 interface DashboardTeamRouteChildren {
   DashboardTeamLeadsRoute: typeof DashboardTeamLeadsRoute
   DashboardTeamMembersRoute: typeof DashboardTeamMembersRoute
+  DashboardTeamPerformanceRoute: typeof DashboardTeamPerformanceRoute
   DashboardTeamLeadsIdRoute: typeof DashboardTeamLeadsIdRoute
 }
 
 const DashboardTeamRouteChildren: DashboardTeamRouteChildren = {
   DashboardTeamLeadsRoute: DashboardTeamLeadsRoute,
   DashboardTeamMembersRoute: DashboardTeamMembersRoute,
+  DashboardTeamPerformanceRoute: DashboardTeamPerformanceRoute,
   DashboardTeamLeadsIdRoute: DashboardTeamLeadsIdRoute,
 }
 
