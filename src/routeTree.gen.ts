@@ -43,11 +43,13 @@ import { Route as SellerIdRouteImport } from './routes/seller.$id'
 import { Route as SellImportRouteImport } from './routes/sell.import'
 import { Route as RidesSlugRouteImport } from './routes/rides.$slug'
 import { Route as RCodeRouteImport } from './routes/r.$code'
+import { Route as PassportSlugRouteImport } from './routes/passport.$slug'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as InvitesTokenRouteImport } from './routes/invites.$token'
 import { Route as GoProductIdRouteImport } from './routes/go.$productId'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as DashboardVerificationRouteImport } from './routes/dashboard.verification'
+import { Route as DashboardVehiclesRouteImport } from './routes/dashboard.vehicles'
 import { Route as DashboardTowRouteImport } from './routes/dashboard.tow'
 import { Route as DashboardTeamRouteImport } from './routes/dashboard.team'
 import { Route as DashboardShopFavoritesRouteImport } from './routes/dashboard.shop-favorites'
@@ -280,6 +282,11 @@ const RCodeRoute = RCodeRouteImport.update({
   path: '/r/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PassportSlugRoute = PassportSlugRouteImport.update({
+  id: '/passport/$slug',
+  path: '/passport/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ListingIdRoute = ListingIdRouteImport.update({
   id: '/listing/$id',
   path: '/listing/$id',
@@ -303,6 +310,11 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
 const DashboardVerificationRoute = DashboardVerificationRouteImport.update({
   id: '/verification',
   path: '/verification',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardVehiclesRoute = DashboardVehiclesRouteImport.update({
+  id: '/vehicles',
+  path: '/vehicles',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardTowRoute = DashboardTowRouteImport.update({
@@ -679,11 +691,13 @@ export interface FileRoutesByFullPath {
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
   '/dashboard/team': typeof DashboardTeamRouteWithChildren
   '/dashboard/tow': typeof DashboardTowRoute
+  '/dashboard/vehicles': typeof DashboardVehiclesRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/go/$productId': typeof GoProductIdRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
+  '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
   '/sell/import': typeof SellImportRoute
@@ -778,11 +792,13 @@ export interface FileRoutesByTo {
   '/dashboard/searches': typeof DashboardSearchesRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
   '/dashboard/tow': typeof DashboardTowRoute
+  '/dashboard/vehicles': typeof DashboardVehiclesRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/go/$productId': typeof GoProductIdRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
+  '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
   '/sell/import': typeof SellImportRoute
@@ -881,11 +897,13 @@ export interface FileRoutesById {
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
   '/dashboard/team': typeof DashboardTeamRouteWithChildren
   '/dashboard/tow': typeof DashboardTowRoute
+  '/dashboard/vehicles': typeof DashboardVehiclesRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/go/$productId': typeof GoProductIdRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
+  '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
   '/sell/import': typeof SellImportRoute
@@ -985,11 +1003,13 @@ export interface FileRouteTypes {
     | '/dashboard/shop-favorites'
     | '/dashboard/team'
     | '/dashboard/tow'
+    | '/dashboard/vehicles'
     | '/dashboard/verification'
     | '/email/unsubscribe'
     | '/go/$productId'
     | '/invites/$token'
     | '/listing/$id'
+    | '/passport/$slug'
     | '/r/$code'
     | '/rides/$slug'
     | '/sell/import'
@@ -1084,11 +1104,13 @@ export interface FileRouteTypes {
     | '/dashboard/searches'
     | '/dashboard/shop-favorites'
     | '/dashboard/tow'
+    | '/dashboard/vehicles'
     | '/dashboard/verification'
     | '/email/unsubscribe'
     | '/go/$productId'
     | '/invites/$token'
     | '/listing/$id'
+    | '/passport/$slug'
     | '/r/$code'
     | '/rides/$slug'
     | '/sell/import'
@@ -1186,11 +1208,13 @@ export interface FileRouteTypes {
     | '/dashboard/shop-favorites'
     | '/dashboard/team'
     | '/dashboard/tow'
+    | '/dashboard/vehicles'
     | '/dashboard/verification'
     | '/email/unsubscribe'
     | '/go/$productId'
     | '/invites/$token'
     | '/listing/$id'
+    | '/passport/$slug'
     | '/r/$code'
     | '/rides/$slug'
     | '/sell/import'
@@ -1263,6 +1287,7 @@ export interface RootRouteChildren {
   GoProductIdRoute: typeof GoProductIdRoute
   InvitesTokenRoute: typeof InvitesTokenRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
+  PassportSlugRoute: typeof PassportSlugRoute
   RCodeRoute: typeof RCodeRouteWithChildren
   RidesSlugRoute: typeof RidesSlugRoute
   SellerIdRoute: typeof SellerIdRoute
@@ -1524,6 +1549,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/passport/$slug': {
+      id: '/passport/$slug'
+      path: '/passport/$slug'
+      fullPath: '/passport/$slug'
+      preLoaderRoute: typeof PassportSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/listing/$id': {
       id: '/listing/$id'
       path: '/listing/$id'
@@ -1557,6 +1589,13 @@ declare module '@tanstack/react-router' {
       path: '/verification'
       fullPath: '/dashboard/verification'
       preLoaderRoute: typeof DashboardVerificationRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/vehicles': {
+      id: '/dashboard/vehicles'
+      path: '/vehicles'
+      fullPath: '/dashboard/vehicles'
+      preLoaderRoute: typeof DashboardVehiclesRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/tow': {
@@ -2070,6 +2109,7 @@ interface DashboardRouteChildren {
   DashboardShopFavoritesRoute: typeof DashboardShopFavoritesRoute
   DashboardTeamRoute: typeof DashboardTeamRouteWithChildren
   DashboardTowRoute: typeof DashboardTowRoute
+  DashboardVehiclesRoute: typeof DashboardVehiclesRoute
   DashboardVerificationRoute: typeof DashboardVerificationRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardRidesNewRoute: typeof DashboardRidesNewRoute
@@ -2089,6 +2129,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardShopFavoritesRoute: DashboardShopFavoritesRoute,
   DashboardTeamRoute: DashboardTeamRouteWithChildren,
   DashboardTowRoute: DashboardTowRoute,
+  DashboardVehiclesRoute: DashboardVehiclesRoute,
   DashboardVerificationRoute: DashboardVerificationRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardRidesNewRoute: DashboardRidesNewRoute,
@@ -2180,6 +2221,7 @@ const rootRouteChildren: RootRouteChildren = {
   GoProductIdRoute: GoProductIdRoute,
   InvitesTokenRoute: InvitesTokenRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
+  PassportSlugRoute: PassportSlugRoute,
   RCodeRoute: RCodeRouteWithChildren,
   RidesSlugRoute: RidesSlugRoute,
   SellerIdRoute: SellerIdRoute,
