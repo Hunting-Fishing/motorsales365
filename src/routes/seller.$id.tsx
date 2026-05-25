@@ -33,7 +33,7 @@ export const Route = createFileRoute("/seller/$id")({
       };
     }
     const name = p.business_name || p.full_name || "Seller";
-    const loc = [p.city, p.region].filter(Boolean).join(", ");
+    const loc = [p.business_city, p.business_region].filter(Boolean).join(", ");
     const title = `${name}${loc ? ` — ${loc}` : ""} | 365 MotorSales`;
     const desc = `Listings from ${name}${loc ? ` in ${loc}` : ""} on 365 MotorSales Philippines.`.slice(0, 155);
     return {
