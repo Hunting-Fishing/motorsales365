@@ -67,11 +67,13 @@ function BusinessesIndex() {
     (async () => {
       let query = (supabase as any)
         .from("businesses")
-        .select("id,slug,name,type_slug,description,logo_url,region,province,city,barangay,lat,lng,rating_avg,rating_count,featured,price_label")
+        .select("id,slug,name,type_slug,description,logo_url,region,province,city,barangay,lat,lng,rating_avg,rating_count,featured,price_label,subscription_tier")
         .eq("status", "active")
+        .order("subscription_tier", { ascending: false })
         .order("featured", { ascending: false })
         .order("rating_avg", { ascending: false })
         .limit(200);
+
       if (typeSlug) query = query.eq("type_slug", typeSlug);
       if (loc.region) query = query.eq("region", loc.region);
       if (loc.province) query = query.eq("province", loc.province);
