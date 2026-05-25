@@ -20,6 +20,7 @@ import { formatPHP, formatDate } from "@/lib/format";
 import placeholderCar from "@/assets/placeholder-car.webp";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ListingQr } from "@/components/listing-qr";
+import { BoostDialog } from "@/components/boost-dialog";
 
 export const Route = createFileRoute("/dashboard/")({
   component: MyListings,
