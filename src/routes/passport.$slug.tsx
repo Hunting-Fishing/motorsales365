@@ -1,9 +1,11 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ShieldCheck, Car, Wrench, ExternalLink, Calendar } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/site-layout";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatPHP } from "@/lib/format";
+import { PassportShareSection } from "@/components/passport-share-section";
 
 const SERVICE_TYPE_LABELS: Record<string, string> = {
   oil_change: "Oil change",
