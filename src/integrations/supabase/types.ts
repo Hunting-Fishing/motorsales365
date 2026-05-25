@@ -1437,6 +1437,44 @@ export type Database = {
           },
         ]
       }
+      listing_price_history: {
+        Row: {
+          changed_at: string
+          delta_pct: number
+          delta_php: number
+          id: string
+          listing_id: string
+          new_price_php: number
+          old_price_php: number
+        }
+        Insert: {
+          changed_at?: string
+          delta_pct: number
+          delta_php: number
+          id?: string
+          listing_id: string
+          new_price_php: number
+          old_price_php: number
+        }
+        Update: {
+          changed_at?: string
+          delta_pct?: number
+          delta_php?: number
+          id?: string
+          listing_id?: string
+          new_price_php?: number
+          old_price_php?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_price_history_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listing_views: {
         Row: {
           created_at: string

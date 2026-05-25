@@ -4,6 +4,7 @@ import { Search, Car, Bike, Ship, Plane, Truck, Caravan, ShieldCheck, Tag, Zap, 
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/site-layout";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
+import { LiveActivityFeed } from "@/components/live-activity-feed";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -261,6 +262,9 @@ function Index() {
         </div>
       </section>
 
+
+      {/* Live activity feed */}
+      <LiveActivityFeed />
 
       {/* Featured */}
       {featured.length > 0 && (
