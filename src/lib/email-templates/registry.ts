@@ -18,6 +18,8 @@ import { template as subscriptionCancelled } from './subscription-cancelled'
 import { template as adInquiryReceived } from './ad-inquiry-received'
 import { template as adInquiryStaffNotice } from './ad-inquiry-staff-notice'
 import { template as adInquiryReply } from './ad-inquiry-reply'
+import { template as teamInvite } from './team-invite'
+import { template as teamNewLead } from './team-new-lead'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'signup-welcome': signupWelcome,
@@ -29,4 +31,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'ad-inquiry-received': adInquiryReceived,
   'ad-inquiry-staff-notice': adInquiryStaffNotice,
   'ad-inquiry-reply': adInquiryReply,
+  'team-invite': teamInvite,
+  'team-new-lead': teamNewLead,
 }

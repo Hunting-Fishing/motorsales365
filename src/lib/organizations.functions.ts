@@ -46,6 +46,31 @@ export const inviteOrgMember = createServerFn({ method: "POST" })
       .select("id, email, role, token")
       .single();
     if (error) throw new Error(error.message);
+
+    // Best-effort email notification — never block the invite flow if email enqueue fails
+    try {
+      const [{ data: org }, { data: inviter }] = await Promise.all([
+        supabase.from("organizations").select("name").eq("id", data.orgId).maybeSingle(),
+        supabase.from("profiles").select("full_name").eq("id", userId).maybeSingle(),
+      ]);
+      const origin = (process.env.SITE_URL || process.env.VITE_SITE_URL || "https://365motorsales.com").replace(/\/+$/, "");
+      await supabase.rpc("enqueue_email" as any, {
+        queue_name: "transactional_emails",
+        payload: {
+          template: "team-invite",
+          to: data.email,
+          data: {
+            org_name: (org as any)?.name ?? "a team",
+            inviter_name: (inviter as any)?.full_name ?? "Your teammate",
+            role: data.role,
+            invite_url: `${origin}/invites/${token}`,
+          },
+        },
+      } as any);
+    } catch {
+      // swallow — surfaced via email_send_log in admin tooling
+    }
+
     return invite;
   });
 
@@ -56,7 +81,7 @@ export const listOrgInvites = createServerFn({ method: "POST" })
     const { supabase } = context;
     const { data: rows, error } = await supabase
       .from("organization_invites")
-      .select("id, email, role, expires_at, accepted_at, created_at")
+      .select("id, email, role, token, expires_at, accepted_at, created_at")
       .eq("organization_id", data.orgId)
       .is("accepted_at", null)
       .order("created_at", { ascending: false });

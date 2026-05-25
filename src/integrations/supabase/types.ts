@@ -3527,6 +3527,7 @@ export type Database = {
       }
     }
     Functions: {
+      accept_org_invite: { Args: { _token: string }; Returns: Json }
       apply_referral_redemption: {
         Args: {
           _base_amount: number
@@ -3598,6 +3599,7 @@ export type Database = {
           staff_referral_id: string
         }[]
       }
+      preview_org_invite: { Args: { _token: string }; Returns: Json }
       preview_referral_discount: {
         Args: { _base_amount: number; _kind: string }
         Returns: Json
