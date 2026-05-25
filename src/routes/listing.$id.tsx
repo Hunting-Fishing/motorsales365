@@ -2,6 +2,7 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { MapPin, Heart, Flag, Star, Phone, MessageSquare, ChevronLeft, Truck, Eye, Bookmark, Banknote, Shield, FileText, ClipboardCheck, Wrench } from "lucide-react";
 import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
+import { ServiceStrip } from "@/components/service-strip";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -353,6 +354,11 @@ function ListingDetailPage() {
               {favorited ? "Saved" : "Save"}
             </Button>
           </div>
+
+          {/* Above-the-fold service CTA strip — revenue: lead-gen for finance/insurance/inspection partners */}
+          {listing.category_slug !== "towing" && listing.category_slug !== "services" && (
+            <ServiceStrip listingId={listing.id} vehicleSummary={listing.title} />
+          )}
 
           {/* Service tags */}
           {Array.isArray(listing.attributes?.tags) && listing.attributes.tags.length > 0 && (
