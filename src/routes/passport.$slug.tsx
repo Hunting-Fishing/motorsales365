@@ -84,32 +84,48 @@ function PassportPage() {
   const totalSpent = records.reduce((s: number, r: any) => s + Number(r.cost_php || 0), 0);
   const lastMileage = records.find((r: any) => r.mileage_km)?.mileage_km;
 
+  const fullUrl = `https://365motorsales.com/passport/${v.passport_slug}`;
+
   return (
     <SiteLayout>
-      <div className="container mx-auto max-w-3xl px-4 py-8">
-        <div className="overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-card">
+      <div className="container mx-auto max-w-3xl px-4 py-8 print:py-4">
+        <div className="overflow-hidden rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-card print:border-0 print:bg-white print:shadow-none">
           {v.cover_url ? (
-            <div className="aspect-[16/9] w-full overflow-hidden bg-muted">
+            <div className="aspect-[16/9] w-full overflow-hidden bg-muted print:hidden">
               <img src={v.cover_url} alt={name} className="h-full w-full object-cover" />
             </div>
           ) : (
-            <div className="flex aspect-[16/9] w-full items-center justify-center bg-muted">
+            <div className="flex aspect-[16/9] w-full items-center justify-center bg-muted print:hidden">
               <Car className="h-16 w-16 text-muted-foreground/40" />
             </div>
           )}
-          <div className="p-6">
-            <div className="flex items-center gap-2">
-              <Badge variant="secondary" className="gap-1"><ShieldCheck className="h-3 w-3" /> Verified passport</Badge>
+          <div className="p-6 print:p-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <Badge variant="secondary" className="gap-1 print:hidden"><ShieldCheck className="h-3 w-3" /> Verified passport</Badge>
+              <span className="hidden text-xs uppercase tracking-wide text-muted-foreground print:inline">Verified vehicle passport — 365motorsales.com</span>
             </div>
-            <h1 className="mt-3 font-display text-3xl font-semibold leading-tight">{name}</h1>
+            <h1 className="mt-3 font-display text-3xl font-semibold leading-tight print:text-2xl">{name}</h1>
             <p className="mt-1 text-sm text-muted-foreground">
               {v.make} {v.model} {v.year ? `· ${v.year}` : ""} {v.color ? `· ${v.color}` : ""} {v.plate_number ? `· ${v.plate_number}` : ""}
             </p>
 
-            <div className="mt-5 grid grid-cols-3 gap-3">
+            <div className="mt-5 grid grid-cols-3 gap-3 print:grid-cols-3">
               <Stat label="Records" value={records.length.toString()} />
               <Stat label="Total spent" value={totalSpent > 0 ? formatPHP(totalSpent) : "—"} />
               <Stat label="Latest mileage" value={lastMileage ? `${lastMileage.toLocaleString()} km` : "—"} />
+            </div>
+
+            <div className="mt-5 flex flex-wrap items-center gap-3 print:hidden">
+              <PassportShareSection url={fullUrl} vehicleName={name} />
+            </div>
+
+            {/* Inline QR for quick offline access */}
+            <div className="mt-5 hidden items-center gap-4 rounded-lg border border-border bg-background p-4 print:flex">
+              <QRCodeSVG value={fullUrl} size={80} level="M" includeMargin bgColor="#ffffff" fgColor="#0f172a" />
+              <div>
+                <p className="text-sm font-medium">Scan to verify online</p>
+                <p className="text-xs text-muted-foreground">{fullUrl}</p>
+              </div>
             </div>
           </div>
         </div>
