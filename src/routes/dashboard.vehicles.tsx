@@ -2,8 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Car, Plus, ShieldCheck, Globe, Lock, Wrench, ExternalLink, Trash2 } from "lucide-react";
+import { Car, Plus, ShieldCheck, Globe, Lock, Wrench, ExternalLink, Trash2, QrCode } from "lucide-react";
 import { toast } from "sonner";
+import { QRCodeSVG } from "qrcode.react";
 import {
   listMyVehicles,
   createVehicle,
@@ -26,6 +27,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatPHP } from "@/lib/format";
+import { PassportShareSection } from "@/components/passport-share-section";
 
 export const Route = createFileRoute("/dashboard/vehicles")({
   component: VehiclesPage,
@@ -326,11 +328,17 @@ function VehicleDetailDialog({
                 <Button size="sm" variant="outline">Edit details</Button>
               </VehicleDialog>
               {data.vehicle.is_public && data.vehicle.passport_slug && (
-                <Button asChild size="sm" variant="outline">
-                  <Link to="/passport/$slug" params={{ slug: data.vehicle.passport_slug }}>
-                    <ShieldCheck className="mr-1.5 h-3.5 w-3.5" /> View public passport
-                  </Link>
-                </Button>
+                <>
+                  <Button asChild size="sm" variant="outline">
+                    <Link to="/passport/$slug" params={{ slug: data.vehicle.passport_slug }}>
+                      <ShieldCheck className="mr-1.5 h-3.5 w-3.5" /> View public passport
+                    </Link>
+                  </Button>
+                  <PassportShareSection
+                    url={`https://365motorsales.com/passport/${data.vehicle.passport_slug}`}
+                    vehicleName={data.vehicle.nickname || `${data.vehicle.year ? data.vehicle.year + " " : ""}${data.vehicle.make} ${data.vehicle.model}`}
+                  />
+                </>
               )}
               <Button size="sm" variant="ghost" className="text-destructive" onClick={onDeleteVehicle}>
                 <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Delete
