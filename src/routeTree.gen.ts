@@ -85,6 +85,7 @@ import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising'
 import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
+import { Route as DashboardTeamIndexRouteImport } from './routes/dashboard.team.index'
 import { Route as ShopPSlugRouteImport } from './routes/shop.p.$slug'
 import { Route as RCodePosterRouteImport } from './routes/r.$code.poster'
 import { Route as PaymentsIdReceiptRouteImport } from './routes/payments.$id.receipt'
@@ -488,6 +489,11 @@ const AdminAccountsRoute = AdminAccountsRouteImport.update({
   path: '/accounts',
   getParentRoute: () => AdminRoute,
 } as any)
+const DashboardTeamIndexRoute = DashboardTeamIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DashboardTeamRoute,
+} as any)
 const ShopPSlugRoute = ShopPSlugRouteImport.update({
   id: '/shop/p/$slug',
   path: '/shop/p/$slug',
@@ -694,6 +700,7 @@ export interface FileRoutesByFullPath {
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
+  '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
@@ -763,7 +770,6 @@ export interface FileRoutesByTo {
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
-  '/dashboard/team': typeof DashboardTeamRouteWithChildren
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -792,6 +798,7 @@ export interface FileRoutesByTo {
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
+  '/dashboard/team': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
@@ -893,6 +900,7 @@ export interface FileRoutesById {
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
+  '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/dashboard/rides_/$id/edit': typeof DashboardRidesIdEditRoute
@@ -995,6 +1003,7 @@ export interface FileRouteTypes {
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/shop/p/$slug'
+    | '/dashboard/team/'
     | '/api/public/fx/refresh'
     | '/api/public/payments/webhook'
     | '/dashboard/rides/$id/edit'
@@ -1064,7 +1073,6 @@ export interface FileRouteTypes {
     | '/dashboard/rides'
     | '/dashboard/searches'
     | '/dashboard/shop-favorites'
-    | '/dashboard/team'
     | '/dashboard/tow'
     | '/dashboard/verification'
     | '/email/unsubscribe'
@@ -1093,6 +1101,7 @@ export interface FileRouteTypes {
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/shop/p/$slug'
+    | '/dashboard/team'
     | '/api/public/fx/refresh'
     | '/api/public/payments/webhook'
     | '/dashboard/rides/$id/edit'
@@ -1193,6 +1202,7 @@ export interface FileRouteTypes {
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/shop/p/$slug'
+    | '/dashboard/team/'
     | '/api/public/fx/refresh'
     | '/api/public/payments/webhook'
     | '/dashboard/rides_/$id/edit'
@@ -1795,6 +1805,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAccountsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/dashboard/team/': {
+      id: '/dashboard/team/'
+      path: '/'
+      fullPath: '/dashboard/team/'
+      preLoaderRoute: typeof DashboardTeamIndexRouteImport
+      parentRoute: typeof DashboardTeamRoute
+    }
     '/shop/p/$slug': {
       id: '/shop/p/$slug'
       path: '/shop/p/$slug'
@@ -2004,6 +2021,7 @@ interface DashboardTeamRouteChildren {
   DashboardTeamLeadsRoute: typeof DashboardTeamLeadsRoute
   DashboardTeamMembersRoute: typeof DashboardTeamMembersRoute
   DashboardTeamPerformanceRoute: typeof DashboardTeamPerformanceRoute
+  DashboardTeamIndexRoute: typeof DashboardTeamIndexRoute
   DashboardTeamLeadsIdRoute: typeof DashboardTeamLeadsIdRoute
 }
 
@@ -2011,6 +2029,7 @@ const DashboardTeamRouteChildren: DashboardTeamRouteChildren = {
   DashboardTeamLeadsRoute: DashboardTeamLeadsRoute,
   DashboardTeamMembersRoute: DashboardTeamMembersRoute,
   DashboardTeamPerformanceRoute: DashboardTeamPerformanceRoute,
+  DashboardTeamIndexRoute: DashboardTeamIndexRoute,
   DashboardTeamLeadsIdRoute: DashboardTeamLeadsIdRoute,
 }
 
