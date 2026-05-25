@@ -31,7 +31,9 @@ type BusinessRow = {
   barangay: string | null; lat: number | null; lng: number | null;
   rating_avg: number; rating_count: number; featured: boolean;
   price_label: string | null;
+  subscription_tier: "free" | "listed" | "featured" | "premium" | null;
 };
+
 
 function BusinessesIndex() {
   const navigate = useNavigate();
@@ -65,11 +67,13 @@ function BusinessesIndex() {
     (async () => {
       let query = (supabase as any)
         .from("businesses")
-        .select("id,slug,name,type_slug,description,logo_url,region,province,city,barangay,lat,lng,rating_avg,rating_count,featured,price_label")
+        .select("id,slug,name,type_slug,description,logo_url,region,province,city,barangay,lat,lng,rating_avg,rating_count,featured,price_label,subscription_tier")
         .eq("status", "active")
+        .order("subscription_tier", { ascending: false })
         .order("featured", { ascending: false })
         .order("rating_avg", { ascending: false })
         .limit(200);
+
       if (typeSlug) query = query.eq("type_slug", typeSlug);
       if (loc.region) query = query.eq("region", loc.region);
       if (loc.province) query = query.eq("province", loc.province);
@@ -215,12 +219,16 @@ function BusinessesIndex() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <h3 className="truncate font-semibold">{b.name}</h3>
-                            {b.featured && <Badge variant="default" className="shrink-0">Featured</Badge>}
+                            {b.subscription_tier === "premium" && <Badge className="shrink-0 bg-amber-500 text-amber-950">Premium</Badge>}
+                            {b.subscription_tier === "featured" && <Badge className="shrink-0 bg-primary">Featured</Badge>}
+                            {b.subscription_tier === "listed" && <Badge variant="secondary" className="shrink-0">Listed</Badge>}
+                            {b.featured && !b.subscription_tier && <Badge variant="default" className="shrink-0">Featured</Badge>}
                           </div>
                           <div className="text-xs text-muted-foreground">{typeLabel(b.type_slug)}</div>
                         </div>
+
                         {b.rating_count > 0 && (
                           <div className="flex shrink-0 items-center gap-1 text-xs font-medium">
                             <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />

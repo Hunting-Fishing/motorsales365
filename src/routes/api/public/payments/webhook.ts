@@ -19,6 +19,14 @@ async function resolvePlanId(lookupKey: string | null | undefined): Promise<stri
 }
 
 async function upsertSubscription(env: StripeEnv, sub: Stripe.Subscription) {
+  // Business directory subscriptions live in business_subscriptions, not subscriptions.
+  if (sub.metadata?.kind === "business") {
+    await upsertBusinessSubscription(env, sub);
+    return;
+  }
+  // Boost subscriptions are activated separately via checkout.session.completed.
+  if (sub.metadata?.kind === "boost") return;
+
   const userId = (sub.metadata?.userId as string | undefined) ?? null;
   const lookupKey = (sub.metadata?.lookup_key as string | undefined) ?? null;
   if (!userId) return;
@@ -72,6 +80,85 @@ async function upsertSubscription(env: StripeEnv, sub: Stripe.Subscription) {
     await supabaseAdmin.from("subscriptions").insert(row);
   }
 }
+
+async function upsertBusinessSubscription(env: StripeEnv, sub: Stripe.Subscription) {
+  const userId = (sub.metadata?.userId as string | undefined) ?? null;
+  const businessId = (sub.metadata?.businessId as string | undefined) ?? null;
+  const planSlug =
+    (sub.metadata?.planSlug as string | undefined)
+    ?? null;
+  if (!userId || !businessId) {
+    console.error("[webhook] business sub missing metadata", sub.id);
+    return;
+  }
+
+  // Resolve plan_id + tier from planSlug, fall back to item lookup_key
+  const item = sub.items.data[0];
+  const itemLookup = item?.price?.lookup_key ?? null;
+  let { data: plan } = planSlug
+    ? await supabaseAdmin
+        .from("business_plans")
+        .select("id, tier, interval")
+        .eq("slug", planSlug)
+        .maybeSingle()
+    : { data: null as any };
+  if (!plan && itemLookup) {
+    const r = await supabaseAdmin
+      .from("business_plans")
+      .select("id, tier, interval, slug")
+      .eq("stripe_lookup_key", itemLookup)
+      .maybeSingle();
+    plan = r.data;
+  }
+  if (!plan) {
+    console.error("[webhook] business plan not found for sub", sub.id);
+    return;
+  }
+
+  const periodEnd = (item as any)?.current_period_end ?? (sub as any).current_period_end;
+  const isActive = sub.status === "active" || sub.status === "trialing";
+  const status = isActive ? "active" : sub.status;
+
+  const row = {
+    business_id: businessId,
+    owner_user_id: userId,
+    plan_id: (plan as any).id,
+    plan_slug: planSlug ?? (plan as any).slug,
+    tier: (plan as any).tier,
+    status,
+    current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+    cancel_at_period_end: !!sub.cancel_at_period_end,
+    environment: env,
+    stripe_customer_id: typeof sub.customer === "string" ? sub.customer : sub.customer?.id ?? null,
+    stripe_subscription_id: sub.id,
+    stripe_price_id: item?.price?.id ?? null,
+    metadata: { interval: (plan as any).interval },
+    updated_at: new Date().toISOString(),
+  } as any;
+
+  const { data: existing } = await supabaseAdmin
+    .from("business_subscriptions")
+    .select("id")
+    .eq("stripe_subscription_id", sub.id)
+    .maybeSingle();
+
+  if (existing) {
+    await supabaseAdmin.from("business_subscriptions").update(row).eq("id", (existing as any).id);
+  } else {
+    await supabaseAdmin.from("business_subscriptions").insert(row);
+  }
+
+  // Mirror tier onto the business so the public directory reflects it instantly.
+  await supabaseAdmin
+    .from("businesses")
+    .update({
+      subscription_tier: isActive ? (plan as any).tier : "free",
+      featured_until: isActive && periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq("id", businessId);
+}
+
 
 async function recordPaymentFromInvoice(env: StripeEnv, invoice: Stripe.Invoice) {
   // Only record paid invoices

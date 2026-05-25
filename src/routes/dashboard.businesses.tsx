@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Store as StoreIcon, Plus, Check, X, Pencil, Tag } from "lucide-react";
+import { Store as StoreIcon, Plus, Check, X, Pencil, Tag, Sparkles } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ShareQr } from "@/components/share-qr";
+import { BusinessPlanDialog } from "@/components/business-plan-dialog";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/dashboard/businesses")({
@@ -19,7 +20,9 @@ type Row = {
   city: string | null; region: string | null;
   rating_avg: number; rating_count: number;
   price_label: string | null;
+  subscription_tier: "free" | "listed" | "featured" | "premium" | null;
 };
+
 
 function statusBadge(s: string) {
   if (s === "active") return <Badge className="bg-emerald-600">Active</Badge>;
@@ -85,17 +88,28 @@ function PriceEditor({ row, onSaved }: { row: Row; onSaved: (val: string | null)
   );
 }
 
+function tierBadge(tier: Row["subscription_tier"]) {
+  if (!tier || tier === "free") return null;
+  const styles: Record<string, string> = {
+    listed: "bg-slate-600",
+    featured: "bg-primary",
+    premium: "bg-amber-500 text-amber-950",
+  };
+  return <Badge className={styles[tier] ?? ""}>{tier.charAt(0).toUpperCase() + tier.slice(1)}</Badge>;
+}
+
 function MyBusinessesPage() {
   const { user } = useAuth();
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
+  const [planTarget, setPlanTarget] = useState<Row | null>(null);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
       const { data } = await (supabase as any)
         .from("businesses")
-        .select("id,slug,name,type_slug,status,city,region,rating_avg,rating_count,price_label")
+        .select("id,slug,name,type_slug,status,city,region,rating_avg,rating_count,price_label,subscription_tier")
         .eq("owner_id", user.id)
         .order("created_at", { ascending: false });
       setRows(data ?? []); setLoading(false);
@@ -120,9 +134,10 @@ function MyBusinessesPage() {
           {rows.map((b) => (
             <Card key={b.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
               <div className="min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Link to="/businesses/$slug" params={{ slug: b.slug }} className="truncate font-semibold hover:underline">{b.name}</Link>
                   {statusBadge(b.status)}
+                  {tierBadge(b.subscription_tier)}
                 </div>
                 <div className="text-xs text-muted-foreground">{[b.city, b.region].filter(Boolean).join(" · ")}</div>
                 <div className="mt-2">
@@ -132,22 +147,40 @@ function MyBusinessesPage() {
                   />
                 </div>
               </div>
-              <div className="flex shrink-0 items-center gap-2">
+              <div className="flex shrink-0 flex-wrap items-center gap-2">
                 <span className="text-xs text-muted-foreground">{b.rating_count} review{b.rating_count === 1 ? "" : "s"}</span>
                 {b.status === "active" && (
-                  <ShareQr
-                    url={`${typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com"}/businesses/${b.slug}`}
-                    title={b.name}
-                    subtitle={[b.city, b.region].filter(Boolean).join(", ") || null}
-                    fileSlug={b.slug}
-                    compact
-                  />
+                  <>
+                    <Button size="sm" variant="outline" onClick={() => setPlanTarget(b)}>
+                      <Sparkles className="mr-1 h-3.5 w-3.5" />
+                      {b.subscription_tier && b.subscription_tier !== "free" ? "Change plan" : "Upgrade"}
+                    </Button>
+                    <ShareQr
+                      url={`${typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com"}/businesses/${b.slug}`}
+                      title={b.name}
+                      subtitle={[b.city, b.region].filter(Boolean).join(", ") || null}
+                      fileSlug={b.slug}
+                      compact
+                    />
+                  </>
                 )}
               </div>
             </Card>
           ))}
         </div>
       )}
+
+      {planTarget && (
+        <BusinessPlanDialog
+          open={!!planTarget}
+          onOpenChange={(open) => !open && setPlanTarget(null)}
+          businessId={planTarget.id}
+          businessName={planTarget.name}
+          typeSlug={planTarget.type_slug}
+          currentTier={planTarget.subscription_tier ?? "free"}
+        />
+      )}
     </div>
   );
 }
+
