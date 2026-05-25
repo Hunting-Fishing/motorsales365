@@ -396,6 +396,17 @@ function ListingDetailPage() {
             </p>
           </div>
 
+          {/* Affiliate parts — revenue: commission on partner shop checkouts */}
+          {listing.category_slug !== "towing" && listing.category_slug !== "services" && (
+            <AffiliatePartsSection
+              make={listing.attributes?.make ?? null}
+              model={listing.attributes?.model ?? null}
+              year={listing.attributes?.year ? Number(listing.attributes.year) : null}
+              listingId={listing.id}
+            />
+          )}
+
+
           <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
             <span>Listed {formatDate(listing.published_at)}</span>
             <span>·</span>
