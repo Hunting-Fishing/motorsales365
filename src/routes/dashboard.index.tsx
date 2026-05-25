@@ -292,25 +292,27 @@ function MyListings() {
                     coverUrl={photo?.url ?? null}
                     compact
                   />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => boost(l)}
-                    disabled={
-                      boosted ||
-                      !(l.status === "active" ||
-                        (l.status === "pending_sale" && (pricing.pending_sale_boost_eligible ?? 1) === 1))
-                    }
-                    title={
-                      boosted
-                        ? "Already boosted"
-                        : l.status === "pending_sale" && (pricing.pending_sale_boost_eligible ?? 1) !== 1
-                          ? "Boost disabled for Pending Sale listings"
-                          : "Boost listing"
-                    }
-                  >
-                    <Rocket className="h-4 w-4" />
-                  </Button>
+                  <BoostDialog listingId={l.id} listingTitle={l.title}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      disabled={
+                        boosted ||
+                        !(l.status === "active" ||
+                          (l.status === "pending_sale" && (pricing.pending_sale_boost_eligible ?? 1) === 1))
+                      }
+                      title={
+                        boosted
+                          ? "Already boosted"
+                          : l.status === "pending_sale" && (pricing.pending_sale_boost_eligible ?? 1) !== 1
+                            ? "Boost disabled for Pending Sale listings"
+                            : "Boost listing"
+                      }
+                    >
+                      <Rocket className="h-4 w-4" />
+                    </Button>
+                  </BoostDialog>
+
                   <Button variant="outline" size="sm" onClick={() => renew(l.id)} title="Renew">
                     <RefreshCcw className="h-4 w-4" />
                   </Button>
