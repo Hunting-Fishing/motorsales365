@@ -73,7 +73,9 @@ type Business = {
   lat: number | null; lng: number | null;
   rating_avg: number; rating_count: number; featured: boolean;
   price_label: string | null;
+  subscription_tier: "free" | "listed" | "featured" | "premium" | null;
 };
+
 type Review = { id: string; user_id: string; rating: number; body: string | null; created_at: string };
 
 function BusinessProfilePage() {
