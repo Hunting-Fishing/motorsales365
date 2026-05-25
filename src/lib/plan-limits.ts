@@ -6,14 +6,18 @@ export interface PlanLimits {
   listingsPerMonth: number | null;
 }
 
+/**
+ * Defaults for users without an active paid subscription.
+ * Matches the Private Seller plan: 5 active listings, 20 photos.
+ */
 export const FREE_PLAN_LIMITS: PlanLimits = {
-  planName: "Free",
-  maxPhotosPerListing: 3,
-  listingsPerMonth: 4,
+  planName: "Private Seller",
+  maxPhotosPerListing: 20,
+  listingsPerMonth: 5,
 };
 
 /**
- * Returns the active subscription plan limits for a user, or Free defaults.
+ * Returns the active subscription plan limits for a user, or Private Seller defaults.
  */
 export async function getUserPlanLimits(userId: string | null | undefined): Promise<PlanLimits> {
   if (!userId) return FREE_PLAN_LIMITS;
@@ -29,7 +33,7 @@ export async function getUserPlanLimits(userId: string | null | undefined): Prom
   if (!plan) return FREE_PLAN_LIMITS;
   return {
     planName: plan.name,
-    maxPhotosPerListing: plan.max_photos_per_listing ?? 3,
+    maxPhotosPerListing: plan.max_photos_per_listing ?? FREE_PLAN_LIMITS.maxPhotosPerListing,
     listingsPerMonth: plan.listings_per_month ?? null,
   };
 }

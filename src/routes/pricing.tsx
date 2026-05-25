@@ -234,17 +234,19 @@ function PricingPage() {
     <SiteLayout>
       <section className="bg-secondary/40 py-12">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="font-display text-3xl font-bold sm:text-4xl">Simple pricing</h1>
-          <p className="mt-2 text-muted-foreground">Pay per listing, or subscribe monthly. All prices in ₱ PHP.</p>
+          <h1 className="font-display text-3xl font-bold sm:text-4xl">Free to post. Powerful for dealers.</h1>
+          <p className="mt-2 text-muted-foreground">
+            Posting a vehicle is always free for private sellers. Upgrade only when you need more reach, more listings, or business tools.
+          </p>
         </div>
       </section>
 
       <section className="container mx-auto grid gap-4 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { t: "Free listing", p: 0, d: "1 photo, no video. 1 free listing per week." },
-          { t: "Standard listing", p: settings.listing_fee_php ?? 20, d: "5 photos, 1 video. Stays live for 60 days." },
-          { t: "Upgraded listing", p: (settings.listing_fee_php ?? 20) + (settings.upgrade_fee_php ?? 100), d: "20 photos, 3 videos. Stand out from the crowd." },
-          { t: "Boost", p: settings.boost_fee_php ?? 150, d: `Pin to top of search and renew the ad every ${settings.boost_renewal_days ?? 14} days.` },
+          { t: "Free listing", p: 0, d: "Up to 20 photos and 1 video. Live for 60 days. No fees." },
+          { t: "Search Boost", p: 99, d: "Higher placement in search results for 7 days." },
+          { t: "Province Boost", p: 199, d: "Featured at the top of your province for 7 days." },
+          { t: "Homepage Spotlight", p: 499, d: "Rotating homepage placement for 7 days." },
         ].map((c) => (
           <div key={c.t} className="rounded-xl border border-border bg-card p-6">
             <div className="text-sm font-semibold text-muted-foreground">{c.t}</div>
@@ -306,28 +308,30 @@ function PricingPage() {
             </div>
 
             {(() => {
-              const silver = plans.find((p) => /silver/i.test(p.name));
-              if (!silver) return null;
-              const silverLimit = silver.listings_per_month;
-              const isCurrentSilver = currentPlan?.id === silver.id;
-              if (isCurrentSilver) return null;
+              // Recommend the next-tier-up plan (by price) if usage suggests they'd benefit.
+              const currentPrice = currentPlan?.price_php ?? 0;
+              const upsell = plans
+                .filter((p) => Number(p.price_php) > Number(currentPrice))
+                .sort((a, b) => Number(a.price_php) - Number(b.price_php))[0];
+              if (!upsell) return null;
+              const upsellLimit = upsell.listings_per_month;
               const overran = usage.some(
                 (m) => planLimit !== null && m.count > (planLimit ?? 0),
               );
-              const wouldFitSilver =
-                silverLimit === null ||
-                usage.every((m) => m.count <= silverLimit);
-              if (!overran && (silverLimit === null || thisMonthCount * 2 <= silverLimit)) return null;
+              const wouldFit =
+                upsellLimit === null ||
+                usage.every((m) => m.count <= upsellLimit);
+              if (!overran && (upsellLimit === null || thisMonthCount * 2 <= upsellLimit)) return null;
               return (
                 <div className="mt-5 flex items-start gap-3 rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm">
                   <Sparkles className="mt-0.5 h-4 w-4 text-primary" />
                   <div>
                     <div className="font-medium text-foreground">
-                      {silver.name} fits your activity{wouldFitSilver ? " every month" : " better"}.
+                      {upsell.name} fits your activity{wouldFit ? " every month" : " better"}.
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      You'd get {silverLimit ?? "unlimited"} listings/mo and up to{" "}
-                      {silver.max_photos_per_listing ?? "more"} photos per listing for {formatPHP(silver.price_php)}/mo.
+                      You'd get {upsellLimit ?? "unlimited"} listings/mo and up to{" "}
+                      {upsell.max_photos_per_listing ?? "more"} photos per listing for {formatPHP(upsell.price_php)}/mo.
                     </div>
                   </div>
                 </div>

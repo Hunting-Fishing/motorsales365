@@ -75,6 +75,7 @@ import { Route as AdminRedemptionsRouteImport } from './routes/admin.redemptions
 import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
+import { Route as AdminInquiriesRouteImport } from './routes/admin.inquiries'
 import { Route as AdminCurrenciesRouteImport } from './routes/admin.currencies'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
@@ -430,6 +431,11 @@ const AdminListingsRoute = AdminListingsRouteImport.update({
   path: '/listings',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminInquiriesRoute = AdminInquiriesRouteImport.update({
+  id: '/inquiries',
+  path: '/inquiries',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCurrenciesRoute = AdminCurrenciesRouteImport.update({
   id: '/currencies',
   path: '/currencies',
@@ -586,6 +592,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
+  '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
@@ -676,6 +683,7 @@ export interface FileRoutesByTo {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
+  '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
@@ -769,6 +777,7 @@ export interface FileRoutesById {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
+  '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
@@ -863,6 +872,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/businesses'
     | '/admin/currencies'
+    | '/admin/inquiries'
     | '/admin/listings'
     | '/admin/performance'
     | '/admin/pricing'
@@ -953,6 +963,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/businesses'
     | '/admin/currencies'
+    | '/admin/inquiries'
     | '/admin/listings'
     | '/admin/performance'
     | '/admin/pricing'
@@ -1045,6 +1056,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/businesses'
     | '/admin/currencies'
+    | '/admin/inquiries'
     | '/admin/listings'
     | '/admin/performance'
     | '/admin/pricing'
@@ -1626,6 +1638,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminListingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/inquiries': {
+      id: '/admin/inquiries'
+      path: '/inquiries'
+      fullPath: '/admin/inquiries'
+      preLoaderRoute: typeof AdminInquiriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/currencies': {
       id: '/admin/currencies'
       path: '/currencies'
@@ -1804,6 +1823,7 @@ interface AdminRouteChildren {
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBusinessesRoute: typeof AdminBusinessesRoute
   AdminCurrenciesRoute: typeof AdminCurrenciesRoute
+  AdminInquiriesRoute: typeof AdminInquiriesRoute
   AdminListingsRoute: typeof AdminListingsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
   AdminPricingRoute: typeof AdminPricingRoute
@@ -1826,6 +1846,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAuditRoute: AdminAuditRoute,
   AdminBusinessesRoute: AdminBusinessesRoute,
   AdminCurrenciesRoute: AdminCurrenciesRoute,
+  AdminInquiriesRoute: AdminInquiriesRoute,
   AdminListingsRoute: AdminListingsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
   AdminPricingRoute: AdminPricingRoute,

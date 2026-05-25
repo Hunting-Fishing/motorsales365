@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { Settings, ListChecks, Users, Flag, CreditCard, ShieldCheck, ShieldAlert, Gauge, BarChart3, UserCog, Megaphone, QrCode, Ticket, Globe, FlaskConical, Store, Sparkles, Info } from "lucide-react";
+import { Settings, ListChecks, Users, Flag, CreditCard, ShieldCheck, ShieldAlert, Gauge, BarChart3, UserCog, Megaphone, QrCode, Ticket, Globe, FlaskConical, Store, Sparkles, Info, Inbox } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -30,6 +30,7 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean; roles: Role[
   { to: "/admin/users", label: "Users", Icon: Users, roles: ["admin"], info: "Create new users (staff or business) and assign roles. For billing/status use Accounts." },
   { to: "/admin/audit", label: "Audit log", Icon: ShieldAlert, roles: ["admin","support"], info: "Timestamped record of every role grant/revoke and verification status change made via the admin panel." },
   { to: "/admin/reports", label: "Reports", Icon: Flag, roles: ["admin","moderator","support"], info: "User-submitted reports of listings, messages or scams." },
+  { to: "/admin/inquiries", label: "Service inquiries", Icon: Inbox, roles: ["admin","sales","support"], info: "Lead-gen inbox: financing, insurance, OR/CR, title transfer, inspection, towing requests from listing pages." },
   { to: "/admin/sandbox", label: "Sandbox", Icon: FlaskConical, roles: ["admin"], info: "Internal sandbox for testing flows without affecting production data." },
 ];
 
