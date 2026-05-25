@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { formatPHP } from "@/lib/currency";
+import { formatPHP } from "@/lib/format";
 import { listBoostProducts } from "@/lib/boosts.functions";
 
 interface Props {
