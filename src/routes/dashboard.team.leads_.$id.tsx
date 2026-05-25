@@ -14,7 +14,7 @@ import { toast } from "sonner";
 
 const searchSchema = z.object({ orgId: z.string().uuid() });
 
-export const Route = createFileRoute("/dashboard/team/leads/$id")({
+export const Route = createFileRoute("/dashboard/team/leads_/$id")({
   validateSearch: searchSchema,
   component: LeadDetail,
 });

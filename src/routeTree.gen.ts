@@ -101,6 +101,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as DashboardTeamLeadsIdRouteImport } from './routes/dashboard.team.leads.$id'
 import { Route as DashboardRidesIdEditRouteImport } from './routes/dashboard.rides_.$id.edit'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
@@ -568,6 +569,11 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DashboardTeamLeadsIdRoute = DashboardTeamLeadsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => DashboardTeamLeadsRoute,
+} as any)
 const DashboardRidesIdEditRoute = DashboardRidesIdEditRouteImport.update({
   id: '/rides_/$id/edit',
   path: '/rides/$id/edit',
@@ -667,7 +673,7 @@ export interface FileRoutesByFullPath {
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
-  '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
+  '/dashboard/team/leads': typeof DashboardTeamLeadsRouteWithChildren
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
@@ -676,6 +682,7 @@ export interface FileRoutesByFullPath {
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
+  '/dashboard/team/leads/$id': typeof DashboardTeamLeadsIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -762,7 +769,7 @@ export interface FileRoutesByTo {
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
-  '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
+  '/dashboard/team/leads': typeof DashboardTeamLeadsRouteWithChildren
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
@@ -771,6 +778,7 @@ export interface FileRoutesByTo {
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
+  '/dashboard/team/leads/$id': typeof DashboardTeamLeadsIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -860,7 +868,7 @@ export interface FileRoutesById {
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/dashboard/rides_/new': typeof DashboardRidesNewRoute
-  '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
+  '/dashboard/team/leads': typeof DashboardTeamLeadsRouteWithChildren
   '/listing/$id/edit': typeof ListingIdEditRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
@@ -869,6 +877,7 @@ export interface FileRoutesById {
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/dashboard/rides_/$id/edit': typeof DashboardRidesIdEditRoute
+  '/dashboard/team/leads/$id': typeof DashboardTeamLeadsIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -968,6 +977,7 @@ export interface FileRouteTypes {
     | '/api/public/fx/refresh'
     | '/api/public/payments/webhook'
     | '/dashboard/rides/$id/edit'
+    | '/dashboard/team/leads/$id'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1063,6 +1073,7 @@ export interface FileRouteTypes {
     | '/api/public/fx/refresh'
     | '/api/public/payments/webhook'
     | '/dashboard/rides/$id/edit'
+    | '/dashboard/team/leads/$id'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1160,6 +1171,7 @@ export interface FileRouteTypes {
     | '/api/public/fx/refresh'
     | '/api/public/payments/webhook'
     | '/dashboard/rides_/$id/edit'
+    | '/dashboard/team/leads/$id'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1870,6 +1882,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dashboard/team/leads/$id': {
+      id: '/dashboard/team/leads/$id'
+      path: '/$id'
+      fullPath: '/dashboard/team/leads/$id'
+      preLoaderRoute: typeof DashboardTeamLeadsIdRouteImport
+      parentRoute: typeof DashboardTeamLeadsRoute
+    }
     '/dashboard/rides_/$id/edit': {
       id: '/dashboard/rides_/$id/edit'
       path: '/rides/$id/edit'
@@ -1942,12 +1961,23 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface DashboardTeamLeadsRouteChildren {
+  DashboardTeamLeadsIdRoute: typeof DashboardTeamLeadsIdRoute
+}
+
+const DashboardTeamLeadsRouteChildren: DashboardTeamLeadsRouteChildren = {
+  DashboardTeamLeadsIdRoute: DashboardTeamLeadsIdRoute,
+}
+
+const DashboardTeamLeadsRouteWithChildren =
+  DashboardTeamLeadsRoute._addFileChildren(DashboardTeamLeadsRouteChildren)
+
 interface DashboardTeamRouteChildren {
-  DashboardTeamLeadsRoute: typeof DashboardTeamLeadsRoute
+  DashboardTeamLeadsRoute: typeof DashboardTeamLeadsRouteWithChildren
 }
 
 const DashboardTeamRouteChildren: DashboardTeamRouteChildren = {
-  DashboardTeamLeadsRoute: DashboardTeamLeadsRoute,
+  DashboardTeamLeadsRoute: DashboardTeamLeadsRouteWithChildren,
 }
 
 const DashboardTeamRouteWithChildren = DashboardTeamRoute._addFileChildren(
