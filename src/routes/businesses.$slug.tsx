@@ -113,7 +113,7 @@ function BusinessProfilePage() {
     setReviews(revs ?? []);
     const uids = Array.from(new Set((revs ?? []).map((r: any) => r.user_id)));
     if (uids.length > 0) {
-      const { data: profs } = await (supabase as any).from("profiles").select("id,full_name").in("id", uids);
+      const { data: profs } = await (supabase as any).from("public_profiles").select("id,full_name").in("id", uids);
       const m: Record<string, string> = {};
       for (const p of profs ?? []) m[p.id] = p.full_name ?? "User";
       setReviewerNames(m);

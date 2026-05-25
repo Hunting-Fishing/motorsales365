@@ -50,7 +50,7 @@ function RidesHubPage() {
       if (!rows.length || rows[0].owner_name === undefined) {
         const ids = Array.from(new Set(rows.map((r) => r.user_id)));
         if (ids.length) {
-          const { data: profs } = await supabase.from("profiles").select("id,full_name,business_name").in("id", ids);
+          const { data: profs } = await supabase.from("public_profiles").select("id,full_name,business_name").in("id", ids);
           const map = new Map((profs ?? []).map((p: any) => [p.id, p.business_name || p.full_name]));
           rows = rows.map((r) => ({ ...r, owner_name: map.get(r.user_id) ?? null }));
         }

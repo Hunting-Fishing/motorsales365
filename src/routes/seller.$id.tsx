@@ -14,8 +14,8 @@ export const Route = createFileRoute("/seller/$id")({
   loader: async ({ params }) => {
     try {
       const { data } = await supabase
-        .from("profiles")
-        .select("full_name,avatar_url,seller_type,business_name,city,region")
+        .from("public_profiles")
+        .select("full_name,avatar_url,seller_type,business_name,business_city,business_region")
         .eq("id", params.id)
         .maybeSingle();
       return { seo: data ?? null };
@@ -33,7 +33,7 @@ export const Route = createFileRoute("/seller/$id")({
       };
     }
     const name = p.business_name || p.full_name || "Seller";
-    const loc = [p.city, p.region].filter(Boolean).join(", ");
+    const loc = [p.business_city, p.business_region].filter(Boolean).join(", ");
     const title = `${name}${loc ? ` — ${loc}` : ""} | 365 MotorSales`;
     const desc = `Listings from ${name}${loc ? ` in ${loc}` : ""} on 365 MotorSales Philippines.`.slice(0, 155);
     return {
@@ -67,7 +67,7 @@ function SellerProfilePage() {
     const load = async () => {
       setLoading(true);
       const [{ data: p }, { data: ls }, { data: rs }] = await Promise.all([
-        supabase.from("profiles").select("*").eq("id", id).maybeSingle(),
+        supabase.from("public_profiles").select("*").eq("id", id).maybeSingle(),
         supabase
           .from("listings")
           .select(

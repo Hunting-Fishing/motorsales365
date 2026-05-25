@@ -120,7 +120,7 @@ function TowProviderDashboard() {
     const myReqIds = new Set((reqData ?? []).filter((r: any) => r.requester_id === user.id).map((r: any) => r.id));
     const providerIds = Array.from(new Set((bidData ?? []).filter((b: any) => myReqIds.has(b.request_id)).map((b: any) => b.provider_id)));
     if (providerIds.length) {
-      const { data: profs } = await supabase.from("profiles").select("id,full_name,business_name").in("id", providerIds);
+      const { data: profs } = await supabase.from("public_profiles").select("id,full_name,business_name").in("id", providerIds);
       const map: Record<string, string> = {};
       (profs ?? []).forEach((p: any) => { map[p.id] = p.business_name || p.full_name || "Provider"; });
       setProviderNames(map);
