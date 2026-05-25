@@ -78,11 +78,7 @@ export function PassportShareSection({
                 includeMargin
                 bgColor="#ffffff"
                 fgColor="#0f172a"
-                imageSettings={
-                  {
-                    /* could add logo here */
-                  }
-                }
+                imageSettings={undefined}
               />
             </div>
             <p className="text-center text-xs text-muted-foreground">
@@ -102,7 +98,7 @@ export function PassportShareSection({
                 )}
                 {copied ? "Copied" : "Copy link"}
               </Button>
-              {navigator.share && (
+              {typeof navigator.share === "function" && (
                 <Button
                   variant="outline"
                   size="sm"
