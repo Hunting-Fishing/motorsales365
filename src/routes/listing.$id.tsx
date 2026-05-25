@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { MapPin, Heart, Flag, Star, Phone, MessageSquare, ChevronLeft, Truck, Eye, Bookmark, Banknote, Shield, FileText, ClipboardCheck, Wrench } from "lucide-react";
 import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
 import { ServiceStrip } from "@/components/service-strip";
+import { AffiliatePartsSection } from "@/components/affiliate-parts-section";
+import { toast } from "sonner";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
