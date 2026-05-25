@@ -414,6 +414,7 @@ export type Database = {
           sort_order: number
           stripe_lookup_key: string
           tier: Database["public"]["Enums"]["business_tier"]
+          type_slug: string | null
           updated_at: string
         }
         Insert: {
@@ -428,6 +429,7 @@ export type Database = {
           sort_order?: number
           stripe_lookup_key: string
           tier: Database["public"]["Enums"]["business_tier"]
+          type_slug?: string | null
           updated_at?: string
         }
         Update: {
@@ -442,6 +444,7 @@ export type Database = {
           sort_order?: number
           stripe_lookup_key?: string
           tier?: Database["public"]["Enums"]["business_tier"]
+          type_slug?: string | null
           updated_at?: string
         }
         Relationships: []
