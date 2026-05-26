@@ -191,9 +191,15 @@ export const adminDeleteProduct = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+async function assertShopManager(supabase: any, userId: string) {
+  const { data: ok } = await supabase.rpc("can_manage_shop", { _user_id: userId });
+  if (!ok) throw new Error("Forbidden");
+}
+
 export const adminListNetworks = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
+    await assertShopManager(context.supabase, context.userId);
     const { data, error } = await context.supabase.from("affiliate_networks").select("*").order("sort_order");
     if (error) throw new Error(error.message);
     return { networks: data ?? [] };
@@ -214,6 +220,7 @@ export const adminUpsertNetwork = createServerFn({ method: "POST" })
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
+    await assertShopManager(context.supabase, context.userId);
     if (data.id) {
       const { error } = await context.supabase.from("affiliate_networks").update(data).eq("id", data.id);
       if (error) throw new Error(error.message);
@@ -236,6 +243,7 @@ export const adminUpsertLink = createServerFn({ method: "POST" })
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
+    await assertShopManager(context.supabase, context.userId);
     const { supabase } = context;
     if (data.id) {
       const { error } = await supabase.from("shop_product_links").update(data).eq("id", data.id);
@@ -255,6 +263,7 @@ export const adminDeleteLink = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
+    await assertShopManager(context.supabase, context.userId);
     const { error } = await context.supabase.from("shop_product_links").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -264,6 +273,7 @@ export const adminProductLinks = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { productId: string }) => z.object({ productId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
+    await assertShopManager(context.supabase, context.userId);
     const { data: rows, error } = await context.supabase
       .from("shop_product_links")
       .select("*, network:affiliate_networks(id, slug, name)")
@@ -289,6 +299,7 @@ export const adminListFitment = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { productId: string }) => z.object({ productId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
+    await assertShopManager(context.supabase, context.userId);
     const { data: rows, error } = await context.supabase
       .from("shop_product_fitment")
       .select("*")
@@ -302,6 +313,7 @@ export const adminUpsertFitment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => fitmentSchema.parse(input))
   .handler(async ({ data, context }) => {
+    await assertShopManager(context.supabase, context.userId);
     if (data.id) {
       const { error } = await context.supabase.from("shop_product_fitment").update(data).eq("id", data.id);
       if (error) throw new Error(error.message);
@@ -316,6 +328,7 @@ export const adminDeleteFitment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
+    await assertShopManager(context.supabase, context.userId);
     const { error } = await context.supabase.from("shop_product_fitment").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
