@@ -42,7 +42,7 @@ export function AdCarousel({ placement, limit = 6, className }: AdCarouselProps)
 
   useEffect(() => {
     if (!ads.length) return;
-    ads.forEach((ad) => {
+    ads.forEach((ad: any) => {
       if (trackedRef.current.has(ad.id)) return;
       trackedRef.current.add(ad.id);
       trackAdEvent({ data: { adId: ad.id, eventType: "impression", visitorId: visitorId || undefined } }).catch(() => {});
@@ -80,7 +80,7 @@ export function AdCarousel({ placement, limit = 6, className }: AdCarouselProps)
   return (
     <Carousel className={className} opts={{ loop: true, align: "start" }}>
       <CarouselContent>
-        {ads.map((ad) => (
+        {ads.map((ad: any) => (
           <CarouselItem key={ad.id} className="md:basis-1/2 lg:basis-1/2">
             <a
               href={ad.target_url}

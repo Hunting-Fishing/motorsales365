@@ -80,6 +80,13 @@ export type Database = {
             foreignKeyName: "ad_events_ad_id_fkey"
             columns: ["ad_id"]
             isOneToOne: false
+            referencedRelation: "active_ads_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ad_events_ad_id_fkey"
+            columns: ["ad_id"]
+            isOneToOne: false
             referencedRelation: "advertisements"
             referencedColumns: ["id"]
           },
@@ -3696,6 +3703,81 @@ export type Database = {
       }
     }
     Views: {
+      active_ads_public: {
+        Row: {
+          caption: string | null
+          created_at: string | null
+          ends_at: string | null
+          id: string | null
+          image_url: string | null
+          placement: Database["public"]["Enums"]["ad_placement"] | null
+          priority: number | null
+          starts_at: string | null
+          target_url: string | null
+          title: string | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string | null
+          ends_at?: string | null
+          id?: string | null
+          image_url?: string | null
+          placement?: Database["public"]["Enums"]["ad_placement"] | null
+          priority?: number | null
+          starts_at?: string | null
+          target_url?: string | null
+          title?: string | null
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string | null
+          ends_at?: string | null
+          id?: string | null
+          image_url?: string | null
+          placement?: Database["public"]["Enums"]["ad_placement"] | null
+          priority?: number | null
+          starts_at?: string | null
+          target_url?: string | null
+          title?: string | null
+        }
+        Relationships: []
+      }
+      listing_active_boosts: {
+        Row: {
+          ends_at: string | null
+          listing_id: string | null
+          product_slug: string | null
+          starts_at: string | null
+        }
+        Insert: {
+          ends_at?: string | null
+          listing_id?: string | null
+          product_slug?: string | null
+          starts_at?: string | null
+        }
+        Update: {
+          ends_at?: string | null
+          listing_id?: string | null
+          product_slug?: string | null
+          starts_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_boosts_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "listing_boosts_product_slug_fkey"
+            columns: ["product_slug"]
+            isOneToOne: false
+            referencedRelation: "boost_products"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       public_profiles: {
         Row: {
           avatar_url: string | null

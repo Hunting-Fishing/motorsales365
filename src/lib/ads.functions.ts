@@ -12,13 +12,10 @@ export const getActiveAds = createServerFn({ method: "GET" })
     z.object({ placement: placementSchema, limit: z.number().int().min(1).max(20).optional() }).parse(input),
   )
   .handler(async ({ data }) => {
-    const { data: rows, error } = await supabaseAdmin
-      .from("advertisements")
-      .select("id, title, caption, image_url, target_url, placement, advertiser_name")
+    const { data: rows, error } = await (supabaseAdmin as any)
+      .from("active_ads_public")
+      .select("id, title, caption, image_url, target_url, placement")
       .eq("placement", data.placement)
-      .eq("status", "active")
-      .or(`starts_at.is.null,starts_at.lte.${new Date().toISOString()}`)
-      .or(`ends_at.is.null,ends_at.gte.${new Date().toISOString()}`)
       .order("priority", { ascending: false })
       .order("created_at", { ascending: false })
       .limit(data.limit ?? 6);
