@@ -159,7 +159,16 @@ export const deleteServiceRecord = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { id: string }) => ({ id: uuid.parse(d.id) }))
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    // Verify the record belongs to a vehicle owned by the caller.
+    const { data: rec, error: lookupErr } = await supabase
+      .from("vehicle_service_records")
+      .select("id, vehicles!inner(owner_user_id)")
+      .eq("id", data.id)
+      .eq("vehicles.owner_user_id", userId)
+      .maybeSingle();
+    if (lookupErr) throw new Error(lookupErr.message);
+    if (!rec) throw new Error("Service record not found");
     const { error } = await supabase
       .from("vehicle_service_records")
       .delete()

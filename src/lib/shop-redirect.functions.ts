@@ -1,5 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+
 
 function applyTag(url: string, network: any): string {
   try {
@@ -20,7 +22,13 @@ function applyTag(url: string, network: any): string {
 }
 
 export const resolveShopRedirect = createServerFn({ method: "POST" })
-  .inputValidator((input: { productId: string; networkSlug?: string; visitorId?: string | null }) => input)
+  .inputValidator((input: unknown) =>
+    z.object({
+      productId: z.string().uuid(),
+      networkSlug: z.string().min(1).max(60).regex(/^[a-z0-9_-]+$/i).optional(),
+      visitorId: z.string().uuid().nullable().optional(),
+    }).parse(input),
+  )
   .handler(async ({ data }) => {
     const { data: product } = await supabaseAdmin
       .from("shop_products")
