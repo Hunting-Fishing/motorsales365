@@ -20,8 +20,9 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, Link as LinkIcon, ExternalLink } from "lucide-react";
+import { Pencil, Trash2, Plus, Link as LinkIcon, ExternalLink, AlertTriangle, Sparkles } from "lucide-react";
 import { AD_NETWORKS, AFFILIATE_PROGRAMS, COUNTRY_ORDER, type DirectoryEntry } from "@/lib/monetization-directory";
+import { detectNetworkSlug, cleanShopUrl, urlMatchesNetwork } from "@/lib/shop-url";
 
 export const Route = createFileRoute("/admin/shop")({
   component: AdminShop,
