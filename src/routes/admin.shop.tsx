@@ -5,6 +5,7 @@ import {
   adminListProducts, adminUpsertProduct, adminDeleteProduct,
   adminListNetworks, adminUpsertNetwork,
   adminProductLinks, adminUpsertLink, adminDeleteLink,
+  adminListFitment, adminUpsertFitment, adminDeleteFitment,
   listShopCategories,
 } from "@/lib/shop.functions";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, Link as LinkIcon, ExternalLink, AlertTriangle, Sparkles } from "lucide-react";
+import { Pencil, Trash2, Plus, Link as LinkIcon, ExternalLink, AlertTriangle, Sparkles, Car } from "lucide-react";
 import { AD_NETWORKS, AFFILIATE_PROGRAMS, COUNTRY_ORDER, type DirectoryEntry } from "@/lib/monetization-directory";
 import { detectNetworkSlug, cleanShopUrl, urlMatchesNetwork } from "@/lib/shop-url";
 
@@ -139,6 +140,7 @@ function ProductsTab() {
   const { data: catData } = useQuery({ queryKey: ["shop-cats"], queryFn: () => listShopCategories() });
   const [editing, setEditing] = useState<any | null>(null);
   const [linksFor, setLinksFor] = useState<any | null>(null);
+  const [fitmentFor, setFitmentFor] = useState<any | null>(null);
 
   const del = useMutation({
     mutationFn: (id: string) => adminDeleteProduct({ data: { id } }),
@@ -172,9 +174,10 @@ function ProductsTab() {
                     </td>
                     <td className="p-2">
                       <div className="flex gap-1">
-                        <Button size="sm" variant="ghost" onClick={() => setLinksFor(p)}><LinkIcon className="h-4 w-4" /></Button>
-                        <Button size="sm" variant="ghost" onClick={() => setEditing(p)}><Pencil className="h-4 w-4" /></Button>
-                        <Button size="sm" variant="ghost" onClick={() => { if (confirm(`Delete "${p.title}"?`)) del.mutate(p.id); }}><Trash2 className="h-4 w-4" /></Button>
+                        <Button size="sm" variant="ghost" title="Outbound links" onClick={() => setLinksFor(p)}><LinkIcon className="h-4 w-4" /></Button>
+                        <Button size="sm" variant="ghost" title="Vehicle fitment" onClick={() => setFitmentFor(p)}><Car className="h-4 w-4" /></Button>
+                        <Button size="sm" variant="ghost" title="Edit" onClick={() => setEditing(p)}><Pencil className="h-4 w-4" /></Button>
+                        <Button size="sm" variant="ghost" title="Delete" onClick={() => { if (confirm(`Delete "${p.title}"?`)) del.mutate(p.id); }}><Trash2 className="h-4 w-4" /></Button>
                       </div>
                     </td>
                   </tr>
@@ -192,6 +195,7 @@ function ProductsTab() {
         onSaved={() => { setEditing(null); qc.invalidateQueries({ queryKey: ["admin-shop-products"] }); }}
       />}
       {linksFor && <LinksDialog product={linksFor} onClose={() => setLinksFor(null)} />}
+      {fitmentFor && <FitmentDialog product={fitmentFor} onClose={() => setFitmentFor(null)} />}
     </Card>
   );
 }
@@ -208,6 +212,7 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
     price_php: initial.price_php ?? null,
     featured: initial.featured ?? false,
     active: initial.active ?? true,
+    universal_fit: initial.universal_fit ?? false,
   });
   const mut = useMutation({
     mutationFn: () => adminUpsertProduct({ data: {
@@ -242,9 +247,12 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
             </Select>
           </div>
           <div><Label>Description</Label><Textarea rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap gap-6">
             <label className="flex items-center gap-2"><Switch checked={form.active} onCheckedChange={(v) => setForm({ ...form, active: v })} />Active</label>
             <label className="flex items-center gap-2"><Switch checked={form.featured} onCheckedChange={(v) => setForm({ ...form, featured: v })} />Featured</label>
+            <label className="flex items-center gap-2" title="Show for all vehicles regardless of fitment rules">
+              <Switch checked={form.universal_fit} onCheckedChange={(v) => setForm({ ...form, universal_fit: v })} />Universal fit
+            </label>
           </div>
         </div>
         <DialogFooter>
@@ -460,6 +468,106 @@ function NetworkDialog({ initial, onClose, onSaved }: any) {
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Cancel</Button>
           <Button onClick={() => mut.mutate()} disabled={mut.isPending}>Save</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function FitmentDialog({ product, onClose }: any) {
+  const qc = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-product-fitment", product.id],
+    queryFn: () => adminListFitment({ data: { productId: product.id } }),
+  });
+  const [form, setForm] = useState({
+    category: "car" as "car" | "motorcycle",
+    make: "",
+    model: "",
+    year_start: "" as string,
+    year_end: "" as string,
+    notes: "",
+  });
+
+  const add = useMutation({
+    mutationFn: () => adminUpsertFitment({ data: {
+      product_id: product.id,
+      category: form.category,
+      make: form.make || null,
+      model: form.model || null,
+      year_start: form.year_start ? Number(form.year_start) : null,
+      year_end: form.year_end ? Number(form.year_end) : null,
+      notes: form.notes || null,
+    } as any }),
+    onSuccess: () => {
+      toast.success("Fitment added");
+      setForm({ category: "car", make: "", model: "", year_start: "", year_end: "", notes: "" });
+      qc.invalidateQueries({ queryKey: ["admin-product-fitment", product.id] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+  const del = useMutation({
+    mutationFn: (id: string) => adminDeleteFitment({ data: { id } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-product-fitment", product.id] }),
+  });
+
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader><DialogTitle>Vehicle fitment — {product.title}</DialogTitle></DialogHeader>
+        <p className="text-xs text-muted-foreground">
+          Add the vehicles this product fits. Leave make or model blank to match any value. Year range is optional.
+        </p>
+        <div className="space-y-2">
+          {isLoading ? <p className="text-sm text-muted-foreground">Loading…</p> : (data?.fitment ?? []).length === 0 ? (
+            <p className="text-sm text-muted-foreground">No fitment rules yet. Enable “Universal fit” on the product if it fits everything.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="border-b text-left text-xs uppercase text-muted-foreground">
+                  <tr><th className="p-2">Type</th><th className="p-2">Make</th><th className="p-2">Model</th><th className="p-2">Years</th><th className="p-2">Notes</th><th className="p-2"></th></tr>
+                </thead>
+                <tbody>
+                  {(data?.fitment ?? []).map((f: any) => (
+                    <tr key={f.id} className="border-b">
+                      <td className="p-2">{f.category}</td>
+                      <td className="p-2">{f.make ?? <span className="text-muted-foreground">any</span>}</td>
+                      <td className="p-2">{f.model ?? <span className="text-muted-foreground">any</span>}</td>
+                      <td className="p-2">{f.year_start || f.year_end ? `${f.year_start ?? "…"}–${f.year_end ?? "…"}` : "—"}</td>
+                      <td className="p-2 text-xs text-muted-foreground">{f.notes ?? ""}</td>
+                      <td className="p-2"><Button size="sm" variant="ghost" onClick={() => del.mutate(f.id)}><Trash2 className="h-4 w-4" /></Button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+        <div className="rounded border p-3 space-y-2">
+          <p className="text-sm font-medium">Add fitment rule</p>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div>
+              <Label>Type</Label>
+              <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v as any })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="car">Car</SelectItem>
+                  <SelectItem value="motorcycle">Motorcycle</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div><Label>Make</Label><Input value={form.make} onChange={(e) => setForm({ ...form, make: e.target.value })} placeholder="Toyota" /></div>
+            <div><Label>Model</Label><Input value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} placeholder="Vios" /></div>
+            <div><Label>Year start</Label><Input type="number" value={form.year_start} onChange={(e) => setForm({ ...form, year_start: e.target.value })} /></div>
+            <div><Label>Year end</Label><Input type="number" value={form.year_end} onChange={(e) => setForm({ ...form, year_end: e.target.value })} /></div>
+            <div className="sm:col-span-3"><Label>Notes</Label><Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="e.g. 1.5L variant only" /></div>
+          </div>
+          <Button onClick={() => add.mutate()} disabled={add.isPending} size="sm">
+            {add.isPending ? "Saving…" : "Add fitment"}
+          </Button>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Close</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
