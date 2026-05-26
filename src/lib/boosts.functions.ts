@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { type StripeEnv, createStripeClient } from "@/lib/stripe.server";
+import { type StripeEnv, createStripeClient, validateReturnUrl } from "@/lib/stripe.server";
 
 function validateEnv(env: StripeEnv): StripeEnv {
   if (env !== "sandbox" && env !== "live") throw new Error("Invalid environment");
@@ -56,6 +56,7 @@ export const createBoostCheckout = createServerFn({ method: "POST" })
     if (!/^[a-z0-9_]+$/.test(data.boostSlug)) throw new Error("Invalid boostSlug");
     if (!/^[0-9a-f-]{36}$/i.test(data.listingId)) throw new Error("Invalid listingId");
     validateEnv(data.environment);
+    validateReturnUrl(data.returnUrl);
     return data;
   })
   .handler(async ({ data, context }) => {

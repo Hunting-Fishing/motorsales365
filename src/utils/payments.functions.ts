@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { type StripeEnv, createStripeClient } from "@/lib/stripe.server";
+import { type StripeEnv, createStripeClient, validateReturnUrl } from "@/lib/stripe.server";
 
 async function resolveOrCreateCustomer(
   stripe: ReturnType<typeof createStripeClient>,
@@ -50,6 +50,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
   }) => {
     if (!/^[a-zA-Z0-9_-]+$/.test(data.priceId)) throw new Error("Invalid priceId");
     validateEnv(data.environment);
+    validateReturnUrl(data.returnUrl);
     return data;
   })
   .handler(async ({ data, context }) => {
@@ -312,6 +313,7 @@ export const createPortalSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { returnUrl?: string; environment: StripeEnv }) => {
     validateEnv(data.environment);
+    validateReturnUrl(data.returnUrl, { required: false });
     return data;
   })
   .handler(async ({ data, context }) => {
