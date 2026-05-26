@@ -212,6 +212,7 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
     price_php: initial.price_php ?? null,
     featured: initial.featured ?? false,
     active: initial.active ?? true,
+    universal_fit: initial.universal_fit ?? false,
   });
   const mut = useMutation({
     mutationFn: () => adminUpsertProduct({ data: {
@@ -246,9 +247,12 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
             </Select>
           </div>
           <div><Label>Description</Label><Textarea rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
-          <div className="flex gap-6">
+          <div className="flex flex-wrap gap-6">
             <label className="flex items-center gap-2"><Switch checked={form.active} onCheckedChange={(v) => setForm({ ...form, active: v })} />Active</label>
             <label className="flex items-center gap-2"><Switch checked={form.featured} onCheckedChange={(v) => setForm({ ...form, featured: v })} />Featured</label>
+            <label className="flex items-center gap-2" title="Show for all vehicles regardless of fitment rules">
+              <Switch checked={form.universal_fit} onCheckedChange={(v) => setForm({ ...form, universal_fit: v })} />Universal fit
+            </label>
           </div>
         </div>
         <DialogFooter>
