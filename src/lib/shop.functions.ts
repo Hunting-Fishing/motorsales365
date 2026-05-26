@@ -136,27 +136,46 @@ export const getShopProduct = createServerFn({ method: "GET" })
 
 // ============ ADMIN ============
 
+const emptyToNull = <T extends z.ZodTypeAny>(schema: T) =>
+  z.preprocess((v) => (v === "" || v === undefined ? null : v), schema);
+
+function slugify(s: string) {
+  return s
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 120);
+}
+
 const productSchema = z.object({
-  id: z.string().uuid().optional(),
-  slug: z.string().min(1).max(120).regex(/^[a-z0-9-]+$/),
+  id: emptyToNull(z.string().uuid().nullable()).optional(),
+  slug: emptyToNull(z.string().max(120).regex(/^[a-z0-9-]+$/).nullable()).optional(),
   title: z.string().min(1).max(200),
-  description: z.string().max(5000).optional().nullable(),
-  brand: z.string().max(120).optional().nullable(),
-  image_url: z.string().url().max(2000).optional().nullable(),
-  category_id: z.string().uuid().optional().nullable(),
-  price_php: z.number().nonnegative().optional().nullable(),
+  description: emptyToNull(z.string().max(5000).nullable()).optional(),
+  brand: emptyToNull(z.string().max(120).nullable()).optional(),
+  image_url: emptyToNull(z.string().url().max(2000).nullable()).optional(),
+  category_id: emptyToNull(z.string().uuid().nullable()).optional(),
+  price_php: z.preprocess(
+    (v) => (v === "" || v === null || v === undefined ? null : Number(v)),
+    z.number().nonnegative().nullable(),
+  ).optional(),
   tags: z.array(z.string().max(60)).max(20).optional(),
   featured: z.boolean().optional(),
   active: z.boolean().optional(),
   universal_fit: z.boolean().optional(),
 });
 
+async function assertShopManagerInline(supabase: any, userId: string) {
+  const { data: ok } = await supabase.rpc("can_manage_shop", { _user_id: userId });
+  if (!ok) throw new Error("Forbidden");
+}
+
 export const adminListProducts = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const { data: ok } = await supabase.rpc("can_manage_shop", { _user_id: userId });
-    if (!ok) throw new Error("Forbidden");
+    await assertShopManagerInline(supabase, userId);
     const { data, error } = await supabase
       .from("shop_products")
       .select("*, category:shop_categories(name, slug)")
@@ -171,11 +190,15 @@ export const adminUpsertProduct = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => productSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const payload = { ...data, created_by: userId };
-    if (data.id) {
-      const { error } = await supabase.from("shop_products").update(payload).eq("id", data.id);
+    await assertShopManagerInline(supabase, userId);
+    const { id, ...rest } = data as any;
+    const slug = rest.slug || slugify(rest.title);
+    if (!slug) throw new Error("A slug or title is required");
+    const payload: any = { ...rest, slug, created_by: userId };
+    if (id) {
+      const { error } = await supabase.from("shop_products").update(payload).eq("id", id);
       if (error) throw new Error(error.message);
-      return { id: data.id };
+      return { id };
     }
     const { data: row, error } = await supabase.from("shop_products").insert(payload).select("id").single();
     if (error) throw new Error(error.message);
@@ -186,6 +209,7 @@ export const adminDeleteProduct = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
+    await assertShopManagerInline(context.supabase, context.userId);
     const { error } = await context.supabase.from("shop_products").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
