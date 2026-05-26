@@ -14,7 +14,8 @@ export const getActiveAds = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { data: rows, error } = await supabaseAdmin
       .from("advertisements")
-      .select("id, title, caption, image_url, target_url, placement, advertiser_name")
+      .from("active_ads_public")
+      .select("id, title, caption, image_url, target_url, placement")
       .eq("placement", data.placement)
       .eq("status", "active")
       .or(`starts_at.is.null,starts_at.lte.${new Date().toISOString()}`)
