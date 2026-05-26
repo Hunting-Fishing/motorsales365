@@ -1,74 +1,70 @@
-# Phase 2B — Dealer SaaS
+# Finalize remaining security findings
 
-Build multi-staff dealer tools on top of the existing `organizations` + `organization_members` infrastructure.
+The latest scan returned 46 items. Most of the 39 Supabase-linter warnings are already documented as intentional in `docs/SECURITY.md` (8 helper RPCs + `increment_listing_view` + `ad_inquiries` `INSERT (true)`). The remainder are **real** issues that need code/migration fixes.
 
-## What's already in place
+## Real fixes (migration + code)
 
-- `organizations`, `organization_members` (roles: owner/admin/…), `organization_invites`
-- `listings.organization_id` already exists
-- Helper fns: `is_org_member`, `can_manage_org`, `org_role`, `tg_org_add_creator_as_owner`
-- `messages` (listing inquiries), `service_inquiries`, `tow_requests` exist but are user-scoped, not org-scoped
+### 1. `listing_boosts` — leaking `user_id` / `payment_id` (ERROR)
+Replace public `SELECT USING (true)` with:
+- Public sees only: a thin view `public.listing_active_boosts(listing_id, product_slug, starts_at, ends_at)` filtered to `now() between starts_at and ends_at`, `security_invoker = on`, granted to `anon`/`authenticated`.
+- Table policy: owner (`auth.uid() = user_id`) and admin/sales (`is_staff`) only.
+- Update `src/components/boost-dialog.tsx` and any listing-card boost badge to read from the new view.
 
-## Scope of this pass
+### 2. `advertisements` — exposes `advertiser_email` / `advertiser_name` (ERROR)
+- Drop the broad "Anyone can view active ads" policy.
+- Add `public.active_ads_public` view (security_invoker) selecting only the columns the carousel actually needs (id, placement, image_url, headline, cta_url, etc. — **no** advertiser_email/name/phone).
+- Repoint `src/components/ads/ad-carousel.tsx` and `src/lib/ads.functions.ts` public reads at the view. Admin reads stay on the table via `can_manage_ads`.
 
-### 1. Database migration
+### 3. Shop admin functions missing `can_manage_shop` (ERROR — 8 functions)
+In `src/lib/shop.functions.ts`, add the same guard already used by `adminUpsertProduct` to:
+`adminListNetworks`, `adminUpsertNetwork`, `adminUpsertLink`, `adminDeleteLink`, `adminProductLinks`, `adminListFitment`, `adminUpsertFitment`, `adminDeleteFitment`.
 
-- **Add `organization_id`** (nullable, FK) to `businesses`.
-- **`leads`** table — unified inbox:
-  - `id`, `organization_id`, `source` enum (`listing_message`, `business_inquiry`, `service_inquiry`, `tow_request`), `source_id`, `listing_id?`, `business_id?`
-  - `customer_user_id?`, `customer_name`, `customer_email?`, `customer_phone?`
-  - `subject`, `preview` (first 280 chars)
-  - `status` enum (`new`, `in_progress`, `won`, `lost`)
-  - `assigned_to?` (FK profiles), `assigned_at?`
-  - `last_activity_at`, `created_at`, `updated_at`
-  - Unique `(source, source_id)` to dedupe.
-- **`lead_activities`** — append-only audit + notes timeline:
-  - `lead_id`, `actor_id`, `kind` (`created`, `assigned`, `status_changed`, `note`, `reply_sent`), `from_value?`, `to_value?`, `body?`, `created_at`.
-- **Triggers** auto-create leads:
-  - On `messages` insert where recipient owns a listing tied to an org → create/update lead (source=`listing_message`).
-  - On `service_inquiries` insert tied to a business with `organization_id` → lead.
-  - On `tow_requests` insert where provider listing belongs to an org → lead.
-- **RLS**:
-  - `leads` SELECT/UPDATE: org members (any role) of `organization_id`.
-  - `lead_activities` SELECT: org members; INSERT: org members for their org's leads.
-- Status-change + assign trigger writes `lead_activities` row automatically.
+```ts
+const { data: ok } = await supabase.rpc("can_manage_shop", { _user_id: userId });
+if (!ok) throw new Error("Forbidden");
+```
 
-### 2. Server functions (`src/lib/leads.functions.ts`)
+Also tighten RLS on `affiliate_networks`, `shop_product_links`, `shop_product_fitment`: writes restricted to `can_manage_shop(auth.uid())`; reads stay public where the feature needs it.
 
-- `listOrgLeads({ orgId, status?, assignedTo?, source?, q? })`
-- `getLead({ id })` (lead + activities + members for the assign dropdown)
-- `assignLead({ id, userId | null })`
-- `updateLeadStatus({ id, status })`
-- `addLeadNote({ id, body })`
-- `getOrgPerformance({ orgId, since? })` → per-member counts of new/in_progress/won/lost + win-rate.
-- `listMyOrgs()` → orgs the current user belongs to (for org switcher).
+### 4. Open redirect on Stripe `returnUrl` (4 functions)
+Add a shared `validateReturnUrl()` helper in `src/lib/stripe.server.ts` with an allowlist:
+`https://365motorsales.com`, `https://www.365motorsales.com`, `https://motorsales365.lovable.app`, plus current preview origin from `process.env`.
+Call it inside `.inputValidator()` of:
+- `createCheckoutSession` (`src/utils/payments.functions.ts`)
+- `createPortalSession` (same file)
+- `createBoostCheckout` (`src/lib/boosts.functions.ts`)
+- `createBusinessSubscriptionCheckout` (`src/lib/business-subscriptions.functions.ts`)
 
-All use `requireSupabaseAuth`; org membership enforced by RLS + explicit `is_org_member` checks where we touch related tables.
+Throw on mismatch; clients already pass `window.location.origin`-based URLs so no UI change needed.
 
-### 3. UI routes (under `_authenticated/dashboard/team/`)
+### 5. `businesses` / `organizations` — public phone/email (WARN)
+Create `public.businesses_public` and `public.organizations_public` views that omit `email`, `phone`, raw `address_line` (keep city/region/coords for the map). Repoint public reads (`businesses.index.tsx`, `business-map`, public org pages) at the views. Authenticated detail pages can still read contact fields via the existing inquiry/lead flow, which already gates by RLS.
 
-- `team.tsx` (layout w/ org switcher + tabs: Leads / Members / Performance)
-- `team.leads.tsx` — inbox table: status pills, source icons, assignee avatar, filters, search
-- `team.leads.$id.tsx` — drawer/page: customer details, source link, status dropdown, assignee dropdown, activity timeline, "Add note"
-- `team.members.tsx` — current members + roles; invite by email (reuses `organization_invites`); promote/demote owner-only
-- `team.performance.tsx` — table of reps with new/in-progress/won/lost + win-rate, 30-day range
+### 6. `listing_views` — confirm no direct insert path
+Already correct: there is **no** INSERT policy, and writes happen exclusively through `increment_listing_view()` (SECURITY DEFINER). Add an explicit `REVOKE INSERT ON public.listing_views FROM anon, authenticated` to document intent + silence the scanner re-check.
 
-Add a **Team** entry in the dashboard sidebar visible when the user belongs to ≥1 org.
+## Findings to ignore (already documented)
 
-### 4. Polish
+Mark these as `ignore` via `security--manage_security_finding` with the rationale already living in `docs/SECURITY.md`, and refresh `security--update_memory` so future scans don't re-flag them:
 
-- Dashboard home shows a "Team inbox: N new leads" card when the user is in an org.
-- When a sales rep replies via the existing message thread on a listing inquiry, the trigger writes a `reply_sent` activity (so we get rep attribution).
+- 8× `SUPA_authenticated_security_definer_function_executable` for `has_role`, `is_staff`, `can_moderate`, `can_support`, `can_manage_ads`, `can_manage_shop`, `current_plan_tier`, `is_business_account`, `increment_listing_view` (needed by RLS policies — see SECURITY.md §1/§3).
+- 1× `SUPA_anon_security_definer_function_executable` for `increment_listing_view` (anonymous page-view tracking — SECURITY.md §2).
+- 1× `SUPA_rls_policy_always_true` on `ad_inquiries` "Anyone can submit ad inquiry" (lead-capture form, validated by trigger — SECURITY.md "Accepted RLS warnings").
 
-## Out of scope (next passes)
+The other 5 `RLS Policy Always True` warnings will be investigated during the migration; if any covers a real INSERT/UPDATE/DELETE on user data it gets fixed (not ignored). Likely candidates are other public-form inserts (`service_inquiries`, `tow_requests` requester self-insert, `staff_referral_audit` trigger inserts). Each will either be tightened to `WITH CHECK (auth.uid() = <owner_col>)` or — if it's a truly anonymous form like `ad_inquiries` — kept and ignored with the same trigger-validated rationale.
 
-- Multi-org per-listing assignment UI (we already have `listings.organization_id`; just expose it in the listing form).
-- Business → org binding UI for legacy businesses (will add a dropdown in `dashboard.businesses` to attach to an org after this migration lands).
-- Email/SMS notifications to assigned rep — relies on existing `enqueue_email` pipeline; add in next pass.
+The 2 `Public Bucket Allows Listing` warnings will be resolved by re-checking the storage policies added in the last hardening migration; if any bucket still has a wildcard `SELECT` policy on `storage.objects`, replace it with a per-object policy (`name = <expected>` or owner-scoped).
 
-## Technical notes
+## Deliverables
 
-- Lead dedup via `UNIQUE (source, source_id)` + `ON CONFLICT DO UPDATE SET last_activity_at = now()`.
-- For `listing_message` source, `source_id` = the listing thread key `LEAST(sender,recipient) || '|' || listing_id` so all messages in a thread roll up into one lead.
-- Assign + status changes go through server functions so we can write `lead_activities` in the same transaction.
-- Realtime: enable on `leads` so the inbox updates live.
+1. One migration containing: 2 new views, RLS rewrites on `listing_boosts`/`advertisements`/`businesses`/`organizations`/shop tables, explicit REVOKE on `listing_views`, storage policy fixes if any remain.
+2. Code edits: 8 shop functions, 4 Stripe functions, plus repoint reads to the new views (ad-carousel, businesses index, listings boost badge).
+3. `security--manage_security_finding` batch to ignore the documented noise.
+4. `security--update_memory` updated with the new accepted-risk list.
+5. Re-run `security--run_security_scan` — target: 0 errors, only the documented accepted warnings remain.
+
+## What this does NOT touch
+
+- Stripe live-mode go-live (still requires user action in dashboard).
+- Email queue/auth-hook infra (already verified working).
+- Functional changes to listings, leads, dashboards, or passports.
