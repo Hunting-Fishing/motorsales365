@@ -13,7 +13,7 @@ import { VehicleFitmentPicker } from "@/components/shop/vehicle-fitment-picker";
 import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
 import { ShopFavoriteButton } from "@/components/shop/shop-favorite-button";
 import { ShopMobileCtaBar } from "@/components/shop/shop-mobile-cta-bar";
-import { ShopProfile } from "@/components/shop/shop-profile";
+
 import { useGarage, formatVehicle } from "@/lib/garage";
 import { X } from "lucide-react";
 
@@ -197,10 +197,6 @@ function ShopIndex() {
             : <ProductGrid products={latest} vehicle={activeVehicle} />}
         </section>
 
-        <section aria-label="Shop profile">
-          <h2 className="mb-4 text-xl font-semibold">Visit our shop</h2>
-          <ShopProfile />
-        </section>
 
         <p className="rounded-md border bg-muted/40 p-4 text-xs text-muted-foreground">
           Disclosure: 365 MotorSales earns a commission on qualifying purchases. Prices and availability are set by the seller.

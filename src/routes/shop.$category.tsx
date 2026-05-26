@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
 import { ShopMobileCtaBar } from "@/components/shop/shop-mobile-cta-bar";
-import { ShopProfile } from "@/components/shop/shop-profile";
+
 import { X } from "lucide-react";
 
 const catSearch = z.object({
@@ -142,7 +142,6 @@ function ShopCategory() {
             </p>
           : <ProductGrid products={products} vehicle={activeVehicle} />}
 
-        <ShopProfile />
 
         <p className="rounded-md border bg-muted/40 p-4 text-xs text-muted-foreground">
           Disclosure: 365 MotorSales earns a commission on qualifying purchases.
