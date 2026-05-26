@@ -4,6 +4,24 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const uuid = z.string().uuid();
 
+async function assertOrgMember(supabase: any, userId: string, orgId: string) {
+  const { data, error } = await supabase.rpc("is_org_member", {
+    _user_id: userId,
+    _org_id: orgId,
+  });
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Forbidden");
+}
+
+async function assertOrgManager(supabase: any, userId: string, orgId: string) {
+  const { data, error } = await supabase.rpc("can_manage_org", {
+    _user_id: userId,
+    _org_id: orgId,
+  });
+  if (error) throw new Error(error.message);
+  if (!data) throw new Error("Forbidden — owner or admin role required");
+}
+
 export const createOrganization = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { name: string; kind?: string }) => ({
@@ -32,6 +50,7 @@ export const inviteOrgMember = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    await assertOrgManager(supabase, userId, data.orgId);
     const token = crypto.randomUUID().replace(/-/g, "") + Math.random().toString(36).slice(2, 8);
     const { data: invite, error } = await supabase
       .from("organization_invites")
@@ -47,7 +66,6 @@ export const inviteOrgMember = createServerFn({ method: "POST" })
       .single();
     if (error) throw new Error(error.message);
 
-    // Best-effort email notification — never block the invite flow if email enqueue fails
     try {
       const [{ data: org }, { data: inviter }] = await Promise.all([
         supabase.from("organizations").select("name").eq("id", data.orgId).maybeSingle(),
@@ -78,7 +96,8 @@ export const listOrgInvites = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: { orgId: string }) => ({ orgId: uuid.parse(d.orgId) }))
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    await assertOrgMember(supabase, userId, data.orgId);
     const { data: rows, error } = await supabase
       .from("organization_invites")
       .select("id, email, role, token, expires_at, accepted_at, created_at")
@@ -97,7 +116,8 @@ export const updateMemberRole = createServerFn({ method: "POST" })
     role: z.enum(["owner", "admin", "manager", "member", "viewer"]).parse(d.role),
   }))
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    await assertOrgManager(supabase, userId, data.orgId);
     const { error } = await supabase
       .from("organization_members")
       .update({ role: data.role as any })
@@ -114,7 +134,8 @@ export const removeMember = createServerFn({ method: "POST" })
     userId: uuid.parse(d.userId),
   }))
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    await assertOrgManager(supabase, userId, data.orgId);
     const { error } = await supabase
       .from("organization_members")
       .delete()

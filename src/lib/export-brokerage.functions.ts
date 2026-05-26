@@ -96,8 +96,11 @@ export const updateExportInquiry = createServerFn({ method: "POST" })
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: canSupport } = await supabase.rpc("can_support", { _user_id: userId });
+    if (!canSupport) throw new Error("Forbidden");
     const { id, ...rest } = data;
-    const { error } = await context.supabase.from("export_inquiries").update(rest).eq("id", id);
+    const { error } = await supabase.from("export_inquiries").update(rest).eq("id", id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

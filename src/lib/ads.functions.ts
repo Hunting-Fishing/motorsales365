@@ -92,7 +92,10 @@ export const deleteAd = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("advertisements").delete().eq("id", data.id);
+    const { supabase, userId } = context;
+    const { data: canManage } = await supabase.rpc("can_manage_ads", { _user_id: userId });
+    if (!canManage) throw new Error("Forbidden");
+    const { error } = await supabase.from("advertisements").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
