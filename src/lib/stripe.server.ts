@@ -42,3 +42,40 @@ export function createStripeClient(env: StripeEnv): Stripe {
     }) as typeof fetch),
   });
 }
+
+const ALLOWED_RETURN_ORIGINS = new Set<string>([
+  "https://365motorsales.com",
+  "https://www.365motorsales.com",
+  "https://motorsales365.lovable.app",
+  "https://id-preview--0738c881-614d-4885-8d75-1b7c90e0835e.lovable.app",
+  "https://project--0738c881-614d-4885-8d75-1b7c90e0835e.lovable.app",
+  "https://project--0738c881-614d-4885-8d75-1b7c90e0835e-dev.lovable.app",
+]);
+
+/**
+ * Validate a client-supplied `returnUrl` against an allowlist of trusted
+ * origins so an attacker can't redirect a user back to an external phishing
+ * page after a legitimate Stripe Checkout / Billing Portal flow.
+ *
+ * Throws if invalid. Returns the original URL string when allowed.
+ * Pass `required: false` to allow undefined (used by Portal).
+ */
+export function validateReturnUrl(
+  url: string | undefined,
+  { required = true }: { required?: boolean } = {},
+): string | undefined {
+  if (!url) {
+    if (required) throw new Error("returnUrl is required");
+    return undefined;
+  }
+  let parsed: URL;
+  try {
+    parsed = new URL(url);
+  } catch {
+    throw new Error("Invalid returnUrl");
+  }
+  if (!ALLOWED_RETURN_ORIGINS.has(parsed.origin)) {
+    throw new Error("returnUrl origin is not allowed");
+  }
+  return url;
+}
