@@ -1,70 +1,46 @@
-# Finalize remaining security findings
+## Goal
+Resolve the 40 remaining security findings — fix the 5 ERROR-level vulnerabilities and the substantive WARN-level data exposures, then formally ignore the documented noise so the scan ends with **0 errors** and only accepted warnings.
 
-The latest scan returned 46 items. Most of the 39 Supabase-linter warnings are already documented as intentional in `docs/SECURITY.md` (8 helper RPCs + `increment_listing_view` + `ad_inquiries` `INSERT (true)`). The remainder are **real** issues that need code/migration fixes.
+## Errors to fix (5)
 
-## Real fixes (migration + code)
+1. **`PRIVILEGE_ESCALATION_SUBSCRIPTIONS`** — Rewrite the `subscriptions` INSERT policy to force `status='pending'`, `complimentary=false`, `discount_percent=0`, and `stripe_subscription_id IS NULL` for self-inserts. Privileged inserts continue via `service_role` (webhook) and admin policies.
 
-### 1. `listing_boosts` — leaking `user_id` / `payment_id` (ERROR)
-Replace public `SELECT USING (true)` with:
-- Public sees only: a thin view `public.listing_active_boosts(listing_id, product_slug, starts_at, ends_at)` filtered to `now() between starts_at and ends_at`, `security_invoker = on`, granted to `anon`/`authenticated`.
-- Table policy: owner (`auth.uid() = user_id`) and admin/sales (`is_staff`) only.
-- Update `src/components/boost-dialog.tsx` and any listing-card boost badge to read from the new view.
+2. **`PRIVILEGE_ESCALATION_PAYMENTS`** — Rewrite the `payments` INSERT policy to force `status='pending'`, `paid_at IS NULL`, `amount_php > 0`, and block setting `method`/`stripe_payment_id`. Webhooks/admin keep writing via `service_role`.
 
-### 2. `advertisements` — exposes `advertiser_email` / `advertiser_name` (ERROR)
-- Drop the broad "Anyone can view active ads" policy.
-- Add `public.active_ads_public` view (security_invoker) selecting only the columns the carousel actually needs (id, placement, image_url, headline, cta_url, etc. — **no** advertiser_email/name/phone).
-- Repoint `src/components/ads/ad-carousel.tsx` and `src/lib/ads.functions.ts` public reads at the view. Admin reads stay on the table via `can_manage_ads`.
+3. **`STAFF_REFERRAL_EMAIL_IMPERSONATION`** — Drop the email-based SELECT branch on `staff_referrals`; keep only `staff_user_id = auth.uid()` plus the admin policy. Backfill any rows missing `staff_user_id` (already populated by trigger `tg_create_staff_referral`).
 
-### 3. Shop admin functions missing `can_manage_shop` (ERROR — 8 functions)
-In `src/lib/shop.functions.ts`, add the same guard already used by `adminUpsertProduct` to:
-`adminListNetworks`, `adminUpsertNetwork`, `adminUpsertLink`, `adminDeleteLink`, `adminProductLinks`, `adminListFitment`, `adminUpsertFitment`, `adminDeleteFitment`.
+4. **`SERVER_FN_MISSING_AUTH` (3 functions)**:
+   - `src/lib/vehicles.functions.ts` → `deleteServiceRecord`: verify the record belongs to a vehicle owned by `userId` before delete.
+   - `src/lib/export-brokerage.functions.ts` → `updateExportInquiry`: gate with `can_support`.
+   - `src/lib/ads.functions.ts` → `deleteAd`: gate with `can_manage_ads`.
+   - `src/lib/leads.functions.ts` → 7 functions (`listOrgMembers`, `listOrgLeads`, `getLead`, `assignLead`, `updateLeadStatus`, `addLeadNote`, `getOrgPerformance`): add `is_org_member(userId, orgId)` check at top of each handler. For role-gated writes (`assignLead`, `updateLeadStatus`, `updateMemberRole`), also require `owner`/`admin` org role.
 
-```ts
-const { data: ok } = await supabase.rpc("can_manage_shop", { _user_id: userId });
-if (!ok) throw new Error("Forbidden");
-```
+## Warnings to fix (substantive)
 
-Also tighten RLS on `affiliate_networks`, `shop_product_links`, `shop_product_fitment`: writes restricted to `can_manage_shop(auth.uid())`; reads stay public where the feature needs it.
+5. **`EXPOSED_SENSITIVE_DATA_BUSINESSES` / `_ORGANIZATIONS`** — Create `public.businesses_public` and `public.organizations_public` views (`security_invoker = on`) omitting `phone`/`email`. Restrict the underlying public SELECT policy to authenticated users; repoint anonymous reads in `businesses.index.tsx`, `businesses.$slug.tsx`, map components, and `organizations.functions.ts` to the new views.
 
-### 4. Open redirect on Stripe `returnUrl` (4 functions)
-Add a shared `validateReturnUrl()` helper in `src/lib/stripe.server.ts` with an allowlist:
-`https://365motorsales.com`, `https://www.365motorsales.com`, `https://motorsales365.lovable.app`, plus current preview origin from `process.env`.
-Call it inside `.inputValidator()` of:
-- `createCheckoutSession` (`src/utils/payments.functions.ts`)
-- `createPortalSession` (same file)
-- `createBoostCheckout` (`src/lib/boosts.functions.ts`)
-- `createBusinessSubscriptionCheckout` (`src/lib/business-subscriptions.functions.ts`)
+6. **`EXPOSED_SENSITIVE_DATA_LISTINGS`** — Add a `public.listings_public` view (security_invoker, omits `contact_phone`). Anonymous reads in `browse.$category.tsx`, `index.tsx`, `seller.$id.tsx`, search/listing-card queries switch to the view; the existing detail-page query stays on the table for authenticated callers only.
 
-Throw on mismatch; clients already pass `window.location.origin`-based URLs so no UI change needed.
+7. **`EXPOSED_SENSITIVE_DATA_PROVIDER_TOW_RATES`** — Create `public.provider_tow_rates_public` view without `notes`; restrict table SELECT to authenticated; repoint `tow.tsx` public read.
 
-### 5. `businesses` / `organizations` — public phone/email (WARN)
-Create `public.businesses_public` and `public.organizations_public` views that omit `email`, `phone`, raw `address_line` (keep city/region/coords for the map). Repoint public reads (`businesses.index.tsx`, `business-map`, public org pages) at the views. Authenticated detail pages can still read contact fields via the existing inquiry/lead flow, which already gates by RLS.
+8. **`EXPOSED_SENSITIVE_DATA_STAFF_PROMOTIONS`** — Create `public.staff_promotions_public` view exposing only marketing-safe fields (`title`, `description`, `applies_to`, `ends_at`); revoke broad public SELECT; repoint `r.$code.tsx` / referral landing reads.
 
-### 6. `listing_views` — confirm no direct insert path
-Already correct: there is **no** INSERT policy, and writes happen exclusively through `increment_listing_view()` (SECURITY DEFINER). Add an explicit `REVOKE INSERT ON public.listing_views FROM anon, authenticated` to document intent + silence the scanner re-check.
+9. **`MISSING_REALTIME_CHANNEL_AUTHORIZATION`** — Add RLS on `realtime.messages` so authenticated users can only subscribe to topics that match their `auth.uid()` (for DM channels) or an org they belong to (for `leads`, `lead_activities`). Topics for `tow_requests`/`tow_bids` scoped to requester/provider IDs encoded in topic names.
 
-## Findings to ignore (already documented)
+## Noise to ignore (documented, behavior-correct)
 
-Mark these as `ignore` via `security--manage_security_finding` with the rationale already living in `docs/SECURITY.md`, and refresh `security--update_memory` so future scans don't re-flag them:
-
-- 8× `SUPA_authenticated_security_definer_function_executable` for `has_role`, `is_staff`, `can_moderate`, `can_support`, `can_manage_ads`, `can_manage_shop`, `current_plan_tier`, `is_business_account`, `increment_listing_view` (needed by RLS policies — see SECURITY.md §1/§3).
-- 1× `SUPA_anon_security_definer_function_executable` for `increment_listing_view` (anonymous page-view tracking — SECURITY.md §2).
-- 1× `SUPA_rls_policy_always_true` on `ad_inquiries` "Anyone can submit ad inquiry" (lead-capture form, validated by trigger — SECURITY.md "Accepted RLS warnings").
-
-The other 5 `RLS Policy Always True` warnings will be investigated during the migration; if any covers a real INSERT/UPDATE/DELETE on user data it gets fixed (not ignored). Likely candidates are other public-form inserts (`service_inquiries`, `tow_requests` requester self-insert, `staff_referral_audit` trigger inserts). Each will either be tightened to `WITH CHECK (auth.uid() = <owner_col>)` or — if it's a truly anonymous form like `ad_inquiries` — kept and ignored with the same trigger-validated rationale.
-
-The 2 `Public Bucket Allows Listing` warnings will be resolved by re-checking the storage policies added in the last hardening migration; if any bucket still has a wildcard `SELECT` policy on `storage.objects`, replace it with a per-object policy (`name = <expected>` or owner-scoped).
+10. The remaining **6× `SUPA_rls_policy_always_true`**, **2× `SUPA_anon_security_definer_function_executable`**, and **18× `SUPA_authenticated_security_definer_function_executable`** are existing accepted risks (helper functions backing RLS, `increment_listing_view`, `ad_inquiries` public submit). Call `security--manage_security_finding` with `ignore` for each, linking back to `docs/SECURITY.md`. Update `docs/SECURITY.md` to add any new entries (`can_manage_shop`, `user_has_paid_subscription`, `is_towing_provider`) that weren't already there. Update security memory via `security--update_memory`.
 
 ## Deliverables
 
-1. One migration containing: 2 new views, RLS rewrites on `listing_boosts`/`advertisements`/`businesses`/`organizations`/shop tables, explicit REVOKE on `listing_views`, storage policy fixes if any remain.
-2. Code edits: 8 shop functions, 4 Stripe functions, plus repoint reads to the new views (ad-carousel, businesses index, listings boost badge).
-3. `security--manage_security_finding` batch to ignore the documented noise.
-4. `security--update_memory` updated with the new accepted-risk list.
-5. Re-run `security--run_security_scan` — target: 0 errors, only the documented accepted warnings remain.
+1. **Migration**: policy rewrites (subscriptions, payments, staff_referrals), 5 new `_public` views (security_invoker), revoked broad SELECTs, realtime RLS policies.
+2. **Code edits**: 11 server functions hardened (auth/ownership/membership checks), public-facing queries repointed to new views.
+3. **Docs**: `docs/SECURITY.md` updated with new accepted-noise rationales; security memory refreshed.
+4. **Scanner cleanup**: batch `ignore` the documented findings; rerun `security--run_security_scan` until **0 errors** and only the accepted warning IDs remain.
 
-## What this does NOT touch
+## Technical notes
 
-- Stripe live-mode go-live (still requires user action in dashboard).
-- Email queue/auth-hook infra (already verified working).
-- Functional changes to listings, leads, dashboards, or passports.
+- All new views use `WITH (security_invoker = on)` so the caller's RLS applies; this avoids re-exposing data via the view.
+- `is_org_member(uid, org)` already exists in `public` (used by `tg_lead_from_message`); the leads functions just need to call it via `supabase.rpc`.
+- Subscriptions/payments INSERT tightening will not affect webhook flow because the Stripe webhook handler uses `supabaseAdmin` (`service_role`) which bypasses RLS.
+- Realtime RLS is added to `realtime.messages`, not the public `messages` table, so it only governs subscription topic auth — existing app reads/writes are unaffected.
