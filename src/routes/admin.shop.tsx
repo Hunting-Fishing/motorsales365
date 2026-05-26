@@ -5,6 +5,7 @@ import {
   adminListProducts, adminUpsertProduct, adminDeleteProduct,
   adminListNetworks, adminUpsertNetwork,
   adminProductLinks, adminUpsertLink, adminDeleteLink,
+  adminListFitment, adminUpsertFitment, adminDeleteFitment,
   listShopCategories,
 } from "@/lib/shop.functions";
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, Link as LinkIcon, ExternalLink, AlertTriangle, Sparkles } from "lucide-react";
+import { Pencil, Trash2, Plus, Link as LinkIcon, ExternalLink, AlertTriangle, Sparkles, Car } from "lucide-react";
 import { AD_NETWORKS, AFFILIATE_PROGRAMS, COUNTRY_ORDER, type DirectoryEntry } from "@/lib/monetization-directory";
 import { detectNetworkSlug, cleanShopUrl, urlMatchesNetwork } from "@/lib/shop-url";
 
