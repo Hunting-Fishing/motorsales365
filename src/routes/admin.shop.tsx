@@ -473,3 +473,103 @@ function NetworkDialog({ initial, onClose, onSaved }: any) {
     </Dialog>
   );
 }
+
+function FitmentDialog({ product, onClose }: any) {
+  const qc = useQueryClient();
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-product-fitment", product.id],
+    queryFn: () => adminListFitment({ data: { productId: product.id } }),
+  });
+  const [form, setForm] = useState({
+    category: "car" as "car" | "motorcycle",
+    make: "",
+    model: "",
+    year_start: "" as string,
+    year_end: "" as string,
+    notes: "",
+  });
+
+  const add = useMutation({
+    mutationFn: () => adminUpsertFitment({ data: {
+      product_id: product.id,
+      category: form.category,
+      make: form.make || null,
+      model: form.model || null,
+      year_start: form.year_start ? Number(form.year_start) : null,
+      year_end: form.year_end ? Number(form.year_end) : null,
+      notes: form.notes || null,
+    } as any }),
+    onSuccess: () => {
+      toast.success("Fitment added");
+      setForm({ category: "car", make: "", model: "", year_start: "", year_end: "", notes: "" });
+      qc.invalidateQueries({ queryKey: ["admin-product-fitment", product.id] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+  const del = useMutation({
+    mutationFn: (id: string) => adminDeleteFitment({ data: { id } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["admin-product-fitment", product.id] }),
+  });
+
+  return (
+    <Dialog open onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader><DialogTitle>Vehicle fitment — {product.title}</DialogTitle></DialogHeader>
+        <p className="text-xs text-muted-foreground">
+          Add the vehicles this product fits. Leave make or model blank to match any value. Year range is optional.
+        </p>
+        <div className="space-y-2">
+          {isLoading ? <p className="text-sm text-muted-foreground">Loading…</p> : (data?.fitment ?? []).length === 0 ? (
+            <p className="text-sm text-muted-foreground">No fitment rules yet. Enable “Universal fit” on the product if it fits everything.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="border-b text-left text-xs uppercase text-muted-foreground">
+                  <tr><th className="p-2">Type</th><th className="p-2">Make</th><th className="p-2">Model</th><th className="p-2">Years</th><th className="p-2">Notes</th><th className="p-2"></th></tr>
+                </thead>
+                <tbody>
+                  {(data?.fitment ?? []).map((f: any) => (
+                    <tr key={f.id} className="border-b">
+                      <td className="p-2">{f.category}</td>
+                      <td className="p-2">{f.make ?? <span className="text-muted-foreground">any</span>}</td>
+                      <td className="p-2">{f.model ?? <span className="text-muted-foreground">any</span>}</td>
+                      <td className="p-2">{f.year_start || f.year_end ? `${f.year_start ?? "…"}–${f.year_end ?? "…"}` : "—"}</td>
+                      <td className="p-2 text-xs text-muted-foreground">{f.notes ?? ""}</td>
+                      <td className="p-2"><Button size="sm" variant="ghost" onClick={() => del.mutate(f.id)}><Trash2 className="h-4 w-4" /></Button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+        <div className="rounded border p-3 space-y-2">
+          <p className="text-sm font-medium">Add fitment rule</p>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div>
+              <Label>Type</Label>
+              <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v as any })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="car">Car</SelectItem>
+                  <SelectItem value="motorcycle">Motorcycle</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div><Label>Make</Label><Input value={form.make} onChange={(e) => setForm({ ...form, make: e.target.value })} placeholder="Toyota" /></div>
+            <div><Label>Model</Label><Input value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} placeholder="Vios" /></div>
+            <div><Label>Year start</Label><Input type="number" value={form.year_start} onChange={(e) => setForm({ ...form, year_start: e.target.value })} /></div>
+            <div><Label>Year end</Label><Input type="number" value={form.year_end} onChange={(e) => setForm({ ...form, year_end: e.target.value })} /></div>
+            <div className="sm:col-span-3"><Label>Notes</Label><Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="e.g. 1.5L variant only" /></div>
+          </div>
+          <Button onClick={() => add.mutate()} disabled={add.isPending} size="sm">
+            {add.isPending ? "Saving…" : "Add fitment"}
+          </Button>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Close</Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
