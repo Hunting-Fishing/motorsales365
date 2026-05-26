@@ -140,6 +140,7 @@ function ProductsTab() {
   const { data: catData } = useQuery({ queryKey: ["shop-cats"], queryFn: () => listShopCategories() });
   const [editing, setEditing] = useState<any | null>(null);
   const [linksFor, setLinksFor] = useState<any | null>(null);
+  const [fitmentFor, setFitmentFor] = useState<any | null>(null);
 
   const del = useMutation({
     mutationFn: (id: string) => adminDeleteProduct({ data: { id } }),
@@ -173,9 +174,10 @@ function ProductsTab() {
                     </td>
                     <td className="p-2">
                       <div className="flex gap-1">
-                        <Button size="sm" variant="ghost" onClick={() => setLinksFor(p)}><LinkIcon className="h-4 w-4" /></Button>
-                        <Button size="sm" variant="ghost" onClick={() => setEditing(p)}><Pencil className="h-4 w-4" /></Button>
-                        <Button size="sm" variant="ghost" onClick={() => { if (confirm(`Delete "${p.title}"?`)) del.mutate(p.id); }}><Trash2 className="h-4 w-4" /></Button>
+                        <Button size="sm" variant="ghost" title="Outbound links" onClick={() => setLinksFor(p)}><LinkIcon className="h-4 w-4" /></Button>
+                        <Button size="sm" variant="ghost" title="Vehicle fitment" onClick={() => setFitmentFor(p)}><Car className="h-4 w-4" /></Button>
+                        <Button size="sm" variant="ghost" title="Edit" onClick={() => setEditing(p)}><Pencil className="h-4 w-4" /></Button>
+                        <Button size="sm" variant="ghost" title="Delete" onClick={() => { if (confirm(`Delete "${p.title}"?`)) del.mutate(p.id); }}><Trash2 className="h-4 w-4" /></Button>
                       </div>
                     </td>
                   </tr>
@@ -193,6 +195,7 @@ function ProductsTab() {
         onSaved={() => { setEditing(null); qc.invalidateQueries({ queryKey: ["admin-shop-products"] }); }}
       />}
       {linksFor && <LinksDialog product={linksFor} onClose={() => setLinksFor(null)} />}
+      {fitmentFor && <FitmentDialog product={fitmentFor} onClose={() => setFitmentFor(null)} />}
     </Card>
   );
 }
