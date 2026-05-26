@@ -262,10 +262,49 @@ function LinksDialog({ product, onClose }: any) {
   const { data: netData } = useQuery({ queryKey: ["admin-networks"], queryFn: () => adminListNetworks() });
   const [networkId, setNetworkId] = useState<string>("");
   const [url, setUrl] = useState("");
+  const [touchedNetwork, setTouchedNetwork] = useState(false);
+
+  const networks = (netData?.networks ?? []) as any[];
+  const activeNetworks = networks.filter((n) => n.active);
+  const selectedNetwork = networks.find((n) => n.id === networkId);
+  const detectedSlug = url ? detectNetworkSlug(url) : null;
+  const detectedNetwork = detectedSlug ? activeNetworks.find((n) => n.slug === detectedSlug) : null;
+  const mismatch = !!(selectedNetwork && detectedSlug && detectedSlug !== selectedNetwork.slug);
+
+  // Auto-select network from pasted URL when the user hasn't picked one manually.
+  function handleUrlChange(next: string) {
+    setUrl(next);
+    if (touchedNetwork) return;
+    const slug = detectNetworkSlug(next);
+    if (slug) {
+      const match = activeNetworks.find((n) => n.slug === slug);
+      if (match && match.id !== networkId) setNetworkId(match.id);
+    }
+  }
+
+  function handleClean() {
+    const cleaned = cleanShopUrl(url);
+    if (cleaned !== url) {
+      setUrl(cleaned);
+      toast.success("URL cleaned");
+    } else {
+      toast.info("URL already clean");
+    }
+  }
 
   const add = useMutation({
-    mutationFn: () => adminUpsertLink({ data: { product_id: product.id, network_id: networkId, url } as any }),
-    onSuccess: () => { toast.success("Link saved"); setUrl(""); setNetworkId(""); qc.invalidateQueries({ queryKey: ["admin-product-links", product.id] }); },
+    mutationFn: () => {
+      const finalUrl = cleanShopUrl(url);
+      if (selectedNetwork && !urlMatchesNetwork(finalUrl, selectedNetwork.slug)) {
+        throw new Error(`URL host does not match ${selectedNetwork.name}.`);
+      }
+      return adminUpsertLink({ data: { product_id: product.id, network_id: networkId, url: finalUrl } as any });
+    },
+    onSuccess: () => {
+      toast.success("Link saved");
+      setUrl(""); setNetworkId(""); setTouchedNetwork(false);
+      qc.invalidateQueries({ queryKey: ["admin-product-links", product.id] });
+    },
     onError: (e: any) => toast.error(e.message),
   });
   const del = useMutation({
@@ -287,22 +326,56 @@ function LinksDialog({ product, onClose }: any) {
           ))}
           <div className="rounded border p-3 space-y-2">
             <p className="text-sm font-medium">Add link</p>
-            <Select value={networkId} onValueChange={setNetworkId}>
+            <div className="space-y-1">
+              <Input
+                placeholder="Paste Shopee / Lazada / TikTok / Amazon URL…"
+                value={url}
+                onChange={(e) => handleUrlChange(e.target.value)}
+              />
+              {url && (
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  {detectedNetwork ? (
+                    <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                      <Sparkles className="h-3 w-3" />Detected: {detectedNetwork.name}
+                    </span>
+                  ) : detectedSlug ? (
+                    <span className="text-amber-600">Detected slug “{detectedSlug}” — no matching active network. Add one in Networks.</span>
+                  ) : (
+                    <span className="text-muted-foreground">Unknown host — pick a network manually.</span>
+                  )}
+                  <button type="button" onClick={handleClean} className="ml-auto text-primary underline-offset-2 hover:underline">
+                    Clean tracking params
+                  </button>
+                </div>
+              )}
+            </div>
+            <Select
+              value={networkId}
+              onValueChange={(v) => { setNetworkId(v); setTouchedNetwork(true); }}
+            >
               <SelectTrigger><SelectValue placeholder="Choose network" /></SelectTrigger>
               <SelectContent>
-                {(netData?.networks ?? []).filter((n: any) => n.active).map((n: any) => (
+                {activeNetworks.map((n: any) => (
                   <SelectItem key={n.id} value={n.id}>{n.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Input placeholder="https://shopee.ph/..." value={url} onChange={(e) => setUrl(e.target.value)} />
-            <Button onClick={() => add.mutate()} disabled={!networkId || !url || add.isPending} size="sm">Add</Button>
+            {mismatch && (
+              <p className="flex items-center gap-1 text-xs text-amber-600">
+                <AlertTriangle className="h-3 w-3" />
+                URL looks like {detectedSlug}, but you picked {selectedNetwork?.name}.
+              </p>
+            )}
+            <Button onClick={() => add.mutate()} disabled={!networkId || !url || add.isPending} size="sm">
+              {add.isPending ? "Saving…" : "Add"}
+            </Button>
           </div>
         </div>
       </DialogContent>
     </Dialog>
   );
 }
+
 
 function NetworksTab() {
   const qc = useQueryClient();
