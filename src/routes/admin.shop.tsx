@@ -231,7 +231,7 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
         price_php: f.price_php ?? s.price_php ?? null,
         category_id: f.category_id ?? s.category_id ?? null,
       }));
-      setImportInfo({ networkSlug: res.networkSlug, cleanedUrl: res.cleanedUrl, networkId: res.networkId });
+      setImportInfo({ networkSlug: res.networkSlug, cleanedUrl: res.cleanedUrl, networkId: res.networkId, resolvedFrom: res.resolvedFrom ?? null });
       toast.success("Fetched — review and save.");
     },
     onError: (e: any) => toast.error(e.message ?? "Fetch failed"),
