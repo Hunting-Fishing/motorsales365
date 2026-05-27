@@ -332,7 +332,7 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
     queryFn: () => adminListNetworks(),
     staleTime: 60_000,
   });
-  const activeNetworks = (networksData ?? []).filter((n: any) => n.active);
+  const activeNetworks = (((networksData as any)?.networks ?? networksData ?? []) as any[]).filter((n: any) => n?.active);
 
   const importMut = useMutation({
     mutationFn: () => scrapeShopUrl({ data: {
