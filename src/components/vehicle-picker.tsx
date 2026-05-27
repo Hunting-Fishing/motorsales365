@@ -268,7 +268,7 @@ export function VehiclePicker({ category, year, make, model, engine, onChange }:
             {year && (
               <button
                 type="button"
-                onClick={() => onChange({ year: "", make, model })}
+                onClick={() => onChange({ year: "", make, model, engine })}
                 className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground"
               >
                 <X className="mr-1 h-3 w-3" /> Clear
@@ -282,7 +282,7 @@ export function VehiclePicker({ category, year, make, model, engine, onChange }:
             searchPlaceholder="Search year…"
             emptyText="No years"
             addLabel="Use year"
-            onSelect={(v) => onChange({ year: v, make, model })}
+            onSelect={(v) => onChange({ year: v, make, model, engine })}
           />
         </div>
 
@@ -293,7 +293,7 @@ export function VehiclePicker({ category, year, make, model, engine, onChange }:
             {make && (
               <button
                 type="button"
-                onClick={() => onChange({ year, make: "", model: "" })}
+                onClick={() => onChange({ year, make: "", model: "", engine: "" })}
                 className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground"
               >
                 <X className="mr-1 h-3 w-3" /> Clear
@@ -308,7 +308,7 @@ export function VehiclePicker({ category, year, make, model, engine, onChange }:
             emptyText="No makes found"
             addLabel="Add missing make"
             getKeywords={(opt) => MAKE_ALIASES[opt] ?? []}
-            onSelect={(v) => onChange({ year, make: v, model: "" })}
+            onSelect={(v) => onChange({ year, make: v, model: "", engine: "" })}
           />
         </div>
 
@@ -319,7 +319,7 @@ export function VehiclePicker({ category, year, make, model, engine, onChange }:
             {model && (
               <button
                 type="button"
-                onClick={() => onChange({ year, make, model: "" })}
+                onClick={() => onChange({ year, make, model: "", engine: "" })}
                 className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground"
               >
                 <X className="mr-1 h-3 w-3" /> Clear
@@ -330,7 +330,7 @@ export function VehiclePicker({ category, year, make, model, engine, onChange }:
             <Input
               value={model}
               placeholder="Type model"
-              onChange={(e) => onChange({ year, make, model: e.target.value })}
+              onChange={(e) => onChange({ year, make, model: e.target.value, engine })}
             />
           ) : (
             <Combo
@@ -346,19 +346,75 @@ export function VehiclePicker({ category, year, make, model, engine, onChange }:
               }
               addLabel="Add model"
               getKeywords={(opt) => getModelAliases(opt)}
-              onSelect={(v) => onChange({ year, make, model: v })}
+              onSelect={(v) => onChange({ year, make, model: v, engine: "" })}
             />
           )}
           {isOtherModel && !isOtherMake && (
             <Input
               value={model === "Other" ? "" : model}
               placeholder="Type custom model"
-              onChange={(e) => onChange({ year, make, model: e.target.value })}
+              onChange={(e) => onChange({ year, make, model: e.target.value, engine })}
               className="mt-2"
             />
           )}
         </div>
       </div>
+
+      {/* Engine */}
+      {(category === "car" || category === "motorcycle") && (
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Engine <span className="text-xs font-normal text-muted-foreground">(optional)</span></span>
+            {engine && (
+              <button
+                type="button"
+                onClick={() => onChange({ year, make, model, engine: "" })}
+                className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground"
+              >
+                <X className="mr-1 h-3 w-3" /> Clear
+              </button>
+            )}
+          </div>
+          {engineCustom || (model && engineOptions.length === 0) ? (
+            <div className="flex gap-2">
+              <Input
+                value={engine ?? ""}
+                placeholder="e.g. 2.4L Diesel (2GD-FTV)"
+                onChange={(e) => onChange({ year, make, model, engine: e.target.value })}
+              />
+              {engineOptions.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => { setEngineCustom(false); onChange({ year, make, model, engine: "" }); }}
+                  className="text-xs text-primary hover:underline"
+                >
+                  Use list
+                </button>
+              )}
+            </div>
+          ) : (
+            <Combo
+              value={engine ?? ""}
+              options={engineOptions.map((e) => e.label)}
+              disabled={!model}
+              placeholder={model ? "Select engine (or leave blank)" : "Pick a model first"}
+              searchPlaceholder="Search engine…"
+              emptyText="No engines listed"
+              addLabel="Use custom engine"
+              onSelect={(v) => onChange({ year, make, model, engine: v })}
+            />
+          )}
+          {model && engineOptions.length > 0 && !engineCustom && (
+            <button
+              type="button"
+              onClick={() => setEngineCustom(true)}
+              className="text-xs text-primary hover:underline"
+            >
+              Engine not listed? Type your own
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="flex items-center justify-between">
         <p className="text-xs text-muted-foreground">
