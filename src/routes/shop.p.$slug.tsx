@@ -104,7 +104,8 @@ function ProductPage() {
                   const yr = f.year_start || f.year_end
                     ? ` (${f.year_start ?? "…"}–${f.year_end ?? "present"})`
                     : "";
-                  const label = [f.make ?? "Any make", f.model ?? "Any model"].join(" ") + yr;
+                  const eng = f.engine ? ` — ${f.engine}` : "";
+                  const label = [f.make ?? "Any make", f.model ?? "Any model"].join(" ") + yr + eng;
                   return (
                     <li key={f.id} className="flex items-start gap-2">
                       <span>•</span>
