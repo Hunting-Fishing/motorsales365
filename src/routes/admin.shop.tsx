@@ -6,7 +6,7 @@ import {
   adminListNetworks, adminUpsertNetwork,
   adminProductLinks, adminUpsertLink, adminDeleteLink,
   adminListFitment, adminUpsertFitment, adminDeleteFitment,
-  listShopCategories,
+  listShopCategories, scrapeShopUrl,
 } from "@/lib/shop.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -214,20 +214,85 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
     active: initial.active ?? true,
     universal_fit: initial.universal_fit ?? false,
   });
+  const [importUrl, setImportUrl] = useState("");
+  const [importInfo, setImportInfo] = useState<{ networkSlug: string | null; cleanedUrl: string; networkId: string | null } | null>(null);
+
+  const importMut = useMutation({
+    mutationFn: () => scrapeShopUrl({ data: { url: importUrl } }),
+    onSuccess: (res: any) => {
+      if (res.error) { toast.error(res.error); return; }
+      const s = res.suggested ?? {};
+      setForm((f) => ({
+        ...f,
+        title: f.title || s.title || "",
+        brand: f.brand || s.brand || "",
+        description: f.description || s.description || "",
+        image_url: f.image_url || s.image_url || "",
+        price_php: f.price_php ?? s.price_php ?? null,
+        category_id: f.category_id ?? s.category_id ?? null,
+      }));
+      setImportInfo({ networkSlug: res.networkSlug, cleanedUrl: res.cleanedUrl, networkId: res.networkId });
+      toast.success("Fetched — review and save.");
+    },
+    onError: (e: any) => toast.error(e.message ?? "Fetch failed"),
+  });
+
   const mut = useMutation({
-    mutationFn: () => adminUpsertProduct({ data: {
-      ...form,
-      price_php: form.price_php ? Number(form.price_php) : null,
-    } as any }),
+    mutationFn: async () => {
+      const saved = await adminUpsertProduct({ data: {
+        ...form,
+        price_php: form.price_php ? Number(form.price_php) : null,
+      } as any });
+      // Auto-stage affiliate link if we imported from a recognized network
+      if (importInfo?.networkId && importInfo.cleanedUrl && saved?.id) {
+        try {
+          await adminUpsertLink({ data: {
+            product_id: saved.id,
+            network_id: importInfo.networkId,
+            url: importInfo.cleanedUrl,
+          } as any });
+        } catch (e: any) {
+          toast.warning(`Saved product, but couldn’t add link: ${e?.message ?? "error"}`);
+        }
+      }
+      return saved;
+    },
     onSuccess: () => { toast.success("Saved"); onSaved(); },
     onError: (e: any) => toast.error(e.message),
   });
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader><DialogTitle>{form.id ? "Edit product" : "New product"}</DialogTitle></DialogHeader>
         <div className="grid gap-3">
+          <div className="rounded-lg border bg-muted/40 p-3 space-y-2">
+            <Label className="flex items-center gap-2 text-sm">
+              <Sparkles className="h-4 w-4 text-primary" /> Import from affiliate URL
+            </Label>
+            <div className="flex gap-2">
+              <Input
+                placeholder="Paste Shopee / Lazada / TikTok / Amazon product URL…"
+                value={importUrl}
+                onChange={(e) => setImportUrl(e.target.value)}
+              />
+              <Button
+                type="button"
+                onClick={() => importMut.mutate()}
+                disabled={!importUrl || importMut.isPending}
+              >
+                {importMut.isPending ? "Fetching…" : "Fetch"}
+              </Button>
+            </div>
+            {importInfo && (
+              <p className="text-xs text-muted-foreground">
+                {importInfo.networkSlug
+                  ? <>Detected <strong>{importInfo.networkSlug}</strong>{importInfo.networkId ? " · network linked ✓" : " · no matching active network"}</>
+                  : "Unknown host — fields pre-filled from page metadata."}
+                {" "}Empty fields below were auto-filled; review before saving.
+              </p>
+            )}
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <div><Label>Title</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
             <div><Label>Slug (url)</Label><Input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="meguiars-gold-class-wax" /></div>
@@ -236,7 +301,13 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
             <div><Label>Brand</Label><Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} /></div>
             <div><Label>Price (₱, optional)</Label><Input type="number" value={form.price_php ?? ""} onChange={(e) => setForm({ ...form, price_php: e.target.value as any })} /></div>
           </div>
-          <div><Label>Image URL</Label><Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} /></div>
+          <div>
+            <Label>Image URL</Label>
+            <Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} />
+            {form.image_url && (
+              <img src={form.image_url} alt="" className="mt-2 h-24 w-24 rounded border object-cover" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
+            )}
+          </div>
           <div>
             <Label>Category</Label>
             <Select value={form.category_id ?? ""} onValueChange={(v) => setForm({ ...form, category_id: v || null })}>
