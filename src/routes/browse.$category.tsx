@@ -230,6 +230,26 @@ function BrowsePage() {
                 <Input id="kw" value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="Make, model…" className="pl-8" />
               </div>
             </div>
+            {(category === "car" || category === "motorcycle") && (
+              <div className="rounded-md border border-border/60 bg-background/60 p-3">
+                <Label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Vehicle
+                </Label>
+                <VehiclePicker
+                  category={category as "car" | "motorcycle"}
+                  year={vYear}
+                  make={vMake}
+                  model={vModel}
+                  engine={vEngine}
+                  onChange={(v) => {
+                    setVYear(v.year);
+                    setVMake(v.make);
+                    setVModel(v.model);
+                    setVEngine(v.engine ?? "");
+                  }}
+                />
+              </div>
+            )}
             <LocationPicker
               asFilter
               stacked
