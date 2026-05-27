@@ -8,8 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RidePhotoUploader } from "@/components/rides/ride-photo-uploader";
 import { ServiceLogPhotoUploader } from "@/components/rides/service-log-photo-uploader";
+import { getEnginesFor } from "@/data/vehicle-engines";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { linkRideToListing, publishRide } from "@/lib/rides.functions";
@@ -165,7 +167,7 @@ function EditRidePage() {
           <div className="grid gap-3 sm:grid-cols-2">
             {[
               ["name", "Nickname"], ["year", "Year"], ["make", "Make"], ["model", "Model"],
-              ["trim", "Trim"], ["color", "Color"], ["engine", "Engine"],
+              ["trim", "Trim"], ["color", "Color"],
               ["transmission", "Transmission"], ["drivetrain", "Drivetrain"],
               ["mileage_km", "Mileage (km)"], ["region", "Region"], ["city", "City"],
             ].map(([k, label]) => (
@@ -181,6 +183,7 @@ function EditRidePage() {
                 />
               </div>
             ))}
+            <RideEngineField ride={ride} setRide={setRide} />
           </div>
           <div className="space-y-1">
             <Label>The story</Label>
@@ -266,6 +269,58 @@ function EditRidePage() {
           )}
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+const ENGINE_CUSTOM = "__custom__";
+const ENGINE_NONE = "__none__";
+
+function RideEngineField({ ride, setRide }: { ride: any; setRide: (r: any) => void }) {
+  const cat: "car" | "motorcycle" = (ride?.vehicle_type === "motorcycle" || ride?.vehicle_type === "scooter") ? "motorcycle" : "car";
+  const yearNum = ride?.year ? Number(ride.year) : undefined;
+  const engines = getEnginesFor(cat, ride?.make, ride?.model, yearNum);
+  const current: string = ride?.engine ?? "";
+  const inList = engines.some((e) => e.label === current);
+  const [custom, setCustom] = useState<boolean>(!!current && !inList);
+
+  if (custom || (ride?.model && engines.length === 0)) {
+    return (
+      <div className="space-y-1 sm:col-span-2">
+        <Label>Engine</Label>
+        <div className="flex gap-2">
+          <Input
+            value={current}
+            placeholder="e.g. 2.4L Diesel (2GD-FTV)"
+            onChange={(e) => setRide({ ...ride, engine: e.target.value })}
+          />
+          {engines.length > 0 && (
+            <Button type="button" variant="ghost" size="sm" onClick={() => { setCustom(false); setRide({ ...ride, engine: null }); }}>
+              Use list
+            </Button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-1 sm:col-span-2">
+      <Label>Engine</Label>
+      <Select
+        value={current || ENGINE_NONE}
+        onValueChange={(v) => {
+          if (v === ENGINE_CUSTOM) { setCustom(true); setRide({ ...ride, engine: "" }); return; }
+          setRide({ ...ride, engine: v === ENGINE_NONE ? null : v });
+        }}
+      >
+        <SelectTrigger><SelectValue placeholder={ride?.model ? "Select engine" : "Pick a model first"} /></SelectTrigger>
+        <SelectContent className="max-h-72">
+          <SelectItem value={ENGINE_NONE}>— Not specified —</SelectItem>
+          {engines.map((e) => <SelectItem key={e.label} value={e.label}>{e.label}</SelectItem>)}
+          <SelectItem value={ENGINE_CUSTOM}>Other / custom…</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   );
 }

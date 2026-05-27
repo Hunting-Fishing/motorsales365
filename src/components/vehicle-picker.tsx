@@ -20,6 +20,7 @@ import {
   getYearOptions,
   type VehicleCategory,
 } from "@/data/vehicles";
+import { getEnginesFor } from "@/data/vehicle-engines";
 import { normalize } from "@/lib/fuzzy";
 import { MAKE_ALIASES, getModelAliases } from "@/lib/vehicle-aliases";
 
@@ -28,7 +29,8 @@ type Props = {
   year: string;
   make: string;
   model: string;
-  onChange: (next: { year: string; make: string; model: string }) => void;
+  engine?: string;
+  onChange: (next: { year: string; make: string; model: string; engine?: string }) => void;
 };
 
 function Combo({
@@ -155,9 +157,10 @@ function Combo({
   );
 }
 
-export function VehiclePicker({ category, year, make, model, onChange }: Props) {
+export function VehiclePicker({ category, year, make, model, engine, onChange }: Props) {
   // "Other" mode = three free-text inputs (escape hatch).
   const [otherMode, setOtherMode] = React.useState(false);
+  const [engineCustom, setEngineCustom] = React.useState(false);
 
   const yearNum = year && /^\d{4}$/.test(year) ? parseInt(year, 10) : undefined;
   const yearOptions = React.useMemo(
@@ -187,6 +190,11 @@ export function VehiclePicker({ category, year, make, model, onChange }: Props) 
     [category, make, yearNum],
   );
 
+  const engineOptions = React.useMemo(
+    () => getEnginesFor(category, make, model, yearNum),
+    [category, make, model, yearNum],
+  );
+
   const isOtherMake = make.toLowerCase() === "other";
   const isOtherModel = model.toLowerCase() === "other";
 
@@ -194,10 +202,21 @@ export function VehiclePicker({ category, year, make, model, onChange }: Props) 
   React.useEffect(() => {
     if (!yearNum || !make || !model) return;
     if (!modelOptions.some((m) => m.toLowerCase() === model.toLowerCase())) {
-      onChange({ year, make, model: "" });
+      onChange({ year, make, model: "", engine: "" });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [yearNum]);
+
+  // Drop stale engine when its label is no longer offered (unless user is
+  // typing a custom value).
+  React.useEffect(() => {
+    if (engineCustom) return;
+    if (!engine) return;
+    if (engineOptions.length && !engineOptions.some((e) => e.label === engine)) {
+      onChange({ year, make, model, engine: "" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [make, model, yearNum]);
 
   if (otherMode) {
     return (
@@ -215,21 +234,26 @@ export function VehiclePicker({ category, year, make, model, onChange }: Props) 
         <div className="grid gap-2 sm:grid-cols-3">
           <Input
             value={year}
-            onChange={(e) => onChange({ year: e.target.value, make, model })}
+            onChange={(e) => onChange({ year: e.target.value, make, model, engine })}
             placeholder="Year (e.g. 2019)"
             inputMode="numeric"
           />
           <Input
             value={make}
-            onChange={(e) => onChange({ year, make: e.target.value, model })}
+            onChange={(e) => onChange({ year, make: e.target.value, model, engine })}
             placeholder="Make"
           />
           <Input
             value={model}
-            onChange={(e) => onChange({ year, make, model: e.target.value })}
+            onChange={(e) => onChange({ year, make, model: e.target.value, engine })}
             placeholder="Model"
           />
         </div>
+        <Input
+          value={engine ?? ""}
+          onChange={(e) => onChange({ year, make, model, engine: e.target.value })}
+          placeholder="Engine (optional, e.g. 2.4L Diesel)"
+        />
       </div>
     );
   }
@@ -244,7 +268,7 @@ export function VehiclePicker({ category, year, make, model, onChange }: Props) 
             {year && (
               <button
                 type="button"
-                onClick={() => onChange({ year: "", make, model })}
+                onClick={() => onChange({ year: "", make, model, engine })}
                 className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground"
               >
                 <X className="mr-1 h-3 w-3" /> Clear
@@ -258,7 +282,7 @@ export function VehiclePicker({ category, year, make, model, onChange }: Props) 
             searchPlaceholder="Search year…"
             emptyText="No years"
             addLabel="Use year"
-            onSelect={(v) => onChange({ year: v, make, model })}
+            onSelect={(v) => onChange({ year: v, make, model, engine })}
           />
         </div>
 
@@ -269,7 +293,7 @@ export function VehiclePicker({ category, year, make, model, onChange }: Props) 
             {make && (
               <button
                 type="button"
-                onClick={() => onChange({ year, make: "", model: "" })}
+                onClick={() => onChange({ year, make: "", model: "", engine: "" })}
                 className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground"
               >
                 <X className="mr-1 h-3 w-3" /> Clear
@@ -284,7 +308,7 @@ export function VehiclePicker({ category, year, make, model, onChange }: Props) 
             emptyText="No makes found"
             addLabel="Add missing make"
             getKeywords={(opt) => MAKE_ALIASES[opt] ?? []}
-            onSelect={(v) => onChange({ year, make: v, model: "" })}
+            onSelect={(v) => onChange({ year, make: v, model: "", engine: "" })}
           />
         </div>
 
@@ -295,7 +319,7 @@ export function VehiclePicker({ category, year, make, model, onChange }: Props) 
             {model && (
               <button
                 type="button"
-                onClick={() => onChange({ year, make, model: "" })}
+                onClick={() => onChange({ year, make, model: "", engine: "" })}
                 className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground"
               >
                 <X className="mr-1 h-3 w-3" /> Clear
@@ -306,7 +330,7 @@ export function VehiclePicker({ category, year, make, model, onChange }: Props) 
             <Input
               value={model}
               placeholder="Type model"
-              onChange={(e) => onChange({ year, make, model: e.target.value })}
+              onChange={(e) => onChange({ year, make, model: e.target.value, engine })}
             />
           ) : (
             <Combo
@@ -322,19 +346,75 @@ export function VehiclePicker({ category, year, make, model, onChange }: Props) 
               }
               addLabel="Add model"
               getKeywords={(opt) => getModelAliases(opt)}
-              onSelect={(v) => onChange({ year, make, model: v })}
+              onSelect={(v) => onChange({ year, make, model: v, engine: "" })}
             />
           )}
           {isOtherModel && !isOtherMake && (
             <Input
               value={model === "Other" ? "" : model}
               placeholder="Type custom model"
-              onChange={(e) => onChange({ year, make, model: e.target.value })}
+              onChange={(e) => onChange({ year, make, model: e.target.value, engine })}
               className="mt-2"
             />
           )}
         </div>
       </div>
+
+      {/* Engine */}
+      {(category === "car" || category === "motorcycle") && (
+        <div className="space-y-1">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Engine <span className="text-xs font-normal text-muted-foreground">(optional)</span></span>
+            {engine && (
+              <button
+                type="button"
+                onClick={() => onChange({ year, make, model, engine: "" })}
+                className="inline-flex items-center text-xs text-muted-foreground hover:text-foreground"
+              >
+                <X className="mr-1 h-3 w-3" /> Clear
+              </button>
+            )}
+          </div>
+          {engineCustom || (model && engineOptions.length === 0) ? (
+            <div className="flex gap-2">
+              <Input
+                value={engine ?? ""}
+                placeholder="e.g. 2.4L Diesel (2GD-FTV)"
+                onChange={(e) => onChange({ year, make, model, engine: e.target.value })}
+              />
+              {engineOptions.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => { setEngineCustom(false); onChange({ year, make, model, engine: "" }); }}
+                  className="text-xs text-primary hover:underline"
+                >
+                  Use list
+                </button>
+              )}
+            </div>
+          ) : (
+            <Combo
+              value={engine ?? ""}
+              options={engineOptions.map((e) => e.label)}
+              disabled={!model}
+              placeholder={model ? "Select engine (or leave blank)" : "Pick a model first"}
+              searchPlaceholder="Search engine…"
+              emptyText="No engines listed"
+              addLabel="Use custom engine"
+              onSelect={(v) => onChange({ year, make, model, engine: v })}
+            />
+          )}
+          {model && engineOptions.length > 0 && !engineCustom && (
+            <button
+              type="button"
+              onClick={() => setEngineCustom(true)}
+              className="text-xs text-primary hover:underline"
+            >
+              Engine not listed? Type your own
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="flex items-center justify-between">
         <p className="text-xs text-muted-foreground">

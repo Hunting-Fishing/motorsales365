@@ -20,7 +20,7 @@ export const listShopCategories = createServerFn({ method: "GET" }).handler(asyn
 export const listShopProducts = createServerFn({ method: "GET" })
   .inputValidator((input: {
     categorySlug?: string; featured?: boolean; search?: string; limit?: number;
-    make?: string; model?: string; year?: number; includeUniversal?: boolean;
+    make?: string; model?: string; year?: number; engine?: string; includeUniversal?: boolean;
     brand?: string;
   } = {}) =>
     z.object({
@@ -31,6 +31,7 @@ export const listShopProducts = createServerFn({ method: "GET" })
       make: z.string().max(80).optional(),
       model: z.string().max(120).optional(),
       year: z.number().int().min(1900).max(2100).optional(),
+      engine: z.string().max(120).optional(),
       includeUniversal: z.boolean().optional(),
       brand: z.string().max(120).optional(),
     }).parse(input),
@@ -48,17 +49,27 @@ export const listShopProducts = createServerFn({ method: "GET" })
     if (data.make && data.model) {
       let fq = supabaseAdmin
         .from("shop_product_fitment")
-        .select("product_id, make, model, year_start, year_end");
+        .select("product_id, make, model, year_start, year_end, engine");
       // make matches or is null (any-make rule)
       fq = fq.or(`make.is.null,make.ilike.${data.make}`);
       const { data: rows, error: fErr } = await fq.limit(5000);
       if (fErr) throw new Error(fErr.message);
+      const visitorEngine = data.engine?.trim().toLowerCase();
       const matched = (rows ?? []).filter((r: any) => {
         const modelOk = !r.model || r.model.toLowerCase() === data.model!.toLowerCase();
         if (!modelOk) return false;
         if (data.year) {
           if (r.year_start && data.year < r.year_start) return false;
           if (r.year_end && data.year > r.year_end) return false;
+        }
+        // Engine rule: if the rule pins an engine, only match when the visitor
+        // supplied that same engine (case-insensitive). If the visitor hasn't
+        // chosen an engine, engine-specific rules are ignored entirely so we
+        // never hide otherwise-fitting parts.
+        const ruleEngine = (r.engine ?? "").trim().toLowerCase();
+        if (ruleEngine) {
+          if (!visitorEngine) return true; // visitor hasn't narrowed yet
+          if (ruleEngine !== visitorEngine) return false;
         }
         return true;
       });

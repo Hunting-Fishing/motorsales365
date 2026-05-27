@@ -21,6 +21,7 @@ const shopSearch = z.object({
   make: fallback(z.string(), "").default(""),
   model: fallback(z.string(), "").default(""),
   year: fallback(z.number().optional(), undefined).default(undefined),
+  engine: fallback(z.string(), "").default(""),
   brand: fallback(z.string(), "").default(""),
   category: fallback(z.string(), "").default(""),
 });
@@ -46,7 +47,7 @@ function ShopIndex() {
 
   // Sync URL <-> garage
   const activeVehicle = search.make && search.model
-    ? { category: "car" as const, make: search.make, model: search.model, year: search.year }
+    ? { category: "car" as const, make: search.make, model: search.model, year: search.year, engine: search.engine || undefined }
     : garage;
 
   const { data: catData } = useQuery({ queryKey: ["shop-cats"], queryFn: () => listShopCategories() });
@@ -55,7 +56,7 @@ function ShopIndex() {
     queryFn: () => listShopBrands({ data: search.category ? { categorySlug: search.category } : {} }),
   });
   const filterArgs = {
-    ...(activeVehicle ? { make: activeVehicle.make, model: activeVehicle.model, year: activeVehicle.year } : {}),
+    ...(activeVehicle ? { make: activeVehicle.make, model: activeVehicle.model, year: activeVehicle.year, engine: activeVehicle.engine } : {}),
     ...(search.brand ? { brand: search.brand } : {}),
     ...(search.category ? { categorySlug: search.category } : {}),
   };
@@ -73,14 +74,14 @@ function ShopIndex() {
   const featured = featData?.products ?? [];
   const latest = latestData?.products ?? [];
 
-  const onPickVehicle = (v: { category: "car" | "motorcycle"; make: string; model: string; year?: number }) => {
+  const onPickVehicle = (v: { category: "car" | "motorcycle"; make: string; model: string; year?: number; engine?: string }) => {
     setGarageState(v);
-    navigate({ search: (prev: any) => ({ ...prev, make: v.make, model: v.model, year: v.year }) });
+    navigate({ search: (prev: any) => ({ ...prev, make: v.make, model: v.model, year: v.year, engine: v.engine ?? "" }) });
   };
 
   const clearVehicle = () => {
     setGarageState(null);
-    navigate({ search: (prev: any) => ({ ...prev, make: "", model: "", year: undefined }) });
+    navigate({ search: (prev: any) => ({ ...prev, make: "", model: "", year: undefined, engine: "" }) });
   };
 
   const onApplyFilters = (next: { categorySlug: string; brand: string; vehicle: typeof activeVehicle }) => {
@@ -93,6 +94,7 @@ function ShopIndex() {
         make: next.vehicle?.make ?? "",
         model: next.vehicle?.model ?? "",
         year: next.vehicle?.year,
+        engine: next.vehicle?.engine ?? "",
       }),
     });
   };
@@ -140,7 +142,7 @@ function ShopIndex() {
               size="sm"
               onClick={() => {
                 setGarageState(null);
-                navigate({ search: () => ({ make: "", model: "", year: undefined, brand: "", category: "" }) });
+                navigate({ search: () => ({ make: "", model: "", year: undefined, engine: "", brand: "", category: "" }) });
               }}
             >
               <X className="h-4 w-4" />
@@ -171,7 +173,7 @@ function ShopIndex() {
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
               {cats.map((c) => (
                 <Link key={c.id} to="/shop/$category" params={{ category: c.slug }}
-                  search={activeVehicle ? { make: activeVehicle.make, model: activeVehicle.model, year: activeVehicle.year } : {}}
+                  search={activeVehicle ? { make: activeVehicle.make, model: activeVehicle.model, year: activeVehicle.year, engine: activeVehicle.engine ?? "" } : {}}
                   className="group rounded-xl border bg-card p-5 transition hover:border-primary hover:shadow-md">
                   <p className="font-semibold group-hover:text-primary">{c.name}</p>
                   {c.description && <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{c.description}</p>}

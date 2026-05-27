@@ -14,6 +14,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { LocationPicker } from "@/components/location-picker";
+import { VehiclePicker } from "@/components/vehicle-picker";
 import { buildTitleSearchTerms } from "@/lib/vehicle-aliases";
 import { fuzzyFilter } from "@/lib/fuzzy";
 
@@ -25,6 +26,10 @@ const searchSchema = z.object({
   min: z.coerce.number().optional(),
   max: z.coerce.number().optional(),
   sort: z.enum(["recent", "price_asc", "price_desc"]).optional(),
+  year: z.coerce.number().optional(),
+  make: z.string().optional(),
+  model: z.string().optional(),
+  engine: z.string().optional(),
 });
 
 const CATEGORY_LABEL: Record<string, string> = {
@@ -70,6 +75,10 @@ function BrowsePage() {
   const [minPrice, setMinPrice] = useState(search.min?.toString() ?? "");
   const [maxPrice, setMaxPrice] = useState(search.max?.toString() ?? "");
   const [sort, setSort] = useState(search.sort ?? "recent");
+  const [vYear, setVYear] = useState(search.year ? String(search.year) : "");
+  const [vMake, setVMake] = useState(search.make ?? "");
+  const [vModel, setVModel] = useState(search.model ?? "");
+  const [vEngine, setVEngine] = useState(search.engine ?? "");
   const [items, setItems] = useState<ListingCardData[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -88,6 +97,12 @@ function BrowsePage() {
         if (search.city) q = q.eq("city", search.city);
         if (search.min) q = q.gte("price_php", search.min);
         if (search.max) q = q.lte("price_php", search.max);
+        // Vehicle attributes are stored as JSON. Match the seller-entered
+        // string casing-insensitively when possible.
+        if (search.year) q = q.eq("attributes->>year", String(search.year));
+        if (search.make) q = q.ilike("attributes->>make", search.make);
+        if (search.model) q = q.ilike("attributes->>model", search.model);
+        if (search.engine) q = q.ilike("attributes->>engine", search.engine);
         if (search.sort === "price_asc") q = q.order("price_php", { ascending: true });
         else if (search.sort === "price_desc") q = q.order("price_php", { ascending: false });
         else q = q.order("boost_until", { ascending: false, nullsFirst: false }).order("published_at", { ascending: false, nullsFirst: false });
@@ -138,7 +153,7 @@ function BrowsePage() {
       setLoading(false);
     };
     fetchListings();
-  }, [category, search.q, search.region, search.province, search.city, search.min, search.max, search.sort]);
+  }, [category, search.q, search.region, search.province, search.city, search.min, search.max, search.sort, search.year, search.make, search.model, search.engine]);
 
   const applyFilters = (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,6 +168,10 @@ function BrowsePage() {
         min: minPrice ? Number(minPrice) : undefined,
         max: maxPrice ? Number(maxPrice) : undefined,
         sort,
+        year: vYear ? Number(vYear) : undefined,
+        make: vMake || undefined,
+        model: vModel || undefined,
+        engine: vEngine || undefined,
       },
     });
   };
@@ -176,6 +195,10 @@ function BrowsePage() {
         min: minPrice ? Number(minPrice) : null,
         max: maxPrice ? Number(maxPrice) : null,
         sort,
+        year: vYear ? Number(vYear) : null,
+        make: vMake || null,
+        model: vModel || null,
+        engine: vEngine || null,
       },
     });
     if (error) toast.error(error.message);
@@ -207,6 +230,26 @@ function BrowsePage() {
                 <Input id="kw" value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="Make, model…" className="pl-8" />
               </div>
             </div>
+            {(category === "car" || category === "motorcycle") && (
+              <div className="rounded-md border border-border/60 bg-background/60 p-3">
+                <Label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Vehicle
+                </Label>
+                <VehiclePicker
+                  category={category as "car" | "motorcycle"}
+                  year={vYear}
+                  make={vMake}
+                  model={vModel}
+                  engine={vEngine}
+                  onChange={(v) => {
+                    setVYear(v.year);
+                    setVMake(v.make);
+                    setVModel(v.model);
+                    setVEngine(v.engine ?? "");
+                  }}
+                />
+              </div>
+            )}
             <LocationPicker
               asFilter
               stacked

@@ -15,7 +15,7 @@ export const Route = createFileRoute("/rides/$slug")({
   loader: async ({ params }) => {
     const { data } = await (supabase as any)
       .from("rides")
-      .select("id,slug,name,year,make,model,trim,cover_photo_url,description,user_id,status")
+      .select("id,slug,name,year,make,model,trim,engine,cover_photo_url,description,user_id,status")
       .eq("slug", params.slug)
       .maybeSingle();
     if (!data || (data.status !== "published")) {
@@ -31,8 +31,9 @@ export const Route = createFileRoute("/rides/$slug")({
       return { meta: [{ title: "Ride — 365 MotorSales" }], links: [{ rel: "canonical", href: url }] };
     }
     const vehicle = [d.year, d.make, d.model, d.trim].filter(Boolean).join(" ");
-    const title = `${d.name}${vehicle ? ` — ${vehicle}` : ""} | 365 MotorSales Rides`;
-    const desc = (d.description ?? `Photos, specs, mods and service history for ${vehicle || d.name} on 365 MotorSales Philippines.`).slice(0, 155);
+    const vehicleWithEngine = d.engine ? `${vehicle} • ${d.engine}` : vehicle;
+    const title = `${d.name}${vehicleWithEngine ? ` — ${vehicleWithEngine}` : ""} | 365 MotorSales Rides`;
+    const desc = (d.description ?? `Photos, specs, mods and service history for ${vehicleWithEngine || d.name} on 365 MotorSales Philippines.`).slice(0, 155);
     return {
       meta: [
         { title }, { name: "description", content: desc },

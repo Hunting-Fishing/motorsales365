@@ -5,6 +5,8 @@ export type GarageVehicle = {
   make: string;
   model: string;
   year?: number;
+  /** Engine variant label, e.g. "2.4L Diesel (2GD-FTV)". Optional. */
+  engine?: string;
 };
 
 const KEY = "garage_vehicle_v1";
@@ -42,5 +44,6 @@ export function useGarage(): [GarageVehicle | null, (v: GarageVehicle | null) =>
 }
 
 export function formatVehicle(v: GarageVehicle): string {
-  return [v.year, v.make, v.model].filter(Boolean).join(" ");
+  const base = [v.year, v.make, v.model].filter(Boolean).join(" ");
+  return v.engine ? `${base} — ${v.engine}` : base;
 }

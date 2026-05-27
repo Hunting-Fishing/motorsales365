@@ -9,6 +9,7 @@ const CreateInput = z.object({
   make: z.string().max(60).optional().nullable(),
   model: z.string().max(80).optional().nullable(),
   trim: z.string().max(60).optional().nullable(),
+  engine: z.string().max(120).optional().nullable(),
   vehicle_type: z.enum(["car","truck","suv","van","motorcycle","scooter","atv","utv","boat","other"]).default("car"),
 });
 
@@ -38,6 +39,7 @@ export const createRide = createServerFn({ method: "POST" })
         make: data.make ?? null,
         model: data.model ?? null,
         trim: data.trim ?? null,
+        engine: data.engine ?? null,
         vehicle_type: data.vehicle_type,
         status: "draft",
       } as never)

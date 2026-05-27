@@ -18,6 +18,7 @@ const catSearch = z.object({
   make: fallback(z.string(), "").default(""),
   model: fallback(z.string(), "").default(""),
   year: fallback(z.number().optional(), undefined).default(undefined),
+  engine: fallback(z.string(), "").default(""),
   brand: fallback(z.string(), "").default(""),
 });
 
@@ -38,7 +39,7 @@ function ShopCategory() {
   const navigate = useNavigate({ from: "/shop/$category" });
   const [garage, setGarageState] = useGarage();
   const activeVehicle = search.make && search.model
-    ? { category: "car" as const, make: search.make, model: search.model, year: search.year }
+    ? { category: "car" as const, make: search.make, model: search.model, year: search.year, engine: search.engine || undefined }
     : garage;
 
   const { data: catData } = useQuery({ queryKey: ["shop-cats"], queryFn: () => listShopCategories() });
@@ -50,7 +51,7 @@ function ShopCategory() {
   const brands = brandData?.brands ?? [];
 
   const filterArgs = {
-    ...(activeVehicle ? { make: activeVehicle.make, model: activeVehicle.model, year: activeVehicle.year } : {}),
+    ...(activeVehicle ? { make: activeVehicle.make, model: activeVehicle.model, year: activeVehicle.year, engine: activeVehicle.engine } : {}),
     ...(search.brand ? { brand: search.brand } : {}),
   };
   const { data } = useQuery({
@@ -70,6 +71,7 @@ function ShopCategory() {
         make: next.vehicle?.make ?? "",
         model: next.vehicle?.model ?? "",
         year: next.vehicle?.year,
+        engine: next.vehicle?.engine ?? "",
       }),
     });
   };
@@ -93,7 +95,7 @@ function ShopCategory() {
               size="sm"
               onClick={() => {
                 setGarageState(null);
-                navigate({ search: () => ({ brand: "", make: "", model: "", year: undefined }) });
+                navigate({ search: () => ({ brand: "", make: "", model: "", year: undefined, engine: "" }) });
               }}
             >
               <X className="h-4 w-4" />
@@ -152,11 +154,11 @@ function ShopCategory() {
         vehicle={activeVehicle}
         onPickVehicle={(v) => {
           setGarageState(v);
-          navigate({ search: (prev: any) => ({ ...prev, make: v.make, model: v.model, year: v.year }) });
+          navigate({ search: (prev: any) => ({ ...prev, make: v.make, model: v.model, year: v.year, engine: v.engine ?? "" }) });
         }}
         onClearVehicle={() => {
           setGarageState(null);
-          navigate({ search: (prev: any) => ({ ...prev, make: "", model: "", year: undefined }) });
+          navigate({ search: (prev: any) => ({ ...prev, make: "", model: "", year: undefined, engine: "" }) });
         }}
       />
     </SiteLayout>

@@ -132,6 +132,7 @@ function SellPage() {
   const [mileage, setMileage] = useState("");
   const [transmission, setTransmission] = useState("");
   const [fuel, setFuel] = useState("");
+  const [engine, setEngine] = useState("");
 
   // Towing service-specific fields
   const [towServiceType, setTowServiceType] = useState("");
@@ -423,6 +424,7 @@ function SellPage() {
         if (mileage) attributes.mileage_km = mileage;
         if (transmission) attributes.transmission = transmission;
         if (fuel) attributes.fuel = fuel;
+        if (engine) attributes.engine = engine;
         if (category === "towing") {
           if (towServiceType) attributes.service_type = towServiceType;
           if (towCapacity) attributes.vehicle_capacity = towCapacity;
@@ -794,7 +796,8 @@ function SellPage() {
                   year={year}
                   make={make}
                   model={model}
-                  onChange={(v) => { setYear(v.year); setMake(v.make); setModel(v.model); }}
+                  engine={engine}
+                  onChange={(v) => { setYear(v.year); setMake(v.make); setModel(v.model); setEngine(v.engine ?? ""); }}
                 />
               </div>
             ) : (
