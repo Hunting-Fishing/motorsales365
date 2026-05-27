@@ -138,11 +138,18 @@ function DirectoryTable({ entries }: { entries: DirectoryEntry[] }) {
 
 function ProductsTab() {
   const qc = useQueryClient();
-  const { data, isLoading } = useQuery({ queryKey: ["admin-shop-products"], queryFn: () => adminListProducts() });
-  const { data: catData } = useQuery({ queryKey: ["shop-cats"], queryFn: () => listShopCategories() });
+  const { data, isLoading, isFetching, error, refetch } = useQuery({
+    queryKey: ["admin-shop-products"],
+    queryFn: () => adminListProducts(),
+    staleTime: 30_000,
+  });
+  const { data: catData } = useQuery({ queryKey: ["shop-cats"], queryFn: () => listShopCategories(), staleTime: 60_000 });
   const [editing, setEditing] = useState<any | null>(null);
   const [linksFor, setLinksFor] = useState<any | null>(null);
   const [fitmentFor, setFitmentFor] = useState<any | null>(null);
+  const [search, setSearch] = useState("");
+  const [catFilter, setCatFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
 
   const del = useMutation({
     mutationFn: (id: string) => adminDeleteProduct({ data: { id } }),
@@ -150,29 +157,124 @@ function ProductsTab() {
     onError: (e: any) => toast.error(e.message),
   });
 
+  const all = (data?.products ?? []) as any[];
+  const filtered = all.filter((p) => {
+    if (statusFilter === "active" && !p.active) return false;
+    if (statusFilter === "inactive" && p.active) return false;
+    if (statusFilter === "featured" && !p.featured) return false;
+    if (catFilter !== "all" && p.category?.slug !== catFilter) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      const hay = `${p.title ?? ""} ${p.brand ?? ""} ${(p.tags ?? []).join(" ")} ${p.category?.name ?? ""}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  });
+
   return (
     <Card>
       <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
-        <CardTitle>Products ({data?.products?.length ?? 0})</CardTitle>
-        <Button onClick={() => setEditing({})}><Plus className="mr-1 h-4 w-4" />New product</Button>
+        <div>
+          <CardTitle>Products ({filtered.length}{filtered.length !== all.length ? ` of ${all.length}` : ""})</CardTitle>
+          {error && <p className="mt-1 text-sm text-destructive">Failed to load: {(error as any).message}</p>}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button size="sm" variant="outline" onClick={() => refetch()} disabled={isFetching}>
+            {isFetching ? "Refreshing…" : "Refresh"}
+          </Button>
+          <Button onClick={() => setEditing({})}><Plus className="mr-1 h-4 w-4" />New product</Button>
+        </div>
       </CardHeader>
       <CardContent>
-        {isLoading ? <p className="text-muted-foreground">Loading…</p> : (
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <Input
+            placeholder="Search title, brand, tag…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="h-9 w-full max-w-xs"
+          />
+          <Select value={catFilter} onValueChange={setCatFilter}>
+            <SelectTrigger className="h-9 w-48"><SelectValue placeholder="All categories" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All categories</SelectItem>
+              {(catData?.categories ?? []).map((c: any) => (
+                <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="h-9 w-40"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All statuses</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="inactive">Inactive</SelectItem>
+              <SelectItem value="featured">Featured</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {isLoading ? (
+          <div className="space-y-2">
+            {[1,2,3].map((i) => <div key={i} className="h-12 animate-pulse rounded bg-muted" />)}
+          </div>
+        ) : all.length === 0 ? (
+          <div className="rounded-lg border border-dashed p-10 text-center text-muted-foreground">
+            <p className="font-medium">No products yet</p>
+            <p className="mt-1 text-sm">Click <strong>New product</strong> to add your first affiliate item.</p>
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-lg border border-dashed p-10 text-center text-muted-foreground">
+            No products match the current filters.
+          </div>
+        ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[640px] text-sm">
+            <table className="w-full min-w-[860px] text-sm">
               <thead className="border-b text-left text-xs uppercase text-muted-foreground">
-                <tr><th className="p-2">Title</th><th className="p-2">Category</th><th className="p-2">Price</th><th className="p-2">Clicks</th><th className="p-2">Status</th><th className="p-2"></th></tr>
+                <tr>
+                  <th className="p-2">Product</th>
+                  <th className="p-2">Category</th>
+                  <th className="p-2">Tags</th>
+                  <th className="p-2">Price</th>
+                  <th className="p-2">Clicks</th>
+                  <th className="p-2">Status</th>
+                  <th className="p-2"></th>
+                </tr>
               </thead>
               <tbody>
-                {(data?.products ?? []).map((p: any) => (
-                  <tr key={p.id} className="border-b">
-                    <td className="p-2 font-medium">{p.title}</td>
-                    <td className="p-2 text-muted-foreground">{p.category?.name ?? "—"}</td>
+                {filtered.map((p: any) => (
+                  <tr key={p.id} className="border-b align-top">
+                    <td className="p-2">
+                      <div className="flex items-start gap-2">
+                        {p.image_url ? (
+                          <img src={p.image_url} alt="" loading="lazy" className="h-10 w-10 flex-shrink-0 rounded object-cover" />
+                        ) : (
+                          <div className="h-10 w-10 flex-shrink-0 rounded bg-muted" />
+                        )}
+                        <div className="min-w-0">
+                          <p className="line-clamp-2 font-medium">{p.title}</p>
+                          {p.brand && <p className="text-xs text-muted-foreground">{p.brand}</p>}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-2 text-xs text-muted-foreground">{p.category?.name ?? "—"}</td>
+                    <td className="p-2">
+                      <div className="flex max-w-[220px] flex-wrap gap-1">
+                        {(p.tags ?? []).slice(0, 4).map((t: string) => (
+                          <Badge key={t} variant="outline" className="text-[10px]">{t}</Badge>
+                        ))}
+                        {(p.tags ?? []).length > 4 && (
+                          <span className="text-[10px] text-muted-foreground">+{p.tags.length - 4}</span>
+                        )}
+                      </div>
+                    </td>
                     <td className="p-2">{p.price_php ? `₱${Number(p.price_php).toLocaleString()}` : "—"}</td>
                     <td className="p-2">{p.click_count}</td>
                     <td className="p-2">
-                      {p.active ? <Badge variant="secondary">Active</Badge> : <Badge variant="outline">Inactive</Badge>}
-                      {p.featured && <Badge className="ml-1">Featured</Badge>}
+                      <div className="flex flex-wrap gap-1">
+                        {p.active ? <Badge variant="secondary">Active</Badge> : <Badge variant="outline">Inactive</Badge>}
+                        {p.featured && <Badge>Featured</Badge>}
+                        {p.is_deal && <Badge variant="destructive">Deal</Badge>}
+                      </div>
                     </td>
                     <td className="p-2">
                       <div className="flex gap-1">
