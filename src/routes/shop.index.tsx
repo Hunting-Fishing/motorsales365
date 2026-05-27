@@ -4,7 +4,7 @@ import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { SiteLayout } from "@/components/site-layout";
 import { AdCarousel } from "@/components/ads/ad-carousel";
-import { listShopCategories, listShopProducts, listShopBrands } from "@/lib/shop.functions";
+import { listShopCategories, listShopProducts, listShopBrands, listShopDepartments } from "@/lib/shop.functions";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
