@@ -395,7 +395,7 @@ export const adminListProducts = createServerFn({ method: "GET" })
     await assertShopManagerInline(supabase, userId);
     const { data, error } = await supabase
       .from("shop_products")
-      .select("id, slug, title, brand, image_url, price_php, currency, tags, featured, active, universal_fit, is_deal, click_count, view_count, category_id, created_at, category:shop_categories!shop_products_category_id_fkey(name, slug, department_slug)")
+      .select("id, slug, title, brand, image_url, price_php, currency, tags, featured, active, universal_fit, is_deal, click_count, view_count, category_id, created_at, category:shop_categories!category_id(name, slug, department_slug)")
       .order("created_at", { ascending: false })
       .limit(1000);
     if (error) throw new Error(error.message);
