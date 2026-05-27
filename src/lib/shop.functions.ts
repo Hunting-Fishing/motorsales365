@@ -807,6 +807,10 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     const rawPrice = marketplace?.price ?? ld?.price ?? metadata?.["og:price:amount"] ?? metadata?.["product:price:amount"] ?? extracted?.price ?? null;
     const rawCurrency = marketplace?.currency ?? ld?.currency ?? metadata?.["og:price:currency"] ?? metadata?.["product:price:currency"] ?? extracted?.currency ?? null;
     const price_php = pickPricePhp(rawPrice, rawCurrency);
+    const sale_price_php = marketplace?.sale_price
+      ? pickPricePhp(marketplace.sale_price, marketplace?.currency ?? "PHP")
+      : null;
+    const is_deal = !!(sale_price_php && price_php && sale_price_php < price_php);
 
     const category_id = fuzzyCategoryMatch(
       String(marketplace?.category_hint ?? extracted?.category_hint ?? title ?? ""),
@@ -844,6 +848,8 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
         description,
         image_url,
         price_php,
+        deal_price_php: is_deal ? sale_price_php : null,
+        is_deal,
         currency: "PHP",
         category_id,
       },
