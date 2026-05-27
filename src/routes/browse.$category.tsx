@@ -25,6 +25,10 @@ const searchSchema = z.object({
   min: z.coerce.number().optional(),
   max: z.coerce.number().optional(),
   sort: z.enum(["recent", "price_asc", "price_desc"]).optional(),
+  year: z.coerce.number().optional(),
+  make: z.string().optional(),
+  model: z.string().optional(),
+  engine: z.string().optional(),
 });
 
 const CATEGORY_LABEL: Record<string, string> = {
@@ -70,6 +74,10 @@ function BrowsePage() {
   const [minPrice, setMinPrice] = useState(search.min?.toString() ?? "");
   const [maxPrice, setMaxPrice] = useState(search.max?.toString() ?? "");
   const [sort, setSort] = useState(search.sort ?? "recent");
+  const [vYear, setVYear] = useState(search.year ? String(search.year) : "");
+  const [vMake, setVMake] = useState(search.make ?? "");
+  const [vModel, setVModel] = useState(search.model ?? "");
+  const [vEngine, setVEngine] = useState(search.engine ?? "");
   const [items, setItems] = useState<ListingCardData[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -88,6 +96,12 @@ function BrowsePage() {
         if (search.city) q = q.eq("city", search.city);
         if (search.min) q = q.gte("price_php", search.min);
         if (search.max) q = q.lte("price_php", search.max);
+        // Vehicle attributes are stored as JSON. Match the seller-entered
+        // string casing-insensitively when possible.
+        if (search.year) q = q.eq("attributes->>year", String(search.year));
+        if (search.make) q = q.ilike("attributes->>make", search.make);
+        if (search.model) q = q.ilike("attributes->>model", search.model);
+        if (search.engine) q = q.ilike("attributes->>engine", search.engine);
         if (search.sort === "price_asc") q = q.order("price_php", { ascending: true });
         else if (search.sort === "price_desc") q = q.order("price_php", { ascending: false });
         else q = q.order("boost_until", { ascending: false, nullsFirst: false }).order("published_at", { ascending: false, nullsFirst: false });
@@ -138,7 +152,7 @@ function BrowsePage() {
       setLoading(false);
     };
     fetchListings();
-  }, [category, search.q, search.region, search.province, search.city, search.min, search.max, search.sort]);
+  }, [category, search.q, search.region, search.province, search.city, search.min, search.max, search.sort, search.year, search.make, search.model, search.engine]);
 
   const applyFilters = (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,6 +167,10 @@ function BrowsePage() {
         min: minPrice ? Number(minPrice) : undefined,
         max: maxPrice ? Number(maxPrice) : undefined,
         sort,
+        year: vYear ? Number(vYear) : undefined,
+        make: vMake || undefined,
+        model: vModel || undefined,
+        engine: vEngine || undefined,
       },
     });
   };
