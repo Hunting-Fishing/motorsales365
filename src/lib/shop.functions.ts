@@ -10,19 +10,59 @@ import { cleanShopUrl, detectNetworkSlug, isShortLink, looksLikeIconImage } from
 export const listShopCategories = createServerFn({ method: "GET" }).handler(async () => {
   const { data, error } = await supabaseAdmin
     .from("shop_categories")
-    .select("id, slug, name, description, icon, sort_order, parent_id, hero_image_url")
+    .select("id, slug, name, description, icon, sort_order, parent_id, hero_image_url, department_slug, cross_department_slugs")
     .eq("active", true)
     .order("sort_order");
   if (error) throw new Error(error.message);
   return { categories: data ?? [] };
 });
 
+export const listShopDepartments = createServerFn({ method: "GET" }).handler(async () => {
+  const [{ data: deps, error: dErr }, { data: cats, error: cErr }, { data: pcRows }] = await Promise.all([
+    supabaseAdmin.from("shop_departments").select("*").eq("active", true).order("sort_order"),
+    supabaseAdmin
+      .from("shop_categories")
+      .select("id, slug, name, description, icon, sort_order, parent_id, hero_image_url, department_slug, cross_department_slugs")
+      .eq("active", true)
+      .order("sort_order"),
+    supabaseAdmin.from("shop_product_categories").select("category_id").limit(5000),
+  ]);
+  if (dErr) throw new Error(dErr.message);
+  if (cErr) throw new Error(cErr.message);
+  const counts = new Map<string, number>();
+  for (const r of pcRows ?? []) counts.set((r as any).category_id, (counts.get((r as any).category_id) ?? 0) + 1);
+  const all = (cats ?? []).map((c: any) => ({ ...c, product_count: counts.get(c.id) ?? 0 }));
+  const tops = all.filter((c: any) => !c.parent_id);
+  const childrenOf = (parentId: string) => all.filter((c: any) => c.parent_id === parentId);
+
+  const departments = (deps ?? []).map((d: any) => {
+    const primary = tops.filter((t: any) => t.department_slug === d.slug);
+    const crossChildren = all.filter((c: any) =>
+      Array.isArray(c.cross_department_slugs) && c.cross_department_slugs.includes(d.slug),
+    );
+    return {
+      ...d,
+      categories: primary.map((p: any) => ({ ...p, children: childrenOf(p.id) })),
+      cross_categories: crossChildren,
+      product_count: primary.reduce(
+        (sum: number, p: any) =>
+          sum + p.product_count + childrenOf(p.id).reduce((s: number, c: any) => s + c.product_count, 0),
+        0,
+      ),
+    };
+  });
+  return { departments };
+});
+
 export const listShopCategoryTree = createServerFn({ method: "GET" }).handler(async () => {
-  const { data: cats, error } = await supabaseAdmin
-    .from("shop_categories")
-    .select("id, slug, name, description, icon, sort_order, parent_id, hero_image_url")
-    .eq("active", true)
-    .order("sort_order");
+  const [{ data: cats, error }, { data: deps }] = await Promise.all([
+    supabaseAdmin
+      .from("shop_categories")
+      .select("id, slug, name, description, icon, sort_order, parent_id, hero_image_url, department_slug")
+      .eq("active", true)
+      .order("sort_order"),
+    supabaseAdmin.from("shop_departments").select("slug, name, sort_order").eq("active", true).order("sort_order"),
+  ]);
   if (error) throw new Error(error.message);
 
   const { data: pcRows } = await supabaseAdmin
@@ -44,8 +84,37 @@ export const listShopCategoryTree = createServerFn({ method: "GET" }).handler(as
     ...parent,
     children: (byParent.get(parent.id) ?? []) as any[],
   }));
-  return { tree };
+  return { tree, departments: deps ?? [] };
 });
+
+export const getShopDepartment = createServerFn({ method: "GET" })
+  .inputValidator((input: { slug: string }) => z.object({ slug: z.string().min(1).max(80) }).parse(input))
+  .handler(async ({ data }) => {
+    const { data: dep } = await supabaseAdmin
+      .from("shop_departments")
+      .select("*")
+      .eq("slug", data.slug)
+      .eq("active", true)
+      .maybeSingle();
+    if (!dep) return { department: null, categories: [], cross_categories: [] };
+    const { data: cats } = await supabaseAdmin
+      .from("shop_categories")
+      .select("id, slug, name, description, icon, parent_id, hero_image_url, department_slug, cross_department_slugs")
+      .eq("active", true)
+      .order("sort_order");
+    const all = cats ?? [];
+    const tops = all.filter((c: any) => !c.parent_id && c.department_slug === data.slug);
+    const categories = tops.map((p: any) => ({
+      ...p,
+      children: all.filter((c: any) => c.parent_id === p.id),
+    }));
+    const cross_categories = all.filter((c: any) =>
+      Array.isArray(c.cross_department_slugs) &&
+      c.cross_department_slugs.includes(data.slug) &&
+      c.department_slug !== data.slug,
+    );
+    return { department: dep, categories, cross_categories };
+  });
 
 export const getShopBreadcrumb = createServerFn({ method: "GET" })
   .inputValidator((input: { slug: string }) => z.object({ slug: z.string().min(1).max(80) }).parse(input))
