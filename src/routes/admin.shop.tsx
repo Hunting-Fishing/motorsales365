@@ -285,12 +285,17 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
               </Button>
             </div>
             {importInfo && (
-              <p className="text-xs text-muted-foreground">
-                {importInfo.networkSlug
-                  ? <>Detected <strong>{importInfo.networkSlug}</strong>{importInfo.networkId ? " · network linked ✓" : " · no matching active network"}</>
-                  : "Unknown host — fields pre-filled from page metadata."}
-                {" "}Empty fields below were auto-filled; review before saving.
-              </p>
+              <div className="space-y-1 text-xs text-muted-foreground">
+                {importInfo.resolvedFrom && (
+                  <p className="break-all">Resolved short link → <span className="font-mono">{importInfo.cleanedUrl}</span></p>
+                )}
+                <p>
+                  {importInfo.networkSlug
+                    ? <>Detected <strong>{importInfo.networkSlug}</strong>{importInfo.networkId ? " · network linked ✓" : " · no matching active network"}</>
+                    : "Unknown host — fields pre-filled from page metadata."}
+                  {" "}Empty fields below were auto-filled; review before saving.
+                </p>
+              </div>
             )}
           </div>
           <div className="grid grid-cols-2 gap-3">
