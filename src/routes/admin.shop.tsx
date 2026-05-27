@@ -39,10 +39,10 @@ function AdminShop() {
         <p className="text-muted-foreground">Manage curated products, affiliate networks, and outbound links.</p>
       </div>
       <Tabs defaultValue="products">
-        <TabsList>
+        <TabsList className="w-full justify-start overflow-x-auto sm:w-auto">
           <TabsTrigger value="products">Products</TabsTrigger>
           <TabsTrigger value="networks">Networks</TabsTrigger>
-          <TabsTrigger value="directory">Sign-up directory</TabsTrigger>
+          <TabsTrigger value="directory" className="whitespace-nowrap">Sign-up directory</TabsTrigger>
         </TabsList>
         <TabsContent value="products" className="mt-4"><ProductsTab /></TabsContent>
         <TabsContent value="networks" className="mt-4"><NetworksTab /></TabsContent>
