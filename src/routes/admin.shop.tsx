@@ -476,9 +476,9 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
             </label>
           </div>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={() => mut.mutate()} disabled={mut.isPending}>{mut.isPending ? "Saving…" : "Save"}</Button>
+        <DialogFooter className="flex-col-reverse gap-2 sm:flex-row">
+          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">Cancel</Button>
+          <Button onClick={() => mut.mutate()} disabled={mut.isPending} className="w-full sm:w-auto">{mut.isPending ? "Saving…" : "Save"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
