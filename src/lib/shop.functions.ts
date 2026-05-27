@@ -755,12 +755,14 @@ async function fetchLazadaProductData(input: string): Promise<MarketplaceProduct
     const first = await fetch(makeUrl(String(Date.now()), ""), { headers, signal: AbortSignal.timeout(8_000) });
     const cookie = first.headers.get("set-cookie") ?? "";
     const tokenValue = cookie.match(/_m_h5_tk=([^;]+)/)?.[1];
+    const tokenEnc = cookie.match(/_m_h5_tk_enc=([^;]+)/)?.[1];
     const token = tokenValue?.split("_")[0];
     if (!token) return null;
     const t = String(Date.now());
     const sign = createHash("md5").update(`${token}&${t}&${appKey}&${data}`).digest("hex");
+    const cookieHeader = `_m_h5_tk=${tokenValue}${tokenEnc ? `; _m_h5_tk_enc=${tokenEnc}` : ""}`;
     const second = await fetch(makeUrl(t, sign), {
-      headers: { ...headers, "cookie": cookie },
+      headers: { ...headers, "cookie": cookieHeader },
       signal: AbortSignal.timeout(8_000),
     });
     const text = await second.text();
