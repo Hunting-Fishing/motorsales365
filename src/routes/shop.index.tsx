@@ -169,16 +169,25 @@ function ShopIndex() {
       <div className="container mx-auto px-4 py-8 space-y-12">
         <AdCarousel placement="shop_top" />
 
-        {cats.length > 0 && (
+        {departments.length > 0 && (
           <section>
-            <h2 className="mb-4 text-xl font-semibold">Shop by category</h2>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
-              {cats.map((c) => (
-                <Link key={c.id} to="/shop/$category" params={{ category: c.slug }}
-                  search={activeVehicle ? { make: activeVehicle.make, model: activeVehicle.model, year: activeVehicle.year, engine: activeVehicle.engine ?? "" } : {}}
-                  className="group rounded-xl border bg-card p-5 transition hover:border-primary hover:shadow-md">
-                  <p className="font-semibold group-hover:text-primary">{c.name}</p>
-                  {c.description && <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{c.description}</p>}
+            <div className="mb-4 flex items-end justify-between gap-3">
+              <h2 className="text-xl font-semibold">Shop by department</h2>
+              <Link to="/shop/categories" className="text-sm text-muted-foreground hover:text-primary">All categories →</Link>
+            </div>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              {departments.map((d: any) => (
+                <Link key={d.slug} to="/shop/department/$slug" params={{ slug: d.slug }}
+                  className="group flex flex-col rounded-xl border bg-card p-5 transition hover:border-primary hover:shadow-md">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="font-semibold group-hover:text-primary">{d.name}</p>
+                    {d.product_count > 0 && <Badge variant="secondary" className="text-[10px]">{d.product_count}</Badge>}
+                  </div>
+                  {d.categories?.length > 0 && (
+                    <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
+                      {d.categories.slice(0, 4).map((c: any) => c.name).join(" · ")}
+                    </p>
+                  )}
                 </Link>
               ))}
             </div>
