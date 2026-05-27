@@ -8,8 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RidePhotoUploader } from "@/components/rides/ride-photo-uploader";
 import { ServiceLogPhotoUploader } from "@/components/rides/service-log-photo-uploader";
+import { getEnginesFor } from "@/data/vehicle-engines";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { linkRideToListing, publishRide } from "@/lib/rides.functions";
@@ -165,7 +167,7 @@ function EditRidePage() {
           <div className="grid gap-3 sm:grid-cols-2">
             {[
               ["name", "Nickname"], ["year", "Year"], ["make", "Make"], ["model", "Model"],
-              ["trim", "Trim"], ["color", "Color"], ["engine", "Engine"],
+              ["trim", "Trim"], ["color", "Color"],
               ["transmission", "Transmission"], ["drivetrain", "Drivetrain"],
               ["mileage_km", "Mileage (km)"], ["region", "Region"], ["city", "City"],
             ].map(([k, label]) => (
@@ -181,6 +183,7 @@ function EditRidePage() {
                 />
               </div>
             ))}
+            <RideEngineField ride={ride} setRide={setRide} />
           </div>
           <div className="space-y-1">
             <Label>The story</Label>
