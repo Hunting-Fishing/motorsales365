@@ -222,15 +222,19 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
     onSuccess: (res: any) => {
       if (res.error) { toast.error(res.error); return; }
       const s = res.suggested ?? {};
-      setForm((f) => ({
-        ...f,
-        title: f.title || s.title || "",
-        brand: f.brand || s.brand || "",
-        description: f.description || s.description || "",
-        image_url: f.image_url || s.image_url || "",
-        price_php: f.price_php ?? s.price_php ?? null,
-        category_id: f.category_id ?? s.category_id ?? null,
-      }));
+      setForm((f) => {
+        const title = f.title || s.title || "";
+        return {
+          ...f,
+          title,
+          slug: f.slug || (title ? slugifyClient(title) : ""),
+          brand: f.brand || s.brand || "",
+          description: f.description || s.description || "",
+          image_url: f.image_url || s.image_url || "",
+          price_php: f.price_php ?? s.price_php ?? null,
+          category_id: f.category_id ?? s.category_id ?? null,
+        };
+      });
       setImportInfo({ networkSlug: res.networkSlug, cleanedUrl: res.cleanedUrl, networkId: res.networkId, resolvedFrom: res.resolvedFrom ?? null });
       toast.success("Fetched — review and save.");
     },
