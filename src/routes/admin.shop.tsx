@@ -387,21 +387,22 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[calc(100vw-1rem)] p-4 sm:p-6">
         <DialogHeader><DialogTitle>{form.id ? "Edit product" : "New product"}</DialogTitle></DialogHeader>
         <div className="grid gap-3">
           <div className="rounded-lg border bg-muted/40 p-3 space-y-2">
             <Label className="flex items-center gap-2 text-sm">
               <Sparkles className="h-4 w-4 text-primary" /> Import from affiliate URL
             </Label>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Paste Shopee / Lazada / TikTok / Amazon product URL…"
-                value={importUrl}
-                onChange={(e) => setImportUrl(e.target.value)}
-              />
+            <Input
+              placeholder="Paste Shopee / Lazada / TikTok / Amazon product URL…"
+              value={importUrl}
+              onChange={(e) => setImportUrl(e.target.value)}
+              className="h-11 text-base"
+            />
+            <div className="flex flex-col gap-2 sm:flex-row">
               <Select value={importNetwork} onValueChange={setImportNetwork}>
-                <SelectTrigger className="w-[150px]">
+                <SelectTrigger className="h-11 w-full sm:w-[180px]">
                   <SelectValue placeholder="Network" />
                 </SelectTrigger>
                 <SelectContent>
@@ -418,8 +419,9 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
                 type="button"
                 onClick={() => importMut.mutate()}
                 disabled={!importUrl || importMut.isPending}
+                className="h-11 w-full sm:flex-1"
               >
-                {importMut.isPending ? "Fetching…" : "Fetch"}
+                {importMut.isPending ? "Fetching…" : "Fetch product info"}
               </Button>
             </div>
             {importInfo && (
@@ -441,11 +443,11 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
               </div>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid gap-3 sm:grid-cols-2">
             <div><Label>Title</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
             <div><Label>Slug (url)</Label><Input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="meguiars-gold-class-wax" /></div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid gap-3 sm:grid-cols-2">
             <div><Label>Brand</Label><Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} /></div>
             <div><Label>Price (₱, optional)</Label><Input type="number" value={form.price_php ?? ""} onChange={(e) => setForm({ ...form, price_php: e.target.value as any })} /></div>
           </div>
@@ -466,7 +468,7 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
             </Select>
           </div>
           <div><Label>Description</Label><Textarea rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
-          <div className="flex flex-wrap gap-6">
+          <div className="flex flex-wrap gap-4 sm:gap-6">
             <label className="flex items-center gap-2"><Switch checked={form.active} onCheckedChange={(v) => setForm({ ...form, active: v })} />Active</label>
             <label className="flex items-center gap-2"><Switch checked={form.featured} onCheckedChange={(v) => setForm({ ...form, featured: v })} />Featured</label>
             <label className="flex items-center gap-2" title="Show for all vehicles regardless of fitment rules">
