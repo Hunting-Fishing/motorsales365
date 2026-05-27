@@ -119,23 +119,31 @@ export const getShopDepartment = createServerFn({ method: "GET" })
 export const getShopBreadcrumb = createServerFn({ method: "GET" })
   .inputValidator((input: { slug: string }) => z.object({ slug: z.string().min(1).max(80) }).parse(input))
   .handler(async ({ data }) => {
-    const { data: cats } = await supabaseAdmin
-      .from("shop_categories")
-      .select("id, slug, name, parent_id")
-      .eq("active", true);
+    const [{ data: cats }, { data: deps }] = await Promise.all([
+      supabaseAdmin.from("shop_categories").select("id, slug, name, parent_id, department_slug").eq("active", true),
+      supabaseAdmin.from("shop_departments").select("slug, name").eq("active", true),
+    ]);
     const list = cats ?? [];
     const byId = new Map(list.map((c: any) => [c.id, c]));
+    const depByslug = new Map((deps ?? []).map((d: any) => [d.slug, d]));
     const start = list.find((c: any) => c.slug === data.slug);
     if (!start) return { trail: [] };
     const trail: Array<{ slug: string; name: string }> = [];
     let cur: any = start;
     let guard = 0;
+    let topDeptSlug: string | null = null;
     while (cur && guard++ < 8) {
       trail.unshift({ slug: cur.slug, name: cur.name });
+      if (cur.department_slug) topDeptSlug = cur.department_slug;
       cur = cur.parent_id ? byId.get(cur.parent_id) : null;
+    }
+    if (topDeptSlug && depByslug.has(topDeptSlug)) {
+      const d: any = depByslug.get(topDeptSlug);
+      trail.unshift({ slug: `department/${d.slug}`, name: d.name });
     }
     return { trail };
   });
+
 
 export const trackShopClick = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
