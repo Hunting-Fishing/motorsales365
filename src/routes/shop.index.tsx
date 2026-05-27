@@ -51,6 +51,7 @@ function ShopIndex() {
     : garage;
 
   const { data: catData } = useQuery({ queryKey: ["shop-cats"], queryFn: () => listShopCategories() });
+  const { data: depData } = useQuery({ queryKey: ["shop-deps"], queryFn: () => listShopDepartments() });
   const { data: brandData } = useQuery({
     queryKey: ["shop-brands", search.category],
     queryFn: () => listShopBrands({ data: search.category ? { categorySlug: search.category } : {} }),
