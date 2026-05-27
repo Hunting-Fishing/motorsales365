@@ -17,7 +17,7 @@ function NewRidePage() {
   const create = useServerFn(createRide);
   const [name, setName] = useState("");
   const [vehicleType, setVehicleType] = useState<"car" | "motorcycle">("car");
-  const [v, setV] = useState({ year: "", make: "", model: "" });
+  const [v, setV] = useState<{ year: string; make: string; model: string; engine?: string }>({ year: "", make: "", model: "", engine: "" });
   const [trim, setTrim] = useState("");
   const [busy, setBusy] = useState(false);
 
@@ -33,6 +33,7 @@ function NewRidePage() {
           make: v.make || null,
           model: v.model || null,
           trim: trim || null,
+          engine: v.engine || null,
           vehicle_type: vehicleType,
         },
       });
@@ -61,7 +62,7 @@ function NewRidePage() {
           ))}
         </div>
       </div>
-      <VehiclePicker category={vehicleType} year={v.year} make={v.make} model={v.model} onChange={setV} />
+      <VehiclePicker category={vehicleType} year={v.year} make={v.make} model={v.model} engine={v.engine} onChange={setV} />
       <div className="space-y-2">
         <Label>Trim (optional)</Label>
         <Input value={trim} onChange={(e) => setTrim(e.target.value)} placeholder="e.g. Type R, Sport, GR" />
