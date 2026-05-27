@@ -63,7 +63,10 @@ const TRACKING_PARAMS = new Set([
   "sp_atk", "xptdk", "deep_and_deferred", "is_from_login", "publish_id", "smtt",
   // lazada
   "spm", "scm", "pvid", "search", "clickTrackInfo", "mp", "trafficSource",
-  "exlaz", "wh_pid", "sourceType",
+  "exlaz", "wh_pid", "sourceType", "fs_ab", "priceCompare", "ratingscore",
+  "freeshipping", "source", "channelLpJumpArgs", "fuse_fs", "sale", "price",
+  "review", "location", "stock", "lang", "request_id", "c", "t", "dsource",
+  "laz_share_info", "laz_token", "from_affiliate",
   // tiktok
   "_t", "_r", "share_app_id", "share_link_id", "checksum", "tt_from",
   "u_code", "share_iid", "social_share_type", "share_iid", "timestamp",
