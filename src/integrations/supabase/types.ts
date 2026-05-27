@@ -2780,6 +2780,7 @@ export type Database = {
           icon: string | null
           id: string
           name: string
+          parent_id: string | null
           slug: string
           sort_order: number
         }
@@ -2790,6 +2791,7 @@ export type Database = {
           icon?: string | null
           id?: string
           name: string
+          parent_id?: string | null
           slug: string
           sort_order?: number
         }
@@ -2800,10 +2802,19 @@ export type Database = {
           icon?: string | null
           id?: string
           name?: string
+          parent_id?: string | null
           slug?: string
           sort_order?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "shop_categories_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "shop_categories"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       shop_clicks: {
         Row: {
@@ -2870,6 +2881,42 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      shop_product_categories: {
+        Row: {
+          category_id: string
+          created_at: string
+          is_primary: boolean
+          product_id: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          is_primary?: boolean
+          product_id: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          is_primary?: boolean
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_product_categories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "shop_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_product_categories_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "shop_products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       shop_product_fitment: {
         Row: {
