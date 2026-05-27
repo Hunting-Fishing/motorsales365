@@ -888,23 +888,36 @@ async function resolveFinalUrl(input: string): Promise<string> {
 function extractRedirectFromHtml(html: string, base: string): string | null {
   if (!html) return null;
   const patterns: RegExp[] = [
-    /<meta[^>]+http-equiv=["']refresh["'][^>]+content=["'][^;]*;\s*url=([^"'>\s]+)/i,
-    /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)/i,
-    /window\.location(?:\.href)?\s*=\s*["']([^"']+)["']/i,
-    /location\.replace\(\s*["']([^"']+)["']\s*\)/i,
-    /"redirectUrl"\s*:\s*"([^"]+)"/i,
-    /data-spm-url=["']([^"']+)/i,
+    /<meta[^>]+http-equiv=["']refresh["'][^>]+content=["'][^;]*;\s*url=([^"'>\s]+)/gi,
+    /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)/gi,
+    /window\.location(?:\.href)?\s*=\s*["']([^"']+)["']/gi,
+    /location\.replace\(\s*["']([^"']+)["']\s*\)/gi,
+    /"redirectUrl"\s*:\s*"([^"]+)"/gi,
+    /data-spm-url=["']([^"']+)/gi,
   ];
+  let baseHost = "";
+  try { baseHost = new URL(base).hostname.toLowerCase(); } catch { /* ignore */ }
+  const sameHostCandidates: string[] = [];
   for (const re of patterns) {
-    const m = html.match(re);
-    if (m?.[1]) {
+    for (const m of html.matchAll(re)) {
+      const raw = m[1]?.replace(/\\u002F/g, "/").replace(/\\\//g, "/").trim();
+      if (!raw) continue;
+      // Reject JS variable / template refs (e.g. `url`, `${x}`, `lazShareInfo`).
+      if (!/^(https?:)?\/\//i.test(raw) && !raw.startsWith("/")) continue;
       try {
-        const resolved = new URL(m[1].replace(/\\u002F/g, "/").replace(/\\\//g, "/"), base).toString();
-        if (resolved !== base) return resolved;
+        const resolved = new URL(raw, base).toString();
+        if (!/^https?:/i.test(resolved) || resolved === base) continue;
+        const host = new URL(resolved).hostname.toLowerCase();
+        // Prefer URLs that escape the short-link host.
+        if (baseHost && host === baseHost) {
+          sameHostCandidates.push(resolved);
+          continue;
+        }
+        return resolved;
       } catch { /* ignore */ }
     }
   }
-  return null;
+  return sameHostCandidates[0] ?? null;
 }
 
 const BAD_BRANDS = new Set([
