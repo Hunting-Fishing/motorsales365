@@ -660,17 +660,31 @@ function fuzzyCategoryMatch(hint: string, cats: Array<{ id: string; name: string
   return best?.id ?? null;
 }
 
+const NETWORK_SLUGS = ["shopee", "lazada", "tiktok", "amazon", "aliexpress", "carousell", "ebay", "zalora"] as const;
+
+async function runNetworkScraper(slug: string | null, url: string): Promise<MarketplaceProductData | null> {
+  switch (slug) {
+    case "lazada":
+      return fetchLazadaProductData(url);
+    // Other networks fall through to Firecrawl for now (phase 2).
+    default:
+      return null;
+  }
+}
+
 export const scrapeShopUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
     z.object({
       url: z.string().url().max(2000).regex(/^https?:\/\//i),
+      networkSlug: z.enum(NETWORK_SLUGS).optional(),
     }).parse(input),
   )
   .handler(async ({ data, context }) => {
     await assertShopManager(context.supabase, context.userId);
 
     const apiKey = process.env.FIRECRAWL_API_KEY;
+    const forcedSlug = data.networkSlug ?? null;
 
     // Resolve short / redirect links to the real product URL first.
     const pasted = data.url;
@@ -685,7 +699,9 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     }
 
     const cleanedUrl = cleanShopUrl(workingUrl);
-    const networkSlug = detectNetworkSlug(cleanedUrl);
+    const detectedSlug = detectNetworkSlug(cleanedUrl);
+    // Manual override takes precedence over host detection.
+    const networkSlug = forcedSlug ?? detectedSlug;
 
     // Look up matching active network
     let networkId: string | null = null;
@@ -705,9 +721,9 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       .select("id, slug, name")
       .eq("active", true);
 
-    // Lazada product pages often block generic scrapers, but their search endpoint
-    // exposes the exact product when queried by item id. Prefer this over LLM guesses.
-    const marketplace = await fetchLazadaProductData(cleanedUrl);
+    // Try a per-network scraper (currently only lazada has a custom path).
+    // Anything else (or a failed custom path) falls through to Firecrawl.
+    const marketplace = await runNetworkScraper(networkSlug, cleanedUrl);
 
     if (!apiKey && !marketplace) {
       return {
@@ -716,6 +732,7 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
         cleanedUrl,
         resolvedFrom,
         networkSlug,
+        detectedSlug,
         networkId,
       };
     }
@@ -761,6 +778,7 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
           cleanedUrl,
           resolvedFrom,
           networkSlug,
+          detectedSlug,
           networkId,
         };
       }
@@ -816,7 +834,9 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       error: null,
       cleanedUrl: finalCleanedUrl,
       resolvedFrom,
-      networkSlug: detectNetworkSlug(finalCleanedUrl) ?? networkSlug,
+      // Forced slug always wins; otherwise re-detect from final URL.
+      networkSlug: forcedSlug ?? detectNetworkSlug(finalCleanedUrl) ?? networkSlug,
+      detectedSlug: detectNetworkSlug(finalCleanedUrl) ?? detectedSlug,
       networkId,
       suggested: {
         title,
@@ -985,10 +1005,17 @@ async function fetchLazadaProductData(input: string): Promise<MarketplaceProduct
     const jsonText = text.replace(/^\s*mtopjsonp1\(/, "").replace(/\)\s*$/, "");
     const payload = JSON.parse(jsonText);
     const items: any[] = payload?.data?.mods?.listItems ?? [];
-    const item = items.find((row) => String(row.itemId ?? row.nid) === ids.itemId && (!ids.skuId || String(row.skuId ?? "") === ids.skuId))
-      ?? items.find((row) => String(row.itemId ?? row.nid) === ids.itemId)
-      ?? items[0];
+    // STRICT match only — no fallback to items[0], which historically picked
+    // unrelated cross-marketplace products and polluted the form.
+    const item = items.find((row) =>
+      String(row.itemId ?? row.nid) === ids.itemId
+      && (!ids.skuId || String(row.skuId ?? "") === ids.skuId),
+    ) ?? items.find((row) => String(row.itemId ?? row.nid) === ids.itemId);
     if (!item) return null;
+    // Reject results whose image is clearly from another marketplace CDN
+    // (e.g. s.alicdn.com on an AliExpress hit returned from Lazada search).
+    const img = String(item.image ?? "");
+    if (img && !/(lzcdn\.com|slatic\.net|lazcdn\.com)/i.test(img)) return null;
     const productUrl = item.productUrl ? new URL(String(item.productUrl), "https://www.lazada.com.ph").toString() : input;
     const description = Array.isArray(item.description) ? item.description.filter(Boolean).join("\n") : String(item.description ?? "").trim();
     const categoryHint = payload?.data?.mods?.filter?.filterItems?.find((f: any) => f?.name === "category")?.options?.[0]?.title;

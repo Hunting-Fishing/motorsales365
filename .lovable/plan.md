@@ -1,81 +1,49 @@
-# Shop category grouping — Departments + cross-tags
-
 ## Goal
 
-Today `/shop` shows 14 flat top-level categories. Major auto retailers (Summit Racing, RockAuto, FCP Euro, AutoZone, CARiD) group everything under 4–7 "departments" in a mega-menu, then categories, then sub-categories. We will do the same — without deleting anything we already have.
+Fix the regression where pasting an affiliate URL (e.g. Lazada short link) populates the form with junk or empty fields, and give the admin a way to manually pick which marketplace the URL belongs to so the right scraper path runs.
 
-Reference patterns we're mirroring:
-- **Summit Racing**: Engine, Drivetrain, Suspension, Brakes, Wheels & Tires, Exterior, Interior, Tools & Equipment.
-- **RockAuto**: Body & Lamp, Brake, Engine, Heat & A/C, Suspension, Transmission, Wheel.
-- **CARiD**: Performance, Wheels & Tires, Body, Interior, Lighting, Accessories.
-- **AutoZone**: Parts, Fluids & Chemicals, Accessories, Tools & Equipment, Performance.
+## Problems observed
 
-## New department layer
+From the screenshot: a Lazada short link resolves correctly, but the form ends up with placeholder title/brand/description, an `s.alicdn.com` (AliExpress CDN) image, and no price. Reading `src/lib/shop.functions.ts` `scrapeShopUrl`:
 
-Six departments (top-level groupings). Each existing top-level category becomes a child of one department. Sub-categories stay where they are.
-
-```
-Performance Parts        ← Performance & Tuning, Exterior Mods (Body Kits, Spoilers, Wings)
-Maintenance & Fluids     ← Lubricants & Fluids (Engine Oil, ATF/Gear, Brake Fluid, Coolant, Grease), Filters*, Belts & Hoses*
-Repair & Replacement     ← Parts & Spares (Brakes, Suspension, Ignition, Cooling, Exhaust, Engine Internals)
-Wheels, Tires & Brakes   ← Tires & Wheels (Tires, Wheels, TPMS), Brakes* (cross-tag from Parts)
-Interior & Exterior      ← Accessories (Floor Mats, Seat Covers, Phone Mounts), Detailing, Window Tint*, Decals*
-Tools & Garage           ← Mechanic Tools, Garage & Storage, Safety & Recovery
-Electronics & Lighting   ← Electronics (Dashcams, Head Units, Speakers, Lighting, Cameras)
-Specialty                ← Motorcycle Gear, Off-Road & Overland, EV & Hybrid
-```
-
-\* = appears in primary department but is **cross-tagged** to a second department via the new tag layer (see below).
-
-## Cross-tag layer (phase 1)
-
-Some categories naturally belong in two places (Brakes = Repair + Wheels/Tires/Brakes; Filters = Maintenance + Repair; Window Tint = Interior/Exterior + Performance-adjacent). We add a simple `cross_department_slugs text[]` on `shop_categories` so a category can surface under multiple department mega-menu columns and filter drawers — without duplicating rows. **No engine-to-fluid matching yet** — that's phase 2 as you noted.
+1. **Wrong result silently wins.** `fetchLazadaProductData` calls Lazada's `mtop.gsearch` search endpoint by item id. When it returns a non-matching item (different itemId, even from a different marketplace's CDN), the function still returns it as `marketplace`, and the code then does `apiKey && !marketplace` → Firecrawl is skipped. The bad search hit becomes the answer.
+2. **No id verification.** The "find by itemId" lookup falls back to `items[0]` when no exact match — that's how an unrelated product (with an alicdn image) slips through.
+3. **No way to override.** If detection picks the wrong network, or Lazada's API path fails for a working Shopee/Amazon URL, the admin has no escape hatch — they have to clear fields manually.
 
 ## Changes
 
-### 1. Schema (one small migration)
-- `shop_departments` table: `slug pk`, `name`, `description`, `icon`, `sort_order`, `hero_image_url`, `seo_title`, `seo_description`.
-- `shop_categories.department_slug text` (nullable; only top-level cats set it).
-- `shop_categories.cross_department_slugs text[] default '{}'`.
-- Seed 8 departments and assign every existing top-level category to one.
-- No deletions. No URL changes. Existing `/shop/$category` and `/shop/categories` keep working.
+### 1. `src/lib/shop.functions.ts` — harden `scrapeShopUrl`
 
-### 2. Server (`src/lib/shop.functions.ts`)
-- `listShopDepartments()` → departments + their top-level categories + sub-counts.
-- Extend `listShopCategoryTree()` to group by department.
-- Extend `listShopProducts` filter: accept `departmentSlug` (resolves to all categories in that department + cross-tagged ones).
+- Accept an optional `networkSlug` input (`shopee | lazada | tiktok | amazon | aliexpress | carousell | ebay | zalora`). When provided, it overrides `detectNetworkSlug` and selects which per-network helper to try.
+- In `fetchLazadaProductData`:
+  - Drop the `items[0]` fallback. Only return a match when `String(row.itemId) === ids.itemId` (and skuId matches when present). Otherwise return `null`.
+  - Reject results whose image host is not `*.lzcdn.com` / `*.slatic.net` / `*.alicdn.com`-with-lazada-path — i.e. if the image clearly belongs to another marketplace, treat it as no result.
+  - Wrap the whole call in a single try/catch that returns `null` on any parse error (already partly there, tighten it).
+- Change the dispatch logic to: `marketplace = await runNetworkScraper(networkSlug, cleanedUrl)`, where `runNetworkScraper` is a thin switch with a slot per network. Today only `lazada` has a custom path; the others fall through to Firecrawl. This makes it trivial to add Shopee/Amazon-specific paths later without touching the orchestrator.
+- Always run Firecrawl when `marketplace` is `null` AND `apiKey` is set, regardless of detected slug. Merge: marketplace wins only field-by-field when it actually has a value (`pickStr` already does this).
+- When the user explicitly forces a `networkSlug`, skip `detectNetworkSlug`'s host check and pass the slug straight through to the link-staging step so the affiliate link still gets attached to the right network row.
 
-### 3. UI
+### 2. `src/routes/admin.shop.tsx` — network selector in the import panel
 
-**Desktop header** — replace the single "Shop" link with a mega-menu dropdown: 8 department columns, each listing its top categories, with a "View all" link. Pattern matches Summit/CARiD.
+In `ProductDialog`'s "Import from affiliate URL" block:
 
-**`/shop` index** — replace today's flat 14-tile "Shop by category" grid with 8 department cards (icon + name + 3–4 example sub-cats). Clicking a card → `/shop/department/$slug`.
+- Add a small `Select` next to the URL input: "Auto-detect" (default) + one option per active row from `adminListNetworks()`. Reuse the existing `useQuery(["admin-networks"])` pattern from `LinksDialog`.
+- Pass the chosen slug to `scrapeShopUrl({ data: { url, networkSlug } })`.
+- After fetch, if `importInfo.networkSlug` differs from the manual choice, show a one-line warning ("URL host looks like X but you selected Y — link will be saved under Y").
+- Keep the existing auto-fill behaviour (don't overwrite user-edited fields).
 
-**New route `/shop/department/$slug`** — department lander showing all child categories + cross-tagged categories, with the existing filter drawer scoped to the department.
+### 3. No DB or schema changes
 
-**`/shop/categories`** — keep, but group the tree under department headings.
+`affiliate_networks` already has the slug column; we just read it. No migration needed.
 
-**Filter drawer (`shop-filter-drawer.tsx`)** — add a Department accordion at the top; selecting one narrows the category chips to that department.
+## Out of scope (phase 2)
 
-**Breadcrumbs** — `Shop › {Department} › {Category} › {Sub-category}`.
+- Writing Shopee / Amazon / AliExpress custom scrapers. The selector lets you pick the network now; we'll add per-network extractors as separate steps once we see which sites Firecrawl handles poorly.
+- Changing how the scraper handles Lazada region detection beyond `.ph/.sg/.my/...` (already in `extractLazadaIds`).
 
-### 4. Admin (`admin.shop.tsx`)
-- Department picker on the category editor.
-- Multi-select "Also show in" for cross-department tagging.
+## Verification
 
-## Explicitly out of scope (phase 2)
-- Engine-to-fluid matching (e.g. "2.0L Turbo → 5W-30 full synthetic").
-- Maintenance-interval triggered recommendations.
-- Department-specific hero artwork / SEO copy beyond defaults.
-- Migrating affiliate-link UTM grouping by department.
-
-## Files touched
-- New migration (departments table + columns + seed).
-- `src/lib/shop.functions.ts` (department queries + filter).
-- `src/components/site-header.tsx` (mega-menu).
-- `src/routes/shop.index.tsx` (department grid).
-- `src/routes/shop.categories.tsx` (group by department).
-- `src/routes/shop.department.$slug.tsx` (new).
-- `src/components/shop/shop-filter-drawer.tsx` (department facet).
-- `src/components/shop/shop-breadcrumbs.tsx` (department crumb).
-- `src/routes/admin.shop.tsx` (department + cross-tag pickers).
+- Paste the Lazada short link from the screenshot with "Auto-detect" → expect either real fields or a clean Firecrawl fallback (no alicdn image).
+- Paste the same link with network forced to "lazada" → same.
+- Paste a Shopee product URL with "Auto-detect" → Firecrawl path runs, fields populate, link auto-staged under shopee network.
+- Paste a Lazada URL with network forced to "shopee" → fields populate via Firecrawl, link saved under shopee (warning shown about mismatch).
