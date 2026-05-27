@@ -14,6 +14,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { LocationPicker } from "@/components/location-picker";
+import { VehiclePicker } from "@/components/vehicle-picker";
 import { buildTitleSearchTerms } from "@/lib/vehicle-aliases";
 import { fuzzyFilter } from "@/lib/fuzzy";
 
@@ -194,6 +195,10 @@ function BrowsePage() {
         min: minPrice ? Number(minPrice) : null,
         max: maxPrice ? Number(maxPrice) : null,
         sort,
+        year: vYear ? Number(vYear) : null,
+        make: vMake || null,
+        model: vModel || null,
+        engine: vEngine || null,
       },
     });
     if (error) toast.error(error.message);
