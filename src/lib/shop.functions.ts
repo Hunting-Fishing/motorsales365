@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { createHash } from "crypto";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { cleanShopUrl, detectNetworkSlug, isShortLink, looksLikeIconImage } from "@/lib/shop-url";
+import { scrapeLazadaProduct } from "@/lib/lazada-scraper.server";
 
 // ============ PUBLIC ============
 
@@ -807,6 +807,10 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     const rawPrice = marketplace?.price ?? ld?.price ?? metadata?.["og:price:amount"] ?? metadata?.["product:price:amount"] ?? extracted?.price ?? null;
     const rawCurrency = marketplace?.currency ?? ld?.currency ?? metadata?.["og:price:currency"] ?? metadata?.["product:price:currency"] ?? extracted?.currency ?? null;
     const price_php = pickPricePhp(rawPrice, rawCurrency);
+    const sale_price_php = marketplace?.sale_price
+      ? pickPricePhp(marketplace.sale_price, marketplace?.currency ?? "PHP")
+      : null;
+    const is_deal = !!(sale_price_php && price_php && sale_price_php < price_php);
 
     const category_id = fuzzyCategoryMatch(
       String(marketplace?.category_hint ?? extracted?.category_hint ?? title ?? ""),
@@ -844,6 +848,8 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
         description,
         image_url,
         price_php,
+        deal_price_php: is_deal ? sale_price_php : null,
+        is_deal,
         currency: "PHP",
         category_id,
       },
@@ -950,101 +956,26 @@ type MarketplaceProductData = {
   description?: string;
   image_url?: string;
   price?: number;
+  sale_price?: number;
   currency?: string;
   category_hint?: string;
   url?: string;
 };
 
-function extractLazadaIds(input: string): { itemId: string; skuId?: string; region: string } | null {
-  try {
-    const url = new URL(input);
-    if (!/(^|\.)lazada\./i.test(url.hostname)) return null;
-    const region = url.hostname.endsWith(".sg") ? "SG"
-      : url.hostname.endsWith(".my") ? "MY"
-      : url.hostname.endsWith(".co.th") ? "TH"
-      : url.hostname.endsWith(".vn") ? "VN"
-      : url.hostname.endsWith(".co.id") ? "ID"
-      : "PH";
-    const pathMatch = url.pathname.match(/(?:^|-)i(\d+)(?:-s(\d+))?\.html/i);
-    const itemId = pathMatch?.[1] ?? url.searchParams.get("itemId") ?? url.searchParams.get("item_id");
-    const skuId = pathMatch?.[2] ?? url.searchParams.get("skuId") ?? url.searchParams.get("sku_id") ?? undefined;
-    return itemId ? { itemId, skuId, region } : null;
-  } catch {
-    return null;
-  }
-}
-
 async function fetchLazadaProductData(input: string): Promise<MarketplaceProductData | null> {
-  const ids = extractLazadaIds(input);
-  if (!ids) return null;
-  const api = "mtop.lazada.gsearch.appsearch";
-  const appKey = "12574478";
-  const data = JSON.stringify({ q: ids.itemId, m: "search", regionID: ids.region, language: "en" });
-  const makeUrl = (t: string, sign: string) => {
-    const qs = new URLSearchParams({
-      jsv: "2.6.1",
-      appKey,
-      t,
-      sign,
-      api,
-      v: "1.0",
-      type: "jsonp",
-      dataType: "jsonp",
-      callback: "mtopjsonp1",
-      data,
-    });
-    return `https://acs-m.lazada.com.ph/h5/${api}/1.0/?${qs.toString()}`;
+  const result = await scrapeLazadaProduct(input);
+  if (!result) return null;
+  return {
+    title: result.title,
+    brand: result.brand,
+    description: result.description,
+    image_url: result.image_url,
+    price: result.price,
+    sale_price: result.sale_price,
+    currency: result.currency,
+    category_hint: result.category_hint,
+    url: result.url,
   };
-  const headers = {
-    "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
-    "accept": "application/json,text/javascript,*/*;q=0.1",
-    "referer": input,
-  };
-  try {
-    const first = await fetch(makeUrl(String(Date.now()), ""), { headers, signal: AbortSignal.timeout(8_000) });
-    const cookie = first.headers.get("set-cookie") ?? "";
-    const tokenValue = cookie.match(/_m_h5_tk=([^;]+)/)?.[1];
-    const tokenEnc = cookie.match(/_m_h5_tk_enc=([^;]+)/)?.[1];
-    const token = tokenValue?.split("_")[0];
-    if (!token) return null;
-    const t = String(Date.now());
-    const sign = createHash("md5").update(`${token}&${t}&${appKey}&${data}`).digest("hex");
-    const cookieHeader = `_m_h5_tk=${tokenValue}${tokenEnc ? `; _m_h5_tk_enc=${tokenEnc}` : ""}`;
-    const second = await fetch(makeUrl(t, sign), {
-      headers: { ...headers, "cookie": cookieHeader },
-      signal: AbortSignal.timeout(8_000),
-    });
-    const text = await second.text();
-    const jsonText = text.replace(/^\s*mtopjsonp1\(/, "").replace(/\)\s*$/, "");
-    const payload = JSON.parse(jsonText);
-    const items: any[] = payload?.data?.mods?.listItems ?? [];
-    // STRICT match only — no fallback to items[0], which historically picked
-    // unrelated cross-marketplace products and polluted the form.
-    const item = items.find((row) =>
-      String(row.itemId ?? row.nid) === ids.itemId
-      && (!ids.skuId || String(row.skuId ?? "") === ids.skuId),
-    ) ?? items.find((row) => String(row.itemId ?? row.nid) === ids.itemId);
-    if (!item) return null;
-    // Reject results whose image is clearly from another marketplace CDN
-    // (e.g. s.alicdn.com on an AliExpress hit returned from Lazada search).
-    const img = String(item.image ?? "");
-    if (img && !/(lzcdn\.com|slatic\.net|lazcdn\.com)/i.test(img)) return null;
-    const productUrl = item.productUrl ? new URL(String(item.productUrl), "https://www.lazada.com.ph").toString() : input;
-    const description = Array.isArray(item.description) ? item.description.filter(Boolean).join("\n") : String(item.description ?? "").trim();
-    const categoryHint = payload?.data?.mods?.filter?.filterItems?.find((f: any) => f?.name === "category")?.options?.[0]?.title;
-    return {
-      title: item.name,
-      brand: item.brandName,
-      description: description || undefined,
-      image_url: item.image,
-      price: Number(String(item.price ?? item.priceShow ?? "").replace(/[^0-9.]/g, "")) || undefined,
-      currency: "PHP",
-      category_hint: categoryHint,
-      url: productUrl,
-    };
-  } catch {
-    return null;
-  }
 }
 
 type LdProduct = {
