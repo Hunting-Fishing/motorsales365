@@ -693,6 +693,100 @@ function pickFirstNonIconImage(...candidates: any[]): string | null {
   return null;
 }
 
+type MarketplaceProductData = {
+  title?: string;
+  brand?: string;
+  description?: string;
+  image_url?: string;
+  price?: number;
+  currency?: string;
+  category_hint?: string;
+  url?: string;
+};
+
+function extractLazadaIds(input: string): { itemId: string; skuId?: string; region: string } | null {
+  try {
+    const url = new URL(input);
+    if (!/(^|\.)lazada\./i.test(url.hostname)) return null;
+    const region = url.hostname.endsWith(".sg") ? "SG"
+      : url.hostname.endsWith(".my") ? "MY"
+      : url.hostname.endsWith(".co.th") ? "TH"
+      : url.hostname.endsWith(".vn") ? "VN"
+      : url.hostname.endsWith(".co.id") ? "ID"
+      : "PH";
+    const pathMatch = url.pathname.match(/(?:^|-)i(\d+)(?:-s(\d+))?\.html/i);
+    const itemId = pathMatch?.[1] ?? url.searchParams.get("itemId") ?? url.searchParams.get("item_id");
+    const skuId = pathMatch?.[2] ?? url.searchParams.get("skuId") ?? url.searchParams.get("sku_id") ?? undefined;
+    return itemId ? { itemId, skuId, region } : null;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchLazadaProductData(input: string): Promise<MarketplaceProductData | null> {
+  const ids = extractLazadaIds(input);
+  if (!ids) return null;
+  const api = "mtop.lazada.gsearch.appsearch";
+  const appKey = "12574478";
+  const data = JSON.stringify({ q: ids.itemId, m: "search", regionID: ids.region, language: "en" });
+  const makeUrl = (t: string, sign: string) => {
+    const qs = new URLSearchParams({
+      jsv: "2.6.1",
+      appKey,
+      t,
+      sign,
+      api,
+      v: "1.0",
+      type: "jsonp",
+      dataType: "jsonp",
+      callback: "mtopjsonp1",
+      data,
+    });
+    return `https://acs-m.lazada.com.ph/h5/${api}/1.0/?${qs.toString()}`;
+  };
+  const headers = {
+    "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+    "accept": "application/json,text/javascript,*/*;q=0.1",
+    "referer": input,
+  };
+  try {
+    const first = await fetch(makeUrl(String(Date.now()), ""), { headers, signal: AbortSignal.timeout(8_000) });
+    const cookie = first.headers.get("set-cookie") ?? "";
+    const tokenValue = cookie.match(/_m_h5_tk=([^;]+)/)?.[1];
+    const token = tokenValue?.split("_")[0];
+    if (!token) return null;
+    const t = String(Date.now());
+    const sign = createHash("md5").update(`${token}&${t}&${appKey}&${data}`).digest("hex");
+    const second = await fetch(makeUrl(t, sign), {
+      headers: { ...headers, "cookie": cookie },
+      signal: AbortSignal.timeout(8_000),
+    });
+    const text = await second.text();
+    const jsonText = text.replace(/^\s*mtopjsonp1\(/, "").replace(/\)\s*$/, "");
+    const payload = JSON.parse(jsonText);
+    const items: any[] = payload?.data?.mods?.listItems ?? [];
+    const item = items.find((row) => String(row.itemId ?? row.nid) === ids.itemId && (!ids.skuId || String(row.skuId ?? "") === ids.skuId))
+      ?? items.find((row) => String(row.itemId ?? row.nid) === ids.itemId)
+      ?? items[0];
+    if (!item) return null;
+    const productUrl = item.productUrl ? new URL(String(item.productUrl), "https://www.lazada.com.ph").toString() : input;
+    const description = Array.isArray(item.description) ? item.description.filter(Boolean).join("\n") : String(item.description ?? "").trim();
+    const categoryHint = payload?.data?.mods?.filter?.filterItems?.find((f: any) => f?.name === "category")?.options?.[0]?.title;
+    return {
+      title: item.name,
+      brand: item.brandName,
+      description: description || undefined,
+      image_url: item.image,
+      price: Number(String(item.price ?? item.priceShow ?? "").replace(/[^0-9.]/g, "")) || undefined,
+      currency: "PHP",
+      category_hint: categoryHint,
+      url: productUrl,
+    };
+  } catch {
+    return null;
+  }
+}
+
 type LdProduct = {
   name?: string;
   brand?: string;
