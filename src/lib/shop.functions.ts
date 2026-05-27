@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { createHash } from "crypto";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { cleanShopUrl, detectNetworkSlug, isShortLink, looksLikeIconImage } from "@/lib/shop-url";
@@ -454,16 +455,6 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     await assertShopManager(context.supabase, context.userId);
 
     const apiKey = process.env.FIRECRAWL_API_KEY;
-    if (!apiKey) {
-      return {
-        error: "Scraper not configured — please connect Firecrawl.",
-        suggested: null,
-        cleanedUrl: cleanShopUrl(data.url),
-        resolvedFrom: null as string | null,
-        networkSlug: detectNetworkSlug(data.url),
-        networkId: null,
-      };
-    }
 
     // Resolve short / redirect links to the real product URL first.
     const pasted = data.url;
@@ -498,10 +489,22 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       .select("id, slug, name")
       .eq("active", true);
 
-    // Firecrawl scrape
-    const { default: Firecrawl } = await import("@mendable/firecrawl-js");
-    const firecrawl = new Firecrawl({ apiKey });
+    // Lazada product pages often block generic scrapers, but their search endpoint
+    // exposes the exact product when queried by item id. Prefer this over LLM guesses.
+    const marketplace = await fetchLazadaProductData(cleanedUrl);
 
+    if (!apiKey && !marketplace) {
+      return {
+        error: "Scraper not configured — please connect Firecrawl.",
+        suggested: null,
+        cleanedUrl,
+        resolvedFrom,
+        networkSlug,
+        networkId,
+      };
+    }
+
+    // Firecrawl scrape
     const schema = {
       type: "object",
       properties: {
@@ -518,29 +521,33 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     let extracted: any = null;
     let metadata: any = null;
     let html: string | null = null;
-    try {
-      const result: any = await firecrawl.scrape(cleanedUrl, {
-        formats: [
-          "markdown",
-          "rawHtml",
-          { type: "json", schema, prompt: "Extract real product fields for the main product on this marketplace listing. Ignore navigation, related items, recommendation rails, 'you may also like', and site-wide UI elements like favorite/heart icons." } as any,
-        ] as any,
-        onlyMainContent: true,
-        waitFor: 2500,
-        location: { country: "PH", languages: ["en"] },
-      } as any);
-      extracted = result?.json ?? result?.data?.json ?? null;
-      metadata = result?.metadata ?? result?.data?.metadata ?? null;
-      html = result?.rawHtml ?? result?.data?.rawHtml ?? result?.html ?? result?.data?.html ?? null;
-    } catch (e: any) {
-      return {
-        error: `Could not fetch page: ${e?.message ?? "unknown error"}`,
-        suggested: null,
-        cleanedUrl,
-        resolvedFrom,
-        networkSlug,
-        networkId,
-      };
+    if (apiKey && !marketplace) {
+      try {
+        const { default: Firecrawl } = await import("@mendable/firecrawl-js");
+        const firecrawl = new Firecrawl({ apiKey });
+        const result: any = await firecrawl.scrape(cleanedUrl, {
+          formats: [
+            "markdown",
+            "rawHtml",
+            { type: "json", schema, prompt: "Extract real product fields for the main product on this marketplace listing. Ignore navigation, related items, recommendation rails, 'you may also like', and site-wide UI elements like favorite/heart icons." } as any,
+          ] as any,
+          onlyMainContent: true,
+          waitFor: 2500,
+          location: { country: "PH", languages: ["en"] },
+        } as any);
+        extracted = result?.json ?? result?.data?.json ?? null;
+        metadata = result?.metadata ?? result?.data?.metadata ?? null;
+        html = result?.rawHtml ?? result?.data?.rawHtml ?? result?.html ?? result?.data?.html ?? null;
+      } catch (e: any) {
+        return {
+          error: `Could not fetch page: ${e?.message ?? "unknown error"}`,
+          suggested: null,
+          cleanedUrl,
+          resolvedFrom,
+          networkSlug,
+          networkId,
+        };
+      }
     }
 
     // JSON-LD Product fallback
@@ -549,12 +556,13 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     const pickStr = (...vals: any[]) =>
       vals.map((v) => (v == null ? "" : String(v).trim())).find((v) => v.length > 0) ?? "";
 
-    const title = pickStr(ld?.name, extracted?.title, metadata?.ogTitle, metadata?.["og:title"], metadata?.title).slice(0, 200) || null;
-    const brand = sanitizeBrand(pickStr(ld?.brand, extracted?.brand).slice(0, 120) || null);
-    const description = pickStr(ld?.description, extracted?.description, metadata?.ogDescription, metadata?.["og:description"], metadata?.description).slice(0, 2000) || null;
+    const title = pickStr(marketplace?.title, ld?.name, extracted?.title, metadata?.ogTitle, metadata?.["og:title"], metadata?.title).slice(0, 200) || null;
+    const brand = sanitizeBrand(pickStr(marketplace?.brand, ld?.brand, extracted?.brand).slice(0, 120) || null);
+    const description = pickStr(marketplace?.description, ld?.description, extracted?.description, metadata?.ogDescription, metadata?.["og:description"], metadata?.description).slice(0, 2000) || null;
 
     // Image: JSON-LD > og:image > extractor; reject icons.
     const image_url = pickFirstNonIconImage(
+      marketplace?.image_url,
       ld?.image,
       metadata?.ogImage,
       metadata?.["og:image"],
@@ -562,17 +570,18 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     );
 
     // Price: JSON-LD > og:price > extractor.
-    const rawPrice = ld?.price ?? metadata?.["og:price:amount"] ?? metadata?.["product:price:amount"] ?? extracted?.price ?? null;
-    const rawCurrency = ld?.currency ?? metadata?.["og:price:currency"] ?? metadata?.["product:price:currency"] ?? extracted?.currency ?? null;
+    const rawPrice = marketplace?.price ?? ld?.price ?? metadata?.["og:price:amount"] ?? metadata?.["product:price:amount"] ?? extracted?.price ?? null;
+    const rawCurrency = marketplace?.currency ?? ld?.currency ?? metadata?.["og:price:currency"] ?? metadata?.["product:price:currency"] ?? extracted?.currency ?? null;
     const price_php = pickPricePhp(rawPrice, rawCurrency);
 
     const category_id = fuzzyCategoryMatch(
-      String(extracted?.category_hint ?? title ?? ""),
+      String(marketplace?.category_hint ?? extracted?.category_hint ?? title ?? ""),
       (cats ?? []) as any[],
     );
 
     // Canonical URL hardening — prefer the marketplace's own URL if present.
     const canonical = pickStr(
+      marketplace?.url,
       metadata?.ogUrl,
       metadata?.["og:url"],
       metadata?.sourceURL,
@@ -684,6 +693,102 @@ function pickFirstNonIconImage(...candidates: any[]): string | null {
     }
   }
   return null;
+}
+
+type MarketplaceProductData = {
+  title?: string;
+  brand?: string;
+  description?: string;
+  image_url?: string;
+  price?: number;
+  currency?: string;
+  category_hint?: string;
+  url?: string;
+};
+
+function extractLazadaIds(input: string): { itemId: string; skuId?: string; region: string } | null {
+  try {
+    const url = new URL(input);
+    if (!/(^|\.)lazada\./i.test(url.hostname)) return null;
+    const region = url.hostname.endsWith(".sg") ? "SG"
+      : url.hostname.endsWith(".my") ? "MY"
+      : url.hostname.endsWith(".co.th") ? "TH"
+      : url.hostname.endsWith(".vn") ? "VN"
+      : url.hostname.endsWith(".co.id") ? "ID"
+      : "PH";
+    const pathMatch = url.pathname.match(/(?:^|-)i(\d+)(?:-s(\d+))?\.html/i);
+    const itemId = pathMatch?.[1] ?? url.searchParams.get("itemId") ?? url.searchParams.get("item_id");
+    const skuId = pathMatch?.[2] ?? url.searchParams.get("skuId") ?? url.searchParams.get("sku_id") ?? undefined;
+    return itemId ? { itemId, skuId, region } : null;
+  } catch {
+    return null;
+  }
+}
+
+async function fetchLazadaProductData(input: string): Promise<MarketplaceProductData | null> {
+  const ids = extractLazadaIds(input);
+  if (!ids) return null;
+  const api = "mtop.lazada.gsearch.appsearch";
+  const appKey = "12574478";
+  const data = JSON.stringify({ q: ids.itemId, m: "search", regionID: ids.region, language: "en" });
+  const makeUrl = (t: string, sign: string) => {
+    const qs = new URLSearchParams({
+      jsv: "2.6.1",
+      appKey,
+      t,
+      sign,
+      api,
+      v: "1.0",
+      type: "jsonp",
+      dataType: "jsonp",
+      callback: "mtopjsonp1",
+      data,
+    });
+    return `https://acs-m.lazada.com.ph/h5/${api}/1.0/?${qs.toString()}`;
+  };
+  const headers = {
+    "user-agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+    "accept": "application/json,text/javascript,*/*;q=0.1",
+    "referer": input,
+  };
+  try {
+    const first = await fetch(makeUrl(String(Date.now()), ""), { headers, signal: AbortSignal.timeout(8_000) });
+    const cookie = first.headers.get("set-cookie") ?? "";
+    const tokenValue = cookie.match(/_m_h5_tk=([^;]+)/)?.[1];
+    const tokenEnc = cookie.match(/_m_h5_tk_enc=([^;]+)/)?.[1];
+    const token = tokenValue?.split("_")[0];
+    if (!token) return null;
+    const t = String(Date.now());
+    const sign = createHash("md5").update(`${token}&${t}&${appKey}&${data}`).digest("hex");
+    const cookieHeader = `_m_h5_tk=${tokenValue}${tokenEnc ? `; _m_h5_tk_enc=${tokenEnc}` : ""}`;
+    const second = await fetch(makeUrl(t, sign), {
+      headers: { ...headers, "cookie": cookieHeader },
+      signal: AbortSignal.timeout(8_000),
+    });
+    const text = await second.text();
+    const jsonText = text.replace(/^\s*mtopjsonp1\(/, "").replace(/\)\s*$/, "");
+    const payload = JSON.parse(jsonText);
+    const items: any[] = payload?.data?.mods?.listItems ?? [];
+    const item = items.find((row) => String(row.itemId ?? row.nid) === ids.itemId && (!ids.skuId || String(row.skuId ?? "") === ids.skuId))
+      ?? items.find((row) => String(row.itemId ?? row.nid) === ids.itemId)
+      ?? items[0];
+    if (!item) return null;
+    const productUrl = item.productUrl ? new URL(String(item.productUrl), "https://www.lazada.com.ph").toString() : input;
+    const description = Array.isArray(item.description) ? item.description.filter(Boolean).join("\n") : String(item.description ?? "").trim();
+    const categoryHint = payload?.data?.mods?.filter?.filterItems?.find((f: any) => f?.name === "category")?.options?.[0]?.title;
+    return {
+      title: item.name,
+      brand: item.brandName,
+      description: description || undefined,
+      image_url: item.image,
+      price: Number(String(item.price ?? item.priceShow ?? "").replace(/[^0-9.]/g, "")) || undefined,
+      currency: "PHP",
+      category_hint: categoryHint,
+      url: productUrl,
+    };
+  } catch {
+    return null;
+  }
 }
 
 type LdProduct = {
