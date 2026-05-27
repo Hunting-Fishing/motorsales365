@@ -1005,10 +1005,17 @@ async function fetchLazadaProductData(input: string): Promise<MarketplaceProduct
     const jsonText = text.replace(/^\s*mtopjsonp1\(/, "").replace(/\)\s*$/, "");
     const payload = JSON.parse(jsonText);
     const items: any[] = payload?.data?.mods?.listItems ?? [];
-    const item = items.find((row) => String(row.itemId ?? row.nid) === ids.itemId && (!ids.skuId || String(row.skuId ?? "") === ids.skuId))
-      ?? items.find((row) => String(row.itemId ?? row.nid) === ids.itemId)
-      ?? items[0];
+    // STRICT match only — no fallback to items[0], which historically picked
+    // unrelated cross-marketplace products and polluted the form.
+    const item = items.find((row) =>
+      String(row.itemId ?? row.nid) === ids.itemId
+      && (!ids.skuId || String(row.skuId ?? "") === ids.skuId),
+    ) ?? items.find((row) => String(row.itemId ?? row.nid) === ids.itemId);
     if (!item) return null;
+    // Reject results whose image is clearly from another marketplace CDN
+    // (e.g. s.alicdn.com on an AliExpress hit returned from Lazada search).
+    const img = String(item.image ?? "");
+    if (img && !/(lzcdn\.com|slatic\.net|lazcdn\.com)/i.test(img)) return null;
     const productUrl = item.productUrl ? new URL(String(item.productUrl), "https://www.lazada.com.ph").toString() : input;
     const description = Array.isArray(item.description) ? item.description.filter(Boolean).join("\n") : String(item.description ?? "").trim();
     const categoryHint = payload?.data?.mods?.filter?.filterItems?.find((f: any) => f?.name === "category")?.options?.[0]?.title;
