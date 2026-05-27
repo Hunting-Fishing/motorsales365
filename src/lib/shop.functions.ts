@@ -162,7 +162,8 @@ export const trackShopClick = createServerFn({ method: "POST" })
 
 export const listShopProducts = createServerFn({ method: "GET" })
   .inputValidator((input: {
-    categorySlug?: string; subSlugs?: string[]; featured?: boolean; dealsOnly?: boolean;
+    categorySlug?: string; subSlugs?: string[]; departmentSlug?: string;
+    featured?: boolean; dealsOnly?: boolean;
     search?: string; limit?: number;
     make?: string; model?: string; year?: number; engine?: string; includeUniversal?: boolean;
     brand?: string; priceMin?: number; priceMax?: number;
@@ -171,6 +172,7 @@ export const listShopProducts = createServerFn({ method: "GET" })
     z.object({
       categorySlug: z.string().max(80).optional(),
       subSlugs: z.array(z.string().max(80)).max(20).optional(),
+      departmentSlug: z.string().max(80).optional(),
       featured: z.boolean().optional(),
       dealsOnly: z.boolean().optional(),
       search: z.string().max(120).optional(),
@@ -191,6 +193,23 @@ export const listShopProducts = createServerFn({ method: "GET" })
     const wantedSlugs = new Set<string>();
     if (data.categorySlug) wantedSlugs.add(data.categorySlug);
     for (const s of data.subSlugs ?? []) wantedSlugs.add(s);
+
+    // If a department is supplied, expand it to all category slugs that
+    // belong (or are cross-tagged) to that department.
+    if (data.departmentSlug && !data.categorySlug && (data.subSlugs?.length ?? 0) === 0) {
+      const { data: depCats } = await supabaseAdmin
+        .from("shop_categories")
+        .select("slug, department_slug, cross_department_slugs")
+        .eq("active", true);
+      for (const c of depCats ?? []) {
+        const own = (c as any).department_slug === data.departmentSlug;
+        const cross = Array.isArray((c as any).cross_department_slugs) &&
+          (c as any).cross_department_slugs.includes(data.departmentSlug);
+        if (own || cross) wantedSlugs.add((c as any).slug);
+      }
+      if (wantedSlugs.size === 0) return { products: [] };
+    }
+
     let catIds: string[] = [];
     if (wantedSlugs.size > 0) {
       const { data: rows } = await supabaseAdmin
