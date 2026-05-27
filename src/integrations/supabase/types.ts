@@ -2777,10 +2777,14 @@ export type Database = {
           active: boolean
           created_at: string
           description: string | null
+          hero_image_url: string | null
           icon: string | null
           id: string
+          intro_md: string | null
           name: string
           parent_id: string | null
+          seo_description: string | null
+          seo_title: string | null
           slug: string
           sort_order: number
         }
@@ -2788,10 +2792,14 @@ export type Database = {
           active?: boolean
           created_at?: string
           description?: string | null
+          hero_image_url?: string | null
           icon?: string | null
           id?: string
+          intro_md?: string | null
           name: string
           parent_id?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
           slug: string
           sort_order?: number
         }
@@ -2799,10 +2807,14 @@ export type Database = {
           active?: boolean
           created_at?: string
           description?: string | null
+          hero_image_url?: string | null
           icon?: string | null
           id?: string
+          intro_md?: string | null
           name?: string
           parent_id?: string | null
+          seo_description?: string | null
+          seo_title?: string | null
           slug?: string
           sort_order?: number
         }
@@ -2812,6 +2824,60 @@ export type Database = {
             columns: ["parent_id"]
             isOneToOne: false
             referencedRelation: "shop_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_click_events: {
+        Row: {
+          created_at: string
+          id: string
+          link_id: string | null
+          product_id: string
+          referrer: string | null
+          user_agent: string | null
+          user_id: string | null
+          utm_campaign: string | null
+          utm_medium: string | null
+          utm_source: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          link_id?: string | null
+          product_id: string
+          referrer?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          link_id?: string | null
+          product_id?: string
+          referrer?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+          utm_campaign?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_click_events_link_id_fkey"
+            columns: ["link_id"]
+            isOneToOne: false
+            referencedRelation: "shop_product_links"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_click_events_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "shop_products"
             referencedColumns: ["id"]
           },
         ]
@@ -3019,11 +3085,14 @@ export type Database = {
           created_at: string
           created_by: string | null
           currency: string
+          deal_ends_at: string | null
+          deal_price_php: number | null
           description: string | null
           featured: boolean
           gallery: Json
           id: string
           image_url: string | null
+          is_deal: boolean
           price_php: number | null
           slug: string
           tags: string[]
@@ -3040,11 +3109,14 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           currency?: string
+          deal_ends_at?: string | null
+          deal_price_php?: number | null
           description?: string | null
           featured?: boolean
           gallery?: Json
           id?: string
           image_url?: string | null
+          is_deal?: boolean
           price_php?: number | null
           slug: string
           tags?: string[]
@@ -3061,11 +3133,14 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           currency?: string
+          deal_ends_at?: string | null
+          deal_price_php?: number | null
           description?: string | null
           featured?: boolean
           gallery?: Json
           id?: string
           image_url?: string | null
+          is_deal?: boolean
           price_php?: number | null
           slug?: string
           tags?: string[]

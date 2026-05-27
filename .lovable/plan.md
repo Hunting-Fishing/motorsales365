@@ -1,71 +1,68 @@
-# Make Engine a first-class facet app-wide
 
-The fitment dialog now supports engine, but only the admin shop side knows about it. This plan pushes engine through the rest of the app so visitors can pick an engine, listings advertise an engine, and filters/match logic actually use it.
+## Context
 
-## 1. Garage (visitor's "my vehicle")
+Phase 1 already shipped: multi-category join table, nested `parent_id` taxonomy, multi-select filtering server-side, expanded seeded categories (Detailing → Car Washing/Polishing/Waxes/etc., Tools → Hand/Power/Diagnostics, Performance, Off-Road, EV, etc.), and the filter drawer now exposes sub-category chips, price range, brand, and sort.
 
-`src/lib/garage.ts`
-- Add optional `engine?: string` to `GarageVehicle` (backward compatible — existing localStorage entries just don't have it).
-- `formatVehicle()` appends ` — <engine>` when set.
+This plan covers what's still missing to make the shop genuinely discoverable and to start driving real affiliate revenue.
 
-## 2. Vehicle picker that knows about engines
+## 1. Category UX & Discovery
 
-`src/components/shop/vehicle-fitment-picker.tsx`
-- After Model select, render an Engine select populated by `getEnginesFor(category, make, model, year)` from `src/data/vehicle-engines.ts`.
-- Engine select includes an "Any engine" option and a "Custom…" escape hatch (text input) for models without catalog entries.
-- Emit `engine` in the `onSubmit` payload.
+- **Persistent sidebar filters on desktop** (`/shop` + `/shop/$category`). Drawer stays on mobile/tablet. Sidebar shows: Category tree (expandable parents → children), Brand, Price range, Tags, Universal-fit toggle, Marketplace source.
+- **Active filter chips row** above the product grid with one-click removal and "Clear all".
+- **Category tree page (`/shop/categories`)**: visual grid of all top-level categories with child chips underneath, product counts per node, hero icon per parent. Becomes the primary browsing entry.
+- **Breadcrumbs** on `/shop/$category` and product pages showing parent → child path (driven by `parent_id`).
+- **Related categories** strip on category and product pages ("People shopping Car Washing also browse Waxes, Microfiber, Wheel & Tire").
 
-This component is reused by the shop filter drawer, so the shop filter inherits engine support automatically.
+## 2. SEO Category Landers
 
-`src/components/vehicle-picker.tsx` (used by sell/rides flows)
-- Add the same Engine select underneath Model, again driven by `getEnginesFor` with a free-text fallback. Lifts `engine` through `onChange`.
+- Per-category `head()` with unique title/description/canonical/og:image derived from category record (add `hero_image_url`, `seo_title`, `seo_description`, `intro_md` columns to `shop_categories`).
+- JSON-LD `ItemList` of products on category pages.
+- Sitemap entries for every category and sub-category slug.
 
-## 3. Shop product matching honors engine
+## 3. Garage-Aware Recommendations
 
-`src/lib/shop.functions.ts` — `listShopProducts`
-- Add `engine?: string` to the input validator and the `vehicle` param.
-- Update the fitment matcher (lines 46–65): a rule passes the engine check when its `engine` is null/empty, OR when the visitor supplied an `engine` that case-insensitively equals the rule's `engine`. If the visitor has no engine selected, engine rules are ignored (current behavior preserved — never hides results).
+- New `/shop` rail: **"Recommended for your {Year Make Model Engine}"** when the visitor has a primary garage vehicle. Server-side: pick products whose fitment matches the primary vehicle, ordered by click_count.
+- Product page: **"Fits your garage"** badge + **"Also fits"** list (other vehicles in the user's garage that match this product's fitment rules).
+- Empty-garage CTA: "Add your ride to see parts that fit" → links to `/dashboard/rides/new`.
 
-`src/routes/shop.index.tsx` and `src/routes/shop.$category.tsx`
-- Pass `vehicle.engine` through to `listShopProducts` so the new filter actually runs.
+## 4. Maintenance-Driven Marketing
 
-## 4. Vehicle listings (sell flow) capture engine
+- Use `rides.mileage_km` + service log cadence to surface **"Time for an oil change?"** / **"Brake pads due"** cards on the dashboard, each linking to a pre-filtered shop search (category=lubricants, fits=this vehicle).
+- Seed a small `maintenance_reminders` table (interval_km, interval_months, default category slug).
 
-`src/routes/sell.tsx`
-- Add an Engine field beside Mileage/Transmission/Fuel for car & motorcycle categories. Uses the same catalog-driven select with free-text fallback.
-- On submit, write `attributes.engine` alongside the existing `attributes.year/make/model`.
-- Listing edit path: preload `attributes.engine` into state.
+## 5. Monetization Features (build now)
 
-`src/routes/dashboard.rides_.new.tsx` and `dashboard.rides_.$id.edit.tsx`
-- Replace the free-text "Engine" input with the new catalog-driven select (free-text fallback when unknown). Persist to the existing `rides.engine` text column — no schema change.
+- **Featured/Sponsored slots**: add `is_featured boolean`, `featured_until timestamptz`, `featured_rank int` to `shop_products`. Featured products pin to the top of `/shop` and matching category pages with a subtle "Featured" badge. Admin toggle in product dialog.
+- **Brand pages (`/shop/brand/$slug`)**: auto-generated from distinct `brand` values, with logo (new `shop_brands` table: slug, name, logo_url, description, affiliate_disclosure). Filterable like category pages.
+- **Deal of the week**: `is_deal boolean` + `deal_ends_at` on products. Homepage + shop hero rail.
+- **Affiliate disclosure**: small disclosure line on every product card linking to an `/affiliate-disclosure` page; required by FTC/most networks.
+- **Outbound click tracking already exists** (`tg_shop_click_increment`) — add a `shop_click_events` row per click (user_id, product_id, referrer, utm) so we can report top earners and optimize.
 
-## 5. Show engine where vehicles are displayed
+## 6. Monetization Features (deferred — note only)
 
-- `src/routes/listing.$id.tsx`: render Engine in the spec block when `attributes.engine` is set.
-- `src/components/listing-card.tsx`: append engine to the small spec line (`year • make • model • engine`) when available.
-- `src/routes/rides.$slug.tsx`: already shows `ride.engine` — verify the label stays consistent.
-- Product fitment list on `src/routes/shop.p.$slug.tsx`: already shows engine (done last turn).
+Bundles/kits, price-drop alerts, comparison tool, newsletter "Deal of the week" automation, sponsored-billing UI, user-submitted finds, local services marketplace. Out of scope this round.
 
-## 6. Browse filters get an engine-aware vehicle filter
+## Technical Notes
 
-`src/routes/browse.$category.tsx` (only for `car` / `motorcycle` categories)
-- Add a compact `VehiclePicker`-style block above the keyword field: Year / Make / Model / Engine.
-- Extend `searchSchema` with `year`, `make`, `model`, `engine` and persist them in URL state.
-- Apply against the `attributes` JSON: `.eq("attributes->>make", make)`, `.eq("attributes->>model", model)`, `.eq("attributes->>year", year)`, `.eq("attributes->>engine", engine)` — only when each is set.
+**Migrations**
+- `shop_categories`: add `hero_image_url text`, `icon text`, `seo_title text`, `seo_description text`, `intro_md text`, `sort_order int default 0`.
+- `shop_products`: add `is_featured boolean default false`, `featured_until timestamptz`, `featured_rank int`, `is_deal boolean default false`, `deal_ends_at timestamptz`.
+- New table `shop_brands` (slug PK, name, logo_url, description, affiliate_disclosure) + RLS (public select, admin write) + GRANTs.
+- New table `maintenance_reminders` (id, interval_km, interval_months, category_slug, label) + GRANTs.
+- New table `shop_click_events` (id, product_id, user_id nullable, referrer, utm_source, utm_medium, utm_campaign, created_at) + GRANTs (insert: anon+authenticated, select: admin only).
 
-## 7. Save searches & SEO niceties
+**Server functions** (`src/lib/shop.functions.ts`)
+- `listShopCategories()` returns nested tree with product counts.
+- `listShopProducts` accepts `featuredFirst boolean`, `dealsOnly boolean`, `brandSlug string`.
+- `getCategoryTree(slug)` for breadcrumbs.
+- `recommendForVehicle({vehicleId})` server fn for the garage rail.
+- `trackShopClick({productId, utm})` — already increments counter, also insert `shop_click_events`.
 
-- `dashboard.searches` already serializes the URL query, so the new params ride along with no code changes there.
-- `listing.$id.tsx` head(): include engine in the dynamic title/description when present (e.g. "2019 Toyota Hilux 2.4L Diesel — …"). Same treatment for `rides.$slug.tsx`.
+**UI**
+- New `ShopSidebarFilters` component used on `/shop` and `/shop/$category`.
+- New `CategoryTree` page + `BrandPage` route + `ShopBreadcrumbs` component.
+- Admin: featured toggle + brand picker + deal fields in `ProductDialog`; new `/admin/shop/brands` and `/admin/shop/categories` editors.
 
-## Out of scope (intentionally)
+## Out of Scope
 
-- No DB migration. Rides already has `engine TEXT`; listings keep using `attributes` JSON; `shop_product_fitment.engine` was added last turn.
-- No bulk backfill of existing listings — engine is purely additive and optional.
-- Engine catalog stays in `src/data/vehicle-engines.ts`; expanding model coverage is a separate, additive task.
-
-## Technical notes
-
-- Engine matching is case-insensitive and string-equal on the stored label (the catalog returns stable labels like `"2.4L Diesel (2GD-FTV)"`). This is intentional — it keeps the data model simple and matches how `make`/`model` are matched today.
-- Free-text engines entered by sellers/visitors still work — they just only match other free-text entries with the same string. The catalog ensures most users converge on the same labels.
-- All UI changes degrade gracefully: existing listings/garage entries without an engine continue to render and match exactly as they do today.
+- Bundles, comparison, price-drop alerts, automated newsletter, sponsored-ad billing flow, mobile redesign beyond reusing the existing drawer, changes to affiliate scraping logic.

@@ -29,6 +29,7 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ExportRouteImport } from './routes/export'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AffiliateDisclosureRouteImport } from './routes/affiliate-disclosure'
 import { Route as AdvertiseRouteImport } from './routes/advertise'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
@@ -38,6 +39,7 @@ import { Route as RidesIndexRouteImport } from './routes/rides.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as BusinessesIndexRouteImport } from './routes/businesses.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as ShopCategoriesRouteImport } from './routes/shop.categories'
 import { Route as ShopCategoryRouteImport } from './routes/shop.$category'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
 import { Route as SellImportRouteImport } from './routes/sell.import'
@@ -90,6 +92,7 @@ import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising
 import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
 import { Route as DashboardTeamIndexRouteImport } from './routes/dashboard.team.index'
 import { Route as ShopPSlugRouteImport } from './routes/shop.p.$slug'
+import { Route as ShopBrandSlugRouteImport } from './routes/shop.brand.$slug'
 import { Route as RCodePosterRouteImport } from './routes/r.$code.poster'
 import { Route as PaymentsIdReceiptRouteImport } from './routes/payments.$id.receipt'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
@@ -212,6 +215,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AffiliateDisclosureRoute = AffiliateDisclosureRouteImport.update({
+  id: '/affiliate-disclosure',
+  path: '/affiliate-disclosure',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdvertiseRoute = AdvertiseRouteImport.update({
   id: '/advertise',
   path: '/advertise',
@@ -256,6 +264,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const ShopCategoriesRoute = ShopCategoriesRouteImport.update({
+  id: '/shop/categories',
+  path: '/shop/categories',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ShopCategoryRoute = ShopCategoryRouteImport.update({
   id: '/shop/$category',
@@ -517,6 +530,11 @@ const ShopPSlugRoute = ShopPSlugRouteImport.update({
   path: '/shop/p/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopBrandSlugRoute = ShopBrandSlugRouteImport.update({
+  id: '/shop/brand/$slug',
+  path: '/shop/brand/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RCodePosterRoute = RCodePosterRouteImport.update({
   id: '/poster',
   path: '/poster',
@@ -633,6 +651,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/advertise': typeof AdvertiseRoute
+  '/affiliate-disclosure': typeof AffiliateDisclosureRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/export': typeof ExportRoute
@@ -703,6 +722,7 @@ export interface FileRoutesByFullPath {
   '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
   '/shop/$category': typeof ShopCategoryRoute
+  '/shop/categories': typeof ShopCategoriesRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -720,6 +740,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
+  '/shop/brand/$slug': typeof ShopBrandSlugRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
@@ -736,6 +757,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/advertise': typeof AdvertiseRoute
+  '/affiliate-disclosure': typeof AffiliateDisclosureRoute
   '/contact': typeof ContactRoute
   '/export': typeof ExportRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -804,6 +826,7 @@ export interface FileRoutesByTo {
   '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
   '/shop/$category': typeof ShopCategoryRoute
+  '/shop/categories': typeof ShopCategoriesRoute
   '/admin': typeof AdminIndexRoute
   '/businesses': typeof BusinessesIndexRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -821,6 +844,7 @@ export interface FileRoutesByTo {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
+  '/shop/brand/$slug': typeof ShopBrandSlugRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/dashboard/team': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
@@ -839,6 +863,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/advertise': typeof AdvertiseRoute
+  '/affiliate-disclosure': typeof AffiliateDisclosureRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/export': typeof ExportRoute
@@ -909,6 +934,7 @@ export interface FileRoutesById {
   '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
   '/shop/$category': typeof ShopCategoryRoute
+  '/shop/categories': typeof ShopCategoriesRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -926,6 +952,7 @@ export interface FileRoutesById {
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
+  '/shop/brand/$slug': typeof ShopBrandSlugRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
@@ -945,6 +972,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/advertise'
+    | '/affiliate-disclosure'
     | '/contact'
     | '/dashboard'
     | '/export'
@@ -1015,6 +1043,7 @@ export interface FileRouteTypes {
     | '/sell/import'
     | '/seller/$id'
     | '/shop/$category'
+    | '/shop/categories'
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
@@ -1032,6 +1061,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
+    | '/shop/brand/$slug'
     | '/shop/p/$slug'
     | '/dashboard/team/'
     | '/api/public/fx/refresh'
@@ -1048,6 +1078,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/advertise'
+    | '/affiliate-disclosure'
     | '/contact'
     | '/export'
     | '/forgot-password'
@@ -1116,6 +1147,7 @@ export interface FileRouteTypes {
     | '/sell/import'
     | '/seller/$id'
     | '/shop/$category'
+    | '/shop/categories'
     | '/admin'
     | '/businesses'
     | '/dashboard'
@@ -1133,6 +1165,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
+    | '/shop/brand/$slug'
     | '/shop/p/$slug'
     | '/dashboard/team'
     | '/api/public/fx/refresh'
@@ -1150,6 +1183,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/admin'
     | '/advertise'
+    | '/affiliate-disclosure'
     | '/contact'
     | '/dashboard'
     | '/export'
@@ -1220,6 +1254,7 @@ export interface FileRouteTypes {
     | '/sell/import'
     | '/seller/$id'
     | '/shop/$category'
+    | '/shop/categories'
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
@@ -1237,6 +1272,7 @@ export interface FileRouteTypes {
     | '/lovable/email/suppression'
     | '/payments/$id/receipt'
     | '/r/$code/poster'
+    | '/shop/brand/$slug'
     | '/shop/p/$slug'
     | '/dashboard/team/'
     | '/api/public/fx/refresh'
@@ -1255,6 +1291,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   AdvertiseRoute: typeof AdvertiseRoute
+  AffiliateDisclosureRoute: typeof AffiliateDisclosureRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   ExportRoute: typeof ExportRoute
@@ -1292,6 +1329,7 @@ export interface RootRouteChildren {
   RidesSlugRoute: typeof RidesSlugRoute
   SellerIdRoute: typeof SellerIdRoute
   ShopCategoryRoute: typeof ShopCategoryRoute
+  ShopCategoriesRoute: typeof ShopCategoriesRoute
   BusinessesIndexRoute: typeof BusinessesIndexRoute
   RidesIndexRoute: typeof RidesIndexRoute
   ShopIndexRoute: typeof ShopIndexRoute
@@ -1299,6 +1337,7 @@ export interface RootRouteChildren {
   ApiPublicGeocodeRoute: typeof ApiPublicGeocodeRoute
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ShopBrandSlugRoute: typeof ShopBrandSlugRoute
   ShopPSlugRoute: typeof ShopPSlugRoute
   ApiPublicFxRefreshRoute: typeof ApiPublicFxRefreshRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -1451,6 +1490,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/affiliate-disclosure': {
+      id: '/affiliate-disclosure'
+      path: '/affiliate-disclosure'
+      fullPath: '/affiliate-disclosure'
+      preLoaderRoute: typeof AffiliateDisclosureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/advertise': {
       id: '/advertise'
       path: '/advertise'
@@ -1513,6 +1559,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/shop/categories': {
+      id: '/shop/categories'
+      path: '/shop/categories'
+      fullPath: '/shop/categories'
+      preLoaderRoute: typeof ShopCategoriesRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/shop/$category': {
       id: '/shop/$category'
@@ -1878,6 +1931,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopPSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shop/brand/$slug': {
+      id: '/shop/brand/$slug'
+      path: '/shop/brand/$slug'
+      fullPath: '/shop/brand/$slug'
+      preLoaderRoute: typeof ShopBrandSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/r/$code/poster': {
       id: '/r/$code/poster'
       path: '/poster'
@@ -2189,6 +2249,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   AdvertiseRoute: AdvertiseRoute,
+  AffiliateDisclosureRoute: AffiliateDisclosureRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   ExportRoute: ExportRoute,
@@ -2226,6 +2287,7 @@ const rootRouteChildren: RootRouteChildren = {
   RidesSlugRoute: RidesSlugRoute,
   SellerIdRoute: SellerIdRoute,
   ShopCategoryRoute: ShopCategoryRoute,
+  ShopCategoriesRoute: ShopCategoriesRoute,
   BusinessesIndexRoute: BusinessesIndexRoute,
   RidesIndexRoute: RidesIndexRoute,
   ShopIndexRoute: ShopIndexRoute,
@@ -2233,6 +2295,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicGeocodeRoute: ApiPublicGeocodeRoute,
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ShopBrandSlugRoute: ShopBrandSlugRoute,
   ShopPSlugRoute: ShopPSlugRoute,
   ApiPublicFxRefreshRoute: ApiPublicFxRefreshRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
@@ -2245,3 +2308,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
