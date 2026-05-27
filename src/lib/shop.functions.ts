@@ -549,18 +549,21 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     const pickStr = (...vals: any[]) =>
       vals.map((v) => (v == null ? "" : String(v).trim())).find((v) => v.length > 0) ?? "";
 
-    const title = pickStr(extracted?.title, ld?.name, metadata?.ogTitle, metadata?.["og:title"], metadata?.title).slice(0, 200) || null;
-    const brand = pickStr(extracted?.brand, ld?.brand).slice(0, 120) || null;
-    const description = pickStr(extracted?.description, ld?.description, metadata?.ogDescription, metadata?.["og:description"], metadata?.description).slice(0, 2000) || null;
+    const title = pickStr(ld?.name, extracted?.title, metadata?.ogTitle, metadata?.["og:title"], metadata?.title).slice(0, 200) || null;
+    const brand = sanitizeBrand(pickStr(ld?.brand, extracted?.brand).slice(0, 120) || null);
+    const description = pickStr(ld?.description, extracted?.description, metadata?.ogDescription, metadata?.["og:description"], metadata?.description).slice(0, 2000) || null;
 
-    // Image: try extractor, JSON-LD, og:image — reject icon-looking URLs.
-    const imageCandidates = [extracted?.image_url, ld?.image, metadata?.ogImage, metadata?.["og:image"]]
-      .map((v) => (v == null ? "" : String(v).trim()))
-      .filter((v) => v.length > 0 && !looksLikeIconImage(v));
-    const image_url = imageCandidates[0] || null;
+    // Image: JSON-LD > og:image > extractor; reject icons.
+    const image_url = pickFirstNonIconImage(
+      ld?.image,
+      metadata?.ogImage,
+      metadata?.["og:image"],
+      extracted?.image_url,
+    );
 
-    const rawPrice = extracted?.price ?? ld?.price ?? metadata?.["og:price:amount"] ?? null;
-    const rawCurrency = extracted?.currency ?? ld?.currency ?? metadata?.["og:price:currency"] ?? null;
+    // Price: JSON-LD > og:price > extractor.
+    const rawPrice = ld?.price ?? metadata?.["og:price:amount"] ?? metadata?.["product:price:amount"] ?? extracted?.price ?? null;
+    const rawCurrency = ld?.currency ?? metadata?.["og:price:currency"] ?? metadata?.["product:price:currency"] ?? extracted?.currency ?? null;
     const price_php = pickPricePhp(rawPrice, rawCurrency);
 
     const category_id = fuzzyCategoryMatch(
@@ -568,11 +571,27 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       (cats ?? []) as any[],
     );
 
+    // Canonical URL hardening — prefer the marketplace's own URL if present.
+    const canonical = pickStr(
+      metadata?.ogUrl,
+      metadata?.["og:url"],
+      metadata?.sourceURL,
+      ld?.url,
+    );
+    let finalCleanedUrl = cleanedUrl;
+    if (canonical && /^https?:\/\//i.test(canonical)) {
+      const cleanedCanonical = cleanShopUrl(canonical);
+      const sameNet = detectNetworkSlug(cleanedCanonical);
+      if (sameNet && (!networkSlug || sameNet === networkSlug)) {
+        finalCleanedUrl = cleanedCanonical;
+      }
+    }
+
     return {
       error: null,
-      cleanedUrl,
+      cleanedUrl: finalCleanedUrl,
       resolvedFrom,
-      networkSlug,
+      networkSlug: detectNetworkSlug(finalCleanedUrl) ?? networkSlug,
       networkId,
       suggested: {
         title,
