@@ -722,6 +722,7 @@ function extractJsonLdProduct(html: string): LdProduct | null {
         image: typeof image === "string" ? image : image?.url,
         price: Number.isFinite(price) ? price : undefined,
         currency: typeof offer?.priceCurrency === "string" ? offer.priceCurrency : undefined,
+        url: typeof node.url === "string" ? node.url : (typeof node["@id"] === "string" ? node["@id"] : undefined),
       };
     }
   }
