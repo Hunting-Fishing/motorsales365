@@ -71,6 +71,7 @@ function ShopIndex() {
   });
 
   const cats = catData?.categories ?? [];
+  const departments = depData?.departments ?? [];
   const brands = brandData?.brands ?? [];
   const featured = featData?.products ?? [];
   const latest = latestData?.products ?? [];
