@@ -336,19 +336,26 @@ export const getShopProduct = createServerFn({ method: "GET" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!product) return { product: null, links: [], fitment: [] };
-    const [{ data: links }, { data: fitment }] = await Promise.all([
+    const [{ data: links }, { data: fitment }, { data: history }] = await Promise.all([
       supabaseAdmin
         .from("shop_product_links")
-        .select("id, url, sku, network:affiliate_networks(id, slug, name, tag_param, tag_value, deeplink_template, active)")
+        .select("id, url, sku, price_php, sale_price_php, in_stock, last_checked_at, network:affiliate_networks(id, slug, name, tag_param, tag_value, deeplink_template, active)")
         .eq("product_id", product.id),
       supabaseAdmin
         .from("shop_product_fitment")
         .select("id, category, make, model, year_start, year_end, notes")
         .eq("product_id", product.id)
         .order("make", { ascending: true }),
+      supabaseAdmin
+        .from("shop_price_history")
+        .select("price_php, sale_price_php, captured_at, network_id")
+        .eq("product_id", product.id)
+        .gte("captured_at", new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString())
+        .order("captured_at", { ascending: true })
+        .limit(500),
     ]);
     const visible = (links ?? []).filter((l: any) => l.network?.active);
-    return { product, links: visible, fitment: fitment ?? [] };
+    return { product, links: visible, fitment: fitment ?? [], history: history ?? [] };
   });
 
 // ============ ADMIN ============

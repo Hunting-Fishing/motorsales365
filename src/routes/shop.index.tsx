@@ -69,12 +69,17 @@ function ShopIndex() {
     queryKey: ["shop-latest", filterArgs],
     queryFn: () => listShopProducts({ data: { limit: 24, ...filterArgs } }),
   });
+  const { data: dealsData } = useQuery({
+    queryKey: ["shop-deals", filterArgs],
+    queryFn: () => listShopProducts({ data: { dealsOnly: true, limit: 12, sort: "popular", ...filterArgs } }),
+  });
 
   const cats = catData?.categories ?? [];
   const departments = depData?.departments ?? [];
   const brands = brandData?.brands ?? [];
   const featured = featData?.products ?? [];
   const latest = latestData?.products ?? [];
+  const deals = dealsData?.products ?? [];
 
   const onPickVehicle = (v: { category: "car" | "motorcycle"; make: string; model: string; year?: number; engine?: string }) => {
     setGarageState(v);
@@ -205,6 +210,16 @@ function ShopIndex() {
                 </Link>
               ))}
             </div>
+          </section>
+        )}
+
+        {deals.length > 0 && (
+          <section>
+            <div className="mb-4 flex items-end justify-between gap-3">
+              <h2 className="text-xl font-semibold">🔥 Hot deals</h2>
+              <span className="text-xs text-muted-foreground">Auto-refreshed every 6 hours</span>
+            </div>
+            <ProductGrid products={deals} vehicle={activeVehicle} />
           </section>
         )}
 
