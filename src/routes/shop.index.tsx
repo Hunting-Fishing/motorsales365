@@ -178,16 +178,30 @@ function ShopIndex() {
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {departments.map((d: any) => (
                 <Link key={d.slug} to="/shop/department/$slug" params={{ slug: d.slug }}
-                  className="group flex flex-col rounded-xl border bg-card p-5 transition hover:border-primary hover:shadow-md">
-                  <div className="flex items-start justify-between gap-2">
-                    <p className="font-semibold group-hover:text-primary">{d.name}</p>
-                    {d.product_count > 0 && <Badge variant="secondary" className="text-[10px]">{d.product_count}</Badge>}
-                  </div>
-                  {d.categories?.length > 0 && (
-                    <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
-                      {d.categories.slice(0, 4).map((c: any) => c.name).join(" · ")}
-                    </p>
+                  className="group flex flex-col overflow-hidden rounded-xl border bg-card transition hover:border-primary hover:shadow-md">
+                  {d.hero_image_url && (
+                    <div className="aspect-[4/3] w-full overflow-hidden bg-muted">
+                      <img
+                        src={d.hero_image_url}
+                        alt={d.name}
+                        loading="lazy"
+                        width={768}
+                        height={576}
+                        className="h-full w-full object-cover transition-transform group-hover:scale-105"
+                      />
+                    </div>
                   )}
+                  <div className="flex flex-1 flex-col p-4">
+                    <div className="flex items-start justify-between gap-2">
+                      <p className="font-semibold group-hover:text-primary">{d.name}</p>
+                      {d.product_count > 0 && <Badge variant="secondary" className="text-[10px]">{d.product_count}</Badge>}
+                    </div>
+                    {d.categories?.length > 0 && (
+                      <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
+                        {d.categories.slice(0, 4).map((c: any) => c.name).join(" · ")}
+                      </p>
+                    )}
+                  </div>
                 </Link>
               ))}
             </div>
