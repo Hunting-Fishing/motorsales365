@@ -20,6 +20,7 @@ import {
   getYearOptions,
   type VehicleCategory,
 } from "@/data/vehicles";
+import { getEnginesFor } from "@/data/vehicle-engines";
 import { normalize } from "@/lib/fuzzy";
 import { MAKE_ALIASES, getModelAliases } from "@/lib/vehicle-aliases";
 
@@ -28,7 +29,8 @@ type Props = {
   year: string;
   make: string;
   model: string;
-  onChange: (next: { year: string; make: string; model: string }) => void;
+  engine?: string;
+  onChange: (next: { year: string; make: string; model: string; engine?: string }) => void;
 };
 
 function Combo({
@@ -155,9 +157,10 @@ function Combo({
   );
 }
 
-export function VehiclePicker({ category, year, make, model, onChange }: Props) {
+export function VehiclePicker({ category, year, make, model, engine, onChange }: Props) {
   // "Other" mode = three free-text inputs (escape hatch).
   const [otherMode, setOtherMode] = React.useState(false);
+  const [engineCustom, setEngineCustom] = React.useState(false);
 
   const yearNum = year && /^\d{4}$/.test(year) ? parseInt(year, 10) : undefined;
   const yearOptions = React.useMemo(
@@ -187,6 +190,11 @@ export function VehiclePicker({ category, year, make, model, onChange }: Props) 
     [category, make, yearNum],
   );
 
+  const engineOptions = React.useMemo(
+    () => getEnginesFor(category, make, model, yearNum),
+    [category, make, model, yearNum],
+  );
+
   const isOtherMake = make.toLowerCase() === "other";
   const isOtherModel = model.toLowerCase() === "other";
 
@@ -194,10 +202,21 @@ export function VehiclePicker({ category, year, make, model, onChange }: Props) 
   React.useEffect(() => {
     if (!yearNum || !make || !model) return;
     if (!modelOptions.some((m) => m.toLowerCase() === model.toLowerCase())) {
-      onChange({ year, make, model: "" });
+      onChange({ year, make, model: "", engine: "" });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [yearNum]);
+
+  // Drop stale engine when its label is no longer offered (unless user is
+  // typing a custom value).
+  React.useEffect(() => {
+    if (engineCustom) return;
+    if (!engine) return;
+    if (engineOptions.length && !engineOptions.some((e) => e.label === engine)) {
+      onChange({ year, make, model, engine: "" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [make, model, yearNum]);
 
   if (otherMode) {
     return (
