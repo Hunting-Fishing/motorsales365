@@ -24,6 +24,8 @@ import { toast } from "sonner";
 import { Pencil, Trash2, Plus, Link as LinkIcon, ExternalLink, AlertTriangle, Sparkles, Car } from "lucide-react";
 import { AD_NETWORKS, AFFILIATE_PROGRAMS, COUNTRY_ORDER, type DirectoryEntry } from "@/lib/monetization-directory";
 import { detectNetworkSlug, cleanShopUrl, urlMatchesNetwork } from "@/lib/shop-url";
+import { getYearOptions, getMakesForYear, getModelsForYear } from "@/data/vehicles";
+import { getEnginesFor } from "@/data/vehicle-engines";
 
 export const Route = createFileRoute("/admin/shop")({
   component: AdminShop,
