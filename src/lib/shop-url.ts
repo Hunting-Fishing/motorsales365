@@ -14,6 +14,33 @@ const HOST_PATTERNS: Array<{ slug: string; test: (host: string, url: URL) => boo
   { slug: "zalora",   test: (h) => /(^|\.)zalora\.(com\.ph|com\.my|sg|co\.id|com\.hk)$/i.test(h) },
 ];
 
+// Short / redirect link hosts — must be resolved to the real product URL before scraping.
+const SHORT_LINK_HOSTS: RegExp[] = [
+  /^s\.lazada\.[a-z.]+$/i,
+  /^c\.lazada\.[a-z.]+$/i,
+  /^s\.shopee\.[a-z.]+$/i,
+  /^shp\.ee$/i,
+  /^(vt|vm)\.tiktok\.com$/i,
+  /^amzn\.(to|asia)$/i,
+  /^a\.co$/i,
+  /^s\.click\.aliexpress\.com$/i,
+  /^a\.aliexpress\.com$/i,
+];
+
+export function isShortLink(input: string): boolean {
+  const url = safeParseUrl(input);
+  if (!url) return false;
+  const host = url.hostname.toLowerCase();
+  return SHORT_LINK_HOSTS.some((r) => r.test(host));
+}
+
+// Image URLs that are clearly site UI / icons, not product photos.
+const IMAGE_BLOCKLIST = /(favicon|sprite|placeholder|wishlist|heart|logo|icon[-_/]|\/124-124\.|\/64-64\.|\/40-40\.)/i;
+export function looksLikeIconImage(url: string | null | undefined): boolean {
+  if (!url) return true;
+  return IMAGE_BLOCKLIST.test(url);
+}
+
 // Marketplace-specific noise to drop from query strings.
 const TRACKING_PARAMS = new Set([
   // generic
