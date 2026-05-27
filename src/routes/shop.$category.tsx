@@ -4,13 +4,14 @@ import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { SiteLayout } from "@/components/site-layout";
 import { AdCarousel } from "@/components/ads/ad-carousel";
-import { listShopCategories, listShopProducts, listShopBrands } from "@/lib/shop.functions";
+import { listShopCategories, listShopProducts, listShopBrands, getShopBreadcrumb } from "@/lib/shop.functions";
 import { ProductGrid } from "./shop.index";
 import { useGarage, formatVehicle } from "@/lib/garage";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
 import { ShopMobileCtaBar } from "@/components/shop/shop-mobile-cta-bar";
+import { ShopBreadcrumbs } from "@/components/shop/shop-breadcrumbs";
 
 import { X } from "lucide-react";
 
@@ -113,11 +114,8 @@ function ShopCategory() {
       </div>
 
       <div className="container mx-auto px-4 py-8 space-y-8">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Link to="/shop" className="hover:text-foreground">Shop</Link>
-          <span>/</span>
-          <span className="text-foreground">{cat?.name ?? category}</span>
-        </div>
+        <BreadcrumbForCategory slug={category} />
+
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="font-display text-2xl sm:text-3xl md:text-4xl">{cat?.name ?? category}</h1>
@@ -146,7 +144,8 @@ function ShopCategory() {
 
 
         <p className="rounded-md border bg-muted/40 p-4 text-xs text-muted-foreground">
-          Disclosure: 365 MotorSales earns a commission on qualifying purchases.
+          Disclosure: 365 MotorSales earns a commission on qualifying purchases. See our{" "}
+          <Link to="/affiliate-disclosure" className="underline">affiliate disclosure</Link>.
         </p>
       </div>
 
@@ -164,3 +163,10 @@ function ShopCategory() {
     </SiteLayout>
   );
 }
+
+function BreadcrumbForCategory({ slug }: { slug: string }) {
+  const { data } = useQuery({ queryKey: ["shop-breadcrumb", slug], queryFn: () => getShopBreadcrumb({ data: { slug } }) });
+  const trail = data?.trail ?? [{ slug, name: slug }];
+  return <ShopBreadcrumbs trail={trail} />;
+}
+

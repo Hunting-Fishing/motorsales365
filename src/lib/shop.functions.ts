@@ -10,22 +10,100 @@ import { cleanShopUrl, detectNetworkSlug, isShortLink, looksLikeIconImage } from
 export const listShopCategories = createServerFn({ method: "GET" }).handler(async () => {
   const { data, error } = await supabaseAdmin
     .from("shop_categories")
-    .select("id, slug, name, description, icon, sort_order")
+    .select("id, slug, name, description, icon, sort_order, parent_id, hero_image_url")
     .eq("active", true)
     .order("sort_order");
   if (error) throw new Error(error.message);
   return { categories: data ?? [] };
 });
 
+export const listShopCategoryTree = createServerFn({ method: "GET" }).handler(async () => {
+  const { data: cats, error } = await supabaseAdmin
+    .from("shop_categories")
+    .select("id, slug, name, description, icon, sort_order, parent_id, hero_image_url")
+    .eq("active", true)
+    .order("sort_order");
+  if (error) throw new Error(error.message);
+
+  const { data: pcRows } = await supabaseAdmin
+    .from("shop_product_categories")
+    .select("category_id")
+    .limit(5000);
+  const counts = new Map<string, number>();
+  for (const r of pcRows ?? []) counts.set((r as any).category_id, (counts.get((r as any).category_id) ?? 0) + 1);
+
+  const all = (cats ?? []).map((c: any) => ({ ...c, product_count: counts.get(c.id) ?? 0 }));
+  const byParent = new Map<string | null, any[]>();
+  for (const c of all) {
+    const k = c.parent_id ?? null;
+    const arr = byParent.get(k) ?? [];
+    arr.push(c);
+    byParent.set(k, arr);
+  }
+  const tree = (byParent.get(null) ?? []).map((parent: any) => ({
+    ...parent,
+    children: (byParent.get(parent.id) ?? []) as any[],
+  }));
+  return { tree };
+});
+
+export const getShopBreadcrumb = createServerFn({ method: "GET" })
+  .inputValidator((input: { slug: string }) => z.object({ slug: z.string().min(1).max(80) }).parse(input))
+  .handler(async ({ data }) => {
+    const { data: cats } = await supabaseAdmin
+      .from("shop_categories")
+      .select("id, slug, name, parent_id")
+      .eq("active", true);
+    const list = cats ?? [];
+    const byId = new Map(list.map((c: any) => [c.id, c]));
+    const start = list.find((c: any) => c.slug === data.slug);
+    if (!start) return { trail: [] };
+    const trail: Array<{ slug: string; name: string }> = [];
+    let cur: any = start;
+    let guard = 0;
+    while (cur && guard++ < 8) {
+      trail.unshift({ slug: cur.slug, name: cur.name });
+      cur = cur.parent_id ? byId.get(cur.parent_id) : null;
+    }
+    return { trail };
+  });
+
+export const trackShopClick = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) =>
+    z.object({
+      productId: z.string().uuid(),
+      linkId: z.string().uuid().optional(),
+      referrer: z.string().max(500).optional(),
+      utm_source: z.string().max(80).optional(),
+      utm_medium: z.string().max(80).optional(),
+      utm_campaign: z.string().max(80).optional(),
+    }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    await supabaseAdmin.from("shop_click_events").insert({
+      product_id: data.productId,
+      link_id: data.linkId ?? null,
+      referrer: data.referrer ?? null,
+      utm_source: data.utm_source ?? null,
+      utm_medium: data.utm_medium ?? null,
+      utm_campaign: data.utm_campaign ?? null,
+    });
+    return { ok: true };
+  });
+
 export const listShopProducts = createServerFn({ method: "GET" })
   .inputValidator((input: {
-    categorySlug?: string; featured?: boolean; search?: string; limit?: number;
+    categorySlug?: string; subSlugs?: string[]; featured?: boolean; dealsOnly?: boolean;
+    search?: string; limit?: number;
     make?: string; model?: string; year?: number; engine?: string; includeUniversal?: boolean;
-    brand?: string;
+    brand?: string; priceMin?: number; priceMax?: number;
+    sort?: "featured" | "newest" | "price_asc" | "price_desc" | "popular";
   } = {}) =>
     z.object({
       categorySlug: z.string().max(80).optional(),
+      subSlugs: z.array(z.string().max(80)).max(20).optional(),
       featured: z.boolean().optional(),
+      dealsOnly: z.boolean().optional(),
       search: z.string().max(120).optional(),
       limit: z.number().int().min(1).max(60).optional(),
       make: z.string().max(80).optional(),
@@ -34,15 +112,26 @@ export const listShopProducts = createServerFn({ method: "GET" })
       engine: z.string().max(120).optional(),
       includeUniversal: z.boolean().optional(),
       brand: z.string().max(120).optional(),
+      priceMin: z.number().nonnegative().optional(),
+      priceMax: z.number().nonnegative().optional(),
+      sort: z.enum(["featured", "newest", "price_asc", "price_desc", "popular"]).optional(),
     }).parse(input),
   )
   .handler(async ({ data }) => {
-    let cat: string | null = null;
-    if (data.categorySlug) {
-      const { data: c } = await supabaseAdmin.from("shop_categories").select("id").eq("slug", data.categorySlug).maybeSingle();
-      cat = c?.id ?? null;
-      if (!cat) return { products: [] };
+    // Resolve a primary category + any extra sub-category slugs to ids
+    const wantedSlugs = new Set<string>();
+    if (data.categorySlug) wantedSlugs.add(data.categorySlug);
+    for (const s of data.subSlugs ?? []) wantedSlugs.add(s);
+    let catIds: string[] = [];
+    if (wantedSlugs.size > 0) {
+      const { data: rows } = await supabaseAdmin
+        .from("shop_categories")
+        .select("id, slug")
+        .in("slug", Array.from(wantedSlugs));
+      catIds = (rows ?? []).map((r: any) => r.id);
+      if (catIds.length === 0) return { products: [] };
     }
+    const cat: string | null = data.categorySlug ? (catIds[0] ?? null) : null;
 
     // Vehicle fitment filter: find matching product_ids first, then filter.
     let allowedIds: Set<string> | null = null;
@@ -78,17 +167,36 @@ export const listShopProducts = createServerFn({ method: "GET" })
 
     let q = supabaseAdmin
       .from("shop_products")
-      .select("id, slug, title, brand, image_url, price_php, currency, featured, category_id, click_count, universal_fit")
+      .select("id, slug, title, brand, image_url, price_php, currency, featured, category_id, click_count, universal_fit, is_deal, deal_ends_at, deal_price_php")
       .eq("active", true);
-    if (cat) q = q.eq("category_id", cat);
+    if (cat && catIds.length <= 1) {
+      q = q.eq("category_id", cat);
+    } else if (catIds.length > 0) {
+      // multi-category: filter via join table
+      const { data: pcRows } = await supabaseAdmin
+        .from("shop_product_categories")
+        .select("product_id")
+        .in("category_id", catIds)
+        .limit(5000);
+      const ids = Array.from(new Set((pcRows ?? []).map((r: any) => r.product_id as string)));
+      if (ids.length === 0) return { products: [] };
+      q = q.in("id", ids);
+    }
     if (data.featured) q = q.eq("featured", true);
+    if (data.dealsOnly) q = q.eq("is_deal", true);
     if (data.search) q = q.ilike("title", `%${data.search}%`);
     if (data.brand) q = q.ilike("brand", data.brand);
-    const { data: rows, error } = await q
-      .order("featured", { ascending: false })
-      .order("created_at", { ascending: false })
-      .limit(data.limit ?? 24);
+    if (typeof data.priceMin === "number") q = q.gte("price_php", data.priceMin);
+    if (typeof data.priceMax === "number") q = q.lte("price_php", data.priceMax);
+    const sort = data.sort ?? "featured";
+    if (sort === "price_asc") q = q.order("price_php", { ascending: true, nullsFirst: false });
+    else if (sort === "price_desc") q = q.order("price_php", { ascending: false, nullsFirst: false });
+    else if (sort === "popular") q = q.order("click_count", { ascending: false });
+    else if (sort === "newest") q = q.order("created_at", { ascending: false });
+    else q = q.order("featured", { ascending: false }).order("created_at", { ascending: false });
+    const { data: rows, error } = await q.limit(data.limit ?? 24);
     if (error) throw new Error(error.message);
+
 
     let products = rows ?? [];
     if (allowedIds) {
