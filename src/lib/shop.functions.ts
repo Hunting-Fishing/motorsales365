@@ -693,6 +693,7 @@ type LdProduct = {
   image?: string;
   price?: number;
   currency?: string;
+  url?: string;
 };
 
 function extractJsonLdProduct(html: string): LdProduct | null {
