@@ -778,6 +778,7 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
           cleanedUrl,
           resolvedFrom,
           networkSlug,
+          detectedSlug,
           networkId,
         };
       }
