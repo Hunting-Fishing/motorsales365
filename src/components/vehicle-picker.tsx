@@ -234,21 +234,26 @@ export function VehiclePicker({ category, year, make, model, engine, onChange }:
         <div className="grid gap-2 sm:grid-cols-3">
           <Input
             value={year}
-            onChange={(e) => onChange({ year: e.target.value, make, model })}
+            onChange={(e) => onChange({ year: e.target.value, make, model, engine })}
             placeholder="Year (e.g. 2019)"
             inputMode="numeric"
           />
           <Input
             value={make}
-            onChange={(e) => onChange({ year, make: e.target.value, model })}
+            onChange={(e) => onChange({ year, make: e.target.value, model, engine })}
             placeholder="Make"
           />
           <Input
             value={model}
-            onChange={(e) => onChange({ year, make, model: e.target.value })}
+            onChange={(e) => onChange({ year, make, model: e.target.value, engine })}
             placeholder="Model"
           />
         </div>
+        <Input
+          value={engine ?? ""}
+          onChange={(e) => onChange({ year, make, model, engine: e.target.value })}
+          placeholder="Engine (optional, e.g. 2.4L Diesel)"
+        />
       </div>
     );
   }
