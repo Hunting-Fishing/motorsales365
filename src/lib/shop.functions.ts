@@ -414,3 +414,139 @@ export const toggleShopFavorite = createServerFn({ method: "POST" })
     }
     return { ok: true, favorite: data.favorite };
   });
+
+// ============ URL SCRAPE (admin) ============
+
+function pickPricePhp(price: unknown, currency: unknown): number | null {
+  const n = typeof price === "number" ? price : Number(String(price ?? "").replace(/[^0-9.]/g, ""));
+  if (!Number.isFinite(n) || n <= 0) return null;
+  const cur = String(currency ?? "").toUpperCase();
+  // We only store PHP. If the marketplace returned PHP or no currency, keep the number.
+  if (!cur || cur === "PHP" || cur === "₱") return Math.round(n * 100) / 100;
+  return null; // unknown FX — let admin fill manually
+}
+
+function fuzzyCategoryMatch(hint: string, cats: Array<{ id: string; name: string; slug: string }>): string | null {
+  if (!hint) return null;
+  const h = hint.toLowerCase();
+  for (const c of cats) {
+    if (h.includes(c.slug.toLowerCase()) || h.includes(c.name.toLowerCase())) return c.id;
+  }
+  // token overlap fallback
+  const tokens = h.split(/[^a-z0-9]+/).filter(Boolean);
+  let best: { id: string; score: number } | null = null;
+  for (const c of cats) {
+    const ct = `${c.name} ${c.slug}`.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+    const score = tokens.filter((t) => ct.includes(t)).length;
+    if (score > 0 && (!best || score > best.score)) best = { id: c.id, score };
+  }
+  return best?.id ?? null;
+}
+
+export const scrapeShopUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) =>
+    z.object({
+      url: z.string().url().max(2000).regex(/^https?:\/\//i),
+    }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    await assertShopManager(context.supabase, context.userId);
+
+    const apiKey = process.env.FIRECRAWL_API_KEY;
+    if (!apiKey) {
+      return {
+        error: "Scraper not configured — please connect Firecrawl.",
+        suggested: null,
+        cleanedUrl: cleanShopUrl(data.url),
+        networkSlug: detectNetworkSlug(data.url),
+        networkId: null,
+      };
+    }
+
+    const cleanedUrl = cleanShopUrl(data.url);
+    const networkSlug = detectNetworkSlug(cleanedUrl);
+
+    // Look up matching active network
+    let networkId: string | null = null;
+    if (networkSlug) {
+      const { data: net } = await context.supabase
+        .from("affiliate_networks")
+        .select("id")
+        .eq("slug", networkSlug)
+        .eq("active", true)
+        .maybeSingle();
+      networkId = net?.id ?? null;
+    }
+
+    // Load categories for fuzzy mapping
+    const { data: cats } = await supabaseAdmin
+      .from("shop_categories")
+      .select("id, slug, name")
+      .eq("active", true);
+
+    // Firecrawl scrape
+    const { default: Firecrawl } = await import("@mendable/firecrawl-js");
+    const firecrawl = new Firecrawl({ apiKey });
+
+    const schema = {
+      type: "object",
+      properties: {
+        title: { type: "string", description: "Concise product title without seller/shop name" },
+        brand: { type: "string", description: "Brand / manufacturer if mentioned" },
+        description: { type: "string", description: "1-3 sentence product description" },
+        price: { type: "number", description: "Numeric price value" },
+        currency: { type: "string", description: "ISO currency code, e.g. PHP, USD" },
+        image_url: { type: "string", description: "Absolute URL of the primary product image" },
+        category_hint: { type: "string", description: "Best-guess product category (e.g. car wax, oil filter, helmet)" },
+      },
+    };
+
+    let extracted: any = null;
+    let metadata: any = null;
+    try {
+      const result: any = await firecrawl.scrape(cleanedUrl, {
+        formats: [
+          "markdown",
+          { type: "json", schema, prompt: "Extract product fields from this marketplace listing." } as any,
+        ] as any,
+        onlyMainContent: true,
+      });
+      extracted = result?.json ?? result?.data?.json ?? null;
+      metadata = result?.metadata ?? result?.data?.metadata ?? null;
+    } catch (e: any) {
+      return {
+        error: `Could not fetch page: ${e?.message ?? "unknown error"}`,
+        suggested: null,
+        cleanedUrl,
+        networkSlug,
+        networkId,
+      };
+    }
+
+    const title = (extracted?.title ?? metadata?.title ?? "").toString().trim().slice(0, 200) || null;
+    const brand = (extracted?.brand ?? "").toString().trim().slice(0, 120) || null;
+    const description = (extracted?.description ?? metadata?.description ?? "").toString().trim().slice(0, 2000) || null;
+    const image_url = (extracted?.image_url ?? metadata?.ogImage ?? metadata?.["og:image"] ?? "").toString().trim() || null;
+    const price_php = pickPricePhp(extracted?.price, extracted?.currency);
+    const category_id = fuzzyCategoryMatch(
+      String(extracted?.category_hint ?? title ?? ""),
+      (cats ?? []) as any[],
+    );
+
+    return {
+      error: null,
+      cleanedUrl,
+      networkSlug,
+      networkId,
+      suggested: {
+        title,
+        brand,
+        description,
+        image_url,
+        price_php,
+        currency: "PHP",
+        category_id,
+      },
+    };
+  });
