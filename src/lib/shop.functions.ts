@@ -318,6 +318,7 @@ const fitmentSchema = z.object({
   model: z.string().max(120).optional().nullable(),
   year_start: z.number().int().min(1900).max(2100).optional().nullable(),
   year_end: z.number().int().min(1900).max(2100).optional().nullable(),
+  engine: z.string().max(120).optional().nullable(),
   notes: z.string().max(500).optional().nullable(),
 });
 

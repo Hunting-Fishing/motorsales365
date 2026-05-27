@@ -24,6 +24,8 @@ import { toast } from "sonner";
 import { Pencil, Trash2, Plus, Link as LinkIcon, ExternalLink, AlertTriangle, Sparkles, Car } from "lucide-react";
 import { AD_NETWORKS, AFFILIATE_PROGRAMS, COUNTRY_ORDER, type DirectoryEntry } from "@/lib/monetization-directory";
 import { detectNetworkSlug, cleanShopUrl, urlMatchesNetwork } from "@/lib/shop-url";
+import { getYearOptions, getMakesForYear, getModelsForYear } from "@/data/vehicles";
+import { getEnginesFor } from "@/data/vehicle-engines";
 
 export const Route = createFileRoute("/admin/shop")({
   component: AdminShop,
@@ -564,14 +566,24 @@ function FitmentDialog({ product, onClose }: any) {
     queryKey: ["admin-product-fitment", product.id],
     queryFn: () => adminListFitment({ data: { productId: product.id } }),
   });
-  const [form, setForm] = useState({
+
+  const emptyForm = {
     category: "car" as "car" | "motorcycle",
     make: "",
     model: "",
-    year_start: "" as string,
-    year_end: "" as string,
+    year_start: "",
+    year_end: "",
+    engine: "",
     notes: "",
-  });
+  };
+  const [form, setForm] = useState(emptyForm);
+
+  const years = getYearOptions();
+  const ys = form.year_start ? Number(form.year_start) : undefined;
+  const ye = form.year_end ? Number(form.year_end) : undefined;
+  const makes = getMakesForYear(form.category, ys);
+  const models = form.make ? getModelsForYear(form.category, form.make, ys) : [];
+  const engineSuggestions = getEnginesFor(form.category, form.make, form.model, ys, ye);
 
   const add = useMutation({
     mutationFn: () => adminUpsertFitment({ data: {
@@ -581,11 +593,12 @@ function FitmentDialog({ product, onClose }: any) {
       model: form.model || null,
       year_start: form.year_start ? Number(form.year_start) : null,
       year_end: form.year_end ? Number(form.year_end) : null,
+      engine: form.engine || null,
       notes: form.notes || null,
     } as any }),
     onSuccess: () => {
       toast.success("Fitment added");
-      setForm({ category: "car", make: "", model: "", year_start: "", year_end: "", notes: "" });
+      setForm(emptyForm);
       qc.invalidateQueries({ queryKey: ["admin-product-fitment", product.id] });
     },
     onError: (e: any) => toast.error(e.message),
@@ -597,10 +610,10 @@ function FitmentDialog({ product, onClose }: any) {
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader><DialogTitle>Vehicle fitment — {product.title}</DialogTitle></DialogHeader>
         <p className="text-xs text-muted-foreground">
-          Add the vehicles this product fits. Leave make or model blank to match any value. Year range is optional.
+          Add the vehicles this product fits. Leave make/model blank to match any value. Pick an engine to scope the rule to a specific variant (e.g. Hilux 2.4L vs 2.8L).
         </p>
         <div className="space-y-2">
           {isLoading ? <p className="text-sm text-muted-foreground">Loading…</p> : (data?.fitment ?? []).length === 0 ? (
@@ -609,7 +622,7 @@ function FitmentDialog({ product, onClose }: any) {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="border-b text-left text-xs uppercase text-muted-foreground">
-                  <tr><th className="p-2">Type</th><th className="p-2">Make</th><th className="p-2">Model</th><th className="p-2">Years</th><th className="p-2">Notes</th><th className="p-2"></th></tr>
+                  <tr><th className="p-2">Type</th><th className="p-2">Make</th><th className="p-2">Model</th><th className="p-2">Years</th><th className="p-2">Engine</th><th className="p-2">Notes</th><th className="p-2"></th></tr>
                 </thead>
                 <tbody>
                   {(data?.fitment ?? []).map((f: any) => (
@@ -618,6 +631,7 @@ function FitmentDialog({ product, onClose }: any) {
                       <td className="p-2">{f.make ?? <span className="text-muted-foreground">any</span>}</td>
                       <td className="p-2">{f.model ?? <span className="text-muted-foreground">any</span>}</td>
                       <td className="p-2">{f.year_start || f.year_end ? `${f.year_start ?? "…"}–${f.year_end ?? "…"}` : "—"}</td>
+                      <td className="p-2">{f.engine ?? <span className="text-muted-foreground">any</span>}</td>
                       <td className="p-2 text-xs text-muted-foreground">{f.notes ?? ""}</td>
                       <td className="p-2"><Button size="sm" variant="ghost" onClick={() => del.mutate(f.id)}><Trash2 className="h-4 w-4" /></Button></td>
                     </tr>
@@ -627,24 +641,113 @@ function FitmentDialog({ product, onClose }: any) {
             </div>
           )}
         </div>
-        <div className="rounded border p-3 space-y-2">
+        <div className="rounded border p-3 space-y-3">
           <p className="text-sm font-medium">Add fitment rule</p>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3">
             <div>
               <Label>Type</Label>
-              <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v as any })}>
+              <Select
+                value={form.category}
+                onValueChange={(v) => setForm({ ...emptyForm, category: v as any })}
+              >
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="car">Car</SelectItem>
+                  <SelectItem value="car">Car / Truck</SelectItem>
                   <SelectItem value="motorcycle">Motorcycle</SelectItem>
                 </SelectContent>
               </Select>
             </div>
-            <div><Label>Make</Label><Input value={form.make} onChange={(e) => setForm({ ...form, make: e.target.value })} placeholder="Toyota" /></div>
-            <div><Label>Model</Label><Input value={form.model} onChange={(e) => setForm({ ...form, model: e.target.value })} placeholder="Vios" /></div>
-            <div><Label>Year start</Label><Input type="number" value={form.year_start} onChange={(e) => setForm({ ...form, year_start: e.target.value })} /></div>
-            <div><Label>Year end</Label><Input type="number" value={form.year_end} onChange={(e) => setForm({ ...form, year_end: e.target.value })} /></div>
-            <div className="sm:col-span-3"><Label>Notes</Label><Input value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} placeholder="e.g. 1.5L variant only" /></div>
+            <div>
+              <Label>Year start</Label>
+              <Select
+                value={form.year_start}
+                onValueChange={(v) => setForm({ ...form, year_start: v, engine: "" })}
+              >
+                <SelectTrigger><SelectValue placeholder="Any" /></SelectTrigger>
+                <SelectContent className="max-h-72">
+                  <SelectItem value="__any__" onSelect={(e) => e.preventDefault()} disabled>Any</SelectItem>
+                  {years.map((y) => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Year end</Label>
+              <Select
+                value={form.year_end}
+                onValueChange={(v) => setForm({ ...form, year_end: v, engine: "" })}
+              >
+                <SelectTrigger><SelectValue placeholder="Same as start" /></SelectTrigger>
+                <SelectContent className="max-h-72">
+                  {years.map((y) => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Make</Label>
+              <Select
+                value={form.make}
+                onValueChange={(v) => setForm({ ...form, make: v, model: "", engine: "" })}
+              >
+                <SelectTrigger><SelectValue placeholder="Any make" /></SelectTrigger>
+                <SelectContent className="max-h-72">
+                  {makes.map((m) => <SelectItem key={m.make} value={m.make}>{m.make}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Model</Label>
+              <Select
+                value={form.model}
+                onValueChange={(v) => setForm({ ...form, model: v, engine: "" })}
+                disabled={!form.make}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder={form.make ? "Any model" : "Pick make first"} />
+                </SelectTrigger>
+                <SelectContent className="max-h-72">
+                  {models.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Engine</Label>
+              {engineSuggestions.length > 0 ? (
+                <Select value={form.engine} onValueChange={(v) => setForm({ ...form, engine: v === "__custom__" ? "" : v })}>
+                  <SelectTrigger><SelectValue placeholder="Any engine" /></SelectTrigger>
+                  <SelectContent className="max-h-72">
+                    {engineSuggestions.map((e) => (
+                      <SelectItem key={e.label} value={e.label}>{e.label}</SelectItem>
+                    ))}
+                    <SelectItem value="__custom__">Custom (type below)…</SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  value={form.engine}
+                  onChange={(e) => setForm({ ...form, engine: e.target.value })}
+                  placeholder="e.g. 2.4L Diesel (2GD-FTV)"
+                />
+              )}
+              {engineSuggestions.length > 0 && (form.engine === "" || !engineSuggestions.find((e) => e.label === form.engine)) && (
+                <Input
+                  className="mt-2"
+                  value={form.engine}
+                  onChange={(e) => setForm({ ...form, engine: e.target.value })}
+                  placeholder="Custom engine label (optional)"
+                />
+              )}
+              {form.make && form.model && engineSuggestions.length === 0 && (
+                <p className="mt-1 text-xs text-muted-foreground">No catalog entries for this model — type the engine manually.</p>
+              )}
+            </div>
+            <div className="sm:col-span-2 md:col-span-3">
+              <Label>Notes</Label>
+              <Input
+                value={form.notes}
+                onChange={(e) => setForm({ ...form, notes: e.target.value })}
+                placeholder="e.g. 4x4 variant only"
+              />
+            </div>
           </div>
           <Button onClick={() => add.mutate()} disabled={add.isPending} size="sm">
             {add.isPending ? "Saving…" : "Add fitment"}
