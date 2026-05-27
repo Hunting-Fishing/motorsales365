@@ -589,20 +589,82 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
 // ---------- helpers for scrapeShopUrl ----------
 
 async function resolveFinalUrl(input: string): Promise<string> {
-  try {
-    const res = await fetch(input, {
-      method: "GET",
-      redirect: "follow",
-      headers: {
-        "user-agent": "Mozilla/5.0 (compatible; 365MotorSalesBot/1.0; +https://365motorsales.com)",
-        "accept": "text/html,application/xhtml+xml",
-      },
-      signal: AbortSignal.timeout(8000),
-    });
-    return res.url || input;
-  } catch {
-    return input;
+  let current = input;
+  for (let hop = 0; hop < 3; hop++) {
+    try {
+      const res = await fetch(current, {
+        method: "GET",
+        redirect: "follow",
+        headers: {
+          "user-agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+          "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          "accept-language": "en-US,en;q=0.9",
+        },
+        signal: AbortSignal.timeout(10_000),
+      });
+      let next = res.url || current;
+      if (next === current) {
+        // No HTTP redirect happened — inspect body for meta-refresh / JS redirect.
+        const body = await res.text().catch(() => "");
+        const fromHtml = extractRedirectFromHtml(body, current);
+        if (fromHtml && fromHtml !== current) next = fromHtml;
+      }
+      if (next === current) return current;
+      current = next;
+      // Stop early if we've landed on a real product page (heuristic).
+      if (/\/products?\/|\/p\/|\/item\/|\/dp\/|-i\.\d+\.\d+/i.test(current)) return current;
+    } catch {
+      return current;
+    }
   }
+  return current;
+}
+
+function extractRedirectFromHtml(html: string, base: string): string | null {
+  if (!html) return null;
+  const patterns: RegExp[] = [
+    /<meta[^>]+http-equiv=["']refresh["'][^>]+content=["'][^;]*;\s*url=([^"'>\s]+)/i,
+    /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)/i,
+    /window\.location(?:\.href)?\s*=\s*["']([^"']+)["']/i,
+    /location\.replace\(\s*["']([^"']+)["']\s*\)/i,
+    /"redirectUrl"\s*:\s*"([^"]+)"/i,
+    /data-spm-url=["']([^"']+)/i,
+  ];
+  for (const re of patterns) {
+    const m = html.match(re);
+    if (m?.[1]) {
+      try {
+        const resolved = new URL(m[1].replace(/\\u002F/g, "/").replace(/\\\//g, "/"), base).toString();
+        if (resolved !== base) return resolved;
+      } catch { /* ignore */ }
+    }
+  }
+  return null;
+}
+
+const BAD_BRANDS = new Set([
+  "generic", "no brand", "no-brand", "nobrand", "unbranded",
+  "oem", "none", "n/a", "na", "unknown", "other",
+]);
+function sanitizeBrand(b: string | null | undefined): string | null {
+  if (!b) return null;
+  const v = b.trim();
+  if (!v) return null;
+  if (BAD_BRANDS.has(v.toLowerCase())) return null;
+  return v;
+}
+
+function pickFirstNonIconImage(...candidates: any[]): string | null {
+  for (const c of candidates) {
+    const list = Array.isArray(c) ? c : [c];
+    for (const raw of list) {
+      const v = raw == null ? "" : (typeof raw === "string" ? raw : raw?.url ?? "");
+      const s = String(v).trim();
+      if (s && /^https?:\/\//i.test(s) && !looksLikeIconImage(s)) return s;
+    }
+  }
+  return null;
 }
 
 type LdProduct = {
