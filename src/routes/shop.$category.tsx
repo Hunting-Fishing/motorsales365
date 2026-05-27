@@ -95,7 +95,7 @@ function ShopCategory() {
               size="sm"
               onClick={() => {
                 setGarageState(null);
-                navigate({ search: () => ({ brand: "", make: "", model: "", year: undefined }) });
+                navigate({ search: () => ({ brand: "", make: "", model: "", year: undefined, engine: "" }) });
               }}
             >
               <X className="h-4 w-4" />
@@ -154,11 +154,11 @@ function ShopCategory() {
         vehicle={activeVehicle}
         onPickVehicle={(v) => {
           setGarageState(v);
-          navigate({ search: (prev: any) => ({ ...prev, make: v.make, model: v.model, year: v.year }) });
+          navigate({ search: (prev: any) => ({ ...prev, make: v.make, model: v.model, year: v.year, engine: v.engine ?? "" }) });
         }}
         onClearVehicle={() => {
           setGarageState(null);
-          navigate({ search: (prev: any) => ({ ...prev, make: "", model: "", year: undefined }) });
+          navigate({ search: (prev: any) => ({ ...prev, make: "", model: "", year: undefined, engine: "" }) });
         }}
       />
     </SiteLayout>
