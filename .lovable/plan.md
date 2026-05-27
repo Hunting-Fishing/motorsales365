@@ -1,64 +1,66 @@
+## Problem
 
-## Goal
+`https://s.lazada.com.ph/s.ZUvcYu?c=a` is a **short redirect link**, not the actual product page. The current `scrapeShopUrl` passes it straight to Firecrawl, which scrapes the tiny intermediary HTML — so the JSON extractor gets nothing (no title, brand, price, description, category) and grabs the generic Lazada "favorite" heart GIF as the image.
 
-In **Admin → Shop → New/Edit Product**, add a URL-import flow: paste any marketplace link (Shopee, Lazada, TikTok Shop, Amazon, Carousell, AliExpress, etc.), click **Fetch**, and the dialog auto-populates **title, brand, description, image, price, suggested category** — plus the canonical affiliate link is pre-staged for the Links tab. Detected network is matched against your `affiliate_networks` table so the click-through tag is applied later by `/go/$productId`.
+The same problem applies to `vt.tiktok.com`, `vm.tiktok.com`, `amzn.to`, `amzn.asia`, `s.shopee.*`, etc.
 
-## UX
+## Fix
 
-In `ProductDialog` (admin.shop.tsx), add a section at the top of the form:
+Resolve the URL **before** scraping, then improve extraction quality.
 
-```text
-┌─ Import from URL ─────────────────────────────────────┐
-│ [ https://shopee.ph/...  paste link        ] [Fetch] │
-│ Detected: Shopee PH · Network linked ✅               │
-│ ⓘ Fields below were pre-filled — review before save.  │
-└───────────────────────────────────────────────────────┘
+### 1. `src/lib/shop-url.ts` — short-link detection
+
+Add `isShortLink(url)` returning true for known short hosts:
+- `s.lazada.*`, `c.lazada.*`
+- `s.shopee.*`, `shp.ee`
+- `vt.tiktok.com`, `vm.tiktok.com`
+- `amzn.to`, `amzn.asia`, `a.co`
+- `s.click.aliexpress.com`, `a.aliexpress.com`
+
+### 2. `src/lib/shop.functions.ts` — `scrapeShopUrl` handler
+
+**a. Resolve redirects server-side** before calling Firecrawl:
+```ts
+async function resolveFinalUrl(input: string): Promise<string> {
+  try {
+    const res = await fetch(input, {
+      method: "GET",
+      redirect: "follow",
+      headers: { "user-agent": "Mozilla/5.0 (compatible; 365MotorSalesBot/1.0)" },
+      signal: AbortSignal.timeout(8000),
+    });
+    return res.url || input;
+  } catch { return input; }
+}
 ```
+If `isShortLink(data.url)` → resolve, then re-run `cleanShopUrl` + `detectNetworkSlug` against the resolved URL. Use the resolved URL as the scrape target and as the saved canonical URL.
 
-Behavior:
-- Empty fields are filled. Already-filled fields are **not overwritten** unless the user clicks a small "Replace" badge next to each scraped value.
-- Image preview shows the scraped `og:image` before saving.
-- On save, if a network was detected, the cleaned URL is also auto-inserted as a `shop_product_link` row for that network (via existing `adminUpsertLink`) so the admin doesn't have to re-paste it under the Links dialog.
-- Fetch button shows a spinner and a toast on error (rate-limited, blocked, no metadata found).
+**b. Harden Firecrawl call**:
+- Add `waitFor: 2500` so SPA marketplaces (Lazada/Shopee/TikTok) finish rendering.
+- Add `location: { country: "PH", languages: ["en"] }` for PH pricing.
+- Expand schema prompt: "Extract real product fields. Ignore navigation, recommendation rails, 'you may also like', and site-wide UI."
+- Add `og:title` / `og:description` / `ogImage` / `og:price:amount` to the metadata fallback chain.
 
-## Server side
+**c. Image quality filter**:
+Reject obvious icon/UI images: any image-url whose path matches `/124-124\.|favicon|heart|wishlist|placeholder` or is from a non-CDN host. Prefer the `og:image` when the extracted `image_url` is rejected.
 
-New server function `scrapeShopUrl` in `src/lib/shop.functions.ts` (admin-only, behind `requireSupabaseAuth` + `assertShopManager`):
+**d. JSON-LD `Product` fallback**:
+When the JSON extractor returns null for title/price/brand, parse the scraped `html` (request `rawHtml` format too) for `<script type="application/ld+json">` blocks, pick the first `@type: "Product"` (or graph node), and read `name`, `brand.name`, `description`, `image[0]`, `offers.price`, `offers.priceCurrency`.
 
-1. Validate input URL (zod, `https?://`, max 2000 chars).
-2. `cleanShopUrl(url)` (existing util) to strip tracking junk.
-3. `detectNetworkSlug(url)` to identify the marketplace; look up matching row in `affiliate_networks` for the response.
-4. Call **Firecrawl** (`@mendable/firecrawl-js`, `FIRECRAWL_API_KEY` from env) using `scrape` with formats `['markdown', 'summary', { type: 'json', schema }]` where `schema` describes:
-   ```ts
-   { title, brand, description, price, currency, image_url, category_hint }
-   ```
-   Firecrawl's LLM extraction handles each marketplace's varied HTML/JSON-LD without per-site parsers. Fallback: read `metadata.title`, `metadata.description`, `metadata.ogImage` if JSON extraction returns nothing.
-5. Map `category_hint` to an existing `shop_categories` row by fuzzy slug/name match (server-side).
-6. Return:
-   ```ts
-   {
-     cleanedUrl, networkSlug, networkId | null,
-     suggested: { title, brand, description, image_url, price_php, currency, category_id | null },
-     raw: { sourceUrl, scrapedAt }
-   }
-   ```
+**e. Return the resolved canonical URL** in `cleanedUrl` so the auto-link save uses the real product URL, not the short link.
 
-Errors return `{ error: string, suggested: null }` so the UI can show a toast without crashing.
+### 3. UI feedback (`src/routes/admin.shop.tsx`)
 
-## Connector requirement
+Surface what got resolved/filled so the user understands:
+- After fetch, also display the resolved URL in the helper line: `Resolved → {cleanedUrl}` when it differs from the pasted URL.
+- Keep current "auto-filled empty fields" behavior unchanged.
 
-This needs the **Firecrawl** connector (gateway-enabled) so `FIRECRAWL_API_KEY` is injected at runtime. If it isn't linked yet, I'll prompt you to connect it before shipping — no code change needed from you, just one click.
+## Files
 
-If you'd rather not use Firecrawl, the fallback is a much weaker "fetch HTML + parse `<meta og:*>` + JSON-LD `Product`" implementation in pure server code — works on Amazon/Shopify but unreliable on Shopee/Lazada/TikTok because they render client-side. Recommendation: Firecrawl.
+- `src/lib/shop-url.ts` — add `isShortLink` + image-icon blocklist helper
+- `src/lib/shop.functions.ts` — add `resolveFinalUrl`, JSON-LD fallback, image filter, `waitFor`, `location`, rawHtml format
+- `src/routes/admin.shop.tsx` — show resolved-URL hint after fetch
 
-## Files touched
+## Out of scope
 
-- `src/lib/shop.functions.ts` — add `scrapeShopUrl` server fn + small helpers (fuzzy category match).
-- `src/routes/admin.shop.tsx` — `ProductDialog`: add Import-from-URL row, fetch handler, pre-fill logic, and on-save side effect to upsert the affiliate link when a network was detected.
-- No DB migration. No changes to public shop pages.
-
-## Out of scope (ask if you want)
-
-- Bulk import (paste many URLs at once).
-- Re-scrape on a schedule to refresh price/stock.
-- Image rehosting to Supabase Storage (we'd just store the marketplace `og:image` URL).
+- Bulk import, scheduled re-scrape, image rehosting to Storage, headless-browser scraping beyond Firecrawl's built-in render.
