@@ -834,7 +834,9 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       error: null,
       cleanedUrl: finalCleanedUrl,
       resolvedFrom,
-      networkSlug: detectNetworkSlug(finalCleanedUrl) ?? networkSlug,
+      // Forced slug always wins; otherwise re-detect from final URL.
+      networkSlug: forcedSlug ?? detectNetworkSlug(finalCleanedUrl) ?? networkSlug,
+      detectedSlug: detectNetworkSlug(finalCleanedUrl) ?? detectedSlug,
       networkId,
       suggested: {
         title,
