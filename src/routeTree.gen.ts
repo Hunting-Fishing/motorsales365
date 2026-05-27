@@ -92,6 +92,7 @@ import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising
 import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
 import { Route as DashboardTeamIndexRouteImport } from './routes/dashboard.team.index'
 import { Route as ShopPSlugRouteImport } from './routes/shop.p.$slug'
+import { Route as ShopDepartmentSlugRouteImport } from './routes/shop.department.$slug'
 import { Route as ShopBrandSlugRouteImport } from './routes/shop.brand.$slug'
 import { Route as RCodePosterRouteImport } from './routes/r.$code.poster'
 import { Route as PaymentsIdReceiptRouteImport } from './routes/payments.$id.receipt'
@@ -530,6 +531,11 @@ const ShopPSlugRoute = ShopPSlugRouteImport.update({
   path: '/shop/p/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ShopDepartmentSlugRoute = ShopDepartmentSlugRouteImport.update({
+  id: '/shop/department/$slug',
+  path: '/shop/department/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopBrandSlugRoute = ShopBrandSlugRouteImport.update({
   id: '/shop/brand/$slug',
   path: '/shop/brand/$slug',
@@ -741,6 +747,7 @@ export interface FileRoutesByFullPath {
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/shop/brand/$slug': typeof ShopBrandSlugRoute
+  '/shop/department/$slug': typeof ShopDepartmentSlugRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
@@ -845,6 +852,7 @@ export interface FileRoutesByTo {
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/shop/brand/$slug': typeof ShopBrandSlugRoute
+  '/shop/department/$slug': typeof ShopDepartmentSlugRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/dashboard/team': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
@@ -953,6 +961,7 @@ export interface FileRoutesById {
   '/payments/$id/receipt': typeof PaymentsIdReceiptRoute
   '/r/$code/poster': typeof RCodePosterRoute
   '/shop/brand/$slug': typeof ShopBrandSlugRoute
+  '/shop/department/$slug': typeof ShopDepartmentSlugRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
@@ -1062,6 +1071,7 @@ export interface FileRouteTypes {
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/shop/brand/$slug'
+    | '/shop/department/$slug'
     | '/shop/p/$slug'
     | '/dashboard/team/'
     | '/api/public/fx/refresh'
@@ -1166,6 +1176,7 @@ export interface FileRouteTypes {
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/shop/brand/$slug'
+    | '/shop/department/$slug'
     | '/shop/p/$slug'
     | '/dashboard/team'
     | '/api/public/fx/refresh'
@@ -1273,6 +1284,7 @@ export interface FileRouteTypes {
     | '/payments/$id/receipt'
     | '/r/$code/poster'
     | '/shop/brand/$slug'
+    | '/shop/department/$slug'
     | '/shop/p/$slug'
     | '/dashboard/team/'
     | '/api/public/fx/refresh'
@@ -1338,6 +1350,7 @@ export interface RootRouteChildren {
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ShopBrandSlugRoute: typeof ShopBrandSlugRoute
+  ShopDepartmentSlugRoute: typeof ShopDepartmentSlugRoute
   ShopPSlugRoute: typeof ShopPSlugRoute
   ApiPublicFxRefreshRoute: typeof ApiPublicFxRefreshRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -1931,6 +1944,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ShopPSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/shop/department/$slug': {
+      id: '/shop/department/$slug'
+      path: '/shop/department/$slug'
+      fullPath: '/shop/department/$slug'
+      preLoaderRoute: typeof ShopDepartmentSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/brand/$slug': {
       id: '/shop/brand/$slug'
       path: '/shop/brand/$slug'
@@ -2296,6 +2316,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ShopBrandSlugRoute: ShopBrandSlugRoute,
+  ShopDepartmentSlugRoute: ShopDepartmentSlugRoute,
   ShopPSlugRoute: ShopPSlugRoute,
   ApiPublicFxRefreshRoute: ApiPublicFxRefreshRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,

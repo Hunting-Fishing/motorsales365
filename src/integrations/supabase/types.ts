@@ -2776,6 +2776,8 @@ export type Database = {
         Row: {
           active: boolean
           created_at: string
+          cross_department_slugs: string[]
+          department_slug: string | null
           description: string | null
           hero_image_url: string | null
           icon: string | null
@@ -2791,6 +2793,8 @@ export type Database = {
         Insert: {
           active?: boolean
           created_at?: string
+          cross_department_slugs?: string[]
+          department_slug?: string | null
           description?: string | null
           hero_image_url?: string | null
           icon?: string | null
@@ -2806,6 +2810,8 @@ export type Database = {
         Update: {
           active?: boolean
           created_at?: string
+          cross_department_slugs?: string[]
+          department_slug?: string | null
           description?: string | null
           hero_image_url?: string | null
           icon?: string | null
@@ -2819,6 +2825,13 @@ export type Database = {
           sort_order?: number
         }
         Relationships: [
+          {
+            foreignKeyName: "shop_categories_department_slug_fkey"
+            columns: ["department_slug"]
+            isOneToOne: false
+            referencedRelation: "shop_departments"
+            referencedColumns: ["slug"]
+          },
           {
             foreignKeyName: "shop_categories_parent_id_fkey"
             columns: ["parent_id"]
@@ -2929,6 +2942,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      shop_departments: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          hero_image_url: string | null
+          icon: string | null
+          name: string
+          seo_description: string | null
+          seo_title: string | null
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          hero_image_url?: string | null
+          icon?: string | null
+          name: string
+          seo_description?: string | null
+          seo_title?: string | null
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          hero_image_url?: string | null
+          icon?: string | null
+          name?: string
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
       }
       shop_favorites: {
         Row: {

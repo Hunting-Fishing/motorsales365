@@ -10,19 +10,59 @@ import { cleanShopUrl, detectNetworkSlug, isShortLink, looksLikeIconImage } from
 export const listShopCategories = createServerFn({ method: "GET" }).handler(async () => {
   const { data, error } = await supabaseAdmin
     .from("shop_categories")
-    .select("id, slug, name, description, icon, sort_order, parent_id, hero_image_url")
+    .select("id, slug, name, description, icon, sort_order, parent_id, hero_image_url, department_slug, cross_department_slugs")
     .eq("active", true)
     .order("sort_order");
   if (error) throw new Error(error.message);
   return { categories: data ?? [] };
 });
 
+export const listShopDepartments = createServerFn({ method: "GET" }).handler(async () => {
+  const [{ data: deps, error: dErr }, { data: cats, error: cErr }, { data: pcRows }] = await Promise.all([
+    supabaseAdmin.from("shop_departments").select("*").eq("active", true).order("sort_order"),
+    supabaseAdmin
+      .from("shop_categories")
+      .select("id, slug, name, description, icon, sort_order, parent_id, hero_image_url, department_slug, cross_department_slugs")
+      .eq("active", true)
+      .order("sort_order"),
+    supabaseAdmin.from("shop_product_categories").select("category_id").limit(5000),
+  ]);
+  if (dErr) throw new Error(dErr.message);
+  if (cErr) throw new Error(cErr.message);
+  const counts = new Map<string, number>();
+  for (const r of pcRows ?? []) counts.set((r as any).category_id, (counts.get((r as any).category_id) ?? 0) + 1);
+  const all = (cats ?? []).map((c: any) => ({ ...c, product_count: counts.get(c.id) ?? 0 }));
+  const tops = all.filter((c: any) => !c.parent_id);
+  const childrenOf = (parentId: string) => all.filter((c: any) => c.parent_id === parentId);
+
+  const departments = (deps ?? []).map((d: any) => {
+    const primary = tops.filter((t: any) => t.department_slug === d.slug);
+    const crossChildren = all.filter((c: any) =>
+      Array.isArray(c.cross_department_slugs) && c.cross_department_slugs.includes(d.slug),
+    );
+    return {
+      ...d,
+      categories: primary.map((p: any) => ({ ...p, children: childrenOf(p.id) })),
+      cross_categories: crossChildren,
+      product_count: primary.reduce(
+        (sum: number, p: any) =>
+          sum + p.product_count + childrenOf(p.id).reduce((s: number, c: any) => s + c.product_count, 0),
+        0,
+      ),
+    };
+  });
+  return { departments };
+});
+
 export const listShopCategoryTree = createServerFn({ method: "GET" }).handler(async () => {
-  const { data: cats, error } = await supabaseAdmin
-    .from("shop_categories")
-    .select("id, slug, name, description, icon, sort_order, parent_id, hero_image_url")
-    .eq("active", true)
-    .order("sort_order");
+  const [{ data: cats, error }, { data: deps }] = await Promise.all([
+    supabaseAdmin
+      .from("shop_categories")
+      .select("id, slug, name, description, icon, sort_order, parent_id, hero_image_url, department_slug")
+      .eq("active", true)
+      .order("sort_order"),
+    supabaseAdmin.from("shop_departments").select("slug, name, sort_order").eq("active", true).order("sort_order"),
+  ]);
   if (error) throw new Error(error.message);
 
   const { data: pcRows } = await supabaseAdmin
@@ -44,29 +84,66 @@ export const listShopCategoryTree = createServerFn({ method: "GET" }).handler(as
     ...parent,
     children: (byParent.get(parent.id) ?? []) as any[],
   }));
-  return { tree };
+  return { tree, departments: deps ?? [] };
 });
+
+export const getShopDepartment = createServerFn({ method: "GET" })
+  .inputValidator((input: { slug: string }) => z.object({ slug: z.string().min(1).max(80) }).parse(input))
+  .handler(async ({ data }) => {
+    const { data: dep } = await supabaseAdmin
+      .from("shop_departments")
+      .select("*")
+      .eq("slug", data.slug)
+      .eq("active", true)
+      .maybeSingle();
+    if (!dep) return { department: null, categories: [], cross_categories: [] };
+    const { data: cats } = await supabaseAdmin
+      .from("shop_categories")
+      .select("id, slug, name, description, icon, parent_id, hero_image_url, department_slug, cross_department_slugs")
+      .eq("active", true)
+      .order("sort_order");
+    const all = cats ?? [];
+    const tops = all.filter((c: any) => !c.parent_id && c.department_slug === data.slug);
+    const categories = tops.map((p: any) => ({
+      ...p,
+      children: all.filter((c: any) => c.parent_id === p.id),
+    }));
+    const cross_categories = all.filter((c: any) =>
+      Array.isArray(c.cross_department_slugs) &&
+      c.cross_department_slugs.includes(data.slug) &&
+      c.department_slug !== data.slug,
+    );
+    return { department: dep, categories, cross_categories };
+  });
 
 export const getShopBreadcrumb = createServerFn({ method: "GET" })
   .inputValidator((input: { slug: string }) => z.object({ slug: z.string().min(1).max(80) }).parse(input))
   .handler(async ({ data }) => {
-    const { data: cats } = await supabaseAdmin
-      .from("shop_categories")
-      .select("id, slug, name, parent_id")
-      .eq("active", true);
+    const [{ data: cats }, { data: deps }] = await Promise.all([
+      supabaseAdmin.from("shop_categories").select("id, slug, name, parent_id, department_slug").eq("active", true),
+      supabaseAdmin.from("shop_departments").select("slug, name").eq("active", true),
+    ]);
     const list = cats ?? [];
     const byId = new Map(list.map((c: any) => [c.id, c]));
+    const depByslug = new Map((deps ?? []).map((d: any) => [d.slug, d]));
     const start = list.find((c: any) => c.slug === data.slug);
     if (!start) return { trail: [] };
     const trail: Array<{ slug: string; name: string }> = [];
     let cur: any = start;
     let guard = 0;
+    let topDeptSlug: string | null = null;
     while (cur && guard++ < 8) {
       trail.unshift({ slug: cur.slug, name: cur.name });
+      if (cur.department_slug) topDeptSlug = cur.department_slug;
       cur = cur.parent_id ? byId.get(cur.parent_id) : null;
+    }
+    if (topDeptSlug && depByslug.has(topDeptSlug)) {
+      const d: any = depByslug.get(topDeptSlug);
+      trail.unshift({ slug: `department/${d.slug}`, name: d.name });
     }
     return { trail };
   });
+
 
 export const trackShopClick = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
@@ -93,7 +170,8 @@ export const trackShopClick = createServerFn({ method: "POST" })
 
 export const listShopProducts = createServerFn({ method: "GET" })
   .inputValidator((input: {
-    categorySlug?: string; subSlugs?: string[]; featured?: boolean; dealsOnly?: boolean;
+    categorySlug?: string; subSlugs?: string[]; departmentSlug?: string;
+    featured?: boolean; dealsOnly?: boolean;
     search?: string; limit?: number;
     make?: string; model?: string; year?: number; engine?: string; includeUniversal?: boolean;
     brand?: string; priceMin?: number; priceMax?: number;
@@ -102,6 +180,7 @@ export const listShopProducts = createServerFn({ method: "GET" })
     z.object({
       categorySlug: z.string().max(80).optional(),
       subSlugs: z.array(z.string().max(80)).max(20).optional(),
+      departmentSlug: z.string().max(80).optional(),
       featured: z.boolean().optional(),
       dealsOnly: z.boolean().optional(),
       search: z.string().max(120).optional(),
@@ -122,6 +201,23 @@ export const listShopProducts = createServerFn({ method: "GET" })
     const wantedSlugs = new Set<string>();
     if (data.categorySlug) wantedSlugs.add(data.categorySlug);
     for (const s of data.subSlugs ?? []) wantedSlugs.add(s);
+
+    // If a department is supplied, expand it to all category slugs that
+    // belong (or are cross-tagged) to that department.
+    if (data.departmentSlug && !data.categorySlug && (data.subSlugs?.length ?? 0) === 0) {
+      const { data: depCats } = await supabaseAdmin
+        .from("shop_categories")
+        .select("slug, department_slug, cross_department_slugs")
+        .eq("active", true);
+      for (const c of depCats ?? []) {
+        const own = (c as any).department_slug === data.departmentSlug;
+        const cross = Array.isArray((c as any).cross_department_slugs) &&
+          (c as any).cross_department_slugs.includes(data.departmentSlug);
+        if (own || cross) wantedSlugs.add((c as any).slug);
+      }
+      if (wantedSlugs.size === 0) return { products: [] };
+    }
+
     let catIds: string[] = [];
     if (wantedSlugs.size > 0) {
       const { data: rows } = await supabaseAdmin

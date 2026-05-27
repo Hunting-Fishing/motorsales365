@@ -1,68 +1,81 @@
+# Shop category grouping — Departments + cross-tags
 
-## Context
+## Goal
 
-Phase 1 already shipped: multi-category join table, nested `parent_id` taxonomy, multi-select filtering server-side, expanded seeded categories (Detailing → Car Washing/Polishing/Waxes/etc., Tools → Hand/Power/Diagnostics, Performance, Off-Road, EV, etc.), and the filter drawer now exposes sub-category chips, price range, brand, and sort.
+Today `/shop` shows 14 flat top-level categories. Major auto retailers (Summit Racing, RockAuto, FCP Euro, AutoZone, CARiD) group everything under 4–7 "departments" in a mega-menu, then categories, then sub-categories. We will do the same — without deleting anything we already have.
 
-This plan covers what's still missing to make the shop genuinely discoverable and to start driving real affiliate revenue.
+Reference patterns we're mirroring:
+- **Summit Racing**: Engine, Drivetrain, Suspension, Brakes, Wheels & Tires, Exterior, Interior, Tools & Equipment.
+- **RockAuto**: Body & Lamp, Brake, Engine, Heat & A/C, Suspension, Transmission, Wheel.
+- **CARiD**: Performance, Wheels & Tires, Body, Interior, Lighting, Accessories.
+- **AutoZone**: Parts, Fluids & Chemicals, Accessories, Tools & Equipment, Performance.
 
-## 1. Category UX & Discovery
+## New department layer
 
-- **Persistent sidebar filters on desktop** (`/shop` + `/shop/$category`). Drawer stays on mobile/tablet. Sidebar shows: Category tree (expandable parents → children), Brand, Price range, Tags, Universal-fit toggle, Marketplace source.
-- **Active filter chips row** above the product grid with one-click removal and "Clear all".
-- **Category tree page (`/shop/categories`)**: visual grid of all top-level categories with child chips underneath, product counts per node, hero icon per parent. Becomes the primary browsing entry.
-- **Breadcrumbs** on `/shop/$category` and product pages showing parent → child path (driven by `parent_id`).
-- **Related categories** strip on category and product pages ("People shopping Car Washing also browse Waxes, Microfiber, Wheel & Tire").
+Six departments (top-level groupings). Each existing top-level category becomes a child of one department. Sub-categories stay where they are.
 
-## 2. SEO Category Landers
+```
+Performance Parts        ← Performance & Tuning, Exterior Mods (Body Kits, Spoilers, Wings)
+Maintenance & Fluids     ← Lubricants & Fluids (Engine Oil, ATF/Gear, Brake Fluid, Coolant, Grease), Filters*, Belts & Hoses*
+Repair & Replacement     ← Parts & Spares (Brakes, Suspension, Ignition, Cooling, Exhaust, Engine Internals)
+Wheels, Tires & Brakes   ← Tires & Wheels (Tires, Wheels, TPMS), Brakes* (cross-tag from Parts)
+Interior & Exterior      ← Accessories (Floor Mats, Seat Covers, Phone Mounts), Detailing, Window Tint*, Decals*
+Tools & Garage           ← Mechanic Tools, Garage & Storage, Safety & Recovery
+Electronics & Lighting   ← Electronics (Dashcams, Head Units, Speakers, Lighting, Cameras)
+Specialty                ← Motorcycle Gear, Off-Road & Overland, EV & Hybrid
+```
 
-- Per-category `head()` with unique title/description/canonical/og:image derived from category record (add `hero_image_url`, `seo_title`, `seo_description`, `intro_md` columns to `shop_categories`).
-- JSON-LD `ItemList` of products on category pages.
-- Sitemap entries for every category and sub-category slug.
+\* = appears in primary department but is **cross-tagged** to a second department via the new tag layer (see below).
 
-## 3. Garage-Aware Recommendations
+## Cross-tag layer (phase 1)
 
-- New `/shop` rail: **"Recommended for your {Year Make Model Engine}"** when the visitor has a primary garage vehicle. Server-side: pick products whose fitment matches the primary vehicle, ordered by click_count.
-- Product page: **"Fits your garage"** badge + **"Also fits"** list (other vehicles in the user's garage that match this product's fitment rules).
-- Empty-garage CTA: "Add your ride to see parts that fit" → links to `/dashboard/rides/new`.
+Some categories naturally belong in two places (Brakes = Repair + Wheels/Tires/Brakes; Filters = Maintenance + Repair; Window Tint = Interior/Exterior + Performance-adjacent). We add a simple `cross_department_slugs text[]` on `shop_categories` so a category can surface under multiple department mega-menu columns and filter drawers — without duplicating rows. **No engine-to-fluid matching yet** — that's phase 2 as you noted.
 
-## 4. Maintenance-Driven Marketing
+## Changes
 
-- Use `rides.mileage_km` + service log cadence to surface **"Time for an oil change?"** / **"Brake pads due"** cards on the dashboard, each linking to a pre-filtered shop search (category=lubricants, fits=this vehicle).
-- Seed a small `maintenance_reminders` table (interval_km, interval_months, default category slug).
+### 1. Schema (one small migration)
+- `shop_departments` table: `slug pk`, `name`, `description`, `icon`, `sort_order`, `hero_image_url`, `seo_title`, `seo_description`.
+- `shop_categories.department_slug text` (nullable; only top-level cats set it).
+- `shop_categories.cross_department_slugs text[] default '{}'`.
+- Seed 8 departments and assign every existing top-level category to one.
+- No deletions. No URL changes. Existing `/shop/$category` and `/shop/categories` keep working.
 
-## 5. Monetization Features (build now)
+### 2. Server (`src/lib/shop.functions.ts`)
+- `listShopDepartments()` → departments + their top-level categories + sub-counts.
+- Extend `listShopCategoryTree()` to group by department.
+- Extend `listShopProducts` filter: accept `departmentSlug` (resolves to all categories in that department + cross-tagged ones).
 
-- **Featured/Sponsored slots**: add `is_featured boolean`, `featured_until timestamptz`, `featured_rank int` to `shop_products`. Featured products pin to the top of `/shop` and matching category pages with a subtle "Featured" badge. Admin toggle in product dialog.
-- **Brand pages (`/shop/brand/$slug`)**: auto-generated from distinct `brand` values, with logo (new `shop_brands` table: slug, name, logo_url, description, affiliate_disclosure). Filterable like category pages.
-- **Deal of the week**: `is_deal boolean` + `deal_ends_at` on products. Homepage + shop hero rail.
-- **Affiliate disclosure**: small disclosure line on every product card linking to an `/affiliate-disclosure` page; required by FTC/most networks.
-- **Outbound click tracking already exists** (`tg_shop_click_increment`) — add a `shop_click_events` row per click (user_id, product_id, referrer, utm) so we can report top earners and optimize.
+### 3. UI
 
-## 6. Monetization Features (deferred — note only)
+**Desktop header** — replace the single "Shop" link with a mega-menu dropdown: 8 department columns, each listing its top categories, with a "View all" link. Pattern matches Summit/CARiD.
 
-Bundles/kits, price-drop alerts, comparison tool, newsletter "Deal of the week" automation, sponsored-billing UI, user-submitted finds, local services marketplace. Out of scope this round.
+**`/shop` index** — replace today's flat 14-tile "Shop by category" grid with 8 department cards (icon + name + 3–4 example sub-cats). Clicking a card → `/shop/department/$slug`.
 
-## Technical Notes
+**New route `/shop/department/$slug`** — department lander showing all child categories + cross-tagged categories, with the existing filter drawer scoped to the department.
 
-**Migrations**
-- `shop_categories`: add `hero_image_url text`, `icon text`, `seo_title text`, `seo_description text`, `intro_md text`, `sort_order int default 0`.
-- `shop_products`: add `is_featured boolean default false`, `featured_until timestamptz`, `featured_rank int`, `is_deal boolean default false`, `deal_ends_at timestamptz`.
-- New table `shop_brands` (slug PK, name, logo_url, description, affiliate_disclosure) + RLS (public select, admin write) + GRANTs.
-- New table `maintenance_reminders` (id, interval_km, interval_months, category_slug, label) + GRANTs.
-- New table `shop_click_events` (id, product_id, user_id nullable, referrer, utm_source, utm_medium, utm_campaign, created_at) + GRANTs (insert: anon+authenticated, select: admin only).
+**`/shop/categories`** — keep, but group the tree under department headings.
 
-**Server functions** (`src/lib/shop.functions.ts`)
-- `listShopCategories()` returns nested tree with product counts.
-- `listShopProducts` accepts `featuredFirst boolean`, `dealsOnly boolean`, `brandSlug string`.
-- `getCategoryTree(slug)` for breadcrumbs.
-- `recommendForVehicle({vehicleId})` server fn for the garage rail.
-- `trackShopClick({productId, utm})` — already increments counter, also insert `shop_click_events`.
+**Filter drawer (`shop-filter-drawer.tsx`)** — add a Department accordion at the top; selecting one narrows the category chips to that department.
 
-**UI**
-- New `ShopSidebarFilters` component used on `/shop` and `/shop/$category`.
-- New `CategoryTree` page + `BrandPage` route + `ShopBreadcrumbs` component.
-- Admin: featured toggle + brand picker + deal fields in `ProductDialog`; new `/admin/shop/brands` and `/admin/shop/categories` editors.
+**Breadcrumbs** — `Shop › {Department} › {Category} › {Sub-category}`.
 
-## Out of Scope
+### 4. Admin (`admin.shop.tsx`)
+- Department picker on the category editor.
+- Multi-select "Also show in" for cross-department tagging.
 
-- Bundles, comparison, price-drop alerts, automated newsletter, sponsored-ad billing flow, mobile redesign beyond reusing the existing drawer, changes to affiliate scraping logic.
+## Explicitly out of scope (phase 2)
+- Engine-to-fluid matching (e.g. "2.0L Turbo → 5W-30 full synthetic").
+- Maintenance-interval triggered recommendations.
+- Department-specific hero artwork / SEO copy beyond defaults.
+- Migrating affiliate-link UTM grouping by department.
+
+## Files touched
+- New migration (departments table + columns + seed).
+- `src/lib/shop.functions.ts` (department queries + filter).
+- `src/components/site-header.tsx` (mega-menu).
+- `src/routes/shop.index.tsx` (department grid).
+- `src/routes/shop.categories.tsx` (group by department).
+- `src/routes/shop.department.$slug.tsx` (new).
+- `src/components/shop/shop-filter-drawer.tsx` (department facet).
+- `src/components/shop/shop-breadcrumbs.tsx` (department crumb).
+- `src/routes/admin.shop.tsx` (department + cross-tag pickers).
