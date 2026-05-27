@@ -35,7 +35,19 @@ export function isShortLink(input: string): boolean {
 }
 
 // Image URLs that are clearly site UI / icons, not product photos.
-const IMAGE_BLOCKLIST = /(favicon|sprite|placeholder|wishlist|heart|logo|icon[-_/]|\/124-124\.|\/64-64\.|\/40-40\.)/i;
+const IMAGE_BLOCKLIST = new RegExp(
+  [
+    "favicon", "sprite", "placeholder", "wishlist", "heart",
+    "lazada[_-]?logo", "lzd-img-global\\/.*\\/static", "app-?icon",
+    "appdownload", "qr[_-]?code", "\\/banner[_-/]", "static\\.lazada\\.com\\.ph\\/static\\/",
+    "shopee\\.\\w+\\/file\\/.*_tn",
+    "\\/(40|60|64|80|100|120|124|150|200)x\\d+q?\\d*\\.(jpg|jpeg|png|webp)",
+    "\\/(40|64|80|120|124|150|200)-\\1\\.",
+    "logo[._-]|[._-]logo",
+    "icon[-_/]",
+  ].join("|"),
+  "i",
+);
 export function looksLikeIconImage(url: string | null | undefined): boolean {
   if (!url) return true;
   return IMAGE_BLOCKLIST.test(url);

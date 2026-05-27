@@ -549,18 +549,21 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     const pickStr = (...vals: any[]) =>
       vals.map((v) => (v == null ? "" : String(v).trim())).find((v) => v.length > 0) ?? "";
 
-    const title = pickStr(extracted?.title, ld?.name, metadata?.ogTitle, metadata?.["og:title"], metadata?.title).slice(0, 200) || null;
-    const brand = pickStr(extracted?.brand, ld?.brand).slice(0, 120) || null;
-    const description = pickStr(extracted?.description, ld?.description, metadata?.ogDescription, metadata?.["og:description"], metadata?.description).slice(0, 2000) || null;
+    const title = pickStr(ld?.name, extracted?.title, metadata?.ogTitle, metadata?.["og:title"], metadata?.title).slice(0, 200) || null;
+    const brand = sanitizeBrand(pickStr(ld?.brand, extracted?.brand).slice(0, 120) || null);
+    const description = pickStr(ld?.description, extracted?.description, metadata?.ogDescription, metadata?.["og:description"], metadata?.description).slice(0, 2000) || null;
 
-    // Image: try extractor, JSON-LD, og:image — reject icon-looking URLs.
-    const imageCandidates = [extracted?.image_url, ld?.image, metadata?.ogImage, metadata?.["og:image"]]
-      .map((v) => (v == null ? "" : String(v).trim()))
-      .filter((v) => v.length > 0 && !looksLikeIconImage(v));
-    const image_url = imageCandidates[0] || null;
+    // Image: JSON-LD > og:image > extractor; reject icons.
+    const image_url = pickFirstNonIconImage(
+      ld?.image,
+      metadata?.ogImage,
+      metadata?.["og:image"],
+      extracted?.image_url,
+    );
 
-    const rawPrice = extracted?.price ?? ld?.price ?? metadata?.["og:price:amount"] ?? null;
-    const rawCurrency = extracted?.currency ?? ld?.currency ?? metadata?.["og:price:currency"] ?? null;
+    // Price: JSON-LD > og:price > extractor.
+    const rawPrice = ld?.price ?? metadata?.["og:price:amount"] ?? metadata?.["product:price:amount"] ?? extracted?.price ?? null;
+    const rawCurrency = ld?.currency ?? metadata?.["og:price:currency"] ?? metadata?.["product:price:currency"] ?? extracted?.currency ?? null;
     const price_php = pickPricePhp(rawPrice, rawCurrency);
 
     const category_id = fuzzyCategoryMatch(
@@ -568,11 +571,27 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       (cats ?? []) as any[],
     );
 
+    // Canonical URL hardening — prefer the marketplace's own URL if present.
+    const canonical = pickStr(
+      metadata?.ogUrl,
+      metadata?.["og:url"],
+      metadata?.sourceURL,
+      ld?.url,
+    );
+    let finalCleanedUrl = cleanedUrl;
+    if (canonical && /^https?:\/\//i.test(canonical)) {
+      const cleanedCanonical = cleanShopUrl(canonical);
+      const sameNet = detectNetworkSlug(cleanedCanonical);
+      if (sameNet && (!networkSlug || sameNet === networkSlug)) {
+        finalCleanedUrl = cleanedCanonical;
+      }
+    }
+
     return {
       error: null,
-      cleanedUrl,
+      cleanedUrl: finalCleanedUrl,
       resolvedFrom,
-      networkSlug,
+      networkSlug: detectNetworkSlug(finalCleanedUrl) ?? networkSlug,
       networkId,
       suggested: {
         title,
@@ -589,20 +608,82 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
 // ---------- helpers for scrapeShopUrl ----------
 
 async function resolveFinalUrl(input: string): Promise<string> {
-  try {
-    const res = await fetch(input, {
-      method: "GET",
-      redirect: "follow",
-      headers: {
-        "user-agent": "Mozilla/5.0 (compatible; 365MotorSalesBot/1.0; +https://365motorsales.com)",
-        "accept": "text/html,application/xhtml+xml",
-      },
-      signal: AbortSignal.timeout(8000),
-    });
-    return res.url || input;
-  } catch {
-    return input;
+  let current = input;
+  for (let hop = 0; hop < 3; hop++) {
+    try {
+      const res = await fetch(current, {
+        method: "GET",
+        redirect: "follow",
+        headers: {
+          "user-agent":
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+          "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          "accept-language": "en-US,en;q=0.9",
+        },
+        signal: AbortSignal.timeout(10_000),
+      });
+      let next = res.url || current;
+      if (next === current) {
+        // No HTTP redirect happened — inspect body for meta-refresh / JS redirect.
+        const body = await res.text().catch(() => "");
+        const fromHtml = extractRedirectFromHtml(body, current);
+        if (fromHtml && fromHtml !== current) next = fromHtml;
+      }
+      if (next === current) return current;
+      current = next;
+      // Stop early if we've landed on a real product page (heuristic).
+      if (/\/products?\/|\/p\/|\/item\/|\/dp\/|-i\.\d+\.\d+/i.test(current)) return current;
+    } catch {
+      return current;
+    }
   }
+  return current;
+}
+
+function extractRedirectFromHtml(html: string, base: string): string | null {
+  if (!html) return null;
+  const patterns: RegExp[] = [
+    /<meta[^>]+http-equiv=["']refresh["'][^>]+content=["'][^;]*;\s*url=([^"'>\s]+)/i,
+    /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)/i,
+    /window\.location(?:\.href)?\s*=\s*["']([^"']+)["']/i,
+    /location\.replace\(\s*["']([^"']+)["']\s*\)/i,
+    /"redirectUrl"\s*:\s*"([^"]+)"/i,
+    /data-spm-url=["']([^"']+)/i,
+  ];
+  for (const re of patterns) {
+    const m = html.match(re);
+    if (m?.[1]) {
+      try {
+        const resolved = new URL(m[1].replace(/\\u002F/g, "/").replace(/\\\//g, "/"), base).toString();
+        if (resolved !== base) return resolved;
+      } catch { /* ignore */ }
+    }
+  }
+  return null;
+}
+
+const BAD_BRANDS = new Set([
+  "generic", "no brand", "no-brand", "nobrand", "unbranded",
+  "oem", "none", "n/a", "na", "unknown", "other",
+]);
+function sanitizeBrand(b: string | null | undefined): string | null {
+  if (!b) return null;
+  const v = b.trim();
+  if (!v) return null;
+  if (BAD_BRANDS.has(v.toLowerCase())) return null;
+  return v;
+}
+
+function pickFirstNonIconImage(...candidates: any[]): string | null {
+  for (const c of candidates) {
+    const list = Array.isArray(c) ? c : [c];
+    for (const raw of list) {
+      const v = raw == null ? "" : (typeof raw === "string" ? raw : raw?.url ?? "");
+      const s = String(v).trim();
+      if (s && /^https?:\/\//i.test(s) && !looksLikeIconImage(s)) return s;
+    }
+  }
+  return null;
 }
 
 type LdProduct = {
@@ -612,6 +693,7 @@ type LdProduct = {
   image?: string;
   price?: number;
   currency?: string;
+  url?: string;
 };
 
 function extractJsonLdProduct(html: string): LdProduct | null {
@@ -640,6 +722,7 @@ function extractJsonLdProduct(html: string): LdProduct | null {
         image: typeof image === "string" ? image : image?.url,
         price: Number.isFinite(price) ? price : undefined,
         currency: typeof offer?.priceCurrency === "string" ? offer.priceCurrency : undefined,
+        url: typeof node.url === "string" ? node.url : (typeof node["@id"] === "string" ? node["@id"] : undefined),
       };
     }
   }

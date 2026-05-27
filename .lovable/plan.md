@@ -1,66 +1,105 @@
-## Problem
+## Root causes (Lazada short link `s.lazada.com.ph/s.XXX`)
 
-`https://s.lazada.com.ph/s.ZUvcYu?c=a` is a **short redirect link**, not the actual product page. The current `scrapeShopUrl` passes it straight to Firecrawl, which scrapes the tiny intermediary HTML — so the JSON extractor gets nothing (no title, brand, price, description, category) and grabs the generic Lazada "favorite" heart GIF as the image.
+The previous fix assumes Lazada short links use HTTP 30x redirects. They don't — they redirect via **client-side JS / `<meta http-equiv="refresh">`**. So `fetch(..., { redirect: "follow" }).url` returns the short URL itself, Firecrawl scrapes the tiny redirect shim page, and downstream extraction grabs:
 
-The same problem applies to `vt.tiktok.com`, `vm.tiktok.com`, `amzn.to`, `amzn.asia`, `s.shopee.*`, etc.
+1. **Generic brand** — the shim page has no brand, Firecrawl's LLM fills "Generic"/"No Brand".
+2. **Wrong price (₱450)** — extractor grabs a voucher/coupon number from the shim, not the real product price (which lives in JSON-LD on the real page).
+3. **Empty slug** — importer never fills `form.slug`; admin has to type it.
+4. **Generic image** — picks the Lazada favicon / app-banner that survives the icon blocklist.
 
 ## Fix
 
-Resolve the URL **before** scraping, then improve extraction quality.
+### 1. `src/lib/shop.functions.ts` — robust `resolveFinalUrl`
 
-### 1. `src/lib/shop-url.ts` — short-link detection
+Replace the current "fetch+follow" with a two-pass resolver:
 
-Add `isShortLink(url)` returning true for known short hosts:
-- `s.lazada.*`, `c.lazada.*`
-- `s.shopee.*`, `shp.ee`
-- `vt.tiktok.com`, `vm.tiktok.com`
-- `amzn.to`, `amzn.asia`, `a.co`
-- `s.click.aliexpress.com`, `a.aliexpress.com`
-
-### 2. `src/lib/shop.functions.ts` — `scrapeShopUrl` handler
-
-**a. Resolve redirects server-side** before calling Firecrawl:
 ```ts
 async function resolveFinalUrl(input: string): Promise<string> {
   try {
     const res = await fetch(input, {
       method: "GET",
       redirect: "follow",
-      headers: { "user-agent": "Mozilla/5.0 (compatible; 365MotorSalesBot/1.0)" },
-      signal: AbortSignal.timeout(8000),
+      headers: {
+        "user-agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
+        "accept": "text/html,application/xhtml+xml",
+      },
+      signal: AbortSignal.timeout(10_000),
     });
-    return res.url || input;
+    let finalUrl = res.url || input;
+    // If HTTP follow didn't move us (JS / meta-refresh shim), inspect body.
+    if (finalUrl === input) {
+      const body = await res.text();
+      finalUrl = extractRedirectFromHtml(body, input) ?? input;
+    }
+    return finalUrl;
   } catch { return input; }
 }
+
+function extractRedirectFromHtml(html: string, base: string): string | null {
+  const patterns = [
+    /<meta[^>]+http-equiv=["']refresh["'][^>]+content=["'][^;]*;\s*url=([^"'>\s]+)/i,
+    /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)/i,
+    /window\.location(?:\.href)?\s*=\s*["']([^"']+)["']/i,
+    /location\.replace\(\s*["']([^"']+)["']/i,
+    /"redirectUrl"\s*:\s*"([^"]+)"/i,
+    /data-spm-url=["']([^"']+)/i,
+  ];
+  for (const re of patterns) {
+    const m = html.match(re);
+    if (m?.[1]) { try { return new URL(m[1].replace(/\\u002F/g, "/"), base).toString(); } catch {} }
+  }
+  return null;
+}
 ```
-If `isShortLink(data.url)` → resolve, then re-run `cleanShopUrl` + `detectNetworkSlug` against the resolved URL. Use the resolved URL as the scrape target and as the saved canonical URL.
 
-**b. Harden Firecrawl call**:
-- Add `waitFor: 2500` so SPA marketplaces (Lazada/Shopee/TikTok) finish rendering.
-- Add `location: { country: "PH", languages: ["en"] }` for PH pricing.
-- Expand schema prompt: "Extract real product fields. Ignore navigation, recommendation rails, 'you may also like', and site-wide UI."
-- Add `og:title` / `og:description` / `ogImage` / `og:price:amount` to the metadata fallback chain.
+Also loop up to **2 hops** (some short links chain `s.lazada → www.lazada/redirect → product`).
 
-**c. Image quality filter**:
-Reject obvious icon/UI images: any image-url whose path matches `/124-124\.|favicon|heart|wishlist|placeholder` or is from a non-CDN host. Prefer the `og:image` when the extracted `image_url` is rejected.
+### 2. `src/lib/shop.functions.ts` — extraction quality
 
-**d. JSON-LD `Product` fallback**:
-When the JSON extractor returns null for title/price/brand, parse the scraped `html` (request `rawHtml` format too) for `<script type="application/ld+json">` blocks, pick the first `@type: "Product"` (or graph node), and read `name`, `brand.name`, `description`, `image[0]`, `offers.price`, `offers.priceCurrency`.
+- **Brand sanitization**: treat `generic`, `no brand`, `no-brand`, `nobrand`, `unbranded`, `oem`, `none`, `n/a` (case-insensitive) as `null`.
+- **Price preference order**: JSON-LD `offers.price` → `og:price:amount` / `product:price:amount` → extractor `price`. (Currently extractor wins, which is the noisy source.) Also reject suspiciously low prices when title length suggests a real product (`< 50` AND title has multiple words AND no "voucher/coupon/free" keyword → drop).
+- **Image preference order**: JSON-LD `image` → `og:image` → extractor `image_url`. Re-run `looksLikeIconImage` on each. Pull JSON-LD `image` arrays fully and pick the first non-icon entry, not just `[0]`.
+- **Canonical URL hardening**: after scrape, if `metadata.ogUrl` / `metadata["og:url"]` / JSON-LD `@id` / `url` is a same-marketplace product page, use *that* as `cleanedUrl` (catches cases where short-link resolver still ends on a redirect page).
 
-**e. Return the resolved canonical URL** in `cleanedUrl` so the auto-link save uses the real product URL, not the short link.
+### 3. `src/lib/shop-url.ts` — stronger image blocklist
 
-### 3. UI feedback (`src/routes/admin.shop.tsx`)
+Add Lazada/Shopee CDN icon patterns to `IMAGE_BLOCKLIST`:
+```
+/_(40|60|64|80|100|120|124|150|200)x\1q?\d*\.(jpg|jpeg|png|webp)/i
+/lazada[_-]?logo|lzd-img-global\/.*\/static|app-icon|appdownload|qr[_-]code|banner/i
+/static\.lazada\.com\.ph\/static\//i
+/shopee\.\w+\/file\/.*_tn/i  // tiny thumbs
+```
 
-Surface what got resolved/filled so the user understands:
-- After fetch, also display the resolved URL in the helper line: `Resolved → {cleanedUrl}` when it differs from the pasted URL.
-- Keep current "auto-filled empty fields" behavior unchanged.
+### 4. `src/routes/admin.shop.tsx` — auto-fill slug
 
-## Files
+In `importMut.onSuccess`, when slug is empty also set it from the resolved title:
 
-- `src/lib/shop-url.ts` — add `isShortLink` + image-icon blocklist helper
-- `src/lib/shop.functions.ts` — add `resolveFinalUrl`, JSON-LD fallback, image filter, `waitFor`, `location`, rawHtml format
-- `src/routes/admin.shop.tsx` — show resolved-URL hint after fetch
+```ts
+setForm((f) => {
+  const title = f.title || s.title || "";
+  return {
+    ...f,
+    title,
+    slug: f.slug || (title ? slugifyClient(title) : ""),
+    brand: f.brand || s.brand || "",
+    description: f.description || s.description || "",
+    image_url: f.image_url || s.image_url || "",
+    price_php: f.price_php ?? s.price_php ?? null,
+    category_id: f.category_id ?? s.category_id ?? null,
+  };
+});
+```
+
+Add a tiny client `slugifyClient` (`lower → strip non-alnum → collapse → 80 chars`) in the same file (server already has `slugify`).
 
 ## Out of scope
 
-- Bulk import, scheduled re-scrape, image rehosting to Storage, headless-browser scraping beyond Firecrawl's built-in render.
+Headless-browser scraping beyond Firecrawl's renderer, multi-image gallery import, Storage rehosting, retry/queue of failed imports.
+
+## Files
+
+- `src/lib/shop.functions.ts` — rewrite `resolveFinalUrl` + chain hops, reorder price/image preference, brand sanitizer, canonical URL fallback.
+- `src/lib/shop-url.ts` — extend `IMAGE_BLOCKLIST`.
+- `src/routes/admin.shop.tsx` — auto-fill `slug` from title on import.
