@@ -543,23 +543,28 @@ function LinksDialog({ product, onClose }: any) {
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-xl">
-        <DialogHeader><DialogTitle>Outbound links — {product.title}</DialogTitle></DialogHeader>
+      <DialogContent className="max-w-xl w-[calc(100vw-1rem)] p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+        <DialogHeader><DialogTitle className="truncate">Outbound links — {product.title}</DialogTitle></DialogHeader>
         <div className="space-y-3">
           {(data?.links ?? []).map((l: any) => (
             <div key={l.id} className="flex items-center gap-2 rounded border p-2 text-sm">
-              <Badge variant="secondary">{l.network?.name}</Badge>
+              <Badge variant="secondary" className="shrink-0">{l.network?.name}</Badge>
               <a href={l.url} target="_blank" rel="noopener" className="flex-1 truncate text-primary hover:underline">{l.url}</a>
-              <Button size="sm" variant="ghost" onClick={() => del.mutate(l.id)}><Trash2 className="h-4 w-4" /></Button>
+              <Button size="sm" variant="ghost" onClick={() => del.mutate(l.id)} className="shrink-0"><Trash2 className="h-4 w-4" /></Button>
             </div>
           ))}
-          <div className="rounded border p-3 space-y-2">
-            <p className="text-sm font-medium">Add link</p>
-            <div className="space-y-1">
+          <div className="rounded border p-3 space-y-3">
+            <p className="text-sm font-semibold">Add affiliate link</p>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Paste the full product URL</Label>
               <Input
-                placeholder="Paste Shopee / Lazada / TikTok / Amazon URL…"
+                placeholder="https://www.lazada.com.ph/products/..."
                 value={url}
                 onChange={(e) => handleUrlChange(e.target.value)}
+                className="h-12 text-base"
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
               />
               {url && (
                 <div className="flex flex-wrap items-center gap-2 text-xs">
@@ -578,25 +583,28 @@ function LinksDialog({ product, onClose }: any) {
                 </div>
               )}
             </div>
-            <Select
-              value={networkId}
-              onValueChange={(v) => { setNetworkId(v); setTouchedNetwork(true); }}
-            >
-              <SelectTrigger><SelectValue placeholder="Choose network" /></SelectTrigger>
-              <SelectContent>
-                {activeNetworks.map((n: any) => (
-                  <SelectItem key={n.id} value={n.id}>{n.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Network</Label>
+              <Select
+                value={networkId}
+                onValueChange={(v) => { setNetworkId(v); setTouchedNetwork(true); }}
+              >
+                <SelectTrigger className="h-11"><SelectValue placeholder="Choose network" /></SelectTrigger>
+                <SelectContent>
+                  {activeNetworks.map((n: any) => (
+                    <SelectItem key={n.id} value={n.id}>{n.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             {mismatch && (
               <p className="flex items-center gap-1 text-xs text-amber-600">
                 <AlertTriangle className="h-3 w-3" />
                 URL looks like {detectedSlug}, but you picked {selectedNetwork?.name}.
               </p>
             )}
-            <Button onClick={() => add.mutate()} disabled={!networkId || !url || add.isPending} size="sm">
-              {add.isPending ? "Saving…" : "Add"}
+            <Button onClick={() => add.mutate()} disabled={!networkId || !url || add.isPending} className="h-11 w-full">
+              {add.isPending ? "Saving…" : "Add link"}
             </Button>
           </div>
         </div>
