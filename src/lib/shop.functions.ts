@@ -521,31 +521,33 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     let extracted: any = null;
     let metadata: any = null;
     let html: string | null = null;
-    if (apiKey && !marketplace) try {
-      const { default: Firecrawl } = await import("@mendable/firecrawl-js");
-      const firecrawl = new Firecrawl({ apiKey });
-      const result: any = await firecrawl.scrape(cleanedUrl, {
-        formats: [
-          "markdown",
-          "rawHtml",
-          { type: "json", schema, prompt: "Extract real product fields for the main product on this marketplace listing. Ignore navigation, related items, recommendation rails, 'you may also like', and site-wide UI elements like favorite/heart icons." } as any,
-        ] as any,
-        onlyMainContent: true,
-        waitFor: 2500,
-        location: { country: "PH", languages: ["en"] },
-      } as any);
-      extracted = result?.json ?? result?.data?.json ?? null;
-      metadata = result?.metadata ?? result?.data?.metadata ?? null;
-      html = result?.rawHtml ?? result?.data?.rawHtml ?? result?.html ?? result?.data?.html ?? null;
-    } catch (e: any) {
-      return {
-        error: `Could not fetch page: ${e?.message ?? "unknown error"}`,
-        suggested: null,
-        cleanedUrl,
-        resolvedFrom,
-        networkSlug,
-        networkId,
-      };
+    if (apiKey && !marketplace) {
+      try {
+        const { default: Firecrawl } = await import("@mendable/firecrawl-js");
+        const firecrawl = new Firecrawl({ apiKey });
+        const result: any = await firecrawl.scrape(cleanedUrl, {
+          formats: [
+            "markdown",
+            "rawHtml",
+            { type: "json", schema, prompt: "Extract real product fields for the main product on this marketplace listing. Ignore navigation, related items, recommendation rails, 'you may also like', and site-wide UI elements like favorite/heart icons." } as any,
+          ] as any,
+          onlyMainContent: true,
+          waitFor: 2500,
+          location: { country: "PH", languages: ["en"] },
+        } as any);
+        extracted = result?.json ?? result?.data?.json ?? null;
+        metadata = result?.metadata ?? result?.data?.metadata ?? null;
+        html = result?.rawHtml ?? result?.data?.rawHtml ?? result?.html ?? result?.data?.html ?? null;
+      } catch (e: any) {
+        return {
+          error: `Could not fetch page: ${e?.message ?? "unknown error"}`,
+          suggested: null,
+          cleanedUrl,
+          resolvedFrom,
+          networkSlug,
+          networkId,
+        };
+      }
     }
 
     // JSON-LD Product fallback
