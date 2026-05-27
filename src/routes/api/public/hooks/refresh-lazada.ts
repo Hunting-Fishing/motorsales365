@@ -80,7 +80,12 @@ export const Route = createFileRoute("/api/public/hooks/refresh-lazada")({
             const sale = data.sale_price ?? null;
             const isDeal = !!(sale && list && sale < list);
 
-            const patch: Record<string, unknown> = {};
+            const patch: {
+              price_php?: number | null;
+              deal_price_php?: number | null;
+              is_deal?: boolean;
+              updated_at?: string;
+            } = {};
             if (list != null && Number(list) !== Number(product.price_php ?? 0)) {
               patch.price_php = list;
             }
