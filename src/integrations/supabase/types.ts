@@ -2875,6 +2875,7 @@ export type Database = {
         Row: {
           category: string
           created_at: string
+          engine: string | null
           id: string
           make: string | null
           model: string | null
@@ -2886,6 +2887,7 @@ export type Database = {
         Insert: {
           category?: string
           created_at?: string
+          engine?: string | null
           id?: string
           make?: string | null
           model?: string | null
@@ -2897,6 +2899,7 @@ export type Database = {
         Update: {
           category?: string
           created_at?: string
+          engine?: string | null
           id?: string
           make?: string | null
           model?: string | null
