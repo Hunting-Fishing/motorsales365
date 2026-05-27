@@ -39,10 +39,10 @@ function AdminShop() {
         <p className="text-muted-foreground">Manage curated products, affiliate networks, and outbound links.</p>
       </div>
       <Tabs defaultValue="products">
-        <TabsList>
+        <TabsList className="w-full justify-start overflow-x-auto sm:w-auto">
           <TabsTrigger value="products">Products</TabsTrigger>
           <TabsTrigger value="networks">Networks</TabsTrigger>
-          <TabsTrigger value="directory">Sign-up directory</TabsTrigger>
+          <TabsTrigger value="directory" className="whitespace-nowrap">Sign-up directory</TabsTrigger>
         </TabsList>
         <TabsContent value="products" className="mt-4"><ProductsTab /></TabsContent>
         <TabsContent value="networks" className="mt-4"><NetworksTab /></TabsContent>
@@ -186,31 +186,33 @@ function ProductsTab() {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="mb-3 flex flex-wrap items-center gap-2">
+        <div className="mb-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
           <Input
             placeholder="Search title, brand, tag…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="h-9 w-full max-w-xs"
+            className="h-9 w-full sm:max-w-xs"
           />
-          <Select value={catFilter} onValueChange={setCatFilter}>
-            <SelectTrigger className="h-9 w-48"><SelectValue placeholder="All categories" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All categories</SelectItem>
-              {(catData?.categories ?? []).map((c: any) => (
-                <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="h-9 w-40"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-              <SelectItem value="featured">Featured</SelectItem>
-            </SelectContent>
-          </Select>
+          <div className="flex gap-2">
+            <Select value={catFilter} onValueChange={setCatFilter}>
+              <SelectTrigger className="h-9 flex-1 sm:w-48 sm:flex-none"><SelectValue placeholder="All categories" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All categories</SelectItem>
+                {(catData?.categories ?? []).map((c: any) => (
+                  <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="h-9 flex-1 sm:w-40 sm:flex-none"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All statuses</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+                <SelectItem value="featured">Featured</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
 
         {isLoading ? (
@@ -387,21 +389,22 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[calc(100vw-1rem)] p-4 sm:p-6">
         <DialogHeader><DialogTitle>{form.id ? "Edit product" : "New product"}</DialogTitle></DialogHeader>
         <div className="grid gap-3">
           <div className="rounded-lg border bg-muted/40 p-3 space-y-2">
             <Label className="flex items-center gap-2 text-sm">
               <Sparkles className="h-4 w-4 text-primary" /> Import from affiliate URL
             </Label>
-            <div className="flex gap-2">
-              <Input
-                placeholder="Paste Shopee / Lazada / TikTok / Amazon product URL…"
-                value={importUrl}
-                onChange={(e) => setImportUrl(e.target.value)}
-              />
+            <Input
+              placeholder="Paste Shopee / Lazada / TikTok / Amazon product URL…"
+              value={importUrl}
+              onChange={(e) => setImportUrl(e.target.value)}
+              className="h-11 text-base"
+            />
+            <div className="flex flex-col gap-2 sm:flex-row">
               <Select value={importNetwork} onValueChange={setImportNetwork}>
-                <SelectTrigger className="w-[150px]">
+                <SelectTrigger className="h-11 w-full sm:w-[180px]">
                   <SelectValue placeholder="Network" />
                 </SelectTrigger>
                 <SelectContent>
@@ -418,8 +421,9 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
                 type="button"
                 onClick={() => importMut.mutate()}
                 disabled={!importUrl || importMut.isPending}
+                className="h-11 w-full sm:flex-1"
               >
-                {importMut.isPending ? "Fetching…" : "Fetch"}
+                {importMut.isPending ? "Fetching…" : "Fetch product info"}
               </Button>
             </div>
             {importInfo && (
@@ -441,11 +445,11 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
               </div>
             )}
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid gap-3 sm:grid-cols-2">
             <div><Label>Title</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
             <div><Label>Slug (url)</Label><Input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="meguiars-gold-class-wax" /></div>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid gap-3 sm:grid-cols-2">
             <div><Label>Brand</Label><Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} /></div>
             <div><Label>Price (₱, optional)</Label><Input type="number" value={form.price_php ?? ""} onChange={(e) => setForm({ ...form, price_php: e.target.value as any })} /></div>
           </div>
@@ -466,7 +470,7 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
             </Select>
           </div>
           <div><Label>Description</Label><Textarea rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
-          <div className="flex flex-wrap gap-6">
+          <div className="flex flex-wrap gap-4 sm:gap-6">
             <label className="flex items-center gap-2"><Switch checked={form.active} onCheckedChange={(v) => setForm({ ...form, active: v })} />Active</label>
             <label className="flex items-center gap-2"><Switch checked={form.featured} onCheckedChange={(v) => setForm({ ...form, featured: v })} />Featured</label>
             <label className="flex items-center gap-2" title="Show for all vehicles regardless of fitment rules">
@@ -474,9 +478,9 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
             </label>
           </div>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={() => mut.mutate()} disabled={mut.isPending}>{mut.isPending ? "Saving…" : "Save"}</Button>
+        <DialogFooter className="flex-col-reverse gap-2 sm:flex-row">
+          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">Cancel</Button>
+          <Button onClick={() => mut.mutate()} disabled={mut.isPending} className="w-full sm:w-auto">{mut.isPending ? "Saving…" : "Save"}</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
@@ -541,23 +545,28 @@ function LinksDialog({ product, onClose }: any) {
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-xl">
-        <DialogHeader><DialogTitle>Outbound links — {product.title}</DialogTitle></DialogHeader>
+      <DialogContent className="max-w-xl w-[calc(100vw-1rem)] p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+        <DialogHeader><DialogTitle className="truncate">Outbound links — {product.title}</DialogTitle></DialogHeader>
         <div className="space-y-3">
           {(data?.links ?? []).map((l: any) => (
             <div key={l.id} className="flex items-center gap-2 rounded border p-2 text-sm">
-              <Badge variant="secondary">{l.network?.name}</Badge>
+              <Badge variant="secondary" className="shrink-0">{l.network?.name}</Badge>
               <a href={l.url} target="_blank" rel="noopener" className="flex-1 truncate text-primary hover:underline">{l.url}</a>
-              <Button size="sm" variant="ghost" onClick={() => del.mutate(l.id)}><Trash2 className="h-4 w-4" /></Button>
+              <Button size="sm" variant="ghost" onClick={() => del.mutate(l.id)} className="shrink-0"><Trash2 className="h-4 w-4" /></Button>
             </div>
           ))}
-          <div className="rounded border p-3 space-y-2">
-            <p className="text-sm font-medium">Add link</p>
-            <div className="space-y-1">
+          <div className="rounded border p-3 space-y-3">
+            <p className="text-sm font-semibold">Add affiliate link</p>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Paste the full product URL</Label>
               <Input
-                placeholder="Paste Shopee / Lazada / TikTok / Amazon URL…"
+                placeholder="https://www.lazada.com.ph/products/..."
                 value={url}
                 onChange={(e) => handleUrlChange(e.target.value)}
+                className="h-12 text-base"
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
               />
               {url && (
                 <div className="flex flex-wrap items-center gap-2 text-xs">
@@ -576,25 +585,28 @@ function LinksDialog({ product, onClose }: any) {
                 </div>
               )}
             </div>
-            <Select
-              value={networkId}
-              onValueChange={(v) => { setNetworkId(v); setTouchedNetwork(true); }}
-            >
-              <SelectTrigger><SelectValue placeholder="Choose network" /></SelectTrigger>
-              <SelectContent>
-                {activeNetworks.map((n: any) => (
-                  <SelectItem key={n.id} value={n.id}>{n.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="space-y-1.5">
+              <Label className="text-xs text-muted-foreground">Network</Label>
+              <Select
+                value={networkId}
+                onValueChange={(v) => { setNetworkId(v); setTouchedNetwork(true); }}
+              >
+                <SelectTrigger className="h-11"><SelectValue placeholder="Choose network" /></SelectTrigger>
+                <SelectContent>
+                  {activeNetworks.map((n: any) => (
+                    <SelectItem key={n.id} value={n.id}>{n.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             {mismatch && (
               <p className="flex items-center gap-1 text-xs text-amber-600">
                 <AlertTriangle className="h-3 w-3" />
                 URL looks like {detectedSlug}, but you picked {selectedNetwork?.name}.
               </p>
             )}
-            <Button onClick={() => add.mutate()} disabled={!networkId || !url || add.isPending} size="sm">
-              {add.isPending ? "Saving…" : "Add"}
+            <Button onClick={() => add.mutate()} disabled={!networkId || !url || add.isPending} className="h-11 w-full">
+              {add.isPending ? "Saving…" : "Add link"}
             </Button>
           </div>
         </div>
