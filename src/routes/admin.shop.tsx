@@ -215,7 +215,7 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
     universal_fit: initial.universal_fit ?? false,
   });
   const [importUrl, setImportUrl] = useState("");
-  const [importInfo, setImportInfo] = useState<{ networkSlug: string | null; cleanedUrl: string; networkId: string | null } | null>(null);
+  const [importInfo, setImportInfo] = useState<{ networkSlug: string | null; cleanedUrl: string; networkId: string | null; resolvedFrom: string | null } | null>(null);
 
   const importMut = useMutation({
     mutationFn: () => scrapeShopUrl({ data: { url: importUrl } }),
@@ -231,7 +231,7 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
         price_php: f.price_php ?? s.price_php ?? null,
         category_id: f.category_id ?? s.category_id ?? null,
       }));
-      setImportInfo({ networkSlug: res.networkSlug, cleanedUrl: res.cleanedUrl, networkId: res.networkId });
+      setImportInfo({ networkSlug: res.networkSlug, cleanedUrl: res.cleanedUrl, networkId: res.networkId, resolvedFrom: res.resolvedFrom ?? null });
       toast.success("Fetched — review and save.");
     },
     onError: (e: any) => toast.error(e.message ?? "Fetch failed"),
@@ -285,12 +285,17 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
               </Button>
             </div>
             {importInfo && (
-              <p className="text-xs text-muted-foreground">
-                {importInfo.networkSlug
-                  ? <>Detected <strong>{importInfo.networkSlug}</strong>{importInfo.networkId ? " · network linked ✓" : " · no matching active network"}</>
-                  : "Unknown host — fields pre-filled from page metadata."}
-                {" "}Empty fields below were auto-filled; review before saving.
-              </p>
+              <div className="space-y-1 text-xs text-muted-foreground">
+                {importInfo.resolvedFrom && (
+                  <p className="break-all">Resolved short link → <span className="font-mono">{importInfo.cleanedUrl}</span></p>
+                )}
+                <p>
+                  {importInfo.networkSlug
+                    ? <>Detected <strong>{importInfo.networkSlug}</strong>{importInfo.networkId ? " · network linked ✓" : " · no matching active network"}</>
+                    : "Unknown host — fields pre-filled from page metadata."}
+                  {" "}Empty fields below were auto-filled; review before saving.
+                </p>
+              </div>
             )}
           </div>
           <div className="grid grid-cols-2 gap-3">

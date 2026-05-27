@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { cleanShopUrl, detectNetworkSlug } from "@/lib/shop-url";
+import { cleanShopUrl, detectNetworkSlug, isShortLink, looksLikeIconImage } from "@/lib/shop-url";
 
 // ============ PUBLIC ============
 
@@ -459,12 +459,25 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
         error: "Scraper not configured — please connect Firecrawl.",
         suggested: null,
         cleanedUrl: cleanShopUrl(data.url),
+        resolvedFrom: null as string | null,
         networkSlug: detectNetworkSlug(data.url),
         networkId: null,
       };
     }
 
-    const cleanedUrl = cleanShopUrl(data.url);
+    // Resolve short / redirect links to the real product URL first.
+    const pasted = data.url;
+    let workingUrl = pasted;
+    let resolvedFrom: string | null = null;
+    if (isShortLink(pasted)) {
+      const resolved = await resolveFinalUrl(pasted);
+      if (resolved && resolved !== pasted) {
+        workingUrl = resolved;
+        resolvedFrom = pasted;
+      }
+    }
+
+    const cleanedUrl = cleanShopUrl(workingUrl);
     const networkSlug = detectNetworkSlug(cleanedUrl);
 
     // Look up matching active network
@@ -494,41 +507,62 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       properties: {
         title: { type: "string", description: "Concise product title without seller/shop name" },
         brand: { type: "string", description: "Brand / manufacturer if mentioned" },
-        description: { type: "string", description: "1-3 sentence product description" },
-        price: { type: "number", description: "Numeric price value" },
+        description: { type: "string", description: "1-3 sentence product description focused on what the item is and key specs" },
+        price: { type: "number", description: "Numeric price value of the main product" },
         currency: { type: "string", description: "ISO currency code, e.g. PHP, USD" },
-        image_url: { type: "string", description: "Absolute URL of the primary product image" },
+        image_url: { type: "string", description: "Absolute URL of the primary product photo (NOT site icons, favorite hearts, or thumbnails of related items)" },
         category_hint: { type: "string", description: "Best-guess product category (e.g. car wax, oil filter, helmet)" },
       },
     };
 
     let extracted: any = null;
     let metadata: any = null;
+    let html: string | null = null;
     try {
       const result: any = await firecrawl.scrape(cleanedUrl, {
         formats: [
           "markdown",
-          { type: "json", schema, prompt: "Extract product fields from this marketplace listing." } as any,
+          "rawHtml",
+          { type: "json", schema, prompt: "Extract real product fields for the main product on this marketplace listing. Ignore navigation, related items, recommendation rails, 'you may also like', and site-wide UI elements like favorite/heart icons." } as any,
         ] as any,
         onlyMainContent: true,
-      });
+        waitFor: 2500,
+        location: { country: "PH", languages: ["en"] },
+      } as any);
       extracted = result?.json ?? result?.data?.json ?? null;
       metadata = result?.metadata ?? result?.data?.metadata ?? null;
+      html = result?.rawHtml ?? result?.data?.rawHtml ?? result?.html ?? result?.data?.html ?? null;
     } catch (e: any) {
       return {
         error: `Could not fetch page: ${e?.message ?? "unknown error"}`,
         suggested: null,
         cleanedUrl,
+        resolvedFrom,
         networkSlug,
         networkId,
       };
     }
 
-    const title = (extracted?.title ?? metadata?.title ?? "").toString().trim().slice(0, 200) || null;
-    const brand = (extracted?.brand ?? "").toString().trim().slice(0, 120) || null;
-    const description = (extracted?.description ?? metadata?.description ?? "").toString().trim().slice(0, 2000) || null;
-    const image_url = (extracted?.image_url ?? metadata?.ogImage ?? metadata?.["og:image"] ?? "").toString().trim() || null;
-    const price_php = pickPricePhp(extracted?.price, extracted?.currency);
+    // JSON-LD Product fallback
+    const ld = html ? extractJsonLdProduct(html) : null;
+
+    const pickStr = (...vals: any[]) =>
+      vals.map((v) => (v == null ? "" : String(v).trim())).find((v) => v.length > 0) ?? "";
+
+    const title = pickStr(extracted?.title, ld?.name, metadata?.ogTitle, metadata?.["og:title"], metadata?.title).slice(0, 200) || null;
+    const brand = pickStr(extracted?.brand, ld?.brand).slice(0, 120) || null;
+    const description = pickStr(extracted?.description, ld?.description, metadata?.ogDescription, metadata?.["og:description"], metadata?.description).slice(0, 2000) || null;
+
+    // Image: try extractor, JSON-LD, og:image — reject icon-looking URLs.
+    const imageCandidates = [extracted?.image_url, ld?.image, metadata?.ogImage, metadata?.["og:image"]]
+      .map((v) => (v == null ? "" : String(v).trim()))
+      .filter((v) => v.length > 0 && !looksLikeIconImage(v));
+    const image_url = imageCandidates[0] || null;
+
+    const rawPrice = extracted?.price ?? ld?.price ?? metadata?.["og:price:amount"] ?? null;
+    const rawCurrency = extracted?.currency ?? ld?.currency ?? metadata?.["og:price:currency"] ?? null;
+    const price_php = pickPricePhp(rawPrice, rawCurrency);
+
     const category_id = fuzzyCategoryMatch(
       String(extracted?.category_hint ?? title ?? ""),
       (cats ?? []) as any[],
@@ -537,6 +571,7 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     return {
       error: null,
       cleanedUrl,
+      resolvedFrom,
       networkSlug,
       networkId,
       suggested: {
@@ -550,3 +585,63 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       },
     };
   });
+
+// ---------- helpers for scrapeShopUrl ----------
+
+async function resolveFinalUrl(input: string): Promise<string> {
+  try {
+    const res = await fetch(input, {
+      method: "GET",
+      redirect: "follow",
+      headers: {
+        "user-agent": "Mozilla/5.0 (compatible; 365MotorSalesBot/1.0; +https://365motorsales.com)",
+        "accept": "text/html,application/xhtml+xml",
+      },
+      signal: AbortSignal.timeout(8000),
+    });
+    return res.url || input;
+  } catch {
+    return input;
+  }
+}
+
+type LdProduct = {
+  name?: string;
+  brand?: string;
+  description?: string;
+  image?: string;
+  price?: number;
+  currency?: string;
+};
+
+function extractJsonLdProduct(html: string): LdProduct | null {
+  const blocks = Array.from(html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi));
+  for (const m of blocks) {
+    const raw = m[1]?.trim();
+    if (!raw) continue;
+    let parsed: any;
+    try { parsed = JSON.parse(raw); } catch { continue; }
+    const candidates: any[] = Array.isArray(parsed) ? parsed : (parsed["@graph"] ?? [parsed]);
+    for (const node of candidates) {
+      if (!node || typeof node !== "object") continue;
+      const t = node["@type"];
+      const isProduct = t === "Product" || (Array.isArray(t) && t.includes("Product"));
+      if (!isProduct) continue;
+      const offer = Array.isArray(node.offers) ? node.offers[0] : node.offers;
+      const image = Array.isArray(node.image) ? node.image[0] : node.image;
+      const brandRaw = node.brand;
+      const brand = typeof brandRaw === "string" ? brandRaw : brandRaw?.name;
+      const priceRaw = offer?.price ?? offer?.lowPrice;
+      const price = priceRaw != null ? Number(String(priceRaw).replace(/[^\d.]/g, "")) : undefined;
+      return {
+        name: typeof node.name === "string" ? node.name : undefined,
+        brand: typeof brand === "string" ? brand : undefined,
+        description: typeof node.description === "string" ? node.description : undefined,
+        image: typeof image === "string" ? image : image?.url,
+        price: Number.isFinite(price) ? price : undefined,
+        currency: typeof offer?.priceCurrency === "string" ? offer.priceCurrency : undefined,
+      };
+    }
+  }
+  return null;
+}
