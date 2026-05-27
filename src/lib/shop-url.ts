@@ -39,7 +39,7 @@ const IMAGE_BLOCKLIST = new RegExp(
   [
     "favicon", "sprite", "placeholder", "wishlist", "heart",
     "lazada[_-]?logo", "lzd-img-global\\/.*\\/static", "app-?icon",
-    "appdownload", "qr[_-]?code", "\\/banner[_-/]", "static\\.lazada\\.com\\.ph\\/static\\/",
+    "\\/banner[_\\-/]",
     "shopee\\.\\w+\\/file\\/.*_tn",
     "\\/(40|60|64|80|100|120|124|150|200)x\\d+q?\\d*\\.(jpg|jpeg|png|webp)",
     "\\/(40|64|80|120|124|150|200)-\\1\\.",
