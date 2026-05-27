@@ -215,7 +215,7 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
     universal_fit: initial.universal_fit ?? false,
   });
   const [importUrl, setImportUrl] = useState("");
-  const [importInfo, setImportInfo] = useState<{ networkSlug: string | null; cleanedUrl: string; networkId: string | null } | null>(null);
+  const [importInfo, setImportInfo] = useState<{ networkSlug: string | null; cleanedUrl: string; networkId: string | null; resolvedFrom: string | null } | null>(null);
 
   const importMut = useMutation({
     mutationFn: () => scrapeShopUrl({ data: { url: importUrl } }),
