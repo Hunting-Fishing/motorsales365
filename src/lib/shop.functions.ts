@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { createHash } from "crypto";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { cleanShopUrl, detectNetworkSlug, isShortLink, looksLikeIconImage } from "@/lib/shop-url";
@@ -454,16 +455,6 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     await assertShopManager(context.supabase, context.userId);
 
     const apiKey = process.env.FIRECRAWL_API_KEY;
-    if (!apiKey) {
-      return {
-        error: "Scraper not configured — please connect Firecrawl.",
-        suggested: null,
-        cleanedUrl: cleanShopUrl(data.url),
-        resolvedFrom: null as string | null,
-        networkSlug: detectNetworkSlug(data.url),
-        networkId: null,
-      };
-    }
 
     // Resolve short / redirect links to the real product URL first.
     const pasted = data.url;
@@ -498,10 +489,22 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       .select("id, slug, name")
       .eq("active", true);
 
-    // Firecrawl scrape
-    const { default: Firecrawl } = await import("@mendable/firecrawl-js");
-    const firecrawl = new Firecrawl({ apiKey });
+    // Lazada product pages often block generic scrapers, but their search endpoint
+    // exposes the exact product when queried by item id. Prefer this over LLM guesses.
+    const marketplace = await fetchLazadaProductData(cleanedUrl);
 
+    if (!apiKey && !marketplace) {
+      return {
+        error: "Scraper not configured — please connect Firecrawl.",
+        suggested: null,
+        cleanedUrl,
+        resolvedFrom,
+        networkSlug,
+        networkId,
+      };
+    }
+
+    // Firecrawl scrape
     const schema = {
       type: "object",
       properties: {
@@ -518,7 +521,9 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     let extracted: any = null;
     let metadata: any = null;
     let html: string | null = null;
-    try {
+    if (apiKey && !marketplace) try {
+      const { default: Firecrawl } = await import("@mendable/firecrawl-js");
+      const firecrawl = new Firecrawl({ apiKey });
       const result: any = await firecrawl.scrape(cleanedUrl, {
         formats: [
           "markdown",
@@ -549,12 +554,13 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     const pickStr = (...vals: any[]) =>
       vals.map((v) => (v == null ? "" : String(v).trim())).find((v) => v.length > 0) ?? "";
 
-    const title = pickStr(ld?.name, extracted?.title, metadata?.ogTitle, metadata?.["og:title"], metadata?.title).slice(0, 200) || null;
-    const brand = sanitizeBrand(pickStr(ld?.brand, extracted?.brand).slice(0, 120) || null);
-    const description = pickStr(ld?.description, extracted?.description, metadata?.ogDescription, metadata?.["og:description"], metadata?.description).slice(0, 2000) || null;
+    const title = pickStr(marketplace?.title, ld?.name, extracted?.title, metadata?.ogTitle, metadata?.["og:title"], metadata?.title).slice(0, 200) || null;
+    const brand = sanitizeBrand(pickStr(marketplace?.brand, ld?.brand, extracted?.brand).slice(0, 120) || null);
+    const description = pickStr(marketplace?.description, ld?.description, extracted?.description, metadata?.ogDescription, metadata?.["og:description"], metadata?.description).slice(0, 2000) || null;
 
     // Image: JSON-LD > og:image > extractor; reject icons.
     const image_url = pickFirstNonIconImage(
+      marketplace?.image_url,
       ld?.image,
       metadata?.ogImage,
       metadata?.["og:image"],
@@ -562,17 +568,18 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     );
 
     // Price: JSON-LD > og:price > extractor.
-    const rawPrice = ld?.price ?? metadata?.["og:price:amount"] ?? metadata?.["product:price:amount"] ?? extracted?.price ?? null;
-    const rawCurrency = ld?.currency ?? metadata?.["og:price:currency"] ?? metadata?.["product:price:currency"] ?? extracted?.currency ?? null;
+    const rawPrice = marketplace?.price ?? ld?.price ?? metadata?.["og:price:amount"] ?? metadata?.["product:price:amount"] ?? extracted?.price ?? null;
+    const rawCurrency = marketplace?.currency ?? ld?.currency ?? metadata?.["og:price:currency"] ?? metadata?.["product:price:currency"] ?? extracted?.currency ?? null;
     const price_php = pickPricePhp(rawPrice, rawCurrency);
 
     const category_id = fuzzyCategoryMatch(
-      String(extracted?.category_hint ?? title ?? ""),
+      String(marketplace?.category_hint ?? extracted?.category_hint ?? title ?? ""),
       (cats ?? []) as any[],
     );
 
     // Canonical URL hardening — prefer the marketplace's own URL if present.
     const canonical = pickStr(
+      marketplace?.url,
       metadata?.ogUrl,
       metadata?.["og:url"],
       metadata?.sourceURL,
