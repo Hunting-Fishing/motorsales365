@@ -400,6 +400,20 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
                 value={importUrl}
                 onChange={(e) => setImportUrl(e.target.value)}
               />
+              <Select value={importNetwork} onValueChange={setImportNetwork}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder="Network" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="auto">Auto-detect</SelectItem>
+                  {(["shopee","lazada","tiktok","amazon","aliexpress","carousell","ebay","zalora"] as const)
+                    .filter((slug) => activeNetworks.some((n: any) => n.slug === slug))
+                    .map((slug) => {
+                      const n = activeNetworks.find((x: any) => x.slug === slug);
+                      return <SelectItem key={slug} value={slug}>{n?.name ?? slug}</SelectItem>;
+                    })}
+                </SelectContent>
+              </Select>
               <Button
                 type="button"
                 onClick={() => importMut.mutate()}
@@ -415,10 +429,15 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
                 )}
                 <p>
                   {importInfo.networkSlug
-                    ? <>Detected <strong>{importInfo.networkSlug}</strong>{importInfo.networkId ? " · network linked ✓" : " · no matching active network"}</>
+                    ? <>Using <strong>{importInfo.networkSlug}</strong>{importInfo.networkId ? " · network linked ✓" : " · no matching active network"}</>
                     : "Unknown host — fields pre-filled from page metadata."}
                   {" "}Empty fields below were auto-filled; review before saving.
                 </p>
+                {importInfo.detectedSlug && importInfo.networkSlug && importInfo.detectedSlug !== importInfo.networkSlug && (
+                  <p className="text-amber-600 dark:text-amber-400">
+                    ⚠ URL host looks like <strong>{importInfo.detectedSlug}</strong> but you selected <strong>{importInfo.networkSlug}</strong> — link will be saved under {importInfo.networkSlug}.
+                  </p>
+                )}
               </div>
             )}
           </div>
