@@ -1,105 +1,71 @@
-## Root causes (Lazada short link `s.lazada.com.ph/s.XXX`)
+# Make Engine a first-class facet app-wide
 
-The previous fix assumes Lazada short links use HTTP 30x redirects. They don't — they redirect via **client-side JS / `<meta http-equiv="refresh">`**. So `fetch(..., { redirect: "follow" }).url` returns the short URL itself, Firecrawl scrapes the tiny redirect shim page, and downstream extraction grabs:
+The fitment dialog now supports engine, but only the admin shop side knows about it. This plan pushes engine through the rest of the app so visitors can pick an engine, listings advertise an engine, and filters/match logic actually use it.
 
-1. **Generic brand** — the shim page has no brand, Firecrawl's LLM fills "Generic"/"No Brand".
-2. **Wrong price (₱450)** — extractor grabs a voucher/coupon number from the shim, not the real product price (which lives in JSON-LD on the real page).
-3. **Empty slug** — importer never fills `form.slug`; admin has to type it.
-4. **Generic image** — picks the Lazada favicon / app-banner that survives the icon blocklist.
+## 1. Garage (visitor's "my vehicle")
 
-## Fix
+`src/lib/garage.ts`
+- Add optional `engine?: string` to `GarageVehicle` (backward compatible — existing localStorage entries just don't have it).
+- `formatVehicle()` appends ` — <engine>` when set.
 
-### 1. `src/lib/shop.functions.ts` — robust `resolveFinalUrl`
+## 2. Vehicle picker that knows about engines
 
-Replace the current "fetch+follow" with a two-pass resolver:
+`src/components/shop/vehicle-fitment-picker.tsx`
+- After Model select, render an Engine select populated by `getEnginesFor(category, make, model, year)` from `src/data/vehicle-engines.ts`.
+- Engine select includes an "Any engine" option and a "Custom…" escape hatch (text input) for models without catalog entries.
+- Emit `engine` in the `onSubmit` payload.
 
-```ts
-async function resolveFinalUrl(input: string): Promise<string> {
-  try {
-    const res = await fetch(input, {
-      method: "GET",
-      redirect: "follow",
-      headers: {
-        "user-agent":
-          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
-        "accept": "text/html,application/xhtml+xml",
-      },
-      signal: AbortSignal.timeout(10_000),
-    });
-    let finalUrl = res.url || input;
-    // If HTTP follow didn't move us (JS / meta-refresh shim), inspect body.
-    if (finalUrl === input) {
-      const body = await res.text();
-      finalUrl = extractRedirectFromHtml(body, input) ?? input;
-    }
-    return finalUrl;
-  } catch { return input; }
-}
+This component is reused by the shop filter drawer, so the shop filter inherits engine support automatically.
 
-function extractRedirectFromHtml(html: string, base: string): string | null {
-  const patterns = [
-    /<meta[^>]+http-equiv=["']refresh["'][^>]+content=["'][^;]*;\s*url=([^"'>\s]+)/i,
-    /<link[^>]+rel=["']canonical["'][^>]+href=["']([^"']+)/i,
-    /window\.location(?:\.href)?\s*=\s*["']([^"']+)["']/i,
-    /location\.replace\(\s*["']([^"']+)["']/i,
-    /"redirectUrl"\s*:\s*"([^"]+)"/i,
-    /data-spm-url=["']([^"']+)/i,
-  ];
-  for (const re of patterns) {
-    const m = html.match(re);
-    if (m?.[1]) { try { return new URL(m[1].replace(/\\u002F/g, "/"), base).toString(); } catch {} }
-  }
-  return null;
-}
-```
+`src/components/vehicle-picker.tsx` (used by sell/rides flows)
+- Add the same Engine select underneath Model, again driven by `getEnginesFor` with a free-text fallback. Lifts `engine` through `onChange`.
 
-Also loop up to **2 hops** (some short links chain `s.lazada → www.lazada/redirect → product`).
+## 3. Shop product matching honors engine
 
-### 2. `src/lib/shop.functions.ts` — extraction quality
+`src/lib/shop.functions.ts` — `listShopProducts`
+- Add `engine?: string` to the input validator and the `vehicle` param.
+- Update the fitment matcher (lines 46–65): a rule passes the engine check when its `engine` is null/empty, OR when the visitor supplied an `engine` that case-insensitively equals the rule's `engine`. If the visitor has no engine selected, engine rules are ignored (current behavior preserved — never hides results).
 
-- **Brand sanitization**: treat `generic`, `no brand`, `no-brand`, `nobrand`, `unbranded`, `oem`, `none`, `n/a` (case-insensitive) as `null`.
-- **Price preference order**: JSON-LD `offers.price` → `og:price:amount` / `product:price:amount` → extractor `price`. (Currently extractor wins, which is the noisy source.) Also reject suspiciously low prices when title length suggests a real product (`< 50` AND title has multiple words AND no "voucher/coupon/free" keyword → drop).
-- **Image preference order**: JSON-LD `image` → `og:image` → extractor `image_url`. Re-run `looksLikeIconImage` on each. Pull JSON-LD `image` arrays fully and pick the first non-icon entry, not just `[0]`.
-- **Canonical URL hardening**: after scrape, if `metadata.ogUrl` / `metadata["og:url"]` / JSON-LD `@id` / `url` is a same-marketplace product page, use *that* as `cleanedUrl` (catches cases where short-link resolver still ends on a redirect page).
+`src/routes/shop.index.tsx` and `src/routes/shop.$category.tsx`
+- Pass `vehicle.engine` through to `listShopProducts` so the new filter actually runs.
 
-### 3. `src/lib/shop-url.ts` — stronger image blocklist
+## 4. Vehicle listings (sell flow) capture engine
 
-Add Lazada/Shopee CDN icon patterns to `IMAGE_BLOCKLIST`:
-```
-/_(40|60|64|80|100|120|124|150|200)x\1q?\d*\.(jpg|jpeg|png|webp)/i
-/lazada[_-]?logo|lzd-img-global\/.*\/static|app-icon|appdownload|qr[_-]code|banner/i
-/static\.lazada\.com\.ph\/static\//i
-/shopee\.\w+\/file\/.*_tn/i  // tiny thumbs
-```
+`src/routes/sell.tsx`
+- Add an Engine field beside Mileage/Transmission/Fuel for car & motorcycle categories. Uses the same catalog-driven select with free-text fallback.
+- On submit, write `attributes.engine` alongside the existing `attributes.year/make/model`.
+- Listing edit path: preload `attributes.engine` into state.
 
-### 4. `src/routes/admin.shop.tsx` — auto-fill slug
+`src/routes/dashboard.rides_.new.tsx` and `dashboard.rides_.$id.edit.tsx`
+- Replace the free-text "Engine" input with the new catalog-driven select (free-text fallback when unknown). Persist to the existing `rides.engine` text column — no schema change.
 
-In `importMut.onSuccess`, when slug is empty also set it from the resolved title:
+## 5. Show engine where vehicles are displayed
 
-```ts
-setForm((f) => {
-  const title = f.title || s.title || "";
-  return {
-    ...f,
-    title,
-    slug: f.slug || (title ? slugifyClient(title) : ""),
-    brand: f.brand || s.brand || "",
-    description: f.description || s.description || "",
-    image_url: f.image_url || s.image_url || "",
-    price_php: f.price_php ?? s.price_php ?? null,
-    category_id: f.category_id ?? s.category_id ?? null,
-  };
-});
-```
+- `src/routes/listing.$id.tsx`: render Engine in the spec block when `attributes.engine` is set.
+- `src/components/listing-card.tsx`: append engine to the small spec line (`year • make • model • engine`) when available.
+- `src/routes/rides.$slug.tsx`: already shows `ride.engine` — verify the label stays consistent.
+- Product fitment list on `src/routes/shop.p.$slug.tsx`: already shows engine (done last turn).
 
-Add a tiny client `slugifyClient` (`lower → strip non-alnum → collapse → 80 chars`) in the same file (server already has `slugify`).
+## 6. Browse filters get an engine-aware vehicle filter
 
-## Out of scope
+`src/routes/browse.$category.tsx` (only for `car` / `motorcycle` categories)
+- Add a compact `VehiclePicker`-style block above the keyword field: Year / Make / Model / Engine.
+- Extend `searchSchema` with `year`, `make`, `model`, `engine` and persist them in URL state.
+- Apply against the `attributes` JSON: `.eq("attributes->>make", make)`, `.eq("attributes->>model", model)`, `.eq("attributes->>year", year)`, `.eq("attributes->>engine", engine)` — only when each is set.
 
-Headless-browser scraping beyond Firecrawl's renderer, multi-image gallery import, Storage rehosting, retry/queue of failed imports.
+## 7. Save searches & SEO niceties
 
-## Files
+- `dashboard.searches` already serializes the URL query, so the new params ride along with no code changes there.
+- `listing.$id.tsx` head(): include engine in the dynamic title/description when present (e.g. "2019 Toyota Hilux 2.4L Diesel — …"). Same treatment for `rides.$slug.tsx`.
 
-- `src/lib/shop.functions.ts` — rewrite `resolveFinalUrl` + chain hops, reorder price/image preference, brand sanitizer, canonical URL fallback.
-- `src/lib/shop-url.ts` — extend `IMAGE_BLOCKLIST`.
-- `src/routes/admin.shop.tsx` — auto-fill `slug` from title on import.
+## Out of scope (intentionally)
+
+- No DB migration. Rides already has `engine TEXT`; listings keep using `attributes` JSON; `shop_product_fitment.engine` was added last turn.
+- No bulk backfill of existing listings — engine is purely additive and optional.
+- Engine catalog stays in `src/data/vehicle-engines.ts`; expanding model coverage is a separate, additive task.
+
+## Technical notes
+
+- Engine matching is case-insensitive and string-equal on the stored label (the catalog returns stable labels like `"2.4L Diesel (2GD-FTV)"`). This is intentional — it keeps the data model simple and matches how `make`/`model` are matched today.
+- Free-text engines entered by sellers/visitors still work — they just only match other free-text entries with the same string. The catalog ensures most users converge on the same labels.
+- All UI changes degrade gracefully: existing listings/garage entries without an engine continue to render and match exactly as they do today.
