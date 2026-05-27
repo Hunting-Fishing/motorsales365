@@ -323,10 +323,22 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
     universal_fit: initial.universal_fit ?? false,
   });
   const [importUrl, setImportUrl] = useState("");
-  const [importInfo, setImportInfo] = useState<{ networkSlug: string | null; cleanedUrl: string; networkId: string | null; resolvedFrom: string | null } | null>(null);
+  const [importNetwork, setImportNetwork] = useState<string>("auto");
+  const [importInfo, setImportInfo] = useState<{ networkSlug: string | null; detectedSlug: string | null; cleanedUrl: string; networkId: string | null; resolvedFrom: string | null } | null>(null);
+
+  // Active networks for the manual selector (shared with LinksDialog).
+  const { data: networksData } = useQuery({
+    queryKey: ["admin-networks"],
+    queryFn: () => adminListNetworks(),
+    staleTime: 60_000,
+  });
+  const activeNetworks = (networksData ?? []).filter((n: any) => n.active);
 
   const importMut = useMutation({
-    mutationFn: () => scrapeShopUrl({ data: { url: importUrl } }),
+    mutationFn: () => scrapeShopUrl({ data: {
+      url: importUrl,
+      ...(importNetwork !== "auto" ? { networkSlug: importNetwork as any } : {}),
+    } }),
     onSuccess: (res: any) => {
       if (res.error) { toast.error(res.error); return; }
       const s = res.suggested ?? {};
@@ -343,7 +355,7 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
           category_id: f.category_id ?? s.category_id ?? null,
         };
       });
-      setImportInfo({ networkSlug: res.networkSlug, cleanedUrl: res.cleanedUrl, networkId: res.networkId, resolvedFrom: res.resolvedFrom ?? null });
+      setImportInfo({ networkSlug: res.networkSlug, detectedSlug: res.detectedSlug ?? null, cleanedUrl: res.cleanedUrl, networkId: res.networkId, resolvedFrom: res.resolvedFrom ?? null });
       toast.success("Fetched — review and save.");
     },
     onError: (e: any) => toast.error(e.message ?? "Fetch failed"),
