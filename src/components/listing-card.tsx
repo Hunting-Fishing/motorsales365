@@ -61,6 +61,12 @@ function summarizeAttributes(slug: string, attrs?: Record<string, any> | null): 
     const parts = [list(attrs.droneServices), attrs.business_type].filter(Boolean);
     return parts.join(" • ") || null;
   }
+  // Vehicle listings (car/motorcycle/truck/etc.): show a short spec line
+  // ending with the engine variant when the seller picked one.
+  if (attrs.engine || attrs.transmission || attrs.fuel) {
+    const parts = [attrs.transmission, attrs.fuel, attrs.engine].filter(Boolean);
+    return parts.join(" • ") || null;
+  }
   return null;
 }
 
