@@ -3003,6 +3003,48 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_price_history: {
+        Row: {
+          captured_at: string
+          id: string
+          network_id: string | null
+          price_php: number | null
+          product_id: string
+          sale_price_php: number | null
+        }
+        Insert: {
+          captured_at?: string
+          id?: string
+          network_id?: string | null
+          price_php?: number | null
+          product_id: string
+          sale_price_php?: number | null
+        }
+        Update: {
+          captured_at?: string
+          id?: string
+          network_id?: string | null
+          price_php?: number | null
+          product_id?: string
+          sale_price_php?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_price_history_network_id_fkey"
+            columns: ["network_id"]
+            isOneToOne: false
+            referencedRelation: "affiliate_networks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_price_history_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "shop_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_product_categories: {
         Row: {
           category_id: string
@@ -3090,27 +3132,36 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          in_stock: boolean | null
           last_checked_at: string | null
           network_id: string
+          price_php: number | null
           product_id: string
+          sale_price_php: number | null
           sku: string | null
           url: string
         }
         Insert: {
           created_at?: string
           id?: string
+          in_stock?: boolean | null
           last_checked_at?: string | null
           network_id: string
+          price_php?: number | null
           product_id: string
+          sale_price_php?: number | null
           sku?: string | null
           url: string
         }
         Update: {
           created_at?: string
           id?: string
+          in_stock?: boolean | null
           last_checked_at?: string | null
           network_id?: string
+          price_php?: number | null
           product_id?: string
+          sale_price_php?: number | null
           sku?: string | null
           url?: string
         }
