@@ -505,11 +505,25 @@ function LinksDialog({ product, onClose }: any) {
   const detectedNetwork = detectedSlug ? activeNetworks.find((n) => n.slug === detectedSlug) : null;
   const mismatch = !!(selectedNetwork && detectedSlug && detectedSlug !== selectedNetwork.slug);
 
+  function validateUrl(input: string): string {
+    const trimmed = input.trim();
+    if (!trimmed) return "";
+    try {
+      const withProto = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+      new URL(withProto);
+      return "";
+    } catch {
+      return "Please enter a valid URL (e.g. https://www.lazada.com.ph/products/...)";
+    }
+  }
+
   // Auto-select network from pasted URL when the user hasn't picked one manually.
   function handleUrlChange(next: string) {
-    setUrl(next);
+    const trimmed = next.trimStart();
+    setUrl(trimmed);
+    setUrlError(validateUrl(trimmed));
     if (touchedNetwork) return;
-    const slug = detectNetworkSlug(next);
+    const slug = detectNetworkSlug(trimmed);
     if (slug) {
       const match = activeNetworks.find((n) => n.slug === slug);
       if (match && match.id !== networkId) setNetworkId(match.id);
