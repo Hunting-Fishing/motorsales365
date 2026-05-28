@@ -496,6 +496,7 @@ function LinksDialog({ product, onClose }: any) {
   const [networkId, setNetworkId] = useState<string>("");
   const [url, setUrl] = useState("");
   const [touchedNetwork, setTouchedNetwork] = useState(false);
+  const [urlError, setUrlError] = useState("");
 
   const networks = (netData?.networks ?? []) as any[];
   const activeNetworks = networks.filter((n) => n.active);
@@ -504,11 +505,25 @@ function LinksDialog({ product, onClose }: any) {
   const detectedNetwork = detectedSlug ? activeNetworks.find((n) => n.slug === detectedSlug) : null;
   const mismatch = !!(selectedNetwork && detectedSlug && detectedSlug !== selectedNetwork.slug);
 
+  function validateUrl(input: string): string {
+    const trimmed = input.trim();
+    if (!trimmed) return "";
+    try {
+      const withProto = /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+      new URL(withProto);
+      return "";
+    } catch {
+      return "Please enter a valid URL (e.g. https://www.lazada.com.ph/products/...)";
+    }
+  }
+
   // Auto-select network from pasted URL when the user hasn't picked one manually.
   function handleUrlChange(next: string) {
-    setUrl(next);
+    const trimmed = next.trimStart();
+    setUrl(trimmed);
+    setUrlError(validateUrl(trimmed));
     if (touchedNetwork) return;
-    const slug = detectNetworkSlug(next);
+    const slug = detectNetworkSlug(trimmed);
     if (slug) {
       const match = activeNetworks.find((n) => n.slug === slug);
       if (match && match.id !== networkId) setNetworkId(match.id);
@@ -519,6 +534,7 @@ function LinksDialog({ product, onClose }: any) {
     const cleaned = cleanShopUrl(url);
     if (cleaned !== url) {
       setUrl(cleaned);
+      setUrlError(validateUrl(cleaned));
       toast.success("URL cleaned");
     } else {
       toast.info("URL already clean");
@@ -528,6 +544,8 @@ function LinksDialog({ product, onClose }: any) {
   const add = useMutation({
     mutationFn: () => {
       const finalUrl = cleanShopUrl(url);
+      const err = validateUrl(finalUrl);
+      if (err) throw new Error(err);
       if (selectedNetwork && !urlMatchesNetwork(finalUrl, selectedNetwork.slug)) {
         throw new Error(`URL host does not match ${selectedNetwork.name}.`);
       }
@@ -535,7 +553,7 @@ function LinksDialog({ product, onClose }: any) {
     },
     onSuccess: () => {
       toast.success("Link saved");
-      setUrl(""); setNetworkId(""); setTouchedNetwork(false);
+      setUrl(""); setNetworkId(""); setTouchedNetwork(false); setUrlError("");
       qc.invalidateQueries({ queryKey: ["admin-product-links", product.id] });
     },
     onError: (e: any) => toast.error(e.message),
@@ -571,7 +589,13 @@ function LinksDialog({ product, onClose }: any) {
                 autoCorrect="off"
                 spellCheck={false}
               />
-              {url && (
+              {urlError && (
+                <p className="flex items-center gap-1 text-xs text-destructive">
+                  <AlertTriangle className="h-3 w-3" />
+                  {urlError}
+                </p>
+              )}
+              {url && !urlError && (
                 <div className="flex flex-wrap items-center gap-2 text-xs">
                   {detectedNetwork ? (
                     <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
@@ -613,7 +637,7 @@ function LinksDialog({ product, onClose }: any) {
         <div className="sticky bottom-0 -mx-4 px-4 sm:-mx-6 sm:px-6 border-t bg-background/95 backdrop-blur pt-3 pb-1 sm:pt-4">
           <div className="flex flex-col-reverse gap-2 sm:flex-row">
             <Button variant="outline" onClick={onClose} className="h-11 w-full sm:w-auto">Cancel</Button>
-            <Button onClick={() => add.mutate()} disabled={!networkId || !url || add.isPending} className="h-11 w-full sm:w-auto">
+            <Button onClick={() => add.mutate()} disabled={!networkId || !url || !!urlError || add.isPending} className="h-11 w-full sm:w-auto">
               {add.isPending ? "Saving…" : "Add link"}
             </Button>
           </div>
