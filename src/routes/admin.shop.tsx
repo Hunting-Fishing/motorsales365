@@ -478,10 +478,12 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
             </label>
           </div>
         </div>
-        <DialogFooter className="flex-col-reverse gap-2 sm:flex-row">
-          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">Cancel</Button>
-          <Button onClick={() => mut.mutate()} disabled={mut.isPending} className="w-full sm:w-auto">{mut.isPending ? "Saving…" : "Save"}</Button>
-        </DialogFooter>
+        <div className="sticky bottom-0 -mx-4 px-4 sm:-mx-6 sm:px-6 border-t bg-background/95 backdrop-blur pt-3 pb-1 sm:pt-4">
+          <DialogFooter className="flex-col-reverse gap-2 sm:flex-row">
+            <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">Cancel</Button>
+            <Button onClick={() => mut.mutate()} disabled={mut.isPending} className="w-full sm:w-auto">{mut.isPending ? "Saving…" : "Save"}</Button>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
@@ -606,7 +608,12 @@ function LinksDialog({ product, onClose }: any) {
                 URL looks like {detectedSlug}, but you picked {selectedNetwork?.name}.
               </p>
             )}
-            <Button onClick={() => add.mutate()} disabled={!networkId || !url || add.isPending} className="h-11 w-full">
+          </div>
+        </div>
+        <div className="sticky bottom-0 -mx-4 px-4 sm:-mx-6 sm:px-6 border-t bg-background/95 backdrop-blur pt-3 pb-1 sm:pt-4">
+          <div className="flex flex-col-reverse gap-2 sm:flex-row">
+            <Button variant="outline" onClick={onClose} className="h-11 w-full sm:w-auto">Cancel</Button>
+            <Button onClick={() => add.mutate()} disabled={!networkId || !url || add.isPending} className="h-11 w-full sm:w-auto">
               {add.isPending ? "Saving…" : "Add link"}
             </Button>
           </div>
@@ -697,10 +704,12 @@ function NetworkDialog({ initial, onClose, onSaved }: any) {
           </div>
           <label className="flex items-center gap-2"><Switch checked={form.active} onCheckedChange={(v) => setForm({ ...form, active: v })} />Active</label>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Cancel</Button>
-          <Button onClick={() => mut.mutate()} disabled={mut.isPending}>Save</Button>
-        </DialogFooter>
+        <div className="sticky bottom-0 -mx-6 px-6 border-t bg-background/95 backdrop-blur pt-3 pb-1 sm:pt-4">
+          <DialogFooter className="flex-col-reverse gap-2 sm:flex-row">
+            <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">Cancel</Button>
+            <Button onClick={() => mut.mutate()} disabled={mut.isPending} className="w-full sm:w-auto">Save</Button>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
@@ -895,13 +904,15 @@ function FitmentDialog({ product, onClose }: any) {
               />
             </div>
           </div>
-          <Button onClick={() => add.mutate()} disabled={add.isPending} size="sm">
-            {add.isPending ? "Saving…" : "Add fitment"}
-          </Button>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Close</Button>
-        </DialogFooter>
+        <div className="sticky bottom-0 -mx-6 px-6 border-t bg-background/95 backdrop-blur pt-3 pb-1 sm:pt-4">
+          <DialogFooter className="flex-col-reverse gap-2 sm:flex-row">
+            <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">Close</Button>
+            <Button onClick={() => add.mutate()} disabled={add.isPending} className="w-full sm:w-auto">
+              {add.isPending ? "Saving…" : "Add fitment"}
+            </Button>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
