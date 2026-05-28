@@ -476,6 +476,50 @@ export type Database = {
         }
         Relationships: []
       }
+      business_inquiries: {
+        Row: {
+          business_id: string
+          created_at: string
+          email: string | null
+          id: string
+          message: string
+          name: string
+          phone: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          message: string
+          name: string
+          phone?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          email?: string | null
+          id?: string
+          message?: string
+          name?: string
+          phone?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_inquiries_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_plans: {
         Row: {
           active: boolean
@@ -524,6 +568,97 @@ export type Database = {
         }
         Relationships: []
       }
+      business_posts: {
+        Row: {
+          body: string
+          business_id: string
+          created_at: string
+          id: string
+          photo_url: string | null
+          published: boolean
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          business_id: string
+          created_at?: string
+          id?: string
+          photo_url?: string | null
+          published?: boolean
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          business_id?: string
+          created_at?: string
+          id?: string
+          photo_url?: string | null
+          published?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_posts_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_products: {
+        Row: {
+          active: boolean
+          business_id: string
+          created_at: string
+          description: string | null
+          id: string
+          in_stock: boolean
+          photo_url: string | null
+          price_php: number | null
+          sale_price_php: number | null
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          business_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          in_stock?: boolean
+          photo_url?: string | null
+          price_php?: number | null
+          sale_price_php?: number | null
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          business_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          in_stock?: boolean
+          photo_url?: string | null
+          price_php?: number | null
+          sale_price_php?: number | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_products_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_reviews: {
         Row: {
           body: string | null
@@ -558,6 +693,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "business_reviews_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_services: {
+        Row: {
+          active: boolean
+          business_id: string
+          created_at: string
+          description: string | null
+          id: string
+          photo_url: string | null
+          price_label: string | null
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          business_id: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          photo_url?: string | null
+          price_label?: string | null
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          business_id?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          photo_url?: string | null
+          price_label?: string | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_services_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
@@ -775,6 +957,7 @@ export type Database = {
           city: string | null
           cover_url: string | null
           created_at: string
+          cta_primary: string
           description: string | null
           email: string | null
           featured: boolean
@@ -797,12 +980,17 @@ export type Database = {
           rating_avg: number
           rating_count: number
           region: string | null
+          show_posts: boolean
+          show_products: boolean
+          show_services: boolean
           slug: string
           source: string
           source_external_id: string | null
           status: Database["public"]["Enums"]["business_status"]
           street_address: string | null
           subscription_tier: Database["public"]["Enums"]["business_tier"]
+          tagline: string | null
+          theme_color: string | null
           type_slug: string
           updated_at: string
           website: string | null
@@ -813,6 +1001,7 @@ export type Database = {
           city?: string | null
           cover_url?: string | null
           created_at?: string
+          cta_primary?: string
           description?: string | null
           email?: string | null
           featured?: boolean
@@ -835,12 +1024,17 @@ export type Database = {
           rating_avg?: number
           rating_count?: number
           region?: string | null
+          show_posts?: boolean
+          show_products?: boolean
+          show_services?: boolean
           slug: string
           source?: string
           source_external_id?: string | null
           status?: Database["public"]["Enums"]["business_status"]
           street_address?: string | null
           subscription_tier?: Database["public"]["Enums"]["business_tier"]
+          tagline?: string | null
+          theme_color?: string | null
           type_slug: string
           updated_at?: string
           website?: string | null
@@ -851,6 +1045,7 @@ export type Database = {
           city?: string | null
           cover_url?: string | null
           created_at?: string
+          cta_primary?: string
           description?: string | null
           email?: string | null
           featured?: boolean
@@ -873,12 +1068,17 @@ export type Database = {
           rating_avg?: number
           rating_count?: number
           region?: string | null
+          show_posts?: boolean
+          show_products?: boolean
+          show_services?: boolean
           slug?: string
           source?: string
           source_external_id?: string | null
           status?: Database["public"]["Enums"]["business_status"]
           street_address?: string | null
           subscription_tier?: Database["public"]["Enums"]["business_tier"]
+          tagline?: string | null
+          theme_color?: string | null
           type_slug?: string
           updated_at?: string
           website?: string | null
@@ -4138,6 +4338,10 @@ export type Database = {
         Returns: undefined
       }
       is_business_account: { Args: { _user_id: string }; Returns: boolean }
+      is_business_editor: {
+        Args: { _business_id: string; _user_id: string }
+        Returns: boolean
+      }
       is_org_member: {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
