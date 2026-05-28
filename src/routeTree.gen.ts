@@ -113,6 +113,7 @@ import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/em
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as DashboardTeamLeadsIdRouteImport } from './routes/dashboard.team.leads_.$id'
 import { Route as DashboardRidesIdEditRouteImport } from './routes/dashboard.rides_.$id.edit'
+import { Route as DashboardBusinessesIdEditRouteImport } from './routes/dashboard.businesses_.$id.edit'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksRefreshLazadaRouteImport } from './routes/api/public/hooks/refresh-lazada'
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
@@ -641,6 +642,12 @@ const DashboardRidesIdEditRoute = DashboardRidesIdEditRouteImport.update({
   path: '/rides/$id/edit',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardBusinessesIdEditRoute =
+  DashboardBusinessesIdEditRouteImport.update({
+    id: '/businesses_/$id/edit',
+    path: '/businesses/$id/edit',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -760,6 +767,7 @@ export interface FileRoutesByFullPath {
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/dashboard/businesses/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
   '/dashboard/team/leads/$id': typeof DashboardTeamLeadsIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -866,6 +874,7 @@ export interface FileRoutesByTo {
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/dashboard/businesses/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
   '/dashboard/team/leads/$id': typeof DashboardTeamLeadsIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -976,6 +985,7 @@ export interface FileRoutesById {
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/dashboard/businesses_/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides_/$id/edit': typeof DashboardRidesIdEditRoute
   '/dashboard/team/leads_/$id': typeof DashboardTeamLeadsIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -1087,6 +1097,7 @@ export interface FileRouteTypes {
     | '/api/public/fx/refresh'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
+    | '/dashboard/businesses/$id/edit'
     | '/dashboard/rides/$id/edit'
     | '/dashboard/team/leads/$id'
     | '/lovable/email/auth/preview'
@@ -1193,6 +1204,7 @@ export interface FileRouteTypes {
     | '/api/public/fx/refresh'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
+    | '/dashboard/businesses/$id/edit'
     | '/dashboard/rides/$id/edit'
     | '/dashboard/team/leads/$id'
     | '/lovable/email/auth/preview'
@@ -1302,6 +1314,7 @@ export interface FileRouteTypes {
     | '/api/public/fx/refresh'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
+    | '/dashboard/businesses_/$id/edit'
     | '/dashboard/rides_/$id/edit'
     | '/dashboard/team/leads_/$id'
     | '/lovable/email/auth/preview'
@@ -2105,6 +2118,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRidesIdEditRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/businesses_/$id/edit': {
+      id: '/dashboard/businesses_/$id/edit'
+      path: '/businesses/$id/edit'
+      fullPath: '/dashboard/businesses/$id/edit'
+      preLoaderRoute: typeof DashboardBusinessesIdEditRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -2214,6 +2234,7 @@ interface DashboardRouteChildren {
   DashboardVerificationRoute: typeof DashboardVerificationRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardRidesNewRoute: typeof DashboardRidesNewRoute
+  DashboardBusinessesIdEditRoute: typeof DashboardBusinessesIdEditRoute
   DashboardRidesIdEditRoute: typeof DashboardRidesIdEditRoute
 }
 
@@ -2234,6 +2255,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardVerificationRoute: DashboardVerificationRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardRidesNewRoute: DashboardRidesNewRoute,
+  DashboardBusinessesIdEditRoute: DashboardBusinessesIdEditRoute,
   DashboardRidesIdEditRoute: DashboardRidesIdEditRoute,
 }
 
