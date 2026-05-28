@@ -637,7 +637,7 @@ function LinksDialog({ product, onClose }: any) {
         <div className="sticky bottom-0 -mx-4 px-4 sm:-mx-6 sm:px-6 border-t bg-background/95 backdrop-blur pt-3 pb-1 sm:pt-4">
           <div className="flex flex-col-reverse gap-2 sm:flex-row">
             <Button variant="outline" onClick={onClose} className="h-11 w-full sm:w-auto">Cancel</Button>
-            <Button onClick={() => add.mutate()} disabled={!networkId || !url || add.isPending} className="h-11 w-full sm:w-auto">
+            <Button onClick={() => add.mutate()} disabled={!networkId || !url || !!urlError || add.isPending} className="h-11 w-full sm:w-auto">
               {add.isPending ? "Saving…" : "Add link"}
             </Button>
           </div>
