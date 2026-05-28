@@ -24,7 +24,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { uploadWithRetry } from "@/lib/storage-upload";
-import { supabase } from "@/integrations/supabase/client";
+
 import { toast } from "sonner";
 import { ArrowLeft, Plus, Trash2, Upload, ExternalLink, Image as ImageIcon } from "lucide-react";
 
