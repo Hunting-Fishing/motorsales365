@@ -589,6 +589,12 @@ function LinksDialog({ product, onClose }: any) {
                 autoCorrect="off"
                 spellCheck={false}
               />
+              {urlError && (
+                <p className="flex items-center gap-1 text-xs text-destructive">
+                  <AlertTriangle className="h-3 w-3" />
+                  {urlError}
+                </p>
+              )}
               {url && (
                 <div className="flex flex-wrap items-center gap-2 text-xs">
                   {detectedNetwork ? (
