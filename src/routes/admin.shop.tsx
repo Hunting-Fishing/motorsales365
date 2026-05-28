@@ -552,7 +552,8 @@ function LinksDialog({ product, onClose }: any) {
             <div key={l.id} className="flex items-center gap-2 rounded border p-2 text-sm">
               <Badge variant="secondary" className="shrink-0">{l.network?.name}</Badge>
               <a href={l.url} target="_blank" rel="noopener" className="flex-1 truncate text-primary hover:underline">{l.url}</a>
-              <Button size="sm" variant="ghost" onClick={() => del.mutate(l.id)} className="shrink-0"><Trash2 className="h-4 w-4" /></Button>
+              <Button size="sm" variant="ghost" title="Copy link" onClick={async () => { try { await navigator.clipboard.writeText(l.url); toast.success("Copied link"); } catch { toast.error("Could not copy"); } }} className="shrink-0"><Copy className="h-4 w-4" /></Button>
+              <Button size="sm" variant="ghost" title="Delete" onClick={() => del.mutate(l.id)} className="shrink-0"><Trash2 className="h-4 w-4" /></Button>
             </div>
           ))}
           <div className="rounded border p-3 space-y-3">
