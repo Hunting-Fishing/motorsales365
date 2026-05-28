@@ -1,6 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { MapPin, Phone, Mail, Globe, MessageCircle, Star, Store as StoreIcon, Clock } from "lucide-react";
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Globe,
+  MessageCircle,
+  Star,
+  Store as StoreIcon,
+  Clock,
+  ShoppingBag,
+  Sparkles,
+  CalendarDays,
+} from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
 import { SiteLayout } from "@/components/site-layout";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -11,13 +25,15 @@ import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { GoogleBusinessMap } from "@/components/businesses/google-business-map";
 import { ShareQr } from "@/components/share-qr";
+import { InquiryForm } from "@/components/business-page/inquiry-form";
+import { getBusinessPage } from "@/lib/business-pages.functions";
 
 export const Route = createFileRoute("/businesses/$slug")({
   loader: async ({ params }) => {
     try {
       const { data } = await (supabase as any)
         .from("businesses")
-        .select("name,description,city,region,logo_url,cover_url")
+        .select("name,description,tagline,city,region,logo_url,cover_url")
         .eq("slug", params.slug)
         .eq("status", "active")
         .maybeSingle();
@@ -40,7 +56,7 @@ export const Route = createFileRoute("/businesses/$slug")({
     }
     const loc = [b.city, b.region].filter(Boolean).join(", ");
     const title = `${b.name}${loc ? ` — ${loc}` : ""} | 365 MotorSales`;
-    const desc = (b.description ?? `${b.name}${loc ? ` in ${loc}` : ""} — automotive business profile on 365 MotorSales Philippines.`).slice(0, 155);
+    const desc = (b.tagline || b.description || `${b.name}${loc ? ` in ${loc}` : ""} — automotive business on 365 MotorSales Philippines.`).slice(0, 155);
     const img = b.cover_url ?? b.logo_url ?? null;
     return {
       meta: [
@@ -50,96 +66,56 @@ export const Route = createFileRoute("/businesses/$slug")({
         { property: "og:description", content: desc },
         { property: "og:type", content: "website" },
         { property: "og:url", content: url },
-        ...(img ? [
-          { property: "og:image", content: img },
-          { name: "twitter:image", content: img },
-        ] : []),
+        ...(img
+          ? [
+              { property: "og:image", content: img },
+              { name: "twitter:image", content: img },
+            ]
+          : []),
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
       ],
       links: [{ rel: "canonical", href: url }],
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            name: b.name,
+            description: b.tagline || b.description || undefined,
+            image: img || undefined,
+            address: loc || undefined,
+            url,
+          }),
+        },
+      ],
     };
   },
   component: BusinessProfilePage,
 });
 
-type Business = {
-  id: string; slug: string; name: string; type_slug: string; description: string | null;
-  logo_url: string | null; cover_url: string | null; photos: string[];
-  phone: string | null; email: string | null; website: string | null; messenger_url: string | null;
-  hours: Record<string, string> | null;
-  region: string | null; province: string | null; city: string | null; barangay: string | null; street_address: string | null;
-  lat: number | null; lng: number | null;
-  rating_avg: number; rating_count: number; featured: boolean;
-  price_label: string | null;
-  subscription_tier: "free" | "listed" | "featured" | "premium" | null;
-};
-
-type Review = { id: string; user_id: string; rating: number; body: string | null; created_at: string };
+function peso(n: number | null | undefined) {
+  if (n == null) return null;
+  return new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP", maximumFractionDigits: 0 }).format(n);
+}
 
 function BusinessProfilePage() {
   const { slug } = Route.useParams();
   const { user } = useAuth();
-  const [biz, setBiz] = useState<Business | null>(null);
-  const [typeLabel, setTypeLabel] = useState("");
-  const [tagLabels, setTagLabels] = useState<string[]>([]);
-  const [reviews, setReviews] = useState<Review[]>([]);
-  const [reviewerNames, setReviewerNames] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(true);
+  const fetchPage = useServerFn(getBusinessPage);
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["business-page", slug],
+    queryFn: () => fetchPage({ data: { slug } }),
+  });
+
   const [rating, setRating] = useState(5);
   const [body, setBody] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  const load = async () => {
-    setLoading(true);
-    const { data, error } = await (supabase as any)
-      .from("businesses")
-      .select("*")
-      .eq("slug", slug)
-      .maybeSingle();
-    if (error || !data) { setBiz(null); setLoading(false); return; }
-    setBiz(data as Business);
-
-    const [{ data: t }, { data: links }, { data: revs }] = await Promise.all([
-      (supabase as any).from("business_types").select("label").eq("slug", data.type_slug).maybeSingle(),
-      (supabase as any).from("business_tag_links").select("tag_slug").eq("business_id", data.id),
-      (supabase as any).from("business_reviews").select("id,user_id,rating,body,created_at").eq("business_id", data.id).eq("status", "active").order("created_at", { ascending: false }),
-    ]);
-    setTypeLabel(t?.label ?? "");
-    const slugs = (links ?? []).map((l: any) => l.tag_slug);
-    if (slugs.length > 0) {
-      const { data: tagRows } = await (supabase as any).from("business_tags").select("slug,label").in("slug", slugs);
-      setTagLabels((tagRows ?? []).map((r: any) => r.label));
-    } else setTagLabels([]);
-    setReviews(revs ?? []);
-    const uids = Array.from(new Set((revs ?? []).map((r: any) => r.user_id)));
-    if (uids.length > 0) {
-      const { data: profs } = await (supabase as any).from("public_profiles").select("id,full_name").in("id", uids);
-      const m: Record<string, string> = {};
-      for (const p of profs ?? []) m[p.id] = p.full_name ?? "User";
-      setReviewerNames(m);
-    }
-    setLoading(false);
-  };
-
-  useEffect(() => { load(); }, [slug]);
-
-  const submitReview = async () => {
-    if (!user) { toast.error("Please sign in to leave a review"); return; }
-    if (!biz) return;
-    setSubmitting(true);
-    const { error } = await (supabase as any)
-      .from("business_reviews")
-      .upsert({ business_id: biz.id, user_id: user.id, rating, body: body.trim() || null }, { onConflict: "business_id,user_id" });
-    setSubmitting(false);
-    if (error) { toast.error(error.message); return; }
-    toast.success("Thanks for your review!");
-    setBody("");
-    load();
-  };
-
-  if (loading) return <SiteLayout><div className="container mx-auto p-8">Loading…</div></SiteLayout>;
+  if (isLoading) return <SiteLayout><div className="container mx-auto p-8">Loading…</div></SiteLayout>;
+  const biz: any = data?.business;
   if (!biz) {
     return (
       <SiteLayout>
@@ -151,143 +127,367 @@ function BusinessProfilePage() {
     );
   }
 
-  const myReview = reviews.find((r) => r.user_id === user?.id);
+  const typeLabel = data?.typeLabel ?? "";
+  const tagLabels = data?.tagLabels ?? [];
+  const services = data?.services ?? [];
+  const products = data?.products ?? [];
+  const posts = data?.posts ?? [];
+  const reviews = data?.reviews ?? [];
+  const reviewerNames = data?.reviewerNames ?? {};
+
+  const myReview = reviews.find((r: any) => r.user_id === user?.id);
   const location = [biz.barangay, biz.city, biz.province, biz.region].filter(Boolean).join(", ");
+  const accent = biz.theme_color || null;
+  const accentStyle = accent ? ({ ["--vendor-accent" as any]: accent } as React.CSSProperties) : undefined;
+
+  const submitReview = async () => {
+    if (!user) {
+      toast.error("Please sign in to leave a review");
+      return;
+    }
+    setSubmitting(true);
+    const { error } = await (supabase as any)
+      .from("business_reviews")
+      .upsert(
+        { business_id: biz.id, user_id: user.id, rating, body: body.trim() || null },
+        { onConflict: "business_id,user_id" },
+      );
+    setSubmitting(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Thanks for your review!");
+    setBody("");
+    refetch();
+  };
+
+  const messengerHref = biz.messenger_url || null;
+  const telHref = biz.phone ? `tel:${biz.phone}` : null;
 
   return (
     <SiteLayout>
-      <div className="container mx-auto px-4 py-6 md:py-10">
-        <Link to="/businesses" className="text-sm text-muted-foreground hover:text-foreground">← Back to businesses</Link>
-
-        <Card className="mt-4 overflow-hidden">
-          {biz.cover_url && <div className="h-40 w-full bg-muted md:h-56"><img src={biz.cover_url} alt="" className="h-full w-full object-cover" /></div>}
-          <div className="flex flex-wrap items-start gap-4 p-5">
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-muted">
-              {biz.logo_url ? <img src={biz.logo_url} alt={biz.name} className="h-full w-full object-cover" /> : <StoreIcon className="h-8 w-8 text-muted-foreground" />}
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-2">
-                <h1 className="font-display text-2xl font-bold">{biz.name}</h1>
-                {biz.subscription_tier === "premium" && <Badge className="bg-amber-500 text-amber-950">Premium</Badge>}
-                {biz.subscription_tier === "featured" && <Badge className="bg-primary">Featured</Badge>}
-                {biz.subscription_tier === "listed" && <Badge variant="secondary">Listed</Badge>}
-                {biz.featured && !biz.subscription_tier && <Badge>Featured</Badge>}
-                {biz.price_label && (
-                  <Badge variant="secondary" className="font-semibold">{biz.price_label}</Badge>
-                )}
-              </div>
-
-              <div className="text-sm text-muted-foreground">{typeLabel}</div>
-              {biz.rating_count > 0 && (
-                <div className="mt-1 flex items-center gap-1 text-sm">
-                  <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
-                  <span className="font-medium">{Number(biz.rating_avg).toFixed(1)}</span>
-                  <span className="text-muted-foreground">({biz.rating_count} review{biz.rating_count === 1 ? "" : "s"})</span>
-                </div>
-              )}
-              {location && (
-                <div className="mt-1 flex items-start gap-1 text-sm text-muted-foreground">
-                  <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-                  <span>{biz.street_address ? `${biz.street_address}, ` : ""}{location}</span>
-                </div>
-              )}
-              <div className="mt-3 flex flex-wrap gap-2">
-                {biz.phone && <Button size="sm" variant="outline" asChild><a href={`tel:${biz.phone}`}><Phone className="mr-1 h-4 w-4" />{biz.phone}</a></Button>}
-                {biz.email && <Button size="sm" variant="outline" asChild><a href={`mailto:${biz.email}`}><Mail className="mr-1 h-4 w-4" />Email</a></Button>}
-                {biz.website && <Button size="sm" variant="outline" asChild><a href={biz.website} target="_blank" rel="noreferrer"><Globe className="mr-1 h-4 w-4" />Website</a></Button>}
-                {biz.messenger_url && <Button size="sm" variant="outline" asChild><a href={biz.messenger_url} target="_blank" rel="noreferrer"><MessageCircle className="mr-1 h-4 w-4" />Messenger</a></Button>}
-                <ShareQr
-                  url={`${typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com"}/businesses/${biz.slug}`}
-                  title={biz.name}
-                  subtitle={location || null}
-                  coverUrl={biz.cover_url || biz.logo_url || null}
-                  accent={typeLabel || null}
-                  fileSlug={biz.slug}
-                  triggerLabel="QR & Poster"
-                />
-              </div>
-              {tagLabels.length > 0 && (
-                <div className="mt-3 flex flex-wrap gap-1">
-                  {tagLabels.map((l) => <Badge key={l} variant="secondary">{l}</Badge>)}
-                </div>
-              )}
-            </div>
+      <div style={accentStyle}>
+        {/* HERO */}
+        <div className="relative">
+          <div
+            className="h-48 w-full bg-muted md:h-72 lg:h-80"
+            style={{
+              backgroundImage: biz.cover_url ? `url(${biz.cover_url})` : undefined,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          >
+            <div className="h-full w-full bg-gradient-to-b from-black/10 via-black/30 to-background" />
           </div>
-        </Card>
 
-        <div className="mt-6 grid gap-6 md:grid-cols-2">
-          <Card className="p-5">
-            <h2 className="mb-2 font-display text-lg font-semibold">About</h2>
-            <p className="whitespace-pre-wrap text-sm text-muted-foreground">{biz.description || "No description provided."}</p>
-            {biz.hours && Object.keys(biz.hours).length > 0 && (
-              <div className="mt-4">
-                <h3 className="mb-2 flex items-center gap-1 text-sm font-semibold"><Clock className="h-4 w-4" />Hours</h3>
-                <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                  {Object.entries(biz.hours).map(([day, hrs]) => (
-                    <div key={day} className="contents"><dt className="text-muted-foreground capitalize">{day}</dt><dd>{hrs}</dd></div>
-                  ))}
-                </dl>
+          <div className="container mx-auto -mt-16 px-4 md:-mt-20">
+            <Card className="overflow-hidden">
+              <div className="flex flex-wrap items-start gap-4 p-5">
+                <div
+                  className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-4 border-background bg-muted shadow-lg md:h-28 md:w-28"
+                  style={accent ? { borderColor: accent } : undefined}
+                >
+                  {biz.logo_url ? (
+                    <img src={biz.logo_url} alt={biz.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <StoreIcon className="h-10 w-10 text-muted-foreground" />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h1 className="font-display text-2xl font-bold md:text-3xl">{biz.name}</h1>
+                    {biz.subscription_tier === "premium" && <Badge className="bg-amber-500 text-amber-950">Premium</Badge>}
+                    {biz.subscription_tier === "featured" && <Badge className="bg-primary">Featured</Badge>}
+                    {biz.subscription_tier === "listed" && <Badge variant="secondary">Listed</Badge>}
+                    {biz.price_label && (
+                      <Badge variant="secondary" className="font-semibold">{biz.price_label}</Badge>
+                    )}
+                  </div>
+                  {typeLabel && <div className="text-sm text-muted-foreground">{typeLabel}</div>}
+                  {biz.tagline && (
+                    <p className="mt-1 text-sm md:text-base text-foreground/80">{biz.tagline}</p>
+                  )}
+                  {biz.rating_count > 0 && (
+                    <div className="mt-1 flex items-center gap-1 text-sm">
+                      <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                      <span className="font-medium">{Number(biz.rating_avg).toFixed(1)}</span>
+                      <span className="text-muted-foreground">({biz.rating_count} review{biz.rating_count === 1 ? "" : "s"})</span>
+                    </div>
+                  )}
+                  {location && (
+                    <div className="mt-1 flex items-start gap-1 text-sm text-muted-foreground">
+                      <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
+                      <span>{biz.street_address ? `${biz.street_address}, ` : ""}{location}</span>
+                    </div>
+                  )}
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {telHref && (
+                      <Button size="sm" asChild style={accent ? { backgroundColor: accent } : undefined}>
+                        <a href={telHref}><Phone className="mr-1 h-4 w-4" />Call</a>
+                      </Button>
+                    )}
+                    {messengerHref && (
+                      <Button size="sm" variant="outline" asChild>
+                        <a href={messengerHref} target="_blank" rel="noreferrer">
+                          <MessageCircle className="mr-1 h-4 w-4" />Messenger
+                        </a>
+                      </Button>
+                    )}
+                    <Button size="sm" variant="outline" asChild>
+                      <a href="#inquiry"><Mail className="mr-1 h-4 w-4" />Get a quote</a>
+                    </Button>
+                    {biz.website && (
+                      <Button size="sm" variant="outline" asChild>
+                        <a href={biz.website} target="_blank" rel="noreferrer"><Globe className="mr-1 h-4 w-4" />Website</a>
+                      </Button>
+                    )}
+                    <ShareQr
+                      url={`${typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com"}/businesses/${biz.slug}`}
+                      title={biz.name}
+                      subtitle={location || null}
+                      coverUrl={biz.cover_url || biz.logo_url || null}
+                      accent={typeLabel || null}
+                      fileSlug={biz.slug}
+                      triggerLabel="QR & Poster"
+                    />
+                  </div>
+                  {tagLabels.length > 0 && (
+                    <div className="mt-3 flex flex-wrap gap-1">
+                      {tagLabels.map((l: string) => (
+                        <Badge key={l} variant="secondary">{l}</Badge>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            )}
-          </Card>
-          <div>
-            <GoogleBusinessMap
-              height={420}
-              center={biz.lat && biz.lng ? { lat: Number(biz.lat), lng: Number(biz.lng) } : null}
-              businesses={biz.lat && biz.lng ? [{
-                id: biz.id, slug: biz.slug, name: biz.name,
-                type_slug: biz.type_slug, type_label: typeLabel,
-                lat: Number(biz.lat), lng: Number(biz.lng), rating_avg: Number(biz.rating_avg),
-                rating_count: biz.rating_count, city: biz.city, featured: biz.featured,
-                price_label: biz.price_label,
-              }] : []}
-            />
+            </Card>
           </div>
         </div>
 
-        <Card className="mt-6 p-5">
-          <h2 className="mb-4 font-display text-lg font-semibold">Reviews</h2>
-          {user ? (
-            <div className="mb-6 rounded-lg border border-border p-4">
-              <div className="mb-2 text-sm font-medium">{myReview ? "Update your review" : "Leave a review"}</div>
-              <div className="mb-3 flex gap-1">
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <button key={n} onClick={() => setRating(n)} aria-label={`Rate ${n}`}>
-                    <Star className={`h-6 w-6 ${n <= rating ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground"}`} />
-                  </button>
-                ))}
-              </div>
-              <Textarea value={body} onChange={(e) => setBody(e.target.value)} placeholder="Share your experience…" rows={3} maxLength={1000} />
-              <div className="mt-2 flex justify-end">
-                <Button size="sm" onClick={submitReview} disabled={submitting}>{submitting ? "Saving…" : (myReview ? "Update review" : "Submit review")}</Button>
-              </div>
+        <div className="container mx-auto px-4 py-6 md:py-10 space-y-6">
+          {/* ABOUT + HOURS + MAP */}
+          <div className="grid gap-6 md:grid-cols-2">
+            <Card className="p-5">
+              <h2 className="mb-2 font-display text-lg font-semibold">About</h2>
+              <p className="whitespace-pre-wrap text-sm text-muted-foreground">{biz.description || "No description provided."}</p>
+              {biz.brands_carried && (
+                <div className="mt-3">
+                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Brands carried</div>
+                  <div className="mt-1 text-sm">{biz.brands_carried}</div>
+                </div>
+              )}
+              {biz.hours && Object.keys(biz.hours).length > 0 && (
+                <div className="mt-4">
+                  <h3 className="mb-2 flex items-center gap-1 text-sm font-semibold"><Clock className="h-4 w-4" />Hours</h3>
+                  <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                    {Object.entries(biz.hours as Record<string, string>).map(([day, hrs]) => (
+                      <div key={day} className="contents">
+                        <dt className="text-muted-foreground capitalize">{day}</dt>
+                        <dd>{hrs}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )}
+            </Card>
+            <div>
+              <GoogleBusinessMap
+                height={420}
+                center={biz.lat && biz.lng ? { lat: Number(biz.lat), lng: Number(biz.lng) } : null}
+                businesses={
+                  biz.lat && biz.lng
+                    ? [{
+                        id: biz.id,
+                        slug: biz.slug,
+                        name: biz.name,
+                        type_slug: biz.type_slug,
+                        type_label: typeLabel,
+                        lat: Number(biz.lat),
+                        lng: Number(biz.lng),
+                        rating_avg: Number(biz.rating_avg),
+                        rating_count: biz.rating_count,
+                        city: biz.city,
+                        featured: biz.featured,
+                        price_label: biz.price_label,
+                      }]
+                    : []
+                }
+              />
             </div>
-          ) : (
-            <div className="mb-6 rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
-              <Link to="/login" className="text-primary underline">Sign in</Link> to leave a review.
-            </div>
-          )}
-          {reviews.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No reviews yet.</p>
-          ) : (
-            <div className="space-y-3">
-              {reviews.map((r) => (
-                <div key={r.id} className="rounded-lg border border-border p-3">
-                  <div className="mb-1 flex items-center justify-between">
-                    <div className="text-sm font-medium">{reviewerNames[r.user_id] ?? "User"}</div>
-                    <div className="flex items-center gap-1 text-xs">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star key={i} className={`h-3 w-3 ${i < r.rating ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground"}`} />
-                      ))}
+          </div>
+
+          {/* SERVICES */}
+          {biz.show_services !== false && services.length > 0 && (
+            <Card className="p-5">
+              <div className="mb-3 flex items-center gap-2">
+                <Sparkles className="h-5 w-5" style={accent ? { color: accent } : undefined} />
+                <h2 className="font-display text-lg font-semibold">Services</h2>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {services.map((s: any) => (
+                  <div key={s.id} className="flex gap-3 rounded-lg border border-border p-3">
+                    {s.photo_url && (
+                      <img src={s.photo_url} alt="" className="h-16 w-16 shrink-0 rounded-md object-cover" />
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="font-medium">{s.title}</div>
+                        {s.price_label && (
+                          <Badge variant="secondary" className="shrink-0 font-semibold">{s.price_label}</Badge>
+                        )}
+                      </div>
+                      {s.description && (
+                        <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{s.description}</p>
+                      )}
                     </div>
                   </div>
-                  {r.body && <p className="whitespace-pre-wrap text-sm">{r.body}</p>}
-                  <div className="mt-1 text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </Card>
           )}
-        </Card>
+
+          {/* PRODUCTS */}
+          {biz.show_products !== false && products.length > 0 && (
+            <Card className="p-5">
+              <div className="mb-3 flex items-center gap-2">
+                <ShoppingBag className="h-5 w-5" style={accent ? { color: accent } : undefined} />
+                <h2 className="font-display text-lg font-semibold">Shop</h2>
+              </div>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                {products.map((p: any) => {
+                  const onSale = p.sale_price_php != null && p.price_php != null && Number(p.sale_price_php) < Number(p.price_php);
+                  return (
+                    <div key={p.id} className="overflow-hidden rounded-lg border border-border">
+                      <div className="aspect-square w-full bg-muted">
+                        {p.photo_url ? (
+                          <img src={p.photo_url} alt={p.title} className="h-full w-full object-cover" />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-muted-foreground"><ShoppingBag className="h-6 w-6" /></div>
+                        )}
+                      </div>
+                      <div className="p-2">
+                        <div className="line-clamp-2 text-sm font-medium">{p.title}</div>
+                        <div className="mt-1 flex items-center gap-2">
+                          {onSale ? (
+                            <>
+                              <span className="text-sm font-bold" style={accent ? { color: accent } : undefined}>
+                                {peso(Number(p.sale_price_php))}
+                              </span>
+                              <span className="text-xs text-muted-foreground line-through">{peso(Number(p.price_php))}</span>
+                            </>
+                          ) : p.price_php != null ? (
+                            <span className="text-sm font-bold">{peso(Number(p.price_php))}</span>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">Message for price</span>
+                          )}
+                        </div>
+                        {!p.in_stock && <div className="mt-1 text-xs text-destructive">Out of stock</div>}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="mt-2 w-full text-xs"
+                          asChild
+                        >
+                          <a href={messengerHref || telHref || "#inquiry"} target={messengerHref ? "_blank" : undefined} rel="noreferrer">
+                            {messengerHref ? "Message to order" : telHref ? "Call to order" : "Inquire"}
+                          </a>
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </Card>
+          )}
+
+          {/* POSTS */}
+          {biz.show_posts !== false && posts.length > 0 && (
+            <Card className="p-5">
+              <div className="mb-3 flex items-center gap-2">
+                <CalendarDays className="h-5 w-5" style={accent ? { color: accent } : undefined} />
+                <h2 className="font-display text-lg font-semibold">Updates</h2>
+              </div>
+              <div className="space-y-3">
+                {posts.map((p: any) => (
+                  <div key={p.id} className="rounded-lg border border-border p-3">
+                    <div className="text-xs text-muted-foreground">{new Date(p.created_at).toLocaleString()}</div>
+                    <p className="mt-1 whitespace-pre-wrap text-sm">{p.body}</p>
+                    {p.photo_url && <img src={p.photo_url} alt="" className="mt-2 max-h-72 rounded-md object-cover" />}
+                  </div>
+                ))}
+              </div>
+            </Card>
+          )}
+
+          {/* INQUIRY */}
+          <Card id="inquiry" className="p-5">
+            <h2 className="mb-1 font-display text-lg font-semibold">Send a message</h2>
+            <p className="mb-4 text-sm text-muted-foreground">
+              Ask {biz.name} a question or request a quote. They'll get back to you directly.
+            </p>
+            <InquiryForm businessId={biz.id} businessName={biz.name} />
+          </Card>
+
+          {/* REVIEWS */}
+          <Card className="p-5">
+            <h2 className="mb-4 font-display text-lg font-semibold">Reviews</h2>
+            {user ? (
+              <div className="mb-6 rounded-lg border border-border p-4">
+                <div className="mb-2 text-sm font-medium">{myReview ? "Update your review" : "Leave a review"}</div>
+                <div className="mb-3 flex gap-1">
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <button key={n} type="button" onClick={() => setRating(n)} aria-label={`Rate ${n}`}>
+                      <Star className={`h-6 w-6 ${n <= rating ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground"}`} />
+                    </button>
+                  ))}
+                </div>
+                <Textarea
+                  value={body}
+                  onChange={(e) => setBody(e.target.value)}
+                  placeholder="Share your experience…"
+                  rows={3}
+                  maxLength={1000}
+                />
+                <div className="mt-2 flex justify-end">
+                  <Button size="sm" onClick={submitReview} disabled={submitting}>
+                    {submitting ? "Saving…" : myReview ? "Update review" : "Submit review"}
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="mb-6 rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
+                <Link to="/login" className="text-primary underline">Sign in</Link> to leave a review.
+              </div>
+            )}
+            {reviews.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No reviews yet.</p>
+            ) : (
+              <div className="space-y-3">
+                {reviews.map((r: any) => (
+                  <div key={r.id} className="rounded-lg border border-border p-3">
+                    <div className="mb-1 flex items-center justify-between">
+                      <div className="text-sm font-medium">{reviewerNames[r.user_id] ?? "User"}</div>
+                      <div className="flex items-center gap-1 text-xs">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <Star key={i} className={`h-3 w-3 ${i < r.rating ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground"}`} />
+                        ))}
+                      </div>
+                    </div>
+                    {r.body && <p className="whitespace-pre-wrap text-sm">{r.body}</p>}
+                    <div className="mt-1 text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+
+          <div className="text-center">
+            <Link to="/businesses" className="text-sm text-muted-foreground hover:text-foreground">
+              ← Back to directory
+            </Link>
+          </div>
+        </div>
       </div>
     </SiteLayout>
   );

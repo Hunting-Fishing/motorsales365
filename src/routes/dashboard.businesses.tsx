@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Store as StoreIcon, Plus, Check, X, Pencil, Tag, Sparkles } from "lucide-react";
+import { Store as StoreIcon, Plus, Check, X, Pencil, Tag, Sparkles, LayoutTemplate } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -149,6 +149,12 @@ function MyBusinessesPage() {
               </div>
               <div className="flex shrink-0 flex-wrap items-center gap-2">
                 <span className="text-xs text-muted-foreground">{b.rating_count} review{b.rating_count === 1 ? "" : "s"}</span>
+                <Button size="sm" asChild>
+                  <Link to="/dashboard/businesses/$id/edit" params={{ id: b.id }}>
+                    <LayoutTemplate className="mr-1 h-3.5 w-3.5" />
+                    Manage page
+                  </Link>
+                </Button>
                 {b.status === "active" && (
                   <>
                     <Button size="sm" variant="outline" onClick={() => setPlanTarget(b)}>
