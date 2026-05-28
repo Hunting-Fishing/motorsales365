@@ -595,7 +595,7 @@ function LinksDialog({ product, onClose }: any) {
                   {urlError}
                 </p>
               )}
-              {url && (
+              {url && !urlError && (
                 <div className="flex flex-wrap items-center gap-2 text-xs">
                   {detectedNetwork ? (
                     <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
