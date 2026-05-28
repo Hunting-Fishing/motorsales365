@@ -534,6 +534,7 @@ function LinksDialog({ product, onClose }: any) {
     const cleaned = cleanShopUrl(url);
     if (cleaned !== url) {
       setUrl(cleaned);
+      setUrlError(validateUrl(cleaned));
       toast.success("URL cleaned");
     } else {
       toast.info("URL already clean");
@@ -543,6 +544,8 @@ function LinksDialog({ product, onClose }: any) {
   const add = useMutation({
     mutationFn: () => {
       const finalUrl = cleanShopUrl(url);
+      const err = validateUrl(finalUrl);
+      if (err) throw new Error(err);
       if (selectedNetwork && !urlMatchesNetwork(finalUrl, selectedNetwork.slug)) {
         throw new Error(`URL host does not match ${selectedNetwork.name}.`);
       }
@@ -550,7 +553,7 @@ function LinksDialog({ product, onClose }: any) {
     },
     onSuccess: () => {
       toast.success("Link saved");
-      setUrl(""); setNetworkId(""); setTouchedNetwork(false);
+      setUrl(""); setNetworkId(""); setTouchedNetwork(false); setUrlError("");
       qc.invalidateQueries({ queryKey: ["admin-product-links", product.id] });
     },
     onError: (e: any) => toast.error(e.message),
