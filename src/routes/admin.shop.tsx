@@ -545,7 +545,7 @@ function LinksDialog({ product, onClose }: any) {
 
   return (
     <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-xl w-[calc(100vw-1rem)] p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+      <DialogContent className="inset-0 h-dvh w-screen max-w-none translate-x-0 translate-y-0 rounded-none p-4 sm:inset-auto sm:left-[50%] sm:top-[50%] sm:h-auto sm:max-h-[90dvh] sm:w-[calc(100vw-2rem)] sm:max-w-xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:p-6 overflow-y-auto">
         <DialogHeader><DialogTitle className="truncate">Outbound links — {product.title}</DialogTitle></DialogHeader>
         <div className="space-y-3">
           {(data?.links ?? []).map((l: any) => (
