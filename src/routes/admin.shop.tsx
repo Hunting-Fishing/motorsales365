@@ -496,6 +496,7 @@ function LinksDialog({ product, onClose }: any) {
   const [networkId, setNetworkId] = useState<string>("");
   const [url, setUrl] = useState("");
   const [touchedNetwork, setTouchedNetwork] = useState(false);
+  const [urlError, setUrlError] = useState("");
 
   const networks = (netData?.networks ?? []) as any[];
   const activeNetworks = networks.filter((n) => n.active);
