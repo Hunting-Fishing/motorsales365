@@ -904,13 +904,15 @@ function FitmentDialog({ product, onClose }: any) {
               />
             </div>
           </div>
-          <Button onClick={() => add.mutate()} disabled={add.isPending} size="sm">
-            {add.isPending ? "Saving…" : "Add fitment"}
-          </Button>
         </div>
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose}>Close</Button>
-        </DialogFooter>
+        <div className="sticky bottom-0 -mx-6 px-6 border-t bg-background/95 backdrop-blur pt-3 pb-1 sm:pt-4">
+          <DialogFooter className="flex-col-reverse gap-2 sm:flex-row">
+            <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">Close</Button>
+            <Button onClick={() => add.mutate()} disabled={add.isPending} className="w-full sm:w-auto">
+              {add.isPending ? "Saving…" : "Add fitment"}
+            </Button>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
