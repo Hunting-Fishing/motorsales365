@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { Search, ArrowRightLeft } from "lucide-react";
+import { Search, ArrowRightLeft, ShieldCheck, ShieldAlert } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { searchTransferableUsers } from "@/lib/admin-users.functions";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
@@ -23,6 +26,8 @@ type ProfileHit = {
   full_name: string | null;
   business_name: string | null;
   signup_intent: string | null;
+  email: string | null;
+  email_confirmed_at: string | null;
 };
 
 export function TransferBusinessOwnerDialog({
@@ -33,6 +38,8 @@ export function TransferBusinessOwnerDialog({
   const [results, setResults] = useState<ProfileHit[]>([]);
   const [selected, setSelected] = useState<ProfileHit | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [includeUnverified, setIncludeUnverified] = useState(false);
+  const runSearch = useServerFn(searchTransferableUsers);
 
   const reset = () => {
     setQuery(""); setResults([]); setSelected(null);
@@ -43,28 +50,13 @@ export function TransferBusinessOwnerDialog({
     if (!q) return;
     setSearching(true);
     setSelected(null);
-
-    // If query looks like a UUID, fetch by id directly
-    const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    let data: ProfileHit[] | null = null;
-    if (uuidRe.test(q)) {
-      const { data: d, error } = await (supabase as any)
-        .from("profiles")
-        .select("id,full_name,business_name,signup_intent")
-        .eq("id", q)
-        .limit(1);
-      if (error) toast.error(error.message);
-      data = d;
-    } else {
-      const { data: d, error } = await (supabase as any)
-        .from("profiles")
-        .select("id,full_name,business_name,signup_intent")
-        .or(`full_name.ilike.%${q}%,business_name.ilike.%${q}%`)
-        .limit(20);
-      if (error) toast.error(error.message);
-      data = d;
+    try {
+      const { rows } = await runSearch({ data: { query: q, includeUnverified } });
+      setResults(rows ?? []);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Search failed");
+      setResults([]);
     }
-    setResults(data ?? []);
     setSearching(false);
   };
 
@@ -112,6 +104,14 @@ export function TransferBusinessOwnerDialog({
           </Button>
         </div>
 
+        <label className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Checkbox
+            checked={includeUnverified}
+            onCheckedChange={(v) => setIncludeUnverified(!!v)}
+          />
+          Include unverified (email not confirmed) users
+        </label>
+
         <div className="max-h-72 overflow-auto rounded-md border">
           {results.length === 0 ? (
             <div className="p-3 text-center text-xs text-muted-foreground">
@@ -122,6 +122,7 @@ export function TransferBusinessOwnerDialog({
               {results.map((p) => {
                 const isCurrent = p.id === currentOwnerId;
                 const isSelected = selected?.id === p.id;
+                const verified = !!p.email_confirmed_at;
                 return (
                   <li
                     key={p.id}
@@ -129,11 +130,17 @@ export function TransferBusinessOwnerDialog({
                     onClick={() => setSelected(p)}
                   >
                     <div className="min-w-0">
-                      <div className="truncate text-sm font-medium">
+                      <div className="flex items-center gap-2 truncate text-sm font-medium">
                         {p.full_name || p.business_name || "(no name)"}
-                        {isCurrent && <Badge variant="secondary" className="ml-2">Current owner</Badge>}
+                        {verified ? (
+                          <Badge variant="secondary" className="gap-1"><ShieldCheck className="h-3 w-3" />Verified</Badge>
+                        ) : (
+                          <Badge variant="destructive" className="gap-1"><ShieldAlert className="h-3 w-3" />Unverified</Badge>
+                        )}
+                        {isCurrent && <Badge variant="secondary">Current owner</Badge>}
                       </div>
                       <div className="truncate text-xs text-muted-foreground">
+                        {p.email ? p.email + " · " : ""}
                         {p.business_name && p.full_name ? p.business_name + " · " : ""}
                         {p.signup_intent || "user"} · {p.id}
                       </div>
@@ -145,6 +152,7 @@ export function TransferBusinessOwnerDialog({
             </ul>
           )}
         </div>
+
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>Cancel</Button>

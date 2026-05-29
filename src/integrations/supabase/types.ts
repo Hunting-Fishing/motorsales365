@@ -4363,6 +4363,7 @@ export type Database = {
       can_manage_shop: { Args: { _user_id: string }; Returns: boolean }
       can_moderate: { Args: { _user_id: string }; Returns: boolean }
       can_support: { Args: { _user_id: string }; Returns: boolean }
+      cleanup_unverified_users: { Args: never; Returns: number }
       current_plan_tier: { Args: { _user_id: string }; Returns: string }
       delete_email: {
         Args: { message_id: number; queue_name: string }
