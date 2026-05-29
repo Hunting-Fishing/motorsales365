@@ -28,6 +28,9 @@ import { uploadWithRetry } from "@/lib/storage-upload";
 
 import { toast } from "sonner";
 import { ArrowLeft, Plus, Trash2, Upload, ExternalLink, Image as ImageIcon } from "lucide-react";
+import { WeekHoursEditor } from "@/components/business/hours-editor";
+import { isStructuredHours, emptyStructured, TZ, type StructuredHours, type WeekSchedule } from "@/lib/business-hours";
+
 
 export const Route = createFileRoute("/dashboard/businesses_/$id/edit")({
   component: EditBusinessPage,
