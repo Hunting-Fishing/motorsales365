@@ -181,7 +181,7 @@ function SignupPage() {
           full_name: fullName,
           first_name: firstName.trim(),
           last_name: lastName.trim(),
-          phone: phone.trim() || undefined,
+          phone: phoneE164 || undefined,
           business_name: isBusinessLike ? businessName.trim() : undefined,
           business_address: isBusinessLike ? (businessAddress.trim() || undefined) : undefined,
           business_kind: isBusinessLike ? (businessKind || undefined) : undefined,
