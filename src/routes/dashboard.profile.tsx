@@ -59,6 +59,30 @@ function ProfilePage() {
   const [otpSent, setOtpSent] = useState(false);
   const [phoneSubmitting, setPhoneSubmitting] = useState(false);
 
+  // Email change
+  const [newEmail, setNewEmail] = useState("");
+  const [emailSubmitting, setEmailSubmitting] = useState(false);
+
+  const requestEmailChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const target = newEmail.trim().toLowerCase();
+    if (!target || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(target)) {
+      return toast.error("Enter a valid email address.");
+    }
+    if (user && target === user.email?.toLowerCase()) {
+      return toast.error("That's already your current email.");
+    }
+    setEmailSubmitting(true);
+    const { error } = await supabase.auth.updateUser(
+      { email: target },
+      { emailRedirectTo: `${window.location.origin}/dashboard/profile` },
+    );
+    setEmailSubmitting(false);
+    if (error) return toast.error(error.message);
+    toast.success("Confirmation links sent to both your current and new email. Click both to complete the change.");
+    setNewEmail("");
+  };
+
   useEffect(() => {
     if (!user) return;
     supabase.from("profiles").select("*").eq("id", user.id).maybeSingle().then(({ data }) => {
@@ -261,6 +285,36 @@ function ProfilePage() {
           </>
         )}
         <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save profile"}</Button>
+      </div>
+
+      {/* Account email */}
+      <div className="mt-6 space-y-4 rounded-xl border border-border bg-card p-6">
+        <div>
+          <h2 className="font-display text-lg font-bold">Account email</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Your sign-in email. Changing it sends a confirmation link to both your current and new addresses — click both to complete.
+          </p>
+        </div>
+        <div>
+          <Label>Current email</Label>
+          <Input value={user?.email ?? ""} disabled readOnly />
+        </div>
+        <form onSubmit={requestEmailChange} className="space-y-3">
+          <div>
+            <Label htmlFor="new-email">New email</Label>
+            <Input
+              id="new-email"
+              type="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              value={newEmail}
+              onChange={(e) => setNewEmail(e.target.value)}
+            />
+          </div>
+          <Button type="submit" variant="secondary" disabled={emailSubmitting}>
+            {emailSubmitting ? "Sending…" : "Send confirmation links"}
+          </Button>
+        </form>
       </div>
 
       {/* Security: phone verification */}
