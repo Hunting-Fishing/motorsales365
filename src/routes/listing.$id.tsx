@@ -328,7 +328,7 @@ function ListingDetailPage() {
                 {[listing.city, listing.region].filter(Boolean).join(", ") || "Philippines"}
               </div>
             </div>
-            <div className="text-3xl font-bold text-primary md:text-4xl">{formatPHP(listing.price_php)}</div>
+            <ListingPrice pricePhp={listing.price_php} size="lg" />
           </div>
 
           {/* Engagement bar */}
