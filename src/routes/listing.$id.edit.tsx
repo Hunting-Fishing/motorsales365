@@ -72,7 +72,7 @@ function EditListingPage() {
     setCity(l.city ?? null);
     setBarangay(l.barangay ?? null);
     setCondition(l.condition ?? "Used");
-    setPhone(l.contact_phone ?? "");
+    { const p = parseE164(l.contact_phone ?? null); setPhoneIso(p.iso); setPhoneNational(p.national); }
     setAllowMessages(l.allow_messages);
 
     const { data: m } = await supabase
