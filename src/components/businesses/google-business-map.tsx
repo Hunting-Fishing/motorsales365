@@ -141,7 +141,7 @@ export function GoogleBusinessMap({
     valid.forEach((b) => {
       const color = colorForType(b.type_slug);
       const marker = L.marker([Number(b.lat), Number(b.lng)], {
-        icon: pinDivIcon(color, b.featured, b.highlighted),
+        icon: pinDivIcon(color, b.featured, b.highlighted, b.type_slug),
         title: b.name,
         zIndexOffset: b.highlighted ? 1000 : b.featured ? 500 : 0,
       }).addTo(map);
