@@ -2225,6 +2225,7 @@ export type Database = {
           business_lng: number | null
           business_logo_url: string | null
           business_name: string | null
+          business_postal_code: string | null
           business_province: string | null
           business_region: string | null
           created_at: string
@@ -2243,11 +2244,13 @@ export type Database = {
           phone: string | null
           phone_e164: string | null
           phone_verified_at: string | null
+          postal_code: string | null
           seller_type: Database["public"]["Enums"]["seller_type"]
           signup_city: string | null
           signup_intent: string | null
           signup_province: string | null
           signup_region: string | null
+          street_address: string | null
           updated_at: string
           verification_status: Database["public"]["Enums"]["verification_status"]
           verified_at: string | null
@@ -2265,6 +2268,7 @@ export type Database = {
           business_lng?: number | null
           business_logo_url?: string | null
           business_name?: string | null
+          business_postal_code?: string | null
           business_province?: string | null
           business_region?: string | null
           created_at?: string
@@ -2283,11 +2287,13 @@ export type Database = {
           phone?: string | null
           phone_e164?: string | null
           phone_verified_at?: string | null
+          postal_code?: string | null
           seller_type?: Database["public"]["Enums"]["seller_type"]
           signup_city?: string | null
           signup_intent?: string | null
           signup_province?: string | null
           signup_region?: string | null
+          street_address?: string | null
           updated_at?: string
           verification_status?: Database["public"]["Enums"]["verification_status"]
           verified_at?: string | null
@@ -2305,6 +2311,7 @@ export type Database = {
           business_lng?: number | null
           business_logo_url?: string | null
           business_name?: string | null
+          business_postal_code?: string | null
           business_province?: string | null
           business_region?: string | null
           created_at?: string
@@ -2323,11 +2330,13 @@ export type Database = {
           phone?: string | null
           phone_e164?: string | null
           phone_verified_at?: string | null
+          postal_code?: string | null
           seller_type?: Database["public"]["Enums"]["seller_type"]
           signup_city?: string | null
           signup_intent?: string | null
           signup_province?: string | null
           signup_region?: string | null
+          street_address?: string | null
           updated_at?: string
           verification_status?: Database["public"]["Enums"]["verification_status"]
           verified_at?: string | null

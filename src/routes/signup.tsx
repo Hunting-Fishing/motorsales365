@@ -87,6 +87,9 @@ function SignupPage() {
   const [businessName, setBusinessName] = useState("");
   const [businessAddress, setBusinessAddress] = useState("");
   const [businessKind, setBusinessKind] = useState<string>("");
+  const [streetAddress, setStreetAddress] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [businessPostalCode, setBusinessPostalCode] = useState("");
   const [location, setLocation] = useState<LocationValue>({ region: null, province: null, city: null, barangay: null });
   const [refCode, setRefCode] = useState("");
   const [agreed, setAgreed] = useState(false);
@@ -161,6 +164,9 @@ function SignupPage() {
         business_name: isBusinessLike ? businessName.trim() || undefined : undefined,
         business_address: isBusinessLike ? businessAddress.trim() || undefined : undefined,
         business_kind: isBusinessLike ? businessKind || undefined : undefined,
+        street_address: streetAddress.trim() || undefined,
+        postal_code: postalCode.trim() || undefined,
+        business_postal_code: isBusinessLike ? businessPostalCode.trim() || undefined : undefined,
         region: location.region ?? undefined,
         province: location.province ?? undefined,
         city: location.city ?? undefined,
@@ -197,6 +203,8 @@ function SignupPage() {
           business_name: isBusinessLike ? businessName.trim() : undefined,
           business_address: isBusinessLike ? (businessAddress.trim() || undefined) : undefined,
           business_kind: isBusinessLike ? (businessKind || undefined) : undefined,
+          street_address: streetAddress.trim() || undefined,
+          postal_code: isBusinessLike ? (businessPostalCode.trim() || undefined) : (postalCode.trim() || undefined),
           signup_city: location.city ?? undefined,
           signup_region: location.region ?? undefined,
           signup_province: location.province ?? undefined,
@@ -322,6 +330,32 @@ function SignupPage() {
             {errorFor("city") && <p className="mt-1 text-xs text-destructive">{errorFor("city")}</p>}
           </div>
 
+          {!isBusinessLike && (
+            <div className="grid gap-4 sm:grid-cols-[1fr_180px]">
+              <div>
+                <Label htmlFor="street-address">Street address (optional)</Label>
+                <Input
+                  id="street-address"
+                  value={streetAddress}
+                  onChange={(e) => setStreetAddress(e.target.value)}
+                  placeholder="e.g. 123 Rizal Ave, Brgy. San Jose"
+                  autoComplete="street-address"
+                />
+              </div>
+              <div>
+                <Label htmlFor="postal-code">Postal / ZIP code</Label>
+                <Input
+                  id="postal-code"
+                  value={postalCode}
+                  onChange={(e) => setPostalCode(e.target.value)}
+                  placeholder="e.g. 1000"
+                  autoComplete="postal-code"
+                  inputMode="text"
+                />
+              </div>
+            </div>
+          )}
+
           {isBusinessLike && (
             <div className="space-y-4 rounded-xl border border-dashed border-border bg-muted/30 p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Business details</p>
@@ -359,19 +393,31 @@ function SignupPage() {
                 </div>
               </div>
 
-              <div>
-                <Label htmlFor="business-address">Street address (optional)</Label>
-                <Input
-                  id="business-address"
-                  value={businessAddress}
-                  onChange={(e) => setBusinessAddress(e.target.value)}
-                  placeholder="e.g. 123 Rizal Ave, Brgy. San Jose"
-                  autoComplete="street-address"
-                />
-                <p className="mt-1 text-xs text-muted-foreground">
-                  You can skip this for now, but your account won't go live or appear in the directory until a business address is saved.
-                </p>
+              <div className="grid gap-4 sm:grid-cols-[1fr_180px]">
+                <div>
+                  <Label htmlFor="business-address">Street address (optional)</Label>
+                  <Input
+                    id="business-address"
+                    value={businessAddress}
+                    onChange={(e) => setBusinessAddress(e.target.value)}
+                    placeholder="e.g. 123 Rizal Ave, Brgy. San Jose"
+                    autoComplete="street-address"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="business-postal">Postal / ZIP code</Label>
+                  <Input
+                    id="business-postal"
+                    value={businessPostalCode}
+                    onChange={(e) => setBusinessPostalCode(e.target.value)}
+                    placeholder="e.g. 1000"
+                    autoComplete="postal-code"
+                  />
+                </div>
               </div>
+              <p className="text-xs text-muted-foreground">
+                You can skip the street and postal for now, but your account won't go live or appear in the directory until a full business address is saved.
+              </p>
             </div>
           )}
 
