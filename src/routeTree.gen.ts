@@ -13,6 +13,7 @@ import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TowRouteImport } from './routes/tow'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SupportRouteImport } from './routes/support'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SellRouteImport } from './routes/sell'
@@ -136,6 +137,11 @@ const TowRoute = TowRouteImport.update({
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -688,6 +694,7 @@ export interface FileRoutesByFullPath {
   '/sell': typeof SellRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -796,6 +803,7 @@ export interface FileRoutesByTo {
   '/sell': typeof SellRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -906,6 +914,7 @@ export interface FileRoutesById {
   '/sell': typeof SellRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -1018,6 +1027,7 @@ export interface FileRouteTypes {
     | '/sell'
     | '/signup'
     | '/sitemap.xml'
+    | '/support'
     | '/terms'
     | '/tow'
     | '/unsubscribe'
@@ -1126,6 +1136,7 @@ export interface FileRouteTypes {
     | '/sell'
     | '/signup'
     | '/sitemap.xml'
+    | '/support'
     | '/terms'
     | '/tow'
     | '/unsubscribe'
@@ -1235,6 +1246,7 @@ export interface FileRouteTypes {
     | '/sell'
     | '/signup'
     | '/sitemap.xml'
+    | '/support'
     | '/terms'
     | '/tow'
     | '/unsubscribe'
@@ -1346,6 +1358,7 @@ export interface RootRouteChildren {
   SellRoute: typeof SellRouteWithChildren
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
   TowRoute: typeof TowRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
@@ -1416,6 +1429,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -2329,6 +2349,7 @@ const rootRouteChildren: RootRouteChildren = {
   SellRoute: SellRouteWithChildren,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
   TowRoute: TowRoute,
   UnsubscribeRoute: UnsubscribeRoute,
@@ -2373,13 +2394,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
