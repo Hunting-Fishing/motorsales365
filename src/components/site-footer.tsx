@@ -54,6 +54,7 @@ export function SiteFooter() {
       links: [
         { to: "/about", label: "About" },
         { to: "/contact", label: "Contact" },
+        { to: "/support", label: "Help & Support" },
         { to: "/advertise", label: "Advertise / buy ad space" },
         ...(referralCode ? [{ to: "/my-qr", label: "My QR Code" }] : []),
       ],
