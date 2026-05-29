@@ -220,7 +220,7 @@ function EditListingPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label>Contact phone</Label>
-                <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
+                <PhoneInput iso={phoneIso} national={phoneNational} onChange={({ iso, national }) => { setPhoneIso(iso); setPhoneNational(national); }} />
               </div>
               <div className="flex items-center gap-2 pt-6">
                 <input
