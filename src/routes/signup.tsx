@@ -21,6 +21,8 @@ import { SiteLayout } from "@/components/site-layout";
 import { getCreditedCode } from "@/lib/referral";
 import { AccountTypeGrid, SIGNUP_TYPES, type SignupIntent } from "@/components/signup/account-type-grid";
 import { LocationPicker, type LocationValue } from "@/components/location-picker";
+import { PhoneInput } from "@/components/phone-input";
+import { buildE164 } from "@/data/country-codes";
 
 type SignupSearch = { type?: SignupIntent };
 
