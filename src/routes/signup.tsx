@@ -42,16 +42,28 @@ const POST_SIGNUP_ROUTE: Record<SignupIntent, string> = {
   service_provider: "/businesses/submit",
 };
 
-const BUSINESS_KIND_OPTIONS: { value: string; label: string; forIntent?: SignupIntent }[] = [
-  { value: "dealer", label: "Dealership / Showroom", forIntent: "business" },
-  { value: "parts_shop", label: "Parts shop", forIntent: "service_provider" },
-  { value: "rental", label: "Rental", forIntent: "business" },
-  { value: "repair_shop", label: "Repair shop", forIntent: "service_provider" },
-  { value: "towing", label: "Towing", forIntent: "service_provider" },
-  { value: "body_shop", label: "Body shop", forIntent: "service_provider" },
-  { value: "carwash", label: "Carwash / detailing", forIntent: "service_provider" },
-  { value: "salvage", label: "Salvage yard", forIntent: "service_provider" },
+// All business / service categories are selectable regardless of the high-level
+// intent (Business vs Service provider). Admins can re-categorize later if needed.
+const BUSINESS_KIND_OPTIONS: { value: string; label: string }[] = [
+  { value: "dealer", label: "Dealership / Showroom" },
+  { value: "rental", label: "Vehicle rental" },
+  { value: "parts_shop", label: "Parts supplier / shop" },
+  { value: "repair_shop", label: "Repair shop / mechanic" },
+  { value: "body_shop", label: "Body shop / paint" },
+  { value: "tire_shop", label: "Tire shop / wheels" },
+  { value: "battery_shop", label: "Battery shop" },
+  { value: "towing", label: "Tow / roadside assistance" },
+  { value: "fuel_station", label: "Fuel station" },
+  { value: "carwash", label: "Carwash / detailing" },
+  { value: "salvage", label: "Salvage yard / scrap" },
+  { value: "accessories", label: "Accessories / customization" },
+  { value: "audio_tint", label: "Audio / window tint" },
+  { value: "inspection", label: "Inspection / emissions" },
+  { value: "driving_school", label: "Driving school" },
+  { value: "lto_services", label: "LTO / registration services" },
   { value: "insurance", label: "Insurance" },
+  { value: "financing", label: "Financing / loans" },
+  { value: "transport", label: "Transport / logistics" },
   { value: "corporate", label: "Corporate / fleet" },
   { value: "other", label: "Other" },
 ];
@@ -88,8 +100,8 @@ function SignupPage() {
   const isBusinessLike = intent === "business" || intent === "service_provider";
   const intentMeta = useMemo(() => SIGNUP_TYPES.find((s) => s.id === intent), [intent]);
   const kindOptions = useMemo(
-    () => BUSINESS_KIND_OPTIONS.filter((o) => !o.forIntent || o.forIntent === intent),
-    [intent],
+    () => BUSINESS_KIND_OPTIONS,
+    [],
   );
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
