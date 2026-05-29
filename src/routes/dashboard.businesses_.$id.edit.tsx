@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
@@ -86,6 +87,7 @@ function EditBusinessPage() {
       <Tabs defaultValue="profile" className="space-y-4">
         <TabsList className="flex w-full overflow-x-auto">
           <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsTrigger value="tags">Tags</TabsTrigger>
           <TabsTrigger value="services">Services ({data.services.length})</TabsTrigger>
           <TabsTrigger value="products">Products ({data.products.length})</TabsTrigger>
           <TabsTrigger value="posts">Posts ({data.posts.length})</TabsTrigger>
@@ -102,6 +104,9 @@ function EditBusinessPage() {
         <TabsContent value="profile">
           <ProfileTab biz={biz} userId={user.id} onSaved={refetch} />
         </TabsContent>
+        <TabsContent value="tags">
+          <TagsTab businessId={biz.id} typeSlug={biz.type_slug} />
+        </TabsContent>
         <TabsContent value="services">
           <ServicesTab businessId={biz.id} userId={user.id} services={data.services} onChange={refetch} />
         </TabsContent>
@@ -116,6 +121,160 @@ function EditBusinessPage() {
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+/* ---------------- TAGS ---------------- */
+
+type TagRow = { slug: string; label: string; type_slug: string | null; category: string | null; sort_order: number; is_popular: boolean };
+
+const CATEGORY_LABELS: Record<string, string> = {
+  fuel_grade: "Fuel grades / octane (RON & diesel)",
+  ev_charging: "EV charging",
+  station_services: "Station services & amenities",
+  vehicle_scope: "Vehicle scope",
+  service_mode: "Service mode",
+  other: "Other",
+};
+
+function prettyCategory(k: string | null) {
+  if (!k) return CATEGORY_LABELS.other;
+  return CATEGORY_LABELS[k] ?? k.split("_").map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
+}
+
+function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: string }) {
+  const [allTags, setAllTags] = useState<TagRow[]>([]);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      const [{ data: t }, { data: links }] = await Promise.all([
+        (supabase as any).from("business_tags")
+          .select("slug,label,type_slug,category,sort_order,is_popular")
+          .or(`type_slug.eq.${typeSlug},type_slug.is.null`)
+          .order("sort_order"),
+        (supabase as any).from("business_tag_links").select("tag_slug").eq("business_id", businessId),
+      ]);
+      if (cancelled) return;
+      setAllTags((t ?? []) as TagRow[]);
+      setSelected(new Set((links ?? []).map((l: any) => l.tag_slug)));
+      setLoading(false);
+    })();
+    return () => { cancelled = true; };
+  }, [businessId, typeSlug]);
+
+  const toggle = (slug: string) => {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(slug)) next.delete(slug); else next.add(slug);
+      return next;
+    });
+  };
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const { error: delErr } = await (supabase as any)
+        .from("business_tag_links").delete().eq("business_id", businessId);
+      if (delErr) throw new Error(delErr.message);
+      const rows = Array.from(selected).map((tag_slug) => ({ business_id: businessId, tag_slug }));
+      if (rows.length > 0) {
+        const { error: insErr } = await (supabase as any).from("business_tag_links").insert(rows);
+        if (insErr) throw new Error(insErr.message);
+      }
+      toast.success("Tags saved");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Save failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) return <Card className="p-6 text-sm text-muted-foreground">Loading tags…</Card>;
+
+  if (allTags.length === 0) {
+    return <Card className="p-6 text-sm text-muted-foreground">No tags available for this business type yet.</Card>;
+  }
+
+  const grouped: Record<string, TagRow[]> = {};
+  for (const t of allTags) {
+    const key = t.category ?? "other";
+    (grouped[key] = grouped[key] ?? []).push(t);
+  }
+  const ORDER = ["fuel_grade", "ev_charging", "station_services"];
+  const groupKeys = Object.keys(grouped).sort((a, b) => {
+    const ai = ORDER.indexOf(a); const bi = ORDER.indexOf(b);
+    if (ai !== -1 || bi !== -1) return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    return a.localeCompare(b);
+  });
+
+  return (
+    <Card className="space-y-5 p-4 md:p-5">
+      <div>
+        <h2 className="font-display text-lg font-semibold">Tags</h2>
+        <p className="text-sm text-muted-foreground">
+          Pick what your station offers — fuel grades (91/95/97/100 RON), diesel types,
+          EV charging connectors, and amenities. These show as filterable badges on your public page.
+        </p>
+      </div>
+
+      {selected.size > 0 && (
+        <div className="rounded-lg border border-border bg-secondary/40 p-3">
+          <div className="mb-2 text-xs font-medium text-muted-foreground">{selected.size} selected</div>
+          <div className="flex flex-wrap gap-1.5">
+            {Array.from(selected).map((s) => {
+              const t = allTags.find((x) => x.slug === s);
+              if (!t) return null;
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => toggle(s)}
+                  className="inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-xs font-medium text-primary-foreground hover:bg-primary/90"
+                >
+                  {t.label} ×
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {groupKeys.map((k) => (
+        <div key={k}>
+          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            {prettyCategory(k)}
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {grouped[k].map((t) => {
+              const active = selected.has(t.slug);
+              return (
+                <button
+                  key={t.slug}
+                  type="button"
+                  onClick={() => toggle(t.slug)}
+                  className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                    active
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                  }`}
+                >
+                  {t.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+
+      <div className="flex justify-end">
+        <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save tags"}</Button>
+      </div>
+    </Card>
   );
 }
 
