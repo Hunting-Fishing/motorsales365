@@ -25,9 +25,34 @@ const isTouchDevice = () =>
   typeof window !== "undefined" &&
   (("ontouchstart" in window) || (navigator.maxTouchPoints ?? 0) > 0);
 
-function pinDivIcon(color: string, featured: boolean, highlighted = false): L.DivIcon {
+function pinDivIcon(color: string, featured: boolean, highlighted = false, typeSlug?: string): L.DivIcon {
   const touchBoost = isTouchDevice() ? 1.2 : 1;
   const scale = (highlighted ? 1.6 : featured ? 1.4 : 1.1) * touchBoost;
+
+  // Fuel-station: render a fuel-pump badge instead of the generic teardrop.
+  if (typeSlug === "fuel_station") {
+    const size = 34 * scale;
+    const stroke = highlighted ? "#0ea5e9" : "#ffffff";
+    const strokeW = highlighted ? 3 : 2;
+    // Inlined Lucide "fuel" path, white on colored circle.
+    const html = `
+      <div style="position:relative;width:${size}px;height:${size}px;display:flex;align-items:center;justify-content:center;border-radius:9999px;background:${color};border:${strokeW}px solid ${stroke};box-shadow:0 2px 4px rgba(0,0,0,0.35)">
+        <svg xmlns="http://www.w3.org/2000/svg" width="${size * 0.6}" height="${size * 0.6}" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="22" x2="15" y2="22"/>
+          <line x1="4" y1="9" x2="14" y2="9"/>
+          <path d="M14 22V4a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v18"/>
+          <path d="M14 13h2a2 2 0 0 1 2 2v2a2 2 0 0 0 2 2a2 2 0 0 0 2-2V9.83a2 2 0 0 0-.59-1.42L18 5"/>
+        </svg>
+      </div>`;
+    return L.divIcon({
+      html,
+      className: "lovable-map-pin",
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size / 2],
+      popupAnchor: [0, -size / 2 + 4],
+    });
+  }
+
   const w = 24 * scale;
   const h = 34 * scale;
   const stroke = highlighted ? "#0ea5e9" : "#ffffff";
