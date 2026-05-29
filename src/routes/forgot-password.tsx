@@ -36,8 +36,8 @@ function ForgotPasswordPage() {
 
   const handleSendSmsOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    const e164 = normalizePhPhone(phone);
-    if (!e164) return toast.error("Enter a valid PH phone number (e.g. 0917...)");
+    const e164 = buildE164(phoneIso, phoneNational);
+    if (!e164) return toast.error("Enter a valid mobile number");
     setSubmitting(true);
     const { error } = await supabase.auth.signInWithOtp({ phone: e164 });
     setSubmitting(false);
@@ -48,7 +48,7 @@ function ForgotPasswordPage() {
 
   const handleVerifySmsOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    const e164 = normalizePhPhone(phone);
+    const e164 = buildE164(phoneIso, phoneNational);
     if (!e164) return;
     setSubmitting(true);
     const { error } = await supabase.auth.verifyOtp({ phone: e164, token: otp, type: "sms" });
