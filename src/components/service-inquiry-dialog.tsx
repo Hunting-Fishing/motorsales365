@@ -187,12 +187,15 @@ export function ServiceInquiryDialog({
           </div>
           <div>
             <Label htmlFor="si-phone">Phone (optional)</Label>
-            <Input
+            <PhoneInput
               id="si-phone"
-              type="tel"
-              maxLength={30}
-              value={form.phone}
-              onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+              iso={phoneIso}
+              national={phoneNational}
+              onChange={({ iso, national }) => {
+                setPhoneIso(iso);
+                setPhoneNational(national);
+                setForm((f) => ({ ...f, phone: buildE164(iso, national) ?? "" }));
+              }}
             />
           </div>
           <div>
