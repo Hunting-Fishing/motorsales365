@@ -31,7 +31,7 @@ export function InquiryForm({ businessId, businessName }: { businessId: string; 
         data: {
           businessId,
           name: name.trim(),
-          phone: phone.trim() || null,
+          phone: buildE164(phoneIso, phoneNational) ?? null,
           email: email.trim() || null,
           message: message.trim(),
         },
