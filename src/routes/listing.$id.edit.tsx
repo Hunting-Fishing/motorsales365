@@ -103,7 +103,7 @@ function EditListingPage() {
         city,
         barangay,
         condition,
-        contact_phone: phone || null,
+        contact_phone: buildE164(phoneIso, phoneNational) ?? null,
         allow_messages: allowMessages,
       })
       .eq("id", id);
