@@ -116,7 +116,7 @@ function SignupPage() {
     else if (password.length < 8) list.push({ field: "password", label: "Password", message: "Password must be at least 8 characters." });
     if (!agreed) list.push({ field: "terms", label: "Terms", message: "Agree to the Terms and Privacy Policy to continue." });
     return list;
-  }, [intent, firstName, lastName, email, emailValid, phone, phoneValid, location.city, isBusinessLike, businessName, businessKind, password, agreed]);
+  }, [intent, firstName, lastName, email, emailValid, phoneNational, phoneValid, location.city, isBusinessLike, businessName, businessKind, password, agreed]);
 
   const errorFor = (field: string) => {
     if (!submitAttempted && !touched[field]) return null;
