@@ -270,20 +270,17 @@ function VerificationPage() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <Label>Contact phone</Label>
-            {(() => {
-              const parsed = parseE164(form.contact_phone || null);
-              return (
-                <PhoneInput
-                  iso={parsed.iso}
-                  national={parsed.national}
-                  disabled={!canEdit}
-                  onChange={({ iso, national }) => {
-                    const e164 = buildE164(iso, national);
-                    setForm({ ...form, contact_phone: e164 ?? (national ? `${iso}:${national}` : "") });
-                  }}
-                />
-              );
-            })()}
+            <PhoneInput
+              iso={phoneIso}
+              national={phoneNational}
+              disabled={!canEdit}
+              onChange={({ iso, national }) => {
+                setPhoneIso(iso);
+                setPhoneNational(national);
+                const e164 = buildE164(iso, national);
+                setForm((f) => ({ ...f, contact_phone: e164 ?? "" }));
+              }}
+            />
           </div>
           <div>
             <Label>Contact email</Label>
