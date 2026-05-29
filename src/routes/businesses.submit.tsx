@@ -313,6 +313,37 @@ function SubmitBusinessPage() {
           </div>
 
           <div>
+            <Label>Business logo / avatar</Label>
+            <p className="mb-2 text-xs text-muted-foreground">Square works best. PNG or JPG, up to 5MB.</p>
+            <div className="flex items-center gap-3">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-muted">
+                {logoUrl ? (
+                  <img src={logoUrl} alt="Logo preview" className="h-full w-full object-cover" />
+                ) : (
+                  <ImageIconFallback />
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-secondary">
+                  <Upload className="h-3.5 w-3.5" />
+                  {logoUploading ? "Uploading…" : logoUrl ? "Replace logo" : "Upload logo"}
+                  <input type="file" accept="image/*" className="hidden" onChange={onLogoChange} disabled={logoUploading} />
+                </label>
+                {logoUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setLogoUrl(null)}
+                    className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-secondary"
+                  >
+                    <X className="h-3.5 w-3.5" /> Remove
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+
+          <div>
             <div className="mb-1 flex items-center justify-between gap-2">
               <Label>Business type *</Label>
               <Dialog open={suggestOpen} onOpenChange={setSuggestOpen}>
