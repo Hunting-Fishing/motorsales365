@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
-import { Search, Upload, X } from "lucide-react";
+import { Search, Upload, X, Image as ImageIcon } from "lucide-react";
 import { LocationDrilldown, type LocationValue } from "@/components/businesses/location-drilldown";
 import { LocationPicker } from "@/components/businesses/location-picker";
 import { resolvePsgc } from "@/lib/psgc";
