@@ -303,6 +303,33 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
   );
 }
 
+function AddCustomTagInline({ category, onAdd }: { category: string; onAdd: (label: string) => Promise<void> | void }) {
+  const [val, setVal] = useState("");
+  const [busy, setBusy] = useState(false);
+  const submit = async () => {
+    if (!val.trim()) return;
+    setBusy(true);
+    try { await onAdd(val); setVal(""); } finally { setBusy(false); }
+  };
+  return (
+    <div className="mt-2 flex gap-1.5">
+      <Input
+        value={val}
+        onChange={(e) => setVal(e.target.value)}
+        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); submit(); } }}
+        placeholder={`Add a ${prettyCategory(category).toLowerCase()} tag…`}
+        className="h-8 max-w-xs text-xs"
+        maxLength={40}
+      />
+      <Button type="button" size="sm" variant="outline" onClick={submit} disabled={busy || val.trim().length < 2}>
+        <Plus className="mr-1 h-3 w-3" />Add
+      </Button>
+    </div>
+  );
+}
+
+
+
 /* ---------------- PROFILE ---------------- */
 
 function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSaved: () => void }) {
