@@ -109,6 +109,10 @@ function EditBusinessPage() {
         <TabsContent value="tags">
           <TagsTab businessId={biz.id} typeSlug={biz.type_slug} />
         </TabsContent>
+        <TabsContent value="hours">
+          <HoursTab biz={biz} onSaved={refetch} />
+        </TabsContent>
+
         <TabsContent value="services">
           <ServicesTab businessId={biz.id} userId={user.id} services={data.services} onChange={refetch} />
         </TabsContent>
