@@ -247,7 +247,7 @@ function SubmitBusinessPage() {
       owner_id: user.id, slug, name: name.trim(), type_slug: typeSlug,
       description: description.trim() || null,
       logo_url: logoUrl,
-      phone: phone.trim() || null, email: email.trim() || null,
+      phone: buildE164(phoneIso, phoneNational) ?? null, email: email.trim() || null,
       website: website.trim() || null, messenger_url: messengerUrl.trim() || null,
       street_address: streetAddress.trim() || null,
       region: loc.region, province: loc.province, city: loc.city, barangay: loc.barangay,
