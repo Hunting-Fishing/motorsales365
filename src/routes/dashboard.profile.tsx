@@ -59,6 +59,30 @@ function ProfilePage() {
   const [otpSent, setOtpSent] = useState(false);
   const [phoneSubmitting, setPhoneSubmitting] = useState(false);
 
+  // Email change
+  const [newEmail, setNewEmail] = useState("");
+  const [emailSubmitting, setEmailSubmitting] = useState(false);
+
+  const requestEmailChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const target = newEmail.trim().toLowerCase();
+    if (!target || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(target)) {
+      return toast.error("Enter a valid email address.");
+    }
+    if (user && target === user.email?.toLowerCase()) {
+      return toast.error("That's already your current email.");
+    }
+    setEmailSubmitting(true);
+    const { error } = await supabase.auth.updateUser(
+      { email: target },
+      { emailRedirectTo: `${window.location.origin}/dashboard/profile` },
+    );
+    setEmailSubmitting(false);
+    if (error) return toast.error(error.message);
+    toast.success("Confirmation links sent to both your current and new email. Click both to complete the change.");
+    setNewEmail("");
+  };
+
   useEffect(() => {
     if (!user) return;
     supabase.from("profiles").select("*").eq("id", user.id).maybeSingle().then(({ data }) => {
