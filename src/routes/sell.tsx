@@ -119,6 +119,8 @@ function SellPage() {
   const [barangay, setBarangay] = useState<string | null>(null);
   const [condition, setCondition] = useState("Used");
   const [phone, setPhone] = useState("");
+  const [phoneIso, setPhoneIso] = useState("PH");
+  const [phoneNational, setPhoneNational] = useState("");
   const [sellerType, setSellerType] = useState<"private" | "business">(
     effectiveSellerType === "private" ? "private" : "business",
   );
