@@ -20,6 +20,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { formatPHP, formatDate } from "@/lib/format";
+import { ListingPrice } from "@/components/listing-price";
 import placeholderCar from "@/assets/placeholder-car.webp";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ListingQr } from "@/components/listing-qr";
