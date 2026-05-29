@@ -597,7 +597,16 @@ function SellPage() {
               </div>
               <div>
                 <Label htmlFor="phone">Contact phone (optional)</Label>
-                <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+63 9XX XXX XXXX" />
+                <PhoneInput
+                  id="phone"
+                  iso={phoneIso}
+                  national={phoneNational}
+                  onChange={({ iso, national }) => {
+                    setPhoneIso(iso);
+                    setPhoneNational(national);
+                    setPhone(buildE164(iso, national) ?? "");
+                  }}
+                />
               </div>
             </div>
           </section>
