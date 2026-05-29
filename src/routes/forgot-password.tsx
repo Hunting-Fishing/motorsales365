@@ -86,8 +86,13 @@ function ForgotPasswordPage() {
             {!otpStep ? (
               <form onSubmit={handleSendSmsOtp} className="space-y-4">
                 <div>
-                  <Label htmlFor="phone">PH mobile number</Label>
-                  <Input id="phone" placeholder="09XX XXX XXXX" required value={phone} onChange={(e) => setPhone(e.target.value)} />
+                  <Label htmlFor="phone">Mobile number</Label>
+                  <PhoneInput
+                    id="phone"
+                    iso={phoneIso}
+                    national={phoneNational}
+                    onChange={({ iso, national }) => { setPhoneIso(iso); setPhoneNational(national); }}
+                  />
                   <p className="mt-1 text-xs text-muted-foreground">Must be a phone you've already added to your account.</p>
                 </div>
                 <Button type="submit" disabled={submitting} className="w-full">
