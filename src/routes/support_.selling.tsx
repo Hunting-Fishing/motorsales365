@@ -8,7 +8,7 @@ import pricingShot from "@/assets/support/pricing.png";
 const TITLE = "Selling & boosting";
 const DESC = "Post a listing in minutes and boost it for more reach. Pricing, photo tips and step-by-step instructions.";
 
-export const Route = createFileRoute("/support/selling")({
+export const Route = createFileRoute("/support_/selling")({
   component: SellingSupport,
   head: () => ({
     meta: [

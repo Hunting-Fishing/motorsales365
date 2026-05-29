@@ -8,7 +8,7 @@ import browseShot from "@/assets/support/browse.png";
 const TITLE = "Buying a vehicle";
 const DESC = "How to search, filter, and contact sellers safely on 365 MotorSales Philippines.";
 
-export const Route = createFileRoute("/support/buying")({
+export const Route = createFileRoute("/support_/buying")({
   component: BuyingSupport,
   head: () => ({
     meta: [
