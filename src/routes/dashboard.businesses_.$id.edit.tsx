@@ -975,3 +975,75 @@ function InquiriesTab({
     </div>
   );
 }
+
+/* ---------------- HOURS ---------------- */
+
+function HoursTab({ biz, onSaved }: { biz: any; onSaved: () => void }) {
+  const initial = isStructuredHours(biz.hours) ? (biz.hours as StructuredHours) : emptyStructured();
+  const [primary, setPrimary] = useState<WeekSchedule>(initial.primary);
+  const [store, setStore] = useState<WeekSchedule | null>(initial.store ?? null);
+  const [saving, setSaving] = useState(false);
+  const showStoreToggle = biz.type_slug === "fuel_station";
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      const payload: StructuredHours = { tz: TZ, primary, ...(store ? { store } : {}) };
+      const { error } = await (supabase as any).from("businesses").update({ hours: payload }).eq("id", biz.id);
+      if (error) throw new Error(error.message);
+      toast.success("Hours saved");
+      onSaved();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Save failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Card className="space-y-5 p-4 md:p-5">
+      <div>
+        <h2 className="font-display text-lg font-semibold">Hours</h2>
+        <p className="text-sm text-muted-foreground">
+          Times are in Asia/Manila. Visitors see an "Open now / Closing soon / Opening soon / Closed" badge automatically.
+        </p>
+      </div>
+
+      <div>
+        <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          {biz.type_slug === "fuel_station" ? "Pump / station hours" : "Business hours"}
+        </div>
+        <WeekHoursEditor value={primary} onChange={setPrimary} />
+      </div>
+
+      {showStoreToggle && (
+        <div>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={!!store}
+              onChange={(e) => setStore(e.target.checked ? (store ?? JSON.parse(JSON.stringify(primary))) : null)}
+            />
+            Convenience store / Sari-Sari Store has different hours
+          </label>
+          {store && (
+            <div className="mt-3 space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Store hours</div>
+                <Button type="button" size="sm" variant="ghost" onClick={() => setStore(JSON.parse(JSON.stringify(primary)))}>
+                  Copy from station
+                </Button>
+              </div>
+              <WeekHoursEditor value={store} onChange={setStore} />
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="flex justify-end">
+        <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save hours"}</Button>
+      </div>
+    </Card>
+  );
+}
+
