@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/select";
 import { formatDate } from "@/lib/format";
 import { LocationPicker } from "@/components/location-picker";
+import { PhoneInput } from "@/components/phone-input";
+import { parseE164, buildE164 } from "@/data/country-codes";
 
 export const Route = createFileRoute("/dashboard/verification")({
   component: VerificationPage,
