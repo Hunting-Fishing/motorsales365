@@ -288,6 +288,10 @@ function ProfilePage() {
         <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save profile"}</Button>
       </div>
 
+      <CurrencyPreferenceCard />
+
+
+
       {/* Account email */}
       <div className="mt-6 space-y-4 rounded-xl border border-border bg-card p-6">
         <div>
