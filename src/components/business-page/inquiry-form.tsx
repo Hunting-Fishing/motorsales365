@@ -66,12 +66,11 @@ export function InquiryForm({ businessId, businessName }: { businessId: string; 
           className="h-11 text-base"
           required
         />
-        <Input
+        <PhoneInput
+          iso={phoneIso}
+          national={phoneNational}
+          onChange={({ iso, national }) => { setPhoneIso(iso); setPhoneNational(national); }}
           placeholder="Phone (optional)"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          maxLength={40}
-          className="h-11 text-base"
         />
       </div>
       <Input
