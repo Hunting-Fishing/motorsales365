@@ -145,7 +145,7 @@ function SignupPage() {
         full_name: fullName || undefined,
         first_name: firstName.trim() || undefined,
         last_name: lastName.trim() || undefined,
-        phone: phone.trim() || undefined,
+        phone: phoneE164 || undefined,
         business_name: isBusinessLike ? businessName.trim() || undefined : undefined,
         business_address: isBusinessLike ? businessAddress.trim() || undefined : undefined,
         business_kind: isBusinessLike ? businessKind || undefined : undefined,
