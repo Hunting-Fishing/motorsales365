@@ -104,6 +104,14 @@ export function TransferBusinessOwnerDialog({
           </Button>
         </div>
 
+        <label className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Checkbox
+            checked={includeUnverified}
+            onCheckedChange={(v) => setIncludeUnverified(!!v)}
+          />
+          Include unverified (email not confirmed) users
+        </label>
+
         <div className="max-h-72 overflow-auto rounded-md border">
           {results.length === 0 ? (
             <div className="p-3 text-center text-xs text-muted-foreground">
@@ -114,6 +122,7 @@ export function TransferBusinessOwnerDialog({
               {results.map((p) => {
                 const isCurrent = p.id === currentOwnerId;
                 const isSelected = selected?.id === p.id;
+                const verified = !!p.email_confirmed_at;
                 return (
                   <li
                     key={p.id}
@@ -121,11 +130,17 @@ export function TransferBusinessOwnerDialog({
                     onClick={() => setSelected(p)}
                   >
                     <div className="min-w-0">
-                      <div className="truncate text-sm font-medium">
+                      <div className="flex items-center gap-2 truncate text-sm font-medium">
                         {p.full_name || p.business_name || "(no name)"}
-                        {isCurrent && <Badge variant="secondary" className="ml-2">Current owner</Badge>}
+                        {verified ? (
+                          <Badge variant="secondary" className="gap-1"><ShieldCheck className="h-3 w-3" />Verified</Badge>
+                        ) : (
+                          <Badge variant="destructive" className="gap-1"><ShieldAlert className="h-3 w-3" />Unverified</Badge>
+                        )}
+                        {isCurrent && <Badge variant="secondary">Current owner</Badge>}
                       </div>
                       <div className="truncate text-xs text-muted-foreground">
+                        {p.email ? p.email + " · " : ""}
                         {p.business_name && p.full_name ? p.business_name + " · " : ""}
                         {p.signup_intent || "user"} · {p.id}
                       </div>
@@ -137,6 +152,7 @@ export function TransferBusinessOwnerDialog({
             </ul>
           )}
         </div>
+
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>Cancel</Button>
