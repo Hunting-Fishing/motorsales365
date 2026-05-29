@@ -49,7 +49,8 @@ function SubmitBusinessPage() {
   const [name, setName] = useState("");
   const [typeSlug, setTypeSlug] = useState<string>("");
   const [description, setDescription] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phoneIso, setPhoneIso] = useState("PH");
+  const [phoneNational, setPhoneNational] = useState("");
   const [email, setEmail] = useState("");
   const [website, setWebsite] = useState("");
   const [messengerUrl, setMessengerUrl] = useState("");
