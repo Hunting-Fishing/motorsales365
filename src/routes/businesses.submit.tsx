@@ -18,6 +18,8 @@ import { uploadWithRetry } from "@/lib/storage-upload";
 import { toast } from "sonner";
 import { useDynamicMeta } from "@/hooks/use-dynamic-meta";
 import { useDynamicJsonLd } from "@/hooks/use-dynamic-jsonld";
+import { PhoneInput } from "@/components/phone-input";
+import { buildE164 } from "@/data/country-codes";
 
 export const Route = createFileRoute("/businesses/submit")({
   head: () => ({
