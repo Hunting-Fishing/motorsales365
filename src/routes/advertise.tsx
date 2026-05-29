@@ -69,6 +69,8 @@ function AdvertisePage() {
     start_date: "",
     message: "",
   });
+  const [phoneIso, setPhoneIso] = useState("PH");
+  const [phoneNational, setPhoneNational] = useState("");
 
   const update = (k: keyof typeof form, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
