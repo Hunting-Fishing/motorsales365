@@ -321,7 +321,6 @@ function SubmitBusinessPage() {
                   <img src={logoUrl} alt="Logo preview" className="h-full w-full object-cover" />
                 ) : (
                   <Search className="h-6 w-6 text-muted-foreground/40" />
-                  {/* visual fallback only */}
                 )}
               </div>
               <div className="flex flex-wrap gap-2">
