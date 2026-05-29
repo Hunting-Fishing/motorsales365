@@ -282,19 +282,13 @@ function BusinessProfilePage() {
                   <div className="mt-1 text-sm">{biz.brands_carried}</div>
                 </div>
               )}
-              {biz.hours && Object.keys(biz.hours).length > 0 && (
+              {biz.hours && (
                 <div className="mt-4">
                   <h3 className="mb-2 flex items-center gap-1 text-sm font-semibold"><Clock className="h-4 w-4" />Hours</h3>
-                  <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                    {Object.entries(biz.hours as Record<string, string>).map(([day, hrs]) => (
-                      <div key={day} className="contents">
-                        <dt className="text-muted-foreground capitalize">{day}</dt>
-                        <dd>{hrs}</dd>
-                      </div>
-                    ))}
-                  </dl>
+                  <BusinessHoursBlock hours={biz.hours} isFuelStation={biz.type_slug === "fuel_station"} />
                 </div>
               )}
+
             </Card>
             <div>
               <GoogleBusinessMap
