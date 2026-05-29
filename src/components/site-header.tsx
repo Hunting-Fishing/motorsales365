@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Menu, Plus, Heart, MessageSquare, LogOut, Shield, User as UserIcon, Eye, X, LogIn, UserPlus } from "lucide-react";
+import { Menu, Plus, Heart, MessageSquare, LogOut, Shield, User as UserIcon, Eye, X, LogIn, UserPlus, LifeBuoy } from "lucide-react";
 import { useAuth, type SellerType } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/brand-logo";
@@ -108,6 +108,11 @@ export function SiteHeader() {
           <div className="hidden sm:block">
             <CurrencySwitcher />
           </div>
+
+          {/* Help icon — desktop */}
+          <Button asChild variant="ghost" size="icon" className="hidden md:inline-flex h-9 w-9" aria-label="Help & support">
+            <Link to="/support"><LifeBuoy className="h-4 w-4" /></Link>
+          </Button>
 
           {/* Sell CTA — desktop only; mobile uses bottom tab bar */}
           <Button asChild className="hidden sm:inline-flex" variant="default">
