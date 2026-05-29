@@ -220,6 +220,11 @@ const serviceInput = z.object({
   photo_url: z.string().url().nullable().optional(),
   sort_order: z.number().int().optional(),
   active: z.boolean().optional(),
+  category: z.string().max(40).nullable().optional(),
+  unit: z.string().max(20).nullable().optional(),
+  price_php: z.number().nonnegative().nullable().optional(),
+  sale_price_php: z.number().nonnegative().nullable().optional(),
+  catalog_key: z.string().max(60).nullable().optional(),
 });
 
 export const upsertBusinessService = createServerFn({ method: "POST" })
