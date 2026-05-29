@@ -56,15 +56,8 @@ const BUSINESS_KIND_OPTIONS: { value: string; label: string; forIntent?: SignupI
   { value: "other", label: "Other" },
 ];
 
-function normalizePhPhone(raw: string): string | null {
-  const d = raw.replace(/[^0-9+]/g, "");
-  if (!d) return null;
-  if (d.startsWith("+")) return /^\+\d{8,15}$/.test(d) ? d : null;
-  if (/^09\d{9}$/.test(d)) return "+63" + d.slice(1);
-  if (/^9\d{9}$/.test(d)) return "+63" + d;
-  if (/^63\d{10}$/.test(d)) return "+" + d;
-  return null;
-}
+// Phone is now captured as { iso, national } via PhoneInput and normalized to
+// E.164 via buildE164 on submit.
 
 function SignupPage() {
   const { user, loading } = useAuth();
