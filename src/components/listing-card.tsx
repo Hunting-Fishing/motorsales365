@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { MapPin, Camera, Video, Star, Droplets, Wrench, Send, SprayCan, Recycle, Eye, Heart } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { VerifiedBadge } from "@/components/verified-badge";
-import { formatPHP } from "@/lib/format";
+import { ListingPrice } from "@/components/listing-price";
 import placeholderCar from "@/assets/placeholder-car.webp";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ServiceStrip } from "@/components/service-strip";
