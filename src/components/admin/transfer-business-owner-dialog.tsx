@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { Search, ArrowRightLeft } from "lucide-react";
+import { Search, ArrowRightLeft, ShieldCheck, ShieldAlert } from "lucide-react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
+import { searchTransferableUsers } from "@/lib/admin-users.functions";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
@@ -23,6 +26,8 @@ type ProfileHit = {
   full_name: string | null;
   business_name: string | null;
   signup_intent: string | null;
+  email: string | null;
+  email_confirmed_at: string | null;
 };
 
 export function TransferBusinessOwnerDialog({
@@ -33,6 +38,8 @@ export function TransferBusinessOwnerDialog({
   const [results, setResults] = useState<ProfileHit[]>([]);
   const [selected, setSelected] = useState<ProfileHit | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [includeUnverified, setIncludeUnverified] = useState(false);
+  const runSearch = useServerFn(searchTransferableUsers);
 
   const reset = () => {
     setQuery(""); setResults([]); setSelected(null);
@@ -43,28 +50,13 @@ export function TransferBusinessOwnerDialog({
     if (!q) return;
     setSearching(true);
     setSelected(null);
-
-    // If query looks like a UUID, fetch by id directly
-    const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    let data: ProfileHit[] | null = null;
-    if (uuidRe.test(q)) {
-      const { data: d, error } = await (supabase as any)
-        .from("profiles")
-        .select("id,full_name,business_name,signup_intent")
-        .eq("id", q)
-        .limit(1);
-      if (error) toast.error(error.message);
-      data = d;
-    } else {
-      const { data: d, error } = await (supabase as any)
-        .from("profiles")
-        .select("id,full_name,business_name,signup_intent")
-        .or(`full_name.ilike.%${q}%,business_name.ilike.%${q}%`)
-        .limit(20);
-      if (error) toast.error(error.message);
-      data = d;
+    try {
+      const { rows } = await runSearch({ data: { query: q, includeUnverified } });
+      setResults(rows ?? []);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Search failed");
+      setResults([]);
     }
-    setResults(data ?? []);
     setSearching(false);
   };
 
