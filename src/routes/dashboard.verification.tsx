@@ -67,6 +67,8 @@ function VerificationPage() {
     barangay: "",
   });
   const [docs, setDocs] = useState<DocItem[]>([]);
+  const [phoneIso, setPhoneIso] = useState("PH");
+  const [phoneNational, setPhoneNational] = useState("");
 
   const load = async () => {
     if (!user) return;
