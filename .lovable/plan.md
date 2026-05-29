@@ -1,62 +1,67 @@
 ## Goal
 
-Make the Tags tab for fuel stations cover everything a station actually sells or offers, and let owners add their own tags that grow the shared database — including "Sari-Sari Store".
+Give business owners a proper weekly Hours editor, show an "Open now / Closing soon / Opening soon / Closed" badge on the public page, and let fuel stations set a separate schedule for an on-site convenience / Sari-Sari store when it differs from pump hours.
 
-## 1. Expand the fuel-station tag catalog (migration, seeded into `business_tags`)
+## 1. Storage (no schema change)
 
-The current catalog has 37 tags across `fuel_grade`, `ev_charging`, `station_services`. We'll add many more, grouped:
+`businesses.hours` is already `jsonb`. Use a structured shape, backward-compatible with the existing free-text map:
 
-**fuel_grade** (add)
-- Premium 95 (e.g. XCS/Blaze 95), Premium 97/98, Racing 100 (Blaze 100), Standard Diesel, Premium Diesel (Diesel Max/Turbo Diesel/Diesel Xtra), Bio-Diesel B2, E85.
+```json
+{
+  "tz": "Asia/Manila",
+  "primary": {
+    "mon": { "mode": "open", "ranges": [{"open":"06:00","close":"22:00"}] },
+    "tue": { "mode": "24h" },
+    "sun": { "mode": "closed" }
+  },
+  "store": { "mon": { "mode":"open", "ranges":[{"open":"05:00","close":"23:00"}] }, ... }
+}
+```
 
-**station_services** (add)
-- Quick-serve food, Coffee bar, Fast-food tenant (Jollibee/McDo/etc.), Pharmacy, Seating area, Wi-Fi, Mobile load / e-load, Bills payment, Remittance, GCash cash-in, Package pickup (Lalamove/Grab drop), Parking, Truck parking, Diesel for trucks (high-flow), Motorcycle lane, PWD-accessible, Prayer room, Baby changing.
+- `mode`: `"open" | "closed" | "24h"`.
+- `ranges`: 1–2 ranges per day (handles split lunch closures).
+- `store` is optional; only persisted for fuel_station / repair_shop / dealer / parts when the owner enables "Different hours for store".
+- When loading old data with plain `{ monday: "9-5" }`, treat it as display-only legacy until the user re-saves.
 
-**station_products** (new category)
-- Sari-Sari Store, Engine oil, Coolant, Brake fluid, Wiper fluid, Lubricants (drums), Batteries, Tires, Tire sealant, Air fresheners, Snacks & drinks, Ice, Cigarettes/Vape (regulated), LPG cylinders for sale.
+## 2. Dashboard editor (`dashboard.businesses_.$id.edit.tsx`)
 
-**station_payment** (new category)
-- Cash, Credit card, Debit card, GCash, Maya, QR Ph, Fleet card (Petron/Shell/Caltex), Corporate account.
+New `HoursTab` in the existing Tabs, placed after Tags.
 
-**station_brand** (new category, optional brand of station)
-- Petron, Shell, Caltex, Phoenix, Seaoil, Cleanfuel, Total/TotalEnergies, Unioil, Flying V, PTT, Jetti, Independent.
+- Timezone display (locked to `Asia/Manila`; show as read-only chip).
+- 7 day rows. Each row: Day name · mode toggle (Open / 24 hours / Closed) · two time pickers per range · "+ Add split range" (max 2 ranges).
+- "Copy Monday to all weekdays" and "Copy to weekend" helpers.
+- For `fuel_station` only: checkbox "Convenience store / Sari-Sari Store has different hours". When on, a second collapsible block edits `store` with the same controls and a "Copy from station hours" button.
+- Use shadcn `Input type="time"` (no datepicker needed — time only).
+- Save writes the full JSON to `businesses.hours` via existing owner UPDATE policy.
 
-All inserted with `type_slug = 'fuel_station'`, sensible `sort_order`, `is_popular` set on the common ones (91/95/Diesel/Sari-Sari/Convenience store/Restrooms/24-7).
+## 3. Public page status badge (`businesses.$slug.tsx`)
 
-Run as a single `INSERT ... ON CONFLICT (slug) DO NOTHING` migration so it's idempotent.
+New helper `src/lib/business-hours.ts` exporting:
+- `getStatus(hours, now, key='primary')` → `{ state: 'open'|'closing_soon'|'opening_soon'|'closed', nextChangeAt: Date, label: string }`.
+- `closing_soon` = currently open, closes within 30 min.
+- `opening_soon` = currently closed, opens within 60 min today.
+- Computes against `Asia/Manila` regardless of viewer timezone.
+- Recomputes client-side every 60s so badge updates without a refresh.
 
-## 2. User-submitted tags (custom tag input)
+Render:
+- Replace current static "Hours" list with a grouped block:
+  - Status pill at top (color-coded: open=green, closing_soon=amber, opening_soon=blue, closed=muted).
+  - Weekly grid showing each day with its ranges (or "24 hours" / "Closed").
+- For fuel stations with a `store` schedule, show two pills/blocks side by side: "Pumps" and "Store / Sari-Sari".
+- Legacy free-text map: keep current renderer as fallback when JSON isn't in the new shape.
 
-Add a "+ Add your own tag" input at the bottom of each category and a free-form one at the top of the Tags tab.
+## 4. Submit form (`businesses.submit.tsx`)
 
-Flow when an owner submits a new tag name:
-1. Slugify the label (`station-tag-<kebab>`) client-side.
-2. Call a new SECURITY DEFINER RPC `suggest_business_tag(_label text, _type_slug text, _category text)` that:
-   - Validates length (2–40 chars), trims, ensures auth user owns at least one business.
-   - Inserts into `business_tags` `ON CONFLICT (slug) DO NOTHING` with `sort_order = 1000` and `is_popular = false`.
-   - Returns the canonical slug.
-3. Auto-selects the returned slug for the current business (insert into `business_tag_links`).
-4. Refreshes the local tag list so it appears in the right category and is selectable for everyone else going forward.
-
-This satisfies "Enter your own that adds to the database so users can help grow it." Admins can later curate / merge duplicates in the admin panel (existing `Admins manage business tags` policy already allows that — no UI change needed in this pass).
-
-## 3. UI changes in `dashboard.businesses_.$id.edit.tsx` `TagsTab`
-
-- Add a `CATEGORY_LABELS` entry + ORDER for the new categories: `fuel_grade`, `ev_charging`, `station_services`, `station_products`, `station_payment`, `station_brand`.
-- Per-group "Add custom…" inline input → calls the RPC with that category.
-- Toast on success/duplicate/error. No business-logic changes elsewhere.
-
-## 4. Sari-Sari Store
-
-Seeded as `station-sari-sari-store` under `station_products`, `is_popular = true`, so it's visible by default on every fuel station.
-
-## Out of scope
-
-- No schema changes to `business_tag_links`.
-- No changes to public business page rendering (already reads from `business_tag_links` + `business_tags`).
-- No admin moderation UI for suggested tags in this pass (admins can edit via existing policies / SQL).
+Out of scope this pass — owners can set hours after creation from the dashboard. (Adding to submit can come later; keeps signup short.)
 
 ## Files touched
 
-- New migration: seed tags + create `suggest_business_tag` RPC + grants.
-- `src/routes/dashboard.businesses_.$id.edit.tsx` — extend `TagsTab` with custom-tag input and new category labels/order.
+- `src/lib/business-hours.ts` (new) — types, normalize legacy data, status calculator.
+- `src/components/business/hours-editor.tsx` (new) — reusable weekly editor used by HoursTab.
+- `src/routes/dashboard.businesses_.$id.edit.tsx` — add `HoursTab` and tab trigger.
+- `src/routes/businesses.$slug.tsx` — replace existing hours block with status pill + dual-schedule renderer; keep legacy fallback.
+
+## Out of scope
+
+- No DB migration. No changes to admin moderation, search, or filters.
+- No holiday / special-hours overrides (can be added later as `overrides: [{date, mode, ranges}]` without breaking the shape).
