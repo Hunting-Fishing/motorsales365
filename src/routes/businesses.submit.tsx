@@ -256,6 +256,12 @@ function SubmitBusinessPage() {
 
   const prettyCategory = (k: string | null) => {
     if (!k) return "Other";
+    const overrides: Record<string, string> = {
+      fuel_grade: "Fuel grade / octane",
+      ev_charging: "EV charging",
+      station_services: "Station services",
+    };
+    if (overrides[k]) return overrides[k];
     return k.split("_").map((w) => w[0].toUpperCase() + w.slice(1)).join(" & ").replace("Vehicle & Scope", "Vehicle scope").replace("Service & Mode", "Service mode");
   };
 
