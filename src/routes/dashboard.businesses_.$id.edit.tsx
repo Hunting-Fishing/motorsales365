@@ -88,6 +88,8 @@ function EditBusinessPage() {
         <TabsList className="flex w-full overflow-x-auto">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="tags">Tags</TabsTrigger>
+          <TabsTrigger value="hours">Hours</TabsTrigger>
+
           <TabsTrigger value="services">Services ({data.services.length})</TabsTrigger>
           <TabsTrigger value="products">Products ({data.products.length})</TabsTrigger>
           <TabsTrigger value="posts">Posts ({data.posts.length})</TabsTrigger>
