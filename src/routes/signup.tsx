@@ -104,7 +104,7 @@ function SignupPage() {
     if (!lastName.trim()) list.push({ field: "lastName", label: "Last name", message: "Enter your last name." });
     if (!email.trim()) list.push({ field: "email", label: "Email", message: "Enter your email address." });
     else if (!emailValid) list.push({ field: "email", label: "Email", message: "Enter a valid email address." });
-    if (phone.trim() && !phoneValid) list.push({ field: "phone", label: "Mobile", message: "Use a PH mobile format like 09XX XXX XXXX, or leave it blank." });
+    if (phoneNational.trim() && !phoneValid) list.push({ field: "phone", label: "Mobile", message: "Enter a valid mobile number or leave it blank." });
     if (!location.city) list.push({ field: "city", label: "City / Town", message: "Choose your city or town." });
     if (isBusinessLike && !businessName.trim()) {
       list.push({ field: "businessName", label: intent === "service_provider" ? "Service name" : "Business name", message: "Required for business and service accounts." });
