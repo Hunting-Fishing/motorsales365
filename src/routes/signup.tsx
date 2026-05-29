@@ -87,6 +87,9 @@ function SignupPage() {
   const [businessName, setBusinessName] = useState("");
   const [businessAddress, setBusinessAddress] = useState("");
   const [businessKind, setBusinessKind] = useState<string>("");
+  const [streetAddress, setStreetAddress] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [businessPostalCode, setBusinessPostalCode] = useState("");
   const [location, setLocation] = useState<LocationValue>({ region: null, province: null, city: null, barangay: null });
   const [refCode, setRefCode] = useState("");
   const [agreed, setAgreed] = useState(false);
