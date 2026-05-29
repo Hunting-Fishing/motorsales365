@@ -507,7 +507,7 @@ function SubmitBusinessPage() {
 
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <div><Label>Phone</Label><Input value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
+            <div><Label>Phone</Label><PhoneInput iso={phoneIso} national={phoneNational} onChange={({ iso, national }) => { setPhoneIso(iso); setPhoneNational(national); }} /></div>
             <div><Label>Email</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
             <div><Label>Website</Label><Input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://…" /></div>
             <div><Label>Messenger / FB</Label><Input value={messengerUrl} onChange={(e) => setMessengerUrl(e.target.value)} placeholder="https://m.me/…" /></div>
