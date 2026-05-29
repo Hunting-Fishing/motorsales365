@@ -123,6 +123,10 @@ export function SiteFooter() {
       </div>
 
       <div className="border-t border-border px-4 py-4 text-center text-xs text-muted-foreground">
+        <div className="mb-3 flex flex-col items-center gap-2">
+          <p className="font-medium text-foreground">Get the 365 MotorSales app</p>
+          <InstallAppButton />
+        </div>
         <p>© {new Date().getFullYear()} 365 MotorSales Philippines. All prices in ₱ PHP.</p>
         <p className="mt-1">Registered in the Philippines · Metro Manila · DPA-compliant.</p>
         <p className="mt-1">As an affiliate, 365 MotorSales earns from qualifying purchases made through outbound Shop links.</p>
