@@ -102,6 +102,9 @@ function VerificationPage() {
         barangay: req.barangay ?? "",
       });
       setDocs(((req.documents as DocItem[]) ?? []) as DocItem[]);
+      const parsed = parseE164(req.contact_phone ?? null);
+      setPhoneIso(parsed.iso);
+      setPhoneNational(parsed.national);
     }
     setLoading(false);
   };
