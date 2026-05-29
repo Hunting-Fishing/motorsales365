@@ -216,6 +216,25 @@ function SubmitBusinessPage() {
     }
   };
 
+  const onLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !user) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error("Logo must be 5MB or smaller"); return; }
+    setLogoUploading(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `${user.id}/_pending/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { publicUrl } = await uploadWithRetry({ bucket: "business-media", path, file, contentType: file.type });
+      setLogoUrl(publicUrl);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setLogoUploading(false);
+    }
+  };
+
+
   const submit = async () => {
     if (!user) return;
     if (!name.trim() || !typeSlug) { toast.error("Name and business type are required"); return; }
