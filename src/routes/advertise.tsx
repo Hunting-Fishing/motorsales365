@@ -10,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { PhoneInput } from "@/components/phone-input";
+import { buildE164 } from "@/data/country-codes";
 
 export const Route = createFileRoute("/advertise")({
   head: () => ({
