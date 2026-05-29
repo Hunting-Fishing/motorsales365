@@ -176,7 +176,7 @@ function PrivacyPage() {
           additional protections.
         </p>
 
-        <h2 className="mt-6 text-xl function-semibold text-xl font-semibold">11. Children</h2>
+        <h2 className="mt-6 text-xl font-semibold">11. Children</h2>
         <p className="mt-2 text-muted-foreground">
           The Platform is not directed to children under 18. We do not knowingly collect personal
           data from minors. If you believe a minor has created an account, contact our DPO and we
