@@ -6,11 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Send, CheckCircle2 } from "lucide-react";
+import { PhoneInput } from "@/components/phone-input";
+import { buildE164 } from "@/data/country-codes";
 
 export function InquiryForm({ businessId, businessName }: { businessId: string; businessName: string }) {
   const submit = useServerFn(submitBusinessInquiry);
   const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phoneIso, setPhoneIso] = useState("PH");
+  const [phoneNational, setPhoneNational] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
