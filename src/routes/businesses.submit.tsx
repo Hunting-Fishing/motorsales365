@@ -59,6 +59,8 @@ function SubmitBusinessPage() {
   const [brandsCarried, setBrandsCarried] = useState("");
   const [priceLabel, setPriceLabel] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
   const [tagsOpen, setTagsOpen] = useState(false);
   const [tagSearch, setTagSearch] = useState("");
   const [suggestOpen, setSuggestOpen] = useState(false);
