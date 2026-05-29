@@ -20,6 +20,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { formatPHP, formatDate } from "@/lib/format";
+import { ListingPrice } from "@/components/listing-price";
 import placeholderCar from "@/assets/placeholder-car.webp";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ListingQr } from "@/components/listing-qr";
@@ -328,7 +329,7 @@ function ListingDetailPage() {
                 {[listing.city, listing.region].filter(Boolean).join(", ") || "Philippines"}
               </div>
             </div>
-            <div className="text-3xl font-bold text-primary md:text-4xl">{formatPHP(listing.price_php)}</div>
+            <ListingPrice pricePhp={listing.price_php} size="lg" />
           </div>
 
           {/* Engagement bar */}
