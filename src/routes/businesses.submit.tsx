@@ -10,10 +10,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
-import { Search } from "lucide-react";
+import { Search, Upload, X, Image as ImageIcon } from "lucide-react";
 import { LocationDrilldown, type LocationValue } from "@/components/businesses/location-drilldown";
 import { LocationPicker } from "@/components/businesses/location-picker";
 import { resolvePsgc } from "@/lib/psgc";
+import { uploadWithRetry } from "@/lib/storage-upload";
 import { toast } from "sonner";
 import { useDynamicMeta } from "@/hooks/use-dynamic-meta";
 import { useDynamicJsonLd } from "@/hooks/use-dynamic-jsonld";
@@ -58,6 +59,8 @@ function SubmitBusinessPage() {
   const [brandsCarried, setBrandsCarried] = useState("");
   const [priceLabel, setPriceLabel] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoUploading, setLogoUploading] = useState(false);
   const [tagsOpen, setTagsOpen] = useState(false);
   const [tagSearch, setTagSearch] = useState("");
   const [suggestOpen, setSuggestOpen] = useState(false);
@@ -213,6 +216,25 @@ function SubmitBusinessPage() {
     }
   };
 
+  const onLogoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file || !user) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error("Logo must be 5MB or smaller"); return; }
+    setLogoUploading(true);
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const path = `${user.id}/_pending/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+      const { publicUrl } = await uploadWithRetry({ bucket: "business-media", path, file, contentType: file.type });
+      setLogoUrl(publicUrl);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setLogoUploading(false);
+    }
+  };
+
+
   const submit = async () => {
     if (!user) return;
     if (!name.trim() || !typeSlug) { toast.error("Name and business type are required"); return; }
@@ -221,6 +243,7 @@ function SubmitBusinessPage() {
     const insert = {
       owner_id: user.id, slug, name: name.trim(), type_slug: typeSlug,
       description: description.trim() || null,
+      logo_url: logoUrl,
       phone: phone.trim() || null, email: email.trim() || null,
       website: website.trim() || null, messenger_url: messengerUrl.trim() || null,
       street_address: streetAddress.trim() || null,
@@ -252,6 +275,12 @@ function SubmitBusinessPage() {
 
   const prettyCategory = (k: string | null) => {
     if (!k) return "Other";
+    const overrides: Record<string, string> = {
+      fuel_grade: "Fuel grade / octane",
+      ev_charging: "EV charging",
+      station_services: "Station services",
+    };
+    if (overrides[k]) return overrides[k];
     return k.split("_").map((w) => w[0].toUpperCase() + w.slice(1)).join(" & ").replace("Vehicle & Scope", "Vehicle scope").replace("Service & Mode", "Service mode");
   };
 
@@ -282,6 +311,37 @@ function SubmitBusinessPage() {
             <Label>Business name *</Label>
             <Input value={name} onChange={(e) => setName(e.target.value)} maxLength={120} placeholder="e.g. Quezon Ave Toyota" />
           </div>
+
+          <div>
+            <Label>Business logo / avatar</Label>
+            <p className="mb-2 text-xs text-muted-foreground">Square works best. PNG or JPG, up to 5MB.</p>
+            <div className="flex items-center gap-3">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-muted">
+                {logoUrl ? (
+                  <img src={logoUrl} alt="Logo preview" className="h-full w-full object-cover" />
+                ) : (
+                  <ImageIcon className="h-6 w-6 text-muted-foreground/50" />
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-secondary">
+                  <Upload className="h-3.5 w-3.5" />
+                  {logoUploading ? "Uploading…" : logoUrl ? "Replace logo" : "Upload logo"}
+                  <input type="file" accept="image/*" className="hidden" onChange={onLogoChange} disabled={logoUploading} />
+                </label>
+                {logoUrl && (
+                  <button
+                    type="button"
+                    onClick={() => setLogoUrl(null)}
+                    className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-secondary"
+                  >
+                    <X className="h-3.5 w-3.5" /> Remove
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
 
           <div>
             <div className="mb-1 flex items-center justify-between gap-2">
