@@ -112,7 +112,7 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
           {summary && (
             <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{summary}</p>
           )}
-          <div className="mt-2 text-xl font-bold text-primary">{formatPHP(listing.price_php)}</div>
+          <ListingPrice pricePhp={listing.price_php} size="md" className="mt-2" />
           <div className="mt-auto flex items-center justify-between gap-2 pt-3 text-xs text-muted-foreground">
             <span className="flex min-w-0 items-center gap-1">
               <MapPin className="h-3 w-3" />
