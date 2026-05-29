@@ -287,6 +287,36 @@ function ProfilePage() {
         <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save profile"}</Button>
       </div>
 
+      {/* Account email */}
+      <div className="mt-6 space-y-4 rounded-xl border border-border bg-card p-6">
+        <div>
+          <h2 className="font-display text-lg font-bold">Account email</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Your sign-in email. Changing it sends a confirmation link to both your current and new addresses — click both to complete.
+          </p>
+        </div>
+        <div>
+          <Label>Current email</Label>
+          <Input value={user?.email ?? ""} disabled readOnly />
+        </div>
+        <form onSubmit={requestEmailChange} className="space-y-3">
+          <div>
+            <Label htmlFor="new-email">New email</Label>
+            <Input
+              id="new-email"
+              type="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              value={newEmail}
+              onChange={(e) => setNewEmail(e.target.value)}
+            />
+          </div>
+          <Button type="submit" variant="secondary" disabled={emailSubmitting}>
+            {emailSubmitting ? "Sending…" : "Send confirmation links"}
+          </Button>
+        </form>
+      </div>
+
       {/* Security: phone verification */}
       <div className="mt-6 space-y-4 rounded-xl border border-border bg-card p-6">
         <div>
