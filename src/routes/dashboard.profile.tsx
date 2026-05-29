@@ -13,6 +13,7 @@ import { CheckCircle2, Circle, AlertCircle } from "lucide-react";
 import { PhoneInput } from "@/components/phone-input";
 import { AvatarUploader } from "@/components/avatar-uploader";
 import { buildE164, parseE164 } from "@/data/country-codes";
+import { useCurrency } from "@/lib/currency";
 
 type ChecklistItem = { label: string; done: boolean; required: boolean };
 
