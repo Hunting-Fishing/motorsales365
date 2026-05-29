@@ -5,7 +5,7 @@ import { SupportArticleLayout } from "@/components/support/support-article-layou
 const TITLE = "Account & verification";
 const DESC = "Sign up, sign in, reset your password, and earn the Verified badge on 365 MotorSales.";
 
-export const Route = createFileRoute("/support/account")({
+export const Route = createFileRoute("/support_/account")({
   component: AccountSupport,
   head: () => ({
     meta: [

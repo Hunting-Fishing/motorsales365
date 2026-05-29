@@ -8,7 +8,7 @@ import businessesShot from "@/assets/support/businesses.png";
 const TITLE = "Business, shop & payments";
 const DESC = "Set up a business page, manage affiliate shop links, and handle billing, receipts and refunds.";
 
-export const Route = createFileRoute("/support/business")({
+export const Route = createFileRoute("/support_/business")({
   component: BusinessSupport,
   head: () => ({
     meta: [
