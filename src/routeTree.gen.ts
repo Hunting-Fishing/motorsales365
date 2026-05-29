@@ -40,6 +40,10 @@ import { Route as RidesIndexRouteImport } from './routes/rides.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as BusinessesIndexRouteImport } from './routes/businesses.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as SupportSellingRouteImport } from './routes/support.selling'
+import { Route as SupportBuyingRouteImport } from './routes/support.buying'
+import { Route as SupportBusinessRouteImport } from './routes/support.business'
+import { Route as SupportAccountRouteImport } from './routes/support.account'
 import { Route as ShopCategoriesRouteImport } from './routes/shop.categories'
 import { Route as ShopCategoryRouteImport } from './routes/shop.$category'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
@@ -273,6 +277,26 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const SupportSellingRoute = SupportSellingRouteImport.update({
+  id: '/selling',
+  path: '/selling',
+  getParentRoute: () => SupportRoute,
+} as any)
+const SupportBuyingRoute = SupportBuyingRouteImport.update({
+  id: '/buying',
+  path: '/buying',
+  getParentRoute: () => SupportRoute,
+} as any)
+const SupportBusinessRoute = SupportBusinessRouteImport.update({
+  id: '/business',
+  path: '/business',
+  getParentRoute: () => SupportRoute,
+} as any)
+const SupportAccountRoute = SupportAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
+  getParentRoute: () => SupportRoute,
 } as any)
 const ShopCategoriesRoute = ShopCategoriesRouteImport.update({
   id: '/shop/categories',
@@ -694,7 +718,7 @@ export interface FileRoutesByFullPath {
   '/sell': typeof SellRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/support': typeof SupportRoute
+  '/support': typeof SupportRouteWithChildren
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -750,6 +774,10 @@ export interface FileRoutesByFullPath {
   '/seller/$id': typeof SellerIdRoute
   '/shop/$category': typeof ShopCategoryRoute
   '/shop/categories': typeof ShopCategoriesRoute
+  '/support/account': typeof SupportAccountRoute
+  '/support/business': typeof SupportBusinessRoute
+  '/support/buying': typeof SupportBuyingRoute
+  '/support/selling': typeof SupportSellingRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -803,7 +831,7 @@ export interface FileRoutesByTo {
   '/sell': typeof SellRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/support': typeof SupportRoute
+  '/support': typeof SupportRouteWithChildren
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -858,6 +886,10 @@ export interface FileRoutesByTo {
   '/seller/$id': typeof SellerIdRoute
   '/shop/$category': typeof ShopCategoryRoute
   '/shop/categories': typeof ShopCategoriesRoute
+  '/support/account': typeof SupportAccountRoute
+  '/support/business': typeof SupportBusinessRoute
+  '/support/buying': typeof SupportBuyingRoute
+  '/support/selling': typeof SupportSellingRoute
   '/admin': typeof AdminIndexRoute
   '/businesses': typeof BusinessesIndexRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -914,7 +946,7 @@ export interface FileRoutesById {
   '/sell': typeof SellRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
-  '/support': typeof SupportRoute
+  '/support': typeof SupportRouteWithChildren
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
   '/unsubscribe': typeof UnsubscribeRoute
@@ -970,6 +1002,10 @@ export interface FileRoutesById {
   '/seller/$id': typeof SellerIdRoute
   '/shop/$category': typeof ShopCategoryRoute
   '/shop/categories': typeof ShopCategoriesRoute
+  '/support/account': typeof SupportAccountRoute
+  '/support/business': typeof SupportBusinessRoute
+  '/support/buying': typeof SupportBuyingRoute
+  '/support/selling': typeof SupportSellingRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -1083,6 +1119,10 @@ export interface FileRouteTypes {
     | '/seller/$id'
     | '/shop/$category'
     | '/shop/categories'
+    | '/support/account'
+    | '/support/business'
+    | '/support/buying'
+    | '/support/selling'
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
@@ -1191,6 +1231,10 @@ export interface FileRouteTypes {
     | '/seller/$id'
     | '/shop/$category'
     | '/shop/categories'
+    | '/support/account'
+    | '/support/business'
+    | '/support/buying'
+    | '/support/selling'
     | '/admin'
     | '/businesses'
     | '/dashboard'
@@ -1302,6 +1346,10 @@ export interface FileRouteTypes {
     | '/seller/$id'
     | '/shop/$category'
     | '/shop/categories'
+    | '/support/account'
+    | '/support/business'
+    | '/support/buying'
+    | '/support/selling'
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
@@ -1358,7 +1406,7 @@ export interface RootRouteChildren {
   SellRoute: typeof SellRouteWithChildren
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
-  SupportRoute: typeof SupportRoute
+  SupportRoute: typeof SupportRouteWithChildren
   TermsRoute: typeof TermsRoute
   TowRoute: typeof TowRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
@@ -1619,6 +1667,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/support/selling': {
+      id: '/support/selling'
+      path: '/selling'
+      fullPath: '/support/selling'
+      preLoaderRoute: typeof SupportSellingRouteImport
+      parentRoute: typeof SupportRoute
+    }
+    '/support/buying': {
+      id: '/support/buying'
+      path: '/buying'
+      fullPath: '/support/buying'
+      preLoaderRoute: typeof SupportBuyingRouteImport
+      parentRoute: typeof SupportRoute
+    }
+    '/support/business': {
+      id: '/support/business'
+      path: '/business'
+      fullPath: '/support/business'
+      preLoaderRoute: typeof SupportBusinessRouteImport
+      parentRoute: typeof SupportRoute
+    }
+    '/support/account': {
+      id: '/support/account'
+      path: '/account'
+      fullPath: '/support/account'
+      preLoaderRoute: typeof SupportAccountRouteImport
+      parentRoute: typeof SupportRoute
     }
     '/shop/categories': {
       id: '/shop/categories'
@@ -2305,6 +2381,23 @@ const SellRouteChildren: SellRouteChildren = {
 
 const SellRouteWithChildren = SellRoute._addFileChildren(SellRouteChildren)
 
+interface SupportRouteChildren {
+  SupportAccountRoute: typeof SupportAccountRoute
+  SupportBusinessRoute: typeof SupportBusinessRoute
+  SupportBuyingRoute: typeof SupportBuyingRoute
+  SupportSellingRoute: typeof SupportSellingRoute
+}
+
+const SupportRouteChildren: SupportRouteChildren = {
+  SupportAccountRoute: SupportAccountRoute,
+  SupportBusinessRoute: SupportBusinessRoute,
+  SupportBuyingRoute: SupportBuyingRoute,
+  SupportSellingRoute: SupportSellingRoute,
+}
+
+const SupportRouteWithChildren =
+  SupportRoute._addFileChildren(SupportRouteChildren)
+
 interface ListingIdRouteChildren {
   ListingIdEditRoute: typeof ListingIdEditRoute
 }
@@ -2349,7 +2442,7 @@ const rootRouteChildren: RootRouteChildren = {
   SellRoute: SellRouteWithChildren,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
-  SupportRoute: SupportRoute,
+  SupportRoute: SupportRouteWithChildren,
   TermsRoute: TermsRoute,
   TowRoute: TowRoute,
   UnsubscribeRoute: UnsubscribeRoute,
