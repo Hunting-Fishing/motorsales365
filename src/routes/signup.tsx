@@ -393,19 +393,31 @@ function SignupPage() {
                 </div>
               </div>
 
-              <div>
-                <Label htmlFor="business-address">Street address (optional)</Label>
-                <Input
-                  id="business-address"
-                  value={businessAddress}
-                  onChange={(e) => setBusinessAddress(e.target.value)}
-                  placeholder="e.g. 123 Rizal Ave, Brgy. San Jose"
-                  autoComplete="street-address"
-                />
-                <p className="mt-1 text-xs text-muted-foreground">
-                  You can skip this for now, but your account won't go live or appear in the directory until a business address is saved.
-                </p>
+              <div className="grid gap-4 sm:grid-cols-[1fr_180px]">
+                <div>
+                  <Label htmlFor="business-address">Street address (optional)</Label>
+                  <Input
+                    id="business-address"
+                    value={businessAddress}
+                    onChange={(e) => setBusinessAddress(e.target.value)}
+                    placeholder="e.g. 123 Rizal Ave, Brgy. San Jose"
+                    autoComplete="street-address"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="business-postal">Postal / ZIP code</Label>
+                  <Input
+                    id="business-postal"
+                    value={businessPostalCode}
+                    onChange={(e) => setBusinessPostalCode(e.target.value)}
+                    placeholder="e.g. 1000"
+                    autoComplete="postal-code"
+                  />
+                </div>
               </div>
+              <p className="text-xs text-muted-foreground">
+                You can skip the street and postal for now, but your account won't go live or appear in the directory until a full business address is saved.
+              </p>
             </div>
           )}
 
