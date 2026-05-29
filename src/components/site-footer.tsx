@@ -4,6 +4,7 @@ import { BrandLogo } from "@/components/brand-logo";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { InstallAppButton } from "@/components/install-app-button";
 
 export function SiteFooter() {
   const { user } = useAuth();
