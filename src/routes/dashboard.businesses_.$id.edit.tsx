@@ -132,10 +132,14 @@ const CATEGORY_LABELS: Record<string, string> = {
   fuel_grade: "Fuel grades / octane (RON & diesel)",
   ev_charging: "EV charging",
   station_services: "Station services & amenities",
+  station_products: "Products sold (store / shop)",
+  station_payment: "Payment methods accepted",
+  station_brand: "Station brand",
   vehicle_scope: "Vehicle scope",
   service_mode: "Service mode",
   other: "Other",
 };
+
 
 function prettyCategory(k: string | null) {
   if (!k) return CATEGORY_LABELS.other;
