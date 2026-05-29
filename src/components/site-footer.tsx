@@ -64,6 +64,7 @@ export function SiteFooter() {
       title: "Legal",
       links: [
         { to: "/terms", label: "Terms of Service" },
+        { to: "/terms-and-conditions", label: "Terms & Conditions" },
         { to: "/privacy", label: "Privacy Policy" },
         { to: "/guidelines", label: "Community Guidelines" },
         { to: "/refund-policy", label: "Refund Policy" },
