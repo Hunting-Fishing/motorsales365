@@ -4445,6 +4445,10 @@ export type Database = {
         Returns: Json
       }
       self_serve_change_plan: { Args: { _plan_id: string }; Returns: Json }
+      suggest_business_tag: {
+        Args: { _category: string; _label: string; _type_slug: string }
+        Returns: string
+      }
       sync_staff_referrals: { Args: never; Returns: number }
       upsert_currency_rates: { Args: { _rates: Json }; Returns: number }
       user_has_paid_subscription: {

@@ -132,10 +132,14 @@ const CATEGORY_LABELS: Record<string, string> = {
   fuel_grade: "Fuel grades / octane (RON & diesel)",
   ev_charging: "EV charging",
   station_services: "Station services & amenities",
+  station_products: "Products sold (store / shop)",
+  station_payment: "Payment methods accepted",
+  station_brand: "Station brand",
   vehicle_scope: "Vehicle scope",
   service_mode: "Service mode",
   other: "Other",
 };
+
 
 function prettyCategory(k: string | null) {
   if (!k) return CATEGORY_LABELS.other;
@@ -205,12 +209,31 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
     const key = t.category ?? "other";
     (grouped[key] = grouped[key] ?? []).push(t);
   }
-  const ORDER = ["fuel_grade", "ev_charging", "station_services"];
+  const ORDER = ["fuel_grade", "ev_charging", "station_products", "station_services", "station_payment", "station_brand"];
   const groupKeys = Object.keys(grouped).sort((a, b) => {
     const ai = ORDER.indexOf(a); const bi = ORDER.indexOf(b);
     if (ai !== -1 || bi !== -1) return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
     return a.localeCompare(b);
   });
+
+  const addCustom = async (category: string, label: string) => {
+    const trimmed = label.trim();
+    if (trimmed.length < 2) { toast.error("Tag must be at least 2 characters"); return; }
+    const { data, error } = await (supabase as any).rpc("suggest_business_tag", {
+      _label: trimmed, _type_slug: typeSlug, _category: category,
+    });
+    if (error) { toast.error(error.message); return; }
+    const newSlug = data as string;
+    // Refresh tag catalog so the new tag appears in its group
+    const { data: t } = await (supabase as any).from("business_tags")
+      .select("slug,label,type_slug,category,sort_order,is_popular")
+      .or(`type_slug.eq.${typeSlug},type_slug.is.null`)
+      .order("sort_order");
+    setAllTags((t ?? []) as TagRow[]);
+    setSelected((prev) => new Set(prev).add(newSlug));
+    toast.success("Tag added — remember to click Save tags");
+  };
+
 
   return (
     <Card className="space-y-5 p-4 md:p-5">
@@ -268,8 +291,10 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
               );
             })}
           </div>
+          <AddCustomTagInline category={k} onAdd={(label) => addCustom(k, label)} />
         </div>
       ))}
+
 
       <div className="flex justify-end">
         <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save tags"}</Button>
@@ -277,6 +302,33 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
     </Card>
   );
 }
+
+function AddCustomTagInline({ category, onAdd }: { category: string; onAdd: (label: string) => Promise<void> | void }) {
+  const [val, setVal] = useState("");
+  const [busy, setBusy] = useState(false);
+  const submit = async () => {
+    if (!val.trim()) return;
+    setBusy(true);
+    try { await onAdd(val); setVal(""); } finally { setBusy(false); }
+  };
+  return (
+    <div className="mt-2 flex gap-1.5">
+      <Input
+        value={val}
+        onChange={(e) => setVal(e.target.value)}
+        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); submit(); } }}
+        placeholder={`Add a ${prettyCategory(category).toLowerCase()} tag…`}
+        className="h-8 max-w-xs text-xs"
+        maxLength={40}
+      />
+      <Button type="button" size="sm" variant="outline" onClick={submit} disabled={busy || val.trim().length < 2}>
+        <Plus className="mr-1 h-3 w-3" />Add
+      </Button>
+    </div>
+  );
+}
+
+
 
 /* ---------------- PROFILE ---------------- */
 

@@ -1,65 +1,62 @@
-## Business Transfer Workflow
+## Goal
 
-Add the ability for a business owner to transfer ownership of a business to another user, with admin moderation, party confirmations, in‑app notifications, view/contact tracking, and a complete immutable audit log for legal reference.
+Make the Tags tab for fuel stations cover everything a station actually sells or offers, and let owners add their own tags that grow the shared database — including "Sari-Sari Store".
 
-### Flow
+## 1. Expand the fuel-station tag catalog (migration, seeded into `business_tags`)
 
-```text
-Owner → request transfer → Recipient (accept/decline)
-                                ↓ accept
-                          Admin review (approve/reject)
-                                ↓ approve
-                       Ownership transferred + both notified
-```
+The current catalog has 37 tags across `fuel_grade`, `ev_charging`, `station_services`. We'll add many more, grouped:
 
-Every state change writes to an append-only history table. Both parties (and admins) get in-app notifications; "viewed" + "contacted" flags are tracked on each notification.
+**fuel_grade** (add)
+- Premium 95 (e.g. XCS/Blaze 95), Premium 97/98, Racing 100 (Blaze 100), Standard Diesel, Premium Diesel (Diesel Max/Turbo Diesel/Diesel Xtra), Bio-Diesel B2, E85.
 
-### Database (one migration)
+**station_services** (add)
+- Quick-serve food, Coffee bar, Fast-food tenant (Jollibee/McDo/etc.), Pharmacy, Seating area, Wi-Fi, Mobile load / e-load, Bills payment, Remittance, GCash cash-in, Package pickup (Lalamove/Grab drop), Parking, Truck parking, Diesel for trucks (high-flow), Motorcycle lane, PWD-accessible, Prayer room, Baby changing.
 
-- `business_transfer_requests`
-  - `id`, `business_id`, `from_user_id`, `to_user_id`, `to_email` (for invite-style if user not yet on platform — optional v1: required existing user)
-  - `status` enum: `pending_recipient | recipient_accepted | recipient_declined | admin_approved | admin_rejected | completed | cancelled | expired`
-  - `owner_message`, `recipient_response`, `admin_note`
-  - `requested_at`, `recipient_responded_at`, `admin_reviewed_at`, `completed_at`, `expires_at` (default 14 days)
-  - `admin_id`
-- `business_transfer_history` (append-only)
-  - `transfer_id`, `actor_id`, `actor_role` (`owner|recipient|admin|system`), `action`, `from_status`, `to_status`, `note`, `metadata jsonb`, `created_at`
-- `notifications` (generic, reusable)
-  - `user_id`, `kind` (`transfer_request|transfer_accepted|transfer_declined|transfer_approved|transfer_rejected|transfer_completed|transfer_cancelled`)
-  - `title`, `body`, `link_url`, `entity_type`, `entity_id`
-  - `viewed_at`, `contacted_at` (set when user clicks the contact CTA)
-  - `created_at`
-- RLS: owner/recipient see their own transfers; admins see all. History is read-only to parties + admins. Notifications scoped to `user_id`.
-- Trigger on `status` change → write history row + insert notifications for the relevant parties.
-- On `completed`: update `businesses.user_id` (and `organization_id` ownership if applicable) atomically inside a SECURITY DEFINER RPC `complete_business_transfer(transfer_id)` only callable when status = `admin_approved`.
+**station_products** (new category)
+- Sari-Sari Store, Engine oil, Coolant, Brake fluid, Wiper fluid, Lubricants (drums), Batteries, Tires, Tire sealant, Air fresheners, Snacks & drinks, Ice, Cigarettes/Vape (regulated), LPG cylinders for sale.
 
-### Server functions (`src/lib/business-transfers.functions.ts`)
+**station_payment** (new category)
+- Cash, Credit card, Debit card, GCash, Maya, QR Ph, Fleet card (Petron/Shell/Caltex), Corporate account.
 
-- `requestTransfer({ businessId, toEmail, message })` — owner only
-- `respondToTransfer({ transferId, accept, message })` — recipient only
-- `adminReviewTransfer({ transferId, approve, note })` — admin only; on approve calls RPC to finalize
-- `cancelTransfer({ transferId })` — owner (before admin approval)
-- `listMyTransfers()` / `listAdminTransfers()`
-- `markNotificationViewed({ id })`, `markNotificationContacted({ id })`
+**station_brand** (new category, optional brand of station)
+- Petron, Shell, Caltex, Phoenix, Seaoil, Cleanfuel, Total/TotalEnergies, Unioil, Flying V, PTT, Jetti, Independent.
 
-### UI
+All inserted with `type_slug = 'fuel_station'`, sensible `sort_order`, `is_popular` set on the common ones (91/95/Diesel/Sari-Sari/Convenience store/Restrooms/24-7).
 
-- **Owner**: button "Transfer ownership" on `/dashboard/businesses/$id/edit` → dialog with recipient email + message.
-- **Recipient & Owner**: `/dashboard/transfers` list with status, history timeline, accept/decline/cancel actions.
-- **Admin**: `/admin/business-transfers` queue (pending approval) with approve/reject + note; shows full history.
-- **Notifications**: bell icon in `site-header` with unread count, dropdown list, "Mark contacted" button (logs contact attempt with timestamp for legal record).
+Run as a single `INSERT ... ON CONFLICT (slug) DO NOTHING` migration so it's idempotent.
 
-### Audit & legal
+## 2. User-submitted tags (custom tag input)
 
-- `business_transfer_history` is INSERT-only (no UPDATE/DELETE policy). Captures actor, IP-less but timestamped trail of every action, message, status change. Visible to both parties and admins from the transfer detail page; exportable as JSON via a server fn for legal review.
+Add a "+ Add your own tag" input at the bottom of each category and a free-form one at the top of the Tags tab.
 
-### Files
+Flow when an owner submits a new tag name:
+1. Slugify the label (`station-tag-<kebab>`) client-side.
+2. Call a new SECURITY DEFINER RPC `suggest_business_tag(_label text, _type_slug text, _category text)` that:
+   - Validates length (2–40 chars), trims, ensures auth user owns at least one business.
+   - Inserts into `business_tags` `ON CONFLICT (slug) DO NOTHING` with `sort_order = 1000` and `is_popular = false`.
+   - Returns the canonical slug.
+3. Auto-selects the returned slug for the current business (insert into `business_tag_links`).
+4. Refreshes the local tag list so it appears in the right category and is selectable for everyone else going forward.
 
-- migration: tables, RLS, GRANTs, triggers, RPC
-- `src/lib/business-transfers.functions.ts`
-- `src/lib/notifications.functions.ts`
-- `src/components/notifications/notification-bell.tsx`
-- `src/components/businesses/transfer-business-dialog.tsx`
-- `src/routes/dashboard.transfers.tsx`
-- `src/routes/admin.business-transfers.tsx`
-- edits: `src/routes/dashboard.businesses_.$id.edit.tsx` (transfer button), `src/components/site-header.tsx` (bell), `src/routes/admin.tsx` (nav link), `src/routes/dashboard.tsx` (nav link)
+This satisfies "Enter your own that adds to the database so users can help grow it." Admins can later curate / merge duplicates in the admin panel (existing `Admins manage business tags` policy already allows that — no UI change needed in this pass).
+
+## 3. UI changes in `dashboard.businesses_.$id.edit.tsx` `TagsTab`
+
+- Add a `CATEGORY_LABELS` entry + ORDER for the new categories: `fuel_grade`, `ev_charging`, `station_services`, `station_products`, `station_payment`, `station_brand`.
+- Per-group "Add custom…" inline input → calls the RPC with that category.
+- Toast on success/duplicate/error. No business-logic changes elsewhere.
+
+## 4. Sari-Sari Store
+
+Seeded as `station-sari-sari-store` under `station_products`, `is_popular = true`, so it's visible by default on every fuel station.
+
+## Out of scope
+
+- No schema changes to `business_tag_links`.
+- No changes to public business page rendering (already reads from `business_tag_links` + `business_tags`).
+- No admin moderation UI for suggested tags in this pass (admins can edit via existing policies / SQL).
+
+## Files touched
+
+- New migration: seed tags + create `suggest_business_tag` RPC + grants.
+- `src/routes/dashboard.businesses_.$id.edit.tsx` — extend `TagsTab` with custom-tag input and new category labels/order.
