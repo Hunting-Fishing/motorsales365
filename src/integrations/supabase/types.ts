@@ -704,37 +704,52 @@ export type Database = {
         Row: {
           active: boolean
           business_id: string
+          catalog_key: string | null
+          category: string | null
           created_at: string
           description: string | null
           id: string
           photo_url: string | null
           price_label: string | null
+          price_php: number | null
+          sale_price_php: number | null
           sort_order: number
           title: string
+          unit: string | null
           updated_at: string
         }
         Insert: {
           active?: boolean
           business_id: string
+          catalog_key?: string | null
+          category?: string | null
           created_at?: string
           description?: string | null
           id?: string
           photo_url?: string | null
           price_label?: string | null
+          price_php?: number | null
+          sale_price_php?: number | null
           sort_order?: number
           title: string
+          unit?: string | null
           updated_at?: string
         }
         Update: {
           active?: boolean
           business_id?: string
+          catalog_key?: string | null
+          category?: string | null
           created_at?: string
           description?: string | null
           id?: string
           photo_url?: string | null
           price_label?: string | null
+          price_php?: number | null
+          sale_price_php?: number | null
           sort_order?: number
           title?: string
+          unit?: string | null
           updated_at?: string
         }
         Relationships: [
