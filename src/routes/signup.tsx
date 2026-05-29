@@ -93,8 +93,8 @@ function SignupPage() {
   );
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-  const phoneNormalized = phone.trim() ? normalizePhPhone(phone) : "";
-  const phoneValid = phoneNormalized !== null;
+  const phoneE164 = phoneNational.trim() ? buildE164(phoneIso, phoneNational) : "";
+  const phoneValid = phoneE164 !== null;
 
   type Issue = { field: string; label: string; message: string };
   const issues = useMemo<Issue[]>(() => {
