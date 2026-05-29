@@ -105,6 +105,9 @@ export function ServiceInquiryDialog({
     phone: "",
     message: "",
   });
+  const [phoneIso, setPhoneIso] = useState("PH");
+  const [phoneNational, setPhoneNational] = useState("");
+
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
