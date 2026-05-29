@@ -209,12 +209,31 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
     const key = t.category ?? "other";
     (grouped[key] = grouped[key] ?? []).push(t);
   }
-  const ORDER = ["fuel_grade", "ev_charging", "station_services"];
+  const ORDER = ["fuel_grade", "ev_charging", "station_products", "station_services", "station_payment", "station_brand"];
   const groupKeys = Object.keys(grouped).sort((a, b) => {
     const ai = ORDER.indexOf(a); const bi = ORDER.indexOf(b);
     if (ai !== -1 || bi !== -1) return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
     return a.localeCompare(b);
   });
+
+  const addCustom = async (category: string, label: string) => {
+    const trimmed = label.trim();
+    if (trimmed.length < 2) { toast.error("Tag must be at least 2 characters"); return; }
+    const { data, error } = await (supabase as any).rpc("suggest_business_tag", {
+      _label: trimmed, _type_slug: typeSlug, _category: category,
+    });
+    if (error) { toast.error(error.message); return; }
+    const newSlug = data as string;
+    // Refresh tag catalog so the new tag appears in its group
+    const { data: t } = await (supabase as any).from("business_tags")
+      .select("slug,label,type_slug,category,sort_order,is_popular")
+      .or(`type_slug.eq.${typeSlug},type_slug.is.null`)
+      .order("sort_order");
+    setAllTags((t ?? []) as TagRow[]);
+    setSelected((prev) => new Set(prev).add(newSlug));
+    toast.success("Tag added — remember to click Save tags");
+  };
+
 
   return (
     <Card className="space-y-5 p-4 md:p-5">
