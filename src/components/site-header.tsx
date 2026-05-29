@@ -235,6 +235,7 @@ export function SiteHeader() {
                   <SheetClose asChild><Link to="/map" className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">Map</Link></SheetClose>
                   <SheetClose asChild><Link to="/shop" className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">Shop</Link></SheetClose>
                   <SheetClose asChild><Link to="/pricing" className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary">Pricing</Link></SheetClose>
+                  <SheetClose asChild><Link to="/support" className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"><LifeBuoy className="h-4 w-4" /> Help &amp; Support</Link></SheetClose>
                 </div>
 
                 {user && (
