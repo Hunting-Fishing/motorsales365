@@ -279,23 +279,21 @@ function SignupPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div id="field-phone">
               <Label htmlFor="phone">Mobile (optional)</Label>
-              <Input
+              <PhoneInput
                 id="phone"
-                type="tel"
-                placeholder="09XX XXX XXXX"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                onBlur={() => markTouched("phone")}
-                autoComplete="tel"
-                aria-invalid={!!errorFor("phone")}
-                className={invalidCls("phone")}
+                iso={phoneIso}
+                national={phoneNational}
+                onChange={({ iso, national }) => {
+                  setPhoneIso(iso);
+                  setPhoneNational(national);
+                }}
               />
               {errorFor("phone") ? (
                 <p className="mt-1 text-xs text-destructive">{errorFor("phone")}</p>
               ) : (
                 <p className="mt-1 text-xs text-muted-foreground">
-                  PH mobile format — we'll store it as +63.
-                  {phone.trim() && phoneValid && <span className="ml-1 text-emerald-600">✓ {phoneNormalized}</span>}
+                  Pick your country, then enter your number.
+                  {phoneNational.trim() && phoneValid && <span className="ml-1 text-emerald-600">✓ {phoneE164}</span>}
                 </p>
               )}
             </div>
