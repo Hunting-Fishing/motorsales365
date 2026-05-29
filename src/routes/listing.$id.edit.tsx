@@ -12,6 +12,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LocationPicker } from "@/components/location-picker";
 import { getUserPlanLimits, FREE_PLAN_LIMITS, type PlanLimits } from "@/lib/plan-limits";
+import { PhoneInput } from "@/components/phone-input";
+import { parseE164, buildE164 } from "@/data/country-codes";
 
 export const Route = createFileRoute("/listing/$id/edit")({
   component: EditListingPage,
