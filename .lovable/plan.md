@@ -1,67 +1,50 @@
-## Goal
+## Plan: Terms & Conditions page + developer rule
 
-Give business owners a proper weekly Hours editor, show an "Open now / Closing soon / Opening soon / Closed" badge on the public page, and let fuel stations set a separate schedule for an on-site convenience / Sari-Sari store when it differs from pump hours.
+### Observations
+- A `/terms` route already exists (`src/routes/terms.tsx`) with a short Terms of Service. It is linked from the footer and from the Refund/Privacy pages.
+- The user is asking for a dedicated **Terms & Conditions** page — broader than the existing ToS, covering marketplace rules, fees, listings, payments, business directory (hours, services/products catalog, pricing), boosts/subscriptions, refunds reference, user-generated content, data, dispute handling, and Philippine law.
+- A standing developer/AI rule should be saved so future changes to related features (pricing, payments, boosts, subscriptions, business directory, services catalog, refunds, data handling) automatically trigger a T&C review/update.
 
-## 1. Storage (no schema change)
+### What to build
 
-`businesses.hours` is already `jsonb`. Use a structured shape, backward-compatible with the existing free-text map:
+1. **New route `/terms-and-conditions`** (`src/routes/terms-and-conditions.tsx`)
+   - Built with `SiteLayout` and the same prose styling pattern as `/terms`, `/privacy`, `/refund-policy`.
+   - Proper `head()` metadata: title `Terms & Conditions — 365 MotorSales Philippines`, meta description < 160 chars, `og:title`, `og:description`.
+   - Single H1, semantic sections, "Last updated" line.
+   - Sections:
+     1. Introduction & acceptance
+     2. Eligibility (18+, PH residents/registered businesses)
+     3. Accounts & security
+     4. Listings (vehicles, parts, services) — accuracy, ownership, photos
+     5. Business directory (verified businesses, hours, opening/closing warnings, services & products catalog, pricing in ₱)
+     6. Pricing display & promo pricing rules (fuel ₱/L, ₱/kWh, ₱/item, "From ₱")
+     7. Prohibited items & conduct (mirrors guidelines)
+     8. Fees, boosts, subscriptions (link to `/pricing`)
+     9. Payments & test mode disclosure
+     10. Refunds (link to `/refund-policy`)
+     11. Buyer–seller transactions disclaimer
+     12. User-generated content license
+     13. Account suspension & termination
+     14. Privacy (link to `/privacy`)
+     15. Limitation of liability
+     16. Governing law (Philippines, Metro Manila)
+     17. Changes to these terms
+     18. Contact
 
-```json
-{
-  "tz": "Asia/Manila",
-  "primary": {
-    "mon": { "mode": "open", "ranges": [{"open":"06:00","close":"22:00"}] },
-    "tue": { "mode": "24h" },
-    "sun": { "mode": "closed" }
-  },
-  "store": { "mon": { "mode":"open", "ranges":[{"open":"05:00","close":"23:00"}] }, ... }
-}
-```
+2. **Link the new page**
+   - Add a footer link in `src/components/site-footer.tsx` (next to the existing Terms link), labeled "Terms & Conditions".
+   - Keep `/terms` as-is to avoid breaking inbound links; cross-link the two at the top of each.
 
-- `mode`: `"open" | "closed" | "24h"`.
-- `ranges`: 1–2 ranges per day (handles split lunch closures).
-- `store` is optional; only persisted for fuel_station / repair_shop / dealer / parts when the owner enables "Different hours for store".
-- When loading old data with plain `{ monday: "9-5" }`, treat it as display-only legacy until the user re-saves.
+3. **Save the developer rule as project memory** (`mem://index.md` Core + `mem://policies/terms-sync`)
+   - Core one-liner: "When changing fees, payments, boosts, subscriptions, refunds, business directory, services/products catalog, pricing units, prohibited items, or data handling — also update `/terms-and-conditions` (and `/terms`, `/refund-policy`, `/privacy` if relevant) and bump the Last updated date."
+   - Detail file lists the exact triggers, the files to touch, and the "Last updated" convention.
 
-## 2. Dashboard editor (`dashboard.businesses_.$id.edit.tsx`)
+### Technical notes
+- Pure frontend/content change; no DB, no server functions, no auth changes.
+- Route file naming: `terms-and-conditions.tsx` → `createFileRoute("/terms-and-conditions")`.
+- Reuse Tailwind `prose` classes already used by sibling policy pages for visual consistency.
+- No new dependencies.
 
-New `HoursTab` in the existing Tabs, placed after Tags.
-
-- Timezone display (locked to `Asia/Manila`; show as read-only chip).
-- 7 day rows. Each row: Day name · mode toggle (Open / 24 hours / Closed) · two time pickers per range · "+ Add split range" (max 2 ranges).
-- "Copy Monday to all weekdays" and "Copy to weekend" helpers.
-- For `fuel_station` only: checkbox "Convenience store / Sari-Sari Store has different hours". When on, a second collapsible block edits `store` with the same controls and a "Copy from station hours" button.
-- Use shadcn `Input type="time"` (no datepicker needed — time only).
-- Save writes the full JSON to `businesses.hours` via existing owner UPDATE policy.
-
-## 3. Public page status badge (`businesses.$slug.tsx`)
-
-New helper `src/lib/business-hours.ts` exporting:
-- `getStatus(hours, now, key='primary')` → `{ state: 'open'|'closing_soon'|'opening_soon'|'closed', nextChangeAt: Date, label: string }`.
-- `closing_soon` = currently open, closes within 30 min.
-- `opening_soon` = currently closed, opens within 60 min today.
-- Computes against `Asia/Manila` regardless of viewer timezone.
-- Recomputes client-side every 60s so badge updates without a refresh.
-
-Render:
-- Replace current static "Hours" list with a grouped block:
-  - Status pill at top (color-coded: open=green, closing_soon=amber, opening_soon=blue, closed=muted).
-  - Weekly grid showing each day with its ranges (or "24 hours" / "Closed").
-- For fuel stations with a `store` schedule, show two pills/blocks side by side: "Pumps" and "Store / Sari-Sari".
-- Legacy free-text map: keep current renderer as fallback when JSON isn't in the new shape.
-
-## 4. Submit form (`businesses.submit.tsx`)
-
-Out of scope this pass — owners can set hours after creation from the dashboard. (Adding to submit can come later; keeps signup short.)
-
-## Files touched
-
-- `src/lib/business-hours.ts` (new) — types, normalize legacy data, status calculator.
-- `src/components/business/hours-editor.tsx` (new) — reusable weekly editor used by HoursTab.
-- `src/routes/dashboard.businesses_.$id.edit.tsx` — add `HoursTab` and tab trigger.
-- `src/routes/businesses.$slug.tsx` — replace existing hours block with status pill + dual-schedule renderer; keep legacy fallback.
-
-## Out of scope
-
-- No DB migration. No changes to admin moderation, search, or filters.
-- No holiday / special-hours overrides (can be added later as `overrides: [{date, mode, ranges}]` without breaking the shape).
+### Out of scope
+- No changes to the existing `/terms` content beyond a one-line cross-link.
+- No admin UI to edit T&C content (it stays in code).
