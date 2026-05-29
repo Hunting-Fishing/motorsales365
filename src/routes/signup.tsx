@@ -330,6 +330,32 @@ function SignupPage() {
             {errorFor("city") && <p className="mt-1 text-xs text-destructive">{errorFor("city")}</p>}
           </div>
 
+          {!isBusinessLike && (
+            <div className="grid gap-4 sm:grid-cols-[1fr_180px]">
+              <div>
+                <Label htmlFor="street-address">Street address (optional)</Label>
+                <Input
+                  id="street-address"
+                  value={streetAddress}
+                  onChange={(e) => setStreetAddress(e.target.value)}
+                  placeholder="e.g. 123 Rizal Ave, Brgy. San Jose"
+                  autoComplete="street-address"
+                />
+              </div>
+              <div>
+                <Label htmlFor="postal-code">Postal / ZIP code</Label>
+                <Input
+                  id="postal-code"
+                  value={postalCode}
+                  onChange={(e) => setPostalCode(e.target.value)}
+                  placeholder="e.g. 1000"
+                  autoComplete="postal-code"
+                  inputMode="text"
+                />
+              </div>
+            </div>
+          )}
+
           {isBusinessLike && (
             <div className="space-y-4 rounded-xl border border-dashed border-border bg-muted/30 p-4">
               <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Business details</p>
