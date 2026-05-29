@@ -203,6 +203,8 @@ function SignupPage() {
           business_name: isBusinessLike ? businessName.trim() : undefined,
           business_address: isBusinessLike ? (businessAddress.trim() || undefined) : undefined,
           business_kind: isBusinessLike ? (businessKind || undefined) : undefined,
+          street_address: streetAddress.trim() || undefined,
+          postal_code: isBusinessLike ? (businessPostalCode.trim() || undefined) : (postalCode.trim() || undefined),
           signup_city: location.city ?? undefined,
           signup_region: location.region ?? undefined,
           signup_province: location.province ?? undefined,
