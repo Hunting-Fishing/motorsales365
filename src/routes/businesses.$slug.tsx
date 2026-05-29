@@ -27,6 +27,11 @@ import { GoogleBusinessMap } from "@/components/businesses/google-business-map";
 import { ShareQr } from "@/components/share-qr";
 import { InquiryForm } from "@/components/business-page/inquiry-form";
 import { getBusinessPage } from "@/lib/business-pages.functions";
+import {
+  isStructuredHours, getStatus, legacyToRows, formatRange,
+  DAY_KEYS, DAY_LABELS, type StructuredHours, type HoursStatus,
+} from "@/lib/business-hours";
+
 
 export const Route = createFileRoute("/businesses/$slug")({
   loader: async ({ params }) => {
@@ -277,19 +282,13 @@ function BusinessProfilePage() {
                   <div className="mt-1 text-sm">{biz.brands_carried}</div>
                 </div>
               )}
-              {biz.hours && Object.keys(biz.hours).length > 0 && (
+              {biz.hours && (
                 <div className="mt-4">
                   <h3 className="mb-2 flex items-center gap-1 text-sm font-semibold"><Clock className="h-4 w-4" />Hours</h3>
-                  <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                    {Object.entries(biz.hours as Record<string, string>).map(([day, hrs]) => (
-                      <div key={day} className="contents">
-                        <dt className="text-muted-foreground capitalize">{day}</dt>
-                        <dd>{hrs}</dd>
-                      </div>
-                    ))}
-                  </dl>
+                  <BusinessHoursBlock hours={biz.hours} isFuelStation={biz.type_slug === "fuel_station"} />
                 </div>
               )}
+
             </Card>
             <div>
               <GoogleBusinessMap
@@ -492,3 +491,89 @@ function BusinessProfilePage() {
     </SiteLayout>
   );
 }
+
+function statusClass(state: HoursStatus["state"]) {
+  switch (state) {
+    case "open": return "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30";
+    case "closing_soon": return "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30";
+    case "opening_soon": return "bg-sky-500/15 text-sky-700 dark:text-sky-300 border-sky-500/30";
+    case "closed": return "bg-muted text-muted-foreground border-border";
+    default: return "hidden";
+  }
+}
+
+function StatusPill({ hours, which, prefix }: { hours: any; which: "primary" | "store"; prefix?: string }) {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+  const status = getStatus(hours, now, which);
+  if (status.state === "unknown") return null;
+  return (
+    <div className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${statusClass(status.state)}`}>
+      <span className="h-1.5 w-1.5 rounded-full bg-current" />
+      {prefix ? <span className="opacity-70">{prefix}:</span> : null}
+      <span>{status.label}</span>
+      {status.detail ? <span className="opacity-70">· {status.detail}</span> : null}
+    </div>
+  );
+}
+
+function WeekGrid({ week }: { week: StructuredHours["primary"] }) {
+  return (
+    <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+      {DAY_KEYS.map((d) => {
+        const ds = week[d];
+        let text = "Closed";
+        if (ds?.mode === "24h") text = "24 hours";
+        else if (ds?.mode === "open" && ds.ranges?.length) text = ds.ranges.map(formatRange).join(", ");
+        return (
+          <div key={d} className="contents">
+            <dt className="text-muted-foreground">{DAY_LABELS[d]}</dt>
+            <dd>{text}</dd>
+          </div>
+        );
+      })}
+    </dl>
+  );
+}
+
+function BusinessHoursBlock({ hours, isFuelStation }: { hours: any; isFuelStation: boolean }) {
+  const legacy = legacyToRows(hours);
+  if (legacy) {
+    return (
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+        {legacy.map((r) => (
+          <div key={r.day} className="contents">
+            <dt className="text-muted-foreground capitalize">{r.day}</dt>
+            <dd>{r.text}</dd>
+          </div>
+        ))}
+      </dl>
+    );
+  }
+  if (!isStructuredHours(hours)) return null;
+  const hasStore = !!hours.store;
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-2">
+        <StatusPill hours={hours} which="primary" prefix={hasStore && isFuelStation ? "Pumps" : undefined} />
+        {hasStore && <StatusPill hours={hours} which="store" prefix={isFuelStation ? "Store" : "Store"} />}
+      </div>
+      <div>
+        {hasStore && isFuelStation && (
+          <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Pumps</div>
+        )}
+        <WeekGrid week={hours.primary} />
+      </div>
+      {hasStore && hours.store && (
+        <div>
+          <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Store / Sari-Sari</div>
+          <WeekGrid week={hours.store} />
+        </div>
+      )}
+    </div>
+  );
+}
+
