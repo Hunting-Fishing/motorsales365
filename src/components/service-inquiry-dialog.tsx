@@ -16,6 +16,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
 import { createServiceInquiry } from "@/lib/service-inquiries.functions";
+import { PhoneInput } from "@/components/phone-input";
+import { buildE164 } from "@/data/country-codes";
 
 export type InquiryType =
   | "financing"
