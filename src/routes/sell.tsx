@@ -23,6 +23,8 @@ import { uploadWithRetry } from "@/lib/storage-upload";
 import { getUserPlanLimits, FREE_PLAN_LIMITS, type PlanLimits } from "@/lib/plan-limits";
 import { useDynamicMeta } from "@/hooks/use-dynamic-meta";
 import { useDynamicJsonLd } from "@/hooks/use-dynamic-jsonld";
+import { PhoneInput } from "@/components/phone-input";
+import { buildE164 } from "@/data/country-codes";
 
 const SELL_SEO: Record<string, { title: string; description: string }> = {
   car: { title: "Sell your car in the Philippines — 365 MotorSales", description: "Post your car for sale and reach Filipino buyers nationwide. Free listings, photos, and instant messaging on 365 MotorSales." },
