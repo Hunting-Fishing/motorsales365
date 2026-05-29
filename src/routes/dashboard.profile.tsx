@@ -384,6 +384,55 @@ function ProfilePage() {
   );
 }
 
+function CurrencyPreferenceCard() {
+  const { code, setCode, currencies, current, loading, format } = useCurrency();
+  const sample = 1_250_000; // ₱1.25M — representative listing price
+  return (
+    <div className="mt-6 space-y-4 rounded-xl border border-border bg-card p-6">
+      <div>
+        <h2 className="font-display text-lg font-bold">Display currency</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          All listings are priced in Philippine Peso (₱). Pick a display currency to see
+          live conversions alongside the listed price across the site.
+        </p>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
+        <div>
+          <Label htmlFor="currency-pref">Preferred display currency</Label>
+          <select
+            id="currency-pref"
+            value={code}
+            disabled={loading}
+            onChange={(e) => setCode(e.target.value)}
+            className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+          >
+            {currencies.map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.symbol} {c.code} — {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="rounded-lg border border-border bg-muted/30 px-4 py-3 text-sm">
+          <div className="text-xs uppercase tracking-wide text-muted-foreground">Preview</div>
+          <div className="mt-0.5 font-semibold">
+            ₱{sample.toLocaleString()} <span className="text-xs text-muted-foreground">PHP</span>
+          </div>
+          {code !== "PHP" && current.rate_to_php > 0 && (
+            <div className="text-xs text-muted-foreground">
+              ≈ <span className="font-semibold text-foreground">{format(sample)}</span>{" "}
+              (1 {current.code} ≈ ₱{current.rate_to_php.toLocaleString("en-US", { maximumFractionDigits: 2 })})
+            </div>
+          )}
+        </div>
+      </div>
+      <p className="text-xs text-muted-foreground">
+        Conversions are indicative only. All transactions are billed in PHP.
+      </p>
+    </div>
+  );
+}
+
 function ProfileCompletion({ profile }: { profile: any }) {
   const items = buildChecklist(profile);
   const required = items.filter((i) => i.required);
