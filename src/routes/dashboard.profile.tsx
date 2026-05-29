@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -10,6 +10,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { LocationPicker } from "@/components/location-picker";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, Circle, AlertCircle } from "lucide-react";
+import { PhoneInput } from "@/components/phone-input";
+import { AvatarUploader } from "@/components/avatar-uploader";
+import { buildE164, parseE164 } from "@/data/country-codes";
 
 type ChecklistItem = { label: string; done: boolean; required: boolean };
 
@@ -17,8 +20,9 @@ function buildChecklist(profile: any): ChecklistItem[] {
   const isBusiness = profile?.seller_type === "business" || profile?.seller_type === "dealer";
   const has = (v: any) => typeof v === "string" ? v.trim().length > 0 : !!v;
   const items: ChecklistItem[] = [
-    { label: "Name", done: has(profile?.full_name) || (has(profile?.first_name) && has(profile?.last_name)), required: true },
+    { label: "First & last name", done: has(profile?.first_name) && has(profile?.last_name), required: true },
     { label: "Phone number", done: has(profile?.phone) || has(profile?.phone_e164), required: true },
+    { label: "Profile photo", done: has(profile?.avatar_url), required: false },
     { label: "Verified phone (SMS recovery)", done: !!profile?.phone_verified_at, required: false },
   ];
   if (isBusiness) {
@@ -35,35 +39,39 @@ export const Route = createFileRoute("/dashboard/profile")({
   component: ProfilePage,
 });
 
-function normalizePhPhone(input: string): string | null {
-  const digits = input.replace(/\D/g, "");
-  if (digits.startsWith("63") && digits.length === 12) return `+${digits}`;
-  if (digits.startsWith("0") && digits.length === 11) return `+63${digits.slice(1)}`;
-  if (digits.startsWith("9") && digits.length === 10) return `+63${digits}`;
-  return null;
-}
-
 function ProfilePage() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [saving, setSaving] = useState(false);
 
+  // Profile phone (country + national)
+  const [profilePhone, setProfilePhone] = useState<{ iso: string; national: string }>({
+    iso: "PH",
+    national: "",
+  });
+
   // Phone verification state
-  const [phoneInput, setPhoneInput] = useState("");
+  const [verifyPhone, setVerifyPhone] = useState<{ iso: string; national: string }>({
+    iso: "PH",
+    national: "",
+  });
   const [otpCode, setOtpCode] = useState("");
   const [otpSent, setOtpSent] = useState(false);
   const [phoneSubmitting, setPhoneSubmitting] = useState(false);
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("profiles").select("*").eq("id", user.id).maybeSingle().then(({ data }) => setProfile(data ?? {}));
+    supabase.from("profiles").select("*").eq("id", user.id).maybeSingle().then(({ data }) => {
+      setProfile(data ?? {});
+      const seed = data?.phone_e164 || data?.phone || "";
+      setProfilePhone(parseE164(seed));
+    });
   }, [user]);
 
   const sendPhoneOtp = async () => {
-    const e164 = normalizePhPhone(phoneInput);
-    if (!e164) return toast.error("Enter a valid PH phone number (e.g. 0917...)");
+    const e164 = buildE164(verifyPhone.iso, verifyPhone.national);
+    if (!e164) return toast.error("Enter a valid phone number.");
     setPhoneSubmitting(true);
-    // Rate-limit: 3 sends per phone per hour
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
     const { count } = await supabase
       .from("otp_send_log")
@@ -85,7 +93,7 @@ function ProfilePage() {
   };
 
   const verifyPhoneOtp = async () => {
-    const e164 = normalizePhPhone(phoneInput);
+    const e164 = buildE164(verifyPhone.iso, verifyPhone.national);
     if (!e164 || !user) return;
     setPhoneSubmitting(true);
     const { error } = await supabase.auth.verifyOtp({ phone: e164, token: otpCode, type: "phone_change" });
@@ -101,7 +109,7 @@ function ProfilePage() {
     toast.success("Phone verified — recovery via SMS is now enabled.");
     setOtpSent(false);
     setOtpCode("");
-    setPhoneInput("");
+    setVerifyPhone({ iso: "PH", national: "" });
   };
 
   const removePhone = async () => {
@@ -114,11 +122,35 @@ function ProfilePage() {
   const save = async () => {
     if (!user || !profile) return;
     setSaving(true);
-    const { error } = await supabase.from("profiles").upsert({ id: user.id, ...profile });
+    const e164 = buildE164(profilePhone.iso, profilePhone.national);
+    const first = (profile.first_name ?? "").trim();
+    const last = (profile.last_name ?? "").trim();
+    const full = [first, last].filter(Boolean).join(" ") || profile.full_name || null;
+    const payload = {
+      id: user.id,
+      ...profile,
+      first_name: first || null,
+      last_name: last || null,
+      full_name: full,
+      phone: e164 ?? profile.phone ?? null,
+    };
+    const { error } = await supabase.from("profiles").upsert(payload);
     setSaving(false);
     if (error) toast.error(error.message);
-    else toast.success("Profile saved");
+    else {
+      setProfile(payload);
+      toast.success("Profile saved");
+    }
   };
+
+  const initials = useMemo(() => {
+    const f = (profile?.first_name ?? "").trim();
+    const l = (profile?.last_name ?? "").trim();
+    if (f || l) return `${f[0] ?? ""}${l[0] ?? ""}`.toUpperCase() || "?";
+    const fn = (profile?.full_name ?? "").trim();
+    if (fn) return fn.split(/\s+/).map((s: string) => s[0]).slice(0, 2).join("").toUpperCase();
+    return user?.email?.[0]?.toUpperCase() ?? "?";
+  }, [profile, user]);
 
   if (!profile) return <div>Loading…</div>;
 
@@ -141,12 +173,46 @@ function ProfilePage() {
       )}
       <div className="space-y-4 rounded-xl border border-border bg-card p-6">
         <div>
-          <Label>Full name</Label>
-          <Input value={profile.full_name ?? ""} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })} />
+          <Label className="mb-2 block">Profile photo</Label>
+          {user && (
+            <AvatarUploader
+              userId={user.id}
+              value={profile.avatar_url ?? null}
+              fallback={initials}
+              onChange={(url) => setProfile({ ...profile, avatar_url: url })}
+            />
+          )}
+        </div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <Label htmlFor="first-name">First name</Label>
+            <Input
+              id="first-name"
+              autoComplete="given-name"
+              value={profile.first_name ?? ""}
+              onChange={(e) => setProfile({ ...profile, first_name: e.target.value })}
+            />
+          </div>
+          <div>
+            <Label htmlFor="last-name">Last name</Label>
+            <Input
+              id="last-name"
+              autoComplete="family-name"
+              value={profile.last_name ?? ""}
+              onChange={(e) => setProfile({ ...profile, last_name: e.target.value })}
+            />
+          </div>
         </div>
         <div>
           <Label>Phone</Label>
-          <Input value={profile.phone ?? ""} onChange={(e) => setProfile({ ...profile, phone: e.target.value })} />
+          <PhoneInput
+            iso={profilePhone.iso}
+            national={profilePhone.national}
+            onChange={setProfilePhone}
+          />
+          <p className="mt-1 text-xs text-muted-foreground">
+            Pick your country code, then enter your number. Stored as international format.
+          </p>
         </div>
         <div>
           <Label className="mb-2 block">Default seller type</Label>
@@ -202,7 +268,7 @@ function ProfilePage() {
         <div>
           <h2 className="font-display text-lg font-bold">Security — Phone verification</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Add a verified PH mobile number to recover your account by SMS if you lose access to your email.
+            Add a verified mobile number to recover your account by SMS if you lose access to your email.
           </p>
         </div>
 
@@ -219,14 +285,14 @@ function ProfilePage() {
         ) : !otpSent ? (
           <div className="space-y-3">
             <div>
-              <Label htmlFor="phone-verify">PH mobile number</Label>
-              <Input
+              <Label htmlFor="phone-verify">Mobile number</Label>
+              <PhoneInput
                 id="phone-verify"
-                placeholder="09XX XXX XXXX"
-                value={phoneInput}
-                onChange={(e) => setPhoneInput(e.target.value)}
+                iso={verifyPhone.iso}
+                national={verifyPhone.national}
+                onChange={setVerifyPhone}
               />
-              <p className="mt-1 text-xs text-muted-foreground">Format: 09XX XXX XXXX or +63 9XX XXX XXXX.</p>
+              <p className="mt-1 text-xs text-muted-foreground">Pick your country, then enter your mobile number.</p>
             </div>
             <Button onClick={sendPhoneOtp} disabled={phoneSubmitting} variant="secondary">
               {phoneSubmitting ? "Sending…" : "Send verification code"}
@@ -235,7 +301,9 @@ function ProfilePage() {
         ) : (
           <div className="space-y-3">
             <div>
-              <Label htmlFor="phone-otp">6-digit code sent to {phoneInput}</Label>
+              <Label htmlFor="phone-otp">
+                6-digit code sent to {buildE164(verifyPhone.iso, verifyPhone.national)}
+              </Label>
               <Input
                 id="phone-otp"
                 inputMode="numeric"
