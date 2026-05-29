@@ -210,11 +210,14 @@ function AdvertisePage() {
                     />
                   </Field>
                   <Field label="Phone" error={errors.phone}>
-                    <Input
-                      value={form.phone}
-                      maxLength={30}
-                      placeholder="+63 917 555 0100"
-                      onChange={(e) => update("phone", e.target.value)}
+                    <PhoneInput
+                      iso={phoneIso}
+                      national={phoneNational}
+                      onChange={({ iso, national }) => {
+                        setPhoneIso(iso);
+                        setPhoneNational(national);
+                        update("phone", buildE164(iso, national) ?? "");
+                      }}
                     />
                   </Field>
                 </div>
