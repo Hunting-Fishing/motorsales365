@@ -291,8 +291,10 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
               );
             })}
           </div>
+          <AddCustomTagInline category={k} onAdd={(label) => addCustom(k, label)} />
         </div>
       ))}
+
 
       <div className="flex justify-end">
         <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save tags"}</Button>
