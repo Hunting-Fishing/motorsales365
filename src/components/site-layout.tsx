@@ -4,6 +4,7 @@ import { SiteFooter } from "./site-footer";
 import { CookieBanner } from "./cookie-banner";
 import { PaymentTestModeBanner } from "./PaymentTestModeBanner";
 import { MobileTabBar } from "./mobile-tab-bar";
+import { FloatingHelpWidget } from "./support/floating-help-widget";
 import bannerImage from "@/assets/banner.webp";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
@@ -24,6 +25,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <main className="brand-watermark flex-1">{children}</main>
       <SiteFooter />
       <CookieBanner />
+      <FloatingHelpWidget />
       <MobileTabBar />
     </div>
   );

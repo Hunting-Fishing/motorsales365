@@ -8,7 +8,6 @@ import {
   Mail,
   MessageCircle,
   LifeBuoy,
-  ShieldCheck,
   HelpCircle,
   ArrowRight,
 } from "lucide-react";
@@ -22,15 +21,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { AnnotatedScreenshot } from "@/components/support/annotated-screenshot";
-import { SupportStep, SupportSteps } from "@/components/support/support-step";
-import { TopicSection } from "@/components/support/topic-section";
-
-import homeShot from "@/assets/support/home.png";
-import browseShot from "@/assets/support/browse.png";
-import pricingShot from "@/assets/support/pricing.png";
-import shopShot from "@/assets/support/shop.png";
-import businessesShot from "@/assets/support/businesses.png";
+import { SupportTicketForm } from "@/components/support/support-ticket-form";
 
 const FAQS: { q: string; a: string }[] = [
   {
@@ -84,34 +75,56 @@ const FAQS: { q: string; a: string }[] = [
 ];
 
 const TOPICS = [
-  { id: "buying", title: "Buying a vehicle", icon: Search, desc: "Search, compare, contact sellers safely." },
-  { id: "selling", title: "Selling & boosting", icon: Tag, desc: "List, photograph and promote your vehicle." },
-  { id: "account", title: "Account & verification", icon: UserCheck, desc: "Sign up, log in, reset password, verify." },
-  { id: "business", title: "Business, shop & payments", icon: Store, desc: "Business pages, affiliate shop, billing." },
+  {
+    to: "/support/buying" as const,
+    title: "Buying a vehicle",
+    icon: Search,
+    desc: "Search, filter, contact sellers safely.",
+    examples: ["Search & filter", "Safe meetups", "Inspecting paperwork"],
+  },
+  {
+    to: "/support/selling" as const,
+    title: "Selling & boosting",
+    icon: Tag,
+    desc: "List, photograph, promote your vehicle.",
+    examples: ["Post a listing", "Photo tips", "Boost & promote"],
+  },
+  {
+    to: "/support/account" as const,
+    title: "Account & verification",
+    icon: UserCheck,
+    desc: "Sign up, log in, reset password, verify.",
+    examples: ["Reset password", "Verified badge", "Privacy & data"],
+  },
+  {
+    to: "/support/business" as const,
+    title: "Business, shop & payments",
+    icon: Store,
+    desc: "Business pages, affiliate shop, billing.",
+    examples: ["List your business", "Manage shop links", "Billing & refunds"],
+  },
 ];
 
 export const Route = createFileRoute("/support")({
-  component: SupportPage,
+  component: SupportHubPage,
   head: () => ({
     meta: [
       { title: "Help & Support — 365 MotorSales Philippines" },
       {
         name: "description",
         content:
-          "Step-by-step guides, FAQ and contact options for buying, selling, boosting and managing your 365 MotorSales account.",
+          "Step-by-step guides, FAQ and direct support for buying, selling, boosting and managing your 365 MotorSales account.",
       },
       { property: "og:title", content: "Help & Support — 365 MotorSales" },
       {
         property: "og:description",
         content:
-          "How-tos with annotated screenshots, FAQ and contact options for the Philippines' vehicle marketplace.",
+          "How-tos with annotated screenshots, FAQ and a support ticket form for the Philippines' vehicle marketplace.",
       },
       { property: "og:url", content: "https://365motorsales.com/support" },
       { property: "og:type", content: "website" },
     ],
-    links: [
-      { rel: "canonical", href: "https://365motorsales.com/support" },
-    ],
+    links: [{ rel: "canonical", href: "https://365motorsales.com/support" }],
     scripts: [
       {
         type: "application/ld+json",
@@ -129,7 +142,7 @@ export const Route = createFileRoute("/support")({
   }),
 });
 
-function SupportPage() {
+function SupportHubPage() {
   const [query, setQuery] = useState("");
 
   const filteredFaqs = useMemo(() => {
@@ -151,7 +164,7 @@ function SupportPage() {
               How can we help?
             </h1>
             <p className="mt-3 text-sm text-primary-foreground/85 sm:text-base">
-              Step-by-step how-tos, answers to common questions and a direct line to our team.
+              Browse guides, search the FAQ, or message our team directly.
             </p>
             <div className="relative mx-auto mt-6 max-w-xl">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -163,268 +176,49 @@ function SupportPage() {
               />
             </div>
           </div>
-
-          {/* Topic quick-links */}
-          <div className="mx-auto mt-10 grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-4">
-            {TOPICS.map((t) => (
-              <a
-                key={t.id}
-                href={`#${t.id}`}
-                className="group flex flex-col items-start gap-2 rounded-xl bg-white/10 p-4 text-left backdrop-blur transition-colors hover:bg-white/20"
-              >
-                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/20">
-                  <t.icon className="h-4 w-4" />
-                </span>
-                <span className="text-sm font-semibold leading-tight">{t.title}</span>
-                <span className="hidden text-xs text-primary-foreground/75 sm:block">
-                  {t.desc}
-                </span>
-              </a>
-            ))}
-          </div>
         </div>
       </section>
 
-      <div className="container mx-auto max-w-4xl px-4">
-        {/* BUYING */}
-        <TopicSection
-          id="buying"
-          icon={Search}
-          title="Buying a vehicle"
-          description="Find the right car, motorcycle or equipment — and meet sellers safely."
-        >
-          <div>
-            <h3 className="text-lg font-semibold">Search and filter listings</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Pick a category from the top nav, then narrow results with filters on the left.
-            </p>
-            <AnnotatedScreenshot
-              src={browseShot}
-              alt="Browse cars page with category tabs and filter panel"
-              annotations={[
-                { n: 1, x: 25, y: 39, label: "Category tabs", side: "bottom" },
-                { n: 2, x: 14, y: 70, label: "Filter by make, model & year", side: "right" },
-              ]}
-            />
-            <SupportSteps>
-              <SupportStep n={1} title="Choose a category">
-                Click <strong>Cars</strong>, <strong>Motorcycles</strong>, <strong>Boats</strong>,{" "}
-                <strong>Airplanes</strong>, <strong>Equipment</strong> or <strong>Towing</strong> from the top nav.
-              </SupportStep>
-              <SupportStep n={2} title="Apply filters">
-                Use the Filters panel to narrow by make, model, year, engine, price and location.
-              </SupportStep>
-              <SupportStep n={3} title="Save a search">
-                Logged in? Click the bookmark icon to get notified when matching listings appear.
-              </SupportStep>
-            </SupportSteps>
+      <div className="container mx-auto max-w-5xl px-4">
+        {/* Topic cards */}
+        <section className="py-10 sm:py-14">
+          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Browse by topic</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Each guide has annotated screenshots and step-by-step instructions.
+          </p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            {TOPICS.map((t) => (
+              <Link
+                key={t.to}
+                to={t.to}
+                className="group rounded-xl border border-border bg-card p-5 transition-all hover:border-primary/40 hover:shadow-md"
+              >
+                <div className="flex items-start gap-4">
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <t.icon className="h-5 w-5" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="flex items-center gap-1 text-base font-semibold sm:text-lg">
+                      {t.title}
+                      <ArrowRight className="h-4 w-4 -translate-x-1 opacity-0 transition-all group-hover:translate-x-0 group-hover:opacity-100" />
+                    </h3>
+                    <p className="mt-1 text-sm text-muted-foreground">{t.desc}</p>
+                    <ul className="mt-3 flex flex-wrap gap-1.5">
+                      {t.examples.map((e) => (
+                        <li
+                          key={e}
+                          className="rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium text-muted-foreground"
+                        >
+                          {e}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
-
-          <div>
-            <h3 className="text-lg font-semibold">Contact a seller safely</h3>
-            <SupportSteps>
-              <SupportStep n={1} title="Use on-platform messaging first">
-                Keep early conversations on 365 MotorSales — this protects both buyer and seller.
-              </SupportStep>
-              <SupportStep n={2} title="Inspect in person">
-                Always view the vehicle in daylight at a public, well-lit location. Bring a friend or mechanic.
-              </SupportStep>
-              <SupportStep n={3} title="Verify the paperwork">
-                Check that the OR/CR, chassis number and engine number match. Never pay a deposit before seeing the vehicle.
-              </SupportStep>
-              <SupportStep n={4} title="Use traceable payments">
-                Bank transfer, GCash or Maya. Avoid large cash transactions.
-              </SupportStep>
-            </SupportSteps>
-            <div className="mt-4 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm">
-              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
-              <p>
-                See our <Link to="/guidelines" className="font-semibold text-primary underline">Community Guidelines</Link>{" "}
-                for the full safety checklist.
-              </p>
-            </div>
-          </div>
-        </TopicSection>
-
-        {/* SELLING */}
-        <TopicSection
-          id="selling"
-          icon={Tag}
-          title="Selling & boosting"
-          description="List your vehicle in minutes, then boost it for more reach."
-        >
-          <div>
-            <h3 className="text-lg font-semibold">Post a listing</h3>
-            <AnnotatedScreenshot
-              src={homeShot}
-              alt="365 MotorSales home page showing the Post a listing button"
-              annotations={[
-                { n: 1, x: 87, y: 39, label: "Click Post a listing", side: "left" },
-              ]}
-            />
-            <SupportSteps>
-              <SupportStep n={1} title="Click Post a listing">
-                Top-right of every page. You'll be asked to sign in if you haven't already.
-              </SupportStep>
-              <SupportStep n={2} title="Pick a category and vehicle">
-                Choose the type (Car, Motorcycle, etc.) and select make, model and year.
-              </SupportStep>
-              <SupportStep n={3} title="Add great photos">
-                Up to 20 photos and 1 video. Use daylight, clean the vehicle, and shoot from all 4 sides plus interior and engine.
-              </SupportStep>
-              <SupportStep n={4} title="Set your price and location">
-                Prices are in ₱ PHP. Pick the region and city — buyers filter by location.
-              </SupportStep>
-              <SupportStep n={5} title="Publish">
-                Your listing goes live for 60 days. Free.
-              </SupportStep>
-            </SupportSteps>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold">Boost your listing</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Boosts move your listing higher in search and add featured placements.
-            </p>
-            <AnnotatedScreenshot
-              src={pricingShot}
-              alt="Pricing page with Search Boost, Province Boost and Homepage Spotlight tiers"
-              annotations={[
-                { n: 1, x: 30, y: 81, label: "₱99 — Search Boost", side: "right" },
-                { n: 2, x: 55, y: 81, label: "₱199 — Province", side: "right" },
-                { n: 3, x: 80, y: 81, label: "₱499 — Homepage", side: "left" },
-              ]}
-            />
-            <SupportSteps>
-              <SupportStep n={1} title="Open Dashboard → My listings">
-                Find the listing you want to promote.
-              </SupportStep>
-              <SupportStep n={2} title="Click Boost">
-                Pick the plan that matches your goal. Stripe handles payment securely.
-              </SupportStep>
-              <SupportStep n={3} title="Track results">
-                Your dashboard shows views and click-throughs while the boost is active.
-              </SupportStep>
-            </SupportSteps>
-          </div>
-        </TopicSection>
-
-        {/* ACCOUNT */}
-        <TopicSection
-          id="account"
-          icon={UserCheck}
-          title="Account & verification"
-          description="Sign up, log in, reset your password and earn the Verified badge."
-        >
-          <div>
-            <h3 className="text-lg font-semibold">Sign up or log in</h3>
-            <SupportSteps>
-              <SupportStep n={1} title="Click Account → Sign up">
-                Top-right of the header. Use email + password or continue with Google.
-              </SupportStep>
-              <SupportStep n={2} title="Verify your email">
-                We send a confirmation link. Click it to activate your account.
-              </SupportStep>
-              <SupportStep n={3} title="Forgot password?">
-                On the Login page click <strong>Forgot password</strong> — we email a secure reset link valid for 1 hour.
-              </SupportStep>
-            </SupportSteps>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold">Get the Verified badge</h3>
-            <SupportSteps>
-              <SupportStep n={1} title="Open Dashboard → Verification">
-                You'll see the checklist of what we need.
-              </SupportStep>
-              <SupportStep n={2} title="Upload a valid government ID">
-                Driver's license, passport, UMID or PhilSys ID. Make sure all corners are visible and text is readable.
-              </SupportStep>
-              <SupportStep n={3} title="Take a selfie">
-                A short selfie helps us confirm the ID belongs to you. We never publish this image.
-              </SupportStep>
-              <SupportStep n={4} title="Wait 24–48 hours">
-                Our team reviews and applies the blue Verified badge. You'll get an email when it's live.
-              </SupportStep>
-            </SupportSteps>
-          </div>
-        </TopicSection>
-
-        {/* BUSINESS */}
-        <TopicSection
-          id="business"
-          icon={Store}
-          title="Business, shop & payments"
-          description="Set up a business page, manage shop links, and handle billing."
-        >
-          <div>
-            <h3 className="text-lg font-semibold">Create a business page</h3>
-            <AnnotatedScreenshot
-              src={businessesShot}
-              alt="Businesses directory with the List your business button highlighted"
-              annotations={[
-                { n: 1, x: 90, y: 56, label: "List your business", side: "left" },
-                { n: 2, x: 25, y: 73, label: "Categories & filters", side: "right" },
-              ]}
-            />
-            <SupportSteps>
-              <SupportStep n={1} title="Click List your business">
-                From the Businesses page (top-right). You'll need a logged-in account.
-              </SupportStep>
-              <SupportStep n={2} title="Fill in your details">
-                Name, category (dealership, repair shop, parts, etc.), location, hours, photos and accepted payments.
-              </SupportStep>
-              <SupportStep n={3} title="Pick a plan">
-                Free directory listing, or upgrade for leads, multiple staff seats and analytics.
-              </SupportStep>
-              <SupportStep n={4} title="Publish & manage leads">
-                Inquiries land in Dashboard → Leads. Assign to staff and respond fast — buyers move quickly.
-              </SupportStep>
-            </SupportSteps>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold">Shop products & affiliate links</h3>
-            <AnnotatedScreenshot
-              src={shopShot}
-              alt="Shop page with vehicle fitment picker"
-              annotations={[
-                { n: 1, x: 50, y: 88, label: "Find parts that fit your vehicle", side: "top" },
-              ]}
-            />
-            <SupportSteps>
-              <SupportStep n={1} title="Pick your vehicle">
-                Use the fitment picker so we only show parts compatible with your make and model.
-              </SupportStep>
-              <SupportStep n={2} title="Click through to buy">
-                You'll be sent to Shopee, Lazada, AliExpress or the brand store. Pricing, shipping and returns are handled there.
-              </SupportStep>
-              <SupportStep n={3} title="How we earn">
-                We may receive a small commission — your price doesn't change.{" "}
-                <Link to="/affiliate-disclosure" className="font-semibold text-primary underline">
-                  Read the full disclosure
-                </Link>
-                .
-              </SupportStep>
-            </SupportSteps>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold">Billing, receipts & refunds</h3>
-            <SupportSteps>
-              <SupportStep n={1} title="Find your receipts">
-                Dashboard → Billing lists every charge with downloadable PDF receipts.
-              </SupportStep>
-              <SupportStep n={2} title="Update payment method">
-                From Billing, click Manage to add or change card / e-wallet.
-              </SupportStep>
-              <SupportStep n={3} title="Request a refund">
-                Within 24 hours of an unused boost, click <strong>Refund</strong> next to the charge.
-                See the <Link to="/refund-policy" className="font-semibold text-primary underline">Refund Policy</Link> for details.
-              </SupportStep>
-            </SupportSteps>
-          </div>
-        </TopicSection>
+        </section>
 
         {/* FAQ */}
         <section id="faq" className="scroll-mt-24 border-t border-border py-10 sm:py-14">
@@ -437,7 +231,9 @@ function SupportPage() {
                 Frequently asked questions
               </h2>
               <p className="mt-1 text-sm text-muted-foreground">
-                {query ? `${filteredFaqs.length} match${filteredFaqs.length === 1 ? "" : "es"} for "${query}"` : "Quick answers to the most common questions."}
+                {query
+                  ? `${filteredFaqs.length} match${filteredFaqs.length === 1 ? "" : "es"} for "${query}"`
+                  : "Quick answers to the most common questions."}
               </p>
             </div>
           </div>
@@ -469,38 +265,40 @@ function SupportPage() {
 
         {/* CONTACT */}
         <section id="contact" className="scroll-mt-24 border-t border-border py-10 sm:py-14">
-          <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 to-transparent">
-            <CardContent className="p-6 sm:p-10">
-              <div className="flex flex-col items-start gap-6 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                    Still need help?
-                  </h2>
-                  <p className="mt-2 max-w-xl text-sm text-muted-foreground">
-                    Our support team typically replies within one business day. Filipino and English.
-                  </p>
-                </div>
-                <div className="flex w-full flex-col gap-2 sm:w-auto">
-                  <Button asChild size="lg">
-                    <a href="mailto:support@365motorsales.com?subject=Support%20request">
-                      <Mail className="h-4 w-4" /> Email support
-                    </a>
-                  </Button>
-                  <Button asChild size="lg" variant="outline">
-                    <Link to="/contact">
-                      Contact form <ArrowRight className="h-4 w-4" />
-                    </Link>
-                  </Button>
-                  <Button asChild size="lg" variant="ghost">
-                    {/* TODO: replace # with real Messenger / WhatsApp link */}
-                    <a href="#" aria-disabled="true">
-                      <MessageCircle className="h-4 w-4" /> Messenger / WhatsApp
-                    </a>
-                  </Button>
-                </div>
+          <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
+            <div>
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
+                Still need help?
+              </h2>
+              <p className="mt-2 max-w-md text-sm text-muted-foreground">
+                Send our team a message. We typically reply within 1 business day — Filipino and English support.
+              </p>
+              <div className="mt-6 space-y-2">
+                <Button asChild variant="outline" className="w-full justify-start">
+                  <a href="mailto:support@365motorsales.com?subject=Support%20request">
+                    <Mail className="h-4 w-4" /> support@365motorsales.com
+                  </a>
+                </Button>
+                <Button asChild variant="ghost" className="w-full justify-start">
+                  {/* TODO: replace # with real Messenger / WhatsApp link */}
+                  <a href="#" aria-disabled="true">
+                    <MessageCircle className="h-4 w-4" /> Messenger / WhatsApp
+                  </a>
+                </Button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+            <Card>
+              <CardContent className="p-5 sm:p-6">
+                <h3 className="text-lg font-semibold">Send a support request</h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  We'll email you a confirmation right away.
+                </p>
+                <div className="mt-5">
+                  <SupportTicketForm />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </section>
       </div>
     </SiteLayout>

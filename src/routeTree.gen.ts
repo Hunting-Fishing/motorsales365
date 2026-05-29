@@ -40,6 +40,10 @@ import { Route as RidesIndexRouteImport } from './routes/rides.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as BusinessesIndexRouteImport } from './routes/businesses.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as SupportSellingRouteImport } from './routes/support_.selling'
+import { Route as SupportBuyingRouteImport } from './routes/support_.buying'
+import { Route as SupportBusinessRouteImport } from './routes/support_.business'
+import { Route as SupportAccountRouteImport } from './routes/support_.account'
 import { Route as ShopCategoriesRouteImport } from './routes/shop.categories'
 import { Route as ShopCategoryRouteImport } from './routes/shop.$category'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
@@ -273,6 +277,26 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const SupportSellingRoute = SupportSellingRouteImport.update({
+  id: '/support_/selling',
+  path: '/support/selling',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportBuyingRoute = SupportBuyingRouteImport.update({
+  id: '/support_/buying',
+  path: '/support/buying',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportBusinessRoute = SupportBusinessRouteImport.update({
+  id: '/support_/business',
+  path: '/support/business',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportAccountRoute = SupportAccountRouteImport.update({
+  id: '/support_/account',
+  path: '/support/account',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ShopCategoriesRoute = ShopCategoriesRouteImport.update({
   id: '/shop/categories',
@@ -750,6 +774,10 @@ export interface FileRoutesByFullPath {
   '/seller/$id': typeof SellerIdRoute
   '/shop/$category': typeof ShopCategoryRoute
   '/shop/categories': typeof ShopCategoriesRoute
+  '/support/account': typeof SupportAccountRoute
+  '/support/business': typeof SupportBusinessRoute
+  '/support/buying': typeof SupportBuyingRoute
+  '/support/selling': typeof SupportSellingRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -858,6 +886,10 @@ export interface FileRoutesByTo {
   '/seller/$id': typeof SellerIdRoute
   '/shop/$category': typeof ShopCategoryRoute
   '/shop/categories': typeof ShopCategoriesRoute
+  '/support/account': typeof SupportAccountRoute
+  '/support/business': typeof SupportBusinessRoute
+  '/support/buying': typeof SupportBuyingRoute
+  '/support/selling': typeof SupportSellingRoute
   '/admin': typeof AdminIndexRoute
   '/businesses': typeof BusinessesIndexRoute
   '/dashboard': typeof DashboardIndexRoute
@@ -970,6 +1002,10 @@ export interface FileRoutesById {
   '/seller/$id': typeof SellerIdRoute
   '/shop/$category': typeof ShopCategoryRoute
   '/shop/categories': typeof ShopCategoriesRoute
+  '/support_/account': typeof SupportAccountRoute
+  '/support_/business': typeof SupportBusinessRoute
+  '/support_/buying': typeof SupportBuyingRoute
+  '/support_/selling': typeof SupportSellingRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
@@ -1083,6 +1119,10 @@ export interface FileRouteTypes {
     | '/seller/$id'
     | '/shop/$category'
     | '/shop/categories'
+    | '/support/account'
+    | '/support/business'
+    | '/support/buying'
+    | '/support/selling'
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
@@ -1191,6 +1231,10 @@ export interface FileRouteTypes {
     | '/seller/$id'
     | '/shop/$category'
     | '/shop/categories'
+    | '/support/account'
+    | '/support/business'
+    | '/support/buying'
+    | '/support/selling'
     | '/admin'
     | '/businesses'
     | '/dashboard'
@@ -1302,6 +1346,10 @@ export interface FileRouteTypes {
     | '/seller/$id'
     | '/shop/$category'
     | '/shop/categories'
+    | '/support_/account'
+    | '/support_/business'
+    | '/support_/buying'
+    | '/support_/selling'
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
@@ -1381,6 +1429,10 @@ export interface RootRouteChildren {
   SellerIdRoute: typeof SellerIdRoute
   ShopCategoryRoute: typeof ShopCategoryRoute
   ShopCategoriesRoute: typeof ShopCategoriesRoute
+  SupportAccountRoute: typeof SupportAccountRoute
+  SupportBusinessRoute: typeof SupportBusinessRoute
+  SupportBuyingRoute: typeof SupportBuyingRoute
+  SupportSellingRoute: typeof SupportSellingRoute
   BusinessesIndexRoute: typeof BusinessesIndexRoute
   RidesIndexRoute: typeof RidesIndexRoute
   ShopIndexRoute: typeof ShopIndexRoute
@@ -1619,6 +1671,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/support_/selling': {
+      id: '/support_/selling'
+      path: '/support/selling'
+      fullPath: '/support/selling'
+      preLoaderRoute: typeof SupportSellingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support_/buying': {
+      id: '/support_/buying'
+      path: '/support/buying'
+      fullPath: '/support/buying'
+      preLoaderRoute: typeof SupportBuyingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support_/business': {
+      id: '/support_/business'
+      path: '/support/business'
+      fullPath: '/support/business'
+      preLoaderRoute: typeof SupportBusinessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support_/account': {
+      id: '/support_/account'
+      path: '/support/account'
+      fullPath: '/support/account'
+      preLoaderRoute: typeof SupportAccountRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/shop/categories': {
       id: '/shop/categories'
@@ -2372,6 +2452,10 @@ const rootRouteChildren: RootRouteChildren = {
   SellerIdRoute: SellerIdRoute,
   ShopCategoryRoute: ShopCategoryRoute,
   ShopCategoriesRoute: ShopCategoriesRoute,
+  SupportAccountRoute: SupportAccountRoute,
+  SupportBusinessRoute: SupportBusinessRoute,
+  SupportBuyingRoute: SupportBuyingRoute,
+  SupportSellingRoute: SupportSellingRoute,
   BusinessesIndexRoute: BusinessesIndexRoute,
   RidesIndexRoute: RidesIndexRoute,
   ShopIndexRoute: ShopIndexRoute,
@@ -2394,3 +2478,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
