@@ -16,6 +16,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
 import { createServiceInquiry } from "@/lib/service-inquiries.functions";
+import { PhoneInput } from "@/components/phone-input";
+import { buildE164 } from "@/data/country-codes";
 
 export type InquiryType =
   | "financing"
@@ -103,6 +105,9 @@ export function ServiceInquiryDialog({
     phone: "",
     message: "",
   });
+  const [phoneIso, setPhoneIso] = useState("PH");
+  const [phoneNational, setPhoneNational] = useState("");
+
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -182,12 +187,15 @@ export function ServiceInquiryDialog({
           </div>
           <div>
             <Label htmlFor="si-phone">Phone (optional)</Label>
-            <Input
+            <PhoneInput
               id="si-phone"
-              type="tel"
-              maxLength={30}
-              value={form.phone}
-              onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+              iso={phoneIso}
+              national={phoneNational}
+              onChange={({ iso, national }) => {
+                setPhoneIso(iso);
+                setPhoneNational(national);
+                setForm((f) => ({ ...f, phone: buildE164(iso, national) ?? "" }));
+              }}
             />
           </div>
           <div>

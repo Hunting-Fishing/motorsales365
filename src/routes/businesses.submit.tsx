@@ -18,6 +18,8 @@ import { uploadWithRetry } from "@/lib/storage-upload";
 import { toast } from "sonner";
 import { useDynamicMeta } from "@/hooks/use-dynamic-meta";
 import { useDynamicJsonLd } from "@/hooks/use-dynamic-jsonld";
+import { PhoneInput } from "@/components/phone-input";
+import { buildE164 } from "@/data/country-codes";
 
 export const Route = createFileRoute("/businesses/submit")({
   head: () => ({
@@ -47,7 +49,8 @@ function SubmitBusinessPage() {
   const [name, setName] = useState("");
   const [typeSlug, setTypeSlug] = useState<string>("");
   const [description, setDescription] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phoneIso, setPhoneIso] = useState("PH");
+  const [phoneNational, setPhoneNational] = useState("");
   const [email, setEmail] = useState("");
   const [website, setWebsite] = useState("");
   const [messengerUrl, setMessengerUrl] = useState("");
@@ -244,7 +247,7 @@ function SubmitBusinessPage() {
       owner_id: user.id, slug, name: name.trim(), type_slug: typeSlug,
       description: description.trim() || null,
       logo_url: logoUrl,
-      phone: phone.trim() || null, email: email.trim() || null,
+      phone: buildE164(phoneIso, phoneNational) ?? null, email: email.trim() || null,
       website: website.trim() || null, messenger_url: messengerUrl.trim() || null,
       street_address: streetAddress.trim() || null,
       region: loc.region, province: loc.province, city: loc.city, barangay: loc.barangay,
@@ -504,7 +507,7 @@ function SubmitBusinessPage() {
 
 
           <div className="grid gap-3 sm:grid-cols-2">
-            <div><Label>Phone</Label><Input value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
+            <div><Label>Phone</Label><PhoneInput iso={phoneIso} national={phoneNational} onChange={({ iso, national }) => { setPhoneIso(iso); setPhoneNational(national); }} /></div>
             <div><Label>Email</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
             <div><Label>Website</Label><Input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://…" /></div>
             <div><Label>Messenger / FB</Label><Input value={messengerUrl} onChange={(e) => setMessengerUrl(e.target.value)} placeholder="https://m.me/…" /></div>

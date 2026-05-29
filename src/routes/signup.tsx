@@ -21,6 +21,8 @@ import { SiteLayout } from "@/components/site-layout";
 import { getCreditedCode } from "@/lib/referral";
 import { AccountTypeGrid, SIGNUP_TYPES, type SignupIntent } from "@/components/signup/account-type-grid";
 import { LocationPicker, type LocationValue } from "@/components/location-picker";
+import { PhoneInput } from "@/components/phone-input";
+import { buildE164 } from "@/data/country-codes";
 
 type SignupSearch = { type?: SignupIntent };
 
@@ -54,15 +56,8 @@ const BUSINESS_KIND_OPTIONS: { value: string; label: string; forIntent?: SignupI
   { value: "other", label: "Other" },
 ];
 
-function normalizePhPhone(raw: string): string | null {
-  const d = raw.replace(/[^0-9+]/g, "");
-  if (!d) return null;
-  if (d.startsWith("+")) return /^\+\d{8,15}$/.test(d) ? d : null;
-  if (/^09\d{9}$/.test(d)) return "+63" + d.slice(1);
-  if (/^9\d{9}$/.test(d)) return "+63" + d;
-  if (/^63\d{10}$/.test(d)) return "+" + d;
-  return null;
-}
+// Phone is now captured as { iso, national } via PhoneInput and normalized to
+// E.164 via buildE164 on submit.
 
 function SignupPage() {
   const { user, loading } = useAuth();
@@ -73,7 +68,8 @@ function SignupPage() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phoneIso, setPhoneIso] = useState("PH");
+  const [phoneNational, setPhoneNational] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [businessName, setBusinessName] = useState("");
@@ -97,8 +93,8 @@ function SignupPage() {
   );
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-  const phoneNormalized = phone.trim() ? normalizePhPhone(phone) : "";
-  const phoneValid = phoneNormalized !== null;
+  const phoneE164 = phoneNational.trim() ? buildE164(phoneIso, phoneNational) : "";
+  const phoneValid = phoneE164 !== null;
 
   type Issue = { field: string; label: string; message: string };
   const issues = useMemo<Issue[]>(() => {
@@ -108,7 +104,7 @@ function SignupPage() {
     if (!lastName.trim()) list.push({ field: "lastName", label: "Last name", message: "Enter your last name." });
     if (!email.trim()) list.push({ field: "email", label: "Email", message: "Enter your email address." });
     else if (!emailValid) list.push({ field: "email", label: "Email", message: "Enter a valid email address." });
-    if (phone.trim() && !phoneValid) list.push({ field: "phone", label: "Mobile", message: "Use a PH mobile format like 09XX XXX XXXX, or leave it blank." });
+    if (phoneNational.trim() && !phoneValid) list.push({ field: "phone", label: "Mobile", message: "Enter a valid mobile number or leave it blank." });
     if (!location.city) list.push({ field: "city", label: "City / Town", message: "Choose your city or town." });
     if (isBusinessLike && !businessName.trim()) {
       list.push({ field: "businessName", label: intent === "service_provider" ? "Service name" : "Business name", message: "Required for business and service accounts." });
@@ -120,7 +116,7 @@ function SignupPage() {
     else if (password.length < 8) list.push({ field: "password", label: "Password", message: "Password must be at least 8 characters." });
     if (!agreed) list.push({ field: "terms", label: "Terms", message: "Agree to the Terms and Privacy Policy to continue." });
     return list;
-  }, [intent, firstName, lastName, email, emailValid, phone, phoneValid, location.city, isBusinessLike, businessName, businessKind, password, agreed]);
+  }, [intent, firstName, lastName, email, emailValid, phoneNational, phoneValid, location.city, isBusinessLike, businessName, businessKind, password, agreed]);
 
   const errorFor = (field: string) => {
     if (!submitAttempted && !touched[field]) return null;
@@ -149,7 +145,7 @@ function SignupPage() {
         full_name: fullName || undefined,
         first_name: firstName.trim() || undefined,
         last_name: lastName.trim() || undefined,
-        phone: phone.trim() || undefined,
+        phone: phoneE164 || undefined,
         business_name: isBusinessLike ? businessName.trim() || undefined : undefined,
         business_address: isBusinessLike ? businessAddress.trim() || undefined : undefined,
         business_kind: isBusinessLike ? businessKind || undefined : undefined,
@@ -185,7 +181,7 @@ function SignupPage() {
           full_name: fullName,
           first_name: firstName.trim(),
           last_name: lastName.trim(),
-          phone: phone.trim() || undefined,
+          phone: phoneE164 || undefined,
           business_name: isBusinessLike ? businessName.trim() : undefined,
           business_address: isBusinessLike ? (businessAddress.trim() || undefined) : undefined,
           business_kind: isBusinessLike ? (businessKind || undefined) : undefined,
@@ -283,23 +279,21 @@ function SignupPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div id="field-phone">
               <Label htmlFor="phone">Mobile (optional)</Label>
-              <Input
+              <PhoneInput
                 id="phone"
-                type="tel"
-                placeholder="09XX XXX XXXX"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                onBlur={() => markTouched("phone")}
-                autoComplete="tel"
-                aria-invalid={!!errorFor("phone")}
-                className={invalidCls("phone")}
+                iso={phoneIso}
+                national={phoneNational}
+                onChange={({ iso, national }) => {
+                  setPhoneIso(iso);
+                  setPhoneNational(national);
+                }}
               />
               {errorFor("phone") ? (
                 <p className="mt-1 text-xs text-destructive">{errorFor("phone")}</p>
               ) : (
                 <p className="mt-1 text-xs text-muted-foreground">
-                  PH mobile format — we'll store it as +63.
-                  {phone.trim() && phoneValid && <span className="ml-1 text-emerald-600">✓ {phoneNormalized}</span>}
+                  Pick your country, then enter your number.
+                  {phoneNational.trim() && phoneValid && <span className="ml-1 text-emerald-600">✓ {phoneE164}</span>}
                 </p>
               )}
             </div>

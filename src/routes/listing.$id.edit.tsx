@@ -12,6 +12,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LocationPicker } from "@/components/location-picker";
 import { getUserPlanLimits, FREE_PLAN_LIMITS, type PlanLimits } from "@/lib/plan-limits";
+import { PhoneInput } from "@/components/phone-input";
+import { parseE164, buildE164 } from "@/data/country-codes";
 
 export const Route = createFileRoute("/listing/$id/edit")({
   component: EditListingPage,
@@ -40,7 +42,8 @@ function EditListingPage() {
   const [city, setCity] = useState<string | null>(null);
   const [barangay, setBarangay] = useState<string | null>(null);
   const [condition, setCondition] = useState("Used");
-  const [phone, setPhone] = useState("");
+  const [phoneIso, setPhoneIso] = useState("PH");
+  const [phoneNational, setPhoneNational] = useState("");
   const [allowMessages, setAllowMessages] = useState(true);
 
   useEffect(() => {
@@ -69,7 +72,7 @@ function EditListingPage() {
     setCity(l.city ?? null);
     setBarangay(l.barangay ?? null);
     setCondition(l.condition ?? "Used");
-    setPhone(l.contact_phone ?? "");
+    { const p = parseE164(l.contact_phone ?? null); setPhoneIso(p.iso); setPhoneNational(p.national); }
     setAllowMessages(l.allow_messages);
 
     const { data: m } = await supabase
@@ -100,7 +103,7 @@ function EditListingPage() {
         city,
         barangay,
         condition,
-        contact_phone: phone || null,
+        contact_phone: buildE164(phoneIso, phoneNational) ?? null,
         allow_messages: allowMessages,
       })
       .eq("id", id);
@@ -217,7 +220,7 @@ function EditListingPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label>Contact phone</Label>
-                <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
+                <PhoneInput iso={phoneIso} national={phoneNational} onChange={({ iso, national }) => { setPhoneIso(iso); setPhoneNational(national); }} />
               </div>
               <div className="flex items-center gap-2 pt-6">
                 <input

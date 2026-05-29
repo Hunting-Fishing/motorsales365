@@ -6,11 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Send, CheckCircle2 } from "lucide-react";
+import { PhoneInput } from "@/components/phone-input";
+import { buildE164 } from "@/data/country-codes";
 
 export function InquiryForm({ businessId, businessName }: { businessId: string; businessName: string }) {
   const submit = useServerFn(submitBusinessInquiry);
   const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phoneIso, setPhoneIso] = useState("PH");
+  const [phoneNational, setPhoneNational] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
@@ -28,7 +31,7 @@ export function InquiryForm({ businessId, businessName }: { businessId: string; 
         data: {
           businessId,
           name: name.trim(),
-          phone: phone.trim() || null,
+          phone: buildE164(phoneIso, phoneNational) ?? null,
           email: email.trim() || null,
           message: message.trim(),
         },
@@ -63,12 +66,11 @@ export function InquiryForm({ businessId, businessName }: { businessId: string; 
           className="h-11 text-base"
           required
         />
-        <Input
+        <PhoneInput
+          iso={phoneIso}
+          national={phoneNational}
+          onChange={({ iso, national }) => { setPhoneIso(iso); setPhoneNational(national); }}
           placeholder="Phone (optional)"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          maxLength={40}
-          className="h-11 text-base"
         />
       </div>
       <Input

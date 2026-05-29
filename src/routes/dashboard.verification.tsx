@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/select";
 import { formatDate } from "@/lib/format";
 import { LocationPicker } from "@/components/location-picker";
+import { PhoneInput } from "@/components/phone-input";
+import { parseE164, buildE164 } from "@/data/country-codes";
 
 export const Route = createFileRoute("/dashboard/verification")({
   component: VerificationPage,
@@ -65,6 +67,8 @@ function VerificationPage() {
     barangay: "",
   });
   const [docs, setDocs] = useState<DocItem[]>([]);
+  const [phoneIso, setPhoneIso] = useState("PH");
+  const [phoneNational, setPhoneNational] = useState("");
 
   const load = async () => {
     if (!user) return;
@@ -98,6 +102,9 @@ function VerificationPage() {
         barangay: req.barangay ?? "",
       });
       setDocs(((req.documents as DocItem[]) ?? []) as DocItem[]);
+      const parsed = parseE164(req.contact_phone ?? null);
+      setPhoneIso(parsed.iso);
+      setPhoneNational(parsed.national);
     }
     setLoading(false);
   };
@@ -268,11 +275,16 @@ function VerificationPage() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
             <Label>Contact phone</Label>
-            <Input
-              value={form.contact_phone}
-              onChange={(e) => setForm({ ...form, contact_phone: e.target.value })}
+            <PhoneInput
+              iso={phoneIso}
+              national={phoneNational}
               disabled={!canEdit}
-              maxLength={40}
+              onChange={({ iso, national }) => {
+                setPhoneIso(iso);
+                setPhoneNational(national);
+                const e164 = buildE164(iso, national);
+                setForm((f) => ({ ...f, contact_phone: e164 ?? "" }));
+              }}
             />
           </div>
           <div>

@@ -10,6 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { PhoneInput } from "@/components/phone-input";
+import { buildE164 } from "@/data/country-codes";
 
 export const Route = createFileRoute("/advertise")({
   head: () => ({
@@ -67,6 +69,8 @@ function AdvertisePage() {
     start_date: "",
     message: "",
   });
+  const [phoneIso, setPhoneIso] = useState("PH");
+  const [phoneNational, setPhoneNational] = useState("");
 
   const update = (k: keyof typeof form, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
@@ -206,11 +210,14 @@ function AdvertisePage() {
                     />
                   </Field>
                   <Field label="Phone" error={errors.phone}>
-                    <Input
-                      value={form.phone}
-                      maxLength={30}
-                      placeholder="+63 917 555 0100"
-                      onChange={(e) => update("phone", e.target.value)}
+                    <PhoneInput
+                      iso={phoneIso}
+                      national={phoneNational}
+                      onChange={({ iso, national }) => {
+                        setPhoneIso(iso);
+                        setPhoneNational(national);
+                        update("phone", buildE164(iso, national) ?? "");
+                      }}
                     />
                   </Field>
                 </div>

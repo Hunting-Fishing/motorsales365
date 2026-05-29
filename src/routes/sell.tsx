@@ -23,6 +23,8 @@ import { uploadWithRetry } from "@/lib/storage-upload";
 import { getUserPlanLimits, FREE_PLAN_LIMITS, type PlanLimits } from "@/lib/plan-limits";
 import { useDynamicMeta } from "@/hooks/use-dynamic-meta";
 import { useDynamicJsonLd } from "@/hooks/use-dynamic-jsonld";
+import { PhoneInput } from "@/components/phone-input";
+import { buildE164 } from "@/data/country-codes";
 
 const SELL_SEO: Record<string, { title: string; description: string }> = {
   car: { title: "Sell your car in the Philippines — 365 MotorSales", description: "Post your car for sale and reach Filipino buyers nationwide. Free listings, photos, and instant messaging on 365 MotorSales." },
@@ -117,6 +119,8 @@ function SellPage() {
   const [barangay, setBarangay] = useState<string | null>(null);
   const [condition, setCondition] = useState("Used");
   const [phone, setPhone] = useState("");
+  const [phoneIso, setPhoneIso] = useState("PH");
+  const [phoneNational, setPhoneNational] = useState("");
   const [sellerType, setSellerType] = useState<"private" | "business">(
     effectiveSellerType === "private" ? "private" : "business",
   );
@@ -593,7 +597,16 @@ function SellPage() {
               </div>
               <div>
                 <Label htmlFor="phone">Contact phone (optional)</Label>
-                <Input id="phone" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+63 9XX XXX XXXX" />
+                <PhoneInput
+                  id="phone"
+                  iso={phoneIso}
+                  national={phoneNational}
+                  onChange={({ iso, national }) => {
+                    setPhoneIso(iso);
+                    setPhoneNational(national);
+                    setPhone(buildE164(iso, national) ?? "");
+                  }}
+                />
               </div>
             </div>
           </section>

@@ -7,23 +7,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { SiteLayout } from "@/components/site-layout";
+import { PhoneInput } from "@/components/phone-input";
+import { buildE164 } from "@/data/country-codes";
 
 export const Route = createFileRoute("/forgot-password")({
   component: ForgotPasswordPage,
 });
 
-function normalizePhPhone(input: string): string | null {
-  const digits = input.replace(/\D/g, "");
-  if (digits.startsWith("63") && digits.length === 12) return `+${digits}`;
-  if (digits.startsWith("0") && digits.length === 11) return `+63${digits.slice(1)}`;
-  if (digits.startsWith("9") && digits.length === 10) return `+63${digits}`;
-  return null;
-}
-
 function ForgotPasswordPage() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [phoneIso, setPhoneIso] = useState("PH");
+  const [phoneNational, setPhoneNational] = useState("");
   const [otpStep, setOtpStep] = useState(false);
   const [otp, setOtp] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -41,8 +36,8 @@ function ForgotPasswordPage() {
 
   const handleSendSmsOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    const e164 = normalizePhPhone(phone);
-    if (!e164) return toast.error("Enter a valid PH phone number (e.g. 0917...)");
+    const e164 = buildE164(phoneIso, phoneNational);
+    if (!e164) return toast.error("Enter a valid mobile number");
     setSubmitting(true);
     const { error } = await supabase.auth.signInWithOtp({ phone: e164 });
     setSubmitting(false);
@@ -53,7 +48,7 @@ function ForgotPasswordPage() {
 
   const handleVerifySmsOtp = async (e: React.FormEvent) => {
     e.preventDefault();
-    const e164 = normalizePhPhone(phone);
+    const e164 = buildE164(phoneIso, phoneNational);
     if (!e164) return;
     setSubmitting(true);
     const { error } = await supabase.auth.verifyOtp({ phone: e164, token: otp, type: "sms" });
@@ -91,8 +86,13 @@ function ForgotPasswordPage() {
             {!otpStep ? (
               <form onSubmit={handleSendSmsOtp} className="space-y-4">
                 <div>
-                  <Label htmlFor="phone">PH mobile number</Label>
-                  <Input id="phone" placeholder="09XX XXX XXXX" required value={phone} onChange={(e) => setPhone(e.target.value)} />
+                  <Label htmlFor="phone">Mobile number</Label>
+                  <PhoneInput
+                    id="phone"
+                    iso={phoneIso}
+                    national={phoneNational}
+                    onChange={({ iso, national }) => { setPhoneIso(iso); setPhoneNational(national); }}
+                  />
                   <p className="mt-1 text-xs text-muted-foreground">Must be a phone you've already added to your account.</p>
                 </div>
                 <Button type="submit" disabled={submitting} className="w-full">
