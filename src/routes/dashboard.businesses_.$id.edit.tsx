@@ -529,46 +529,98 @@ function ServicesTab({
   const upsert = useServerFn(upsertBusinessService);
   const del = useServerFn(deleteBusinessService);
   const [editing, setEditing] = useState<any | null>(null);
+  const [showPicker, setShowPicker] = useState<boolean>(services.length === 0);
 
-  const blank = () => ({ businessId, title: "", description: "", price_label: "", photo_url: null, active: true, sort_order: services.length });
+  const existingKeys = new Set<string>(
+    services.map((s: any) => s.catalog_key).filter(Boolean),
+  );
+
+  const groupedByCategory = services.reduce((acc: Record<string, any[]>, s: any) => {
+    const key = s.category ?? "other";
+    (acc[key] ||= []).push(s);
+    return acc;
+  }, {});
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-end">
-        <Button size="sm" onClick={() => setEditing(blank())}>
-          <Plus className="mr-1 h-4 w-4" />Add service
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm text-muted-foreground">
+          {services.length === 0
+            ? "Start by picking from the catalog of fuel-station services & products."
+            : "Pick more items from the catalog, or add a custom one."}
+        </p>
+        <Button size="sm" variant={showPicker ? "secondary" : "default"} onClick={() => setShowPicker((v) => !v)}>
+          {showPicker ? <><X className="mr-1 h-4 w-4" /> Hide catalog</> : <><Plus className="mr-1 h-4 w-4" /> Add from catalog</>}
         </Button>
       </div>
+
+      {showPicker && (
+        <CatalogPicker
+          existingKeys={existingKeys}
+          onPick={(item) => {
+            const v = fromCatalogItem(item);
+            setEditing({ ...v, businessId, sort_order: services.length });
+          }}
+          onCustom={() => setEditing({ ...blankService(), businessId, sort_order: services.length })}
+        />
+      )}
+
       {services.length === 0 ? (
-        <Card className="p-6 text-center text-sm text-muted-foreground">No services yet.</Card>
+        <Card className="p-6 text-center text-sm text-muted-foreground">
+          No services yet. Pick from the catalog above to add your first one.
+        </Card>
       ) : (
-        <div className="space-y-2">
-          {services.map((s) => (
-            <Card key={s.id} className="flex items-center gap-3 p-3">
-              {s.photo_url ? (
-                <img src={s.photo_url} alt="" className="h-14 w-14 rounded object-cover" />
-              ) : (
-                <div className="flex h-14 w-14 items-center justify-center rounded bg-muted text-muted-foreground"><ImageIcon className="h-5 w-5" /></div>
-              )}
-              <div className="min-w-0 flex-1">
-                <div className="truncate font-medium">{s.title}</div>
-                {s.price_label && <div className="text-xs text-muted-foreground">{s.price_label}</div>}
+        <div className="space-y-4">
+          {Object.entries(groupedByCategory).map(([cat, list]) => (
+            <div key={cat}>
+              <div className="mb-2 flex items-center gap-2">
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  {CATEGORY_LABEL[cat] ?? "Other"}
+                </h3>
+                <Badge variant="outline" className="text-[10px]">{list.length}</Badge>
               </div>
-              <div className="flex gap-1">
-                <Button size="sm" variant="outline" onClick={() => setEditing(s)}>Edit</Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={async () => {
-                    if (!confirm("Delete this service?")) return;
-                    await del({ data: { businessId, id: s.id } });
-                    onChange();
-                  }}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+              <div className="space-y-2">
+                {list.map((s: any) => {
+                  const priceStr = formatServicePrice(s);
+                  return (
+                    <Card key={s.id} className="flex items-center gap-3 p-3">
+                      {s.photo_url ? (
+                        <img src={s.photo_url} alt="" className="h-14 w-14 rounded object-cover" />
+                      ) : (
+                        <div className="flex h-14 w-14 items-center justify-center rounded bg-muted text-muted-foreground"><ImageIcon className="h-5 w-5" /></div>
+                      )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-center gap-1.5">
+                          <span className="truncate font-medium">{s.title}</span>
+                          {!s.active && <Badge variant="secondary" className="text-[10px]">Hidden</Badge>}
+                        </div>
+                        {priceStr ? (
+                          <div className="text-sm font-semibold text-primary">{priceStr}</div>
+                        ) : (
+                          <div className="text-xs text-muted-foreground italic">No price set</div>
+                        )}
+                      </div>
+                      <div className="flex gap-1">
+                        <Button size="sm" variant="outline" onClick={() => setEditing(s)}>
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={async () => {
+                            if (!confirm("Delete this item?")) return;
+                            await del({ data: { businessId, id: s.id } });
+                            onChange();
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </Card>
+                  );
+                })}
               </div>
-            </Card>
+            </div>
           ))}
         </div>
       )}
@@ -603,47 +655,75 @@ function ServiceEditor({
   onClose: () => void;
   onSave: (payload: any) => Promise<void>;
 }) {
-  const [title, setTitle] = useState(initial.title ?? "");
-  const [description, setDescription] = useState(initial.description ?? "");
-  const [priceLabel, setPriceLabel] = useState(initial.price_label ?? "");
-  const [photoUrl, setPhotoUrl] = useState<string | null>(initial.photo_url ?? null);
-  const [active, setActive] = useState<boolean>(initial.active ?? true);
+  const [value, setValue] = useState<ServiceFormValue & { id?: string }>(() => ({
+    id: initial.id,
+    title: initial.title ?? "",
+    description: initial.description ?? null,
+    price_label: initial.price_label ?? null,
+    photo_url: initial.photo_url ?? null,
+    active: initial.active ?? true,
+    category: initial.category ?? null,
+    unit: initial.unit ?? null,
+    price_php: initial.price_php != null ? Number(initial.price_php) : null,
+    sale_price_php: initial.sale_price_php != null ? Number(initial.sale_price_php) : null,
+    catalog_key: initial.catalog_key ?? null,
+  }));
   const [saving, setSaving] = useState(false);
+
+  const patch = (p: Partial<ServiceFormValue>) => setValue((v) => ({ ...v, ...p }));
 
   return (
     <Card className="space-y-3 border-primary/40 p-4">
-      <div className="font-medium">{initial.id ? "Edit service" : "New service"}</div>
-      <ImageField label="Photo" url={photoUrl} onUpload={async (f) => setPhotoUrl(await uploadMedia(userId, businessId, f))} onClear={() => setPhotoUrl(null)} square />
+      <div className="flex items-center justify-between">
+        <div className="font-medium">{initial.id ? "Edit item" : "New item"}</div>
+        {value.catalog_key && (
+          <Badge variant="outline" className="text-[10px]">From catalog</Badge>
+        )}
+      </div>
+      <ImageField
+        label="Photo"
+        url={value.photo_url}
+        onUpload={async (f) => patch({ photo_url: await uploadMedia(userId, businessId, f) })}
+        onClear={() => patch({ photo_url: null })}
+        square
+      />
       <div>
         <Label>Title *</Label>
-        <Input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} className="h-11 text-base" />
+        <Input value={value.title} onChange={(e) => patch({ title: e.target.value })} maxLength={120} className="h-11 text-base" />
       </div>
-      <div>
-        <Label>Price label (e.g. "₱350" or "From ₱500")</Label>
-        <Input value={priceLabel} onChange={(e) => setPriceLabel(e.target.value)} maxLength={60} className="h-11 text-base" />
-      </div>
+      <PricingFields value={value} onChange={patch} />
       <div>
         <Label>Description</Label>
-        <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} maxLength={2000} />
+        <Textarea
+          value={value.description ?? ""}
+          onChange={(e) => patch({ description: e.target.value || null })}
+          rows={3}
+          maxLength={2000}
+        />
       </div>
       <div className="flex items-center justify-between rounded-lg border border-border p-3">
         <span className="text-sm">Show on public page</span>
-        <Switch checked={active} onCheckedChange={setActive} />
+        <Switch checked={value.active} onCheckedChange={(c) => patch({ active: c })} />
       </div>
       <div className="flex justify-end gap-2">
         <Button variant="ghost" onClick={onClose}>Cancel</Button>
         <Button
-          disabled={saving || title.trim().length === 0}
+          disabled={saving || value.title.trim().length === 0}
           onClick={async () => {
             setSaving(true);
             try {
               await onSave({
-                id: initial.id,
-                title: title.trim(),
-                description: description.trim() || null,
-                price_label: priceLabel.trim() || null,
-                photo_url: photoUrl,
-                active,
+                id: value.id,
+                title: value.title.trim(),
+                description: value.description?.trim() || null,
+                price_label: value.price_label?.trim() || null,
+                photo_url: value.photo_url,
+                active: value.active,
+                category: value.category,
+                unit: value.unit,
+                price_php: value.price_php,
+                sale_price_php: value.sale_price_php,
+                catalog_key: value.catalog_key,
               });
             } catch (e: any) {
               toast.error(e?.message ?? "Save failed");
