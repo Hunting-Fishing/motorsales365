@@ -100,8 +100,8 @@ function SignupPage() {
   const isBusinessLike = intent === "business" || intent === "service_provider";
   const intentMeta = useMemo(() => SIGNUP_TYPES.find((s) => s.id === intent), [intent]);
   const kindOptions = useMemo(
-    () => BUSINESS_KIND_OPTIONS.filter((o) => !o.forIntent || o.forIntent === intent),
-    [intent],
+    () => BUSINESS_KIND_OPTIONS,
+    [],
   );
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
