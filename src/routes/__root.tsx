@@ -128,6 +128,7 @@ function RootComponent() {
             <Outlet />
             <Toaster richColors position="top-right" />
             <AnalyticsGA />
+            <ServiceWorkerRegister />
           </CurrencyProvider>
         </FeatureFlagProvider>
       </AuthProvider>
