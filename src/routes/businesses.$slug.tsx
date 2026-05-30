@@ -440,6 +440,17 @@ function BusinessProfilePage() {
             </Card>
           )}
 
+          {/* GALLERY */}
+          {biz.show_gallery !== false && albums.length > 0 && (
+            <PublicGallerySection albums={albums} photos={photos} accent={accent} />
+          )}
+
+          {/* CONTACT CHANNELS */}
+          {biz.show_contact !== false && contactChannels.length > 0 && (
+            <PublicContactSection channels={contactChannels} accent={accent} />
+          )}
+
+
           {/* INQUIRY */}
           <Card id="inquiry" className="p-5">
             <h2 className="mb-1 font-display text-lg font-semibold">Send a message</h2>
