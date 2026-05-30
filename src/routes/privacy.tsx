@@ -38,7 +38,6 @@ function PrivacyPage() {
           <Link className="text-primary underline" to="/terms">Terms &amp; Conditions</Link>.
         </p>
 
-        <p className="hidden">
 
 
         <h2 className="mt-8 text-xl font-semibold">1. Who we are (Data Controller)</h2>
