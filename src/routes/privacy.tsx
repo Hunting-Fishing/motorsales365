@@ -35,12 +35,11 @@ function PrivacyPage() {
           with the Philippines' <strong>Data Privacy Act of 2012 (RA 10173)</strong> and its
           Implementing Rules and Regulations. This policy explains what we collect, why, who we
           share it with, and the rights you have. It works together with our{" "}
-          <Link className="text-primary underline" to="/terms-and-conditions">
-            Terms &amp; Conditions
-          </Link>{" "}
-          and{" "}
-          <Link className="text-primary underline" to="/terms">Terms of Service</Link>.
+          <Link className="text-primary underline" to="/terms">Terms &amp; Conditions</Link>.
         </p>
+
+        <p className="hidden">
+
 
         <h2 className="mt-8 text-xl font-semibold">1. Who we are (Data Controller)</h2>
         <p className="mt-2 text-muted-foreground">
