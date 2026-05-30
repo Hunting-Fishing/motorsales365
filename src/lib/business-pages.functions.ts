@@ -33,6 +33,7 @@ export const getBusinessPage = createServerFn({ method: "GET" })
       { data: albums },
       { data: photos },
       { data: contactChannels },
+      { data: bookableItems },
     ] = await Promise.all([
       supabaseAdmin.from("business_types").select("label").eq("slug", (biz as any).type_slug).maybeSingle(),
       supabaseAdmin.from("business_tag_links").select("tag_slug").eq("business_id", (biz as any).id),
@@ -76,6 +77,12 @@ export const getBusinessPage = createServerFn({ method: "GET" })
         .select("id, kind, label, value, sort_order")
         .eq("business_id", (biz as any).id)
         .order("sort_order"),
+      supabaseAdmin
+        .from("business_bookable_items")
+        .select("id, title, duration_min, price_php")
+        .eq("business_id", (biz as any).id)
+        .eq("active", true)
+        .order("sort_order"),
     ]);
 
     let tagLabels: string[] = [];
@@ -117,6 +124,7 @@ export const getBusinessPage = createServerFn({ method: "GET" })
       albums: albums ?? [],
       photos: photos ?? [],
       contactChannels: contactChannels ?? [],
+      bookableItems: bookableItems ?? [],
     };
   });
 
@@ -189,6 +197,10 @@ export const getMyBusinessPage = createServerFn({ method: "GET" })
       { data: albums },
       { data: photos },
       { data: contactChannels },
+      { data: bookableItems },
+      { data: availability },
+      { data: exceptions },
+      { data: bookings },
     ] = await Promise.all([
       supabase.from("businesses").select("*").eq("id", data.businessId).maybeSingle(),
       supabase.from("business_services").select("*").eq("business_id", data.businessId).order("sort_order"),
@@ -219,6 +231,26 @@ export const getMyBusinessPage = createServerFn({ method: "GET" })
         .select("*")
         .eq("business_id", data.businessId)
         .order("sort_order"),
+      supabase
+        .from("business_bookable_items")
+        .select("*")
+        .eq("business_id", data.businessId)
+        .order("sort_order"),
+      supabase
+        .from("business_availability")
+        .select("*")
+        .eq("business_id", data.businessId),
+      supabase
+        .from("business_availability_exceptions")
+        .select("*")
+        .eq("business_id", data.businessId)
+        .order("date"),
+      supabase
+        .from("business_bookings")
+        .select("*")
+        .eq("business_id", data.businessId)
+        .order("starts_at", { ascending: false })
+        .limit(200),
     ]);
 
     return {
@@ -230,6 +262,10 @@ export const getMyBusinessPage = createServerFn({ method: "GET" })
       albums: albums ?? [],
       photos: photos ?? [],
       contactChannels: contactChannels ?? [],
+      bookableItems: bookableItems ?? [],
+      availability: availability ?? [],
+      exceptions: exceptions ?? [],
+      bookings: bookings ?? [],
     };
   });
 

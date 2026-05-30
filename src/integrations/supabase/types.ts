@@ -476,6 +476,210 @@ export type Database = {
         }
         Relationships: []
       }
+      business_availability: {
+        Row: {
+          business_id: string
+          created_at: string
+          end_time: string
+          id: string
+          start_time: string
+          weekday: number
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          end_time: string
+          id?: string
+          start_time: string
+          weekday: number
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          end_time?: string
+          id?: string
+          start_time?: string
+          weekday?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_availability_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_availability_exceptions: {
+        Row: {
+          business_id: string
+          closed: boolean
+          created_at: string
+          date: string
+          end_time: string | null
+          id: string
+          note: string | null
+          start_time: string | null
+        }
+        Insert: {
+          business_id: string
+          closed?: boolean
+          created_at?: string
+          date: string
+          end_time?: string | null
+          id?: string
+          note?: string | null
+          start_time?: string | null
+        }
+        Update: {
+          business_id?: string
+          closed?: boolean
+          created_at?: string
+          date?: string
+          end_time?: string | null
+          id?: string
+          note?: string | null
+          start_time?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_availability_exceptions_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_bookable_items: {
+        Row: {
+          active: boolean
+          buffer_min: number
+          business_id: string
+          created_at: string
+          description: string | null
+          duration_min: number
+          horizon_days: number
+          id: string
+          lead_time_hours: number
+          max_concurrent: number
+          price_php: number | null
+          require_approval: boolean
+          service_id: string | null
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          buffer_min?: number
+          business_id: string
+          created_at?: string
+          description?: string | null
+          duration_min?: number
+          horizon_days?: number
+          id?: string
+          lead_time_hours?: number
+          max_concurrent?: number
+          price_php?: number | null
+          require_approval?: boolean
+          service_id?: string | null
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          buffer_min?: number
+          business_id?: string
+          created_at?: string
+          description?: string | null
+          duration_min?: number
+          horizon_days?: number
+          id?: string
+          lead_time_hours?: number
+          max_concurrent?: number
+          price_php?: number | null
+          require_approval?: boolean
+          service_id?: string | null
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_bookable_items_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_bookings: {
+        Row: {
+          bookable_item_id: string
+          business_id: string
+          created_at: string
+          customer_email: string | null
+          customer_name: string
+          customer_phone: string | null
+          ends_at: string
+          id: string
+          notes: string | null
+          starts_at: string
+          status: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          bookable_item_id: string
+          business_id: string
+          created_at?: string
+          customer_email?: string | null
+          customer_name: string
+          customer_phone?: string | null
+          ends_at: string
+          id?: string
+          notes?: string | null
+          starts_at: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          bookable_item_id?: string
+          business_id?: string
+          created_at?: string
+          customer_email?: string | null
+          customer_name?: string
+          customer_phone?: string | null
+          ends_at?: string
+          id?: string
+          notes?: string | null
+          starts_at?: string
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_bookings_bookable_item_id_fkey"
+            columns: ["bookable_item_id"]
+            isOneToOne: false
+            referencedRelation: "business_bookable_items"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_bookings_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_contact_channels: {
         Row: {
           business_id: string
