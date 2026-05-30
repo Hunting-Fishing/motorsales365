@@ -1,50 +1,36 @@
-## Plan: Terms & Conditions page + developer rule
+## Header fixes (`src/components/site-header.tsx`)
 
-### Observations
-- A `/terms` route already exists (`src/routes/terms.tsx`) with a short Terms of Service. It is linked from the footer and from the Refund/Privacy pages.
-- The user is asking for a dedicated **Terms & Conditions** page — broader than the existing ToS, covering marketplace rules, fees, listings, payments, business directory (hours, services/products catalog, pricing), boosts/subscriptions, refunds reference, user-generated content, data, dispute handling, and Philippine law.
-- A standing developer/AI rule should be saved so future changes to related features (pricing, payments, boosts, subscriptions, business directory, services catalog, refunds, data handling) automatically trigger a T&C review/update.
+### 1. Quick-link bar overlap
+At the current viewport (~1162px) the desktop nav appears at `lg` (1024px) but the right-side action cluster (Currency, Help, Post a listing, Account/Sign up, menu) is too wide, so "Map / Shop" visually collide with the Currency pill and Post a listing button.
 
-### What to build
+Fix:
+- Promote the desktop nav from `lg:flex` → `xl:flex` (and the mobile menu trigger from `lg:hidden` → `xl:hidden`) so the inline nav only appears when there's actually room. Between `lg` and `xl` users get the hamburger sheet (which already lists every link).
+- Tighten the right cluster gap (`gap-1.5 sm:gap-2` → keep, but drop the now-removed Currency switcher — see #3).
+- Reduce nav inner gap from `gap-1` plus `px-3` to `px-2.5` so it still fits comfortably at `xl`.
 
-1. **New route `/terms-and-conditions`** (`src/routes/terms-and-conditions.tsx`)
-   - Built with `SiteLayout` and the same prose styling pattern as `/terms`, `/privacy`, `/refund-policy`.
-   - Proper `head()` metadata: title `Terms & Conditions — 365 MotorSales Philippines`, meta description < 160 chars, `og:title`, `og:description`.
-   - Single H1, semantic sections, "Last updated" line.
-   - Sections:
-     1. Introduction & acceptance
-     2. Eligibility (18+, PH residents/registered businesses)
-     3. Accounts & security
-     4. Listings (vehicles, parts, services) — accuracy, ownership, photos
-     5. Business directory (verified businesses, hours, opening/closing warnings, services & products catalog, pricing in ₱)
-     6. Pricing display & promo pricing rules (fuel ₱/L, ₱/kWh, ₱/item, "From ₱")
-     7. Prohibited items & conduct (mirrors guidelines)
-     8. Fees, boosts, subscriptions (link to `/pricing`)
-     9. Payments & test mode disclosure
-     10. Refunds (link to `/refund-policy`)
-     11. Buyer–seller transactions disclaimer
-     12. User-generated content license
-     13. Account suspension & termination
-     14. Privacy (link to `/privacy`)
-     15. Limitation of liability
-     16. Governing law (Philippines, Metro Manila)
-     17. Changes to these terms
-     18. Contact
+### 2. Sign up → Sign in / Sign up combined control
+Replace the single "Sign up" outline button (lines 186–188) with a two-button group for guests on desktop:
 
-2. **Link the new page**
-   - Add a footer link in `src/components/site-footer.tsx` (next to the existing Terms link), labeled "Terms & Conditions".
-   - Keep `/terms` as-is to avoid breaking inbound links; cross-link the two at the top of each.
+```text
+[ Sign in ]  [ Sign up ]
+```
 
-3. **Save the developer rule as project memory** (`mem://index.md` Core + `mem://policies/terms-sync`)
-   - Core one-liner: "When changing fees, payments, boosts, subscriptions, refunds, business directory, services/products catalog, pricing units, prohibited items, or data handling — also update `/terms-and-conditions` (and `/terms`, `/refund-policy`, `/privacy` if relevant) and bump the Last updated date."
-   - Detail file lists the exact triggers, the files to touch, and the "Last updated" convention.
+- "Sign in" → `variant="ghost"` linking to `/login`
+- "Sign up" → `variant="outline"` linking to `/signup`
+- Wrapped in a `hidden md:flex items-center gap-1` container so both appear together on desktop and the mobile sheet (which already has both) stays unchanged.
 
-### Technical notes
-- Pure frontend/content change; no DB, no server functions, no auth changes.
-- Route file naming: `terms-and-conditions.tsx` → `createFileRoute("/terms-and-conditions")`.
-- Reuse Tailwind `prose` classes already used by sibling policy pages for visual consistency.
-- No new dependencies.
+### 3. Currency control: header → profile only
+The profile page already has a `CurrencyPreferenceCard` (built last round) that writes to the same `useCurrency()` store, so every listing already reflects the chosen currency via `<ListingPrice>`. The header switcher is now redundant and contributes to the overlap.
+
+Fix:
+- Remove the `<CurrencySwitcher />` block from the desktop header (lines 108–110).
+- Remove the `<CurrencySwitcher />` block from the mobile sheet (lines 264–266).
+- Keep `CurrencySwitcher` component file untouched (still used in profile preview indirectly via the same context; component itself isn't removed in case it's reused).
+- No change to `ListingPrice` — it already reads from `useCurrency()` which is fed by the profile setting (or localStorage default `PHP` for guests).
 
 ### Out of scope
-- No changes to the existing `/terms` content beyond a one-line cross-link.
-- No admin UI to edit T&C content (it stays in code).
+- No changes to `ListingPrice`, currency context, listing pages, or profile page — the wiring is already correct from the previous round.
+- No backend or schema changes.
+
+## Files touched
+- `src/components/site-header.tsx` — nav breakpoint bump, Sign in/Sign up pair, remove header CurrencySwitcher (desktop + sheet).
