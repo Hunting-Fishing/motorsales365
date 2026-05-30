@@ -198,7 +198,7 @@ function BusinessProfilePage() {
             </div>
           )}
 
-          <div className="container mx-auto -mt-16 px-4 md:-mt-20">
+          <div className={`container mx-auto px-4 ${biz.featured_video_url ? "mt-4" : "-mt-16 md:-mt-20"}`}>
             <Card className="overflow-hidden">
               <div className="flex flex-wrap items-start gap-4 p-5">
                 <div
