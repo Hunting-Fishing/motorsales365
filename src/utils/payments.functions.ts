@@ -581,3 +581,81 @@ export const getInvoiceDetails = createServerFn({ method: "POST" })
       })),
     };
   });
+
+/**
+ * Admin-only: assign Stripe tax codes to every product backing an active
+ * subscription plan or boost product. Required for Stripe's end-to-end
+ * tax handling (`managed_payments`) to calculate VAT correctly.
+ *
+ * - Subscription plans → SaaS / electronic services (txcd_10103001)
+ * - Boost products → general digital goods (txcd_10000000)
+ *
+ * Idempotent: skips products that already have a tax_code set.
+ */
+export const setStripeTaxCodes = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { environment: StripeEnv }) => {
+    validateEnv(data.environment);
+    return data;
+  })
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: isAdmin, error: roleErr } = await supabase.rpc("has_role", {
+      _user_id: userId,
+      _role: "admin",
+    });
+    if (roleErr) throw new Error(roleErr.message);
+    if (!isAdmin) throw new Error("Admin access required");
+
+    const stripe = createStripeClient(data.environment);
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const [{ data: plans }, { data: boosts }] = await Promise.all([
+      supabaseAdmin.from("subscription_plans").select("stripe_lookup_key").not("stripe_lookup_key", "is", null),
+      supabaseAdmin.from("boost_products").select("stripe_lookup_key").not("stripe_lookup_key", "is", null),
+    ]);
+
+    const targets: Array<{ lookupKey: string; taxCode: string; kind: "plan" | "boost" }> = [];
+    for (const p of plans ?? []) {
+      if ((p as any).stripe_lookup_key) {
+        targets.push({ lookupKey: (p as any).stripe_lookup_key, taxCode: "txcd_10103001", kind: "plan" });
+      }
+    }
+    for (const b of boosts ?? []) {
+      if ((b as any).stripe_lookup_key) {
+        targets.push({ lookupKey: (b as any).stripe_lookup_key, taxCode: "txcd_10000000", kind: "boost" });
+      }
+    }
+
+    const results: Array<{ lookupKey: string; status: "set" | "already_set" | "missing" | "error"; message?: string }> = [];
+
+    for (const t of targets) {
+      try {
+        const prices = await stripe.prices.list({ lookup_keys: [t.lookupKey], limit: 1 });
+        if (!prices.data.length) {
+          results.push({ lookupKey: t.lookupKey, status: "missing" });
+          continue;
+        }
+        const productId = typeof prices.data[0].product === "string"
+          ? prices.data[0].product
+          : (prices.data[0].product as any)?.id;
+        if (!productId) {
+          results.push({ lookupKey: t.lookupKey, status: "error", message: "No product id" });
+          continue;
+        }
+        const product = await stripe.products.retrieve(productId);
+        if (product.tax_code) {
+          results.push({ lookupKey: t.lookupKey, status: "already_set" });
+          continue;
+        }
+        await stripe.products.update(productId, { tax_code: t.taxCode });
+        results.push({ lookupKey: t.lookupKey, status: "set" });
+      } catch (e: any) {
+        results.push({ lookupKey: t.lookupKey, status: "error", message: e?.message ?? String(e) });
+      }
+    }
+
+    return { ok: true, environment: data.environment, results };
+  });
+

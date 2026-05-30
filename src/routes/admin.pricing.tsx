@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatDate, formatPHP } from "@/lib/format";
-import { verifyStripePlans } from "@/utils/payments.functions";
+import { verifyStripePlans, setStripeTaxCodes } from "@/utils/payments.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
 
 type VerifyRow = {
