@@ -7,6 +7,7 @@ import { FeatureFlagProvider } from "@/lib/feature-flags";
 import { SandboxBanner } from "@/components/sandbox-banner";
 import { Toaster } from "@/components/ui/sonner";
 import { AnalyticsGA } from "@/components/analytics-ga";
+import { ServiceWorkerRegister } from "@/components/service-worker-register";
 
 import appCss from "../styles.css?url";
 
@@ -127,6 +128,7 @@ function RootComponent() {
             <Outlet />
             <Toaster richColors position="top-right" />
             <AnalyticsGA />
+            <ServiceWorkerRegister />
           </CurrencyProvider>
         </FeatureFlagProvider>
       </AuthProvider>

@@ -25,9 +25,13 @@ const STATIC_ENTRIES: SitemapEntry[] = [
   { path: "/advertise", changefreq: "monthly", priority: "0.5" },
   { path: "/sell", changefreq: "monthly", priority: "0.6" },
   { path: "/tow", changefreq: "monthly", priority: "0.6" },
+  { path: "/map", changefreq: "weekly", priority: "0.6" },
+  { path: "/export", changefreq: "monthly", priority: "0.5" },
   { path: "/businesses", changefreq: "daily", priority: "0.8" },
   { path: "/rides", changefreq: "daily", priority: "0.7" },
   { path: "/businesses/submit", changefreq: "monthly", priority: "0.5" },
+  { path: "/shop", changefreq: "daily", priority: "0.8" },
+  { path: "/shop/categories", changefreq: "weekly", priority: "0.6" },
   { path: "/guidelines", changefreq: "monthly", priority: "0.3" },
   { path: "/affiliate-disclosure", changefreq: "yearly", priority: "0.3" },
   { path: "/privacy", changefreq: "yearly", priority: "0.3" },
@@ -102,6 +106,46 @@ export const Route = createFileRoute("/sitemap.xml")({
               entries.push({
                 path: `/rides/${r.slug}`,
                 lastmod: r.updated_at?.slice(0, 10),
+                changefreq: "weekly",
+                priority: "0.5",
+              });
+            }
+
+            const { data: departments } = await (sb as any)
+              .from("shop_departments")
+              .select("slug, updated_at")
+              .eq("active", true);
+            for (const d of departments ?? []) {
+              entries.push({
+                path: `/shop/department/${d.slug}`,
+                lastmod: d.updated_at?.slice(0, 10),
+                changefreq: "weekly",
+                priority: "0.6",
+              });
+            }
+
+            const { data: shopCats } = await (sb as any)
+              .from("shop_categories")
+              .select("slug")
+              .eq("active", true);
+            for (const c of shopCats ?? []) {
+              entries.push({
+                path: `/shop/${c.slug}`,
+                changefreq: "weekly",
+                priority: "0.5",
+              });
+            }
+
+            const { data: products } = await (sb as any)
+              .from("shop_products")
+              .select("slug, updated_at")
+              .eq("active", true)
+              .order("updated_at", { ascending: false })
+              .limit(5000);
+            for (const p of products ?? []) {
+              entries.push({
+                path: `/shop/p/${p.slug}`,
+                lastmod: p.updated_at?.slice(0, 10),
                 changefreq: "weekly",
                 priority: "0.5",
               });
