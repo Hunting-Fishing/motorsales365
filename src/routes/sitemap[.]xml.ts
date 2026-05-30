@@ -110,6 +110,46 @@ export const Route = createFileRoute("/sitemap.xml")({
                 priority: "0.5",
               });
             }
+
+            const { data: departments } = await (sb as any)
+              .from("shop_departments")
+              .select("slug, updated_at")
+              .eq("active", true);
+            for (const d of departments ?? []) {
+              entries.push({
+                path: `/shop/department/${d.slug}`,
+                lastmod: d.updated_at?.slice(0, 10),
+                changefreq: "weekly",
+                priority: "0.6",
+              });
+            }
+
+            const { data: shopCats } = await (sb as any)
+              .from("shop_categories")
+              .select("slug")
+              .eq("active", true);
+            for (const c of shopCats ?? []) {
+              entries.push({
+                path: `/shop/${c.slug}`,
+                changefreq: "weekly",
+                priority: "0.5",
+              });
+            }
+
+            const { data: products } = await (sb as any)
+              .from("shop_products")
+              .select("slug, updated_at")
+              .eq("active", true)
+              .order("updated_at", { ascending: false })
+              .limit(5000);
+            for (const p of products ?? []) {
+              entries.push({
+                path: `/shop/p/${p.slug}`,
+                lastmod: p.updated_at?.slice(0, 10),
+                changefreq: "weekly",
+                priority: "0.5",
+              });
+            }
           }
         } catch (err) {
           console.warn("[sitemap] dynamic entries failed", err);
