@@ -47,17 +47,36 @@ export function TotpSetupCard() {
 
   const startEnroll = async () => {
     setBusy(true);
-    // Clean up any half-started unverified factor first
-    const stale = factors.find((f) => f.status === "unverified");
-    if (stale) {
-      await supabase.auth.mfa.unenroll({ factorId: stale.id });
+    const { data: latestFactors, error: listError } = await supabase.auth.mfa.listFactors();
+    if (listError) {
+      setBusy(false);
+      return toast.error(listError.message);
     }
+
+    const latestTotp = (latestFactors?.totp ?? []) as Factor[];
+    const active = latestTotp.find((f) => f.status === "verified");
+    if (active) {
+      setFactors(latestTotp);
+      setBusy(false);
+      return toast.info("Two-factor authentication is already enabled.");
+    }
+
+    const staleFactors = latestTotp.filter((f) => f.status === "unverified");
+    for (const stale of staleFactors) {
+      const { error } = await supabase.auth.mfa.unenroll({ factorId: stale.id });
+      if (error) {
+        setBusy(false);
+        return toast.error(`Couldn't reset the previous setup: ${error.message}`);
+      }
+    }
+
     const { data, error } = await supabase.auth.mfa.enroll({
       factorType: "totp",
-      friendlyName: `Authenticator ${new Date().toLocaleDateString()}`,
+      friendlyName: `Authenticator ${new Date().toLocaleString()} ${Math.random().toString(36).slice(2, 6)}`,
     });
     setBusy(false);
     if (error) return toast.error(error.message);
+    setFactors([]);
     setEnroll({
       factorId: data.id,
       qrSvg: data.totp.qr_code,
