@@ -306,8 +306,8 @@ function Index() {
         <div className="overflow-hidden rounded-2xl border border-border bg-card p-10 shadow-[var(--shadow-card)]">
           <div className="grid gap-8 md:grid-cols-2 md:items-center">
             <div>
-              <h3 className="font-display text-3xl font-bold">Posting is free. Forever.</h3>
-              <p className="mt-2 text-muted-foreground">Private sellers get up to 5 active ads with 12 photos and 1 video each — no card required. Sell more? Upgrade to a Verified Seller or Dealer plan.</p>
+              <h3 className="font-display text-3xl font-bold">Start free. Upgrade as you grow.</h3>
+              <p className="mt-2 text-muted-foreground">Private sellers get up to 5 active ads with 12 photos and 1 video each — no card required. Change or upgrade your plan anytime as your business grows.</p>
               <div className="mt-6 flex flex-wrap gap-3">
                 <Button asChild size="lg"><Link to="/sell">Post a free ad</Link></Button>
                 <Button asChild size="lg" variant="outline"><Link to="/pricing">See seller plans</Link></Button>
