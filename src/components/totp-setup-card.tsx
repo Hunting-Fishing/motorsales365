@@ -178,6 +178,8 @@ export function TotpSetupCard() {
               Authenticator, 1Password, Bitwarden, etc.) and use its built-in scanner.
               Don't tap the QR image — it's just an image to scan, not a link.
             </p>
+            <img
+              src={enroll.qrSvg}
               alt="TOTP QR code"
               className="mx-auto h-44 w-44 rounded bg-white p-2"
             />
