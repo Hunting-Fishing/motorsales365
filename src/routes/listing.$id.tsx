@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { MapPin, Heart, Flag, Star, Phone, MessageSquare, ChevronLeft, Truck, Eye, Bookmark, Banknote, Shield, FileText, ClipboardCheck, Wrench } from "lucide-react";
+import { MapPin, Heart, Flag, Star, Phone, MessageSquare, ChevronLeft, Truck, Eye, Bookmark, Banknote, Shield, FileText, ClipboardCheck, Wrench, MessageCircle } from "lucide-react";
+import { waMeUrl } from "@/lib/whatsapp";
 import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
 import { ServiceStrip } from "@/components/service-strip";
 import { AffiliatePartsSection } from "@/components/affiliate-parts-section";
@@ -490,6 +491,20 @@ function ListingDetailPage() {
               {listing.contact_phone && (
                 <a href={`tel:${listing.contact_phone}`}>
                   <Button className="w-full" variant="default"><Phone className="mr-2 h-4 w-4" />Call seller</Button>
+                </a>
+              )}
+              {listing.contact_phone && waMeUrl(listing.contact_phone) && (
+                <a
+                  href={waMeUrl(
+                    listing.contact_phone,
+                    `Hi! I'm interested in your listing "${listing.title}" on 365 Motor Sales: ${typeof window !== "undefined" ? window.location.href : ""}`,
+                  )!}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <Button className="w-full bg-[#25D366] text-white hover:bg-[#1ebe5d]">
+                    <MessageCircle className="mr-2 h-4 w-4" />WhatsApp seller
+                  </Button>
                 </a>
               )}
               <Button variant="outline" className="w-full" onClick={toggleFavorite}>

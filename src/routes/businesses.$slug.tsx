@@ -13,6 +13,7 @@ import {
   Sparkles,
   CalendarDays,
 } from "lucide-react";
+import { waMeUrl } from "@/lib/whatsapp";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { SiteLayout } from "@/components/site-layout";
@@ -169,6 +170,7 @@ function BusinessProfilePage() {
 
   const messengerHref = biz.messenger_url || null;
   const telHref = biz.phone ? `tel:${biz.phone}` : null;
+  const whatsappHref = waMeUrl(biz.phone, `Hi ${biz.name}, I found you on 365 Motor Sales and would like to ask about your services.`);
 
   return (
     <SiteLayout>
@@ -230,6 +232,13 @@ function BusinessProfilePage() {
                     {telHref && (
                       <Button size="sm" asChild style={accent ? { backgroundColor: accent } : undefined}>
                         <a href={telHref}><Phone className="mr-1 h-4 w-4" />Call</a>
+                      </Button>
+                    )}
+                    {whatsappHref && (
+                      <Button size="sm" asChild className="bg-[#25D366] text-white hover:bg-[#1ebe5d]">
+                        <a href={whatsappHref} target="_blank" rel="noreferrer">
+                          <MessageCircle className="mr-1 h-4 w-4" />WhatsApp
+                        </a>
                       </Button>
                     )}
                     {messengerHref && (
