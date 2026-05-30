@@ -15,7 +15,7 @@ export function SiteLayout({ children }: { children: ReactNode }) {
         <img
           src={bannerImage}
           alt="365 Motor Sales — Buy, Sell, List Vehicles & Equipment across the Philippines"
-          className="h-auto w-full sm:max-h-[140px] md:max-h-[220px] sm:object-cover object-contain object-center"
+          className="h-auto w-full object-contain object-center"
           loading="eager"
         />
       </a>
