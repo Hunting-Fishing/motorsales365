@@ -99,13 +99,16 @@ export const createBusinessSubscriptionCheckout = createServerFn({ method: "POST
       ui_mode: "embedded_page",
       return_url: data.returnUrl,
       customer: customerId,
-      customer_update: { name: "auto", address: "auto" },
+      // End-to-end tax/fraud/disputes handled by Stripe. Conflicts with
+      // customer_update, so that's omitted.
+      managed_payments: { enabled: true },
       metadata: {
         userId,
         kind: "business",
         businessId: data.businessId,
         planSlug: data.planSlug,
         lookup_key: lookupKey,
+        managed_payments: "true",
       },
       subscription_data: {
         description: productName,
@@ -117,7 +120,7 @@ export const createBusinessSubscriptionCheckout = createServerFn({ method: "POST
           lookup_key: lookupKey,
         },
       },
-    });
+    } as any);
 
     return session.client_secret;
   });

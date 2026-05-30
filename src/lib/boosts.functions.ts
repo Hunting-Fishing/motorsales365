@@ -100,17 +100,18 @@ export const createBoostCheckout = createServerFn({ method: "POST" })
       ui_mode: "embedded_page",
       return_url: data.returnUrl,
       customer: customerId,
-      customer_update: { name: "auto", address: "auto" },
+      // End-to-end tax/fraud/disputes handled by Stripe. Conflicts with
+      // customer_update and payment_intent_data, so those are omitted.
+      managed_payments: { enabled: true },
       metadata: {
         userId,
         kind: "boost",
         boostSlug: data.boostSlug,
         listingId: data.listingId,
         lookup_key: lookupKey,
+        productName,
+        managed_payments: "true",
       },
-      ...(!isRecurring && {
-        payment_intent_data: { description: productName },
-      }),
       ...(isRecurring && {
         subscription_data: {
           metadata: {
@@ -122,7 +123,7 @@ export const createBoostCheckout = createServerFn({ method: "POST" })
           },
         },
       }),
-    });
+    } as any);
 
     return session.client_secret;
   });

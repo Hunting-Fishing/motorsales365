@@ -6,6 +6,7 @@ import { CurrencyProvider } from "@/lib/currency";
 import { FeatureFlagProvider } from "@/lib/feature-flags";
 import { SandboxBanner } from "@/components/sandbox-banner";
 import { Toaster } from "@/components/ui/sonner";
+import { AnalyticsGA } from "@/components/analytics-ga";
 
 import appCss from "../styles.css?url";
 
@@ -125,6 +126,7 @@ function RootComponent() {
             <SandboxBanner />
             <Outlet />
             <Toaster richColors position="top-right" />
+            <AnalyticsGA />
           </CurrencyProvider>
         </FeatureFlagProvider>
       </AuthProvider>

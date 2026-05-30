@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatDate, formatPHP } from "@/lib/format";
-import { verifyStripePlans } from "@/utils/payments.functions";
+import { verifyStripePlans, setStripeTaxCodes } from "@/utils/payments.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
 
 type VerifyRow = {
@@ -38,7 +38,9 @@ function AdminPricing() {
   const [verifyRows, setVerifyRows] = useState<VerifyRow[] | null>(null);
   const [verifying, setVerifying] = useState(false);
   const [verifyAllOk, setVerifyAllOk] = useState<boolean | null>(null);
+  const [taxBusy, setTaxBusy] = useState(false);
   const verifyFn = useServerFn(verifyStripePlans);
+  const taxFn = useServerFn(setStripeTaxCodes);
 
   const runVerify = async () => {
     setVerifying(true);
@@ -52,6 +54,21 @@ function AdminPricing() {
       toast.error(e?.message ?? "Verification failed");
     } finally {
       setVerifying(false);
+    }
+  };
+
+  const runSetTaxCodes = async () => {
+    setTaxBusy(true);
+    try {
+      const res = await taxFn({ data: { environment: getStripeEnvironment() } });
+      const set = res.results.filter((r) => r.status === "set").length;
+      const already = res.results.filter((r) => r.status === "already_set").length;
+      const failed = res.results.filter((r) => r.status === "error" || r.status === "missing").length;
+      toast.success(`Tax codes: ${set} set, ${already} already set${failed ? `, ${failed} failed/missing` : ""}.`);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to set tax codes");
+    } finally {
+      setTaxBusy(false);
     }
   };
 
@@ -181,9 +198,14 @@ function AdminPricing() {
               Run this before announcing pricing changes — missing keys cause checkout to fail.
             </p>
           </div>
-          <Button onClick={runVerify} disabled={verifying}>
-            {verifying ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying…</> : "Verify Stripe prices"}
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={runVerify} disabled={verifying} variant="outline">
+              {verifying ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Verifying…</> : "Verify Stripe prices"}
+            </Button>
+            <Button onClick={runSetTaxCodes} disabled={taxBusy}>
+              {taxBusy ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Setting…</> : "Set Stripe tax codes"}
+            </Button>
+          </div>
         </div>
         {verifyRows && (
           <div className="space-y-2">

@@ -1,10 +1,12 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useEffect } from "react";
-import { Settings, ListChecks, Users, Flag, CreditCard, ShieldCheck, ShieldAlert, Gauge, BarChart3, UserCog, Megaphone, QrCode, Ticket, Globe, FlaskConical, Store, Sparkles, Info, Inbox } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Settings, ListChecks, Users, Flag, CreditCard, ShieldCheck, ShieldAlert, Gauge, BarChart3, UserCog, Megaphone, QrCode, Ticket, Globe, FlaskConical, Store, Sparkles, Info, Inbox, Shield } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
@@ -42,14 +44,48 @@ function AdminLayout() {
     isAdmin && "admin", isSales && "sales", isModerator && "moderator", isSupport && "support", isAdvertising && "advertising",
   ].filter(Boolean) as Role[];
 
+  // Enforce TOTP 2FA for admins. Sales / moderator / support / advertising
+  // staff aren't required (they can opt in via profile).
+  const [mfaState, setMfaState] = useState<"checking" | "ok" | "missing">("checking");
+  useEffect(() => {
+    if (!user || !isAdmin) { setMfaState("ok"); return; }
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase.auth.mfa.listFactors();
+      if (cancelled) return;
+      if (error) { setMfaState("ok"); return; } // fail-open on transient errors
+      const verified = (data?.totp ?? []).some((f: any) => f.status === "verified");
+      setMfaState(verified ? "ok" : "missing");
+    })();
+    return () => { cancelled = true; };
+  }, [user, isAdmin]);
+
   useEffect(() => {
     if (loading) return;
     if (!user) navigate({ to: "/login" });
     else if (!hasAccess) navigate({ to: "/dashboard" });
   }, [user, hasAccess, loading, navigate]);
 
-  if (loading || !user || !hasAccess) {
+  if (loading || !user || !hasAccess || mfaState === "checking") {
     return <SiteLayout><div className="p-12 text-center text-muted-foreground">Checking access…</div></SiteLayout>;
+  }
+
+  if (mfaState === "missing") {
+    return (
+      <SiteLayout>
+        <div className="container mx-auto flex max-w-lg flex-col items-center px-4 py-16 text-center">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+            <Shield className="h-7 w-7" />
+          </div>
+          <h1 className="mt-4 text-2xl font-bold">Two-factor authentication required</h1>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Admin accounts must enable an authenticator app (TOTP) before accessing the admin
+            console. This protects every customer's data on the platform.
+          </p>
+          <Button asChild className="mt-6"><Link to="/dashboard/profile">Set up 2FA in your profile</Link></Button>
+        </div>
+      </SiteLayout>
+    );
   }
 
   const visibleNav = NAV.filter((n) => n.roles.some((r) => myRoles.includes(r)));

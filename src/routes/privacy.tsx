@@ -22,7 +22,7 @@ export const Route = createFileRoute("/privacy")({
 });
 
 function PrivacyPage() {
-  const lastUpdated = "May 29, 2026";
+  const lastUpdated = "May 30, 2026";
 
   return (
     <SiteLayout>
@@ -122,10 +122,12 @@ function PrivacyPage() {
           <li><strong>Cloud hosting &amp; database:</strong> our managed backend provider.</li>
           <li><strong>Payments:</strong> Stripe and other licensed processors for cards, GCash,
             Maya, and bank transfer.</li>
-          <li><strong>Email:</strong> transactional and notification email providers.</li>
+          <li><strong>Email:</strong> transactional and notification emails are sent through our
+            managed email infrastructure on the verified subdomain <code>notify.365motorsales.com</code>.</li>
           <li><strong>Maps &amp; geocoding:</strong> for location pins, "near me" search, and
             business directory.</li>
-          <li><strong>Analytics:</strong> privacy-respecting analytics to understand product use.</li>
+          <li><strong>Analytics:</strong> <strong>Google Analytics 4</strong> (with IP anonymization),
+            loaded only after you accept optional cookies via the cookie banner.</li>
           <li><strong>Customer support tools:</strong> to handle your tickets and inquiries.</li>
         </ul>
         <p className="mt-2 text-muted-foreground">
@@ -169,9 +171,12 @@ function PrivacyPage() {
         <h2 className="mt-6 text-xl font-semibold">10. Security</h2>
         <p className="mt-2 text-muted-foreground">
           We protect your data with HTTPS, encrypted storage at rest, role-based access control,
-          row-level security on our database, audit logging, and routine security reviews. No
-          system is 100% secure — please use a strong, unique password and enable any available
-          additional protections.
+          row-level security on our database, audit logging, and routine security reviews. Sign-in
+          is available via email/password or <strong>Google</strong>, with leaked-password
+          protection (HIBP) on new and changed passwords and optional
+          <strong> two-factor authentication (TOTP)</strong> for every account. Two-factor
+          authentication is <strong>required</strong> for administrator accounts. No system is
+          100% secure — please use a strong, unique password and enable 2FA where available.
         </p>
 
         <h2 className="mt-6 text-xl font-semibold">11. Children</h2>
