@@ -38,6 +38,14 @@ function PrivacyPage() {
           <Link className="text-primary underline" to="/terms">Terms &amp; Conditions</Link>.
         </p>
 
+        <p className="mt-3 text-muted-foreground">
+          <strong>Appointment bookings.</strong> When you book a service through a business
+          mini-site, we collect your name, contact details, requested time, and any notes you
+          provide, and disclose them to that business so they can fulfil the appointment. The
+          business is a separate Personal Information Controller for the booking. We retain
+          booking records for service history, dispute resolution, and tax compliance.
+        </p>
+
 
 
         <h2 className="mt-8 text-xl font-semibold">1. Who we are (Data Controller)</h2>
