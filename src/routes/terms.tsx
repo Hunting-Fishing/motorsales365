@@ -56,6 +56,13 @@ function TermsPage() {
           buyer, broker, financier, transport carrier, mechanic, or insurer, and we do not take
           title to or possession of any item listed on the Platform.
         </p>
+        <p className="mt-2 text-muted-foreground">
+          Business mini-sites may offer online <strong>appointment bookings</strong>. When a customer
+          books a service, 365 MotorSales transmits the booking details (customer name, contact, time,
+          notes) to the business. The business is solely responsible for honouring, rescheduling, or
+          cancelling the appointment, for any deposit or payment policy it advertises, and for
+          complying with the Consumer Act (RA 7394). We are not a party to the booking contract.
+        </p>
 
         <h2 className="mt-6 text-xl font-semibold">2. Eligibility</h2>
         <ul className="mt-2 list-disc pl-6 text-muted-foreground">
