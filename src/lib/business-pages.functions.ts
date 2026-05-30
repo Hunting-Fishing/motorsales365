@@ -33,6 +33,7 @@ export const getBusinessPage = createServerFn({ method: "GET" })
       { data: albums },
       { data: photos },
       { data: contactChannels },
+      { data: bookableItems },
     ] = await Promise.all([
       supabaseAdmin.from("business_types").select("label").eq("slug", (biz as any).type_slug).maybeSingle(),
       supabaseAdmin.from("business_tag_links").select("tag_slug").eq("business_id", (biz as any).id),
