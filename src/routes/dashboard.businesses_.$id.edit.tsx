@@ -110,6 +110,14 @@ function EditBusinessPage() {
           <TabsTrigger value="gallery">Gallery ({(data as any).albums?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="contact">Contact ({(data as any).contactChannels?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="posts">Posts ({data.posts.length})</TabsTrigger>
+          <TabsTrigger value="bookings">
+            Bookings ({(data as any).bookableItems?.length ?? 0})
+            {(data as any).bookings?.filter((b: any) => b.status === "pending").length > 0 && (
+              <Badge className="ml-2 h-5 px-1.5 text-xs" variant="destructive">
+                {(data as any).bookings.filter((b: any) => b.status === "pending").length}
+              </Badge>
+            )}
+          </TabsTrigger>
           <TabsTrigger value="inquiries">
             Inquiries
             {data.inquiries.filter((i: any) => i.status === "new").length > 0 && (
