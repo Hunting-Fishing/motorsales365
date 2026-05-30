@@ -12,6 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, Circle, AlertCircle } from "lucide-react";
 import { PhoneInput } from "@/components/phone-input";
 import { AvatarUploader } from "@/components/avatar-uploader";
+import { TotpSetupCard } from "@/components/totp-setup-card";
 import { buildE164, parseE164 } from "@/data/country-codes";
 import { useCurrency } from "@/lib/currency";
 
@@ -24,7 +25,7 @@ function buildChecklist(profile: any): ChecklistItem[] {
     { label: "First & last name", done: has(profile?.first_name) && has(profile?.last_name), required: true },
     { label: "Phone number", done: has(profile?.phone) || has(profile?.phone_e164), required: true },
     { label: "Profile photo", done: has(profile?.avatar_url), required: false },
-    { label: "Verified phone (SMS recovery)", done: !!profile?.phone_verified_at, required: false },
+    { label: "Two-factor authentication (authenticator app)", done: false, required: false },
   ];
   if (isBusiness) {
     items.push(
@@ -51,14 +52,7 @@ function ProfilePage() {
     national: "",
   });
 
-  // Phone verification state
-  const [verifyPhone, setVerifyPhone] = useState<{ iso: string; national: string }>({
-    iso: "PH",
-    national: "",
-  });
-  const [otpCode, setOtpCode] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [phoneSubmitting, setPhoneSubmitting] = useState(false);
+  // (Phone-verification SMS flow removed — replaced with TOTP 2FA below.)
 
   // Email change
   const [newEmail, setNewEmail] = useState("");
