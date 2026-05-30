@@ -30,6 +30,9 @@ export const getBusinessPage = createServerFn({ method: "GET" })
       { data: products },
       { data: posts },
       { data: reviews },
+      { data: albums },
+      { data: photos },
+      { data: contactChannels },
     ] = await Promise.all([
       supabaseAdmin.from("business_types").select("label").eq("slug", (biz as any).type_slug).maybeSingle(),
       supabaseAdmin.from("business_tag_links").select("tag_slug").eq("business_id", (biz as any).id),
@@ -58,6 +61,21 @@ export const getBusinessPage = createServerFn({ method: "GET" })
         .eq("business_id", (biz as any).id)
         .eq("status", "active")
         .order("created_at", { ascending: false }),
+      supabaseAdmin
+        .from("business_gallery_albums")
+        .select("id, title, description, cover_url, sort_order")
+        .eq("business_id", (biz as any).id)
+        .order("sort_order"),
+      supabaseAdmin
+        .from("business_gallery_photos")
+        .select("id, album_id, url, caption, sort_order")
+        .eq("business_id", (biz as any).id)
+        .order("sort_order"),
+      supabaseAdmin
+        .from("business_contact_channels")
+        .select("id, kind, label, value, sort_order")
+        .eq("business_id", (biz as any).id)
+        .order("sort_order"),
     ]);
 
     let tagLabels: string[] = [];
