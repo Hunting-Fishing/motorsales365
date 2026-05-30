@@ -122,8 +122,14 @@ function TermsPage() {
           <li>Catalog of services and products (fuels, lubricants, car wash, tire and air,
             inflation, LPG, EV charging, retail items, etc.) and any prices the owner chooses to
             publish.</li>
-          <li>Photos, amenities, accepted payment methods, and any required permits (e.g. DOE for
-            retail fuel outlets, FDA for regulated goods).</li>
+          <li>Photos, photo galleries (organised into albums), embedded videos (YouTube, Vimeo,
+            or Facebook video URLs), amenities, accepted payment methods, additional contact
+            channels (phone, WhatsApp, Viber, Telegram, Instagram, TikTok, email, Facebook, X,
+            LinkedIn), and any required permits (e.g. DOE for retail fuel outlets, FDA for
+            regulated goods).</li>
+          <li>Owners are responsible for the rights to all media they upload, and must not
+            post content that infringes copyright, contains personal data of third parties
+            without consent, or violates Platform community guidelines.</li>
         </ul>
         <p className="mt-2 text-muted-foreground">
           Materially misrepresenting hours, services, stock, or prices may result in suspension or
