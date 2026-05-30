@@ -106,6 +106,7 @@ import { Route as DashboardTeamPerformanceRouteImport } from './routes/dashboard
 import { Route as DashboardTeamMembersRouteImport } from './routes/dashboard.team.members'
 import { Route as DashboardTeamLeadsRouteImport } from './routes/dashboard.team.leads'
 import { Route as DashboardRidesNewRouteImport } from './routes/dashboard.rides_.new'
+import { Route as BusinessesSlugBookRouteImport } from './routes/businesses.$slug.book'
 import { Route as ApiPublicPaymentEventsRouteImport } from './routes/api/public/payment-events'
 import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocode'
 import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
@@ -608,6 +609,11 @@ const DashboardRidesNewRoute = DashboardRidesNewRouteImport.update({
   path: '/rides/new',
   getParentRoute: () => DashboardRoute,
 } as any)
+const BusinessesSlugBookRoute = BusinessesSlugBookRouteImport.update({
+  id: '/book',
+  path: '/book',
+  getParentRoute: () => BusinessesSlugRoute,
+} as any)
 const ApiPublicPaymentEventsRoute = ApiPublicPaymentEventsRouteImport.update({
   id: '/api/public/payment-events',
   path: '/api/public/payment-events',
@@ -739,7 +745,7 @@ export interface FileRoutesByFullPath {
   '/boost/checkout': typeof BoostCheckoutRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/business/checkout': typeof BusinessCheckoutRoute
-  '/businesses/$slug': typeof BusinessesSlugRoute
+  '/businesses/$slug': typeof BusinessesSlugRouteWithChildren
   '/businesses/submit': typeof BusinessesSubmitRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/dashboard/billing': typeof DashboardBillingRoute
@@ -780,6 +786,7 @@ export interface FileRoutesByFullPath {
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
+  '/businesses/$slug/book': typeof BusinessesSlugBookRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
@@ -851,7 +858,7 @@ export interface FileRoutesByTo {
   '/boost/checkout': typeof BoostCheckoutRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/business/checkout': typeof BusinessCheckoutRoute
-  '/businesses/$slug': typeof BusinessesSlugRoute
+  '/businesses/$slug': typeof BusinessesSlugRouteWithChildren
   '/businesses/submit': typeof BusinessesSubmitRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/dashboard/billing': typeof DashboardBillingRoute
@@ -891,6 +898,7 @@ export interface FileRoutesByTo {
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
+  '/businesses/$slug/book': typeof BusinessesSlugBookRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
@@ -965,7 +973,7 @@ export interface FileRoutesById {
   '/boost/checkout': typeof BoostCheckoutRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/business/checkout': typeof BusinessCheckoutRoute
-  '/businesses/$slug': typeof BusinessesSlugRoute
+  '/businesses/$slug': typeof BusinessesSlugRouteWithChildren
   '/businesses/submit': typeof BusinessesSubmitRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/dashboard/billing': typeof DashboardBillingRoute
@@ -1006,6 +1014,7 @@ export interface FileRoutesById {
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
+  '/businesses/$slug/book': typeof BusinessesSlugBookRoute
   '/dashboard/rides_/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
@@ -1122,6 +1131,7 @@ export interface FileRouteTypes {
     | '/api/admin/create-user'
     | '/api/public/geocode'
     | '/api/public/payment-events'
+    | '/businesses/$slug/book'
     | '/dashboard/rides/new'
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
@@ -1233,6 +1243,7 @@ export interface FileRouteTypes {
     | '/api/admin/create-user'
     | '/api/public/geocode'
     | '/api/public/payment-events'
+    | '/businesses/$slug/book'
     | '/dashboard/rides/new'
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
@@ -1347,6 +1358,7 @@ export interface FileRouteTypes {
     | '/api/admin/create-user'
     | '/api/public/geocode'
     | '/api/public/payment-events'
+    | '/businesses/$slug/book'
     | '/dashboard/rides_/new'
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
@@ -1403,7 +1415,7 @@ export interface RootRouteChildren {
   BoostCheckoutRoute: typeof BoostCheckoutRoute
   BrowseCategoryRoute: typeof BrowseCategoryRoute
   BusinessCheckoutRoute: typeof BusinessCheckoutRoute
-  BusinessesSlugRoute: typeof BusinessesSlugRoute
+  BusinessesSlugRoute: typeof BusinessesSlugRouteWithChildren
   BusinessesSubmitRoute: typeof BusinessesSubmitRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
@@ -2121,6 +2133,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRidesNewRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/businesses/$slug/book': {
+      id: '/businesses/$slug/book'
+      path: '/book'
+      fullPath: '/businesses/$slug/book'
+      preLoaderRoute: typeof BusinessesSlugBookRouteImport
+      parentRoute: typeof BusinessesSlugRoute
+    }
     '/api/public/payment-events': {
       id: '/api/public/payment-events'
       path: '/api/public/payment-events'
@@ -2365,6 +2384,18 @@ const SellRouteChildren: SellRouteChildren = {
 
 const SellRouteWithChildren = SellRoute._addFileChildren(SellRouteChildren)
 
+interface BusinessesSlugRouteChildren {
+  BusinessesSlugBookRoute: typeof BusinessesSlugBookRoute
+}
+
+const BusinessesSlugRouteChildren: BusinessesSlugRouteChildren = {
+  BusinessesSlugBookRoute: BusinessesSlugBookRoute,
+}
+
+const BusinessesSlugRouteWithChildren = BusinessesSlugRoute._addFileChildren(
+  BusinessesSlugRouteChildren,
+)
+
 interface ListingIdRouteChildren {
   ListingIdEditRoute: typeof ListingIdEditRoute
 }
@@ -2418,7 +2449,7 @@ const rootRouteChildren: RootRouteChildren = {
   BoostCheckoutRoute: BoostCheckoutRoute,
   BrowseCategoryRoute: BrowseCategoryRoute,
   BusinessCheckoutRoute: BusinessCheckoutRoute,
-  BusinessesSlugRoute: BusinessesSlugRoute,
+  BusinessesSlugRoute: BusinessesSlugRouteWithChildren,
   BusinessesSubmitRoute: BusinessesSubmitRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
