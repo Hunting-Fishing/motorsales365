@@ -155,8 +155,8 @@ export function TotpSetupCard() {
             <div>
               <div className="text-sm font-semibold">Two-factor enabled</div>
               <div className="text-xs text-muted-foreground">
-                Enrolled {new Date(verified.created_at).toLocaleDateString()} — codes from
-                your authenticator app are required at sign-in.
+                Enrolled {new Date(verified.created_at).toLocaleDateString()} — codes from your
+                authenticator app are required at sign-in.
               </div>
             </div>
           </div>
@@ -215,7 +215,9 @@ export function TotpSetupCard() {
         <div className="space-y-3">
           <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm">
             <ShieldAlert className="mt-0.5 h-4 w-4 text-amber-600" />
-            <span>Two-factor authentication is not enabled. Recommended for sellers and admins.</span>
+            <span>
+              Two-factor authentication is not enabled. Recommended for sellers and admins.
+            </span>
           </div>
           <Button onClick={startEnroll} disabled={busy}>
             {busy ? "Preparing…" : "Set up authenticator app"}
