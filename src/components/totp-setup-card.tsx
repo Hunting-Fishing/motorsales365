@@ -151,10 +151,10 @@ export function TotpSetupCard() {
             <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
               <KeyRound className="h-4 w-4" /> Step 1 — Scan this QR code
             </div>
-            <div
-              className="mx-auto h-44 w-44"
-              // Supabase returns an inline SVG string for qr_code
-              dangerouslySetInnerHTML={{ __html: enroll.qrSvg }}
+            <img
+              src={enroll.qrSvg}
+              alt="TOTP QR code"
+              className="mx-auto h-44 w-44 rounded bg-white p-2"
             />
             <div className="mt-3">
               <Label className="text-xs text-muted-foreground">Or enter this secret manually</Label>
