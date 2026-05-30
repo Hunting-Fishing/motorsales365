@@ -1,7 +1,14 @@
-// Server-only helpers for talking to the Google Maps Platform connector gateway.
-// Must NOT be imported from client code. The router blocks *.server.ts from the client bundle.
+// Server-only helpers for geocoding (free OSM Nominatim) and Google Places
+// nearby search (admin-only import flow). Must NOT be imported from client code.
+// The router blocks *.server.ts from the client bundle.
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_maps";
+
+// Nominatim usage policy: descriptive User-Agent, <=1 req/sec, attribution in UI.
+// https://operations.osmfoundation.org/policies/nominatim/
+const NOMINATIM_URL = "https://nominatim.openstreetmap.org";
+const NOMINATIM_UA =
+  "365MotorSales/1.0 (https://365motorsales.com; support@365motorsales.com)";
 
 function authHeaders(): Record<string, string> {
   const lovable = process.env.LOVABLE_API_KEY;
@@ -20,22 +27,26 @@ export type GeocodeResult = {
   label: string;
 };
 
+// Free geocoding via OSM Nominatim. Biased to the Philippines (countrycodes=ph).
 export async function geocodeAddress(query: string): Promise<GeocodeResult | null> {
-  const res = await fetch(
-    `${GATEWAY_URL}/maps/api/geocode/json?address=${encodeURIComponent(query)}&region=ph`,
-    { headers: authHeaders() },
-  );
+  const url =
+    `${NOMINATIM_URL}/search?format=json&limit=1&countrycodes=ph&addressdetails=0` +
+    `&q=${encodeURIComponent(query)}`;
+  const res = await fetch(url, {
+    headers: { "User-Agent": NOMINATIM_UA, Accept: "application/json" },
+  });
   if (!res.ok) throw new Error(`Geocode error [${res.status}]: ${await res.text()}`);
-  const json = (await res.json()) as {
-    results?: { formatted_address: string; geometry: { location: { lat: number; lng: number } } }[];
-    status?: string;
-  };
-  const first = json.results?.[0];
+  const json = (await res.json()) as Array<{
+    lat: string;
+    lon: string;
+    display_name: string;
+  }>;
+  const first = json[0];
   if (!first) return null;
   return {
-    lat: first.geometry.location.lat,
-    lng: first.geometry.location.lng,
-    label: first.formatted_address,
+    lat: Number(first.lat),
+    lng: Number(first.lon),
+    label: first.display_name,
   };
 }
 
