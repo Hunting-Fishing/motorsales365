@@ -78,11 +78,6 @@ export const getBusinessPage = createServerFn({ method: "GET" })
         .eq("business_id", (biz as any).id)
         .order("sort_order"),
       supabaseAdmin
-        .from("business_contact_channels")
-        .select("id, kind, label, value, sort_order")
-        .eq("business_id", (biz as any).id)
-        .order("sort_order"),
-      supabaseAdmin
         .from("business_bookable_items")
         .select("id, title, duration_min, price_php")
         .eq("business_id", (biz as any).id)
@@ -129,6 +124,7 @@ export const getBusinessPage = createServerFn({ method: "GET" })
       albums: albums ?? [],
       photos: photos ?? [],
       contactChannels: contactChannels ?? [],
+      bookableItems: bookableItems ?? [],
     };
   });
 
