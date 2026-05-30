@@ -39,6 +39,8 @@ import {
   type ServiceFormValue,
 } from "@/components/business/service-catalog-picker";
 import { CATEGORY_LABEL } from "@/data/fuel-station-catalog";
+import { GalleryTab, ContactChannelsTab } from "@/components/business-page/gallery-contact-tabs";
+
 
 
 export const Route = createFileRoute("/dashboard/businesses_/$id/edit")({
