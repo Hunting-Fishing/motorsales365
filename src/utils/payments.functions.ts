@@ -80,8 +80,11 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       ui_mode: "embedded_page",
       return_url: data.returnUrl,
       customer: customerId,
-      customer_update: { name: "auto", address: "auto" },
-      metadata: { userId, lookup_key: data.priceId },
+      // Stripe handles end-to-end tax compliance, fraud, disputes, receipts
+      // globally on this session. Conflicts with customer_update / automatic_tax,
+      // so those are intentionally omitted.
+      managed_payments: { enabled: true },
+      metadata: { userId, lookup_key: data.priceId, managed_payments: "true" },
       ...(isRecurring && {
         subscription_data: { metadata: { userId, lookup_key: data.priceId } },
       }),

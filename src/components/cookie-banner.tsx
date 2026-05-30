@@ -19,6 +19,7 @@ export function CookieBanner() {
 
   function set(value: "accepted" | "declined") {
     try { localStorage.setItem(STORAGE_KEY, value); } catch {}
+    try { window.dispatchEvent(new CustomEvent("ms-consent-changed")); } catch {}
     setVisible(false);
   }
 
