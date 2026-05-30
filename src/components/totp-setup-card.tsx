@@ -171,10 +171,13 @@ export function TotpSetupCard() {
         <div className="space-y-4">
           <div className="rounded-lg border border-border bg-background p-4">
             <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
-              <KeyRound className="h-4 w-4" /> Step 1 — Scan this QR code
+              <KeyRound className="h-4 w-4" /> Step 1 — Open your existing authenticator app and scan
             </div>
-            <img
-              src={enroll.qrSvg}
+            <p className="mb-3 text-xs text-muted-foreground">
+              Open the authenticator app already on your phone (Authy, Microsoft
+              Authenticator, 1Password, Bitwarden, etc.) and use its built-in scanner.
+              Don't tap the QR image — it's just an image to scan, not a link.
+            </p>
               alt="TOTP QR code"
               className="mx-auto h-44 w-44 rounded bg-white p-2"
             />
