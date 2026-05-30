@@ -120,7 +120,7 @@ export const createBusinessSubscriptionCheckout = createServerFn({ method: "POST
           lookup_key: lookupKey,
         },
       },
-    });
+    } as any);
 
     return session.client_secret;
   });

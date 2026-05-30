@@ -123,7 +123,7 @@ export const createBoostCheckout = createServerFn({ method: "POST" })
           },
         },
       }),
-    });
+    } as any);
 
     return session.client_secret;
   });

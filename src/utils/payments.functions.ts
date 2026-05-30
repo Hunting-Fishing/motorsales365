@@ -80,15 +80,14 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       ui_mode: "embedded_page",
       return_url: data.returnUrl,
       customer: customerId,
-      // Stripe handles end-to-end tax compliance, fraud, disputes, receipts
-      // globally on this session. Conflicts with customer_update / automatic_tax,
-      // so those are intentionally omitted.
+      // Stripe handles end-to-end tax/fraud/disputes globally on this session.
+      // `managed_payments` is newer than the installed SDK typings — safe to cast.
       managed_payments: { enabled: true },
       metadata: { userId, lookup_key: data.priceId, managed_payments: "true" },
       ...(isRecurring && {
         subscription_data: { metadata: { userId, lookup_key: data.priceId } },
       }),
-    });
+    } as any);
 
     return session.client_secret;
   });
