@@ -141,8 +141,11 @@ export function TotpSetupCard() {
       <div>
         <h2 className="font-display text-lg font-bold">Security — Two-factor authentication</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Add a free authenticator app (Google Authenticator, Authy, 1Password, Microsoft
-          Authenticator) for a 6-digit code at sign-in. No SMS needed.
+          Use <strong>any</strong> free TOTP authenticator app you already have — open it
+          on your phone and scan the QR below. Compatible apps include Authy, Microsoft
+          Authenticator, 1Password, Bitwarden, Proton Authenticator, Aegis (Android),
+          Raivo (iOS), or Google Authenticator. You do <strong>not</strong> need to
+          install a new app — any TOTP app works. We never link to a paid app.
         </p>
       </div>
 
@@ -168,8 +171,13 @@ export function TotpSetupCard() {
         <div className="space-y-4">
           <div className="rounded-lg border border-border bg-background p-4">
             <div className="mb-2 flex items-center gap-2 text-sm font-semibold">
-              <KeyRound className="h-4 w-4" /> Step 1 — Scan this QR code
+              <KeyRound className="h-4 w-4" /> Step 1 — Open your existing authenticator app and scan
             </div>
+            <p className="mb-3 text-xs text-muted-foreground">
+              Open the authenticator app already on your phone (Authy, Microsoft
+              Authenticator, 1Password, Bitwarden, etc.) and use its built-in scanner.
+              Don't tap the QR image — it's just an image to scan, not a link.
+            </p>
             <img
               src={enroll.qrSvg}
               alt="TOTP QR code"
