@@ -378,9 +378,12 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
   const [showServices, setShowServices] = useState<boolean>(biz.show_services ?? true);
   const [showProducts, setShowProducts] = useState<boolean>(biz.show_products ?? true);
   const [showPosts, setShowPosts] = useState<boolean>(biz.show_posts ?? true);
+  const [showGallery, setShowGallery] = useState<boolean>(biz.show_gallery ?? true);
+  const [showContact, setShowContact] = useState<boolean>(biz.show_contact ?? true);
   const [ctaPrimary, setCtaPrimary] = useState<string>(biz.cta_primary ?? "inquiry");
   const [logoUrl, setLogoUrl] = useState<string | null>(biz.logo_url);
   const [coverUrl, setCoverUrl] = useState<string | null>(biz.cover_url);
+  const [featuredVideoUrl, setFeaturedVideoUrl] = useState<string>(biz.featured_video_url ?? "");
   const [saving, setSaving] = useState(false);
 
   const onUpload = async (file: File, target: "logo" | "cover") => {
@@ -393,9 +396,26 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
     }
   };
 
+  const detectVideoProvider = (url: string): "youtube" | "vimeo" | "facebook" | null => {
+    try {
+      const u = new URL(url);
+      if (u.hostname.includes("youtube.com") || u.hostname === "youtu.be") return "youtube";
+      if (u.hostname.includes("vimeo.com")) return "vimeo";
+      if (u.hostname.includes("facebook.com") || u.hostname.includes("fb.watch")) return "facebook";
+    } catch { /* noop */ }
+    return null;
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
+      const trimmedVideo = featuredVideoUrl.trim();
+      const provider = trimmedVideo ? detectVideoProvider(trimmedVideo) : null;
+      if (trimmedVideo && !provider) {
+        toast.error("Featured video must be a YouTube, Vimeo, or Facebook URL");
+        setSaving(false);
+        return;
+      }
       await save({
         data: {
           businessId: biz.id,
@@ -405,9 +425,13 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
           show_services: showServices,
           show_products: showProducts,
           show_posts: showPosts,
+          show_gallery: showGallery,
+          show_contact: showContact,
           cta_primary: ctaPrimary as any,
           logo_url: logoUrl,
           cover_url: coverUrl,
+          featured_video_url: trimmedVideo || null,
+          featured_video_provider: provider,
         },
       });
       toast.success("Saved");
