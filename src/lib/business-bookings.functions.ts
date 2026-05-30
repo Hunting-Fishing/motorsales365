@@ -31,14 +31,6 @@ function toMinutes(t: string) {
   return h * 60 + m;
 }
 
-function pad(n: number) {
-  return String(n).padStart(2, "0");
-}
-
-function fmtTime(min: number) {
-  return `${pad(Math.floor(min / 60))}:${pad(min % 60)}`;
-}
-
 /* ---------- PUBLIC: load booking config + compute slots ---------- */
 
 /**
