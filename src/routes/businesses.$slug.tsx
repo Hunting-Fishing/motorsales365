@@ -451,6 +451,23 @@ function BusinessProfilePage() {
           )}
 
 
+          {/* BOOKINGS CTA */}
+          {Array.isArray((data as any)?.bookableItems) && (data as any).bookableItems.length > 0 && (
+            <Card className="p-5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h2 className="font-display text-lg font-semibold">Book an appointment</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Pick a time that works for you — {(data as any).bookableItems.length} bookable service{(data as any).bookableItems.length === 1 ? "" : "s"}.
+                  </p>
+                </div>
+                <Link to="/businesses/$slug/book" params={{ slug }}>
+                  <Button style={{ backgroundColor: accent || undefined }}>Book now</Button>
+                </Link>
+              </div>
+            </Card>
+          )}
+
           {/* INQUIRY */}
           <Card id="inquiry" className="p-5">
             <h2 className="mb-1 font-display text-lg font-semibold">Send a message</h2>
