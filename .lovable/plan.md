@@ -1,54 +1,130 @@
-# Finish-the-app plan
+# Business Mini-Sites → Facebook Replacement
 
-Tackled in dependency order so each step unblocks the next. Each phase is independently shippable.
+Goal: give every Philippine business a professional, standalone-feeling presence on 365MotorSales so they can stop relying on a Facebook Page. Built in 5 phases so each ships usable.
 
-## Phase 1 — Email domain + transactional emails
-Without this, receipts, inquiry notifications, verification approvals, and team invites fail-soft (logged, not delivered).
+## Phase 1 — Bookings & Availability (biggest Facebook gap)
 
-1. Open the email domain setup dialog so you can pick a sender domain (e.g. `notify.365motorsales.com`) and add the NS records at your registrar.
-2. Once set, scaffold Lovable Emails infra (queue, suppression, unsubscribe) and the auth email templates so password reset / verification / magic links use the project's branding.
-3. Wire the existing transactional templates (ad inquiry, payment receipt, refund, subscription renewed/cancelled, support ticket, team invite, verification approve/reject) into the queue via `sendTransactionalEmail`.
-4. Add an admin notification on verification approve/reject (currently missing).
+What the owner sets up in `/dashboard/businesses/:id/edit` → new **Bookings** tab:
+- **Bookable items**: pick from existing services (e.g. "Oil change", "Detailing"), set duration (15/30/60/90/120 min), buffer time, price, max concurrent bookings (e.g. 2 bays).
+- **Weekly availability**: per-day open windows (reuses existing hours editor as default, overridable per service).
+- **Date exceptions**: holidays / closed days / special hours.
+- **Lead time & horizon**: "bookable starting X hours out, up to Y days ahead".
+- **Approval mode**: auto-confirm OR manual approval.
+- **Notifications**: email to owner on new booking; email/SMS confirmation to customer.
 
-## Phase 2 — Auth hardening
-1. Enable Google sign-in via `configure_social_auth` (providers: ["google"]) and add a "Continue with Google" button on `/login` and `/signup` using the Lovable broker.
-2. Turn on **leaked password protection (HIBP)** via `configure_auth`.
-3. Keep email/password as-is (no auto-confirm). Make sure verification email uses the new branded template.
-4. Leave TOTP 2FA optional for users, but **enforce** it for accounts with the `admin` role (block admin-area routes until enrolled).
+What the public sees on `/businesses/:slug` → new **Book** section + dedicated `/businesses/:slug/book` route:
+- Service picker → date picker (calendar with available days highlighted) → time slot grid → contact form → confirm.
+- No login required (guest bookings allowed); logged-in users get prefill.
+- Confirmation page with booking reference + add-to-calendar (.ics download).
 
-## Phase 3 — Phone / WhatsApp verification (currently broken)
-Supabase doesn't send WhatsApp OTPs natively. Two viable paths — pick one:
-- **A (recommended, cheap):** Replace "WhatsApp verify" with a Twilio SMS OTP via the Twilio connector, server-fn issued + verified, stored on the profile.
-- **B:** Twilio WhatsApp Business sender (needs business verification, longer setup).
+Owner inbox → new **Bookings** tab next to Inquiries:
+- New / Confirmed / Completed / Cancelled / No-show.
+- One-click confirm / decline / reschedule / cancel (email triggered).
 
-Plan assumes A unless you say otherwise. Includes rate-limit + cooldown to prevent SMS pumping.
+## Phase 2 — Image Galleries
 
-## Phase 4 — Stripe go-live
-Code is already wired for sandbox/live switching. Steps are user-driven in Stripe:
-1. Claim the sandbox account from **Connectors → Lovable Cloud → Payments**.
-2. Complete Stripe activation (business, bank, 2FA, submit).
-3. Install Lovable app on the live account (copy from sandbox includes it).
-4. Lovable auto-provisions `STRIPE_LIVE_API_KEY` + `PAYMENTS_LIVE_WEBHOOK_SECRET` and writes `pk_live_…` to `.env.production` on next publish — test-mode banner disappears automatically.
-5. Run the readiness check from the Payments tab.
-6. **Optional, recommended:** enable end-to-end tax/compliance (`managed_payments: { enabled: true }`) in `createCheckoutSession` for digital products (subscriptions, boosts). Adds +3.5% but Stripe handles VAT/filing/disputes/receipts globally. Set proper Stripe tax codes on the 5 subscription products + boost product first.
+- New **Gallery** section on the mini-site, separate from product/service photos.
+- Albums (e.g. "Shop interior", "Recent work", "Before/After").
+- Multi-image upload with drag-to-reorder, captions.
+- Lightbox viewer on public page with swipe on mobile.
+- Storage: new `business-gallery` bucket, max 30 images per album, max 12 albums per business.
 
-## Phase 5 — Analytics + error monitoring
-1. Add **Plausible** (privacy-friendly, simple) via a small script in `__root.tsx`, gated on cookie consent.
-2. Add **Sentry** for browser + server-fn error monitoring (DSN via secret).
-3. Tie cookie banner consent to analytics gating (currently banner exists but doesn't actually block).
+## Phase 3 — Embedded Video
 
-## Phase 6 — SEO / PWA polish
-1. Verify `sitemap.xml` includes every real route (browse, businesses, rides, shop categories, support pages).
-2. Add an offline fallback service worker (manifest already exists, install prompt already exists).
-3. Audit `<title>` / meta on top-traffic routes (`/`, `/pricing`, `/businesses`, `/shop`, `/sell`).
+- YouTube / Vimeo / Facebook Video URL field on Posts (already exists) + new dedicated **Videos** section.
+- Server-side URL parsing → safe embed (no arbitrary iframes).
+- Optional featured video on the cover area (replaces hero image when set).
 
-## Phase 7 — Policy refresh (memory rule)
-After Phases 1–4 land, bump "Last updated" on `/terms`, `/privacy`, `/refund-policy` to reflect: new auth methods (Google, TOTP, SMS), Stripe live processing, analytics provider, email sender domain.
+## Phase 4 — Contact Section Polish
 
----
+Already have inquiry form + call/messenger CTAs. Adds:
+- **Multiple phone numbers** (sales / service / parts) with labels.
+- **WhatsApp, Viber, Telegram, Instagram, TikTok** handles (PH businesses live on these).
+- **Email** with anti-spam click-to-reveal.
+- **Embedded map** with "Get directions" deep link to Google/Waze/Apple Maps.
+- **"Send us a message"** form already exists — add file attachment (1 photo, e.g. for damage estimates).
 
-### What I need from you before building
-1. **Phone verification path** — confirm Twilio SMS (path A) or WhatsApp Business (path B)?
-2. **Stripe compliance handling** — enable `managed_payments` on subscriptions/boosts (+3.5%, Stripe handles tax globally), or stick with calculation-only (+0.5%) for now?
-3. **Analytics** — Plausible (recommended), PostHog (product analytics + session replay), or GA4?
-4. **Build order** — do all phases now, or just Phase 1 + 2 first and pause?
+## Phase 5 — "Your Own Domain Feel" (vanity URLs)
+
+Two layers, both cheap:
+
+**5a. Subdomain-style vanity slug (free, ships immediately)**
+- Today: `365motorsales.com/businesses/ucatch-cook-fuels-mlpb8`
+- New: owner picks a clean slug → `365motorsales.com/b/ucatchfuels` (short `/b/` prefix, vanity slug, no random suffix).
+- Reserved-word list, uniqueness check, slug history table so old links 301-redirect.
+- Optional: `ucatchfuels.365motorsales.com` wildcard subdomain (requires DNS wildcard + Vite route rewrite — included if you want it).
+
+**5b. Custom domain (paid add-on, opt-in)**
+- Owner adds `ucatchfuels.com` → we show DNS instructions (CNAME to our host).
+- Verification via TXT record.
+- Auto SSL via the hosting provider (Cloudflare/Lovable).
+- This is part of the Pro / Business subscription tier — adds revenue.
+- Privacy/Terms updated to mention custom domain processing.
+
+## Technical details
+
+```text
+New tables
+  business_bookable_items   id, business_id, service_id (nullable), title,
+                            duration_min, buffer_min, price_php, max_concurrent,
+                            require_approval, active, sort_order
+  business_availability     id, business_id, weekday (0-6), start_time,
+                            end_time  (multiple rows per weekday allowed)
+  business_availability_exceptions
+                            id, business_id, date, closed (bool),
+                            start_time, end_time, note
+  business_bookings         id, business_id, bookable_item_id, customer_name,
+                            customer_phone, customer_email, user_id (nullable),
+                            starts_at (timestamptz), ends_at, status
+                            (pending|confirmed|completed|cancelled|no_show),
+                            notes, created_at
+  business_gallery_albums   id, business_id, title, cover_url, sort_order
+  business_gallery_photos   id, album_id, url, caption, sort_order
+  business_videos           id, business_id, provider (youtube|vimeo|facebook),
+                            url, embed_id, title, sort_order, featured
+  business_contact_channels id, business_id, kind (phone|whatsapp|viber|
+                            telegram|instagram|tiktok|email), label, value,
+                            sort_order
+  business_slug_history     id, business_id, old_slug, redirected_at
+  business_custom_domains   id, business_id, domain, verification_token,
+                            verified_at, ssl_status
+
+New storage bucket: business-gallery (public read, owner write)
+
+New server functions (src/lib/business-bookings.functions.ts,
+                     src/lib/business-gallery.functions.ts,
+                     src/lib/business-media.functions.ts,
+                     src/lib/business-domains.functions.ts)
+
+New routes:
+  src/routes/businesses.$slug.book.tsx          (public booking flow)
+  src/routes/b.$slug.tsx                        (short vanity URL)
+  src/routes/dashboard.businesses_.$id.bookings.tsx
+  src/routes/dashboard.businesses_.$id.gallery.tsx
+  src/routes/dashboard.businesses_.$id.domain.tsx
+
+Edits:
+  /businesses/:slug → add Bookings, Gallery, Videos, Contact-channels
+  Edit page → add new tabs
+  Subscription / pricing → add custom-domain add-on
+  /terms, /privacy → bump for bookings + custom domains
+  sitemap.xml → add /b/:slug entries
+```
+
+## Suggested rollout order
+
+If you want this to ship in usable chunks rather than one giant push:
+1. **Phase 2 (Gallery)** + **Phase 4 (Contact)** — fast wins, 1 batch.
+2. **Phase 3 (Video)** — small, slots in next.
+3. **Phase 1 (Bookings)** — biggest single feature, ship on its own.
+4. **Phase 5a (vanity `/b/:slug`)** — small.
+5. **Phase 5b (custom domains)** — last, since it touches DNS/SSL and billing.
+
+Or I do it all in one go if you prefer — just more time before anything lands.
+
+## Decisions I need from you
+
+1. **Rollout**: phased as above, or all-in-one?
+2. **Bookings approval mode default**: auto-confirm or manual?
+3. **Custom domains pricing**: free for all, or paid add-on (e.g. ₱299/month per domain)?
+4. **Vanity URL shape**: `/b/ucatchfuels` (path) or `ucatchfuels.365motorsales.com` (subdomain)? Subdomain feels more pro but needs DNS wildcard on the custom domain.
