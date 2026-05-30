@@ -87,49 +87,6 @@ function ProfilePage() {
     });
   }, [user]);
 
-  const sendPhoneOtp = async () => {
-    const e164 = buildE164(verifyPhone.iso, verifyPhone.national);
-    if (!e164) return toast.error("Enter a valid phone number.");
-    setPhoneSubmitting(true);
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-    const { count } = await supabase
-      .from("otp_send_log")
-      .select("id", { count: "exact", head: true })
-      .eq("phone", e164)
-      .gte("sent_at", oneHourAgo);
-    if ((count ?? 0) >= 3) {
-      setPhoneSubmitting(false);
-      return toast.error("Too many attempts. Try again in an hour.");
-    }
-    const { error } = await supabase.auth.updateUser({ phone: e164 });
-    if (!error && user) {
-      await supabase.from("otp_send_log").insert({ user_id: user.id, phone: e164, purpose: "verify" });
-    }
-    setPhoneSubmitting(false);
-    if (error) return toast.error(error.message);
-    setOtpSent(true);
-    toast.success("OTP sent to your phone.");
-  };
-
-  const verifyPhoneOtp = async () => {
-    const e164 = buildE164(verifyPhone.iso, verifyPhone.national);
-    if (!e164 || !user) return;
-    setPhoneSubmitting(true);
-    const { error } = await supabase.auth.verifyOtp({ phone: e164, token: otpCode, type: "phone_change" });
-    if (!error) {
-      await supabase.from("profiles").update({
-        phone_e164: e164,
-        phone_verified_at: new Date().toISOString(),
-      }).eq("id", user.id);
-      setProfile((p: any) => ({ ...p, phone_e164: e164, phone_verified_at: new Date().toISOString() }));
-    }
-    setPhoneSubmitting(false);
-    if (error) return toast.error(error.message);
-    toast.success("Phone verified — recovery via SMS is now enabled.");
-    setOtpSent(false);
-    setOtpCode("");
-    setVerifyPhone({ iso: "PH", national: "" });
-  };
 
   const removePhone = async () => {
     if (!user) return;
