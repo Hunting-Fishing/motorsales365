@@ -188,15 +188,20 @@ function TermsPage() {
           required by RA 7394.
         </p>
 
-        <h2 className="mt-6 text-xl font-semibold">9. Payments &amp; payment test mode</h2>
+        <h2 className="mt-6 text-xl font-semibold">9. Payments, tax &amp; payment test mode</h2>
         <p className="mt-2 text-muted-foreground">
-          Card and e-wallet payments are processed by third-party payment service providers
-          regulated by the Bangko Sentral ng Pilipinas (BSP) and operating in accordance with RA
-          11765 (Financial Products and Services Consumer Protection Act) and RA 9160 (Anti-Money
-          Laundering Act, as amended). When the Platform is operating in <strong>payment test
-          mode</strong>, a visible banner is displayed and no real charges are made. We do not
-          store full primary account numbers (PANs) on our servers; sensitive payment data is
-          handled by PCI-DSS-compliant processors.
+          Card and e-wallet payments for subscriptions, boosts, and business plans are processed
+          by <strong>Stripe</strong> in live mode. Where supported by the buyer's location, Stripe
+          calculates, collects, and remits applicable sales tax / VAT (including PH VAT) on our
+          behalf and handles fraud screening, dispute (chargeback) processing, and transactional
+          receipts directly. For buyers outside Stripe's supported tax jurisdictions, tax is
+          calculated at checkout and remitted by us where required. When the Platform is operating
+          in <strong>payment test mode</strong>, a visible banner is displayed and no real
+          charges are made. We do not store full primary account numbers (PANs) on our servers;
+          sensitive payment data is handled by PCI-DSS-compliant processors regulated by the
+          Bangko Sentral ng Pilipinas (BSP) and operating in accordance with RA 11765 (Financial
+          Products and Services Consumer Protection Act) and RA 9160 (Anti-Money Laundering Act,
+          as amended).
         </p>
 
         <h2 className="mt-6 text-xl font-semibold">10. Refunds &amp; chargebacks</h2>
