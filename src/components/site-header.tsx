@@ -105,9 +105,7 @@ export function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <div className="hidden sm:block">
-            <CurrencySwitcher />
-          </div>
+
 
           {/* Help icon — desktop */}
           <Button asChild variant="ghost" size="icon" className="hidden md:inline-flex h-9 w-9" aria-label="Help & support">
