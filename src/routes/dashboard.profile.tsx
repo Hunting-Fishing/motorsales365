@@ -12,6 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, Circle, AlertCircle } from "lucide-react";
 import { PhoneInput } from "@/components/phone-input";
 import { AvatarUploader } from "@/components/avatar-uploader";
+import { TotpSetupCard } from "@/components/totp-setup-card";
 import { buildE164, parseE164 } from "@/data/country-codes";
 import { useCurrency } from "@/lib/currency";
 
@@ -24,7 +25,7 @@ function buildChecklist(profile: any): ChecklistItem[] {
     { label: "First & last name", done: has(profile?.first_name) && has(profile?.last_name), required: true },
     { label: "Phone number", done: has(profile?.phone) || has(profile?.phone_e164), required: true },
     { label: "Profile photo", done: has(profile?.avatar_url), required: false },
-    { label: "Verified phone (SMS recovery)", done: !!profile?.phone_verified_at, required: false },
+    { label: "Two-factor authentication (authenticator app)", done: false, required: false },
   ];
   if (isBusiness) {
     items.push(
@@ -51,14 +52,7 @@ function ProfilePage() {
     national: "",
   });
 
-  // Phone verification state
-  const [verifyPhone, setVerifyPhone] = useState<{ iso: string; national: string }>({
-    iso: "PH",
-    national: "",
-  });
-  const [otpCode, setOtpCode] = useState("");
-  const [otpSent, setOtpSent] = useState(false);
-  const [phoneSubmitting, setPhoneSubmitting] = useState(false);
+  // (Phone-verification SMS flow removed — replaced with TOTP 2FA below.)
 
   // Email change
   const [newEmail, setNewEmail] = useState("");
@@ -93,49 +87,6 @@ function ProfilePage() {
     });
   }, [user]);
 
-  const sendPhoneOtp = async () => {
-    const e164 = buildE164(verifyPhone.iso, verifyPhone.national);
-    if (!e164) return toast.error("Enter a valid phone number.");
-    setPhoneSubmitting(true);
-    const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-    const { count } = await supabase
-      .from("otp_send_log")
-      .select("id", { count: "exact", head: true })
-      .eq("phone", e164)
-      .gte("sent_at", oneHourAgo);
-    if ((count ?? 0) >= 3) {
-      setPhoneSubmitting(false);
-      return toast.error("Too many attempts. Try again in an hour.");
-    }
-    const { error } = await supabase.auth.updateUser({ phone: e164 });
-    if (!error && user) {
-      await supabase.from("otp_send_log").insert({ user_id: user.id, phone: e164, purpose: "verify" });
-    }
-    setPhoneSubmitting(false);
-    if (error) return toast.error(error.message);
-    setOtpSent(true);
-    toast.success("OTP sent to your phone.");
-  };
-
-  const verifyPhoneOtp = async () => {
-    const e164 = buildE164(verifyPhone.iso, verifyPhone.national);
-    if (!e164 || !user) return;
-    setPhoneSubmitting(true);
-    const { error } = await supabase.auth.verifyOtp({ phone: e164, token: otpCode, type: "phone_change" });
-    if (!error) {
-      await supabase.from("profiles").update({
-        phone_e164: e164,
-        phone_verified_at: new Date().toISOString(),
-      }).eq("id", user.id);
-      setProfile((p: any) => ({ ...p, phone_e164: e164, phone_verified_at: new Date().toISOString() }));
-    }
-    setPhoneSubmitting(false);
-    if (error) return toast.error(error.message);
-    toast.success("Phone verified — recovery via SMS is now enabled.");
-    setOtpSent(false);
-    setOtpCode("");
-    setVerifyPhone({ iso: "PH", national: "" });
-  };
 
   const removePhone = async () => {
     if (!user) return;
@@ -322,64 +273,8 @@ function ProfilePage() {
         </form>
       </div>
 
-      {/* Security: phone verification */}
-      <div className="mt-6 space-y-4 rounded-xl border border-border bg-card p-6">
-        <div>
-          <h2 className="font-display text-lg font-bold">Security — Phone verification</h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Add a verified mobile number to recover your account by SMS if you lose access to your email.
-          </p>
-        </div>
-
-        {profile.phone_verified_at && profile.phone_e164 ? (
-          <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3">
-            <div>
-              <div className="text-sm font-semibold">Verified: {profile.phone_e164}</div>
-              <div className="text-xs text-muted-foreground">
-                Verified {new Date(profile.phone_verified_at).toLocaleDateString()} — SMS recovery enabled.
-              </div>
-            </div>
-            <Button variant="outline" size="sm" onClick={removePhone}>Remove</Button>
-          </div>
-        ) : !otpSent ? (
-          <div className="space-y-3">
-            <div>
-              <Label htmlFor="phone-verify">Mobile number</Label>
-              <PhoneInput
-                id="phone-verify"
-                iso={verifyPhone.iso}
-                national={verifyPhone.national}
-                onChange={setVerifyPhone}
-              />
-              <p className="mt-1 text-xs text-muted-foreground">Pick your country, then enter your mobile number.</p>
-            </div>
-            <Button onClick={sendPhoneOtp} disabled={phoneSubmitting} variant="secondary">
-              {phoneSubmitting ? "Sending…" : "Send verification code"}
-            </Button>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <div>
-              <Label htmlFor="phone-otp">
-                6-digit code sent to {buildE164(verifyPhone.iso, verifyPhone.national)}
-              </Label>
-              <Input
-                id="phone-otp"
-                inputMode="numeric"
-                maxLength={6}
-                value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value)}
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button onClick={verifyPhoneOtp} disabled={phoneSubmitting}>
-                {phoneSubmitting ? "Verifying…" : "Verify"}
-              </Button>
-              <Button variant="ghost" onClick={() => { setOtpSent(false); setOtpCode(""); }}>Cancel</Button>
-            </div>
-          </div>
-        )}
-      </div>
+      {/* Security: TOTP two-factor authentication (free, no SMS) */}
+      <TotpSetupCard />
     </div>
   );
 }
