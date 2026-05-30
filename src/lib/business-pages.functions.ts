@@ -61,13 +61,19 @@ export const getBusinessPage = createServerFn({ method: "GET" })
     ]);
 
     let tagLabels: string[] = [];
+    let tags: { slug: string; label: string; category: string | null }[] = [];
     const tagSlugs = (tagLinks ?? []).map((l: any) => l.tag_slug);
     if (tagSlugs.length > 0) {
       const { data: tagRows } = await supabaseAdmin
         .from("business_tags")
-        .select("slug,label")
+        .select("slug,label,category")
         .in("slug", tagSlugs);
-      tagLabels = (tagRows ?? []).map((r: any) => r.label);
+      tags = (tagRows ?? []).map((r: any) => ({
+        slug: r.slug,
+        label: r.label,
+        category: r.category ?? null,
+      }));
+      tagLabels = tags.map((t) => t.label);
     }
 
     const uids = Array.from(new Set((reviews ?? []).map((r: any) => r.user_id)));
