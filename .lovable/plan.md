@@ -1,36 +1,54 @@
-## Header fixes (`src/components/site-header.tsx`)
+# Finish-the-app plan
 
-### 1. Quick-link bar overlap
-At the current viewport (~1162px) the desktop nav appears at `lg` (1024px) but the right-side action cluster (Currency, Help, Post a listing, Account/Sign up, menu) is too wide, so "Map / Shop" visually collide with the Currency pill and Post a listing button.
+Tackled in dependency order so each step unblocks the next. Each phase is independently shippable.
 
-Fix:
-- Promote the desktop nav from `lg:flex` → `xl:flex` (and the mobile menu trigger from `lg:hidden` → `xl:hidden`) so the inline nav only appears when there's actually room. Between `lg` and `xl` users get the hamburger sheet (which already lists every link).
-- Tighten the right cluster gap (`gap-1.5 sm:gap-2` → keep, but drop the now-removed Currency switcher — see #3).
-- Reduce nav inner gap from `gap-1` plus `px-3` to `px-2.5` so it still fits comfortably at `xl`.
+## Phase 1 — Email domain + transactional emails
+Without this, receipts, inquiry notifications, verification approvals, and team invites fail-soft (logged, not delivered).
 
-### 2. Sign up → Sign in / Sign up combined control
-Replace the single "Sign up" outline button (lines 186–188) with a two-button group for guests on desktop:
+1. Open the email domain setup dialog so you can pick a sender domain (e.g. `notify.365motorsales.com`) and add the NS records at your registrar.
+2. Once set, scaffold Lovable Emails infra (queue, suppression, unsubscribe) and the auth email templates so password reset / verification / magic links use the project's branding.
+3. Wire the existing transactional templates (ad inquiry, payment receipt, refund, subscription renewed/cancelled, support ticket, team invite, verification approve/reject) into the queue via `sendTransactionalEmail`.
+4. Add an admin notification on verification approve/reject (currently missing).
 
-```text
-[ Sign in ]  [ Sign up ]
-```
+## Phase 2 — Auth hardening
+1. Enable Google sign-in via `configure_social_auth` (providers: ["google"]) and add a "Continue with Google" button on `/login` and `/signup` using the Lovable broker.
+2. Turn on **leaked password protection (HIBP)** via `configure_auth`.
+3. Keep email/password as-is (no auto-confirm). Make sure verification email uses the new branded template.
+4. Leave TOTP 2FA optional for users, but **enforce** it for accounts with the `admin` role (block admin-area routes until enrolled).
 
-- "Sign in" → `variant="ghost"` linking to `/login`
-- "Sign up" → `variant="outline"` linking to `/signup`
-- Wrapped in a `hidden md:flex items-center gap-1` container so both appear together on desktop and the mobile sheet (which already has both) stays unchanged.
+## Phase 3 — Phone / WhatsApp verification (currently broken)
+Supabase doesn't send WhatsApp OTPs natively. Two viable paths — pick one:
+- **A (recommended, cheap):** Replace "WhatsApp verify" with a Twilio SMS OTP via the Twilio connector, server-fn issued + verified, stored on the profile.
+- **B:** Twilio WhatsApp Business sender (needs business verification, longer setup).
 
-### 3. Currency control: header → profile only
-The profile page already has a `CurrencyPreferenceCard` (built last round) that writes to the same `useCurrency()` store, so every listing already reflects the chosen currency via `<ListingPrice>`. The header switcher is now redundant and contributes to the overlap.
+Plan assumes A unless you say otherwise. Includes rate-limit + cooldown to prevent SMS pumping.
 
-Fix:
-- Remove the `<CurrencySwitcher />` block from the desktop header (lines 108–110).
-- Remove the `<CurrencySwitcher />` block from the mobile sheet (lines 264–266).
-- Keep `CurrencySwitcher` component file untouched (still used in profile preview indirectly via the same context; component itself isn't removed in case it's reused).
-- No change to `ListingPrice` — it already reads from `useCurrency()` which is fed by the profile setting (or localStorage default `PHP` for guests).
+## Phase 4 — Stripe go-live
+Code is already wired for sandbox/live switching. Steps are user-driven in Stripe:
+1. Claim the sandbox account from **Connectors → Lovable Cloud → Payments**.
+2. Complete Stripe activation (business, bank, 2FA, submit).
+3. Install Lovable app on the live account (copy from sandbox includes it).
+4. Lovable auto-provisions `STRIPE_LIVE_API_KEY` + `PAYMENTS_LIVE_WEBHOOK_SECRET` and writes `pk_live_…` to `.env.production` on next publish — test-mode banner disappears automatically.
+5. Run the readiness check from the Payments tab.
+6. **Optional, recommended:** enable end-to-end tax/compliance (`managed_payments: { enabled: true }`) in `createCheckoutSession` for digital products (subscriptions, boosts). Adds +3.5% but Stripe handles VAT/filing/disputes/receipts globally. Set proper Stripe tax codes on the 5 subscription products + boost product first.
 
-### Out of scope
-- No changes to `ListingPrice`, currency context, listing pages, or profile page — the wiring is already correct from the previous round.
-- No backend or schema changes.
+## Phase 5 — Analytics + error monitoring
+1. Add **Plausible** (privacy-friendly, simple) via a small script in `__root.tsx`, gated on cookie consent.
+2. Add **Sentry** for browser + server-fn error monitoring (DSN via secret).
+3. Tie cookie banner consent to analytics gating (currently banner exists but doesn't actually block).
 
-## Files touched
-- `src/components/site-header.tsx` — nav breakpoint bump, Sign in/Sign up pair, remove header CurrencySwitcher (desktop + sheet).
+## Phase 6 — SEO / PWA polish
+1. Verify `sitemap.xml` includes every real route (browse, businesses, rides, shop categories, support pages).
+2. Add an offline fallback service worker (manifest already exists, install prompt already exists).
+3. Audit `<title>` / meta on top-traffic routes (`/`, `/pricing`, `/businesses`, `/shop`, `/sell`).
+
+## Phase 7 — Policy refresh (memory rule)
+After Phases 1–4 land, bump "Last updated" on `/terms`, `/privacy`, `/refund-policy` to reflect: new auth methods (Google, TOTP, SMS), Stripe live processing, analytics provider, email sender domain.
+
+---
+
+### What I need from you before building
+1. **Phone verification path** — confirm Twilio SMS (path A) or WhatsApp Business (path B)?
+2. **Stripe compliance handling** — enable `managed_payments` on subscriptions/boosts (+3.5%, Stripe handles tax globally), or stick with calculation-only (+0.5%) for now?
+3. **Analytics** — Plausible (recommended), PostHog (product analytics + session replay), or GA4?
+4. **Build order** — do all phases now, or just Phase 1 + 2 first and pause?
