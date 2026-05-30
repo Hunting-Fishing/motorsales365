@@ -181,16 +181,22 @@ function BusinessProfilePage() {
       <div style={accentStyle}>
         {/* HERO */}
         <div className="relative">
-          <div
-            className="h-48 w-full bg-muted md:h-72 lg:h-80"
-            style={{
-              backgroundImage: biz.cover_url ? `url(${biz.cover_url})` : undefined,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          >
-            <div className="h-full w-full bg-gradient-to-b from-black/10 via-black/30 to-background" />
-          </div>
+          {biz.featured_video_url ? (
+            <div className="container mx-auto px-4 pt-4">
+              <FeaturedVideoEmbed url={biz.featured_video_url} provider={biz.featured_video_provider ?? null} />
+            </div>
+          ) : (
+            <div
+              className="h-48 w-full bg-muted md:h-72 lg:h-80"
+              style={{
+                backgroundImage: biz.cover_url ? `url(${biz.cover_url})` : undefined,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            >
+              <div className="h-full w-full bg-gradient-to-b from-black/10 via-black/30 to-background" />
+            </div>
+          )}
 
           <div className="container mx-auto -mt-16 px-4 md:-mt-20">
             <Card className="overflow-hidden">
