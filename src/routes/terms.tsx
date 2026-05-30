@@ -3,8 +3,9 @@ import { SiteLayout } from "@/components/site-layout";
 
 const TITLE = "Terms & Conditions — 365 MotorSales Philippines";
 const DESCRIPTION =
-  "Terms & Conditions for 365 MotorSales Philippines: accounts, listings, business directory, pricing in ₱, fees, payments, refunds, and PH law.";
+  "Terms & Conditions for 365 MotorSales Philippines: accounts, listings, business directory, pricing, fees, payments, refunds, and Philippine law (RA 11967, RA 8792, RA 7394, RA 10173, RA 10175).";
 const URL = "https://365motorsales.com/terms";
+const SUPPORT_EMAIL = "legal@365motorsales.com";
 
 export const Route = createFileRoute("/terms")({
   head: () => ({
@@ -27,172 +28,328 @@ function TermsPage() {
   return (
     <SiteLayout>
       <article className="container mx-auto max-w-3xl px-4 py-16 prose prose-sm dark:prose-invert">
-        <h1 className="font-display text-3xl font-bold sm:text-4xl">Terms & Conditions</h1>
+        <h1 className="font-display text-3xl font-bold sm:text-4xl">Terms &amp; Conditions</h1>
         <p className="text-sm text-muted-foreground">Last updated: {lastUpdated}</p>
         <p className="mt-2 text-muted-foreground">
-          These Terms & Conditions ("Terms") govern your use of 365 MotorSales Philippines. By
-          creating an account, posting a listing, claiming a business, or otherwise using the
-          platform you agree to these Terms.
+          These Terms &amp; Conditions ("<strong>Terms</strong>") form a binding agreement between
+          you and 365 MotorSales Philippines ("<strong>365 MotorSales</strong>", "
+          <strong>we</strong>", "<strong>us</strong>", or the "<strong>Platform</strong>") under the
+          laws of the Republic of the Philippines, including the{" "}
+          <em>Electronic Commerce Act of 2000</em> (RA 8792) and the{" "}
+          <em>Internet Transactions Act of 2023</em> (RA 11967). By creating an account, posting a
+          listing, claiming a business profile, browsing the site, or otherwise using the Platform,
+          you confirm that you have read, understood, and accepted these Terms together with our{" "}
+          <Link className="text-primary underline" to="/privacy">Privacy Policy</Link>,{" "}
+          <Link className="text-primary underline" to="/guidelines">Community Guidelines</Link>,
+          and{" "}
+          <Link className="text-primary underline" to="/refund-policy">Refund Policy</Link>. Your
+          click, tap, or continued use constitutes a valid electronic signature under Section 8 of
+          RA 8792.
         </p>
 
-        <h2 className="mt-8 text-xl font-semibold">1. Introduction & acceptance</h2>
+        <h2 className="mt-8 text-xl font-semibold">1. The service we provide</h2>
         <p className="mt-2 text-muted-foreground">
-          365 MotorSales Philippines ("we", "us", "the Platform") operates an online marketplace and
-          business directory for vehicles, parts, fuel stations, and related services in the
-          Philippines. By accessing the Platform you agree to these Terms, our{" "}
-          <Link className="text-primary underline" to="/privacy">Privacy Policy</Link>, our{" "}
-          <Link className="text-primary underline" to="/guidelines">Community Guidelines</Link>, and
-          our <Link className="text-primary underline" to="/refund-policy">Refund Policy</Link>.
+          365 MotorSales operates an online marketplace and business directory that allows private
+          individuals and registered businesses in the Philippines to list, discover, and enquire
+          about vehicles, parts, equipment, fuel stations, and related services. We are an{" "}
+          <em>e-marketplace operator</em> within the meaning of RA 11967. We are not a seller,
+          buyer, broker, financier, transport carrier, mechanic, or insurer, and we do not take
+          title to or possession of any item listed on the Platform.
         </p>
 
         <h2 className="mt-6 text-xl font-semibold">2. Eligibility</h2>
-        <p className="mt-2 text-muted-foreground">
-          You must be at least 18 years old and a resident of, or a business registered in, the
-          Republic of the Philippines to post listings or operate a business profile. By signing up
-          you confirm the information you provide is accurate and that you have the legal right to
-          sell the items or services you list.
-        </p>
-
-        <h2 className="mt-6 text-xl font-semibold">3. Accounts & security</h2>
         <ul className="mt-2 list-disc pl-6 text-muted-foreground">
-          <li>You are responsible for keeping your password and access to your account secure.</li>
-          <li>One person or registered business per account; no impersonation.</li>
-          <li>We may verify your identity, business permits, or vehicle ownership at any time.</li>
-          <li>You must notify us immediately of any unauthorised access.</li>
+          <li>You must be at least eighteen (18) years old and have the legal capacity to enter
+            into binding contracts under Philippine law.</li>
+          <li>Business accounts must be operated by a sole proprietorship, partnership, corporation,
+            or cooperative duly registered with the Department of Trade and Industry (DTI), the
+            Securities and Exchange Commission (SEC), or the Cooperative Development Authority
+            (CDA), and the relevant local government unit, and must be in good standing with the
+            Bureau of Internal Revenue (BIR).</li>
+          <li>You confirm that the information you provide on registration and in your listings is
+            true, accurate, and complete, and that you have the legal right to offer the items or
+            services you list.</li>
         </ul>
 
-        <h2 className="mt-6 text-xl font-semibold">4. Listings (vehicles, parts, services)</h2>
+        <h2 className="mt-6 text-xl font-semibold">3. Accounts &amp; security</h2>
         <ul className="mt-2 list-disc pl-6 text-muted-foreground">
-          <li>List only items you legally own and can transfer.</li>
-          <li>Use your own clear photos. No watermarked, AI-faked, or stolen images.</li>
-          <li>Be honest about condition, mileage, accidents, repairs, and missing parts.</li>
-          <li>Keep prices in Philippine Pesos (₱). No bait-and-switch pricing.</li>
-          <li>Mark listings as "Sold" promptly when the deal closes.</li>
+          <li>You are responsible for safeguarding your login credentials and for all activity
+            under your account.</li>
+          <li>One natural person or one registered business per account; multi-accounting or
+            impersonation is prohibited.</li>
+          <li>We may, in good faith, request government-issued identification, business
+            registration documents, or proof of vehicle ownership to verify accounts in accordance
+            with RA 11967 and our anti-fraud obligations.</li>
+          <li>You must notify us immediately at{" "}
+            <a className="text-primary underline" href={`mailto:${SUPPORT_EMAIL}`}>
+              {SUPPORT_EMAIL}
+            </a>{" "}
+            of any unauthorised access, suspected breach, or compromise of your account.</li>
         </ul>
 
-        <h2 className="mt-6 text-xl font-semibold">5. Business directory</h2>
+        <h2 className="mt-6 text-xl font-semibold">4. Listings of vehicles, parts &amp; services</h2>
+        <ul className="mt-2 list-disc pl-6 text-muted-foreground">
+          <li>List only items that you legally own and have the right to transfer.</li>
+          <li>For motor vehicles, you must hold a valid Certificate of Registration (CR) and
+            Official Receipt (OR) issued by the Land Transportation Office (LTO), and the chassis
+            and engine numbers must match the registration documents in accordance with RA 4136
+            (Land Transportation and Traffic Code) and related LTO issuances.</li>
+          <li>Imported vehicles, equipment, or parts must comply with Bureau of Customs (BOC)
+            documentation and any applicable import restrictions (including EO 156, EO 877-A, and
+            related issuances on used motor vehicles).</li>
+          <li>Photos must be your own and accurately depict the actual item. Watermarked, stolen,
+            stock, or materially altered images are prohibited.</li>
+          <li>Listings must honestly describe condition, mileage, accident or flood history, prior
+            repairs, missing parts, and any encumbrances (chattel mortgage, lien, or pending
+            transfer).</li>
+          <li>Mark listings as "Sold" or remove them promptly once the transaction closes.</li>
+        </ul>
+
+        <h2 className="mt-6 text-xl font-semibold">5. Business directory &amp; merchant
+          obligations</h2>
         <p className="mt-2 text-muted-foreground">
           Verified business owners may operate a business profile (fuel station, parts shop,
-          convenience / sari-sari store, service centre, etc.). Owners are responsible for keeping
-          the following accurate:
+          convenience or sari-sari store, service centre, towing operator, dealership, etc.).
+          Pursuant to RA 11967 and its Implementing Rules and Regulations, business owners agree
+          to keep the following true and current:
         </p>
         <ul className="mt-2 list-disc pl-6 text-muted-foreground">
-          <li>Business name, address, location pin, and contact details.</li>
+          <li>Registered business name, trade name, principal address, map pin, and contact
+            details.</li>
           <li>Operating hours, including separate hours for convenience or sari-sari sections where
-            different from the main fuel/service hours. The Platform may display
-            "Open", "Closing soon", and "Opens soon" indicators derived from these hours.</li>
-          <li>Services and products catalog (fuels, lubes, car wash, tire/air, LPG, EV charging,
-            shop items, etc.) and any prices you choose to publish.</li>
-          <li>Photos, amenities, and accepted payment methods.</li>
+            different from the main fuel or service hours. The Platform displays "Open", "Closing
+            soon", and "Opens soon" indicators derived from these hours.</li>
+          <li>Catalog of services and products (fuels, lubricants, car wash, tire and air,
+            inflation, LPG, EV charging, retail items, etc.) and any prices the owner chooses to
+            publish.</li>
+          <li>Photos, amenities, accepted payment methods, and any required permits (e.g. DOE for
+            retail fuel outlets, FDA for regulated goods).</li>
         </ul>
         <p className="mt-2 text-muted-foreground">
-          Misrepresenting hours, services, or stock availability may result in suspension of the
-          business profile.
+          Materially misrepresenting hours, services, stock, or prices may result in suspension or
+          removal of the business profile and, where required, referral to the DTI E-Commerce
+          Bureau or other competent authority.
         </p>
 
-        <h2 className="mt-6 text-xl font-semibold">6. Pricing display & promo pricing</h2>
+        <h2 className="mt-6 text-xl font-semibold">6. Pricing display, currency &amp; promo
+          pricing</h2>
         <ul className="mt-2 list-disc pl-6 text-muted-foreground">
-          <li>All prices on the Platform are denominated in Philippine Pesos (₱) and inclusive of
-            applicable taxes unless explicitly stated. Signed-in users may choose a display
-            currency in their profile; converted values shown alongside ₱ are indicative only and
-            the listed ₱ price prevails.</li>
-          <li>Service and product prices may be published with units such as <em>₱/L</em>, <em>₱/kWh</em>,
-            <em> ₱/item</em>, <em>per service</em>, or as a "From ₱" indicative price.</li>
-          <li>Promo or sale prices must reflect the actual price you are willing to honour at the
-            time of display. Owners are responsible for updating prices when they change.</li>
-          <li>Indicative prices ("From ₱…") do not create a binding offer; the final price is
-            confirmed at the point of sale by the business.</li>
+          <li>The official currency for all listings on the Platform is the{" "}
+            <strong>Philippine Peso (₱)</strong>. All prices are deemed inclusive of value-added
+            tax (VAT) and other applicable taxes unless the listing expressly states otherwise, in
+            compliance with RA 7394 (Consumer Act of the Philippines) and RA 10963 (TRAIN Law).</li>
+          <li>Signed-in users may select a preferred display currency in their profile. Converted
+            amounts shown alongside ₱ are <em>indicative only</em>; the listed ₱ price is the
+            authoritative price, and exchange-rate variations are not grounds for a price
+            adjustment.</li>
+          <li>Service and product prices may be published with units such as <em>₱/L</em>,{" "}
+            <em>₱/kWh</em>, <em>₱/item</em>, <em>per service</em>, or as a "From ₱…" indicative
+            price.</li>
+          <li>Promotional or sale prices must reflect the actual price the seller is willing to
+            honour at the time of display, in line with the price-tag and deceptive-sales-acts
+            provisions of RA 7394.</li>
+          <li>Indicative prices ("From ₱…") do not constitute a binding offer; the final price is
+            confirmed by the business at the point of sale.</li>
         </ul>
 
-        <h2 className="mt-6 text-xl font-semibold">7. Prohibited items & conduct</h2>
+        <h2 className="mt-6 text-xl font-semibold">7. Prohibited items &amp; conduct</h2>
+        <p className="mt-2 text-muted-foreground">
+          You may not list, advertise, or use the Platform to facilitate the sale, lease, or
+          exchange of any of the following:
+        </p>
         <ul className="mt-2 list-disc pl-6 text-muted-foreground">
-          <li>Stolen vehicles, parts, or documents (including tampered chassis, OR/CR, or plates).</li>
+          <li>Stolen vehicles, parts, or documents, including tampered chassis or engine numbers,
+            falsified OR/CR, or forged plates (RA 6539 — Anti-Carnapping Act, as amended by RA
+            10883).</li>
           <li>Vehicles or equipment without legal title or proper import documentation.</li>
-          <li>Weapons, illegal drugs, or any item restricted under Philippine law.</li>
-          <li>Counterfeit branded parts; misleading photos; fake reviews.</li>
-          <li>Spam, harassment, scams, phishing, or impersonation of other sellers.</li>
-          <li>Off-platform contact attempts intended to bypass safety features or fees.</li>
+          <li>Firearms, ammunition, explosives, illegal drugs, or any item restricted or prohibited
+            under Philippine law (including RA 9165, RA 10591, and BOC regulations).</li>
+          <li>Counterfeit branded parts, accessories, or merchandise, in violation of RA 8293
+            (Intellectual Property Code of the Philippines).</li>
+          <li>Misleading photos, fabricated reviews, undisclosed material defects, or any other act
+            constituting a deceptive, unfair, or unconscionable sales practice under RA 7394.</li>
+          <li>Spam, harassment, threats, scams, phishing, identity theft, or impersonation, which
+            may constitute offences under RA 10175 (Cybercrime Prevention Act) and RA 8484 (Access
+            Devices Regulation Act).</li>
+          <li>Attempts to take communications or payment off-Platform with the purpose of bypassing
+            safety features, fees, or our dispute-resolution mechanism.</li>
         </ul>
 
-        <h2 className="mt-6 text-xl font-semibold">8. Fees, boosts & subscriptions</h2>
+        <h2 className="mt-6 text-xl font-semibold">8. Fees, boosts &amp; subscriptions</h2>
         <p className="mt-2 text-muted-foreground">
-          Certain features (listing boosts, business plans, premium directory placement, advertising)
-          require payment. Current pricing is shown on our{" "}
-          <Link className="text-primary underline" to="/pricing">Pricing page</Link>. All fees are
-          quoted in ₱. Subscriptions renew automatically until cancelled from your dashboard;
-          cancellation stops future charges but does not refund the current billing period.
+          Posting and browsing listings is generally free. Certain optional features — including
+          listing boosts, business plans, premium directory placement, and advertising — require
+          payment. Current pricing is published on our{" "}
+          <Link className="text-primary underline" to="/pricing">Pricing page</Link> and is quoted
+          in ₱ inclusive of VAT where applicable. Subscriptions renew automatically until you
+          cancel from your dashboard; cancellation stops future renewals but does not entitle you
+          to a refund of the current billing period except as provided in our{" "}
+          <Link className="text-primary underline" to="/refund-policy">Refund Policy</Link> or as
+          required by RA 7394.
         </p>
 
-        <h2 className="mt-6 text-xl font-semibold">9. Payments & test mode</h2>
+        <h2 className="mt-6 text-xl font-semibold">9. Payments &amp; payment test mode</h2>
         <p className="mt-2 text-muted-foreground">
-          Payments are processed by third-party providers. When the Platform is operating in payment
-          test mode, a visible banner is shown and no real charges are made. We never store full
-          card numbers on our servers.
+          Card and e-wallet payments are processed by third-party payment service providers
+          regulated by the Bangko Sentral ng Pilipinas (BSP) and operating in accordance with RA
+          11765 (Financial Products and Services Consumer Protection Act) and RA 9160 (Anti-Money
+          Laundering Act, as amended). When the Platform is operating in <strong>payment test
+          mode</strong>, a visible banner is displayed and no real charges are made. We do not
+          store full primary account numbers (PANs) on our servers; sensitive payment data is
+          handled by PCI-DSS-compliant processors.
         </p>
 
-        <h2 className="mt-6 text-xl font-semibold">10. Refunds</h2>
+        <h2 className="mt-6 text-xl font-semibold">10. Refunds &amp; chargebacks</h2>
         <p className="mt-2 text-muted-foreground">
-          Refund eligibility for listing fees, boosts, and subscriptions is governed by our{" "}
+          Refund eligibility for listing fees, boosts, subscriptions, and advertising is governed
+          by our{" "}
           <Link className="text-primary underline" to="/refund-policy">Refund Policy</Link>.
+          Nothing in our Refund Policy limits or excludes any non-waivable consumer right granted
+          to you under RA 7394 (Consumer Act) or RA 11765. Chargebacks initiated without first
+          using our internal dispute-resolution channel may result in suspension of your account
+          pending investigation.
         </p>
 
         <h2 className="mt-6 text-xl font-semibold">11. Buyer–seller transactions</h2>
         <p className="mt-2 text-muted-foreground">
-          365 MotorSales is a venue. We are not a party to any transaction between buyers and
-          sellers and we do not hold funds, transfer titles, or guarantee the condition or legality
-          of any item or service. Always inspect a vehicle in person, verify documents (OR/CR, deed
-          of sale), and meet in safe locations before paying.
+          365 MotorSales provides the venue and tools; the actual contract of sale is concluded
+          directly between the buyer and the seller and is governed by the Civil Code of the
+          Philippines and, where the seller is a merchant, by RA 7394. We do not hold funds,
+          transfer titles, inspect vehicles, or guarantee the condition, legality, roadworthiness,
+          or fitness for purpose of any item or service. Buyers are strongly encouraged to:
+        </p>
+        <ul className="mt-2 list-disc pl-6 text-muted-foreground">
+          <li>Physically inspect the vehicle and verify its chassis, engine, OR, and CR with the
+            LTO.</li>
+          <li>Execute a notarised Deed of Sale and complete the LTO transfer within the periods
+            prescribed by LTO regulations to avoid penalties.</li>
+          <li>Meet in safe, public locations and avoid carrying large amounts of cash.</li>
+          <li>Use traceable payment methods (bank transfer, InstaPay/PESONet, or escrow) where
+            possible.</li>
+        </ul>
+
+        <h2 className="mt-6 text-xl font-semibold">12. User-generated content &amp; intellectual
+          property</h2>
+        <p className="mt-2 text-muted-foreground">
+          You retain ownership of the photos, text, reviews, and other content you upload ("
+          <strong>User Content</strong>"). You grant 365 MotorSales a non-exclusive, worldwide,
+          royalty-free, sublicensable licence to host, store, reproduce, resize, adapt, display,
+          and distribute your User Content for the purpose of operating, securing, and promoting
+          the Platform. You warrant that you own or have all necessary rights to your User Content
+          and that it does not infringe any third party's rights under RA 8293 or any other law.
+        </p>
+        <p className="mt-2 text-muted-foreground">
+          365 MotorSales respects intellectual-property rights. Rights holders who believe content
+          on the Platform infringes their rights may submit a notice to{" "}
+          <a className="text-primary underline" href={`mailto:${SUPPORT_EMAIL}`}>
+            {SUPPORT_EMAIL}
+          </a>{" "}
+          identifying the infringing material and the right asserted; we will act on validated
+          notices in accordance with RA 8293 and RA 11967.
         </p>
 
-        <h2 className="mt-6 text-xl font-semibold">12. User-generated content</h2>
+        <h2 className="mt-6 text-xl font-semibold">13. Suspension &amp; termination</h2>
         <p className="mt-2 text-muted-foreground">
-          You retain ownership of the photos, text, and other content you upload. You grant us a
-          worldwide, royalty-free licence to host, display, resize, and redistribute that content
-          for the purpose of operating and promoting the Platform. You confirm you have the right
-          to upload everything you post.
+          We may, with or without prior notice as the circumstances warrant, suspend, restrict, or
+          terminate your account or any listing if we reasonably believe you have violated these
+          Terms, applicable Philippine law, or the rights of another user, or if required by a
+          lawful order from a competent authority. Boost, subscription, or advertising fees paid in
+          respect of suspended or terminated accounts are forfeited except where the suspension was
+          attributable solely to our error.
         </p>
 
-        <h2 className="mt-6 text-xl font-semibold">13. Suspension & termination</h2>
+        <h2 className="mt-6 text-xl font-semibold">14. Dispute resolution</h2>
         <p className="mt-2 text-muted-foreground">
-          We may suspend or terminate accounts that violate these Terms, attempt fraud, or receive
-          multiple verified reports. Boost or subscription fees on suspended accounts are forfeited.
+          In line with RA 11967, we maintain an internal dispute-resolution mechanism. Before
+          commencing any formal proceedings, please raise your complaint with our support team at{" "}
+          <a className="text-primary underline" href={`mailto:${SUPPORT_EMAIL}`}>
+            {SUPPORT_EMAIL}
+          </a>{" "}
+          or via the in-app help centre. We will acknowledge your complaint within five (5)
+          business days and aim to resolve it within fifteen (15) business days.
+        </p>
+        <p className="mt-2 text-muted-foreground">
+          If your complaint is not resolved to your satisfaction, you may escalate it to the DTI
+          E-Commerce Bureau, the Department of Trade and Industry Consumer Protection Group, the
+          National Privacy Commission (for data-privacy matters), or the BSP Consumer Assistance
+          Mechanism (for payment-related matters), as appropriate.
         </p>
 
-        <h2 className="mt-6 text-xl font-semibold">14. Privacy</h2>
+        <h2 className="mt-6 text-xl font-semibold">15. Privacy &amp; data protection</h2>
         <p className="mt-2 text-muted-foreground">
-          How we collect and use personal data is described in our{" "}
-          <Link className="text-primary underline" to="/privacy">Privacy Policy</Link>. We comply
-          with the Data Privacy Act of 2012 (RA 10173).
+          Our processing of personal data is described in our{" "}
+          <Link className="text-primary underline" to="/privacy">Privacy Policy</Link>. We process
+          personal data in accordance with RA 10173 (Data Privacy Act of 2012), its Implementing
+          Rules and Regulations, and applicable issuances of the National Privacy Commission.
         </p>
 
-        <h2 className="mt-6 text-xl font-semibold">15. Limitation of liability</h2>
+        <h2 className="mt-6 text-xl font-semibold">16. Disclaimers &amp; limitation of liability</h2>
         <p className="mt-2 text-muted-foreground">
-          To the maximum extent permitted by law, 365 MotorSales Philippines is not liable for
-          losses arising from buyer–seller disputes, product defects, inaccurate business listings,
-          or third-party services such as towing or repair. Our total liability for any claim is
-          limited to the fees you paid us in the 30 days preceding the claim.
+          The Platform is provided on an "<em>as is</em>" and "<em>as available</em>" basis. To
+          the maximum extent permitted by Philippine law, 365 MotorSales disclaims all implied
+          warranties of merchantability, fitness for a particular purpose, and non-infringement,
+          except as expressly provided in these Terms.
+        </p>
+        <p className="mt-2 text-muted-foreground">
+          To the maximum extent permitted by law, 365 MotorSales shall not be liable for indirect,
+          incidental, special, consequential, or exemplary damages, or for losses arising from
+          buyer–seller disputes, product defects, inaccurate listings, or third-party services
+          such as towing, financing, repair, or insurance. Our aggregate liability for any claim
+          arising out of or relating to the Platform shall not exceed the total fees you paid us
+          in the twelve (12) months preceding the event giving rise to the claim. Nothing in this
+          section limits liability for fraud, wilful misconduct, gross negligence, or any other
+          liability that cannot be limited or excluded under Philippine law (including
+          non-waivable rights under RA 7394 and RA 11765).
         </p>
 
-        <h2 className="mt-6 text-xl font-semibold">16. Governing law</h2>
+        <h2 className="mt-6 text-xl font-semibold">17. Force majeure</h2>
         <p className="mt-2 text-muted-foreground">
-          These Terms are governed by the laws of the Republic of the Philippines. Disputes shall be
-          resolved in the courts of Metro Manila.
+          Neither party is liable for any failure or delay in performing its obligations caused by
+          events beyond its reasonable control, including acts of God, typhoons, earthquakes,
+          floods, fire, pandemic, civil unrest, government action, telecommunications or power
+          failures, or third-party service outages.
         </p>
 
-        <h2 className="mt-6 text-xl font-semibold">17. Changes to these Terms</h2>
+        <h2 className="mt-6 text-xl font-semibold">18. Governing law &amp; venue</h2>
         <p className="mt-2 text-muted-foreground">
-          We may update these Terms when the Platform's features change (for example, new pricing
-          units, new business directory features, new payment methods, or updated refund rules).
-          Material changes will be announced on the site and the "Last updated" date above will be
-          bumped. Continued use of the Platform after changes are posted means you accept the
-          updated Terms.
+          These Terms are governed by and construed in accordance with the laws of the Republic of
+          the Philippines, without regard to its conflict-of-laws principles. Subject to Section 14
+          (Dispute Resolution), the parties submit to the exclusive jurisdiction of the proper
+          courts of the City of Makati, Metro Manila, Philippines, for any dispute arising out of
+          or relating to these Terms or the Platform.
         </p>
 
-        <h2 className="mt-6 text-xl font-semibold">18. Contact</h2>
+        <h2 className="mt-6 text-xl font-semibold">19. Changes to these Terms</h2>
         <p className="mt-2 text-muted-foreground">
-          Questions about these Terms? Email{" "}
-          <a className="text-primary underline" href="mailto:legal@365motorsales.ph">
-            legal@365motorsales.ph
+          We may update these Terms when the Platform's features, fees, or applicable law change
+          (for example, new pricing units, new business-directory features, new payment methods,
+          or updated regulatory requirements). Material changes will be announced on the site and
+          the "Last updated" date above will be bumped. Continued use of the Platform after the
+          effective date of any update constitutes acceptance of the revised Terms.
+        </p>
+
+        <h2 className="mt-6 text-xl font-semibold">20. General provisions</h2>
+        <ul className="mt-2 list-disc pl-6 text-muted-foreground">
+          <li><strong>Entire agreement.</strong> These Terms, together with the Privacy Policy,
+            Community Guidelines, and Refund Policy, constitute the entire agreement between you
+            and 365 MotorSales regarding the Platform.</li>
+          <li><strong>Severability.</strong> If any provision is found unenforceable, the
+            remaining provisions remain in full force and effect.</li>
+          <li><strong>No waiver.</strong> Our failure to enforce any right or provision is not a
+            waiver of that right or provision.</li>
+          <li><strong>Assignment.</strong> You may not assign these Terms without our prior written
+            consent. We may assign these Terms to an affiliate or in connection with a merger,
+            acquisition, or sale of assets.</li>
+          <li><strong>Electronic notices.</strong> You consent to receive notices from us
+            electronically (in-app or by email), which shall satisfy any legal requirement that
+            such notice be in writing under RA 8792.</li>
+        </ul>
+
+        <h2 className="mt-6 text-xl font-semibold">21. Contact</h2>
+        <p className="mt-2 text-muted-foreground">
+          Questions, complaints, or notices under these Terms should be sent to{" "}
+          <a className="text-primary underline" href={`mailto:${SUPPORT_EMAIL}`}>
+            {SUPPORT_EMAIL}
           </a>
           .
         </p>
