@@ -257,13 +257,15 @@ function BusinessProfilePage() {
                       triggerLabel="QR & Poster"
                     />
                   </div>
-                  {tagLabels.length > 0 && (
+                  {(data?.tags?.length ?? 0) > 0 ? (
+                    <TagGroups tags={data!.tags as any} />
+                  ) : tagLabels.length > 0 ? (
                     <div className="mt-3 flex flex-wrap gap-1">
                       {tagLabels.map((l: string) => (
                         <Badge key={l} variant="secondary">{l}</Badge>
                       ))}
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </Card>
@@ -576,4 +578,61 @@ function BusinessHoursBlock({ hours, isFuelStation }: { hours: any; isFuelStatio
     </div>
   );
 }
+
+// ---------- Grouped tag display ----------
+type TagItem = { slug: string; label: string; category: string | null };
+
+const TAG_GROUP_MAP: { label: string; cats: string[] }[] = [
+  { label: "Fuels", cats: ["fuel_grade", "fuel"] },
+  { label: "EV charging", cats: ["ev_charging"] },
+  { label: "Station brand", cats: ["station_brand", "brand"] },
+  { label: "Services", cats: [
+    "station_services", "service", "service_mode", "maintenance",
+    "brakes", "drivetrain", "engine", "cooling", "suspension", "wheels",
+    "climate", "electrical", "exhaust", "diagnostics", "wash", "detail",
+    "paint", "body", "glass", "mobile", "roadside", "inspection",
+    "specialty", "performance",
+  ] },
+  { label: "Products on sale", cats: [
+    "station_products", "parts", "parts_sold", "inventory_type",
+    "equipment", "electronics", "interior", "exterior", "styling",
+    "protection",
+  ] },
+  { label: "Payment accepted", cats: ["station_payment", "payment", "financing"] },
+  { label: "Languages", cats: ["language"] },
+  { label: "Coverage", cats: ["vehicle_scope", "coverage", "buyback", "channel", "logistics", "condition", "trust"] },
+  { label: "Hours", cats: ["hours", "operations"] },
+];
+
+function TagGroups({ tags }: { tags: TagItem[] }) {
+  const groups: { label: string; items: TagItem[] }[] = [];
+  const used = new Set<string>();
+  for (const g of TAG_GROUP_MAP) {
+    const items = tags.filter((t) => t.category && g.cats.includes(t.category));
+    if (items.length > 0) {
+      groups.push({ label: g.label, items });
+      items.forEach((i) => used.add(i.slug));
+    }
+  }
+  const other = tags.filter((t) => !used.has(t.slug));
+  if (other.length > 0) groups.push({ label: "Other", items: other });
+
+  return (
+    <div className="mt-3 space-y-2">
+      {groups.map((g) => (
+        <div key={g.label}>
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            {g.label}
+          </div>
+          <div className="mt-1 flex flex-wrap gap-1">
+            {g.items.map((t) => (
+              <Badge key={t.slug} variant="secondary">{t.label}</Badge>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 
