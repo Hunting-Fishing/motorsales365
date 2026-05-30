@@ -90,6 +90,7 @@ export const getBusinessPage = createServerFn({ method: "GET" })
       business: biz,
       typeLabel: typeRow?.label ?? "",
       tagLabels,
+      tags,
       services: services ?? [],
       products: products ?? [],
       posts: posts ?? [],
