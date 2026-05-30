@@ -180,23 +180,46 @@ export const getMyBusinessPage = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     await assertEditor(supabase, userId, data.businessId);
 
-    const [{ data: biz }, { data: services }, { data: products }, { data: posts }, { data: inquiries }] =
-      await Promise.all([
-        supabase.from("businesses").select("*").eq("id", data.businessId).maybeSingle(),
-        supabase.from("business_services").select("*").eq("business_id", data.businessId).order("sort_order"),
-        supabase.from("business_products").select("*").eq("business_id", data.businessId).order("sort_order"),
-        supabase
-          .from("business_posts")
-          .select("*")
-          .eq("business_id", data.businessId)
-          .order("created_at", { ascending: false }),
-        supabase
-          .from("business_inquiries")
-          .select("*")
-          .eq("business_id", data.businessId)
-          .order("created_at", { ascending: false })
-          .limit(200),
-      ]);
+    const [
+      { data: biz },
+      { data: services },
+      { data: products },
+      { data: posts },
+      { data: inquiries },
+      { data: albums },
+      { data: photos },
+      { data: contactChannels },
+    ] = await Promise.all([
+      supabase.from("businesses").select("*").eq("id", data.businessId).maybeSingle(),
+      supabase.from("business_services").select("*").eq("business_id", data.businessId).order("sort_order"),
+      supabase.from("business_products").select("*").eq("business_id", data.businessId).order("sort_order"),
+      supabase
+        .from("business_posts")
+        .select("*")
+        .eq("business_id", data.businessId)
+        .order("created_at", { ascending: false }),
+      supabase
+        .from("business_inquiries")
+        .select("*")
+        .eq("business_id", data.businessId)
+        .order("created_at", { ascending: false })
+        .limit(200),
+      supabase
+        .from("business_gallery_albums")
+        .select("*")
+        .eq("business_id", data.businessId)
+        .order("sort_order"),
+      supabase
+        .from("business_gallery_photos")
+        .select("*")
+        .eq("business_id", data.businessId)
+        .order("sort_order"),
+      supabase
+        .from("business_contact_channels")
+        .select("*")
+        .eq("business_id", data.businessId)
+        .order("sort_order"),
+    ]);
 
     return {
       business: biz,
@@ -204,6 +227,9 @@ export const getMyBusinessPage = createServerFn({ method: "GET" })
       products: products ?? [],
       posts: posts ?? [],
       inquiries: inquiries ?? [],
+      albums: albums ?? [],
+      photos: photos ?? [],
+      contactChannels: contactChannels ?? [],
     };
   });
 
@@ -223,9 +249,13 @@ export const updateBusinessPageSettings = createServerFn({ method: "POST" })
         show_services: z.boolean().optional(),
         show_products: z.boolean().optional(),
         show_posts: z.boolean().optional(),
+        show_gallery: z.boolean().optional(),
+        show_contact: z.boolean().optional(),
         cta_primary: z.enum(["inquiry", "call", "messenger"]).optional(),
         logo_url: z.string().url().nullable().optional(),
         cover_url: z.string().url().nullable().optional(),
+        featured_video_url: z.string().url().max(500).nullable().optional(),
+        featured_video_provider: z.enum(["youtube", "vimeo", "facebook"]).nullable().optional(),
       })
       .parse(input),
   )
