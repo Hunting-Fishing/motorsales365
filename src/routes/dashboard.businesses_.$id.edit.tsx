@@ -495,6 +495,20 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
         </div>
       </div>
 
+      <div>
+        <Label>Featured video (optional)</Label>
+        <Input
+          value={featuredVideoUrl}
+          onChange={(e) => setFeaturedVideoUrl(e.target.value)}
+          maxLength={500}
+          placeholder="https://youtube.com/watch?v=… or Vimeo / Facebook video URL"
+          className="h-11"
+        />
+        <p className="mt-1 text-xs text-muted-foreground">
+          When set, this replaces the cover photo with an embedded video at the top of your page.
+        </p>
+      </div>
+
       <div className="space-y-2">
         <div className="text-sm font-medium">Show sections on public page</div>
         <div className="flex items-center justify-between rounded-lg border border-border p-3">
@@ -504,6 +518,14 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
         <div className="flex items-center justify-between rounded-lg border border-border p-3">
           <span className="text-sm">Products</span>
           <Switch checked={showProducts} onCheckedChange={setShowProducts} />
+        </div>
+        <div className="flex items-center justify-between rounded-lg border border-border p-3">
+          <span className="text-sm">Gallery</span>
+          <Switch checked={showGallery} onCheckedChange={setShowGallery} />
+        </div>
+        <div className="flex items-center justify-between rounded-lg border border-border p-3">
+          <span className="text-sm">Contact channels</span>
+          <Switch checked={showContact} onCheckedChange={setShowContact} />
         </div>
         <div className="flex items-center justify-between rounded-lg border border-border p-3">
           <span className="text-sm">Posts / Updates</span>
