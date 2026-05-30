@@ -3,7 +3,7 @@ import { Menu, Plus, Heart, MessageSquare, LogOut, Shield, User as UserIcon, Eye
 import { useAuth, type SellerType } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/brand-logo";
-import { CurrencySwitcher } from "@/components/currency-switcher";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
