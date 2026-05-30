@@ -3,7 +3,7 @@ import { Menu, Plus, Heart, MessageSquare, LogOut, Shield, User as UserIcon, Eye
 import { useAuth, type SellerType } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/brand-logo";
-import { CurrencySwitcher } from "@/components/currency-switcher";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -61,13 +61,13 @@ export function SiteHeader() {
             </div>
           </Link>
 
-          <nav className="hidden items-center gap-1 lg:flex">
+          <nav className="hidden items-center gap-0.5 xl:flex">
             {NAV.map((n) => (
               <Link
                 key={n.category}
                 to="/browse/$category"
                 params={{ category: n.category }}
-                className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                 activeProps={{ className: "bg-secondary text-foreground" }}
               >
                 {n.label}
@@ -75,28 +75,28 @@ export function SiteHeader() {
             ))}
             <Link
               to={BUSINESSES_LINK.to}
-              className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               {BUSINESSES_LINK.label}
             </Link>
             <Link
               to={RIDES_LINK.to}
-              className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               {RIDES_LINK.label}
             </Link>
             <Link
               to="/map"
-              className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               Map
             </Link>
             <Link
               to="/shop"
-              className="rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               Shop
@@ -105,9 +105,7 @@ export function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2">
-          <div className="hidden sm:block">
-            <CurrencySwitcher />
-          </div>
+
 
           {/* Help icon — desktop */}
           <Button asChild variant="ghost" size="icon" className="hidden md:inline-flex h-9 w-9" aria-label="Help & support">
@@ -183,16 +181,22 @@ export function SiteHeader() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button asChild variant="outline" size="sm" className="hidden md:inline-flex">
-              <Link to="/signup">Sign up</Link>
-            </Button>
+            <div className="hidden md:flex items-center gap-1">
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/login"><LogIn className="mr-1 h-4 w-4" />Sign in</Link>
+              </Button>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/signup"><UserPlus className="mr-1 h-4 w-4" />Sign up</Link>
+              </Button>
+            </div>
           )}
 
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden h-9 w-9" aria-label="Open menu">
+              <Button variant="ghost" size="icon" className="xl:hidden h-9 w-9" aria-label="Open menu">
                 <Menu className="h-5 w-5" />
               </Button>
+
             </SheetTrigger>
             <SheetContent side="right" className="w-[88vw] max-w-sm p-0 flex flex-col">
               <div className="flex items-center justify-between border-b border-border px-4 py-3">
@@ -260,11 +264,8 @@ export function SiteHeader() {
                     )}
                   </>
                 )}
-
-                <div className="mt-4 px-3">
-                  <CurrencySwitcher />
-                </div>
               </div>
+
 
               <div className="border-t border-border p-3">
                 {user ? (
