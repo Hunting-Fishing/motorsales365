@@ -28,6 +28,7 @@ import { GoogleBusinessMap } from "@/components/businesses/google-business-map";
 import { ShareQr } from "@/components/share-qr";
 import { InquiryForm } from "@/components/business-page/inquiry-form";
 import { getBusinessPage } from "@/lib/business-pages.functions";
+import { PublicGallerySection, PublicContactSection, FeaturedVideoEmbed } from "@/components/business-page/public-sections";
 import {
   isStructuredHours, getStatus, legacyToRows, formatRange,
   DAY_KEYS, DAY_LABELS, type StructuredHours, type HoursStatus,
