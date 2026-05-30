@@ -106,6 +106,8 @@ function EditBusinessPage() {
 
           <TabsTrigger value="services">Services ({data.services.length})</TabsTrigger>
           <TabsTrigger value="products">Products ({data.products.length})</TabsTrigger>
+          <TabsTrigger value="gallery">Gallery ({(data as any).albums?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="contact">Contact ({(data as any).contactChannels?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="posts">Posts ({data.posts.length})</TabsTrigger>
           <TabsTrigger value="inquiries">
             Inquiries
