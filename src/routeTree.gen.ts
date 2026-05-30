@@ -75,7 +75,6 @@ import { Route as BusinessesSlugRouteImport } from './routes/businesses.$slug'
 import { Route as BusinessCheckoutRouteImport } from './routes/business.checkout'
 import { Route as BrowseCategoryRouteImport } from './routes/browse.$category'
 import { Route as BoostCheckoutRouteImport } from './routes/boost.checkout'
-import { Route as ApiSitemapDotxmlRouteImport } from './routes/api/sitemap[.]xml'
 import { Route as ApiRobotsDottxtRouteImport } from './routes/api/robots[.]txt'
 import { Route as AdminVerificationsRouteImport } from './routes/admin.verifications'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
@@ -453,11 +452,6 @@ const BoostCheckoutRoute = BoostCheckoutRouteImport.update({
   path: '/boost/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiSitemapDotxmlRoute = ApiSitemapDotxmlRouteImport.update({
-  id: '/api/sitemap.xml',
-  path: '/api/sitemap.xml',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiRobotsDottxtRoute = ApiRobotsDottxtRouteImport.update({
   id: '/api/robots.txt',
   path: '/api/robots.txt',
@@ -742,7 +736,6 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
   '/api/robots.txt': typeof ApiRobotsDottxtRoute
-  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/boost/checkout': typeof BoostCheckoutRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/business/checkout': typeof BusinessCheckoutRoute
@@ -855,7 +848,6 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
   '/api/robots.txt': typeof ApiRobotsDottxtRoute
-  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/boost/checkout': typeof BoostCheckoutRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/business/checkout': typeof BusinessCheckoutRoute
@@ -970,7 +962,6 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
   '/api/robots.txt': typeof ApiRobotsDottxtRoute
-  '/api/sitemap.xml': typeof ApiSitemapDotxmlRoute
   '/boost/checkout': typeof BoostCheckoutRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/business/checkout': typeof BusinessCheckoutRoute
@@ -1087,7 +1078,6 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/verifications'
     | '/api/robots.txt'
-    | '/api/sitemap.xml'
     | '/boost/checkout'
     | '/browse/$category'
     | '/business/checkout'
@@ -1200,7 +1190,6 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/verifications'
     | '/api/robots.txt'
-    | '/api/sitemap.xml'
     | '/boost/checkout'
     | '/browse/$category'
     | '/business/checkout'
@@ -1314,7 +1303,6 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/verifications'
     | '/api/robots.txt'
-    | '/api/sitemap.xml'
     | '/boost/checkout'
     | '/browse/$category'
     | '/business/checkout'
@@ -1412,7 +1400,6 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   ApiRobotsDottxtRoute: typeof ApiRobotsDottxtRoute
-  ApiSitemapDotxmlRoute: typeof ApiSitemapDotxmlRoute
   BoostCheckoutRoute: typeof BoostCheckoutRoute
   BrowseCategoryRoute: typeof BrowseCategoryRoute
   BusinessCheckoutRoute: typeof BusinessCheckoutRoute
@@ -1915,13 +1902,6 @@ declare module '@tanstack/react-router' {
       path: '/boost/checkout'
       fullPath: '/boost/checkout'
       preLoaderRoute: typeof BoostCheckoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/sitemap.xml': {
-      id: '/api/sitemap.xml'
-      path: '/api/sitemap.xml'
-      fullPath: '/api/sitemap.xml'
-      preLoaderRoute: typeof ApiSitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/robots.txt': {
@@ -2435,7 +2415,6 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   ApiRobotsDottxtRoute: ApiRobotsDottxtRoute,
-  ApiSitemapDotxmlRoute: ApiSitemapDotxmlRoute,
   BoostCheckoutRoute: BoostCheckoutRoute,
   BrowseCategoryRoute: BrowseCategoryRoute,
   BusinessCheckoutRoute: BusinessCheckoutRoute,
@@ -2478,3 +2457,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
