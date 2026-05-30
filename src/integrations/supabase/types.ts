@@ -476,6 +476,130 @@ export type Database = {
         }
         Relationships: []
       }
+      business_contact_channels: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          kind: string
+          label: string | null
+          sort_order: number
+          value: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          kind: string
+          label?: string | null
+          sort_order?: number
+          value: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          label?: string | null
+          sort_order?: number
+          value?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_contact_channels_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_gallery_albums: {
+        Row: {
+          business_id: string
+          cover_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          cover_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_gallery_albums_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_gallery_photos: {
+        Row: {
+          album_id: string
+          business_id: string
+          caption: string | null
+          created_at: string
+          id: string
+          sort_order: number
+          url: string
+        }
+        Insert: {
+          album_id: string
+          business_id: string
+          caption?: string | null
+          created_at?: string
+          id?: string
+          sort_order?: number
+          url: string
+        }
+        Update: {
+          album_id?: string
+          business_id?: string
+          caption?: string | null
+          created_at?: string
+          id?: string
+          sort_order?: number
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_gallery_photos_album_id_fkey"
+            columns: ["album_id"]
+            isOneToOne: false
+            referencedRelation: "business_gallery_albums"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_gallery_photos_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_inquiries: {
         Row: {
           business_id: string
@@ -977,6 +1101,8 @@ export type Database = {
           email: string | null
           featured: boolean
           featured_until: string | null
+          featured_video_provider: string | null
+          featured_video_url: string | null
           hours: Json | null
           id: string
           lat: number | null
@@ -995,6 +1121,8 @@ export type Database = {
           rating_avg: number
           rating_count: number
           region: string | null
+          show_contact: boolean
+          show_gallery: boolean
           show_posts: boolean
           show_products: boolean
           show_services: boolean
@@ -1021,6 +1149,8 @@ export type Database = {
           email?: string | null
           featured?: boolean
           featured_until?: string | null
+          featured_video_provider?: string | null
+          featured_video_url?: string | null
           hours?: Json | null
           id?: string
           lat?: number | null
@@ -1039,6 +1169,8 @@ export type Database = {
           rating_avg?: number
           rating_count?: number
           region?: string | null
+          show_contact?: boolean
+          show_gallery?: boolean
           show_posts?: boolean
           show_products?: boolean
           show_services?: boolean
@@ -1065,6 +1197,8 @@ export type Database = {
           email?: string | null
           featured?: boolean
           featured_until?: string | null
+          featured_video_provider?: string | null
+          featured_video_url?: string | null
           hours?: Json | null
           id?: string
           lat?: number | null
@@ -1083,6 +1217,8 @@ export type Database = {
           rating_avg?: number
           rating_count?: number
           region?: string | null
+          show_contact?: boolean
+          show_gallery?: boolean
           show_posts?: boolean
           show_products?: boolean
           show_services?: boolean
