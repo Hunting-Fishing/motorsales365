@@ -140,6 +140,9 @@ function BusinessProfilePage() {
   const posts = data?.posts ?? [];
   const reviews = data?.reviews ?? [];
   const reviewerNames = data?.reviewerNames ?? {};
+  const albums = (data as any)?.albums ?? [];
+  const photos = (data as any)?.photos ?? [];
+  const contactChannels = (data as any)?.contactChannels ?? [];
 
   const myReview = reviews.find((r: any) => r.user_id === user?.id);
   const location = [biz.barangay, biz.city, biz.province, biz.region].filter(Boolean).join(", ");
