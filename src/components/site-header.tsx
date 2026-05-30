@@ -264,11 +264,8 @@ export function SiteHeader() {
                     )}
                   </>
                 )}
-
-                <div className="mt-4 px-3">
-                  <CurrencySwitcher />
-                </div>
               </div>
+
 
               <div className="border-t border-border p-3">
                 {user ? (
