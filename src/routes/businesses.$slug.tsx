@@ -28,6 +28,7 @@ import { GoogleBusinessMap } from "@/components/businesses/google-business-map";
 import { ShareQr } from "@/components/share-qr";
 import { InquiryForm } from "@/components/business-page/inquiry-form";
 import { getBusinessPage } from "@/lib/business-pages.functions";
+import { PublicGallerySection, PublicContactSection, FeaturedVideoEmbed } from "@/components/business-page/public-sections";
 import {
   isStructuredHours, getStatus, legacyToRows, formatRange,
   DAY_KEYS, DAY_LABELS, type StructuredHours, type HoursStatus,
@@ -140,6 +141,9 @@ function BusinessProfilePage() {
   const posts = data?.posts ?? [];
   const reviews = data?.reviews ?? [];
   const reviewerNames = data?.reviewerNames ?? {};
+  const albums = (data as any)?.albums ?? [];
+  const photos = (data as any)?.photos ?? [];
+  const contactChannels = (data as any)?.contactChannels ?? [];
 
   const myReview = reviews.find((r: any) => r.user_id === user?.id);
   const location = [biz.barangay, biz.city, biz.province, biz.region].filter(Boolean).join(", ");
@@ -177,18 +181,24 @@ function BusinessProfilePage() {
       <div style={accentStyle}>
         {/* HERO */}
         <div className="relative">
-          <div
-            className="h-48 w-full bg-muted md:h-72 lg:h-80"
-            style={{
-              backgroundImage: biz.cover_url ? `url(${biz.cover_url})` : undefined,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-            }}
-          >
-            <div className="h-full w-full bg-gradient-to-b from-black/10 via-black/30 to-background" />
-          </div>
+          {biz.featured_video_url ? (
+            <div className="container mx-auto px-4 pt-4">
+              <FeaturedVideoEmbed url={biz.featured_video_url} provider={biz.featured_video_provider ?? null} />
+            </div>
+          ) : (
+            <div
+              className="h-48 w-full bg-muted md:h-72 lg:h-80"
+              style={{
+                backgroundImage: biz.cover_url ? `url(${biz.cover_url})` : undefined,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
+            >
+              <div className="h-full w-full bg-gradient-to-b from-black/10 via-black/30 to-background" />
+            </div>
+          )}
 
-          <div className="container mx-auto -mt-16 px-4 md:-mt-20">
+          <div className={`container mx-auto px-4 ${biz.featured_video_url ? "mt-4" : "-mt-16 md:-mt-20"}`}>
             <Card className="overflow-hidden">
               <div className="flex flex-wrap items-start gap-4 p-5">
                 <div
@@ -429,6 +439,17 @@ function BusinessProfilePage() {
               </div>
             </Card>
           )}
+
+          {/* GALLERY */}
+          {biz.show_gallery !== false && albums.length > 0 && (
+            <PublicGallerySection albums={albums} photos={photos} accent={accent} />
+          )}
+
+          {/* CONTACT CHANNELS */}
+          {biz.show_contact !== false && contactChannels.length > 0 && (
+            <PublicContactSection channels={contactChannels} accent={accent} />
+          )}
+
 
           {/* INQUIRY */}
           <Card id="inquiry" className="p-5">

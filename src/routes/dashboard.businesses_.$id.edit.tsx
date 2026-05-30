@@ -39,6 +39,8 @@ import {
   type ServiceFormValue,
 } from "@/components/business/service-catalog-picker";
 import { CATEGORY_LABEL } from "@/data/fuel-station-catalog";
+import { GalleryTab, ContactChannelsTab } from "@/components/business-page/gallery-contact-tabs";
+
 
 
 export const Route = createFileRoute("/dashboard/businesses_/$id/edit")({
@@ -104,6 +106,8 @@ function EditBusinessPage() {
 
           <TabsTrigger value="services">Services ({data.services.length})</TabsTrigger>
           <TabsTrigger value="products">Products ({data.products.length})</TabsTrigger>
+          <TabsTrigger value="gallery">Gallery ({(data as any).albums?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="contact">Contact ({(data as any).contactChannels?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="posts">Posts ({data.posts.length})</TabsTrigger>
           <TabsTrigger value="inquiries">
             Inquiries
@@ -130,6 +134,22 @@ function EditBusinessPage() {
         </TabsContent>
         <TabsContent value="products">
           <ProductsTab businessId={biz.id} userId={user.id} products={data.products} onChange={refetch} />
+        </TabsContent>
+        <TabsContent value="gallery">
+          <GalleryTab
+            businessId={biz.id}
+            userId={user.id}
+            albums={(data as any).albums ?? []}
+            photos={(data as any).photos ?? []}
+            onChange={refetch}
+          />
+        </TabsContent>
+        <TabsContent value="contact">
+          <ContactChannelsTab
+            businessId={biz.id}
+            channels={(data as any).contactChannels ?? []}
+            onChange={refetch}
+          />
         </TabsContent>
         <TabsContent value="posts">
           <PostsTab businessId={biz.id} userId={user.id} posts={data.posts} onChange={refetch} />
@@ -358,9 +378,12 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
   const [showServices, setShowServices] = useState<boolean>(biz.show_services ?? true);
   const [showProducts, setShowProducts] = useState<boolean>(biz.show_products ?? true);
   const [showPosts, setShowPosts] = useState<boolean>(biz.show_posts ?? true);
+  const [showGallery, setShowGallery] = useState<boolean>(biz.show_gallery ?? true);
+  const [showContact, setShowContact] = useState<boolean>(biz.show_contact ?? true);
   const [ctaPrimary, setCtaPrimary] = useState<string>(biz.cta_primary ?? "inquiry");
   const [logoUrl, setLogoUrl] = useState<string | null>(biz.logo_url);
   const [coverUrl, setCoverUrl] = useState<string | null>(biz.cover_url);
+  const [featuredVideoUrl, setFeaturedVideoUrl] = useState<string>(biz.featured_video_url ?? "");
   const [saving, setSaving] = useState(false);
 
   const onUpload = async (file: File, target: "logo" | "cover") => {
@@ -373,9 +396,26 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
     }
   };
 
+  const detectVideoProvider = (url: string): "youtube" | "vimeo" | "facebook" | null => {
+    try {
+      const u = new URL(url);
+      if (u.hostname.includes("youtube.com") || u.hostname === "youtu.be") return "youtube";
+      if (u.hostname.includes("vimeo.com")) return "vimeo";
+      if (u.hostname.includes("facebook.com") || u.hostname.includes("fb.watch")) return "facebook";
+    } catch { /* noop */ }
+    return null;
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
+      const trimmedVideo = featuredVideoUrl.trim();
+      const provider = trimmedVideo ? detectVideoProvider(trimmedVideo) : null;
+      if (trimmedVideo && !provider) {
+        toast.error("Featured video must be a YouTube, Vimeo, or Facebook URL");
+        setSaving(false);
+        return;
+      }
       await save({
         data: {
           businessId: biz.id,
@@ -385,9 +425,13 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
           show_services: showServices,
           show_products: showProducts,
           show_posts: showPosts,
+          show_gallery: showGallery,
+          show_contact: showContact,
           cta_primary: ctaPrimary as any,
           logo_url: logoUrl,
           cover_url: coverUrl,
+          featured_video_url: trimmedVideo || null,
+          featured_video_provider: provider,
         },
       });
       toast.success("Saved");
@@ -451,6 +495,20 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
         </div>
       </div>
 
+      <div>
+        <Label>Featured video (optional)</Label>
+        <Input
+          value={featuredVideoUrl}
+          onChange={(e) => setFeaturedVideoUrl(e.target.value)}
+          maxLength={500}
+          placeholder="https://youtube.com/watch?v=… or Vimeo / Facebook video URL"
+          className="h-11"
+        />
+        <p className="mt-1 text-xs text-muted-foreground">
+          When set, this replaces the cover photo with an embedded video at the top of your page.
+        </p>
+      </div>
+
       <div className="space-y-2">
         <div className="text-sm font-medium">Show sections on public page</div>
         <div className="flex items-center justify-between rounded-lg border border-border p-3">
@@ -460,6 +518,14 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
         <div className="flex items-center justify-between rounded-lg border border-border p-3">
           <span className="text-sm">Products</span>
           <Switch checked={showProducts} onCheckedChange={setShowProducts} />
+        </div>
+        <div className="flex items-center justify-between rounded-lg border border-border p-3">
+          <span className="text-sm">Gallery</span>
+          <Switch checked={showGallery} onCheckedChange={setShowGallery} />
+        </div>
+        <div className="flex items-center justify-between rounded-lg border border-border p-3">
+          <span className="text-sm">Contact channels</span>
+          <Switch checked={showContact} onCheckedChange={setShowContact} />
         </div>
         <div className="flex items-center justify-between rounded-lg border border-border p-3">
           <span className="text-sm">Posts / Updates</span>

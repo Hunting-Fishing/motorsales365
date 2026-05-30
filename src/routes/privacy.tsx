@@ -22,7 +22,7 @@ export const Route = createFileRoute("/privacy")({
 });
 
 function PrivacyPage() {
-  const lastUpdated = "May 30, 2026";
+  const lastUpdated = "May 31, 2026";
 
   return (
     <SiteLayout>
@@ -65,9 +65,11 @@ function PrivacyPage() {
             model, year, plate area), parts/services details, contact preferences.
           </li>
           <li>
-            <strong>Business directory data:</strong> business address, location pin, operating
-            hours (including separate convenience/sari-sari hours), services &amp; products catalog,
-            and any prices you publish.
+            <strong>Business directory & mini-site data:</strong> business address, location pin,
+            operating hours (including separate convenience/sari-sari hours), services &amp;
+            products catalog, any prices you publish, photo galleries you upload, embedded videos
+            you link, and contact channels you list (phone, WhatsApp, Viber, Telegram, Instagram,
+            TikTok, email, Facebook, X, LinkedIn).
           </li>
           <li>
             <strong>Transactions:</strong> billing details, transaction IDs, plan/boost purchases,
