@@ -163,6 +163,16 @@ function EditBusinessPage() {
         <TabsContent value="posts">
           <PostsTab businessId={biz.id} userId={user.id} posts={data.posts} onChange={refetch} />
         </TabsContent>
+        <TabsContent value="bookings">
+          <BookingsTab
+            businessId={biz.id}
+            items={(data as any).bookableItems ?? []}
+            availability={(data as any).availability ?? []}
+            exceptions={(data as any).exceptions ?? []}
+            bookings={(data as any).bookings ?? []}
+            onChange={refetch}
+          />
+        </TabsContent>
         <TabsContent value="inquiries">
           <InquiriesTab businessId={biz.id} inquiries={data.inquiries} onChange={refetch} />
         </TabsContent>
