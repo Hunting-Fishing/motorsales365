@@ -257,13 +257,15 @@ function BusinessProfilePage() {
                       triggerLabel="QR & Poster"
                     />
                   </div>
-                  {tagLabels.length > 0 && (
+                  {(data?.tags?.length ?? 0) > 0 ? (
+                    <TagGroups tags={data!.tags as any} />
+                  ) : tagLabels.length > 0 ? (
                     <div className="mt-3 flex flex-wrap gap-1">
                       {tagLabels.map((l: string) => (
                         <Badge key={l} variant="secondary">{l}</Badge>
                       ))}
                     </div>
-                  )}
+                  ) : null}
                 </div>
               </div>
             </Card>
