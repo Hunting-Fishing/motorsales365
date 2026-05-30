@@ -114,6 +114,9 @@ export const getBusinessPage = createServerFn({ method: "GET" })
       posts: posts ?? [],
       reviews: reviews ?? [],
       reviewerNames,
+      albums: albums ?? [],
+      photos: photos ?? [],
+      contactChannels: contactChannels ?? [],
     };
   });
 
