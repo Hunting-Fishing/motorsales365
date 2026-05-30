@@ -124,8 +124,9 @@ function PrivacyPage() {
             Maya, and bank transfer.</li>
           <li><strong>Email:</strong> transactional and notification emails are sent through our
             managed email infrastructure on the verified subdomain <code>notify.365motorsales.com</code>.</li>
-          <li><strong>Maps &amp; geocoding:</strong> for location pins, "near me" search, and
-            business directory.</li>
+          <li><strong>Maps &amp; geocoding:</strong> map tiles via <strong>OpenStreetMap</strong> (Leaflet)
+            and address geocoding via <strong>OSM Nominatim</strong>. <strong>Google Places</strong>
+            is used only by admins to import public business listings into our directory.</li>
           <li><strong>Analytics:</strong> <strong>Google Analytics 4</strong> (with IP anonymization),
             loaded only after you accept optional cookies via the cookie banner.</li>
           <li><strong>Customer support tools:</strong> to handle your tickets and inquiries.</li>
