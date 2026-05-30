@@ -47,17 +47,36 @@ export function TotpSetupCard() {
 
   const startEnroll = async () => {
     setBusy(true);
-    // Clean up any half-started unverified factor first
-    const stale = factors.find((f) => f.status === "unverified");
-    if (stale) {
-      await supabase.auth.mfa.unenroll({ factorId: stale.id });
+    const { data: latestFactors, error: listError } = await supabase.auth.mfa.listFactors();
+    if (listError) {
+      setBusy(false);
+      return toast.error(listError.message);
     }
+
+    const latestTotp = (latestFactors?.totp ?? []) as Factor[];
+    const active = latestTotp.find((f) => f.status === "verified");
+    if (active) {
+      setFactors(latestTotp);
+      setBusy(false);
+      return toast.info("Two-factor authentication is already enabled.");
+    }
+
+    const staleFactors = latestTotp.filter((f) => f.status === "unverified");
+    for (const stale of staleFactors) {
+      const { error } = await supabase.auth.mfa.unenroll({ factorId: stale.id });
+      if (error) {
+        setBusy(false);
+        return toast.error(`Couldn't reset the previous setup: ${error.message}`);
+      }
+    }
+
     const { data, error } = await supabase.auth.mfa.enroll({
       factorType: "totp",
-      friendlyName: `Authenticator ${new Date().toLocaleDateString()}`,
+      friendlyName: `Authenticator ${new Date().toLocaleString()} ${Math.random().toString(36).slice(2, 6)}`,
     });
     setBusy(false);
     if (error) return toast.error(error.message);
+    setFactors([]);
     setEnroll({
       factorId: data.id,
       qrSvg: data.totp.qr_code,
@@ -136,8 +155,8 @@ export function TotpSetupCard() {
             <div>
               <div className="text-sm font-semibold">Two-factor enabled</div>
               <div className="text-xs text-muted-foreground">
-                Enrolled {new Date(verified.created_at).toLocaleDateString()} — codes from
-                your authenticator app are required at sign-in.
+                Enrolled {new Date(verified.created_at).toLocaleDateString()} — codes from your
+                authenticator app are required at sign-in.
               </div>
             </div>
           </div>
@@ -196,7 +215,9 @@ export function TotpSetupCard() {
         <div className="space-y-3">
           <div className="flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm">
             <ShieldAlert className="mt-0.5 h-4 w-4 text-amber-600" />
-            <span>Two-factor authentication is not enabled. Recommended for sellers and admins.</span>
+            <span>
+              Two-factor authentication is not enabled. Recommended for sellers and admins.
+            </span>
           </div>
           <Button onClick={startEnroll} disabled={busy}>
             {busy ? "Preparing…" : "Set up authenticator app"}
