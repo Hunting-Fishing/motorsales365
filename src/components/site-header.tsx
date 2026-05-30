@@ -181,16 +181,22 @@ export function SiteHeader() {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button asChild variant="outline" size="sm" className="hidden md:inline-flex">
-              <Link to="/signup">Sign up</Link>
-            </Button>
+            <div className="hidden md:flex items-center gap-1">
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/login"><LogIn className="mr-1 h-4 w-4" />Sign in</Link>
+              </Button>
+              <Button asChild variant="outline" size="sm">
+                <Link to="/signup"><UserPlus className="mr-1 h-4 w-4" />Sign up</Link>
+              </Button>
+            </div>
           )}
 
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden h-9 w-9" aria-label="Open menu">
+              <Button variant="ghost" size="icon" className="xl:hidden h-9 w-9" aria-label="Open menu">
                 <Menu className="h-5 w-5" />
               </Button>
+
             </SheetTrigger>
             <SheetContent side="right" className="w-[88vw] max-w-sm p-0 flex flex-col">
               <div className="flex items-center justify-between border-b border-border px-4 py-3">
