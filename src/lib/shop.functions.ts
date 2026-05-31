@@ -330,13 +330,20 @@ export const getShopProduct = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const { data: product, error } = await supabaseAdmin
       .from("shop_products")
-      .select("*, category:shop_categories(slug, name)")
+      .select("*")
       .eq("slug", data.slug)
       .eq("active", true)
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!product) return { product: null, links: [], fitment: [] };
-    const [{ data: links }, { data: fitment }, { data: history }] = await Promise.all([
+    const [{ data: category }, { data: links }, { data: fitment }, { data: history }] = await Promise.all([
+      product.category_id
+        ? supabaseAdmin
+            .from("shop_categories")
+            .select("slug, name")
+            .eq("id", product.category_id)
+            .maybeSingle()
+        : Promise.resolve({ data: null }),
       supabaseAdmin
         .from("shop_product_links")
         .select("id, url, sku, price_php, sale_price_php, in_stock, last_checked_at, network:affiliate_networks(id, slug, name, tag_param, tag_value, deeplink_template, active)")
@@ -355,7 +362,7 @@ export const getShopProduct = createServerFn({ method: "GET" })
         .limit(500),
     ]);
     const visible = (links ?? []).filter((l: any) => l.network?.active);
-    return { product, links: visible, fitment: fitment ?? [], history: history ?? [] };
+    return { product: { ...product, category }, links: visible, fitment: fitment ?? [], history: history ?? [] };
   });
 
 // ============ ADMIN ============
