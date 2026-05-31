@@ -490,6 +490,10 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
         />
       </div>
 
+      <VanitySlugField businessId={biz.id} currentVanity={biz.vanity_slug ?? null} currentSlug={biz.slug} />
+
+
+
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
           <Label>Accent color</Label>
