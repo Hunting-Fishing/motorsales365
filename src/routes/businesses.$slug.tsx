@@ -124,7 +124,11 @@ function BusinessProfilePage() {
   const [body, setBody] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  useTrackPageView(data?.business?.id ?? null);
+  const track = useTrackBusinessEvent(data?.business?.id ?? null);
+
   if (isLoading) return <SiteLayout><div className="container mx-auto p-8">Loading…</div></SiteLayout>;
+
   const biz: any = data?.business;
   if (!biz) {
     return (
