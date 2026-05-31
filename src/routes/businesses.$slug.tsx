@@ -247,19 +247,19 @@ function BusinessProfilePage() {
                   )}
                   <div className="mt-3 flex flex-wrap gap-2">
                     {telHref && (
-                      <Button size="sm" asChild style={accent ? { backgroundColor: accent } : undefined}>
+                      <Button size="sm" asChild style={accent ? { backgroundColor: accent } : undefined} onClick={() => track("call_click")}>
                         <a href={telHref}><Phone className="mr-1 h-4 w-4" />Call</a>
                       </Button>
                     )}
                     {whatsappHref && (
-                      <Button size="sm" asChild className="bg-[#25D366] text-white hover:bg-[#1ebe5d]">
+                      <Button size="sm" asChild className="bg-[#25D366] text-white hover:bg-[#1ebe5d]" onClick={() => track("whatsapp_click")}>
                         <a href={whatsappHref} target="_blank" rel="noreferrer">
                           <MessageCircle className="mr-1 h-4 w-4" />WhatsApp
                         </a>
                       </Button>
                     )}
                     {messengerHref && (
-                      <Button size="sm" variant="outline" asChild>
+                      <Button size="sm" variant="outline" asChild onClick={() => track("messenger_click")}>
                         <a href={messengerHref} target="_blank" rel="noreferrer">
                           <MessageCircle className="mr-1 h-4 w-4" />Messenger
                         </a>
@@ -269,10 +269,15 @@ function BusinessProfilePage() {
                       <a href="#inquiry"><Mail className="mr-1 h-4 w-4" />Get a quote</a>
                     </Button>
                     {biz.website && (
-                      <Button size="sm" variant="outline" asChild>
+                      <Button size="sm" variant="outline" asChild onClick={() => track("website_click")}>
                         <a href={biz.website} target="_blank" rel="noreferrer"><Globe className="mr-1 h-4 w-4" />Website</a>
                       </Button>
                     )}
+                    <ShareButtons
+                      url={`${typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com"}/businesses/${biz.slug}`}
+                      title={biz.name}
+                      onShare={(target) => track("share_click", { target })}
+                    />
                     <ShareQr
                       url={`${typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com"}/businesses/${biz.slug}`}
                       title={biz.name}
@@ -283,6 +288,7 @@ function BusinessProfilePage() {
                       triggerLabel="QR & Poster"
                     />
                   </div>
+
                   {(data?.tags?.length ?? 0) > 0 ? (
                     <TagGroups tags={data!.tags as any} />
                   ) : tagLabels.length > 0 ? (
