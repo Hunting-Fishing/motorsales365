@@ -80,13 +80,24 @@ export const getBusinessAnalytics = createServerFn({ method: "GET" })
 
     const byKind: Record<string, number> = {};
     const byDay: Record<string, { views: number; clicks: number; bookings: number }> = {};
+    const bySource: Record<string, number> = {};
+    const topQueries: Record<string, number> = {};
 
     for (const e of events ?? []) {
       const kind = (e as any).kind as string;
+      const meta = ((e as any).meta ?? {}) as Record<string, any>;
       byKind[kind] = (byKind[kind] ?? 0) + 1;
       const day = new Date((e as any).occurred_at).toISOString().slice(0, 10);
       if (!byDay[day]) byDay[day] = { views: 0, clicks: 0, bookings: 0 };
-      if (kind === "view") byDay[day].views += 1;
+      if (kind === "view") {
+        byDay[day].views += 1;
+        const src = (typeof meta.source === "string" && meta.source) ? meta.source : "direct";
+        bySource[src] = (bySource[src] ?? 0) + 1;
+        if (typeof meta.query === "string" && meta.query.trim()) {
+          const q = meta.query.trim().toLowerCase().slice(0, 64);
+          topQueries[q] = (topQueries[q] ?? 0) + 1;
+        }
+      }
       else if (kind === "book_created" || kind === "book_confirmed") byDay[day].bookings += 1;
       else if (kind.endsWith("_click")) byDay[day].clicks += 1;
     }
@@ -101,12 +112,20 @@ export const getBusinessAnalytics = createServerFn({ method: "GET" })
     const totalBookings = (byKind.book_created ?? 0) + (byKind.book_confirmed ?? 0);
     const conversion = totalViews > 0 ? (totalBookings / totalViews) * 100 : 0;
 
+    const queries = Object.entries(topQueries)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([term, count]) => ({ term, count }));
+
     return {
       totalEvents: events?.length ?? 0,
       totalViews,
       totalBookings,
       conversionRate: Number(conversion.toFixed(2)),
       byKind,
+      bySource,
+      topQueries: queries,
       series,
     };
   });
+
