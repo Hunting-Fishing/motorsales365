@@ -15,13 +15,32 @@ export const getBusinessPage = createServerFn({ method: "GET" })
     z.object({ slug: z.string().min(1).max(200) }).parse(input),
   )
   .handler(async ({ data }) => {
-    const { data: biz, error } = await supabaseAdmin
+    const lookup = data.slug.toLowerCase();
+    let { data: biz, error } = await supabaseAdmin
       .from("businesses")
       .select("*")
-      .eq("slug", data.slug)
+      .or(`slug.eq.${lookup},vanity_slug.eq.${lookup}`)
       .maybeSingle();
     if (error) throw new Error(error.message);
+    if (!biz) {
+      // fall back to slug history → resolve to canonical
+      const { data: hist } = await supabaseAdmin
+        .from("business_slug_history")
+        .select("business_id")
+        .ilike("old_slug", lookup)
+        .limit(1)
+        .maybeSingle();
+      if (hist) {
+        const { data: b2 } = await supabaseAdmin
+          .from("businesses")
+          .select("*")
+          .eq("id", (hist as any).business_id)
+          .maybeSingle();
+        biz = b2 ?? null;
+      }
+    }
     if (!biz) return { business: null };
+
 
     const [
       { data: typeRow },
