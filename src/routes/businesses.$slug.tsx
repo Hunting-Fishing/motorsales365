@@ -29,10 +29,13 @@ import { ShareQr } from "@/components/share-qr";
 import { InquiryForm } from "@/components/business-page/inquiry-form";
 import { getBusinessPage } from "@/lib/business-pages.functions";
 import { PublicGallerySection, PublicContactSection, FeaturedVideoEmbed } from "@/components/business-page/public-sections";
+import { ShareButtons } from "@/components/business-page/share-buttons";
+import { useTrackBusinessEvent, useTrackPageView } from "@/lib/use-track-business-event";
 import {
   isStructuredHours, getStatus, legacyToRows, formatRange,
   DAY_KEYS, DAY_LABELS, type StructuredHours, type HoursStatus,
 } from "@/lib/business-hours";
+
 
 
 export const Route = createFileRoute("/businesses/$slug")({
@@ -121,7 +124,11 @@ function BusinessProfilePage() {
   const [body, setBody] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
+  useTrackPageView(data?.business?.id ?? null);
+  const track = useTrackBusinessEvent(data?.business?.id ?? null);
+
   if (isLoading) return <SiteLayout><div className="container mx-auto p-8">Loading…</div></SiteLayout>;
+
   const biz: any = data?.business;
   if (!biz) {
     return (
@@ -240,19 +247,19 @@ function BusinessProfilePage() {
                   )}
                   <div className="mt-3 flex flex-wrap gap-2">
                     {telHref && (
-                      <Button size="sm" asChild style={accent ? { backgroundColor: accent } : undefined}>
+                      <Button size="sm" asChild style={accent ? { backgroundColor: accent } : undefined} onClick={() => track("call_click")}>
                         <a href={telHref}><Phone className="mr-1 h-4 w-4" />Call</a>
                       </Button>
                     )}
                     {whatsappHref && (
-                      <Button size="sm" asChild className="bg-[#25D366] text-white hover:bg-[#1ebe5d]">
+                      <Button size="sm" asChild className="bg-[#25D366] text-white hover:bg-[#1ebe5d]" onClick={() => track("whatsapp_click")}>
                         <a href={whatsappHref} target="_blank" rel="noreferrer">
                           <MessageCircle className="mr-1 h-4 w-4" />WhatsApp
                         </a>
                       </Button>
                     )}
                     {messengerHref && (
-                      <Button size="sm" variant="outline" asChild>
+                      <Button size="sm" variant="outline" asChild onClick={() => track("messenger_click")}>
                         <a href={messengerHref} target="_blank" rel="noreferrer">
                           <MessageCircle className="mr-1 h-4 w-4" />Messenger
                         </a>
@@ -262,10 +269,15 @@ function BusinessProfilePage() {
                       <a href="#inquiry"><Mail className="mr-1 h-4 w-4" />Get a quote</a>
                     </Button>
                     {biz.website && (
-                      <Button size="sm" variant="outline" asChild>
+                      <Button size="sm" variant="outline" asChild onClick={() => track("website_click")}>
                         <a href={biz.website} target="_blank" rel="noreferrer"><Globe className="mr-1 h-4 w-4" />Website</a>
                       </Button>
                     )}
+                    <ShareButtons
+                      url={`${typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com"}/businesses/${biz.slug}`}
+                      title={biz.name}
+                      onShare={(target) => track("share_click", { target })}
+                    />
                     <ShareQr
                       url={`${typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com"}/businesses/${biz.slug}`}
                       title={biz.name}
@@ -276,6 +288,7 @@ function BusinessProfilePage() {
                       triggerLabel="QR & Poster"
                     />
                   </div>
+
                   {(data?.tags?.length ?? 0) > 0 ? (
                     <TagGroups tags={data!.tags as any} />
                   ) : tagLabels.length > 0 ? (
@@ -461,12 +474,13 @@ function BusinessProfilePage() {
                     Pick a time that works for you — {(data as any).bookableItems.length} bookable service{(data as any).bookableItems.length === 1 ? "" : "s"}.
                   </p>
                 </div>
-                <Link to="/businesses/$slug/book" params={{ slug }}>
+                <Link to="/businesses/$slug/book" params={{ slug }} onClick={() => track("book_click")}>
                   <Button style={{ backgroundColor: accent || undefined }}>Book now</Button>
                 </Link>
               </div>
             </Card>
           )}
+
 
           {/* INQUIRY */}
           <Card id="inquiry" className="p-5">
@@ -536,10 +550,40 @@ function BusinessProfilePage() {
             </Link>
           </div>
         </div>
+
+        {/* Sticky mobile CTA bar */}
+        {(telHref || whatsappHref || Array.isArray((data as any)?.bookableItems) && (data as any).bookableItems.length > 0) && (
+          <div className="sticky bottom-0 left-0 right-0 z-30 border-t border-border bg-background/95 px-3 py-2 backdrop-blur md:hidden">
+            <div className="flex gap-2">
+              {Array.isArray((data as any)?.bookableItems) && (data as any).bookableItems.length > 0 ? (
+                <Link to="/businesses/$slug/book" params={{ slug }} onClick={() => track("book_click")} className="flex-1">
+                  <Button size="sm" className="w-full" style={{ backgroundColor: accent || undefined }}>
+                    <CalendarDays className="mr-1 h-4 w-4" />Book now
+                  </Button>
+                </Link>
+              ) : (
+                <Button size="sm" className="flex-1" asChild>
+                  <a href="#inquiry"><Mail className="mr-1 h-4 w-4" />Get a quote</a>
+                </Button>
+              )}
+              {telHref && (
+                <Button size="sm" variant="outline" asChild onClick={() => track("call_click")}>
+                  <a href={telHref}><Phone className="h-4 w-4" /></a>
+                </Button>
+              )}
+              {whatsappHref && (
+                <Button size="sm" asChild className="bg-[#25D366] text-white hover:bg-[#1ebe5d]" onClick={() => track("whatsapp_click")}>
+                  <a href={whatsappHref} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /></a>
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </SiteLayout>
   );
 }
+
 
 function statusClass(state: HoursStatus["state"]) {
   switch (state) {
