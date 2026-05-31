@@ -13,10 +13,12 @@ export function PublicGallerySection({
   albums,
   photos,
   accent,
+  onAlbumOpen,
 }: {
   albums: Album[];
   photos: Photo[];
   accent?: string | null;
+  onAlbumOpen?: (albumId: string) => void;
 }) {
   const [openAlbumId, setOpenAlbumId] = useState<string | null>(null);
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
