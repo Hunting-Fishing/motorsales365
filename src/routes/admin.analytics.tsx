@@ -245,23 +245,60 @@ function AdminAnalytics() {
       </div>
 
       <Card title="Device locations heatmap — Philippines" icon={Smartphone}>
-        <div className="mb-3 flex flex-wrap gap-2">
-          {[7, 30, 90].map((d) => (
-            <button
-              key={d}
-              onClick={() => setDays(d as 7 | 30 | 90)}
-              className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                days === d
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-card text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Last {d} days
-            </button>
-          ))}
+        <div className="mb-3 flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-muted-foreground">{compare ? "Range A:" : "Range:"}</span>
+            {[7, 30, 90].map((d) => (
+              <button
+                key={d}
+                onClick={() => setDays(d as 7 | 30 | 90)}
+                className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                  days === d
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-card text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Last {d} days
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => setCompare((v) => !v)}
+            className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+              compare
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border bg-card text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {compare ? "Compare: on" : "Compare ranges"}
+          </button>
+          {compare && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-medium text-muted-foreground">Range B (prior):</span>
+              {[7, 30, 90].map((d) => (
+                <button
+                  key={d}
+                  onClick={() => setDaysB(d as 7 | 30 | 90)}
+                  className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                    daysB === d
+                      ? "border-blue-600 bg-blue-600 text-white"
+                      : "border-border bg-card text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {d} days
+                </button>
+              ))}
+            </div>
+          )}
         </div>
-        <DeviceHeatmap points={heatPoints} />
+        <DeviceHeatmap
+          points={heatPoints}
+          pointsB={compare ? heatPointsB : null}
+          labelA={`Last ${days}d`}
+          labelB={`Prior ${daysB}d`}
+        />
       </Card>
+
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card title="Listings by category" icon={Tag}>
