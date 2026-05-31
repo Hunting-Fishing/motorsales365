@@ -210,6 +210,10 @@ function AdminAnalytics() {
         ))}
       </div>
 
+      <Card title="Device locations heatmap — Philippines" icon={Smartphone}>
+        <DeviceHeatmap points={heatPoints} />
+      </Card>
+
       <div className="grid gap-4 lg:grid-cols-2">
         <Card title="Listings by category" icon={Tag}>
           <BarList items={byCategory} total={totalListings} />
