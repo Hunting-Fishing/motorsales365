@@ -1,0 +1,121 @@
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
+import { Card } from "@/components/ui/card";
+import { getBusinessAnalytics } from "@/lib/business-analytics.functions";
+import { Eye, MousePointerClick, CalendarCheck2, TrendingUp, Phone, MessageCircle, Share2, Mail } from "lucide-react";
+
+const CHANNEL_KIND_LABELS: Record<string, { label: string; icon: any }> = {
+  call_click: { label: "Phone calls", icon: Phone },
+  whatsapp_click: { label: "WhatsApp", icon: MessageCircle },
+  messenger_click: { label: "Messenger", icon: MessageCircle },
+  contact_click: { label: "Other channels", icon: MessageCircle },
+  website_click: { label: "Website", icon: TrendingUp },
+  share_click: { label: "Shares", icon: Share2 },
+  inquiry_submitted: { label: "Inquiries", icon: Mail },
+  book_click: { label: "Booking clicks", icon: CalendarCheck2 },
+};
+
+function Sparkline({ values, max }: { values: number[]; max: number }) {
+  const w = 280;
+  const h = 50;
+  const safeMax = Math.max(1, max);
+  const step = values.length > 1 ? w / (values.length - 1) : w;
+  const points = values
+    .map((v, i) => `${i * step},${h - (v / safeMax) * h}`)
+    .join(" ");
+  return (
+    <svg width="100%" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className="h-12 w-full">
+      <polyline
+        points={points}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.5}
+        className="text-primary"
+      />
+    </svg>
+  );
+}
+
+function StatCard({ label, value, icon: Icon, accent }: { label: string; value: string | number; icon: any; accent?: string }) {
+  return (
+    <Card className="p-4">
+      <div className="flex items-center gap-2 text-muted-foreground">
+        <Icon className="h-4 w-4" />
+        <span className="text-xs font-medium uppercase tracking-wide">{label}</span>
+      </div>
+      <div className={`mt-2 font-display text-2xl font-bold ${accent ?? ""}`}>{value}</div>
+    </Card>
+  );
+}
+
+export function AnalyticsTab({ businessId }: { businessId: string }) {
+  const fetchAnalytics = useServerFn(getBusinessAnalytics);
+  const { data, isLoading } = useQuery({
+    queryKey: ["business-analytics", businessId, 30],
+    queryFn: () => fetchAnalytics({ data: { businessId, days: 30 } }),
+    enabled: !!businessId,
+  });
+
+  if (isLoading || !data) return <div className="text-sm text-muted-foreground">Loading analytics…</div>;
+
+  const a: any = data;
+  const series = a.series as Array<{ date: string; views: number; clicks: number; bookings: number }>;
+  const maxView = Math.max(0, ...series.map((s) => s.views));
+
+  const channelRows = Object.entries(CHANNEL_KIND_LABELS)
+    .map(([kind, meta]) => ({ kind, ...meta, count: (a.byKind[kind] as number) ?? 0 }))
+    .filter((r) => r.count > 0)
+    .sort((x, y) => y.count - x.count);
+
+  return (
+    <div className="space-y-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard label="Page views" value={a.totalViews} icon={Eye} />
+        <StatCard label="Clicks (all CTAs)" value={Object.entries(a.byKind).reduce((acc, [k, v]) => acc + (k.endsWith("_click") ? (v as number) : 0), 0)} icon={MousePointerClick} />
+        <StatCard label="Bookings" value={a.totalBookings} icon={CalendarCheck2} />
+        <StatCard label="Conversion rate" value={`${a.conversionRate}%`} icon={TrendingUp} />
+      </div>
+
+      <Card className="p-4">
+        <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Views — last 30 days</div>
+        <Sparkline values={series.map((s) => s.views)} max={maxView} />
+        <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
+          <span>{series[0]?.date}</span>
+          <span>{series[series.length - 1]?.date}</span>
+        </div>
+      </Card>
+
+      <Card className="p-4">
+        <h3 className="mb-3 font-display text-base font-semibold">Top actions</h3>
+        {channelRows.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No CTA clicks recorded yet.</p>
+        ) : (
+          <ul className="space-y-2">
+            {channelRows.map((r) => {
+              const Icon = r.icon;
+              const pct = a.totalViews > 0 ? Math.round((r.count / a.totalViews) * 100) : 0;
+              return (
+                <li key={r.kind} className="flex items-center gap-3">
+                  <Icon className="h-4 w-4 text-muted-foreground" />
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="font-medium">{r.label}</span>
+                      <span className="text-muted-foreground">{r.count} ({pct}% of views)</span>
+                    </div>
+                    <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                      <div className="h-full bg-primary" style={{ width: `${Math.min(100, pct)}%` }} />
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </Card>
+
+      <p className="text-xs text-muted-foreground">
+        Stats cover the last 30 days. Page views are de-duplicated per browser session per business.
+      </p>
+    </div>
+  );
+}
