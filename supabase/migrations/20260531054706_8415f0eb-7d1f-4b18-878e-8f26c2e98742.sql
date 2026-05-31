@@ -1,0 +1,1 @@
+CREATE POLICY "Admins read all business events" ON public.business_page_events FOR SELECT TO authenticated USING (has_role(auth.uid(), 'admin'::app_role));
