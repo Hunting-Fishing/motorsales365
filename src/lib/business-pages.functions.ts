@@ -172,8 +172,15 @@ export const submitBusinessInquiry = createServerFn({ method: "POST" })
       message: data.message.trim(),
     } as any);
     if (error) throw new Error(error.message);
+    try {
+      await supabaseAdmin.from("business_page_events").insert({
+        business_id: data.businessId,
+        kind: "inquiry_submitted",
+      } as any);
+    } catch { /* ignore */ }
     return { ok: true };
   });
+
 
 // ============== OWNER (authed) ==============
 
