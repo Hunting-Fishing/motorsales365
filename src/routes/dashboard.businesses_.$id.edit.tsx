@@ -87,6 +87,13 @@ function EditBusinessPage() {
 
   const biz: any = data.business;
 
+  return <EditBusinessPageInner biz={biz} data={data} user={user} refetch={refetch} navigate={navigate} />;
+}
+
+function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
+  const validTabs = ["profile","tags","hours","services","products","gallery","contact","posts","bookings","inquiries","analytics"];
+  const [activeTab, setActiveTab] = useState<string>("profile");
+
   return (
     <div className="container mx-auto max-w-5xl px-3 py-4 md:px-6 md:py-8">
       <div className="mb-4 flex flex-wrap items-center gap-2">
