@@ -104,6 +104,27 @@ function EditBusinessPage() {
         </div>
       </div>
 
+      <div className="mb-4">
+        <OnboardingChecklist
+          data={{
+            biz,
+            services: data.services,
+            products: data.products,
+            posts: data.posts,
+            albums: (data as any).albums ?? [],
+            photos: (data as any).photos ?? [],
+            contactChannels: (data as any).contactChannels ?? [],
+            bookableItems: (data as any).bookableItems ?? [],
+            availability: (data as any).availability ?? [],
+          }}
+          onJumpTab={(v) => {
+            const trigger = document.querySelector<HTMLButtonElement>(`[role="tab"][data-state][value="${v}"]`)
+              ?? document.querySelector<HTMLButtonElement>(`[role="tab"][value="${v}"]`);
+            trigger?.click();
+          }}
+        />
+      </div>
+
       <Tabs defaultValue="profile" className="space-y-4">
         <TabsList className="flex w-full overflow-x-auto">
           <TabsTrigger value="profile">Profile</TabsTrigger>
@@ -116,6 +137,7 @@ function EditBusinessPage() {
           <TabsTrigger value="contact">Contact ({(data as any).contactChannels?.length ?? 0})</TabsTrigger>
           <TabsTrigger value="posts">Posts ({data.posts.length})</TabsTrigger>
           <TabsTrigger value="bookings">
+
             Bookings ({(data as any).bookableItems?.length ?? 0})
             {(data as any).bookings?.filter((b: any) => b.status === "pending").length > 0 && (
               <Badge className="ml-2 h-5 px-1.5 text-xs" variant="destructive">
