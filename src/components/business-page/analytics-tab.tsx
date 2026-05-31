@@ -2,7 +2,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { getBusinessAnalytics } from "@/lib/business-analytics.functions";
-import { Eye, MousePointerClick, CalendarCheck2, TrendingUp, Phone, MessageCircle, Share2, Mail, Compass, Search, Tag, Megaphone, Globe2, Link2, Share, ListOrdered } from "lucide-react";
+import { Eye, MousePointerClick, CalendarCheck2, TrendingUp, Phone, MessageCircle, Share2, Mail, Compass, Search, Tag, Megaphone, Globe2, Link2, Share, ListOrdered, Smartphone, Monitor, Tablet, Bot, HelpCircle, MapPin, Building2 } from "lucide-react";
 
 const CHANNEL_KIND_LABELS: Record<string, { label: string; icon: any }> = {
   call_click: { label: "Phone calls", icon: Phone },
@@ -27,6 +27,15 @@ const SOURCE_LABELS: Record<string, { label: string; icon: any; hint: string }> 
   external: { label: "External sites", icon: Globe2, hint: "Outside sites that linked to you" },
   direct: { label: "Direct / saved link", icon: Link2, hint: "Typed URL, bookmark, or QR code" },
 };
+
+const DEVICE_LABELS: Record<string, { label: string; icon: any }> = {
+  mobile: { label: "Mobile", icon: Smartphone },
+  tablet: { label: "Tablet", icon: Tablet },
+  desktop: { label: "Desktop", icon: Monitor },
+  bot: { label: "Bots & crawlers", icon: Bot },
+  unknown: { label: "Unknown device", icon: HelpCircle },
+};
+
 
 
 function Sparkline({ values, max }: { values: number[]; max: number }) {
