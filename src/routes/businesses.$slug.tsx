@@ -550,10 +550,40 @@ function BusinessProfilePage() {
             </Link>
           </div>
         </div>
+
+        {/* Sticky mobile CTA bar */}
+        {(telHref || whatsappHref || Array.isArray((data as any)?.bookableItems) && (data as any).bookableItems.length > 0) && (
+          <div className="sticky bottom-0 left-0 right-0 z-30 border-t border-border bg-background/95 px-3 py-2 backdrop-blur md:hidden">
+            <div className="flex gap-2">
+              {Array.isArray((data as any)?.bookableItems) && (data as any).bookableItems.length > 0 ? (
+                <Link to="/businesses/$slug/book" params={{ slug }} onClick={() => track("book_click")} className="flex-1">
+                  <Button size="sm" className="w-full" style={{ backgroundColor: accent || undefined }}>
+                    <CalendarDays className="mr-1 h-4 w-4" />Book now
+                  </Button>
+                </Link>
+              ) : (
+                <Button size="sm" className="flex-1" asChild>
+                  <a href="#inquiry"><Mail className="mr-1 h-4 w-4" />Get a quote</a>
+                </Button>
+              )}
+              {telHref && (
+                <Button size="sm" variant="outline" asChild onClick={() => track("call_click")}>
+                  <a href={telHref}><Phone className="h-4 w-4" /></a>
+                </Button>
+              )}
+              {whatsappHref && (
+                <Button size="sm" asChild className="bg-[#25D366] text-white hover:bg-[#1ebe5d]" onClick={() => track("whatsapp_click")}>
+                  <a href={whatsappHref} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /></a>
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </SiteLayout>
   );
 }
+
 
 function statusClass(state: HoursStatus["state"]) {
   switch (state) {
