@@ -36,15 +36,10 @@ function ProductPage() {
     queryFn: () => getShopProduct({ data: { slug } }),
   });
   const visitor = useMemo(() => getVisitorId(), []);
-
-  if (isLoading) return <SiteLayout><div className="container mx-auto px-4 py-16 text-center text-muted-foreground">Loading…</div></SiteLayout>;
-  if (!data?.product) {
-    return <SiteLayout><div className="container mx-auto px-4 py-16 text-center"><h1 className="text-2xl font-semibold">Product not found</h1><Link to="/shop" className="mt-4 inline-block text-primary underline">Back to shop</Link></div></SiteLayout>;
-  }
-  const p = data.product as any;
-  const links = data.links as any[];
-  const fitment = (data.fitment ?? []) as any[];
-  const history = (data.history ?? []) as any[];
+  const p = data?.product as any | undefined;
+  const links = (data?.links ?? []) as any[];
+  const fitment = (data?.fitment ?? []) as any[];
+  const history = (data?.history ?? []) as any[];
 
   // Cheapest current price across all retailers
   const cheapest = useMemo(() => {
@@ -67,6 +62,11 @@ function ProductPage() {
       .filter((v) => !Number.isNaN(v) && v > 0);
     return vals.length ? Math.min(...vals) : null;
   }, [history]);
+
+  if (isLoading) return <SiteLayout><div className="container mx-auto px-4 py-16 text-center text-muted-foreground">Loading…</div></SiteLayout>;
+  if (!p) {
+    return <SiteLayout><div className="container mx-auto px-4 py-16 text-center"><h1 className="text-2xl font-semibold">Product not found</h1><Link to="/shop" className="mt-4 inline-block text-primary underline">Back to shop</Link></div></SiteLayout>;
+  }
 
   const listPrice = p.price_php != null ? Number(p.price_php) : null;
   const dealPrice = p.deal_price_php != null ? Number(p.deal_price_php) : null;
