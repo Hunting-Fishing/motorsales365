@@ -2,7 +2,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { getBusinessAnalytics } from "@/lib/business-analytics.functions";
-import { Eye, MousePointerClick, CalendarCheck2, TrendingUp, Phone, MessageCircle, Share2, Mail } from "lucide-react";
+import { Eye, MousePointerClick, CalendarCheck2, TrendingUp, Phone, MessageCircle, Share2, Mail, Compass, Search, Tag, Megaphone, Globe2, Link2, Share, ListOrdered } from "lucide-react";
 
 const CHANNEL_KIND_LABELS: Record<string, { label: string; icon: any }> = {
   call_click: { label: "Phone calls", icon: Phone },
@@ -14,6 +14,20 @@ const CHANNEL_KIND_LABELS: Record<string, { label: string; icon: any }> = {
   inquiry_submitted: { label: "Inquiries", icon: Mail },
   book_click: { label: "Booking clicks", icon: CalendarCheck2 },
 };
+
+const SOURCE_LABELS: Record<string, { label: string; icon: any; hint: string }> = {
+  ads: { label: "Ads", icon: Megaphone, hint: "Visitors from your ads or promoted slots" },
+  directory: { label: "Directory browse", icon: Compass, hint: "Browsing the businesses directory" },
+  name_search: { label: "Name searches", icon: Search, hint: "Searched by your business name" },
+  relevant_search: { label: "Relevant searches", icon: Tag, hint: "Found via category, tag, or related filters" },
+  listing: { label: "From listings / shop", icon: ListOrdered, hint: "Clicked through from a product or listing" },
+  search_engine: { label: "Search engines", icon: Globe2, hint: "Google, Bing and other search engines" },
+  social: { label: "Social media", icon: Share, hint: "Facebook, Instagram, TikTok and others" },
+  internal: { label: "Other pages on site", icon: Link2, hint: "Other pages within this site" },
+  external: { label: "External sites", icon: Globe2, hint: "Outside sites that linked to you" },
+  direct: { label: "Direct / saved link", icon: Link2, hint: "Typed URL, bookmark, or QR code" },
+};
+
 
 function Sparkline({ values, max }: { values: number[]; max: number }) {
   const w = 280;
