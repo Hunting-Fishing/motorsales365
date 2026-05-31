@@ -87,6 +87,13 @@ function EditBusinessPage() {
 
   const biz: any = data.business;
 
+  return <EditBusinessPageInner biz={biz} data={data} user={user} refetch={refetch} navigate={navigate} />;
+}
+
+function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
+  const validTabs = ["profile","tags","hours","services","products","gallery","contact","posts","bookings","inquiries","analytics"];
+  const [activeTab, setActiveTab] = useState<string>("profile");
+
   return (
     <div className="container mx-auto max-w-5xl px-3 py-4 md:px-6 md:py-8">
       <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -118,14 +125,12 @@ function EditBusinessPage() {
             availability: (data as any).availability ?? [],
           }}
           onJumpTab={(v) => {
-            const trigger = document.querySelector<HTMLButtonElement>(`[role="tab"][data-state][value="${v}"]`)
-              ?? document.querySelector<HTMLButtonElement>(`[role="tab"][value="${v}"]`);
-            trigger?.click();
+            if (validTabs.includes(v)) setActiveTab(v);
           }}
         />
       </div>
 
-      <Tabs defaultValue="profile" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="flex w-full overflow-x-auto">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="tags">Tags</TabsTrigger>
