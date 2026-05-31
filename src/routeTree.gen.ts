@@ -75,6 +75,7 @@ import { Route as BusinessesSlugRouteImport } from './routes/businesses.$slug'
 import { Route as BusinessCheckoutRouteImport } from './routes/business.checkout'
 import { Route as BrowseCategoryRouteImport } from './routes/browse.$category'
 import { Route as BoostCheckoutRouteImport } from './routes/boost.checkout'
+import { Route as BSlugRouteImport } from './routes/b.$slug'
 import { Route as ApiRobotsDottxtRouteImport } from './routes/api/robots[.]txt'
 import { Route as AdminVerificationsRouteImport } from './routes/admin.verifications'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
@@ -453,6 +454,11 @@ const BoostCheckoutRoute = BoostCheckoutRouteImport.update({
   path: '/boost/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BSlugRoute = BSlugRouteImport.update({
+  id: '/b/$slug',
+  path: '/b/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiRobotsDottxtRoute = ApiRobotsDottxtRouteImport.update({
   id: '/api/robots.txt',
   path: '/api/robots.txt',
@@ -742,6 +748,7 @@ export interface FileRoutesByFullPath {
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
   '/api/robots.txt': typeof ApiRobotsDottxtRoute
+  '/b/$slug': typeof BSlugRoute
   '/boost/checkout': typeof BoostCheckoutRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/business/checkout': typeof BusinessCheckoutRoute
@@ -855,6 +862,7 @@ export interface FileRoutesByTo {
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
   '/api/robots.txt': typeof ApiRobotsDottxtRoute
+  '/b/$slug': typeof BSlugRoute
   '/boost/checkout': typeof BoostCheckoutRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/business/checkout': typeof BusinessCheckoutRoute
@@ -970,6 +978,7 @@ export interface FileRoutesById {
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
   '/api/robots.txt': typeof ApiRobotsDottxtRoute
+  '/b/$slug': typeof BSlugRoute
   '/boost/checkout': typeof BoostCheckoutRoute
   '/browse/$category': typeof BrowseCategoryRoute
   '/business/checkout': typeof BusinessCheckoutRoute
@@ -1087,6 +1096,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/verifications'
     | '/api/robots.txt'
+    | '/b/$slug'
     | '/boost/checkout'
     | '/browse/$category'
     | '/business/checkout'
@@ -1200,6 +1210,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/verifications'
     | '/api/robots.txt'
+    | '/b/$slug'
     | '/boost/checkout'
     | '/browse/$category'
     | '/business/checkout'
@@ -1314,6 +1325,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/verifications'
     | '/api/robots.txt'
+    | '/b/$slug'
     | '/boost/checkout'
     | '/browse/$category'
     | '/business/checkout'
@@ -1412,6 +1424,7 @@ export interface RootRouteChildren {
   UnsubscribeRoute: typeof UnsubscribeRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   ApiRobotsDottxtRoute: typeof ApiRobotsDottxtRoute
+  BSlugRoute: typeof BSlugRoute
   BoostCheckoutRoute: typeof BoostCheckoutRoute
   BrowseCategoryRoute: typeof BrowseCategoryRoute
   BusinessCheckoutRoute: typeof BusinessCheckoutRoute
@@ -1914,6 +1927,13 @@ declare module '@tanstack/react-router' {
       path: '/boost/checkout'
       fullPath: '/boost/checkout'
       preLoaderRoute: typeof BoostCheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/b/$slug': {
+      id: '/b/$slug'
+      path: '/b/$slug'
+      fullPath: '/b/$slug'
+      preLoaderRoute: typeof BSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/robots.txt': {
@@ -2446,6 +2466,7 @@ const rootRouteChildren: RootRouteChildren = {
   UnsubscribeRoute: UnsubscribeRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   ApiRobotsDottxtRoute: ApiRobotsDottxtRoute,
+  BSlugRoute: BSlugRoute,
   BoostCheckoutRoute: BoostCheckoutRoute,
   BrowseCategoryRoute: BrowseCategoryRoute,
   BusinessCheckoutRoute: BusinessCheckoutRoute,
