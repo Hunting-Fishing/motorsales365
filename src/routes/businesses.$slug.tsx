@@ -455,7 +455,12 @@ function BusinessProfilePage() {
 
           {/* GALLERY */}
           {biz.show_gallery !== false && albums.length > 0 && (
-            <PublicGallerySection albums={albums} photos={photos} accent={accent} />
+            <PublicGallerySection
+              albums={albums}
+              photos={photos}
+              accent={accent}
+              onAlbumOpen={(albumId) => track("gallery_view", { album_id: albumId })}
+            />
           )}
 
           {/* CONTACT CHANNELS */}

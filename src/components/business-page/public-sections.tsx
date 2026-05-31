@@ -13,10 +13,12 @@ export function PublicGallerySection({
   albums,
   photos,
   accent,
+  onAlbumOpen,
 }: {
   albums: Album[];
   photos: Photo[];
   accent?: string | null;
+  onAlbumOpen?: (albumId: string) => void;
 }) {
   const [openAlbumId, setOpenAlbumId] = useState<string | null>(null);
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
@@ -62,7 +64,7 @@ export function PublicGallerySection({
               <button
                 key={a.id}
                 type="button"
-                onClick={() => setOpenAlbumId(a.id)}
+                onClick={() => { setOpenAlbumId(a.id); onAlbumOpen?.(a.id); }}
                 className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted text-left"
               >
                 {cover ? (

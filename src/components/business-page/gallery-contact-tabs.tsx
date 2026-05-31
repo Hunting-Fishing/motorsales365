@@ -7,12 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Plus, Trash2, Upload, Pencil, X } from "lucide-react";
+import { Plus, Trash2, Upload, Pencil, X, Star, Check } from "lucide-react";
 import {
   upsertGalleryAlbum,
   deleteGalleryAlbum,
   addGalleryPhotos,
   deleteGalleryPhoto,
+  updateGalleryPhoto,
 } from "@/lib/business-mini-site.functions";
 import { uploadWithRetry } from "@/lib/storage-upload";
 
@@ -43,6 +44,7 @@ export function GalleryTab({
   const delAlbum = useServerFn(deleteGalleryAlbum);
   const addPhotos = useServerFn(addGalleryPhotos);
   const delPhoto = useServerFn(deleteGalleryPhoto);
+  const updPhoto = useServerFn(updateGalleryPhoto);
 
   const [creating, setCreating] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -51,6 +53,8 @@ export function GalleryTab({
   const [editTitle, setEditTitle] = useState("");
   const [editDesc, setEditDesc] = useState("");
   const [uploadingFor, setUploadingFor] = useState<string | null>(null);
+  const [captionFor, setCaptionFor] = useState<string | null>(null);
+  const [captionDraft, setCaptionDraft] = useState("");
 
   const createAlbum = async () => {
     if (!newTitle.trim()) return;
@@ -119,6 +123,28 @@ export function GalleryTab({
   const removePhoto = async (id: string) => {
     try {
       await delPhoto({ data: { businessId, id } });
+      onChange();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    }
+  };
+
+  const saveCaption = async (id: string) => {
+    try {
+      await updPhoto({ data: { businessId, id, caption: captionDraft.trim() || null } });
+      setCaptionFor(null);
+      setCaptionDraft("");
+      toast.success("Caption saved");
+      onChange();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    }
+  };
+
+  const setAsCover = async (albumId: string, url: string) => {
+    try {
+      await upsertAlbum({ data: { id: albumId, businessId, title: albums.find((a) => a.id === albumId)?.title ?? "", cover_url: url } });
+      toast.success("Cover updated");
       onChange();
     } catch (e: any) {
       toast.error(e?.message ?? "Failed");
@@ -196,19 +222,68 @@ export function GalleryTab({
               )}
 
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
-                {albumPhotos.map((p) => (
-                  <div key={p.id} className="group relative aspect-square overflow-hidden rounded-md border border-border">
-                    <img src={p.url} alt={p.caption ?? ""} className="h-full w-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => removePhoto(p.id)}
-                      className="absolute right-1 top-1 rounded-full bg-background/80 p-1 opacity-0 group-hover:opacity-100"
-                      aria-label="Remove photo"
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                ))}
+                {albumPhotos.map((p) => {
+                  const isCover = a.cover_url === p.url;
+                  const isCaptioning = captionFor === p.id;
+                  return (
+                    <div key={p.id} className="group relative aspect-square overflow-hidden rounded-md border border-border">
+                      <img src={p.url} alt={p.caption ?? ""} className="h-full w-full object-cover" />
+                      {isCover && (
+                        <div className="absolute left-1 top-1 rounded-full bg-primary/90 p-1 text-primary-foreground" title="Album cover">
+                          <Star className="h-3 w-3 fill-current" />
+                        </div>
+                      )}
+                      <div className="absolute right-1 top-1 flex gap-1 opacity-0 group-hover:opacity-100">
+                        {!isCover && (
+                          <button
+                            type="button"
+                            onClick={() => setAsCover(a.id, p.url)}
+                            className="rounded-full bg-background/80 p-1"
+                            aria-label="Set as cover"
+                            title="Set as cover"
+                          >
+                            <Star className="h-3.5 w-3.5" />
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => { setCaptionFor(p.id); setCaptionDraft(p.caption ?? ""); }}
+                          className="rounded-full bg-background/80 p-1"
+                          aria-label="Edit caption"
+                          title="Edit caption"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removePhoto(p.id)}
+                          className="rounded-full bg-background/80 p-1"
+                          aria-label="Remove photo"
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                      {isCaptioning && (
+                        <div className="absolute inset-x-0 bottom-0 flex items-center gap-1 bg-background/95 p-1">
+                          <Input
+                            value={captionDraft}
+                            onChange={(e) => setCaptionDraft(e.target.value)}
+                            maxLength={300}
+                            placeholder="Caption"
+                            className="h-7 flex-1 text-xs"
+                            autoFocus
+                          />
+                          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => saveCaption(p.id)} aria-label="Save caption">
+                            <Check className="h-3.5 w-3.5" />
+                          </Button>
+                          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => { setCaptionFor(null); setCaptionDraft(""); }} aria-label="Cancel">
+                            <X className="h-3.5 w-3.5" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
                 <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-md border border-dashed border-border bg-muted/30 text-xs text-muted-foreground hover:bg-muted/60">
                   <Upload className="h-4 w-4" />
                   {uploadingFor === a.id ? "Uploading…" : "Add"}
