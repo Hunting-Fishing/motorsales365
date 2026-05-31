@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPHP } from "@/lib/format";
-import { BarChart3, MapPin, Users, Tag, CreditCard, TrendingUp } from "lucide-react";
+import { BarChart3, MapPin, Users, Tag, CreditCard, TrendingUp, Smartphone } from "lucide-react";
+import { DeviceHeatmap, type HeatPoint } from "@/components/admin/device-heatmap";
 
 export const Route = createFileRoute("/admin/analytics")({
   component: AdminAnalytics,
@@ -67,17 +68,19 @@ function AdminAnalytics() {
   const [subs, setSubs] = useState<any[]>([]);
   const [plans, setPlans] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
+  const [heatPoints, setHeatPoints] = useState<HeatPoint[]>([]);
 
   useEffect(() => {
     (async () => {
       setLoading(true);
-      const [l, p, pay, s, pl, c] = await Promise.all([
+      const [l, p, pay, s, pl, c, ev] = await Promise.all([
         supabase.from("listings").select("id,user_id,category_slug,region,province,city,status,plan,seller_type,view_count,price_php,created_at").limit(5000),
         supabase.from("profiles").select("id,seller_type,business_kind,verification_status,business_region,created_at").limit(5000),
         supabase.from("payments").select("amount_php,status,kind,created_at").limit(5000),
         supabase.from("subscriptions").select("plan_id,status,created_at").limit(5000),
         supabase.from("subscription_plans").select("id,name,price_php"),
         supabase.from("categories").select("slug,name"),
+        supabase.from("business_page_events").select("meta").limit(10000),
       ]);
       setListings(l.data ?? []);
       setProfiles(p.data ?? []);
@@ -85,6 +88,19 @@ function AdminAnalytics() {
       setSubs(s.data ?? []);
       setPlans(pl.data ?? []);
       setCategories(c.data ?? []);
+      const agg = new Map<string, HeatPoint>();
+      for (const row of (ev.data ?? []) as Array<{ meta: any }>) {
+        const m = row.meta || {};
+        const region = (m.region as string) || null;
+        const city = (m.city as string) || null;
+        const device = (m.device as string) || null;
+        if (!region && !city) continue;
+        const key = `${region}|${city}|${device}`;
+        const cur = agg.get(key);
+        if (cur) cur.count += 1;
+        else agg.set(key, { region, city, device, count: 1 });
+      }
+      setHeatPoints([...agg.values()]);
       setLoading(false);
     })();
   }, []);
@@ -193,6 +209,10 @@ function AdminAnalytics() {
           </div>
         ))}
       </div>
+
+      <Card title="Device locations heatmap — Philippines" icon={Smartphone}>
+        <DeviceHeatmap points={heatPoints} />
+      </Card>
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card title="Listings by category" icon={Tag}>
