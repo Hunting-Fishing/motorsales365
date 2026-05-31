@@ -213,6 +213,21 @@ function AdminAnalytics() {
       </div>
 
       <Card title="Device locations heatmap — Philippines" icon={Smartphone}>
+        <div className="mb-3 flex flex-wrap gap-2">
+          {[7, 30, 90].map((d) => (
+            <button
+              key={d}
+              onClick={() => setDays(d as 7 | 30 | 90)}
+              className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                days === d
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-card text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Last {d} days
+            </button>
+          ))}
+        </div>
         <DeviceHeatmap points={heatPoints} />
       </Card>
 
