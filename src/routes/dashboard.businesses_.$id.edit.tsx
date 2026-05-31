@@ -1230,3 +1230,91 @@ function HoursTab({ biz, onSaved }: { biz: any; onSaved: () => void }) {
   );
 }
 
+
+function VanitySlugField({
+  businessId,
+  currentVanity,
+  currentSlug,
+}: {
+  businessId: string;
+  currentVanity: string | null;
+  currentSlug: string;
+}) {
+  const save = useServerFn(setVanitySlug);
+  const [value, setValue] = useState(currentVanity ?? "");
+  const [saving, setSaving] = useState(false);
+  const origin = typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com";
+
+  const onSave = async () => {
+    const trimmed = value.trim().toLowerCase();
+    setSaving(true);
+    try {
+      await save({ data: { businessId, vanitySlug: trimmed || null } });
+      toast.success(trimmed ? "Short URL saved" : "Short URL removed");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Couldn't save");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const onClear = async () => {
+    setValue("");
+    setSaving(true);
+    try {
+      await save({ data: { businessId, vanitySlug: null } });
+      toast.success("Short URL removed");
+    } catch (e: any) {
+      toast.error(e?.message ?? "Couldn't remove");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const preview = value.trim().toLowerCase();
+  return (
+    <Card className="space-y-3 border-primary/40 bg-primary/5 p-4 md:p-5">
+      <div>
+        <Label className="text-base font-semibold">Your short URL</Label>
+        <p className="mt-1 text-xs text-muted-foreground">
+          A clean, memorable web address for your business — perfect for business cards, posters, and stickers.
+          Replaces the long auto-generated link.
+        </p>
+      </div>
+      <div className="flex flex-wrap items-center gap-2 rounded-md border border-border bg-background px-3 py-2 font-mono text-sm">
+        <span className="text-muted-foreground">{origin.replace(/^https?:\/\//, "")}/b/</span>
+        <Input
+          value={value}
+          onChange={(e) => setValue(e.target.value.replace(/[^a-zA-Z0-9-]/g, "").slice(0, 32))}
+          placeholder="your-shop-name"
+          maxLength={32}
+          className="h-8 flex-1 border-0 bg-transparent p-0 font-mono text-sm focus-visible:ring-0"
+        />
+      </div>
+      <p className="text-xs text-muted-foreground">
+        3–32 characters · lowercase letters, numbers, and hyphens · cannot start or end with a hyphen.
+      </p>
+      {preview && (
+        <p className="text-xs">
+          Will be reachable at{" "}
+          <a className="text-primary underline" href={`/b/${preview}`} target="_blank" rel="noreferrer">
+            {origin}/b/{preview}
+          </a>
+        </p>
+      )}
+      <div className="flex flex-wrap gap-2">
+        <Button onClick={onSave} disabled={saving || preview === (currentVanity ?? "")}>
+          {saving ? "Saving…" : currentVanity ? "Update short URL" : "Claim short URL"}
+        </Button>
+        {currentVanity && (
+          <Button type="button" variant="outline" onClick={onClear} disabled={saving}>
+            Remove
+          </Button>
+        )}
+      </div>
+      <p className="text-[11px] text-muted-foreground">
+        Canonical permalink: <span className="font-mono">/businesses/{currentSlug}</span> (old links keep working).
+      </p>
+    </Card>
+  );
+}
