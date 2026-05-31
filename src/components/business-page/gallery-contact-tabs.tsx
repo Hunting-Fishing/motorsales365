@@ -7,12 +7,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Plus, Trash2, Upload, Pencil, X } from "lucide-react";
+import { Plus, Trash2, Upload, Pencil, X, Star, Check } from "lucide-react";
 import {
   upsertGalleryAlbum,
   deleteGalleryAlbum,
   addGalleryPhotos,
   deleteGalleryPhoto,
+  updateGalleryPhoto,
 } from "@/lib/business-mini-site.functions";
 import { uploadWithRetry } from "@/lib/storage-upload";
 
