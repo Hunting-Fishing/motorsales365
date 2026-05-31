@@ -987,6 +987,18 @@ export type Database = {
           },
         ]
       }
+      business_reserved_slugs: {
+        Row: {
+          slug: string
+        }
+        Insert: {
+          slug: string
+        }
+        Update: {
+          slug?: string
+        }
+        Relationships: []
+      }
       business_reviews: {
         Row: {
           body: string | null
@@ -1083,6 +1095,38 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "business_services_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_slug_history: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          kind: string
+          old_slug: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          kind: string
+          old_slug: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          kind?: string
+          old_slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_slug_history_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
@@ -1340,6 +1384,7 @@ export type Database = {
           theme_color: string | null
           type_slug: string
           updated_at: string
+          vanity_slug: string | null
           website: string | null
         }
         Insert: {
@@ -1388,6 +1433,7 @@ export type Database = {
           theme_color?: string | null
           type_slug: string
           updated_at?: string
+          vanity_slug?: string | null
           website?: string | null
         }
         Update: {
@@ -1436,6 +1482,7 @@ export type Database = {
           theme_color?: string | null
           type_slug?: string
           updated_at?: string
+          vanity_slug?: string | null
           website?: string | null
         }
         Relationships: [
