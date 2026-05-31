@@ -205,7 +205,11 @@ function EditBusinessPage() {
         <TabsContent value="inquiries">
           <InquiriesTab businessId={biz.id} inquiries={data.inquiries} onChange={refetch} />
         </TabsContent>
+        <TabsContent value="analytics">
+          <AnalyticsTab businessId={biz.id} />
+        </TabsContent>
       </Tabs>
+
     </div>
   );
 }
