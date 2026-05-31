@@ -44,6 +44,7 @@ export function GalleryTab({
   const delAlbum = useServerFn(deleteGalleryAlbum);
   const addPhotos = useServerFn(addGalleryPhotos);
   const delPhoto = useServerFn(deleteGalleryPhoto);
+  const updPhoto = useServerFn(updateGalleryPhoto);
 
   const [creating, setCreating] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -52,6 +53,8 @@ export function GalleryTab({
   const [editTitle, setEditTitle] = useState("");
   const [editDesc, setEditDesc] = useState("");
   const [uploadingFor, setUploadingFor] = useState<string | null>(null);
+  const [captionFor, setCaptionFor] = useState<string | null>(null);
+  const [captionDraft, setCaptionDraft] = useState("");
 
   const createAlbum = async () => {
     if (!newTitle.trim()) return;
