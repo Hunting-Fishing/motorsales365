@@ -152,8 +152,85 @@ export const createBooking = createServerFn({ method: "POST" })
       .select("id, status, starts_at, ends_at")
       .single();
     if (error) throw new Error(error.message);
+
+    // Fire analytics event + emails (fail-soft)
+    try {
+      await supabaseAdmin.from("business_page_events").insert({
+        business_id: data.businessId,
+        kind: status === "confirmed" ? "book_confirmed" : "book_created",
+        meta: { booking_id: (row as any).id, bookable_item_id: data.bookableItemId },
+      } as any);
+    } catch { /* ignore */ }
+
+    // Lookup business + item + owner for emails
+    try {
+      const [{ data: biz }, { data: itemRow }] = await Promise.all([
+        supabaseAdmin
+          .from("businesses")
+          .select("id, name, slug, owner_id, contact_email")
+          .eq("id", data.businessId)
+          .maybeSingle(),
+        supabaseAdmin
+          .from("business_bookable_items")
+          .select("title")
+          .eq("id", data.bookableItemId)
+          .maybeSingle(),
+      ]);
+
+      const serviceTitle = (itemRow as any)?.title ?? "Appointment";
+      const startsAtHuman = new Date(start.toISOString()).toLocaleString("en-PH", {
+        weekday: "short", month: "short", day: "numeric", year: "numeric",
+        hour: "numeric", minute: "2-digit", hour12: true,
+      });
+
+      // Customer confirmation / request
+      if (data.customerEmail) {
+        await enqueueTransactionalEmailServer({
+          templateName: "booking-customer",
+          recipientEmail: data.customerEmail,
+          idempotencyKey: `booking-customer-${(row as any).id}`,
+          templateData: {
+            customer_name: data.customerName.trim(),
+            business_name: (biz as any)?.name ?? "the shop",
+            business_slug: (biz as any)?.slug ?? "",
+            service_title: serviceTitle,
+            starts_at_human: startsAtHuman,
+            status,
+          },
+        });
+      }
+
+      // Owner notice — prefer contact_email, fall back to owner profile email
+      let ownerEmail: string | null = (biz as any)?.contact_email ?? null;
+      if (!ownerEmail && (biz as any)?.owner_id) {
+        const { data: u } = await supabaseAdmin.auth.admin.getUserById((biz as any).owner_id);
+        ownerEmail = (u as any)?.user?.email ?? null;
+      }
+      if (ownerEmail) {
+        await enqueueTransactionalEmailServer({
+          templateName: "booking-owner",
+          recipientEmail: ownerEmail,
+          idempotencyKey: `booking-owner-${(row as any).id}`,
+          templateData: {
+            business_name: (biz as any)?.name ?? "Your business",
+            business_id: data.businessId,
+            service_title: serviceTitle,
+            starts_at_human: startsAtHuman,
+            customer_name: data.customerName.trim(),
+            customer_phone: data.customerPhone?.trim() || null,
+            customer_email: data.customerEmail?.trim() || null,
+            notes: data.notes?.trim() || null,
+            status,
+          },
+        });
+      }
+    } catch (err) {
+      console.warn("[bookings] notification email failed", err);
+    }
+
     return { booking: row };
   });
+
 
 /* ---------- OWNER: bookable items CRUD ---------- */
 
