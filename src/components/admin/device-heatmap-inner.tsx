@@ -39,8 +39,7 @@ function HeatLayer({ data }: { data: Array<[number, number, number]> }) {
       layerRef.current = null;
     }
     if (!data.length) return;
-    // @ts-expect-error - leaflet.heat augments L at runtime
-    const layer = L.heatLayer(data, {
+    const layer = (L as any).heatLayer(data, {
       radius: 38,
       blur: 28,
       maxZoom: 10,
