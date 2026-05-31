@@ -69,43 +69,75 @@ function AdminAnalytics() {
   const [plans, setPlans] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [heatPoints, setHeatPoints] = useState<HeatPoint[]>([]);
+  const [heatPointsB, setHeatPointsB] = useState<HeatPoint[] | null>(null);
   const [days, setDays] = useState<7 | 30 | 90>(30);
+  const [compare, setCompare] = useState(false);
+  const [daysB, setDaysB] = useState<7 | 30 | 90>(30);
+
+  function aggregateEvents(rows: Array<{ meta: any }>): HeatPoint[] {
+    const agg = new Map<string, HeatPoint>();
+    for (const row of rows) {
+      const m = row.meta || {};
+      const region = (m.region as string) || null;
+      const city = (m.city as string) || null;
+      const device = (m.device as string) || null;
+      if (!region && !city) continue;
+      const key = `${region}|${city}|${device}`;
+      const cur = agg.get(key);
+      if (cur) cur.count += 1;
+      else agg.set(key, { region, city, device, count: 1 });
+    }
+    return [...agg.values()];
+  }
 
   useEffect(() => {
     (async () => {
       setLoading(true);
-      const since = new Date(Date.now() - days * 86400000).toISOString();
-      const [l, p, pay, s, pl, c, ev] = await Promise.all([
+      const nowMs = Date.now();
+      const sinceA = new Date(nowMs - days * 86400000).toISOString();
+      const queries: any[] = [
         supabase.from("listings").select("id,user_id,category_slug,region,province,city,status,plan,seller_type,view_count,price_php,created_at").limit(5000),
         supabase.from("profiles").select("id,seller_type,business_kind,verification_status,business_region,created_at").limit(5000),
         supabase.from("payments").select("amount_php,status,kind,created_at").limit(5000),
         supabase.from("subscriptions").select("plan_id,status,created_at").limit(5000),
         supabase.from("subscription_plans").select("id,name,price_php"),
         supabase.from("categories").select("slug,name"),
-        supabase.from("business_page_events").select("meta,occurred_at").gte("occurred_at", since).limit(10000),
-      ]);
+        supabase.from("business_page_events").select("meta,occurred_at").gte("occurred_at", sinceA).limit(10000),
+      ];
+      let bIndex = -1;
+      if (compare) {
+        // Range B = the period of `daysB` immediately preceding range A
+        const endB = new Date(nowMs - days * 86400000).toISOString();
+        const startB = new Date(nowMs - days * 86400000 - daysB * 86400000).toISOString();
+        bIndex = queries.length;
+        queries.push(
+          supabase
+            .from("business_page_events")
+            .select("meta,occurred_at")
+            .gte("occurred_at", startB)
+            .lt("occurred_at", endB)
+            .limit(10000),
+        );
+      }
+      const results = await Promise.all(queries);
+      const [l, p, pay, s, pl, c, ev] = results;
       setListings(l.data ?? []);
       setProfiles(p.data ?? []);
       setPayments(pay.data ?? []);
       setSubs(s.data ?? []);
       setPlans(pl.data ?? []);
       setCategories(c.data ?? []);
-      const agg = new Map<string, HeatPoint>();
-      for (const row of (ev.data ?? []) as Array<{ meta: any }>) {
-        const m = row.meta || {};
-        const region = (m.region as string) || null;
-        const city = (m.city as string) || null;
-        const device = (m.device as string) || null;
-        if (!region && !city) continue;
-        const key = `${region}|${city}|${device}`;
-        const cur = agg.get(key);
-        if (cur) cur.count += 1;
-        else agg.set(key, { region, city, device, count: 1 });
+      setHeatPoints(aggregateEvents((ev.data ?? []) as Array<{ meta: any }>));
+      if (compare && bIndex >= 0) {
+        const evB = results[bIndex];
+        setHeatPointsB(aggregateEvents((evB.data ?? []) as Array<{ meta: any }>));
+      } else {
+        setHeatPointsB(null);
       }
-      setHeatPoints([...agg.values()]);
       setLoading(false);
     })();
-  }, [days]);
+  }, [days, compare, daysB]);
+
 
   const catMap = useMemo(() => Object.fromEntries(categories.map((c) => [c.slug, c.name])), [categories]);
   const planMap = useMemo(() => Object.fromEntries(plans.map((p) => [p.id, p])), [plans]);
@@ -213,23 +245,60 @@ function AdminAnalytics() {
       </div>
 
       <Card title="Device locations heatmap — Philippines" icon={Smartphone}>
-        <div className="mb-3 flex flex-wrap gap-2">
-          {[7, 30, 90].map((d) => (
-            <button
-              key={d}
-              onClick={() => setDays(d as 7 | 30 | 90)}
-              className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                days === d
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-card text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Last {d} days
-            </button>
-          ))}
+        <div className="mb-3 flex flex-wrap items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-muted-foreground">{compare ? "Range A:" : "Range:"}</span>
+            {[7, 30, 90].map((d) => (
+              <button
+                key={d}
+                onClick={() => setDays(d as 7 | 30 | 90)}
+                className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                  days === d
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-card text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Last {d} days
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => setCompare((v) => !v)}
+            className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+              compare
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border bg-card text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            {compare ? "Compare: on" : "Compare ranges"}
+          </button>
+          {compare && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-medium text-muted-foreground">Range B (prior):</span>
+              {[7, 30, 90].map((d) => (
+                <button
+                  key={d}
+                  onClick={() => setDaysB(d as 7 | 30 | 90)}
+                  className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                    daysB === d
+                      ? "border-blue-600 bg-blue-600 text-white"
+                      : "border-border bg-card text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {d} days
+                </button>
+              ))}
+            </div>
+          )}
         </div>
-        <DeviceHeatmap points={heatPoints} />
+        <DeviceHeatmap
+          points={heatPoints}
+          pointsB={compare ? heatPointsB : null}
+          labelA={`Last ${days}d`}
+          labelB={`Prior ${daysB}d`}
+        />
       </Card>
+
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card title="Listings by category" icon={Tag}>
