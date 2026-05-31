@@ -129,6 +129,28 @@ export function GalleryTab({
     }
   };
 
+  const saveCaption = async (id: string) => {
+    try {
+      await updPhoto({ data: { businessId, id, caption: captionDraft.trim() || null } });
+      setCaptionFor(null);
+      setCaptionDraft("");
+      toast.success("Caption saved");
+      onChange();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    }
+  };
+
+  const setAsCover = async (albumId: string, url: string) => {
+    try {
+      await upsertAlbum({ data: { id: albumId, businessId, title: albums.find((a) => a.id === albumId)?.title ?? "", cover_url: url } });
+      toast.success("Cover updated");
+      onChange();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    }
+  };
+
   return (
     <Card className="space-y-4 p-4 md:p-5">
       <div className="flex items-center justify-between">
