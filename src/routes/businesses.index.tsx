@@ -211,7 +211,18 @@ function BusinessesIndex() {
               </Card>
             ) : (
               items.map((b) => (
-                <Link key={b.id} to="/businesses/$slug" params={{ slug: b.slug }}>
+                <Link
+                  key={b.id}
+                  to="/businesses/$slug"
+                  params={{ slug: b.slug }}
+                  search={{
+                    src: q.trim() ? "name_search" : (selectedTags.length > 0 || typeSlug ? "relevant_search" : "directory"),
+                    q: q.trim() || undefined,
+                    type: typeSlug || undefined,
+                    tags: selectedTags.length > 0 ? selectedTags.join(",") : undefined,
+                  } as any}
+                >
+
                   <Card className="flex items-start gap-3 p-3 transition hover:border-primary hover:shadow-sm">
                     <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted">
                       {b.logo_url ? <img src={b.logo_url} alt={b.name} className="h-full w-full object-cover" /> : <StoreIcon className="h-6 w-6 text-muted-foreground" />}
