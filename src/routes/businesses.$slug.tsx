@@ -474,12 +474,13 @@ function BusinessProfilePage() {
                     Pick a time that works for you — {(data as any).bookableItems.length} bookable service{(data as any).bookableItems.length === 1 ? "" : "s"}.
                   </p>
                 </div>
-                <Link to="/businesses/$slug/book" params={{ slug }}>
+                <Link to="/businesses/$slug/book" params={{ slug }} onClick={() => track("book_click")}>
                   <Button style={{ backgroundColor: accent || undefined }}>Book now</Button>
                 </Link>
               </div>
             </Card>
           )}
+
 
           {/* INQUIRY */}
           <Card id="inquiry" className="p-5">
