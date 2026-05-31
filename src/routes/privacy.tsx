@@ -122,6 +122,13 @@ function PrivacyPage() {
           <li><strong>Legitimate interest:</strong> securing the platform, preventing abuse, and
             improving the product.</li>
         </ul>
+        <p className="mt-3 text-sm text-muted-foreground">
+          <strong>Mini-site analytics:</strong> when you visit a public business page on 365 MotorSales, we record
+          aggregated events (page view, contact-channel click, share, booking click) so the business owner can see
+          how their page performs. We do not store IP addresses or personally identifying browser fingerprints
+          for this purpose; events are de-duplicated per browser session using a random identifier.
+        </p>
+
 
         <h2 className="mt-6 text-xl font-semibold">5. Sharing &amp; processors</h2>
         <p className="mt-2 text-muted-foreground">
