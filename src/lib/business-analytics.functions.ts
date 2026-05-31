@@ -112,6 +112,10 @@ export const getBusinessAnalytics = createServerFn({ method: "GET" })
     const byKind: Record<string, number> = {};
     const byDay: Record<string, { views: number; clicks: number; bookings: number }> = {};
     const bySource: Record<string, number> = {};
+    const byDevice: Record<string, number> = {};
+    const byCity: Record<string, number> = {};
+    const byRegion: Record<string, number> = {};
+    const byCountry: Record<string, number> = {};
     const topQueries: Record<string, number> = {};
 
     for (const e of events ?? []) {
@@ -124,6 +128,14 @@ export const getBusinessAnalytics = createServerFn({ method: "GET" })
         byDay[day].views += 1;
         const src = (typeof meta.source === "string" && meta.source) ? meta.source : "direct";
         bySource[src] = (bySource[src] ?? 0) + 1;
+        const device = (typeof meta.device === "string" && meta.device) ? meta.device : "unknown";
+        byDevice[device] = (byDevice[device] ?? 0) + 1;
+        const city = (typeof meta.city === "string" && meta.city.trim()) ? meta.city.trim() : null;
+        if (city) byCity[city] = (byCity[city] ?? 0) + 1;
+        const region = (typeof meta.region === "string" && meta.region.trim()) ? meta.region.trim() : null;
+        if (region) byRegion[region] = (byRegion[region] ?? 0) + 1;
+        const country = (typeof meta.country === "string" && meta.country.trim()) ? meta.country.trim().toUpperCase() : null;
+        if (country) byCountry[country] = (byCountry[country] ?? 0) + 1;
         if (typeof meta.query === "string" && meta.query.trim()) {
           const q = meta.query.trim().toLowerCase().slice(0, 64);
           topQueries[q] = (topQueries[q] ?? 0) + 1;
@@ -148,6 +160,19 @@ export const getBusinessAnalytics = createServerFn({ method: "GET" })
       .slice(0, 10)
       .map(([term, count]) => ({ term, count }));
 
+    const topCities = Object.entries(byCity)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([name, count]) => ({ name, count }));
+    const topRegions = Object.entries(byRegion)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([name, count]) => ({ name, count }));
+    const topCountries = Object.entries(byCountry)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([code, count]) => ({ code, count }));
+
     return {
       totalEvents: events?.length ?? 0,
       totalViews,
@@ -155,8 +180,13 @@ export const getBusinessAnalytics = createServerFn({ method: "GET" })
       conversionRate: Number(conversion.toFixed(2)),
       byKind,
       bySource,
+      byDevice,
+      topCities,
+      topRegions,
+      topCountries,
       topQueries: queries,
       series,
     };
   });
+
 
