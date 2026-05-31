@@ -69,10 +69,12 @@ function AdminAnalytics() {
   const [plans, setPlans] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [heatPoints, setHeatPoints] = useState<HeatPoint[]>([]);
+  const [days, setDays] = useState<7 | 30 | 90>(30);
 
   useEffect(() => {
     (async () => {
       setLoading(true);
+      const since = new Date(Date.now() - days * 86400000).toISOString();
       const [l, p, pay, s, pl, c, ev] = await Promise.all([
         supabase.from("listings").select("id,user_id,category_slug,region,province,city,status,plan,seller_type,view_count,price_php,created_at").limit(5000),
         supabase.from("profiles").select("id,seller_type,business_kind,verification_status,business_region,created_at").limit(5000),
@@ -80,7 +82,7 @@ function AdminAnalytics() {
         supabase.from("subscriptions").select("plan_id,status,created_at").limit(5000),
         supabase.from("subscription_plans").select("id,name,price_php"),
         supabase.from("categories").select("slug,name"),
-        supabase.from("business_page_events").select("meta").limit(10000),
+        supabase.from("business_page_events").select("meta,occurred_at").gte("occurred_at", since).limit(10000),
       ]);
       setListings(l.data ?? []);
       setProfiles(p.data ?? []);
@@ -103,7 +105,7 @@ function AdminAnalytics() {
       setHeatPoints([...agg.values()]);
       setLoading(false);
     })();
-  }, []);
+  }, [days]);
 
   const catMap = useMemo(() => Object.fromEntries(categories.map((c) => [c.slug, c.name])), [categories]);
   const planMap = useMemo(() => Object.fromEntries(plans.map((p) => [p.id, p])), [plans]);
@@ -211,6 +213,21 @@ function AdminAnalytics() {
       </div>
 
       <Card title="Device locations heatmap — Philippines" icon={Smartphone}>
+        <div className="mb-3 flex flex-wrap gap-2">
+          {[7, 30, 90].map((d) => (
+            <button
+              key={d}
+              onClick={() => setDays(d as 7 | 30 | 90)}
+              className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
+                days === d
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-card text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Last {d} days
+            </button>
+          ))}
+        </div>
         <DeviceHeatmap points={heatPoints} />
       </Card>
 
