@@ -83,18 +83,21 @@ export const Route = createFileRoute("/sitemap.xml")({
 
             const { data: businesses } = await (sb as any)
               .from("businesses")
-              .select("slug, updated_at")
+              .select("slug, vanity_slug, updated_at")
               .eq("status", "active")
               .order("updated_at", { ascending: false })
               .limit(5000);
             for (const b of businesses ?? []) {
+              // Prefer vanity short URL as canonical when set
+              const path = b.vanity_slug ? `/b/${b.vanity_slug}` : `/businesses/${b.slug}`;
               entries.push({
-                path: `/businesses/${b.slug}`,
+                path,
                 lastmod: b.updated_at?.slice(0, 10),
                 changefreq: "weekly",
                 priority: "0.6",
               });
             }
+
 
             const { data: rides } = await (sb as any)
               .from("rides")
