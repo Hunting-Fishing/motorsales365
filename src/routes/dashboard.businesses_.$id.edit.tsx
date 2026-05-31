@@ -15,6 +15,8 @@ import {
   deleteBusinessPost,
   updateInquiryStatus,
 } from "@/lib/business-pages.functions";
+import { setVanitySlug } from "@/lib/business-mini-site.functions";
+
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
