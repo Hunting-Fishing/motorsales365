@@ -125,14 +125,12 @@ function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
             availability: (data as any).availability ?? [],
           }}
           onJumpTab={(v) => {
-            const trigger = document.querySelector<HTMLButtonElement>(`[role="tab"][data-state][value="${v}"]`)
-              ?? document.querySelector<HTMLButtonElement>(`[role="tab"][value="${v}"]`);
-            trigger?.click();
+            if (validTabs.includes(v)) setActiveTab(v);
           }}
         />
       </div>
 
-      <Tabs defaultValue="profile" className="space-y-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="flex w-full overflow-x-auto">
           <TabsTrigger value="profile">Profile</TabsTrigger>
           <TabsTrigger value="tags">Tags</TabsTrigger>
