@@ -187,10 +187,117 @@ export function AnalyticsTab({ businessId }: { businessId: string }) {
         </Card>
       )}
 
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card className="p-4">
+          <h3 className="mb-1 font-display text-base font-semibold">Devices</h3>
+          <p className="mb-3 text-xs text-muted-foreground">What visitors used to view your page.</p>
+          {(() => {
+            const rows = Object.entries(a.byDevice ?? {})
+              .map(([k, v]) => ({ key: k, count: v as number, meta: DEVICE_LABELS[k] ?? DEVICE_LABELS.unknown }))
+              .filter((r) => r.count > 0)
+              .sort((x, y) => y.count - x.count);
+            if (rows.length === 0) return <p className="text-sm text-muted-foreground">No device info recorded yet.</p>;
+            const total = rows.reduce((acc, r) => acc + r.count, 0);
+            return (
+              <ul className="space-y-2">
+                {rows.map((r) => {
+                  const Icon = r.meta.icon;
+                  const pct = total > 0 ? Math.round((r.count / total) * 100) : 0;
+                  return (
+                    <li key={r.key} className="flex items-center gap-3">
+                      <Icon className="h-4 w-4 text-muted-foreground" />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="font-medium">{r.meta.label}</span>
+                          <span className="text-muted-foreground">{r.count} ({pct}%)</span>
+                        </div>
+                        <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                          <div className="h-full bg-primary" style={{ width: `${Math.min(100, pct)}%` }} />
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            );
+          })()}
+        </Card>
+
+        <Card className="p-4">
+          <h3 className="mb-1 font-display text-base font-semibold">Top locations</h3>
+          <p className="mb-3 text-xs text-muted-foreground">Where your visitors are browsing from.</p>
+          {(() => {
+            const cities = (a.topCities ?? []) as Array<{ name: string; count: number }>;
+            const regions = (a.topRegions ?? []) as Array<{ name: string; count: number }>;
+            const countries = (a.topCountries ?? []) as Array<{ code: string; count: number }>;
+            if (cities.length === 0 && regions.length === 0 && countries.length === 0) {
+              return <p className="text-sm text-muted-foreground">No location info recorded yet.</p>;
+            }
+            const totalCities = cities.reduce((acc, r) => acc + r.count, 0);
+            const totalRegions = regions.reduce((acc, r) => acc + r.count, 0);
+            return (
+              <div className="space-y-4">
+                {cities.length > 0 && (
+                  <div>
+                    <div className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      <MapPin className="h-3 w-3" /> Cities
+                    </div>
+                    <ul className="space-y-1">
+                      {cities.map((c) => {
+                        const pct = totalCities > 0 ? Math.round((c.count / totalCities) * 100) : 0;
+                        return (
+                          <li key={c.name} className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-1.5 text-sm">
+                            <span className="truncate font-medium">{c.name}</span>
+                            <span className="text-muted-foreground">{c.count} ({pct}%)</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+                {regions.length > 0 && (
+                  <div>
+                    <div className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      <Building2 className="h-3 w-3" /> Regions
+                    </div>
+                    <ul className="space-y-1">
+                      {regions.map((r) => {
+                        const pct = totalRegions > 0 ? Math.round((r.count / totalRegions) * 100) : 0;
+                        return (
+                          <li key={r.name} className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-1.5 text-sm">
+                            <span className="truncate font-medium">{r.name}</span>
+                            <span className="text-muted-foreground">{r.count} ({pct}%)</span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+                {countries.length > 0 && (
+                  <div>
+                    <div className="mb-1 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                      <Globe2 className="h-3 w-3" /> Countries
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {countries.map((c) => (
+                        <span key={c.code} className="rounded-md bg-muted/40 px-2 py-0.5 text-xs">
+                          {c.code} · {c.count}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+        </Card>
+      </div>
+
       <p className="text-xs text-muted-foreground">
         Stats cover the last {a.series.length} days. Page views are de-duplicated per browser session per business.
-        Sources are detected from referrer and link parameters — some visits may show as “Direct” when the browser hides referrer info.
+        Source is detected from referrer and link parameters; device and location are inferred from request headers — some visits may show as “Direct” or have no location when the browser hides this info.
       </p>
+
 
     </div>
   );
