@@ -257,3 +257,68 @@ export const deleteContactChannel = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+/* ============== VANITY SLUG ============== */
+
+export const setVanitySlug = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        businessId: z.string().uuid(),
+        vanitySlug: z
+          .string()
+          .min(3)
+          .max(32)
+          .regex(/^[a-z0-9]([a-z0-9-]{1,30})[a-z0-9]$/, "lowercase letters, numbers, and hyphens only (3–32 chars)")
+          .nullable(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertEditor(supabase, userId, data.businessId);
+
+    const slug = data.vanitySlug ? data.vanitySlug.toLowerCase().trim() : null;
+
+    // fetch current to log history if changing
+    const { data: current } = await supabase
+      .from("businesses")
+      .select("vanity_slug")
+      .eq("id", data.businessId)
+      .maybeSingle();
+    const oldSlug = (current as any)?.vanity_slug ?? null;
+    if (oldSlug === slug) return { ok: true, vanity_slug: slug };
+
+    if (slug) {
+      // reserved word check
+      const { data: reserved } = await supabase
+        .from("business_reserved_slugs")
+        .select("slug")
+        .eq("slug", slug)
+        .maybeSingle();
+      if (reserved) throw new Error("That URL is reserved. Please choose another.");
+
+      // uniqueness against vanity_slug AND canonical slug
+      const { data: existing } = await supabase
+        .from("businesses")
+        .select("id")
+        .or(`vanity_slug.eq.${slug},slug.eq.${slug}`)
+        .neq("id", data.businessId)
+        .limit(1);
+      if (existing && existing.length) throw new Error("That URL is already taken.");
+    }
+
+    const { error } = await supabase
+      .from("businesses")
+      .update({ vanity_slug: slug })
+      .eq("id", data.businessId);
+    if (error) throw new Error(error.message);
+
+    if (oldSlug) {
+      await supabase
+        .from("business_slug_history")
+        .insert({ business_id: data.businessId, old_slug: oldSlug, kind: "vanity_slug" });
+    }
+    return { ok: true, vanity_slug: slug };
+  });
