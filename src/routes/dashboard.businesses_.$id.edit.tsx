@@ -153,7 +153,9 @@ function EditBusinessPage() {
               </Badge>
             )}
           </TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
+
 
         <TabsContent value="profile">
           <ProfileTab biz={biz} userId={user.id} onSaved={refetch} />
