@@ -127,9 +127,62 @@ export function AnalyticsTab({ businessId }: { businessId: string }) {
         )}
       </Card>
 
+      <Card className="p-4">
+        <h3 className="mb-1 font-display text-base font-semibold">Where visitors came from</h3>
+        <p className="mb-3 text-xs text-muted-foreground">Traffic sources for the last {a.series.length} days.</p>
+        {(() => {
+          const rows = Object.entries(a.bySource ?? {})
+            .map(([k, v]) => ({ key: k, count: v as number, meta: SOURCE_LABELS[k] ?? { label: k, icon: Globe2, hint: "" } }))
+            .filter((r) => r.count > 0)
+            .sort((x, y) => y.count - x.count);
+          if (rows.length === 0) return <p className="text-sm text-muted-foreground">No view sources recorded yet.</p>;
+          const total = rows.reduce((acc, r) => acc + r.count, 0);
+          return (
+            <ul className="space-y-2">
+              {rows.map((r) => {
+                const Icon = r.meta.icon;
+                const pct = total > 0 ? Math.round((r.count / total) * 100) : 0;
+                return (
+                  <li key={r.key} className="flex items-start gap-3">
+                    <Icon className="mt-0.5 h-4 w-4 text-muted-foreground" />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-2 text-sm">
+                        <span className="font-medium">{r.meta.label}</span>
+                        <span className="text-muted-foreground">{r.count} ({pct}%)</span>
+                      </div>
+                      {r.meta.hint && <div className="text-[11px] text-muted-foreground">{r.meta.hint}</div>}
+                      <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
+                        <div className="h-full bg-primary" style={{ width: `${Math.min(100, pct)}%` }} />
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          );
+        })()}
+      </Card>
+
+      {Array.isArray(a.topQueries) && a.topQueries.length > 0 && (
+        <Card className="p-4">
+          <h3 className="mb-1 font-display text-base font-semibold">Top search terms</h3>
+          <p className="mb-3 text-xs text-muted-foreground">Search terms visitors used before landing on your page.</p>
+          <ul className="space-y-1">
+            {a.topQueries.map((q: { term: string; count: number }) => (
+              <li key={q.term} className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-1.5 text-sm">
+                <span className="truncate font-medium">{q.term}</span>
+                <span className="text-muted-foreground">{q.count}</span>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
+
       <p className="text-xs text-muted-foreground">
-        Stats cover the last 30 days. Page views are de-duplicated per browser session per business.
+        Stats cover the last {a.series.length} days. Page views are de-duplicated per browser session per business.
+        Sources are detected from referrer and link parameters — some visits may show as “Direct” when the browser hides referrer info.
       </p>
+
     </div>
   );
 }
