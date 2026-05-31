@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequestHeader } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
@@ -8,6 +9,15 @@ const EVENT_KINDS = [
   "contact_click", "share_click", "book_click", "book_created", "book_confirmed",
   "inquiry_submitted", "gallery_view", "video_play",
 ] as const;
+
+function classifyDevice(ua: string | null | undefined): "mobile" | "tablet" | "desktop" | "bot" | "unknown" {
+  if (!ua) return "unknown";
+  const s = ua.toLowerCase();
+  if (/bot|crawler|spider|crawling|facebookexternalhit|preview|slurp|wget|curl/.test(s)) return "bot";
+  if (/ipad|tablet|playbook|silk|(android(?!.*mobile))/.test(s)) return "tablet";
+  if (/mobi|iphone|ipod|android.*mobile|blackberry|opera mini|iemobile/.test(s)) return "mobile";
+  return "desktop";
+}
 
 /** Public — anyone (incl. guests) can record an event from a mini-site. */
 export const recordBusinessEvent = createServerFn({ method: "POST" })
@@ -23,15 +33,36 @@ export const recordBusinessEvent = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data }) => {
+    // Enrich meta with device + geo derived from request headers (server-only).
+    let enrichedMeta: Record<string, any> = { ...(data.meta ?? {}) };
+    try {
+      const ua = getRequestHeader("user-agent") ?? null;
+      const device = classifyDevice(ua);
+      // Cloudflare workers expose geo via these headers (and the cf object, not always available via getRequestHeader).
+      const city = (getRequestHeader("cf-ipcity") || getRequestHeader("x-vercel-ip-city") || "").trim() || null;
+      const region = (getRequestHeader("cf-region") || getRequestHeader("cf-region-code") || getRequestHeader("x-vercel-ip-country-region") || "").trim() || null;
+      const country = (getRequestHeader("cf-ipcountry") || getRequestHeader("x-vercel-ip-country") || "").trim() || null;
+      enrichedMeta = {
+        ...enrichedMeta,
+        device,
+        city: city ? city.slice(0, 64) : null,
+        region: region ? region.slice(0, 64) : null,
+        country: country ? country.slice(0, 4) : null,
+      };
+    } catch {
+      /* headers unavailable — fall back to raw meta */
+    }
+
     await supabaseAdmin.from("business_page_events").insert({
       business_id: data.businessId,
       kind: data.kind,
-      meta: data.meta ?? null,
+      meta: enrichedMeta,
       session_hash: data.sessionHash ?? null,
       referrer: data.referrer ?? null,
     } as any);
     return { ok: true };
   });
+
 
 async function assertEditor(supabase: any, userId: string, businessId: string) {
   const { data } = await supabase
