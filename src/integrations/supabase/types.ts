@@ -848,6 +848,44 @@ export type Database = {
           },
         ]
       }
+      business_page_events: {
+        Row: {
+          business_id: string
+          id: number
+          kind: string
+          meta: Json | null
+          occurred_at: string
+          referrer: string | null
+          session_hash: string | null
+        }
+        Insert: {
+          business_id: string
+          id?: number
+          kind: string
+          meta?: Json | null
+          occurred_at?: string
+          referrer?: string | null
+          session_hash?: string | null
+        }
+        Update: {
+          business_id?: string
+          id?: number
+          kind?: string
+          meta?: Json | null
+          occurred_at?: string
+          referrer?: string | null
+          session_hash?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_page_events_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_plans: {
         Row: {
           active: boolean
