@@ -29,10 +29,13 @@ import { ShareQr } from "@/components/share-qr";
 import { InquiryForm } from "@/components/business-page/inquiry-form";
 import { getBusinessPage } from "@/lib/business-pages.functions";
 import { PublicGallerySection, PublicContactSection, FeaturedVideoEmbed } from "@/components/business-page/public-sections";
+import { ShareButtons } from "@/components/business-page/share-buttons";
+import { useTrackBusinessEvent, useTrackPageView } from "@/lib/use-track-business-event";
 import {
   isStructuredHours, getStatus, legacyToRows, formatRange,
   DAY_KEYS, DAY_LABELS, type StructuredHours, type HoursStatus,
 } from "@/lib/business-hours";
+
 
 
 export const Route = createFileRoute("/businesses/$slug")({
