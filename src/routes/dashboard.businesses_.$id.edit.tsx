@@ -559,7 +559,68 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
         />
       </div>
 
+      <div className="space-y-3 rounded-lg border border-border p-3">
+        <div className="text-sm font-medium">Contact details</div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <Label>Phone</Label>
+            <Input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              maxLength={40}
+              placeholder="+63 9XX XXX XXXX"
+              className="h-11"
+            />
+          </div>
+          <div>
+            <Label>Email</Label>
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              maxLength={200}
+              placeholder="hello@yourbusiness.com"
+              className="h-11"
+            />
+          </div>
+          <div>
+            <Label>Website</Label>
+            <Input
+              type="url"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              maxLength={500}
+              placeholder="https://yourbusiness.com"
+              className="h-11"
+            />
+          </div>
+          <div>
+            <Label>Messenger URL</Label>
+            <Input
+              type="url"
+              value={messengerUrl}
+              onChange={(e) => setMessengerUrl(e.target.value)}
+              maxLength={500}
+              placeholder="https://m.me/yourpage"
+              className="h-11"
+            />
+          </div>
+        </div>
+        <div>
+          <Label>Brands carried (optional)</Label>
+          <Textarea
+            value={brandsCarried}
+            onChange={(e) => setBrandsCarried(e.target.value)}
+            rows={2}
+            maxLength={2000}
+            placeholder="Toyota, Honda, Mitsubishi, …"
+          />
+        </div>
+      </div>
+
       <VanitySlugField businessId={biz.id} currentVanity={biz.vanity_slug ?? null} currentSlug={biz.slug} />
+
 
 
 
