@@ -18,14 +18,14 @@ import { useCurrency } from "@/lib/currency";
 
 type ChecklistItem = { label: string; done: boolean; required: boolean };
 
-function buildChecklist(profile: any): ChecklistItem[] {
+function buildChecklist(profile: any, totpEnabled: boolean): ChecklistItem[] {
   const isBusiness = profile?.seller_type === "business" || profile?.seller_type === "dealer";
   const has = (v: any) => typeof v === "string" ? v.trim().length > 0 : !!v;
   const items: ChecklistItem[] = [
     { label: "First & last name", done: has(profile?.first_name) && has(profile?.last_name), required: true },
     { label: "Phone number", done: has(profile?.phone) || has(profile?.phone_e164), required: true },
     { label: "Profile photo", done: has(profile?.avatar_url), required: false },
-    { label: "Two-factor authentication (authenticator app)", done: false, required: false },
+    { label: "Two-factor authentication (authenticator app)", done: totpEnabled, required: false },
   ];
   if (isBusiness) {
     items.push(
@@ -44,6 +44,7 @@ export const Route = createFileRoute("/dashboard/profile")({
 function ProfilePage() {
   const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
+  const [totpEnabled, setTotpEnabled] = useState(false);
   const [saving, setSaving] = useState(false);
 
   // Profile phone (country + national)
@@ -84,6 +85,10 @@ function ProfilePage() {
       setProfile(data ?? {});
       const seed = data?.phone_e164 || data?.phone || "";
       setProfilePhone(parseE164(seed));
+    });
+    supabase.auth.mfa.listFactors().then(({ data }) => {
+      const verified = (data?.totp ?? []).some((f: any) => f.status === "verified");
+      setTotpEnabled(verified);
     });
   }, [user]);
 
@@ -133,7 +138,7 @@ function ProfilePage() {
   return (
     <div className="max-w-2xl">
       <h1 className="mb-6 font-display text-2xl font-bold">Profile</h1>
-      <ProfileCompletion profile={profile} />
+      <ProfileCompletion profile={profile} totpEnabled={totpEnabled} />
       {profile.is_founding_member && (
         <div className="mb-4 flex items-center gap-3 rounded-xl border border-amber-500/40 bg-amber-500/5 p-4">
           <span className="text-2xl">✨</span>
@@ -328,8 +333,8 @@ function CurrencyPreferenceCard() {
   );
 }
 
-function ProfileCompletion({ profile }: { profile: any }) {
-  const items = buildChecklist(profile);
+function ProfileCompletion({ profile, totpEnabled }: { profile: any; totpEnabled: boolean }) {
+  const items = buildChecklist(profile, totpEnabled);
   const required = items.filter((i) => i.required);
   const requiredDone = required.filter((i) => i.done).length;
   const totalDone = items.filter((i) => i.done).length;
