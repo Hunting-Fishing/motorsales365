@@ -116,6 +116,7 @@ function ShopCategory() {
 
       <div className="container mx-auto px-4 py-8 space-y-8">
         <BreadcrumbForCategory slug={category} />
+        <ShopifyStoreBanner />
 
 
         <div className="flex flex-wrap items-center justify-between gap-3">
