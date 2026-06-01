@@ -22,6 +22,8 @@ import { useDynamicMeta } from "@/hooks/use-dynamic-meta";
 import { useDynamicJsonLd } from "@/hooks/use-dynamic-jsonld";
 import { PhoneInput } from "@/components/phone-input";
 import { buildE164 } from "@/data/country-codes";
+import { WeekHoursEditor } from "@/components/business/hours-editor";
+import { emptyWeek, hasOpenDay, TZ, type WeekSchedule } from "@/lib/business-hours";
 
 export const Route = createFileRoute("/businesses/submit")({
   head: () => ({
