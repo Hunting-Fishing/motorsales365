@@ -155,6 +155,21 @@ export const Route = createFileRoute("/sitemap.xml")({
                 priority: "0.5",
               });
             }
+
+            const { data: courses } = await (sb as any)
+              .from("courses")
+              .select("slug, updated_at")
+              .eq("status", "published")
+              .order("updated_at", { ascending: false })
+              .limit(2000);
+            for (const c of courses ?? []) {
+              entries.push({
+                path: `/learn/${c.slug}`,
+                lastmod: c.updated_at?.slice(0, 10),
+                changefreq: "weekly",
+                priority: "0.6",
+              });
+            }
           }
         } catch (err) {
           console.warn("[sitemap] dynamic entries failed", err);
