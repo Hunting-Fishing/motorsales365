@@ -24,6 +24,8 @@ import { template as supportTicketReceived } from './support-ticket-received'
 import { template as supportTicketStaffNotice } from './support-ticket-staff-notice'
 import { template as bookingCustomer } from './booking-customer'
 import { template as bookingOwner } from './booking-owner'
+import { template as businessArchived } from './business-archived'
+import { template as businessRestored } from './business-restored'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'signup-welcome': signupWelcome,
@@ -41,5 +43,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'support-ticket-staff-notice': supportTicketStaffNotice,
   'booking-customer': bookingCustomer,
   'booking-owner': bookingOwner,
+  'business-archived': businessArchived,
+  'business-restored': businessRestored,
 }
 

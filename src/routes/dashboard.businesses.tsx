@@ -370,7 +370,7 @@ function MyBusinessesPage() {
                     variant="ghost"
                     className="text-muted-foreground hover:text-destructive"
                     onClick={() => {
-                      if (typeof window !== "undefined" && !window.confirm(`Archive "${b.name}"? It will be hidden from public search but you can restore it anytime.`)) return;
+                      if (typeof window !== "undefined" && !window.confirm(`Archive "${b.name}"?\n\nIt will be immediately hidden from:\n• Public search results\n• The directory map\n• Direct shared links (/businesses/… and /b/…)\n\nWe'll email you a confirmation. You can restore it anytime from this page.`)) return;
                       setStatus(b, "archived");
                     }}
                   >
