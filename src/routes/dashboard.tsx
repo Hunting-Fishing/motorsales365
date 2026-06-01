@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { LayoutGrid, Heart, MessageSquare, User as UserIcon, CreditCard, Bookmark, ShieldCheck, Truck, QrCode, Store, Shield, Car, ShoppingBag, ChevronDown, Check, Users, GraduationCap } from "lucide-react";
+import { LayoutGrid, Heart, MessageSquare, User as UserIcon, CreditCard, Bookmark, Search, ShieldCheck, Truck, QrCode, Store, Shield, Car, ShoppingBag, ChevronDown, Check, Users, GraduationCap } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { supabase } from "@/integrations/supabase/client";
@@ -18,7 +18,7 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean }[] = [
   { to: "/dashboard/shop-favorites", label: "Saved products", Icon: ShoppingBag },
   { to: "/dashboard/learning", label: "My learning", Icon: GraduationCap },
   { to: "/dashboard/likes", label: "Liked", Icon: Heart },
-  { to: "/dashboard/searches", label: "Saved searches", Icon: Bookmark },
+  { to: "/dashboard/searches", label: "Saved searches", Icon: Search },
   { to: "/dashboard/messages", label: "Messages", Icon: MessageSquare },
   { to: "/dashboard/tow", label: "Tow requests", Icon: Truck },
   { to: "/dashboard/businesses", label: "My businesses", Icon: Store },

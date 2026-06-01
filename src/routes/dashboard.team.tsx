@@ -1,4 +1,4 @@
-import { createFileRoute, Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -7,6 +7,7 @@ import { createOrganization } from "@/lib/organizations.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Building2, Users, Inbox, BarChart3, Plus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -21,7 +22,7 @@ function TeamLayout() {
     queryFn: () => fetchOrgs(),
   });
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const navigate = useNavigate();
+  const [createOpen, setCreateOpen] = useState(false);
 
   const [selectedOrgId, setSelectedOrgId] = useState<string | null>(null);
   useEffect(() => {
@@ -58,7 +59,7 @@ function TeamLayout() {
           </select>
         </div>
         <div className="ml-auto">
-          <Button variant="outline" size="sm" onClick={() => navigate({ to: "/dashboard/team", search: { create: 1 } as any })}>
+          <Button variant="outline" size="sm" onClick={() => setCreateOpen(true)}>
             <Plus className="mr-1 h-4 w-4" /> New team
           </Button>
         </div>
@@ -82,7 +83,62 @@ function TeamLayout() {
       </div>
 
       <Outlet />
+
+      <CreateOrgDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        onCreated={(id) => { setSelectedOrgId(id); refetch(); }}
+      />
     </div>
+  );
+}
+
+function CreateOrgDialog({ open, onOpenChange, onCreated }: {
+  open: boolean;
+  onOpenChange: (o: boolean) => void;
+  onCreated: (id: string) => void;
+}) {
+  const [name, setName] = useState("");
+  const [creating, setCreating] = useState(false);
+  const create = useServerFn(createOrganization);
+
+  const submit = async () => {
+    if (name.trim().length < 2) return;
+    setCreating(true);
+    try {
+      const res: any = await create({ data: { name: name.trim() } });
+      toast.success("Team created");
+      setName("");
+      onOpenChange(false);
+      if (res?.id) onCreated(res.id);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Could not create team");
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create a new team</DialogTitle>
+          <DialogDescription>Teams let you assign customer inquiries to sales reps and track who closes deals.</DialogDescription>
+        </DialogHeader>
+        <Input
+          placeholder="Team name (e.g. Quezon Auto)"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
+        />
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={creating}>Cancel</Button>
+          <Button onClick={submit} disabled={creating || name.trim().length < 2}>
+            {creating ? "Creating…" : "Create team"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
 

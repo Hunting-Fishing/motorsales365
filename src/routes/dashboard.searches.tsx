@@ -62,7 +62,7 @@ function SavedSearchesPage() {
                   <div>
                     <div className="font-semibold">{s.name}</div>
                     <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                      <Badge variant="secondary">{s.category_slug}</Badge>
+                      <Badge variant="secondary">{s.category_slug ?? "all categories"}</Badge>
                       {q.q && <span>“{q.q}”</span>}
                       {q.region && <span>· {q.region}</span>}
                       {(q.min || q.max) && (
@@ -77,7 +77,7 @@ function SavedSearchesPage() {
                     <Button asChild size="sm">
                       <Link
                         to="/browse/$category"
-                        params={{ category: s.category_slug ?? "car" }}
+                        params={{ category: s.category_slug || "all" }}
                         search={{
                           q: q.q ?? undefined,
                           region: q.region ?? undefined,
