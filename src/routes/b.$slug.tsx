@@ -46,7 +46,8 @@ export const Route = createFileRoute("/b/$slug")({
       }
     }
 
-    if (!biz) {
+    if (!biz || (biz as any).status !== "active") {
+      // Archived, hidden, pending or unknown → don't expose via direct link.
       throw redirect({ to: "/businesses" });
     }
     throw redirect({ to: "/businesses/$slug", params: { slug: (biz as any).slug } });
