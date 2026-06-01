@@ -91,7 +91,7 @@ function EditBusinessPage() {
 }
 
 function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
-  const validTabs = ["profile","tags","hours","services","products","gallery","contact","posts","bookings","inquiries","analytics"];
+  const validTabs = ["profile","location","tags","hours","services","products","gallery","contact","posts","bookings","inquiries","analytics"];
   const [activeTab, setActiveTab] = useState<string>("profile");
 
   return (
