@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { ShareQr } from "@/components/share-qr";
 import { BusinessPlanDialog } from "@/components/business-plan-dialog";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/dashboard/businesses")({
   component: MyBusinessesPage,
