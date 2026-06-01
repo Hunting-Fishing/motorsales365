@@ -13,6 +13,7 @@ import { VehicleFitmentPicker } from "@/components/shop/vehicle-fitment-picker";
 import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
 import { ShopFavoriteButton } from "@/components/shop/shop-favorite-button";
 import { ShopMobileCtaBar } from "@/components/shop/shop-mobile-cta-bar";
+import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
 
 import { useGarage, formatVehicle } from "@/lib/garage";
 import { X } from "lucide-react";
@@ -172,6 +173,7 @@ function ShopIndex() {
       </div>
 
       <div className="container mx-auto px-4 py-8 space-y-12">
+        <ShopifyStoreBanner />
         <AdCarousel placement="shop_top" />
 
         {departments.length > 0 && (

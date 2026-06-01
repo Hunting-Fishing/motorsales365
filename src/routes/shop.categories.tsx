@@ -5,6 +5,7 @@ import { listShopCategoryTree } from "@/lib/shop.functions";
 import { Badge } from "@/components/ui/badge";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ShopBreadcrumbs } from "@/components/shop/shop-breadcrumbs";
+import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
 
 export const Route = createFileRoute("/shop/categories")({
   component: ShopCategoriesIndex,
@@ -42,6 +43,8 @@ function ShopCategoriesIndex() {
             Browse every section of the shop, grouped by department. Click a department for the full lander, or jump straight to a category.
           </p>
         </header>
+
+        <ShopifyStoreBanner />
 
         {grouped.map(({ department, parents }) => (
           parents.length > 0 && (

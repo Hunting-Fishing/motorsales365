@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
 import { ShopMobileCtaBar } from "@/components/shop/shop-mobile-cta-bar";
 import { ShopBreadcrumbs } from "@/components/shop/shop-breadcrumbs";
+import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
 
 import { X } from "lucide-react";
 
@@ -115,6 +116,7 @@ function ShopCategory() {
 
       <div className="container mx-auto px-4 py-8 space-y-8">
         <BreadcrumbForCategory slug={category} />
+        <ShopifyStoreBanner />
 
 
         <div className="flex flex-wrap items-center justify-between gap-3">

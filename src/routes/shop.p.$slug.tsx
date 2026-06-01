@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, TrendingDown, Clock } from "lucide-react";
 import { ShopFavoriteButton } from "@/components/shop/shop-favorite-button";
+import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
 import { PriceSparkline } from "@/components/shop/price-sparkline";
 
 function getVisitorId(): string {
@@ -91,6 +92,8 @@ function ProductPage() {
             <Link to="/shop/$category" params={{ category: p.category.slug }} className="hover:text-foreground">{p.category.name}</Link>
           </>}
         </div>
+
+        <ShopifyStoreBanner />
 
         <div className="grid gap-8 md:grid-cols-2">
           <div>

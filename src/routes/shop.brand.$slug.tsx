@@ -6,6 +6,7 @@ import { SiteLayout } from "@/components/site-layout";
 import { listShopProducts, listShopCategories } from "@/lib/shop.functions";
 import { ProductGrid } from "./shop.index";
 import { ShopBreadcrumbs } from "@/components/shop/shop-breadcrumbs";
+import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
 import { Badge } from "@/components/ui/badge";
 import { useGarage, formatVehicle } from "@/lib/garage";
 
@@ -64,6 +65,8 @@ function BrandPage() {
           </div>
           {garage && <Badge variant="secondary">Filtered for: {formatVehicle(garage)}</Badge>}
         </header>
+
+        <ShopifyStoreBanner />
 
         <div className="flex flex-wrap items-center gap-2">
           <label className="text-xs text-muted-foreground">Category</label>

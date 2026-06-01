@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
 import { ShopBreadcrumbs } from "@/components/shop/shop-breadcrumbs";
+import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { X } from "lucide-react";
 
@@ -116,6 +117,7 @@ function DepartmentPage() {
           </div>
         )}
 
+        <ShopifyStoreBanner />
         <AdCarousel placement="shop_top" />
 
         {categories.length > 0 && (
