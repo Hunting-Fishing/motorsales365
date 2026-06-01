@@ -15,6 +15,27 @@ function fmtTime(min: number) {
   return `${pad(Math.floor(min / 60))}:${pad(min % 60)}`;
 }
 
+/** Subtract a set of blocked ranges from a set of open windows. Inputs are in minutes. */
+function subtractRanges(
+  windows: { start: number; end: number }[],
+  blocks: { start: number; end: number }[],
+): { start: number; end: number }[] {
+  let result = windows.map((w) => ({ ...w }));
+  for (const b of blocks) {
+    const next: { start: number; end: number }[] = [];
+    for (const w of result) {
+      if (b.end <= w.start || b.start >= w.end) {
+        next.push(w);
+        continue;
+      }
+      if (b.start > w.start) next.push({ start: w.start, end: Math.min(w.end, b.start) });
+      if (b.end < w.end) next.push({ start: Math.max(w.start, b.end), end: w.end });
+    }
+    result = next.filter((w) => w.end > w.start);
+  }
+  return result;
+}
+
 export function computeSlots(opts: {
   date: string; // YYYY-MM-DD local
   itemDurationMin: number;
@@ -27,17 +48,34 @@ export function computeSlots(opts: {
   leadTimeHours: number;
 }): { startsAtIso: string; label: string }[] {
   const [Y, M, D] = opts.date.split("-").map(Number);
-  const exc = opts.exceptions.find((e) => e.date === opts.date);
-  let windows: { start: number; end: number }[] = [];
-  if (exc) {
-    if (exc.closed) return [];
-    if (exc.start_time && exc.end_time) windows.push({ start: toMinutes(exc.start_time), end: toMinutes(exc.end_time) });
+  const excs = opts.exceptions.filter((e) => e.date === opts.date);
+
+  // Full-day closure short-circuits everything.
+  if (excs.some((e) => e.closed && !(e.start_time && e.end_time))) return [];
+
+  // "Open override" exceptions (closed=false + range) replace the day's windows.
+  const overrides = excs
+    .filter((e) => !e.closed && e.start_time && e.end_time)
+    .map((e) => ({ start: toMinutes(e.start_time!), end: toMinutes(e.end_time!) }));
+
+  let windows: { start: number; end: number }[];
+  if (overrides.length > 0) {
+    windows = overrides;
   } else {
     const dow = new Date(Y, M - 1, D).getDay();
     windows = opts.availability
       .filter((a) => a.weekday === dow)
       .map((a) => ({ start: toMinutes(a.start_time), end: toMinutes(a.end_time) }));
   }
+
+  // "Partial block" exceptions (closed=true + range) subtract from windows.
+  const blocks = excs
+    .filter((e) => e.closed && e.start_time && e.end_time)
+    .map((e) => ({ start: toMinutes(e.start_time!), end: toMinutes(e.end_time!) }));
+  if (blocks.length > 0) {
+    windows = subtractRanges(windows, blocks);
+  }
+
   if (windows.length === 0) return [];
 
   const step = opts.itemDurationMin + opts.itemBufferMin;
