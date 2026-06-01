@@ -37,6 +37,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as RidesIndexRouteImport } from './routes/rides.index'
+import { Route as LearnIndexRouteImport } from './routes/learn.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as BusinessesIndexRouteImport } from './routes/businesses.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -262,6 +263,11 @@ const ShopIndexRoute = ShopIndexRouteImport.update({
 const RidesIndexRoute = RidesIndexRouteImport.update({
   id: '/rides/',
   path: '/rides/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnIndexRoute = LearnIndexRouteImport.update({
+  id: '/learn/',
+  path: '/learn/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
@@ -787,6 +793,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/learn/': typeof LearnIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop/': typeof ShopIndexRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
@@ -900,6 +907,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/businesses': typeof BusinessesIndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/learn': typeof LearnIndexRoute
   '/rides': typeof RidesIndexRoute
   '/shop': typeof ShopIndexRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
@@ -1017,6 +1025,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/learn/': typeof LearnIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop/': typeof ShopIndexRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
@@ -1135,6 +1144,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
+    | '/learn/'
     | '/rides/'
     | '/shop/'
     | '/admin/redemptions/$staffId'
@@ -1248,6 +1258,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/businesses'
     | '/dashboard'
+    | '/learn'
     | '/rides'
     | '/shop'
     | '/admin/redemptions/$staffId'
@@ -1364,6 +1375,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
+    | '/learn/'
     | '/rides/'
     | '/shop/'
     | '/admin/redemptions_/$staffId'
@@ -1446,6 +1458,7 @@ export interface RootRouteChildren {
   SupportBuyingRoute: typeof SupportBuyingRoute
   SupportSellingRoute: typeof SupportSellingRoute
   BusinessesIndexRoute: typeof BusinessesIndexRoute
+  LearnIndexRoute: typeof LearnIndexRoute
   RidesIndexRoute: typeof RidesIndexRoute
   ShopIndexRoute: typeof ShopIndexRoute
   ApiAdminCreateUserRoute: typeof ApiAdminCreateUserRoute
@@ -1661,6 +1674,13 @@ declare module '@tanstack/react-router' {
       path: '/rides'
       fullPath: '/rides/'
       preLoaderRoute: typeof RidesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn/': {
+      id: '/learn/'
+      path: '/learn'
+      fullPath: '/learn/'
+      preLoaderRoute: typeof LearnIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard/': {
@@ -2488,6 +2508,7 @@ const rootRouteChildren: RootRouteChildren = {
   SupportBuyingRoute: SupportBuyingRoute,
   SupportSellingRoute: SupportSellingRoute,
   BusinessesIndexRoute: BusinessesIndexRoute,
+  LearnIndexRoute: LearnIndexRoute,
   RidesIndexRoute: RidesIndexRoute,
   ShopIndexRoute: ShopIndexRoute,
   ApiAdminCreateUserRoute: ApiAdminCreateUserRoute,

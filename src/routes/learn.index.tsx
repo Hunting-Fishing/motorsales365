@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { GraduationCap, Clock, Search, Sparkles } from "lucide-react";
 import { listCourses, listCourseCategories } from "@/lib/education.functions";
 
-export const Route = createFileRoute("/learn")({
+export const Route = createFileRoute("/learn/")({
   head: () => ({
     meta: [
       { title: "365 Learn — Auto repair, detailing & business courses" },
