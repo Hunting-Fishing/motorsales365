@@ -344,6 +344,10 @@ export const upsertException = createServerFn({ method: "POST" })
         end_time: z.string().regex(/^\d{2}:\d{2}$/).nullable().optional(),
         note: z.string().max(200).nullable().optional(),
       })
+      .refine(
+        (v) => (v.start_time && v.end_time ? v.end_time > v.start_time : !v.start_time && !v.end_time),
+        { message: "Time range must include both start and end, and end must be after start." },
+      )
       .parse(input),
   )
   .handler(async ({ data, context }) => {
