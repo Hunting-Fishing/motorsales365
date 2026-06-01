@@ -275,6 +275,52 @@ async function activateBoostFromSession(env: StripeEnv, session: Stripe.Checkout
     .eq("id", listingId);
 }
 
+async function enrollCourseFromSession(env: StripeEnv, session: Stripe.Checkout.Session) {
+  const meta = session.metadata || {};
+  const userId = meta.userId as string | undefined;
+  const courseId = meta.courseId as string | undefined;
+  if (!userId || !courseId) {
+    console.error("[webhook] course session missing metadata", session.id);
+    return;
+  }
+  // Idempotent insert: unique(user_id, course_id) handles duplicate webhooks
+  const reference = `stripe_session:${session.id}`;
+  const { data: existingPayment } = await supabaseAdmin
+    .from("payments")
+    .select("id")
+    .eq("reference", reference)
+    .maybeSingle();
+  let paymentId: string | null = (existingPayment as any)?.id ?? null;
+  if (!paymentId) {
+    const { data: payRow } = await supabaseAdmin
+      .from("payments")
+      .insert({
+        user_id: userId,
+        kind: "course" as any,
+        status: "paid" as any,
+        amount_php: (session.amount_total ?? 0) / 100,
+        method: "stripe",
+        reference,
+        paid_at: new Date().toISOString(),
+      } as any)
+      .select("id")
+      .maybeSingle();
+    paymentId = (payRow as any)?.id ?? null;
+  }
+  await supabaseAdmin
+    .from("course_enrollments")
+    .upsert(
+      {
+        user_id: userId,
+        course_id: courseId,
+        source: "purchase",
+        payment_id: paymentId,
+        stripe_session_id: session.id,
+      },
+      { onConflict: "user_id,course_id" },
+    );
+}
+
 async function handleEvent(env: StripeEnv, event: Stripe.Event) {
   switch (event.type) {
     case "customer.subscription.created":
@@ -287,6 +333,10 @@ async function handleEvent(env: StripeEnv, event: Stripe.Event) {
       const session = event.data.object as Stripe.Checkout.Session;
       if (session.metadata?.kind === "boost") {
         await activateBoostFromSession(env, session);
+        break;
+      }
+      if (session.metadata?.kind === "course") {
+        await enrollCourseFromSession(env, session);
         break;
       }
       if (session.mode === "subscription" && session.subscription) {

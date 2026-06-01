@@ -29,6 +29,15 @@ function RefundPage() {
         <h2 className="mt-6 text-xl font-semibold">Subscriptions</h2>
         <p className="mt-2 text-muted-foreground">Monthly and annual plans renew automatically. You may cancel anytime from your dashboard. Cancellation stops future charges but does not refund the current billing period.</p>
 
+        <h2 className="mt-6 text-xl font-semibold">365 Learn course purchases</h2>
+        <p className="mt-2 text-muted-foreground">One-time course purchases are refundable within <strong>7 days of purchase</strong> provided you have completed less than <strong>20%</strong> of the course lessons and have not been issued a certificate. After either threshold is crossed, the purchase is non-refundable since the educational content has been substantially delivered. Courses unlocked via a subscription are not separately refundable — cancel the subscription instead.</p>
+
+        <h2 className="mt-6 text-xl font-semibold">Partner Training schools</h2>
+        <p className="mt-2 text-muted-foreground">Payments made directly to a sponsored Partner Training school are <strong>not</strong> processed by 365 MotorSales and are governed solely by that school's own refund policy. We cannot refund or mediate fees paid to third parties.</p>
+
+        <p className="mt-6 text-xs text-muted-foreground">Last updated: June 1, 2026 (rev. education portal)</p>
+
+
         <h2 className="mt-6 text-xl font-semibold">How to request</h2>
         <p className="mt-2 text-muted-foreground">Email <a className="text-primary underline" href="mailto:billing@365motorsales.ph">billing@365motorsales.ph</a> with your account email, the transaction date, and a brief explanation. We respond within 3 business days.</p>
       </article>

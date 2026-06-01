@@ -22,6 +22,7 @@ import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PaymentsRouteImport } from './routes/payments'
+import { Route as PartnerTrainingRouteImport } from './routes/partner-training'
 import { Route as MyQrRouteImport } from './routes/my-qr'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as LoginRouteImport } from './routes/login'
@@ -37,6 +38,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as RidesIndexRouteImport } from './routes/rides.index'
+import { Route as LearnIndexRouteImport } from './routes/learn.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as BusinessesIndexRouteImport } from './routes/businesses.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -52,6 +54,7 @@ import { Route as RidesSlugRouteImport } from './routes/rides.$slug'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as PassportSlugRouteImport } from './routes/passport.$slug'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
+import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
 import { Route as InvitesTokenRouteImport } from './routes/invites.$token'
 import { Route as GoProductIdRouteImport } from './routes/go.$productId'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
@@ -66,10 +69,12 @@ import { Route as DashboardReferralRouteImport } from './routes/dashboard.referr
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
 import { Route as DashboardMessagesRouteImport } from './routes/dashboard.messages'
 import { Route as DashboardLikesRouteImport } from './routes/dashboard.likes'
+import { Route as DashboardLearningRouteImport } from './routes/dashboard.learning'
 import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favorites'
 import { Route as DashboardBusinessesRouteImport } from './routes/dashboard.businesses'
 import { Route as DashboardBillingRouteImport } from './routes/dashboard.billing'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
+import { Route as CCodeRouteImport } from './routes/c.$code'
 import { Route as BusinessesSubmitRouteImport } from './routes/businesses.submit'
 import { Route as BusinessesSlugRouteImport } from './routes/businesses.$slug'
 import { Route as BusinessCheckoutRouteImport } from './routes/business.checkout'
@@ -89,6 +94,7 @@ import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
 import { Route as AdminInquiriesRouteImport } from './routes/admin.inquiries'
+import { Route as AdminEducationRouteImport } from './routes/admin.education'
 import { Route as AdminCurrenciesRouteImport } from './routes/admin.currencies'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
@@ -117,12 +123,14 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as LearnSlugWatchLessonIdRouteImport } from './routes/learn_.$slug.watch.$lessonId'
 import { Route as DashboardTeamLeadsIdRouteImport } from './routes/dashboard.team.leads_.$id'
 import { Route as DashboardRidesIdEditRouteImport } from './routes/dashboard.rides_.$id.edit'
 import { Route as DashboardBusinessesIdEditRouteImport } from './routes/dashboard.businesses_.$id.edit'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksRefreshLazadaRouteImport } from './routes/api/public/hooks/refresh-lazada'
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
+import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: '/verify-email',
@@ -187,6 +195,11 @@ const PricingRoute = PricingRouteImport.update({
 const PaymentsRoute = PaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartnerTrainingRoute = PartnerTrainingRouteImport.update({
+  id: '/partner-training',
+  path: '/partner-training',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MyQrRoute = MyQrRouteImport.update({
@@ -264,6 +277,11 @@ const RidesIndexRoute = RidesIndexRouteImport.update({
   path: '/rides/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LearnIndexRoute = LearnIndexRouteImport.update({
+  id: '/learn/',
+  path: '/learn/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -339,6 +357,11 @@ const ListingIdRoute = ListingIdRouteImport.update({
   path: '/listing/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LearnSlugRoute = LearnSlugRouteImport.update({
+  id: '/learn/$slug',
+  path: '/learn/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InvitesTokenRoute = InvitesTokenRouteImport.update({
   id: '/invites/$token',
   path: '/invites/$token',
@@ -409,6 +432,11 @@ const DashboardLikesRoute = DashboardLikesRouteImport.update({
   path: '/likes',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardLearningRoute = DashboardLearningRouteImport.update({
+  id: '/learning',
+  path: '/learning',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardFavoritesRoute = DashboardFavoritesRouteImport.update({
   id: '/favorites',
   path: '/favorites',
@@ -427,6 +455,11 @@ const DashboardBillingRoute = DashboardBillingRouteImport.update({
 const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
   id: '/checkout/return',
   path: '/checkout/return',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CCodeRoute = CCodeRouteImport.update({
+  id: '/c/$code',
+  path: '/c/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BusinessesSubmitRoute = BusinessesSubmitRouteImport.update({
@@ -522,6 +555,11 @@ const AdminListingsRoute = AdminListingsRouteImport.update({
 const AdminInquiriesRoute = AdminInquiriesRouteImport.update({
   id: '/inquiries',
   path: '/inquiries',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminEducationRoute = AdminEducationRouteImport.update({
+  id: '/education',
+  path: '/education',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminCurrenciesRoute = AdminCurrenciesRouteImport.update({
@@ -668,6 +706,11 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LearnSlugWatchLessonIdRoute = LearnSlugWatchLessonIdRouteImport.update({
+  id: '/learn_/$slug/watch/$lessonId',
+  path: '/learn/$slug/watch/$lessonId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardTeamLeadsIdRoute = DashboardTeamLeadsIdRouteImport.update({
   id: '/leads_/$id',
   path: '/leads/$id',
@@ -701,6 +744,12 @@ const ApiPublicFxRefreshRoute = ApiPublicFxRefreshRouteImport.update({
   path: '/api/public/fx/refresh',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicTrainingPartnersIdClickRoute =
+  ApiPublicTrainingPartnersIdClickRouteImport.update({
+    id: '/api/public/training-partners/$id/click',
+    path: '/api/public/training-partners/$id/click',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -716,6 +765,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
   '/my-qr': typeof MyQrRoute
+  '/partner-training': typeof PartnerTrainingRoute
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -735,6 +785,7 @@ export interface FileRoutesByFullPath {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
+  '/admin/education': typeof AdminEducationRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -754,10 +805,12 @@ export interface FileRoutesByFullPath {
   '/business/checkout': typeof BusinessCheckoutRoute
   '/businesses/$slug': typeof BusinessesSlugRouteWithChildren
   '/businesses/submit': typeof BusinessesSubmitRoute
+  '/c/$code': typeof CCodeRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
+  '/dashboard/learning': typeof DashboardLearningRoute
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
@@ -772,6 +825,7 @@ export interface FileRoutesByFullPath {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/go/$productId': typeof GoProductIdRoute
   '/invites/$token': typeof InvitesTokenRoute
+  '/learn/$slug': typeof LearnSlugRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
@@ -787,6 +841,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/learn/': typeof LearnIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop/': typeof ShopIndexRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
@@ -812,11 +867,13 @@ export interface FileRoutesByFullPath {
   '/dashboard/businesses/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
   '/dashboard/team/leads/$id': typeof DashboardTeamLeadsIdRoute
+  '/learn/$slug/watch/$lessonId': typeof LearnSlugWatchLessonIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -830,6 +887,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
   '/my-qr': typeof MyQrRoute
+  '/partner-training': typeof PartnerTrainingRoute
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -849,6 +907,7 @@ export interface FileRoutesByTo {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
+  '/admin/education': typeof AdminEducationRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -868,10 +927,12 @@ export interface FileRoutesByTo {
   '/business/checkout': typeof BusinessCheckoutRoute
   '/businesses/$slug': typeof BusinessesSlugRouteWithChildren
   '/businesses/submit': typeof BusinessesSubmitRoute
+  '/c/$code': typeof CCodeRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
+  '/dashboard/learning': typeof DashboardLearningRoute
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
@@ -885,6 +946,7 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/go/$productId': typeof GoProductIdRoute
   '/invites/$token': typeof InvitesTokenRoute
+  '/learn/$slug': typeof LearnSlugRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
@@ -900,6 +962,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/businesses': typeof BusinessesIndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/learn': typeof LearnIndexRoute
   '/rides': typeof RidesIndexRoute
   '/shop': typeof ShopIndexRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
@@ -925,11 +988,13 @@ export interface FileRoutesByTo {
   '/dashboard/businesses/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
   '/dashboard/team/leads/$id': typeof DashboardTeamLeadsIdRoute
+  '/learn/$slug/watch/$lessonId': typeof LearnSlugWatchLessonIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -946,6 +1011,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
   '/my-qr': typeof MyQrRoute
+  '/partner-training': typeof PartnerTrainingRoute
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -965,6 +1031,7 @@ export interface FileRoutesById {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
+  '/admin/education': typeof AdminEducationRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -984,10 +1051,12 @@ export interface FileRoutesById {
   '/business/checkout': typeof BusinessCheckoutRoute
   '/businesses/$slug': typeof BusinessesSlugRouteWithChildren
   '/businesses/submit': typeof BusinessesSubmitRoute
+  '/c/$code': typeof CCodeRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
+  '/dashboard/learning': typeof DashboardLearningRoute
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
@@ -1002,6 +1071,7 @@ export interface FileRoutesById {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/go/$productId': typeof GoProductIdRoute
   '/invites/$token': typeof InvitesTokenRoute
+  '/learn/$slug': typeof LearnSlugRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
@@ -1017,6 +1087,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/learn/': typeof LearnIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop/': typeof ShopIndexRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
@@ -1042,11 +1113,13 @@ export interface FileRoutesById {
   '/dashboard/businesses_/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides_/$id/edit': typeof DashboardRidesIdEditRoute
   '/dashboard/team/leads_/$id': typeof DashboardTeamLeadsIdRoute
+  '/learn_/$slug/watch/$lessonId': typeof LearnSlugWatchLessonIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1064,6 +1137,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/map'
     | '/my-qr'
+    | '/partner-training'
     | '/payments'
     | '/pricing'
     | '/privacy'
@@ -1083,6 +1157,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/businesses'
     | '/admin/currencies'
+    | '/admin/education'
     | '/admin/inquiries'
     | '/admin/listings'
     | '/admin/performance'
@@ -1102,10 +1177,12 @@ export interface FileRouteTypes {
     | '/business/checkout'
     | '/businesses/$slug'
     | '/businesses/submit'
+    | '/c/$code'
     | '/checkout/return'
     | '/dashboard/billing'
     | '/dashboard/businesses'
     | '/dashboard/favorites'
+    | '/dashboard/learning'
     | '/dashboard/likes'
     | '/dashboard/messages'
     | '/dashboard/profile'
@@ -1120,6 +1197,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/go/$productId'
     | '/invites/$token'
+    | '/learn/$slug'
     | '/listing/$id'
     | '/passport/$slug'
     | '/r/$code'
@@ -1135,6 +1213,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
+    | '/learn/'
     | '/rides/'
     | '/shop/'
     | '/admin/redemptions/$staffId'
@@ -1160,11 +1239,13 @@ export interface FileRouteTypes {
     | '/dashboard/businesses/$id/edit'
     | '/dashboard/rides/$id/edit'
     | '/dashboard/team/leads/$id'
+    | '/learn/$slug/watch/$lessonId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/api/public/training-partners/$id/click'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1178,6 +1259,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/map'
     | '/my-qr'
+    | '/partner-training'
     | '/payments'
     | '/pricing'
     | '/privacy'
@@ -1197,6 +1279,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/businesses'
     | '/admin/currencies'
+    | '/admin/education'
     | '/admin/inquiries'
     | '/admin/listings'
     | '/admin/performance'
@@ -1216,10 +1299,12 @@ export interface FileRouteTypes {
     | '/business/checkout'
     | '/businesses/$slug'
     | '/businesses/submit'
+    | '/c/$code'
     | '/checkout/return'
     | '/dashboard/billing'
     | '/dashboard/businesses'
     | '/dashboard/favorites'
+    | '/dashboard/learning'
     | '/dashboard/likes'
     | '/dashboard/messages'
     | '/dashboard/profile'
@@ -1233,6 +1318,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/go/$productId'
     | '/invites/$token'
+    | '/learn/$slug'
     | '/listing/$id'
     | '/passport/$slug'
     | '/r/$code'
@@ -1248,6 +1334,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/businesses'
     | '/dashboard'
+    | '/learn'
     | '/rides'
     | '/shop'
     | '/admin/redemptions/$staffId'
@@ -1273,11 +1360,13 @@ export interface FileRouteTypes {
     | '/dashboard/businesses/$id/edit'
     | '/dashboard/rides/$id/edit'
     | '/dashboard/team/leads/$id'
+    | '/learn/$slug/watch/$lessonId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/api/public/training-partners/$id/click'
   id:
     | '__root__'
     | '/'
@@ -1293,6 +1382,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/map'
     | '/my-qr'
+    | '/partner-training'
     | '/payments'
     | '/pricing'
     | '/privacy'
@@ -1312,6 +1402,7 @@ export interface FileRouteTypes {
     | '/admin/audit'
     | '/admin/businesses'
     | '/admin/currencies'
+    | '/admin/education'
     | '/admin/inquiries'
     | '/admin/listings'
     | '/admin/performance'
@@ -1331,10 +1422,12 @@ export interface FileRouteTypes {
     | '/business/checkout'
     | '/businesses/$slug'
     | '/businesses/submit'
+    | '/c/$code'
     | '/checkout/return'
     | '/dashboard/billing'
     | '/dashboard/businesses'
     | '/dashboard/favorites'
+    | '/dashboard/learning'
     | '/dashboard/likes'
     | '/dashboard/messages'
     | '/dashboard/profile'
@@ -1349,6 +1442,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/go/$productId'
     | '/invites/$token'
+    | '/learn/$slug'
     | '/listing/$id'
     | '/passport/$slug'
     | '/r/$code'
@@ -1364,6 +1458,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
+    | '/learn/'
     | '/rides/'
     | '/shop/'
     | '/admin/redemptions_/$staffId'
@@ -1389,11 +1484,13 @@ export interface FileRouteTypes {
     | '/dashboard/businesses_/$id/edit'
     | '/dashboard/rides_/$id/edit'
     | '/dashboard/team/leads_/$id'
+    | '/learn_/$slug/watch/$lessonId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/api/public/training-partners/$id/click'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1410,6 +1507,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   MapRoute: typeof MapRoute
   MyQrRoute: typeof MyQrRoute
+  PartnerTrainingRoute: typeof PartnerTrainingRoute
   PaymentsRoute: typeof PaymentsRouteWithChildren
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -1430,10 +1528,12 @@ export interface RootRouteChildren {
   BusinessCheckoutRoute: typeof BusinessCheckoutRoute
   BusinessesSlugRoute: typeof BusinessesSlugRouteWithChildren
   BusinessesSubmitRoute: typeof BusinessesSubmitRoute
+  CCodeRoute: typeof CCodeRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   GoProductIdRoute: typeof GoProductIdRoute
   InvitesTokenRoute: typeof InvitesTokenRoute
+  LearnSlugRoute: typeof LearnSlugRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   PassportSlugRoute: typeof PassportSlugRoute
   RCodeRoute: typeof RCodeRouteWithChildren
@@ -1446,6 +1546,7 @@ export interface RootRouteChildren {
   SupportBuyingRoute: typeof SupportBuyingRoute
   SupportSellingRoute: typeof SupportSellingRoute
   BusinessesIndexRoute: typeof BusinessesIndexRoute
+  LearnIndexRoute: typeof LearnIndexRoute
   RidesIndexRoute: typeof RidesIndexRoute
   ShopIndexRoute: typeof ShopIndexRoute
   ApiAdminCreateUserRoute: typeof ApiAdminCreateUserRoute
@@ -1458,11 +1559,13 @@ export interface RootRouteChildren {
   ApiPublicFxRefreshRoute: typeof ApiPublicFxRefreshRoute
   ApiPublicHooksRefreshLazadaRoute: typeof ApiPublicHooksRefreshLazadaRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
+  LearnSlugWatchLessonIdRoute: typeof LearnSlugWatchLessonIdRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
   LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
+  ApiPublicTrainingPartnersIdClickRoute: typeof ApiPublicTrainingPartnersIdClickRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1556,6 +1659,13 @@ declare module '@tanstack/react-router' {
       path: '/payments'
       fullPath: '/payments'
       preLoaderRoute: typeof PaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/partner-training': {
+      id: '/partner-training'
+      path: '/partner-training'
+      fullPath: '/partner-training'
+      preLoaderRoute: typeof PartnerTrainingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/my-qr': {
@@ -1663,6 +1773,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RidesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/learn/': {
+      id: '/learn/'
+      path: '/learn'
+      fullPath: '/learn/'
+      preLoaderRoute: typeof LearnIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/': {
       id: '/dashboard/'
       path: '/'
@@ -1768,6 +1885,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ListingIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/learn/$slug': {
+      id: '/learn/$slug'
+      path: '/learn/$slug'
+      fullPath: '/learn/$slug'
+      preLoaderRoute: typeof LearnSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/invites/$token': {
       id: '/invites/$token'
       path: '/invites/$token'
@@ -1866,6 +1990,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardLikesRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/learning': {
+      id: '/dashboard/learning'
+      path: '/learning'
+      fullPath: '/dashboard/learning'
+      preLoaderRoute: typeof DashboardLearningRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/favorites': {
       id: '/dashboard/favorites'
       path: '/favorites'
@@ -1892,6 +2023,13 @@ declare module '@tanstack/react-router' {
       path: '/checkout/return'
       fullPath: '/checkout/return'
       preLoaderRoute: typeof CheckoutReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/c/$code': {
+      id: '/c/$code'
+      path: '/c/$code'
+      fullPath: '/c/$code'
+      preLoaderRoute: typeof CCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/businesses/submit': {
@@ -2025,6 +2163,13 @@ declare module '@tanstack/react-router' {
       path: '/inquiries'
       fullPath: '/admin/inquiries'
       preLoaderRoute: typeof AdminInquiriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/education': {
+      id: '/admin/education'
+      path: '/education'
+      fullPath: '/admin/education'
+      preLoaderRoute: typeof AdminEducationRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/currencies': {
@@ -2223,6 +2368,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/learn_/$slug/watch/$lessonId': {
+      id: '/learn_/$slug/watch/$lessonId'
+      path: '/learn/$slug/watch/$lessonId'
+      fullPath: '/learn/$slug/watch/$lessonId'
+      preLoaderRoute: typeof LearnSlugWatchLessonIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/team/leads_/$id': {
       id: '/dashboard/team/leads_/$id'
       path: '/leads/$id'
@@ -2265,6 +2417,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicFxRefreshRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/training-partners/$id/click': {
+      id: '/api/public/training-partners/$id/click'
+      path: '/api/public/training-partners/$id/click'
+      fullPath: '/api/public/training-partners/$id/click'
+      preLoaderRoute: typeof ApiPublicTrainingPartnersIdClickRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -2275,6 +2434,7 @@ interface AdminRouteChildren {
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBusinessesRoute: typeof AdminBusinessesRoute
   AdminCurrenciesRoute: typeof AdminCurrenciesRoute
+  AdminEducationRoute: typeof AdminEducationRoute
   AdminInquiriesRoute: typeof AdminInquiriesRoute
   AdminListingsRoute: typeof AdminListingsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
@@ -2298,6 +2458,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAuditRoute: AdminAuditRoute,
   AdminBusinessesRoute: AdminBusinessesRoute,
   AdminCurrenciesRoute: AdminCurrenciesRoute,
+  AdminEducationRoute: AdminEducationRoute,
   AdminInquiriesRoute: AdminInquiriesRoute,
   AdminListingsRoute: AdminListingsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
@@ -2340,6 +2501,7 @@ interface DashboardRouteChildren {
   DashboardBillingRoute: typeof DashboardBillingRoute
   DashboardBusinessesRoute: typeof DashboardBusinessesRoute
   DashboardFavoritesRoute: typeof DashboardFavoritesRoute
+  DashboardLearningRoute: typeof DashboardLearningRoute
   DashboardLikesRoute: typeof DashboardLikesRoute
   DashboardMessagesRoute: typeof DashboardMessagesRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
@@ -2361,6 +2523,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardBillingRoute: DashboardBillingRoute,
   DashboardBusinessesRoute: DashboardBusinessesRoute,
   DashboardFavoritesRoute: DashboardFavoritesRoute,
+  DashboardLearningRoute: DashboardLearningRoute,
   DashboardLikesRoute: DashboardLikesRoute,
   DashboardMessagesRoute: DashboardMessagesRoute,
   DashboardProfileRoute: DashboardProfileRoute,
@@ -2452,6 +2615,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   MapRoute: MapRoute,
   MyQrRoute: MyQrRoute,
+  PartnerTrainingRoute: PartnerTrainingRoute,
   PaymentsRoute: PaymentsRouteWithChildren,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
@@ -2472,10 +2636,12 @@ const rootRouteChildren: RootRouteChildren = {
   BusinessCheckoutRoute: BusinessCheckoutRoute,
   BusinessesSlugRoute: BusinessesSlugRouteWithChildren,
   BusinessesSubmitRoute: BusinessesSubmitRoute,
+  CCodeRoute: CCodeRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   GoProductIdRoute: GoProductIdRoute,
   InvitesTokenRoute: InvitesTokenRoute,
+  LearnSlugRoute: LearnSlugRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   PassportSlugRoute: PassportSlugRoute,
   RCodeRoute: RCodeRouteWithChildren,
@@ -2488,6 +2654,7 @@ const rootRouteChildren: RootRouteChildren = {
   SupportBuyingRoute: SupportBuyingRoute,
   SupportSellingRoute: SupportSellingRoute,
   BusinessesIndexRoute: BusinessesIndexRoute,
+  LearnIndexRoute: LearnIndexRoute,
   RidesIndexRoute: RidesIndexRoute,
   ShopIndexRoute: ShopIndexRoute,
   ApiAdminCreateUserRoute: ApiAdminCreateUserRoute,
@@ -2500,22 +2667,14 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicFxRefreshRoute: ApiPublicFxRefreshRoute,
   ApiPublicHooksRefreshLazadaRoute: ApiPublicHooksRefreshLazadaRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
+  LearnSlugWatchLessonIdRoute: LearnSlugWatchLessonIdRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
   LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
+  ApiPublicTrainingPartnersIdClickRoute: ApiPublicTrainingPartnersIdClickRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "May 31, 2026 (rev. bookings)";
+  const lastUpdated = "June 1, 2026 (rev. education portal & partner training)";
 
   return (
     <SiteLayout>
@@ -291,6 +291,29 @@ function TermsPage() {
           E-Commerce Bureau, the Department of Trade and Industry Consumer Protection Group, the
           National Privacy Commission (for data-privacy matters), or the BSP Consumer Assistance
           Mechanism (for payment-related matters), as appropriate.
+        </p>
+
+        <h2 className="mt-6 text-xl font-semibold">15a. 365 Learn (education portal)</h2>
+        <p className="mt-2 text-muted-foreground">
+          Through <Link className="text-primary underline" to="/learn">365 Learn</Link> we offer
+          video courses, quizzes and certificates of completion. Courses may be purchased
+          individually (one-time payment) or unlocked as part of an active subscription plan
+          (where indicated on the course page). Course access is granted to your account only and
+          is non-transferable. Certificates are issued automatically upon passing the final quiz
+          and are publicly verifiable at <code>/c/&lt;code&gt;</code>; they are a record of
+          participation, not an industry-recognised qualification, and do not constitute
+          professional certification, accreditation or any licence to practise a regulated trade.
+          Refunds for course purchases follow our{" "}
+          <Link className="text-primary underline" to="/refund-policy">Refund Policy</Link>.
+        </p>
+        <p className="mt-2 text-muted-foreground">
+          Our <Link className="text-primary underline" to="/partner-training">Partner Training</Link>{" "}
+          page lists external training schools as <strong>paid sponsored placements</strong>.
+          365 MotorSales does not certify, accredit, endorse or guarantee any partner school,
+          their curriculum, instructors, facilities, fees or outcomes. You are solely responsible
+          for verifying accreditation, qualifications and any contractual terms with the partner
+          before enrolling or paying any sum directly to a partner. Any agreement you enter with
+          a partner school is strictly between you and that school.
         </p>
 
         <h2 className="mt-6 text-xl font-semibold">15. Privacy &amp; data protection</h2>

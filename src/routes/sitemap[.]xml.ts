@@ -32,6 +32,8 @@ const STATIC_ENTRIES: SitemapEntry[] = [
   { path: "/businesses/submit", changefreq: "monthly", priority: "0.5" },
   { path: "/shop", changefreq: "daily", priority: "0.8" },
   { path: "/shop/categories", changefreq: "weekly", priority: "0.6" },
+  { path: "/learn", changefreq: "weekly", priority: "0.7" },
+  { path: "/partner-training", changefreq: "weekly", priority: "0.5" },
   { path: "/guidelines", changefreq: "monthly", priority: "0.3" },
   { path: "/affiliate-disclosure", changefreq: "yearly", priority: "0.3" },
   { path: "/privacy", changefreq: "yearly", priority: "0.3" },
@@ -151,6 +153,21 @@ export const Route = createFileRoute("/sitemap.xml")({
                 lastmod: p.updated_at?.slice(0, 10),
                 changefreq: "weekly",
                 priority: "0.5",
+              });
+            }
+
+            const { data: courses } = await (sb as any)
+              .from("courses")
+              .select("slug, updated_at")
+              .eq("status", "published")
+              .order("updated_at", { ascending: false })
+              .limit(2000);
+            for (const c of courses ?? []) {
+              entries.push({
+                path: `/learn/${c.slug}`,
+                lastmod: c.updated_at?.slice(0, 10),
+                changefreq: "weekly",
+                priority: "0.6",
               });
             }
           }

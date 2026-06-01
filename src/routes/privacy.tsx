@@ -22,7 +22,7 @@ export const Route = createFileRoute("/privacy")({
 });
 
 function PrivacyPage() {
-  const lastUpdated = "May 31, 2026 (rev. analytics device & geo)";
+  const lastUpdated = "June 1, 2026 (rev. education portal learning data)";
 
   return (
     <SiteLayout>
@@ -237,6 +237,18 @@ function PrivacyPage() {
             dpo@365motorsales.ph
           </a>
           . We respond within 15 business days.
+        </p>
+
+        <h2 className="mt-6 text-xl font-semibold">13a. 365 Learn (education portal)</h2>
+        <p className="mt-2 text-muted-foreground">
+          When you enrol in or interact with a 365 Learn course we collect lesson-completion
+          timestamps, watch-time per lesson, quiz answers and scores. This data is used to track
+          your progress, gate access to subsequent modules, and issue certificates of completion.
+          Certificate records (your display name, course title and issue date) are made publicly
+          verifiable at <code>/c/&lt;code&gt;</code> so third parties can confirm authenticity —
+          do not enrol under a name you do not wish to appear there. Clicks on Partner Training
+          listings are logged anonymously (no account identifier) and are used only to bill
+          sponsors and surface aggregate analytics.
         </p>
 
         <h2 className="mt-6 text-xl font-semibold">14. Changes to this policy</h2>

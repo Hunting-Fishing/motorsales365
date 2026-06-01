@@ -1,130 +1,99 @@
-# Business Mini-Sites → Facebook Replacement
 
-Goal: give every Philippine business a professional, standalone-feeling presence on 365MotorSales so they can stop relying on a Facebook Page. Built in 5 phases so each ships usable.
+# Education Portal Plan
 
-## Phase 1 — Bookings & Availability (biggest Facebook gap)
+Adds a new `/learn` section to 365 Motorsales: admin-published video courses with quizzes and completion certificates, sold individually or unlocked via existing subscription tiers, plus a separate `/partner-training` page for sponsored external schools.
 
-What the owner sets up in `/dashboard/businesses/:id/edit` → new **Bookings** tab:
-- **Bookable items**: pick from existing services (e.g. "Oil change", "Detailing"), set duration (15/30/60/90/120 min), buffer time, price, max concurrent bookings (e.g. 2 bays).
-- **Weekly availability**: per-day open windows (reuses existing hours editor as default, overridable per service).
-- **Date exceptions**: holidays / closed days / special hours.
-- **Lead time & horizon**: "bookable starting X hours out, up to Y days ahead".
-- **Approval mode**: auto-confirm OR manual approval.
-- **Notifications**: email to owner on new booking; email/SMS confirmation to customer.
+## Routes
 
-What the public sees on `/businesses/:slug` → new **Book** section + dedicated `/businesses/:slug/book` route:
-- Service picker → date picker (calendar with available days highlighted) → time slot grid → contact form → confirm.
-- No login required (guest bookings allowed); logged-in users get prefill.
-- Confirmation page with booking reference + add-to-calendar (.ics download).
+- `/learn` — course catalog (categories: Repair, Detailing, Bodywork, Business, etc.), filters, search
+- `/learn/$slug` — course landing page: overview, curriculum, instructor, price, "Buy" or "Start learning" CTA
+- `/learn/$slug/watch/$lessonId` — gated player (video + lesson notes), sidebar with lesson list & progress
+- `/learn/$slug/quiz/$quizId` — quiz taker (multiple choice, pass threshold gates next module)
+- `/learn/$slug/certificate` — completion certificate page (printable, shareable, verifiable via short code)
+- `/dashboard/learning` — user's enrolled courses + progress + certificates
+- `/partner-training` — sponsored external training facilities directory (clearly marked as paid placements)
+- `/admin/education` — admin: CRUD courses, modules, lessons, quizzes, enrollments, certificates, partners
+- `/c/$code` — public certificate verification page
 
-Owner inbox → new **Bookings** tab next to Inquiries:
-- New / Confirmed / Completed / Cancelled / No-show.
-- One-click confirm / decline / reschedule / cancel (email triggered).
+## Data model (new tables)
 
-## Phase 2 — Image Galleries
+- `courses` — slug, title, summary, description, hero_image, category, level, duration_minutes, instructor_name, price_id (nullable for subscription-only), included_in_tiers (array of plan slugs), status, published_at
+- `course_modules` — course_id, position, title
+- `course_lessons` — module_id, position, title, video_url (Mux/Cloudflare Stream playback id), duration_seconds, content_md (notes/resources), is_preview
+- `course_resources` — lesson_id, label, file_url
+- `course_quizzes` — module_id (or course_id for final), title, pass_threshold (e.g. 80)
+- `course_quiz_questions` — quiz_id, position, prompt, choices (jsonb), correct_index, explanation
+- `course_enrollments` — user_id, course_id, source ('purchase' | 'subscription' | 'admin_grant'), payment_id (nullable), enrolled_at
+- `course_lesson_progress` — enrollment_id, lesson_id, completed_at, watch_seconds
+- `course_quiz_attempts` — enrollment_id, quiz_id, score, passed, answers (jsonb), attempted_at
+- `course_certificates` — enrollment_id, code (short public id), issued_at, pdf_url (nullable, generated on demand)
+- `training_partners` — slug, name, logo_url, website_url, description, location, specialties, tier ('featured' | 'standard'), sponsored_until, click_count, active
+- `training_partner_clicks` — partner_id, visitor_id, created_at (for affiliate-style tracking, like existing `shop_clicks`)
 
-- New **Gallery** section on the mini-site, separate from product/service photos.
-- Albums (e.g. "Shop interior", "Recent work", "Before/After").
-- Multi-image upload with drag-to-reorder, captions.
-- Lightbox viewer on public page with swipe on mobile.
-- Storage: new `business-gallery` bucket, max 30 images per album, max 12 albums per business.
+All tables get RLS:
+- Public reads on `courses` (status='published'), `course_modules`, `course_lessons` (preview-only fields when not enrolled), `training_partners` (active=true), `course_certificates` by `code`.
+- Authenticated users read/write their own `course_enrollments`, `course_lesson_progress`, `course_quiz_attempts`.
+- Admin/moderator full CRUD via existing `can_moderate()` / `has_role('admin')` helpers.
+- Explicit GRANTs to anon/authenticated/service_role per public-schema rules.
 
-## Phase 3 — Embedded Video
+## Access logic
 
-- YouTube / Vimeo / Facebook Video URL field on Posts (already exists) + new dedicated **Videos** section.
-- Server-side URL parsing → safe embed (no arbitrary iframes).
-- Optional featured video on the cover area (replaces hero image when set).
+Server function `getCourseAccess(courseId)`:
+1. If user owns an active `course_enrollments` row → access granted.
+2. Else if course is included in a tier AND user has an active subscription on that tier → auto-create enrollment (source='subscription') → access granted.
+3. Else → access denied (show buy CTA).
 
-## Phase 4 — Contact Section Polish
+Certificate is issued by a server function after the final quiz passes and all required lessons are marked complete.
 
-Already have inquiry form + call/messenger CTAs. Adds:
-- **Multiple phone numbers** (sales / service / parts) with labels.
-- **WhatsApp, Viber, Telegram, Instagram, TikTok** handles (PH businesses live on these).
-- **Email** with anti-spam click-to-reveal.
-- **Embedded map** with "Get directions" deep link to Google/Waze/Apple Maps.
-- **"Send us a message"** form already exists — add file attachment (1 photo, e.g. for damage estimates).
+## Payments
 
-## Phase 5 — "Your Own Domain Feel" (vanity URLs)
+- Each paid course gets a one-time Stripe price via `payments--create_product` (snake_case `course_<slug>_onetime`, PHP currency to match existing plans, single quantity).
+- Checkout reuses the existing embedded Stripe flow (`StripeEmbeddedCheckout` + `createCheckoutSession`) — no new infra.
+- Webhook handler (`/api/public/payments/webhook`) adds a `checkout.session.completed` branch: if metadata.kind === 'course', insert `course_enrollments` (source='purchase').
+- Subscription tiers (Bronze/Silver/Gold/Platinum/Business) get a configurable "included courses" mapping in admin — drives auto-enrollment in step 2 above.
+- Tax handling: ask the user before wiring (per Stripe rules) — for digital courses, Lovable-managed compliance handling (+3.5%) is recommended; will confirm at build time.
 
-Two layers, both cheap:
+## Sponsored partners (`/partner-training`)
 
-**5a. Subdomain-style vanity slug (free, ships immediately)**
-- Today: `365motorsales.com/businesses/ucatch-cook-fuels-mlpb8`
-- New: owner picks a clean slug → `365motorsales.com/b/ucatchfuels` (short `/b/` prefix, vanity slug, no random suffix).
-- Reserved-word list, uniqueness check, slug history table so old links 301-redirect.
-- Optional: `ucatchfuels.365motorsales.com` wildcard subdomain (requires DNS wildcard + Vite route rewrite — included if you want it).
+- Standalone public page, separate from `/learn` so course catalog stays uncluttered.
+- Card grid: logo, name, location, specialties, "Visit website" button → routes through `/api/public/training-partners/$id/click` to log + redirect (mirrors existing `resolveShopRedirect` pattern).
+- Admin CRUD with `sponsored_until` date and `tier` flag controlling sort.
+- Clearly labeled "Sponsored" on each card; "These are paid placements" disclosure at top + in `/terms`.
 
-**5b. Custom domain (paid add-on, opt-in)**
-- Owner adds `ucatchfuels.com` → we show DNS instructions (CNAME to our host).
-- Verification via TXT record.
-- Auto SSL via the hosting provider (Cloudflare/Lovable).
-- This is part of the Pro / Business subscription tier — adds revenue.
-- Privacy/Terms updated to mention custom domain processing.
+## Admin tooling (`/admin/education`)
 
-## Technical details
+- Tabs: Courses, Partners, Enrollments, Certificates.
+- Course editor: tabbed form (Details / Curriculum / Quizzes / Pricing / Publish).
+- Lesson media: upload to existing Supabase storage bucket (new `course-media` bucket) or paste Mux playback id.
+- Enrollments table: search, manual grant, revoke.
+- Partner editor: name, logo upload, website, sponsorship dates.
 
-```text
-New tables
-  business_bookable_items   id, business_id, service_id (nullable), title,
-                            duration_min, buffer_min, price_php, max_concurrent,
-                            require_approval, active, sort_order
-  business_availability     id, business_id, weekday (0-6), start_time,
-                            end_time  (multiple rows per weekday allowed)
-  business_availability_exceptions
-                            id, business_id, date, closed (bool),
-                            start_time, end_time, note
-  business_bookings         id, business_id, bookable_item_id, customer_name,
-                            customer_phone, customer_email, user_id (nullable),
-                            starts_at (timestamptz), ends_at, status
-                            (pending|confirmed|completed|cancelled|no_show),
-                            notes, created_at
-  business_gallery_albums   id, business_id, title, cover_url, sort_order
-  business_gallery_photos   id, album_id, url, caption, sort_order
-  business_videos           id, business_id, provider (youtube|vimeo|facebook),
-                            url, embed_id, title, sort_order, featured
-  business_contact_channels id, business_id, kind (phone|whatsapp|viber|
-                            telegram|instagram|tiktok|email), label, value,
-                            sort_order
-  business_slug_history     id, business_id, old_slug, redirected_at
-  business_custom_domains   id, business_id, domain, verification_token,
-                            verified_at, ssl_status
+## Navigation & SEO
 
-New storage bucket: business-gallery (public read, owner write)
+- Add "Learn" link to `site-header.tsx` desktop nav + mobile tab bar.
+- Each route defines its own `head()` with title/description/og.
+- Sitemap (`/sitemap.xml`) extended to include published courses and active partners.
+- JSON-LD `Course` schema on `/learn/$slug` for SEO.
 
-New server functions (src/lib/business-bookings.functions.ts,
-                     src/lib/business-gallery.functions.ts,
-                     src/lib/business-media.functions.ts,
-                     src/lib/business-domains.functions.ts)
+## Policy updates (per project memory)
 
-New routes:
-  src/routes/businesses.$slug.book.tsx          (public booking flow)
-  src/routes/b.$slug.tsx                        (short vanity URL)
-  src/routes/dashboard.businesses_.$id.bookings.tsx
-  src/routes/dashboard.businesses_.$id.gallery.tsx
-  src/routes/dashboard.businesses_.$id.domain.tsx
+- `/terms` — new section covering course purchases, refund window for courses, subscription-included access, sponsored partner disclosure; bump "Last updated".
+- `/refund-policy` — course refund rules (e.g. 7-day if <20% watched).
+- `/privacy` — note progress/quiz data collection; bump date.
 
-Edits:
-  /businesses/:slug → add Bookings, Gallery, Videos, Contact-channels
-  Edit page → add new tabs
-  Subscription / pricing → add custom-domain add-on
-  /terms, /privacy → bump for bookings + custom domains
-  sitemap.xml → add /b/:slug entries
-```
+## Out of scope (explicit)
 
-## Suggested rollout order
+- Live streaming / cohort classes.
+- Instructor marketplace / revenue share (admin-only publishing for now).
+- DRM beyond signed playback URLs.
+- Mobile native app changes.
 
-If you want this to ship in usable chunks rather than one giant push:
-1. **Phase 2 (Gallery)** + **Phase 4 (Contact)** — fast wins, 1 batch.
-2. **Phase 3 (Video)** — small, slots in next.
-3. **Phase 1 (Bookings)** — biggest single feature, ship on its own.
-4. **Phase 5a (vanity `/b/:slug`)** — small.
-5. **Phase 5b (custom domains)** — last, since it touches DNS/SSL and billing.
+## Build order
 
-Or I do it all in one go if you prefer — just more time before anything lands.
-
-## Decisions I need from you
-
-1. **Rollout**: phased as above, or all-in-one?
-2. **Bookings approval mode default**: auto-confirm or manual?
-3. **Custom domains pricing**: free for all, or paid add-on (e.g. ₱299/month per domain)?
-4. **Vanity URL shape**: `/b/ucatchfuels` (path) or `ucatchfuels.365motorsales.com` (subdomain)? Subdomain feels more pro but needs DNS wildcard on the custom domain.
+1. DB migrations (tables + RLS + GRANTs + storage bucket).
+2. Server functions (course access, enrollment, progress, quiz scoring, certificate issuance, partner click tracking).
+3. Public routes (`/learn`, `/learn/$slug`, watch/quiz/certificate, `/partner-training`, `/c/$code`).
+4. User dashboard tab (`/dashboard/learning`).
+5. Admin `/admin/education` panels.
+6. Stripe product seeding helper (admin button → creates Stripe product/price for a course) + webhook branch.
+7. Header/footer/sitemap/SEO + policy page updates.
