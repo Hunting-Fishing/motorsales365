@@ -359,6 +359,25 @@ function MyBusinessesPage() {
                     />
                   </>
                 )}
+                {b.status === "archived" ? (
+                  <Button size="sm" variant="outline" onClick={() => setStatus(b, "active")}>
+                    <ArchiveRestore className="mr-1 h-3.5 w-3.5" />
+                    Restore
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-muted-foreground hover:text-destructive"
+                    onClick={() => {
+                      if (typeof window !== "undefined" && !window.confirm(`Archive "${b.name}"? It will be hidden from public search but you can restore it anytime.`)) return;
+                      setStatus(b, "archived");
+                    }}
+                  >
+                    <Archive className="mr-1 h-3.5 w-3.5" />
+                    Archive
+                  </Button>
+                )}
               </div>
             </Card>
             );
