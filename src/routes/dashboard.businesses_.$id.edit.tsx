@@ -173,7 +173,7 @@ function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
         </TabsContent>
 
         <TabsContent value="services">
-          <ServicesTab businessId={biz.id} userId={user.id} services={data.services} onChange={refetch} />
+          <ServicesTab businessId={biz.id} userId={user.id} typeSlug={biz.type_slug} services={data.services} onChange={refetch} />
         </TabsContent>
         <TabsContent value="products">
           <ProductsTab businessId={biz.id} userId={user.id} products={data.products} onChange={refetch} />
