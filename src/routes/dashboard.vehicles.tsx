@@ -268,6 +268,7 @@ function VehicleDetailDialog({
   const addRec = useServerFn(addServiceRecord);
   const delRec = useServerFn(deleteServiceRecord);
   const delVeh = useServerFn(deleteVehicle);
+  const { user } = useAuth();
 
   const { data, refetch, isLoading } = useQuery({
     queryKey: ["vehicle", vehicleId],
