@@ -166,6 +166,9 @@ function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
         <TabsContent value="profile">
           <ProfileTab biz={biz} userId={user.id} onSaved={refetch} />
         </TabsContent>
+        <TabsContent value="location">
+          <LocationTab biz={biz} onSaved={refetch} />
+        </TabsContent>
         <TabsContent value="tags">
           <TagsTab businessId={biz.id} typeSlug={biz.type_slug} />
         </TabsContent>
