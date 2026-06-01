@@ -20,6 +20,7 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean; roles: Role[
   { to: "/admin/analytics", label: "Analytics", Icon: BarChart3, roles: ["admin","sales","support"], info: "Traffic, listings, conversions and other platform analytics." },
   { to: "/admin/advertising", label: "Advertising", Icon: Megaphone, roles: ["admin","advertising"], info: "Ad inquiries, placements and advertiser CRM." },
   { to: "/admin/shop", label: "Affiliate Shop", Icon: Store, roles: ["admin","advertising","sales"], info: "Manage affiliate products, networks (Shopee/Lazada/AliExpress) and click analytics." },
+  { to: "/admin/education", label: "Education", Icon: GraduationCap, roles: ["admin","moderator"], info: "Create and manage courses, modules, lessons, quizzes and sponsored Partner Training schools." },
   { to: "/admin/referrals", label: "Staff QR Referrals", Icon: QrCode, roles: ["admin","sales"], info: "QR codes & referral codes for every staff member, including admins." },
   { to: "/admin/redemptions", label: "Referral Redemptions", Icon: Ticket, roles: ["admin","sales"], info: "Discounts redeemed via staff referral codes." },
   { to: "/admin/pricing", label: "Pricing & plans", Icon: CreditCard, roles: ["admin"], info: "Subscription plans, listing fees and global pricing settings." },
