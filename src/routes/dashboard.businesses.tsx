@@ -295,7 +295,11 @@ function MyBusinessesPage() {
         </div>
       </div>
       {loading ? (
-        <Card className="p-6 text-sm text-muted-foreground">Loading…</Card>
+        <div className="space-y-2">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-20 w-full rounded-xl" />
+          ))}
+        </div>
       ) : visibleRows.length === 0 ? (
         <Card className="p-6 text-center text-sm text-muted-foreground">
           <StoreIcon className="mx-auto mb-2 h-6 w-6 opacity-60" />
