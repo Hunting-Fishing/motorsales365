@@ -419,10 +419,21 @@ function VehicleDetailDialog({
                     <Label htmlFor="r-notes">Notes</Label>
                     <Textarea id="r-notes" rows={2} maxLength={2000} value={rec.notes} onChange={(e) => setRec({ ...rec, notes: e.target.value })} />
                   </div>
-                  <div>
-                    <Label htmlFor="r-rec">Receipt URL (optional)</Label>
-                    <Input id="r-rec" type="url" maxLength={2000} value={rec.receiptUrl} onChange={(e) => setRec({ ...rec, receiptUrl: e.target.value })} placeholder="https://…" />
-                  </div>
+                  {user && (
+                    <div>
+                      <Label>Receipt (optional)</Label>
+                      <SingleFileUploader
+                        userId={user.id}
+                        bucket="vehicle-media"
+                        prefix={`receipts/${vehicleId}`}
+                        value={rec.receiptUrl || null}
+                        onChange={(url) => setRec({ ...rec, receiptUrl: url ?? "" })}
+                        accept="image/*,application/pdf"
+                        label="Upload receipt"
+                        variant="file"
+                      />
+                    </div>
+                  )}
                   <div className="flex justify-end">
                     <Button type="submit" disabled={saving}>{saving ? "Saving…" : "Save record"}</Button>
                   </div>
