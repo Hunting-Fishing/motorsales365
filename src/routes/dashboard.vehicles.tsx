@@ -28,6 +28,9 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatPHP } from "@/lib/format";
 import { PassportShareSection } from "@/components/passport-share-section";
+import { SingleFileUploader } from "@/components/single-file-uploader";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/dashboard/vehicles")({
   component: VehiclesPage,
@@ -67,7 +70,13 @@ function VehiclesPage() {
         </VehicleDialog>
       </div>
 
-      {isLoading && <div className="rounded-xl border border-border p-8 text-center text-muted-foreground">Loading…</div>}
+      {isLoading && (
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-24 w-full rounded-xl" />
+          ))}
+        </div>
+      )}
 
       {!isLoading && (!vehicles || vehicles.length === 0) && (
         <div className="rounded-xl border border-dashed border-border bg-card p-10 text-center">
@@ -129,6 +138,7 @@ function VehicleDialog({
   onSaved: () => void;
 }) {
   const [open, setOpen] = useState(false);
+  const { user } = useAuth();
   const [form, setForm] = useState({
     make: vehicle?.make ?? "",
     model: vehicle?.model ?? "",
@@ -214,6 +224,20 @@ function VehicleDialog({
             <Label htmlFor="v-nick">Nickname (optional)</Label>
             <Input id="v-nick" maxLength={60} value={form.nickname} onChange={(e) => setForm((f) => ({ ...f, nickname: e.target.value }))} placeholder='e.g. "Red Hilux"' />
           </div>
+          {user && (
+            <div>
+              <Label>Cover photo</Label>
+              <SingleFileUploader
+                userId={user.id}
+                bucket="vehicle-media"
+                prefix="covers"
+                value={form.coverUrl || null}
+                onChange={(url) => setForm((f) => ({ ...f, coverUrl: url ?? "" }))}
+                accept="image/*"
+                label="Upload cover photo"
+              />
+            </div>
+          )}
           <div className="flex items-center justify-between rounded-md border border-border p-3">
             <div className="text-sm">
               <p className="font-medium">Public passport</p>
@@ -244,6 +268,7 @@ function VehicleDetailDialog({
   const addRec = useServerFn(addServiceRecord);
   const delRec = useServerFn(deleteServiceRecord);
   const delVeh = useServerFn(deleteVehicle);
+  const { user } = useAuth();
 
   const { data, refetch, isLoading } = useQuery({
     queryKey: ["vehicle", vehicleId],
@@ -310,7 +335,7 @@ function VehicleDetailDialog({
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         {isLoading || !data ? (
-          <div className="p-8 text-center text-muted-foreground">Loading…</div>
+          <div className="space-y-3 p-4"><Skeleton className="h-6 w-1/2" /><Skeleton className="h-4 w-1/3" /><Skeleton className="h-32 w-full" /></div>
         ) : (
           <>
             <DialogHeader>
@@ -394,10 +419,21 @@ function VehicleDetailDialog({
                     <Label htmlFor="r-notes">Notes</Label>
                     <Textarea id="r-notes" rows={2} maxLength={2000} value={rec.notes} onChange={(e) => setRec({ ...rec, notes: e.target.value })} />
                   </div>
-                  <div>
-                    <Label htmlFor="r-rec">Receipt URL (optional)</Label>
-                    <Input id="r-rec" type="url" maxLength={2000} value={rec.receiptUrl} onChange={(e) => setRec({ ...rec, receiptUrl: e.target.value })} placeholder="https://…" />
-                  </div>
+                  {user && (
+                    <div>
+                      <Label>Receipt (optional)</Label>
+                      <SingleFileUploader
+                        userId={user.id}
+                        bucket="vehicle-media"
+                        prefix={`receipts/${vehicleId}`}
+                        value={rec.receiptUrl || null}
+                        onChange={(url) => setRec({ ...rec, receiptUrl: url ?? "" })}
+                        accept="image/*,application/pdf"
+                        label="Upload receipt"
+                        variant="file"
+                      />
+                    </div>
+                  )}
                   <div className="flex justify-end">
                     <Button type="submit" disabled={saving}>{saving ? "Saving…" : "Save record"}</Button>
                   </div>
