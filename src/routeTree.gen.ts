@@ -128,6 +128,7 @@ import { Route as DashboardBusinessesIdEditRouteImport } from './routes/dashboar
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksRefreshLazadaRouteImport } from './routes/api/public/hooks/refresh-lazada'
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
+import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: '/verify-email',
@@ -731,6 +732,12 @@ const ApiPublicFxRefreshRoute = ApiPublicFxRefreshRouteImport.update({
   path: '/api/public/fx/refresh',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicTrainingPartnersIdClickRoute =
+  ApiPublicTrainingPartnersIdClickRouteImport.update({
+    id: '/api/public/training-partners/$id/click',
+    path: '/api/public/training-partners/$id/click',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -852,6 +859,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -970,6 +978,7 @@ export interface FileRoutesByTo {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -1092,6 +1101,7 @@ export interface FileRoutesById {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -1215,6 +1225,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/api/public/training-partners/$id/click'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -1333,6 +1344,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/api/public/training-partners/$id/click'
   id:
     | '__root__'
     | '/'
@@ -1454,6 +1466,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/api/public/training-partners/$id/click'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -1528,6 +1541,7 @@ export interface RootRouteChildren {
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
   LovableEmailTransactionalPreviewRoute: typeof LovableEmailTransactionalPreviewRoute
   LovableEmailTransactionalSendRoute: typeof LovableEmailTransactionalSendRoute
+  ApiPublicTrainingPartnersIdClickRoute: typeof ApiPublicTrainingPartnersIdClickRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -2365,6 +2379,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicFxRefreshRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/training-partners/$id/click': {
+      id: '/api/public/training-partners/$id/click'
+      path: '/api/public/training-partners/$id/click'
+      fullPath: '/api/public/training-partners/$id/click'
+      preLoaderRoute: typeof ApiPublicTrainingPartnersIdClickRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -2610,6 +2631,7 @@ const rootRouteChildren: RootRouteChildren = {
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
   LovableEmailTransactionalPreviewRoute: LovableEmailTransactionalPreviewRoute,
   LovableEmailTransactionalSendRoute: LovableEmailTransactionalSendRoute,
+  ApiPublicTrainingPartnersIdClickRoute: ApiPublicTrainingPartnersIdClickRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
