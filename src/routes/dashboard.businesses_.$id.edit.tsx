@@ -91,7 +91,7 @@ function EditBusinessPage() {
 }
 
 function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
-  const validTabs = ["profile","tags","hours","services","products","gallery","contact","posts","bookings","inquiries","analytics"];
+  const validTabs = ["profile","location","tags","hours","services","products","gallery","contact","posts","bookings","inquiries","analytics"];
   const [activeTab, setActiveTab] = useState<string>("profile");
 
   return (
@@ -133,6 +133,7 @@ function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="flex w-full overflow-x-auto">
           <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsTrigger value="location">Location</TabsTrigger>
           <TabsTrigger value="tags">Tags</TabsTrigger>
           <TabsTrigger value="hours">Hours</TabsTrigger>
 
@@ -165,6 +166,9 @@ function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
         <TabsContent value="profile">
           <ProfileTab biz={biz} userId={user.id} onSaved={refetch} />
         </TabsContent>
+        <TabsContent value="location">
+          <LocationTab biz={biz} onSaved={refetch} />
+        </TabsContent>
         <TabsContent value="tags">
           <TagsTab businessId={biz.id} typeSlug={biz.type_slug} />
         </TabsContent>
@@ -173,7 +177,7 @@ function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
         </TabsContent>
 
         <TabsContent value="services">
-          <ServicesTab businessId={biz.id} userId={user.id} services={data.services} onChange={refetch} />
+          <ServicesTab businessId={biz.id} userId={user.id} typeSlug={biz.type_slug} services={data.services} onChange={refetch} />
         </TabsContent>
         <TabsContent value="products">
           <ProductsTab businessId={biz.id} userId={user.id} products={data.products} onChange={refetch} />
@@ -654,11 +658,13 @@ function ImageField({
 function ServicesTab({
   businessId,
   userId,
+  typeSlug,
   services,
   onChange,
 }: {
   businessId: string;
   userId: string;
+  typeSlug: string | null;
   services: any[];
   onChange: () => void;
 }) {
@@ -693,6 +699,7 @@ function ServicesTab({
       {showPicker && (
         <CatalogPicker
           existingKeys={existingKeys}
+          typeSlug={typeSlug}
           onPick={(item) => {
             const v = fromCatalogItem(item);
             setEditing({ ...v, businessId, sort_order: services.length });

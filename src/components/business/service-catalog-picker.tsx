@@ -57,15 +57,21 @@ export function CatalogPicker({
   existingKeys,
   onPick,
   onCustom,
+  typeSlug,
 }: {
   existingKeys: Set<string>;
   onPick: (item: CatalogItem) => void;
   onCustom: () => void;
+  /** Business type slug. Only "fuel_station" gets the fuel catalog;
+   * everything else gets an "Add custom item" panel. */
+  typeSlug?: string | null;
 }) {
+  const useFuelCatalog = typeSlug === "fuel_station";
   const [q, setQ] = useState("");
   const [activeGroup, setActiveGroup] = useState<string>(FUEL_STATION_CATALOG[0].key);
 
   const filtered = useMemo(() => {
+    if (!useFuelCatalog) return null;
     const term = q.trim().toLowerCase();
     if (!term) return null;
     const hits: { group: string; item: CatalogItem }[] = [];
@@ -80,7 +86,27 @@ export function CatalogPicker({
       }
     }
     return hits.slice(0, 40);
-  }, [q]);
+  }, [q, useFuelCatalog]);
+
+  // Non-fuel businesses: simple custom-only panel (no curated catalog yet).
+  if (!useFuelCatalog) {
+    return (
+      <Card className="overflow-hidden border-primary/30">
+        <div className="border-b border-border bg-muted/40 p-3">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-sm font-semibold">Add a service or product</h3>
+            <Button size="sm" variant="default" onClick={onCustom}>
+              <Plus className="mr-1 h-4 w-4" /> Add custom item
+            </Button>
+          </div>
+        </div>
+        <div className="p-4 text-sm text-muted-foreground">
+          Describe each service or product you offer (title, price, optional photo and description).
+          A curated catalog for this business type is coming soon — for now, add items manually.
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="overflow-hidden border-primary/30">

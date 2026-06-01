@@ -1,0 +1,103 @@
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+function slugify(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
+}
+
+/**
+ * Submit a new business listing. Validates input, generates a unique slug
+ * (collision-loop), inserts the business row + tag links, and returns the
+ * new business id + slug. The DB trigger `tg_notify_business_submitted`
+ * enqueues the "business-submitted" email automatically.
+ */
+export const submitBusiness = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        name: z.string().trim().min(2).max(120),
+        type_slug: z.string().min(1).max(60),
+        description: z.string().max(2000).nullable().optional(),
+        logo_url: z.string().url().nullable().optional(),
+        phone: z.string().max(40).nullable().optional(),
+        email: z.string().email().max(200).nullable().optional(),
+        website: z.string().url().max(500).nullable().optional(),
+        messenger_url: z.string().url().max(500).nullable().optional(),
+        street_address: z.string().max(300).nullable().optional(),
+        region: z.string().max(120).nullable().optional(),
+        province: z.string().max(120).nullable().optional(),
+        city: z.string().max(120).nullable().optional(),
+        barangay: z.string().max(120).nullable().optional(),
+        postal_code: z.string().max(20).nullable().optional(),
+        brands_carried: z.string().max(500).nullable().optional(),
+        price_label: z.string().max(60).nullable().optional(),
+        lat: z.number().min(-90).max(90).nullable().optional(),
+        lng: z.number().min(-180).max(180).nullable().optional(),
+        tag_slugs: z.array(z.string().min(1).max(80)).max(40).optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    // 1) Unique-slug loop (max 50 attempts) — pre-checks `businesses.slug`.
+    const base = slugify(data.name) || "business";
+    let slug = base;
+    let found = false;
+    for (let i = 0; i < 50; i++) {
+      const candidate = i === 0 ? base : `${base}-${i + 1}`;
+      const { data: existing, error: chkErr } = await supabase
+        .from("businesses")
+        .select("id")
+        .eq("slug", candidate)
+        .maybeSingle();
+      if (chkErr) throw new Error(chkErr.message);
+      if (!existing) {
+        slug = candidate;
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      // Fall back to a random suffix.
+      slug = `${base}-${Math.random().toString(36).slice(2, 7)}`;
+    }
+
+    const { tag_slugs, ...biz } = data;
+
+    // 2) Insert business (RLS scopes owner_id to auth.uid()).
+    const { data: row, error: insErr } = await supabase
+      .from("businesses")
+      .insert({
+        owner_id: userId,
+        slug,
+        status: "pending",
+        ...biz,
+      } as any)
+      .select("id, slug")
+      .single();
+    if (insErr) {
+      // Friendly message for slug race condition.
+      if (insErr.code === "23505" || /duplicate key/i.test(insErr.message)) {
+        throw new Error("That URL was just taken — please try again.");
+      }
+      throw new Error(insErr.message);
+    }
+
+    // 3) Tag links (best-effort; non-fatal).
+    if (tag_slugs && tag_slugs.length > 0) {
+      await supabase
+        .from("business_tag_links")
+        .insert(tag_slugs.map((s) => ({ business_id: (row as any).id, tag_slug: s })) as any);
+    }
+
+    return { id: (row as any).id as string, slug: (row as any).slug as string };
+  });

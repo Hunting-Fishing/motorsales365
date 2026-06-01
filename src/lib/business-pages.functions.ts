@@ -318,6 +318,15 @@ export const updateBusinessPageSettings = createServerFn({ method: "POST" })
         cover_url: z.string().url().nullable().optional(),
         featured_video_url: z.string().url().max(500).nullable().optional(),
         featured_video_provider: z.enum(["youtube", "vimeo", "facebook"]).nullable().optional(),
+        // Location fields (editable post-submission)
+        street_address: z.string().max(300).nullable().optional(),
+        region: z.string().max(120).nullable().optional(),
+        province: z.string().max(120).nullable().optional(),
+        city: z.string().max(120).nullable().optional(),
+        barangay: z.string().max(120).nullable().optional(),
+        postal_code: z.string().max(20).nullable().optional(),
+        lat: z.number().min(-90).max(90).nullable().optional(),
+        lng: z.number().min(-180).max(180).nullable().optional(),
       })
       .parse(input),
   )
