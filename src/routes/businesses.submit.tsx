@@ -567,6 +567,12 @@ function SubmitBusinessPage() {
             </div>
           </div>
 
+          <div>
+            <Label>Business hours</Label>
+            <p className="mb-2 text-xs text-muted-foreground">Set at least one open day so customers know when to reach you. You can refine these any time from your dashboard.</p>
+            <WeekHoursEditor value={hours} onChange={setHours} />
+          </div>
+
           <div className="flex justify-end">
             <Button onClick={submit} disabled={submitting}>{submitting ? "Submitting…" : "Submit for review"}</Button>
           </div>
