@@ -5453,6 +5453,15 @@ export type Database = {
         | "rental"
         | "financing"
         | "trucking"
+        | "tire_shop"
+        | "battery_shop"
+        | "fuel_station"
+        | "accessories"
+        | "audio_tint"
+        | "inspection"
+        | "driving_school"
+        | "lto_services"
+        | "transport"
       business_status: "pending" | "active" | "rejected" | "hidden"
       business_tier: "free" | "listed" | "featured" | "premium"
       course_level: "beginner" | "intermediate" | "advanced"
@@ -5710,6 +5719,15 @@ export const Constants = {
         "rental",
         "financing",
         "trucking",
+        "tire_shop",
+        "battery_shop",
+        "fuel_station",
+        "accessories",
+        "audio_tint",
+        "inspection",
+        "driving_school",
+        "lto_services",
+        "transport",
       ],
       business_status: ["pending", "active", "rejected", "hidden"],
       business_tier: ["free", "listed", "featured", "premium"],
