@@ -272,6 +272,7 @@ function SubmitBusinessPage() {
           lat: lat ? Number(lat) : null,
           lng: lng ? Number(lng) : null,
           tag_slugs: selectedTags,
+          hours: { tz: TZ, primary: hours },
         },
       });
       setSubmitting(false);
