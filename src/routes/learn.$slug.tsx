@@ -8,8 +8,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { useState } from "react";
 import { CheckCircle2, Lock, PlayCircle, GraduationCap, Award, Clock } from "lucide-react";
 import { getCourse, getEnrollmentProgress, createCourseCheckout } from "@/lib/education.functions";
-import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
-import { getStripeEnvironment } from "@/lib/stripe";
+import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
+import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/learn/$slug")({

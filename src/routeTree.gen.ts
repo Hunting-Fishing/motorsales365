@@ -53,6 +53,7 @@ import { Route as RidesSlugRouteImport } from './routes/rides.$slug'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as PassportSlugRouteImport } from './routes/passport.$slug'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
+import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
 import { Route as InvitesTokenRouteImport } from './routes/invites.$token'
 import { Route as GoProductIdRouteImport } from './routes/go.$productId'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
@@ -343,6 +344,11 @@ const PassportSlugRoute = PassportSlugRouteImport.update({
 const ListingIdRoute = ListingIdRouteImport.update({
   id: '/listing/$id',
   path: '/listing/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnSlugRoute = LearnSlugRouteImport.update({
+  id: '/learn/$slug',
+  path: '/learn/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InvitesTokenRoute = InvitesTokenRouteImport.update({
@@ -778,6 +784,7 @@ export interface FileRoutesByFullPath {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/go/$productId': typeof GoProductIdRoute
   '/invites/$token': typeof InvitesTokenRoute
+  '/learn/$slug': typeof LearnSlugRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
@@ -892,6 +899,7 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/go/$productId': typeof GoProductIdRoute
   '/invites/$token': typeof InvitesTokenRoute
+  '/learn/$slug': typeof LearnSlugRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
@@ -1010,6 +1018,7 @@ export interface FileRoutesById {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/go/$productId': typeof GoProductIdRoute
   '/invites/$token': typeof InvitesTokenRoute
+  '/learn/$slug': typeof LearnSlugRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
@@ -1129,6 +1138,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/go/$productId'
     | '/invites/$token'
+    | '/learn/$slug'
     | '/listing/$id'
     | '/passport/$slug'
     | '/r/$code'
@@ -1243,6 +1253,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/go/$productId'
     | '/invites/$token'
+    | '/learn/$slug'
     | '/listing/$id'
     | '/passport/$slug'
     | '/r/$code'
@@ -1360,6 +1371,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/go/$productId'
     | '/invites/$token'
+    | '/learn/$slug'
     | '/listing/$id'
     | '/passport/$slug'
     | '/r/$code'
@@ -1446,6 +1458,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   GoProductIdRoute: typeof GoProductIdRoute
   InvitesTokenRoute: typeof InvitesTokenRoute
+  LearnSlugRoute: typeof LearnSlugRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   PassportSlugRoute: typeof PassportSlugRoute
   RCodeRoute: typeof RCodeRouteWithChildren
@@ -1786,6 +1799,13 @@ declare module '@tanstack/react-router' {
       path: '/listing/$id'
       fullPath: '/listing/$id'
       preLoaderRoute: typeof ListingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn/$slug': {
+      id: '/learn/$slug'
+      path: '/learn/$slug'
+      fullPath: '/learn/$slug'
+      preLoaderRoute: typeof LearnSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/invites/$token': {
@@ -2496,6 +2516,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   GoProductIdRoute: GoProductIdRoute,
   InvitesTokenRoute: InvitesTokenRoute,
+  LearnSlugRoute: LearnSlugRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   PassportSlugRoute: PassportSlugRoute,
   RCodeRoute: RCodeRouteWithChildren,
