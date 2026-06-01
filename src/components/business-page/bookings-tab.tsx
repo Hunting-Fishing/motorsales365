@@ -351,11 +351,28 @@ function ExceptionsSection({
   const remove = useServerFn(deleteException);
   const [date, setDate] = useState("");
   const [note, setNote] = useState("");
+  const [mode, setMode] = useState<"closed_all" | "block_range" | "open_range">("closed_all");
+  const [startTime, setStartTime] = useState("09:00");
+  const [endTime, setEndTime] = useState("12:00");
 
-  async function addClosed() {
+  async function add() {
     if (!date) return;
+    const payload: any = { businessId, date, note: note || null };
+    if (mode === "closed_all") {
+      payload.closed = true;
+      payload.start_time = null;
+      payload.end_time = null;
+    } else {
+      if (!startTime || !endTime || endTime <= startTime) {
+        toast.error("End time must be after start time.");
+        return;
+      }
+      payload.closed = mode === "block_range";
+      payload.start_time = startTime;
+      payload.end_time = endTime;
+    }
     try {
-      await upsert({ data: { businessId, date, closed: true, note: note || null } });
+      await upsert({ data: payload });
       setDate("");
       setNote("");
       onChange();
@@ -366,32 +383,71 @@ function ExceptionsSection({
 
   return (
     <Card className="p-5">
-      <h2 className="mb-1 font-display text-lg font-semibold">Holidays / closed days</h2>
-      <p className="mb-3 text-xs text-muted-foreground">Block specific dates from bookings.</p>
-      <div className="mb-3 flex flex-wrap items-end gap-2">
-        <div>
-          <Label>Date</Label>
-          <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="h-9 w-44" />
+      <h2 className="mb-1 font-display text-lg font-semibold">Holidays &amp; date overrides</h2>
+      <p className="mb-3 text-xs text-muted-foreground">
+        Close a full day, block a specific time range, or open a custom window for one date.
+      </p>
+      <div className="mb-3 grid gap-2 sm:grid-cols-[auto,1fr] sm:items-end">
+        <div className="flex flex-wrap items-end gap-2">
+          <div>
+            <Label>Date</Label>
+            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="h-9 w-44" />
+          </div>
+          <div>
+            <Label>Type</Label>
+            <select
+              value={mode}
+              onChange={(e) => setMode(e.target.value as typeof mode)}
+              className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+            >
+              <option value="closed_all">Closed all day</option>
+              <option value="block_range">Block time range</option>
+              <option value="open_range">Open only this range</option>
+            </select>
+          </div>
+          {mode !== "closed_all" && (
+            <>
+              <div>
+                <Label>From</Label>
+                <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="h-9 w-28" />
+              </div>
+              <div>
+                <Label>To</Label>
+                <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="h-9 w-28" />
+              </div>
+            </>
+          )}
         </div>
-        <div className="flex-1 min-w-[160px]">
-          <Label>Note</Label>
-          <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Holiday, etc." maxLength={200} className="h-9" />
+        <div className="flex items-end gap-2">
+          <div className="flex-1">
+            <Label>Note</Label>
+            <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Holiday, lunch break, etc." maxLength={200} className="h-9" />
+          </div>
+          <Button onClick={add}>Add</Button>
         </div>
-        <Button onClick={addClosed}>Add closed day</Button>
       </div>
       <div className="space-y-2">
-        {exceptions.map((e) => (
-          <div key={e.id} className="flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm">
-            <div>
-              <span className="font-medium">{e.date}</span>
-              {e.closed ? <Badge variant="secondary" className="ml-2">Closed</Badge> : <Badge variant="outline" className="ml-2">{e.start_time}–{e.end_time}</Badge>}
-              {e.note && <span className="ml-2 text-muted-foreground">{e.note}</span>}
+        {exceptions.map((e) => {
+          const hasRange = !!(e.start_time && e.end_time);
+          const label = !hasRange
+            ? "Closed all day"
+            : e.closed
+              ? `Blocked ${e.start_time}–${e.end_time}`
+              : `Open only ${e.start_time}–${e.end_time}`;
+          const variant = e.closed ? "secondary" : "outline";
+          return (
+            <div key={e.id} className="flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm">
+              <div>
+                <span className="font-medium">{e.date}</span>
+                <Badge variant={variant} className="ml-2">{label}</Badge>
+                {e.note && <span className="ml-2 text-muted-foreground">{e.note}</span>}
+              </div>
+              <Button size="sm" variant="ghost" onClick={() => remove({ data: { businessId, id: e.id } }).then(onChange)}>
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
-            <Button size="sm" variant="ghost" onClick={() => remove({ data: { businessId, id: e.id } }).then(onChange)}>
-              <Trash2 className="h-4 w-4" />
-            </Button>
-          </div>
-        ))}
+          );
+        })}
         {exceptions.length === 0 && <p className="text-sm text-muted-foreground">No exceptions.</p>}
       </div>
     </Card>
