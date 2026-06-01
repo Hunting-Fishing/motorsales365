@@ -1,99 +1,102 @@
+## Business sign-up & onboarding — audit findings + fix plan
 
-# Education Portal Plan
+Full audit covered the 15 surfaces of the business owner lifecycle (signup → email verify → verification docs → submit listing → checkout → list dashboard → editor tabs → mini-site → bookings/analytics → emails → tier gating).
 
-Adds a new `/learn` section to 365 Motorsales: admin-published video courses with quizzes and completion certificates, sold individually or unlocked via existing subscription tiers, plus a separate `/partner-training` page for sponsored external schools.
+Below is the prioritized fix plan. P0 = blocks launch; P1 = important; P2 = polish.
 
-## Routes
+---
 
-- `/learn` — course catalog (categories: Repair, Detailing, Bodywork, Business, etc.), filters, search
-- `/learn/$slug` — course landing page: overview, curriculum, instructor, price, "Buy" or "Start learning" CTA
-- `/learn/$slug/watch/$lessonId` — gated player (video + lesson notes), sidebar with lesson list & progress
-- `/learn/$slug/quiz/$quizId` — quiz taker (multiple choice, pass threshold gates next module)
-- `/learn/$slug/certificate` — completion certificate page (printable, shareable, verifiable via short code)
-- `/dashboard/learning` — user's enrolled courses + progress + certificates
-- `/partner-training` — sponsored external training facilities directory (clearly marked as paid placements)
-- `/admin/education` — admin: CRUD courses, modules, lessons, quizzes, enrollments, certificates, partners
-- `/c/$code` — public certificate verification page
+### P0 — Launch blockers (do first)
 
-## Data model (new tables)
+1. **Send the missing lifecycle emails** — owners are currently flying blind at every step.
+   - Create templates: `business-submitted`, `business-approved`, `verification-submitted`, `verification-approved`, `verification-rejected`, `booking-status-changed`.
+   - Wire `business-archived` / `business-restored` (templates exist but `dashboard.businesses.tsx setStatus` never enqueues them — UI even promises "we'll email you").
+   - Add DB triggers (or server-fn enqueues) for: business insert → submitted; business status `pending → active` → approved; verification_requests status changes → submitted/approved/rejected; bookings status change → customer email.
 
-- `courses` — slug, title, summary, description, hero_image, category, level, duration_minutes, instructor_name, price_id (nullable for subscription-only), included_in_tiers (array of plan slugs), status, published_at
-- `course_modules` — course_id, position, title
-- `course_lessons` — module_id, position, title, video_url (Mux/Cloudflare Stream playback id), duration_seconds, content_md (notes/resources), is_preview
-- `course_resources` — lesson_id, label, file_url
-- `course_quizzes` — module_id (or course_id for final), title, pass_threshold (e.g. 80)
-- `course_quiz_questions` — quiz_id, position, prompt, choices (jsonb), correct_index, explanation
-- `course_enrollments` — user_id, course_id, source ('purchase' | 'subscription' | 'admin_grant'), payment_id (nullable), enrolled_at
-- `course_lesson_progress` — enrollment_id, lesson_id, completed_at, watch_seconds
-- `course_quiz_attempts` — enrollment_id, quiz_id, score, passed, answers (jsonb), attempted_at
-- `course_certificates` — enrollment_id, code (short public id), issued_at, pdf_url (nullable, generated on demand)
-- `training_partners` — slug, name, logo_url, website_url, description, location, specialties, tier ('featured' | 'standard'), sponsored_until, click_count, active
-- `training_partner_clicks` — partner_id, visitor_id, created_at (for affiliate-style tracking, like existing `shop_clicks`)
+2. **Wrong service catalog for non-fuel businesses.** `CatalogPicker` (`service-catalog-picker.tsx`) hardcodes `FUEL_STATION_CATALOG` and shows fuel grades to repair shops, towing companies, etc. Branch the catalog by `typeSlug` (fall back to a generic "Add custom service" panel when no catalog exists for the type).
 
-All tables get RLS:
-- Public reads on `courses` (status='published'), `course_modules`, `course_lessons` (preview-only fields when not enrolled), `training_partners` (active=true), `course_certificates` by `code`.
-- Authenticated users read/write their own `course_enrollments`, `course_lesson_progress`, `course_quiz_attempts`.
-- Admin/moderator full CRUD via existing `can_moderate()` / `has_role('admin')` helpers.
-- Explicit GRANTs to anon/authenticated/service_role per public-schema rules.
+3. **No location / map edit post-submission.** `lat`, `lng`, `street_address`, `region/province/city`, `postal_code` are locked at submit time. Add a "Location" tab to `dashboard.businesses_.$id.edit.tsx` with the same `LocationPicker` used at submit.
 
-## Access logic
+4. **Raw client insert in `businesses.submit.tsx`.** Replace `(supabase as any).from('businesses').insert(...)` with a `createServerFn` (`submitBusiness`) that validates with Zod, generates a unique slug (collision-check loop), uploads photos to a per-owner path, and returns the new row. Enqueues the `business-submitted` email from the same handler.
 
-Server function `getCourseAccess(courseId)`:
-1. If user owns an active `course_enrollments` row → access granted.
-2. Else if course is included in a tier AND user has an active subscription on that tier → auto-create enrollment (source='subscription') → access granted.
-3. Else → access denied (show buy CTA).
+5. **Verification `business_kind` mismatch.** `dashboard.verification.tsx` exposes 4 options but signup offers 21. Replace the hardcoded enum with the same `BUSINESS_KINDS` source used at signup so a `towing` / `carwash` / `parts_shop` owner can self-identify correctly.
 
-Certificate is issued by a server function after the final quiz passes and all required lessons are marked complete.
+---
 
-## Payments
+### P1 — Important polish
 
-- Each paid course gets a one-time Stripe price via `payments--create_product` (snake_case `course_<slug>_onetime`, PHP currency to match existing plans, single quantity).
-- Checkout reuses the existing embedded Stripe flow (`StripeEmbeddedCheckout` + `createCheckoutSession`) — no new infra.
-- Webhook handler (`/api/public/payments/webhook`) adds a `checkout.session.completed` branch: if metadata.kind === 'course', insert `course_enrollments` (source='purchase').
-- Subscription tiers (Bronze/Silver/Gold/Platinum/Business) get a configurable "included courses" mapping in admin — drives auto-enrollment in step 2 above.
-- Tax handling: ask the user before wiring (per Stripe rules) — for digital courses, Lovable-managed compliance handling (+3.5%) is recommended; will confirm at build time.
+6. **Make core business fields editable post-submit.** Profile tab in the editor currently can't change `name`, `phone`, `email`, `website`, `type_slug`. Add these to `ProfileTab` (with slug-rename warning).
 
-## Sponsored partners (`/partner-training`)
+7. **Replace `window.confirm` with themed dialog** in `dashboard.businesses.tsx` (archive) and `bookings-tab.tsx` (delete). Use existing `AlertDialog`.
 
-- Standalone public page, separate from `/learn` so course catalog stays uncluttered.
-- Card grid: logo, name, location, specialties, "Visit website" button → routes through `/api/public/training-partners/$id/click` to log + redirect (mirrors existing `resolveShopRedirect` pattern).
-- Admin CRUD with `sponsored_until` date and `tier` flag controlling sort.
-- Clearly labeled "Sponsored" on each card; "These are paid placements" disclosure at top + in `/terms`.
+8. **Slug collision UX** in `businesses.submit.tsx` — pre-check uniqueness before insert and surface a friendly message ("That URL is taken — try `repair-shop-makati-2`").
 
-## Admin tooling (`/admin/education`)
+9. **Google OAuth drops business fields.** `signup.tsx` business-intent form values aren't stashed before `signInWithOAuth` redirect. Persist them to `localStorage` in `handleGoogle()` the same way email signup does, and replay in `verify-email.tsx` / `use-auth.tsx`.
 
-- Tabs: Courses, Partners, Enrollments, Certificates.
-- Course editor: tabbed form (Details / Curriculum / Quizzes / Pricing / Publish).
-- Lesson media: upload to existing Supabase storage bucket (new `course-media` bucket) or paste Mux playback id.
-- Enrollments table: search, manual grant, revoke.
-- Partner editor: name, logo upload, website, sponsorship dates.
+10. **Tier feature gates missing.** Analytics tab, gallery size, services count, etc. are open to all tiers. Add a small `useBusinessTier(business)` helper and gate the relevant tabs with an upsell card linking to the plan dialog.
 
-## Navigation & SEO
+11. **Pending business cannot upgrade.** `dashboard.businesses.tsx` only shows the Upgrade CTA when `status === 'active'`. Add explanatory copy + allow plan selection (saved as `pending_plan_slug`) for pending businesses.
 
-- Add "Learn" link to `site-header.tsx` desktop nav + mobile tab bar.
-- Each route defines its own `head()` with title/description/og.
-- Sitemap (`/sitemap.xml`) extended to include published courses and active partners.
-- JSON-LD `Course` schema on `/learn/$slug` for SEO.
+12. **No cancel / downgrade UI** in `business-plan-dialog.tsx`. Add a "Manage subscription" link (Stripe customer portal) and surface current renewal date.
 
-## Policy updates (per project memory)
+13. **Remove dead `private_seller` type** in `signup.tsx`, `verify-email.tsx`, `account-type-grid.tsx`.
 
-- `/terms` — new section covering course purchases, refund window for courses, subscription-included access, sponsored partner disclosure; bump "Last updated".
-- `/refund-policy` — course refund rules (e.g. 7-day if <20% watched).
-- `/privacy` — note progress/quiz data collection; bump date.
+14. **Hours editor incomplete-check.** `onboarding-checklist.tsx` flags `hours` as done when the JSON is non-null even if all days are closed. Add a real "has at least one open day" check.
 
-## Out of scope (explicit)
+15. **Booking exception editor — partial-day overrides.** Schema supports start/end times but UI only toggles full-day closed. Allow time-range overrides.
 
-- Live streaming / cohort classes.
-- Instructor marketplace / revenue share (admin-only publishing for now).
-- DRM beyond signed playback URLs.
-- Mobile native app changes.
+---
 
-## Build order
+### P2 — Nice to have
 
-1. DB migrations (tables + RLS + GRANTs + storage bucket).
-2. Server functions (course access, enrollment, progress, quiz scoring, certificate issuance, partner click tracking).
-3. Public routes (`/learn`, `/learn/$slug`, watch/quiz/certificate, `/partner-training`, `/c/$code`).
-4. User dashboard tab (`/dashboard/learning`).
-5. Admin `/admin/education` panels.
-6. Stripe product seeding helper (admin button → creates Stripe product/price for a course) + webhook branch.
-7. Header/footer/sitemap/SEO + policy page updates.
+16. Auto-save drafts in the 11-tab editor (per-tab debounce → `business_drafts` table or local).
+17. Preview-before-publish toggle (`/dashboard/businesses/{id}/preview`).
+18. Public/draft soft-unpublish toggle.
+19. Transfer-ownership flow (email-confirmation handoff).
+20. Analytics tab: date-range picker + CSV export + clicks/bookings overlay.
+21. SEO tab: per-business meta title/description/OG image overrides.
+22. Verification form: cancel pending submission; larger mobile-friendly dropzone.
+23. `verify-email.tsx`: graceful fallback when `?email=` missing; intent-specific "what's next" copy.
+24. `account-type-card.tsx`: always-visible "Popular for Pros" badge + keyboard nav.
+25. Tags tab: order category headers based on business type instead of fuel-station-first.
+26. `business.checkout.tsx`: loading state + error boundary around Stripe `EmbeddedCheckout`.
+
+---
+
+### Implementation order (suggested)
+
+```text
+Phase 1 (P0):
+  1. Create 6 missing email templates + registry entries
+  2. Add DB triggers / server fn enqueues for each lifecycle event
+  3. Wire archive/restore emails into setStatus
+  4. submitBusiness server fn + slug collision loop
+  5. Verification kind enum sync
+  6. Location tab in editor
+  7. Branch CatalogPicker by typeSlug
+
+Phase 2 (P1):
+  8. Editable core fields in ProfileTab
+  9. AlertDialog replacements
+ 10. Google OAuth stash for business fields
+ 11. Tier gate helper + upsell cards
+ 12. Pending-business upgrade affordance
+ 13. Stripe portal link in plan dialog
+ 14. Drop private_seller dead type
+ 15. Real hours-completeness check
+ 16. Partial-day booking exceptions
+
+Phase 3 (P2 polish): items 16–26 as bandwidth allows.
+```
+
+### Reference files
+
+- Signup: `src/routes/signup.tsx`, `src/components/signup/account-type-{card,grid}.tsx`, `src/routes/verify-email.tsx`
+- Verification: `src/routes/dashboard.verification.tsx`
+- Submit / checkout: `src/routes/businesses.submit.tsx`, `src/routes/business.checkout.tsx`
+- Dashboard: `src/routes/dashboard.businesses.tsx`, `src/routes/dashboard.businesses_.$id.edit.tsx`
+- Components: `src/components/business-page/*`, `src/components/business/*`, `src/components/business-plan-dialog.tsx`
+- Server fns: `src/lib/business-{subscriptions,pages,mini-site,bookings}.functions.ts`
+- Emails: `src/lib/email-templates/*`, `src/lib/email-templates/registry.ts`
+
+Approve to proceed with **Phase 1 (P0)** first, or tell me to scope down / re-order.
