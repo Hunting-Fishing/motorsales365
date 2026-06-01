@@ -248,6 +248,7 @@ function SubmitBusinessPage() {
   const submit = async () => {
     if (!user) return;
     if (!name.trim() || !typeSlug) { toast.error("Name and business type are required"); return; }
+    if (!hasOpenDay(hours)) { toast.error("Set at least one open day in your business hours."); return; }
     setSubmitting(true);
     try {
       const result = await submitFn({
