@@ -272,22 +272,37 @@ function MyBusinessesPage() {
     })();
   }, [user]);
 
+  const archivedCount = rows.filter((r) => r.status === "archived").length;
+  const visibleRows = showArchived ? rows : rows.filter((r) => r.status !== "archived");
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <h1 className="font-display text-2xl font-bold">My businesses</h1>
-        <Button asChild size="sm"><Link to="/businesses/submit"><Plus className="mr-1 h-4 w-4" />Add business</Link></Button>
+        <div className="flex items-center gap-2">
+          {archivedCount > 0 && (
+            <Button
+              size="sm"
+              variant={showArchived ? "secondary" : "outline"}
+              onClick={() => setShowArchived((v) => !v)}
+            >
+              <Archive className="mr-1 h-3.5 w-3.5" />
+              {showArchived ? "Hide archived" : `Show archived (${archivedCount})`}
+            </Button>
+          )}
+          <Button asChild size="sm"><Link to="/businesses/submit"><Plus className="mr-1 h-4 w-4" />Add business</Link></Button>
+        </div>
       </div>
       {loading ? (
         <Card className="p-6 text-sm text-muted-foreground">Loading…</Card>
-      ) : rows.length === 0 ? (
+      ) : visibleRows.length === 0 ? (
         <Card className="p-6 text-center text-sm text-muted-foreground">
           <StoreIcon className="mx-auto mb-2 h-6 w-6 opacity-60" />
-          You haven't listed any business yet.
+          {rows.length === 0 ? "You haven't listed any business yet." : "No businesses to show."}
         </Card>
       ) : (
         <div className="space-y-2">
-          {rows.map((b) => {
+          {visibleRows.map((b) => {
             const x: Extras = extras[b.id] ?? { servicesCount: 0, productsCount: 0, photosCount: 0, newInquiries: 0 };
             return (
             <Card key={b.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
