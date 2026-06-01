@@ -289,6 +289,10 @@ async function handleEvent(env: StripeEnv, event: Stripe.Event) {
         await activateBoostFromSession(env, session);
         break;
       }
+      if (session.metadata?.kind === "course") {
+        await enrollCourseFromSession(env, session);
+        break;
+      }
       if (session.mode === "subscription" && session.subscription) {
         const stripe = createStripeClient(env);
         const subId = typeof session.subscription === "string"
