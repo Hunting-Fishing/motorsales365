@@ -66,6 +66,8 @@ function BrandPage() {
           {garage && <Badge variant="secondary">Filtered for: {formatVehicle(garage)}</Badge>}
         </header>
 
+        <ShopifyStoreBanner />
+
         <div className="flex flex-wrap items-center gap-2">
           <label className="text-xs text-muted-foreground">Category</label>
           <select

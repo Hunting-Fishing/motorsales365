@@ -117,6 +117,7 @@ function DepartmentPage() {
           </div>
         )}
 
+        <ShopifyStoreBanner />
         <AdCarousel placement="shop_top" />
 
         {categories.length > 0 && (

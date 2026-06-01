@@ -93,6 +93,8 @@ function ProductPage() {
           </>}
         </div>
 
+        <ShopifyStoreBanner />
+
         <div className="grid gap-8 md:grid-cols-2">
           <div>
             {p.image_url

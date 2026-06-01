@@ -44,6 +44,8 @@ function ShopCategoriesIndex() {
           </p>
         </header>
 
+        <ShopifyStoreBanner />
+
         {grouped.map(({ department, parents }) => (
           parents.length > 0 && (
             <section key={department.slug} className="space-y-4">
