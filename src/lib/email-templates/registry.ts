@@ -26,6 +26,12 @@ import { template as bookingCustomer } from './booking-customer'
 import { template as bookingOwner } from './booking-owner'
 import { template as businessArchived } from './business-archived'
 import { template as businessRestored } from './business-restored'
+import { template as businessSubmitted } from './business-submitted'
+import { template as businessApproved } from './business-approved'
+import { template as verificationSubmitted } from './verification-submitted'
+import { template as verificationApproved } from './verification-approved'
+import { template as verificationRejected } from './verification-rejected'
+import { template as bookingStatusChanged } from './booking-status-changed'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'signup-welcome': signupWelcome,
@@ -45,5 +51,11 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'booking-owner': bookingOwner,
   'business-archived': businessArchived,
   'business-restored': businessRestored,
+  'business-submitted': businessSubmitted,
+  'business-approved': businessApproved,
+  'verification-submitted': verificationSubmitted,
+  'verification-approved': verificationApproved,
+  'verification-rejected': verificationRejected,
+  'booking-status-changed': bookingStatusChanged,
 }
 
