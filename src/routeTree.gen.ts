@@ -72,6 +72,7 @@ import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favor
 import { Route as DashboardBusinessesRouteImport } from './routes/dashboard.businesses'
 import { Route as DashboardBillingRouteImport } from './routes/dashboard.billing'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
+import { Route as CCodeRouteImport } from './routes/c.$code'
 import { Route as BusinessesSubmitRouteImport } from './routes/businesses.submit'
 import { Route as BusinessesSlugRouteImport } from './routes/businesses.$slug'
 import { Route as BusinessCheckoutRouteImport } from './routes/business.checkout'
@@ -442,6 +443,11 @@ const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
   path: '/checkout/return',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CCodeRoute = CCodeRouteImport.update({
+  id: '/c/$code',
+  path: '/c/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BusinessesSubmitRoute = BusinessesSubmitRouteImport.update({
   id: '/businesses/submit',
   path: '/businesses/submit',
@@ -772,6 +778,7 @@ export interface FileRoutesByFullPath {
   '/business/checkout': typeof BusinessCheckoutRoute
   '/businesses/$slug': typeof BusinessesSlugRouteWithChildren
   '/businesses/submit': typeof BusinessesSubmitRoute
+  '/c/$code': typeof CCodeRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
@@ -889,6 +896,7 @@ export interface FileRoutesByTo {
   '/business/checkout': typeof BusinessCheckoutRoute
   '/businesses/$slug': typeof BusinessesSlugRouteWithChildren
   '/businesses/submit': typeof BusinessesSubmitRoute
+  '/c/$code': typeof CCodeRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
@@ -1008,6 +1016,7 @@ export interface FileRoutesById {
   '/business/checkout': typeof BusinessCheckoutRoute
   '/businesses/$slug': typeof BusinessesSlugRouteWithChildren
   '/businesses/submit': typeof BusinessesSubmitRoute
+  '/c/$code': typeof CCodeRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
@@ -1129,6 +1138,7 @@ export interface FileRouteTypes {
     | '/business/checkout'
     | '/businesses/$slug'
     | '/businesses/submit'
+    | '/c/$code'
     | '/checkout/return'
     | '/dashboard/billing'
     | '/dashboard/businesses'
@@ -1246,6 +1256,7 @@ export interface FileRouteTypes {
     | '/business/checkout'
     | '/businesses/$slug'
     | '/businesses/submit'
+    | '/c/$code'
     | '/checkout/return'
     | '/dashboard/billing'
     | '/dashboard/businesses'
@@ -1364,6 +1375,7 @@ export interface FileRouteTypes {
     | '/business/checkout'
     | '/businesses/$slug'
     | '/businesses/submit'
+    | '/c/$code'
     | '/checkout/return'
     | '/dashboard/billing'
     | '/dashboard/businesses'
@@ -1466,6 +1478,7 @@ export interface RootRouteChildren {
   BusinessCheckoutRoute: typeof BusinessCheckoutRoute
   BusinessesSlugRoute: typeof BusinessesSlugRouteWithChildren
   BusinessesSubmitRoute: typeof BusinessesSubmitRoute
+  CCodeRoute: typeof CCodeRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   GoProductIdRoute: typeof GoProductIdRoute
@@ -1945,6 +1958,13 @@ declare module '@tanstack/react-router' {
       path: '/checkout/return'
       fullPath: '/checkout/return'
       preLoaderRoute: typeof CheckoutReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/c/$code': {
+      id: '/c/$code'
+      path: '/c/$code'
+      fullPath: '/c/$code'
+      preLoaderRoute: typeof CCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/businesses/submit': {
@@ -2532,6 +2552,7 @@ const rootRouteChildren: RootRouteChildren = {
   BusinessCheckoutRoute: BusinessCheckoutRoute,
   BusinessesSlugRoute: BusinessesSlugRouteWithChildren,
   BusinessesSubmitRoute: BusinessesSubmitRoute,
+  CCodeRoute: CCodeRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   GoProductIdRoute: GoProductIdRoute,
