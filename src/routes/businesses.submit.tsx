@@ -68,6 +68,7 @@ function SubmitBusinessPage() {
   const [submitting, setSubmitting] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [logoUploading, setLogoUploading] = useState(false);
+  const [hours, setHours] = useState<WeekSchedule>(emptyWeek());
   const [tagsOpen, setTagsOpen] = useState(false);
   const [tagSearch, setTagSearch] = useState("");
   const [suggestOpen, setSuggestOpen] = useState(false);
