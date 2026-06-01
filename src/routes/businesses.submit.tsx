@@ -22,6 +22,8 @@ import { useDynamicMeta } from "@/hooks/use-dynamic-meta";
 import { useDynamicJsonLd } from "@/hooks/use-dynamic-jsonld";
 import { PhoneInput } from "@/components/phone-input";
 import { buildE164 } from "@/data/country-codes";
+import { WeekHoursEditor } from "@/components/business/hours-editor";
+import { emptyWeek, hasOpenDay, TZ, type WeekSchedule } from "@/lib/business-hours";
 
 export const Route = createFileRoute("/businesses/submit")({
   head: () => ({
@@ -66,6 +68,7 @@ function SubmitBusinessPage() {
   const [submitting, setSubmitting] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [logoUploading, setLogoUploading] = useState(false);
+  const [hours, setHours] = useState<WeekSchedule>(emptyWeek());
   const [tagsOpen, setTagsOpen] = useState(false);
   const [tagSearch, setTagSearch] = useState("");
   const [suggestOpen, setSuggestOpen] = useState(false);
@@ -245,6 +248,7 @@ function SubmitBusinessPage() {
   const submit = async () => {
     if (!user) return;
     if (!name.trim() || !typeSlug) { toast.error("Name and business type are required"); return; }
+    if (!hasOpenDay(hours)) { toast.error("Set at least one open day in your business hours."); return; }
     setSubmitting(true);
     try {
       const result = await submitFn({
@@ -268,6 +272,7 @@ function SubmitBusinessPage() {
           lat: lat ? Number(lat) : null,
           lng: lng ? Number(lng) : null,
           tag_slugs: selectedTags,
+          hours: { tz: TZ, primary: hours },
         },
       });
       setSubmitting(false);
@@ -560,6 +565,12 @@ function SubmitBusinessPage() {
               <Input placeholder="Latitude" value={lat} onChange={(e) => setLat(e.target.value)} />
               <Input placeholder="Longitude" value={lng} onChange={(e) => setLng(e.target.value)} />
             </div>
+          </div>
+
+          <div>
+            <Label>Business hours</Label>
+            <p className="mb-2 text-xs text-muted-foreground">Set at least one open day so customers know when to reach you. You can refine these any time from your dashboard.</p>
+            <WeekHoursEditor value={hours} onChange={setHours} />
           </div>
 
           <div className="flex justify-end">

@@ -132,3 +132,23 @@ export function legacyToRows(h: any): { day: string; text: string }[] | null {
   if (keys.length === 0) return null;
   return keys.map((k) => ({ day: k, text: String(h[k]) }));
 }
+
+// True if at least one day is 24h, or "open" with a valid range (close > open).
+export function hasOpenDay(week: WeekSchedule): boolean {
+  for (const d of DAY_KEYS) {
+    const day = week[d];
+    if (!day) continue;
+    if (day.mode === "24h") return true;
+    if (day.mode === "open") {
+      const ranges = day.ranges ?? [];
+      if (ranges.some((r) => r && r.open && r.close && toMin(r.close) > toMin(r.open))) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+export function hasStructuredOpenDay(h: any): boolean {
+  return isStructuredHours(h) && hasOpenDay(h.primary);
+}

@@ -1,42 +1,47 @@
-## Phase 1 (P0) — remaining items
+## Goal
 
-Continuing from the email templates + triggers + business_kind enum sync already shipped. Four items left to close out Phase 1.
+Block business submission until the owner has set at least one open day in the weekly hours. Today, hours are only editable in the post-submission editor, so brand-new listings can go to "pending" with no schedule at all — which downstream booking, "open now" badges, and the public mini-site all assume exists.
 
-### 1. Resolve `business_kind` type-cast errors in verification
-- `dashboard.verification.tsx` now renders all 21 options from `BUSINESS_KIND_OPTIONS`, but TS still narrows `business_kind` to the old 4-value union in places.
-- Fix the form state + insert payload to type as `Database["public"]["Enums"]["business_kind"]` (regenerated after the enum migration) and drop any `as any` casts.
+## Scope
 
-### 2. Branch `CatalogPicker` by business type
-- `src/components/business/service-catalog-picker.tsx` currently always loads `FUEL_STATION_CATALOG`.
-- Add a `typeSlug` prop. Map:
-  - `fuel_station` → existing fuel catalog
-  - everything else → generic "Add custom service" panel (name + price + duration + description), backed by the same `services` table shape.
-- Update call sites in `dashboard.businesses_.$id.edit.tsx` and `businesses.submit.tsx` to pass `typeSlug`.
+- Add a hours step to the public submit form (`/businesses/submit`).
+- Gate the submit action on having ≥1 day with `mode: "open"` (with at least one valid range) or `mode: "24h"`.
+- Persist the structured hours through the `submitBusiness` server function into `businesses.hours`.
+- Add a shared `hasOpenDay()` helper in `src/lib/business-hours.ts` so the submit form, the editor, and any future verification gate share the same definition.
 
-### 3. `submitBusiness` server function
-- New file: `src/lib/businesses.functions.ts` (createServerFn, `requireSupabaseAuth`).
-- Zod-validate the full submit payload (name, type_slug, contact, location, hours, photos[], services[]).
-- Slug generation loop: slugify(name) → check `businesses.slug` uniqueness → append `-2`, `-3`… until free (max 50 tries).
-- Insert business row owned by `auth.uid()` with `status='pending'`.
-- Insert child rows (hours, services, photos) in same handler.
-- Enqueue `business-submitted` email (already wired via DB trigger — handler just returns).
-- Replace the raw `(supabase as any).from('businesses').insert(...)` block in `src/routes/businesses.submit.tsx` with `useServerFn(submitBusiness)` + friendly slug-collision error toast.
+Out of scope: forcing already-pending/approved businesses without hours to backfill, partial-day exceptions, separate "store" vs "primary" schedules.
 
-### 4. "Location" tab in business editor
-- New tab in `src/routes/dashboard.businesses_.$id.edit.tsx` between Profile and Hours.
-- Reuses `LocationPicker` from submit flow.
-- Editable fields: `street_address`, `city`, `province`, `region`, `postal_code`, `lat`, `lng`, plus map marker drag.
-- Save via existing `updateBusiness` server fn (extend allowed columns).
+## Changes
 
-### Files touched
-- create `src/lib/businesses.functions.ts`
-- edit `src/components/business/service-catalog-picker.tsx`
-- edit `src/routes/businesses.submit.tsx`
-- edit `src/routes/dashboard.businesses_.$id.edit.tsx`
-- edit `src/routes/dashboard.verification.tsx` (type cleanup only)
-- edit `src/lib/business-pages.functions.ts` (if `updateBusiness` needs new allowed fields)
+1. **`src/lib/business-hours.ts`** — add:
+   - `hasOpenDay(week: WeekSchedule): boolean` → true if any day is `mode: "24h"`, or `mode: "open"` with ≥1 range where `close > open` (both `HH:MM`).
+   - `hasStructuredOpenDay(h: any): boolean` → `isStructuredHours(h) && hasOpenDay(h.primary)`.
 
-### Out of scope (Phase 2)
-Editable core ProfileTab fields, AlertDialog swaps, Google OAuth stash, tier gates, pending-upgrade affordance, Stripe portal link, dead `private_seller` removal, hours-completeness check, partial-day booking exceptions.
+2. **`src/lib/businesses.functions.ts`** — extend `submitBusiness`:
+   - Add optional `hours` to the zod schema: an object `{ tz: string, primary: WeekSchedule }` with `mode ∈ {"open","closed","24h"}` and `ranges` of `{open, close}` `HH:MM` strings (max 3/day).
+   - Reject the call if `hours` is missing or `hasStructuredOpenDay(hours)` is false → `throw new Error("Please set at least one open day in your business hours.")`.
+   - Insert `hours: data.hours` along with the rest of the row.
 
-Approve to switch to build mode and ship items 1–4 in that order.
+3. **`src/routes/businesses.submit.tsx`**:
+   - Import `WeekHoursEditor`, `emptyWeek`, `hasOpenDay`, `TZ` from existing helpers.
+   - New state: `const [hours, setHours] = useState<WeekSchedule>(emptyWeek())`.
+   - Render a "Business hours" section (Card) between Location and the Tags block.
+   - In `submit()`, before calling the server fn:
+     - `if (!hasOpenDay(hours)) { toast.error("Set at least one open day in your hours."); return; }`
+   - Pass `hours: { tz: TZ, primary: hours }` to `submitFn`.
+
+4. **`src/routes/dashboard.businesses_.$id.edit.tsx` (HoursTab)** — swap its local "any open day" check (if it has one) for the shared `hasOpenDay()` so error copy matches; no behavioral change beyond consistency.
+
+## Validation
+
+- Manual: open `/businesses/submit`, fill required fields, leave all days closed → submit shows the toast and never reaches the server. Mark Mon open 09:00–17:00 → submit succeeds, `businesses.hours` populated, public mini-site shows "Open now" / "Closed" correctly.
+- `bunx tsc --noEmit` after the edit.
+
+## Files
+
+- edit: `src/lib/business-hours.ts`
+- edit: `src/lib/businesses.functions.ts`
+- edit: `src/routes/businesses.submit.tsx`
+- edit (small): `src/routes/dashboard.businesses_.$id.edit.tsx`
+
+No DB migration, no policy/terms change (hours are not a fee/data-handling change).

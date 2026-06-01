@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { hasStructuredOpenDay } from "@/lib/business-hours";
 
 function slugify(s: string): string {
   return s
@@ -42,11 +43,35 @@ export const submitBusiness = createServerFn({ method: "POST" })
         lat: z.number().min(-90).max(90).nullable().optional(),
         lng: z.number().min(-180).max(180).nullable().optional(),
         tag_slugs: z.array(z.string().min(1).max(80)).max(40).optional(),
+        hours: z
+          .object({
+            tz: z.string().min(1).max(60),
+            primary: z.record(
+              z.enum(["mon", "tue", "wed", "thu", "fri", "sat", "sun"]),
+              z.object({
+                mode: z.enum(["open", "closed", "24h"]),
+                ranges: z
+                  .array(
+                    z.object({
+                      open: z.string().regex(/^\d{2}:\d{2}$/),
+                      close: z.string().regex(/^\d{2}:\d{2}$/),
+                    }),
+                  )
+                  .max(3)
+                  .optional(),
+              }),
+            ),
+          })
+          .optional(),
       })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+
+    if (!hasStructuredOpenDay(data.hours)) {
+      throw new Error("Please set at least one open day in your business hours.");
+    }
 
     // 1) Unique-slug loop (max 50 attempts) — pre-checks `businesses.slug`.
     const base = slugify(data.name) || "business";
