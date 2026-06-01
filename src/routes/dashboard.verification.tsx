@@ -150,7 +150,7 @@ function VerificationPage() {
     setSubmitting(true);
     const payload = {
       user_id: user.id,
-      business_kind: form.business_kind,
+      business_kind: form.business_kind as (typeof BUSINESS_KIND_VALUES)[number],
       legal_name: form.legal_name.trim(),
       dti_sec_registration: form.dti_sec_registration.trim() || null,
       tax_id: form.tax_id.trim() || null,
