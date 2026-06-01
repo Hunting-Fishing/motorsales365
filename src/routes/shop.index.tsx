@@ -173,6 +173,7 @@ function ShopIndex() {
       </div>
 
       <div className="container mx-auto px-4 py-8 space-y-12">
+        <ShopifyStoreBanner />
         <AdCarousel placement="shop_top" />
 
         {departments.length > 0 && (

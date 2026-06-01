@@ -5,6 +5,7 @@ import { listShopCategoryTree } from "@/lib/shop.functions";
 import { Badge } from "@/components/ui/badge";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ShopBreadcrumbs } from "@/components/shop/shop-breadcrumbs";
+import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
 
 export const Route = createFileRoute("/shop/categories")({
   component: ShopCategoriesIndex,

@@ -6,6 +6,7 @@ import { SiteLayout } from "@/components/site-layout";
 import { listShopProducts, listShopCategories } from "@/lib/shop.functions";
 import { ProductGrid } from "./shop.index";
 import { ShopBreadcrumbs } from "@/components/shop/shop-breadcrumbs";
+import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
 import { Badge } from "@/components/ui/badge";
 import { useGarage, formatVehicle } from "@/lib/garage";
 

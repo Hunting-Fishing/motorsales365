@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, TrendingDown, Clock } from "lucide-react";
 import { ShopFavoriteButton } from "@/components/shop/shop-favorite-button";
+import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
 import { PriceSparkline } from "@/components/shop/price-sparkline";
 
 function getVisitorId(): string {
