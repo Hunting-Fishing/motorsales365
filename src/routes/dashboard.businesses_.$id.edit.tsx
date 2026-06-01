@@ -133,6 +133,7 @@ function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
         <TabsList className="flex w-full overflow-x-auto">
           <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsTrigger value="location">Location</TabsTrigger>
           <TabsTrigger value="tags">Tags</TabsTrigger>
           <TabsTrigger value="hours">Hours</TabsTrigger>
 
