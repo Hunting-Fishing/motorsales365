@@ -271,37 +271,23 @@ function EnrollFreeButton({ courseId, onEnrolled }: { courseId: string; onEnroll
 
 function CheckoutCard({ courseId }: { courseId: string }) {
   const params = Route.useParams();
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const createCheckout = useServerFn(createCourseCheckout);
-
-  useState(() => {
-    (async () => {
-      try {
-        const cs = await createCheckout({
-          data: {
-            courseId,
-            returnUrl: `${window.location.origin}/learn/${params.slug}?session_id={CHECKOUT_SESSION_ID}`,
-            environment: getStripeEnvironment(),
-          },
-        });
-        setClientSecret(cs);
-      } catch (e: any) {
-        setError(e?.message ?? "Could not start checkout");
-      }
-    })();
-    return undefined;
-  });
-
-  if (error) return <p className="text-sm text-destructive">{error}</p>;
-  if (!clientSecret) return <p className="text-sm text-muted-foreground">Loading checkout…</p>;
-  return <StripeEmbeddedCheckoutInline clientSecret={clientSecret} />;
-}
-
-function StripeEmbeddedCheckoutInline({ clientSecret }: { clientSecret: string }) {
+  const fetchClientSecret = async (): Promise<string> => {
+    const cs = await createCheckout({
+      data: {
+        courseId,
+        returnUrl: `${window.location.origin}/learn/${params.slug}?session_id={CHECKOUT_SESSION_ID}`,
+        environment: getStripeEnvironment(),
+      },
+    });
+    if (!cs) throw new Error("Could not start checkout");
+    return cs;
+  };
   return (
     <div className="min-h-[500px]">
-      <StripeEmbeddedCheckout priceId="placeholder" returnUrl={window.location.href} key={clientSecret} />
+      <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
+        <EmbeddedCheckout />
+      </EmbeddedCheckoutProvider>
     </div>
   );
 }
