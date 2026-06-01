@@ -17,20 +17,16 @@ import { formatDate } from "@/lib/format";
 import { LocationPicker } from "@/components/location-picker";
 import { PhoneInput } from "@/components/phone-input";
 import { parseE164, buildE164 } from "@/data/country-codes";
+import { BUSINESS_KIND_OPTIONS, BUSINESS_KIND_VALUES } from "@/data/business-kinds";
 
 export const Route = createFileRoute("/dashboard/verification")({
   component: VerificationPage,
 });
 
-const BUSINESS_KINDS = [
-  { value: "repair_shop", label: "Repair shop" },
-  { value: "insurance", label: "Insurance provider / agency" },
-  { value: "dealer", label: "Dealership / car lot" },
-  { value: "other", label: "Other business" },
-];
+const BUSINESS_KINDS = BUSINESS_KIND_OPTIONS;
 
 const formSchema = z.object({
-  business_kind: z.enum(["repair_shop", "insurance", "dealer", "other"]),
+  business_kind: z.enum(BUSINESS_KIND_VALUES),
   legal_name: z.string().trim().min(2, "Legal business name is required").max(200),
   dti_sec_registration: z.string().trim().max(100).optional().or(z.literal("")),
   tax_id: z.string().trim().max(100).optional().or(z.literal("")),
@@ -54,7 +50,7 @@ function VerificationPage() {
   const [uploading, setUploading] = useState(false);
 
   const [form, setForm] = useState({
-    business_kind: "repair_shop" as "repair_shop" | "insurance" | "dealer" | "other",
+    business_kind: "repair_shop" as string,
     legal_name: "",
     dti_sec_registration: "",
     tax_id: "",
@@ -87,9 +83,9 @@ function VerificationPage() {
     setProfile(prof);
     if (req) {
       setForm({
-        business_kind: (["repair_shop", "insurance", "dealer", "other"].includes(req.business_kind as string)
-          ? (req.business_kind as "repair_shop" | "insurance" | "dealer" | "other")
-          : "other"),
+        business_kind: (BUSINESS_KIND_VALUES as readonly string[]).includes(req.business_kind as string)
+          ? (req.business_kind as string)
+          : "other",
         legal_name: req.legal_name ?? "",
         dti_sec_registration: req.dti_sec_registration ?? "",
         tax_id: req.tax_id ?? "",
