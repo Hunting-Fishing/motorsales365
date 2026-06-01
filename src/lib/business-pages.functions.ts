@@ -301,8 +301,14 @@ export const updateBusinessPageSettings = createServerFn({ method: "POST" })
     z
       .object({
         businessId: z.string().uuid(),
+        name: z.string().trim().min(2).max(160).optional(),
         tagline: z.string().max(160).nullable().optional(),
         description: z.string().max(4000).nullable().optional(),
+        phone: z.string().max(40).nullable().optional(),
+        email: z.string().email().max(200).nullable().optional(),
+        website: z.string().url().max(500).nullable().optional(),
+        messenger_url: z.string().url().max(500).nullable().optional(),
+        brands_carried: z.string().max(2000).nullable().optional(),
         theme_color: z
           .string()
           .regex(/^#[0-9a-fA-F]{6}$/)
