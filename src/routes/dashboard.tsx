@@ -16,6 +16,7 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean }[] = [
   { to: "/dashboard/vehicles", label: "Vehicle passport", Icon: ShieldCheck },
   { to: "/dashboard/favorites", label: "Saved", Icon: Bookmark },
   { to: "/dashboard/shop-favorites", label: "Saved products", Icon: ShoppingBag },
+  { to: "/dashboard/learning", label: "My learning", Icon: GraduationCap },
   { to: "/dashboard/likes", label: "Liked", Icon: Heart },
   { to: "/dashboard/searches", label: "Saved searches", Icon: Bookmark },
   { to: "/dashboard/messages", label: "Messages", Icon: MessageSquare },
