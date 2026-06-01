@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { hasStructuredOpenDay } from "@/lib/business-hours";
 
 function slugify(s: string): string {
   return s
