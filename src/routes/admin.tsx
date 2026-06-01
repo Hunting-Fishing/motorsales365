@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Settings, ListChecks, Users, Flag, CreditCard, ShieldCheck, ShieldAlert, Gauge, BarChart3, UserCog, Megaphone, QrCode, Ticket, Globe, FlaskConical, Store, Sparkles, Info, Inbox, Shield } from "lucide-react";
+import { Settings, ListChecks, Users, Flag, CreditCard, ShieldCheck, ShieldAlert, Gauge, BarChart3, UserCog, Megaphone, QrCode, Ticket, Globe, FlaskConical, Store, Sparkles, Info, Inbox, Shield, GraduationCap } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
