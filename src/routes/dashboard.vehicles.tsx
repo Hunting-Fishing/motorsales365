@@ -224,6 +224,20 @@ function VehicleDialog({
             <Label htmlFor="v-nick">Nickname (optional)</Label>
             <Input id="v-nick" maxLength={60} value={form.nickname} onChange={(e) => setForm((f) => ({ ...f, nickname: e.target.value }))} placeholder='e.g. "Red Hilux"' />
           </div>
+          {user && (
+            <div>
+              <Label>Cover photo</Label>
+              <SingleFileUploader
+                userId={user.id}
+                bucket="vehicle-media"
+                prefix="covers"
+                value={form.coverUrl || null}
+                onChange={(url) => setForm((f) => ({ ...f, coverUrl: url ?? "" }))}
+                accept="image/*"
+                label="Upload cover photo"
+              />
+            </div>
+          )}
           <div className="flex items-center justify-between rounded-md border border-border p-3">
             <div className="text-sm">
               <p className="font-medium">Public passport</p>
