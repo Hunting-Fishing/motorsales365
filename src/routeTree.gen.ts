@@ -119,6 +119,7 @@ import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/l
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
+import { Route as LearnSlugWatchLessonIdRouteImport } from './routes/learn_.$slug.watch.$lessonId'
 import { Route as DashboardTeamLeadsIdRouteImport } from './routes/dashboard.team.leads_.$id'
 import { Route as DashboardRidesIdEditRouteImport } from './routes/dashboard.rides_.$id.edit'
 import { Route as DashboardBusinessesIdEditRouteImport } from './routes/dashboard.businesses_.$id.edit'
@@ -680,6 +681,11 @@ const LovableEmailAuthPreviewRoute = LovableEmailAuthPreviewRouteImport.update({
   path: '/lovable/email/auth/preview',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LearnSlugWatchLessonIdRoute = LearnSlugWatchLessonIdRouteImport.update({
+  id: '/learn_/$slug/watch/$lessonId',
+  path: '/learn/$slug/watch/$lessonId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardTeamLeadsIdRoute = DashboardTeamLeadsIdRouteImport.update({
   id: '/leads_/$id',
   path: '/leads/$id',
@@ -826,6 +832,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/businesses/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
   '/dashboard/team/leads/$id': typeof DashboardTeamLeadsIdRoute
+  '/learn/$slug/watch/$lessonId': typeof LearnSlugWatchLessonIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -941,6 +948,7 @@ export interface FileRoutesByTo {
   '/dashboard/businesses/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
   '/dashboard/team/leads/$id': typeof DashboardTeamLeadsIdRoute
+  '/learn/$slug/watch/$lessonId': typeof LearnSlugWatchLessonIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -1060,6 +1068,7 @@ export interface FileRoutesById {
   '/dashboard/businesses_/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides_/$id/edit': typeof DashboardRidesIdEditRoute
   '/dashboard/team/leads_/$id': typeof DashboardTeamLeadsIdRoute
+  '/learn_/$slug/watch/$lessonId': typeof LearnSlugWatchLessonIdRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -1180,6 +1189,7 @@ export interface FileRouteTypes {
     | '/dashboard/businesses/$id/edit'
     | '/dashboard/rides/$id/edit'
     | '/dashboard/team/leads/$id'
+    | '/learn/$slug/watch/$lessonId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1295,6 +1305,7 @@ export interface FileRouteTypes {
     | '/dashboard/businesses/$id/edit'
     | '/dashboard/rides/$id/edit'
     | '/dashboard/team/leads/$id'
+    | '/learn/$slug/watch/$lessonId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1413,6 +1424,7 @@ export interface FileRouteTypes {
     | '/dashboard/businesses_/$id/edit'
     | '/dashboard/rides_/$id/edit'
     | '/dashboard/team/leads_/$id'
+    | '/learn_/$slug/watch/$lessonId'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -1484,6 +1496,7 @@ export interface RootRouteChildren {
   ApiPublicFxRefreshRoute: typeof ApiPublicFxRefreshRoute
   ApiPublicHooksRefreshLazadaRoute: typeof ApiPublicHooksRefreshLazadaRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
+  LearnSlugWatchLessonIdRoute: typeof LearnSlugWatchLessonIdRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -2263,6 +2276,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailAuthPreviewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/learn_/$slug/watch/$lessonId': {
+      id: '/learn_/$slug/watch/$lessonId'
+      path: '/learn/$slug/watch/$lessonId'
+      fullPath: '/learn/$slug/watch/$lessonId'
+      preLoaderRoute: typeof LearnSlugWatchLessonIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard/team/leads_/$id': {
       id: '/dashboard/team/leads_/$id'
       path: '/leads/$id'
@@ -2542,6 +2562,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicFxRefreshRoute: ApiPublicFxRefreshRoute,
   ApiPublicHooksRefreshLazadaRoute: ApiPublicHooksRefreshLazadaRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
+  LearnSlugWatchLessonIdRoute: LearnSlugWatchLessonIdRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
