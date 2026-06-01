@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Store as StoreIcon, Plus, Check, X, Pencil, Tag, Sparkles, LayoutTemplate, Inbox } from "lucide-react";
+import { Store as StoreIcon, Plus, Check, X, Pencil, Tag, Sparkles, LayoutTemplate, Inbox, Archive, ArchiveRestore } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
