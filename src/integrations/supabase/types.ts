@@ -5483,7 +5483,7 @@ export type Database = {
       media_type: "photo" | "video"
       org_role: "owner" | "admin" | "member"
       partner_tier: "featured" | "standard"
-      payment_kind: "listing" | "upgrade" | "boost" | "subscription"
+      payment_kind: "listing" | "upgrade" | "boost" | "subscription" | "course"
       payment_status: "pending" | "paid" | "failed" | "refunded"
       referral_kind: "promo" | "deal" | "rate" | "incentive" | "other"
       ride_mod_category:
@@ -5744,7 +5744,7 @@ export const Constants = {
       media_type: ["photo", "video"],
       org_role: ["owner", "admin", "member"],
       partner_tier: ["featured", "standard"],
-      payment_kind: ["listing", "upgrade", "boost", "subscription"],
+      payment_kind: ["listing", "upgrade", "boost", "subscription", "course"],
       payment_status: ["pending", "paid", "failed", "refunded"],
       referral_kind: ["promo", "deal", "rate", "incentive", "other"],
       ride_mod_category: [
