@@ -206,6 +206,22 @@ function MyBusinessesPage() {
   const [extras, setExtras] = useState<Record<string, Extras>>({});
   const [loading, setLoading] = useState(true);
   const [planTarget, setPlanTarget] = useState<Row | null>(null);
+  const [showArchived, setShowArchived] = useState(false);
+
+  const setStatus = async (b: Row, nextStatus: "active" | "archived") => {
+    const prevStatus = b.status;
+    setRows((prev) => prev.map((r) => r.id === b.id ? { ...r, status: nextStatus } : r));
+    const { error } = await (supabase as any)
+      .from("businesses")
+      .update({ status: nextStatus })
+      .eq("id", b.id);
+    if (error) {
+      setRows((prev) => prev.map((r) => r.id === b.id ? { ...r, status: prevStatus } : r));
+      toast.error(error.message);
+      return;
+    }
+    toast.success(nextStatus === "archived" ? "Business archived" : "Business restored");
+  };
 
   useEffect(() => {
     if (!user) return;
