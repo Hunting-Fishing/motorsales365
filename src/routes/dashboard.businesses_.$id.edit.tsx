@@ -42,6 +42,7 @@ import {
 } from "@/components/business/service-catalog-picker";
 import { CATEGORY_LABEL } from "@/data/fuel-station-catalog";
 import { GalleryTab, ContactChannelsTab } from "@/components/business-page/gallery-contact-tabs";
+import { LocationPicker } from "@/components/businesses/location-picker";
 import { BookingsTab } from "@/components/business-page/bookings-tab";
 import { OnboardingChecklist } from "@/components/business-page/onboarding-checklist";
 import { AnalyticsTab } from "@/components/business-page/analytics-tab";
