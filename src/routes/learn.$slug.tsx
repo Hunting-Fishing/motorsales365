@@ -258,7 +258,10 @@ function EnrollFreeButton({ courseId, onEnrolled }: { courseId: string; onEnroll
         setLoading(true);
         try {
           const { supabase } = await import("@/integrations/supabase/client");
-          await supabase.from("course_enrollments").insert({ user_id: (await supabase.auth.getUser()).data.user?.id, course_id: courseId, source: "admin_grant" });
+          const uid = (await supabase.auth.getUser()).data.user?.id;
+          if (uid) {
+            await supabase.from("course_enrollments").insert({ user_id: uid, course_id: courseId, source: "admin_grant" });
+          }
         } catch { /* ignore duplicate */ }
         onEnrolled();
         setLoading(false);
