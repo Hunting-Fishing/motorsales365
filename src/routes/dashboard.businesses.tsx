@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Store as StoreIcon, Plus, Check, X, Pencil, Tag, Sparkles, LayoutTemplate, Inbox } from "lucide-react";
+import { Store as StoreIcon, Plus, Check, X, Pencil, Tag, Sparkles, LayoutTemplate, Inbox, Archive, ArchiveRestore } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -42,6 +42,7 @@ function statusBadge(s: string) {
   if (s === "active") return <Badge className="bg-emerald-600">Active</Badge>;
   if (s === "pending") return <Badge variant="secondary">Pending review</Badge>;
   if (s === "rejected") return <Badge variant="destructive">Rejected</Badge>;
+  if (s === "archived") return <Badge variant="outline" className="border-amber-500/60 text-amber-600">Archived</Badge>;
   return <Badge variant="outline">{s}</Badge>;
 }
 
@@ -205,6 +206,22 @@ function MyBusinessesPage() {
   const [extras, setExtras] = useState<Record<string, Extras>>({});
   const [loading, setLoading] = useState(true);
   const [planTarget, setPlanTarget] = useState<Row | null>(null);
+  const [showArchived, setShowArchived] = useState(false);
+
+  const setStatus = async (b: Row, nextStatus: "active" | "archived") => {
+    const prevStatus = b.status;
+    setRows((prev) => prev.map((r) => r.id === b.id ? { ...r, status: nextStatus } : r));
+    const { error } = await (supabase as any)
+      .from("businesses")
+      .update({ status: nextStatus })
+      .eq("id", b.id);
+    if (error) {
+      setRows((prev) => prev.map((r) => r.id === b.id ? { ...r, status: prevStatus } : r));
+      toast.error(error.message);
+      return;
+    }
+    toast.success(nextStatus === "archived" ? "Business archived" : "Business restored");
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -255,22 +272,37 @@ function MyBusinessesPage() {
     })();
   }, [user]);
 
+  const archivedCount = rows.filter((r) => r.status === "archived").length;
+  const visibleRows = showArchived ? rows : rows.filter((r) => r.status !== "archived");
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <h1 className="font-display text-2xl font-bold">My businesses</h1>
-        <Button asChild size="sm"><Link to="/businesses/submit"><Plus className="mr-1 h-4 w-4" />Add business</Link></Button>
+        <div className="flex items-center gap-2">
+          {archivedCount > 0 && (
+            <Button
+              size="sm"
+              variant={showArchived ? "secondary" : "outline"}
+              onClick={() => setShowArchived((v) => !v)}
+            >
+              <Archive className="mr-1 h-3.5 w-3.5" />
+              {showArchived ? "Hide archived" : `Show archived (${archivedCount})`}
+            </Button>
+          )}
+          <Button asChild size="sm"><Link to="/businesses/submit"><Plus className="mr-1 h-4 w-4" />Add business</Link></Button>
+        </div>
       </div>
       {loading ? (
         <Card className="p-6 text-sm text-muted-foreground">Loading…</Card>
-      ) : rows.length === 0 ? (
+      ) : visibleRows.length === 0 ? (
         <Card className="p-6 text-center text-sm text-muted-foreground">
           <StoreIcon className="mx-auto mb-2 h-6 w-6 opacity-60" />
-          You haven't listed any business yet.
+          {rows.length === 0 ? "You haven't listed any business yet." : "No businesses to show."}
         </Card>
       ) : (
         <div className="space-y-2">
-          {rows.map((b) => {
+          {visibleRows.map((b) => {
             const x: Extras = extras[b.id] ?? { servicesCount: 0, productsCount: 0, photosCount: 0, newInquiries: 0 };
             return (
             <Card key={b.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
@@ -326,6 +358,25 @@ function MyBusinessesPage() {
                       compact
                     />
                   </>
+                )}
+                {b.status === "archived" ? (
+                  <Button size="sm" variant="outline" onClick={() => setStatus(b, "active")}>
+                    <ArchiveRestore className="mr-1 h-3.5 w-3.5" />
+                    Restore
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-muted-foreground hover:text-destructive"
+                    onClick={() => {
+                      if (typeof window !== "undefined" && !window.confirm(`Archive "${b.name}"? It will be hidden from public search but you can restore it anytime.`)) return;
+                      setStatus(b, "archived");
+                    }}
+                  >
+                    <Archive className="mr-1 h-3.5 w-3.5" />
+                    Archive
+                  </Button>
                 )}
               </div>
             </Card>
