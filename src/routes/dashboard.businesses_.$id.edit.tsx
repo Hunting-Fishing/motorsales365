@@ -434,8 +434,14 @@ function AddCustomTagInline({ category, onAdd }: { category: string; onAdd: (lab
 
 function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSaved: () => void }) {
   const save = useServerFn(updateBusinessPageSettings);
+  const [name, setName] = useState<string>(biz.name ?? "");
   const [tagline, setTagline] = useState(biz.tagline ?? "");
   const [description, setDescription] = useState(biz.description ?? "");
+  const [phone, setPhone] = useState<string>(biz.phone ?? "");
+  const [email, setEmail] = useState<string>(biz.email ?? "");
+  const [website, setWebsite] = useState<string>(biz.website ?? "");
+  const [messengerUrl, setMessengerUrl] = useState<string>(biz.messenger_url ?? "");
+  const [brandsCarried, setBrandsCarried] = useState<string>(biz.brands_carried ?? "");
   const [themeColor, setThemeColor] = useState<string>(biz.theme_color ?? "#0ea5e9");
   const [showServices, setShowServices] = useState<boolean>(biz.show_services ?? true);
   const [showProducts, setShowProducts] = useState<boolean>(biz.show_products ?? true);
@@ -469,6 +475,11 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
   };
 
   const handleSave = async () => {
+    const trimmedName = name.trim();
+    if (trimmedName.length < 2) {
+      toast.error("Business name must be at least 2 characters");
+      return;
+    }
     setSaving(true);
     try {
       const trimmedVideo = featuredVideoUrl.trim();
@@ -481,8 +492,14 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
       await save({
         data: {
           businessId: biz.id,
+          name: trimmedName,
           tagline: tagline.trim() || null,
           description: description.trim() || null,
+          phone: phone.trim() || null,
+          email: email.trim() || null,
+          website: website.trim() || null,
+          messenger_url: messengerUrl.trim() || null,
+          brands_carried: brandsCarried.trim() || null,
           theme_color: themeColor || null,
           show_services: showServices,
           show_products: showProducts,
@@ -511,6 +528,17 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
       <ImageField label="Cover photo" url={coverUrl} onUpload={(f) => onUpload(f, "cover")} onClear={() => setCoverUrl(null)} />
 
       <div>
+        <Label>Business name</Label>
+        <Input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          maxLength={160}
+          placeholder="Your business name as customers see it"
+          className="h-11 text-base"
+        />
+      </div>
+
+      <div>
         <Label>Tagline</Label>
         <Input
           value={tagline}
@@ -531,7 +559,68 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
         />
       </div>
 
+      <div className="space-y-3 rounded-lg border border-border p-3">
+        <div className="text-sm font-medium">Contact details</div>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div>
+            <Label>Phone</Label>
+            <Input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              maxLength={40}
+              placeholder="+63 9XX XXX XXXX"
+              className="h-11"
+            />
+          </div>
+          <div>
+            <Label>Email</Label>
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              maxLength={200}
+              placeholder="hello@yourbusiness.com"
+              className="h-11"
+            />
+          </div>
+          <div>
+            <Label>Website</Label>
+            <Input
+              type="url"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              maxLength={500}
+              placeholder="https://yourbusiness.com"
+              className="h-11"
+            />
+          </div>
+          <div>
+            <Label>Messenger URL</Label>
+            <Input
+              type="url"
+              value={messengerUrl}
+              onChange={(e) => setMessengerUrl(e.target.value)}
+              maxLength={500}
+              placeholder="https://m.me/yourpage"
+              className="h-11"
+            />
+          </div>
+        </div>
+        <div>
+          <Label>Brands carried (optional)</Label>
+          <Textarea
+            value={brandsCarried}
+            onChange={(e) => setBrandsCarried(e.target.value)}
+            rows={2}
+            maxLength={2000}
+            placeholder="Toyota, Honda, Mitsubishi, …"
+          />
+        </div>
+      </div>
+
       <VanitySlugField businessId={biz.id} currentVanity={biz.vanity_slug ?? null} currentSlug={biz.slug} />
+
 
 
 
