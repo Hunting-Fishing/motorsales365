@@ -7,7 +7,7 @@ interface Props { name?: string; business_name?: string; business_slug?: string 
 const BusinessRestored = ({ name, business_name, business_slug }: Props) => (
   <Html lang="en">
     <Head />
-    <Preview>Your business "{business_name}" is live again on {SITE_NAME}.</Preview>
+    <Preview>Your business "{business_name ?? ""}" is live again on {SITE_NAME}.</Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={brandBar} />
