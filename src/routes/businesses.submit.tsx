@@ -240,33 +240,43 @@ function SubmitBusinessPage() {
   };
 
 
+  const submitFn = useServerFn(submitBusiness);
+
   const submit = async () => {
     if (!user) return;
     if (!name.trim() || !typeSlug) { toast.error("Name and business type are required"); return; }
     setSubmitting(true);
-    const slug = `${slugify(name)}-${Math.random().toString(36).slice(2, 7)}`;
-    const insert = {
-      owner_id: user.id, slug, name: name.trim(), type_slug: typeSlug,
-      description: description.trim() || null,
-      logo_url: logoUrl,
-      phone: buildE164(phoneIso, phoneNational) ?? null, email: email.trim() || null,
-      website: website.trim() || null, messenger_url: messengerUrl.trim() || null,
-      street_address: streetAddress.trim() || null,
-      region: loc.region, province: loc.province, city: loc.city, barangay: loc.barangay,
-      postal_code: postalCode.trim() || null,
-      brands_carried: brandsCarried.trim() || null,
-      price_label: priceLabel.trim() || null,
-      lat: lat ? Number(lat) : null, lng: lng ? Number(lng) : null,
-      status: "pending",
-    };
-    const { data, error } = await (supabase as any).from("businesses").insert(insert).select("id").single();
-    if (error) { setSubmitting(false); toast.error(error.message); return; }
-    if (selectedTags.length > 0) {
-      await (supabase as any).from("business_tag_links").insert(selectedTags.map((s) => ({ business_id: data.id, tag_slug: s })));
+    try {
+      const result = await submitFn({
+        data: {
+          name: name.trim(),
+          type_slug: typeSlug,
+          description: description.trim() || null,
+          logo_url: logoUrl,
+          phone: buildE164(phoneIso, phoneNational) ?? null,
+          email: email.trim() || null,
+          website: website.trim() || null,
+          messenger_url: messengerUrl.trim() || null,
+          street_address: streetAddress.trim() || null,
+          region: loc.region,
+          province: loc.province,
+          city: loc.city,
+          barangay: loc.barangay,
+          postal_code: postalCode.trim() || null,
+          brands_carried: brandsCarried.trim() || null,
+          price_label: priceLabel.trim() || null,
+          lat: lat ? Number(lat) : null,
+          lng: lng ? Number(lng) : null,
+          tag_slugs: selectedTags,
+        },
+      });
+      setSubmitting(false);
+      toast.success(`Submitted! Your business URL: /businesses/${result.slug}`);
+      navigate({ to: "/dashboard/businesses" });
+    } catch (err: any) {
+      setSubmitting(false);
+      toast.error(err?.message ?? "Submission failed — please try again.");
     }
-    setSubmitting(false);
-    toast.success("Submitted! It will appear after review.");
-    navigate({ to: "/dashboard/businesses" });
   };
 
   const visibleTags = typeSlug ? tags.filter((t) => t.type_slug === null || t.type_slug === typeSlug) : tags.filter((t) => t.type_slug === null);
