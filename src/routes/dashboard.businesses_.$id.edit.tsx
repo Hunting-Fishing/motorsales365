@@ -42,6 +42,7 @@ import {
 } from "@/components/business/service-catalog-picker";
 import { CATEGORY_LABEL } from "@/data/fuel-station-catalog";
 import { GalleryTab, ContactChannelsTab } from "@/components/business-page/gallery-contact-tabs";
+import { LocationPicker } from "@/components/businesses/location-picker";
 import { BookingsTab } from "@/components/business-page/bookings-tab";
 import { OnboardingChecklist } from "@/components/business-page/onboarding-checklist";
 import { AnalyticsTab } from "@/components/business-page/analytics-tab";
@@ -1203,6 +1204,129 @@ function InquiriesTab({
 }
 
 /* ---------------- HOURS ---------------- */
+
+function LocationTab({ biz, onSaved }: { biz: any; onSaved: () => void }) {
+  const save = useServerFn(updateBusinessPageSettings);
+  const [streetAddress, setStreetAddress] = useState<string>(biz.street_address ?? "");
+  const [region, setRegion] = useState<string>(biz.region ?? "");
+  const [province, setProvince] = useState<string>(biz.province ?? "");
+  const [city, setCity] = useState<string>(biz.city ?? "");
+  const [barangay, setBarangay] = useState<string>(biz.barangay ?? "");
+  const [postalCode, setPostalCode] = useState<string>(biz.postal_code ?? "");
+  const [lat, setLat] = useState<string>(biz.lat != null ? String(biz.lat) : "");
+  const [lng, setLng] = useState<string>(biz.lng != null ? String(biz.lng) : "");
+  const [saving, setSaving] = useState(false);
+
+  const useMyLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation not supported");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (p) => {
+        setLat(p.coords.latitude.toFixed(6));
+        setLng(p.coords.longitude.toFixed(6));
+      },
+      () => toast.error("Could not get your location"),
+    );
+  };
+
+  const setCoords = (la: number, ln: number) => {
+    setLat(la.toFixed(6));
+    setLng(ln.toFixed(6));
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await save({
+        data: {
+          businessId: biz.id,
+          street_address: streetAddress.trim() || null,
+          region: region.trim() || null,
+          province: province.trim() || null,
+          city: city.trim() || null,
+          barangay: barangay.trim() || null,
+          postal_code: postalCode.trim() || null,
+          lat: lat ? Number(lat) : null,
+          lng: lng ? Number(lng) : null,
+        },
+      });
+      toast.success("Location saved");
+      onSaved();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Save failed");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Card className="space-y-5 p-4 md:p-5">
+      <div>
+        <h2 className="font-display text-lg font-semibold">Location</h2>
+        <p className="text-sm text-muted-foreground">
+          Update your address and pin location. Customers use this for directions and proximity search.
+        </p>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div className="sm:col-span-2">
+          <Label>Street address</Label>
+          <Input value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} placeholder="123 Rizal St." />
+        </div>
+        <div>
+          <Label>Region</Label>
+          <Input value={region} onChange={(e) => setRegion(e.target.value)} />
+        </div>
+        <div>
+          <Label>Province</Label>
+          <Input value={province} onChange={(e) => setProvince(e.target.value)} />
+        </div>
+        <div>
+          <Label>City / Municipality</Label>
+          <Input value={city} onChange={(e) => setCity(e.target.value)} />
+        </div>
+        <div>
+          <Label>Barangay</Label>
+          <Input value={barangay} onChange={(e) => setBarangay(e.target.value)} />
+        </div>
+        <div>
+          <Label>Postal code</Label>
+          <Input value={postalCode} onChange={(e) => setPostalCode(e.target.value)} />
+        </div>
+      </div>
+
+      <div>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Label>Pin on the map</Label>
+          <Button type="button" variant="outline" size="sm" onClick={useMyLocation}>
+            Use my location
+          </Button>
+        </div>
+        <p className="mb-2 mt-1 text-xs text-muted-foreground">
+          Click the map or drag the pin to set the exact spot.
+        </p>
+        <LocationPicker
+          lat={lat ? Number(lat) : null}
+          lng={lng ? Number(lng) : null}
+          region={region || null}
+          onChange={(la, ln) => setCoords(la, ln)}
+        />
+        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          <Input placeholder="Latitude" value={lat} onChange={(e) => setLat(e.target.value)} />
+          <Input placeholder="Longitude" value={lng} onChange={(e) => setLng(e.target.value)} />
+        </div>
+      </div>
+
+      <div className="flex justify-end">
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? "Saving…" : "Save location"}
+        </Button>
+      </div>
+    </Card>
+  );
+}
 
 function HoursTab({ biz, onSaved }: { biz: any; onSaved: () => void }) {
   const initial = isStructuredHours(biz.hours) ? (biz.hours as StructuredHours) : emptyStructured();
