@@ -101,6 +101,13 @@ export function SiteHeader() {
             >
               Shop
             </Link>
+            <Link
+              to="/learn"
+              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              activeProps={{ className: "bg-secondary text-foreground" }}
+            >
+              Learn
+            </Link>
           </nav>
         </div>
 
