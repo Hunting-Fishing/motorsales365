@@ -42,6 +42,7 @@ function statusBadge(s: string) {
   if (s === "active") return <Badge className="bg-emerald-600">Active</Badge>;
   if (s === "pending") return <Badge variant="secondary">Pending review</Badge>;
   if (s === "rejected") return <Badge variant="destructive">Rejected</Badge>;
+  if (s === "archived") return <Badge variant="outline" className="border-amber-500/60 text-amber-600">Archived</Badge>;
   return <Badge variant="outline">{s}</Badge>;
 }
 
