@@ -335,7 +335,7 @@ function VehicleDetailDialog({
     <Dialog open onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         {isLoading || !data ? (
-          <div className="p-8 text-center text-muted-foreground">Loading…</div>
+          <div className="space-y-3 p-4"><Skeleton className="h-6 w-1/2" /><Skeleton className="h-4 w-1/3" /><Skeleton className="h-32 w-full" /></div>
         ) : (
           <>
             <DialogHeader>
