@@ -138,6 +138,7 @@ function VehicleDialog({
   onSaved: () => void;
 }) {
   const [open, setOpen] = useState(false);
+  const { user } = useAuth();
   const [form, setForm] = useState({
     make: vehicle?.make ?? "",
     model: vehicle?.model ?? "",
