@@ -654,11 +654,13 @@ function ImageField({
 function ServicesTab({
   businessId,
   userId,
+  typeSlug,
   services,
   onChange,
 }: {
   businessId: string;
   userId: string;
+  typeSlug: string | null;
   services: any[];
   onChange: () => void;
 }) {
