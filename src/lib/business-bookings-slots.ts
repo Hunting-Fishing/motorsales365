@@ -15,6 +15,27 @@ function fmtTime(min: number) {
   return `${pad(Math.floor(min / 60))}:${pad(min % 60)}`;
 }
 
+/** Subtract a set of blocked ranges from a set of open windows. Inputs are in minutes. */
+function subtractRanges(
+  windows: { start: number; end: number }[],
+  blocks: { start: number; end: number }[],
+): { start: number; end: number }[] {
+  let result = windows.map((w) => ({ ...w }));
+  for (const b of blocks) {
+    const next: { start: number; end: number }[] = [];
+    for (const w of result) {
+      if (b.end <= w.start || b.start >= w.end) {
+        next.push(w);
+        continue;
+      }
+      if (b.start > w.start) next.push({ start: w.start, end: Math.min(w.end, b.start) });
+      if (b.end < w.end) next.push({ start: Math.max(w.start, b.end), end: w.end });
+    }
+    result = next.filter((w) => w.end > w.start);
+  }
+  return result;
+}
+
 export function computeSlots(opts: {
   date: string; // YYYY-MM-DD local
   itemDurationMin: number;
