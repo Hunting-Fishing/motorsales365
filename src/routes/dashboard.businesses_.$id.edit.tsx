@@ -528,6 +528,17 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
       <ImageField label="Cover photo" url={coverUrl} onUpload={(f) => onUpload(f, "cover")} onClear={() => setCoverUrl(null)} />
 
       <div>
+        <Label>Business name</Label>
+        <Input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          maxLength={160}
+          placeholder="Your business name as customers see it"
+          className="h-11 text-base"
+        />
+      </div>
+
+      <div>
         <Label>Tagline</Label>
         <Input
           value={tagline}
