@@ -37,6 +37,14 @@ import { useDynamicMeta } from "@/hooks/use-dynamic-meta";
 import { useDynamicJsonLd } from "@/hooks/use-dynamic-jsonld";
 import { PhoneInput } from "@/components/phone-input";
 import { buildE164 } from "@/data/country-codes";
+import { z } from "zod";
+
+const ListingTextSchema = z.object({
+  title: z.string().trim().min(3, "Title must be at least 3 characters").max(120, "Title must be 120 characters or fewer"),
+  description: z.string().trim().max(5000, "Description must be 5000 characters or fewer").optional().default(""),
+  price_php: z.number().int("Price must be a whole number").min(0, "Price cannot be negative").max(1_000_000_000, "Price is too high"),
+  contact_phone: z.string().trim().max(40).optional().nullable(),
+});
 
 const SELL_SEO: Record<string, { title: string; description: string }> = {
   car: {
