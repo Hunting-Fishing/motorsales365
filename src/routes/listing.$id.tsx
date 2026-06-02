@@ -141,6 +141,8 @@ export const Route = createFileRoute("/listing/$id")({
     };
   },
   component: ListingDetailPage,
+  errorComponent: RouteErrorBoundary,
+  notFoundComponent: () => <RouteNotFoundBoundary message="Listing not found." />,
 });
 
 interface ListingDetail {
