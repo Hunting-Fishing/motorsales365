@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import ogMap from "@/assets/og/map.jpg";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
 import { Star, Store as StoreIcon, MapPin } from "lucide-react";
@@ -35,7 +36,11 @@ export const Route = createFileRoute("/map")({
         property: "og:description",
         content: "Find motor businesses near you on the full-screen Philippines map.",
       },
+      { property: "og:url", content: "https://365motorsales.com/map" },
+      { property: "og:image", content: `https://365motorsales.com${ogMap}` },
+      { property: "twitter:image", content: `https://365motorsales.com${ogMap}` },
     ],
+    links: [{ rel: "canonical", href: "https://365motorsales.com/map" }],
   }),
   component: MapPage,
 });

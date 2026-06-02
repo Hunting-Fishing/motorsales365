@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import ogBusinesses from "@/assets/og/businesses.jpg";
 import { useEffect, useMemo, useState } from "react";
 import { Search, MapPin, Star, Store as StoreIcon, Plus } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
@@ -14,7 +15,7 @@ import { haversineKm } from "@/components/businesses/google-maps-loader";
 import { LocationDrilldown, type LocationValue } from "@/components/businesses/location-drilldown";
 
 export const Route = createFileRoute("/businesses/")({
-  head: () => ({
+    head: () => ({
     meta: [
       { title: "Businesses Directory — 365 MotorSales Philippines" },
       {
@@ -22,7 +23,17 @@ export const Route = createFileRoute("/businesses/")({
         content:
           "Find local dealerships, repair shops, parts stores, towing companies and insurance providers across the Philippines on a barangay-level map.",
       },
+      { property: "og:title", content: "Businesses Directory — 365 MotorSales Philippines" },
+      {
+        property: "og:description",
+        content:
+          "Local dealerships, repair shops, parts stores, towing and insurance — mapped by barangay.",
+      },
+      { property: "og:url", content: "https://365motorsales.com/businesses" },
+      { property: "og:image", content: `https://365motorsales.com${ogBusinesses}` },
+      { property: "twitter:image", content: `https://365motorsales.com${ogBusinesses}` },
     ],
+    links: [{ rel: "canonical", href: "https://365motorsales.com/businesses" }],
   }),
   component: BusinessesIndex,
 });

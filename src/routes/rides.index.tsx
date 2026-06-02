@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import ogRides from "@/assets/og/rides.jpg";
 import { useEffect, useMemo, useState } from "react";
 import { Search, Sparkles } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
@@ -22,6 +23,8 @@ export const Route = createFileRoute("/rides/")({
         content: "Browse Filipino-owned vehicles with full mod and service history.",
       },
       { property: "og:url", content: "https://365motorsales.com/rides" },
+      { property: "og:image", content: `https://365motorsales.com${ogRides}` },
+      { property: "twitter:image", content: `https://365motorsales.com${ogRides}` },
     ],
     links: [{ rel: "canonical", href: "https://365motorsales.com/rides" }],
   }),
