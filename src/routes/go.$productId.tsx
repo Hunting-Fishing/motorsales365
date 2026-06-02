@@ -1,4 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { RouteErrorBoundary } from "@/components/route-boundaries";
 import { resolveShopRedirect } from "@/lib/shop-redirect.functions";
 
 export const Route = createFileRoute("/go/$productId")({
