@@ -514,14 +514,21 @@ function SellPage() {
     }
     if (photos.length > maxPhotos) {
       toast.error(
-        plan === "standard"
-          ? `Too many photos for Standard (max ${maxPhotos}). Remove some or upgrade.`
-          : `Too many photos (max ${maxPhotos}).`,
+        plan === "upgraded"
+          ? `Upgraded listings allow up to 20 photos.`
+          : plan === "standard"
+            ? `Standard listings allow up to 5 photos. Remove some or upgrade to add up to 20.`
+            : `Free listings allow only 1 photo. Choose Standard or Upgraded for more.`,
       );
       return;
     }
     if (video && maxVideos < 1) {
       toast.error("Remove the video or upgrade your plan to include video.");
+      return;
+    }
+    if (video && maxVideos >= 1 && 1 > maxVideos) {
+      // single-video uploader; reserved guard if multi-video added later
+      toast.error(`This plan allows up to ${maxVideos} video${maxVideos > 1 ? "s" : ""}.`);
       return;
     }
 
