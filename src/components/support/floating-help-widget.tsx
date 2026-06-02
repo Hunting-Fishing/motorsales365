@@ -1,6 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
-import { HelpCircle, X, MessageSquare, Search, Tag, UserCheck, Store, MessageCircle } from "lucide-react";
+import {
+  HelpCircle,
+  X,
+  MessageSquare,
+  Search,
+  Tag,
+  UserCheck,
+  Store,
+  MessageCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { fetchSupportContact } from "@/lib/site-settings";
@@ -25,10 +34,15 @@ const HIDDEN_PREFIXES = [
 export function FloatingHelpWidget() {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
-  const [contact, setContact] = useState<{ whatsappHref: string | null; messengerHref: string | null }>({ whatsappHref: null, messengerHref: null });
+  const [contact, setContact] = useState<{
+    whatsappHref: string | null;
+    messengerHref: string | null;
+  }>({ whatsappHref: null, messengerHref: null });
 
   useEffect(() => {
-    fetchSupportContact().then(setContact).catch(() => {});
+    fetchSupportContact()
+      .then(setContact)
+      .catch(() => {});
   }, []);
 
   // Don't show on routes where it would get in the way
@@ -95,14 +109,26 @@ export function FloatingHelpWidget() {
               <p className="mb-2 text-xs font-medium text-muted-foreground">Chat with us</p>
               <div className="flex gap-2">
                 {contact.whatsappHref && (
-                  <Button asChild size="sm" variant="outline" className="flex-1" onClick={() => setOpen(false)}>
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setOpen(false)}
+                  >
                     <a href={contact.whatsappHref} target="_blank" rel="noreferrer">
                       <MessageCircle className="h-4 w-4" /> WhatsApp
                     </a>
                   </Button>
                 )}
                 {contact.messengerHref && (
-                  <Button asChild size="sm" variant="outline" className="flex-1" onClick={() => setOpen(false)}>
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="outline"
+                    className="flex-1"
+                    onClick={() => setOpen(false)}
+                  >
                     <a href={contact.messengerHref} target="_blank" rel="noreferrer">
                       <MessageCircle className="h-4 w-4" /> Messenger
                     </a>

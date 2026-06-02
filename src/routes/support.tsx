@@ -145,10 +145,15 @@ export const Route = createFileRoute("/support")({
 
 function SupportHubPage() {
   const [query, setQuery] = useState("");
-  const [supportContact, setSupportContact] = useState<{ whatsappHref: string | null; messengerHref: string | null }>({ whatsappHref: null, messengerHref: null });
+  const [supportContact, setSupportContact] = useState<{
+    whatsappHref: string | null;
+    messengerHref: string | null;
+  }>({ whatsappHref: null, messengerHref: null });
 
   useEffect(() => {
-    fetchSupportContact().then(setSupportContact).catch(() => {});
+    fetchSupportContact()
+      .then(setSupportContact)
+      .catch(() => {});
   }, []);
 
   const filteredFaqs = useMemo(() => {
