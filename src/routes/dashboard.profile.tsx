@@ -15,6 +15,7 @@ import { AvatarUploader } from "@/components/avatar-uploader";
 import { TotpSetupCard } from "@/components/totp-setup-card";
 import { buildE164, parseE164 } from "@/data/country-codes";
 import { useCurrency } from "@/lib/currency";
+import { saveProfile } from "@/lib/profile.functions";
 
 type ChecklistItem = { label: string; done: boolean; required: boolean };
 
@@ -131,20 +132,30 @@ function ProfilePage() {
     const first = (profile.first_name ?? "").trim();
     const last = (profile.last_name ?? "").trim();
     const full = [first, last].filter(Boolean).join(" ") || profile.full_name || null;
-    const payload = {
-      id: user.id,
-      ...profile,
-      first_name: first || null,
-      last_name: last || null,
-      full_name: full,
-      phone: e164 ?? profile.phone ?? null,
-    };
-    const { error } = await supabase.from("profiles").upsert(payload);
-    setSaving(false);
-    if (error) toast.error(error.message);
-    else {
-      setProfile(payload);
+    try {
+      const { profile: saved } = await saveProfile({
+        data: {
+          first_name: first || null,
+          last_name: last || null,
+          full_name: full,
+          phone: e164 ?? profile.phone ?? null,
+          phone_e164: e164 ?? profile.phone_e164 ?? null,
+          avatar_url: profile.avatar_url ?? null,
+          seller_type: profile.seller_type ?? null,
+          business_name: profile.business_name ?? null,
+          business_address: profile.business_address ?? null,
+          business_region: profile.business_region ?? null,
+          business_province: profile.business_province ?? null,
+          business_city: profile.business_city ?? null,
+          business_barangay: profile.business_barangay ?? null,
+        },
+      });
+      setProfile(saved ?? { ...profile, first_name: first, last_name: last, full_name: full });
       toast.success("Profile saved");
+    } catch (err: any) {
+      toast.error(err?.message ?? "Failed to save profile");
+    } finally {
+      setSaving(false);
     }
   };
 
