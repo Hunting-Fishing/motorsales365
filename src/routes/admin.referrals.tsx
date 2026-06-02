@@ -1425,6 +1425,8 @@ function PromoDialog({ staff, onClose }: { staff: StaffRow; onClose: () => void 
   };
   useEffect(() => {
     load();
+    // reason: `load` is recreated each render; depend only on its inputs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [staff.id]);
 
   const startEdit = (p: Promo) => {
