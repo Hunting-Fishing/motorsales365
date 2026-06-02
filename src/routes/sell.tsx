@@ -216,6 +216,10 @@ function SellPage() {
   }, [effectiveSellerType]);
   const [plan, setPlan] = useState<"free" | "standard" | "upgraded">("free");
   const [previewPlan, setPreviewPlan] = useState<"free" | "standard" | "upgraded" | null>(null);
+  const [selectedBoost, setSelectedBoost] = useState<string>("");
+  const [boostOptions, setBoostOptions] = useState<
+    Array<{ slug: string; label: string; price_php: number; duration_days: number }>
+  >([]);
   const [year, setYear] = useState("");
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
