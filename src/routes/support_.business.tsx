@@ -6,7 +6,8 @@ import shopShot from "@/assets/support/shop.png";
 import businessesShot from "@/assets/support/businesses.png";
 
 const TITLE = "Business, shop & payments";
-const DESC = "Set up a business page, manage affiliate shop links, and handle billing, receipts and refunds.";
+const DESC =
+  "Set up a business page, manage affiliate shop links, and handle billing, receipts and refunds.";
 
 export const Route = createFileRoute("/support_/business")({
   component: BusinessSupport,
@@ -42,13 +43,15 @@ function BusinessSupport() {
               From the Businesses page (top-right). You'll need a logged-in account.
             </SupportStep>
             <SupportStep n={2} title="Fill in your details">
-              Name, category (dealership, repair shop, parts, etc.), location, hours, photos and accepted payments.
+              Name, category (dealership, repair shop, parts, etc.), location, hours, photos and
+              accepted payments.
             </SupportStep>
             <SupportStep n={3} title="Pick a plan">
               Free directory listing, or upgrade for leads, multiple staff seats and analytics.
             </SupportStep>
             <SupportStep n={4} title="Publish & manage leads">
-              Inquiries land in Dashboard → Leads. Assign to staff and respond fast — buyers move quickly.
+              Inquiries land in Dashboard → Leads. Assign to staff and respond fast — buyers move
+              quickly.
             </SupportStep>
           </SupportSteps>
         </div>
@@ -58,14 +61,17 @@ function BusinessSupport() {
           <AnnotatedScreenshot
             src={shopShot}
             alt="Shop page with vehicle fitment picker"
-            annotations={[{ n: 1, x: 50, y: 88, label: "Find parts that fit your vehicle", side: "top" }]}
+            annotations={[
+              { n: 1, x: 50, y: 88, label: "Find parts that fit your vehicle", side: "top" },
+            ]}
           />
           <SupportSteps>
             <SupportStep n={1} title="Pick your vehicle">
               Use the fitment picker so we only show parts compatible with your make and model.
             </SupportStep>
             <SupportStep n={2} title="Click through to buy">
-              You'll be sent to Shopee, Lazada, AliExpress or the brand store. Pricing, shipping and returns are handled there.
+              You'll be sent to Shopee, Lazada, AliExpress or the brand store. Pricing, shipping and
+              returns are handled there.
             </SupportStep>
             <SupportStep n={3} title="How we earn">
               We may receive a small commission — your price doesn't change.{" "}
@@ -87,14 +93,16 @@ function BusinessSupport() {
               From Billing, click Manage to add or change card / e-wallet.
             </SupportStep>
             <SupportStep n={3} title="Request a refund">
-              Within 24 hours of an unused boost, click <strong>Refund</strong> next to the charge. See the{" "}
+              Within 24 hours of an unused boost, click <strong>Refund</strong> next to the charge.
+              See the{" "}
               <Link to="/refund-policy" className="font-semibold text-primary underline">
                 Refund Policy
               </Link>{" "}
               for full details.
             </SupportStep>
             <SupportStep n={4} title="Cancel a subscription">
-              Business plans can be cancelled any time from Dashboard → Billing. Access continues until the end of the paid period.
+              Business plans can be cancelled any time from Dashboard → Billing. Access continues
+              until the end of the paid period.
             </SupportStep>
           </SupportSteps>
         </div>

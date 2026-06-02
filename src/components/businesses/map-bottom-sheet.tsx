@@ -20,13 +20,7 @@ function snapsForViewport(): Record<Snap, number> {
  * Three snap points: peek (header only), half (~50dvh), full (~85dvh).
  * Renders nothing on lg+ — parent should hide it via `lg:hidden`.
  */
-export function MapBottomSheet({
-  header,
-  children,
-}: {
-  header: ReactNode;
-  children: ReactNode;
-}) {
+export function MapBottomSheet({ header, children }: { header: ReactNode; children: ReactNode }) {
   const [snap, setSnap] = useState<Snap>("peek");
   const [height, setHeight] = useState(PEEK_PX);
   const [dragging, setDragging] = useState(false);
@@ -66,7 +60,10 @@ export function MapBottomSheet({
     let bestDiff = Infinity;
     for (const s of choices) {
       const d = Math.abs(snaps[s] - height);
-      if (d < bestDiff) { bestDiff = d; best = s; }
+      if (d < bestDiff) {
+        bestDiff = d;
+        best = s;
+      }
     }
     setSnap(best);
     setHeight(snaps[best]);

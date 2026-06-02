@@ -9,20 +9,33 @@ const iconUrl = "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png";
 const iconRetinaUrl = "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png";
 const shadowUrl = "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png";
 const DefaultIcon = L.icon({
-  iconUrl, iconRetinaUrl, shadowUrl,
-  iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41],
+  iconUrl,
+  iconRetinaUrl,
+  shadowUrl,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
 const featuredIcon = L.divIcon({
   className: "",
   html: `<div style="background:#0EA5E9;color:white;font-weight:700;border-radius:9999px;width:28px;height:28px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.35);border:2px solid white;font-size:14px;">★</div>`,
-  iconSize: [28, 28], iconAnchor: [14, 14], popupAnchor: [0, -14],
+  iconSize: [28, 28],
+  iconAnchor: [14, 14],
+  popupAnchor: [0, -14],
 });
 
 const PH_DEFAULT = { lat: 12.8797, lng: 121.774, zoom: 6 };
 
-function ViewController({ region, businesses }: { region: string | null; businesses: MapBusiness[] }) {
+function ViewController({
+  region,
+  businesses,
+}: {
+  region: string | null;
+  businesses: MapBusiness[];
+}) {
   const map = useMap();
   useEffect(() => {
     const pinned = businesses.filter((b) => b.lat != null && b.lng != null);
@@ -55,7 +68,10 @@ export function BusinessMapInner({
   onPinClick?: (slug: string) => void;
 }) {
   const ref = useRef<L.Map | null>(null);
-  const pinned = useMemo(() => businesses.filter((b) => b.lat != null && b.lng != null), [businesses]);
+  const pinned = useMemo(
+    () => businesses.filter((b) => b.lat != null && b.lng != null),
+    [businesses],
+  );
 
   return (
     <div className="h-[420px] w-full overflow-hidden rounded-xl border border-border md:h-[560px]">
@@ -81,11 +97,21 @@ export function BusinessMapInner({
             <Popup>
               <div className="space-y-1">
                 <div className="font-semibold">{b.name}</div>
-                <div className="text-xs opacity-80">{b.type_label}{b.city ? ` · ${b.city}` : ""}</div>
+                <div className="text-xs opacity-80">
+                  {b.type_label}
+                  {b.city ? ` · ${b.city}` : ""}
+                </div>
                 {b.rating_count > 0 && (
-                  <div className="text-xs">★ {Number(b.rating_avg).toFixed(1)} ({b.rating_count})</div>
+                  <div className="text-xs">
+                    ★ {Number(b.rating_avg).toFixed(1)} ({b.rating_count})
+                  </div>
                 )}
-                <a href={`/businesses/${b.slug}`} className="text-xs font-medium text-primary underline">View business →</a>
+                <a
+                  href={`/businesses/${b.slug}`}
+                  className="text-xs font-medium text-primary underline"
+                >
+                  View business →
+                </a>
               </div>
             </Popup>
           </Marker>

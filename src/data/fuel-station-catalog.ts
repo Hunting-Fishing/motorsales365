@@ -3,10 +3,10 @@
 // stay private to the business (do not feed back into the shared catalog).
 
 export type CatalogItem = {
-  key: string;        // stable id, persisted as business_services.catalog_key
+  key: string; // stable id, persisted as business_services.catalog_key
   title: string;
   description?: string;
-  unit?: string;      // "L", "item", "kg", "service", "min"
+  unit?: string; // "L", "item", "kg", "service", "min"
   category: string;
 };
 
@@ -23,37 +23,114 @@ export const FUEL_STATION_CATALOG: CatalogGroup[] = [
     label: "Gasoline (unleaded)",
     description: "Pump fuels classified by Research Octane Number (RON).",
     items: [
-      { key: "gas_91", title: "Regular 91 RON", description: "Standard unleaded for commuter cars and motorcycles.", unit: "L", category: "gasoline" },
-      { key: "gas_95", title: "Premium 95 RON", description: "Mid-grade for modern sedans, SUVs, performance commuters.", unit: "L", category: "gasoline" },
-      { key: "gas_97", title: "Premium Plus 97 RON", description: "High-octane for European and performance vehicles.", unit: "L", category: "gasoline" },
-      { key: "gas_100", title: "Race / 100 RON", description: "Track-grade (e.g. Petron Blaze 100, Shell V-Power Racing).", unit: "L", category: "gasoline" },
+      {
+        key: "gas_91",
+        title: "Regular 91 RON",
+        description: "Standard unleaded for commuter cars and motorcycles.",
+        unit: "L",
+        category: "gasoline",
+      },
+      {
+        key: "gas_95",
+        title: "Premium 95 RON",
+        description: "Mid-grade for modern sedans, SUVs, performance commuters.",
+        unit: "L",
+        category: "gasoline",
+      },
+      {
+        key: "gas_97",
+        title: "Premium Plus 97 RON",
+        description: "High-octane for European and performance vehicles.",
+        unit: "L",
+        category: "gasoline",
+      },
+      {
+        key: "gas_100",
+        title: "Race / 100 RON",
+        description: "Track-grade (e.g. Petron Blaze 100, Shell V-Power Racing).",
+        unit: "L",
+        category: "gasoline",
+      },
     ],
   },
   {
     key: "diesel",
     label: "Diesel",
     items: [
-      { key: "diesel_std", title: "Standard Diesel", description: "Meets DOE Cetane ~50 CN. Most consumer & commercial diesel vehicles.", unit: "L", category: "diesel" },
-      { key: "diesel_premium", title: "Premium / Performance Diesel", description: "Additised for cleaner combustion, lower emissions, better power.", unit: "L", category: "diesel" },
-      { key: "diesel_bio", title: "Biodiesel Blend (B5)", description: "Diesel blended with coco-methyl ester per PH biofuels law.", unit: "L", category: "diesel" },
+      {
+        key: "diesel_std",
+        title: "Standard Diesel",
+        description: "Meets DOE Cetane ~50 CN. Most consumer & commercial diesel vehicles.",
+        unit: "L",
+        category: "diesel",
+      },
+      {
+        key: "diesel_premium",
+        title: "Premium / Performance Diesel",
+        description: "Additised for cleaner combustion, lower emissions, better power.",
+        unit: "L",
+        category: "diesel",
+      },
+      {
+        key: "diesel_bio",
+        title: "Biodiesel Blend (B5)",
+        description: "Diesel blended with coco-methyl ester per PH biofuels law.",
+        unit: "L",
+        category: "diesel",
+      },
     ],
   },
   {
     key: "alt_fuel",
     label: "Alternative fuels",
     items: [
-      { key: "autolpg", title: "Auto LPG", description: "Liquefied petroleum gas for converted vehicles.", unit: "L", category: "alt_fuel" },
-      { key: "ev_ac", title: "EV charging — AC (Type 2)", description: "Slow / destination AC charging.", unit: "kWh", category: "alt_fuel" },
-      { key: "ev_dc_ccs", title: "EV fast charging — DC CCS2", description: "DC fast charging (CCS2).", unit: "kWh", category: "alt_fuel" },
-      { key: "ev_dc_chademo", title: "EV fast charging — CHAdeMO", description: "DC fast charging (CHAdeMO).", unit: "kWh", category: "alt_fuel" },
+      {
+        key: "autolpg",
+        title: "Auto LPG",
+        description: "Liquefied petroleum gas for converted vehicles.",
+        unit: "L",
+        category: "alt_fuel",
+      },
+      {
+        key: "ev_ac",
+        title: "EV charging — AC (Type 2)",
+        description: "Slow / destination AC charging.",
+        unit: "kWh",
+        category: "alt_fuel",
+      },
+      {
+        key: "ev_dc_ccs",
+        title: "EV fast charging — DC CCS2",
+        description: "DC fast charging (CCS2).",
+        unit: "kWh",
+        category: "alt_fuel",
+      },
+      {
+        key: "ev_dc_chademo",
+        title: "EV fast charging — CHAdeMO",
+        description: "DC fast charging (CHAdeMO).",
+        unit: "kWh",
+        category: "alt_fuel",
+      },
     ],
   },
   {
     key: "lubes",
     label: "Lubricants & fluids",
     items: [
-      { key: "oil_change", title: "Oil change service", description: "Drain & refill, includes new filter on request.", unit: "service", category: "lubes" },
-      { key: "engine_oil_synthetic", title: "Fully synthetic engine oil", unit: "L", category: "lubes" },
+      {
+        key: "oil_change",
+        title: "Oil change service",
+        description: "Drain & refill, includes new filter on request.",
+        unit: "service",
+        category: "lubes",
+      },
+      {
+        key: "engine_oil_synthetic",
+        title: "Fully synthetic engine oil",
+        unit: "L",
+        category: "lubes",
+      },
       { key: "engine_oil_semi", title: "Semi-synthetic engine oil", unit: "L", category: "lubes" },
       { key: "engine_oil_mineral", title: "Mineral engine oil", unit: "L", category: "lubes" },
       { key: "motorcycle_oil", title: "Motorcycle oil", unit: "L", category: "lubes" },
@@ -71,7 +148,12 @@ export const FUEL_STATION_CATALOG: CatalogGroup[] = [
       { key: "wash_basic", title: "Basic car wash", unit: "service", category: "carcare" },
       { key: "wash_premium", title: "Premium wash & wax", unit: "service", category: "carcare" },
       { key: "wash_motorcycle", title: "Motorcycle wash", unit: "service", category: "carcare" },
-      { key: "interior_clean", title: "Interior vacuum & wipe", unit: "service", category: "carcare" },
+      {
+        key: "interior_clean",
+        title: "Interior vacuum & wipe",
+        unit: "service",
+        category: "carcare",
+      },
       { key: "engine_wash", title: "Engine bay wash", unit: "service", category: "carcare" },
       { key: "tire_black", title: "Tire black / dressing", unit: "service", category: "carcare" },
       { key: "armor_all", title: "Dashboard armour / shine", unit: "service", category: "carcare" },
@@ -83,8 +165,18 @@ export const FUEL_STATION_CATALOG: CatalogGroup[] = [
     items: [
       { key: "free_air", title: "Free air for tires", unit: "service", category: "tire_air" },
       { key: "nitrogen", title: "Nitrogen tire inflation", unit: "service", category: "tire_air" },
-      { key: "tire_patch", title: "Tire patch / vulcanizing", unit: "service", category: "tire_air" },
-      { key: "tire_change", title: "Tire change & mounting", unit: "service", category: "tire_air" },
+      {
+        key: "tire_patch",
+        title: "Tire patch / vulcanizing",
+        unit: "service",
+        category: "tire_air",
+      },
+      {
+        key: "tire_change",
+        title: "Tire change & mounting",
+        unit: "service",
+        category: "tire_air",
+      },
       { key: "battery_jump", title: "Battery jumpstart", unit: "service", category: "tire_air" },
       { key: "battery_swap", title: "Battery installation", unit: "service", category: "tire_air" },
       { key: "wiper_install", title: "Wiper blade install", unit: "service", category: "tire_air" },
@@ -162,7 +254,12 @@ export const FUEL_STATION_CATALOG: CatalogGroup[] = [
       { key: "food_manginasal", title: "Mang Inasal", unit: "service", category: "food" },
       { key: "food_starbucks", title: "Starbucks", unit: "service", category: "food" },
       { key: "food_dunkin", title: "Dunkin'", unit: "service", category: "food" },
-      { key: "food_minigrocery", title: "Mini grocery / Treats", unit: "service", category: "food" },
+      {
+        key: "food_minigrocery",
+        title: "Mini grocery / Treats",
+        unit: "service",
+        category: "food",
+      },
     ],
   },
 ];

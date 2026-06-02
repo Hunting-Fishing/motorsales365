@@ -39,7 +39,9 @@ function AcceptInvitePage() {
       else setPreview(data as any);
       setLoading(false);
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [token]);
 
   const accept = async () => {
@@ -62,7 +64,11 @@ function AcceptInvitePage() {
   };
 
   if (loading || authLoading) {
-    return <Centered><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></Centered>;
+    return (
+      <Centered>
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+      </Centered>
+    );
   }
 
   if (!preview?.ok) {
@@ -88,7 +94,9 @@ function AcceptInvitePage() {
           <p className="mt-2 text-sm text-muted-foreground">
             This invite has already been used. Head to your dashboard to continue.
           </p>
-          <Button asChild className="mt-4"><Link to="/dashboard/team">Go to team</Link></Button>
+          <Button asChild className="mt-4">
+            <Link to="/dashboard/team">Go to team</Link>
+          </Button>
         </Card>
       </Centered>
     );
@@ -109,8 +117,7 @@ function AcceptInvitePage() {
   }
 
   const inviteEmail = preview.email!.toLowerCase();
-  const signedInWithRightEmail =
-    user && (user.email?.toLowerCase() === inviteEmail);
+  const signedInWithRightEmail = user && user.email?.toLowerCase() === inviteEmail;
 
   return (
     <Centered>
@@ -146,7 +153,10 @@ function AcceptInvitePage() {
             <Button
               variant="outline"
               className="mt-3 w-full"
-              onClick={async () => { await supabase.auth.signOut(); navigate({ to: "/login", search: { redirect: `/invites/${token}` } as any }); }}
+              onClick={async () => {
+                await supabase.auth.signOut();
+                navigate({ to: "/login", search: { redirect: `/invites/${token}` } as any });
+              }}
             >
               Sign in with the right account
             </Button>
@@ -167,11 +177,17 @@ function Centered({ children }: { children: React.ReactNode }) {
 
 function reasonLabel(reason?: string, expected?: string) {
   switch (reason) {
-    case "unauthenticated": return "Please sign in first.";
-    case "not_found": return "Invite no longer exists.";
-    case "already_accepted": return "This invite has already been used.";
-    case "expired": return "This invite has expired.";
-    case "email_mismatch": return `This invite is for ${expected}. Sign in with that email.`;
-    default: return "Could not accept invite.";
+    case "unauthenticated":
+      return "Please sign in first.";
+    case "not_found":
+      return "Invite no longer exists.";
+    case "already_accepted":
+      return "This invite has already been used.";
+    case "expired":
+      return "This invite has expired.";
+    case "email_mismatch":
+      return `This invite is for ${expected}. Sign in with that email.`;
+    default:
+      return "Could not accept invite.";
   }
 }

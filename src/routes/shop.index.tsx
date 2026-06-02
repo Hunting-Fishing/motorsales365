@@ -4,7 +4,12 @@ import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { SiteLayout } from "@/components/site-layout";
 import { AdCarousel } from "@/components/ads/ad-carousel";
-import { listShopCategories, listShopProducts, listShopBrands, listShopDepartments } from "@/lib/shop.functions";
+import {
+  listShopCategories,
+  listShopProducts,
+  listShopBrands,
+  listShopDepartments,
+} from "@/lib/shop.functions";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -33,9 +38,16 @@ export const Route = createFileRoute("/shop/")({
   head: () => ({
     meta: [
       { title: "Shop — Car detailing, tools & parts | 365 MotorSales" },
-      { name: "description", content: "Curated car detailing products, mechanic tools, parts and accessories. Search by your vehicle's make and model to find parts that fit." },
+      {
+        name: "description",
+        content:
+          "Curated car detailing products, mechanic tools, parts and accessories. Search by your vehicle's make and model to find parts that fit.",
+      },
       { property: "og:title", content: "365 MotorSales Shop" },
-      { property: "og:description", content: "Detailing, tools, parts and accessories — best prices from top PH marketplaces." },
+      {
+        property: "og:description",
+        content: "Detailing, tools, parts and accessories — best prices from top PH marketplaces.",
+      },
     ],
     links: [{ rel: "canonical", href: "https://365motorsales.com/shop" }],
   }),
@@ -47,18 +59,39 @@ function ShopIndex() {
   const [garage, setGarageState] = useGarage();
 
   // Sync URL <-> garage
-  const activeVehicle = search.make && search.model
-    ? { category: "car" as const, make: search.make, model: search.model, year: search.year, engine: search.engine || undefined }
-    : garage;
+  const activeVehicle =
+    search.make && search.model
+      ? {
+          category: "car" as const,
+          make: search.make,
+          model: search.model,
+          year: search.year,
+          engine: search.engine || undefined,
+        }
+      : garage;
 
-  const { data: catData } = useQuery({ queryKey: ["shop-cats"], queryFn: () => listShopCategories() });
-  const { data: depData } = useQuery({ queryKey: ["shop-deps"], queryFn: () => listShopDepartments() });
+  const { data: catData } = useQuery({
+    queryKey: ["shop-cats"],
+    queryFn: () => listShopCategories(),
+  });
+  const { data: depData } = useQuery({
+    queryKey: ["shop-deps"],
+    queryFn: () => listShopDepartments(),
+  });
   const { data: brandData } = useQuery({
     queryKey: ["shop-brands", search.category],
-    queryFn: () => listShopBrands({ data: search.category ? { categorySlug: search.category } : {} }),
+    queryFn: () =>
+      listShopBrands({ data: search.category ? { categorySlug: search.category } : {} }),
   });
   const filterArgs = {
-    ...(activeVehicle ? { make: activeVehicle.make, model: activeVehicle.model, year: activeVehicle.year, engine: activeVehicle.engine } : {}),
+    ...(activeVehicle
+      ? {
+          make: activeVehicle.make,
+          model: activeVehicle.model,
+          year: activeVehicle.year,
+          engine: activeVehicle.engine,
+        }
+      : {}),
     ...(search.brand ? { brand: search.brand } : {}),
     ...(search.category ? { categorySlug: search.category } : {}),
   };
@@ -72,7 +105,8 @@ function ShopIndex() {
   });
   const { data: dealsData } = useQuery({
     queryKey: ["shop-deals", filterArgs],
-    queryFn: () => listShopProducts({ data: { dealsOnly: true, limit: 12, sort: "popular", ...filterArgs } }),
+    queryFn: () =>
+      listShopProducts({ data: { dealsOnly: true, limit: 12, sort: "popular", ...filterArgs } }),
   });
 
   const cats = catData?.categories ?? [];
@@ -82,17 +116,37 @@ function ShopIndex() {
   const latest = latestData?.products ?? [];
   const deals = dealsData?.products ?? [];
 
-  const onPickVehicle = (v: { category: "car" | "motorcycle"; make: string; model: string; year?: number; engine?: string }) => {
+  const onPickVehicle = (v: {
+    category: "car" | "motorcycle";
+    make: string;
+    model: string;
+    year?: number;
+    engine?: string;
+  }) => {
     setGarageState(v);
-    navigate({ search: (prev: any) => ({ ...prev, make: v.make, model: v.model, year: v.year, engine: v.engine ?? "" }) });
+    navigate({
+      search: (prev: any) => ({
+        ...prev,
+        make: v.make,
+        model: v.model,
+        year: v.year,
+        engine: v.engine ?? "",
+      }),
+    });
   };
 
   const clearVehicle = () => {
     setGarageState(null);
-    navigate({ search: (prev: any) => ({ ...prev, make: "", model: "", year: undefined, engine: "" }) });
+    navigate({
+      search: (prev: any) => ({ ...prev, make: "", model: "", year: undefined, engine: "" }),
+    });
   };
 
-  const onApplyFilters = (next: { categorySlug: string; brand: string; vehicle: typeof activeVehicle }) => {
+  const onApplyFilters = (next: {
+    categorySlug: string;
+    brand: string;
+    vehicle: typeof activeVehicle;
+  }) => {
     if (next.vehicle) setGarageState(next.vehicle);
     else setGarageState(null);
     navigate({
@@ -114,9 +168,12 @@ function ShopIndex() {
       <section className="border-b bg-gradient-to-b from-primary/10 to-background">
         <div className="container mx-auto px-4 py-10 md:py-14">
           <Badge className="mb-3">Shop</Badge>
-          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl tracking-tight">Tools, parts &amp; detailing</h1>
+          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl tracking-tight">
+            Tools, parts &amp; detailing
+          </h1>
           <p className="mt-3 max-w-2xl text-muted-foreground">
-            Curated picks from Shopee, Lazada and AliExpress. Buy direct from the seller — we earn a small commission so the site stays free for you.
+            Curated picks from Shopee, Lazada and AliExpress. Buy direct from the seller — we earn a
+            small commission so the site stays free for you.
           </p>
 
           <div className="mt-6 hidden rounded-xl border bg-card p-4 shadow-sm md:block">
@@ -125,9 +182,13 @@ function ShopIndex() {
             {activeVehicle && (
               <div className="mt-3 flex flex-wrap items-center gap-2 text-sm">
                 <Badge variant="secondary" className="max-w-full gap-1">
-                  <span className="truncate">Showing parts for: <strong>{formatVehicle(activeVehicle)}</strong></span>
+                  <span className="truncate">
+                    Showing parts for: <strong>{formatVehicle(activeVehicle)}</strong>
+                  </span>
                 </Badge>
-                <Button size="sm" variant="ghost" onClick={clearVehicle}><X className="h-4 w-4" /> Clear</Button>
+                <Button size="sm" variant="ghost" onClick={clearVehicle}>
+                  <X className="h-4 w-4" /> Clear
+                </Button>
               </div>
             )}
           </div>
@@ -150,7 +211,16 @@ function ShopIndex() {
               size="sm"
               onClick={() => {
                 setGarageState(null);
-                navigate({ search: () => ({ make: "", model: "", year: undefined, engine: "", brand: "", category: "" }) });
+                navigate({
+                  search: () => ({
+                    make: "",
+                    model: "",
+                    year: undefined,
+                    engine: "",
+                    brand: "",
+                    category: "",
+                  }),
+                });
               }}
             >
               <X className="h-4 w-4" />
@@ -164,9 +234,15 @@ function ShopIndex() {
                 {cats.find((c) => c.slug === search.category)?.name ?? search.category}
               </Badge>
             )}
-            {search.brand && <Badge variant="secondary" className="text-[10px]">{search.brand}</Badge>}
+            {search.brand && (
+              <Badge variant="secondary" className="text-[10px]">
+                {search.brand}
+              </Badge>
+            )}
             {activeVehicle && (
-              <Badge variant="secondary" className="text-[10px]">{formatVehicle(activeVehicle)}</Badge>
+              <Badge variant="secondary" className="text-[10px]">
+                {formatVehicle(activeVehicle)}
+              </Badge>
             )}
           </div>
         )}
@@ -180,12 +256,21 @@ function ShopIndex() {
           <section>
             <div className="mb-4 flex items-end justify-between gap-3">
               <h2 className="text-xl font-semibold">Shop by department</h2>
-              <Link to="/shop/categories" className="text-sm text-muted-foreground hover:text-primary">All categories →</Link>
+              <Link
+                to="/shop/categories"
+                className="text-sm text-muted-foreground hover:text-primary"
+              >
+                All categories →
+              </Link>
             </div>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
               {departments.map((d: any) => (
-                <Link key={d.slug} to="/shop/department/$slug" params={{ slug: d.slug }}
-                  className="group flex flex-col overflow-hidden rounded-xl border bg-card transition hover:border-primary hover:shadow-md">
+                <Link
+                  key={d.slug}
+                  to="/shop/department/$slug"
+                  params={{ slug: d.slug }}
+                  className="group flex flex-col overflow-hidden rounded-xl border bg-card transition hover:border-primary hover:shadow-md"
+                >
                   {d.hero_image_url && (
                     <div className="aspect-[4/3] w-full overflow-hidden bg-muted">
                       <img
@@ -201,11 +286,18 @@ function ShopIndex() {
                   <div className="flex flex-1 flex-col p-4">
                     <div className="flex items-start justify-between gap-2">
                       <p className="font-semibold group-hover:text-primary">{d.name}</p>
-                      {d.product_count > 0 && <Badge variant="secondary" className="text-[10px]">{d.product_count}</Badge>}
+                      {d.product_count > 0 && (
+                        <Badge variant="secondary" className="text-[10px]">
+                          {d.product_count}
+                        </Badge>
+                      )}
                     </div>
                     {d.categories?.length > 0 && (
                       <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
-                        {d.categories.slice(0, 4).map((c: any) => c.name).join(" · ")}
+                        {d.categories
+                          .slice(0, 4)
+                          .map((c: any) => c.name)
+                          .join(" · ")}
                       </p>
                     )}
                   </div>
@@ -233,17 +325,23 @@ function ShopIndex() {
         )}
 
         <section>
-          <h2 className="mb-4 text-xl font-semibold">{activeVehicle ? "Matching products" : "Latest products"}</h2>
-          {latest.length === 0
-            ? <p className="text-muted-foreground">
-                {hasAnyFilter ? "No products match your filters. Try clearing some." : "No products yet — check back soon."}
-              </p>
-            : <ProductGrid products={latest} vehicle={activeVehicle} />}
+          <h2 className="mb-4 text-xl font-semibold">
+            {activeVehicle ? "Matching products" : "Latest products"}
+          </h2>
+          {latest.length === 0 ? (
+            <p className="text-muted-foreground">
+              {hasAnyFilter
+                ? "No products match your filters. Try clearing some."
+                : "No products yet — check back soon."}
+            </p>
+          ) : (
+            <ProductGrid products={latest} vehicle={activeVehicle} />
+          )}
         </section>
 
-
         <p className="rounded-md border bg-muted/40 p-4 text-xs text-muted-foreground">
-          Disclosure: 365 MotorSales earns a commission on qualifying purchases. Prices and availability are set by the seller.
+          Disclosure: 365 MotorSales earns a commission on qualifying purchases. Prices and
+          availability are set by the seller.
         </p>
       </div>
 
@@ -256,7 +354,13 @@ function ShopIndex() {
   );
 }
 
-export function ProductGrid({ products, vehicle }: { products: any[]; vehicle?: { make: string; model: string; year?: number } | null }) {
+export function ProductGrid({
+  products,
+  vehicle,
+}: {
+  products: any[];
+  vehicle?: { make: string; model: string; year?: number } | null;
+}) {
   return (
     <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
       {products.map((p) => {
@@ -267,27 +371,55 @@ export function ProductGrid({ products, vehicle }: { products: any[]; vehicle?: 
         const effective = deal ?? list;
         return (
           <div key={p.id} className="group relative">
-            <ShopFavoriteButton productId={p.id} className="absolute right-2 top-2 z-10" size="md" />
+            <ShopFavoriteButton
+              productId={p.id}
+              className="absolute right-2 top-2 z-10"
+              size="md"
+            />
             {hasDrop && (
-              <Badge className="absolute left-2 top-2 z-10 bg-green-600 hover:bg-green-700">-{pctOff}%</Badge>
+              <Badge className="absolute left-2 top-2 z-10 bg-green-600 hover:bg-green-700">
+                -{pctOff}%
+              </Badge>
             )}
             <Link to="/shop/p/$slug" params={{ slug: p.slug }} className="block">
               <Card className="overflow-hidden transition hover:shadow-lg">
                 {p.image_url ? (
-                  <ImageWithSkeleton src={p.image_url} alt={p.title} className="aspect-square w-full object-cover transition-transform group-hover:scale-105" />
+                  <ImageWithSkeleton
+                    src={p.image_url}
+                    alt={p.title}
+                    className="aspect-square w-full object-cover transition-transform group-hover:scale-105"
+                  />
                 ) : (
                   <div className="aspect-square w-full bg-muted" />
                 )}
                 <CardContent className="p-3">
-                  <p className="line-clamp-2 text-sm font-medium group-hover:text-primary">{p.title}</p>
+                  <p className="line-clamp-2 text-sm font-medium group-hover:text-primary">
+                    {p.title}
+                  </p>
                   {p.brand && <p className="text-xs text-muted-foreground">{p.brand}</p>}
                   <div className="mt-1 flex items-center justify-between gap-1">
                     <div className="flex items-baseline gap-1">
-                      {effective != null ? <p className="text-sm font-bold">₱{effective.toLocaleString()}</p> : <span />}
-                      {hasDrop && <p className="text-[11px] text-muted-foreground line-through">₱{list!.toLocaleString()}</p>}
+                      {effective != null ? (
+                        <p className="text-sm font-bold">₱{effective.toLocaleString()}</p>
+                      ) : (
+                        <span />
+                      )}
+                      {hasDrop && (
+                        <p className="text-[11px] text-muted-foreground line-through">
+                          ₱{list!.toLocaleString()}
+                        </p>
+                      )}
                     </div>
-                    {vehicle && !p.universal_fit && <Badge variant="secondary" className="text-[10px]">Fits {vehicle.model}</Badge>}
-                    {p.universal_fit && <Badge variant="outline" className="text-[10px]">Universal</Badge>}
+                    {vehicle && !p.universal_fit && (
+                      <Badge variant="secondary" className="text-[10px]">
+                        Fits {vehicle.model}
+                      </Badge>
+                    )}
+                    {p.universal_fit && (
+                      <Badge variant="outline" className="text-[10px]">
+                        Universal
+                      </Badge>
+                    )}
                   </div>
                 </CardContent>
               </Card>

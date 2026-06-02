@@ -59,10 +59,17 @@ function HeatLayer({
   return null;
 }
 
-type RegionAgg = { region: string; lat: number; lng: number; count: number; devices: Record<string, number> };
+type RegionAgg = {
+  region: string;
+  lat: number;
+  lng: number;
+  count: number;
+  devices: Record<string, number>;
+};
 
 function aggregate(points: HeatPoint[], device: DeviceFilter): RegionAgg[] {
-  const filtered = device === "all" ? points : points.filter((p) => (p.device || "unknown") === device);
+  const filtered =
+    device === "all" ? points : points.filter((p) => (p.device || "unknown") === device);
   const m = new Map<string, RegionAgg>();
   for (const p of filtered) {
     const c = matchRegion(p.region);
@@ -145,11 +152,17 @@ export function DeviceHeatmapInner({
       {compare && (
         <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-muted/40 px-3 py-2 text-xs">
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: "#ef4444" }} />
+            <span
+              className="inline-block h-2.5 w-2.5 rounded-full"
+              style={{ background: "#ef4444" }}
+            />
             <strong>{labelA}:</strong> {totalA.toLocaleString()}
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: "#2563eb" }} />
+            <span
+              className="inline-block h-2.5 w-2.5 rounded-full"
+              style={{ background: "#2563eb" }}
+            />
             <strong>{labelB}:</strong> {totalB.toLocaleString()}
           </span>
           <span className={delta >= 0 ? "text-emerald-600" : "text-red-600"}>
@@ -160,16 +173,29 @@ export function DeviceHeatmapInner({
       )}
 
       <div className="h-[480px] w-full overflow-hidden rounded-xl border border-border">
-        <MapContainer center={[PH.lat, PH.lng]} zoom={PH.zoom} style={{ height: "100%", width: "100%" }} scrollWheelZoom>
+        <MapContainer
+          center={[PH.lat, PH.lng]}
+          zoom={PH.zoom}
+          style={{ height: "100%", width: "100%" }}
+          scrollWheelZoom
+        >
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           {compare && <HeatLayer data={heatB} gradient={GRADIENT_B} />}
-          <HeatLayer data={heatA} gradient={compare ? GRADIENT_A : { 0.2: "#2563eb", 0.4: "#22c55e", 0.6: "#eab308", 0.8: "#f97316", 1.0: "#ef4444" }} />
+          <HeatLayer
+            data={heatA}
+            gradient={
+              compare
+                ? GRADIENT_A
+                : { 0.2: "#2563eb", 0.4: "#22c55e", 0.6: "#eab308", 0.8: "#f97316", 1.0: "#ef4444" }
+            }
+          />
           {aggA.map((r) => {
             const radius = 8 + Math.sqrt(r.count / maxA) * 22;
-            const topDevice = Object.entries(r.devices).sort((a, b) => b[1] - a[1])[0]?.[0] || "unknown";
+            const topDevice =
+              Object.entries(r.devices).sort((a, b) => b[1] - a[1])[0]?.[0] || "unknown";
             const b = bByRegion.get(r.region);
             const rDelta = b ? r.count - b.count : null;
             return (
@@ -192,7 +218,8 @@ export function DeviceHeatmapInner({
                     </div>
                     {compare && (
                       <div>
-                        <span className="text-blue-600">●</span> {labelB}: {(b?.count ?? 0).toLocaleString()}
+                        <span className="text-blue-600">●</span> {labelB}:{" "}
+                        {(b?.count ?? 0).toLocaleString()}
                       </div>
                     )}
                     {rDelta !== null && (
@@ -232,7 +259,8 @@ export function DeviceHeatmapInner({
                     <div className="space-y-0.5 text-xs">
                       <div className="font-semibold">{r.region}</div>
                       <div>
-                        <span className="text-blue-600">●</span> {labelB}: {r.count.toLocaleString()}
+                        <span className="text-blue-600">●</span> {labelB}:{" "}
+                        {r.count.toLocaleString()}
                       </div>
                     </div>
                   </Tooltip>
@@ -246,10 +274,18 @@ export function DeviceHeatmapInner({
         {compare ? (
           <>
             <span className="flex items-center gap-1.5">
-              <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: "#ef4444" }} /> {labelA} (solid, left)
+              <span
+                className="inline-block h-2.5 w-2.5 rounded-full"
+                style={{ background: "#ef4444" }}
+              />{" "}
+              {labelA} (solid, left)
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: "#2563eb" }} /> {labelB} (dashed, right)
+              <span
+                className="inline-block h-2.5 w-2.5 rounded-full"
+                style={{ background: "#2563eb" }}
+              />{" "}
+              {labelB} (dashed, right)
             </span>
           </>
         ) : (
@@ -257,7 +293,8 @@ export function DeviceHeatmapInner({
             <span>Heat intensity = total interactions per region.</span>
             {Object.entries(DEVICE_COLOR).map(([d, c]) => (
               <span key={d} className="flex items-center gap-1.5">
-                <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: c }} /> {d}
+                <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ background: c }} />{" "}
+                {d}
               </span>
             ))}
           </>

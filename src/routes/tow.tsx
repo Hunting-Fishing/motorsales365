@@ -23,13 +23,22 @@ export const Route = createFileRoute("/tow")({
   head: () => ({
     meta: [
       { title: "Request a tow — 365 MotorSales Philippines" },
-      { name: "description", content: "Arrange towing or trucking for a vehicle anywhere in the Philippines. Get matched with verified providers." },
+      {
+        name: "description",
+        content:
+          "Arrange towing or trucking for a vehicle anywhere in the Philippines. Get matched with verified providers.",
+      },
     ],
   }),
   component: TowPage,
 });
 
-type Loc = { region: string | null; province: string | null; city: string | null; barangay: string | null };
+type Loc = {
+  region: string | null;
+  province: string | null;
+  city: string | null;
+  barangay: string | null;
+};
 const emptyLoc: Loc = { region: null, province: null, city: null, barangay: null };
 
 function TowPage() {
@@ -69,7 +78,10 @@ function TowPage() {
   }, [search.listing]);
 
   useEffect(() => {
-    if (!search.provider) { setProviderName(null); return; }
+    if (!search.provider) {
+      setProviderName(null);
+      return;
+    }
     supabase
       .from("listings")
       .select("title,user_id")
@@ -91,16 +103,29 @@ function TowPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) { navigate({ to: "/login" }); return; }
-    if (!vehicleSummary.trim()) { toast.error("Describe the vehicle to be towed"); return; }
-    if (!pickup.region || !dropoff.region) { toast.error("Pickup and dropoff regions are required"); return; }
+    if (!user) {
+      navigate({ to: "/login" });
+      return;
+    }
+    if (!vehicleSummary.trim()) {
+      toast.error("Describe the vehicle to be towed");
+      return;
+    }
+    if (!pickup.region || !dropoff.region) {
+      toast.error("Pickup and dropoff regions are required");
+      return;
+    }
 
     setSubmitting(true);
     try {
       // Resolve provider user_id from provider listing if specified
       let providerId: string | null = null;
       if (search.provider) {
-        const { data } = await supabase.from("listings").select("user_id").eq("id", search.provider).maybeSingle();
+        const { data } = await supabase
+          .from("listings")
+          .select("user_id")
+          .eq("id", search.provider)
+          .maybeSingle();
         providerId = data?.user_id ?? null;
       }
 
@@ -132,8 +157,16 @@ function TowPage() {
         });
       }
 
-      toast.success(providerId ? "Request sent — the provider will respond soon." : "Request posted to nearby tow providers.");
-      setPickupAddress(""); setDropoffAddress(""); setVehicleSummary(""); setNeededAt(""); setNotes("");
+      toast.success(
+        providerId
+          ? "Request sent — the provider will respond soon."
+          : "Request posted to nearby tow providers.",
+      );
+      setPickupAddress("");
+      setDropoffAddress("");
+      setVehicleSummary("");
+      setNeededAt("");
+      setNotes("");
     } catch (err: any) {
       toast.error(err.message ?? "Failed to submit request");
     } finally {
@@ -141,7 +174,12 @@ function TowPage() {
     }
   };
 
-  if (loading) return <SiteLayout><div className="p-12 text-center">Loading…</div></SiteLayout>;
+  if (loading)
+    return (
+      <SiteLayout>
+        <div className="p-12 text-center">Loading…</div>
+      </SiteLayout>
+    );
 
   return (
     <SiteLayout>
@@ -153,12 +191,15 @@ function TowPage() {
             </div>
             <div>
               <h1 className="font-display text-3xl font-bold md:text-4xl">Request a tow</h1>
-              <p className="text-muted-foreground">Arrange towing or delivery for a vehicle anywhere in the Philippines.</p>
+              <p className="text-muted-foreground">
+                Arrange towing or delivery for a vehicle anywhere in the Philippines.
+              </p>
             </div>
           </div>
           {providerName && (
             <div className="mt-4 rounded-lg border border-border bg-card px-4 py-3 text-sm">
-              Sending this request directly to <span className="font-semibold">{providerName}</span>.
+              Sending this request directly to <span className="font-semibold">{providerName}</span>
+              .
             </div>
           )}
         </div>
@@ -180,13 +221,28 @@ function TowPage() {
             </div>
             <div>
               <Label htmlFor="needed">Needed by (optional)</Label>
-              <Input id="needed" type="datetime-local" value={neededAt} onChange={(e) => setNeededAt(e.target.value)} />
+              <Input
+                id="needed"
+                type="datetime-local"
+                value={neededAt}
+                onChange={(e) => setNeededAt(e.target.value)}
+              />
             </div>
           </section>
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Pickup location</h2>
-            <LocationPicker value={pickup} onChange={(v) => setPickup({ region: v.region ?? null, province: v.province ?? null, city: v.city ?? null, barangay: v.barangay ?? null })} />
+            <LocationPicker
+              value={pickup}
+              onChange={(v) =>
+                setPickup({
+                  region: v.region ?? null,
+                  province: v.province ?? null,
+                  city: v.city ?? null,
+                  barangay: v.barangay ?? null,
+                })
+              }
+            />
             <div>
               <Label>Street / landmark (optional)</Label>
               <Input value={pickupAddress} onChange={(e) => setPickupAddress(e.target.value)} />
@@ -195,7 +251,17 @@ function TowPage() {
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Dropoff location</h2>
-            <LocationPicker value={dropoff} onChange={(v) => setDropoff({ region: v.region ?? null, province: v.province ?? null, city: v.city ?? null, barangay: v.barangay ?? null })} />
+            <LocationPicker
+              value={dropoff}
+              onChange={(v) =>
+                setDropoff({
+                  region: v.region ?? null,
+                  province: v.province ?? null,
+                  city: v.city ?? null,
+                  barangay: v.barangay ?? null,
+                })
+              }
+            />
             <div>
               <Label>Street / landmark (optional)</Label>
               <Input value={dropoffAddress} onChange={(e) => setDropoffAddress(e.target.value)} />
@@ -204,18 +270,31 @@ function TowPage() {
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Notes</h2>
-            <Textarea rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Anything the driver should know — e.g. low-clearance vehicle, no keys, gate access…" />
+            <Textarea
+              rows={4}
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Anything the driver should know — e.g. low-clearance vehicle, no keys, gate access…"
+            />
           </section>
 
           <Button type="submit" size="lg" disabled={submitting}>
-            {submitting ? "Submitting…" : (search.provider ? "Send to provider" : "Post tow request")}
+            {submitting ? "Submitting…" : search.provider ? "Send to provider" : "Post tow request"}
           </Button>
           <p className="text-xs text-muted-foreground">
-            Open requests are visible to verified tow providers, who can bid on the job. You'll see all bids on your dashboard and pick the one you like.
+            Open requests are visible to verified tow providers, who can bid on the job. You'll see
+            all bids on your dashboard and pick the one you like.
           </p>
           <p className="text-xs text-muted-foreground">
             Browsing for a tow provider?{" "}
-            <Link to="/browse/$category" params={{ category: "towing" }} className="font-medium text-primary underline">See towing & trucking listings</Link>.
+            <Link
+              to="/browse/$category"
+              params={{ category: "towing" }}
+              className="font-medium text-primary underline"
+            >
+              See towing & trucking listings
+            </Link>
+            .
           </p>
         </form>
 
@@ -252,8 +331,26 @@ function TowPage() {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  if (status === "accepted") return <Badge className="gap-1"><CheckCircle2 className="h-3 w-3" />Accepted</Badge>;
-  if (status === "completed") return <Badge variant="secondary" className="gap-1"><CheckCircle2 className="h-3 w-3" />Completed</Badge>;
-  if (status === "cancelled") return <Badge variant="destructive" className="gap-1"><XCircle className="h-3 w-3" />Cancelled</Badge>;
+  if (status === "accepted")
+    return (
+      <Badge className="gap-1">
+        <CheckCircle2 className="h-3 w-3" />
+        Accepted
+      </Badge>
+    );
+  if (status === "completed")
+    return (
+      <Badge variant="secondary" className="gap-1">
+        <CheckCircle2 className="h-3 w-3" />
+        Completed
+      </Badge>
+    );
+  if (status === "cancelled")
+    return (
+      <Badge variant="destructive" className="gap-1">
+        <XCircle className="h-3 w-3" />
+        Cancelled
+      </Badge>
+    );
   return <Badge variant="outline">Open</Badge>;
 }

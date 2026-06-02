@@ -3,11 +3,19 @@ import { confirm } from "@/components/ui/confirm-dialog";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import {
-  adminListProducts, adminUpsertProduct, adminDeleteProduct,
-  adminListNetworks, adminUpsertNetwork,
-  adminProductLinks, adminUpsertLink, adminDeleteLink,
-  adminListFitment, adminUpsertFitment, adminDeleteFitment,
-  listShopCategories, scrapeShopUrl,
+  adminListProducts,
+  adminUpsertProduct,
+  adminDeleteProduct,
+  adminListNetworks,
+  adminUpsertNetwork,
+  adminProductLinks,
+  adminUpsertLink,
+  adminDeleteLink,
+  adminListFitment,
+  adminUpsertFitment,
+  adminDeleteFitment,
+  listShopCategories,
+  scrapeShopUrl,
 } from "@/lib/shop.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,13 +25,39 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Pencil, Trash2, Plus, Link as LinkIcon, ExternalLink, AlertTriangle, Sparkles, Car, Copy } from "lucide-react";
-import { AD_NETWORKS, AFFILIATE_PROGRAMS, COUNTRY_ORDER, type DirectoryEntry } from "@/lib/monetization-directory";
+import {
+  Pencil,
+  Trash2,
+  Plus,
+  Link as LinkIcon,
+  ExternalLink,
+  AlertTriangle,
+  Sparkles,
+  Car,
+  Copy,
+} from "lucide-react";
+import {
+  AD_NETWORKS,
+  AFFILIATE_PROGRAMS,
+  COUNTRY_ORDER,
+  type DirectoryEntry,
+} from "@/lib/monetization-directory";
 import { detectNetworkSlug, cleanShopUrl, urlMatchesNetwork } from "@/lib/shop-url";
 import { getYearOptions, getMakesForYear, getModelsForYear } from "@/data/vehicles";
 import { getEnginesFor } from "@/data/vehicle-engines";
@@ -37,17 +71,27 @@ function AdminShop() {
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-3xl">Affiliate Shop</h1>
-        <p className="text-muted-foreground">Manage curated products, affiliate networks, and outbound links.</p>
+        <p className="text-muted-foreground">
+          Manage curated products, affiliate networks, and outbound links.
+        </p>
       </div>
       <Tabs defaultValue="products">
         <TabsList className="w-full justify-start overflow-x-auto sm:w-auto">
           <TabsTrigger value="products">Products</TabsTrigger>
           <TabsTrigger value="networks">Networks</TabsTrigger>
-          <TabsTrigger value="directory" className="whitespace-nowrap">Sign-up directory</TabsTrigger>
+          <TabsTrigger value="directory" className="whitespace-nowrap">
+            Sign-up directory
+          </TabsTrigger>
         </TabsList>
-        <TabsContent value="products" className="mt-4"><ProductsTab /></TabsContent>
-        <TabsContent value="networks" className="mt-4"><NetworksTab /></TabsContent>
-        <TabsContent value="directory" className="mt-4"><DirectoryTab /></TabsContent>
+        <TabsContent value="products" className="mt-4">
+          <ProductsTab />
+        </TabsContent>
+        <TabsContent value="networks" className="mt-4">
+          <NetworksTab />
+        </TabsContent>
+        <TabsContent value="directory" className="mt-4">
+          <DirectoryTab />
+        </TabsContent>
       </Tabs>
     </div>
   );
@@ -60,29 +104,39 @@ function DirectoryTab() {
         <CardHeader>
           <CardTitle>Advertisement networks — earn from ads on our pages</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Sign up as a publisher. Once approved, drop their script into the site and earn passive CPM/CPC revenue from impressions and clicks — no user payments required. Grouped by primary market, Philippines first.
+            Sign up as a publisher. Once approved, drop their script into the site and earn passive
+            CPM/CPC revenue from impressions and clicks — no user payments required. Grouped by
+            primary market, Philippines first.
           </p>
         </CardHeader>
-        <CardContent><GroupedDirectory entries={AD_NETWORKS} /></CardContent>
+        <CardContent>
+          <GroupedDirectory entries={AD_NETWORKS} />
+        </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
           <CardTitle>Affiliate programs — earn commission on outbound clicks</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Sign up, get your tracking ID, then add it under <strong>Networks</strong> as <code>tag_value</code>. The shop redirector (<code>/go/$productId</code>) automatically appends it to outbound URLs. Grouped by primary market for our PH-first → international rollout.
+            Sign up, get your tracking ID, then add it under <strong>Networks</strong> as{" "}
+            <code>tag_value</code>. The shop redirector (<code>/go/$productId</code>) automatically
+            appends it to outbound URLs. Grouped by primary market for our PH-first → international
+            rollout.
           </p>
         </CardHeader>
-        <CardContent><GroupedDirectory entries={AFFILIATE_PROGRAMS} /></CardContent>
+        <CardContent>
+          <GroupedDirectory entries={AFFILIATE_PROGRAMS} />
+        </CardContent>
       </Card>
     </div>
   );
 }
 
 function GroupedDirectory({ entries }: { entries: DirectoryEntry[] }) {
-  const grouped = COUNTRY_ORDER
-    .map((country) => ({ country, items: entries.filter((e) => e.country === country) }))
-    .filter((g) => g.items.length > 0);
+  const grouped = COUNTRY_ORDER.map((country) => ({
+    country,
+    items: entries.filter((e) => e.country === country),
+  })).filter((g) => g.items.length > 0);
   return (
     <div className="space-y-8">
       {grouped.map((g) => (
@@ -99,9 +153,11 @@ function GroupedDirectory({ entries }: { entries: DirectoryEntry[] }) {
 
 function DirectoryTable({ entries }: { entries: DirectoryEntry[] }) {
   const diffColor = (d: string) =>
-    d === "easy" ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
-      : d === "medium" ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
-      : "bg-rose-500/15 text-rose-700 dark:text-rose-400";
+    d === "easy"
+      ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+      : d === "medium"
+        ? "bg-amber-500/15 text-amber-700 dark:text-amber-400"
+        : "bg-rose-500/15 text-rose-700 dark:text-rose-400";
   return (
     <div className="overflow-x-auto">
       <table className="w-full min-w-[640px] text-sm">
@@ -121,10 +177,21 @@ function DirectoryTable({ entries }: { entries: DirectoryEntry[] }) {
               <td className="p-2 font-medium">{e.name}</td>
               <td className="p-2 text-muted-foreground">{e.category}</td>
               <td className="p-2">{e.payout}</td>
-              <td className="p-2"><span className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${diffColor(e.difficulty)}`}>{e.difficulty}</span></td>
+              <td className="p-2">
+                <span
+                  className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${diffColor(e.difficulty)}`}
+                >
+                  {e.difficulty}
+                </span>
+              </td>
               <td className="p-2 text-xs text-muted-foreground max-w-md">{e.notes}</td>
               <td className="p-2">
-                <a href={e.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline whitespace-nowrap">
+                <a
+                  href={e.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-primary hover:underline whitespace-nowrap"
+                >
                   Sign up <ExternalLink className="h-3 w-3" />
                 </a>
               </td>
@@ -136,7 +203,6 @@ function DirectoryTable({ entries }: { entries: DirectoryEntry[] }) {
   );
 }
 
-
 function ProductsTab() {
   const qc = useQueryClient();
   const { data, isLoading, isFetching, error, refetch } = useQuery({
@@ -144,7 +210,11 @@ function ProductsTab() {
     queryFn: () => adminListProducts(),
     staleTime: 30_000,
   });
-  const { data: catData } = useQuery({ queryKey: ["shop-cats"], queryFn: () => listShopCategories(), staleTime: 60_000 });
+  const { data: catData } = useQuery({
+    queryKey: ["shop-cats"],
+    queryFn: () => listShopCategories(),
+    staleTime: 60_000,
+  });
   const [editing, setEditing] = useState<any | null>(null);
   const [linksFor, setLinksFor] = useState<any | null>(null);
   const [fitmentFor, setFitmentFor] = useState<any | null>(null);
@@ -154,7 +224,10 @@ function ProductsTab() {
 
   const del = useMutation({
     mutationFn: (id: string) => adminDeleteProduct({ data: { id } }),
-    onSuccess: () => { toast.success("Deleted"); qc.invalidateQueries({ queryKey: ["admin-shop-products"] }); },
+    onSuccess: () => {
+      toast.success("Deleted");
+      qc.invalidateQueries({ queryKey: ["admin-shop-products"] });
+    },
     onError: (e: any) => toast.error(e.message),
   });
 
@@ -166,7 +239,8 @@ function ProductsTab() {
     if (catFilter !== "all" && p.category?.slug !== catFilter) return false;
     if (search) {
       const q = search.toLowerCase();
-      const hay = `${p.title ?? ""} ${p.brand ?? ""} ${(p.tags ?? []).join(" ")} ${p.category?.name ?? ""}`.toLowerCase();
+      const hay =
+        `${p.title ?? ""} ${p.brand ?? ""} ${(p.tags ?? []).join(" ")} ${p.category?.name ?? ""}`.toLowerCase();
       if (!hay.includes(q)) return false;
     }
     return true;
@@ -176,14 +250,24 @@ function ProductsTab() {
     <Card>
       <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
         <div>
-          <CardTitle>Products ({filtered.length}{filtered.length !== all.length ? ` of ${all.length}` : ""})</CardTitle>
-          {error && <p className="mt-1 text-sm text-destructive">Failed to load: {(error as any).message}</p>}
+          <CardTitle>
+            Products ({filtered.length}
+            {filtered.length !== all.length ? ` of ${all.length}` : ""})
+          </CardTitle>
+          {error && (
+            <p className="mt-1 text-sm text-destructive">
+              Failed to load: {(error as any).message}
+            </p>
+          )}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button size="sm" variant="outline" onClick={() => refetch()} disabled={isFetching}>
             {isFetching ? "Refreshing…" : "Refresh"}
           </Button>
-          <Button onClick={() => setEditing({})}><Plus className="mr-1 h-4 w-4" />New product</Button>
+          <Button onClick={() => setEditing({})}>
+            <Plus className="mr-1 h-4 w-4" />
+            New product
+          </Button>
         </div>
       </CardHeader>
       <CardContent>
@@ -196,16 +280,22 @@ function ProductsTab() {
           />
           <div className="flex gap-2">
             <Select value={catFilter} onValueChange={setCatFilter}>
-              <SelectTrigger className="h-9 flex-1 sm:w-48 sm:flex-none"><SelectValue placeholder="All categories" /></SelectTrigger>
+              <SelectTrigger className="h-9 flex-1 sm:w-48 sm:flex-none">
+                <SelectValue placeholder="All categories" />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All categories</SelectItem>
                 {(catData?.categories ?? []).map((c: any) => (
-                  <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>
+                  <SelectItem key={c.slug} value={c.slug}>
+                    {c.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="h-9 flex-1 sm:w-40 sm:flex-none"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-9 flex-1 sm:w-40 sm:flex-none">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All statuses</SelectItem>
                 <SelectItem value="active">Active</SelectItem>
@@ -218,12 +308,16 @@ function ProductsTab() {
 
         {isLoading ? (
           <div className="space-y-2">
-            {[1,2,3].map((i) => <div key={i} className="h-12 animate-pulse rounded bg-muted" />)}
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-12 animate-pulse rounded bg-muted" />
+            ))}
           </div>
         ) : all.length === 0 ? (
           <div className="rounded-lg border border-dashed p-10 text-center text-muted-foreground">
             <p className="font-medium">No products yet</p>
-            <p className="mt-1 text-sm">Click <strong>New product</strong> to add your first affiliate item.</p>
+            <p className="mt-1 text-sm">
+              Click <strong>New product</strong> to add your first affiliate item.
+            </p>
           </div>
         ) : filtered.length === 0 ? (
           <div className="rounded-lg border border-dashed p-10 text-center text-muted-foreground">
@@ -249,7 +343,12 @@ function ProductsTab() {
                     <td className="p-2">
                       <div className="flex items-start gap-2">
                         {p.image_url ? (
-                          <img src={p.image_url} alt="" loading="lazy" className="h-10 w-10 flex-shrink-0 rounded object-cover" />
+                          <img
+                            src={p.image_url}
+                            alt=""
+                            loading="lazy"
+                            className="h-10 w-10 flex-shrink-0 rounded object-cover"
+                          />
                         ) : (
                           <div className="h-10 w-10 flex-shrink-0 rounded bg-muted" />
                         )}
@@ -263,28 +362,69 @@ function ProductsTab() {
                     <td className="p-2">
                       <div className="flex max-w-[220px] flex-wrap gap-1">
                         {(p.tags ?? []).slice(0, 4).map((t: string) => (
-                          <Badge key={t} variant="outline" className="text-[10px]">{t}</Badge>
+                          <Badge key={t} variant="outline" className="text-[10px]">
+                            {t}
+                          </Badge>
                         ))}
                         {(p.tags ?? []).length > 4 && (
-                          <span className="text-[10px] text-muted-foreground">+{p.tags.length - 4}</span>
+                          <span className="text-[10px] text-muted-foreground">
+                            +{p.tags.length - 4}
+                          </span>
                         )}
                       </div>
                     </td>
-                    <td className="p-2">{p.price_php ? `₱${Number(p.price_php).toLocaleString()}` : "—"}</td>
+                    <td className="p-2">
+                      {p.price_php ? `₱${Number(p.price_php).toLocaleString()}` : "—"}
+                    </td>
                     <td className="p-2">{p.click_count}</td>
                     <td className="p-2">
                       <div className="flex flex-wrap gap-1">
-                        {p.active ? <Badge variant="secondary">Active</Badge> : <Badge variant="outline">Inactive</Badge>}
+                        {p.active ? (
+                          <Badge variant="secondary">Active</Badge>
+                        ) : (
+                          <Badge variant="outline">Inactive</Badge>
+                        )}
                         {p.featured && <Badge>Featured</Badge>}
                         {p.is_deal && <Badge variant="destructive">Deal</Badge>}
                       </div>
                     </td>
                     <td className="p-2">
                       <div className="flex gap-1">
-                        <Button size="sm" variant="ghost" title="Outbound links" onClick={() => setLinksFor(p)}><LinkIcon className="h-4 w-4" /></Button>
-                        <Button size="sm" variant="ghost" title="Vehicle fitment" onClick={() => setFitmentFor(p)}><Car className="h-4 w-4" /></Button>
-                        <Button size="sm" variant="ghost" title="Edit" onClick={() => setEditing(p)}><Pencil className="h-4 w-4" /></Button>
-                        <Button size="sm" variant="ghost" title="Delete" onClick={async () => { if (await confirm({ title: `Delete "${p.title}"?`, destructive: true })) del.mutate(p.id); }}><Trash2 className="h-4 w-4" /></Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          title="Outbound links"
+                          onClick={() => setLinksFor(p)}
+                        >
+                          <LinkIcon className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          title="Vehicle fitment"
+                          onClick={() => setFitmentFor(p)}
+                        >
+                          <Car className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          title="Edit"
+                          onClick={() => setEditing(p)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          title="Delete"
+                          onClick={async () => {
+                            if (await confirm({ title: `Delete "${p.title}"?`, destructive: true }))
+                              del.mutate(p.id);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </td>
                   </tr>
@@ -295,12 +435,17 @@ function ProductsTab() {
         )}
       </CardContent>
 
-      {editing && <ProductDialog
-        initial={editing}
-        categories={catData?.categories ?? []}
-        onClose={() => setEditing(null)}
-        onSaved={() => { setEditing(null); qc.invalidateQueries({ queryKey: ["admin-shop-products"] }); }}
-      />}
+      {editing && (
+        <ProductDialog
+          initial={editing}
+          categories={catData?.categories ?? []}
+          onClose={() => setEditing(null)}
+          onSaved={() => {
+            setEditing(null);
+            qc.invalidateQueries({ queryKey: ["admin-shop-products"] });
+          }}
+        />
+      )}
       {linksFor && <LinksDialog product={linksFor} onClose={() => setLinksFor(null)} />}
       {fitmentFor && <FitmentDialog product={fitmentFor} onClose={() => setFitmentFor(null)} />}
     </Card>
@@ -308,7 +453,12 @@ function ProductsTab() {
 }
 
 function slugifyClient(s: string): string {
-  return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80);
+  return s
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
 }
 
 function ProductDialog({ initial, categories, onClose, onSaved }: any) {
@@ -327,7 +477,13 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
   });
   const [importUrl, setImportUrl] = useState("");
   const [importNetwork, setImportNetwork] = useState<string>("auto");
-  const [importInfo, setImportInfo] = useState<{ networkSlug: string | null; detectedSlug: string | null; cleanedUrl: string; networkId: string | null; resolvedFrom: string | null } | null>(null);
+  const [importInfo, setImportInfo] = useState<{
+    networkSlug: string | null;
+    detectedSlug: string | null;
+    cleanedUrl: string;
+    networkId: string | null;
+    resolvedFrom: string | null;
+  } | null>(null);
 
   // Active networks for the manual selector (shared with LinksDialog).
   const { data: networksData } = useQuery({
@@ -335,15 +491,23 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
     queryFn: () => adminListNetworks(),
     staleTime: 60_000,
   });
-  const activeNetworks = (((networksData as any)?.networks ?? networksData ?? []) as any[]).filter((n: any) => n?.active);
+  const activeNetworks = (((networksData as any)?.networks ?? networksData ?? []) as any[]).filter(
+    (n: any) => n?.active,
+  );
 
   const importMut = useMutation({
-    mutationFn: () => scrapeShopUrl({ data: {
-      url: importUrl,
-      ...(importNetwork !== "auto" ? { networkSlug: importNetwork as any } : {}),
-    } }),
+    mutationFn: () =>
+      scrapeShopUrl({
+        data: {
+          url: importUrl,
+          ...(importNetwork !== "auto" ? { networkSlug: importNetwork as any } : {}),
+        },
+      }),
     onSuccess: (res: any) => {
-      if (res.error) { toast.error(res.error); return; }
+      if (res.error) {
+        toast.error(res.error);
+        return;
+      }
       const s = res.suggested ?? {};
       setForm((f) => {
         const title = f.title || s.title || "";
@@ -358,7 +522,13 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
           category_id: f.category_id ?? s.category_id ?? null,
         };
       });
-      setImportInfo({ networkSlug: res.networkSlug, detectedSlug: res.detectedSlug ?? null, cleanedUrl: res.cleanedUrl, networkId: res.networkId, resolvedFrom: res.resolvedFrom ?? null });
+      setImportInfo({
+        networkSlug: res.networkSlug,
+        detectedSlug: res.detectedSlug ?? null,
+        cleanedUrl: res.cleanedUrl,
+        networkId: res.networkId,
+        resolvedFrom: res.resolvedFrom ?? null,
+      });
       toast.success("Fetched — review and save.");
     },
     onError: (e: any) => toast.error(e.message ?? "Fetch failed"),
@@ -366,32 +536,41 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
 
   const mut = useMutation({
     mutationFn: async () => {
-      const saved = await adminUpsertProduct({ data: {
-        ...form,
-        price_php: form.price_php ? Number(form.price_php) : null,
-      } as any });
+      const saved = await adminUpsertProduct({
+        data: {
+          ...form,
+          price_php: form.price_php ? Number(form.price_php) : null,
+        } as any,
+      });
       // Auto-stage affiliate link if we imported from a recognized network
       if (importInfo?.networkId && importInfo.cleanedUrl && saved?.id) {
         try {
-          await adminUpsertLink({ data: {
-            product_id: saved.id,
-            network_id: importInfo.networkId,
-            url: importInfo.cleanedUrl,
-          } as any });
+          await adminUpsertLink({
+            data: {
+              product_id: saved.id,
+              network_id: importInfo.networkId,
+              url: importInfo.cleanedUrl,
+            } as any,
+          });
         } catch (e: any) {
           toast.warning(`Saved product, but couldn’t add link: ${e?.message ?? "error"}`);
         }
       }
       return saved;
     },
-    onSuccess: () => { toast.success("Saved"); onSaved(); },
+    onSuccess: () => {
+      toast.success("Saved");
+      onSaved();
+    },
     onError: (e: any) => toast.error(e.message),
   });
 
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto w-[calc(100vw-1rem)] p-4 sm:p-6">
-        <DialogHeader><DialogTitle>{form.id ? "Edit product" : "New product"}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>{form.id ? "Edit product" : "New product"}</DialogTitle>
+        </DialogHeader>
         <div className="grid gap-3">
           <div className="rounded-lg border bg-muted/40 p-3 space-y-2">
             <Label className="flex items-center gap-2 text-sm">
@@ -410,11 +589,26 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="auto">Auto-detect</SelectItem>
-                  {(["shopee","lazada","tiktok","amazon","aliexpress","carousell","ebay","zalora"] as const)
+                  {(
+                    [
+                      "shopee",
+                      "lazada",
+                      "tiktok",
+                      "amazon",
+                      "aliexpress",
+                      "carousell",
+                      "ebay",
+                      "zalora",
+                    ] as const
+                  )
                     .filter((slug) => activeNetworks.some((n: any) => n.slug === slug))
                     .map((slug) => {
                       const n = activeNetworks.find((x: any) => x.slug === slug);
-                      return <SelectItem key={slug} value={slug}>{n?.name ?? slug}</SelectItem>;
+                      return (
+                        <SelectItem key={slug} value={slug}>
+                          {n?.name ?? slug}
+                        </SelectItem>
+                      );
                     })}
                 </SelectContent>
               </Select>
@@ -430,59 +624,149 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
             {importInfo && (
               <div className="space-y-1 text-xs text-muted-foreground">
                 {importInfo.resolvedFrom && (
-                  <p className="break-all">Resolved short link → <span className="font-mono">{importInfo.cleanedUrl}</span></p>
-                )}
-                <p>
-                  {importInfo.networkSlug
-                    ? <>Using <strong>{importInfo.networkSlug}</strong>{importInfo.networkId ? " · network linked ✓" : " · no matching active network"}</>
-                    : "Unknown host — fields pre-filled from page metadata."}
-                  {" "}Empty fields below were auto-filled; review before saving.
-                </p>
-                {importInfo.detectedSlug && importInfo.networkSlug && importInfo.detectedSlug !== importInfo.networkSlug && (
-                  <p className="text-amber-600 dark:text-amber-400">
-                    ⚠ URL host looks like <strong>{importInfo.detectedSlug}</strong> but you selected <strong>{importInfo.networkSlug}</strong> — link will be saved under {importInfo.networkSlug}.
+                  <p className="break-all">
+                    Resolved short link → <span className="font-mono">{importInfo.cleanedUrl}</span>
                   </p>
                 )}
+                <p>
+                  {importInfo.networkSlug ? (
+                    <>
+                      Using <strong>{importInfo.networkSlug}</strong>
+                      {importInfo.networkId
+                        ? " · network linked ✓"
+                        : " · no matching active network"}
+                    </>
+                  ) : (
+                    "Unknown host — fields pre-filled from page metadata."
+                  )}{" "}
+                  Empty fields below were auto-filled; review before saving.
+                </p>
+                {importInfo.detectedSlug &&
+                  importInfo.networkSlug &&
+                  importInfo.detectedSlug !== importInfo.networkSlug && (
+                    <p className="text-amber-600 dark:text-amber-400">
+                      ⚠ URL host looks like <strong>{importInfo.detectedSlug}</strong> but you
+                      selected <strong>{importInfo.networkSlug}</strong> — link will be saved under{" "}
+                      {importInfo.networkSlug}.
+                    </p>
+                  )}
               </div>
             )}
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            <div><Label>Title</Label><Input value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} /></div>
-            <div><Label>Slug (url)</Label><Input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} placeholder="meguiars-gold-class-wax" /></div>
+            <div>
+              <Label>Title</Label>
+              <Input
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label>Slug (url)</Label>
+              <Input
+                value={form.slug}
+                onChange={(e) => setForm({ ...form, slug: e.target.value })}
+                placeholder="meguiars-gold-class-wax"
+              />
+            </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            <div><Label>Brand</Label><Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} /></div>
-            <div><Label>Price (₱, optional)</Label><Input type="number" value={form.price_php ?? ""} onChange={(e) => setForm({ ...form, price_php: e.target.value as any })} /></div>
+            <div>
+              <Label>Brand</Label>
+              <Input
+                value={form.brand}
+                onChange={(e) => setForm({ ...form, brand: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label>Price (₱, optional)</Label>
+              <Input
+                type="number"
+                value={form.price_php ?? ""}
+                onChange={(e) => setForm({ ...form, price_php: e.target.value as any })}
+              />
+            </div>
           </div>
           <div>
             <Label>Image URL</Label>
-            <Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} />
+            <Input
+              value={form.image_url}
+              onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+            />
             {form.image_url && (
-              <img src={form.image_url} alt="" className="mt-2 h-24 w-24 rounded border object-cover" onError={(e) => ((e.target as HTMLImageElement).style.display = "none")} />
+              <img
+                src={form.image_url}
+                alt=""
+                className="mt-2 h-24 w-24 rounded border object-cover"
+                onError={(e) => ((e.target as HTMLImageElement).style.display = "none")}
+              />
             )}
           </div>
           <div>
             <Label>Category</Label>
-            <Select value={form.category_id ?? ""} onValueChange={(v) => setForm({ ...form, category_id: v || null })}>
-              <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
+            <Select
+              value={form.category_id ?? ""}
+              onValueChange={(v) => setForm({ ...form, category_id: v || null })}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select category" />
+              </SelectTrigger>
               <SelectContent>
-                {categories.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                {categories.map((c: any) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
-          <div><Label>Description</Label><Textarea rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} /></div>
+          <div>
+            <Label>Description</Label>
+            <Textarea
+              rows={4}
+              value={form.description}
+              onChange={(e) => setForm({ ...form, description: e.target.value })}
+            />
+          </div>
           <div className="flex flex-wrap gap-4 sm:gap-6">
-            <label className="flex items-center gap-2"><Switch checked={form.active} onCheckedChange={(v) => setForm({ ...form, active: v })} />Active</label>
-            <label className="flex items-center gap-2"><Switch checked={form.featured} onCheckedChange={(v) => setForm({ ...form, featured: v })} />Featured</label>
-            <label className="flex items-center gap-2" title="Show for all vehicles regardless of fitment rules">
-              <Switch checked={form.universal_fit} onCheckedChange={(v) => setForm({ ...form, universal_fit: v })} />Universal fit
+            <label className="flex items-center gap-2">
+              <Switch
+                checked={form.active}
+                onCheckedChange={(v) => setForm({ ...form, active: v })}
+              />
+              Active
+            </label>
+            <label className="flex items-center gap-2">
+              <Switch
+                checked={form.featured}
+                onCheckedChange={(v) => setForm({ ...form, featured: v })}
+              />
+              Featured
+            </label>
+            <label
+              className="flex items-center gap-2"
+              title="Show for all vehicles regardless of fitment rules"
+            >
+              <Switch
+                checked={form.universal_fit}
+                onCheckedChange={(v) => setForm({ ...form, universal_fit: v })}
+              />
+              Universal fit
             </label>
           </div>
         </div>
         <div className="sticky bottom-0 -mx-4 px-4 sm:-mx-6 sm:px-6 border-t bg-background/95 backdrop-blur pt-3 pb-1 sm:pt-4">
           <DialogFooter className="flex-col-reverse gap-2 sm:flex-row">
-            <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">Cancel</Button>
-            <Button onClick={() => mut.mutate()} disabled={mut.isPending} className="w-full sm:w-auto">{mut.isPending ? "Saving…" : "Save"}</Button>
+            <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
+              Cancel
+            </Button>
+            <Button
+              onClick={() => mut.mutate()}
+              disabled={mut.isPending}
+              className="w-full sm:w-auto"
+            >
+              {mut.isPending ? "Saving…" : "Save"}
+            </Button>
           </DialogFooter>
         </div>
       </DialogContent>
@@ -492,8 +776,14 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
 
 function LinksDialog({ product, onClose }: any) {
   const qc = useQueryClient();
-  const { data } = useQuery({ queryKey: ["admin-product-links", product.id], queryFn: () => adminProductLinks({ data: { productId: product.id } }) });
-  const { data: netData } = useQuery({ queryKey: ["admin-networks"], queryFn: () => adminListNetworks() });
+  const { data } = useQuery({
+    queryKey: ["admin-product-links", product.id],
+    queryFn: () => adminProductLinks({ data: { productId: product.id } }),
+  });
+  const { data: netData } = useQuery({
+    queryKey: ["admin-networks"],
+    queryFn: () => adminListNetworks(),
+  });
   const [networkId, setNetworkId] = useState<string>("");
   const [url, setUrl] = useState("");
   const [touchedNetwork, setTouchedNetwork] = useState(false);
@@ -550,11 +840,16 @@ function LinksDialog({ product, onClose }: any) {
       if (selectedNetwork && !urlMatchesNetwork(finalUrl, selectedNetwork.slug)) {
         throw new Error(`URL host does not match ${selectedNetwork.name}.`);
       }
-      return adminUpsertLink({ data: { product_id: product.id, network_id: networkId, url: finalUrl } as any });
+      return adminUpsertLink({
+        data: { product_id: product.id, network_id: networkId, url: finalUrl } as any,
+      });
     },
     onSuccess: () => {
       toast.success("Link saved");
-      setUrl(""); setNetworkId(""); setTouchedNetwork(false); setUrlError("");
+      setUrl("");
+      setNetworkId("");
+      setTouchedNetwork(false);
+      setUrlError("");
       qc.invalidateQueries({ queryKey: ["admin-product-links", product.id] });
     },
     onError: (e: any) => toast.error(e.message),
@@ -567,14 +862,48 @@ function LinksDialog({ product, onClose }: any) {
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="inset-0 h-dvh w-screen max-w-none translate-x-0 translate-y-0 rounded-none p-4 sm:inset-auto sm:left-[50%] sm:top-[50%] sm:h-auto sm:max-h-[90dvh] sm:w-[calc(100vw-2rem)] sm:max-w-xl sm:translate-x-[-50%] sm:translate-y-[-50%] sm:rounded-lg sm:p-6 overflow-y-auto">
-        <DialogHeader><DialogTitle className="truncate">Outbound links — {product.title}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle className="truncate">Outbound links — {product.title}</DialogTitle>
+        </DialogHeader>
         <div className="space-y-3">
           {(data?.links ?? []).map((l: any) => (
             <div key={l.id} className="flex items-center gap-2 rounded border p-2 text-sm">
-              <Badge variant="secondary" className="shrink-0">{l.network?.name}</Badge>
-              <a href={l.url} target="_blank" rel="noopener" className="flex-1 truncate text-primary hover:underline">{l.url}</a>
-              <Button size="sm" variant="ghost" title="Copy link" onClick={async () => { try { await navigator.clipboard.writeText(l.url); toast.success("Copied link"); } catch { toast.error("Could not copy"); } }} className="shrink-0"><Copy className="h-4 w-4" /></Button>
-              <Button size="sm" variant="ghost" title="Delete" onClick={() => del.mutate(l.id)} className="shrink-0"><Trash2 className="h-4 w-4" /></Button>
+              <Badge variant="secondary" className="shrink-0">
+                {l.network?.name}
+              </Badge>
+              <a
+                href={l.url}
+                target="_blank"
+                rel="noopener"
+                className="flex-1 truncate text-primary hover:underline"
+              >
+                {l.url}
+              </a>
+              <Button
+                size="sm"
+                variant="ghost"
+                title="Copy link"
+                onClick={async () => {
+                  try {
+                    await navigator.clipboard.writeText(l.url);
+                    toast.success("Copied link");
+                  } catch {
+                    toast.error("Could not copy");
+                  }
+                }}
+                className="shrink-0"
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                title="Delete"
+                onClick={() => del.mutate(l.id)}
+                className="shrink-0"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
             </div>
           ))}
           <div className="rounded border p-3 space-y-3">
@@ -600,14 +929,24 @@ function LinksDialog({ product, onClose }: any) {
                 <div className="flex flex-wrap items-center gap-2 text-xs">
                   {detectedNetwork ? (
                     <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
-                      <Sparkles className="h-3 w-3" />Detected: {detectedNetwork.name}
+                      <Sparkles className="h-3 w-3" />
+                      Detected: {detectedNetwork.name}
                     </span>
                   ) : detectedSlug ? (
-                    <span className="text-amber-600">Detected slug “{detectedSlug}” — no matching active network. Add one in Networks.</span>
+                    <span className="text-amber-600">
+                      Detected slug “{detectedSlug}” — no matching active network. Add one in
+                      Networks.
+                    </span>
                   ) : (
-                    <span className="text-muted-foreground">Unknown host — pick a network manually.</span>
+                    <span className="text-muted-foreground">
+                      Unknown host — pick a network manually.
+                    </span>
                   )}
-                  <button type="button" onClick={handleClean} className="ml-auto text-primary underline-offset-2 hover:underline">
+                  <button
+                    type="button"
+                    onClick={handleClean}
+                    className="ml-auto text-primary underline-offset-2 hover:underline"
+                  >
                     Clean tracking params
                   </button>
                 </div>
@@ -617,12 +956,19 @@ function LinksDialog({ product, onClose }: any) {
               <Label className="text-xs text-muted-foreground">Network</Label>
               <Select
                 value={networkId}
-                onValueChange={(v) => { setNetworkId(v); setTouchedNetwork(true); }}
+                onValueChange={(v) => {
+                  setNetworkId(v);
+                  setTouchedNetwork(true);
+                }}
               >
-                <SelectTrigger className="h-11"><SelectValue placeholder="Choose network" /></SelectTrigger>
+                <SelectTrigger className="h-11">
+                  <SelectValue placeholder="Choose network" />
+                </SelectTrigger>
                 <SelectContent>
                   {activeNetworks.map((n: any) => (
-                    <SelectItem key={n.id} value={n.id}>{n.name}</SelectItem>
+                    <SelectItem key={n.id} value={n.id}>
+                      {n.name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -637,8 +983,14 @@ function LinksDialog({ product, onClose }: any) {
         </div>
         <div className="sticky bottom-0 -mx-4 px-4 sm:-mx-6 sm:px-6 border-t bg-background/95 backdrop-blur pt-3 pb-1 sm:pt-4">
           <div className="flex flex-col-reverse gap-2 sm:flex-row">
-            <Button variant="outline" onClick={onClose} className="h-11 w-full sm:w-auto">Cancel</Button>
-            <Button onClick={() => add.mutate()} disabled={!networkId || !url || !!urlError || add.isPending} className="h-11 w-full sm:w-auto">
+            <Button variant="outline" onClick={onClose} className="h-11 w-full sm:w-auto">
+              Cancel
+            </Button>
+            <Button
+              onClick={() => add.mutate()}
+              disabled={!networkId || !url || !!urlError || add.isPending}
+              className="h-11 w-full sm:w-auto"
+            >
               {add.isPending ? "Saving…" : "Add link"}
             </Button>
           </div>
@@ -647,7 +999,6 @@ function LinksDialog({ product, onClose }: any) {
     </Dialog>
   );
 }
-
 
 function NetworksTab() {
   const qc = useQueryClient();
@@ -658,33 +1009,65 @@ function NetworksTab() {
     <Card>
       <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-2">
         <CardTitle>Affiliate networks</CardTitle>
-        <Button onClick={() => setEditing({})}><Plus className="mr-1 h-4 w-4" />New network</Button>
+        <Button onClick={() => setEditing({})}>
+          <Plus className="mr-1 h-4 w-4" />
+          New network
+        </Button>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
-        <table className="w-full min-w-[640px] text-sm">
-          <thead className="border-b text-left text-xs uppercase text-muted-foreground">
-            <tr><th className="p-2">Name</th><th className="p-2">Slug</th><th className="p-2">Tag param</th><th className="p-2">Tag value</th><th className="p-2">Status</th><th className="p-2"></th></tr>
-          </thead>
-          <tbody>
-            {(data?.networks ?? []).map((n: any) => (
-              <tr key={n.id} className="border-b">
-                <td className="p-2 font-medium">{n.name}</td>
-                <td className="p-2 text-muted-foreground">{n.slug}</td>
-                <td className="p-2">{n.tag_param ?? "—"}</td>
-                <td className="p-2 font-mono text-xs">{n.tag_value || <span className="text-amber-600">not set</span>}</td>
-                <td className="p-2">{n.active ? <Badge variant="secondary">Active</Badge> : <Badge variant="outline">Off</Badge>}</td>
-                <td className="p-2"><Button size="sm" variant="ghost" onClick={() => setEditing(n)}><Pencil className="h-4 w-4" /></Button></td>
+          <table className="w-full min-w-[640px] text-sm">
+            <thead className="border-b text-left text-xs uppercase text-muted-foreground">
+              <tr>
+                <th className="p-2">Name</th>
+                <th className="p-2">Slug</th>
+                <th className="p-2">Tag param</th>
+                <th className="p-2">Tag value</th>
+                <th className="p-2">Status</th>
+                <th className="p-2"></th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {(data?.networks ?? []).map((n: any) => (
+                <tr key={n.id} className="border-b">
+                  <td className="p-2 font-medium">{n.name}</td>
+                  <td className="p-2 text-muted-foreground">{n.slug}</td>
+                  <td className="p-2">{n.tag_param ?? "—"}</td>
+                  <td className="p-2 font-mono text-xs">
+                    {n.tag_value || <span className="text-amber-600">not set</span>}
+                  </td>
+                  <td className="p-2">
+                    {n.active ? (
+                      <Badge variant="secondary">Active</Badge>
+                    ) : (
+                      <Badge variant="outline">Off</Badge>
+                    )}
+                  </td>
+                  <td className="p-2">
+                    <Button size="sm" variant="ghost" onClick={() => setEditing(n)}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
         <p className="mt-4 text-xs text-muted-foreground">
-          Tag value is appended to outbound URLs via <code>tag_param</code>, or substituted into <code>deeplink_template</code> as <code>{`{{tag}}`}</code> and <code>{`{{url}}`}</code>.
+          Tag value is appended to outbound URLs via <code>tag_param</code>, or substituted into{" "}
+          <code>deeplink_template</code> as <code>{`{{tag}}`}</code> and <code>{`{{url}}`}</code>.
         </p>
       </CardContent>
-      {editing && <NetworkDialog initial={editing} onClose={() => setEditing(null)} onSaved={() => { setEditing(null); qc.invalidateQueries({ queryKey: ["admin-networks"] }); }} />}
+      {editing && (
+        <NetworkDialog
+          initial={editing}
+          onClose={() => setEditing(null)}
+          onSaved={() => {
+            setEditing(null);
+            qc.invalidateQueries({ queryKey: ["admin-networks"] });
+          }}
+        />
+      )}
     </Card>
   );
 }
@@ -701,38 +1084,89 @@ function NetworkDialog({ initial, onClose, onSaved }: any) {
     sort_order: initial.sort_order ?? 0,
   });
   const mut = useMutation({
-    mutationFn: () => adminUpsertNetwork({ data: {
-      ...form,
-      tag_param: form.tag_param || null,
-      tag_value: form.tag_value || null,
-      deeplink_template: form.deeplink_template || null,
-    } as any }),
-    onSuccess: () => { toast.success("Saved"); onSaved(); },
+    mutationFn: () =>
+      adminUpsertNetwork({
+        data: {
+          ...form,
+          tag_param: form.tag_param || null,
+          tag_value: form.tag_value || null,
+          deeplink_template: form.deeplink_template || null,
+        } as any,
+      }),
+    onSuccess: () => {
+      toast.success("Saved");
+      onSaved();
+    },
     onError: (e: any) => toast.error(e.message),
   });
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent>
-        <DialogHeader><DialogTitle>{form.id ? "Edit network" : "New network"}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>{form.id ? "Edit network" : "New network"}</DialogTitle>
+        </DialogHeader>
         <div className="grid gap-3">
           <div className="grid grid-cols-2 gap-3">
-            <div><Label>Name</Label><Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></div>
-            <div><Label>Slug</Label><Input value={form.slug} onChange={(e) => setForm({ ...form, slug: e.target.value })} /></div>
+            <div>
+              <Label>Name</Label>
+              <Input
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
+              />
+            </div>
+            <div>
+              <Label>Slug</Label>
+              <Input
+                value={form.slug}
+                onChange={(e) => setForm({ ...form, slug: e.target.value })}
+              />
+            </div>
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <div><Label>Tag param</Label><Input value={form.tag_param} onChange={(e) => setForm({ ...form, tag_param: e.target.value })} placeholder="af_siteid" /></div>
-            <div><Label>Tag value (your affiliate ID)</Label><Input value={form.tag_value} onChange={(e) => setForm({ ...form, tag_value: e.target.value })} /></div>
+            <div>
+              <Label>Tag param</Label>
+              <Input
+                value={form.tag_param}
+                onChange={(e) => setForm({ ...form, tag_param: e.target.value })}
+                placeholder="af_siteid"
+              />
+            </div>
+            <div>
+              <Label>Tag value (your affiliate ID)</Label>
+              <Input
+                value={form.tag_value}
+                onChange={(e) => setForm({ ...form, tag_value: e.target.value })}
+              />
+            </div>
           </div>
           <div>
             <Label>Deeplink template (optional)</Label>
-            <Input value={form.deeplink_template} onChange={(e) => setForm({ ...form, deeplink_template: e.target.value })} placeholder="https://s.click.aliexpress.com/deep_link.htm?aff_short_key={{tag}}&dl_target_url={{url}}" />
+            <Input
+              value={form.deeplink_template}
+              onChange={(e) => setForm({ ...form, deeplink_template: e.target.value })}
+              placeholder="https://s.click.aliexpress.com/deep_link.htm?aff_short_key={{tag}}&dl_target_url={{url}}"
+            />
           </div>
-          <label className="flex items-center gap-2"><Switch checked={form.active} onCheckedChange={(v) => setForm({ ...form, active: v })} />Active</label>
+          <label className="flex items-center gap-2">
+            <Switch
+              checked={form.active}
+              onCheckedChange={(v) => setForm({ ...form, active: v })}
+            />
+            Active
+          </label>
         </div>
         <div className="sticky bottom-0 -mx-6 px-6 border-t bg-background/95 backdrop-blur pt-3 pb-1 sm:pt-4">
           <DialogFooter className="flex-col-reverse gap-2 sm:flex-row">
-            <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">Cancel</Button>
-            <Button onClick={() => mut.mutate()} disabled={mut.isPending} className="w-full sm:w-auto">Save</Button>
+            <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
+              Cancel
+            </Button>
+            <Button
+              onClick={() => mut.mutate()}
+              disabled={mut.isPending}
+              className="w-full sm:w-auto"
+            >
+              Save
+            </Button>
           </DialogFooter>
         </div>
       </DialogContent>
@@ -766,16 +1200,19 @@ function FitmentDialog({ product, onClose }: any) {
   const engineSuggestions = getEnginesFor(form.category, form.make, form.model, ys, ye);
 
   const add = useMutation({
-    mutationFn: () => adminUpsertFitment({ data: {
-      product_id: product.id,
-      category: form.category,
-      make: form.make || null,
-      model: form.model || null,
-      year_start: form.year_start ? Number(form.year_start) : null,
-      year_end: form.year_end ? Number(form.year_end) : null,
-      engine: form.engine || null,
-      notes: form.notes || null,
-    } as any }),
+    mutationFn: () =>
+      adminUpsertFitment({
+        data: {
+          product_id: product.id,
+          category: form.category,
+          make: form.make || null,
+          model: form.model || null,
+          year_start: form.year_start ? Number(form.year_start) : null,
+          year_end: form.year_end ? Number(form.year_end) : null,
+          engine: form.engine || null,
+          notes: form.notes || null,
+        } as any,
+      }),
     onSuccess: () => {
       toast.success("Fitment added");
       setForm(emptyForm);
@@ -791,29 +1228,58 @@ function FitmentDialog({ product, onClose }: any) {
   return (
     <Dialog open onOpenChange={onClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader><DialogTitle>Vehicle fitment — {product.title}</DialogTitle></DialogHeader>
+        <DialogHeader>
+          <DialogTitle>Vehicle fitment — {product.title}</DialogTitle>
+        </DialogHeader>
         <p className="text-xs text-muted-foreground">
-          Add the vehicles this product fits. Leave make/model blank to match any value. Pick an engine to scope the rule to a specific variant (e.g. Hilux 2.4L vs 2.8L).
+          Add the vehicles this product fits. Leave make/model blank to match any value. Pick an
+          engine to scope the rule to a specific variant (e.g. Hilux 2.4L vs 2.8L).
         </p>
         <div className="space-y-2">
-          {isLoading ? <p className="text-sm text-muted-foreground">Loading…</p> : (data?.fitment ?? []).length === 0 ? (
-            <p className="text-sm text-muted-foreground">No fitment rules yet. Enable “Universal fit” on the product if it fits everything.</p>
+          {isLoading ? (
+            <p className="text-sm text-muted-foreground">Loading…</p>
+          ) : (data?.fitment ?? []).length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No fitment rules yet. Enable “Universal fit” on the product if it fits everything.
+            </p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead className="border-b text-left text-xs uppercase text-muted-foreground">
-                  <tr><th className="p-2">Type</th><th className="p-2">Make</th><th className="p-2">Model</th><th className="p-2">Years</th><th className="p-2">Engine</th><th className="p-2">Notes</th><th className="p-2"></th></tr>
+                  <tr>
+                    <th className="p-2">Type</th>
+                    <th className="p-2">Make</th>
+                    <th className="p-2">Model</th>
+                    <th className="p-2">Years</th>
+                    <th className="p-2">Engine</th>
+                    <th className="p-2">Notes</th>
+                    <th className="p-2"></th>
+                  </tr>
                 </thead>
                 <tbody>
                   {(data?.fitment ?? []).map((f: any) => (
                     <tr key={f.id} className="border-b">
                       <td className="p-2">{f.category}</td>
-                      <td className="p-2">{f.make ?? <span className="text-muted-foreground">any</span>}</td>
-                      <td className="p-2">{f.model ?? <span className="text-muted-foreground">any</span>}</td>
-                      <td className="p-2">{f.year_start || f.year_end ? `${f.year_start ?? "…"}–${f.year_end ?? "…"}` : "—"}</td>
-                      <td className="p-2">{f.engine ?? <span className="text-muted-foreground">any</span>}</td>
+                      <td className="p-2">
+                        {f.make ?? <span className="text-muted-foreground">any</span>}
+                      </td>
+                      <td className="p-2">
+                        {f.model ?? <span className="text-muted-foreground">any</span>}
+                      </td>
+                      <td className="p-2">
+                        {f.year_start || f.year_end
+                          ? `${f.year_start ?? "…"}–${f.year_end ?? "…"}`
+                          : "—"}
+                      </td>
+                      <td className="p-2">
+                        {f.engine ?? <span className="text-muted-foreground">any</span>}
+                      </td>
                       <td className="p-2 text-xs text-muted-foreground">{f.notes ?? ""}</td>
-                      <td className="p-2"><Button size="sm" variant="ghost" onClick={() => del.mutate(f.id)}><Trash2 className="h-4 w-4" /></Button></td>
+                      <td className="p-2">
+                        <Button size="sm" variant="ghost" onClick={() => del.mutate(f.id)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -830,7 +1296,9 @@ function FitmentDialog({ product, onClose }: any) {
                 value={form.category}
                 onValueChange={(v) => setForm({ ...emptyForm, category: v as any })}
               >
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="car">Car / Truck</SelectItem>
                   <SelectItem value="motorcycle">Motorcycle</SelectItem>
@@ -843,10 +1311,18 @@ function FitmentDialog({ product, onClose }: any) {
                 value={form.year_start}
                 onValueChange={(v) => setForm({ ...form, year_start: v, engine: "" })}
               >
-                <SelectTrigger><SelectValue placeholder="Any" /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
                 <SelectContent className="max-h-72">
-                  <SelectItem value="__any__" onSelect={(e) => e.preventDefault()} disabled>Any</SelectItem>
-                  {years.map((y) => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+                  <SelectItem value="__any__" onSelect={(e) => e.preventDefault()} disabled>
+                    Any
+                  </SelectItem>
+                  {years.map((y) => (
+                    <SelectItem key={y} value={String(y)}>
+                      {y}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -856,9 +1332,15 @@ function FitmentDialog({ product, onClose }: any) {
                 value={form.year_end}
                 onValueChange={(v) => setForm({ ...form, year_end: v, engine: "" })}
               >
-                <SelectTrigger><SelectValue placeholder="Same as start" /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue placeholder="Same as start" />
+                </SelectTrigger>
                 <SelectContent className="max-h-72">
-                  {years.map((y) => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+                  {years.map((y) => (
+                    <SelectItem key={y} value={String(y)}>
+                      {y}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -868,9 +1350,15 @@ function FitmentDialog({ product, onClose }: any) {
                 value={form.make}
                 onValueChange={(v) => setForm({ ...form, make: v, model: "", engine: "" })}
               >
-                <SelectTrigger><SelectValue placeholder="Any make" /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue placeholder="Any make" />
+                </SelectTrigger>
                 <SelectContent className="max-h-72">
-                  {makes.map((m) => <SelectItem key={m.make} value={m.make}>{m.make}</SelectItem>)}
+                  {makes.map((m) => (
+                    <SelectItem key={m.make} value={m.make}>
+                      {m.make}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -885,18 +1373,29 @@ function FitmentDialog({ product, onClose }: any) {
                   <SelectValue placeholder={form.make ? "Any model" : "Pick make first"} />
                 </SelectTrigger>
                 <SelectContent className="max-h-72">
-                  {models.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+                  {models.map((m) => (
+                    <SelectItem key={m} value={m}>
+                      {m}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
             <div>
               <Label>Engine</Label>
               {engineSuggestions.length > 0 ? (
-                <Select value={form.engine} onValueChange={(v) => setForm({ ...form, engine: v === "__custom__" ? "" : v })}>
-                  <SelectTrigger><SelectValue placeholder="Any engine" /></SelectTrigger>
+                <Select
+                  value={form.engine}
+                  onValueChange={(v) => setForm({ ...form, engine: v === "__custom__" ? "" : v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Any engine" />
+                  </SelectTrigger>
                   <SelectContent className="max-h-72">
                     {engineSuggestions.map((e) => (
-                      <SelectItem key={e.label} value={e.label}>{e.label}</SelectItem>
+                      <SelectItem key={e.label} value={e.label}>
+                        {e.label}
+                      </SelectItem>
                     ))}
                     <SelectItem value="__custom__">Custom (type below)…</SelectItem>
                   </SelectContent>
@@ -908,16 +1407,19 @@ function FitmentDialog({ product, onClose }: any) {
                   placeholder="e.g. 2.4L Diesel (2GD-FTV)"
                 />
               )}
-              {engineSuggestions.length > 0 && (form.engine === "" || !engineSuggestions.find((e) => e.label === form.engine)) && (
-                <Input
-                  className="mt-2"
-                  value={form.engine}
-                  onChange={(e) => setForm({ ...form, engine: e.target.value })}
-                  placeholder="Custom engine label (optional)"
-                />
-              )}
+              {engineSuggestions.length > 0 &&
+                (form.engine === "" || !engineSuggestions.find((e) => e.label === form.engine)) && (
+                  <Input
+                    className="mt-2"
+                    value={form.engine}
+                    onChange={(e) => setForm({ ...form, engine: e.target.value })}
+                    placeholder="Custom engine label (optional)"
+                  />
+                )}
               {form.make && form.model && engineSuggestions.length === 0 && (
-                <p className="mt-1 text-xs text-muted-foreground">No catalog entries for this model — type the engine manually.</p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  No catalog entries for this model — type the engine manually.
+                </p>
               )}
             </div>
             <div className="sm:col-span-2 md:col-span-3">
@@ -932,8 +1434,14 @@ function FitmentDialog({ product, onClose }: any) {
         </div>
         <div className="sticky bottom-0 -mx-6 px-6 border-t bg-background/95 backdrop-blur pt-3 pb-1 sm:pt-4">
           <DialogFooter className="flex-col-reverse gap-2 sm:flex-row">
-            <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">Close</Button>
-            <Button onClick={() => add.mutate()} disabled={add.isPending} className="w-full sm:w-auto">
+            <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
+              Close
+            </Button>
+            <Button
+              onClick={() => add.mutate()}
+              disabled={add.isPending}
+              className="w-full sm:w-auto"
+            >
               {add.isPending ? "Saving…" : "Add fitment"}
             </Button>
           </DialogFooter>

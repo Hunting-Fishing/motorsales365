@@ -65,9 +65,7 @@ export function extractLazadaIds(
               : "PH";
     const pathMatch = url.pathname.match(/(?:^|-)i(\d+)(?:-s(\d+))?\.html/i);
     const itemId =
-      pathMatch?.[1] ??
-      url.searchParams.get("itemId") ??
-      url.searchParams.get("item_id");
+      pathMatch?.[1] ?? url.searchParams.get("itemId") ?? url.searchParams.get("item_id");
     const skuId =
       pathMatch?.[2] ??
       url.searchParams.get("skuId") ??
@@ -130,18 +128,14 @@ async function fetchViaMtop(
     const token = tokenValue?.split("_")[0];
     if (!token) return null;
     const t = String(Date.now());
-    const sign = createHash("md5")
-      .update(`${token}&${t}&${appKey}&${data}`)
-      .digest("hex");
+    const sign = createHash("md5").update(`${token}&${t}&${appKey}&${data}`).digest("hex");
     const cookieHeader = `_m_h5_tk=${tokenValue}${tokenEnc ? `; _m_h5_tk_enc=${tokenEnc}` : ""}`;
     const second = await fetch(makeUrl(t, sign), {
       headers: { ...headers, cookie: cookieHeader },
       signal: AbortSignal.timeout(8_000),
     });
     const text = await second.text();
-    const jsonText = text
-      .replace(/^\s*mtopjsonp1\(/, "")
-      .replace(/\)\s*$/, "");
+    const jsonText = text.replace(/^\s*mtopjsonp1\(/, "").replace(/\)\s*$/, "");
     const payload = JSON.parse(jsonText);
     const items: any[] = payload?.data?.mods?.listItems ?? [];
     const item =
@@ -191,8 +185,7 @@ async function fetchViaPdpHtml(
     const res = await fetch(url, {
       headers: {
         "user-agent": UA,
-        accept:
-          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "accept-language": "en-US,en;q=0.9",
       },
       signal: AbortSignal.timeout(12_000),
@@ -219,14 +212,9 @@ async function fetchViaPdpHtml(
       const skuBase = data.skuBase ?? {};
       const skus = Array.isArray(skuBase.skus) ? skuBase.skus : [];
       const matchedSku =
-        skus.find((s: any) => String(s.skuId ?? "") === (ids.skuId ?? "")) ??
-        skus[0] ??
-        null;
+        skus.find((s: any) => String(s.skuId ?? "") === (ids.skuId ?? "")) ?? skus[0] ?? null;
       const priceInfo =
-        data.skuInfos?.[matchedSku?.skuId]?.price ??
-        data.price ??
-        matchedSku?.price ??
-        {};
+        data.skuInfos?.[matchedSku?.skuId]?.price ?? data.price ?? matchedSku?.price ?? {};
       const list = num(priceInfo?.originalPrice ?? priceInfo?.priceWithTax);
       const sale = num(priceInfo?.salePrice ?? priceInfo?.price);
 
@@ -245,8 +233,7 @@ async function fetchViaPdpHtml(
       if (!title) return null;
 
       const category =
-        data?.breadcrumb?.[data.breadcrumb.length - 1]?.title ??
-        data?.category?.name;
+        data?.breadcrumb?.[data.breadcrumb.length - 1]?.title ?? data?.category?.name;
 
       return {
         title: String(title),
@@ -283,9 +270,7 @@ function extractJsonLdFromHtml(
   ids: { itemId: string; skuId?: string; region: string },
 ): LazadaProductData | null {
   const blocks = Array.from(
-    html.matchAll(
-      /<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi,
-    ),
+    html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi),
   );
   for (const m of blocks) {
     const raw = m[1]?.trim();
@@ -296,36 +281,28 @@ function extractJsonLdFromHtml(
     } catch {
       continue;
     }
-    const candidates: any[] = Array.isArray(parsed)
-      ? parsed
-      : (parsed["@graph"] ?? [parsed]);
+    const candidates: any[] = Array.isArray(parsed) ? parsed : (parsed["@graph"] ?? [parsed]);
     for (const node of candidates) {
       if (!node || typeof node !== "object") continue;
       const t = node["@type"];
-      const isProduct =
-        t === "Product" || (Array.isArray(t) && t.includes("Product"));
+      const isProduct = t === "Product" || (Array.isArray(t) && t.includes("Product"));
       if (!isProduct) continue;
       const offer = Array.isArray(node.offers) ? node.offers[0] : node.offers;
       const image = Array.isArray(node.image) ? node.image[0] : node.image;
       const imgStr = typeof image === "string" ? image : image?.url;
       if (imgStr && !VALID_IMG_RE.test(imgStr)) return null;
       const brandRaw = node.brand;
-      const brand =
-        typeof brandRaw === "string" ? brandRaw : brandRaw?.name;
+      const brand = typeof brandRaw === "string" ? brandRaw : brandRaw?.name;
       const list = num(offer?.priceSpecification?.price ?? offer?.highPrice);
       const sale = num(offer?.price ?? offer?.lowPrice);
       return {
         title: typeof node.name === "string" ? node.name : undefined,
         brand: typeof brand === "string" ? brand : undefined,
-        description:
-          typeof node.description === "string" ? node.description : undefined,
+        description: typeof node.description === "string" ? node.description : undefined,
         image_url: imgStr ?? undefined,
         price: list ?? sale,
         sale_price: list && sale && sale < list ? sale : undefined,
-        currency:
-          typeof offer?.priceCurrency === "string"
-            ? offer.priceCurrency
-            : "PHP",
+        currency: typeof offer?.priceCurrency === "string" ? offer.priceCurrency : "PHP",
         url,
         itemId: ids.itemId,
         skuId: ids.skuId,
@@ -339,9 +316,7 @@ function extractJsonLdFromHtml(
  * Public entry point. Tries strategies in order and returns the first strict
  * match. Returns `null` to signal "fall back to Firecrawl".
  */
-export async function scrapeLazadaProduct(
-  input: string,
-): Promise<LazadaProductData | null> {
+export async function scrapeLazadaProduct(input: string): Promise<LazadaProductData | null> {
   const ids = extractLazadaIds(input);
   if (!ids) return null;
 

@@ -15,7 +15,9 @@ export const getPartsForVehicle = createServerFn({ method: "POST" })
     // Public, anonymous-friendly read via admin client (RLS-safe: only active rows returned).
     let q = supabaseAdmin
       .from("affiliate_parts")
-      .select("id, title, description, category, image_url, target_url, price_php, network_slug, make, model")
+      .select(
+        "id, title, description, category, image_url, target_url, price_php, network_slug, make, model",
+      )
       .eq("active", true)
       .order("sort_order", { ascending: true })
       .limit(data.limit);

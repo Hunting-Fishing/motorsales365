@@ -17,7 +17,9 @@ interface SendTransactionalEmailParams {
  */
 export async function sendTransactionalEmail(params: SendTransactionalEmailParams) {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
     const response = await fetch("/lovable/email/transactional/send", {
       method: "POST",
       headers: {

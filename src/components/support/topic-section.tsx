@@ -22,9 +22,7 @@ export function TopicSection({
         </span>
         <div>
           <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{title}</h2>
-          {description && (
-            <p className="mt-1 text-sm text-muted-foreground">{description}</p>
-          )}
+          {description && <p className="mt-1 text-sm text-muted-foreground">{description}</p>}
         </div>
       </div>
       <div className="space-y-10">{children}</div>

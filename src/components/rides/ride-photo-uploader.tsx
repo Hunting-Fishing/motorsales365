@@ -205,7 +205,12 @@ export function RidePhotoUploader({
           hidden
           onChange={(e) => handleFiles(e.target.files)}
         />
-        <Button type="button" variant="outline" disabled={busy} onClick={() => fileRef.current?.click()}>
+        <Button
+          type="button"
+          variant="outline"
+          disabled={busy}
+          onClick={() => fileRef.current?.click()}
+        >
           <Upload className="mr-2 h-4 w-4" />
           {busy ? "Uploading…" : "Upload photos"}
         </Button>

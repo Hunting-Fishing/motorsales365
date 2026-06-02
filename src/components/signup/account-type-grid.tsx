@@ -14,7 +14,8 @@ export const SIGNUP_TYPES: {
   {
     id: "buyer",
     label: "Buyer & Private Seller",
-    description: "Browse listings, save favorites, message sellers — and list your own vehicle, equipment, or parts when you're ready.",
+    description:
+      "Browse listings, save favorites, message sellers — and list your own vehicle, equipment, or parts when you're ready.",
     icon: UserRound,
     note: "This personal account lets you do both: shop the marketplace and post private listings from your dashboard. Pick a business account below if you sell professionally.",
   },

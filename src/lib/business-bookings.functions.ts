@@ -4,7 +4,6 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/server-enqueue.server";
 
-
 /* ---------- helpers ---------- */
 
 async function assertEditor(supabase: any, userId: string, businessId: string) {
@@ -42,7 +41,12 @@ function toMinutes(t: string) {
  */
 export const getBookingConfig = createServerFn({ method: "GET" })
   .inputValidator((input) =>
-    z.object({ businessId: z.string().uuid(), horizonDays: z.number().int().min(1).max(90).default(30) }).parse(input),
+    z
+      .object({
+        businessId: z.string().uuid(),
+        horizonDays: z.number().int().min(1).max(90).default(30),
+      })
+      .parse(input),
   )
   .handler(async ({ data }) => {
     const horizon = new Date();
@@ -52,7 +56,9 @@ export const getBookingConfig = createServerFn({ method: "GET" })
     const [items, avail, exc, bookings] = await Promise.all([
       supabaseAdmin
         .from("business_bookable_items")
-        .select("id, title, description, duration_min, buffer_min, price_php, max_concurrent, require_approval, lead_time_hours, horizon_days, sort_order")
+        .select(
+          "id, title, description, duration_min, buffer_min, price_php, max_concurrent, require_approval, lead_time_hours, horizon_days, sort_order",
+        )
         .eq("business_id", data.businessId)
         .eq("active", true)
         .order("sort_order"),
@@ -104,7 +110,9 @@ export const createBooking = createServerFn({ method: "POST" })
     // Load item to derive duration + approval
     const { data: item, error: itemErr } = await supabaseAdmin
       .from("business_bookable_items")
-      .select("id, business_id, duration_min, buffer_min, max_concurrent, require_approval, lead_time_hours, horizon_days, active")
+      .select(
+        "id, business_id, duration_min, buffer_min, max_concurrent, require_approval, lead_time_hours, horizon_days, active",
+      )
       .eq("id", data.bookableItemId)
       .eq("business_id", data.businessId)
       .maybeSingle();
@@ -160,7 +168,9 @@ export const createBooking = createServerFn({ method: "POST" })
         kind: status === "confirmed" ? "book_confirmed" : "book_created",
         meta: { booking_id: (row as any).id, bookable_item_id: data.bookableItemId },
       } as any);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
 
     // Lookup business + item + owner for emails
     try {
@@ -179,8 +189,13 @@ export const createBooking = createServerFn({ method: "POST" })
 
       const serviceTitle = (itemRow as any)?.title ?? "Appointment";
       const startsAtHuman = new Date(start.toISOString()).toLocaleString("en-PH", {
-        weekday: "short", month: "short", day: "numeric", year: "numeric",
-        hour: "numeric", minute: "2-digit", hour12: true,
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: true,
       });
 
       // Customer confirmation / request
@@ -231,7 +246,6 @@ export const createBooking = createServerFn({ method: "POST" })
     return { booking: row };
   });
 
-
 /* ---------- OWNER: bookable items CRUD ---------- */
 
 const bookableInput = z.object({
@@ -277,7 +291,9 @@ export const upsertBookableItem = createServerFn({ method: "POST" })
 
 export const deleteBookableItem = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => z.object({ businessId: z.string().uuid(), id: z.string().uuid() }).parse(input))
+  .inputValidator((input) =>
+    z.object({ businessId: z.string().uuid(), id: z.string().uuid() }).parse(input),
+  )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertEditor(supabase, userId, data.businessId);
@@ -340,12 +356,21 @@ export const upsertException = createServerFn({ method: "POST" })
         businessId: z.string().uuid(),
         date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
         closed: z.boolean().default(true),
-        start_time: z.string().regex(/^\d{2}:\d{2}$/).nullable().optional(),
-        end_time: z.string().regex(/^\d{2}:\d{2}$/).nullable().optional(),
+        start_time: z
+          .string()
+          .regex(/^\d{2}:\d{2}$/)
+          .nullable()
+          .optional(),
+        end_time: z
+          .string()
+          .regex(/^\d{2}:\d{2}$/)
+          .nullable()
+          .optional(),
         note: z.string().max(200).nullable().optional(),
       })
       .refine(
-        (v) => (v.start_time && v.end_time ? v.end_time > v.start_time : !v.start_time && !v.end_time),
+        (v) =>
+          v.start_time && v.end_time ? v.end_time > v.start_time : !v.start_time && !v.end_time,
         { message: "Time range must include both start and end, and end must be after start." },
       )
       .parse(input),
@@ -374,7 +399,9 @@ export const upsertException = createServerFn({ method: "POST" })
 
 export const deleteException = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input) => z.object({ businessId: z.string().uuid(), id: z.string().uuid() }).parse(input))
+  .inputValidator((input) =>
+    z.object({ businessId: z.string().uuid(), id: z.string().uuid() }).parse(input),
+  )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertEditor(supabase, userId, data.businessId);

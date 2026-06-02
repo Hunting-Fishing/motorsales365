@@ -18,7 +18,9 @@ export async function logAdminAudit(entries: AdminAuditEntry | AdminAuditEntry[]
   const rows = Array.isArray(entries) ? entries : [entries];
   if (rows.length === 0) return;
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return;
     const payload = rows.map((r) => ({ ...r, actor_id: user.id }));
     await supabase.from("admin_audit_log").insert(payload as any);

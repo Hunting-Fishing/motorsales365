@@ -4,7 +4,12 @@ import { zodValidator, fallback } from "@tanstack/zod-adapter";
 import { z } from "zod";
 import { SiteLayout } from "@/components/site-layout";
 import { AdCarousel } from "@/components/ads/ad-carousel";
-import { listShopCategories, listShopProducts, listShopBrands, getShopBreadcrumb } from "@/lib/shop.functions";
+import {
+  listShopCategories,
+  listShopProducts,
+  listShopBrands,
+  getShopBreadcrumb,
+} from "@/lib/shop.functions";
 import { ProductGrid } from "./shop.index";
 import { useGarage, formatVehicle } from "@/lib/garage";
 import { Badge } from "@/components/ui/badge";
@@ -30,7 +35,10 @@ export const Route = createFileRoute("/shop/$category")({
   head: ({ params }) => ({
     meta: [
       { title: `${params.category} — Shop | 365 MotorSales` },
-      { name: "description", content: `Browse ${params.category} products curated for Filipino car enthusiasts.` },
+      {
+        name: "description",
+        content: `Browse ${params.category} products curated for Filipino car enthusiasts.`,
+      },
     ],
   }),
 });
@@ -40,11 +48,21 @@ function ShopCategory() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/shop/$category" });
   const [garage, setGarageState] = useGarage();
-  const activeVehicle = search.make && search.model
-    ? { category: "car" as const, make: search.make, model: search.model, year: search.year, engine: search.engine || undefined }
-    : garage;
+  const activeVehicle =
+    search.make && search.model
+      ? {
+          category: "car" as const,
+          make: search.make,
+          model: search.model,
+          year: search.year,
+          engine: search.engine || undefined,
+        }
+      : garage;
 
-  const { data: catData } = useQuery({ queryKey: ["shop-cats"], queryFn: () => listShopCategories() });
+  const { data: catData } = useQuery({
+    queryKey: ["shop-cats"],
+    queryFn: () => listShopCategories(),
+  });
   const cat = catData?.categories.find((c) => c.slug === category);
   const { data: brandData } = useQuery({
     queryKey: ["shop-brands", category],
@@ -53,7 +71,14 @@ function ShopCategory() {
   const brands = brandData?.brands ?? [];
 
   const filterArgs = {
-    ...(activeVehicle ? { make: activeVehicle.make, model: activeVehicle.model, year: activeVehicle.year, engine: activeVehicle.engine } : {}),
+    ...(activeVehicle
+      ? {
+          make: activeVehicle.make,
+          model: activeVehicle.model,
+          year: activeVehicle.year,
+          engine: activeVehicle.engine,
+        }
+      : {}),
     ...(search.brand ? { brand: search.brand } : {}),
   };
   const { data } = useQuery({
@@ -64,7 +89,11 @@ function ShopCategory() {
 
   const hasAnyFilter = !!(search.brand || activeVehicle);
 
-  const onApplyFilters = (next: { categorySlug: string; brand: string; vehicle: typeof activeVehicle }) => {
+  const onApplyFilters = (next: {
+    categorySlug: string;
+    brand: string;
+    vehicle: typeof activeVehicle;
+  }) => {
     if (next.vehicle) setGarageState(next.vehicle);
     else setGarageState(null);
     navigate({
@@ -97,7 +126,9 @@ function ShopCategory() {
               size="sm"
               onClick={() => {
                 setGarageState(null);
-                navigate({ search: () => ({ brand: "", make: "", model: "", year: undefined, engine: "" }) });
+                navigate({
+                  search: () => ({ brand: "", make: "", model: "", year: undefined, engine: "" }),
+                });
               }}
             >
               <X className="h-4 w-4" />
@@ -106,9 +137,15 @@ function ShopCategory() {
         </div>
         {hasAnyFilter && (
           <div className="container mx-auto flex flex-wrap gap-1.5 px-4 pb-2">
-            {search.brand && <Badge variant="secondary" className="text-[10px]">{search.brand}</Badge>}
+            {search.brand && (
+              <Badge variant="secondary" className="text-[10px]">
+                {search.brand}
+              </Badge>
+            )}
             {activeVehicle && (
-              <Badge variant="secondary" className="text-[10px]">{formatVehicle(activeVehicle)}</Badge>
+              <Badge variant="secondary" className="text-[10px]">
+                {formatVehicle(activeVehicle)}
+              </Badge>
             )}
           </div>
         )}
@@ -117,7 +154,6 @@ function ShopCategory() {
       <div className="container mx-auto px-4 py-8 space-y-8">
         <BreadcrumbForCategory slug={category} />
         <ShopifyStoreBanner />
-
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h1 className="font-display text-2xl sm:text-3xl md:text-4xl">{cat?.name ?? category}</h1>
@@ -130,24 +166,28 @@ function ShopCategory() {
               lockCategory
             />
           </div>
-          {activeVehicle && (
-            <Badge variant="secondary">Fits: {formatVehicle(activeVehicle)}</Badge>
-          )}
+          {activeVehicle && <Badge variant="secondary">Fits: {formatVehicle(activeVehicle)}</Badge>}
         </div>
         {cat?.description && <p className="text-muted-foreground">{cat.description}</p>}
 
         <AdCarousel placement="shop_top" />
 
-        {products.length === 0
-          ? <p className="text-muted-foreground">
-              {hasAnyFilter ? "No products match your filters in this category." : "No products in this category yet."}
-            </p>
-          : <ProductGrid products={products} vehicle={activeVehicle} />}
-
+        {products.length === 0 ? (
+          <p className="text-muted-foreground">
+            {hasAnyFilter
+              ? "No products match your filters in this category."
+              : "No products in this category yet."}
+          </p>
+        ) : (
+          <ProductGrid products={products} vehicle={activeVehicle} />
+        )}
 
         <p className="rounded-md border bg-muted/40 p-4 text-xs text-muted-foreground">
           Disclosure: 365 MotorSales earns a commission on qualifying purchases. See our{" "}
-          <Link to="/affiliate-disclosure" className="underline">affiliate disclosure</Link>.
+          <Link to="/affiliate-disclosure" className="underline">
+            affiliate disclosure
+          </Link>
+          .
         </p>
       </div>
 
@@ -155,11 +195,21 @@ function ShopCategory() {
         vehicle={activeVehicle}
         onPickVehicle={(v) => {
           setGarageState(v);
-          navigate({ search: (prev: any) => ({ ...prev, make: v.make, model: v.model, year: v.year, engine: v.engine ?? "" }) });
+          navigate({
+            search: (prev: any) => ({
+              ...prev,
+              make: v.make,
+              model: v.model,
+              year: v.year,
+              engine: v.engine ?? "",
+            }),
+          });
         }}
         onClearVehicle={() => {
           setGarageState(null);
-          navigate({ search: (prev: any) => ({ ...prev, make: "", model: "", year: undefined, engine: "" }) });
+          navigate({
+            search: (prev: any) => ({ ...prev, make: "", model: "", year: undefined, engine: "" }),
+          });
         }}
       />
     </SiteLayout>
@@ -167,8 +217,10 @@ function ShopCategory() {
 }
 
 function BreadcrumbForCategory({ slug }: { slug: string }) {
-  const { data } = useQuery({ queryKey: ["shop-breadcrumb", slug], queryFn: () => getShopBreadcrumb({ data: { slug } }) });
+  const { data } = useQuery({
+    queryKey: ["shop-breadcrumb", slug],
+    queryFn: () => getShopBreadcrumb({ data: { slug } }),
+  });
   const trail = data?.trail ?? [{ slug, name: slug }];
   return <ShopBreadcrumbs trail={trail} />;
 }
-

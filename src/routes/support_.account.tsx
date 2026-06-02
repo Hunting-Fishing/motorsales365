@@ -3,7 +3,8 @@ import { SupportStep, SupportSteps } from "@/components/support/support-step";
 import { SupportArticleLayout } from "@/components/support/support-article-layout";
 
 const TITLE = "Account & verification";
-const DESC = "Sign up, sign in, reset your password, and earn the Verified badge on 365 MotorSales.";
+const DESC =
+  "Sign up, sign in, reset your password, and earn the Verified badge on 365 MotorSales.";
 
 export const Route = createFileRoute("/support_/account")({
   component: AccountSupport,
@@ -34,10 +35,12 @@ function AccountSupport() {
               We send a confirmation link. Click it to activate your account.
             </SupportStep>
             <SupportStep n={3} title="Forgot password?">
-              On the Login page click <strong>Forgot password</strong> — we email a secure reset link valid for 1 hour.
+              On the Login page click <strong>Forgot password</strong> — we email a secure reset
+              link valid for 1 hour.
             </SupportStep>
             <SupportStep n={4} title="Change your email">
-              Dashboard → Profile lets you update your email address (you'll need to confirm the new one).
+              Dashboard → Profile lets you update your email address (you'll need to confirm the new
+              one).
             </SupportStep>
           </SupportSteps>
         </div>
@@ -49,13 +52,15 @@ function AccountSupport() {
               You'll see the checklist of what we need.
             </SupportStep>
             <SupportStep n={2} title="Upload a valid government ID">
-              Driver's license, passport, UMID or PhilSys ID. Make sure all corners are visible and text is readable.
+              Driver's license, passport, UMID or PhilSys ID. Make sure all corners are visible and
+              text is readable.
             </SupportStep>
             <SupportStep n={3} title="Take a selfie">
               A short selfie helps us confirm the ID belongs to you. We never publish this image.
             </SupportStep>
             <SupportStep n={4} title="Wait 24–48 hours">
-              Our team reviews and applies the blue Verified badge. You'll get an email when it's live.
+              Our team reviews and applies the blue Verified badge. You'll get an email when it's
+              live.
             </SupportStep>
           </SupportSteps>
         </div>
@@ -64,8 +69,9 @@ function AccountSupport() {
           <h2 className="text-xl font-semibold sm:text-2xl">Privacy & data</h2>
           <p className="mt-2 text-sm text-muted-foreground">
             We are DPA-compliant. Your contact details are only shared when you initiate a message.
-            From Dashboard → Profile you can request a full export of your data, or delete your account
-            at any time. Verification documents are stored encrypted and never displayed publicly.
+            From Dashboard → Profile you can request a full export of your data, or delete your
+            account at any time. Verification documents are stored encrypted and never displayed
+            publicly.
           </p>
         </div>
       </section>

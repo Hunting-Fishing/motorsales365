@@ -1,6 +1,23 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { MapPin, Heart, Flag, Star, Phone, MessageSquare, ChevronLeft, Truck, Eye, Bookmark, Banknote, Shield, FileText, ClipboardCheck, Wrench, MessageCircle } from "lucide-react";
+import {
+  MapPin,
+  Heart,
+  Flag,
+  Star,
+  Phone,
+  MessageSquare,
+  ChevronLeft,
+  Truck,
+  Eye,
+  Bookmark,
+  Banknote,
+  Shield,
+  FileText,
+  ClipboardCheck,
+  Wrench,
+  MessageCircle,
+} from "lucide-react";
 import { waMeUrl } from "@/lib/whatsapp";
 import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
 import { ServiceStrip } from "@/components/service-strip";
@@ -15,10 +32,20 @@ import { VerifiedBadge } from "@/components/verified-badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { formatPHP, formatDate } from "@/lib/format";
 import { ListingPrice } from "@/components/listing-price";
@@ -81,9 +108,16 @@ export const Route = createFileRoute("/listing/$id")({
       };
     }
     const loc = [seo.city, seo.region].filter(Boolean).join(", ");
-    const price = new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP", maximumFractionDigits: 0 }).format(seo.price);
+    const price = new Intl.NumberFormat("en-PH", {
+      style: "currency",
+      currency: "PHP",
+      maximumFractionDigits: 0,
+    }).format(seo.price);
     const title = `${seo.title} — ${price}${loc ? ` · ${loc}` : ""} | 365 MotorSales`;
-    const desc = (seo.description ?? `${seo.title} for sale${loc ? ` in ${loc}` : ""} on 365 MotorSales Philippines.`).slice(0, 155);
+    const desc = (
+      seo.description ??
+      `${seo.title} for sale${loc ? ` in ${loc}` : ""} on 365 MotorSales Philippines.`
+    ).slice(0, 155);
     return {
       meta: [
         { title },
@@ -92,10 +126,12 @@ export const Route = createFileRoute("/listing/$id")({
         { property: "og:description", content: desc },
         { property: "og:type", content: "product" },
         { property: "og:url", content: url },
-        ...(seo.cover ? [
-          { property: "og:image", content: seo.cover },
-          { name: "twitter:image", content: seo.cover },
-        ] : []),
+        ...(seo.cover
+          ? [
+              { property: "og:image", content: seo.cover },
+              { name: "twitter:image", content: seo.cover },
+            ]
+          : []),
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
@@ -150,17 +186,32 @@ function ListingDetailPage() {
     const load = async () => {
       setLoading(true);
       const { data: l } = await supabase.from("listings").select("*").eq("id", id).maybeSingle();
-      if (!l) { setListing(null); setLoading(false); return; }
+      if (!l) {
+        setListing(null);
+        setLoading(false);
+        return;
+      }
       setListing(l as any);
 
-      const { data: m } = await supabase.from("listing_media").select("id,url,type").eq("listing_id", id).order("sort_order");
+      const { data: m } = await supabase
+        .from("listing_media")
+        .select("id,url,type")
+        .eq("listing_id", id)
+        .order("sort_order");
       setMedia((m as any) ?? []);
 
-      const { data: p } = await supabase.from("profiles").select("*").eq("id", l.user_id).maybeSingle();
+      const { data: p } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", l.user_id)
+        .maybeSingle();
       setSeller(p);
 
       // Increment view count via RPC (counts every page load, anon allowed)
-      supabase.rpc("increment_listing_view", { _listing_id: id, _viewer_id: user?.id ?? undefined });
+      supabase.rpc("increment_listing_view", {
+        _listing_id: id,
+        _viewer_id: user?.id ?? undefined,
+      });
 
       // Like count (public)
       const { count: likes } = await supabase
@@ -171,8 +222,18 @@ function ListingDetailPage() {
 
       if (user) {
         const [{ data: fav }, { data: lk }] = await Promise.all([
-          supabase.from("favorites").select("listing_id").eq("user_id", user.id).eq("listing_id", id).maybeSingle(),
-          supabase.from("listing_likes").select("listing_id").eq("user_id", user.id).eq("listing_id", id).maybeSingle(),
+          supabase
+            .from("favorites")
+            .select("listing_id")
+            .eq("user_id", user.id)
+            .eq("listing_id", id)
+            .maybeSingle(),
+          supabase
+            .from("listing_likes")
+            .select("listing_id")
+            .eq("user_id", user.id)
+            .eq("listing_id", id)
+            .maybeSingle(),
         ]);
         setFavorited(!!fav);
         setLiked(!!lk);
@@ -183,7 +244,10 @@ function ListingDetailPage() {
   }, [id, user]);
 
   const toggleFavorite = async () => {
-    if (!user) { navigate({ to: "/login" }); return; }
+    if (!user) {
+      navigate({ to: "/login" });
+      return;
+    }
     if (favorited) {
       await supabase.from("favorites").delete().eq("user_id", user.id).eq("listing_id", id);
       setFavorited(false);
@@ -195,20 +259,43 @@ function ListingDetailPage() {
   };
 
   const toggleLike = async () => {
-    if (!user) { toast.error("Sign in to like this listing"); navigate({ to: "/login" }); return; }
+    if (!user) {
+      toast.error("Sign in to like this listing");
+      navigate({ to: "/login" });
+      return;
+    }
     if (liked) {
-      setLiked(false); setLikeCount((c) => Math.max(0, c - 1));
-      const { error } = await supabase.from("listing_likes").delete().eq("user_id", user.id).eq("listing_id", id);
-      if (error) { setLiked(true); setLikeCount((c) => c + 1); toast.error(error.message); }
+      setLiked(false);
+      setLikeCount((c) => Math.max(0, c - 1));
+      const { error } = await supabase
+        .from("listing_likes")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("listing_id", id);
+      if (error) {
+        setLiked(true);
+        setLikeCount((c) => c + 1);
+        toast.error(error.message);
+      }
     } else {
-      setLiked(true); setLikeCount((c) => c + 1);
-      const { error } = await supabase.from("listing_likes").insert({ user_id: user.id, listing_id: id });
-      if (error) { setLiked(false); setLikeCount((c) => Math.max(0, c - 1)); toast.error(error.message); }
+      setLiked(true);
+      setLikeCount((c) => c + 1);
+      const { error } = await supabase
+        .from("listing_likes")
+        .insert({ user_id: user.id, listing_id: id });
+      if (error) {
+        setLiked(false);
+        setLikeCount((c) => Math.max(0, c - 1));
+        toast.error(error.message);
+      }
     }
   };
 
   const sendMessage = async () => {
-    if (!user) { navigate({ to: "/login" }); return; }
+    if (!user) {
+      navigate({ to: "/login" });
+      return;
+    }
     if (!message.trim() || !listing) return;
     setSending(true);
     const { error } = await supabase.from("messages").insert({
@@ -218,7 +305,10 @@ function ListingDetailPage() {
       body: message.trim(),
     });
     setSending(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setMessage("");
     toast.success("Message sent — check your messages for replies.");
   };
@@ -246,7 +336,11 @@ function ListingDetailPage() {
   };
 
   if (loading) {
-    return <SiteLayout><div className="container mx-auto px-4 py-16 text-muted-foreground">Loading…</div></SiteLayout>;
+    return (
+      <SiteLayout>
+        <div className="container mx-auto px-4 py-16 text-muted-foreground">Loading…</div>
+      </SiteLayout>
+    );
   }
   if (!listing) {
     return (
@@ -254,7 +348,9 @@ function ListingDetailPage() {
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="font-display text-2xl font-bold">Listing not found</h1>
           <p className="text-muted-foreground">It may have been removed or expired.</p>
-          <Button asChild className="mt-4"><Link to="/">Go home</Link></Button>
+          <Button asChild className="mt-4">
+            <Link to="/">Go home</Link>
+          </Button>
         </div>
       </SiteLayout>
     );
@@ -268,7 +364,11 @@ function ListingDetailPage() {
   return (
     <SiteLayout>
       <div className="container mx-auto px-4 py-6">
-        <Link to="/browse/$category" params={{ category: listing.category_slug }} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+        <Link
+          to="/browse/$category"
+          params={{ category: listing.category_slug }}
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+        >
           <ChevronLeft className="h-4 w-4" /> Back to listings
         </Link>
       </div>
@@ -296,7 +396,12 @@ function ListingDetailPage() {
                   </button>
                 ))}
                 {videos.map((v) => (
-                  <video key={v.id} src={v.url} controls className="h-16 w-24 shrink-0 rounded-md border border-border bg-black object-cover" />
+                  <video
+                    key={v.id}
+                    src={v.url}
+                    controls
+                    className="h-16 w-24 shrink-0 rounded-md border border-border bg-black object-cover"
+                  />
                 ))}
               </div>
             )}
@@ -304,12 +409,15 @@ function ListingDetailPage() {
 
           {listing.status === "pending_sale" && (
             <div className="mt-6 flex items-start gap-3 rounded-xl border border-warning/40 bg-warning/10 p-4">
-              <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-warning/20 text-warning-foreground">⏳</span>
+              <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-warning/20 text-warning-foreground">
+                ⏳
+              </span>
               <div className="text-sm">
                 <div className="font-semibold text-foreground">Pending Sale</div>
                 <p className="text-muted-foreground">
-                  The seller is finalizing a sale on this vehicle. You can still send a message or make a backup
-                  offer — the listing will return to active if the deal doesn't go through.
+                  The seller is finalizing a sale on this vehicle. You can still send a message or
+                  make a backup offer — the listing will return to active if the deal doesn't go
+                  through.
                 </p>
               </div>
             </div>
@@ -322,7 +430,12 @@ function ListingDetailPage() {
                 <Badge variant={listing.seller_type === "business" ? "default" : "secondary"}>
                   {listing.seller_type === "business" ? "Business seller" : "Private seller"}
                 </Badge>
-                {boosted && <Badge className="bg-accent text-accent-foreground"><Star className="mr-1 h-3 w-3" />Featured</Badge>}
+                {boosted && (
+                  <Badge className="bg-accent text-accent-foreground">
+                    <Star className="mr-1 h-3 w-3" />
+                    Featured
+                  </Badge>
+                )}
               </div>
               <h1 className="mt-2 font-display text-3xl font-bold md:text-4xl">{listing.title}</h1>
               <div className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
@@ -369,7 +482,9 @@ function ListingDetailPage() {
               <h2 className="mb-3 font-display text-lg font-semibold">Services & offerings</h2>
               <div className="flex flex-wrap gap-1.5">
                 {(listing.attributes.tags as string[]).map((t) => (
-                  <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>
+                  <Badge key={t} variant="secondary" className="text-xs">
+                    {t}
+                  </Badge>
                 ))}
               </div>
             </div>
@@ -380,12 +495,19 @@ function ListingDetailPage() {
             <div className="mt-6 rounded-xl border border-border bg-card p-5">
               <h2 className="mb-3 font-display text-lg font-semibold">Specifications</h2>
               <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {Object.entries(listing.attributes).filter(([k]) => k !== "tags").map(([k, v]) => (
-                  <div key={k} className="flex justify-between gap-3 border-b border-border/60 pb-2 text-sm">
-                    <dt className="capitalize text-muted-foreground">{k.replace(/_/g, " ")}</dt>
-                    <dd className="font-medium text-right">{Array.isArray(v) ? v.join(", ") : String(v)}</dd>
-                  </div>
-                ))}
+                {Object.entries(listing.attributes)
+                  .filter(([k]) => k !== "tags")
+                  .map(([k, v]) => (
+                    <div
+                      key={k}
+                      className="flex justify-between gap-3 border-b border-border/60 pb-2 text-sm"
+                    >
+                      <dt className="capitalize text-muted-foreground">{k.replace(/_/g, " ")}</dt>
+                      <dd className="font-medium text-right">
+                        {Array.isArray(v) ? v.join(", ") : String(v)}
+                      </dd>
+                    </div>
+                  ))}
               </dl>
             </div>
           )}
@@ -407,7 +529,6 @@ function ListingDetailPage() {
               listingId={listing.id}
             />
           )}
-
 
           <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
             <span>Listed {formatDate(listing.published_at)}</span>
@@ -431,10 +552,14 @@ function ListingDetailPage() {
                   <div>
                     <Label>Reason</Label>
                     <Select value={reportReason} onValueChange={setReportReason}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
                       <SelectContent>
                         {REPORT_REASONS.map((r) => (
-                          <SelectItem key={r} value={r}>{r}</SelectItem>
+                          <SelectItem key={r} value={r}>
+                            {r}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -450,7 +575,9 @@ function ListingDetailPage() {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button variant="outline" onClick={() => setReportOpen(false)}>Cancel</Button>
+                  <Button variant="outline" onClick={() => setReportOpen(false)}>
+                    Cancel
+                  </Button>
                   <Button onClick={submitReport} disabled={submittingReport}>
                     {submittingReport ? "Submitting…" : "Submit report"}
                   </Button>
@@ -490,25 +617,33 @@ function ListingDetailPage() {
             <div className="mt-4 space-y-2">
               {listing.contact_phone && (
                 <a href={`tel:${listing.contact_phone}`}>
-                  <Button className="w-full" variant="default"><Phone className="mr-2 h-4 w-4" />Call seller</Button>
+                  <Button className="w-full" variant="default">
+                    <Phone className="mr-2 h-4 w-4" />
+                    Call seller
+                  </Button>
                 </a>
               )}
               {listing.contact_phone && waMeUrl(listing.contact_phone) && (
                 <a
-                  href={waMeUrl(
-                    listing.contact_phone,
-                    `Hi! I'm interested in your listing "${listing.title}" on 365 Motor Sales: ${typeof window !== "undefined" ? window.location.href : ""}`,
-                  )!}
+                  href={
+                    waMeUrl(
+                      listing.contact_phone,
+                      `Hi! I'm interested in your listing "${listing.title}" on 365 Motor Sales: ${typeof window !== "undefined" ? window.location.href : ""}`,
+                    )!
+                  }
                   target="_blank"
                   rel="noreferrer"
                 >
                   <Button className="w-full bg-[#25D366] text-white hover:bg-[#1ebe5d]">
-                    <MessageCircle className="mr-2 h-4 w-4" />WhatsApp seller
+                    <MessageCircle className="mr-2 h-4 w-4" />
+                    WhatsApp seller
                   </Button>
                 </a>
               )}
               <Button variant="outline" className="w-full" onClick={toggleFavorite}>
-                <Heart className={`mr-2 h-4 w-4 ${favorited ? "fill-destructive text-destructive" : ""}`} />
+                <Heart
+                  className={`mr-2 h-4 w-4 ${favorited ? "fill-destructive text-destructive" : ""}`}
+                />
                 {favorited ? "Saved" : "Save listing"}
               </Button>
               <ListingQr
@@ -591,7 +726,6 @@ function ListingDetailPage() {
             </div>
           </div>
 
-
           {listing.allow_messages && (
             <div className="rounded-xl border border-border bg-card p-5">
               <h3 className="flex items-center gap-2 font-display text-lg font-semibold">
@@ -604,7 +738,11 @@ function ListingDetailPage() {
                 className="mt-3"
                 rows={4}
               />
-              <Button onClick={sendMessage} disabled={sending || !message.trim()} className="mt-2 w-full">
+              <Button
+                onClick={sendMessage}
+                disabled={sending || !message.trim()}
+                className="mt-2 w-full"
+              >
                 {sending ? "Sending…" : "Send message"}
               </Button>
             </div>

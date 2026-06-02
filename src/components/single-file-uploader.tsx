@@ -59,7 +59,11 @@ export function SingleFileUploader({
 
   const clear = async () => {
     if (pathRef) {
-      try { await supabase.storage.from(bucket).remove([pathRef]); } catch { /* ignore */ }
+      try {
+        await supabase.storage.from(bucket).remove([pathRef]);
+      } catch {
+        /* ignore */
+      }
     }
     setPathRef(null);
     onChange(null, null);

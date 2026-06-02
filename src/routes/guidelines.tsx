@@ -5,7 +5,11 @@ export const Route = createFileRoute("/guidelines")({
   head: () => ({
     meta: [
       { title: "Community Guidelines — 365 MotorSales Philippines" },
-      { name: "description", content: "What's allowed, what's not, and how to stay safe when buying or selling on 365 MotorSales Philippines." },
+      {
+        name: "description",
+        content:
+          "What's allowed, what's not, and how to stay safe when buying or selling on 365 MotorSales Philippines.",
+      },
     ],
   }),
   component: GuidelinesPage,
@@ -16,7 +20,10 @@ function GuidelinesPage() {
     <SiteLayout>
       <article className="container mx-auto max-w-3xl px-4 py-16 prose prose-sm dark:prose-invert">
         <h1 className="font-display text-3xl font-bold sm:text-4xl">Community Guidelines</h1>
-        <p className="mt-4 text-muted-foreground">These rules keep the marketplace safe for everyone. Breaking them can result in listing removal, account suspension, or referral to authorities.</p>
+        <p className="mt-4 text-muted-foreground">
+          These rules keep the marketplace safe for everyone. Breaking them can result in listing
+          removal, account suspension, or referral to authorities.
+        </p>
 
         <h2 className="mt-8 text-xl font-semibold">For sellers</h2>
         <ul className="mt-2 list-disc pl-6 text-muted-foreground">
@@ -33,7 +40,9 @@ function GuidelinesPage() {
           <li>Always inspect the vehicle in person before paying.</li>
           <li>Verify the OR/CR, chassis number, and engine number match.</li>
           <li>Meet in a public, well-lit place. Bring a friend.</li>
-          <li>Use traceable payments (bank transfer, GCash, Maya). Avoid cash for large amounts.</li>
+          <li>
+            Use traceable payments (bank transfer, GCash, Maya). Avoid cash for large amounts.
+          </li>
           <li>Never pay a "reservation fee" before seeing the vehicle.</li>
           <li>Report suspicious listings using the flag icon.</li>
         </ul>
@@ -48,7 +57,14 @@ function GuidelinesPage() {
         </ul>
 
         <h2 className="mt-6 text-xl font-semibold">Reporting</h2>
-        <p className="mt-2 text-muted-foreground">Use the <strong>Report</strong> button on any listing or seller profile. Our team reviews reports within 48 hours. Urgent safety issues can be emailed to <a className="text-primary underline" href="mailto:safety@365motorsales.ph">safety@365motorsales.ph</a>.</p>
+        <p className="mt-2 text-muted-foreground">
+          Use the <strong>Report</strong> button on any listing or seller profile. Our team reviews
+          reports within 48 hours. Urgent safety issues can be emailed to{" "}
+          <a className="text-primary underline" href="mailto:safety@365motorsales.ph">
+            safety@365motorsales.ph
+          </a>
+          .
+        </p>
       </article>
     </SiteLayout>
   );

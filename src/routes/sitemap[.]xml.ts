@@ -44,8 +44,19 @@ const STATIC_ENTRIES: SitemapEntry[] = [
 ];
 
 const CATEGORIES = [
-  "car", "motorcycle", "boat", "airplane", "equipment", "towing",
-  "carwash", "parts", "drone", "repair", "bodyshop", "salvage", "other",
+  "car",
+  "motorcycle",
+  "boat",
+  "airplane",
+  "equipment",
+  "towing",
+  "carwash",
+  "parts",
+  "drone",
+  "repair",
+  "bodyshop",
+  "salvage",
+  "other",
 ];
 
 function escape(s: string) {
@@ -64,7 +75,8 @@ export const Route = createFileRoute("/sitemap.xml")({
 
         try {
           const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL;
-          const key = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+          const key =
+            process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
           if (url && key) {
             const sb = createClient(url, key, { auth: { persistSession: false } });
 
@@ -99,7 +111,6 @@ export const Route = createFileRoute("/sitemap.xml")({
                 priority: "0.6",
               });
             }
-
 
             const { data: rides } = await (sb as any)
               .from("rides")
@@ -183,7 +194,9 @@ export const Route = createFileRoute("/sitemap.xml")({
             e.changefreq ? `    <changefreq>${e.changefreq}</changefreq>` : null,
             e.priority ? `    <priority>${e.priority}</priority>` : null,
             `  </url>`,
-          ].filter(Boolean).join("\n"),
+          ]
+            .filter(Boolean)
+            .join("\n"),
         );
 
         const xml = [

@@ -9,10 +9,18 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDate, formatPHP } from "@/lib/format";
@@ -102,9 +110,19 @@ function AccountsConsole() {
 
   const load = async () => {
     setLoading(true);
-    const [{ data: profs }, { data: plansData }, { data: subs }, { data: pays }, { data: listingsCount }] = await Promise.all([
+    const [
+      { data: profs },
+      { data: plansData },
+      { data: subs },
+      { data: pays },
+      { data: listingsCount },
+    ] = await Promise.all([
       supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(500),
-      supabase.from("subscription_plans").select("id,name,price_php").eq("active", true).order("sort_order"),
+      supabase
+        .from("subscription_plans")
+        .select("id,name,price_php")
+        .eq("active", true)
+        .order("sort_order"),
       supabase.from("subscriptions").select("*"),
       supabase.from("payments").select("user_id, amount_php, status"),
       supabase.from("listings").select("user_id"),
@@ -118,7 +136,8 @@ function AccountsConsole() {
     (plansData ?? []).forEach((p: any) => planById.set(p.id, p));
     const spendByUser = new Map<string, number>();
     (pays ?? []).forEach((p: any) => {
-      if (p.status === "paid") spendByUser.set(p.user_id, (spendByUser.get(p.user_id) ?? 0) + Number(p.amount_php));
+      if (p.status === "paid")
+        spendByUser.set(p.user_id, (spendByUser.get(p.user_id) ?? 0) + Number(p.amount_php));
     });
     const listingsByUser = new Map<string, number>();
     (listingsCount ?? []).forEach((l: any) => {
@@ -130,7 +149,7 @@ function AccountsConsole() {
         return {
           ...p,
           subscription: sub,
-          plan: sub ? planById.get(sub.plan_id) ?? null : null,
+          plan: sub ? (planById.get(sub.plan_id) ?? null) : null,
           lifetimeSpend: spendByUser.get(p.id) ?? 0,
           listings: listingsByUser.get(p.id) ?? 0,
         };
@@ -139,16 +158,19 @@ function AccountsConsole() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const filtered = useMemo(() => {
     let r = rows;
     if (search.trim()) {
       const q = search.toLowerCase();
-      r = r.filter((x) =>
-        (x.full_name ?? "").toLowerCase().includes(q) ||
-        (x.business_name ?? "").toLowerCase().includes(q) ||
-        x.id.toLowerCase().includes(q),
+      r = r.filter(
+        (x) =>
+          (x.full_name ?? "").toLowerCase().includes(q) ||
+          (x.business_name ?? "").toLowerCase().includes(q) ||
+          x.id.toLowerCase().includes(q),
       );
     }
     if (tierFilter !== "all") r = r.filter((x) => (x.plan?.name ?? "Free") === tierFilter);
@@ -156,41 +178,67 @@ function AccountsConsole() {
     if (foundingFilter === "yes") r = r.filter((x) => x.is_founding_member);
     if (foundingFilter === "no") r = r.filter((x) => !x.is_founding_member);
     if (sortBy === "spend") r = [...r].sort((a, b) => b.lifetimeSpend - a.lifetimeSpend);
-    else if (sortBy === "tier") r = [...r].sort((a, b) => (b.plan?.price_php ?? 0) - (a.plan?.price_php ?? 0));
+    else if (sortBy === "tier")
+      r = [...r].sort((a, b) => (b.plan?.price_php ?? 0) - (a.plan?.price_php ?? 0));
     return r;
   }, [rows, search, tierFilter, statusFilter, foundingFilter, sortBy]);
 
   const togglePause = async (row: Row) => {
     const next = row.account_status === "paused" ? "active" : "paused";
-    const { error } = await supabase.from("profiles").update({ account_status: next }).eq("id", row.id);
-    if (error) { toast.error(error.message); return; }
+    const { error } = await supabase
+      .from("profiles")
+      .update({ account_status: next })
+      .eq("id", row.id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     await logAudit(row.id, "account_status", row.account_status, next, null, isAdmin);
     toast.success(next === "paused" ? "Account paused" : "Account reactivated");
     load();
   };
 
   const exportCsv = () => {
-    const header = ["Name", "Business", "Plan", "Status", "Founding #", "Joined", "Listings", "Lifetime spend", "Discount %"];
-    const lines = filtered.map((r) => [
-      r.full_name ?? "",
-      r.business_name ?? "",
-      r.plan?.name ?? "Free",
-      r.account_status,
-      r.founding_member_number ?? "",
-      r.created_at,
-      r.listings,
-      r.lifetimeSpend,
-      r.subscription?.discount_percent ?? 0,
-    ].map((v) => `"${String(v).replace(/"/g, '""')}"`).join(","));
+    const header = [
+      "Name",
+      "Business",
+      "Plan",
+      "Status",
+      "Founding #",
+      "Joined",
+      "Listings",
+      "Lifetime spend",
+      "Discount %",
+    ];
+    const lines = filtered.map((r) =>
+      [
+        r.full_name ?? "",
+        r.business_name ?? "",
+        r.plan?.name ?? "Free",
+        r.account_status,
+        r.founding_member_number ?? "",
+        r.created_at,
+        r.listings,
+        r.lifetimeSpend,
+        r.subscription?.discount_percent ?? 0,
+      ]
+        .map((v) => `"${String(v).replace(/"/g, '""')}"`)
+        .join(","),
+    );
     const blob = new Blob([[header.join(","), ...lines].join("\n")], { type: "text/csv" });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = "accounts.csv"; a.click();
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "accounts.csv";
+    a.click();
     URL.revokeObjectURL(url);
   };
 
   const stats = useMemo(() => {
     const founding = rows.filter((r) => r.is_founding_member).length;
-    const paying = rows.filter((r) => (r.plan?.price_php ?? 0) > 0 && !r.subscription?.complimentary).length;
+    const paying = rows.filter(
+      (r) => (r.plan?.price_php ?? 0) > 0 && !r.subscription?.complimentary,
+    ).length;
     const paused = rows.filter((r) => r.account_status === "paused").length;
     return { total: rows.length, founding, paying, paused };
   }, [rows]);
@@ -201,37 +249,56 @@ function AccountsConsole() {
         <div>
           <h1 className="font-display text-2xl font-bold">Customer accounts</h1>
           <p className="text-sm text-muted-foreground">
-            {stats.total} accounts · {stats.founding}/1000 founding members · {stats.paying} paying · {stats.paused} paused
+            {stats.total} accounts · {stats.founding}/1000 founding members · {stats.paying} paying
+            · {stats.paused} paused
           </p>
         </div>
         <div className="flex items-center gap-2">
           <AddUserDialog onCreated={load} />
-          <Button variant="outline" size="sm" onClick={exportCsv}><Download className="mr-2 h-4 w-4" />Export CSV</Button>
+          <Button variant="outline" size="sm" onClick={exportCsv}>
+            <Download className="mr-2 h-4 w-4" />
+            Export CSV
+          </Button>
         </div>
       </div>
 
       <div className="mb-4 flex items-start gap-2 rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
         <Info className="mt-0.5 h-4 w-4 shrink-0" />
         <div>
-          <strong className="text-foreground">Accounts</strong> = manage subscriptions, plans, discounts, pausing and account status for existing customers. To create a new user or assign staff roles, use <strong className="text-foreground">Users</strong>.
+          <strong className="text-foreground">Accounts</strong> = manage subscriptions, plans,
+          discounts, pausing and account status for existing customers. To create a new user or
+          assign staff roles, use <strong className="text-foreground">Users</strong>.
         </div>
       </div>
 
       <div className="mb-4 grid gap-2 grid-cols-1 sm:grid-cols-2 md:grid-cols-[1fr_auto_auto_auto_auto]">
         <div className="relative sm:col-span-2 md:col-span-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input className="pl-9" placeholder="Search name, business, ID…" value={search} onChange={(e) => setSearch(e.target.value)} />
+          <Input
+            className="pl-9"
+            placeholder="Search name, business, ID…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
         <Select value={tierFilter} onValueChange={setTierFilter}>
-          <SelectTrigger className="w-full md:w-[140px]"><SelectValue placeholder="Tier" /></SelectTrigger>
+          <SelectTrigger className="w-full md:w-[140px]">
+            <SelectValue placeholder="Tier" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All tiers</SelectItem>
             <SelectItem value="Free">Free</SelectItem>
-            {plans.map((p) => <SelectItem key={p.id} value={p.name}>{p.name}</SelectItem>)}
+            {plans.map((p) => (
+              <SelectItem key={p.id} value={p.name}>
+                {p.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full md:w-[130px]"><SelectValue placeholder="Status" /></SelectTrigger>
+          <SelectTrigger className="w-full md:w-[130px]">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All status</SelectItem>
             <SelectItem value="active">Active</SelectItem>
@@ -240,7 +307,9 @@ function AccountsConsole() {
           </SelectContent>
         </Select>
         <Select value={foundingFilter} onValueChange={setFoundingFilter}>
-          <SelectTrigger className="w-full md:w-[150px]"><SelectValue placeholder="Founding" /></SelectTrigger>
+          <SelectTrigger className="w-full md:w-[150px]">
+            <SelectValue placeholder="Founding" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All members</SelectItem>
             <SelectItem value="yes">Founding only</SelectItem>
@@ -248,7 +317,10 @@ function AccountsConsole() {
           </SelectContent>
         </Select>
         <Select value={sortBy} onValueChange={(v: any) => setSortBy(v)}>
-          <SelectTrigger className="w-full md:w-[140px]"><ArrowUpDown className="mr-1 h-4 w-4" /><SelectValue /></SelectTrigger>
+          <SelectTrigger className="w-full md:w-[140px]">
+            <ArrowUpDown className="mr-1 h-4 w-4" />
+            <SelectValue />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="joined">Recently joined</SelectItem>
             <SelectItem value="spend">Lifetime spend</SelectItem>
@@ -256,7 +328,6 @@ function AccountsConsole() {
           </SelectContent>
         </Select>
       </div>
-
 
       {loading ? (
         <div className="p-12 text-center text-muted-foreground">Loading…</div>
@@ -282,35 +353,58 @@ function AccountsConsole() {
                     <td className="p-3">
                       <div className="font-medium">{r.full_name ?? "(no name)"}</div>
                       <div className="text-xs text-muted-foreground">
-                        {r.business_name ? `${r.business_name} · ` : ""}{r.seller_type}
+                        {r.business_name ? `${r.business_name} · ` : ""}
+                        {r.seller_type}
                         {r.business_region ? ` · ${r.business_region}` : ""}
                       </div>
                       {r.is_founding_member && (
-                        <Badge variant="outline" className="mt-1 gap-1 border-amber-500/50 text-amber-600 dark:text-amber-300">
-                          <Sparkles className="h-3 w-3" />Founding #{r.founding_member_number}
+                        <Badge
+                          variant="outline"
+                          className="mt-1 gap-1 border-amber-500/50 text-amber-600 dark:text-amber-300"
+                        >
+                          <Sparkles className="h-3 w-3" />
+                          Founding #{r.founding_member_number}
                         </Badge>
                       )}
                     </td>
                     <td className="p-3">
-                      <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${tierColors[tierName] ?? tierColors.Free}`}>
+                      <span
+                        className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${tierColors[tierName] ?? tierColors.Free}`}
+                      >
                         {tierName}
                       </span>
-                      {r.subscription?.complimentary && <div className="mt-1 text-[10px] uppercase text-muted-foreground">Complimentary</div>}
+                      {r.subscription?.complimentary && (
+                        <div className="mt-1 text-[10px] uppercase text-muted-foreground">
+                          Complimentary
+                        </div>
+                      )}
                       {(r.subscription?.discount_percent ?? 0) > 0 && (
-                        <div className="mt-1 text-xs text-emerald-600">-{r.subscription!.discount_percent}% discount</div>
+                        <div className="mt-1 text-xs text-emerald-600">
+                          -{r.subscription!.discount_percent}% discount
+                        </div>
                       )}
                     </td>
                     <td className="p-3">
-                      <Badge variant={r.account_status === "active" ? "default" : "destructive"}>{r.account_status}</Badge>
+                      <Badge variant={r.account_status === "active" ? "default" : "destructive"}>
+                        {r.account_status}
+                      </Badge>
                     </td>
                     <td className="p-3">{r.listings}</td>
                     <td className="p-3">{formatPHP(r.lifetimeSpend)}</td>
-                    <td className="p-3 text-xs text-muted-foreground">{formatDate(r.created_at)}</td>
+                    <td className="p-3 text-xs text-muted-foreground">
+                      {formatDate(r.created_at)}
+                    </td>
                     <td className="p-3 text-right">
                       <div className="flex justify-end gap-1">
-                        <Button size="sm" variant="outline" onClick={() => setEditing(r)}><Percent className="h-3.5 w-3.5" /></Button>
+                        <Button size="sm" variant="outline" onClick={() => setEditing(r)}>
+                          <Percent className="h-3.5 w-3.5" />
+                        </Button>
                         <Button size="sm" variant="outline" onClick={() => togglePause(r)}>
-                          {r.account_status === "paused" ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}
+                          {r.account_status === "paused" ? (
+                            <Play className="h-3.5 w-3.5" />
+                          ) : (
+                            <Pause className="h-3.5 w-3.5" />
+                          )}
                         </Button>
                       </div>
                     </td>
@@ -318,7 +412,11 @@ function AccountsConsole() {
                 );
               })}
               {filtered.length === 0 && (
-                <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">No accounts match.</td></tr>
+                <tr>
+                  <td colSpan={7} className="p-8 text-center text-muted-foreground">
+                    No accounts match.
+                  </td>
+                </tr>
               )}
             </tbody>
           </table>
@@ -331,7 +429,10 @@ function AccountsConsole() {
           plans={plans}
           isAdmin={isAdmin}
           onClose={() => setEditing(null)}
-          onSaved={() => { setEditing(null); load(); }}
+          onSaved={() => {
+            setEditing(null);
+            load();
+          }}
         />
       )}
     </div>
@@ -339,19 +440,38 @@ function AccountsConsole() {
 }
 
 function EditAccountDialog({
-  row, plans, isAdmin, onClose, onSaved,
-}: { row: Row; plans: Plan[]; isAdmin: boolean; onClose: () => void; onSaved: () => void }) {
+  row,
+  plans,
+  isAdmin,
+  onClose,
+  onSaved,
+}: {
+  row: Row;
+  plans: Plan[];
+  isAdmin: boolean;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
   const [planId, setPlanId] = useState<string>(row.plan?.id ?? "");
   const [discount, setDiscount] = useState<number>(row.subscription?.discount_percent ?? 0);
-  const [complimentary, setComplimentary] = useState<boolean>(row.subscription?.complimentary ?? false);
+  const [complimentary, setComplimentary] = useState<boolean>(
+    row.subscription?.complimentary ?? false,
+  );
   const [notes, setNotes] = useState<string>(row.subscription?.notes ?? "");
   const [paused, setPaused] = useState<boolean>(row.account_status === "paused");
   const [reason, setReason] = useState<string>("");
   const [saving, setSaving] = useState(false);
-  const [history, setHistory] = useState<Array<{
-    id: string; field: string; old_value: any; new_value: any;
-    note: string | null; actor_role: string; created_at: string;
-  }>>([]);
+  const [history, setHistory] = useState<
+    Array<{
+      id: string;
+      field: string;
+      old_value: any;
+      new_value: any;
+      note: string | null;
+      actor_role: string;
+      created_at: string;
+    }>
+  >([]);
 
   useEffect(() => {
     supabase
@@ -368,7 +488,10 @@ function EditAccountDialog({
   const effectivePrice = selectedPlan
     ? complimentary
       ? 0
-      : Math.max(0, Number(selectedPlan.price_php) * (1 - Math.min(100, Math.max(0, discount)) / 100))
+      : Math.max(
+          0,
+          Number(selectedPlan.price_php) * (1 - Math.min(100, Math.max(0, discount)) / 100),
+        )
     : 0;
 
   const save = async () => {
@@ -419,10 +542,14 @@ function EditAccountDialog({
       // Audit entries — one per changed field
       const entries: Promise<unknown>[] = [];
       if (planId && planId !== prevPlanId) {
-        entries.push(logAudit(row.id, "plan", prevPlanName, selectedPlan?.name ?? null, note, isAdmin));
+        entries.push(
+          logAudit(row.id, "plan", prevPlanName, selectedPlan?.name ?? null, note, isAdmin),
+        );
       }
       if (cleanDiscount !== Number(prevDiscount)) {
-        entries.push(logAudit(row.id, "discount_percent", prevDiscount, cleanDiscount, note, isAdmin));
+        entries.push(
+          logAudit(row.id, "discount_percent", prevDiscount, cleanDiscount, note, isAdmin),
+        );
       }
       if (complimentary !== prevComp) {
         entries.push(logAudit(row.id, "complimentary", prevComp, complimentary, note, isAdmin));
@@ -454,7 +581,9 @@ function EditAccountDialog({
           <div>
             <label className="mb-1 block text-sm font-medium">Plan tier</label>
             <Select value={planId} onValueChange={setPlanId}>
-              <SelectTrigger><SelectValue placeholder="Free (no subscription)" /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue placeholder="Free (no subscription)" />
+              </SelectTrigger>
               <SelectContent>
                 {plans.map((p) => (
                   <SelectItem key={p.id} value={p.id}>
@@ -499,11 +628,7 @@ function EditAccountDialog({
           </label>
 
           <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={paused}
-              onChange={(e) => setPaused(e.target.checked)}
-            />
+            <input type="checkbox" checked={paused} onChange={(e) => setPaused(e.target.checked)} />
             Pause account (hides listings, login still works)
           </label>
 
@@ -518,7 +643,9 @@ function EditAccountDialog({
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium">Reason for this change <span className="text-muted-foreground">(audit trail)</span></label>
+            <label className="mb-1 block text-sm font-medium">
+              Reason for this change <span className="text-muted-foreground">(audit trail)</span>
+            </label>
             <Input
               value={reason}
               onChange={(e) => setReason(e.target.value)}
@@ -531,7 +658,10 @@ function EditAccountDialog({
               <div className="mb-1 text-xs font-medium text-muted-foreground">Recent activity</div>
               <ul className="max-h-40 space-y-1 overflow-y-auto text-xs">
                 {history.map((h) => (
-                  <li key={h.id} className="flex flex-col gap-0.5 border-b border-border/60 pb-1 last:border-0">
+                  <li
+                    key={h.id}
+                    className="flex flex-col gap-0.5 border-b border-border/60 pb-1 last:border-0"
+                  >
                     <div>
                       <span className="font-medium">{h.field}</span>:{" "}
                       <span className="text-muted-foreground">{formatVal(h.old_value)}</span>
@@ -555,7 +685,9 @@ function EditAccountDialog({
           )}
         </div>
         <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={saving}>Cancel</Button>
+          <Button variant="outline" onClick={onClose} disabled={saving}>
+            Cancel
+          </Button>
           <Button onClick={save} disabled={saving}>
             {saving ? "Saving…" : "Save changes"}
           </Button>

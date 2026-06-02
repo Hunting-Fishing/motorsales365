@@ -79,9 +79,7 @@ export function BoostDialog({ listingId, listingTitle, children }: Props) {
                   <span className="font-semibold">{p.label}</span>
                   {p.recurring && <Badge variant="secondary">Monthly</Badge>}
                 </div>
-                {p.description && (
-                  <p className="text-xs text-muted-foreground">{p.description}</p>
-                )}
+                {p.description && <p className="text-xs text-muted-foreground">{p.description}</p>}
                 <div className="mt-auto flex items-baseline justify-between pt-2">
                   <span className="text-lg font-bold text-primary">
                     {formatPHP(Number(p.price_php))}

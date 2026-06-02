@@ -87,8 +87,13 @@ function LoginPage() {
     inFlightRef.current = true;
     setGoogleSubmitting(true);
     try {
-      const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-      if (result.error) { toast.error("Could not sign in with Google"); return; }
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) {
+        toast.error("Could not sign in with Google");
+        return;
+      }
       if (result.redirected) return;
       goToDashboard();
     } finally {
@@ -106,12 +111,20 @@ function LoginPage() {
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           <div>
             <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+            <Input
+              id="email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
           <div>
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <Link to="/forgot-password" className="text-xs text-primary hover:underline">Forgot?</Link>
+              <Link to="/forgot-password" className="text-xs text-primary hover:underline">
+                Forgot?
+              </Link>
             </div>
             <div className="relative">
               <Input
@@ -143,12 +156,21 @@ function LoginPage() {
           <div className="h-px flex-1 bg-border" />
         </div>
 
-        <Button variant="outline" onClick={handleGoogle} disabled={authBusy} aria-busy={googleSubmitting} className="w-full">
+        <Button
+          variant="outline"
+          onClick={handleGoogle}
+          disabled={authBusy}
+          aria-busy={googleSubmitting}
+          className="w-full"
+        >
           {googleSubmitting ? "Connecting to Google…" : "Continue with Google"}
         </Button>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          New here? <Link to="/signup" className="font-semibold text-primary hover:underline">Create an account</Link>
+          New here?{" "}
+          <Link to="/signup" className="font-semibold text-primary hover:underline">
+            Create an account
+          </Link>
         </p>
       </div>
     </SiteLayout>

@@ -1,5 +1,11 @@
 import { useMemo, useState, useEffect } from "react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -63,12 +69,26 @@ export function VehicleFitmentPicker({
   const canSubmit = make && model;
 
   return (
-    <div className={compact ? "flex flex-wrap items-end gap-2" : "grid gap-3 sm:grid-cols-2 md:grid-cols-4"}>
+    <div
+      className={
+        compact ? "flex flex-wrap items-end gap-2" : "grid gap-3 sm:grid-cols-2 md:grid-cols-4"
+      }
+    >
       {showCategory && (
         <div className="space-y-1">
           <Label className="text-xs">Type</Label>
-          <Select value={category} onValueChange={(v) => { setCategory(v as VehicleCategory); setMake(""); setModel(""); setEngine(""); }}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
+          <Select
+            value={category}
+            onValueChange={(v) => {
+              setCategory(v as VehicleCategory);
+              setMake("");
+              setModel("");
+              setEngine("");
+            }}
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="car">Car / Truck</SelectItem>
               <SelectItem value="motorcycle">Motorcycle</SelectItem>
@@ -78,28 +98,67 @@ export function VehicleFitmentPicker({
       )}
       <div className="space-y-1">
         <Label className="text-xs">Year</Label>
-        <Select value={year} onValueChange={(v) => { setYear(v); setModel(""); setEngine(""); }}>
-          <SelectTrigger><SelectValue placeholder="Any" /></SelectTrigger>
+        <Select
+          value={year}
+          onValueChange={(v) => {
+            setYear(v);
+            setModel("");
+            setEngine("");
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Any" />
+          </SelectTrigger>
           <SelectContent className="max-h-72">
-            {years.map((y) => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+            {years.map((y) => (
+              <SelectItem key={y} value={String(y)}>
+                {y}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
       <div className="space-y-1">
         <Label className="text-xs">Make</Label>
-        <Select value={make} onValueChange={(v) => { setMake(v); setModel(""); setEngine(""); }}>
-          <SelectTrigger><SelectValue placeholder="Select make" /></SelectTrigger>
+        <Select
+          value={make}
+          onValueChange={(v) => {
+            setMake(v);
+            setModel("");
+            setEngine("");
+          }}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Select make" />
+          </SelectTrigger>
           <SelectContent className="max-h-72">
-            {makes.map((m) => <SelectItem key={m.make} value={m.make}>{m.make}</SelectItem>)}
+            {makes.map((m) => (
+              <SelectItem key={m.make} value={m.make}>
+                {m.make}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
       <div className="space-y-1">
         <Label className="text-xs">Model</Label>
-        <Select value={model} onValueChange={(v) => { setModel(v); setEngine(""); }} disabled={!make}>
-          <SelectTrigger><SelectValue placeholder={make ? "Select model" : "Pick make first"} /></SelectTrigger>
+        <Select
+          value={model}
+          onValueChange={(v) => {
+            setModel(v);
+            setEngine("");
+          }}
+          disabled={!make}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder={make ? "Select model" : "Pick make first"} />
+          </SelectTrigger>
           <SelectContent className="max-h-72">
-            {models.map((m) => <SelectItem key={m} value={m}>{m}</SelectItem>)}
+            {models.map((m) => (
+              <SelectItem key={m} value={m}>
+                {m}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
@@ -115,7 +174,15 @@ export function VehicleFitmentPicker({
               onChange={(e) => setEngine(e.target.value)}
             />
             {engines.length > 0 && (
-              <Button type="button" variant="ghost" size="sm" onClick={() => { setEngineMode("select"); setEngine(""); }}>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setEngineMode("select");
+                  setEngine("");
+                }}
+              >
                 Use list
               </Button>
             )}
@@ -124,15 +191,25 @@ export function VehicleFitmentPicker({
           <Select
             value={engine || ENGINE_ANY}
             onValueChange={(v) => {
-              if (v === ENGINE_CUSTOM) { setEngineMode("custom"); setEngine(""); return; }
+              if (v === ENGINE_CUSTOM) {
+                setEngineMode("custom");
+                setEngine("");
+                return;
+              }
               setEngine(v === ENGINE_ANY ? "" : v);
             }}
             disabled={!model}
           >
-            <SelectTrigger><SelectValue placeholder={model ? "Any engine" : "Pick model first"} /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue placeholder={model ? "Any engine" : "Pick model first"} />
+            </SelectTrigger>
             <SelectContent className="max-h-72">
               <SelectItem value={ENGINE_ANY}>Any engine</SelectItem>
-              {engines.map((e) => <SelectItem key={e.label} value={e.label}>{e.label}</SelectItem>)}
+              {engines.map((e) => (
+                <SelectItem key={e.label} value={e.label}>
+                  {e.label}
+                </SelectItem>
+              ))}
               <SelectItem value={ENGINE_CUSTOM}>Other / custom…</SelectItem>
             </SelectContent>
           </Select>
@@ -144,7 +221,9 @@ export function VehicleFitmentPicker({
           type="button"
           className="w-full md:w-auto"
           disabled={!canSubmit}
-          onClick={() => onSubmit({ category, make, model, year: yearNum, engine: engine || undefined })}
+          onClick={() =>
+            onSubmit({ category, make, model, year: yearNum, engine: engine || undefined })
+          }
         >
           {submitLabel}
         </Button>

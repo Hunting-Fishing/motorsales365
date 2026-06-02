@@ -30,7 +30,11 @@ export const Route = createFileRoute("/businesses/$slug/book")({
 
 function peso(n: number | null | undefined) {
   if (n == null) return null;
-  return new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP", maximumFractionDigits: 0 }).format(n);
+  return new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+    maximumFractionDigits: 0,
+  }).format(n);
 }
 
 function toLocalDateString(d: Date) {
@@ -90,7 +94,9 @@ function BookingPage() {
   if (!biz) {
     return (
       <SiteLayout>
-        <div className="container mx-auto px-4 py-12 text-center text-muted-foreground">Loading…</div>
+        <div className="container mx-auto px-4 py-12 text-center text-muted-foreground">
+          Loading…
+        </div>
       </SiteLayout>
     );
   }
@@ -161,14 +167,20 @@ function BookingPage() {
   return (
     <SiteLayout>
       <div className="container mx-auto max-w-3xl px-4 py-6">
-        <Link to="/businesses/$slug" params={{ slug }} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+        <Link
+          to="/businesses/$slug"
+          params={{ slug }}
+          className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+        >
           <ChevronLeft className="h-4 w-4" /> Back to {biz.name}
         </Link>
         <h1 className="mt-3 font-display text-2xl font-semibold">Book an appointment</h1>
         <p className="text-sm text-muted-foreground">at {biz.name}</p>
 
         {items.length === 0 && (
-          <Card className="mt-6 p-5 text-sm text-muted-foreground">No bookable services available right now.</Card>
+          <Card className="mt-6 p-5 text-sm text-muted-foreground">
+            No bookable services available right now.
+          </Card>
         )}
 
         {items.length > 0 && (
@@ -187,15 +199,23 @@ function BookingPage() {
                     }}
                     className={cn(
                       "rounded-lg border p-3 text-left transition-colors",
-                      selectedItemId === it.id ? "border-primary bg-primary/5" : "border-border hover:border-primary/40",
+                      selectedItemId === it.id
+                        ? "border-primary bg-primary/5"
+                        : "border-border hover:border-primary/40",
                     )}
                   >
                     <div className="font-medium">{it.title}</div>
                     <div className="mt-1 flex items-center justify-between text-xs text-muted-foreground">
                       <span>{it.duration_min} min</span>
-                      {it.price_php != null && <span className="font-semibold text-foreground">{peso(it.price_php)}</span>}
+                      {it.price_php != null && (
+                        <span className="font-semibold text-foreground">{peso(it.price_php)}</span>
+                      )}
                     </div>
-                    {it.description && <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">{it.description}</p>}
+                    {it.description && (
+                      <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">
+                        {it.description}
+                      </p>
+                    )}
                   </button>
                 ))}
               </div>
@@ -231,7 +251,9 @@ function BookingPage() {
               <Card className="mt-4 p-5">
                 <h2 className="mb-3 font-display text-base font-semibold">3. Choose a time</h2>
                 {slots.length === 0 ? (
-                  <p className="text-sm text-muted-foreground">No times available on this date. Pick another day.</p>
+                  <p className="text-sm text-muted-foreground">
+                    No times available on this date. Pick another day.
+                  </p>
                 ) : (
                   <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
                     {slots.map((s) => (
@@ -261,19 +283,42 @@ function BookingPage() {
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div>
                     <Label htmlFor="b-name">Full name</Label>
-                    <Input id="b-name" value={name} onChange={(e) => setName(e.target.value)} maxLength={120} />
+                    <Input
+                      id="b-name"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      maxLength={120}
+                    />
                   </div>
                   <div>
                     <Label htmlFor="b-phone">Phone</Label>
-                    <Input id="b-phone" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={40} placeholder="+63…" />
+                    <Input
+                      id="b-phone"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      maxLength={40}
+                      placeholder="+63…"
+                    />
                   </div>
                   <div className="sm:col-span-2">
                     <Label htmlFor="b-email">Email</Label>
-                    <Input id="b-email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={200} />
+                    <Input
+                      id="b-email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      maxLength={200}
+                    />
                   </div>
                   <div className="sm:col-span-2">
                     <Label htmlFor="b-notes">Notes (optional)</Label>
-                    <Textarea id="b-notes" value={notes} onChange={(e) => setNotes(e.target.value)} maxLength={1000} rows={3} />
+                    <Textarea
+                      id="b-notes"
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      maxLength={1000}
+                      rows={3}
+                    />
                   </div>
                 </div>
                 <div className="mt-4 flex items-center justify-between text-sm">
@@ -282,7 +327,11 @@ function BookingPage() {
                     {item.require_approval ? " · Awaits owner approval" : " · Auto-confirms"}
                   </div>
                   <Button onClick={handleSubmit} disabled={submitting}>
-                    {submitting ? "Submitting…" : item.require_approval ? "Request booking" : "Confirm booking"}
+                    {submitting
+                      ? "Submitting…"
+                      : item.require_approval
+                        ? "Request booking"
+                        : "Confirm booking"}
                   </Button>
                 </div>
               </Card>

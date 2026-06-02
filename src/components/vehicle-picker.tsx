@@ -79,10 +79,7 @@ function Combo({
           variant="outline"
           role="combobox"
           disabled={disabled}
-          className={cn(
-            "w-full justify-between font-normal",
-            !value && "text-muted-foreground",
-          )}
+          className={cn("w-full justify-between font-normal", !value && "text-muted-foreground")}
         >
           {value || placeholder}
           <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
@@ -112,11 +109,7 @@ function Combo({
             return 0;
           }}
         >
-          <CommandInput
-            placeholder={searchPlaceholder}
-            value={query}
-            onValueChange={setQuery}
-          />
+          <CommandInput placeholder={searchPlaceholder} value={query} onValueChange={setQuery} />
           <CommandList className="max-h-72">
             <CommandEmpty>
               {showAdd ? (
@@ -141,10 +134,7 @@ function Combo({
                   onSelect={() => commit(opt)}
                 >
                   <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value === opt ? "opacity-100" : "opacity-0",
-                    )}
+                    className={cn("mr-2 h-4 w-4", value === opt ? "opacity-100" : "opacity-0")}
                   />
                   {opt}
                 </CommandItem>
@@ -163,10 +153,7 @@ export function VehiclePicker({ category, year, make, model, engine, onChange }:
   const [engineCustom, setEngineCustom] = React.useState(false);
 
   const yearNum = year && /^\d{4}$/.test(year) ? parseInt(year, 10) : undefined;
-  const yearOptions = React.useMemo(
-    () => getYearOptions().map((y) => String(y)),
-    [],
-  );
+  const yearOptions = React.useMemo(() => getYearOptions().map((y) => String(y)), []);
 
   const filteredMakes = React.useMemo(
     () => getMakesForYear(category, yearNum),
@@ -364,7 +351,9 @@ export function VehiclePicker({ category, year, make, model, engine, onChange }:
       {(category === "car" || category === "motorcycle") && (
         <div className="space-y-1">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-medium">Engine <span className="text-xs font-normal text-muted-foreground">(optional)</span></span>
+            <span className="text-sm font-medium">
+              Engine <span className="text-xs font-normal text-muted-foreground">(optional)</span>
+            </span>
             {engine && (
               <button
                 type="button"
@@ -385,7 +374,10 @@ export function VehiclePicker({ category, year, make, model, engine, onChange }:
               {engineOptions.length > 0 && (
                 <button
                   type="button"
-                  onClick={() => { setEngineCustom(false); onChange({ year, make, model, engine: "" }); }}
+                  onClick={() => {
+                    setEngineCustom(false);
+                    onChange({ year, make, model, engine: "" });
+                  }}
                   className="text-xs text-primary hover:underline"
                 >
                   Use list

@@ -46,15 +46,23 @@ function VerifyEmailPage() {
   }, [cooldown]);
 
   const handleResend = async () => {
-    if (!email) { toast.error("Missing email address — please sign up again."); return; }
+    if (!email) {
+      toast.error("Missing email address — please sign up again.");
+      return;
+    }
     setResending(true);
     const { error } = await supabase.auth.resend({
       type: "signup",
       email,
-      options: { emailRedirectTo: `${window.location.origin}/verify-email${intent ? `?intent=${intent}` : ""}` },
+      options: {
+        emailRedirectTo: `${window.location.origin}/verify-email${intent ? `?intent=${intent}` : ""}`,
+      },
     });
     setResending(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Verification email sent again. Check your inbox.");
     setCooldown(45);
   };
@@ -68,27 +76,43 @@ function VerifyEmailPage() {
         <h1 className="text-center font-display text-3xl font-bold">Check your email</h1>
         <p className="mt-3 text-center text-muted-foreground">
           We sent a verification link to{" "}
-          <span className="font-semibold text-foreground">{email ?? "your email"}</span>.
-          Click it to activate your account.
+          <span className="font-semibold text-foreground">{email ?? "your email"}</span>. Click it
+          to activate your account.
         </p>
 
         <div className="mt-8 rounded-xl border border-border bg-card p-5 text-sm">
           <p className="font-semibold">What happens next</p>
           <ul className="mt-2 space-y-1.5 text-muted-foreground">
-            <li>• Open the email and tap <span className="font-medium text-foreground">Verify Email</span>.</li>
+            <li>
+              • Open the email and tap{" "}
+              <span className="font-medium text-foreground">Verify Email</span>.
+            </li>
             <li>• You'll be signed in automatically and your account goes live.</li>
             <li>• Until then, listings and "go live" features are paused.</li>
           </ul>
         </div>
 
         <div className="mt-6 flex flex-col gap-3">
-          <Button onClick={handleResend} disabled={resending || cooldown > 0} variant="outline" className="w-full">
+          <Button
+            onClick={handleResend}
+            disabled={resending || cooldown > 0}
+            variant="outline"
+            className="w-full"
+          >
             <RefreshCw className={`mr-2 h-4 w-4 ${resending ? "animate-spin" : ""}`} />
-            {cooldown > 0 ? `Resend in ${cooldown}s` : resending ? "Sending…" : "Resend verification email"}
+            {cooldown > 0
+              ? `Resend in ${cooldown}s`
+              : resending
+                ? "Sending…"
+                : "Resend verification email"}
           </Button>
           <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <Link to="/signup" className="hover:underline">Wrong email? Start over</Link>
-            <Link to="/login" className="hover:underline">Already verified? Sign in</Link>
+            <Link to="/signup" className="hover:underline">
+              Wrong email? Start over
+            </Link>
+            <Link to="/login" className="hover:underline">
+              Already verified? Sign in
+            </Link>
           </div>
         </div>
 

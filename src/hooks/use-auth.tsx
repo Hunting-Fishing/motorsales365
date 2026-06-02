@@ -1,4 +1,12 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { sendTransactionalEmail } from "@/lib/email/send";
@@ -16,7 +24,11 @@ function normalizePhPhone(raw?: string): string | undefined {
 async function maybeApplyPendingSignup(user: User) {
   if (typeof window === "undefined") return;
   let raw: string | null = null;
-  try { raw = window.localStorage.getItem("signup.pending"); } catch { return; }
+  try {
+    raw = window.localStorage.getItem("signup.pending");
+  } catch {
+    return;
+  }
   if (!raw) return;
   try {
     const pending = JSON.parse(raw) as {
@@ -56,7 +68,10 @@ async function maybeApplyPendingSignup(user: User) {
       if (pending.city) update.business_city = pending.city;
     }
     if (Object.keys(update).length > 0) {
-      await supabase.from("profiles").update(update as never).eq("id", user.id);
+      await supabase
+        .from("profiles")
+        .update(update as never)
+        .eq("id", user.id);
     }
     window.localStorage.removeItem("signup.pending");
   } catch (err) {
@@ -132,7 +147,9 @@ function loadSim(): AppRole[] | null {
     const arr = JSON.parse(raw);
     if (!Array.isArray(arr)) return null;
     return arr.filter((r) => typeof r === "string") as AppRole[];
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 function loadSimSellerType(): SellerType | null {
@@ -141,7 +158,9 @@ function loadSimSellerType(): SellerType | null {
     const raw = window.localStorage.getItem(SIM_SELLER_KEY);
     if (!raw) return null;
     return VALID_SELLER_TYPES.includes(raw as SellerType) ? (raw as SellerType) : null;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -153,49 +172,58 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [roles, setRoles] = useState<string[]>([]);
   const [realSellerType, setRealSellerType] = useState<SellerType>("private");
   const [simulatedRoles, setSimulatedRolesState] = useState<AppRole[] | null>(() => loadSim());
-  const [simulatedSellerType, setSimulatedSellerTypeState] = useState<SellerType | null>(() => loadSimSellerType());
+  const [simulatedSellerType, setSimulatedSellerTypeState] = useState<SellerType | null>(() =>
+    loadSimSellerType(),
+  );
   const lastUidRef = useRef<string | null>(null);
   const welcomeCheckedRef = useRef(new Set<string>());
 
   const loadRoles = useCallback(async (uid: string) => {
-      const [{ data: roleRows }, { data: profileRow }] = await Promise.all([
-        supabase.from("user_roles").select("role").eq("user_id", uid),
-        supabase.from("profiles").select("seller_type").eq("id", uid).maybeSingle(),
-      ]);
-      setRoles((roleRows ?? []).map((r: any) => r.role));
-      const st = (profileRow as any)?.seller_type;
-      setRealSellerType(VALID_SELLER_TYPES.includes(st) ? (st as SellerType) : "private");
+    const [{ data: roleRows }, { data: profileRow }] = await Promise.all([
+      supabase.from("user_roles").select("role").eq("user_id", uid),
+      supabase.from("profiles").select("seller_type").eq("id", uid).maybeSingle(),
+    ]);
+    setRoles((roleRows ?? []).map((r: any) => r.role));
+    const st = (profileRow as any)?.seller_type;
+    setRealSellerType(VALID_SELLER_TYPES.includes(st) ? (st as SellerType) : "private");
   }, []);
 
-  const handleSession = useCallback((newSession: Session | null) => {
-    setSession(newSession);
-    setUser(newSession?.user ?? null);
-    const uid = newSession?.user?.id ?? null;
-    if (uid && uid !== lastUidRef.current) {
-      lastUidRef.current = uid;
-      const u = newSession!.user;
-      setTimeout(() => {
-        loadRoles(uid);
-        if (!welcomeCheckedRef.current.has(uid)) {
-          welcomeCheckedRef.current.add(uid);
-          maybeApplyPendingSignup(u).finally(() => maybeSendWelcomeEmail(u));
-        }
-      }, 0);
-    } else if (!uid) {
-      lastUidRef.current = null;
-      setRoles([]);
-      setRealSellerType("private");
-    }
-  }, [loadRoles]);
+  const handleSession = useCallback(
+    (newSession: Session | null) => {
+      setSession(newSession);
+      setUser(newSession?.user ?? null);
+      const uid = newSession?.user?.id ?? null;
+      if (uid && uid !== lastUidRef.current) {
+        lastUidRef.current = uid;
+        const u = newSession!.user;
+        setTimeout(() => {
+          loadRoles(uid);
+          if (!welcomeCheckedRef.current.has(uid)) {
+            welcomeCheckedRef.current.add(uid);
+            maybeApplyPendingSignup(u).finally(() => maybeSendWelcomeEmail(u));
+          }
+        }, 0);
+      } else if (!uid) {
+        lastUidRef.current = null;
+        setRoles([]);
+        setRealSellerType("private");
+      }
+    },
+    [loadRoles],
+  );
 
-  const refreshSession = useCallback(async (providedSession?: Session | null) => {
-    const nextSession = providedSession !== undefined
-      ? providedSession
-      : (await supabase.auth.getSession()).data.session;
-    handleSession(nextSession ?? null);
-    setLoading(false);
-    return nextSession ?? null;
-  }, [handleSession]);
+  const refreshSession = useCallback(
+    async (providedSession?: Session | null) => {
+      const nextSession =
+        providedSession !== undefined
+          ? providedSession
+          : (await supabase.auth.getSession()).data.session;
+      handleSession(nextSession ?? null);
+      setLoading(false);
+      return nextSession ?? null;
+    },
+    [handleSession],
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -249,7 +277,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Seller-type simulation is allowed for any staff role (admin, sales, support,
   // moderator, advertising). It's a view-only override — RLS is unaffected.
-  const realIsStaff = realRoles.some((r) => ["admin", "sales", "moderator", "support", "advertising"].includes(r));
+  const realIsStaff = realRoles.some((r) =>
+    ["admin", "sales", "moderator", "support", "advertising"].includes(r),
+  );
   const effectiveSellerType: SellerType =
     realIsStaff && simulatedSellerType ? simulatedSellerType : realSellerType;
 
@@ -264,12 +294,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider
       value={{
-        user, session, loading,
-        isAdmin, isSales, isModerator, isSupport, isAdvertising, isStaff,
-        realRoles, effectiveRoles, realIsAdmin,
-        simulatedRoles, setSimulatedRoles,
-        realSellerType, effectiveSellerType, simulatedSellerType, setSimulatedSellerType,
-        refreshSession, signOut,
+        user,
+        session,
+        loading,
+        isAdmin,
+        isSales,
+        isModerator,
+        isSupport,
+        isAdvertising,
+        isStaff,
+        realRoles,
+        effectiveRoles,
+        realIsAdmin,
+        simulatedRoles,
+        setSimulatedRoles,
+        realSellerType,
+        effectiveSellerType,
+        simulatedSellerType,
+        setSimulatedSellerType,
+        refreshSession,
+        signOut,
       }}
     >
       {children}

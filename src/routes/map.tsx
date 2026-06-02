@@ -25,9 +25,16 @@ export const Route = createFileRoute("/map")({
   head: () => ({
     meta: [
       { title: "Business Map — 365 MotorSales Philippines" },
-      { name: "description", content: "Full-screen map of dealerships, gas stations, repair shops, parts and more across the Philippines. Search by radius from any location." },
+      {
+        name: "description",
+        content:
+          "Full-screen map of dealerships, gas stations, repair shops, parts and more across the Philippines. Search by radius from any location.",
+      },
       { property: "og:title", content: "Business Map — 365 MotorSales Philippines" },
-      { property: "og:description", content: "Find motor businesses near you on the full-screen Philippines map." },
+      {
+        property: "og:description",
+        content: "Find motor businesses near you on the full-screen Philippines map.",
+      },
     ],
   }),
   component: MapPage,
@@ -35,10 +42,18 @@ export const Route = createFileRoute("/map")({
 
 type BusinessType = { slug: string; label: string; sort_order: number };
 type Row = {
-  id: string; slug: string; name: string; type_slug: string;
-  city: string | null; barangay: string | null; province: string | null;
-  lat: number | null; lng: number | null;
-  rating_avg: number; rating_count: number; featured: boolean;
+  id: string;
+  slug: string;
+  name: string;
+  type_slug: string;
+  city: string | null;
+  barangay: string | null;
+  province: string | null;
+  lat: number | null;
+  lng: number | null;
+  rating_avg: number;
+  rating_count: number;
+  featured: boolean;
   price_label: string | null;
 };
 
@@ -76,16 +91,16 @@ function MapPage() {
         ? { lat: stored.lat, lng: stored.lng, label: stored.label }
         : null,
   );
-  const [radiusKm, setRadiusKm] = useState<number | null>(
-    search.r ?? (stored?.radiusKm ?? null),
-  );
+  const [radiusKm, setRadiusKm] = useState<number | null>(search.r ?? stored?.radiusKm ?? null);
   const [hoverId, setHoverId] = useState<string | null>(null);
 
   useEffect(() => {
     navigate({
       to: "/map",
       search: {
-        ...(center ? { lat: Number(center.lat.toFixed(5)), lng: Number(center.lng.toFixed(5)) } : {}),
+        ...(center
+          ? { lat: Number(center.lat.toFixed(5)), lng: Number(center.lng.toFixed(5)) }
+          : {}),
         ...(center && radiusKm ? { r: radiusKm } : {}),
         ...(typeSlug ? { type: typeSlug } : {}),
         ...(center?.label ? { q: center.label } : {}),
@@ -115,7 +130,10 @@ function MapPage() {
 
   useEffect(() => {
     (async () => {
-      const { data } = await (supabase as any).from("business_types").select("slug,label,sort_order").order("sort_order");
+      const { data } = await (supabase as any)
+        .from("business_types")
+        .select("slug,label,sort_order")
+        .order("sort_order");
       setTypes(data ?? []);
     })();
   }, []);
@@ -125,7 +143,9 @@ function MapPage() {
     (async () => {
       let query = (supabase as any)
         .from("businesses")
-        .select("id,slug,name,type_slug,city,barangay,province,lat,lng,rating_avg,rating_count,featured,price_label")
+        .select(
+          "id,slug,name,type_slug,city,barangay,province,lat,lng,rating_avg,rating_count,featured,price_label",
+        )
         .eq("status", "active")
         .not("lat", "is", null)
         .not("lng", "is", null)
@@ -144,27 +164,45 @@ function MapPage() {
 
   const inRadius = useMemo(() => {
     if (!center || !radiusKm) return items;
-    return items.filter((b) =>
-      b.lat != null && b.lng != null &&
-      haversineKm({ lat: center.lat, lng: center.lng }, { lat: Number(b.lat), lng: Number(b.lng) }) <= radiusKm,
+    return items.filter(
+      (b) =>
+        b.lat != null &&
+        b.lng != null &&
+        haversineKm(
+          { lat: center.lat, lng: center.lng },
+          { lat: Number(b.lat), lng: Number(b.lng) },
+        ) <= radiusKm,
     );
   }, [items, center, radiusKm]);
 
   const sorted = useMemo(() => {
     if (!center) return inRadius;
     return [...inRadius].sort((a, b) => {
-      const da = haversineKm({ lat: center.lat, lng: center.lng }, { lat: Number(a.lat), lng: Number(a.lng) });
-      const db = haversineKm({ lat: center.lat, lng: center.lng }, { lat: Number(b.lat), lng: Number(b.lng) });
+      const da = haversineKm(
+        { lat: center.lat, lng: center.lng },
+        { lat: Number(a.lat), lng: Number(a.lng) },
+      );
+      const db = haversineKm(
+        { lat: center.lat, lng: center.lng },
+        { lat: Number(b.lat), lng: Number(b.lng) },
+      );
       return da - db;
     });
   }, [inRadius, center]);
 
   const mapBusinesses: GMapBusiness[] = sorted.map((b) => ({
-    id: b.id, slug: b.slug, name: b.name,
-    type_slug: b.type_slug, type_label: typeLabel(b.type_slug),
-    lat: b.lat ? Number(b.lat) : null, lng: b.lng ? Number(b.lng) : null,
-    rating_avg: Number(b.rating_avg), rating_count: b.rating_count,
-    city: b.city, featured: b.featured, price_label: b.price_label,
+    id: b.id,
+    slug: b.slug,
+    name: b.name,
+    type_slug: b.type_slug,
+    type_label: typeLabel(b.type_slug),
+    lat: b.lat ? Number(b.lat) : null,
+    lng: b.lng ? Number(b.lng) : null,
+    rating_avg: Number(b.rating_avg),
+    rating_count: b.rating_count,
+    city: b.city,
+    featured: b.featured,
+    price_label: b.price_label,
     highlighted: hoverId === b.id,
   }));
 
@@ -176,7 +214,9 @@ function MapPage() {
     <>
       {loading ? (
         <div className="space-y-2">
-          {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-20 w-full" />)}
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-20 w-full" />
+          ))}
         </div>
       ) : sorted.length === 0 ? (
         <Card className="p-4 text-center text-sm text-muted-foreground">
@@ -186,9 +226,13 @@ function MapPage() {
       ) : (
         <div className="space-y-2">
           {sorted.map((b) => {
-            const dist = center && b.lat != null && b.lng != null
-              ? haversineKm({ lat: center.lat, lng: center.lng }, { lat: Number(b.lat), lng: Number(b.lng) })
-              : null;
+            const dist =
+              center && b.lat != null && b.lng != null
+                ? haversineKm(
+                    { lat: center.lat, lng: center.lng },
+                    { lat: Number(b.lat), lng: Number(b.lng) },
+                  )
+                : null;
             return (
               <Card
                 key={b.id}
@@ -209,13 +253,19 @@ function MapPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <h3 className="truncate text-base font-semibold sm:text-sm">{b.name}</h3>
-                      {b.featured && <Badge variant="default" className="shrink-0 text-[10px]">Featured</Badge>}
+                      {b.featured && (
+                        <Badge variant="default" className="shrink-0 text-[10px]">
+                          Featured
+                        </Badge>
+                      )}
                     </div>
                     <div className="text-xs text-muted-foreground">{typeLabel(b.type_slug)}</div>
                     {(b.city || b.barangay) && (
                       <div className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
                         <MapPin className="h-3.5 w-3.5 shrink-0" />
-                        <span className="truncate">{[b.barangay, b.city].filter(Boolean).join(", ")}</span>
+                        <span className="truncate">
+                          {[b.barangay, b.city].filter(Boolean).join(", ")}
+                        </span>
                       </div>
                     )}
                   </div>
@@ -226,8 +276,14 @@ function MapPage() {
                         {Number(b.rating_avg).toFixed(1)}
                       </div>
                     )}
-                    {dist != null && <div className="text-muted-foreground">{dist.toFixed(1)} km</div>}
-                    {b.price_label && <Badge variant="secondary" className="text-[10px]">{b.price_label}</Badge>}
+                    {dist != null && (
+                      <div className="text-muted-foreground">{dist.toFixed(1)} km</div>
+                    )}
+                    {b.price_label && (
+                      <Badge variant="secondary" className="text-[10px]">
+                        {b.price_label}
+                      </Badge>
+                    )}
                   </div>
                 </div>
               </Card>
@@ -242,8 +298,12 @@ function MapPage() {
     <SiteLayout>
       <div className="container mx-auto px-3 py-3 sm:px-4 sm:py-4">
         <div className="mb-3 lg:block">
-          <h1 className="font-display text-xl font-bold tracking-tight sm:text-2xl">Business Map</h1>
-          <p className="text-xs text-muted-foreground sm:text-sm">Search a radius around any location. Tap a pin for details.</p>
+          <h1 className="font-display text-xl font-bold tracking-tight sm:text-2xl">
+            Business Map
+          </h1>
+          <p className="text-xs text-muted-foreground sm:text-sm">
+            Search a radius around any location. Tap a pin for details.
+          </p>
         </div>
         <Card className="mb-3 p-3">
           <MapFilterBar

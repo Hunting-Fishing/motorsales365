@@ -5,11 +5,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 const uuid = z.string().uuid();
 
 // Throws if the caller is not a member of the org.
-async function assertOrgMember(
-  supabase: any,
-  userId: string,
-  orgId: string,
-): Promise<void> {
+async function assertOrgMember(supabase: any, userId: string, orgId: string): Promise<void> {
   const { data, error } = await supabase.rpc("is_org_member", {
     _user_id: userId,
     _org_id: orgId,
@@ -19,11 +15,7 @@ async function assertOrgMember(
 }
 
 // Throws if the caller is not an owner/admin of the org.
-async function assertOrgManager(
-  supabase: any,
-  userId: string,
-  orgId: string,
-): Promise<void> {
+async function assertOrgManager(supabase: any, userId: string, orgId: string): Promise<void> {
   const { data, error } = await supabase.rpc("can_manage_org", {
     _user_id: userId,
     _org_id: orgId,
@@ -33,11 +25,7 @@ async function assertOrgManager(
 }
 
 // Returns the lead's organization_id, or throws if not found / caller is not a member.
-async function loadLeadOrg(
-  supabase: any,
-  userId: string,
-  leadId: string,
-): Promise<string> {
+async function loadLeadOrg(supabase: any, userId: string, leadId: string): Promise<string> {
   const { data, error } = await supabase
     .from("leads")
     .select("organization_id")
@@ -69,7 +57,9 @@ export const listOrgMembers = createServerFn({ method: "POST" })
     await assertOrgMember(supabase, userId, data.orgId);
     const { data: members, error } = await supabase
       .from("organization_members")
-      .select("user_id, role, joined_at, profiles:profiles!organization_members_user_id_fkey(id, full_name, avatar_url)")
+      .select(
+        "user_id, role, joined_at, profiles:profiles!organization_members_user_id_fkey(id, full_name, avatar_url)",
+      )
       .eq("organization_id", data.orgId);
     if (error) throw new Error(error.message);
     return members ?? [];
@@ -77,21 +67,23 @@ export const listOrgMembers = createServerFn({ method: "POST" })
 
 export const listOrgLeads = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: {
-    orgId: string;
-    status?: "new" | "in_progress" | "won" | "lost" | "all";
-    assignedTo?: string | "unassigned" | "all";
-    source?: string;
-    q?: string;
-    limit?: number;
-  }) => ({
-    orgId: uuid.parse(d.orgId),
-    status: d.status ?? "all",
-    assignedTo: d.assignedTo ?? "all",
-    source: d.source,
-    q: d.q?.trim() || undefined,
-    limit: Math.min(d.limit ?? 100, 200),
-  }))
+  .inputValidator(
+    (d: {
+      orgId: string;
+      status?: "new" | "in_progress" | "won" | "lost" | "all";
+      assignedTo?: string | "unassigned" | "all";
+      source?: string;
+      q?: string;
+      limit?: number;
+    }) => ({
+      orgId: uuid.parse(d.orgId),
+      status: d.status ?? "all",
+      assignedTo: d.assignedTo ?? "all",
+      source: d.source,
+      q: d.q?.trim() || undefined,
+      limit: Math.min(d.limit ?? 100, 200),
+    }),
+  )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertOrgMember(supabase, userId, data.orgId);
@@ -105,7 +97,10 @@ export const listOrgLeads = createServerFn({ method: "POST" })
     if (data.assignedTo === "unassigned") q = q.is("assigned_to", null);
     else if (data.assignedTo !== "all") q = q.eq("assigned_to", data.assignedTo);
     if (data.source) q = q.eq("source", data.source as any);
-    if (data.q) q = q.or(`customer_name.ilike.%${data.q}%,subject.ilike.%${data.q}%,preview.ilike.%${data.q}%`);
+    if (data.q)
+      q = q.or(
+        `customer_name.ilike.%${data.q}%,subject.ilike.%${data.q}%,preview.ilike.%${data.q}%`,
+      );
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
     return rows ?? [];
@@ -162,7 +157,10 @@ export const updateLeadStatus = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await loadLeadOrg(supabase, userId, data.id);
-    const { error } = await supabase.from("leads").update({ status: data.status }).eq("id", data.id);
+    const { error } = await supabase
+      .from("leads")
+      .update({ status: data.status })
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -183,7 +181,10 @@ export const addLeadNote = createServerFn({ method: "POST" })
       body: data.body,
     });
     if (error) throw new Error(error.message);
-    await supabase.from("leads").update({ last_activity_at: new Date().toISOString() }).eq("id", data.id);
+    await supabase
+      .from("leads")
+      .update({ last_activity_at: new Date().toISOString() })
+      .eq("id", data.id);
     return { ok: true };
   });
 
@@ -201,7 +202,9 @@ export const getOrgPerformance = createServerFn({ method: "POST" })
     const [{ data: members, error: e1 }, { data: leads, error: e2 }] = await Promise.all([
       supabase
         .from("organization_members")
-        .select("user_id, role, profiles:profiles!organization_members_user_id_fkey(id, full_name, avatar_url)")
+        .select(
+          "user_id, role, profiles:profiles!organization_members_user_id_fkey(id, full_name, avatar_url)",
+        )
         .eq("organization_id", data.orgId),
       supabase
         .from("leads")

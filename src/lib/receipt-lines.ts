@@ -58,7 +58,8 @@ export function buildReceiptLines(p: ReceiptInput): ReceiptLine[] {
 
   if (hasSplit) {
     if (plan > 0) lines.push({ kind: "plan", label: "Plan", amount: plan, sign: 1 });
-    if (boost > 0) lines.push({ kind: "boost", label: "Boosted listing renewal", amount: boost, sign: 1 });
+    if (boost > 0)
+      lines.push({ kind: "boost", label: "Boosted listing renewal", amount: boost, sign: 1 });
     if (addons > 0) lines.push({ kind: "addons", label: "Add-ons", amount: addons, sign: 1 });
   } else {
     lines.push({ kind: "charge", label: "Charge", amount: subtotal, sign: 1 });
@@ -70,7 +71,12 @@ export function buildReceiptLines(p: ReceiptInput): ReceiptLine[] {
     lines.push({ kind: "credit", label: "Prorated credit", amount: credit, sign: -1 });
   }
 
-  lines.push({ kind: "net", label: credit > 0 ? "Net due" : "Total", amount: Math.max(0, Math.round(subtotal - credit)), sign: 1 });
+  lines.push({
+    kind: "net",
+    label: credit > 0 ? "Net due" : "Total",
+    amount: Math.max(0, Math.round(subtotal - credit)),
+    sign: 1,
+  });
 
   return lines;
 }

@@ -5,7 +5,12 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { listOrgMembers } from "@/lib/leads.functions";
-import { inviteOrgMember, listOrgInvites, updateMemberRole, removeMember } from "@/lib/organizations.functions";
+import {
+  inviteOrgMember,
+  listOrgInvites,
+  updateMemberRole,
+  removeMember,
+} from "@/lib/organizations.functions";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -62,23 +67,45 @@ function MembersPage() {
   };
 
   const setRoleFor = async (uid: string, r: string) => {
-    try { await roleFn({ data: { orgId, userId: uid, role: r } }); toast.success("Role updated"); qc.invalidateQueries({ queryKey: ["org-members", orgId] }); }
-    catch (e: any) { toast.error(e?.message ?? "Failed"); }
+    try {
+      await roleFn({ data: { orgId, userId: uid, role: r } });
+      toast.success("Role updated");
+      qc.invalidateQueries({ queryKey: ["org-members", orgId] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    }
   };
   const removeFor = async (uid: string) => {
     if (!(await confirm({ title: "Remove this member from the team?", destructive: true }))) return;
-    try { await removeFn({ data: { orgId, userId: uid } }); toast.success("Removed"); qc.invalidateQueries({ queryKey: ["org-members", orgId] }); }
-    catch (e: any) { toast.error(e?.message ?? "Failed"); }
+    try {
+      await removeFn({ data: { orgId, userId: uid } });
+      toast.success("Removed");
+      qc.invalidateQueries({ queryKey: ["org-members", orgId] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    }
   };
 
   return (
     <div className="space-y-4">
       <Card className="p-5">
         <h2 className="font-semibold">Invite a teammate</h2>
-        <p className="text-sm text-muted-foreground">They'll get access after signing up with the invite link.</p>
+        <p className="text-sm text-muted-foreground">
+          They'll get access after signing up with the invite link.
+        </p>
         <div className="mt-3 flex flex-col gap-2 sm:flex-row">
-          <Input type="email" placeholder="teammate@email.com" value={email} onChange={(e) => setEmail(e.target.value)} className="flex-1" />
-          <select value={role} onChange={(e) => setRole(e.target.value as any)} className="rounded-md border border-border bg-card px-3 py-2 text-sm">
+          <Input
+            type="email"
+            placeholder="teammate@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="flex-1"
+          />
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value as any)}
+            className="rounded-md border border-border bg-card px-3 py-2 text-sm"
+          >
             <option value="admin">Admin</option>
             <option value="manager">Manager</option>
             <option value="member">Sales rep</option>
@@ -105,7 +132,9 @@ function MembersPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    navigator.clipboard.writeText(`${window.location.origin}/invites/${inv.token ?? ""}`);
+                    navigator.clipboard.writeText(
+                      `${window.location.origin}/invites/${inv.token ?? ""}`,
+                    );
                     toast.success("Link copied");
                   }}
                 >
@@ -124,7 +153,9 @@ function MembersPage() {
             <li key={m.user_id} className="flex flex-wrap items-center gap-3 py-3 text-sm">
               <div className="flex-1 min-w-0">
                 <div className="font-medium truncate">{m.profiles?.full_name ?? m.user_id}</div>
-                <div className="text-xs text-muted-foreground">Joined {new Date(m.joined_at).toLocaleDateString()}</div>
+                <div className="text-xs text-muted-foreground">
+                  Joined {new Date(m.joined_at).toLocaleDateString()}
+                </div>
               </div>
               {m.role === "owner" ? (
                 <Badge>Owner</Badge>
@@ -136,7 +167,9 @@ function MembersPage() {
                     className="rounded-md border border-border bg-card px-2 py-1 text-xs"
                   >
                     {ROLES.filter((r) => r !== "owner").map((r) => (
-                      <option key={r} value={r}>{r}</option>
+                      <option key={r} value={r}>
+                        {r}
+                      </option>
                     ))}
                   </select>
                   <Button variant="ghost" size="sm" onClick={() => removeFor(m.user_id)}>

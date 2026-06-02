@@ -5,8 +5,23 @@ import { SiteLayout } from "@/components/site-layout";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, PlayCircle, Lock, ChevronLeft, ListChecks, Download, Award } from "lucide-react";
-import { getCourse, getLessonContent, markLessonComplete, getEnrollmentProgress, getQuiz, submitQuiz } from "@/lib/education.functions";
+import {
+  CheckCircle2,
+  PlayCircle,
+  Lock,
+  ChevronLeft,
+  ListChecks,
+  Download,
+  Award,
+} from "lucide-react";
+import {
+  getCourse,
+  getLessonContent,
+  markLessonComplete,
+  getEnrollmentProgress,
+  getQuiz,
+  submitQuiz,
+} from "@/lib/education.functions";
 import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -51,7 +66,11 @@ function Watch() {
   const markComplete = useServerFn(markLessonComplete);
 
   if (!course) {
-    return <SiteLayout><div className="p-12 text-center">Course not found.</div></SiteLayout>;
+    return (
+      <SiteLayout>
+        <div className="p-12 text-center">Course not found.</div>
+      </SiteLayout>
+    );
   }
 
   const allowed = (lessonData as any)?.allowed;
@@ -64,7 +83,11 @@ function Watch() {
     <SiteLayout>
       <div className="container mx-auto grid gap-6 px-4 py-6 lg:grid-cols-[1fr_320px]">
         <div>
-          <Link to="/learn/$slug" params={{ slug: params.slug }} className="inline-flex items-center text-sm text-muted-foreground hover:underline">
+          <Link
+            to="/learn/$slug"
+            params={{ slug: params.slug }}
+            className="inline-flex items-center text-sm text-muted-foreground hover:underline"
+          >
             <ChevronLeft className="h-4 w-4" /> {course.title}
           </Link>
 
@@ -75,9 +98,13 @@ function Watch() {
               <CardContent className="p-8 text-center">
                 <Lock className="mx-auto h-10 w-10 text-muted-foreground" />
                 <h2 className="mt-3 text-xl font-semibold">You're not enrolled in this course</h2>
-                <p className="mt-1 text-sm text-muted-foreground">Purchase the course or activate a subscription to access this lesson.</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Purchase the course or activate a subscription to access this lesson.
+                </p>
                 <Button asChild className="mt-4">
-                  <Link to="/learn/$slug" params={{ slug: params.slug }}>Go to enrollment</Link>
+                  <Link to="/learn/$slug" params={{ slug: params.slug }}>
+                    Go to enrollment
+                  </Link>
                 </Button>
               </CardContent>
             </Card>
@@ -116,7 +143,12 @@ function Watch() {
                   <ul className="mt-2 space-y-1">
                     {(lessonData as any).resources.map((r: any) => (
                       <li key={r.id}>
-                        <a href={r.file_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 text-sm text-primary hover:underline">
+                        <a
+                          href={r.file_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                        >
                           <Download className="h-4 w-4" /> {r.label}
                         </a>
                       </li>
@@ -138,13 +170,22 @@ function Watch() {
                 </Button>
                 {next && (
                   <Button asChild variant="outline">
-                    <Link to="/learn_/$slug/watch/$lessonId" params={{ slug: params.slug, lessonId: next.id }}>
+                    <Link
+                      to="/learn_/$slug/watch/$lessonId"
+                      params={{ slug: params.slug, lessonId: next.id }}
+                    >
                       Next lesson →
                     </Link>
                   </Button>
                 )}
                 {moduleQuiz && (
-                  <QuizLauncher quizId={moduleQuiz.id} onPassed={() => { refetch(); queryClient.invalidateQueries({ queryKey: ["course-progress", course.id] }); }} />
+                  <QuizLauncher
+                    quizId={moduleQuiz.id}
+                    onPassed={() => {
+                      refetch();
+                      queryClient.invalidateQueries({ queryKey: ["course-progress", course.id] });
+                    }}
+                  />
                 )}
               </div>
             </>
@@ -188,11 +229,16 @@ function Watch() {
                     </div>
                   );
                 })}
-                {quizzes.filter((q) => q.is_final).map((q) => (
-                  <div key={q.id} className="rounded-md border border-primary/30 bg-primary/5 p-2 text-xs">
-                    <ListChecks className="mr-1 inline h-3 w-3" /> Final quiz: {q.title}
-                  </div>
-                ))}
+                {quizzes
+                  .filter((q) => q.is_final)
+                  .map((q) => (
+                    <div
+                      key={q.id}
+                      className="rounded-md border border-primary/30 bg-primary/5 p-2 text-xs"
+                    >
+                      <ListChecks className="mr-1 inline h-3 w-3" /> Final quiz: {q.title}
+                    </div>
+                  ))}
               </div>
 
               {progress?.certificate && (
@@ -224,7 +270,9 @@ function normalizeEmbedUrl(url: string): string {
       return `https://player.vimeo.com/video${u.pathname}`;
     }
     return url;
-  } catch { return url; }
+  } catch {
+    return url;
+  }
 }
 
 function QuizLauncher({ quizId, onPassed }: { quizId: string; onPassed: () => void }) {
@@ -252,26 +300,48 @@ function QuizLauncher({ quizId, onPassed }: { quizId: string; onPassed: () => vo
       <CardContent className="p-4">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="font-semibold">{(quizData as any)?.quiz?.title ?? "Quiz"}</h3>
-          <Button variant="ghost" size="sm" onClick={() => { setOpen(false); setResult(null); setAnswers({}); }}>Close</Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setOpen(false);
+              setResult(null);
+              setAnswers({});
+            }}
+          >
+            Close
+          </Button>
         </div>
         {isLoading ? (
           <p>Loading…</p>
         ) : result ? (
           <div>
-            <p className="text-lg font-semibold">{result.passed ? "🎉 Passed!" : "Not quite — try again"}</p>
-            <p className="text-sm text-muted-foreground">Score: {result.score}% ({result.correct}/{result.total})</p>
+            <p className="text-lg font-semibold">
+              {result.passed ? "🎉 Passed!" : "Not quite — try again"}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Score: {result.score}% ({result.correct}/{result.total})
+            </p>
             {result.certificateCode && (
-              <p className="mt-2 text-sm">Certificate code: <code className="rounded bg-secondary px-1.5 py-0.5">{result.certificateCode}</code></p>
+              <p className="mt-2 text-sm">
+                Certificate code:{" "}
+                <code className="rounded bg-secondary px-1.5 py-0.5">{result.certificateCode}</code>
+              </p>
             )}
           </div>
         ) : (
           <div className="space-y-4">
             {((quizData as any)?.questions ?? []).map((q: any, qi: number) => (
               <div key={q.id}>
-                <p className="font-medium">{qi + 1}. {q.prompt}</p>
+                <p className="font-medium">
+                  {qi + 1}. {q.prompt}
+                </p>
                 <div className="mt-2 space-y-1">
                   {(q.choices ?? []).map((choice: string, ci: number) => (
-                    <label key={ci} className="flex cursor-pointer items-center gap-2 rounded p-1.5 hover:bg-secondary">
+                    <label
+                      key={ci}
+                      className="flex cursor-pointer items-center gap-2 rounded p-1.5 hover:bg-secondary"
+                    >
                       <input
                         type="radio"
                         name={q.id}
@@ -286,7 +356,10 @@ function QuizLauncher({ quizId, onPassed }: { quizId: string; onPassed: () => vo
             ))}
             <Button
               onClick={async () => {
-                const submission = Object.entries(answers).map(([questionId, choice]) => ({ questionId, choice }));
+                const submission = Object.entries(answers).map(([questionId, choice]) => ({
+                  questionId,
+                  choice,
+                }));
                 if (submission.length === 0) return;
                 const r = await submit({ data: { quizId, answers: submission } });
                 setResult(r);

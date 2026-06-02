@@ -139,7 +139,13 @@ export function parseMarketplaceItem(
       const u = new URL(link);
       if (!/(^|\.)facebook\.com$/i.test(u.hostname)) continue;
       const p = u.pathname;
-      if (p.startsWith("/marketplace") || p.startsWith("/groups") || p === "/" || p.startsWith("/login")) continue;
+      if (
+        p.startsWith("/marketplace") ||
+        p.startsWith("/groups") ||
+        p === "/" ||
+        p.startsWith("/login")
+      )
+        continue;
       if (p.startsWith("/people/") || /^\/[a-z0-9.\-_]+\/?$/i.test(p) || p === "/profile.php") {
         sellerProfileUrl = `https://www.facebook.com${p}${u.search}`;
         break;

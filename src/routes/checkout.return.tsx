@@ -8,10 +8,7 @@ export const Route = createFileRoute("/checkout/return")({
     session_id: typeof search.session_id === "string" ? search.session_id : undefined,
   }),
   head: () => ({
-    meta: [
-      { title: "Payment complete — 365 MotorSales" },
-      { name: "robots", content: "noindex" },
-    ],
+    meta: [{ title: "Payment complete — 365 MotorSales" }, { name: "robots", content: "noindex" }],
   }),
   component: CheckoutReturn,
 });

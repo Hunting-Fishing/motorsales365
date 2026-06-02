@@ -8,7 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/admin/advertising")({
@@ -46,11 +52,16 @@ function AdminAdvertising() {
     if (filter !== "all") q = q.eq("status", filter);
     if (mineOnly && user?.id) q = q.eq("assigned_to", user.id);
     const { data, error } = await q;
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setInquiries(data ?? []);
     setSelected((prev) => {
       const next = new Set<string>();
-      (data ?? []).forEach((i: any) => { if (prev.has(i.id)) next.add(i.id); });
+      (data ?? []).forEach((i: any) => {
+        if (prev.has(i.id)) next.add(i.id);
+      });
       return next;
     });
   };
@@ -59,7 +70,12 @@ function AdminAdvertising() {
     setActiveId(id);
     const [{ data: msgs }, { data: aud }] = await Promise.all([
       supabase.from("ad_inquiry_messages").select("*").eq("inquiry_id", id).order("created_at"),
-      supabase.from("ad_inquiry_audit").select("*").eq("inquiry_id", id).order("created_at", { ascending: false }).limit(50),
+      supabase
+        .from("ad_inquiry_audit")
+        .select("*")
+        .eq("inquiry_id", id)
+        .order("created_at", { ascending: false })
+        .limit(50),
     ]);
     setMessages(msgs ?? []);
     setAudit(aud ?? []);
@@ -67,7 +83,9 @@ function AdminAdvertising() {
     setNotes(cur.internal_notes ?? "");
   };
 
-  useEffect(() => { if (hasAccess) load(); /* eslint-disable-next-line */ }, [filter, mineOnly, hasAccess]);
+  useEffect(() => {
+    if (hasAccess) load(); /* eslint-disable-next-line */
+  }, [filter, mineOnly, hasAccess]);
 
   const active = useMemo(() => inquiries.find((i) => i.id === activeId), [inquiries, activeId]);
 
@@ -80,7 +98,10 @@ function AdminAdvertising() {
 
   const saveNotes = async () => {
     if (!active) return;
-    const { error } = await supabase.from("ad_inquiries").update({ internal_notes: notes }).eq("id", active.id);
+    const { error } = await supabase
+      .from("ad_inquiries")
+      .update({ internal_notes: notes })
+      .eq("id", active.id);
     if (error) return toast.error(error.message);
     toast.success("Notes saved");
     load();
@@ -88,7 +109,10 @@ function AdminAdvertising() {
 
   const assignToMe = async () => {
     if (!active || !user?.id) return;
-    const { error } = await supabase.from("ad_inquiries").update({ assigned_to: user.id }).eq("id", active.id);
+    const { error } = await supabase
+      .from("ad_inquiries")
+      .update({ assigned_to: user.id })
+      .eq("id", active.id);
     if (error) return toast.error(error.message);
     toast.success("Assigned to you");
     load();
@@ -97,7 +121,8 @@ function AdminAdvertising() {
   const toggleSelect = (id: string) => {
     setSelected((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id); else next.add(id);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
       return next;
     });
   };
@@ -107,7 +132,10 @@ function AdminAdvertising() {
   const bulkApplyStatus = async () => {
     if (selected.size === 0) return;
     const ids = Array.from(selected);
-    const { error } = await supabase.from("ad_inquiries").update({ status: bulkStatus }).in("id", ids);
+    const { error } = await supabase
+      .from("ad_inquiries")
+      .update({ status: bulkStatus })
+      .in("id", ids);
     if (error) return toast.error(error.message);
     toast.success(`Updated ${ids.length} inquiry(ies) → ${bulkStatus}`);
     clearSelection();
@@ -116,7 +144,10 @@ function AdminAdvertising() {
   const bulkAssignToMe = async () => {
     if (selected.size === 0 || !user?.id) return;
     const ids = Array.from(selected);
-    const { error } = await supabase.from("ad_inquiries").update({ assigned_to: user.id }).in("id", ids);
+    const { error } = await supabase
+      .from("ad_inquiries")
+      .update({ assigned_to: user.id })
+      .in("id", ids);
     if (error) return toast.error(error.message);
     toast.success(`Assigned ${ids.length} to you`);
     clearSelection();
@@ -156,10 +187,16 @@ function AdminAdvertising() {
             Assigned to me
           </Button>
           <Select value={filter} onValueChange={(v) => setFilter(v as any)}>
-            <SelectTrigger className="w-44"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-44">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All</SelectItem>
-              {STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+              {STATUSES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -169,15 +206,29 @@ function AdminAdvertising() {
         <div className="mb-3 flex flex-wrap items-center gap-2 rounded-lg border border-primary/40 bg-primary/5 p-3 text-sm">
           <span className="font-medium">{selected.size} selected</span>
           <Select value={bulkStatus} onValueChange={(v) => setBulkStatus(v as Status)}>
-            <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
-              {STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+              {STATUSES.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {s}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
-          <Button size="sm" onClick={bulkApplyStatus}>Apply status</Button>
-          <Button size="sm" variant="outline" onClick={bulkAssignToMe}>Assign to me</Button>
-          <Button size="sm" variant="ghost" onClick={clearSelection}>Clear</Button>
-          <Button size="sm" variant="ghost" onClick={selectAllVisible}>Select all visible</Button>
+          <Button size="sm" onClick={bulkApplyStatus}>
+            Apply status
+          </Button>
+          <Button size="sm" variant="outline" onClick={bulkAssignToMe}>
+            Assign to me
+          </Button>
+          <Button size="sm" variant="ghost" onClick={clearSelection}>
+            Clear
+          </Button>
+          <Button size="sm" variant="ghost" onClick={selectAllVisible}>
+            Select all visible
+          </Button>
         </div>
       )}
 
@@ -192,7 +243,9 @@ function AdminAdvertising() {
             <div
               key={i.id}
               className={`flex gap-2 rounded-lg border p-3 transition ${
-                activeId === i.id ? "border-primary bg-primary/5" : "border-border bg-card hover:bg-secondary/50"
+                activeId === i.id
+                  ? "border-primary bg-primary/5"
+                  : "border-border bg-card hover:bg-secondary/50"
               }`}
             >
               <input
@@ -210,9 +263,13 @@ function AdminAdvertising() {
                 <div className="text-xs text-muted-foreground">{i.company || i.email}</div>
                 <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">{i.message}</div>
                 <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
-                  <span>{formatDate(i.created_at)} · {i.placement}</span>
+                  <span>
+                    {formatDate(i.created_at)} · {i.placement}
+                  </span>
                   {i.assigned_to && (
-                    <span className={i.assigned_to === user?.id ? "text-primary font-semibold" : ""}>
+                    <span
+                      className={i.assigned_to === user?.id ? "text-primary font-semibold" : ""}
+                    >
                       {i.assigned_to === user?.id ? "You" : "Assigned"}
                     </span>
                   )}
@@ -233,7 +290,8 @@ function AdminAdvertising() {
                 <div>
                   <h2 className="font-display text-xl font-bold">{active.contact_name}</h2>
                   <div className="text-sm text-muted-foreground">
-                    {active.company && <>{active.company} · </>}submitted {formatDate(active.created_at)}
+                    {active.company && <>{active.company} · </>}submitted{" "}
+                    {formatDate(active.created_at)}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -244,37 +302,99 @@ function AdminAdvertising() {
                   >
                     {active.assigned_to === user?.id ? "Assigned to you" : "Assign to me"}
                   </Button>
-                  <Select value={active.status} onValueChange={(v) => setStatus(active.id, v as Status)}>
-                    <SelectTrigger className="w-40"><SelectValue /></SelectTrigger>
+                  <Select
+                    value={active.status}
+                    onValueChange={(v) => setStatus(active.id, v as Status)}
+                  >
+                    <SelectTrigger className="w-40">
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
-                      {STATUSES.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                      {STATUSES.map((s) => (
+                        <SelectItem key={s} value={s}>
+                          {s}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
               </div>
 
               <div className="grid gap-2 text-sm sm:grid-cols-2">
-                <Info icon={<Mail className="h-4 w-4" />} label="Email" value={<a className="text-primary underline" href={`mailto:${active.email}`}>{active.email}</a>} />
-                {active.phone && <Info icon={<Phone className="h-4 w-4" />} label="Phone" value={active.phone} />}
-                <Info icon={<Building2 className="h-4 w-4" />} label="Placement" value={active.placement} />
-                {active.budget_range && <Info icon={<Banknote className="h-4 w-4" />} label="Budget" value={active.budget_range} />}
-                {active.start_date && <Info icon={<Calendar className="h-4 w-4" />} label="Start date" value={active.start_date} />}
-                {active.source_url && <Info icon={<ExternalLink className="h-4 w-4" />} label="Source" value={<a className="truncate text-primary underline" href={active.source_url} target="_blank" rel="noreferrer">{active.source_url}</a>} />}
+                <Info
+                  icon={<Mail className="h-4 w-4" />}
+                  label="Email"
+                  value={
+                    <a className="text-primary underline" href={`mailto:${active.email}`}>
+                      {active.email}
+                    </a>
+                  }
+                />
+                {active.phone && (
+                  <Info icon={<Phone className="h-4 w-4" />} label="Phone" value={active.phone} />
+                )}
+                <Info
+                  icon={<Building2 className="h-4 w-4" />}
+                  label="Placement"
+                  value={active.placement}
+                />
+                {active.budget_range && (
+                  <Info
+                    icon={<Banknote className="h-4 w-4" />}
+                    label="Budget"
+                    value={active.budget_range}
+                  />
+                )}
+                {active.start_date && (
+                  <Info
+                    icon={<Calendar className="h-4 w-4" />}
+                    label="Start date"
+                    value={active.start_date}
+                  />
+                )}
+                {active.source_url && (
+                  <Info
+                    icon={<ExternalLink className="h-4 w-4" />}
+                    label="Source"
+                    value={
+                      <a
+                        className="truncate text-primary underline"
+                        href={active.source_url}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {active.source_url}
+                      </a>
+                    }
+                  />
+                )}
               </div>
 
               <div>
-                <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Original message</h3>
-                <p className="whitespace-pre-wrap rounded-lg border border-border bg-secondary/40 p-3 text-sm">{active.message}</p>
+                <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Original message
+                </h3>
+                <p className="whitespace-pre-wrap rounded-lg border border-border bg-secondary/40 p-3 text-sm">
+                  {active.message}
+                </p>
               </div>
 
               <div>
-                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Conversation</h3>
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Conversation
+                </h3>
                 <div className="space-y-2 rounded-lg border border-border bg-background p-3 max-h-72 overflow-y-auto">
-                  {messages.length === 0 && <p className="text-xs text-muted-foreground">No replies yet.</p>}
+                  {messages.length === 0 && (
+                    <p className="text-xs text-muted-foreground">No replies yet.</p>
+                  )}
                   {messages.map((m) => (
-                    <div key={m.id} className={`rounded-md p-2 text-sm ${m.from_staff ? "bg-primary/10" : "bg-secondary"}`}>
+                    <div
+                      key={m.id}
+                      className={`rounded-md p-2 text-sm ${m.from_staff ? "bg-primary/10" : "bg-secondary"}`}
+                    >
                       <div className="text-[11px] font-semibold text-muted-foreground">
-                        {m.from_staff ? "Staff" : "Advertiser"} · {m.sender_name ?? "?"} · {formatDate(m.created_at)}
+                        {m.from_staff ? "Staff" : "Advertiser"} · {m.sender_name ?? "?"} ·{" "}
+                        {formatDate(m.created_at)}
                       </div>
                       <div className="mt-1 whitespace-pre-wrap">{m.body}</div>
                     </div>
@@ -287,17 +407,30 @@ function AdminAdvertising() {
                   onChange={(e) => setReply(e.target.value)}
                   className="mt-2"
                 />
-                <Button onClick={sendReply} disabled={!reply.trim()} className="mt-2">Send reply</Button>
+                <Button onClick={sendReply} disabled={!reply.trim()} className="mt-2">
+                  Send reply
+                </Button>
               </div>
 
               <div>
-                <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Internal notes</h3>
-                <Textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Visible only to staff" />
-                <Button size="sm" variant="outline" className="mt-2" onClick={saveNotes}>Save notes</Button>
+                <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Internal notes
+                </h3>
+                <Textarea
+                  rows={2}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Visible only to staff"
+                />
+                <Button size="sm" variant="outline" className="mt-2" onClick={saveNotes}>
+                  Save notes
+                </Button>
               </div>
 
               <div>
-                <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Activity log</h3>
+                <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Activity log
+                </h3>
                 {audit.length === 0 ? (
                   <p className="text-xs text-muted-foreground">No activity yet.</p>
                 ) : (
@@ -306,7 +439,12 @@ function AdminAdvertising() {
                       <li key={a.id} className="flex justify-between gap-2">
                         <span>
                           <span className="font-semibold">{a.action.replace(/_/g, " ")}</span>
-                          {a.from_value && <> · <span className="text-muted-foreground">{a.from_value}</span> → </>}
+                          {a.from_value && (
+                            <>
+                              {" "}
+                              · <span className="text-muted-foreground">{a.from_value}</span> →{" "}
+                            </>
+                          )}
                           {a.to_value && <span className="text-primary">{a.to_value}</span>}
                         </span>
                         <span className="text-muted-foreground">{formatDate(a.created_at)}</span>
@@ -323,12 +461,22 @@ function AdminAdvertising() {
   );
 }
 
-function Info({ icon, label, value }: { icon: React.ReactNode; label: string; value: React.ReactNode }) {
+function Info({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: React.ReactNode;
+}) {
   return (
     <div className="flex items-start gap-2 rounded-md border border-border bg-secondary/30 p-2">
       <div className="mt-0.5 text-muted-foreground">{icon}</div>
       <div>
-        <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</div>
+        <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+          {label}
+        </div>
         <div className="text-sm">{value}</div>
       </div>
     </div>

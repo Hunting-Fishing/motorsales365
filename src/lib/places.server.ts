@@ -7,8 +7,7 @@ const GATEWAY_URL = "https://connector-gateway.lovable.dev/google_maps";
 // Nominatim usage policy: descriptive User-Agent, <=1 req/sec, attribution in UI.
 // https://operations.osmfoundation.org/policies/nominatim/
 const NOMINATIM_URL = "https://nominatim.openstreetmap.org";
-const NOMINATIM_UA =
-  "365MotorSales/1.0 (https://365motorsales.com; support@365motorsales.com)";
+const NOMINATIM_UA = "365MotorSales/1.0 (https://365motorsales.com; support@365motorsales.com)";
 
 function authHeaders(): Record<string, string> {
   const lovable = process.env.LOVABLE_API_KEY;
@@ -85,7 +84,8 @@ export async function searchNearbyPlaces(opts: {
   typeSlug: string;
 }): Promise<NearbyPlace[]> {
   const includedTypes = PLACE_TYPE_MAP[opts.typeSlug];
-  if (!includedTypes) throw new Error(`Unsupported business type for Places import: ${opts.typeSlug}`);
+  if (!includedTypes)
+    throw new Error(`Unsupported business type for Places import: ${opts.typeSlug}`);
 
   const body = {
     includedTypes,
@@ -138,9 +138,18 @@ export async function searchNearbyPlaces(opts: {
 }
 
 export function normalizeName(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  return s
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
 }
 
 export function slugify(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || "business";
+  return (
+    s
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 60) || "business"
+  );
 }

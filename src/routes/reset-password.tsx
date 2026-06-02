@@ -30,7 +30,10 @@ function ResetPasswordPage() {
       redirectTo: `${window.location.origin}/reset-password`,
     });
     setSubmitting(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Check your email for the reset link.");
   };
 
@@ -39,7 +42,10 @@ function ResetPasswordPage() {
     setSubmitting(true);
     const { error } = await supabase.auth.updateUser({ password });
     setSubmitting(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Password updated.");
     window.location.href = "/dashboard";
   };
@@ -47,16 +53,26 @@ function ResetPasswordPage() {
   return (
     <SiteLayout>
       <div className="container mx-auto flex max-w-md flex-col px-4 py-16">
-        <h1 className="font-display text-3xl font-bold">{mode === "request" ? "Reset password" : "Set new password"}</h1>
+        <h1 className="font-display text-3xl font-bold">
+          {mode === "request" ? "Reset password" : "Set new password"}
+        </h1>
         <p className="text-muted-foreground">
-          {mode === "request" ? "We'll email you a reset link." : "Choose a new password for your account."}
+          {mode === "request"
+            ? "We'll email you a reset link."
+            : "Choose a new password for your account."}
         </p>
 
         {mode === "request" ? (
           <form onSubmit={handleRequest} className="mt-8 space-y-4">
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+              <Input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
             </div>
             <Button type="submit" disabled={submitting} className="w-full">
               {submitting ? "Sending…" : "Send reset link"}
@@ -66,7 +82,14 @@ function ResetPasswordPage() {
           <form onSubmit={handleSet} className="mt-8 space-y-4">
             <div>
               <Label htmlFor="pw">New password</Label>
-              <Input id="pw" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
+              <Input
+                id="pw"
+                type="password"
+                required
+                minLength={6}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
             </div>
             <Button type="submit" disabled={submitting} className="w-full">
               {submitting ? "Saving…" : "Update password"}
@@ -75,7 +98,9 @@ function ResetPasswordPage() {
         )}
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          <Link to="/login" className="font-semibold text-primary hover:underline">Back to sign in</Link>
+          <Link to="/login" className="font-semibold text-primary hover:underline">
+            Back to sign in
+          </Link>
         </p>
       </div>
     </SiteLayout>

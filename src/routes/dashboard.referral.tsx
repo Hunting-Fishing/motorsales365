@@ -69,7 +69,11 @@ function StaffReferral() {
         .select("id,email,full_name,referral_code,qr_storage_path,active")
         .or(`staff_user_id.eq.${user.id},email.eq.${user.email?.toLowerCase()}`)
         .maybeSingle();
-      if (!s) { setNotFound(true); setLoading(false); return; }
+      if (!s) {
+        setNotFound(true);
+        setLoading(false);
+        return;
+      }
       setStaff(s as StaffRow);
 
       const { data: pr } = await sb
@@ -86,11 +90,17 @@ function StaffReferral() {
     if (!staff) return;
     (async () => {
       const since = sinceFor(range);
-      let scansQ = sb.from("qr_scans").select("visitor_id,scanned_at").eq("referral_code", staff.referral_code);
+      let scansQ = sb
+        .from("qr_scans")
+        .select("visitor_id,scanned_at")
+        .eq("referral_code", staff.referral_code);
       if (since) scansQ = scansQ.gte("scanned_at", since);
       const { data: scans } = await scansQ;
 
-      let signupsQ = sb.from("user_referrals").select("user_id,signup_date").eq("referred_by_staff_id", staff.id);
+      let signupsQ = sb
+        .from("user_referrals")
+        .select("user_id,signup_date")
+        .eq("referred_by_staff_id", staff.id);
       if (since) signupsQ = signupsQ.gte("signup_date", since);
       const { data: signups } = await signupsQ;
 
@@ -105,11 +115,11 @@ function StaffReferral() {
   }, [staff, range]);
 
   const link = useMemo(
-    () => staff ? `${window.location.origin}/r/${staff.referral_code}` : "",
+    () => (staff ? `${window.location.origin}/r/${staff.referral_code}` : ""),
     [staff],
   );
   const posterUrl = useMemo(
-    () => staff ? `${window.location.origin}/r/${staff.referral_code}/poster` : "",
+    () => (staff ? `${window.location.origin}/r/${staff.referral_code}/poster` : ""),
     [staff],
   );
   const qrUrl = useMemo(() => {
@@ -118,7 +128,8 @@ function StaffReferral() {
     return data.publicUrl;
   }, [staff]);
 
-  const conversion = stats.visitors > 0 ? Math.round((stats.signups / stats.visitors) * 1000) / 10 : 0;
+  const conversion =
+    stats.visitors > 0 ? Math.round((stats.signups / stats.visitors) * 1000) / 10 : 0;
 
   if (authLoading || loading) {
     return <div className="p-12 text-center text-muted-foreground">Loading…</div>;
@@ -129,7 +140,8 @@ function StaffReferral() {
       <div className="rounded-xl border border-border bg-card p-8 text-center">
         <h1 className="font-display text-2xl font-bold">No referral code yet</h1>
         <p className="mt-2 text-muted-foreground">
-          Your account doesn’t have a personal QR referral set up. Ask an admin to create one tied to your company email.
+          Your account doesn’t have a personal QR referral set up. Ask an admin to create one tied
+          to your company email.
         </p>
       </div>
     );
@@ -139,107 +151,149 @@ function StaffReferral() {
 
   return (
     <div className="space-y-6">
-        <header className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h1 className="font-display text-2xl font-bold">My referral</h1>
-            <p className="text-sm text-muted-foreground">
-              Share your QR or link. Anyone who scans and signs up in the same browser within 90 days is credited to you.
-            </p>
-          </div>
-          <span className={`rounded-full px-3 py-1 text-xs ${staff.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>
-            {staff.active ? "Active" : "Inactive"}
-          </span>
-        </header>
-
-        <section className="grid gap-6 md:grid-cols-[260px_1fr]">
-          <div className="rounded-xl border border-border bg-card p-4">
-            {qrUrl ? (
-              <img src={qrUrl} alt={`QR for ${staff.full_name}`} className="aspect-square w-full rounded-md bg-white object-contain p-2" />
-            ) : (
-              <div className="aspect-square w-full rounded-md bg-muted" />
-            )}
-            <div className="mt-3 text-center">
-              <div className="font-display text-lg font-bold">{staff.full_name}</div>
-              <div className="font-mono text-xs text-muted-foreground">{staff.referral_code}</div>
-            </div>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              {qrUrl && (
-                <a href={qrUrl} download={`${staff.referral_code}.png`}>
-                  <Button variant="outline" size="sm" className="w-full"><Download className="mr-1 h-4 w-4" /> PNG</Button>
-                </a>
-              )}
-              <a href={posterUrl} target="_blank" rel="noreferrer">
-                <Button variant="outline" size="sm" className="w-full"><Printer className="mr-1 h-4 w-4" /> Poster</Button>
-              </a>
-            </div>
-          </div>
-
-          <div className="space-y-4">
-            <div className="rounded-xl border border-border bg-card p-4">
-              <div className="text-xs uppercase tracking-wider text-muted-foreground">Your referral link</div>
-              <div className="mt-1 flex items-center gap-2">
-                <code className="flex-1 truncate rounded bg-muted px-2 py-1 text-sm">{link}</code>
-                <Button size="sm" variant="outline" onClick={() => { navigator.clipboard.writeText(link); toast.success("Copied"); }}>
-                  <Copy className="h-4 w-4" />
-                </Button>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 text-sm">
-              <span className="text-muted-foreground">Range:</span>
-              {(Object.keys(RANGES) as RangeKey[]).map((k) => (
-                <button
-                  key={k}
-                  onClick={() => setRange(k)}
-                  className={`rounded-full px-3 py-1 text-xs ${range === k ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}
-                >
-                  {RANGES[k]}
-                </button>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-              <Kpi icon={<MousePointerClick className="h-4 w-4" />} label="Scans" value={stats.scans.toLocaleString()} />
-              <Kpi icon={<Users className="h-4 w-4" />} label="Unique visitors" value={stats.visitors.toLocaleString()} />
-              <Kpi icon={<UserPlus className="h-4 w-4" />} label="Signups" value={stats.signups.toLocaleString()} />
-              <Kpi icon={<Percent className="h-4 w-4" />} label="Conversion" value={`${conversion}%`} />
-            </div>
-          </div>
-        </section>
-
-        <section className="rounded-xl border border-border bg-card p-4">
-          <h2 className="font-display text-lg font-semibold">My promotions</h2>
-          <p className="text-xs text-muted-foreground">
-            Offers your scanned visitors will see on your landing page. Managed by admins.
+      <header className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="font-display text-2xl font-bold">My referral</h1>
+          <p className="text-sm text-muted-foreground">
+            Share your QR or link. Anyone who scans and signs up in the same browser within 90 days
+            is credited to you.
           </p>
-          {promos.length === 0 ? (
-            <p className="mt-3 text-sm text-muted-foreground">No promotions attached yet.</p>
+        </div>
+        <span
+          className={`rounded-full px-3 py-1 text-xs ${staff.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}
+        >
+          {staff.active ? "Active" : "Inactive"}
+        </span>
+      </header>
+
+      <section className="grid gap-6 md:grid-cols-[260px_1fr]">
+        <div className="rounded-xl border border-border bg-card p-4">
+          {qrUrl ? (
+            <img
+              src={qrUrl}
+              alt={`QR for ${staff.full_name}`}
+              className="aspect-square w-full rounded-md bg-white object-contain p-2"
+            />
           ) : (
-            <ul className="mt-3 space-y-2">
-              {promos.map((p) => (
-                <li key={p.id} className="rounded-md border border-border p-3">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="font-medium">
-                        {p.title}
-                        <span className="ml-2 rounded bg-secondary px-1.5 py-0.5 text-xs uppercase">{p.kind}</span>
-                        {!p.active && <span className="ml-2 rounded bg-muted px-1.5 py-0.5 text-xs">paused</span>}
-                      </div>
-                      {p.description && <p className="text-sm text-muted-foreground">{p.description}</p>}
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        {p.percent_off ? `${p.percent_off}% off · ` : ""}
-                        {p.flat_amount_php ? `₱${p.flat_amount_php} · ` : ""}
-                        applies to {p.applies_to}
-                        {p.ends_at ? ` · ends ${new Date(p.ends_at).toLocaleDateString()}` : ""}
-                      </p>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <div className="aspect-square w-full rounded-md bg-muted" />
           )}
-        </section>
-      </div>
+          <div className="mt-3 text-center">
+            <div className="font-display text-lg font-bold">{staff.full_name}</div>
+            <div className="font-mono text-xs text-muted-foreground">{staff.referral_code}</div>
+          </div>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            {qrUrl && (
+              <a href={qrUrl} download={`${staff.referral_code}.png`}>
+                <Button variant="outline" size="sm" className="w-full">
+                  <Download className="mr-1 h-4 w-4" /> PNG
+                </Button>
+              </a>
+            )}
+            <a href={posterUrl} target="_blank" rel="noreferrer">
+              <Button variant="outline" size="sm" className="w-full">
+                <Printer className="mr-1 h-4 w-4" /> Poster
+              </Button>
+            </a>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="rounded-xl border border-border bg-card p-4">
+            <div className="text-xs uppercase tracking-wider text-muted-foreground">
+              Your referral link
+            </div>
+            <div className="mt-1 flex items-center gap-2">
+              <code className="flex-1 truncate rounded bg-muted px-2 py-1 text-sm">{link}</code>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  navigator.clipboard.writeText(link);
+                  toast.success("Copied");
+                }}
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 text-sm">
+            <span className="text-muted-foreground">Range:</span>
+            {(Object.keys(RANGES) as RangeKey[]).map((k) => (
+              <button
+                key={k}
+                onClick={() => setRange(k)}
+                className={`rounded-full px-3 py-1 text-xs ${range === k ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground"}`}
+              >
+                {RANGES[k]}
+              </button>
+            ))}
+          </div>
+
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            <Kpi
+              icon={<MousePointerClick className="h-4 w-4" />}
+              label="Scans"
+              value={stats.scans.toLocaleString()}
+            />
+            <Kpi
+              icon={<Users className="h-4 w-4" />}
+              label="Unique visitors"
+              value={stats.visitors.toLocaleString()}
+            />
+            <Kpi
+              icon={<UserPlus className="h-4 w-4" />}
+              label="Signups"
+              value={stats.signups.toLocaleString()}
+            />
+            <Kpi
+              icon={<Percent className="h-4 w-4" />}
+              label="Conversion"
+              value={`${conversion}%`}
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="rounded-xl border border-border bg-card p-4">
+        <h2 className="font-display text-lg font-semibold">My promotions</h2>
+        <p className="text-xs text-muted-foreground">
+          Offers your scanned visitors will see on your landing page. Managed by admins.
+        </p>
+        {promos.length === 0 ? (
+          <p className="mt-3 text-sm text-muted-foreground">No promotions attached yet.</p>
+        ) : (
+          <ul className="mt-3 space-y-2">
+            {promos.map((p) => (
+              <li key={p.id} className="rounded-md border border-border p-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="font-medium">
+                      {p.title}
+                      <span className="ml-2 rounded bg-secondary px-1.5 py-0.5 text-xs uppercase">
+                        {p.kind}
+                      </span>
+                      {!p.active && (
+                        <span className="ml-2 rounded bg-muted px-1.5 py-0.5 text-xs">paused</span>
+                      )}
+                    </div>
+                    {p.description && (
+                      <p className="text-sm text-muted-foreground">{p.description}</p>
+                    )}
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      {p.percent_off ? `${p.percent_off}% off · ` : ""}
+                      {p.flat_amount_php ? `₱${p.flat_amount_php} · ` : ""}
+                      applies to {p.applies_to}
+                      {p.ends_at ? ` · ends ${new Date(p.ends_at).toLocaleDateString()}` : ""}
+                    </p>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+    </div>
   );
 }
 

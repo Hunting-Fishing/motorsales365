@@ -92,13 +92,16 @@ export function summarize(events: ImageEvent[]): MetricsSummary {
     .filter((n) => n > 0)
     .sort((a, b) => a - b);
   const pct = (p: number) =>
-    durations.length ? durations[Math.min(durations.length - 1, Math.floor(p * durations.length))] : 0;
+    durations.length
+      ? durations[Math.min(durations.length - 1, Math.floor(p * durations.length))]
+      : 0;
   const total = events.length;
   return {
     total,
     loads: loads.length,
     errors: errors.length,
-    errorRate: loads.length + errors.length > 0 ? errors.length / (loads.length + errors.length) : 0,
+    errorRate:
+      loads.length + errors.length > 0 ? errors.length / (loads.length + errors.length) : 0,
     avgMs: durations.length ? durations.reduce((s, n) => s + n, 0) / durations.length : 0,
     p50Ms: pct(0.5),
     p95Ms: pct(0.95),

@@ -73,9 +73,7 @@ export const searchTransferableUsers = createServerFn({ method: "POST" })
       }),
     );
 
-    const rows = data.includeUnverified
-      ? verified
-      : verified.filter((r) => !!r.email_confirmed_at);
+    const rows = data.includeUnverified ? verified : verified.filter((r) => !!r.email_confirmed_at);
 
     return { rows: rows.slice(0, 20) };
   });

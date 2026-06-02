@@ -1,7 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { Sparkles, Loader2 } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -26,12 +33,22 @@ const TIER_COPY: Record<string, { title: string; blurb: string; perks: string[] 
   featured: {
     title: "Featured",
     blurb: "Sit at the top of your category and on city pages.",
-    perks: ["Everything in Listed", "Top of category & city pages", "\"Featured\" badge on every card", "Higher search rank"],
+    perks: [
+      "Everything in Listed",
+      "Top of category & city pages",
+      '"Featured" badge on every card',
+      "Higher search rank",
+    ],
   },
   premium: {
     title: "Premium",
     blurb: "Maximum reach — homepage rotation plus inquiry leads on every listing.",
-    perks: ["Everything in Featured", "Homepage rotation across vehicle listings", "Lead inbox for inquiries", "Priority support"],
+    perks: [
+      "Everything in Featured",
+      "Homepage rotation across vehicle listings",
+      "Lead inbox for inquiries",
+      "Priority support",
+    ],
   },
 };
 
@@ -47,7 +64,12 @@ interface BusinessPlanDialogProps {
 }
 
 export function BusinessPlanDialog({
-  open, onOpenChange, businessId, businessName, typeSlug, currentTier,
+  open,
+  onOpenChange,
+  businessId,
+  businessName,
+  typeSlug,
+  currentTier,
 }: BusinessPlanDialogProps) {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
@@ -97,7 +119,12 @@ export function BusinessPlanDialog({
         <Tabs value={interval} onValueChange={(v) => setInterval(v as "month" | "year")}>
           <TabsList className="mb-4">
             <TabsTrigger value="month">Monthly</TabsTrigger>
-            <TabsTrigger value="year">Yearly <Badge variant="secondary" className="ml-2">2 months free</Badge></TabsTrigger>
+            <TabsTrigger value="year">
+              Yearly{" "}
+              <Badge variant="secondary" className="ml-2">
+                2 months free
+              </Badge>
+            </TabsTrigger>
           </TabsList>
 
           {(["month", "year"] as const).map((iv) => (
@@ -108,7 +135,8 @@ export function BusinessPlanDialog({
                 </div>
               ) : plans.filter((p) => p.interval === iv).length === 0 ? (
                 <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-                  No plans available for this business type yet. We're adding more — check back soon.
+                  No plans available for this business type yet. We're adding more — check back
+                  soon.
                 </div>
               ) : (
                 <div className="grid gap-3 md:grid-cols-3">
@@ -125,19 +153,28 @@ export function BusinessPlanDialog({
                         }`}
                       >
                         <div className="mb-1 flex items-center justify-between">
-                          <span className="font-display text-lg font-bold capitalize">{copy.title}</span>
-                          {tier === "featured" && <Badge className="bg-primary">Most popular</Badge>}
+                          <span className="font-display text-lg font-bold capitalize">
+                            {copy.title}
+                          </span>
+                          {tier === "featured" && (
+                            <Badge className="bg-primary">Most popular</Badge>
+                          )}
                           {isCurrent && <Badge variant="secondary">Current</Badge>}
                         </div>
                         <div className="mb-2">
-                          <span className="font-display text-2xl font-extrabold">₱{Number(plan.price_php).toLocaleString()}</span>
-                          <span className="text-sm text-muted-foreground">/{plan.interval === "month" ? "mo" : "yr"}</span>
+                          <span className="font-display text-2xl font-extrabold">
+                            ₱{Number(plan.price_php).toLocaleString()}
+                          </span>
+                          <span className="text-sm text-muted-foreground">
+                            /{plan.interval === "month" ? "mo" : "yr"}
+                          </span>
                         </div>
                         <p className="mb-3 text-xs text-muted-foreground">{copy.blurb}</p>
                         <ul className="mb-4 space-y-1 text-xs">
                           {copy.perks.map((p) => (
                             <li key={p} className="flex items-start gap-1.5">
-                              <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-primary" />{p}
+                              <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-primary" />
+                              {p}
                             </li>
                           ))}
                         </ul>
@@ -147,7 +184,11 @@ export function BusinessPlanDialog({
                           disabled={isCurrent || busySlug !== null}
                           onClick={() => startCheckout(plan)}
                         >
-                          {isCurrent ? "Current plan" : busySlug === plan.slug ? "Opening…" : "Choose " + copy.title}
+                          {isCurrent
+                            ? "Current plan"
+                            : busySlug === plan.slug
+                              ? "Opening…"
+                              : "Choose " + copy.title}
                         </Button>
                       </div>
                     );

@@ -10,7 +10,9 @@ import { createBusinessSubscriptionCheckout } from "@/lib/business-subscriptions
 import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/business/checkout")({
-  validateSearch: (search: Record<string, unknown>): { businessId?: string; planSlug?: string } => ({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { businessId?: string; planSlug?: string } => ({
     businessId: typeof search.businessId === "string" ? search.businessId : undefined,
     planSlug: typeof search.planSlug === "string" ? search.planSlug : undefined,
   }),

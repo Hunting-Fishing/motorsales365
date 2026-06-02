@@ -40,9 +40,7 @@ async function uploadViaSignedUrl({
   signal,
   contentType,
 }: UploadOptions): Promise<void> {
-  const { data, error } = await supabase.storage
-    .from(bucket)
-    .createSignedUploadUrl(path);
+  const { data, error } = await supabase.storage.from(bucket).createSignedUploadUrl(path);
   if (error || !data) {
     throw new UploadError(error?.message ?? "Failed to create upload URL", {
       cause: error,
@@ -77,12 +75,9 @@ async function uploadViaSignedUrl({
         );
       }
     };
-    xhr.onerror = () =>
-      reject(new UploadError("Network error during upload", { retriable: true }));
-    xhr.ontimeout = () =>
-      reject(new UploadError("Upload timed out", { retriable: true }));
-    xhr.onabort = () =>
-      reject(new UploadError("Upload cancelled", { retriable: false }));
+    xhr.onerror = () => reject(new UploadError("Network error during upload", { retriable: true }));
+    xhr.ontimeout = () => reject(new UploadError("Upload timed out", { retriable: true }));
+    xhr.onabort = () => reject(new UploadError("Upload cancelled", { retriable: false }));
 
     if (signal) {
       if (signal.aborted) {
@@ -143,8 +138,8 @@ export async function uploadWithRetry(
     }
   }
   if (lastErr instanceof UploadError) throw lastErr;
-  throw new UploadError(
-    lastErr instanceof Error ? lastErr.message : "Upload failed",
-    { cause: lastErr, retriable: false },
-  );
+  throw new UploadError(lastErr instanceof Error ? lastErr.message : "Upload failed", {
+    cause: lastErr,
+    retriable: false,
+  });
 }

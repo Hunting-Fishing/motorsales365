@@ -45,7 +45,9 @@ function ReferralPoster() {
       `}</style>
 
       <div className="no-print sticky top-0 z-10 flex items-center justify-between border-b border-border bg-card px-4 py-3">
-        <div className="text-sm text-muted-foreground">Print this page to A4 for in-store display.</div>
+        <div className="text-sm text-muted-foreground">
+          Print this page to A4 for in-store display.
+        </div>
         <Button onClick={() => window.print()}>
           <Printer className="mr-2 h-4 w-4" /> Print
         </Button>
@@ -58,13 +60,18 @@ function ReferralPoster() {
             Buy. Sell. Tow. <span className="text-primary">Get an exclusive offer.</span>
           </h1>
           <p className="mx-auto mt-3 max-w-md text-neutral-600">
-            Scan with your phone camera to see {name?.split(" ")[0] || "our"} personal offers and create an account.
+            Scan with your phone camera to see {name?.split(" ")[0] || "our"} personal offers and
+            create an account.
           </p>
         </header>
 
         <div className="mt-10 flex flex-col items-center">
           {qrDataUrl ? (
-            <img src={qrDataUrl} alt={`QR for ${name || code}`} className="h-[260px] w-[260px] rounded-md border border-neutral-200 p-2" />
+            <img
+              src={qrDataUrl}
+              alt={`QR for ${name || code}`}
+              className="h-[260px] w-[260px] rounded-md border border-neutral-200 p-2"
+            />
           ) : (
             <div className="h-[260px] w-[260px] animate-pulse rounded-md bg-neutral-100" />
           )}
@@ -74,7 +81,8 @@ function ReferralPoster() {
               Code <span className="font-mono">{code}</span>
             </div>
             <div className="mt-1 text-sm text-neutral-500">
-              {typeof window !== "undefined" ? window.location.origin : "365motorsales.com"}/r/{code}
+              {typeof window !== "undefined" ? window.location.origin : "365motorsales.com"}/r/
+              {code}
             </div>
             {!active && (
               <div className="mt-2 inline-block rounded bg-yellow-100 px-2 py-0.5 text-xs text-yellow-800">
@@ -85,7 +93,8 @@ function ReferralPoster() {
         </div>
 
         <footer className="mt-10 border-t border-neutral-200 pt-6 text-center text-xs text-neutral-500">
-          Offers are subject to terms shown after scan. Credit is recorded on first scan from a device for 90 days.
+          Offers are subject to terms shown after scan. Credit is recorded on first scan from a
+          device for 90 days.
         </footer>
       </main>
     </div>

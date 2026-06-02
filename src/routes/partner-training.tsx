@@ -11,9 +11,17 @@ export const Route = createFileRoute("/partner-training")({
   head: () => ({
     meta: [
       { title: "Partner Training Schools — 365 Motorsales" },
-      { name: "description", content: "Independent automotive training facilities partnered with 365 Motorsales. Sponsored placements clearly labeled." },
+      {
+        name: "description",
+        content:
+          "Independent automotive training facilities partnered with 365 Motorsales. Sponsored placements clearly labeled.",
+      },
       { property: "og:title", content: "Partner Training Schools — 365 Motorsales" },
-      { property: "og:description", content: "Discover external auto training schools — paid sponsored listings, clearly disclosed." },
+      {
+        property: "og:description",
+        content:
+          "Discover external auto training schools — paid sponsored listings, clearly disclosed.",
+      },
     ],
   }),
   component: PartnersPage,
@@ -28,10 +36,16 @@ function PartnersPage() {
   return (
     <SiteLayout>
       <div className="container mx-auto px-4 py-10">
-        <Link to="/learn" className="text-sm text-muted-foreground hover:underline">← 365 Learn</Link>
-        <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Partner Training Schools</h1>
+        <Link to="/learn" className="text-sm text-muted-foreground hover:underline">
+          ← 365 Learn
+        </Link>
+        <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+          Partner Training Schools
+        </h1>
         <p className="mt-2 max-w-2xl text-muted-foreground">
-          Independent auto training facilities. Listings here are <strong>paid sponsored placements</strong> — 365 Motorsales does not certify or endorse the curriculum. Always verify accreditation before enrolling.
+          Independent auto training facilities. Listings here are{" "}
+          <strong>paid sponsored placements</strong> — 365 Motorsales does not certify or endorse
+          the curriculum. Always verify accreditation before enrolling.
         </p>
 
         {featured.length > 0 && (
@@ -40,7 +54,9 @@ function PartnersPage() {
               <Sparkles className="h-5 w-5 text-primary" /> Featured partners
             </h2>
             <div className="mt-3 grid gap-4 sm:grid-cols-2">
-              {featured.map((p) => <PartnerCard key={p.id} p={p} />)}
+              {featured.map((p) => (
+                <PartnerCard key={p.id} p={p} />
+              ))}
             </div>
           </>
         )}
@@ -49,7 +65,9 @@ function PartnersPage() {
           <>
             <h2 className="mt-10 text-xl font-semibold">All partners</h2>
             <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {standard.map((p) => <PartnerCard key={p.id} p={p} />)}
+              {standard.map((p) => (
+                <PartnerCard key={p.id} p={p} />
+              ))}
             </div>
           </>
         )}
@@ -65,7 +83,10 @@ function PartnersPage() {
 
         <div className="mt-16 rounded-xl border bg-muted/50 p-6 text-sm">
           <h3 className="font-semibold">Want to be listed here?</h3>
-          <p className="mt-1 text-muted-foreground">Sponsored partner placements are available to accredited training schools. Get in touch to discuss featured vs. standard slots and pricing.</p>
+          <p className="mt-1 text-muted-foreground">
+            Sponsored partner placements are available to accredited training schools. Get in touch
+            to discuss featured vs. standard slots and pricing.
+          </p>
           <Button asChild variant="outline" className="mt-3">
             <Link to="/contact">Contact our partnerships team</Link>
           </Button>
@@ -90,7 +111,9 @@ function PartnerCard({ p }: { p: any }) {
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2">
               <h3 className="truncate font-semibold">{p.name}</h3>
-              <Badge variant="outline" className="text-[10px]">Sponsored</Badge>
+              <Badge variant="outline" className="text-[10px]">
+                Sponsored
+              </Badge>
             </div>
             {p.location && (
               <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
@@ -103,12 +126,18 @@ function PartnerCard({ p }: { p: any }) {
         {(p.specialties ?? []).length > 0 && (
           <div className="mt-3 flex flex-wrap gap-1">
             {p.specialties.map((s: string) => (
-              <Badge key={s} variant="secondary" className="text-[10px]">{s}</Badge>
+              <Badge key={s} variant="secondary" className="text-[10px]">
+                {s}
+              </Badge>
             ))}
           </div>
         )}
         <Button asChild variant="outline" size="sm" className="mt-4 w-full">
-          <a href={`/api/public/training-partners/${p.id}/click`} target="_blank" rel="noopener sponsored noreferrer">
+          <a
+            href={`/api/public/training-partners/${p.id}/click`}
+            target="_blank"
+            rel="noopener sponsored noreferrer"
+          >
             Visit website <ExternalLink className="ml-1 h-3 w-3" />
           </a>
         </Button>

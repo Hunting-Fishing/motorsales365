@@ -9,7 +9,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { LocationPicker } from "@/components/location-picker";
 import { useAuth } from "@/hooks/use-auth";
@@ -24,7 +28,11 @@ export const Route = createFileRoute("/sell/import")({
   head: () => ({
     meta: [
       { title: "Import from Facebook Marketplace — 365 MotorSales" },
-      { name: "description", content: "Import your Facebook Marketplace listing to 365 MotorSales. Verify your FB profile to prove the listing is yours." },
+      {
+        name: "description",
+        content:
+          "Import your Facebook Marketplace listing to 365 MotorSales. Verify your FB profile to prove the listing is yours.",
+      },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -108,7 +116,9 @@ function ImportPage() {
         return;
       }
       if (!res.extracted.sellerProfileUrl) {
-        toast.error("Could not find the seller's profile link on that page. Try a different listing URL.");
+        toast.error(
+          "Could not find the seller's profile link on that page. Try a different listing URL.",
+        );
         return;
       }
       if (res.alreadyVerified) {
@@ -171,7 +181,10 @@ function ImportPage() {
             price_php: Number(price) || 0,
             category_slug: category,
             condition,
-            region, province, city, barangay,
+            region,
+            province,
+            city,
+            barangay,
             contact_phone: phone || null,
           },
           photoUrls: Array.from(selectedPhotos),
@@ -187,14 +200,21 @@ function ImportPage() {
   };
 
   if (authLoading) {
-    return <SiteLayout><div className="p-12 text-center">Loading…</div></SiteLayout>;
+    return (
+      <SiteLayout>
+        <div className="p-12 text-center">Loading…</div>
+      </SiteLayout>
+    );
   }
 
   return (
     <SiteLayout>
       <div className="container mx-auto max-w-3xl px-4 py-10">
         <Button asChild variant="ghost" size="sm" className="mb-4">
-          <Link to="/sell"><ArrowLeft className="mr-2 h-4 w-4" />Back to manual posting</Link>
+          <Link to="/sell">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to manual posting
+          </Link>
         </Button>
         <h1 className="font-display text-3xl font-bold">Import from Facebook Marketplace</h1>
         <p className="text-muted-foreground">
@@ -202,7 +222,10 @@ function ImportPage() {
         </p>
 
         {step === "url" && (
-          <form onSubmit={onScrape} className="mt-8 space-y-4 rounded-xl border border-border bg-card p-6">
+          <form
+            onSubmit={onScrape}
+            className="mt-8 space-y-4 rounded-xl border border-border bg-card p-6"
+          >
             <div>
               <Label htmlFor="fb-url">Facebook Marketplace URL</Label>
               <Input
@@ -218,52 +241,104 @@ function ImportPage() {
               </p>
             </div>
             <Button type="submit" disabled={busy || !url} className="w-full">
-              {busy ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Importing…</> : "Import listing"}
+              {busy ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Importing…
+                </>
+              ) : (
+                "Import listing"
+              )}
             </Button>
             <p className="text-xs text-muted-foreground">
-              Limit: 10 imports per day. Only your own listings — we verify Facebook profile ownership.
+              Limit: 10 imports per day. Only your own listings — we verify Facebook profile
+              ownership.
             </p>
           </form>
         )}
 
         {step === "verify" && extracted && (
           <div className="mt-8 space-y-4 rounded-xl border border-border bg-card p-6">
-            <h2 className="font-display text-lg font-semibold">Verify this is your Facebook profile</h2>
+            <h2 className="font-display text-lg font-semibold">
+              Verify this is your Facebook profile
+            </h2>
             <p className="text-sm text-muted-foreground">
-              To stop scammers from re-posting other people's listings, prove you own this FB profile:
+              To stop scammers from re-posting other people's listings, prove you own this FB
+              profile:
             </p>
             <div className="rounded-md border border-border bg-secondary/30 p-3 text-sm">
               <div className="text-xs text-muted-foreground">Seller profile detected:</div>
-              <a href={extracted.sellerProfileUrl} target="_blank" rel="noreferrer"
-                className="font-mono break-all text-primary hover:underline">
+              <a
+                href={extracted.sellerProfileUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="font-mono break-all text-primary hover:underline"
+              >
                 {extracted.sellerProfileUrl} <ExternalLink className="inline h-3 w-3" />
               </a>
             </div>
 
             {!verificationCode ? (
               <Button onClick={onStartVerify} disabled={busy} className="w-full">
-                {busy ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Generating code…</> : "Generate verification code"}
+                {busy ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Generating code…
+                  </>
+                ) : (
+                  "Generate verification code"
+                )}
               </Button>
             ) : (
               <>
                 <ol className="list-decimal space-y-2 pl-5 text-sm">
-                  <li>Copy this verification code:
+                  <li>
+                    Copy this verification code:
                     <div className="mt-2 flex items-center gap-2 rounded-md border border-border bg-background p-2">
-                      <code className="flex-1 font-mono text-base font-bold">{verificationCode}</code>
-                      <Button type="button" size="sm" variant="outline"
-                        onClick={() => { navigator.clipboard.writeText(verificationCode); toast.success("Copied"); }}>
+                      <code className="flex-1 font-mono text-base font-bold">
+                        {verificationCode}
+                      </code>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => {
+                          navigator.clipboard.writeText(verificationCode);
+                          toast.success("Copied");
+                        }}
+                      >
                         <Copy className="h-3 w-3" />
                       </Button>
                     </div>
                   </li>
-                  <li>Go to your <a href={extracted.sellerProfileUrl} target="_blank" rel="noreferrer" className="text-primary underline">Facebook profile</a>, click <strong>Edit Bio</strong> (or Edit Intro), and paste the code anywhere in the bio. Make sure visibility is set to <strong>Public</strong>.</li>
+                  <li>
+                    Go to your{" "}
+                    <a
+                      href={extracted.sellerProfileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-primary underline"
+                    >
+                      Facebook profile
+                    </a>
+                    , click <strong>Edit Bio</strong> (or Edit Intro), and paste the code anywhere
+                    in the bio. Make sure visibility is set to <strong>Public</strong>.
+                  </li>
                   <li>Save your FB profile, then click below.</li>
                 </ol>
                 <Button onClick={onCheckVerify} disabled={busy} className="w-full">
-                  {busy ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Checking…</> : "I added the code — verify now"}
+                  {busy ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Checking…
+                    </>
+                  ) : (
+                    "I added the code — verify now"
+                  )}
                 </Button>
                 <p className="text-xs text-muted-foreground">
-                  After verifying you can remove the code from your bio. We won't ask again for 90 days.
+                  After verifying you can remove the code from your bio. We won't ask again for 90
+                  days.
                 </p>
               </>
             )}
@@ -283,16 +358,24 @@ function ImportPage() {
                 <div>
                   <Label>Category</Label>
                   <Select value={category} onValueChange={setCategory}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
-                      {CATEGORIES.map((c) => <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>)}
+                      {CATEGORIES.map((c) => (
+                        <SelectItem key={c.slug} value={c.slug}>
+                          {c.name}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <Label>Condition</Label>
                   <Select value={condition} onValueChange={setCondition}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Brand new">Brand new</SelectItem>
                       <SelectItem value="Used">Used</SelectItem>
@@ -306,15 +389,29 @@ function ImportPage() {
                 </div>
                 <div>
                   <Label>Price (₱)</Label>
-                  <Input type="number" min="0" required value={price} onChange={(e) => setPrice(e.target.value)} />
+                  <Input
+                    type="number"
+                    min="0"
+                    required
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                  />
                 </div>
                 <div>
                   <Label>Contact phone (optional)</Label>
-                  <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+63 9XX XXX XXXX" />
+                  <Input
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+63 9XX XXX XXXX"
+                  />
                 </div>
                 <div className="sm:col-span-2">
                   <Label>Description</Label>
-                  <Textarea rows={6} value={description} onChange={(e) => setDescription(e.target.value)} />
+                  <Textarea
+                    rows={6}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  />
                 </div>
               </div>
             </section>
@@ -322,7 +419,9 @@ function ImportPage() {
             <section className="space-y-4 rounded-xl border border-border bg-card p-6">
               <h2 className="font-display text-lg font-semibold">Location</h2>
               {extracted.locationText && (
-                <p className="text-xs text-muted-foreground">Detected from FB: "{extracted.locationText}" — please confirm below.</p>
+                <p className="text-xs text-muted-foreground">
+                  Detected from FB: "{extracted.locationText}" — please confirm below.
+                </p>
               )}
               <LocationPicker
                 value={{ region, province, city, barangay }}
@@ -336,8 +435,12 @@ function ImportPage() {
             </section>
 
             <section className="space-y-4 rounded-xl border border-border bg-card p-6">
-              <h2 className="font-display text-lg font-semibold">Photos ({selectedPhotos.size}/{extracted.images.length})</h2>
-              <p className="text-xs text-muted-foreground">Untick any photos you don't want. We'll download and re-host the selected ones.</p>
+              <h2 className="font-display text-lg font-semibold">
+                Photos ({selectedPhotos.size}/{extracted.images.length})
+              </h2>
+              <p className="text-xs text-muted-foreground">
+                Untick any photos you don't want. We'll download and re-host the selected ones.
+              </p>
               <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
                 {extracted.images.map((src) => {
                   const checked = selectedPhotos.has(src);
@@ -347,12 +450,18 @@ function ImportPage() {
                       key={src}
                       onClick={() => {
                         const next = new Set(selectedPhotos);
-                        if (checked) next.delete(src); else next.add(src);
+                        if (checked) next.delete(src);
+                        else next.add(src);
                         setSelectedPhotos(next);
                       }}
                       className={`relative aspect-square overflow-hidden rounded-md border-2 ${checked ? "border-primary" : "border-transparent opacity-50"}`}
                     >
-                      <img src={src} alt="" className="h-full w-full object-cover" referrerPolicy="no-referrer" />
+                      <img
+                        src={src}
+                        alt=""
+                        className="h-full w-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
                       {checked && (
                         <div className="absolute right-1 top-1 rounded-full bg-primary p-1 text-primary-foreground">
                           <CheckCircle2 className="h-3 w-3" />
@@ -363,14 +472,26 @@ function ImportPage() {
                 })}
               </div>
               {extracted.images.length === 0 && (
-                <p className="text-sm text-muted-foreground">No photos were extracted. You can add some on the edit screen after the draft is created.</p>
+                <p className="text-sm text-muted-foreground">
+                  No photos were extracted. You can add some on the edit screen after the draft is
+                  created.
+                </p>
               )}
             </section>
 
             <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => setStep("url")}>Start over</Button>
+              <Button type="button" variant="outline" onClick={() => setStep("url")}>
+                Start over
+              </Button>
               <Button type="submit" disabled={busy} size="lg">
-                {busy ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" />Creating draft…</> : "Create draft listing"}
+                {busy ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating draft…
+                  </>
+                ) : (
+                  "Create draft listing"
+                )}
               </Button>
             </div>
           </form>

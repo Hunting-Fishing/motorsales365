@@ -19,7 +19,7 @@ export function ListingPrice({
   size?: "sm" | "md" | "lg";
 }) {
   const { code, current, format } = useCurrency();
-  const amount = typeof pricePhp === "string" ? parseFloat(pricePhp) : pricePhp ?? 0;
+  const amount = typeof pricePhp === "string" ? parseFloat(pricePhp) : (pricePhp ?? 0);
   const showConversion = code !== "PHP" && current.rate_to_php > 0 && amount > 0;
 
   const primarySize =
@@ -38,7 +38,8 @@ export function ListingPrice({
         <div className={cn("mt-0.5 text-muted-foreground", secondarySize)}>
           ≈ <span className="font-semibold text-foreground">{format(amount)}</span>{" "}
           <span className="opacity-70">
-            (1 {current.code} ≈ ₱{current.rate_to_php.toLocaleString("en-US", { maximumFractionDigits: 2 })})
+            (1 {current.code} ≈ ₱
+            {current.rate_to_php.toLocaleString("en-US", { maximumFractionDigits: 2 })})
           </span>
         </div>
       )}

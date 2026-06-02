@@ -3,8 +3,12 @@ import { Plus, Trash2, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  DAY_KEYS, DAY_LABELS, emptyWeek,
-  type DayKey, type WeekSchedule, type DaySchedule,
+  DAY_KEYS,
+  DAY_LABELS,
+  emptyWeek,
+  type DayKey,
+  type WeekSchedule,
+  type DaySchedule,
 } from "@/lib/business-hours";
 
 type Props = {
@@ -18,7 +22,9 @@ export function WeekHoursEditor({ value, onChange }: Props) {
   const copyMondayToWeekdays = () => {
     const mon = value.mon;
     const next = { ...value };
-    (["tue", "wed", "thu", "fri"] as DayKey[]).forEach((d) => { next[d] = clone(mon); });
+    (["tue", "wed", "thu", "fri"] as DayKey[]).forEach((d) => {
+      next[d] = clone(mon);
+    });
     onChange(next);
   };
   const copyMondayToWeekend = () => {
@@ -31,12 +37,16 @@ export function WeekHoursEditor({ value, onChange }: Props) {
     <div className="space-y-2">
       <div className="mb-1 flex flex-wrap gap-2">
         <Button type="button" size="sm" variant="outline" onClick={copyMondayToWeekdays}>
-          <Copy className="mr-1 h-3 w-3" />Copy Mon → weekdays
+          <Copy className="mr-1 h-3 w-3" />
+          Copy Mon → weekdays
         </Button>
         <Button type="button" size="sm" variant="outline" onClick={copyMondayToWeekend}>
-          <Copy className="mr-1 h-3 w-3" />Copy Mon → weekend
+          <Copy className="mr-1 h-3 w-3" />
+          Copy Mon → weekend
         </Button>
-        <Button type="button" size="sm" variant="ghost" onClick={setAllClosed}>Reset all to closed</Button>
+        <Button type="button" size="sm" variant="ghost" onClick={setAllClosed}>
+          Reset all to closed
+        </Button>
       </div>
       <div className="divide-y rounded-lg border">
         {DAY_KEYS.map((d) => (
@@ -51,13 +61,24 @@ function clone(s: DaySchedule): DaySchedule {
   return JSON.parse(JSON.stringify(s));
 }
 
-function DayRow({ day, value, onChange }: { day: DayKey; value: DaySchedule; onChange: (s: DaySchedule) => void }) {
+function DayRow({
+  day,
+  value,
+  onChange,
+}: {
+  day: DayKey;
+  value: DaySchedule;
+  onChange: (s: DaySchedule) => void;
+}) {
   const mode = value?.mode ?? "closed";
   const ranges = value?.ranges ?? [];
 
   const setMode = (m: DaySchedule["mode"]) => {
     if (m === "open") {
-      onChange({ mode: "open", ranges: ranges.length ? ranges : [{ open: "09:00", close: "18:00" }] });
+      onChange({
+        mode: "open",
+        ranges: ranges.length ? ranges : [{ open: "09:00", close: "18:00" }],
+      });
     } else {
       onChange({ mode: m });
     }
@@ -84,7 +105,9 @@ function DayRow({ day, value, onChange }: { day: DayKey; value: DaySchedule; onC
             type="button"
             onClick={() => setMode(m)}
             className={`rounded px-2 py-1 transition-colors ${
-              mode === m ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
+              mode === m
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground"
             }`}
           >
             {m === "open" ? "Open" : m === "24h" ? "24 hours" : "Closed"}
@@ -109,7 +132,13 @@ function DayRow({ day, value, onChange }: { day: DayKey; value: DaySchedule; onC
                 className="h-8 w-28 text-xs"
               />
               {ranges.length > 1 && (
-                <Button type="button" size="icon" variant="ghost" className="h-7 w-7" onClick={() => removeRange(i)}>
+                <Button
+                  type="button"
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7"
+                  onClick={() => removeRange(i)}
+                >
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               )}
@@ -117,7 +146,8 @@ function DayRow({ day, value, onChange }: { day: DayKey; value: DaySchedule; onC
           ))}
           {ranges.length < 2 && (
             <Button type="button" size="sm" variant="ghost" onClick={addRange}>
-              <Plus className="mr-1 h-3 w-3" />Split
+              <Plus className="mr-1 h-3 w-3" />
+              Split
             </Button>
           )}
         </div>

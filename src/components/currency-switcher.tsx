@@ -29,9 +29,7 @@ export function CurrencySwitcher({ compact = false }: { compact?: boolean }) {
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel className="text-xs">
           Display currency
-          <div className="mt-0.5 font-normal text-muted-foreground">
-            Prices are billed in PHP.
-          </div>
+          <div className="mt-0.5 font-normal text-muted-foreground">Prices are billed in PHP.</div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {loading ? (

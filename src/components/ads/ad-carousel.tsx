@@ -11,7 +11,14 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 
-type Placement = "home_carousel" | "browse_top" | "rides_top" | "listing_sidebar" | "export_top" | "shop_top" | "shop_sidebar";
+type Placement =
+  | "home_carousel"
+  | "browse_top"
+  | "rides_top"
+  | "listing_sidebar"
+  | "export_top"
+  | "shop_top"
+  | "shop_sidebar";
 
 interface AdCarouselProps {
   placement: Placement;
@@ -45,14 +52,18 @@ export function AdCarousel({ placement, limit = 6, className }: AdCarouselProps)
     ads.forEach((ad: any) => {
       if (trackedRef.current.has(ad.id)) return;
       trackedRef.current.add(ad.id);
-      trackAdEvent({ data: { adId: ad.id, eventType: "impression", visitorId: visitorId || undefined } }).catch(() => {});
+      trackAdEvent({
+        data: { adId: ad.id, eventType: "impression", visitorId: visitorId || undefined },
+      }).catch(() => {});
     });
   }, [ads, visitorId]);
 
   if (!ads.length) return null;
 
   const handleClick = (adId: string) => {
-    trackAdEvent({ data: { adId, eventType: "click", visitorId: visitorId || undefined } }).catch(() => {});
+    trackAdEvent({ data: { adId, eventType: "click", visitorId: visitorId || undefined } }).catch(
+      () => {},
+    );
   };
 
   if (ads.length === 1) {
@@ -65,8 +76,14 @@ export function AdCarousel({ placement, limit = 6, className }: AdCarouselProps)
         onClick={() => handleClick(ad.id)}
         className={`group relative block overflow-hidden rounded-xl border bg-card ${className ?? ""}`}
       >
-        <ImageWithSkeleton src={ad.image_url} alt={ad.title} className="aspect-[21/9] w-full object-cover transition-transform group-hover:scale-[1.02]" />
-        <Badge variant="secondary" className="absolute right-3 top-3 backdrop-blur">Sponsored</Badge>
+        <ImageWithSkeleton
+          src={ad.image_url}
+          alt={ad.title}
+          className="aspect-[21/9] w-full object-cover transition-transform group-hover:scale-[1.02]"
+        />
+        <Badge variant="secondary" className="absolute right-3 top-3 backdrop-blur">
+          Sponsored
+        </Badge>
         {(ad.caption || ad.title) && (
           <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4">
             <p className="font-semibold text-white">{ad.title}</p>
@@ -89,8 +106,14 @@ export function AdCarousel({ placement, limit = 6, className }: AdCarouselProps)
               onClick={() => handleClick(ad.id)}
               className="group relative block overflow-hidden rounded-xl border bg-card"
             >
-              <ImageWithSkeleton src={ad.image_url} alt={ad.title} className="aspect-[21/9] w-full object-cover transition-transform group-hover:scale-[1.02]" />
-              <Badge variant="secondary" className="absolute right-3 top-3 backdrop-blur">Sponsored</Badge>
+              <ImageWithSkeleton
+                src={ad.image_url}
+                alt={ad.title}
+                className="aspect-[21/9] w-full object-cover transition-transform group-hover:scale-[1.02]"
+              />
+              <Badge variant="secondary" className="absolute right-3 top-3 backdrop-blur">
+                Sponsored
+              </Badge>
               <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-4">
                 <p className="font-semibold text-white">{ad.title}</p>
                 {ad.caption && <p className="text-sm text-white/80">{ad.caption}</p>}

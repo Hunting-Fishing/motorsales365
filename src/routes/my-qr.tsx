@@ -24,7 +24,10 @@ function MyQrPage() {
 
   useEffect(() => {
     if (loading) return;
-    if (!user) { setFetching(false); return; }
+    if (!user) {
+      setFetching(false);
+      return;
+    }
     (async () => {
       const { data } = await sb
         .from("staff_referrals")
@@ -48,14 +51,18 @@ function MyQrPage() {
   }, [user, loading]);
 
   if (loading || fetching) {
-    return <div className="container mx-auto px-4 py-16 text-center text-muted-foreground">Loading…</div>;
+    return (
+      <div className="container mx-auto px-4 py-16 text-center text-muted-foreground">Loading…</div>
+    );
   }
 
   if (!user) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <h1 className="font-display text-2xl font-bold">Sign in to view your QR code</h1>
-        <p className="mt-2 text-muted-foreground">Your personal referral QR is only available to your account.</p>
+        <p className="mt-2 text-muted-foreground">
+          Your personal referral QR is only available to your account.
+        </p>
         <Link to="/login" className="mt-4 inline-block">
           <Button>Sign in</Button>
         </Link>
@@ -67,7 +74,9 @@ function MyQrPage() {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <h1 className="font-display text-2xl font-bold">No referral code yet</h1>
-        <p className="mt-2 text-muted-foreground">You don't have a staff referral code assigned to your account.</p>
+        <p className="mt-2 text-muted-foreground">
+          You don't have a staff referral code assigned to your account.
+        </p>
       </div>
     );
   }
@@ -77,7 +86,9 @@ function MyQrPage() {
   return (
     <div className="container mx-auto max-w-xl px-4 py-10">
       <div className="mb-6 text-center">
-        <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Your referral</div>
+        <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+          Your referral
+        </div>
         <h1 className="mt-2 font-display text-3xl font-bold">{name || "My QR Code"}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
           Show or share this code. Every scan and signup is credited to you.

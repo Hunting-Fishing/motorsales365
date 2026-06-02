@@ -7,7 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PhoneInput } from "@/components/phone-input";
@@ -42,14 +48,21 @@ const inquirySchema = z.object({
   contact_name: z.string().trim().min(1, "Required").max(100, "Max 100 characters"),
   company: z.string().trim().max(120, "Max 120 characters").optional().or(z.literal("")),
   email: z.string().trim().toLowerCase().email("Invalid email").max(255),
-  phone: z.string().trim().max(30, "Max 30 characters")
-    .regex(/^[+\d][\d\s\-().]*$/u, "Digits, spaces, + - ( ) only").optional().or(z.literal("")),
+  phone: z
+    .string()
+    .trim()
+    .max(30, "Max 30 characters")
+    .regex(/^[+\d][\d\s\-().]*$/u, "Digits, spaces, + - ( ) only")
+    .optional()
+    .or(z.literal("")),
   placement: z.enum(PLACEMENTS.map((p) => p.value) as [string, ...string[]]),
   budget_range: z.string().trim().max(60, "Max 60 characters").optional().or(z.literal("")),
-  start_date: z.string().trim().refine(
-    (v) => !v || v >= todayIso(),
-    "Start date must be today or later",
-  ).optional().or(z.literal("")),
+  start_date: z
+    .string()
+    .trim()
+    .refine((v) => !v || v >= todayIso(), "Start date must be today or later")
+    .optional()
+    .or(z.literal("")),
   message: z.string().trim().min(10, "At least 10 characters").max(2000, "Max 2000 characters"),
 });
 
@@ -127,8 +140,8 @@ function AdvertisePage() {
             </h1>
             <p className="mt-4 text-lg text-muted-foreground">
               365 MotorSales is the Philippines' growing marketplace for cars, motorcycles, boats,
-              airplanes, and heavy equipment. We work with dealers, financiers, insurers, parts brands,
-              and service providers across the country.
+              airplanes, and heavy equipment. We work with dealers, financiers, insurers, parts
+              brands, and service providers across the country.
             </p>
 
             <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -222,10 +235,7 @@ function AdvertisePage() {
                   </Field>
                 </div>
                 <Field label="Placement" error={errors.placement}>
-                  <Select
-                    value={form.placement}
-                    onValueChange={(v) => update("placement", v)}
-                  >
+                  <Select value={form.placement} onValueChange={(v) => update("placement", v)}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -288,16 +298,29 @@ function AdvertisePage() {
 function Feature({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
   return (
     <div className="rounded-xl border border-border bg-secondary/40 p-4">
-      <div className="flex items-center gap-2 text-primary">{icon}<span className="text-sm font-semibold text-foreground">{title}</span></div>
+      <div className="flex items-center gap-2 text-primary">
+        {icon}
+        <span className="text-sm font-semibold text-foreground">{title}</span>
+      </div>
       <p className="mt-1 text-sm text-muted-foreground">{body}</p>
     </div>
   );
 }
 
-function Field({ label, error, children }: { label: string; error?: string; children: React.ReactNode }) {
+function Field({
+  label,
+  error,
+  children,
+}: {
+  label: string;
+  error?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-1.5">
-      <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</Label>
+      <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </Label>
       {children}
       {error && <p className="text-xs text-destructive">{error}</p>}
     </div>

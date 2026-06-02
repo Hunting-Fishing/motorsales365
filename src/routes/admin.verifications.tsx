@@ -8,9 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import {
-  Tabs, TabsContent, TabsList, TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/admin/verifications")({
@@ -39,10 +37,15 @@ function AdminVerifications() {
       .order("submitted_at", { ascending: false });
     setRequests(data ?? []);
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   useEffect(() => {
-    if (!selected) { setDocUrls([]); return; }
+    if (!selected) {
+      setDocUrls([]);
+      return;
+    }
     const loadUrls = async () => {
       const docs = (selected.documents ?? []) as { path: string; name: string }[];
       const urls = await Promise.all(
@@ -70,9 +73,16 @@ function AdminVerifications() {
         reviewed_at: new Date().toISOString(),
       })
       .eq("id", selected.id);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success(
-      status === "approved" ? "Approved" : status === "rejected" ? "Rejected" : "Requested more info",
+      status === "approved"
+        ? "Approved"
+        : status === "rejected"
+          ? "Rejected"
+          : "Requested more info",
     );
     setSelected(null);
     load();
@@ -93,8 +103,11 @@ function AdminVerifications() {
       <Tabs value={tab} onValueChange={setTab}>
         <TabsList>
           <TabsTrigger value="pending">
-            Pending {requests.filter((r) => r.status === "pending").length > 0 && (
-              <Badge variant="secondary" className="ml-2">{requests.filter((r) => r.status === "pending").length}</Badge>
+            Pending{" "}
+            {requests.filter((r) => r.status === "pending").length > 0 && (
+              <Badge variant="secondary" className="ml-2">
+                {requests.filter((r) => r.status === "pending").length}
+              </Badge>
             )}
           </TabsTrigger>
           <TabsTrigger value="more_info">More info</TabsTrigger>
@@ -109,21 +122,23 @@ function AdminVerifications() {
                 <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
                   No requests in this state.
                 </div>
-              ) : filtered.map((r) => (
-                <button
-                  key={r.id}
-                  onClick={() => setSelected(r)}
-                  className={`flex w-full flex-wrap items-center justify-between gap-3 rounded-lg border bg-card p-4 text-left transition-colors hover:border-primary ${selected?.id === r.id ? "border-primary" : "border-border"}`}
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="font-medium">{r.legal_name}</div>
-                    <div className="text-xs text-muted-foreground">
-                      {KIND_LABEL[r.business_kind]} · submitted {formatDate(r.submitted_at)}
+              ) : (
+                filtered.map((r) => (
+                  <button
+                    key={r.id}
+                    onClick={() => setSelected(r)}
+                    className={`flex w-full flex-wrap items-center justify-between gap-3 rounded-lg border bg-card p-4 text-left transition-colors hover:border-primary ${selected?.id === r.id ? "border-primary" : "border-border"}`}
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium">{r.legal_name}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {KIND_LABEL[r.business_kind]} · submitted {formatDate(r.submitted_at)}
+                      </div>
                     </div>
-                  </div>
-                  <StatusBadge status={r.status} />
-                </button>
-              ))}
+                    <StatusBadge status={r.status} />
+                  </button>
+                ))
+              )}
             </div>
 
             <aside className="rounded-xl border border-border bg-card p-5 lg:sticky lg:top-20 lg:self-start">
@@ -141,12 +156,24 @@ function AdminVerifications() {
                     <StatusBadge status={selected.status} />
                   </div>
 
-                  <DetailRow label="Submitted by" value={selected.profiles?.business_name ?? selected.profiles?.full_name ?? selected.user_id} />
+                  <DetailRow
+                    label="Submitted by"
+                    value={
+                      selected.profiles?.business_name ??
+                      selected.profiles?.full_name ??
+                      selected.user_id
+                    }
+                  />
                   <DetailRow label="DTI/SEC #" value={selected.dti_sec_registration} />
                   <DetailRow label="Tax ID" value={selected.tax_id} />
                   <DetailRow label="Phone" value={selected.contact_phone} />
                   <DetailRow label="Email" value={selected.contact_email} />
-                  <DetailRow label="Address" value={[selected.address, selected.city, selected.region].filter(Boolean).join(", ")} />
+                  <DetailRow
+                    label="Address"
+                    value={[selected.address, selected.city, selected.region]
+                      .filter(Boolean)
+                      .join(", ")}
+                  />
 
                   <div>
                     <div className="mb-1 text-xs font-medium text-muted-foreground">Documents</div>

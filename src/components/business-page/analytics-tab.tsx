@@ -2,7 +2,31 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { getBusinessAnalytics } from "@/lib/business-analytics.functions";
-import { Eye, MousePointerClick, CalendarCheck2, TrendingUp, Phone, MessageCircle, Share2, Mail, Compass, Search, Tag, Megaphone, Globe2, Link2, Share, ListOrdered, Smartphone, Monitor, Tablet, Bot, HelpCircle, MapPin, Building2 } from "lucide-react";
+import {
+  Eye,
+  MousePointerClick,
+  CalendarCheck2,
+  TrendingUp,
+  Phone,
+  MessageCircle,
+  Share2,
+  Mail,
+  Compass,
+  Search,
+  Tag,
+  Megaphone,
+  Globe2,
+  Link2,
+  Share,
+  ListOrdered,
+  Smartphone,
+  Monitor,
+  Tablet,
+  Bot,
+  HelpCircle,
+  MapPin,
+  Building2,
+} from "lucide-react";
 
 const CHANNEL_KIND_LABELS: Record<string, { label: string; icon: any }> = {
   call_click: { label: "Phone calls", icon: Phone },
@@ -17,11 +41,27 @@ const CHANNEL_KIND_LABELS: Record<string, { label: string; icon: any }> = {
 
 const SOURCE_LABELS: Record<string, { label: string; icon: any; hint: string }> = {
   ads: { label: "Ads", icon: Megaphone, hint: "Visitors from your ads or promoted slots" },
-  directory: { label: "Directory browse", icon: Compass, hint: "Browsing the businesses directory" },
+  directory: {
+    label: "Directory browse",
+    icon: Compass,
+    hint: "Browsing the businesses directory",
+  },
   name_search: { label: "Name searches", icon: Search, hint: "Searched by your business name" },
-  relevant_search: { label: "Relevant searches", icon: Tag, hint: "Found via category, tag, or related filters" },
-  listing: { label: "From listings / shop", icon: ListOrdered, hint: "Clicked through from a product or listing" },
-  search_engine: { label: "Search engines", icon: Globe2, hint: "Google, Bing and other search engines" },
+  relevant_search: {
+    label: "Relevant searches",
+    icon: Tag,
+    hint: "Found via category, tag, or related filters",
+  },
+  listing: {
+    label: "From listings / shop",
+    icon: ListOrdered,
+    hint: "Clicked through from a product or listing",
+  },
+  search_engine: {
+    label: "Search engines",
+    icon: Globe2,
+    hint: "Google, Bing and other search engines",
+  },
   social: { label: "Social media", icon: Share, hint: "Facebook, Instagram, TikTok and others" },
   internal: { label: "Other pages on site", icon: Link2, hint: "Other pages within this site" },
   external: { label: "External sites", icon: Globe2, hint: "Outside sites that linked to you" },
@@ -36,16 +76,12 @@ const DEVICE_LABELS: Record<string, { label: string; icon: any }> = {
   unknown: { label: "Unknown device", icon: HelpCircle },
 };
 
-
-
 function Sparkline({ values, max }: { values: number[]; max: number }) {
   const w = 280;
   const h = 50;
   const safeMax = Math.max(1, max);
   const step = values.length > 1 ? w / (values.length - 1) : w;
-  const points = values
-    .map((v, i) => `${i * step},${h - (v / safeMax) * h}`)
-    .join(" ");
+  const points = values.map((v, i) => `${i * step},${h - (v / safeMax) * h}`).join(" ");
   return (
     <svg width="100%" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className="h-12 w-full">
       <polyline
@@ -59,7 +95,17 @@ function Sparkline({ values, max }: { values: number[]; max: number }) {
   );
 }
 
-function StatCard({ label, value, icon: Icon, accent }: { label: string; value: string | number; icon: any; accent?: string }) {
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+  accent,
+}: {
+  label: string;
+  value: string | number;
+  icon: any;
+  accent?: string;
+}) {
   return (
     <Card className="p-4">
       <div className="flex items-center gap-2 text-muted-foreground">
@@ -79,10 +125,16 @@ export function AnalyticsTab({ businessId }: { businessId: string }) {
     enabled: !!businessId,
   });
 
-  if (isLoading || !data) return <div className="text-sm text-muted-foreground">Loading analytics…</div>;
+  if (isLoading || !data)
+    return <div className="text-sm text-muted-foreground">Loading analytics…</div>;
 
   const a: any = data;
-  const series = a.series as Array<{ date: string; views: number; clicks: number; bookings: number }>;
+  const series = a.series as Array<{
+    date: string;
+    views: number;
+    clicks: number;
+    bookings: number;
+  }>;
   const maxView = Math.max(0, ...series.map((s) => s.views));
 
   const channelRows = Object.entries(CHANNEL_KIND_LABELS)
@@ -94,13 +146,22 @@ export function AnalyticsTab({ businessId }: { businessId: string }) {
     <div className="space-y-4">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Page views" value={a.totalViews} icon={Eye} />
-        <StatCard label="Clicks (all CTAs)" value={Object.entries(a.byKind).reduce((acc, [k, v]) => acc + (k.endsWith("_click") ? (v as number) : 0), 0)} icon={MousePointerClick} />
+        <StatCard
+          label="Clicks (all CTAs)"
+          value={Object.entries(a.byKind).reduce(
+            (acc, [k, v]) => acc + (k.endsWith("_click") ? (v as number) : 0),
+            0,
+          )}
+          icon={MousePointerClick}
+        />
         <StatCard label="Bookings" value={a.totalBookings} icon={CalendarCheck2} />
         <StatCard label="Conversion rate" value={`${a.conversionRate}%`} icon={TrendingUp} />
       </div>
 
       <Card className="p-4">
-        <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Views — last 30 days</div>
+        <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+          Views — last 30 days
+        </div>
         <Sparkline values={series.map((s) => s.views)} max={maxView} />
         <div className="mt-1 flex justify-between text-[10px] text-muted-foreground">
           <span>{series[0]?.date}</span>
@@ -123,10 +184,15 @@ export function AnalyticsTab({ businessId }: { businessId: string }) {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between text-sm">
                       <span className="font-medium">{r.label}</span>
-                      <span className="text-muted-foreground">{r.count} ({pct}% of views)</span>
+                      <span className="text-muted-foreground">
+                        {r.count} ({pct}% of views)
+                      </span>
                     </div>
                     <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                      <div className="h-full bg-primary" style={{ width: `${Math.min(100, pct)}%` }} />
+                      <div
+                        className="h-full bg-primary"
+                        style={{ width: `${Math.min(100, pct)}%` }}
+                      />
                     </div>
                   </div>
                 </li>
@@ -138,13 +204,20 @@ export function AnalyticsTab({ businessId }: { businessId: string }) {
 
       <Card className="p-4">
         <h3 className="mb-1 font-display text-base font-semibold">Where visitors came from</h3>
-        <p className="mb-3 text-xs text-muted-foreground">Traffic sources for the last {a.series.length} days.</p>
+        <p className="mb-3 text-xs text-muted-foreground">
+          Traffic sources for the last {a.series.length} days.
+        </p>
         {(() => {
           const rows = Object.entries(a.bySource ?? {})
-            .map(([k, v]) => ({ key: k, count: v as number, meta: SOURCE_LABELS[k] ?? { label: k, icon: Globe2, hint: "" } }))
+            .map(([k, v]) => ({
+              key: k,
+              count: v as number,
+              meta: SOURCE_LABELS[k] ?? { label: k, icon: Globe2, hint: "" },
+            }))
             .filter((r) => r.count > 0)
             .sort((x, y) => y.count - x.count);
-          if (rows.length === 0) return <p className="text-sm text-muted-foreground">No view sources recorded yet.</p>;
+          if (rows.length === 0)
+            return <p className="text-sm text-muted-foreground">No view sources recorded yet.</p>;
           const total = rows.reduce((acc, r) => acc + r.count, 0);
           return (
             <ul className="space-y-2">
@@ -157,11 +230,18 @@ export function AnalyticsTab({ businessId }: { businessId: string }) {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center justify-between gap-2 text-sm">
                         <span className="font-medium">{r.meta.label}</span>
-                        <span className="text-muted-foreground">{r.count} ({pct}%)</span>
+                        <span className="text-muted-foreground">
+                          {r.count} ({pct}%)
+                        </span>
                       </div>
-                      {r.meta.hint && <div className="text-[11px] text-muted-foreground">{r.meta.hint}</div>}
+                      {r.meta.hint && (
+                        <div className="text-[11px] text-muted-foreground">{r.meta.hint}</div>
+                      )}
                       <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                        <div className="h-full bg-primary" style={{ width: `${Math.min(100, pct)}%` }} />
+                        <div
+                          className="h-full bg-primary"
+                          style={{ width: `${Math.min(100, pct)}%` }}
+                        />
                       </div>
                     </div>
                   </li>
@@ -175,10 +255,15 @@ export function AnalyticsTab({ businessId }: { businessId: string }) {
       {Array.isArray(a.topQueries) && a.topQueries.length > 0 && (
         <Card className="p-4">
           <h3 className="mb-1 font-display text-base font-semibold">Top search terms</h3>
-          <p className="mb-3 text-xs text-muted-foreground">Search terms visitors used before landing on your page.</p>
+          <p className="mb-3 text-xs text-muted-foreground">
+            Search terms visitors used before landing on your page.
+          </p>
           <ul className="space-y-1">
             {a.topQueries.map((q: { term: string; count: number }) => (
-              <li key={q.term} className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-1.5 text-sm">
+              <li
+                key={q.term}
+                className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-1.5 text-sm"
+              >
                 <span className="truncate font-medium">{q.term}</span>
                 <span className="text-muted-foreground">{q.count}</span>
               </li>
@@ -190,13 +275,20 @@ export function AnalyticsTab({ businessId }: { businessId: string }) {
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="p-4">
           <h3 className="mb-1 font-display text-base font-semibold">Devices</h3>
-          <p className="mb-3 text-xs text-muted-foreground">What visitors used to view your page.</p>
+          <p className="mb-3 text-xs text-muted-foreground">
+            What visitors used to view your page.
+          </p>
           {(() => {
             const rows = Object.entries(a.byDevice ?? {})
-              .map(([k, v]) => ({ key: k, count: v as number, meta: DEVICE_LABELS[k] ?? DEVICE_LABELS.unknown }))
+              .map(([k, v]) => ({
+                key: k,
+                count: v as number,
+                meta: DEVICE_LABELS[k] ?? DEVICE_LABELS.unknown,
+              }))
               .filter((r) => r.count > 0)
               .sort((x, y) => y.count - x.count);
-            if (rows.length === 0) return <p className="text-sm text-muted-foreground">No device info recorded yet.</p>;
+            if (rows.length === 0)
+              return <p className="text-sm text-muted-foreground">No device info recorded yet.</p>;
             const total = rows.reduce((acc, r) => acc + r.count, 0);
             return (
               <ul className="space-y-2">
@@ -209,10 +301,15 @@ export function AnalyticsTab({ businessId }: { businessId: string }) {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between text-sm">
                           <span className="font-medium">{r.meta.label}</span>
-                          <span className="text-muted-foreground">{r.count} ({pct}%)</span>
+                          <span className="text-muted-foreground">
+                            {r.count} ({pct}%)
+                          </span>
                         </div>
                         <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-                          <div className="h-full bg-primary" style={{ width: `${Math.min(100, pct)}%` }} />
+                          <div
+                            className="h-full bg-primary"
+                            style={{ width: `${Math.min(100, pct)}%` }}
+                          />
                         </div>
                       </div>
                     </li>
@@ -225,13 +322,17 @@ export function AnalyticsTab({ businessId }: { businessId: string }) {
 
         <Card className="p-4">
           <h3 className="mb-1 font-display text-base font-semibold">Top locations</h3>
-          <p className="mb-3 text-xs text-muted-foreground">Where your visitors are browsing from.</p>
+          <p className="mb-3 text-xs text-muted-foreground">
+            Where your visitors are browsing from.
+          </p>
           {(() => {
             const cities = (a.topCities ?? []) as Array<{ name: string; count: number }>;
             const regions = (a.topRegions ?? []) as Array<{ name: string; count: number }>;
             const countries = (a.topCountries ?? []) as Array<{ code: string; count: number }>;
             if (cities.length === 0 && regions.length === 0 && countries.length === 0) {
-              return <p className="text-sm text-muted-foreground">No location info recorded yet.</p>;
+              return (
+                <p className="text-sm text-muted-foreground">No location info recorded yet.</p>
+              );
             }
             const totalCities = cities.reduce((acc, r) => acc + r.count, 0);
             const totalRegions = regions.reduce((acc, r) => acc + r.count, 0);
@@ -246,9 +347,14 @@ export function AnalyticsTab({ businessId }: { businessId: string }) {
                       {cities.map((c) => {
                         const pct = totalCities > 0 ? Math.round((c.count / totalCities) * 100) : 0;
                         return (
-                          <li key={c.name} className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-1.5 text-sm">
+                          <li
+                            key={c.name}
+                            className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-1.5 text-sm"
+                          >
                             <span className="truncate font-medium">{c.name}</span>
-                            <span className="text-muted-foreground">{c.count} ({pct}%)</span>
+                            <span className="text-muted-foreground">
+                              {c.count} ({pct}%)
+                            </span>
                           </li>
                         );
                       })}
@@ -262,11 +368,17 @@ export function AnalyticsTab({ businessId }: { businessId: string }) {
                     </div>
                     <ul className="space-y-1">
                       {regions.map((r) => {
-                        const pct = totalRegions > 0 ? Math.round((r.count / totalRegions) * 100) : 0;
+                        const pct =
+                          totalRegions > 0 ? Math.round((r.count / totalRegions) * 100) : 0;
                         return (
-                          <li key={r.name} className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-1.5 text-sm">
+                          <li
+                            key={r.name}
+                            className="flex items-center justify-between rounded-md bg-muted/40 px-3 py-1.5 text-sm"
+                          >
                             <span className="truncate font-medium">{r.name}</span>
-                            <span className="text-muted-foreground">{r.count} ({pct}%)</span>
+                            <span className="text-muted-foreground">
+                              {r.count} ({pct}%)
+                            </span>
                           </li>
                         );
                       })}
@@ -294,11 +406,11 @@ export function AnalyticsTab({ businessId }: { businessId: string }) {
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Stats cover the last {a.series.length} days. Page views are de-duplicated per browser session per business.
-        Source is detected from referrer and link parameters; device and location are inferred from request headers — some visits may show as “Direct” or have no location when the browser hides this info.
+        Stats cover the last {a.series.length} days. Page views are de-duplicated per browser
+        session per business. Source is detected from referrer and link parameters; device and
+        location are inferred from request headers — some visits may show as “Direct” or have no
+        location when the browser hides this info.
       </p>
-
-
     </div>
   );
 }

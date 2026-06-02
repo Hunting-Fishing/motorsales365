@@ -26,7 +26,9 @@ export const Route = createFileRoute("/learn/$slug")({
         { name: "description", content: c.summary ?? `Learn ${c.title} on 365 Motorsales.` },
         { property: "og:title", content: c.title },
         { property: "og:description", content: c.summary ?? "" },
-        ...(c.hero_image_url ? [{ property: "og:image", content: c.hero_image_url as string }] : []),
+        ...(c.hero_image_url
+          ? [{ property: "og:image", content: c.hero_image_url as string }]
+          : []),
       ],
     };
   },
@@ -56,7 +58,9 @@ function CourseDetail() {
       <SiteLayout>
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-2xl font-bold">Course not found</h1>
-          <Button asChild className="mt-4"><Link to="/learn">Back to catalog</Link></Button>
+          <Button asChild className="mt-4">
+            <Link to="/learn">Back to catalog</Link>
+          </Button>
         </div>
       </SiteLayout>
     );
@@ -73,7 +77,9 @@ function CourseDetail() {
       <div className="container mx-auto px-4 py-8">
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
-            <Link to="/learn" className="text-sm text-muted-foreground hover:underline">← All courses</Link>
+            <Link to="/learn" className="text-sm text-muted-foreground hover:underline">
+              ← All courses
+            </Link>
             <div className="mt-3 flex flex-wrap items-center gap-2">
               {course.category && <Badge variant="secondary">{course.category}</Badge>}
               <Badge variant="outline">{course.level}</Badge>
@@ -84,7 +90,9 @@ function CourseDetail() {
               ) : null}
             </div>
             <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{course.title}</h1>
-            {course.summary && <p className="mt-3 text-lg text-muted-foreground">{course.summary}</p>}
+            {course.summary && (
+              <p className="mt-3 text-lg text-muted-foreground">{course.summary}</p>
+            )}
             {course.hero_image_url && (
               <img
                 src={course.hero_image_url}
@@ -106,7 +114,9 @@ function CourseDetail() {
                   <Card key={m.id}>
                     <CardContent className="p-4">
                       <h3 className="font-semibold">{m.title}</h3>
-                      {m.summary && <p className="mt-1 text-sm text-muted-foreground">{m.summary}</p>}
+                      {m.summary && (
+                        <p className="mt-1 text-sm text-muted-foreground">{m.summary}</p>
+                      )}
                       <ul className="mt-3 space-y-1">
                         {mLessons.map((l) => {
                           const done = completedIds.has(l.id);
@@ -126,7 +136,11 @@ function CourseDetail() {
                                       <PlayCircle className="h-4 w-4 text-muted-foreground" />
                                     )}
                                     {l.title}
-                                    {l.is_preview && !enrolled && <Badge variant="outline" className="ml-2 text-[10px]">Preview</Badge>}
+                                    {l.is_preview && !enrolled && (
+                                      <Badge variant="outline" className="ml-2 text-[10px]">
+                                        Preview
+                                      </Badge>
+                                    )}
                                   </span>
                                   <span className="text-xs text-muted-foreground">
                                     {Math.round((l.duration_seconds ?? 0) / 60)}m
@@ -138,7 +152,9 @@ function CourseDetail() {
                                     <Lock className="h-4 w-4" />
                                     {l.title}
                                   </span>
-                                  <span className="text-xs">{Math.round((l.duration_seconds ?? 0) / 60)}m</span>
+                                  <span className="text-xs">
+                                    {Math.round((l.duration_seconds ?? 0) / 60)}m
+                                  </span>
                                 </div>
                               )}
                             </li>
@@ -168,17 +184,24 @@ function CourseDetail() {
                   {enrolled ? (
                     <>
                       <div className="mb-3 text-sm">
-                        <div className="font-semibold">{completedCount}/{totalLessons} lessons complete</div>
+                        <div className="font-semibold">
+                          {completedCount}/{totalLessons} lessons complete
+                        </div>
                         <div className="mt-1 h-2 overflow-hidden rounded-full bg-secondary">
                           <div
                             className="h-full bg-primary transition-all"
-                            style={{ width: `${totalLessons ? (completedCount / totalLessons) * 100 : 0}%` }}
+                            style={{
+                              width: `${totalLessons ? (completedCount / totalLessons) * 100 : 0}%`,
+                            }}
                           />
                         </div>
                       </div>
                       {lessons[0] && (
                         <Button asChild className="w-full">
-                          <Link to="/learn/$slug/watch/$lessonId" params={{ slug: params.slug, lessonId: lessons[0].id }}>
+                          <Link
+                            to="/learn/$slug/watch/$lessonId"
+                            params={{ slug: params.slug, lessonId: lessons[0].id }}
+                          >
                             <PlayCircle className="mr-2 h-4 w-4" />
                             {completedCount > 0 ? "Continue learning" : "Start course"}
                           </Link>
@@ -197,7 +220,9 @@ function CourseDetail() {
                       <div className="mb-3 flex items-baseline gap-2">
                         {course.price_php != null ? (
                           <>
-                            <span className="text-3xl font-bold">₱{Number(course.price_php).toLocaleString()}</span>
+                            <span className="text-3xl font-bold">
+                              ₱{Number(course.price_php).toLocaleString()}
+                            </span>
                             <span className="text-sm text-muted-foreground">one-time</span>
                           </>
                         ) : isFree ? (
@@ -216,7 +241,14 @@ function CourseDetail() {
                           <Link to="/login">Sign in to enroll</Link>
                         </Button>
                       ) : isFree ? (
-                        <EnrollFreeButton courseId={course.id} onEnrolled={() => queryClient.invalidateQueries({ queryKey: ["course-progress", course.id] })} />
+                        <EnrollFreeButton
+                          courseId={course.id}
+                          onEnrolled={() =>
+                            queryClient.invalidateQueries({
+                              queryKey: ["course-progress", course.id],
+                            })
+                          }
+                        />
                       ) : course.price_id ? (
                         showCheckout ? (
                           <CheckoutCard courseId={course.id} />
@@ -235,9 +267,15 @@ function CourseDetail() {
                 </div>
 
                 <div className="mt-4 space-y-2 border-t pt-4 text-xs text-muted-foreground">
-                  <div className="flex items-center gap-2"><GraduationCap className="h-3 w-3" /> Certificate of completion</div>
-                  <div className="flex items-center gap-2"><PlayCircle className="h-3 w-3" /> {totalLessons} lessons</div>
-                  <div className="flex items-center gap-2"><Clock className="h-3 w-3" /> {course.duration_minutes ?? 0} minutes total</div>
+                  <div className="flex items-center gap-2">
+                    <GraduationCap className="h-3 w-3" /> Certificate of completion
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <PlayCircle className="h-3 w-3" /> {totalLessons} lessons
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-3 w-3" /> {course.duration_minutes ?? 0} minutes total
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -260,9 +298,13 @@ function EnrollFreeButton({ courseId, onEnrolled }: { courseId: string; onEnroll
           const { supabase } = await import("@/integrations/supabase/client");
           const uid = (await supabase.auth.getUser()).data.user?.id;
           if (uid) {
-            await supabase.from("course_enrollments").insert({ user_id: uid, course_id: courseId, source: "admin_grant" });
+            await supabase
+              .from("course_enrollments")
+              .insert({ user_id: uid, course_id: courseId, source: "admin_grant" });
           }
-        } catch { /* ignore duplicate */ }
+        } catch {
+          /* ignore duplicate */
+        }
         onEnrolled();
         setLoading(false);
       }}

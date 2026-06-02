@@ -5,15 +5,28 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const EVENT_KINDS = [
-  "view", "call_click", "whatsapp_click", "messenger_click", "website_click",
-  "contact_click", "share_click", "book_click", "book_created", "book_confirmed",
-  "inquiry_submitted", "gallery_view", "video_play",
+  "view",
+  "call_click",
+  "whatsapp_click",
+  "messenger_click",
+  "website_click",
+  "contact_click",
+  "share_click",
+  "book_click",
+  "book_created",
+  "book_confirmed",
+  "inquiry_submitted",
+  "gallery_view",
+  "video_play",
 ] as const;
 
-function classifyDevice(ua: string | null | undefined): "mobile" | "tablet" | "desktop" | "bot" | "unknown" {
+function classifyDevice(
+  ua: string | null | undefined,
+): "mobile" | "tablet" | "desktop" | "bot" | "unknown" {
   if (!ua) return "unknown";
   const s = ua.toLowerCase();
-  if (/bot|crawler|spider|crawling|facebookexternalhit|preview|slurp|wget|curl/.test(s)) return "bot";
+  if (/bot|crawler|spider|crawling|facebookexternalhit|preview|slurp|wget|curl/.test(s))
+    return "bot";
   if (/ipad|tablet|playbook|silk|(android(?!.*mobile))/.test(s)) return "tablet";
   if (/mobi|iphone|ipod|android.*mobile|blackberry|opera mini|iemobile/.test(s)) return "mobile";
   return "desktop";
@@ -39,9 +52,22 @@ export const recordBusinessEvent = createServerFn({ method: "POST" })
       const ua = getRequestHeader("user-agent") ?? null;
       const device = classifyDevice(ua);
       // Cloudflare workers expose geo via these headers (and the cf object, not always available via getRequestHeader).
-      const city = (getRequestHeader("cf-ipcity") || getRequestHeader("x-vercel-ip-city") || "").trim() || null;
-      const region = (getRequestHeader("cf-region") || getRequestHeader("cf-region-code") || getRequestHeader("x-vercel-ip-country-region") || "").trim() || null;
-      const country = (getRequestHeader("cf-ipcountry") || getRequestHeader("x-vercel-ip-country") || "").trim() || null;
+      const city =
+        (getRequestHeader("cf-ipcity") || getRequestHeader("x-vercel-ip-city") || "").trim() ||
+        null;
+      const region =
+        (
+          getRequestHeader("cf-region") ||
+          getRequestHeader("cf-region-code") ||
+          getRequestHeader("x-vercel-ip-country-region") ||
+          ""
+        ).trim() || null;
+      const country =
+        (
+          getRequestHeader("cf-ipcountry") ||
+          getRequestHeader("x-vercel-ip-country") ||
+          ""
+        ).trim() || null;
       enrichedMeta = {
         ...enrichedMeta,
         device,
@@ -62,7 +88,6 @@ export const recordBusinessEvent = createServerFn({ method: "POST" })
     } as any);
     return { ok: true };
   });
-
 
 async function assertEditor(supabase: any, userId: string, businessId: string) {
   const { data } = await supabase
@@ -126,22 +151,25 @@ export const getBusinessAnalytics = createServerFn({ method: "GET" })
       if (!byDay[day]) byDay[day] = { views: 0, clicks: 0, bookings: 0 };
       if (kind === "view") {
         byDay[day].views += 1;
-        const src = (typeof meta.source === "string" && meta.source) ? meta.source : "direct";
+        const src = typeof meta.source === "string" && meta.source ? meta.source : "direct";
         bySource[src] = (bySource[src] ?? 0) + 1;
-        const device = (typeof meta.device === "string" && meta.device) ? meta.device : "unknown";
+        const device = typeof meta.device === "string" && meta.device ? meta.device : "unknown";
         byDevice[device] = (byDevice[device] ?? 0) + 1;
-        const city = (typeof meta.city === "string" && meta.city.trim()) ? meta.city.trim() : null;
+        const city = typeof meta.city === "string" && meta.city.trim() ? meta.city.trim() : null;
         if (city) byCity[city] = (byCity[city] ?? 0) + 1;
-        const region = (typeof meta.region === "string" && meta.region.trim()) ? meta.region.trim() : null;
+        const region =
+          typeof meta.region === "string" && meta.region.trim() ? meta.region.trim() : null;
         if (region) byRegion[region] = (byRegion[region] ?? 0) + 1;
-        const country = (typeof meta.country === "string" && meta.country.trim()) ? meta.country.trim().toUpperCase() : null;
+        const country =
+          typeof meta.country === "string" && meta.country.trim()
+            ? meta.country.trim().toUpperCase()
+            : null;
         if (country) byCountry[country] = (byCountry[country] ?? 0) + 1;
         if (typeof meta.query === "string" && meta.query.trim()) {
           const q = meta.query.trim().toLowerCase().slice(0, 64);
           topQueries[q] = (topQueries[q] ?? 0) + 1;
         }
-      }
-      else if (kind === "book_created" || kind === "book_confirmed") byDay[day].bookings += 1;
+      } else if (kind === "book_created" || kind === "book_confirmed") byDay[day].bookings += 1;
       else if (kind.endsWith("_click")) byDay[day].clicks += 1;
     }
 
@@ -188,5 +216,3 @@ export const getBusinessAnalytics = createServerFn({ method: "GET" })
       series,
     };
   });
-
-

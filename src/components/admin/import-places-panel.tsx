@@ -63,13 +63,16 @@ export function ImportPlacesPanel() {
   };
 
   const search = async () => {
-    const la = parseFloat(lat), ln = parseFloat(lng);
+    const la = parseFloat(lat),
+      ln = parseFloat(lng);
     if (!Number.isFinite(la) || !Number.isFinite(ln)) return toast.error("Enter a valid lat/lng");
     setSearching(true);
     setRows([]);
     setSelected(new Set());
     try {
-      const res = await findFn({ data: { lat: la, lng: ln, radius_m: radiusM, type_slug: typeSlug } });
+      const res = await findFn({
+        data: { lat: la, lng: ln, radius_m: radiusM, type_slug: typeSlug },
+      });
       setRows(res.rows);
       // Pre-select all "new"
       setSelected(new Set(res.rows.filter((r) => r.status === "new").map((r) => r.place_id)));
@@ -123,9 +126,12 @@ export function ImportPlacesPanel() {
     <div className="space-y-4">
       <Card className="space-y-4 p-4">
         <div>
-          <h2 className="font-display text-lg font-bold">Import nearby businesses from Google Places</h2>
+          <h2 className="font-display text-lg font-bold">
+            Import nearby businesses from Google Places
+          </h2>
           <p className="text-xs text-muted-foreground">
-            Imported businesses are saved as <span className="font-medium">pending</span> with no owner. Owners can claim them later.
+            Imported businesses are saved as <span className="font-medium">pending</span> with no
+            owner. Owners can claim them later.
           </p>
         </div>
 
@@ -137,7 +143,11 @@ export function ImportPlacesPanel() {
               onChange={(e) => setTypeSlug(e.target.value)}
               className="mt-1 h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
             >
-              {TYPE_OPTIONS.map((t) => <option key={t.slug} value={t.slug}>{t.label}</option>)}
+              {TYPE_OPTIONS.map((t) => (
+                <option key={t.slug} value={t.slug}>
+                  {t.label}
+                </option>
+              ))}
             </select>
           </div>
           <div>
@@ -147,7 +157,11 @@ export function ImportPlacesPanel() {
               onChange={(e) => setRadiusM(Number(e.target.value))}
               className="mt-1 h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
             >
-              {RADIUS_M_OPTIONS.map((m) => <option key={m} value={m}>{m / 1000} km</option>)}
+              {RADIUS_M_OPTIONS.map((m) => (
+                <option key={m} value={m}>
+                  {m / 1000} km
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -155,11 +169,21 @@ export function ImportPlacesPanel() {
         <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
           <div>
             <Label className="text-xs">Latitude</Label>
-            <Input value={lat} onChange={(e) => setLat(e.target.value)} placeholder="14.5995" className="h-9" />
+            <Input
+              value={lat}
+              onChange={(e) => setLat(e.target.value)}
+              placeholder="14.5995"
+              className="h-9"
+            />
           </div>
           <div>
             <Label className="text-xs">Longitude</Label>
-            <Input value={lng} onChange={(e) => setLng(e.target.value)} placeholder="120.9842" className="h-9" />
+            <Input
+              value={lng}
+              onChange={(e) => setLng(e.target.value)}
+              placeholder="120.9842"
+              className="h-9"
+            />
           </div>
           <div className="flex items-end">
             <Button type="button" size="sm" variant="outline" onClick={useMyLocation}>
@@ -217,21 +241,34 @@ export function ImportPlacesPanel() {
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="truncate font-semibold">{r.name}</span>
                       {r.status === "new" && <Badge variant="default">New</Badge>}
-                      {r.status === "already_imported" && <Badge variant="secondary">Already imported</Badge>}
-                      {r.status === "duplicate_name" && <Badge variant="outline">Possible duplicate</Badge>}
+                      {r.status === "already_imported" && (
+                        <Badge variant="secondary">Already imported</Badge>
+                      )}
+                      {r.status === "duplicate_name" && (
+                        <Badge variant="outline">Possible duplicate</Badge>
+                      )}
                       {r.rating != null && (
-                        <span className="text-xs text-muted-foreground">★ {r.rating.toFixed(1)} ({r.rating_count ?? 0})</span>
+                        <span className="text-xs text-muted-foreground">
+                          ★ {r.rating.toFixed(1)} ({r.rating_count ?? 0})
+                        </span>
                       )}
                     </div>
                     {r.address && <div className="text-xs text-muted-foreground">{r.address}</div>}
                     <div className="mt-1 flex flex-wrap gap-3 text-[11px] text-muted-foreground">
                       {r.phone && <span>{r.phone}</span>}
                       {r.website && (
-                        <a href={r.website} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline">
+                        <a
+                          href={r.website}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-1 text-primary hover:underline"
+                        >
                           Website <ExternalLink className="h-3 w-3" />
                         </a>
                       )}
-                      <span>{r.lat.toFixed(4)}, {r.lng.toFixed(4)}</span>
+                      <span>
+                        {r.lat.toFixed(4)}, {r.lng.toFixed(4)}
+                      </span>
                     </div>
                   </div>
                 </div>

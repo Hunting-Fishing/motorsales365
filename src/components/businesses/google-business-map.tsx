@@ -23,9 +23,14 @@ const PH_CENTER: [number, number] = [12.8797, 121.774];
 
 const isTouchDevice = () =>
   typeof window !== "undefined" &&
-  (("ontouchstart" in window) || (navigator.maxTouchPoints ?? 0) > 0);
+  ("ontouchstart" in window || (navigator.maxTouchPoints ?? 0) > 0);
 
-function pinDivIcon(color: string, featured: boolean, highlighted = false, typeSlug?: string): L.DivIcon {
+function pinDivIcon(
+  color: string,
+  featured: boolean,
+  highlighted = false,
+  typeSlug?: string,
+): L.DivIcon {
   const touchBoost = isTouchDevice() ? 1.2 : 1;
   const scale = (highlighted ? 1.6 : featured ? 1.4 : 1.1) * touchBoost;
 
@@ -174,7 +179,9 @@ export function GoogleBusinessMap({
         map.setView([center.lat, center.lng], 12);
       }
     } else if (valid.length > 1) {
-      const bounds = L.latLngBounds(valid.map((b) => [Number(b.lat), Number(b.lng)] as [number, number]));
+      const bounds = L.latLngBounds(
+        valid.map((b) => [Number(b.lat), Number(b.lng)] as [number, number]),
+      );
       map.fitBounds(bounds, { padding: [48, 48] });
     } else if (valid.length === 1) {
       map.setView([Number(valid[0].lat), Number(valid[0].lng)], 14);
@@ -228,7 +235,8 @@ export function GoogleBusinessMap({
 }
 
 function escapeHtml(s: string) {
-  return s.replace(/[&<>"']/g, (c) =>
-    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!,
+  return s.replace(
+    /[&<>"']/g,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!,
   );
 }

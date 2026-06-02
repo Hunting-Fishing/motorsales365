@@ -41,7 +41,6 @@ export const getBusinessPage = createServerFn({ method: "GET" })
     }
     if (!biz) return { business: null };
 
-
     const [
       { data: typeRow },
       { data: tagLinks },
@@ -54,8 +53,15 @@ export const getBusinessPage = createServerFn({ method: "GET" })
       { data: contactChannels },
       { data: bookableItems },
     ] = await Promise.all([
-      supabaseAdmin.from("business_types").select("label").eq("slug", (biz as any).type_slug).maybeSingle(),
-      supabaseAdmin.from("business_tag_links").select("tag_slug").eq("business_id", (biz as any).id),
+      supabaseAdmin
+        .from("business_types")
+        .select("label")
+        .eq("slug", (biz as any).type_slug)
+        .maybeSingle(),
+      supabaseAdmin
+        .from("business_tag_links")
+        .select("tag_slug")
+        .eq("business_id", (biz as any).id),
       supabaseAdmin
         .from("business_services")
         .select("id, title, description, price_label, photo_url, sort_order")
@@ -64,7 +70,9 @@ export const getBusinessPage = createServerFn({ method: "GET" })
         .order("sort_order"),
       supabaseAdmin
         .from("business_products")
-        .select("id, title, description, price_php, sale_price_php, photo_url, in_stock, sort_order")
+        .select(
+          "id, title, description, price_php, sale_price_php, photo_url, in_stock, sort_order",
+        )
         .eq("business_id", (biz as any).id)
         .eq("active", true)
         .order("sort_order"),
@@ -177,10 +185,11 @@ export const submitBusinessInquiry = createServerFn({ method: "POST" })
         business_id: data.businessId,
         kind: "inquiry_submitted",
       } as any);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     return { ok: true };
   });
-
 
 // ============== OWNER (authed) ==============
 
@@ -229,8 +238,16 @@ export const getMyBusinessPage = createServerFn({ method: "GET" })
       { data: bookings },
     ] = await Promise.all([
       supabase.from("businesses").select("*").eq("id", data.businessId).maybeSingle(),
-      supabase.from("business_services").select("*").eq("business_id", data.businessId).order("sort_order"),
-      supabase.from("business_products").select("*").eq("business_id", data.businessId).order("sort_order"),
+      supabase
+        .from("business_services")
+        .select("*")
+        .eq("business_id", data.businessId)
+        .order("sort_order"),
+      supabase
+        .from("business_products")
+        .select("*")
+        .eq("business_id", data.businessId)
+        .order("sort_order"),
       supabase
         .from("business_posts")
         .select("*")
@@ -262,10 +279,7 @@ export const getMyBusinessPage = createServerFn({ method: "GET" })
         .select("*")
         .eq("business_id", data.businessId)
         .order("sort_order"),
-      supabase
-        .from("business_availability")
-        .select("*")
-        .eq("business_id", data.businessId),
+      supabase.from("business_availability").select("*").eq("business_id", data.businessId),
       supabase
         .from("business_availability_exceptions")
         .select("*")
@@ -340,7 +354,10 @@ export const updateBusinessPageSettings = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await assertEditor(supabase, userId, data.businessId);
     const { businessId, ...patch } = data;
-    const { error } = await supabase.from("businesses").update(patch as any).eq("id", businessId);
+    const { error } = await supabase
+      .from("businesses")
+      .update(patch as any)
+      .eq("id", businessId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

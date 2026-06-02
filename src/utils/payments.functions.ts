@@ -42,17 +42,14 @@ function validateEnv(env: StripeEnv): StripeEnv {
 
 export const createCheckoutSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: {
-    priceId: string;
-    quantity?: number;
-    returnUrl: string;
-    environment: StripeEnv;
-  }) => {
-    if (!/^[a-zA-Z0-9_-]+$/.test(data.priceId)) throw new Error("Invalid priceId");
-    validateEnv(data.environment);
-    validateReturnUrl(data.returnUrl);
-    return data;
-  })
+  .inputValidator(
+    (data: { priceId: string; quantity?: number; returnUrl: string; environment: StripeEnv }) => {
+      if (!/^[a-zA-Z0-9_-]+$/.test(data.priceId)) throw new Error("Invalid priceId");
+      validateEnv(data.environment);
+      validateReturnUrl(data.returnUrl);
+      return data;
+    },
+  )
   .handler(async ({ data, context }) => {
     const { supabase, userId, claims } = context;
     const stripe = createStripeClient(data.environment);
@@ -99,18 +96,20 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
  */
 export const updateSubscriptionPlan = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: {
-    priceId: string;
-    environment: StripeEnv;
-    mode: "upgrade" | "downgrade" | "switch";
-  }) => {
-    if (!/^[a-zA-Z0-9_-]+$/.test(data.priceId)) throw new Error("Invalid priceId");
-    validateEnv(data.environment);
-    if (!["upgrade", "downgrade", "switch"].includes(data.mode)) {
-      throw new Error("Invalid mode");
-    }
-    return data;
-  })
+  .inputValidator(
+    (data: {
+      priceId: string;
+      environment: StripeEnv;
+      mode: "upgrade" | "downgrade" | "switch";
+    }) => {
+      if (!/^[a-zA-Z0-9_-]+$/.test(data.priceId)) throw new Error("Invalid priceId");
+      validateEnv(data.environment);
+      if (!["upgrade", "downgrade", "switch"].includes(data.mode)) {
+        throw new Error("Invalid mode");
+      }
+      return data;
+    },
+  )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const stripe = createStripeClient(data.environment);
@@ -287,10 +286,9 @@ export const listPaymentMethods = createServerFn({ method: "POST" })
       stripe.paymentMethods.list({ customer: customerId, limit: 20 }),
     ]);
 
-    const defaultPmId =
-      !("deleted" in customer && customer.deleted)
-        ? ((customer as any).invoice_settings?.default_payment_method as string | null) ?? null
-        : null;
+    const defaultPmId = !("deleted" in customer && customer.deleted)
+      ? (((customer as any).invoice_settings?.default_payment_method as string | null) ?? null)
+      : null;
 
     return {
       defaultPaymentMethodId: defaultPmId,
@@ -533,15 +531,31 @@ export const getInvoiceDetails = createServerFn({ method: "POST" })
       expand: ["lines.data.price"],
     });
 
-    if (typeof invoice.customer === "string"
-      ? invoice.customer !== sub.stripe_customer_id
-      : invoice.customer?.id !== sub.stripe_customer_id) {
+    if (
+      typeof invoice.customer === "string"
+        ? invoice.customer !== sub.stripe_customer_id
+        : invoice.customer?.id !== sub.stripe_customer_id
+    ) {
       throw new Error("Invoice not found");
     }
 
     const ZERO_DECIMAL_CURRENCIES = new Set([
-      "bif", "clp", "djf", "gnf", "jpy", "kmf", "krw", "mga",
-      "pyg", "rwf", "ugx", "vnd", "vuv", "xaf", "xof", "xpf",
+      "bif",
+      "clp",
+      "djf",
+      "gnf",
+      "jpy",
+      "kmf",
+      "krw",
+      "mga",
+      "pyg",
+      "rwf",
+      "ugx",
+      "vnd",
+      "vuv",
+      "xaf",
+      "xof",
+      "xpf",
     ]);
     const THREE_DECIMAL_CURRENCIES = new Set(["bhd", "jod", "kwd", "omr", "tnd"]);
 
@@ -612,23 +626,41 @@ export const setStripeTaxCodes = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const [{ data: plans }, { data: boosts }] = await Promise.all([
-      supabaseAdmin.from("subscription_plans").select("stripe_lookup_key").not("stripe_lookup_key", "is", null),
-      supabaseAdmin.from("boost_products").select("stripe_lookup_key").not("stripe_lookup_key", "is", null),
+      supabaseAdmin
+        .from("subscription_plans")
+        .select("stripe_lookup_key")
+        .not("stripe_lookup_key", "is", null),
+      supabaseAdmin
+        .from("boost_products")
+        .select("stripe_lookup_key")
+        .not("stripe_lookup_key", "is", null),
     ]);
 
     const targets: Array<{ lookupKey: string; taxCode: string; kind: "plan" | "boost" }> = [];
     for (const p of plans ?? []) {
       if ((p as any).stripe_lookup_key) {
-        targets.push({ lookupKey: (p as any).stripe_lookup_key, taxCode: "txcd_10103001", kind: "plan" });
+        targets.push({
+          lookupKey: (p as any).stripe_lookup_key,
+          taxCode: "txcd_10103001",
+          kind: "plan",
+        });
       }
     }
     for (const b of boosts ?? []) {
       if ((b as any).stripe_lookup_key) {
-        targets.push({ lookupKey: (b as any).stripe_lookup_key, taxCode: "txcd_10000000", kind: "boost" });
+        targets.push({
+          lookupKey: (b as any).stripe_lookup_key,
+          taxCode: "txcd_10000000",
+          kind: "boost",
+        });
       }
     }
 
-    const results: Array<{ lookupKey: string; status: "set" | "already_set" | "missing" | "error"; message?: string }> = [];
+    const results: Array<{
+      lookupKey: string;
+      status: "set" | "already_set" | "missing" | "error";
+      message?: string;
+    }> = [];
 
     for (const t of targets) {
       try {
@@ -637,9 +669,10 @@ export const setStripeTaxCodes = createServerFn({ method: "POST" })
           results.push({ lookupKey: t.lookupKey, status: "missing" });
           continue;
         }
-        const productId = typeof prices.data[0].product === "string"
-          ? prices.data[0].product
-          : (prices.data[0].product as any)?.id;
+        const productId =
+          typeof prices.data[0].product === "string"
+            ? prices.data[0].product
+            : (prices.data[0].product as any)?.id;
         if (!productId) {
           results.push({ lookupKey: t.lookupKey, status: "error", message: "No product id" });
           continue;
@@ -658,4 +691,3 @@ export const setStripeTaxCodes = createServerFn({ method: "POST" })
 
     return { ok: true, environment: data.environment, results };
   });
-

@@ -19,10 +19,7 @@ export type EngineSpec = {
   end?: number;
 };
 
-export type EngineCatalog = Record<
-  VehicleCategory,
-  Record<string, Record<string, EngineSpec[]>>
->;
+export type EngineCatalog = Record<VehicleCategory, Record<string, Record<string, EngineSpec[]>>>;
 
 export const VEHICLE_ENGINES: EngineCatalog = {
   car: {
@@ -63,9 +60,7 @@ export const VEHICLE_ENGINES: EngineCatalog = {
         { label: "1.5L Gasoline (2NR-VE)", code: "2NR-VE", start: 2021 },
         { label: "1.3L Gasoline (1NR-VE)", code: "1NR-VE", start: 2015 },
       ],
-      Rush: [
-        { label: "1.5L Gasoline (2NR-VE)", code: "2NR-VE", start: 2018 },
-      ],
+      Rush: [{ label: "1.5L Gasoline (2NR-VE)", code: "2NR-VE", start: 2018 }],
       "Corolla Altis": [
         { label: "1.6L Gasoline (1ZR-FE)", code: "1ZR-FE", start: 2008, end: 2019 },
         { label: "1.8L Gasoline (2ZR-FE)", code: "2ZR-FE", start: 2008, end: 2019 },
@@ -296,8 +291,8 @@ export const VEHICLE_ENGINES: EngineCatalog = {
       "PCX 160": [{ label: "160cc eSP+", start: 2021 }],
       XRM125: [{ label: "125cc Carbureted", start: 2008 }],
       TMX125: [{ label: "125cc Carbureted", start: 2003 }],
-      "CB150R": [{ label: "150cc DOHC", start: 2018 }],
-      "CBR150R": [{ label: "150cc DOHC", start: 2019 }],
+      CB150R: [{ label: "150cc DOHC", start: 2018 }],
+      CBR150R: [{ label: "150cc DOHC", start: 2019 }],
       Beat: [
         { label: "110cc eSP", start: 2014, end: 2020 },
         { label: "110cc eSP+", start: 2020 },
@@ -330,7 +325,7 @@ export const VEHICLE_ENGINES: EngineCatalog = {
       "Barako II": [{ label: "175cc Carbureted", start: 2010 }],
       "Rouser NS200": [{ label: "200cc", start: 2018 }],
       "Ninja 400": [{ label: "400cc Twin", start: 2018 }],
-      "Z400": [{ label: "400cc Twin", start: 2019 }],
+      Z400: [{ label: "400cc Twin", start: 2019 }],
     },
   },
 };

@@ -217,9 +217,7 @@ function AdminInquiriesPage() {
                     {r.phone && <span className="text-muted-foreground"> · {r.phone}</span>}
                   </div>
                   {r.vehicle_summary && (
-                    <div className="text-xs text-muted-foreground">
-                      For: {r.vehicle_summary}
-                    </div>
+                    <div className="text-xs text-muted-foreground">For: {r.vehicle_summary}</div>
                   )}
                   {r.message && (
                     <div className="rounded-md bg-muted/40 p-2 text-sm">{r.message}</div>

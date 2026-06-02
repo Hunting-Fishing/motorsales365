@@ -4,7 +4,12 @@ import { QrCode, Download, Printer, Copy, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { BrandLogo, logoSrc } from "@/components/brand-logo";
 import { formatPHP } from "@/lib/format";
@@ -95,9 +100,7 @@ export function ListingQr({
       return;
     }
     const priceLine = pricePhp ? formatPHP(pricePhp) : "";
-    const coverHtml = coverUrl
-      ? `<img class="cover" src="${coverUrl}" alt="" />`
-      : "";
+    const coverHtml = coverUrl ? `<img class="cover" src="${coverUrl}" alt="" />` : "";
     w.document.write(`<!doctype html>
 <html><head><meta charset="utf-8" />
 <title>${escapeHtml(title)} — 365 MotorSales</title>
@@ -154,7 +157,12 @@ export function ListingQr({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {compact ? (
-          <Button variant={triggerVariant} size="sm" className={className} title="QR code & printable poster">
+          <Button
+            variant={triggerVariant}
+            size="sm"
+            className={className}
+            title="QR code & printable poster"
+          >
             <QrCode className="h-4 w-4" />
           </Button>
         ) : (
@@ -200,8 +208,8 @@ export function ListingQr({
           </Button>
         </div>
         <p className="text-xs text-muted-foreground">
-          Use the printable poster for car windows, dealership boards, or print ads — every scan brings buyers
-          straight to your listing on 365 MotorSales Philippines.
+          Use the printable poster for car windows, dealership boards, or print ads — every scan
+          brings buyers straight to your listing on 365 MotorSales Philippines.
         </p>
       </DialogContent>
     </Dialog>

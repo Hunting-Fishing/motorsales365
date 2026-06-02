@@ -6,9 +6,19 @@ import { useServerFn } from "@tanstack/react-start";
 import { recordBusinessEvent } from "@/lib/business-analytics.functions";
 
 type Kind =
-  | "view" | "call_click" | "whatsapp_click" | "messenger_click" | "website_click"
-  | "contact_click" | "share_click" | "book_click" | "book_created" | "book_confirmed"
-  | "inquiry_submitted" | "gallery_view" | "video_play";
+  | "view"
+  | "call_click"
+  | "whatsapp_click"
+  | "messenger_click"
+  | "website_click"
+  | "contact_click"
+  | "share_click"
+  | "book_click"
+  | "book_created"
+  | "book_confirmed"
+  | "inquiry_submitted"
+  | "gallery_view"
+  | "video_play";
 
 function getSessionHash(): string {
   if (typeof window === "undefined") return "";
@@ -33,15 +43,17 @@ export function useTrackBusinessEvent(businessId: string | null | undefined) {
   const track = (kind: Kind, meta?: Record<string, any>) => {
     if (!businessId) return;
     try {
-      recordRef.current({
-        data: {
-          businessId,
-          kind,
-          meta: meta ?? null,
-          sessionHash: getSessionHash(),
-          referrer: typeof document !== "undefined" ? document.referrer.slice(0, 500) : null,
-        },
-      }).catch(() => {});
+      recordRef
+        .current({
+          data: {
+            businessId,
+            kind,
+            meta: meta ?? null,
+            sessionHash: getSessionHash(),
+            referrer: typeof document !== "undefined" ? document.referrer.slice(0, 500) : null,
+          },
+        })
+        .catch(() => {});
     } catch {
       /* swallow */
     }
@@ -63,13 +75,17 @@ function classifySource(): { source: string; query: string | null; referrer: str
   const q = sp.get("q") || sp.get("query");
 
   if (explicit) {
-    if (["ad", "ads", "advert", "advertisement"].includes(explicit)) return { source: "ads", query: q, referrer };
+    if (["ad", "ads", "advert", "advertisement"].includes(explicit))
+      return { source: "ads", query: q, referrer };
     if (["directory", "browse"].includes(explicit)) {
       return { source: q ? "name_search" : "directory", query: q, referrer };
     }
-    if (["search", "name_search"].includes(explicit)) return { source: "name_search", query: q, referrer };
-    if (["category", "tag", "relevant", "related"].includes(explicit)) return { source: "relevant_search", query: q, referrer };
-    if (["listing", "listings", "shop", "product"].includes(explicit)) return { source: "listing", query: q, referrer };
+    if (["search", "name_search"].includes(explicit))
+      return { source: "name_search", query: q, referrer };
+    if (["category", "tag", "relevant", "related"].includes(explicit))
+      return { source: "relevant_search", query: q, referrer };
+    if (["listing", "listings", "shop", "product"].includes(explicit))
+      return { source: "listing", query: q, referrer };
     return { source: explicit.slice(0, 32), query: q, referrer };
   }
 
@@ -79,15 +95,24 @@ function classifySource(): { source: string; query: string | null; referrer: str
     const sameHost = r.host === url.host;
     if (sameHost) {
       const p = r.pathname;
-      if (p === "/businesses" || p === "/businesses/") return { source: "directory", query: q, referrer };
+      if (p === "/businesses" || p === "/businesses/")
+        return { source: "directory", query: q, referrer };
       if (p.startsWith("/businesses")) return { source: "relevant_search", query: q, referrer };
-      if (p.startsWith("/shop") || p.startsWith("/listing")) return { source: "listing", query: q, referrer };
-      if (p.startsWith("/advertise") || p.startsWith("/r/")) return { source: "ads", query: q, referrer };
+      if (p.startsWith("/shop") || p.startsWith("/listing"))
+        return { source: "listing", query: q, referrer };
+      if (p.startsWith("/advertise") || p.startsWith("/r/"))
+        return { source: "ads", query: q, referrer };
       return { source: "internal", query: q, referrer };
     }
     const host = r.host.toLowerCase();
-    if (/(google|bing|yahoo|duckduckgo|ecosia|yandex)\./.test(host)) return { source: "search_engine", query: q, referrer };
-    if (/(facebook|fb\.|instagram|tiktok|twitter|x\.com|linkedin|youtube|t\.co|messenger)\./.test(host)) return { source: "social", query: q, referrer };
+    if (/(google|bing|yahoo|duckduckgo|ecosia|yandex)\./.test(host))
+      return { source: "search_engine", query: q, referrer };
+    if (
+      /(facebook|fb\.|instagram|tiktok|twitter|x\.com|linkedin|youtube|t\.co|messenger)\./.test(
+        host,
+      )
+    )
+      return { source: "social", query: q, referrer };
     return { source: "external", query: q, referrer };
   } catch {
     return { source: "external", query: q, referrer };
@@ -108,7 +133,9 @@ export function useTrackPageView(businessId: string | null | undefined) {
         return;
       }
       window.sessionStorage.setItem(key, "1");
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
     fired.current = true;
     const info = classifySource();
     track("view", { source: info.source, query: info.query, referrer: info.referrer });

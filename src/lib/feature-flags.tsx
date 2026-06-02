@@ -10,13 +10,41 @@ export type FeatureFlagKey =
   | "verifications";
 
 export const FEATURE_FLAG_META: { key: FeatureFlagKey; label: string; description: string }[] = [
-  { key: "towing", label: "Towing marketplace", description: "Tow request flows, provider bids, and towing nav entry." },
-  { key: "referrals", label: "Staff QR referrals", description: "QR-based referral codes, discounts, and redemptions." },
-  { key: "multiCurrency", label: "Multi-currency switcher", description: "Show the header currency switcher and apply conversions site-wide." },
-  { key: "adsInquiry", label: "Advertising inquiries", description: "Public Advertise form + inbound ad inquiry workflows." },
-  { key: "boosts", label: "Listing boosts", description: "Paid boosts and featured placement on listings." },
-  { key: "messaging", label: "Buyer ↔ seller messaging", description: "In-app inbox and contact buttons on listings." },
-  { key: "verifications", label: "Business verifications", description: "Verification submission + verified badges." },
+  {
+    key: "towing",
+    label: "Towing marketplace",
+    description: "Tow request flows, provider bids, and towing nav entry.",
+  },
+  {
+    key: "referrals",
+    label: "Staff QR referrals",
+    description: "QR-based referral codes, discounts, and redemptions.",
+  },
+  {
+    key: "multiCurrency",
+    label: "Multi-currency switcher",
+    description: "Show the header currency switcher and apply conversions site-wide.",
+  },
+  {
+    key: "adsInquiry",
+    label: "Advertising inquiries",
+    description: "Public Advertise form + inbound ad inquiry workflows.",
+  },
+  {
+    key: "boosts",
+    label: "Listing boosts",
+    description: "Paid boosts and featured placement on listings.",
+  },
+  {
+    key: "messaging",
+    label: "Buyer ↔ seller messaging",
+    description: "In-app inbox and contact buttons on listings.",
+  },
+  {
+    key: "verifications",
+    label: "Business verifications",
+    description: "Verification submission + verified badges.",
+  },
 ];
 
 export type FeatureFlags = Record<FeatureFlagKey, boolean>;
@@ -61,7 +89,9 @@ export function FeatureFlagProvider({ children }: { children: ReactNode }) {
   const setFlag = (key: FeatureFlagKey, value: boolean) =>
     setFlags((prev) => ({ ...prev, [key]: value }));
   const setAll = (value: boolean) =>
-    setFlags(() => FEATURE_FLAG_META.reduce((a, f) => ({ ...a, [f.key]: value }), {} as FeatureFlags));
+    setFlags(() =>
+      FEATURE_FLAG_META.reduce((a, f) => ({ ...a, [f.key]: value }), {} as FeatureFlags),
+    );
   const reset = () => setFlags({ ...DEFAULT_FLAGS });
 
   return <Ctx.Provider value={{ flags, setFlag, setAll, reset }}>{children}</Ctx.Provider>;

@@ -51,7 +51,9 @@ export function RideCard({ ride }: { ride: RideCardData }) {
         {subtitle && <p className="text-xs text-muted-foreground">{subtitle}</p>}
         {(ride.owner_name || ride.city) && (
           <p className="mt-1 text-xs text-muted-foreground">
-            {ride.owner_name}{ride.owner_name && ride.city ? " · " : ""}{ride.city}
+            {ride.owner_name}
+            {ride.owner_name && ride.city ? " · " : ""}
+            {ride.city}
           </p>
         )}
       </div>

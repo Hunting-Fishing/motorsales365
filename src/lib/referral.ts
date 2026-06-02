@@ -40,5 +40,8 @@ export function recordTouch(code: string) {
 }
 
 export function getCreditedCode(): string | null {
-  return getCookie("mref_credit") || (typeof window !== "undefined" ? localStorage.getItem("mref_credit") : null);
+  return (
+    getCookie("mref_credit") ||
+    (typeof window !== "undefined" ? localStorage.getItem("mref_credit") : null)
+  );
 }

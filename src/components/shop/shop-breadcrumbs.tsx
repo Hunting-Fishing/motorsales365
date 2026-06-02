@@ -5,8 +5,13 @@ export type BreadcrumbItem = { slug: string; name: string; href?: string };
 
 export function ShopBreadcrumbs({ trail }: { trail: BreadcrumbItem[] }) {
   return (
-    <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-1 text-sm text-muted-foreground">
-      <Link to="/shop" className="hover:text-foreground">Shop</Link>
+    <nav
+      aria-label="Breadcrumb"
+      className="flex flex-wrap items-center gap-1 text-sm text-muted-foreground"
+    >
+      <Link to="/shop" className="hover:text-foreground">
+        Shop
+      </Link>
       {trail.map((item, i) => {
         const last = i === trail.length - 1;
         // Department breadcrumbs use slug "department/<slug>"
@@ -18,11 +23,19 @@ export function ShopBreadcrumbs({ trail }: { trail: BreadcrumbItem[] }) {
             {last ? (
               <span className="text-foreground">{item.name}</span>
             ) : isDept && deptSlug ? (
-              <Link to="/shop/department/$slug" params={{ slug: deptSlug }} className="hover:text-foreground">
+              <Link
+                to="/shop/department/$slug"
+                params={{ slug: deptSlug }}
+                className="hover:text-foreground"
+              >
                 {item.name}
               </Link>
             ) : (
-              <Link to="/shop/$category" params={{ category: item.slug }} className="hover:text-foreground">
+              <Link
+                to="/shop/$category"
+                params={{ category: item.slug }}
+                className="hover:text-foreground"
+              >
                 {item.name}
               </Link>
             )}

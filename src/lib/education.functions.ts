@@ -7,16 +7,20 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 export const listCourses = createServerFn({ method: "GET" })
   .inputValidator((input: { category?: string; search?: string; limit?: number } = {}) =>
-    z.object({
-      category: z.string().max(60).optional(),
-      search: z.string().max(120).optional(),
-      limit: z.number().int().min(1).max(60).optional(),
-    }).parse(input),
+    z
+      .object({
+        category: z.string().max(60).optional(),
+        search: z.string().max(120).optional(),
+        limit: z.number().int().min(1).max(60).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data }) => {
     let q = supabaseAdmin
       .from("courses")
-      .select("id, slug, title, summary, hero_image_url, category, level, duration_minutes, instructor_name, price_php, included_in_tiers, published_at")
+      .select(
+        "id, slug, title, summary, hero_image_url, category, level, duration_minutes, instructor_name, price_php, included_in_tiers, published_at",
+      )
       .eq("status", "published")
       .order("published_at", { ascending: false });
     if (data.category) q = q.eq("category", data.category);
@@ -52,8 +56,16 @@ export const getCourse = createServerFn({ method: "GET" })
     if (!course) return { course: null, modules: [], lessons: [], quizzes: [] };
 
     const [{ data: modules }, { data: quizzes }] = await Promise.all([
-      supabaseAdmin.from("course_modules").select("*").eq("course_id", (course as any).id).order("position"),
-      supabaseAdmin.from("course_quizzes").select("id, module_id, title, pass_threshold, is_final, position").eq("course_id", (course as any).id).order("position"),
+      supabaseAdmin
+        .from("course_modules")
+        .select("*")
+        .eq("course_id", (course as any).id)
+        .order("position"),
+      supabaseAdmin
+        .from("course_quizzes")
+        .select("id, module_id, title, pass_threshold, is_final, position")
+        .eq("course_id", (course as any).id)
+        .order("position"),
     ]);
     const moduleIds = (modules ?? []).map((m: any) => m.id);
     let lessons: any[] = [];
@@ -82,7 +94,8 @@ async function ensureEnrolledViaSubscription(userId: string, course: any): Promi
     .limit(1)
     .maybeSingle();
   if (!sub) return null;
-  if ((sub as any).current_period_end && new Date((sub as any).current_period_end) < new Date()) return null;
+  if ((sub as any).current_period_end && new Date((sub as any).current_period_end) < new Date())
+    return null;
   const { data: plan } = await supabaseAdmin
     .from("subscription_plans")
     .select("name")
@@ -189,10 +202,12 @@ export const getLessonContent = createServerFn({ method: "POST" })
 export const markLessonComplete = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { lessonId: string; watchSeconds?: number }) =>
-    z.object({
-      lessonId: z.string().uuid(),
-      watchSeconds: z.number().int().min(0).max(86400).optional(),
-    }).parse(input),
+    z
+      .object({
+        lessonId: z.string().uuid(),
+        watchSeconds: z.number().int().min(0).max(86400).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const userId = context.userId as string;
@@ -216,18 +231,16 @@ export const markLessonComplete = createServerFn({ method: "POST" })
       .maybeSingle();
     if (!enrollment) throw new Error("Not enrolled");
 
-    await supabaseAdmin
-      .from("course_lesson_progress")
-      .upsert(
-        {
-          enrollment_id: (enrollment as any).id,
-          lesson_id: data.lessonId,
-          watch_seconds: data.watchSeconds ?? 0,
-          completed_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "enrollment_id,lesson_id" },
-      );
+    await supabaseAdmin.from("course_lesson_progress").upsert(
+      {
+        enrollment_id: (enrollment as any).id,
+        lesson_id: data.lessonId,
+        watch_seconds: data.watchSeconds ?? 0,
+        completed_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "enrollment_id,lesson_id" },
+    );
     return { ok: true };
   });
 
@@ -244,7 +257,8 @@ export const getEnrollmentProgress = createServerFn({ method: "POST" })
       .eq("user_id", userId)
       .eq("course_id", data.courseId)
       .maybeSingle();
-    if (!enrollment) return { enrollment: null, completedLessonIds: [] as string[], certificate: null };
+    if (!enrollment)
+      return { enrollment: null, completedLessonIds: [] as string[], certificate: null };
     const { data: progress } = await supabaseAdmin
       .from("course_lesson_progress")
       .select("lesson_id, completed_at")
@@ -295,11 +309,19 @@ export const getQuiz = createServerFn({ method: "POST" })
 
 export const submitQuiz = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { quizId: string; answers: Array<{ questionId: string; choice: number }> }) =>
-    z.object({
-      quizId: z.string().uuid(),
-      answers: z.array(z.object({ questionId: z.string().uuid(), choice: z.number().int().min(0).max(20) })).min(1).max(200),
-    }).parse(input),
+  .inputValidator(
+    (input: { quizId: string; answers: Array<{ questionId: string; choice: number }> }) =>
+      z
+        .object({
+          quizId: z.string().uuid(),
+          answers: z
+            .array(
+              z.object({ questionId: z.string().uuid(), choice: z.number().int().min(0).max(20) }),
+            )
+            .min(1)
+            .max(200),
+        })
+        .parse(input),
   )
   .handler(async ({ data, context }) => {
     const userId = context.userId as string;
@@ -322,7 +344,9 @@ export const submitQuiz = createServerFn({ method: "POST" })
       .from("course_quiz_questions")
       .select("id, correct_index")
       .eq("quiz_id", data.quizId);
-    const correctMap = new Map<string, number>((questions ?? []).map((q: any) => [q.id, q.correct_index]));
+    const correctMap = new Map<string, number>(
+      (questions ?? []).map((q: any) => [q.id, q.correct_index]),
+    );
     let correct = 0;
     for (const a of data.answers) {
       if (correctMap.get(a.questionId) === a.choice) correct += 1;
@@ -389,8 +413,16 @@ export const verifyCertificate = createServerFn({ method: "GET" })
       .maybeSingle();
     if (!cert) return { certificate: null };
     const [{ data: course }, { data: profile }] = await Promise.all([
-      supabaseAdmin.from("courses").select("title, slug, instructor_name").eq("id", (cert as any).course_id).maybeSingle(),
-      supabaseAdmin.from("profiles").select("full_name").eq("id", (cert as any).user_id).maybeSingle(),
+      supabaseAdmin
+        .from("courses")
+        .select("title, slug, instructor_name")
+        .eq("id", (cert as any).course_id)
+        .maybeSingle(),
+      supabaseAdmin
+        .from("profiles")
+        .select("full_name")
+        .eq("id", (cert as any).user_id)
+        .maybeSingle(),
     ]);
     return {
       certificate: {
@@ -425,7 +457,10 @@ export const listMyEnrollments = createServerFn({ method: "GET" })
       supabaseAdmin
         .from("course_certificates")
         .select("enrollment_id, code")
-        .in("enrollment_id", enrollments.map((e: any) => e.id)),
+        .in(
+          "enrollment_id",
+          enrollments.map((e: any) => e.id),
+        ),
     ]);
     const courseMap = new Map((courses ?? []).map((c: any) => [c.id, c]));
     const certMap = new Map((certs ?? []).map((c: any) => [c.enrollment_id, c.code]));
@@ -443,7 +478,9 @@ export const listMyEnrollments = createServerFn({ method: "GET" })
 export const listTrainingPartners = createServerFn({ method: "GET" }).handler(async () => {
   const { data, error } = await supabaseAdmin
     .from("training_partners")
-    .select("id, slug, name, logo_url, website_url, description, location, specialties, tier, sponsored_until")
+    .select(
+      "id, slug, name, logo_url, website_url, description, location, specialties, tier, sponsored_until",
+    )
     .eq("active", true)
     .order("tier", { ascending: true })
     .order("name", { ascending: true });
@@ -460,7 +497,11 @@ async function assertModerator(userId: string) {
 
 const courseInputSchema = z.object({
   id: z.string().uuid().optional(),
-  slug: z.string().min(1).max(120).regex(/^[a-z0-9-]+$/),
+  slug: z
+    .string()
+    .min(1)
+    .max(120)
+    .regex(/^[a-z0-9-]+$/),
   title: z.string().min(1).max(200),
   summary: z.string().max(500).nullable().optional(),
   description: z.string().max(10000).nullable().optional(),
@@ -499,10 +540,19 @@ export const adminUpsertCourse = createServerFn({ method: "POST" })
       published_at: data.status === "published" ? new Date().toISOString() : null,
     };
     if (data.id) {
-      const { data: updated } = await supabaseAdmin.from("courses").update(row).eq("id", data.id).select().maybeSingle();
+      const { data: updated } = await supabaseAdmin
+        .from("courses")
+        .update(row)
+        .eq("id", data.id)
+        .select()
+        .maybeSingle();
       return { course: updated };
     }
-    const { data: inserted } = await supabaseAdmin.from("courses").insert(row).select().maybeSingle();
+    const { data: inserted } = await supabaseAdmin
+      .from("courses")
+      .insert(row)
+      .select()
+      .maybeSingle();
     return { course: inserted };
   });
 
@@ -519,9 +569,7 @@ export const adminListCourses = createServerFn({ method: "GET" })
 
 export const adminDeleteCourse = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { id: string }) =>
-    z.object({ id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertModerator(context.userId as string);
     await supabaseAdmin.from("courses").delete().eq("id", data.id);
@@ -530,13 +578,19 @@ export const adminDeleteCourse = createServerFn({ method: "POST" })
 
 export const adminGetCourseFull = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { id: string }) =>
-    z.object({ id: z.string().uuid() }).parse(input),
-  )
+  .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertModerator(context.userId as string);
-    const { data: course } = await supabaseAdmin.from("courses").select("*").eq("id", data.id).maybeSingle();
-    const { data: modules } = await supabaseAdmin.from("course_modules").select("*").eq("course_id", data.id).order("position");
+    const { data: course } = await supabaseAdmin
+      .from("courses")
+      .select("*")
+      .eq("id", data.id)
+      .maybeSingle();
+    const { data: modules } = await supabaseAdmin
+      .from("course_modules")
+      .select("*")
+      .eq("course_id", data.id)
+      .order("position");
     const moduleIds = (modules ?? []).map((m: any) => m.id);
     let lessons: any[] = [];
     if (moduleIds.length) {
@@ -547,7 +601,11 @@ export const adminGetCourseFull = createServerFn({ method: "POST" })
         .order("position");
       lessons = ls ?? [];
     }
-    const { data: quizzes } = await supabaseAdmin.from("course_quizzes").select("*").eq("course_id", data.id).order("position");
+    const { data: quizzes } = await supabaseAdmin
+      .from("course_quizzes")
+      .select("*")
+      .eq("course_id", data.id)
+      .order("position");
     return { course, modules: modules ?? [], lessons, quizzes: quizzes ?? [] };
   });
 
@@ -564,14 +622,28 @@ export const adminUpsertModule = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertModerator(context.userId as string);
     if (data.id) {
-      const { data: r } = await supabaseAdmin.from("course_modules").update({
-        title: data.title, summary: data.summary ?? null, position: data.position,
-      }).eq("id", data.id).select().maybeSingle();
+      const { data: r } = await supabaseAdmin
+        .from("course_modules")
+        .update({
+          title: data.title,
+          summary: data.summary ?? null,
+          position: data.position,
+        })
+        .eq("id", data.id)
+        .select()
+        .maybeSingle();
       return { module: r };
     }
-    const { data: r } = await supabaseAdmin.from("course_modules").insert({
-      course_id: data.course_id, title: data.title, summary: data.summary ?? null, position: data.position,
-    }).select().maybeSingle();
+    const { data: r } = await supabaseAdmin
+      .from("course_modules")
+      .insert({
+        course_id: data.course_id,
+        title: data.title,
+        summary: data.summary ?? null,
+        position: data.position,
+      })
+      .select()
+      .maybeSingle();
     return { module: r };
   });
 
@@ -600,15 +672,28 @@ export const adminUpsertLesson = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertModerator(context.userId as string);
     const row = {
-      module_id: data.module_id, title: data.title,
-      video_url: data.video_url ?? null, duration_seconds: data.duration_seconds ?? 0,
-      content_md: data.content_md ?? null, is_preview: data.is_preview ?? false, position: data.position,
+      module_id: data.module_id,
+      title: data.title,
+      video_url: data.video_url ?? null,
+      duration_seconds: data.duration_seconds ?? 0,
+      content_md: data.content_md ?? null,
+      is_preview: data.is_preview ?? false,
+      position: data.position,
     };
     if (data.id) {
-      const { data: r } = await supabaseAdmin.from("course_lessons").update(row).eq("id", data.id).select().maybeSingle();
+      const { data: r } = await supabaseAdmin
+        .from("course_lessons")
+        .update(row)
+        .eq("id", data.id)
+        .select()
+        .maybeSingle();
       return { lesson: r };
     }
-    const { data: r } = await supabaseAdmin.from("course_lessons").insert(row).select().maybeSingle();
+    const { data: r } = await supabaseAdmin
+      .from("course_lessons")
+      .insert(row)
+      .select()
+      .maybeSingle();
     return { lesson: r };
   });
 
@@ -625,7 +710,11 @@ export const adminDeleteLesson = createServerFn({ method: "POST" })
 
 const partnerSchema = z.object({
   id: z.string().uuid().optional(),
-  slug: z.string().min(1).max(80).regex(/^[a-z0-9-]+$/),
+  slug: z
+    .string()
+    .min(1)
+    .max(80)
+    .regex(/^[a-z0-9-]+$/),
   name: z.string().min(1).max(200),
   logo_url: z.string().url().max(2000).nullable().optional(),
   website_url: z.string().url().max(2000),
@@ -655,16 +744,31 @@ export const adminUpsertPartner = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertModerator(context.userId as string);
     const row: any = {
-      slug: data.slug, name: data.name, logo_url: data.logo_url ?? null,
-      website_url: data.website_url, description: data.description ?? null,
-      location: data.location ?? null, specialties: data.specialties ?? [],
-      tier: data.tier, sponsored_until: data.sponsored_until || null, active: data.active,
+      slug: data.slug,
+      name: data.name,
+      logo_url: data.logo_url ?? null,
+      website_url: data.website_url,
+      description: data.description ?? null,
+      location: data.location ?? null,
+      specialties: data.specialties ?? [],
+      tier: data.tier,
+      sponsored_until: data.sponsored_until || null,
+      active: data.active,
     };
     if (data.id) {
-      const { data: r } = await supabaseAdmin.from("training_partners").update(row).eq("id", data.id).select().maybeSingle();
+      const { data: r } = await supabaseAdmin
+        .from("training_partners")
+        .update(row)
+        .eq("id", data.id)
+        .select()
+        .maybeSingle();
       return { partner: r };
     }
-    const { data: r } = await supabaseAdmin.from("training_partners").insert(row).select().maybeSingle();
+    const { data: r } = await supabaseAdmin
+      .from("training_partners")
+      .insert(row)
+      .select()
+      .maybeSingle();
     return { partner: r };
   });
 
@@ -684,11 +788,13 @@ import { type StripeEnv, createStripeClient, validateReturnUrl } from "@/lib/str
 export const createCourseCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { courseId: string; returnUrl: string; environment: StripeEnv }) =>
-    z.object({
-      courseId: z.string().uuid(),
-      returnUrl: z.string().url(),
-      environment: z.enum(["sandbox", "live"]),
-    }).parse(input),
+    z
+      .object({
+        courseId: z.string().uuid(),
+        returnUrl: z.string().url(),
+        environment: z.enum(["sandbox", "live"]),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     validateReturnUrl(data.returnUrl);

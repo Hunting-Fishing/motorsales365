@@ -144,7 +144,8 @@ export function SupportTicketForm({
         <CheckCircle2 className="h-10 w-10 text-primary" />
         <h3 className="text-lg font-semibold">Got it — your request is in.</h3>
         <p className="max-w-md text-sm text-muted-foreground">
-          We sent a confirmation to <strong>{state.email}</strong>. Our team typically replies within 1 business day.
+          We sent a confirmation to <strong>{state.email}</strong>. Our team typically replies
+          within 1 business day.
         </p>
         <Button
           variant="outline"

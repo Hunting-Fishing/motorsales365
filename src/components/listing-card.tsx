@@ -1,5 +1,17 @@
 import { Link } from "@tanstack/react-router";
-import { MapPin, Camera, Video, Star, Droplets, Wrench, Send, SprayCan, Recycle, Eye, Heart } from "lucide-react";
+import {
+  MapPin,
+  Camera,
+  Video,
+  Star,
+  Droplets,
+  Wrench,
+  Send,
+  SprayCan,
+  Recycle,
+  Eye,
+  Heart,
+} from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { VerifiedBadge } from "@/components/verified-badge";
 import { ListingPrice } from "@/components/listing-price";
@@ -87,11 +99,15 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
           />
           <div className="absolute left-2 top-2 flex flex-wrap gap-1">
             {boosted && (
-              <Badge className="bg-accent text-accent-foreground"><Star className="mr-1 h-3 w-3" />Featured</Badge>
+              <Badge className="bg-accent text-accent-foreground">
+                <Star className="mr-1 h-3 w-3" />
+                Featured
+              </Badge>
             )}
             {catMeta && (
               <Badge className="bg-primary text-primary-foreground">
-                <catMeta.Icon className="mr-1 h-3 w-3" />{catMeta.label}
+                <catMeta.Icon className="mr-1 h-3 w-3" />
+                {catMeta.label}
               </Badge>
             )}
             <Badge variant={listing.seller_type === "business" ? "default" : "secondary"}>
@@ -103,35 +119,44 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
             )}
           </div>
           <div className="absolute bottom-2 right-2 flex items-center gap-2 rounded-md bg-black/55 px-2 py-1 text-[11px] font-medium text-white">
-            <span className="flex items-center gap-1"><Camera className="h-3 w-3" />{listing.photo_count ?? 0}</span>
-            {listing.has_video && <span className="flex items-center gap-1"><Video className="h-3 w-3" />1</span>}
+            <span className="flex items-center gap-1">
+              <Camera className="h-3 w-3" />
+              {listing.photo_count ?? 0}
+            </span>
+            {listing.has_video && (
+              <span className="flex items-center gap-1">
+                <Video className="h-3 w-3" />1
+              </span>
+            )}
           </div>
         </div>
         <div className="flex flex-1 flex-col p-4">
           <h3 className="line-clamp-2 font-semibold leading-snug">{listing.title}</h3>
-          {summary && (
-            <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{summary}</p>
-          )}
+          {summary && <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{summary}</p>}
           <ListingPrice pricePhp={listing.price_php} size="md" className="mt-2" />
           <div className="mt-auto flex items-center justify-between gap-2 pt-3 text-xs text-muted-foreground">
             <span className="flex min-w-0 items-center gap-1">
               <MapPin className="h-3 w-3" />
-              <span className="truncate">{[listing.city, listing.region].filter(Boolean).join(", ") || "Philippines"}</span>
+              <span className="truncate">
+                {[listing.city, listing.region].filter(Boolean).join(", ") || "Philippines"}
+              </span>
             </span>
             <span className="flex shrink-0 items-center gap-2">
-              <span className="inline-flex items-center gap-0.5"><Eye className="h-3 w-3" />{(listing.view_count ?? 0).toLocaleString()}</span>
-              <span className="inline-flex items-center gap-0.5"><Heart className="h-3 w-3" />{(listing.like_count ?? 0).toLocaleString()}</span>
+              <span className="inline-flex items-center gap-0.5">
+                <Eye className="h-3 w-3" />
+                {(listing.view_count ?? 0).toLocaleString()}
+              </span>
+              <span className="inline-flex items-center gap-0.5">
+                <Heart className="h-3 w-3" />
+                {(listing.like_count ?? 0).toLocaleString()}
+              </span>
             </span>
           </div>
         </div>
       </Link>
       {showServices && (
         <div className="border-t border-border px-4 pb-4 pt-2">
-          <ServiceStrip
-            listingId={listing.id}
-            vehicleSummary={listing.title}
-            compact
-          />
+          <ServiceStrip listingId={listing.id} vehicleSummary={listing.title} compact />
         </div>
       )}
     </div>

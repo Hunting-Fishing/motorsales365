@@ -10,8 +10,21 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Search, Upload, X, Image as ImageIcon } from "lucide-react";
 import { LocationDrilldown, type LocationValue } from "@/components/businesses/location-drilldown";
 import { LocationPicker } from "@/components/businesses/location-picker";
@@ -29,9 +42,17 @@ export const Route = createFileRoute("/businesses/submit")({
   head: () => ({
     meta: [
       { title: "List your business — 365 MotorSales Philippines" },
-      { name: "description", content: "Add your dealership, shop, or auto service to the 365 MotorSales Philippines directory. Reach buyers and sellers nationwide." },
+      {
+        name: "description",
+        content:
+          "Add your dealership, shop, or auto service to the 365 MotorSales Philippines directory. Reach buyers and sellers nationwide.",
+      },
       { property: "og:title", content: "List your business — 365 MotorSales Philippines" },
-      { property: "og:description", content: "Add your dealership, shop, or auto service to the 365 MotorSales Philippines directory." },
+      {
+        property: "og:description",
+        content:
+          "Add your dealership, shop, or auto service to the 365 MotorSales Philippines directory.",
+      },
       { property: "og:url", content: "https://www.365motorsales.com/businesses/submit" },
     ],
     links: [{ rel: "canonical", href: "https://www.365motorsales.com/businesses/submit" }],
@@ -40,15 +61,28 @@ export const Route = createFileRoute("/businesses/submit")({
 });
 
 function slugify(s: string) {
-  return s.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);
+  return s
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 60);
 }
 
 function SubmitBusinessPage() {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [types, setTypes] = useState<{ slug: string; label: string }[]>([]);
-  const [tags, setTags] = useState<{ slug: string; label: string; type_slug: string | null; category: string | null; is_popular: boolean }[]>([]);
+  const [tags, setTags] = useState<
+    {
+      slug: string;
+      label: string;
+      type_slug: string | null;
+      category: string | null;
+      is_popular: boolean;
+    }[]
+  >([]);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [name, setName] = useState("");
   const [typeSlug, setTypeSlug] = useState<string>("");
@@ -59,7 +93,12 @@ function SubmitBusinessPage() {
   const [website, setWebsite] = useState("");
   const [messengerUrl, setMessengerUrl] = useState("");
   const [streetAddress, setStreetAddress] = useState("");
-  const [loc, setLoc] = useState<LocationValue>({ region: null, province: null, city: null, barangay: null });
+  const [loc, setLoc] = useState<LocationValue>({
+    region: null,
+    province: null,
+    city: null,
+    barangay: null,
+  });
   const [lat, setLat] = useState("");
   const [lng, setLng] = useState("");
   const [postalCode, setPostalCode] = useState("");
@@ -78,9 +117,18 @@ function SubmitBusinessPage() {
 
   const submitTypeSuggestion = async () => {
     const label = suggestLabel.trim();
-    if (label.length < 2) { toast.error("Please enter a type name (min 2 chars)."); return; }
-    if (label.length > 80) { toast.error("Type name is too long (max 80)."); return; }
-    if (!user) { toast.error("Please sign in first."); return; }
+    if (label.length < 2) {
+      toast.error("Please enter a type name (min 2 chars).");
+      return;
+    }
+    if (label.length > 80) {
+      toast.error("Type name is too long (max 80).");
+      return;
+    }
+    if (!user) {
+      toast.error("Please sign in first.");
+      return;
+    }
     setSuggestSubmitting(true);
     const { error } = await (supabase as any).from("business_type_suggestions").insert({
       proposed_label: label,
@@ -89,9 +137,14 @@ function SubmitBusinessPage() {
       submitter_email: user.email ?? null,
     });
     setSuggestSubmitting(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Thanks! Your suggestion was sent to admin for review.");
-    setSuggestLabel(""); setSuggestNotes(""); setSuggestOpen(false);
+    setSuggestLabel("");
+    setSuggestNotes("");
+    setSuggestOpen(false);
   };
 
   useEffect(() => {
@@ -102,9 +155,13 @@ function SubmitBusinessPage() {
     (async () => {
       const [{ data: t1 }, { data: t2 }] = await Promise.all([
         (supabase as any).from("business_types").select("slug,label").order("sort_order"),
-        (supabase as any).from("business_tags").select("slug,label,type_slug,category,sort_order,is_popular").order("sort_order"),
+        (supabase as any)
+          .from("business_tags")
+          .select("slug,label,type_slug,category,sort_order,is_popular")
+          .order("sort_order"),
       ]);
-      setTypes(t1 ?? []); setTags(t2 ?? []);
+      setTypes(t1 ?? []);
+      setTags(t2 ?? []);
     })();
   }, []);
 
@@ -164,7 +221,7 @@ function SubmitBusinessPage() {
     try {
       const res = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${la}&lon=${ln}&zoom=18&addressdetails=1`,
-        { headers: { "Accept": "application/json", "Accept-Language": "en" } },
+        { headers: { Accept: "application/json", "Accept-Language": "en" } },
       );
       const json = await res.json();
       const a = json?.address ?? {};
@@ -197,21 +254,34 @@ function SubmitBusinessPage() {
   };
 
   const useMyLocation = () => {
-    if (!navigator.geolocation) { toast.error("Geolocation not supported"); return; }
+    if (!navigator.geolocation) {
+      toast.error("Geolocation not supported");
+      return;
+    }
     navigator.geolocation.getCurrentPosition(
-      (pos) => { setCoords(pos.coords.latitude, pos.coords.longitude); toast.success("Location captured"); },
+      (pos) => {
+        setCoords(pos.coords.latitude, pos.coords.longitude);
+        toast.success("Location captured");
+      },
       () => toast.error("Could not get your location"),
     );
   };
 
   const geocodeAddress = async () => {
     const parts = [streetAddress, loc.barangay, loc.city, loc.province, loc.region, "Philippines"]
-      .filter(Boolean).join(", ");
-    if (!parts.trim()) { toast.error("Enter an address or pick a location first"); return; }
+      .filter(Boolean)
+      .join(", ");
+    if (!parts.trim()) {
+      toast.error("Enter an address or pick a location first");
+      return;
+    }
     try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ph&q=${encodeURIComponent(parts)}`, {
-        headers: { "Accept": "application/json" },
-      });
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ph&q=${encodeURIComponent(parts)}`,
+        {
+          headers: { Accept: "application/json" },
+        },
+      );
       const json = await res.json();
       if (Array.isArray(json) && json[0]) {
         setCoords(Number(json[0].lat), Number(json[0].lon), { reverse: false });
@@ -228,12 +298,20 @@ function SubmitBusinessPage() {
     const file = e.target.files?.[0];
     e.target.value = "";
     if (!file || !user) return;
-    if (file.size > 5 * 1024 * 1024) { toast.error("Logo must be 5MB or smaller"); return; }
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Logo must be 5MB or smaller");
+      return;
+    }
     setLogoUploading(true);
     try {
       const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
       const path = `${user.id}/_pending/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-      const { publicUrl } = await uploadWithRetry({ bucket: "business-media", path, file, contentType: file.type });
+      const { publicUrl } = await uploadWithRetry({
+        bucket: "business-media",
+        path,
+        file,
+        contentType: file.type,
+      });
       setLogoUrl(publicUrl);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Upload failed");
@@ -242,13 +320,18 @@ function SubmitBusinessPage() {
     }
   };
 
-
   const submitFn = useServerFn(submitBusiness);
 
   const submit = async () => {
     if (!user) return;
-    if (!name.trim() || !typeSlug) { toast.error("Name and business type are required"); return; }
-    if (!hasOpenDay(hours)) { toast.error("Set at least one open day in your business hours."); return; }
+    if (!name.trim() || !typeSlug) {
+      toast.error("Name and business type are required");
+      return;
+    }
+    if (!hasOpenDay(hours)) {
+      toast.error("Set at least one open day in your business hours.");
+      return;
+    }
     setSubmitting(true);
     try {
       const result = await submitFn({
@@ -284,14 +367,20 @@ function SubmitBusinessPage() {
     }
   };
 
-  const visibleTags = typeSlug ? tags.filter((t) => t.type_slug === null || t.type_slug === typeSlug) : tags.filter((t) => t.type_slug === null);
+  const visibleTags = typeSlug
+    ? tags.filter((t) => t.type_slug === null || t.type_slug === typeSlug)
+    : tags.filter((t) => t.type_slug === null);
   const popularTags = visibleTags.filter((t) => t.is_popular).slice(0, 10);
   const popularSet = new Set(popularTags.map((t) => t.slug));
-  const extraSelected = visibleTags.filter((t) => selectedTags.includes(t.slug) && !popularSet.has(t.slug));
+  const extraSelected = visibleTags.filter(
+    (t) => selectedTags.includes(t.slug) && !popularSet.has(t.slug),
+  );
   const inlineTags = [...popularTags, ...extraSelected];
 
   const toggleTag = (slug: string) =>
-    setSelectedTags((prev) => prev.includes(slug) ? prev.filter((x) => x !== slug) : [...prev, slug]);
+    setSelectedTags((prev) =>
+      prev.includes(slug) ? prev.filter((x) => x !== slug) : [...prev, slug],
+    );
 
   const prettyCategory = (k: string | null) => {
     if (!k) return "Other";
@@ -301,7 +390,12 @@ function SubmitBusinessPage() {
       station_services: "Station services",
     };
     if (overrides[k]) return overrides[k];
-    return k.split("_").map((w) => w[0].toUpperCase() + w.slice(1)).join(" & ").replace("Vehicle & Scope", "Vehicle scope").replace("Service & Mode", "Service mode");
+    return k
+      .split("_")
+      .map((w) => w[0].toUpperCase() + w.slice(1))
+      .join(" & ")
+      .replace("Vehicle & Scope", "Vehicle scope")
+      .replace("Service & Mode", "Service mode");
   };
 
   const filteredDialogTags = visibleTags.filter((t) => {
@@ -316,25 +410,42 @@ function SubmitBusinessPage() {
   }
   const groupKeys = Object.keys(grouped).sort();
 
-
-  if (loading || !user) return <SiteLayout><div className="p-12 text-center">Loading…</div></SiteLayout>;
+  if (loading || !user)
+    return (
+      <SiteLayout>
+        <div className="p-12 text-center">Loading…</div>
+      </SiteLayout>
+    );
 
   return (
     <SiteLayout>
       <div className="container mx-auto max-w-3xl px-4 py-8">
-        <Link to="/businesses" className="text-sm text-muted-foreground hover:text-foreground">← Back to businesses</Link>
-        <h1 className="mt-2 font-display text-2xl font-bold tracking-tight md:text-3xl">List your business</h1>
-        <p className="mb-6 text-sm text-muted-foreground">Submissions go through a quick review before being published.</p>
+        <Link to="/businesses" className="text-sm text-muted-foreground hover:text-foreground">
+          ← Back to businesses
+        </Link>
+        <h1 className="mt-2 font-display text-2xl font-bold tracking-tight md:text-3xl">
+          List your business
+        </h1>
+        <p className="mb-6 text-sm text-muted-foreground">
+          Submissions go through a quick review before being published.
+        </p>
 
         <Card className="space-y-5 p-5">
           <div>
             <Label>Business name *</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} maxLength={120} placeholder="e.g. Quezon Ave Toyota" />
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              maxLength={120}
+              placeholder="e.g. Quezon Ave Toyota"
+            />
           </div>
 
           <div>
             <Label>Business logo / avatar</Label>
-            <p className="mb-2 text-xs text-muted-foreground">Square works best. PNG or JPG, up to 5MB.</p>
+            <p className="mb-2 text-xs text-muted-foreground">
+              Square works best. PNG or JPG, up to 5MB.
+            </p>
             <div className="flex items-center gap-3">
               <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-muted">
                 {logoUrl ? (
@@ -347,7 +458,13 @@ function SubmitBusinessPage() {
                 <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-secondary">
                   <Upload className="h-3.5 w-3.5" />
                   {logoUploading ? "Uploading…" : logoUrl ? "Replace logo" : "Upload logo"}
-                  <input type="file" accept="image/*" className="hidden" onChange={onLogoChange} disabled={logoUploading} />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={onLogoChange}
+                    disabled={logoUploading}
+                  />
                 </label>
                 {logoUrl && (
                   <button
@@ -362,13 +479,14 @@ function SubmitBusinessPage() {
             </div>
           </div>
 
-
           <div>
             <div className="mb-1 flex items-center justify-between gap-2">
               <Label>Business type *</Label>
               <Dialog open={suggestOpen} onOpenChange={setSuggestOpen}>
                 <DialogTrigger asChild>
-                  <Button type="button" variant="outline" size="sm">+ Add</Button>
+                  <Button type="button" variant="outline" size="sm">
+                    + Add
+                  </Button>
                 </DialogTrigger>
                 <DialogContent className="max-w-md">
                   <DialogHeader>
@@ -376,7 +494,8 @@ function SubmitBusinessPage() {
                   </DialogHeader>
                   <div className="space-y-3">
                     <p className="text-sm text-muted-foreground">
-                      Don't see your type? Suggest it below. Our admin team will review and either add it to the list or merge it with an existing type.
+                      Don't see your type? Suggest it below. Our admin team will review and either
+                      add it to the list or merge it with an existing type.
                     </p>
                     <div>
                       <Label>Type name *</Label>
@@ -399,18 +518,36 @@ function SubmitBusinessPage() {
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button type="button" variant="ghost" onClick={() => setSuggestOpen(false)}>Cancel</Button>
-                    <Button type="button" onClick={submitTypeSuggestion} disabled={suggestSubmitting}>
+                    <Button type="button" variant="ghost" onClick={() => setSuggestOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={submitTypeSuggestion}
+                      disabled={suggestSubmitting}
+                    >
                       {suggestSubmitting ? "Sending…" : "Send to admin"}
                     </Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
             </div>
-            <Select value={typeSlug} onValueChange={(v) => { setTypeSlug(v); setSelectedTags([]); }}>
-              <SelectTrigger><SelectValue placeholder="Choose a type" /></SelectTrigger>
+            <Select
+              value={typeSlug}
+              onValueChange={(v) => {
+                setTypeSlug(v);
+                setSelectedTags([]);
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Choose a type" />
+              </SelectTrigger>
               <SelectContent>
-                {types.map((t) => <SelectItem key={t.slug} value={t.slug}>{t.label}</SelectItem>)}
+                {types.map((t) => (
+                  <SelectItem key={t.slug} value={t.slug}>
+                    {t.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -418,10 +555,19 @@ function SubmitBusinessPage() {
           {visibleTags.length > 0 && (
             <div>
               <div className="mb-1 flex items-center justify-between gap-2">
-                <Label>Tags {selectedTags.length > 0 && <span className="ml-1 text-xs text-muted-foreground">({selectedTags.length} selected)</span>}</Label>
+                <Label>
+                  Tags{" "}
+                  {selectedTags.length > 0 && (
+                    <span className="ml-1 text-xs text-muted-foreground">
+                      ({selectedTags.length} selected)
+                    </span>
+                  )}
+                </Label>
                 <Dialog open={tagsOpen} onOpenChange={setTagsOpen}>
                   <DialogTrigger asChild>
-                    <Button type="button" variant="outline" size="sm">Browse all tags</Button>
+                    <Button type="button" variant="outline" size="sm">
+                      Browse all tags
+                    </Button>
                   </DialogTrigger>
                   <DialogContent className="max-h-[85vh] max-w-2xl overflow-hidden p-0">
                     <DialogHeader className="border-b p-4">
@@ -441,7 +587,9 @@ function SubmitBusinessPage() {
                     </div>
                     <div className="max-h-[55vh] space-y-5 overflow-y-auto p-4">
                       {groupKeys.length === 0 && (
-                        <p className="py-8 text-center text-sm text-muted-foreground">No tags match "{tagSearch}"</p>
+                        <p className="py-8 text-center text-sm text-muted-foreground">
+                          No tags match "{tagSearch}"
+                        </p>
                       )}
                       {groupKeys.map((k) => (
                         <div key={k}>
@@ -453,10 +601,13 @@ function SubmitBusinessPage() {
                               const on = selectedTags.includes(t.slug);
                               return (
                                 <button
-                                  type="button" key={t.slug}
+                                  type="button"
+                                  key={t.slug}
                                   onClick={() => toggleTag(t.slug)}
                                   className={`rounded-full border px-3 py-1 text-xs transition ${on ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}
-                                >{t.label}</button>
+                                >
+                                  {t.label}
+                                </button>
                               );
                             })}
                           </div>
@@ -464,22 +615,38 @@ function SubmitBusinessPage() {
                       ))}
                     </div>
                     <DialogFooter className="border-t p-4">
-                      <span className="mr-auto self-center text-xs text-muted-foreground">{selectedTags.length} selected</span>
-                      <Button type="button" onClick={() => { setTagsOpen(false); setTagSearch(""); }}>Done</Button>
+                      <span className="mr-auto self-center text-xs text-muted-foreground">
+                        {selectedTags.length} selected
+                      </span>
+                      <Button
+                        type="button"
+                        onClick={() => {
+                          setTagsOpen(false);
+                          setTagSearch("");
+                        }}
+                      >
+                        Done
+                      </Button>
                     </DialogFooter>
                   </DialogContent>
                 </Dialog>
               </div>
-              <p className="mb-2 text-xs text-muted-foreground">Top {popularTags.length} popular tags shown — use "Browse all tags" for the full library.</p>
+              <p className="mb-2 text-xs text-muted-foreground">
+                Top {popularTags.length} popular tags shown — use "Browse all tags" for the full
+                library.
+              </p>
               <div className="flex flex-wrap gap-2">
                 {inlineTags.map((t) => {
                   const on = selectedTags.includes(t.slug);
                   return (
                     <button
-                      type="button" key={t.slug}
+                      type="button"
+                      key={t.slug}
                       onClick={() => toggleTag(t.slug)}
                       className={`rounded-full border px-3 py-1 text-xs transition ${on ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}
-                    >{t.label}</button>
+                    >
+                      {t.label}
+                    </button>
                   );
                 })}
               </div>
@@ -497,8 +664,8 @@ function SubmitBusinessPage() {
                   typeSlug === "parts_accessories"
                     ? "e.g. Bosch, Denso, NGK, Michelin, Yokohama"
                     : typeSlug === "salvage"
-                    ? "e.g. Toyota, Honda, Mitsubishi, Isuzu"
-                    : "e.g. Toyota, Honda, Mitsubishi, Ford"
+                      ? "e.g. Toyota, Honda, Mitsubishi, Isuzu"
+                      : "e.g. Toyota, Honda, Mitsubishi, Ford"
                 }
               />
               <p className="mt-1 text-xs text-muted-foreground">
@@ -509,11 +676,21 @@ function SubmitBusinessPage() {
 
           <div>
             <Label>Description</Label>
-            <Textarea rows={4} value={description} onChange={(e) => setDescription(e.target.value)} maxLength={2000} />
+            <Textarea
+              rows={4}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              maxLength={2000}
+            />
           </div>
 
           <div>
-            <Label>Price / rate label <span className="text-xs font-normal text-muted-foreground">(optional, shown on map and profile)</span></Label>
+            <Label>
+              Price / rate label{" "}
+              <span className="text-xs font-normal text-muted-foreground">
+                (optional, shown on map and profile)
+              </span>
+            </Label>
             <Input
               value={priceLabel}
               onChange={(e) => setPriceLabel(e.target.value)}
@@ -522,22 +699,56 @@ function SubmitBusinessPage() {
             />
           </div>
 
-
           <div className="grid gap-3 sm:grid-cols-2">
-            <div><Label>Phone</Label><PhoneInput iso={phoneIso} national={phoneNational} onChange={({ iso, national }) => { setPhoneIso(iso); setPhoneNational(national); }} /></div>
-            <div><Label>Email</Label><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
-            <div><Label>Website</Label><Input value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://…" /></div>
-            <div><Label>Messenger / FB</Label><Input value={messengerUrl} onChange={(e) => setMessengerUrl(e.target.value)} placeholder="https://m.me/…" /></div>
+            <div>
+              <Label>Phone</Label>
+              <PhoneInput
+                iso={phoneIso}
+                national={phoneNational}
+                onChange={({ iso, national }) => {
+                  setPhoneIso(iso);
+                  setPhoneNational(national);
+                }}
+              />
+            </div>
+            <div>
+              <Label>Email</Label>
+              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            </div>
+            <div>
+              <Label>Website</Label>
+              <Input
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+                placeholder="https://…"
+              />
+            </div>
+            <div>
+              <Label>Messenger / FB</Label>
+              <Input
+                value={messengerUrl}
+                onChange={(e) => setMessengerUrl(e.target.value)}
+                placeholder="https://m.me/…"
+              />
+            </div>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-[1fr_160px]">
             <div>
               <Label>Street address</Label>
-              <Input value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} maxLength={200} />
+              <Input
+                value={streetAddress}
+                onChange={(e) => setStreetAddress(e.target.value)}
+                maxLength={200}
+              />
             </div>
             <div>
               <Label>Postal code</Label>
-              <Input value={postalCode} onChange={(e) => setPostalCode(e.target.value)} maxLength={10} />
+              <Input
+                value={postalCode}
+                onChange={(e) => setPostalCode(e.target.value)}
+                maxLength={10}
+              />
             </div>
           </div>
 
@@ -550,11 +761,18 @@ function SubmitBusinessPage() {
             <div className="flex flex-wrap items-center justify-between gap-2">
               <Label>Pin your business on the map</Label>
               <div className="flex flex-wrap gap-2">
-                <Button type="button" variant="outline" size="sm" onClick={geocodeAddress}>Find on map</Button>
-                <Button type="button" variant="outline" size="sm" onClick={useMyLocation}>Use my location</Button>
+                <Button type="button" variant="outline" size="sm" onClick={geocodeAddress}>
+                  Find on map
+                </Button>
+                <Button type="button" variant="outline" size="sm" onClick={useMyLocation}>
+                  Use my location
+                </Button>
               </div>
             </div>
-            <p className="mb-2 mt-1 text-xs text-muted-foreground">Click the map or drag the pin to set the exact spot. Coordinates are saved with your listing.</p>
+            <p className="mb-2 mt-1 text-xs text-muted-foreground">
+              Click the map or drag the pin to set the exact spot. Coordinates are saved with your
+              listing.
+            </p>
             <LocationPicker
               lat={lat ? Number(lat) : null}
               lng={lng ? Number(lng) : null}
@@ -569,12 +787,17 @@ function SubmitBusinessPage() {
 
           <div>
             <Label>Business hours</Label>
-            <p className="mb-2 text-xs text-muted-foreground">Set at least one open day so customers know when to reach you. You can refine these any time from your dashboard.</p>
+            <p className="mb-2 text-xs text-muted-foreground">
+              Set at least one open day so customers know when to reach you. You can refine these
+              any time from your dashboard.
+            </p>
             <WeekHoursEditor value={hours} onChange={setHours} />
           </div>
 
           <div className="flex justify-end">
-            <Button onClick={submit} disabled={submitting}>{submitting ? "Submitting…" : "Submit for review"}</Button>
+            <Button onClick={submit} disabled={submitting}>
+              {submitting ? "Submitting…" : "Submit for review"}
+            </Button>
           </div>
         </Card>
       </div>

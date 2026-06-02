@@ -49,13 +49,30 @@ function LeadsInbox() {
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input placeholder="Search customer, subject, or message" value={q} onChange={(e) => setQ(e.target.value)} className="pl-9" />
+          <Input
+            placeholder="Search customer, subject, or message"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            className="pl-9"
+          />
         </div>
-        <FilterPill label="All" to={{ orgId, status: undefined, assigned }} active={status === "all"} />
+        <FilterPill
+          label="All"
+          to={{ orgId, status: undefined, assigned }}
+          active={status === "all"}
+        />
         <FilterPill label="New" to={{ orgId, status: "new", assigned }} active={status === "new"} />
-        <FilterPill label="In progress" to={{ orgId, status: "in_progress", assigned }} active={status === "in_progress"} />
+        <FilterPill
+          label="In progress"
+          to={{ orgId, status: "in_progress", assigned }}
+          active={status === "in_progress"}
+        />
         <FilterPill label="Won" to={{ orgId, status: "won", assigned }} active={status === "won"} />
-        <FilterPill label="Lost" to={{ orgId, status: "lost", assigned }} active={status === "lost"} />
+        <FilterPill
+          label="Lost"
+          to={{ orgId, status: "lost", assigned }}
+          active={status === "lost"}
+        />
       </div>
 
       {isLoading ? (
@@ -65,7 +82,8 @@ function LeadsInbox() {
           <Inbox className="mx-auto h-10 w-10 text-muted-foreground" />
           <p className="mt-3 font-semibold">No leads yet</p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Inquiries on listings, businesses, and tow requests assigned to this team will appear here.
+            Inquiries on listings, businesses, and tow requests assigned to this team will appear
+            here.
           </p>
         </Card>
       ) : (
@@ -87,9 +105,13 @@ function LeadsInbox() {
                     <span className="font-semibold truncate">{l.customer_name ?? "Customer"}</span>
                     <Badge className={sb.cls}>{sb.label}</Badge>
                     {l.assignee ? (
-                      <Badge variant="outline" className="text-xs">→ {l.assignee.full_name?.split(" ")[0]}</Badge>
+                      <Badge variant="outline" className="text-xs">
+                        → {l.assignee.full_name?.split(" ")[0]}
+                      </Badge>
                     ) : (
-                      <Badge variant="outline" className="text-xs text-amber-600">Unassigned</Badge>
+                      <Badge variant="outline" className="text-xs text-amber-600">
+                        Unassigned
+                      </Badge>
                     )}
                   </div>
                   <p className="mt-0.5 truncate text-sm text-muted-foreground">

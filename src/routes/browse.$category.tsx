@@ -11,10 +11,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { LocationPicker } from "@/components/location-picker";
 import { VehiclePicker } from "@/components/vehicle-picker";
@@ -36,11 +45,18 @@ const searchSchema = z.object({
 });
 
 const CATEGORY_LABEL: Record<string, string> = {
-  car: "Cars", motorcycle: "Motorcycles", boat: "Boats",
-  airplane: "Airplanes", equipment: "Heavy Equipment",
+  car: "Cars",
+  motorcycle: "Motorcycles",
+  boat: "Boats",
+  airplane: "Airplanes",
+  equipment: "Heavy Equipment",
   towing: "Towing & Trucking",
-  carwash: "Car Wash", parts: "Parts & Accessories", drone: "Drones & Aerial",
-  repair: "Repair Shops", bodyshop: "Body Shops", salvage: "Auto Salvage",
+  carwash: "Car Wash",
+  parts: "Parts & Accessories",
+  drone: "Drones & Aerial",
+  repair: "Repair Shops",
+  bodyshop: "Body Shops",
+  salvage: "Auto Salvage",
   other: "Other Transport",
 };
 
@@ -88,12 +104,13 @@ function BrowsePage() {
   useEffect(() => {
     const fetchListings = async () => {
       setLoading(true);
-      const baseSelect = "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status)";
+      const baseSelect =
+        "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status)";
       const buildBase = () => {
         let q = supabase
           .from("listings")
           .select(baseSelect)
-          .in("status", ["active","pending_sale"])
+          .in("status", ["active", "pending_sale"])
           .eq("category_slug", category);
         if (search.region && search.region !== "all") q = q.eq("region", search.region);
         if (search.province) q = q.eq("province", search.province);
@@ -108,7 +125,10 @@ function BrowsePage() {
         if (search.engine) q = q.ilike("attributes->>engine", search.engine);
         if (search.sort === "price_asc") q = q.order("price_php", { ascending: true });
         else if (search.sort === "price_desc") q = q.order("price_php", { ascending: false });
-        else q = q.order("boost_until", { ascending: false, nullsFirst: false }).order("published_at", { ascending: false, nullsFirst: false });
+        else
+          q = q
+            .order("boost_until", { ascending: false, nullsFirst: false })
+            .order("published_at", { ascending: false, nullsFirst: false });
         return q;
       };
 
@@ -144,19 +164,41 @@ function BrowsePage() {
         const photos = (r.listing_media ?? []).filter((m: any) => m.type === "photo");
         const videos = (r.listing_media ?? []).filter((m: any) => m.type === "video");
         return {
-          id: r.id, title: r.title, price_php: Number(r.price_php),
-          region: r.region, city: r.city, seller_type: r.seller_type,
-          boost_until: r.boost_until, category_slug: r.category_slug, view_count: r.view_count ?? 0,
+          id: r.id,
+          title: r.title,
+          price_php: Number(r.price_php),
+          region: r.region,
+          city: r.city,
+          seller_type: r.seller_type,
+          boost_until: r.boost_until,
+          category_slug: r.category_slug,
+          view_count: r.view_count ?? 0,
           cover_url: photos[0]?.url ?? null,
-          photo_count: photos.length, has_video: videos.length > 0,
-          seller_verified: r.profiles?.verification_status === "verified", status: r.status, attributes: r.attributes,
+          photo_count: photos.length,
+          has_video: videos.length > 0,
+          seller_verified: r.profiles?.verification_status === "verified",
+          status: r.status,
+          attributes: r.attributes,
         } as ListingCardData;
       });
       setItems(mapped);
       setLoading(false);
     };
     fetchListings();
-  }, [category, search.q, search.region, search.province, search.city, search.min, search.max, search.sort, search.year, search.make, search.model, search.engine]);
+  }, [
+    category,
+    search.q,
+    search.region,
+    search.province,
+    search.city,
+    search.min,
+    search.max,
+    search.sort,
+    search.year,
+    search.make,
+    search.model,
+    search.engine,
+  ]);
 
   const applyFilters = (e: React.FormEvent) => {
     e.preventDefault();
@@ -228,11 +270,16 @@ function BrowsePage() {
       <div className="border-b border-border bg-secondary/40">
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <Link to="/" className="hover:text-foreground">Home</Link> <span>/</span>
+            <Link to="/" className="hover:text-foreground">
+              Home
+            </Link>{" "}
+            <span>/</span>
             <span>Browse</span> <span>/</span>
             <span className="text-foreground">{CATEGORY_LABEL[category] ?? category}</span>
           </div>
-          <h1 className="mt-2 font-display text-3xl font-bold md:text-4xl">{CATEGORY_LABEL[category] ?? "Listings"} for sale</h1>
+          <h1 className="mt-2 font-display text-3xl font-bold md:text-4xl">
+            {CATEGORY_LABEL[category] ?? "Listings"} for sale
+          </h1>
         </div>
       </div>
 
@@ -245,7 +292,13 @@ function BrowsePage() {
               <Label htmlFor="kw">Keyword</Label>
               <div className="relative">
                 <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input id="kw" value={keyword} onChange={(e) => setKeyword(e.target.value)} placeholder="Make, model…" className="pl-8" />
+                <Input
+                  id="kw"
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                  placeholder="Make, model…"
+                  className="pl-8"
+                />
               </div>
             </div>
             {(category === "car" || category === "motorcycle") && (
@@ -282,17 +335,29 @@ function BrowsePage() {
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <Label>Min ₱</Label>
-                <Input type="number" min="0" value={minPrice} onChange={(e) => setMinPrice(e.target.value)} />
+                <Input
+                  type="number"
+                  min="0"
+                  value={minPrice}
+                  onChange={(e) => setMinPrice(e.target.value)}
+                />
               </div>
               <div>
                 <Label>Max ₱</Label>
-                <Input type="number" min="0" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
+                <Input
+                  type="number"
+                  min="0"
+                  value={maxPrice}
+                  onChange={(e) => setMaxPrice(e.target.value)}
+                />
               </div>
             </div>
             <div>
               <Label>Sort</Label>
               <Select value={sort} onValueChange={(v: any) => setSort(v)}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="recent">Most recent</SelectItem>
                   <SelectItem value="price_asc">Price (low to high)</SelectItem>
@@ -300,9 +365,12 @@ function BrowsePage() {
                 </SelectContent>
               </Select>
             </div>
-            <Button type="submit" className="w-full">Apply filters</Button>
+            <Button type="submit" className="w-full">
+              Apply filters
+            </Button>
             <Button type="button" variant="outline" className="w-full" onClick={openSaveDialog}>
-              <BookmarkPlus className="mr-2 h-4 w-4" />Save search
+              <BookmarkPlus className="mr-2 h-4 w-4" />
+              Save search
             </Button>
           </form>
         </aside>
@@ -318,7 +386,9 @@ function BrowsePage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {items.map((l) => <ListingCard key={l.id} listing={l} />)}
+              {items.map((l) => (
+                <ListingCard key={l.id} listing={l} />
+              ))}
             </div>
           )}
         </div>
@@ -328,7 +398,9 @@ function BrowsePage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Save this search</DialogTitle>
-            <DialogDescription>Give it a name so you can find it later in your dashboard.</DialogDescription>
+            <DialogDescription>
+              Give it a name so you can find it later in your dashboard.
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
             <Label htmlFor="saved-search-name">Name</Label>
@@ -338,11 +410,19 @@ function BrowsePage() {
               onChange={(e) => setSaveName(e.target.value)}
               placeholder="e.g. Toyota Hilux under 1M"
               autoFocus
-              onKeyDown={(e) => { if (e.key === "Enter") confirmSaveSearch(); }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") confirmSaveSearch();
+              }}
             />
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setSaveDialogOpen(false)} disabled={savingSearch}>Cancel</Button>
+            <Button
+              variant="outline"
+              onClick={() => setSaveDialogOpen(false)}
+              disabled={savingSearch}
+            >
+              Cancel
+            </Button>
             <Button onClick={confirmSaveSearch} disabled={savingSearch || !saveName.trim()}>
               {savingSearch ? "Saving…" : "Save search"}
             </Button>

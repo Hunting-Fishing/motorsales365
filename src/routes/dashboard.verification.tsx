@@ -11,7 +11,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { formatDate } from "@/lib/format";
 import { LocationPicker } from "@/components/location-picker";
@@ -83,7 +87,9 @@ function VerificationPage() {
     setProfile(prof);
     if (req) {
       setForm({
-        business_kind: (BUSINESS_KIND_VALUES as readonly string[]).includes(req.business_kind as string)
+        business_kind: (BUSINESS_KIND_VALUES as readonly string[]).includes(
+          req.business_kind as string,
+        )
           ? (req.business_kind as string)
           : "other",
         legal_name: req.legal_name ?? "",
@@ -105,7 +111,9 @@ function VerificationPage() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, [user]);
+  useEffect(() => {
+    load();
+  }, [user]);
 
   const uploadDoc = async (file: File) => {
     if (!user) return;
@@ -117,7 +125,10 @@ function VerificationPage() {
     const path = `${user.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
     const { error } = await supabase.storage.from("verification-docs").upload(path, file);
     setUploading(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     setDocs((d) => [...d, { path, name: file.name }]);
     toast.success("Document uploaded");
   };
@@ -181,7 +192,10 @@ function VerificationPage() {
       ({ error } = await supabase.from("verification_requests").insert(payload));
     }
     setSubmitting(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("Verification submitted — we'll review within 1–2 business days.");
     load();
   };
@@ -228,10 +242,14 @@ function VerificationPage() {
             onValueChange={(v: any) => setForm({ ...form, business_kind: v })}
             disabled={!canEdit}
           >
-            <SelectTrigger><SelectValue /></SelectTrigger>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               {BUSINESS_KINDS.map((k) => (
-                <SelectItem key={k.value} value={k.value}>{k.label}</SelectItem>
+                <SelectItem key={k.value} value={k.value}>
+                  {k.label}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -313,24 +331,30 @@ function VerificationPage() {
               city: form.city || null,
               barangay: form.barangay || null,
             }}
-            onChange={(v) => setForm({
-              ...form,
-              region: v.region ?? "",
-              province: v.province ?? "",
-              city: v.city ?? "",
-              barangay: v.barangay ?? "",
-            })}
+            onChange={(v) =>
+              setForm({
+                ...form,
+                region: v.region ?? "",
+                province: v.province ?? "",
+                city: v.city ?? "",
+                barangay: v.barangay ?? "",
+              })
+            }
           />
         </div>
 
         <div>
           <Label className="mb-2 block">Supporting documents *</Label>
           <p className="mb-2 text-xs text-muted-foreground">
-            DTI/SEC certificate, BIR Form 2303, Mayor's permit, valid government ID. PDF or image, up to 10MB each.
+            DTI/SEC certificate, BIR Form 2303, Mayor's permit, valid government ID. PDF or image,
+            up to 10MB each.
           </p>
           <div className="space-y-2">
             {docs.map((d, i) => (
-              <div key={d.path} className="flex items-center justify-between rounded-md border border-border bg-background p-2 text-sm">
+              <div
+                key={d.path}
+                className="flex items-center justify-between rounded-md border border-border bg-background p-2 text-sm"
+              >
                 <div className="flex items-center gap-2 truncate">
                   <FileText className="h-4 w-4 shrink-0 text-muted-foreground" />
                   <span className="truncate">{d.name}</span>
@@ -392,10 +416,13 @@ function StatusCard({ status, request }: { status: string; request: any }) {
         <div>
           <div className="font-semibold text-amber-900 dark:text-amber-100">Under review</div>
           <div className="text-sm text-amber-900/80 dark:text-amber-100/80">
-            Submitted {formatDate(request?.submitted_at)}. We typically respond within 1–2 business days.
+            Submitted {formatDate(request?.submitted_at)}. We typically respond within 1–2 business
+            days.
           </div>
         </div>
-        <Badge variant="secondary" className="ml-auto">Pending</Badge>
+        <Badge variant="secondary" className="ml-auto">
+          Pending
+        </Badge>
       </div>
     );
   }

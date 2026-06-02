@@ -12,7 +12,12 @@ export const Route = createFileRoute("/c/$code")({
     return {
       meta: [
         { title: c ? `Certificate ${c.code} — 365 Learn` : "Certificate not found" },
-        { name: "description", content: c ? `Verified certificate of completion for ${c.course_title}, issued by 365 Motorsales.` : "" },
+        {
+          name: "description",
+          content: c
+            ? `Verified certificate of completion for ${c.course_title}, issued by 365 Motorsales.`
+            : "",
+        },
       ],
     };
   },
@@ -29,7 +34,9 @@ function CertificatePage() {
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-2xl font-bold">Certificate not found</h1>
           <p className="mt-2 text-muted-foreground">This verification code is not valid.</p>
-          <Button asChild className="mt-4"><Link to="/learn">Browse courses</Link></Button>
+          <Button asChild className="mt-4">
+            <Link to="/learn">Browse courses</Link>
+          </Button>
         </div>
       </SiteLayout>
     );
@@ -42,7 +49,9 @@ function CertificatePage() {
           <Card className="overflow-hidden border-2 border-primary/30">
             <CardContent className="p-10 text-center">
               <Award className="mx-auto h-16 w-16 text-primary" />
-              <p className="mt-4 text-sm uppercase tracking-widest text-muted-foreground">Certificate of Completion</p>
+              <p className="mt-4 text-sm uppercase tracking-widest text-muted-foreground">
+                Certificate of Completion
+              </p>
               <h1 className="mt-4 text-4xl font-bold tracking-tight">{cert.holder_name}</h1>
               <p className="mt-4 text-muted-foreground">has successfully completed</p>
               <h2 className="mt-2 text-2xl font-semibold">{cert.course_title}</h2>
@@ -64,7 +73,9 @@ function CertificatePage() {
             </Button>
             {cert.course_slug && (
               <Button asChild variant="ghost">
-                <Link to="/learn/$slug" params={{ slug: cert.course_slug }}>View course</Link>
+                <Link to="/learn/$slug" params={{ slug: cert.course_slug }}>
+                  View course
+                </Link>
               </Button>
             )}
           </div>

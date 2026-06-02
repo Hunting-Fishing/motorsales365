@@ -4,7 +4,12 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { searchTransferableUsers } from "@/lib/admin-users.functions";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,7 +36,12 @@ type ProfileHit = {
 };
 
 export function TransferBusinessOwnerDialog({
-  open, onOpenChange, businessId, businessName, currentOwnerId, onTransferred,
+  open,
+  onOpenChange,
+  businessId,
+  businessName,
+  currentOwnerId,
+  onTransferred,
 }: Props) {
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
@@ -42,7 +52,9 @@ export function TransferBusinessOwnerDialog({
   const runSearch = useServerFn(searchTransferableUsers);
 
   const reset = () => {
-    setQuery(""); setResults([]); setSelected(null);
+    setQuery("");
+    setResults([]);
+    setSelected(null);
   };
 
   const search = async () => {
@@ -72,21 +84,31 @@ export function TransferBusinessOwnerDialog({
       .update({ owner_id: selected.id })
       .eq("id", businessId);
     setSubmitting(false);
-    if (error) { toast.error(error.message); return; }
-    toast.success(`Transferred "${businessName}" to ${selected.full_name || selected.business_name || selected.id}`);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(
+      `Transferred "${businessName}" to ${selected.full_name || selected.business_name || selected.id}`,
+    );
     reset();
     onOpenChange(false);
     onTransferred?.();
   };
 
   return (
-    <Dialog open={open} onOpenChange={(o) => { onOpenChange(o); if (!o) reset(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(o) => {
+        onOpenChange(o);
+        if (!o) reset();
+      }}
+    >
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Transfer owner — {businessName}</DialogTitle>
           <DialogDescription>
-            Search by name, business name, or paste a user ID (UUID).
-            Current owner:{" "}
+            Search by name, business name, or paste a user ID (UUID). Current owner:{" "}
             <code className="text-xs">{currentOwnerId ?? "none"}</code>
           </DialogDescription>
         </DialogHeader>
@@ -96,7 +118,9 @@ export function TransferBusinessOwnerDialog({
             placeholder="Search users…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onKeyDown={(e) => { if (e.key === "Enter") search(); }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") search();
+            }}
           />
           <Button onClick={search} disabled={searching || !query.trim()}>
             <Search className="mr-1 h-4 w-4" />
@@ -133,9 +157,15 @@ export function TransferBusinessOwnerDialog({
                       <div className="flex items-center gap-2 truncate text-sm font-medium">
                         {p.full_name || p.business_name || "(no name)"}
                         {verified ? (
-                          <Badge variant="secondary" className="gap-1"><ShieldCheck className="h-3 w-3" />Verified</Badge>
+                          <Badge variant="secondary" className="gap-1">
+                            <ShieldCheck className="h-3 w-3" />
+                            Verified
+                          </Badge>
                         ) : (
-                          <Badge variant="destructive" className="gap-1"><ShieldAlert className="h-3 w-3" />Unverified</Badge>
+                          <Badge variant="destructive" className="gap-1">
+                            <ShieldAlert className="h-3 w-3" />
+                            Unverified
+                          </Badge>
                         )}
                         {isCurrent && <Badge variant="secondary">Current owner</Badge>}
                       </div>
@@ -153,10 +183,14 @@ export function TransferBusinessOwnerDialog({
           )}
         </div>
 
-
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>Cancel</Button>
-          <Button onClick={transfer} disabled={!selected || submitting || selected?.id === currentOwnerId}>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>
+            Cancel
+          </Button>
+          <Button
+            onClick={transfer}
+            disabled={!selected || submitting || selected?.id === currentOwnerId}
+          >
             <ArrowRightLeft className="mr-1 h-4 w-4" />
             {submitting ? "Transferring…" : "Transfer"}
           </Button>

@@ -47,18 +47,15 @@ async function resolveOrCreateCustomer(
  */
 export const createBoostCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: {
-    boostSlug: string;
-    listingId: string;
-    returnUrl: string;
-    environment: StripeEnv;
-  }) => {
-    if (!/^[a-z0-9_]+$/.test(data.boostSlug)) throw new Error("Invalid boostSlug");
-    if (!/^[0-9a-f-]{36}$/i.test(data.listingId)) throw new Error("Invalid listingId");
-    validateEnv(data.environment);
-    validateReturnUrl(data.returnUrl);
-    return data;
-  })
+  .inputValidator(
+    (data: { boostSlug: string; listingId: string; returnUrl: string; environment: StripeEnv }) => {
+      if (!/^[a-z0-9_]+$/.test(data.boostSlug)) throw new Error("Invalid boostSlug");
+      if (!/^[0-9a-f-]{36}$/i.test(data.listingId)) throw new Error("Invalid listingId");
+      validateEnv(data.environment);
+      validateReturnUrl(data.returnUrl);
+      return data;
+    },
+  )
   .handler(async ({ data, context }) => {
     const { supabase, userId, claims } = context;
 

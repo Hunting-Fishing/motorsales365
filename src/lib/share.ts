@@ -12,7 +12,11 @@ export function canNativeShare(): boolean {
   return typeof (navigator as NavigatorWithShare).share === "function";
 }
 
-export async function nativeShare(data: { title?: string; text?: string; url?: string }): Promise<boolean> {
+export async function nativeShare(data: {
+  title?: string;
+  text?: string;
+  url?: string;
+}): Promise<boolean> {
   if (!canNativeShare()) return false;
   try {
     await (navigator as NavigatorWithShare).share!(data);

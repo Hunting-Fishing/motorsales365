@@ -103,7 +103,9 @@ export function resolvePsgc(input: {
 
   // 3) Fall back to region match.
   if (input.region) {
-    const r = PSGC.find((x) => eqLoose(x.name, input.region!) || eqLoose(x.regionName, input.region!));
+    const r = PSGC.find(
+      (x) => eqLoose(x.name, input.region!) || eqLoose(x.regionName, input.region!),
+    );
     if (r) return { region: regionLabel(r), province: null, city: null };
   }
 

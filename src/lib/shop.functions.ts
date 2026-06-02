@@ -10,7 +10,9 @@ import { scrapeLazadaProduct } from "@/lib/lazada-scraper.server";
 export const listShopCategories = createServerFn({ method: "GET" }).handler(async () => {
   const { data, error } = await supabaseAdmin
     .from("shop_categories")
-    .select("id, slug, name, description, icon, sort_order, parent_id, hero_image_url, department_slug, cross_department_slugs")
+    .select(
+      "id, slug, name, description, icon, sort_order, parent_id, hero_image_url, department_slug, cross_department_slugs",
+    )
     .eq("active", true)
     .order("sort_order");
   if (error) throw new Error(error.message);
@@ -18,27 +20,32 @@ export const listShopCategories = createServerFn({ method: "GET" }).handler(asyn
 });
 
 export const listShopDepartments = createServerFn({ method: "GET" }).handler(async () => {
-  const [{ data: deps, error: dErr }, { data: cats, error: cErr }, { data: pcRows }] = await Promise.all([
-    supabaseAdmin.from("shop_departments").select("*").eq("active", true).order("sort_order"),
-    supabaseAdmin
-      .from("shop_categories")
-      .select("id, slug, name, description, icon, sort_order, parent_id, hero_image_url, department_slug, cross_department_slugs")
-      .eq("active", true)
-      .order("sort_order"),
-    supabaseAdmin.from("shop_product_categories").select("category_id").limit(5000),
-  ]);
+  const [{ data: deps, error: dErr }, { data: cats, error: cErr }, { data: pcRows }] =
+    await Promise.all([
+      supabaseAdmin.from("shop_departments").select("*").eq("active", true).order("sort_order"),
+      supabaseAdmin
+        .from("shop_categories")
+        .select(
+          "id, slug, name, description, icon, sort_order, parent_id, hero_image_url, department_slug, cross_department_slugs",
+        )
+        .eq("active", true)
+        .order("sort_order"),
+      supabaseAdmin.from("shop_product_categories").select("category_id").limit(5000),
+    ]);
   if (dErr) throw new Error(dErr.message);
   if (cErr) throw new Error(cErr.message);
   const counts = new Map<string, number>();
-  for (const r of pcRows ?? []) counts.set((r as any).category_id, (counts.get((r as any).category_id) ?? 0) + 1);
+  for (const r of pcRows ?? [])
+    counts.set((r as any).category_id, (counts.get((r as any).category_id) ?? 0) + 1);
   const all = (cats ?? []).map((c: any) => ({ ...c, product_count: counts.get(c.id) ?? 0 }));
   const tops = all.filter((c: any) => !c.parent_id);
   const childrenOf = (parentId: string) => all.filter((c: any) => c.parent_id === parentId);
 
   const departments = (deps ?? []).map((d: any) => {
     const primary = tops.filter((t: any) => t.department_slug === d.slug);
-    const crossChildren = all.filter((c: any) =>
-      Array.isArray(c.cross_department_slugs) && c.cross_department_slugs.includes(d.slug),
+    const crossChildren = all.filter(
+      (c: any) =>
+        Array.isArray(c.cross_department_slugs) && c.cross_department_slugs.includes(d.slug),
     );
     return {
       ...d,
@@ -46,7 +53,9 @@ export const listShopDepartments = createServerFn({ method: "GET" }).handler(asy
       cross_categories: crossChildren,
       product_count: primary.reduce(
         (sum: number, p: any) =>
-          sum + p.product_count + childrenOf(p.id).reduce((s: number, c: any) => s + c.product_count, 0),
+          sum +
+          p.product_count +
+          childrenOf(p.id).reduce((s: number, c: any) => s + c.product_count, 0),
         0,
       ),
     };
@@ -58,10 +67,16 @@ export const listShopCategoryTree = createServerFn({ method: "GET" }).handler(as
   const [{ data: cats, error }, { data: deps }] = await Promise.all([
     supabaseAdmin
       .from("shop_categories")
-      .select("id, slug, name, description, icon, sort_order, parent_id, hero_image_url, department_slug")
+      .select(
+        "id, slug, name, description, icon, sort_order, parent_id, hero_image_url, department_slug",
+      )
       .eq("active", true)
       .order("sort_order"),
-    supabaseAdmin.from("shop_departments").select("slug, name, sort_order").eq("active", true).order("sort_order"),
+    supabaseAdmin
+      .from("shop_departments")
+      .select("slug, name, sort_order")
+      .eq("active", true)
+      .order("sort_order"),
   ]);
   if (error) throw new Error(error.message);
 
@@ -70,7 +85,8 @@ export const listShopCategoryTree = createServerFn({ method: "GET" }).handler(as
     .select("category_id")
     .limit(5000);
   const counts = new Map<string, number>();
-  for (const r of pcRows ?? []) counts.set((r as any).category_id, (counts.get((r as any).category_id) ?? 0) + 1);
+  for (const r of pcRows ?? [])
+    counts.set((r as any).category_id, (counts.get((r as any).category_id) ?? 0) + 1);
 
   const all = (cats ?? []).map((c: any) => ({ ...c, product_count: counts.get(c.id) ?? 0 }));
   const byParent = new Map<string | null, any[]>();
@@ -88,7 +104,9 @@ export const listShopCategoryTree = createServerFn({ method: "GET" }).handler(as
 });
 
 export const getShopDepartment = createServerFn({ method: "GET" })
-  .inputValidator((input: { slug: string }) => z.object({ slug: z.string().min(1).max(80) }).parse(input))
+  .inputValidator((input: { slug: string }) =>
+    z.object({ slug: z.string().min(1).max(80) }).parse(input),
+  )
   .handler(async ({ data }) => {
     const { data: dep } = await supabaseAdmin
       .from("shop_departments")
@@ -99,7 +117,9 @@ export const getShopDepartment = createServerFn({ method: "GET" })
     if (!dep) return { department: null, categories: [], cross_categories: [] };
     const { data: cats } = await supabaseAdmin
       .from("shop_categories")
-      .select("id, slug, name, description, icon, parent_id, hero_image_url, department_slug, cross_department_slugs")
+      .select(
+        "id, slug, name, description, icon, parent_id, hero_image_url, department_slug, cross_department_slugs",
+      )
       .eq("active", true)
       .order("sort_order");
     const all = cats ?? [];
@@ -108,19 +128,25 @@ export const getShopDepartment = createServerFn({ method: "GET" })
       ...p,
       children: all.filter((c: any) => c.parent_id === p.id),
     }));
-    const cross_categories = all.filter((c: any) =>
-      Array.isArray(c.cross_department_slugs) &&
-      c.cross_department_slugs.includes(data.slug) &&
-      c.department_slug !== data.slug,
+    const cross_categories = all.filter(
+      (c: any) =>
+        Array.isArray(c.cross_department_slugs) &&
+        c.cross_department_slugs.includes(data.slug) &&
+        c.department_slug !== data.slug,
     );
     return { department: dep, categories, cross_categories };
   });
 
 export const getShopBreadcrumb = createServerFn({ method: "GET" })
-  .inputValidator((input: { slug: string }) => z.object({ slug: z.string().min(1).max(80) }).parse(input))
+  .inputValidator((input: { slug: string }) =>
+    z.object({ slug: z.string().min(1).max(80) }).parse(input),
+  )
   .handler(async ({ data }) => {
     const [{ data: cats }, { data: deps }] = await Promise.all([
-      supabaseAdmin.from("shop_categories").select("id, slug, name, parent_id, department_slug").eq("active", true),
+      supabaseAdmin
+        .from("shop_categories")
+        .select("id, slug, name, parent_id, department_slug")
+        .eq("active", true),
       supabaseAdmin.from("shop_departments").select("slug, name").eq("active", true),
     ]);
     const list = cats ?? [];
@@ -144,17 +170,18 @@ export const getShopBreadcrumb = createServerFn({ method: "GET" })
     return { trail };
   });
 
-
 export const trackShopClick = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
-    z.object({
-      productId: z.string().uuid(),
-      linkId: z.string().uuid().optional(),
-      referrer: z.string().max(500).optional(),
-      utm_source: z.string().max(80).optional(),
-      utm_medium: z.string().max(80).optional(),
-      utm_campaign: z.string().max(80).optional(),
-    }).parse(input),
+    z
+      .object({
+        productId: z.string().uuid(),
+        linkId: z.string().uuid().optional(),
+        referrer: z.string().max(500).optional(),
+        utm_source: z.string().max(80).optional(),
+        utm_medium: z.string().max(80).optional(),
+        utm_campaign: z.string().max(80).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data }) => {
     await supabaseAdmin.from("shop_click_events").insert({
@@ -169,32 +196,47 @@ export const trackShopClick = createServerFn({ method: "POST" })
   });
 
 export const listShopProducts = createServerFn({ method: "GET" })
-  .inputValidator((input: {
-    categorySlug?: string; subSlugs?: string[]; departmentSlug?: string;
-    featured?: boolean; dealsOnly?: boolean;
-    search?: string; limit?: number;
-    make?: string; model?: string; year?: number; engine?: string; includeUniversal?: boolean;
-    brand?: string; priceMin?: number; priceMax?: number;
-    sort?: "featured" | "newest" | "price_asc" | "price_desc" | "popular";
-  } = {}) =>
-    z.object({
-      categorySlug: z.string().max(80).optional(),
-      subSlugs: z.array(z.string().max(80)).max(20).optional(),
-      departmentSlug: z.string().max(80).optional(),
-      featured: z.boolean().optional(),
-      dealsOnly: z.boolean().optional(),
-      search: z.string().max(120).optional(),
-      limit: z.number().int().min(1).max(60).optional(),
-      make: z.string().max(80).optional(),
-      model: z.string().max(120).optional(),
-      year: z.number().int().min(1900).max(2100).optional(),
-      engine: z.string().max(120).optional(),
-      includeUniversal: z.boolean().optional(),
-      brand: z.string().max(120).optional(),
-      priceMin: z.number().nonnegative().optional(),
-      priceMax: z.number().nonnegative().optional(),
-      sort: z.enum(["featured", "newest", "price_asc", "price_desc", "popular"]).optional(),
-    }).parse(input),
+  .inputValidator(
+    (
+      input: {
+        categorySlug?: string;
+        subSlugs?: string[];
+        departmentSlug?: string;
+        featured?: boolean;
+        dealsOnly?: boolean;
+        search?: string;
+        limit?: number;
+        make?: string;
+        model?: string;
+        year?: number;
+        engine?: string;
+        includeUniversal?: boolean;
+        brand?: string;
+        priceMin?: number;
+        priceMax?: number;
+        sort?: "featured" | "newest" | "price_asc" | "price_desc" | "popular";
+      } = {},
+    ) =>
+      z
+        .object({
+          categorySlug: z.string().max(80).optional(),
+          subSlugs: z.array(z.string().max(80)).max(20).optional(),
+          departmentSlug: z.string().max(80).optional(),
+          featured: z.boolean().optional(),
+          dealsOnly: z.boolean().optional(),
+          search: z.string().max(120).optional(),
+          limit: z.number().int().min(1).max(60).optional(),
+          make: z.string().max(80).optional(),
+          model: z.string().max(120).optional(),
+          year: z.number().int().min(1900).max(2100).optional(),
+          engine: z.string().max(120).optional(),
+          includeUniversal: z.boolean().optional(),
+          brand: z.string().max(120).optional(),
+          priceMin: z.number().nonnegative().optional(),
+          priceMax: z.number().nonnegative().optional(),
+          sort: z.enum(["featured", "newest", "price_asc", "price_desc", "popular"]).optional(),
+        })
+        .parse(input),
   )
   .handler(async ({ data }) => {
     // Resolve a primary category + any extra sub-category slugs to ids
@@ -211,7 +253,8 @@ export const listShopProducts = createServerFn({ method: "GET" })
         .eq("active", true);
       for (const c of depCats ?? []) {
         const own = (c as any).department_slug === data.departmentSlug;
-        const cross = Array.isArray((c as any).cross_department_slugs) &&
+        const cross =
+          Array.isArray((c as any).cross_department_slugs) &&
           (c as any).cross_department_slugs.includes(data.departmentSlug);
         if (own || cross) wantedSlugs.add((c as any).slug);
       }
@@ -263,7 +306,9 @@ export const listShopProducts = createServerFn({ method: "GET" })
 
     let q = supabaseAdmin
       .from("shop_products")
-      .select("id, slug, title, brand, image_url, price_php, currency, featured, category_id, click_count, universal_fit, is_deal, deal_ends_at, deal_price_php")
+      .select(
+        "id, slug, title, brand, image_url, price_php, currency, featured, category_id, click_count, universal_fit, is_deal, deal_ends_at, deal_price_php",
+      )
       .eq("active", true);
     if (cat && catIds.length <= 1) {
       q = q.eq("category_id", cat);
@@ -286,18 +331,20 @@ export const listShopProducts = createServerFn({ method: "GET" })
     if (typeof data.priceMax === "number") q = q.lte("price_php", data.priceMax);
     const sort = data.sort ?? "featured";
     if (sort === "price_asc") q = q.order("price_php", { ascending: true, nullsFirst: false });
-    else if (sort === "price_desc") q = q.order("price_php", { ascending: false, nullsFirst: false });
+    else if (sort === "price_desc")
+      q = q.order("price_php", { ascending: false, nullsFirst: false });
     else if (sort === "popular") q = q.order("click_count", { ascending: false });
     else if (sort === "newest") q = q.order("created_at", { ascending: false });
     else q = q.order("featured", { ascending: false }).order("created_at", { ascending: false });
     const { data: rows, error } = await q.limit(data.limit ?? 24);
     if (error) throw new Error(error.message);
 
-
     let products = rows ?? [];
     if (allowedIds) {
       const includeU = data.includeUniversal ?? true;
-      products = products.filter((p: any) => allowedIds!.has(p.id) || (includeU && p.universal_fit));
+      products = products.filter(
+        (p: any) => allowedIds!.has(p.id) || (includeU && p.universal_fit),
+      );
     }
     return { products };
   });
@@ -309,11 +356,19 @@ export const listShopBrands = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     let cat: string | null = null;
     if (data.categorySlug) {
-      const { data: c } = await supabaseAdmin.from("shop_categories").select("id").eq("slug", data.categorySlug).maybeSingle();
+      const { data: c } = await supabaseAdmin
+        .from("shop_categories")
+        .select("id")
+        .eq("slug", data.categorySlug)
+        .maybeSingle();
       cat = c?.id ?? null;
       if (!cat) return { brands: [] as string[] };
     }
-    let q = supabaseAdmin.from("shop_products").select("brand").eq("active", true).not("brand", "is", null);
+    let q = supabaseAdmin
+      .from("shop_products")
+      .select("brand")
+      .eq("active", true)
+      .not("brand", "is", null);
     if (cat) q = q.eq("category_id", cat);
     const { data: rows, error } = await q.limit(1000);
     if (error) throw new Error(error.message);
@@ -326,7 +381,9 @@ export const listShopBrands = createServerFn({ method: "GET" })
   });
 
 export const getShopProduct = createServerFn({ method: "GET" })
-  .inputValidator((input: { slug: string }) => z.object({ slug: z.string().min(1).max(120) }).parse(input))
+  .inputValidator((input: { slug: string }) =>
+    z.object({ slug: z.string().min(1).max(120) }).parse(input),
+  )
   .handler(async ({ data }) => {
     const { data: product, error } = await supabaseAdmin
       .from("shop_products")
@@ -336,33 +393,41 @@ export const getShopProduct = createServerFn({ method: "GET" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!product) return { product: null, links: [], fitment: [] };
-    const [{ data: category }, { data: links }, { data: fitment }, { data: history }] = await Promise.all([
-      product.category_id
-        ? supabaseAdmin
-            .from("shop_categories")
-            .select("slug, name")
-            .eq("id", product.category_id)
-            .maybeSingle()
-        : Promise.resolve({ data: null }),
-      supabaseAdmin
-        .from("shop_product_links")
-        .select("id, url, sku, price_php, sale_price_php, in_stock, last_checked_at, network:affiliate_networks(id, slug, name, tag_param, tag_value, deeplink_template, active)")
-        .eq("product_id", product.id),
-      supabaseAdmin
-        .from("shop_product_fitment")
-        .select("id, category, make, model, year_start, year_end, notes")
-        .eq("product_id", product.id)
-        .order("make", { ascending: true }),
-      supabaseAdmin
-        .from("shop_price_history")
-        .select("price_php, sale_price_php, captured_at, network_id")
-        .eq("product_id", product.id)
-        .gte("captured_at", new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString())
-        .order("captured_at", { ascending: true })
-        .limit(500),
-    ]);
+    const [{ data: category }, { data: links }, { data: fitment }, { data: history }] =
+      await Promise.all([
+        product.category_id
+          ? supabaseAdmin
+              .from("shop_categories")
+              .select("slug, name")
+              .eq("id", product.category_id)
+              .maybeSingle()
+          : Promise.resolve({ data: null }),
+        supabaseAdmin
+          .from("shop_product_links")
+          .select(
+            "id, url, sku, price_php, sale_price_php, in_stock, last_checked_at, network:affiliate_networks(id, slug, name, tag_param, tag_value, deeplink_template, active)",
+          )
+          .eq("product_id", product.id),
+        supabaseAdmin
+          .from("shop_product_fitment")
+          .select("id, category, make, model, year_start, year_end, notes")
+          .eq("product_id", product.id)
+          .order("make", { ascending: true }),
+        supabaseAdmin
+          .from("shop_price_history")
+          .select("price_php, sale_price_php, captured_at, network_id")
+          .eq("product_id", product.id)
+          .gte("captured_at", new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString())
+          .order("captured_at", { ascending: true })
+          .limit(500),
+      ]);
     const visible = (links ?? []).filter((l: any) => l.network?.active);
-    return { product: { ...product, category }, links: visible, fitment: fitment ?? [], history: history ?? [] };
+    return {
+      product: { ...product, category },
+      links: visible,
+      fitment: fitment ?? [],
+      history: history ?? [],
+    };
   });
 
 // ============ ADMIN ============
@@ -381,16 +446,24 @@ function slugify(s: string) {
 
 const productSchema = z.object({
   id: emptyToNull(z.string().uuid().nullable()).optional(),
-  slug: emptyToNull(z.string().max(120).regex(/^[a-z0-9-]+$/).nullable()).optional(),
+  slug: emptyToNull(
+    z
+      .string()
+      .max(120)
+      .regex(/^[a-z0-9-]+$/)
+      .nullable(),
+  ).optional(),
   title: z.string().min(1).max(200),
   description: emptyToNull(z.string().max(5000).nullable()).optional(),
   brand: emptyToNull(z.string().max(120).nullable()).optional(),
   image_url: emptyToNull(z.string().url().max(2000).nullable()).optional(),
   category_id: emptyToNull(z.string().uuid().nullable()).optional(),
-  price_php: z.preprocess(
-    (v) => (v === "" || v === null || v === undefined ? null : Number(v)),
-    z.number().nonnegative().nullable(),
-  ).optional(),
+  price_php: z
+    .preprocess(
+      (v) => (v === "" || v === null || v === undefined ? null : Number(v)),
+      z.number().nonnegative().nullable(),
+    )
+    .optional(),
   tags: z.array(z.string().max(60)).max(20).optional(),
   featured: z.boolean().optional(),
   active: z.boolean().optional(),
@@ -409,7 +482,9 @@ export const adminListProducts = createServerFn({ method: "GET" })
     await assertShopManagerInline(supabase, userId);
     const { data, error } = await supabase
       .from("shop_products")
-      .select("id, slug, title, brand, image_url, price_php, currency, tags, featured, active, universal_fit, is_deal, click_count, view_count, category_id, created_at, category:shop_categories!category_id(name, slug, department_slug)")
+      .select(
+        "id, slug, title, brand, image_url, price_php, currency, tags, featured, active, universal_fit, is_deal, click_count, view_count, category_id, created_at, category:shop_categories!category_id(name, slug, department_slug)",
+      )
       .order("created_at", { ascending: false })
       .limit(1000);
     if (error) throw new Error(error.message);
@@ -431,7 +506,11 @@ export const adminUpsertProduct = createServerFn({ method: "POST" })
       if (error) throw new Error(error.message);
       return { id };
     }
-    const { data: row, error } = await supabase.from("shop_products").insert(payload).select("id").single();
+    const { data: row, error } = await supabase
+      .from("shop_products")
+      .insert(payload)
+      .select("id")
+      .single();
     if (error) throw new Error(error.message);
     return { id: row.id };
   });
@@ -455,7 +534,10 @@ export const adminListNetworks = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertShopManager(context.supabase, context.userId);
-    const { data, error } = await context.supabase.from("affiliate_networks").select("*").order("sort_order");
+    const { data, error } = await context.supabase
+      .from("affiliate_networks")
+      .select("*")
+      .order("sort_order");
     if (error) throw new Error(error.message);
     return { networks: data ?? [] };
   });
@@ -463,25 +545,38 @@ export const adminListNetworks = createServerFn({ method: "GET" })
 export const adminUpsertNetwork = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({
-      id: z.string().uuid().optional(),
-      slug: z.string().min(1).max(60).regex(/^[a-z0-9_-]+$/),
-      name: z.string().min(1).max(120),
-      tag_param: z.string().max(60).optional().nullable(),
-      tag_value: z.string().max(200).optional().nullable(),
-      deeplink_template: z.string().max(2000).optional().nullable(),
-      active: z.boolean().optional(),
-      sort_order: z.number().int().optional(),
-    }).parse(input),
+    z
+      .object({
+        id: z.string().uuid().optional(),
+        slug: z
+          .string()
+          .min(1)
+          .max(60)
+          .regex(/^[a-z0-9_-]+$/),
+        name: z.string().min(1).max(120),
+        tag_param: z.string().max(60).optional().nullable(),
+        tag_value: z.string().max(200).optional().nullable(),
+        deeplink_template: z.string().max(2000).optional().nullable(),
+        active: z.boolean().optional(),
+        sort_order: z.number().int().optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     await assertShopManager(context.supabase, context.userId);
     if (data.id) {
-      const { error } = await context.supabase.from("affiliate_networks").update(data).eq("id", data.id);
+      const { error } = await context.supabase
+        .from("affiliate_networks")
+        .update(data)
+        .eq("id", data.id);
       if (error) throw new Error(error.message);
       return { id: data.id };
     }
-    const { data: row, error } = await context.supabase.from("affiliate_networks").insert(data).select("id").single();
+    const { data: row, error } = await context.supabase
+      .from("affiliate_networks")
+      .insert(data)
+      .select("id")
+      .single();
     if (error) throw new Error(error.message);
     return { id: row.id };
   });
@@ -489,13 +584,15 @@ export const adminUpsertNetwork = createServerFn({ method: "POST" })
 export const adminUpsertLink = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({
-      id: z.string().uuid().optional(),
-      product_id: z.string().uuid(),
-      network_id: z.string().uuid(),
-      url: z.string().url().max(2000),
-      sku: z.string().max(120).optional().nullable(),
-    }).parse(input),
+    z
+      .object({
+        id: z.string().uuid().optional(),
+        product_id: z.string().uuid(),
+        network_id: z.string().uuid(),
+        url: z.string().url().max(2000),
+        sku: z.string().max(120).optional().nullable(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     await assertShopManager(context.supabase, context.userId);
@@ -526,7 +623,9 @@ export const adminDeleteLink = createServerFn({ method: "POST" })
 
 export const adminProductLinks = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { productId: string }) => z.object({ productId: z.string().uuid() }).parse(input))
+  .inputValidator((input: { productId: string }) =>
+    z.object({ productId: z.string().uuid() }).parse(input),
+  )
   .handler(async ({ data, context }) => {
     await assertShopManager(context.supabase, context.userId);
     const { data: rows, error } = await context.supabase
@@ -553,7 +652,9 @@ const fitmentSchema = z.object({
 
 export const adminListFitment = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { productId: string }) => z.object({ productId: z.string().uuid() }).parse(input))
+  .inputValidator((input: { productId: string }) =>
+    z.object({ productId: z.string().uuid() }).parse(input),
+  )
   .handler(async ({ data, context }) => {
     await assertShopManager(context.supabase, context.userId);
     const { data: rows, error } = await context.supabase
@@ -571,11 +672,18 @@ export const adminUpsertFitment = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertShopManager(context.supabase, context.userId);
     if (data.id) {
-      const { error } = await context.supabase.from("shop_product_fitment").update(data).eq("id", data.id);
+      const { error } = await context.supabase
+        .from("shop_product_fitment")
+        .update(data)
+        .eq("id", data.id);
       if (error) throw new Error(error.message);
       return { id: data.id };
     }
-    const { data: row, error } = await context.supabase.from("shop_product_fitment").insert(data).select("id").single();
+    const { data: row, error } = await context.supabase
+      .from("shop_product_fitment")
+      .insert(data)
+      .select("id")
+      .single();
     if (error) throw new Error(error.message);
     return { id: row.id };
   });
@@ -585,7 +693,10 @@ export const adminDeleteFitment = createServerFn({ method: "POST" })
   .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertShopManager(context.supabase, context.userId);
-    const { error } = await context.supabase.from("shop_product_fitment").delete().eq("id", data.id);
+    const { error } = await context.supabase
+      .from("shop_product_fitment")
+      .delete()
+      .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -610,30 +721,35 @@ export const listShopFavoriteProducts = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data, error } = await supabase
       .from("shop_favorites")
-      .select("created_at, product:shop_products(id, slug, title, brand, image_url, price_php, currency, featured, universal_fit, active)")
+      .select(
+        "created_at, product:shop_products(id, slug, title, brand, image_url, price_php, currency, featured, universal_fit, active)",
+      )
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
     if (error) throw new Error(error.message);
-    const products = (data ?? [])
-      .map((r: any) => r.product)
-      .filter((p: any) => p && p.active);
+    const products = (data ?? []).map((r: any) => r.product).filter((p: any) => p && p.active);
     return { products };
   });
 
 export const toggleShopFavorite = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: { productId: string; favorite: boolean }) =>
-    z.object({
-      productId: z.string().uuid(),
-      favorite: z.boolean(),
-    }).parse(input),
+    z
+      .object({
+        productId: z.string().uuid(),
+        favorite: z.boolean(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     if (data.favorite) {
       const { error } = await supabase
         .from("shop_favorites")
-        .upsert({ user_id: userId, product_id: data.productId }, { onConflict: "user_id,product_id" });
+        .upsert(
+          { user_id: userId, product_id: data.productId },
+          { onConflict: "user_id,product_id" },
+        );
       if (error) throw new Error(error.message);
     } else {
       const { error } = await supabase
@@ -657,7 +773,10 @@ function pickPricePhp(price: unknown, currency: unknown): number | null {
   return null; // unknown FX — let admin fill manually
 }
 
-function fuzzyCategoryMatch(hint: string, cats: Array<{ id: string; name: string; slug: string }>): string | null {
+function fuzzyCategoryMatch(
+  hint: string,
+  cats: Array<{ id: string; name: string; slug: string }>,
+): string | null {
   if (!hint) return null;
   const h = hint.toLowerCase();
   for (const c of cats) {
@@ -667,16 +786,31 @@ function fuzzyCategoryMatch(hint: string, cats: Array<{ id: string; name: string
   const tokens = h.split(/[^a-z0-9]+/).filter(Boolean);
   let best: { id: string; score: number } | null = null;
   for (const c of cats) {
-    const ct = `${c.name} ${c.slug}`.toLowerCase().split(/[^a-z0-9]+/).filter(Boolean);
+    const ct = `${c.name} ${c.slug}`
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter(Boolean);
     const score = tokens.filter((t) => ct.includes(t)).length;
     if (score > 0 && (!best || score > best.score)) best = { id: c.id, score };
   }
   return best?.id ?? null;
 }
 
-const NETWORK_SLUGS = ["shopee", "lazada", "tiktok", "amazon", "aliexpress", "carousell", "ebay", "zalora"] as const;
+const NETWORK_SLUGS = [
+  "shopee",
+  "lazada",
+  "tiktok",
+  "amazon",
+  "aliexpress",
+  "carousell",
+  "ebay",
+  "zalora",
+] as const;
 
-async function runNetworkScraper(slug: string | null, url: string): Promise<MarketplaceProductData | null> {
+async function runNetworkScraper(
+  slug: string | null,
+  url: string,
+): Promise<MarketplaceProductData | null> {
   switch (slug) {
     case "lazada":
       return fetchLazadaProductData(url);
@@ -689,10 +823,16 @@ async function runNetworkScraper(slug: string | null, url: string): Promise<Mark
 export const scrapeShopUrl = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({
-      url: z.string().url().max(2000).regex(/^https?:\/\//i),
-      networkSlug: z.enum(NETWORK_SLUGS).optional(),
-    }).parse(input),
+    z
+      .object({
+        url: z
+          .string()
+          .url()
+          .max(2000)
+          .regex(/^https?:\/\//i),
+        networkSlug: z.enum(NETWORK_SLUGS).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     await assertShopManager(context.supabase, context.userId);
@@ -757,11 +897,21 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       properties: {
         title: { type: "string", description: "Concise product title without seller/shop name" },
         brand: { type: "string", description: "Brand / manufacturer if mentioned" },
-        description: { type: "string", description: "1-3 sentence product description focused on what the item is and key specs" },
+        description: {
+          type: "string",
+          description: "1-3 sentence product description focused on what the item is and key specs",
+        },
         price: { type: "number", description: "Numeric price value of the main product" },
         currency: { type: "string", description: "ISO currency code, e.g. PHP, USD" },
-        image_url: { type: "string", description: "Absolute URL of the primary product photo (NOT site icons, favorite hearts, or thumbnails of related items)" },
-        category_hint: { type: "string", description: "Best-guess product category (e.g. car wax, oil filter, helmet)" },
+        image_url: {
+          type: "string",
+          description:
+            "Absolute URL of the primary product photo (NOT site icons, favorite hearts, or thumbnails of related items)",
+        },
+        category_hint: {
+          type: "string",
+          description: "Best-guess product category (e.g. car wax, oil filter, helmet)",
+        },
       },
     };
 
@@ -776,7 +926,12 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
           formats: [
             "markdown",
             "rawHtml",
-            { type: "json", schema, prompt: "Extract real product fields for the main product on this marketplace listing. Ignore navigation, related items, recommendation rails, 'you may also like', and site-wide UI elements like favorite/heart icons." } as any,
+            {
+              type: "json",
+              schema,
+              prompt:
+                "Extract real product fields for the main product on this marketplace listing. Ignore navigation, related items, recommendation rails, 'you may also like', and site-wide UI elements like favorite/heart icons.",
+            } as any,
           ] as any,
           onlyMainContent: true,
           waitFor: 2500,
@@ -784,7 +939,8 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
         } as any);
         extracted = result?.json ?? result?.data?.json ?? null;
         metadata = result?.metadata ?? result?.data?.metadata ?? null;
-        html = result?.rawHtml ?? result?.data?.rawHtml ?? result?.html ?? result?.data?.html ?? null;
+        html =
+          result?.rawHtml ?? result?.data?.rawHtml ?? result?.html ?? result?.data?.html ?? null;
       } catch (e: any) {
         return {
           error: `Could not fetch page: ${e?.message ?? "unknown error"}`,
@@ -804,9 +960,27 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     const pickStr = (...vals: any[]) =>
       vals.map((v) => (v == null ? "" : String(v).trim())).find((v) => v.length > 0) ?? "";
 
-    const title = pickStr(marketplace?.title, ld?.name, extracted?.title, metadata?.ogTitle, metadata?.["og:title"], metadata?.title).slice(0, 200) || null;
-    const brand = sanitizeBrand(pickStr(marketplace?.brand, ld?.brand, extracted?.brand).slice(0, 120) || null);
-    const description = pickStr(marketplace?.description, ld?.description, extracted?.description, metadata?.ogDescription, metadata?.["og:description"], metadata?.description).slice(0, 2000) || null;
+    const title =
+      pickStr(
+        marketplace?.title,
+        ld?.name,
+        extracted?.title,
+        metadata?.ogTitle,
+        metadata?.["og:title"],
+        metadata?.title,
+      ).slice(0, 200) || null;
+    const brand = sanitizeBrand(
+      pickStr(marketplace?.brand, ld?.brand, extracted?.brand).slice(0, 120) || null,
+    );
+    const description =
+      pickStr(
+        marketplace?.description,
+        ld?.description,
+        extracted?.description,
+        metadata?.ogDescription,
+        metadata?.["og:description"],
+        metadata?.description,
+      ).slice(0, 2000) || null;
 
     // Image: JSON-LD > og:image > extractor; reject icons.
     const image_url = pickFirstNonIconImage(
@@ -818,8 +992,20 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     );
 
     // Price: JSON-LD > og:price > extractor.
-    const rawPrice = marketplace?.price ?? ld?.price ?? metadata?.["og:price:amount"] ?? metadata?.["product:price:amount"] ?? extracted?.price ?? null;
-    const rawCurrency = marketplace?.currency ?? ld?.currency ?? metadata?.["og:price:currency"] ?? metadata?.["product:price:currency"] ?? extracted?.currency ?? null;
+    const rawPrice =
+      marketplace?.price ??
+      ld?.price ??
+      metadata?.["og:price:amount"] ??
+      metadata?.["product:price:amount"] ??
+      extracted?.price ??
+      null;
+    const rawCurrency =
+      marketplace?.currency ??
+      ld?.currency ??
+      metadata?.["og:price:currency"] ??
+      metadata?.["product:price:currency"] ??
+      extracted?.currency ??
+      null;
     const price_php = pickPricePhp(rawPrice, rawCurrency);
     const sale_price_php = marketplace?.sale_price
       ? pickPricePhp(marketplace.sale_price, marketplace?.currency ?? "PHP")
@@ -882,7 +1068,7 @@ async function resolveFinalUrl(input: string): Promise<string> {
         headers: {
           "user-agent":
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36",
-          "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
           "accept-language": "en-US,en;q=0.9",
         },
         signal: AbortSignal.timeout(10_000),
@@ -916,11 +1102,18 @@ function extractRedirectFromHtml(html: string, base: string): string | null {
     /data-spm-url=["']([^"']+)/gi,
   ];
   let baseHost = "";
-  try { baseHost = new URL(base).hostname.toLowerCase(); } catch { /* ignore */ }
+  try {
+    baseHost = new URL(base).hostname.toLowerCase();
+  } catch {
+    /* ignore */
+  }
   const sameHostCandidates: string[] = [];
   for (const re of patterns) {
     for (const m of html.matchAll(re)) {
-      const raw = m[1]?.replace(/\\u002F/g, "/").replace(/\\\//g, "/").trim();
+      const raw = m[1]
+        ?.replace(/\\u002F/g, "/")
+        .replace(/\\\//g, "/")
+        .trim();
       if (!raw) continue;
       // Reject JS variable / template refs (e.g. `url`, `${x}`, `lazShareInfo`).
       if (!/^(https?:)?\/\//i.test(raw) && !raw.startsWith("/")) continue;
@@ -934,15 +1127,26 @@ function extractRedirectFromHtml(html: string, base: string): string | null {
           continue;
         }
         return resolved;
-      } catch { /* ignore */ }
+      } catch {
+        /* ignore */
+      }
     }
   }
   return sameHostCandidates[0] ?? null;
 }
 
 const BAD_BRANDS = new Set([
-  "generic", "no brand", "no-brand", "nobrand", "unbranded",
-  "oem", "none", "n/a", "na", "unknown", "other",
+  "generic",
+  "no brand",
+  "no-brand",
+  "nobrand",
+  "unbranded",
+  "oem",
+  "none",
+  "n/a",
+  "na",
+  "unknown",
+  "other",
 ]);
 function sanitizeBrand(b: string | null | undefined): string | null {
   if (!b) return null;
@@ -956,7 +1160,7 @@ function pickFirstNonIconImage(...candidates: any[]): string | null {
   for (const c of candidates) {
     const list = Array.isArray(c) ? c : [c];
     for (const raw of list) {
-      const v = raw == null ? "" : (typeof raw === "string" ? raw : raw?.url ?? "");
+      const v = raw == null ? "" : typeof raw === "string" ? raw : (raw?.url ?? "");
       const s = String(v).trim();
       if (s && /^https?:\/\//i.test(s) && !looksLikeIconImage(s)) return s;
     }
@@ -1003,12 +1207,18 @@ type LdProduct = {
 };
 
 function extractJsonLdProduct(html: string): LdProduct | null {
-  const blocks = Array.from(html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi));
+  const blocks = Array.from(
+    html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi),
+  );
   for (const m of blocks) {
     const raw = m[1]?.trim();
     if (!raw) continue;
     let parsed: any;
-    try { parsed = JSON.parse(raw); } catch { continue; }
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      continue;
+    }
     const candidates: any[] = Array.isArray(parsed) ? parsed : (parsed["@graph"] ?? [parsed]);
     for (const node of candidates) {
       if (!node || typeof node !== "object") continue;
@@ -1028,7 +1238,12 @@ function extractJsonLdProduct(html: string): LdProduct | null {
         image: typeof image === "string" ? image : image?.url,
         price: Number.isFinite(price) ? price : undefined,
         currency: typeof offer?.priceCurrency === "string" ? offer.priceCurrency : undefined,
-        url: typeof node.url === "string" ? node.url : (typeof node["@id"] === "string" ? node["@id"] : undefined),
+        url:
+          typeof node.url === "string"
+            ? node.url
+            : typeof node["@id"] === "string"
+              ? node["@id"]
+              : undefined,
       };
     }
   }

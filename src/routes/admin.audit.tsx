@@ -4,7 +4,13 @@ import { ChevronLeft, ChevronRight, Search, ShieldAlert } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 
 export const Route = createFileRoute("/admin/audit")({
@@ -47,10 +53,15 @@ function AdminAudit() {
   const [names, setNames] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    const t = setTimeout(() => { setSearch(searchInput.trim()); setPage(0); }, 300);
+    const t = setTimeout(() => {
+      setSearch(searchInput.trim());
+      setPage(0);
+    }, 300);
     return () => clearTimeout(t);
   }, [searchInput]);
-  useEffect(() => { setPage(0); }, [actionFilter]);
+  useEffect(() => {
+    setPage(0);
+  }, [actionFilter]);
 
   const load = async () => {
     setLoading(true);
@@ -71,7 +82,11 @@ function AdminAudit() {
 
       const from = page * PAGE_SIZE;
       const { data, count, error } = await q.range(from, from + PAGE_SIZE - 1);
-      if (error) { console.error(error); setLoading(false); return; }
+      if (error) {
+        console.error(error);
+        setLoading(false);
+        return;
+      }
       const list = (data ?? []) as Row[];
       setRows(list);
       setTotal(count ?? 0);
@@ -79,15 +94,24 @@ function AdminAudit() {
       // Resolve actor + target names
       const ids = Array.from(new Set(list.flatMap((r) => [r.actor_id, r.target_user_id])));
       if (ids.length) {
-        const { data: profs } = await supabase.from("profiles").select("id,full_name").in("id", ids);
+        const { data: profs } = await supabase
+          .from("profiles")
+          .select("id,full_name")
+          .in("id", ids);
         const map: Record<string, string> = {};
-        (profs ?? []).forEach((p: any) => { map[p.id] = p.full_name ?? p.id.slice(0, 8); });
+        (profs ?? []).forEach((p: any) => {
+          map[p.id] = p.full_name ?? p.id.slice(0, 8);
+        });
         setNames((prev) => ({ ...prev, ...map }));
       }
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(() => { load(); }, [page, search, actionFilter]);
+  useEffect(() => {
+    load();
+  }, [page, search, actionFilter]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const nameOf = (id: string) => names[id] ?? id.slice(0, 8) + "…";
@@ -99,7 +123,8 @@ function AdminAudit() {
         <h1 className="font-display text-2xl font-bold">Admin audit log</h1>
       </div>
       <p className="mb-4 text-sm text-muted-foreground">
-        Every role grant/revoke and verification status change made through the admin panel is recorded here with a timestamp and actor.
+        Every role grant/revoke and verification status change made through the admin panel is
+        recorded here with a timestamp and actor.
       </p>
 
       <div className="mb-3 grid gap-2 rounded-lg border border-border bg-card p-3 sm:grid-cols-3">
@@ -113,7 +138,9 @@ function AdminAudit() {
           />
         </div>
         <Select value={actionFilter} onValueChange={setActionFilter}>
-          <SelectTrigger><SelectValue placeholder="Action" /></SelectTrigger>
+          <SelectTrigger>
+            <SelectValue placeholder="Action" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All actions</SelectItem>
             <SelectItem value="role_granted">Role granted</SelectItem>
@@ -141,16 +168,25 @@ function AdminAudit() {
           </thead>
           <tbody>
             {rows.length === 0 && !loading && (
-              <tr><td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">No audit entries match.</td></tr>
+              <tr>
+                <td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">
+                  No audit entries match.
+                </td>
+              </tr>
             )}
             {rows.map((r) => (
               <tr key={r.id} className="border-t border-border">
-                <td className="whitespace-nowrap px-3 py-2 text-xs text-muted-foreground">{fmt(r.created_at)}</td>
-                <td className="px-3 py-2"><Badge variant="secondary">{ACTION_LABEL[r.action] ?? r.action}</Badge></td>
+                <td className="whitespace-nowrap px-3 py-2 text-xs text-muted-foreground">
+                  {fmt(r.created_at)}
+                </td>
+                <td className="px-3 py-2">
+                  <Badge variant="secondary">{ACTION_LABEL[r.action] ?? r.action}</Badge>
+                </td>
                 <td className="px-3 py-2">{nameOf(r.target_user_id)}</td>
                 <td className="px-3 py-2 text-xs">
                   <span className="text-muted-foreground">{r.field}:</span>{" "}
-                  <span className="line-through text-muted-foreground">{r.old_value ?? "—"}</span>{" → "}
+                  <span className="line-through text-muted-foreground">{r.old_value ?? "—"}</span>
+                  {" → "}
                   <span className="font-medium">{r.new_value ?? "—"}</span>
                 </td>
                 <td className="px-3 py-2 text-xs">{nameOf(r.actor_id)}</td>
@@ -162,12 +198,26 @@ function AdminAudit() {
 
       {total > PAGE_SIZE && (
         <div className="mt-4 flex items-center justify-between">
-          <Button size="sm" variant="outline" disabled={page === 0 || loading} onClick={() => setPage((p) => Math.max(0, p - 1))}>
-            <ChevronLeft className="mr-1 h-4 w-4" />Previous
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={page === 0 || loading}
+            onClick={() => setPage((p) => Math.max(0, p - 1))}
+          >
+            <ChevronLeft className="mr-1 h-4 w-4" />
+            Previous
           </Button>
-          <span className="text-xs text-muted-foreground">Page {page + 1} of {totalPages}</span>
-          <Button size="sm" variant="outline" disabled={page + 1 >= totalPages || loading} onClick={() => setPage((p) => p + 1)}>
-            Next<ChevronRight className="ml-1 h-4 w-4" />
+          <span className="text-xs text-muted-foreground">
+            Page {page + 1} of {totalPages}
+          </span>
+          <Button
+            size="sm"
+            variant="outline"
+            disabled={page + 1 >= totalPages || loading}
+            onClick={() => setPage((p) => p + 1)}
+          >
+            Next
+            <ChevronRight className="ml-1 h-4 w-4" />
           </Button>
         </div>
       )}

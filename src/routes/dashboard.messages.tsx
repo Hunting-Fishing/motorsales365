@@ -36,8 +36,12 @@ interface ConversationSummary {
 function MessagesPage() {
   const { user } = useAuth();
   const [messages, setMessages] = useState<MessageRow[]>([]);
-  const [listingsById, setListingsById] = useState<Record<string, { title: string; user_id: string }>>({});
-  const [profilesById, setProfilesById] = useState<Record<string, { full_name: string | null; business_name: string | null }>>({});
+  const [listingsById, setListingsById] = useState<
+    Record<string, { title: string; user_id: string }>
+  >({});
+  const [profilesById, setProfilesById] = useState<
+    Record<string, { full_name: string | null; business_name: string | null }>
+  >({});
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [reply, setReply] = useState("");
   const [sending, setSending] = useState(false);
@@ -59,15 +63,23 @@ function MessagesPage() {
       new Set(rows.flatMap((m) => [m.sender_id, m.recipient_id]).filter((id) => id !== user.id)),
     );
     if (listingIds.length) {
-      const { data: ls } = await supabase.from("listings").select("id,title,user_id").in("id", listingIds);
+      const { data: ls } = await supabase
+        .from("listings")
+        .select("id,title,user_id")
+        .in("id", listingIds);
       const map: Record<string, { title: string; user_id: string }> = {};
       (ls ?? []).forEach((l: any) => (map[l.id] = { title: l.title, user_id: l.user_id }));
       setListingsById(map);
     }
     if (userIds.length) {
-      const { data: ps } = await supabase.from("public_profiles").select("id,full_name,business_name").in("id", userIds);
+      const { data: ps } = await supabase
+        .from("public_profiles")
+        .select("id,full_name,business_name")
+        .in("id", userIds);
       const map: Record<string, { full_name: string | null; business_name: string | null }> = {};
-      (ps ?? []).forEach((p: any) => (map[p.id] = { full_name: p.full_name, business_name: p.business_name }));
+      (ps ?? []).forEach(
+        (p: any) => (map[p.id] = { full_name: p.full_name, business_name: p.business_name }),
+      );
       setProfilesById(map);
     }
   };
@@ -133,7 +145,8 @@ function MessagesPage() {
     return messages.filter(
       (m) =>
         m.listing_id === activeConvo.listing_id &&
-        (m.sender_id === activeConvo.other_user_id || m.recipient_id === activeConvo.other_user_id) &&
+        (m.sender_id === activeConvo.other_user_id ||
+          m.recipient_id === activeConvo.other_user_id) &&
         (m.sender_id === user.id || m.recipient_id === user.id),
     );
   }, [messages, activeConvo, user]);
@@ -141,7 +154,9 @@ function MessagesPage() {
   // Mark active thread read
   useEffect(() => {
     if (!user || !activeConvo) return;
-    const unreadIds = thread.filter((m) => m.recipient_id === user.id && !m.read_at).map((m) => m.id);
+    const unreadIds = thread
+      .filter((m) => m.recipient_id === user.id && !m.read_at)
+      .map((m) => m.id);
     if (unreadIds.length === 0) return;
     supabase
       .from("messages")
@@ -149,7 +164,9 @@ function MessagesPage() {
       .in("id", unreadIds)
       .then(() => {
         setMessages((prev) =>
-          prev.map((m) => (unreadIds.includes(m.id) ? { ...m, read_at: new Date().toISOString() } : m)),
+          prev.map((m) =>
+            unreadIds.includes(m.id) ? { ...m, read_at: new Date().toISOString() } : m,
+          ),
         );
       });
   }, [thread, user, activeConvo]);
@@ -189,7 +206,9 @@ function MessagesPage() {
       ) : (
         <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
           {/* Conversation list */}
-          <div className={`overflow-hidden rounded-xl border border-border bg-card ${activeKey ? "hidden lg:block" : "block"}`}>
+          <div
+            className={`overflow-hidden rounded-xl border border-border bg-card ${activeKey ? "hidden lg:block" : "block"}`}
+          >
             <div className="max-h-[70dvh] divide-y divide-border overflow-y-auto">
               {conversations.map((c) => (
                 <button
@@ -207,16 +226,22 @@ function MessagesPage() {
                       </span>
                     )}
                   </div>
-                  <div className="truncate text-xs text-muted-foreground">Re: {c.listing_title}</div>
+                  <div className="truncate text-xs text-muted-foreground">
+                    Re: {c.listing_title}
+                  </div>
                   <div className="mt-1 line-clamp-1 text-xs text-foreground/70">{c.last_body}</div>
-                  <div className="mt-1 text-[10px] text-muted-foreground">{formatDate(c.last_at)}</div>
+                  <div className="mt-1 text-[10px] text-muted-foreground">
+                    {formatDate(c.last_at)}
+                  </div>
                 </button>
               ))}
             </div>
           </div>
 
           {/* Thread */}
-          <div className={`flex flex-col overflow-hidden rounded-xl border border-border bg-card ${activeKey ? "flex" : "hidden lg:flex"}`}>
+          <div
+            className={`flex flex-col overflow-hidden rounded-xl border border-border bg-card ${activeKey ? "flex" : "hidden lg:flex"}`}
+          >
             {activeConvo ? (
               <>
                 <div className="flex items-start gap-2 border-b border-border p-4">
@@ -252,8 +277,13 @@ function MessagesPage() {
                           }`}
                         >
                           <div className="whitespace-pre-wrap">{m.body}</div>
-                          <div className={`mt-1 text-[10px] ${mine ? "text-primary-foreground/70" : "text-muted-foreground"}`}>
-                            {new Date(m.created_at).toLocaleString("en-PH", { dateStyle: "short", timeStyle: "short" })}
+                          <div
+                            className={`mt-1 text-[10px] ${mine ? "text-primary-foreground/70" : "text-muted-foreground"}`}
+                          >
+                            {new Date(m.created_at).toLocaleString("en-PH", {
+                              dateStyle: "short",
+                              timeStyle: "short",
+                            })}
                           </div>
                         </div>
                       </div>
@@ -281,11 +311,12 @@ function MessagesPage() {
                 </div>
               </>
             ) : (
-              <div className="hidden p-12 text-center text-muted-foreground lg:block">Select a conversation</div>
+              <div className="hidden p-12 text-center text-muted-foreground lg:block">
+                Select a conversation
+              </div>
             )}
           </div>
         </div>
-
       )}
     </div>
   );
