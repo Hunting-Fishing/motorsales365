@@ -128,6 +128,7 @@ function RootComponent() {
             <SandboxBanner />
             <Outlet />
             <Toaster richColors position="top-right" />
+            <ConfirmDialogHost />
             <AnalyticsGA />
             <ServiceWorkerRegister />
           </CurrencyProvider>
