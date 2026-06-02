@@ -97,6 +97,8 @@ function EditListingPage() {
 
   useEffect(() => {
     if (user) load();
+    // reason: `load` is recreated each render; depend only on user/id.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, id]);
 
   const save = async (e: React.FormEvent) => {
