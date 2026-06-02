@@ -459,6 +459,22 @@ async function handleEvent(env: StripeEnv, event: Stripe.Event) {
       await recordPaymentFromInvoice(env, event.data.object as Stripe.Invoice);
       break;
     }
+    case "checkout.session.expired": {
+      await recordFailedListingPayment(
+        env,
+        event.data.object as Stripe.Checkout.Session,
+        "expired",
+      );
+      break;
+    }
+    case "checkout.session.async_payment_failed": {
+      await recordFailedListingPayment(
+        env,
+        event.data.object as Stripe.Checkout.Session,
+        "failed",
+      );
+      break;
+    }
     default:
       break;
   }
