@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import ogBrowse from "@/assets/og/browse.jpg";
 import { useEffect, useState } from "react";
 import { Search, BookmarkPlus } from "lucide-react";
 import { toast } from "sonner";
@@ -74,6 +75,8 @@ export const Route = createFileRoute("/browse/$category")({
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:url", content: url },
+        { property: "og:image", content: `https://365motorsales.com${ogBrowse}` },
+        { property: "twitter:image", content: `https://365motorsales.com${ogBrowse}` },
       ],
       links: [{ rel: "canonical", href: url }],
     };
