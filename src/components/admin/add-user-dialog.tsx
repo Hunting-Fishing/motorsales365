@@ -40,9 +40,7 @@ export function AddUserDialog({ onCreated }: { onCreated?: () => void }) {
   const [password, setPassword] = useState(() => generatePassword());
   const [accountType, setAccountType] = useState<"staff" | "business">("staff");
   const [roles, setRoles] = useState<StaffRole[]>(["support"]);
-  const [sellerType, setSellerType] = useState<"private" | "dealer" | "repair_shop" | "insurance">(
-    "private",
-  );
+  const [sellerType, setSellerType] = useState<"private" | "business">("private");
   const [businessName, setBusinessName] = useState("");
   const [businessKind, setBusinessKind] = useState<"dealer" | "repair_shop" | "insurance" | "">("");
   const [markVerified, setMarkVerified] = useState(true);
@@ -235,9 +233,7 @@ export function AddUserDialog({ onCreated }: { onCreated?: () => void }) {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="private">Private</SelectItem>
-                    <SelectItem value="dealer">Dealer</SelectItem>
-                    <SelectItem value="repair_shop">Repair shop</SelectItem>
-                    <SelectItem value="insurance">Insurance</SelectItem>
+                    <SelectItem value="business">Business</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

@@ -24,7 +24,7 @@ import {
 
 type StaffRole = "admin" | "moderator" | "support" | "sales" | "advertising";
 const STAFF_ROLES: StaffRole[] = ["admin", "moderator", "support", "sales", "advertising"];
-type SellerType = "private" | "dealer" | "repair_shop" | "insurance";
+type SellerType = "private" | "business";
 type VerificationStatus = "unverified" | "pending" | "verified" | "rejected";
 
 export function EditUserDialog({
@@ -201,9 +201,7 @@ export function EditUserDialog({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="private">Private</SelectItem>
-                <SelectItem value="dealer">Dealer</SelectItem>
-                <SelectItem value="repair_shop">Repair shop</SelectItem>
-                <SelectItem value="insurance">Insurance</SelectItem>
+                <SelectItem value="business">Business</SelectItem>
               </SelectContent>
             </Select>
           </div>
