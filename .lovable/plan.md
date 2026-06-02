@@ -5,6 +5,7 @@ Per-site review of all 21 `react-hooks/exhaustive-deps` warnings across ~17 file
 ## Approach
 
 For each warning, choose one of:
+
 1. **Add missing dep** — when the dep is genuinely needed and stable (or already memoized).
 2. **Wrap in `useCallback`/`useMemo`** — when adding a dep would cause re-runs because the value is recreated each render.
 3. **Inline-disable with reason** — when the omission is intentional (e.g., mount-only effect, deliberately stale closure, or adding the dep would cause loops/extra fetches).
@@ -14,6 +15,7 @@ Default bias: add the dep when safe; suppress with a brief `// reason: ...` comm
 ## Files to touch
 
 Based on the prior audit, the 21 sites span:
+
 - `src/components/ads/ad-carousel.tsx`
 - `src/components/businesses/google-business-map.tsx`
 - `src/hooks/use-dynamic-jsonld.ts`
