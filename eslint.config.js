@@ -25,5 +25,19 @@ export default tseslint.config(
       "@typescript-eslint/no-explicit-any": "warn",
     },
   },
+  {
+    // Files where co-exports are intentional or HMR doesn't apply:
+    //  - shadcn UI primitives ship co-exported cva variants by design
+    //  - email templates render server-side (no Fast Refresh)
+    //  - router.tsx is a framework config file
+    files: [
+      "src/components/ui/**/*.{ts,tsx}",
+      "src/lib/email-templates/**/*.{ts,tsx}",
+      "src/router.tsx",
+    ],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
   eslintPluginPrettier,
 );
