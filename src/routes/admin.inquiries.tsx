@@ -88,6 +88,8 @@ function AdminInquiriesPage() {
 
   useEffect(() => {
     if (isStaff) load();
+    // reason: `load` is recreated each render; depend only on its inputs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isStaff, typeFilter, statusFilter]);
 
   const filtered = useMemo(() => {
