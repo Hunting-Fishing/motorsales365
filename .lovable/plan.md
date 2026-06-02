@@ -1,39 +1,57 @@
-# ESLint + TypeScript cleanup pass
+# Tackle remaining ESLint warnings
 
-## What changes
+Goal: drive the non-`any` warning count to zero. ~63 warnings across two rules.
 
-### 1. Auto-format: `prettier --write .`
-The ~11,600 `prettier/prettier` violations are purely formatting. Running `prettier --write` fixes them all with zero behavior risk. No file moves, no logic changes.
+## 1. `react-refresh/only-export-components` (42 → 0)
 
-### 2. ESLint config tweak
-- `eslint.config.js` — add `"@typescript-eslint/no-explicit-any": "warn"` to the rules block. This downgrades the 1,060+ `as any` casts from hard errors to warnings. Fixing them properly requires typing every Supabase query `.select()` shape across ~90 files — that's a separate, deliberate refactor, not a cleanup task.
+### 1a. Scope the rule via ESLint overrides
+`eslint.config.js` — add an override block that turns the rule off for files where it's a false positive:
 
-### 3. ESLint auto-fix: `eslint --fix .`
-After Prettier formatting, `eslint --fix` will resolve any remaining auto-fixable issues (e.g. `prefer-const` where applicable).
+- `src/components/ui/**` — shadcn primitives (co-exported `cva` variants by design)
+- `src/lib/email-templates/**` — server-rendered React, never HMR'd
+- `src/router.tsx` — framework config file
 
-### 4. Manual fixes for non-auto-fixable issues (~76 total)
+This clears ~33 of the 42 warnings.
 
-**react-refresh/only-export-components (42)**
-- Find files that export both React components and non-component values (constants, helper functions, types) from the same module.
-- Move non-component exports into a sibling `.ts` file or use `export default` for the component. Keep behavior identical.
+### 1b. Fix the ~9 genuine app-code violations
+Real components that co-export helpers/constants. Split each into a sibling file:
 
-**react-hooks/exhaustive-deps (28)**
-- Review each `useEffect`/`useCallback`/`useMemo` with missing or incorrect dependency arrays.
-- Add missing deps, or wrap with `useRef` if the value is intentionally stable and should not trigger re-runs. Never change behavior.
+- `src/components/brand-logo.tsx` — extract `logoSrc` helper to `brand-logo.utils.ts`.
+- `src/components/business/service-catalog-picker.tsx` (3 hits) — extract types/constants to `service-catalog-picker.types.ts`.
+- `src/components/shop/shop-favorite-button.tsx` — extract co-exported helper.
+- `src/components/signup/account-type-grid.tsx` — extract `SignupIntent` type + `SIGNUP_TYPES` constant to `account-type-grid.types.ts`.
+- `src/hooks/use-auth.tsx` — extract co-exported constant/helper.
+- `src/lib/currency.tsx` — extract helpers to `currency.ts` (the `.tsx` file keeps the JSX component).
+- `src/lib/feature-flags.tsx` (3 hits) — extract `FeatureFlagKey` type + constants to `feature-flags.types.ts`.
 
-**no-empty (6)**
-- Empty `catch {}` blocks. Add a comment explaining why the exception is intentionally swallowed (e.g. `// localStorage unavailable in some contexts`), or re-throw if the empty catch is hiding a real error.
+Each extraction is mechanical: cut the non-component exports into a sibling file, add re-imports to the original, update import sites to either keep using the original (re-export from it) or import from the new sibling. I'll re-export to minimize call-site churn.
 
-**prefer-const (4)**
-- Should already be caught by `eslint --fix`; if any remain, convert `let` to `const`.
+## 2. `react-hooks/exhaustive-deps` (21 → 0)
+
+Per-site review of 21 effects/memos across 17 files. For each one:
+- **Safe to add**: add the missing dep to the array.
+- **Stable ref or one-shot init**: keep behavior, add `// eslint-disable-next-line react-hooks/exhaustive-deps` with a one-line reason.
+- **Needs memoization**: wrap the dep in `useCallback`/`useMemo` if adding it would cause re-runs.
+
+Files touched:
+- `src/components/ads/ad-carousel.tsx`
+- `src/components/businesses/google-business-map.tsx`
+- `src/hooks/use-dynamic-jsonld.ts`
+- `src/routes/admin.audit.tsx`, `admin.inquiries.tsx`, `admin.referrals.tsx`, `admin.reports.tsx`, `admin.users.tsx`
+- `src/routes/dashboard.billing.tsx`, `dashboard.index.tsx`, `dashboard.messages.tsx`, `dashboard.searches.tsx`, `dashboard.tow.tsx`, `dashboard.verification.tsx`
+- `src/routes/listing.$id.edit.tsx`, `login.tsx`, `shop.p.$slug.tsx`
+
+No behavior changes — only dep-array tightening or documented suppressions.
 
 ## Verification
 
-- `bunx tsc --noEmit` — must remain clean (already passes).
-- `bunx eslint .` — target: 0 errors, ~1060 warnings (the `no-explicit-any` ones).
+- `bunx tsc --noEmit` — must stay clean.
+- `bunx eslint .` — target: 0 errors, ~1054 warnings (all `no-explicit-any`).
+- Spot-check: login still redirects, admin pages still load, dashboard widgets still refresh.
 
 ## Files touched (estimate)
 
-- `eslint.config.js` (1 line added)
-- Potentially dozens of files for Prettier formatting (whitespace only)
-- ~50–70 files for the manual lint fixes
+- `eslint.config.js` (override block added)
+- ~8 new sibling files (`.types.ts` / `.utils.ts` extractions)
+- ~25 files edited for dep arrays or co-export extractions
+- 0 deletions, 0 moves
