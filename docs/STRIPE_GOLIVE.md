@@ -73,13 +73,13 @@ sellers without VAT registration can leave both off.
 
 ## Plan → lookup_key map
 
-| Plan     | lookup_key        | Price (PHP/mo) |
-| -------- | ----------------- | -------------- |
-| Bronze   | `bronze_monthly`  | 80             |
-| Silver   | `silver_monthly`  | 150            |
-| Gold     | `gold_monthly`    | 280            |
-| Platinum | `platinum_monthly`| 500            |
-| Business | `business_monthly`| 1,200          |
+| Plan     | lookup_key         | Price (PHP/mo) |
+| -------- | ------------------ | -------------- |
+| Bronze   | `bronze_monthly`   | 80             |
+| Silver   | `silver_monthly`   | 150            |
+| Gold     | `gold_monthly`     | 280            |
+| Platinum | `platinum_monthly` | 500            |
+| Business | `business_monthly` | 1,200          |
 
 Products and prices for these lookup keys need to exist in Stripe before
 live checkout works. In the Stripe dashboard (sandbox or live), create a

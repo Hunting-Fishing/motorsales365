@@ -16,5 +16,9 @@
   "Region XI — Davao Region": { "lat": 7.07, "lng": 125.61, "zoom": 8 },
   "Region XII — SOCCSKSARGEN": { "lat": 6.5, "lng": 124.85, "zoom": 8 },
   "Region XIII — Caraga": { "lat": 9.05, "lng": 125.5, "zoom": 8 },
-  "BARMM — Bangsamoro Autonomous Region in Muslim Mindanao": { "lat": 7.22, "lng": 124.25, "zoom": 8 }
+  "BARMM — Bangsamoro Autonomous Region in Muslim Mindanao": {
+    "lat": 7.22,
+    "lng": 124.25,
+    "zoom": 8
+  }
 }
