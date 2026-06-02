@@ -187,6 +187,8 @@ function BillingPage() {
         });
         setMediaCounts(counts);
       });
+    // reason: `env` and `reloadSubs` are stable refs from context; depend only on user.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const activeSub = useMemo(
