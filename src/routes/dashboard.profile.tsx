@@ -15,6 +15,7 @@ import { AvatarUploader } from "@/components/avatar-uploader";
 import { TotpSetupCard } from "@/components/totp-setup-card";
 import { buildE164, parseE164 } from "@/data/country-codes";
 import { useCurrency } from "@/lib/currency";
+import { saveProfile } from "@/lib/profile.functions";
 
 type ChecklistItem = { label: string; done: boolean; required: boolean };
 
