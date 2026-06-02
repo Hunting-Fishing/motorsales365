@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "@tanstack/react-router";
-import { HelpCircle, X, MessageSquare, Search, Tag, UserCheck, Store } from "lucide-react";
+import { HelpCircle, X, MessageSquare, Search, Tag, UserCheck, Store, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { fetchSupportContact } from "@/lib/site-settings";
 
 const QUICK_LINKS = [
   { to: "/support/buying", label: "Buying a vehicle", icon: Search },
@@ -24,6 +25,11 @@ const HIDDEN_PREFIXES = [
 export function FloatingHelpWidget() {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
+  const [contact, setContact] = useState<{ whatsappHref: string | null; messengerHref: string | null }>({ whatsappHref: null, messengerHref: null });
+
+  useEffect(() => {
+    fetchSupportContact().then(setContact).catch(() => {});
+  }, []);
 
   // Don't show on routes where it would get in the way
   if (
@@ -33,6 +39,8 @@ export function FloatingHelpWidget() {
   ) {
     return null;
   }
+
+  const hasChat = contact.whatsappHref || contact.messengerHref;
 
   return (
     <>
@@ -82,6 +90,27 @@ export function FloatingHelpWidget() {
               </Link>
             ))}
           </div>
+          {hasChat && (
+            <div className="border-t border-border px-3 pb-3 pt-2">
+              <p className="mb-2 text-xs font-medium text-muted-foreground">Chat with us</p>
+              <div className="flex gap-2">
+                {contact.whatsappHref && (
+                  <Button asChild size="sm" variant="outline" className="flex-1" onClick={() => setOpen(false)}>
+                    <a href={contact.whatsappHref} target="_blank" rel="noreferrer">
+                      <MessageCircle className="h-4 w-4" /> WhatsApp
+                    </a>
+                  </Button>
+                )}
+                {contact.messengerHref && (
+                  <Button asChild size="sm" variant="outline" className="flex-1" onClick={() => setOpen(false)}>
+                    <a href={contact.messengerHref} target="_blank" rel="noreferrer">
+                      <MessageCircle className="h-4 w-4" /> Messenger
+                    </a>
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
           <div className="border-t border-border p-3">
             <Button asChild className="w-full" size="sm" onClick={() => setOpen(false)}>
               <Link to="/support">
