@@ -19,7 +19,6 @@ export const Route = createFileRoute("/verify-email")({
 
 const POST_ROUTE: Record<string, string> = {
   buyer: "/dashboard",
-  private_seller: "/sell",
   business: "/businesses/submit",
   service_provider: "/businesses/submit",
 };

@@ -20,7 +20,7 @@ async function maybeApplyPendingSignup(user: User) {
   if (!raw) return;
   try {
     const pending = JSON.parse(raw) as {
-      intent?: "buyer" | "private_seller" | "business" | "service_provider";
+      intent?: "buyer" | "business" | "service_provider";
       full_name?: string;
       first_name?: string;
       last_name?: string;

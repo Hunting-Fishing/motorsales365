@@ -73,13 +73,9 @@ export function ShareQr({
     }
   };
 
-  const nativeShare = async () => {
-    if (typeof navigator !== "undefined" && (navigator as any).share) {
-      try {
-        await (navigator as any).share({ title, url });
-      } catch {
-        /* dismissed */
-      }
+  const handleNativeShare = async () => {
+    if (canNativeShare()) {
+      await nativeShare({ title, url });
     } else {
       copyLink();
     }
