@@ -53,6 +53,7 @@ import { Route as SellImportRouteImport } from './routes/sell.import'
 import { Route as RidesSlugRouteImport } from './routes/rides.$slug'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as PassportSlugRouteImport } from './routes/passport.$slug'
+import { Route as ListingCheckoutRouteImport } from './routes/listing.checkout'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
 import { Route as InvitesTokenRouteImport } from './routes/invites.$token'
@@ -350,6 +351,11 @@ const RCodeRoute = RCodeRouteImport.update({
 const PassportSlugRoute = PassportSlugRouteImport.update({
   id: '/passport/$slug',
   path: '/passport/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ListingCheckoutRoute = ListingCheckoutRouteImport.update({
+  id: '/listing/checkout',
+  path: '/listing/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ListingIdRoute = ListingIdRouteImport.update({
@@ -827,6 +833,7 @@ export interface FileRoutesByFullPath {
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
+  '/listing/checkout': typeof ListingCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
@@ -948,6 +955,7 @@ export interface FileRoutesByTo {
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
+  '/listing/checkout': typeof ListingCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
@@ -1073,6 +1081,7 @@ export interface FileRoutesById {
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
+  '/listing/checkout': typeof ListingCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
@@ -1199,6 +1208,7 @@ export interface FileRouteTypes {
     | '/invites/$token'
     | '/learn/$slug'
     | '/listing/$id'
+    | '/listing/checkout'
     | '/passport/$slug'
     | '/r/$code'
     | '/rides/$slug'
@@ -1320,6 +1330,7 @@ export interface FileRouteTypes {
     | '/invites/$token'
     | '/learn/$slug'
     | '/listing/$id'
+    | '/listing/checkout'
     | '/passport/$slug'
     | '/r/$code'
     | '/rides/$slug'
@@ -1444,6 +1455,7 @@ export interface FileRouteTypes {
     | '/invites/$token'
     | '/learn/$slug'
     | '/listing/$id'
+    | '/listing/checkout'
     | '/passport/$slug'
     | '/r/$code'
     | '/rides/$slug'
@@ -1535,6 +1547,7 @@ export interface RootRouteChildren {
   InvitesTokenRoute: typeof InvitesTokenRoute
   LearnSlugRoute: typeof LearnSlugRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
+  ListingCheckoutRoute: typeof ListingCheckoutRoute
   PassportSlugRoute: typeof PassportSlugRoute
   RCodeRoute: typeof RCodeRouteWithChildren
   RidesSlugRoute: typeof RidesSlugRoute
@@ -1876,6 +1889,13 @@ declare module '@tanstack/react-router' {
       path: '/passport/$slug'
       fullPath: '/passport/$slug'
       preLoaderRoute: typeof PassportSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/listing/checkout': {
+      id: '/listing/checkout'
+      path: '/listing/checkout'
+      fullPath: '/listing/checkout'
+      preLoaderRoute: typeof ListingCheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/listing/$id': {
@@ -2643,6 +2663,7 @@ const rootRouteChildren: RootRouteChildren = {
   InvitesTokenRoute: InvitesTokenRoute,
   LearnSlugRoute: LearnSlugRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
+  ListingCheckoutRoute: ListingCheckoutRoute,
   PassportSlugRoute: PassportSlugRoute,
   RCodeRoute: RCodeRouteWithChildren,
   RidesSlugRoute: RidesSlugRoute,
