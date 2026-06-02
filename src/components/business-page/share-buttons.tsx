@@ -8,6 +8,7 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { canNativeShare, nativeShare } from "@/lib/share";
 
 interface Props {
   url: string;
@@ -32,9 +33,7 @@ export function ShareButtons({ url, title, onShare }: Props) {
       return;
     }
     if (target === "native") {
-      try {
-        await (navigator as any).share({ title, url });
-      } catch { /* user cancelled */ }
+      await nativeShare({ title, url });
       return;
     }
     const enc = encodeURIComponent(url);
@@ -47,7 +46,7 @@ export function ShareButtons({ url, title, onShare }: Props) {
     window.open(targets[target], "_blank", "noopener,noreferrer,width=600,height=500");
   };
 
-  const hasNative = typeof navigator !== "undefined" && typeof (navigator as any).share === "function";
+  const hasNative = canNativeShare();
 
   return (
     <DropdownMenu>
