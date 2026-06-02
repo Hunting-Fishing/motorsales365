@@ -334,6 +334,42 @@ async function activateListingFromSession(env: StripeEnv, session: Stripe.Checko
   }
 }
 
+async function recordFailedListingPayment(
+  env: StripeEnv,
+  session: Stripe.Checkout.Session,
+  reason: "expired" | "failed",
+) {
+  void env;
+  const meta = session.metadata || {};
+  if (meta.kind !== "listing_payment") return;
+  const userId = meta.userId as string | undefined;
+  const listingId = meta.listingId as string | undefined;
+  const plan = (meta.plan as string | undefined) ?? "standard";
+  if (!userId || !listingId) return;
+
+  // Idempotency: one failed payment row per session
+  const reference = `stripe_session_failed:${session.id}`;
+  const { data: existing } = await supabaseAdmin
+    .from("payments")
+    .select("id")
+    .eq("reference", reference)
+    .maybeSingle();
+  if (existing) return;
+
+  await supabaseAdmin.from("payments").insert({
+    user_id: userId,
+    listing_id: listingId,
+    kind: (plan === "upgraded" ? "upgrade" : "listing") as any,
+    status: "failed" as any,
+    amount_php: (session.amount_total ?? 0) / 100,
+    method: "stripe",
+    reference,
+    new_plan: plan,
+    notes: reason === "expired" ? "Checkout session expired" : "Payment failed",
+  } as any);
+  // NOTE: We deliberately leave the listing in `pending_payment` so the seller
+  // can retry from /listing/checkout?listingId=... without losing their draft.
+
 async function enrollCourseFromSession(env: StripeEnv, session: Stripe.Checkout.Session) {
   const meta = session.metadata || {};
   const userId = meta.userId as string | undefined;
