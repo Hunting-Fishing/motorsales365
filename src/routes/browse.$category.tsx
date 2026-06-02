@@ -323,6 +323,32 @@ function BrowsePage() {
           )}
         </div>
       </div>
+
+      <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save this search</DialogTitle>
+            <DialogDescription>Give it a name so you can find it later in your dashboard.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="saved-search-name">Name</Label>
+            <Input
+              id="saved-search-name"
+              value={saveName}
+              onChange={(e) => setSaveName(e.target.value)}
+              placeholder="e.g. Toyota Hilux under 1M"
+              autoFocus
+              onKeyDown={(e) => { if (e.key === "Enter") confirmSaveSearch(); }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSaveDialogOpen(false)} disabled={savingSearch}>Cancel</Button>
+            <Button onClick={confirmSaveSearch} disabled={savingSearch || !saveName.trim()}>
+              {savingSearch ? "Saving…" : "Save search"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </SiteLayout>
   );
 }
