@@ -1249,6 +1249,19 @@ function SellPage() {
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Photos & video</h2>
+            <div className="flex flex-wrap items-center gap-3 text-sm">
+              <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
+                {planLimits.planName}
+              </span>
+              <span className="text-muted-foreground">
+                <Camera className="mr-0.5 inline h-3.5 w-3.5 -translate-y-0.5" />
+                <strong className="text-foreground">{Math.max(0, maxPhotos - photos.length)}</strong> photo{maxPhotos - photos.length !== 1 ? "s" : ""} remaining
+              </span>
+              <span className="text-muted-foreground">
+                <VideoIcon className="mr-0.5 inline h-3.5 w-3.5 -translate-y-0.5" />
+                <strong className="text-foreground">{Math.max(0, maxVideos - (video ? 1 : 0))}</strong> video{maxVideos - (video ? 1 : 0) !== 1 ? "s" : ""} remaining
+              </span>
+            </div>
             {(photos.length > maxPhotos || (video && maxVideos < 1)) && (
               <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
                 Your media exceeds the {plan === "standard" ? "Standard" : "current"} plan limit (
