@@ -1251,7 +1251,10 @@ function SellPage() {
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Photos & video</h2>
             {(() => {
-              const tierCaps = {
+              const tierCaps: Record<
+                "free" | "standard" | "upgraded",
+                { photos: number; videos: number; label: string; price: number }
+              > = {
                 free: { photos: 1, videos: 0, label: "Free", price: 0 },
                 standard: {
                   photos: 5,
