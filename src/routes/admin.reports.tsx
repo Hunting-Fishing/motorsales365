@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { confirm } from "@/components/ui/confirm-dialog";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Trash2, ShieldOff, CheckCircle2 } from "lucide-react";

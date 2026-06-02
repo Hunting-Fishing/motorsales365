@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { confirm } from "@/components/ui/confirm-dialog";
 import { Upload, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";

@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { confirm } from "@/components/ui/confirm-dialog";
 import { useEffect, useState } from "react";
 import { Store as StoreIcon, Plus, Check, X, Pencil, Tag, Sparkles, LayoutTemplate, Inbox, Archive, ArchiveRestore } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";

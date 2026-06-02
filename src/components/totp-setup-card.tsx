@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { confirm } from "@/components/ui/confirm-dialog";
 import { toast } from "sonner";
 import { ShieldCheck, ShieldAlert, KeyRound, Copy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
