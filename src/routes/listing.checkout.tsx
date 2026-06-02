@@ -98,8 +98,8 @@ function ListingCheckoutPage() {
         <p className="mt-4 text-center text-xs text-muted-foreground">
           Changed your mind?{" "}
           <Link
-            to="/dashboard"
-            search={{ payment: "cancelled", listingId } as never}
+            to="/sell"
+            search={{ payment: "cancelled" as const, listingId }}
             className="underline"
           >
             Cancel and finish later
