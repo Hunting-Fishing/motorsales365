@@ -106,7 +106,7 @@ function BookableItemsSection({
   }
 
   async function del(id: string) {
-    if (!confirm("Delete this bookable item?")) return;
+    if (!(await confirm({ title: "Delete this bookable item?", destructive: true }))) return;
     try {
       await remove({ data: { businessId, id } });
       onChange();

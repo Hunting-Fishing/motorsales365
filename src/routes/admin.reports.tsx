@@ -42,7 +42,7 @@ function AdminReports() {
   };
 
   const removeListing = async (listingId: string, reportId: string) => {
-    if (!confirm("Permanently delete this listing? This cannot be undone.")) return;
+    if (!(await confirm({ title: "Permanently delete this listing? This cannot be undone.", destructive: true }))) return;
     await supabase.from("listings").delete().eq("id", listingId);
     await supabase.from("reports").update({ status: "resolved" }).eq("id", reportId);
     toast.success("Listing deleted");

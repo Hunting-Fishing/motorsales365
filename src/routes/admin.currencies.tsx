@@ -60,7 +60,7 @@ function AdminCurrencies() {
 
   const removeRow = async (code: string) => {
     if (code === "PHP") return toast.error("PHP cannot be removed");
-    if (!confirm(`Remove ${code}?`)) return;
+    if (!(await confirm({ title: `Remove ${code}?`, destructive: true }))) return;
     const { error } = await sb.from("currencies").delete().eq("code", code);
     if (error) toast.error(error.message);
     else {

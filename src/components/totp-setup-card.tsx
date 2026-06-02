@@ -119,7 +119,7 @@ export function TotpSetupCard() {
   };
 
   const disable = async (factorId: string) => {
-    if (!confirm("Disable two-factor authentication on this account?")) return;
+    if (!(await confirm({ title: "Disable two-factor authentication on this account?", destructive: true }))) return;
     setBusy(true);
     const { error } = await supabase.auth.mfa.unenroll({ factorId });
     setBusy(false);

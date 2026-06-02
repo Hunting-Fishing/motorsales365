@@ -317,12 +317,12 @@ function VehicleDetailDialog({
   }
 
   async function onDeleteRec(id: string) {
-    if (!confirm("Delete this service record?")) return;
+    if (!(await confirm({ title: "Delete this service record?", destructive: true }))) return;
     try { await delRec({ data: { id } }); refetch(); } catch (e: any) { toast.error(e?.message); }
   }
 
   async function onDeleteVehicle() {
-    if (!confirm("Delete this vehicle and all its records?")) return;
+    if (!(await confirm({ title: "Delete this vehicle and all its records?", destructive: true }))) return;
     try {
       await delVeh({ data: { id: vehicleId } });
       onChanged();

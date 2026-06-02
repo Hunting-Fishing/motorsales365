@@ -157,7 +157,7 @@ export function RidePhotoUploader({
   };
 
   const remove = async (p: Photo) => {
-    if (!confirm("Remove this photo?")) return;
+    if (!(await confirm({ title: "Remove this photo?", destructive: true }))) return;
     await (supabase as any).from("ride_photos").delete().eq("id", p.id);
     if (p.storage_path) await supabase.storage.from("ride-media").remove([p.storage_path]);
     onChange();

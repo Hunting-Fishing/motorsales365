@@ -72,7 +72,7 @@ export function ServiceLogPhotoUploader({
   };
 
   const remove = async (p: ServiceLogPhoto) => {
-    if (!confirm("Remove this photo?")) return;
+    if (!(await confirm({ title: "Remove this photo?", destructive: true }))) return;
     await (supabase as any).from("ride_service_log_photos").delete().eq("id", p.id);
     if (p.storage_path) await supabase.storage.from("ride-media").remove([p.storage_path]);
     onChange();

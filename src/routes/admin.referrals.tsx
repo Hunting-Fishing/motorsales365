@@ -260,7 +260,7 @@ function AdminReferrals() {
   };
 
   const handleDelete = async (row: StaffRow) => {
-    if (!confirm(`Delete ${row.full_name}'s referral?`)) return;
+    if (!(await confirm({ title: `Delete ${row.full_name}'s referral?`, destructive: true }))) return;
     if (row.qr_storage_path) {
       await supabase.storage.from("qr-codes").remove([row.qr_storage_path]).catch(() => {});
     }
@@ -1070,7 +1070,7 @@ function PromoDialog({ staff, onClose }: { staff: StaffRow; onClose: () => void 
     load();
   };
   const del = async (p: Promo) => {
-    if (!confirm("Delete this promotion?")) return;
+    if (!(await confirm({ title: "Delete this promotion?", destructive: true }))) return;
     await sb.from("staff_promotions").delete().eq("id", p.id);
     load();
   };

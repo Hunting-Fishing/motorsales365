@@ -144,7 +144,7 @@ function EditListingPage() {
   };
 
   const removeMedia = async (m: any) => {
-    if (!confirm("Remove this media?")) return;
+    if (!(await confirm({ title: "Remove this media?", destructive: true }))) return;
     if (m.storage_path) {
       const bucket = m.type === "video" ? "listing-videos" : "listing-photos";
       await supabase.storage.from(bucket).remove([m.storage_path]);

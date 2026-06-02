@@ -91,7 +91,7 @@ export function GalleryTab({
   };
 
   const removeAlbum = async (id: string) => {
-    if (!confirm("Delete this album and all its photos?")) return;
+    if (!(await confirm({ title: "Delete this album and all its photos?", destructive: true }))) return;
     try {
       await delAlbum({ data: { businessId, id } });
       toast.success("Deleted");
