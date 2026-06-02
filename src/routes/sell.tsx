@@ -304,6 +304,18 @@ function SellPage() {
     if (user?.id) getUserPlanLimits(user.id).then(setPlanLimits);
   }, [user?.id]);
 
+  useEffect(() => {
+    supabase
+      .from("boost_products")
+      .select("slug,label,price_php,duration_days,active,sort_order")
+      .eq("active", true)
+      .order("sort_order", { ascending: true })
+      .then(({ data }) => {
+        setBoostOptions((data ?? []) as any);
+      });
+  }, []);
+
+
   // Prefill from a ride profile via ?from_ride=<id>
   useEffect(() => {
     if (typeof window === "undefined") return;
