@@ -16,4 +16,5 @@ export const Route = createFileRoute("/go/$productId")({
     throw redirect({ href: url });
   },
   component: () => null,
+  errorComponent: RouteErrorBoundary,
 });
