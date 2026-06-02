@@ -130,3 +130,30 @@ export const createListingPaymentCheckout = createServerFn({ method: "POST" })
 
     return session.client_secret;
   });
+
+/**
+ * Look up the status of a listing checkout session so the return page can
+ * branch into a success/failure UI. We only return enough info to render
+ * a message and a retry CTA — never raw Stripe payloads.
+ */
+export const getListingCheckoutStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { sessionId: string; environment: StripeEnv }) => {
+    if (!/^cs_[a-zA-Z0-9_]+$/.test(data.sessionId)) throw new Error("Invalid sessionId");
+    validateEnv(data.environment);
+    return data;
+  })
+  .handler(async ({ data, context }) => {
+    const { userId } = context;
+    const stripe = createStripeClient(data.environment);
+    const session = await stripe.checkout.sessions.retrieve(data.sessionId);
+    if (session.metadata?.userId && session.metadata.userId !== userId) {
+      throw new Error("Not your checkout session");
+    }
+    const listingId = (session.metadata?.listingId as string | undefined) ?? null;
+    return {
+      listingId,
+      status: session.status ?? null, // "open" | "complete" | "expired"
+      paymentStatus: session.payment_status ?? null, // "paid" | "unpaid" | "no_payment_required"
+    };
+  });
