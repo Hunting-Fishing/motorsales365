@@ -111,7 +111,7 @@ export function ServiceLogPhotoUploader({
               key={p.id}
               className="group relative aspect-square overflow-hidden rounded-md border border-border bg-muted"
             >
-              <img src={p.url} alt="" className="h-full w-full object-cover" />
+              <img src={p.url} alt="Service log photo" className="h-full w-full object-cover" />
               <button
                 type="button"
                 onClick={() => remove(p)}

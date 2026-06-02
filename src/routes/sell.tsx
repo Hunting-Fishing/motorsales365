@@ -1470,7 +1470,7 @@ function SellPage() {
                     >
                       <img
                         src={URL.createObjectURL(file)}
-                        alt=""
+                        alt={`Listing photo ${i + 1} preview`}
                         className="h-full w-full object-cover"
                       />
                       {u.status !== "done" && (

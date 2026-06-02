@@ -456,7 +456,7 @@ function BusinessProfilePage() {
                     {s.photo_url && (
                       <img
                         src={s.photo_url}
-                        alt=""
+                        alt={s.title ? `${s.title} service photo` : "Service photo"}
                         className="h-16 w-16 shrink-0 rounded-md object-cover"
                       />
                     )}
@@ -571,7 +571,7 @@ function BusinessProfilePage() {
                     {p.photo_url && (
                       <img
                         src={p.photo_url}
-                        alt=""
+                        alt={`${biz.name ?? "Business"} update photo`}
                         className="mt-2 max-h-72 rounded-md object-cover"
                       />
                     )}

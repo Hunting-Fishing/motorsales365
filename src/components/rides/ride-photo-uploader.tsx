@@ -53,7 +53,7 @@ function SortablePhoto({
       style={style}
       className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted touch-none"
     >
-      <img src={photo.url} alt="" className="h-full w-full object-cover" draggable={false} />
+      <img src={photo.url} alt="Ride photo" className="h-full w-full object-cover" draggable={false} />
 
       {/* Drag handle */}
       <button

@@ -81,7 +81,7 @@ export function SingleFileUploader({
       {value ? (
         <div className="flex items-center gap-3 rounded-md border border-border bg-card p-2">
           {variant === "image" ? (
-            <img src={value} alt="" className="h-16 w-16 rounded object-cover" />
+            <img src={value} alt="Uploaded file preview" className="h-16 w-16 rounded object-cover" />
           ) : (
             <div className="flex h-12 w-12 items-center justify-center rounded bg-muted">
               <FileText className="h-5 w-5 text-muted-foreground" />

@@ -159,7 +159,7 @@ function SellerProfilePage() {
           <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
             <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full bg-secondary text-3xl font-bold">
               {logoUrl ? (
-                <img src={logoUrl} alt="" className="h-full w-full object-cover" />
+                <img src={logoUrl} alt={displayName ? `${displayName} ${isBusiness ? "logo" : "avatar"}` : "Profile photo"} className="h-full w-full object-cover" />
               ) : isBusiness ? (
                 <Building2 className="h-8 w-8 text-muted-foreground" />
               ) : (

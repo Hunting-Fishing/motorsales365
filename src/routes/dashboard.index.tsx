@@ -271,7 +271,7 @@ function MyListings() {
                 className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 sm:flex-row"
               >
                 <div className="h-24 w-32 shrink-0 overflow-hidden rounded-md bg-secondary">
-                  <ImageWithSkeleton src={photo?.url || placeholderCar} alt="" />
+                  <ImageWithSkeleton src={photo?.url || placeholderCar} alt={l.title ? `${l.title} cover photo` : "Listing cover photo"} />
                 </div>
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-2">
