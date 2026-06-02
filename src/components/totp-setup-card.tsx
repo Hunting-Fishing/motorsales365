@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { confirm } from "@/components/ui/confirm-dialog";
 import { toast } from "sonner";
 import { ShieldCheck, ShieldAlert, KeyRound, Copy } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -119,7 +120,7 @@ export function TotpSetupCard() {
   };
 
   const disable = async (factorId: string) => {
-    if (!confirm("Disable two-factor authentication on this account?")) return;
+    if (!(await confirm({ title: "Disable two-factor authentication on this account?", destructive: true }))) return;
     setBusy(true);
     const { error } = await supabase.auth.mfa.unenroll({ factorId });
     setBusy(false);

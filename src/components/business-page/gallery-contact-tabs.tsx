@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { confirm } from "@/components/ui/confirm-dialog";
 import { useServerFn } from "@tanstack/react-start";
 
 import { Card } from "@/components/ui/card";
@@ -91,7 +92,7 @@ export function GalleryTab({
   };
 
   const removeAlbum = async (id: string) => {
-    if (!confirm("Delete this album and all its photos?")) return;
+    if (!(await confirm({ title: "Delete this album and all its photos?", destructive: true }))) return;
     try {
       await delAlbum({ data: { businessId, id } });
       toast.success("Deleted");

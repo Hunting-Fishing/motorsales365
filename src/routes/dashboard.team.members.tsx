@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { confirm } from "@/components/ui/confirm-dialog";
 import { z } from "zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -65,7 +66,7 @@ function MembersPage() {
     catch (e: any) { toast.error(e?.message ?? "Failed"); }
   };
   const removeFor = async (uid: string) => {
-    if (!confirm("Remove this member from the team?")) return;
+    if (!(await confirm({ title: "Remove this member from the team?", destructive: true }))) return;
     try { await removeFn({ data: { orgId, userId: uid } }); toast.success("Removed"); qc.invalidateQueries({ queryKey: ["org-members", orgId] }); }
     catch (e: any) { toast.error(e?.message ?? "Failed"); }
   };

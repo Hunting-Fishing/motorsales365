@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { confirm } from "@/components/ui/confirm-dialog";
 import { useEffect, useState } from "react";
 import { Store as StoreIcon, Plus, Check, X, Pencil, Tag, Sparkles, LayoutTemplate, Inbox, Archive, ArchiveRestore } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
@@ -374,8 +375,14 @@ function MyBusinessesPage() {
                     size="sm"
                     variant="ghost"
                     className="text-muted-foreground hover:text-destructive"
-                    onClick={() => {
-                      if (typeof window !== "undefined" && !window.confirm(`Archive "${b.name}"?\n\nIt will be immediately hidden from:\n• Public search results\n• The directory map\n• Direct shared links (/businesses/… and /b/…)\n\nWe'll email you a confirmation. You can restore it anytime from this page.`)) return;
+                    onClick={async () => {
+                      const ok = await confirm({
+                        title: `Archive "${b.name}"?`,
+                        description: `It will be immediately hidden from:\n• Public search results\n• The directory map\n• Direct shared links (/businesses/… and /b/…)\n\nWe'll email you a confirmation. You can restore it anytime from this page.`,
+                        confirmText: "Archive",
+                        destructive: true,
+                      });
+                      if (!ok) return;
                       setStatus(b, "archived");
                     }}
                   >

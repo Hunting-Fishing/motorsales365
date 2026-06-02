@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { confirm } from "@/components/ui/confirm-dialog";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Upload, X, Trash2 } from "lucide-react";
@@ -144,7 +145,7 @@ function EditListingPage() {
   };
 
   const removeMedia = async (m: any) => {
-    if (!confirm("Remove this media?")) return;
+    if (!(await confirm({ title: "Remove this media?", destructive: true }))) return;
     if (m.storage_path) {
       const bucket = m.type === "video" ? "listing-videos" : "listing-photos";
       await supabase.storage.from(bucket).remove([m.storage_path]);

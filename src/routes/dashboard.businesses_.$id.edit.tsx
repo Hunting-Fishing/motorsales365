@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { confirm } from "@/components/ui/confirm-dialog";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
@@ -841,7 +842,7 @@ function ServicesTab({
                           size="sm"
                           variant="ghost"
                           onClick={async () => {
-                            if (!confirm("Delete this item?")) return;
+                            if (!(await confirm({ title: "Delete this item?", destructive: true }))) return;
                             await del({ data: { businessId, id: s.id } });
                             onChange();
                           }}
@@ -1026,7 +1027,7 @@ function ProductsTab({
                     size="sm"
                     variant="ghost"
                     onClick={async () => {
-                      if (!confirm("Delete this product?")) return;
+                      if (!(await confirm({ title: "Delete this product?", destructive: true }))) return;
                       await del({ data: { businessId, id: p.id } });
                       onChange();
                     }}
@@ -1205,7 +1206,7 @@ function PostsTab({
                   variant="ghost"
                   size="sm"
                   onClick={async () => {
-                    if (!confirm("Delete this post?")) return;
+                    if (!(await confirm({ title: "Delete this post?", destructive: true }))) return;
                     await del({ data: { businessId, id: p.id } });
                     onChange();
                   }}

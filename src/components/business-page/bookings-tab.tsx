@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { confirm } from "@/components/ui/confirm-dialog";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { Card } from "@/components/ui/card";
@@ -106,7 +107,7 @@ function BookableItemsSection({
   }
 
   async function del(id: string) {
-    if (!confirm("Delete this bookable item?")) return;
+    if (!(await confirm({ title: "Delete this bookable item?", destructive: true }))) return;
     try {
       await remove({ data: { businessId, id } });
       onChange();

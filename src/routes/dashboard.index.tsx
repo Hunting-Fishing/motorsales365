@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { confirm } from "@/components/ui/confirm-dialog";
 import { useEffect, useState } from "react";
 import { Plus, Trash2, Star, Eye, Rocket, RefreshCcw, CheckCircle2, Edit, Undo2, Clock, Heart, Bookmark, MessageSquare, TrendingUp, TrendingDown } from "lucide-react";
 import { toast } from "sonner";
@@ -104,7 +105,7 @@ function MyListings() {
   }, [user]);
 
   const remove = async (id: string) => {
-    if (!confirm("Delete this listing? This cannot be undone.")) return;
+    if (!(await confirm({ title: "Delete this listing? This cannot be undone.", destructive: true }))) return;
     const { error } = await supabase.from("listings").delete().eq("id", id);
     if (error) toast.error(error.message);
     else {
@@ -145,7 +146,7 @@ function MyListings() {
       next === "pending_sale"
         ? "Mark this listing as Pending Sale? It stays visible and buyers can still send offers."
         : "Cancel pending sale and return this listing to Active?";
-    if (!confirm(message)) return;
+    if (!(await confirm({ title: message, destructive: true }))) return;
     const { error } = await supabase.from("listings").update({ status: next }).eq("id", l.id);
     if (error) toast.error(error.message);
     else {

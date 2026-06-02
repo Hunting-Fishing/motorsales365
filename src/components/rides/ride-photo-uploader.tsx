@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from "react";
+import { confirm } from "@/components/ui/confirm-dialog";
 import { Upload, Trash2, Star, StarOff, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -157,7 +158,7 @@ export function RidePhotoUploader({
   };
 
   const remove = async (p: Photo) => {
-    if (!confirm("Remove this photo?")) return;
+    if (!(await confirm({ title: "Remove this photo?", destructive: true }))) return;
     await (supabase as any).from("ride_photos").delete().eq("id", p.id);
     if (p.storage_path) await supabase.storage.from("ride-media").remove([p.storage_path]);
     onChange();

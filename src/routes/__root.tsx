@@ -8,6 +8,7 @@ import { SandboxBanner } from "@/components/sandbox-banner";
 import { Toaster } from "@/components/ui/sonner";
 import { AnalyticsGA } from "@/components/analytics-ga";
 import { ServiceWorkerRegister } from "@/components/service-worker-register";
+import { ConfirmDialogHost } from "@/components/ui/confirm-dialog";
 
 import appCss from "../styles.css?url";
 
@@ -127,6 +128,7 @@ function RootComponent() {
             <SandboxBanner />
             <Outlet />
             <Toaster richColors position="top-right" />
+            <ConfirmDialogHost />
             <AnalyticsGA />
             <ServiceWorkerRegister />
           </CurrencyProvider>

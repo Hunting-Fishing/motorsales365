@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
+import { confirm } from "@/components/ui/confirm-dialog";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
@@ -95,7 +96,7 @@ function CoursesTab() {
                     </Button>
                     <Button size="sm" variant="ghost" onClick={() => setEditingId(c.id)}><Edit className="h-3 w-3" /></Button>
                     <Button size="sm" variant="ghost" onClick={async () => {
-                      if (!confirm(`Delete "${c.title}"?`)) return;
+                      if (!(await confirm({ title: `Delete "${c.title}"?`, destructive: true }))) return;
                       await del({ data: { id: c.id } });
                       qc.invalidateQueries({ queryKey: ["admin-courses"] });
                     }}>
@@ -253,7 +254,7 @@ function CourseEditor({ courseId, onClose }: { courseId: string; onClose: () => 
                           {m.summary && <p className="text-xs text-muted-foreground">{m.summary}</p>}
                         </div>
                         <Button size="sm" variant="ghost" onClick={async () => {
-                          if (!confirm(`Delete module "${m.title}"?`)) return;
+                          if (!(await confirm({ title: `Delete module "${m.title}"?`, destructive: true }))) return;
                           await delModule({ data: { id: m.id } });
                           refetch();
                         }}><Trash2 className="h-3 w-3 text-destructive" /></Button>
@@ -263,7 +264,7 @@ function CourseEditor({ courseId, onClose }: { courseId: string; onClose: () => 
                           <li key={l.id} className="flex items-center justify-between">
                             <span>{l.position}. {l.title} {l.is_preview && <Badge variant="outline" className="ml-1 text-[10px]">Preview</Badge>}</span>
                             <Button size="sm" variant="ghost" onClick={async () => {
-                              if (!confirm(`Delete lesson "${l.title}"?`)) return;
+                              if (!(await confirm({ title: `Delete lesson "${l.title}"?`, destructive: true }))) return;
                               await delLesson({ data: { id: l.id } });
                               refetch();
                             }}><Trash2 className="h-3 w-3 text-destructive" /></Button>
@@ -376,7 +377,7 @@ function PartnersTab() {
                   <td className="px-3 py-2 text-right">
                     <Button size="sm" variant="ghost" onClick={() => setEditing(p)}><Edit className="h-3 w-3" /></Button>
                     <Button size="sm" variant="ghost" onClick={async () => {
-                      if (!confirm(`Delete ${p.name}?`)) return;
+                      if (!(await confirm({ title: `Delete ${p.name}?`, destructive: true }))) return;
                       await del({ data: { id: p.id } });
                       qc.invalidateQueries({ queryKey: ["admin-partners"] });
                     }}><Trash2 className="h-3 w-3 text-destructive" /></Button>
