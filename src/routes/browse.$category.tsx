@@ -11,6 +11,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+} from "@/components/ui/dialog";
+import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { LocationPicker } from "@/components/location-picker";
@@ -176,13 +179,23 @@ function BrowsePage() {
     });
   };
 
-  const saveCurrentSearch = async () => {
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [saveName, setSaveName] = useState("");
+  const [savingSearch, setSavingSearch] = useState(false);
+
+  const openSaveDialog = () => {
     if (!user) {
       navigate({ to: "/login" });
       return;
     }
-    const name = window.prompt("Name this saved search", `${CATEGORY_LABEL[category] ?? category}${keyword ? ` — ${keyword}` : ""}`);
-    if (!name) return;
+    setSaveName(`${CATEGORY_LABEL[category] ?? category}${keyword ? ` — ${keyword}` : ""}`);
+    setSaveDialogOpen(true);
+  };
+
+  const confirmSaveSearch = async () => {
+    const name = saveName.trim();
+    if (!name || !user) return;
+    setSavingSearch(true);
     const { error } = await supabase.from("saved_searches").insert({
       user_id: user.id,
       name,
@@ -201,8 +214,13 @@ function BrowsePage() {
         engine: vEngine || null,
       },
     });
-    if (error) toast.error(error.message);
-    else toast.success("Search saved. Find it in your dashboard.");
+    setSavingSearch(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setSaveDialogOpen(false);
+    toast.success("Search saved. Find it in your dashboard.");
   };
 
   return (
@@ -283,7 +301,7 @@ function BrowsePage() {
               </Select>
             </div>
             <Button type="submit" className="w-full">Apply filters</Button>
-            <Button type="button" variant="outline" className="w-full" onClick={saveCurrentSearch}>
+            <Button type="button" variant="outline" className="w-full" onClick={openSaveDialog}>
               <BookmarkPlus className="mr-2 h-4 w-4" />Save search
             </Button>
           </form>
@@ -305,6 +323,32 @@ function BrowsePage() {
           )}
         </div>
       </div>
+
+      <Dialog open={saveDialogOpen} onOpenChange={setSaveDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save this search</DialogTitle>
+            <DialogDescription>Give it a name so you can find it later in your dashboard.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <Label htmlFor="saved-search-name">Name</Label>
+            <Input
+              id="saved-search-name"
+              value={saveName}
+              onChange={(e) => setSaveName(e.target.value)}
+              placeholder="e.g. Toyota Hilux under 1M"
+              autoFocus
+              onKeyDown={(e) => { if (e.key === "Enter") confirmSaveSearch(); }}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSaveDialogOpen(false)} disabled={savingSearch}>Cancel</Button>
+            <Button onClick={confirmSaveSearch} disabled={savingSearch || !saveName.trim()}>
+              {savingSearch ? "Saving…" : "Save search"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </SiteLayout>
   );
 }

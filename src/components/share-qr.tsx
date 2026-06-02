@@ -7,6 +7,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription,
 } from "@/components/ui/dialog";
 import { BrandLogo, logoSrc } from "@/components/brand-logo";
+import { canNativeShare, nativeShare } from "@/lib/share";
 
 interface ShareQrProps {
   /** Full absolute URL the QR encodes */
@@ -73,13 +74,9 @@ export function ShareQr({
     }
   };
 
-  const nativeShare = async () => {
-    if (typeof navigator !== "undefined" && (navigator as any).share) {
-      try {
-        await (navigator as any).share({ title, url });
-      } catch {
-        /* dismissed */
-      }
+  const handleNativeShare = async () => {
+    if (canNativeShare()) {
+      await nativeShare({ title, url });
     } else {
       copyLink();
     }
@@ -190,7 +187,7 @@ export function ShareQr({
           <Button onClick={copyLink} variant="outline">
             <Copy className="mr-2 h-4 w-4" /> Copy link
           </Button>
-          <Button onClick={nativeShare} variant="outline">
+          <Button onClick={handleNativeShare} variant="outline">
             <Share2 className="mr-2 h-4 w-4" /> Share
           </Button>
         </div>

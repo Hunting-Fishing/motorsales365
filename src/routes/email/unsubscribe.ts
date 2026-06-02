@@ -141,10 +141,6 @@ export const Route = createFileRoute("/email/unsubscribe")({
           return Response.json({ error: 'Failed to process unsubscribe' }, { status: 500 })
         }
 
-        console.log('Email unsubscribed', {
-          email_redacted: redactEmail(tokenRecord.email),
-        })
-
         return Response.json({ success: true })
       },
     },

@@ -37,7 +37,6 @@ export const Route = createFileRoute("/signup")({
 
 const POST_SIGNUP_ROUTE: Record<SignupIntent, string> = {
   buyer: "/dashboard",
-  private_seller: "/sell",
   business: "/businesses/submit",
   service_provider: "/businesses/submit",
 };

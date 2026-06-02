@@ -46,10 +46,12 @@ export const Route = createFileRoute("/api/public/payment-events")({
         if (process.env.PAYMENT_WEBHOOK_ENABLED !== "1") {
           return new Response("Payment webhook disabled", { status: 503 });
         }
+        // Caller must present the shared debug token. Real Stripe / PayMongo
+        // HMAC signature verification should be added before flipping
+        // PAYMENT_WEBHOOK_ENABLED=1 in any production-facing environment.
         const debugToken = process.env.PAYMENT_WEBHOOK_DEBUG_TOKEN;
         const auth = request.headers.get("x-debug-token");
         if (!debugToken || auth !== debugToken) {
-          // TODO: replace with real Stripe / PayMongo signature verification
           return new Response("Unauthorized", { status: 401 });
         }
 

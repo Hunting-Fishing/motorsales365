@@ -141,11 +141,6 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
             recipient_email: effectiveRecipient,
             status: 'suppressed',
           })
-
-          console.log('Email suppressed', {
-            templateName,
-            recipient_redacted: redactEmail(effectiveRecipient),
-          })
           return Response.json({ success: false, reason: 'email_suppressed' })
         }
 
@@ -311,11 +306,6 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
             { status: 500 }
           )
         }
-
-        console.log('Transactional email enqueued', {
-          templateName,
-          recipient_redacted: redactEmail(effectiveRecipient),
-        })
 
         return Response.json({ success: true, queued: true })
       },

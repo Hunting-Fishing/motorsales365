@@ -1,7 +1,7 @@
 import { Building2, UserRound, Wrench, Search } from "lucide-react";
 import { AccountTypeCard } from "./account-type-card";
 
-export type SignupIntent = "buyer" | "private_seller" | "business" | "service_provider";
+export type SignupIntent = "buyer" | "business" | "service_provider";
 
 export const SIGNUP_TYPES: {
   id: SignupIntent;
