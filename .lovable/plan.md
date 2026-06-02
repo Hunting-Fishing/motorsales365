@@ -1,52 +1,134 @@
-## Audit results
+# Pre-launch closure plan (items 1–10)
 
-Two parallel audits compared every form, server function, route, RLS policy, and GRANT in the four requested areas against the live DB schema. Findings below are grouped by severity. **No code changes yet** — tell me which bucket to tackle and I'll create a focused implementation plan.
-
----
-
-### 🔴 CRITICAL — security / data integrity
-
-1. **`profiles` SELECT is `USING (true)`** — phone, phone_e164, business_address, postal_code, street_address, names, signup metadata are world-readable to anon via the Data API. A `public_profiles` view exists but the base table is wide open.
-2. **`listings` INSERT/UPDATE has no field-level `WITH CHECK`** — `sell.tsx` inserts directly from the browser; a client can self-set `status: 'active'`, any `plan` tier, arbitrary `boost_until`/`expires_at`. Same for UPDATE.
-3. **`payments` INSERT lets users self-confirm payments** — `WITH CHECK (auth.uid() = user_id)` only; a user can insert `status: 'completed'`, `amount_php: 0`.
-4. **`businesses` UPDATE `WITH CHECK` blocks edits on active/featured rows** — owners are silently locked out of editing their live business page (`status <> 'active' AND featured = false`).
-5. **Tow providers cannot accept broadcast requests** — UPDATE RLS requires `auth.uid() = provider_id`, but broadcast rows have `provider_id IS NULL`. Accept silently fails (0 rows, no error).
-6. **Profile upsert lets users self-promote** — `dashboard.profile.tsx` upserts the whole object; nothing stops a user from setting `verification_status = 'verified'` or `is_founding_member = true`.
-7. **Auth hydration uses `getSession()` not `getUser()`** — `use-auth.tsx:241` reads localStorage without server re-validation.
-
-### 🟠 HIGH — broken flows / missing server validation
-
-8. **`sell.tsx` listing creation is 100% client-side** — no serverFn, no zod, plan/photo limits trivially bypassable.
-9. **No explicit GRANTs** on `listings`, `listing_media`, `payments` (rely on implicit Supabase defaults — fragile).
-10. **`sell.tsx` contact_phone race** — submits stale `phone` state instead of recomputing E.164 at submit time.
-11. **`tow_requests` ALTER columns** (`picked_up_at`, `dropped_off_at`, `completed_at`, `eta_minutes`, `final_price_php`, `completion_notes`) — confirm migration applied or pickup/dropoff flows fail.
-12. **`verification_requests.province` / `barangay`** sent by form but added via ALTER — confirm applied.
-
-### 🟡 MEDIUM — data correctness / UX
-
-13. **`business-pages.functions.ts` forwards `patch as any`** — any extra keys reach the DB unchecked; whitelist needed.
-14. **`business_tag_links` SELECT `USING (true)`** — leaks pending/rejected business tag associations.
-15. **Verification resubmit on `rejected` silently no-ops** — RLS UPDATE allows only `pending|more_info`; toast shows success but nothing saved.
-16. **`SellerType` TS enum + `maybeApplyPendingSignup` writes `'dealer'`** — DB enum is `('private','business')` only; writes fail/compare always false.
-17. **`business_postal_code` and `referral_code` in signup metadata never read by `handle_new_user`** — silently dropped.
-18. **`BUSINESS_KIND_VALUES` (verification form) wider than DB enum** — selecting `towing`/`rental` throws raw DB error.
-19. **`condition`, `title`, `description` on listings unbounded** — no zod, no DB CHECK.
-20. **`ride_likes` SELECT `USING (true)`** — who-liked-what is public.
-21. **Route hygiene** — `listing.$id.edit`, `dashboard.businesses_.$id.edit`, `dashboard.rides_.$id.edit`, `dashboard.tow`, `verification`, `tow.tsx` all lack `loader`/`errorComponent`/`notFoundComponent` and use client `useEffect` auth gates (SSR flash, infinite "Loading…" on bad ids).
-22. **`reset-password.tsx`** uses `window.location.hash` detection — fragile vs `onAuthStateChange('PASSWORD_RECOVERY')`. Min length 6 vs signup's 8.
-
-### 🟢 LOW
-
-23. `ride_service_log.photo_url` orphaned column. New-ride form only offers car/motorcycle vs 10-value zod. `category_slug` hardcoded list may diverge from `categories` table. `forgot-password` SMS OTP can create accounts. Misc validator vs constraint nits.
+Each step is independently shippable. We do them in priority order so the highest-impact gaps land first. Every step ends with a quick verification.
 
 ---
 
-## Suggested fix order
+## 1. Make listing edit feature-complete (BLOCKER)
 
-I recommend three implementation passes — pick any combination:
+**Goal:** Sellers can edit every field they set in `sell.tsx`, including videos.
 
-- **Pass A — Security hardening** (CRITICAL 1–7 + HIGH 9): tighten RLS + GRANTs; move listing creation into a serverFn; switch profile upsert to a whitelisted serverFn; switch auth hydration to `getUser()`. ~1 migration + 4-5 file edits.
-- **Pass B — Form ↔ DB alignment** (HIGH 10–12, MEDIUM 15–18): fix tow accept policy + missing trigger keys + verification enum + resubmit flow + phone race. ~1 migration + 4 file edits.
-- **Pass C — Route hygiene + validation** (MEDIUM 13, 19, 21–22 + LOW): add loaders/error boundaries, bound text fields, fix reset-password hash detection. Pure frontend, ~8 files.
+- Extend `src/routes/listing.$id.edit.tsx` form with: `make`, `model`, `year`, `mileage_km`, `transmission`, `trim`, `engine`, `vehicle_type`, `category_slug`, `tags`.
+- Reuse `VehiclePicker`, `TagPicker`, category select from `sell.tsx`.
+- Add video section: list existing videos with remove button; allow uploading 1 (free/standard) or 3 (upgraded) using the same `plan-limits.ts` caps and `uploadWithRetry` flow as sell.
+- Enforce server-side photo/video caps on update (already present for create) — extend the existing trigger/RPC to cover edits.
+- Validation: re-use the Zod-style checks from `sell.tsx`.
 
-**Which pass(es) should I plan in detail and implement?** (Or pick individual numbered items.)
+**Verify:** Edit a listing, change make/model/tags, add a video, remove a photo, save → reload → all changes persisted.
+
+---
+
+## 2. Wire real support contact link
+
+- Replace `href="#"` at `src/routes/support.tsx:282` with the actual Messenger/WhatsApp URL.
+- Pull the number/handle from existing config (likely `pricing_settings` or a new `support_settings` row) so admins can change it without a deploy.
+- Add the same link to the floating help widget for consistency.
+
+**Verify:** Click the CTA on `/support` → opens Messenger/WhatsApp deep link.
+
+---
+
+## 3. Add `alt` text to gallery images
+
+- `src/routes/listing.$id.tsx:398` → `alt={`${listing.title} — photo ${i + 1}`}`.
+- `src/routes/businesses.$slug.tsx:459, 574` → `alt={`${business.name} — ${album.title} photo ${i + 1}`}` (or similar contextual text).
+- Sweep `rg 'alt=""'` under `src/routes` and `src/components` for any other empty alts.
+
+**Verify:** Lighthouse a11y on `/listing/$id` and `/businesses/$slug` → no "image missing alt" warnings.
+
+---
+
+## 4. Per-page `og:image` on key index routes
+
+Add `og:image` (+ `twitter:image`, `og:image:width`, `og:image:height`) to:
+- `src/routes/rides.index.tsx`
+- `src/routes/map.tsx`
+- `src/routes/businesses.index.tsx`
+- `src/routes/browse.$category.tsx`
+
+Generate 4 hero share images (1200×630) tuned per route and store under `src/assets/og/`. For `browse.$category`, derive from category slug (one image per top-level category, fallback to default).
+
+**Verify:** `curl` each route, grep for `og:image`; preview on Facebook sharing debugger.
+
+---
+
+## 5. Persist garage vehicle to Supabase
+
+- New table `user_garage_vehicles` (id, user_id, make, model, year, trim, engine, created_at). RLS: user CRUDs own rows.
+- Replace `src/lib/garage.ts` localStorage singleton with a hook `useGarageVehicle()` backed by a server fn (`getGarageVehicle`, `setGarageVehicle`, `clearGarageVehicle`).
+- Keep a localStorage cache for anonymous browsing; on login, migrate the cached vehicle into the table once.
+- Update fitment filters (shop, parts, browse) to read from the new hook so SSR can use it via cookie or query param.
+
+**Verify:** Set garage vehicle on device A, log in on device B → same vehicle appears; fitment filter still works for anonymous users.
+
+---
+
+## 6. Marker clustering + geolocation on the map
+
+- Add `react-leaflet-cluster` (or `leaflet.markercluster` + a tiny wrapper) and group business pins in `google-business-map.tsx`.
+- On `src/routes/map.tsx` mount, request `navigator.geolocation` (gated behind a user gesture/toast to avoid Safari nags); fall back to PH center.
+- Add a "Use my location" button so users can opt in later.
+- Server-side: convert the client `supabase.from("businesses")` to a server fn with a `limit + bbox` filter so we only fetch pins inside the current viewport.
+
+**Verify:** Map shows clusters that expand on zoom; opting into geolocation centers the map; network panel shows bounded queries.
+
+---
+
+## 7. Proxy Nominatim through a server function
+
+- Create `src/lib/geocode.functions.ts` with `geocodeAddress(q)` and `reverseGeocode(lat,lng)`.
+- Server fn calls the Google Maps connector via the gateway (`/maps/api/geocode/json` and `/places/v1/places:searchText` for autocomplete) — we already have the connector wired.
+- Replace direct Nominatim calls in `src/components/businesses/places-autocomplete.tsx` and any other browser-side OSM callers.
+- Add a 24h server-side cache (Supabase `geocode_cache` table keyed by normalized query) to keep costs low.
+
+**Verify:** Network tab shows requests to our own `_serverFn` endpoint, not `nominatim.openstreetmap.org`; autocomplete still works.
+
+---
+
+## 8. Bundle Leaflet marker icons locally
+
+- Import `marker-icon.png`, `marker-icon-2x.png`, `marker-shadow.png` from `leaflet/dist/images/` (already in `node_modules`) and pass URLs via Vite's `?url` suffix.
+- Update `src/components/businesses/location-picker-inner.tsx` and any other `L.Icon.Default.mergeOptions` call to use the bundled URLs.
+- Remove all `unpkg.com` references.
+
+**Verify:** Block `unpkg.com` in DevTools → markers still render.
+
+---
+
+## 9. Delete-ride action
+
+- Add a destructive "Delete ride" item to the row menu on `src/routes/dashboard.rides.tsx`.
+- Confirm dialog (shadcn `AlertDialog`).
+- Server fn `deleteRide(id)` — verifies ownership, cascades photos/service logs, removes storage objects in `ride-photos` bucket.
+- Update like_count / public ride pages to 404 cleanly after delete (already handled if route uses `notFound()`).
+
+**Verify:** Create test ride → delete → confirm row gone, storage objects removed, `/rides/$slug` returns 404.
+
+---
+
+## 10. Webhook alerting for silent error branches
+
+- In `src/routes/api/public/payments/webhook.ts`, replace each `console.error(...)` metadata-missing branch with a call to a shared `reportWebhookIncident({ event, reason, meta })` helper.
+- Helper inserts a row into a new `webhook_incidents` table (kind, stripe_event_id, reason, payload_snippet, created_at) AND sends an email via the existing transactional template registry (new template `webhook-incident.tsx` to ops inbox).
+- Surface incidents in `src/routes/admin.audit.tsx` (or new `admin.webhook-incidents.tsx`) with a "resolved" toggle.
+
+**Verify:** Send a malformed test Stripe event → row appears, ops email arrives, admin page lists it.
+
+---
+
+## Cross-cutting checklist (do once at the end)
+
+- Update `/terms`, `/refund-policy`, `/privacy` if any of steps 1, 5, 7, or 10 change data collection or fees. Bump "Last updated".
+- Run `bunx tsc --noEmit` and `bunx eslint .` after each step.
+- Smoke-test the seller journey end-to-end: create → pay → edit → boost → delete.
+
+---
+
+## Execution notes
+
+- Steps are sequenced by user impact. We can pause and ship after any step.
+- Steps 1, 5, 9, 10 require Supabase migrations — each is small and independent.
+- Steps 6 and 7 share the Google Maps connector setup; doing 7 first means 6 can reuse the cache table.
+- Estimated effort: step 1 is the largest (~half a day); 2/3/8/9 are < 1 hour each; the rest are 1–3 hours.
+
+Once you approve, I'll start with **step 1 (listing edit completeness)** and stop after it lands so you can sanity-check before I move to step 2.
