@@ -33,6 +33,8 @@ export const Route = createFileRoute("/learn_/$slug/watch/$lessonId")({
   },
   head: () => ({ meta: [{ title: "Lesson — 365 Learn" }] }),
   component: Watch,
+  errorComponent: RouteErrorBoundary,
+  notFoundComponent: () => <RouteNotFoundBoundary message="Lesson not found." />,
 });
 
 function Watch() {
