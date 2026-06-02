@@ -1269,7 +1269,7 @@ function SellPage() {
                   price:
                     (pricing.listing_fee_php ?? 20) + (pricing.upgrade_fee_php ?? 100),
                 },
-              } as const;
+              };
               const preview = previewPlan ?? plan;
               const previewCaps = tierCaps[preview];
               const remainingPhotos = Math.max(0, previewCaps.photos - photos.length);
