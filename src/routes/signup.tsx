@@ -227,7 +227,9 @@ function SignupPage() {
         is_business: isBusinessLike,
       };
       window.localStorage.setItem("signup.pending", JSON.stringify(payload));
-    } catch {}
+    } catch {
+      // localStorage may be unavailable; pending payload is best-effort only.
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

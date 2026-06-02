@@ -265,7 +265,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       if (next && next.length > 0) window.localStorage.setItem(SIM_KEY, JSON.stringify(next));
       else window.localStorage.removeItem(SIM_KEY);
-    } catch {}
+    } catch {
+      // localStorage may be unavailable (private mode); simulation persists in memory only.
+    }
   };
 
   const isAdmin = effectiveRoles.includes("admin");
@@ -288,7 +290,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       if (next) window.localStorage.setItem(SIM_SELLER_KEY, next);
       else window.localStorage.removeItem(SIM_SELLER_KEY);
-    } catch {}
+    } catch {
+      // localStorage may be unavailable; seller-type simulation persists in memory only.
+    }
   };
 
   return (

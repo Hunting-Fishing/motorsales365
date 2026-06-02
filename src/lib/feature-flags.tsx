@@ -83,7 +83,9 @@ export function FeatureFlagProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     try {
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(flags));
-    } catch {}
+    } catch {
+      // localStorage may be unavailable (private mode); flags persist in memory only.
+    }
   }, [flags]);
 
   const setFlag = (key: FeatureFlagKey, value: boolean) =>

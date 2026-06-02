@@ -20,10 +20,14 @@ export function CookieBanner() {
   function set(value: "accepted" | "declined") {
     try {
       localStorage.setItem(STORAGE_KEY, value);
-    } catch {}
+    } catch {
+      // localStorage may be unavailable (private mode, disabled cookies).
+    }
     try {
       window.dispatchEvent(new CustomEvent("ms-consent-changed"));
-    } catch {}
+    } catch {
+      // CustomEvent unsupported in ancient browsers; safe to ignore.
+    }
     setVisible(false);
   }
 
