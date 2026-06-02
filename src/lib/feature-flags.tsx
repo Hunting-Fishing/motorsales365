@@ -9,6 +9,7 @@ export type FeatureFlagKey =
   | "messaging"
   | "verifications";
 
+// eslint-disable-next-line react-refresh/only-export-components -- metadata colocated with the Provider/hook in this module
 export const FEATURE_FLAG_META: { key: FeatureFlagKey; label: string; description: string }[] = [
   {
     key: "towing",
@@ -99,12 +100,14 @@ export function FeatureFlagProvider({ children }: { children: ReactNode }) {
   return <Ctx.Provider value={{ flags, setFlag, setAll, reset }}>{children}</Ctx.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- Provider + hook colocation (React idiom)
 export function useFeatureFlags() {
   const ctx = useContext(Ctx);
   if (!ctx) throw new Error("useFeatureFlags must be used within FeatureFlagProvider");
   return ctx;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- Provider + hook colocation (React idiom)
 export function useFeatureFlag(key: FeatureFlagKey): boolean {
   const { flags } = useFeatureFlags();
   return flags[key];
