@@ -22,6 +22,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { SupportTicketForm } from "@/components/support/support-ticket-form";
+import { fetchSupportContact } from "@/lib/site-settings";
 
 const FAQS: { q: string; a: string }[] = [
   {
