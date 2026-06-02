@@ -16,46 +16,13 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Search, Plus, X, Pencil } from "lucide-react";
 import { FUEL_STATION_CATALOG, UNIT_OPTIONS, type CatalogItem } from "@/data/fuel-station-catalog";
+import { blankService, type ServiceFormValue } from "./service-catalog-picker.utils";
 
-export type ServiceFormValue = {
-  id?: string;
-  title: string;
-  description: string | null;
-  price_label: string | null;
-  photo_url: string | null;
-  active: boolean;
-  category: string | null;
-  unit: string | null;
-  price_php: number | null;
-  sale_price_php: number | null;
-  catalog_key: string | null;
-};
-
-export function blankService(): ServiceFormValue {
-  return {
-    title: "",
-    description: null,
-    price_label: null,
-    photo_url: null,
-    active: true,
-    category: null,
-    unit: null,
-    price_php: null,
-    sale_price_php: null,
-    catalog_key: null,
-  };
-}
-
-export function fromCatalogItem(item: CatalogItem): ServiceFormValue {
-  return {
-    ...blankService(),
-    title: item.title,
-    description: item.description ?? null,
-    category: item.category,
-    unit: item.unit ?? null,
-    catalog_key: item.key,
-  };
-}
+// Re-export the helpers from the colocated utils module so existing call sites
+// importing them from this file continue to work.
+// eslint-disable-next-line react-refresh/only-export-components -- back-compat re-exports for existing call sites
+export { blankService, fromCatalogItem, formatServicePrice } from "./service-catalog-picker.utils";
+export type { ServiceFormValue } from "./service-catalog-picker.utils";
 
 /* ---------------- Catalog picker (search + groups) ---------------- */
 
@@ -298,19 +265,4 @@ export function PricingFields({
       </div>
     </div>
   );
-}
-
-/* ---------------- Public price formatter ---------------- */
-
-export function formatServicePrice(svc: {
-  price_label?: string | null;
-  price_php?: number | null;
-  sale_price_php?: number | null;
-  unit?: string | null;
-}): string | null {
-  if (svc.price_label && svc.price_label.trim()) return svc.price_label;
-  const p = svc.sale_price_php ?? svc.price_php;
-  if (p == null) return null;
-  const unit = svc.unit ? `/${svc.unit}` : "";
-  return `₱${Number(p).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${unit}`;
 }

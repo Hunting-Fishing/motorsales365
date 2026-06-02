@@ -128,6 +128,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
   return <CurrencyCtx.Provider value={value}>{children}</CurrencyCtx.Provider>;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- Provider + hook colocation (React idiom)
 export function useCurrency(): Ctx {
   const ctx = useContext(CurrencyCtx);
   if (!ctx) {

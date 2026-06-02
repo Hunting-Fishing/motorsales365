@@ -6,6 +6,7 @@ import { listShopFavoriteIds, toggleShopFavorite } from "@/lib/shop.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
+// eslint-disable-next-line react-refresh/only-export-components -- hook colocated with the single component that consumes it
 export function useShopFavorites() {
   const { user } = useAuth();
   const { data } = useQuery({

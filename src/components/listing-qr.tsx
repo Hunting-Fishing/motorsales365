@@ -11,7 +11,8 @@ import {
   DialogTrigger,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { BrandLogo, logoSrc } from "@/components/brand-logo";
+import { BrandLogo } from "@/components/brand-logo";
+import logoSrc from "@/assets/logo-small.webp";
 import { formatPHP } from "@/lib/format";
 
 interface ListingQrProps {
