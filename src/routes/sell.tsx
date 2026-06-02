@@ -717,6 +717,40 @@ function SellPage() {
         <h1 className="font-display text-3xl font-bold">Post a listing</h1>
         <p className="text-muted-foreground">Reach buyers across the Philippines.</p>
 
+        {paymentStatus && pendingListingId ? (
+          <div
+            role="alert"
+            className="mt-4 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-destructive/40 bg-destructive/5 p-4"
+          >
+            <div className="flex items-start gap-2">
+              <AlertCircle className="mt-0.5 h-5 w-5 text-destructive" />
+              <div>
+                <div className="font-semibold text-destructive">
+                  {paymentStatus === "cancelled"
+                    ? "Payment cancelled"
+                    : "Payment didn't go through"}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Your listing is saved and still pending payment. You can resume checkout
+                  any time — nothing was charged.
+                </p>
+              </div>
+            </div>
+            <Button
+              size="sm"
+              onClick={() =>
+                navigate({
+                  to: "/listing/checkout",
+                  search: { listingId: pendingListingId },
+                })
+              }
+            >
+              Resume payment
+            </Button>
+          </div>
+        ) : null}
+
+
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4">
           <div>
             <div className="font-semibold">Already selling on Facebook Marketplace?</div>
