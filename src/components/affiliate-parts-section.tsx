@@ -21,7 +21,15 @@ export function AffiliatePartsSection({ make, model, year, listingId, vehicleId 
   const trackClick = useServerFn(trackPartClick);
   const { data: parts, isLoading } = useQuery({
     queryKey: ["affiliate-parts", make ?? "any", model ?? "any", year ?? "any"],
-    queryFn: () => fetchParts({ data: { make: make ?? undefined, model: model ?? undefined, year: year ?? undefined, limit: 6 } }),
+    queryFn: () =>
+      fetchParts({
+        data: {
+          make: make ?? undefined,
+          model: model ?? undefined,
+          year: year ?? undefined,
+          limit: 6,
+        },
+      }),
     staleTime: 5 * 60_000,
   });
 
@@ -45,7 +53,10 @@ export function AffiliatePartsSection({ make, model, year, listingId, vehicleId 
       {isLoading ? (
         <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-32 animate-pulse rounded-lg border border-border bg-muted/30" />
+            <div
+              key={i}
+              className="h-32 animate-pulse rounded-lg border border-border bg-muted/30"
+            />
           ))}
         </div>
       ) : (
@@ -61,7 +72,12 @@ export function AffiliatePartsSection({ make, model, year, listingId, vehicleId 
             >
               {p.image_url ? (
                 <div className="mb-2 aspect-[4/3] w-full overflow-hidden rounded-md bg-muted">
-                  <img src={p.image_url} alt={p.title} className="h-full w-full object-cover" loading="lazy" />
+                  <img
+                    src={p.image_url}
+                    alt={p.title}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
                 </div>
               ) : (
                 <div className="mb-2 flex aspect-[4/3] w-full items-center justify-center rounded-md bg-muted">
@@ -82,7 +98,8 @@ export function AffiliatePartsSection({ make, model, year, listingId, vehicleId 
         </div>
       )}
       <p className="mt-3 text-[10px] text-muted-foreground">
-        Some links are affiliate links — 365 MotorSales may earn a commission, at no extra cost to you.
+        Some links are affiliate links — 365 MotorSales may earn a commission, at no extra cost to
+        you.
       </p>
     </div>
   );

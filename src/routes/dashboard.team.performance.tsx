@@ -52,7 +52,16 @@ function PerformancePage() {
   }
 
   const exportCsv = () => {
-    const header = ["Sales rep", "Role", "Total", "New", "In progress", "Won", "Lost", "Win rate %"];
+    const header = [
+      "Sales rep",
+      "Role",
+      "Total",
+      "New",
+      "In progress",
+      "Won",
+      "Lost",
+      "Win rate %",
+    ];
     const rows = data.members
       .slice()
       .sort((a: any, b: any) => b.won - a.won || b.total - a.total)
@@ -114,17 +123,19 @@ function PerformancePage() {
               .slice()
               .sort((a: any, b: any) => b.won - a.won || b.total - a.total)
               .map((m: any) => (
-              <tr key={m.userId} className="border-b border-border last:border-0">
-                <td className="px-4 py-3 font-medium">{m.profile?.full_name ?? m.userId}</td>
-                <td className="px-3 py-3 text-muted-foreground">{m.role}</td>
-                <td className="px-3 py-3 text-right font-semibold">{m.total}</td>
-                <td className="px-3 py-3 text-right">{m.new}</td>
-                <td className="px-3 py-3 text-right">{m.in_progress}</td>
-                <td className="px-3 py-3 text-right text-emerald-600">{m.won}</td>
-                <td className="px-3 py-3 text-right text-rose-600">{m.lost}</td>
-                <td className="px-3 py-3 text-right">{m.win_rate === null ? "—" : `${m.win_rate}%`}</td>
-              </tr>
-            ))}
+                <tr key={m.userId} className="border-b border-border last:border-0">
+                  <td className="px-4 py-3 font-medium">{m.profile?.full_name ?? m.userId}</td>
+                  <td className="px-3 py-3 text-muted-foreground">{m.role}</td>
+                  <td className="px-3 py-3 text-right font-semibold">{m.total}</td>
+                  <td className="px-3 py-3 text-right">{m.new}</td>
+                  <td className="px-3 py-3 text-right">{m.in_progress}</td>
+                  <td className="px-3 py-3 text-right text-emerald-600">{m.won}</td>
+                  <td className="px-3 py-3 text-right text-rose-600">{m.lost}</td>
+                  <td className="px-3 py-3 text-right">
+                    {m.win_rate === null ? "—" : `${m.win_rate}%`}
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </Card>

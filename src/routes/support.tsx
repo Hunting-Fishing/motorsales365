@@ -267,11 +267,10 @@ function SupportHubPage() {
         <section id="contact" className="scroll-mt-24 border-t border-border py-10 sm:py-14">
           <div className="grid gap-6 lg:grid-cols-[1fr_1.4fr]">
             <div>
-              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                Still need help?
-              </h2>
+              <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Still need help?</h2>
               <p className="mt-2 max-w-md text-sm text-muted-foreground">
-                Send our team a message. We typically reply within 1 business day — Filipino and English support.
+                Send our team a message. We typically reply within 1 business day — Filipino and
+                English support.
               </p>
               <div className="mt-6 space-y-2">
                 <Button asChild variant="outline" className="w-full justify-start">

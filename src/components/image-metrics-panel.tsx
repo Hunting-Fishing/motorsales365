@@ -57,10 +57,7 @@ export function ImageMetricsPanel() {
   }, []);
 
   const summary = useMemo(() => summarize(events), [events]);
-  const byRoot = useMemo(
-    () => breakdown(events, (e) => e.rootMargin ?? ""),
-    [events],
-  );
+  const byRoot = useMemo(() => breakdown(events, (e) => e.rootMargin ?? ""), [events]);
   const byQuality = useMemo(
     () => breakdown(events, (e) => (e.quality != null ? `${e.quality}` : "")),
     [events],
@@ -99,8 +96,8 @@ export function ImageMetricsPanel() {
         <div>
           <h2 className="font-display text-lg font-semibold">Image performance metrics</h2>
           <p className="text-sm text-muted-foreground">
-            Live data from this device's session. Use it to gauge whether the current preload distance
-            and quality are right for your connection.
+            Live data from this device's session. Use it to gauge whether the current preload
+            distance and quality are right for your connection.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={clearImageMetrics}>
@@ -149,29 +146,30 @@ function BreakdownTable({
       {rows.length === 0 ? (
         <div className="px-4 py-6 text-center text-xs text-muted-foreground">No data</div>
       ) : (
-        <div className="overflow-x-auto"><table className="w-full min-w-[480px] text-sm">
-          <thead className="text-xs uppercase tracking-wide text-muted-foreground">
-            <tr>
-              <th className="px-4 py-2 text-left">{keyHeader}</th>
-              <th className="px-4 py-2 text-right">Samples</th>
-              <th className="px-4 py-2 text-right">Preload hit</th>
-              <th className="px-4 py-2 text-right">Avg load</th>
-              <th className="px-4 py-2 text-right">Errors</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((r) => (
-              <tr key={r.key} className="border-t border-border">
-                <td className="px-4 py-2 font-mono">{r.key}</td>
-                <td className="px-4 py-2 text-right">{r.samples}</td>
-                <td className="px-4 py-2 text-right">{pct(r.preloadHitRate)}</td>
-                <td className="px-4 py-2 text-right">{ms(r.avgMs)}</td>
-                <td className="px-4 py-2 text-right">{r.errors}</td>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[480px] text-sm">
+            <thead className="text-xs uppercase tracking-wide text-muted-foreground">
+              <tr>
+                <th className="px-4 py-2 text-left">{keyHeader}</th>
+                <th className="px-4 py-2 text-right">Samples</th>
+                <th className="px-4 py-2 text-right">Preload hit</th>
+                <th className="px-4 py-2 text-right">Avg load</th>
+                <th className="px-4 py-2 text-right">Errors</th>
               </tr>
-            ))}
-          </tbody>
-        </table></div>
-
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr key={r.key} className="border-t border-border">
+                  <td className="px-4 py-2 font-mono">{r.key}</td>
+                  <td className="px-4 py-2 text-right">{r.samples}</td>
+                  <td className="px-4 py-2 text-right">{pct(r.preloadHitRate)}</td>
+                  <td className="px-4 py-2 text-right">{ms(r.avgMs)}</td>
+                  <td className="px-4 py-2 text-right">{r.errors}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

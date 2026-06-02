@@ -46,9 +46,17 @@ export const Route = createRootRoute({
       { name: "mobile-web-app-capable", content: "yes" },
       { name: "format-detection", content: "telephone=no" },
       { title: "365 MotorSales Philippines — Buy & Sell Vehicles" },
-      { name: "description", content: "Buy and sell cars, motorcycles, boats, airplanes, and equipment across the Philippines. Trusted listings, private and business sellers." },
+      {
+        name: "description",
+        content:
+          "Buy and sell cars, motorcycles, boats, airplanes, and equipment across the Philippines. Trusted listings, private and business sellers.",
+      },
       { property: "og:title", content: "365 MotorSales Philippines — Buy & Sell Vehicles" },
-      { property: "og:description", content: "Buy and sell cars, motorcycles, boats, airplanes, and equipment across the Philippines. Trusted listings, private and business sellers." },
+      {
+        property: "og:description",
+        content:
+          "Buy and sell cars, motorcycles, boats, airplanes, and equipment across the Philippines. Trusted listings, private and business sellers.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:site_name", content: "365 MotorSales" },
       { property: "og:url", content: "https://www.365motorsales.com/" },
@@ -57,7 +65,11 @@ export const Route = createRootRoute({
       { property: "og:image:height", content: "640" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "365 MotorSales Philippines — Buy & Sell Vehicles" },
-      { name: "twitter:description", content: "Buy and sell cars, motorcycles, boats, airplanes, and equipment across the Philippines. Trusted listings, private and business sellers." },
+      {
+        name: "twitter:description",
+        content:
+          "Buy and sell cars, motorcycles, boats, airplanes, and equipment across the Philippines. Trusted listings, private and business sellers.",
+      },
       { name: "twitter:image", content: "https://www.365motorsales.com/og-default.png" },
     ],
     links: [
@@ -68,7 +80,10 @@ export const Route = createRootRoute({
       { rel: "apple-touch-icon", sizes: "180x180", href: "/icons/apple-touch-icon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap",
+      },
     ],
     scripts: [
       {
@@ -79,7 +94,8 @@ export const Route = createRootRoute({
           name: "365 MotorSales",
           url: "https://www.365motorsales.com",
           logo: "https://www.365motorsales.com/logo.png",
-          description: "Philippines marketplace for cars, motorcycles, boats, airplanes, and equipment.",
+          description:
+            "Philippines marketplace for cars, motorcycles, boats, airplanes, and equipment.",
           address: { "@type": "PostalAddress", addressCountry: "PH" },
         }),
       },

@@ -62,10 +62,7 @@ function ShopFavoritesPage() {
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {products.map((p) => (
             <div key={p.id} className="group relative">
-              <ShopFavoriteButton
-                productId={p.id}
-                className="absolute right-2 top-2 z-10"
-              />
+              <ShopFavoriteButton productId={p.id} className="absolute right-2 top-2 z-10" />
               <Link to="/shop/p/$slug" params={{ slug: p.slug }} className="block">
                 <Card className="overflow-hidden transition hover:shadow-lg">
                   {p.image_url ? (
@@ -81,14 +78,10 @@ function ShopFavoritesPage() {
                     <p className="line-clamp-2 text-sm font-medium group-hover:text-primary">
                       {p.title}
                     </p>
-                    {p.brand && (
-                      <p className="text-xs text-muted-foreground">{p.brand}</p>
-                    )}
+                    {p.brand && <p className="text-xs text-muted-foreground">{p.brand}</p>}
                     <div className="mt-1 flex items-center justify-between gap-1">
                       {p.price_php ? (
-                        <p className="text-sm font-bold">
-                          ₱{Number(p.price_php).toLocaleString()}
-                        </p>
+                        <p className="text-sm font-bold">₱{Number(p.price_php).toLocaleString()}</p>
                       ) : (
                         <span />
                       )}

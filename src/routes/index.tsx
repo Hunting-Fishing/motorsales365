@@ -1,6 +1,28 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Search, Car, Bike, Ship, Plane, Truck, Caravan, ShieldCheck, Tag, Zap, Construction, Droplets, Wrench, Send, SprayCan, Recycle, Wrench as WrenchIcon, ShoppingBag, Megaphone, LifeBuoy, ArrowRight } from "lucide-react";
+import {
+  Search,
+  Car,
+  Bike,
+  Ship,
+  Plane,
+  Truck,
+  Caravan,
+  ShieldCheck,
+  Tag,
+  Zap,
+  Construction,
+  Droplets,
+  Wrench,
+  Send,
+  SprayCan,
+  Recycle,
+  Wrench as WrenchIcon,
+  ShoppingBag,
+  Megaphone,
+  LifeBuoy,
+  ArrowRight,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/site-layout";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
@@ -8,9 +30,12 @@ import { LiveActivityFeed } from "@/components/live-activity-feed";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
-
 
 export const Route = createFileRoute("/")({
   component: Index,
@@ -37,7 +62,6 @@ const SERVICE_CATEGORIES = [
 
 const CATEGORIES = [...VEHICLE_CATEGORIES, ...SERVICE_CATEGORIES];
 
-
 function Index() {
   const navigate = useNavigate();
   const [category, setCategory] = useState<string>("car");
@@ -49,16 +73,20 @@ function Index() {
     const load = async () => {
       const { data: boostedRows } = await supabase
         .from("listings")
-        .select("id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status)")
-        .in("status", ["active","pending_sale"])
+        .select(
+          "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status)",
+        )
+        .in("status", ["active", "pending_sale"])
         .gt("boost_until", new Date().toISOString())
         .order("boost_until", { ascending: false })
         .limit(8);
 
       const { data: recentRows } = await supabase
         .from("listings")
-        .select("id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status)")
-        .in("status", ["active","pending_sale"])
+        .select(
+          "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status)",
+        )
+        .in("status", ["active", "pending_sale"])
         .order("published_at", { ascending: false, nullsFirst: false })
         .limit(12);
 
@@ -74,11 +102,14 @@ function Index() {
             city: r.city,
             seller_type: r.seller_type,
             boost_until: r.boost_until,
-            category_slug: r.category_slug, view_count: r.view_count ?? 0,
+            category_slug: r.category_slug,
+            view_count: r.view_count ?? 0,
             cover_url: photos[0]?.url ?? null,
             photo_count: photos.length,
             has_video: videos.length > 0,
-            seller_verified: r.profiles?.verification_status === "verified", status: r.status, attributes: r.attributes,
+            seller_verified: r.profiles?.verification_status === "verified",
+            status: r.status,
+            attributes: r.attributes,
           };
         });
       setFeatured(map(boostedRows));
@@ -98,17 +129,19 @@ function Index() {
 
   return (
     <SiteLayout>
-
       {/* Hero */}
       <section
         className="relative overflow-hidden text-white"
         style={{ backgroundImage: "var(--gradient-hero)" }}
       >
-        <div className="absolute inset-0 opacity-10" style={{
-          backgroundImage:
-            "radial-gradient(circle at 20% 20%, white 1px, transparent 1px), radial-gradient(circle at 80% 60%, white 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-        }} />
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 20% 20%, white 1px, transparent 1px), radial-gradient(circle at 80% 60%, white 1px, transparent 1px)",
+            backgroundSize: "60px 60px",
+          }}
+        />
         <div className="container relative mx-auto px-4 py-16 md:py-20">
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 rounded-full bg-accent/90 px-3 py-1 text-xs font-semibold text-accent-foreground">
@@ -118,7 +151,8 @@ function Index() {
               Buy, sell, and service anything that <span className="text-accent">moves</span>.
             </h1>
             <p className="mt-4 max-w-2xl text-lg text-white/85">
-              Free to post. Free to browse. Find trusted dealers, mechanics, towing, financing and insurance — all in one place.
+              Free to post. Free to browse. Find trusted dealers, mechanics, towing, financing and
+              insurance — all in one place.
             </p>
           </div>
 
@@ -139,7 +173,8 @@ function Index() {
                 Cars, motorcycles, boats, trucks and heavy equipment from verified sellers.
               </p>
               <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-accent">
-                Start browsing <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+                Start browsing{" "}
+                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
               </span>
             </Link>
 
@@ -157,7 +192,8 @@ function Index() {
                 Post free in under 2 minutes. Up to 12 photos and 1 video. No listing fee.
               </p>
               <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-accent">
-                Post a free ad <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+                Post a free ad{" "}
+                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
               </span>
             </Link>
 
@@ -175,7 +211,8 @@ function Index() {
                 Repair shops, towing, parts, financing, insurance and inspections near you.
               </p>
               <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-accent">
-                Explore services <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
+                Explore services{" "}
+                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
               </span>
             </Link>
           </div>
@@ -191,7 +228,9 @@ function Index() {
               </SelectTrigger>
               <SelectContent>
                 {CATEGORIES.map((c) => (
-                  <SelectItem key={c.slug} value={c.slug}>{c.name}</SelectItem>
+                  <SelectItem key={c.slug} value={c.slug}>
+                    {c.name}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -204,7 +243,9 @@ function Index() {
                 className="h-12 border-none pl-9 focus-visible:ring-0"
               />
             </div>
-            <Button type="submit" size="lg" className="h-12 sm:w-32">Search</Button>
+            <Button type="submit" size="lg" className="h-12 sm:w-32">
+              Search
+            </Button>
           </form>
         </div>
       </section>
@@ -212,7 +253,9 @@ function Index() {
       {/* Category strip — vehicles + services */}
       <section className="border-b border-border bg-card">
         <div className="container mx-auto px-4 py-6">
-          <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Shop by category</div>
+          <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Shop by category
+          </div>
           <div className="flex flex-wrap gap-2">
             {VEHICLE_CATEGORIES.map(({ slug, name, Icon }) => (
               <Link
@@ -221,11 +264,14 @@ function Index() {
                 params={{ category: slug }}
                 className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium transition hover:border-primary hover:text-primary"
               >
-                <Icon className="h-4 w-4" />{name}
+                <Icon className="h-4 w-4" />
+                {name}
               </Link>
             ))}
           </div>
-          <div className="mb-3 mt-5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Services & shops</div>
+          <div className="mb-3 mt-5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Services & shops
+          </div>
           <div className="flex flex-wrap gap-2">
             {SERVICE_CATEGORIES.map(({ slug, name, Icon }) => (
               <Link
@@ -234,7 +280,8 @@ function Index() {
                 params={{ category: slug }}
                 className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium transition hover:border-primary hover:text-primary"
               >
-                <Icon className="h-4 w-4" />{name}
+                <Icon className="h-4 w-4" />
+                {name}
               </Link>
             ))}
           </div>
@@ -245,9 +292,21 @@ function Index() {
       <section className="border-b border-border bg-secondary/30">
         <div className="container mx-auto grid gap-6 px-4 py-8 md:grid-cols-3">
           {[
-            { Icon: ShieldCheck, t: "Verified sellers", d: "Private and business listings with verification badges and fraud reporting." },
-            { Icon: Tag, t: "100% free to post", d: "Up to 12 photos, 1 video, 60-day listings. No card required. Boost when you want more reach." },
-            { Icon: Zap, t: "Nationwide reach", d: "From Metro Manila to Mindanao — buyers, lenders, insurers and service partners in every region." },
+            {
+              Icon: ShieldCheck,
+              t: "Verified sellers",
+              d: "Private and business listings with verification badges and fraud reporting.",
+            },
+            {
+              Icon: Tag,
+              t: "100% free to post",
+              d: "Up to 12 photos, 1 video, 60-day listings. No card required. Boost when you want more reach.",
+            },
+            {
+              Icon: Zap,
+              t: "Nationwide reach",
+              d: "From Metro Manila to Mindanao — buyers, lenders, insurers and service partners in every region.",
+            },
           ].map(({ Icon, t, d }) => (
             <div key={t} className="flex items-start gap-3">
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -262,7 +321,6 @@ function Index() {
         </div>
       </section>
 
-
       {/* Live activity feed */}
       <LiveActivityFeed />
 
@@ -276,7 +334,9 @@ function Index() {
             </div>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {featured.map((l) => <ListingCard key={l.id} listing={l} />)}
+            {featured.map((l) => (
+              <ListingCard key={l.id} listing={l} />
+            ))}
           </div>
         </section>
       )}
@@ -288,15 +348,25 @@ function Index() {
             <h2 className="font-display text-2xl font-bold md:text-3xl">Latest listings</h2>
             <p className="text-muted-foreground">Fresh on the marketplace.</p>
           </div>
-          <Button asChild variant="outline"><Link to="/browse/$category" params={{ category: "car" }}>Browse all</Link></Button>
+          <Button asChild variant="outline">
+            <Link to="/browse/$category" params={{ category: "car" }}>
+              Browse all
+            </Link>
+          </Button>
         </div>
         {recent.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
-            No listings yet — be the first to <Link to="/sell" className="font-semibold text-primary underline">post one</Link>.
+            No listings yet — be the first to{" "}
+            <Link to="/sell" className="font-semibold text-primary underline">
+              post one
+            </Link>
+            .
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {recent.map((l) => <ListingCard key={l.id} listing={l} />)}
+            {recent.map((l) => (
+              <ListingCard key={l.id} listing={l} />
+            ))}
           </div>
         )}
       </section>
@@ -307,10 +377,17 @@ function Index() {
           <div className="grid gap-8 md:grid-cols-2 md:items-center">
             <div>
               <h3 className="font-display text-3xl font-bold">Start free. Upgrade as you grow.</h3>
-              <p className="mt-2 text-muted-foreground">Private sellers get up to 5 active ads with 12 photos and 1 video each — no card required. Change or upgrade your plan anytime as your business grows.</p>
+              <p className="mt-2 text-muted-foreground">
+                Private sellers get up to 5 active ads with 12 photos and 1 video each — no card
+                required. Change or upgrade your plan anytime as your business grows.
+              </p>
               <div className="mt-6 flex flex-wrap gap-3">
-                <Button asChild size="lg"><Link to="/sell">Post a free ad</Link></Button>
-                <Button asChild size="lg" variant="outline"><Link to="/pricing">See seller plans</Link></Button>
+                <Button asChild size="lg">
+                  <Link to="/sell">Post a free ad</Link>
+                </Button>
+                <Button asChild size="lg" variant="outline">
+                  <Link to="/pricing">See seller plans</Link>
+                </Button>
               </div>
             </div>
             <ul className="grid gap-3 text-sm">
@@ -327,7 +404,6 @@ function Index() {
                 </li>
               ))}
             </ul>
-
           </div>
         </div>
       </section>

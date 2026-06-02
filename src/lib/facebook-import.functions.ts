@@ -29,7 +29,9 @@ export const scrapeFbListing = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     if (!isFacebookMarketplaceUrl(data.url)) {
-      throw new Error("Please paste a Facebook Marketplace item URL (facebook.com/marketplace/item/...).");
+      throw new Error(
+        "Please paste a Facebook Marketplace item URL (facebook.com/marketplace/item/...).",
+      );
     }
 
     // Rate limit per user per day
@@ -40,7 +42,9 @@ export const scrapeFbListing = createServerFn({ method: "POST" })
       .eq("user_id", userId)
       .gte("created_at", since);
     if ((count ?? 0) >= DAILY_IMPORT_LIMIT) {
-      throw new Error(`Daily import limit reached (${DAILY_IMPORT_LIMIT}/day). Try again tomorrow.`);
+      throw new Error(
+        `Daily import limit reached (${DAILY_IMPORT_LIMIT}/day). Try again tomorrow.`,
+      );
     }
 
     const { data: job } = await supabase
@@ -140,7 +144,9 @@ export const startFbVerification = createServerFn({ method: "POST" })
       .eq("fb_profile_id", sellerProfileId)
       .maybeSingle();
     if (existing && existing.id !== userId) {
-      throw new Error("This Facebook profile is already linked to another account. Contact support if this is yours.");
+      throw new Error(
+        "This Facebook profile is already linked to another account. Contact support if this is yours.",
+      );
     }
 
     const code = generateVerificationCode();
@@ -173,7 +179,10 @@ export const checkFbVerification = createServerFn({ method: "POST" })
       .eq("id", userId)
       .maybeSingle();
     if (!me?.fb_verification_code) throw new Error("No verification code issued. Start over.");
-    if (me.fb_verification_code_expires_at && new Date(me.fb_verification_code_expires_at) < new Date()) {
+    if (
+      me.fb_verification_code_expires_at &&
+      new Date(me.fb_verification_code_expires_at) < new Date()
+    ) {
       throw new Error("Verification code expired. Please request a new one.");
     }
 

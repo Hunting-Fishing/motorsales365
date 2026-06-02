@@ -33,8 +33,7 @@ async function upsertSubscription(env: StripeEnv, sub: Stripe.Subscription) {
 
   const item = sub.items.data[0];
   const itemLookup = item?.price?.lookup_key ?? null;
-  const planId =
-    (await resolvePlanId(lookupKey)) ?? (await resolvePlanId(itemLookup));
+  const planId = (await resolvePlanId(lookupKey)) ?? (await resolvePlanId(itemLookup));
 
   if (!planId) {
     console.error("[webhook] could not resolve plan_id for subscription", sub.id);
@@ -66,7 +65,8 @@ async function upsertSubscription(env: StripeEnv, sub: Stripe.Subscription) {
     status,
     current_period_start: periodStart ? new Date(periodStart * 1000).toISOString() : null,
     current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
-    stripe_customer_id: typeof sub.customer === "string" ? sub.customer : sub.customer?.id ?? null,
+    stripe_customer_id:
+      typeof sub.customer === "string" ? sub.customer : (sub.customer?.id ?? null),
     stripe_subscription_id: sub.id,
     stripe_price_id: item?.price?.id ?? null,
     environment: env,
@@ -75,7 +75,10 @@ async function upsertSubscription(env: StripeEnv, sub: Stripe.Subscription) {
   } as any;
 
   if (existing) {
-    await supabaseAdmin.from("subscriptions").update(row).eq("id", (existing as any).id);
+    await supabaseAdmin
+      .from("subscriptions")
+      .update(row)
+      .eq("id", (existing as any).id);
   } else {
     await supabaseAdmin.from("subscriptions").insert(row);
   }
@@ -84,9 +87,7 @@ async function upsertSubscription(env: StripeEnv, sub: Stripe.Subscription) {
 async function upsertBusinessSubscription(env: StripeEnv, sub: Stripe.Subscription) {
   const userId = (sub.metadata?.userId as string | undefined) ?? null;
   const businessId = (sub.metadata?.businessId as string | undefined) ?? null;
-  const planSlug =
-    (sub.metadata?.planSlug as string | undefined)
-    ?? null;
+  const planSlug = (sub.metadata?.planSlug as string | undefined) ?? null;
   if (!userId || !businessId) {
     console.error("[webhook] business sub missing metadata", sub.id);
     return;
@@ -129,7 +130,8 @@ async function upsertBusinessSubscription(env: StripeEnv, sub: Stripe.Subscripti
     current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
     cancel_at_period_end: !!sub.cancel_at_period_end,
     environment: env,
-    stripe_customer_id: typeof sub.customer === "string" ? sub.customer : sub.customer?.id ?? null,
+    stripe_customer_id:
+      typeof sub.customer === "string" ? sub.customer : (sub.customer?.id ?? null),
     stripe_subscription_id: sub.id,
     stripe_price_id: item?.price?.id ?? null,
     metadata: { interval: (plan as any).interval },
@@ -143,7 +145,10 @@ async function upsertBusinessSubscription(env: StripeEnv, sub: Stripe.Subscripti
     .maybeSingle();
 
   if (existing) {
-    await supabaseAdmin.from("business_subscriptions").update(row).eq("id", (existing as any).id);
+    await supabaseAdmin
+      .from("business_subscriptions")
+      .update(row)
+      .eq("id", (existing as any).id);
   } else {
     await supabaseAdmin.from("business_subscriptions").insert(row);
   }
@@ -158,7 +163,6 @@ async function upsertBusinessSubscription(env: StripeEnv, sub: Stripe.Subscripti
     })
     .eq("id", businessId);
 }
-
 
 async function recordPaymentFromInvoice(env: StripeEnv, invoice: Stripe.Invoice) {
   // Only record paid invoices
@@ -307,18 +311,16 @@ async function enrollCourseFromSession(env: StripeEnv, session: Stripe.Checkout.
       .maybeSingle();
     paymentId = (payRow as any)?.id ?? null;
   }
-  await supabaseAdmin
-    .from("course_enrollments")
-    .upsert(
-      {
-        user_id: userId,
-        course_id: courseId,
-        source: "purchase",
-        payment_id: paymentId,
-        stripe_session_id: session.id,
-      },
-      { onConflict: "user_id,course_id" },
-    );
+  await supabaseAdmin.from("course_enrollments").upsert(
+    {
+      user_id: userId,
+      course_id: courseId,
+      source: "purchase",
+      payment_id: paymentId,
+      stripe_session_id: session.id,
+    },
+    { onConflict: "user_id,course_id" },
+  );
 }
 
 async function handleEvent(env: StripeEnv, event: Stripe.Event) {
@@ -341,9 +343,8 @@ async function handleEvent(env: StripeEnv, event: Stripe.Event) {
       }
       if (session.mode === "subscription" && session.subscription) {
         const stripe = createStripeClient(env);
-        const subId = typeof session.subscription === "string"
-          ? session.subscription
-          : session.subscription.id;
+        const subId =
+          typeof session.subscription === "string" ? session.subscription : session.subscription.id;
         const sub = await stripe.subscriptions.retrieve(subId);
         if (!sub.metadata?.userId && session.metadata?.userId) {
           await stripe.subscriptions.update(sub.id, {
@@ -365,7 +366,6 @@ async function handleEvent(env: StripeEnv, event: Stripe.Event) {
   }
 }
 
-
 export const Route = createFileRoute("/api/public/payments/webhook")({
   server: {
     handlers: {
@@ -379,11 +379,7 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
         let event: Stripe.Event;
         try {
           const stripe = createStripeClient(env);
-          event = await stripe.webhooks.constructEventAsync(
-            body,
-            signature,
-            getWebhookSecret(env),
-          );
+          event = await stripe.webhooks.constructEventAsync(body, signature, getWebhookSecret(env));
         } catch (err) {
           console.error("[webhook] signature verification failed:", err);
           return new Response("Invalid signature", { status: 401 });

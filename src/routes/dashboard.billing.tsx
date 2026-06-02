@@ -4,12 +4,42 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { formatPHP, formatDate } from "@/lib/format";
 import { Input } from "@/components/ui/input";
-import { CheckCircle2, AlertTriangle, ArrowUpRight, TrendingUp, Calendar, Check, CreditCard, Receipt, XCircle, RotateCcw, ExternalLink, Search, FileText } from "lucide-react";
-import { Bar, BarChart, CartesianGrid, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import {
+  CheckCircle2,
+  AlertTriangle,
+  ArrowUpRight,
+  TrendingUp,
+  Calendar,
+  Check,
+  CreditCard,
+  Receipt,
+  XCircle,
+  RotateCcw,
+  ExternalLink,
+  Search,
+  FileText,
+} from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { toast } from "sonner";
 import { getStripeEnvironment } from "@/lib/stripe";
 import {
@@ -22,7 +52,6 @@ import {
   detachPaymentMethod,
   getInvoiceDetails,
 } from "@/utils/payments.functions";
-
 
 export const Route = createFileRoute("/dashboard/billing")({
   component: BillingPage,
@@ -67,7 +96,9 @@ function BillingPage() {
   const [plans, setPlans] = useState<Plan[]>([]);
   const [plansById, setPlansById] = useState<Record<string, Plan>>({});
   const [listings, setListings] = useState<Listing[]>([]);
-  const [mediaCounts, setMediaCounts] = useState<Record<string, { photo: number; video: number }>>({});
+  const [mediaCounts, setMediaCounts] = useState<Record<string, { photo: number; video: number }>>(
+    {},
+  );
   const [chartRange, setChartRange] = useState<"daily" | "weekly">("daily");
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [cancelOpen, setCancelOpen] = useState(false);
@@ -86,7 +117,10 @@ function BillingPage() {
 
   const reloadSubs = () => {
     if (!user) return;
-    supabase.from("subscriptions").select("*").eq("user_id", user.id)
+    supabase
+      .from("subscriptions")
+      .select("*")
+      .eq("user_id", user.id)
       .or(`environment.eq.${env},environment.is.null`)
       .order("created_at", { ascending: false })
       .then(({ data }) => setSubs(data ?? []));
@@ -94,7 +128,11 @@ function BillingPage() {
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("payments").select("*").eq("user_id", user.id).order("created_at", { ascending: false })
+    supabase
+      .from("payments")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
       .then(({ data }) => setPayments(data ?? []));
     reloadSubs();
     listInvoices({ data: { environment: env, limit: 20 } })
@@ -110,17 +148,25 @@ function BillingPage() {
         setDefaultPmId(null);
       });
 
-
-    supabase.from("subscription_plans").select("*").eq("active", true).order("sort_order")
+    supabase
+      .from("subscription_plans")
+      .select("*")
+      .eq("active", true)
+      .order("sort_order")
       .then(({ data }) => {
         const list = (data ?? []) as Plan[];
         setPlans(list);
         const m: Record<string, Plan> = {};
-        list.forEach((p) => { m[p.id] = p; });
+        list.forEach((p) => {
+          m[p.id] = p;
+        });
         setPlansById(m);
       });
-    supabase.from("listings")
-      .select("id,title,status,plan,price_php,view_count,created_at,published_at,expires_at,boost_until")
+    supabase
+      .from("listings")
+      .select(
+        "id,title,status,plan,price_php,view_count,created_at,published_at,expires_at,boost_until",
+      )
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
       .limit(50)
@@ -145,9 +191,9 @@ function BillingPage() {
 
   const activeSub = useMemo(
     () => subs.find((s) => ["active", "pending", "paused"].includes(s.status)) ?? null,
-    [subs]
+    [subs],
   );
-  const currentPlan: Plan | null = activeSub ? plansById[activeSub.plan_id] ?? null : null;
+  const currentPlan: Plan | null = activeSub ? (plansById[activeSub.plan_id] ?? null) : null;
 
   const [now, setNow] = useState<Date>(() => new Date());
   useEffect(() => {
@@ -158,13 +204,16 @@ function BillingPage() {
 
   const thisMonthListings = useMemo(
     () => listings.filter((l) => new Date(l.created_at) >= monthStart),
-    [listings, monthStart]
+    [listings, monthStart],
   );
   const activeListings = useMemo(() => listings.filter((l) => l.status === "active"), [listings]);
-  const totalViews = useMemo(() => listings.reduce((s, l) => s + (l.view_count ?? 0), 0), [listings]);
+  const totalViews = useMemo(
+    () => listings.reduce((s, l) => s + (l.view_count ?? 0), 0),
+    [listings],
+  );
   const boostedCount = useMemo(
     () => listings.filter((l) => l.boost_until && new Date(l.boost_until) > now).length,
-    [listings, now]
+    [listings, now],
   );
 
   // Renewal countdown
@@ -186,7 +235,9 @@ function BillingPage() {
 
   // Plan usage percentage
   const monthlyCap = currentPlan?.listings_per_month ?? null;
-  const usedPct = monthlyCap ? Math.min(100, Math.round((thisMonthListings.length / monthlyCap) * 100)) : null;
+  const usedPct = monthlyCap
+    ? Math.min(100, Math.round((thisMonthListings.length / monthlyCap) * 100))
+    : null;
   const overCap = monthlyCap !== null && thisMonthListings.length > monthlyCap;
   const nearCap = monthlyCap !== null && !overCap && thisMonthListings.length / monthlyCap >= 0.8;
 
@@ -225,7 +276,14 @@ function BillingPage() {
         const photoCap = p.max_photos_per_listing ?? 3;
         const listingFit = listingCap >= listingTarget;
         const photoFit = photoCap >= photoTarget;
-        return { plan: p, listingCap, photoCap, listingFit, photoFit, fits: listingFit && photoFit };
+        return {
+          plan: p,
+          listingCap,
+          photoCap,
+          listingFit,
+          photoFit,
+          fits: listingFit && photoFit,
+        };
       })
       .sort((a, b) => a.plan.price_php - b.plan.price_php);
 
@@ -271,10 +329,16 @@ function BillingPage() {
     const curListingCap = currentPlan.listings_per_month ?? Number.POSITIVE_INFINITY;
     const curPhotoCap = currentPlan.max_photos_per_listing ?? 3;
     if (usage > curListingCap) reasons.push(`you're over your ${curListingCap}/mo listing cap`);
-    else if (usage + boostedCount * 0.5 >= curListingCap * 0.8) reasons.push("you're nearing your monthly listing cap");
-    if (maxPhotosUsed > curPhotoCap) reasons.push(`some listings need more than ${curPhotoCap} photos`);
-    if (boostedCount > 0 && fit.listingCap > curListingCap) reasons.push(`${boostedCount} boosted listing${boostedCount === 1 ? "" : "s"} suggest you want more reach`);
-    if (reasons.length === 0) reasons.push(`${fit.plan.name} better matches your activity (${usageSummary})`);
+    else if (usage + boostedCount * 0.5 >= curListingCap * 0.8)
+      reasons.push("you're nearing your monthly listing cap");
+    if (maxPhotosUsed > curPhotoCap)
+      reasons.push(`some listings need more than ${curPhotoCap} photos`);
+    if (boostedCount > 0 && fit.listingCap > curListingCap)
+      reasons.push(
+        `${boostedCount} boosted listing${boostedCount === 1 ? "" : "s"} suggest you want more reach`,
+      );
+    if (reasons.length === 0)
+      reasons.push(`${fit.plan.name} better matches your activity (${usageSummary})`);
 
     const upgradeNet = Math.max(0, fit.plan.price_php - proratedCredit);
     return {
@@ -298,22 +362,32 @@ function BillingPage() {
     }
     const term = invoiceSearch.trim().toLowerCase();
     if (term) {
-      rows = rows.filter((inv) =>
-        ((inv.number ?? inv.id ?? "").toString().toLowerCase().includes(term) ||
-        ((inv.amount_paid ?? 0) / 100).toFixed(2).includes(term))
+      rows = rows.filter(
+        (inv) =>
+          (inv.number ?? inv.id ?? "").toString().toLowerCase().includes(term) ||
+          ((inv.amount_paid ?? 0) / 100).toFixed(2).includes(term),
       );
     }
     return rows;
   }, [invoices, invoiceStatusFilter, invoiceDateFilter, invoiceSearch]);
 
-
-
-
   const subTone = (s: string) =>
-    s === "active" ? "default" : s === "pending" ? "secondary" : s === "paused" ? "outline" : "secondary";
+    s === "active"
+      ? "default"
+      : s === "pending"
+        ? "secondary"
+        : s === "paused"
+          ? "outline"
+          : "secondary";
 
   const listingStatusTone = (s: string) =>
-    s === "active" ? "default" : s === "sold" || s === "pending_sale" ? "secondary" : s === "expired" ? "outline" : "secondary";
+    s === "active"
+      ? "default"
+      : s === "sold" || s === "pending_sale"
+        ? "secondary"
+        : s === "expired"
+          ? "outline"
+          : "secondary";
 
   return (
     <div>
@@ -328,8 +402,12 @@ function BillingPage() {
           <div className="text-xs uppercase text-muted-foreground">Listings this month</div>
           <div className="mt-1 font-display text-2xl font-bold">
             {thisMonthListings.length}
-            {monthlyCap !== null && <span className="text-sm font-normal text-muted-foreground"> / {monthlyCap}</span>}
-            {monthlyCap === null && currentPlan && <span className="text-sm font-normal text-muted-foreground"> / ∞</span>}
+            {monthlyCap !== null && (
+              <span className="text-sm font-normal text-muted-foreground"> / {monthlyCap}</span>
+            )}
+            {monthlyCap === null && currentPlan && (
+              <span className="text-sm font-normal text-muted-foreground"> / ∞</span>
+            )}
           </div>
           {usedPct !== null && (
             <div className="mt-2 h-1.5 w-full overflow-hidden rounded bg-secondary">
@@ -370,10 +448,14 @@ function BillingPage() {
                   <span>Due now</span>
                 ) : (
                   <>
-                    <span>{countdown.d}</span><span className="text-sm font-medium text-muted-foreground">d</span>
-                    <span className="ml-1">{String(countdown.h).padStart(2, "0")}</span><span className="text-sm font-medium text-muted-foreground">h</span>
-                    <span className="ml-1">{String(countdown.m).padStart(2, "0")}</span><span className="text-sm font-medium text-muted-foreground">m</span>
-                    <span className="ml-1">{String(countdown.s).padStart(2, "0")}</span><span className="text-sm font-medium text-muted-foreground">s</span>
+                    <span>{countdown.d}</span>
+                    <span className="text-sm font-medium text-muted-foreground">d</span>
+                    <span className="ml-1">{String(countdown.h).padStart(2, "0")}</span>
+                    <span className="text-sm font-medium text-muted-foreground">h</span>
+                    <span className="ml-1">{String(countdown.m).padStart(2, "0")}</span>
+                    <span className="text-sm font-medium text-muted-foreground">m</span>
+                    <span className="ml-1">{String(countdown.s).padStart(2, "0")}</span>
+                    <span className="text-sm font-medium text-muted-foreground">s</span>
                   </>
                 )}
               </div>
@@ -381,7 +463,13 @@ function BillingPage() {
                 <Calendar className="mr-1 inline h-3 w-3" />
                 Renews {formatDate(activeSub.current_period_end)}
                 {proratedCredit > 0 && (
-                  <> · Upgrade now to get back <span className="font-medium text-emerald-600">{formatPHP(proratedCredit)}</span></>
+                  <>
+                    {" "}
+                    · Upgrade now to get back{" "}
+                    <span className="font-medium text-emerald-600">
+                      {formatPHP(proratedCredit)}
+                    </span>
+                  </>
                 )}
               </div>
             </>
@@ -397,13 +485,15 @@ function BillingPage() {
       {/* Recommendation banner */}
       {recommendation && (
         <section className="mb-8">
-          <div className={`flex flex-wrap items-start justify-between gap-3 rounded-xl border p-4 ${
-            recommendation.matches
-              ? "border-emerald-500/30 bg-emerald-500/5"
-              : recommendation.upgrade
-                ? "border-amber-500/30 bg-amber-500/5"
-                : "border-primary/30 bg-primary/5"
-          }`}>
+          <div
+            className={`flex flex-wrap items-start justify-between gap-3 rounded-xl border p-4 ${
+              recommendation.matches
+                ? "border-emerald-500/30 bg-emerald-500/5"
+                : recommendation.upgrade
+                  ? "border-amber-500/30 bg-amber-500/5"
+                  : "border-primary/30 bg-primary/5"
+            }`}
+          >
             <div className="flex items-start gap-3">
               {recommendation.matches ? (
                 <CheckCircle2 className="mt-0.5 h-5 w-5 text-emerald-600" />
@@ -414,18 +504,31 @@ function BillingPage() {
               )}
               <div className="flex-1">
                 <div className="font-semibold">
-                  {recommendation.matches ? "Your plan is a good fit" : `Suggested plan: ${recommendation.plan.name}`}
+                  {recommendation.matches
+                    ? "Your plan is a good fit"
+                    : `Suggested plan: ${recommendation.plan.name}`}
                 </div>
                 <div className="mt-0.5 text-sm text-muted-foreground">{recommendation.reason}</div>
                 {recommendation.upgrade && currentPlan && (
                   <div className="mt-3 rounded-lg border border-border bg-background/60 p-3 text-xs">
-                    <div className="mb-1 font-medium uppercase tracking-wide text-muted-foreground">Prorated upgrade</div>
+                    <div className="mb-1 font-medium uppercase tracking-wide text-muted-foreground">
+                      Prorated upgrade
+                    </div>
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                      <span>{recommendation.plan.name}: <span className="font-medium text-foreground">{formatPHP(recommendation.plan.price_php)}</span>/mo</span>
+                      <span>
+                        {recommendation.plan.name}:{" "}
+                        <span className="font-medium text-foreground">
+                          {formatPHP(recommendation.plan.price_php)}
+                        </span>
+                        /mo
+                      </span>
                       {recommendation.proratedCredit > 0 && (
                         <span className="text-emerald-600">
-                          − {formatPHP(recommendation.proratedCredit)} credit from {currentPlan.name}
-                          {renewalDays !== null && renewalDays > 0 ? ` (${renewalDays} day${renewalDays === 1 ? "" : "s"} unused)` : ""}
+                          − {formatPHP(recommendation.proratedCredit)} credit from{" "}
+                          {currentPlan.name}
+                          {renewalDays !== null && renewalDays > 0
+                            ? ` (${renewalDays} day${renewalDays === 1 ? "" : "s"} unused)`
+                            : ""}
                         </span>
                       )}
                       <span className="font-semibold text-foreground">
@@ -436,15 +539,16 @@ function BillingPage() {
                 )}
               </div>
             </div>
-            {!recommendation.matches && (
-              recommendation.upgrade && currentPlan ? (
-                <Button size="sm" onClick={() => setConfirmOpen(true)}>Review upgrade</Button>
+            {!recommendation.matches &&
+              (recommendation.upgrade && currentPlan ? (
+                <Button size="sm" onClick={() => setConfirmOpen(true)}>
+                  Review upgrade
+                </Button>
               ) : (
                 <Button asChild size="sm">
                   <Link to="/pricing">View plans</Link>
                 </Button>
-              )
-            )}
+              ))}
           </div>
         </section>
       )}
@@ -507,8 +611,10 @@ function BillingPage() {
                     <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
                     <span>
                       Photo limit increases to{" "}
-                      <span className="font-medium">{recommendation.plan.max_photos_per_listing}</span> per listing
-                      (from {currentPlan.max_photos_per_listing}).
+                      <span className="font-medium">
+                        {recommendation.plan.max_photos_per_listing}
+                      </span>{" "}
+                      per listing (from {currentPlan.max_photos_per_listing}).
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
@@ -524,7 +630,9 @@ function BillingPage() {
             </div>
 
             <DialogFooter>
-              <Button variant="outline" onClick={() => setConfirmOpen(false)}>Cancel</Button>
+              <Button variant="outline" onClick={() => setConfirmOpen(false)}>
+                Cancel
+              </Button>
               <Button asChild>
                 <Link to="/pricing">Continue to checkout</Link>
               </Button>
@@ -542,7 +650,13 @@ function BillingPage() {
               <p className="text-xs text-muted-foreground">
                 Card on file is charged automatically each cycle.
                 {activeSub.cancel_at_period_end && (
-                  <> · <span className="font-medium text-amber-600">Cancels on {formatDate(activeSub.current_period_end)}</span></>
+                  <>
+                    {" "}
+                    ·{" "}
+                    <span className="font-medium text-amber-600">
+                      Cancels on {formatDate(activeSub.current_period_end)}
+                    </span>
+                  </>
                 )}
               </p>
             </div>
@@ -560,7 +674,9 @@ function BillingPage() {
                     window.open(url, "_blank", "noopener,noreferrer");
                   } catch (e: any) {
                     toast.error(e?.message ?? "Could not open billing portal");
-                  } finally { setBusy(null); }
+                  } finally {
+                    setBusy(null);
+                  }
                 }}
               >
                 <CreditCard className="mr-2 h-4 w-4" />
@@ -579,7 +695,9 @@ function BillingPage() {
                       reloadSubs();
                     } catch (e: any) {
                       toast.error(e?.message ?? "Could not resume");
-                    } finally { setBusy(null); }
+                    } finally {
+                      setBusy(null);
+                    }
                   }}
                 >
                   <RotateCcw className="mr-2 h-4 w-4" />
@@ -602,12 +720,17 @@ function BillingPage() {
           <DialogHeader>
             <DialogTitle>Cancel subscription?</DialogTitle>
             <DialogDescription>
-              You'll keep access until {activeSub?.current_period_end ? formatDate(activeSub.current_period_end) : "the end of your current period"}.
-              No more charges after that. You can resume anytime before then.
+              You'll keep access until{" "}
+              {activeSub?.current_period_end
+                ? formatDate(activeSub.current_period_end)
+                : "the end of your current period"}
+              . No more charges after that. You can resume anytime before then.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setCancelOpen(false)}>Keep subscription</Button>
+            <Button variant="outline" onClick={() => setCancelOpen(false)}>
+              Keep subscription
+            </Button>
             <Button
               variant="destructive"
               disabled={busy === "cancel"}
@@ -620,7 +743,9 @@ function BillingPage() {
                   reloadSubs();
                 } catch (e: any) {
                   toast.error(e?.message ?? "Could not cancel");
-                } finally { setBusy(null); }
+                } finally {
+                  setBusy(null);
+                }
               }}
             >
               {busy === "cancel" ? "Cancelling…" : "Confirm cancellation"}
@@ -642,12 +767,16 @@ function BillingPage() {
                 <div>
                   <div className="font-medium">
                     {inv.number ?? inv.id}{" "}
-                    <Badge variant={inv.status === "paid" ? "default" : "secondary"} className="ml-1 text-[10px]">
+                    <Badge
+                      variant={inv.status === "paid" ? "default" : "secondary"}
+                      className="ml-1 text-[10px]"
+                    >
                       {inv.status}
                     </Badge>
                   </div>
                   <div className="text-xs text-muted-foreground">
-                    {formatDate(new Date(inv.created * 1000).toISOString())} · {(inv.currency ?? "php").toUpperCase()} {(inv.amount_paid / 100).toFixed(2)}
+                    {formatDate(new Date(inv.created * 1000).toISOString())} ·{" "}
+                    {(inv.currency ?? "php").toUpperCase()} {(inv.amount_paid / 100).toFixed(2)}
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -660,7 +789,9 @@ function BillingPage() {
                   )}
                   {inv.invoice_pdf && (
                     <Button asChild variant="ghost" size="sm">
-                      <a href={inv.invoice_pdf} target="_blank" rel="noopener noreferrer">PDF</a>
+                      <a href={inv.invoice_pdf} target="_blank" rel="noopener noreferrer">
+                        PDF
+                      </a>
                     </Button>
                   )}
                 </div>
@@ -745,7 +876,11 @@ function BillingPage() {
                 <div className="h-64 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={data} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" vertical={false} />
+                      <CartesianGrid
+                        strokeDasharray="3 3"
+                        stroke="hsl(var(--border))"
+                        vertical={false}
+                      />
                       <XAxis
                         dataKey="label"
                         tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
@@ -796,33 +931,47 @@ function BillingPage() {
         </div>
       </section>
 
-
       {/* Subscriptions */}
       <section className="mb-8">
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-display text-lg font-semibold">Subscriptions</h2>
-          <Button asChild size="sm" variant="outline"><Link to="/pricing">Browse plans</Link></Button>
+          <Button asChild size="sm" variant="outline">
+            <Link to="/pricing">Browse plans</Link>
+          </Button>
         </div>
         {subs.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
-            No subscription yet. <Link to="/pricing" className="text-primary underline">View plans</Link>
+            No subscription yet.{" "}
+            <Link to="/pricing" className="text-primary underline">
+              View plans
+            </Link>
           </div>
         ) : (
           <div className="space-y-2">
             {subs.map((s) => {
               const plan = plansById[s.plan_id];
-              const days = s.current_period_end ? daysBetween(now, new Date(s.current_period_end)) : null;
+              const days = s.current_period_end
+                ? daysBetween(now, new Date(s.current_period_end))
+                : null;
               return (
-                <div key={s.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card p-4">
+                <div
+                  key={s.id}
+                  className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card p-4"
+                >
                   <div>
                     <div className="font-medium">{plan?.name ?? "Plan"}</div>
                     <div className="text-xs text-muted-foreground">
-                      {plan ? formatPHP(plan.price_php) + "/mo · " : ""}requested {formatDate(s.created_at)}
+                      {plan ? formatPHP(plan.price_php) + "/mo · " : ""}requested{" "}
+                      {formatDate(s.created_at)}
                       {s.current_period_end ? ` · renews ${formatDate(s.current_period_end)}` : ""}
-                      {days !== null && days >= 0 && s.status === "active" ? ` · ${days} day${days === 1 ? "" : "s"} left` : ""}
+                      {days !== null && days >= 0 && s.status === "active"
+                        ? ` · ${days} day${days === 1 ? "" : "s"} left`
+                        : ""}
                     </div>
                   </div>
-                  <Badge variant={subTone(s.status) as any} className="uppercase">{s.status}</Badge>
+                  <Badge variant={subTone(s.status) as any} className="uppercase">
+                    {s.status}
+                  </Badge>
                 </div>
               );
             })}
@@ -834,11 +983,16 @@ function BillingPage() {
       <section className="mb-8">
         <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-display text-lg font-semibold">Recent listings</h2>
-          <Button asChild size="sm" variant="outline"><Link to="/dashboard">My listings</Link></Button>
+          <Button asChild size="sm" variant="outline">
+            <Link to="/dashboard">My listings</Link>
+          </Button>
         </div>
         {listings.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border bg-card p-10 text-center text-sm text-muted-foreground">
-            No listings posted yet. <Link to="/sell" className="text-primary underline">Post one</Link>
+            No listings posted yet.{" "}
+            <Link to="/sell" className="text-primary underline">
+              Post one
+            </Link>
           </div>
         ) : (
           <div className="overflow-x-auto rounded-xl border border-border bg-card">
@@ -864,37 +1018,53 @@ function BillingPage() {
                   return (
                     <tr key={l.id} className="border-t border-border">
                       <td className="p-3">
-                        <Link to="/listing/$id" params={{ id: l.id }} className="font-medium text-primary hover:underline">
+                        <Link
+                          to="/listing/$id"
+                          params={{ id: l.id }}
+                          className="font-medium text-primary hover:underline"
+                        >
                           {l.title}
                         </Link>
-                        <div className="text-xs text-muted-foreground">{formatPHP(l.price_php)}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {formatPHP(l.price_php)}
+                        </div>
                       </td>
                       <td className="p-3 capitalize">
                         {l.plan}
                         {l.boost_until && new Date(l.boost_until) > now && (
-                          <Badge variant="secondary" className="ml-1 text-[10px]">BOOST</Badge>
+                          <Badge variant="secondary" className="ml-1 text-[10px]">
+                            BOOST
+                          </Badge>
                         )}
                       </td>
                       <td className="p-3">
-                        <div className={`text-xs font-medium ${overPhoto ? "text-destructive" : nearPhoto ? "text-amber-600" : ""}`}>
+                        <div
+                          className={`text-xs font-medium ${overPhoto ? "text-destructive" : nearPhoto ? "text-amber-600" : ""}`}
+                        >
                           {mc.photo} / {photoCap} photos
                         </div>
                         <div className="text-xs text-muted-foreground">
                           {mc.video} video{mc.video === 1 ? "" : "s"}
                         </div>
                       </td>
-                      <td className="p-3 text-muted-foreground">{formatDate(l.published_at ?? l.created_at)}</td>
+                      <td className="p-3 text-muted-foreground">
+                        {formatDate(l.published_at ?? l.created_at)}
+                      </td>
                       <td className="p-3 text-muted-foreground">
                         {l.expires_at ? (
                           <>
                             {formatDate(l.expires_at)}
                             {expDays !== null && expDays >= 0 && l.status === "active" && (
-                              <div className={`text-xs ${expDays <= 7 ? "text-amber-600" : "text-muted-foreground"}`}>
+                              <div
+                                className={`text-xs ${expDays <= 7 ? "text-amber-600" : "text-muted-foreground"}`}
+                              >
                                 {expDays} day{expDays === 1 ? "" : "s"} left
                               </div>
                             )}
                           </>
-                        ) : "—"}
+                        ) : (
+                          "—"
+                        )}
                       </td>
                       <td className="p-3">{l.view_count.toLocaleString()}</td>
                       <td className="p-3">
@@ -944,18 +1114,20 @@ function BillingPage() {
         ) : (
           <div className="grid gap-2 sm:grid-cols-2">
             {paymentMethods.map((pm) => (
-              <div key={pm.id} className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-4">
+              <div
+                key={pm.id}
+                className="flex items-center justify-between gap-3 rounded-xl border border-border bg-card p-4"
+              >
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-14 items-center justify-center rounded-md bg-secondary text-xs font-bold uppercase">
                     {pm.card?.brand ?? pm.type}
                   </div>
                   <div>
-                    <div className="font-medium">
-                      {pm.card ? `•••• ${pm.card.last4}` : pm.type}
-                    </div>
+                    <div className="font-medium">{pm.card ? `•••• ${pm.card.last4}` : pm.type}</div>
                     {pm.card && (
                       <div className="text-xs text-muted-foreground">
-                        Expires {String(pm.card.exp_month).padStart(2, "0")}/{String(pm.card.exp_year).slice(-2)}
+                        Expires {String(pm.card.exp_month).padStart(2, "0")}/
+                        {String(pm.card.exp_year).slice(-2)}
                       </div>
                     )}
                   </div>
@@ -1054,11 +1226,13 @@ function BillingPage() {
                 ))}
               </div>
               <div className="flex rounded-md border border-border bg-card p-0.5">
-                {([
-                  { key: "all", label: "All time" },
-                  { key: "30d", label: "Last 30 days" },
-                  { key: "90d", label: "Last 90 days" },
-                ] as const).map((d) => (
+                {(
+                  [
+                    { key: "all", label: "All time" },
+                    { key: "30d", label: "Last 30 days" },
+                    { key: "90d", label: "Last 90 days" },
+                  ] as const
+                ).map((d) => (
                   <button
                     key={d.key}
                     onClick={() => setInvoiceDateFilter(d.key)}
@@ -1116,7 +1290,9 @@ function BillingPage() {
                       }
                     }}
                   >
-                    <td className="p-3">{formatDate(new Date(inv.created * 1000).toISOString())}</td>
+                    <td className="p-3">
+                      {formatDate(new Date(inv.created * 1000).toISOString())}
+                    </td>
                     <td className="p-3 font-mono text-xs">{inv.number ?? inv.id}</td>
                     <td className="p-3 font-medium">
                       {(inv.currency ?? "").toUpperCase() === "PHP"
@@ -1124,7 +1300,10 @@ function BillingPage() {
                         : `${(inv.amount_paid / 100).toFixed(2)} ${(inv.currency ?? "").toUpperCase()}`}
                     </td>
                     <td className="p-3">
-                      <Badge variant={inv.status === "paid" ? "default" : "secondary"} className="capitalize">
+                      <Badge
+                        variant={inv.status === "paid" ? "default" : "secondary"}
+                        className="capitalize"
+                      >
                         {inv.status ?? "—"}
                       </Badge>
                     </td>
@@ -1165,7 +1344,9 @@ function BillingPage() {
       <section>
         <h2 className="mb-2 font-display text-lg font-semibold">Payments</h2>
         {payments.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">No payments yet.</div>
+          <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
+            No payments yet.
+          </div>
         ) : (
           <div className="overflow-x-auto rounded-xl border border-border bg-card">
             <table className="w-full min-w-[640px] text-sm">
@@ -1189,7 +1370,11 @@ function BillingPage() {
                       <td className="p-3 capitalize">{p.kind}</td>
                       <td className="p-3">
                         {linked ? (
-                          <Link to="/listing/$id" params={{ id: linked.id }} className="text-primary hover:underline">
+                          <Link
+                            to="/listing/$id"
+                            params={{ id: linked.id }}
+                            className="text-primary hover:underline"
+                          >
                             {linked.title}
                           </Link>
                         ) : p.listing_id ? (
@@ -1200,7 +1385,9 @@ function BillingPage() {
                       </td>
                       <td className="p-3 font-medium">{formatPHP(p.amount_php)}</td>
                       <td className="p-3">
-                        <Badge variant={p.status === "paid" ? "default" : "secondary"}>{p.status}</Badge>
+                        <Badge variant={p.status === "paid" ? "default" : "secondary"}>
+                          {p.status}
+                        </Badge>
                       </td>
                       <td className="p-3">
                         <Link
@@ -1221,13 +1408,16 @@ function BillingPage() {
         )}
       </section>
 
-
       {overCap && (
         <div className="mt-6 flex items-start gap-3 rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm">
           <AlertTriangle className="mt-0.5 h-4 w-4 text-destructive" />
           <div>
-            You've posted {thisMonthListings.length} listings this month, above your {currentPlan?.name} cap of {monthlyCap}.{" "}
-            <Link to="/pricing" className="text-primary underline">Upgrade your plan</Link> to keep posting without limits.
+            You've posted {thisMonthListings.length} listings this month, above your{" "}
+            {currentPlan?.name} cap of {monthlyCap}.{" "}
+            <Link to="/pricing" className="text-primary underline">
+              Upgrade your plan
+            </Link>{" "}
+            to keep posting without limits.
           </div>
         </div>
       )}
@@ -1253,22 +1443,33 @@ function BillingPage() {
               <div className="space-y-1">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-sm text-muted-foreground">Invoice</span>
-                  <span className="font-mono text-sm">{selectedInvoice.number ?? selectedInvoice.id}</span>
+                  <span className="font-mono text-sm">
+                    {selectedInvoice.number ?? selectedInvoice.id}
+                  </span>
                 </div>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-sm text-muted-foreground">Status</span>
-                  <Badge variant={selectedInvoice.status === "paid" ? "default" : "secondary"} className="capitalize">
+                  <Badge
+                    variant={selectedInvoice.status === "paid" ? "default" : "secondary"}
+                    className="capitalize"
+                  >
                     {selectedInvoice.status ?? "—"}
                   </Badge>
                 </div>
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span className="text-sm text-muted-foreground">Date</span>
-                  <span className="text-sm">{selectedInvoice.created ? formatDate(new Date(selectedInvoice.created * 1000).toISOString()) : "—"}</span>
+                  <span className="text-sm">
+                    {selectedInvoice.created
+                      ? formatDate(new Date(selectedInvoice.created * 1000).toISOString())
+                      : "—"}
+                  </span>
                 </div>
                 {selectedInvoice.due_date && (
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="text-sm text-muted-foreground">Due</span>
-                    <span className="text-sm">{formatDate(new Date(selectedInvoice.due_date * 1000).toISOString())}</span>
+                    <span className="text-sm">
+                      {formatDate(new Date(selectedInvoice.due_date * 1000).toISOString())}
+                    </span>
                   </div>
                 )}
               </div>
@@ -1284,13 +1485,15 @@ function BillingPage() {
                       <div className="min-w-0 flex-1">
                         <div className="text-sm font-medium">{line.description || "—"}</div>
                         <div className="text-xs text-muted-foreground">
-                          {line.quantity} × {(selectedInvoice.currency ?? "").toUpperCase() === "PHP"
+                          {line.quantity} ×{" "}
+                          {(selectedInvoice.currency ?? "").toUpperCase() === "PHP"
                             ? formatPHP(line.unit_amount)
                             : `${line.unit_amount.toFixed(2)} ${(selectedInvoice.currency ?? "").toUpperCase()}`}
                         </div>
                         {line.period_start && line.period_end && (
                           <div className="text-xs text-muted-foreground">
-                            {formatDate(new Date(line.period_start * 1000).toISOString())} — {formatDate(new Date(line.period_end * 1000).toISOString())}
+                            {formatDate(new Date(line.period_start * 1000).toISOString())} —{" "}
+                            {formatDate(new Date(line.period_end * 1000).toISOString())}
                           </div>
                         )}
                       </div>
@@ -1358,7 +1561,11 @@ function BillingPage() {
               <div className="flex gap-2">
                 {selectedInvoice.hosted_invoice_url && (
                   <Button asChild variant="outline" className="flex-1">
-                    <a href={selectedInvoice.hosted_invoice_url} target="_blank" rel="noopener noreferrer">
+                    <a
+                      href={selectedInvoice.hosted_invoice_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       <ExternalLink className="mr-1.5 h-4 w-4" />
                       View on Stripe
                     </a>

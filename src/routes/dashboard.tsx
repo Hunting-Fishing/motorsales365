@@ -1,10 +1,34 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { LayoutGrid, Heart, MessageSquare, User as UserIcon, CreditCard, Bookmark, Search, ShieldCheck, Truck, QrCode, Store, Shield, Car, ShoppingBag, ChevronDown, Check, Users, GraduationCap } from "lucide-react";
+import {
+  LayoutGrid,
+  Heart,
+  MessageSquare,
+  User as UserIcon,
+  CreditCard,
+  Bookmark,
+  Search,
+  ShieldCheck,
+  Truck,
+  QrCode,
+  Store,
+  Shield,
+  Car,
+  ShoppingBag,
+  ChevronDown,
+  Check,
+  Users,
+  GraduationCap,
+} from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { supabase } from "@/integrations/supabase/client";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardLayout,
@@ -55,13 +79,20 @@ function DashboardLayout() {
     })();
   }, [user]);
 
-  if (loading || !user) return <SiteLayout><div className="p-12 text-center">Loading…</div></SiteLayout>;
+  if (loading || !user)
+    return (
+      <SiteLayout>
+        <div className="p-12 text-center">Loading…</div>
+      </SiteLayout>
+    );
 
   const nav = [
     ...NAV,
     ...(hasOrg ? [{ to: "/dashboard/team", label: "Team", Icon: Users }] : []),
     ...(hasReferral ? [{ to: "/dashboard/referral", label: "My referral", Icon: QrCode }] : []),
-    ...(isStaff ? [{ to: "/admin", label: isAdmin ? "Admin" : "Staff console", Icon: Shield }] : []),
+    ...(isStaff
+      ? [{ to: "/admin", label: isAdmin ? "Admin" : "Staff console", Icon: Shield }]
+      : []),
   ];
 
   const needsVerify = !user.email_confirmed_at;
@@ -73,7 +104,8 @@ function DashboardLayout() {
           <div className="mb-4 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
             <p className="font-semibold">Verify your email to go live</p>
             <p className="mt-1">
-              Your account is created but not yet verified. Publishing listings and being publicly listed are paused until you confirm your email.{" "}
+              Your account is created but not yet verified. Publishing listings and being publicly
+              listed are paused until you confirm your email.{" "}
               <Link
                 to="/verify-email"
                 search={{ email: user.email ?? undefined, intent: undefined }}
@@ -101,23 +133,32 @@ function DashboardLayout() {
                 activeProps={{ className: "bg-primary text-primary-foreground" }}
                 className="flex items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary"
               >
-                <Icon className="h-4 w-4" />{label}
+                <Icon className="h-4 w-4" />
+                {label}
               </Link>
             ))}
           </nav>
         </aside>
-        <div className="min-w-0"><Outlet /></div>
+        <div className="min-w-0">
+          <Outlet />
+        </div>
       </div>
     </SiteLayout>
   );
 }
 
-function MobileNavMenu({ nav }: { nav: { to: string; label: string; Icon: any; exact?: boolean }[] }) {
+function MobileNavMenu({
+  nav,
+}: {
+  nav: { to: string; label: string; Icon: any; exact?: boolean }[];
+}) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const current =
     [...nav]
       .sort((a, b) => b.to.length - a.to.length)
-      .find((n) => (n.exact ? pathname === n.to : pathname === n.to || pathname.startsWith(n.to + "/"))) ?? nav[0];
+      .find((n) =>
+        n.exact ? pathname === n.to : pathname === n.to || pathname.startsWith(n.to + "/"),
+      ) ?? nav[0];
   const CurrentIcon = current.Icon;
   return (
     <DropdownMenu>
@@ -128,9 +169,15 @@ function MobileNavMenu({ nav }: { nav: { to: string; label: string; Icon: any; e
         </span>
         <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground" />
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" sideOffset={6} className="w-[calc(100vw-1.5rem)] max-h-[70vh] overflow-y-auto">
+      <DropdownMenuContent
+        align="start"
+        sideOffset={6}
+        className="w-[calc(100vw-1.5rem)] max-h-[70vh] overflow-y-auto"
+      >
         {nav.map(({ to, label, Icon, exact }) => {
-          const isActive = exact ? pathname === to : pathname === to || pathname.startsWith(to + "/");
+          const isActive = exact
+            ? pathname === to
+            : pathname === to || pathname.startsWith(to + "/");
           return (
             <DropdownMenuItem key={to} asChild className="min-h-11">
               <Link

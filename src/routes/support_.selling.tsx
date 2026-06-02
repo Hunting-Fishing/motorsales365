@@ -6,7 +6,8 @@ import homeShot from "@/assets/support/home.png";
 import pricingShot from "@/assets/support/pricing.png";
 
 const TITLE = "Selling & boosting";
-const DESC = "Post a listing in minutes and boost it for more reach. Pricing, photo tips and step-by-step instructions.";
+const DESC =
+  "Post a listing in minutes and boost it for more reach. Pricing, photo tips and step-by-step instructions.";
 
 export const Route = createFileRoute("/support_/selling")({
   component: SellingSupport,
@@ -28,10 +29,26 @@ export const Route = createFileRoute("/support_/selling")({
           "@type": "HowTo",
           name: "How to post and boost a listing on 365 MotorSales",
           step: [
-            { "@type": "HowToStep", name: "Click Post a listing", text: "Top-right of every page. Sign in if needed." },
-            { "@type": "HowToStep", name: "Pick category and vehicle", text: "Choose make, model and year." },
-            { "@type": "HowToStep", name: "Add great photos", text: "Up to 20 photos and 1 video." },
-            { "@type": "HowToStep", name: "Set price and location", text: "Prices in PHP. Pick region and city." },
+            {
+              "@type": "HowToStep",
+              name: "Click Post a listing",
+              text: "Top-right of every page. Sign in if needed.",
+            },
+            {
+              "@type": "HowToStep",
+              name: "Pick category and vehicle",
+              text: "Choose make, model and year.",
+            },
+            {
+              "@type": "HowToStep",
+              name: "Add great photos",
+              text: "Up to 20 photos and 1 video.",
+            },
+            {
+              "@type": "HowToStep",
+              name: "Set price and location",
+              text: "Prices in PHP. Pick region and city.",
+            },
             { "@type": "HowToStep", name: "Publish", text: "Live for 60 days. Free." },
           ],
         }),
@@ -59,7 +76,8 @@ function SellingSupport() {
               Choose the type (Car, Motorcycle, etc.) and select make, model and year.
             </SupportStep>
             <SupportStep n={3} title="Add great photos">
-              Up to 20 photos and 1 video. Use daylight, clean the vehicle, and shoot from all 4 sides plus interior and engine.
+              Up to 20 photos and 1 video. Use daylight, clean the vehicle, and shoot from all 4
+              sides plus interior and engine.
             </SupportStep>
             <SupportStep n={4} title="Set your price and location">
               Prices are in ₱ PHP. Pick the region and city — buyers filter by location.
@@ -102,7 +120,9 @@ function SellingSupport() {
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             <li>• Shoot in daylight — avoid harsh midday sun and dark garages.</li>
             <li>• Clean the vehicle inside and out before shooting.</li>
-            <li>• Capture all 4 sides, both rows of seats, dashboard, odometer, engine bay and tires.</li>
+            <li>
+              • Capture all 4 sides, both rows of seats, dashboard, odometer, engine bay and tires.
+            </li>
             <li>• Include OR/CR (cover the plate number) to signal a legitimate listing.</li>
             <li>• Avoid heavy filters — buyers want to see the true condition.</li>
           </ul>

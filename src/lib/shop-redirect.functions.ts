@@ -2,7 +2,6 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-
 function applyTag(url: string, network: any): string {
   try {
     if (network?.deeplink_template && network?.tag_value) {
@@ -23,11 +22,18 @@ function applyTag(url: string, network: any): string {
 
 export const resolveShopRedirect = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) =>
-    z.object({
-      productId: z.string().uuid(),
-      networkSlug: z.string().min(1).max(60).regex(/^[a-z0-9_-]+$/i).optional(),
-      visitorId: z.string().uuid().nullable().optional(),
-    }).parse(input),
+    z
+      .object({
+        productId: z.string().uuid(),
+        networkSlug: z
+          .string()
+          .min(1)
+          .max(60)
+          .regex(/^[a-z0-9_-]+$/i)
+          .optional(),
+        visitorId: z.string().uuid().nullable().optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data }) => {
     const { data: product } = await supabaseAdmin
@@ -39,13 +45,13 @@ export const resolveShopRedirect = createServerFn({ method: "POST" })
 
     const { data: links } = await supabaseAdmin
       .from("shop_product_links")
-      .select("url, network:affiliate_networks(id, slug, tag_param, tag_value, deeplink_template, active)")
+      .select(
+        "url, network:affiliate_networks(id, slug, tag_param, tag_value, deeplink_template, active)",
+      )
       .eq("product_id", data.productId);
 
     const candidates = (links ?? []).filter((l: any) => l.network?.active);
-    const pick =
-      candidates.find((l: any) => l.network?.slug === data.networkSlug) ??
-      candidates[0];
+    const pick = candidates.find((l: any) => l.network?.slug === data.networkSlug) ?? candidates[0];
     if (!pick) return { url: null };
 
     const finalUrl = applyTag(pick.url, pick.network);
@@ -57,7 +63,9 @@ export const resolveShopRedirect = createServerFn({ method: "POST" })
         network_id: pick.network?.id ?? null,
         visitor_id: vid && /^[0-9a-f-]{36}$/i.test(vid) ? vid : null,
       });
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
 
     return { url: finalUrl };
   });

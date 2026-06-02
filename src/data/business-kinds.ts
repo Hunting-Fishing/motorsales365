@@ -24,7 +24,10 @@ export const BUSINESS_KIND_OPTIONS: { value: string; label: string }[] = [
   { value: "other", label: "Other" },
 ];
 
-export const BUSINESS_KIND_VALUES = BUSINESS_KIND_OPTIONS.map((o) => o.value) as [string, ...string[]];
+export const BUSINESS_KIND_VALUES = BUSINESS_KIND_OPTIONS.map((o) => o.value) as [
+  string,
+  ...string[],
+];
 
 export function businessKindLabel(value: string | null | undefined): string {
   if (!value) return "Other";

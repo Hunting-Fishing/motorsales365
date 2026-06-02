@@ -74,7 +74,13 @@ function ForgotPasswordPage() {
             <form onSubmit={handleEmailReset} className="space-y-4">
               <div>
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Input
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
               <Button type="submit" disabled={submitting} className="w-full">
                 {submitting ? "Sending…" : "Send reset link"}
@@ -91,9 +97,14 @@ function ForgotPasswordPage() {
                     id="phone"
                     iso={phoneIso}
                     national={phoneNational}
-                    onChange={({ iso, national }) => { setPhoneIso(iso); setPhoneNational(national); }}
+                    onChange={({ iso, national }) => {
+                      setPhoneIso(iso);
+                      setPhoneNational(national);
+                    }}
                   />
-                  <p className="mt-1 text-xs text-muted-foreground">Must be a phone you've already added to your account.</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Must be a phone you've already added to your account.
+                  </p>
                 </div>
                 <Button type="submit" disabled={submitting} className="w-full">
                   {submitting ? "Sending…" : "Send OTP"}
@@ -103,12 +114,23 @@ function ForgotPasswordPage() {
               <form onSubmit={handleVerifySmsOtp} className="space-y-4">
                 <div>
                   <Label htmlFor="otp">6-digit code</Label>
-                  <Input id="otp" inputMode="numeric" maxLength={6} required value={otp} onChange={(e) => setOtp(e.target.value)} />
+                  <Input
+                    id="otp"
+                    inputMode="numeric"
+                    maxLength={6}
+                    required
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                  />
                 </div>
                 <Button type="submit" disabled={submitting} className="w-full">
                   {submitting ? "Verifying…" : "Verify & continue"}
                 </Button>
-                <button type="button" onClick={() => setOtpStep(false)} className="w-full text-xs text-muted-foreground hover:underline">
+                <button
+                  type="button"
+                  onClick={() => setOtpStep(false)}
+                  className="w-full text-xs text-muted-foreground hover:underline"
+                >
                   Use a different number
                 </button>
               </form>
@@ -117,7 +139,9 @@ function ForgotPasswordPage() {
         </Tabs>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          <Link to="/login" className="font-semibold text-primary hover:underline">Back to sign in</Link>
+          <Link to="/login" className="font-semibold text-primary hover:underline">
+            Back to sign in
+          </Link>
         </p>
       </div>
     </SiteLayout>

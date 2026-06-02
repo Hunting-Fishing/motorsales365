@@ -26,13 +26,34 @@ import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { uploadWithRetry } from "@/lib/storage-upload";
 
 import { toast } from "sonner";
-import { ArrowLeft, Plus, Trash2, Upload, ExternalLink, Image as ImageIcon, X, Pencil } from "lucide-react";
+import {
+  ArrowLeft,
+  Plus,
+  Trash2,
+  Upload,
+  ExternalLink,
+  Image as ImageIcon,
+  X,
+  Pencil,
+} from "lucide-react";
 import { WeekHoursEditor } from "@/components/business/hours-editor";
-import { isStructuredHours, emptyStructured, TZ, type StructuredHours, type WeekSchedule } from "@/lib/business-hours";
+import {
+  isStructuredHours,
+  emptyStructured,
+  TZ,
+  type StructuredHours,
+  type WeekSchedule,
+} from "@/lib/business-hours";
 import {
   CatalogPicker,
   PricingFields,
@@ -48,9 +69,6 @@ import { BookingsTab } from "@/components/business-page/bookings-tab";
 import { OnboardingChecklist } from "@/components/business-page/onboarding-checklist";
 import { AnalyticsTab } from "@/components/business-page/analytics-tab";
 
-
-
-
 export const Route = createFileRoute("/dashboard/businesses_/$id/edit")({
   component: EditBusinessPage,
 });
@@ -58,7 +76,12 @@ export const Route = createFileRoute("/dashboard/businesses_/$id/edit")({
 async function uploadMedia(userId: string, businessId: string, file: File): Promise<string> {
   const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
   const path = `${userId}/${businessId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const { publicUrl } = await uploadWithRetry({ bucket: "business-media", path, file, contentType: file.type });
+  const { publicUrl } = await uploadWithRetry({
+    bucket: "business-media",
+    path,
+    file,
+    contentType: file.type,
+  });
   return publicUrl;
 }
 
@@ -77,7 +100,13 @@ function EditBusinessPage() {
     return (
       <div className="container mx-auto p-6">
         <Card className="p-6 text-center">
-          <p className="text-sm">Please <Link to="/login" className="text-primary underline">sign in</Link> to edit your business page.</p>
+          <p className="text-sm">
+            Please{" "}
+            <Link to="/login" className="text-primary underline">
+              sign in
+            </Link>{" "}
+            to edit your business page.
+          </p>
         </Card>
       </div>
     );
@@ -89,25 +118,48 @@ function EditBusinessPage() {
 
   const biz: any = data.business;
 
-  return <EditBusinessPageInner biz={biz} data={data} user={user} refetch={refetch} navigate={navigate} />;
+  return (
+    <EditBusinessPageInner
+      biz={biz}
+      data={data}
+      user={user}
+      refetch={refetch}
+      navigate={navigate}
+    />
+  );
 }
 
 function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
-  const validTabs = ["profile","location","tags","hours","services","products","gallery","contact","posts","bookings","inquiries","analytics"];
+  const validTabs = [
+    "profile",
+    "location",
+    "tags",
+    "hours",
+    "services",
+    "products",
+    "gallery",
+    "contact",
+    "posts",
+    "bookings",
+    "inquiries",
+    "analytics",
+  ];
   const [activeTab, setActiveTab] = useState<string>("profile");
 
   return (
     <div className="container mx-auto max-w-5xl px-3 py-4 md:px-6 md:py-8">
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <Button variant="ghost" size="sm" onClick={() => navigate({ to: "/dashboard/businesses" })}>
-          <ArrowLeft className="mr-1 h-4 w-4" />Back
+          <ArrowLeft className="mr-1 h-4 w-4" />
+          Back
         </Button>
         <h1 className="font-display text-xl font-bold md:text-2xl">{biz.name}</h1>
         <Badge variant="outline">{biz.status}</Badge>
         <div className="ml-auto">
           <Button variant="outline" size="sm" asChild>
             <a href={`/businesses/${biz.slug}`} target="_blank" rel="noreferrer">
-              <ExternalLink className="mr-1 h-4 w-4" />View public page
+              <ExternalLink className="mr-1 h-4 w-4" />
+              View public page
             </a>
           </Button>
         </div>
@@ -142,10 +194,11 @@ function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
           <TabsTrigger value="services">Services ({data.services.length})</TabsTrigger>
           <TabsTrigger value="products">Products ({data.products.length})</TabsTrigger>
           <TabsTrigger value="gallery">Gallery ({(data as any).albums?.length ?? 0})</TabsTrigger>
-          <TabsTrigger value="contact">Contact ({(data as any).contactChannels?.length ?? 0})</TabsTrigger>
+          <TabsTrigger value="contact">
+            Contact ({(data as any).contactChannels?.length ?? 0})
+          </TabsTrigger>
           <TabsTrigger value="posts">Posts ({data.posts.length})</TabsTrigger>
           <TabsTrigger value="bookings">
-
             Bookings ({(data as any).bookableItems?.length ?? 0})
             {(data as any).bookings?.filter((b: any) => b.status === "pending").length > 0 && (
               <Badge className="ml-2 h-5 px-1.5 text-xs" variant="destructive">
@@ -164,7 +217,6 @@ function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
         </TabsList>
 
-
         <TabsContent value="profile">
           <ProfileTab biz={biz} userId={user.id} onSaved={refetch} />
         </TabsContent>
@@ -179,10 +231,21 @@ function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
         </TabsContent>
 
         <TabsContent value="services">
-          <ServicesTab businessId={biz.id} userId={user.id} typeSlug={biz.type_slug} services={data.services} onChange={refetch} />
+          <ServicesTab
+            businessId={biz.id}
+            userId={user.id}
+            typeSlug={biz.type_slug}
+            services={data.services}
+            onChange={refetch}
+          />
         </TabsContent>
         <TabsContent value="products">
-          <ProductsTab businessId={biz.id} userId={user.id} products={data.products} onChange={refetch} />
+          <ProductsTab
+            businessId={biz.id}
+            userId={user.id}
+            products={data.products}
+            onChange={refetch}
+          />
         </TabsContent>
         <TabsContent value="gallery">
           <GalleryTab
@@ -220,14 +283,20 @@ function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
           <AnalyticsTab businessId={biz.id} />
         </TabsContent>
       </Tabs>
-
     </div>
   );
 }
 
 /* ---------------- TAGS ---------------- */
 
-type TagRow = { slug: string; label: string; type_slug: string | null; category: string | null; sort_order: number; is_popular: boolean };
+type TagRow = {
+  slug: string;
+  label: string;
+  type_slug: string | null;
+  category: string | null;
+  sort_order: number;
+  is_popular: boolean;
+};
 
 const CATEGORY_LABELS: Record<string, string> = {
   fuel_grade: "Fuel grades / octane (RON & diesel)",
@@ -241,10 +310,15 @@ const CATEGORY_LABELS: Record<string, string> = {
   other: "Other",
 };
 
-
 function prettyCategory(k: string | null) {
   if (!k) return CATEGORY_LABELS.other;
-  return CATEGORY_LABELS[k] ?? k.split("_").map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
+  return (
+    CATEGORY_LABELS[k] ??
+    k
+      .split("_")
+      .map((w) => w[0].toUpperCase() + w.slice(1))
+      .join(" ")
+  );
 }
 
 function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: string }) {
@@ -258,24 +332,31 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
     (async () => {
       setLoading(true);
       const [{ data: t }, { data: links }] = await Promise.all([
-        (supabase as any).from("business_tags")
+        (supabase as any)
+          .from("business_tags")
           .select("slug,label,type_slug,category,sort_order,is_popular")
           .or(`type_slug.eq.${typeSlug},type_slug.is.null`)
           .order("sort_order"),
-        (supabase as any).from("business_tag_links").select("tag_slug").eq("business_id", businessId),
+        (supabase as any)
+          .from("business_tag_links")
+          .select("tag_slug")
+          .eq("business_id", businessId),
       ]);
       if (cancelled) return;
       setAllTags((t ?? []) as TagRow[]);
       setSelected(new Set((links ?? []).map((l: any) => l.tag_slug)));
       setLoading(false);
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [businessId, typeSlug]);
 
   const toggle = (slug: string) => {
     setSelected((prev) => {
       const next = new Set(prev);
-      if (next.has(slug)) next.delete(slug); else next.add(slug);
+      if (next.has(slug)) next.delete(slug);
+      else next.add(slug);
       return next;
     });
   };
@@ -284,7 +365,9 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
     setSaving(true);
     try {
       const { error: delErr } = await (supabase as any)
-        .from("business_tag_links").delete().eq("business_id", businessId);
+        .from("business_tag_links")
+        .delete()
+        .eq("business_id", businessId);
       if (delErr) throw new Error(delErr.message);
       const rows = Array.from(selected).map((tag_slug) => ({ business_id: businessId, tag_slug }));
       if (rows.length > 0) {
@@ -302,7 +385,11 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
   if (loading) return <Card className="p-6 text-sm text-muted-foreground">Loading tags…</Card>;
 
   if (allTags.length === 0) {
-    return <Card className="p-6 text-sm text-muted-foreground">No tags available for this business type yet.</Card>;
+    return (
+      <Card className="p-6 text-sm text-muted-foreground">
+        No tags available for this business type yet.
+      </Card>
+    );
   }
 
   const grouped: Record<string, TagRow[]> = {};
@@ -310,23 +397,40 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
     const key = t.category ?? "other";
     (grouped[key] = grouped[key] ?? []).push(t);
   }
-  const ORDER = ["fuel_grade", "ev_charging", "station_products", "station_services", "station_payment", "station_brand"];
+  const ORDER = [
+    "fuel_grade",
+    "ev_charging",
+    "station_products",
+    "station_services",
+    "station_payment",
+    "station_brand",
+  ];
   const groupKeys = Object.keys(grouped).sort((a, b) => {
-    const ai = ORDER.indexOf(a); const bi = ORDER.indexOf(b);
+    const ai = ORDER.indexOf(a);
+    const bi = ORDER.indexOf(b);
     if (ai !== -1 || bi !== -1) return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
     return a.localeCompare(b);
   });
 
   const addCustom = async (category: string, label: string) => {
     const trimmed = label.trim();
-    if (trimmed.length < 2) { toast.error("Tag must be at least 2 characters"); return; }
+    if (trimmed.length < 2) {
+      toast.error("Tag must be at least 2 characters");
+      return;
+    }
     const { data, error } = await (supabase as any).rpc("suggest_business_tag", {
-      _label: trimmed, _type_slug: typeSlug, _category: category,
+      _label: trimmed,
+      _type_slug: typeSlug,
+      _category: category,
     });
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     const newSlug = data as string;
     // Refresh tag catalog so the new tag appears in its group
-    const { data: t } = await (supabase as any).from("business_tags")
+    const { data: t } = await (supabase as any)
+      .from("business_tags")
       .select("slug,label,type_slug,category,sort_order,is_popular")
       .or(`type_slug.eq.${typeSlug},type_slug.is.null`)
       .order("sort_order");
@@ -335,20 +439,21 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
     toast.success("Tag added — remember to click Save tags");
   };
 
-
   return (
     <Card className="space-y-5 p-4 md:p-5">
       <div>
         <h2 className="font-display text-lg font-semibold">Tags</h2>
         <p className="text-sm text-muted-foreground">
-          Pick what your station offers — fuel grades (91/95/97/100 RON), diesel types,
-          EV charging connectors, and amenities. These show as filterable badges on your public page.
+          Pick what your station offers — fuel grades (91/95/97/100 RON), diesel types, EV charging
+          connectors, and amenities. These show as filterable badges on your public page.
         </p>
       </div>
 
       {selected.size > 0 && (
         <div className="rounded-lg border border-border bg-secondary/40 p-3">
-          <div className="mb-2 text-xs font-medium text-muted-foreground">{selected.size} selected</div>
+          <div className="mb-2 text-xs font-medium text-muted-foreground">
+            {selected.size} selected
+          </div>
           <div className="flex flex-wrap gap-1.5">
             {Array.from(selected).map((s) => {
               const t = allTags.find((x) => x.slug === s);
@@ -396,40 +501,62 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
         </div>
       ))}
 
-
       <div className="flex justify-end">
-        <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save tags"}</Button>
+        <Button onClick={save} disabled={saving}>
+          {saving ? "Saving…" : "Save tags"}
+        </Button>
       </div>
     </Card>
   );
 }
 
-function AddCustomTagInline({ category, onAdd }: { category: string; onAdd: (label: string) => Promise<void> | void }) {
+function AddCustomTagInline({
+  category,
+  onAdd,
+}: {
+  category: string;
+  onAdd: (label: string) => Promise<void> | void;
+}) {
   const [val, setVal] = useState("");
   const [busy, setBusy] = useState(false);
   const submit = async () => {
     if (!val.trim()) return;
     setBusy(true);
-    try { await onAdd(val); setVal(""); } finally { setBusy(false); }
+    try {
+      await onAdd(val);
+      setVal("");
+    } finally {
+      setBusy(false);
+    }
   };
   return (
     <div className="mt-2 flex gap-1.5">
       <Input
         value={val}
         onChange={(e) => setVal(e.target.value)}
-        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); submit(); } }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            submit();
+          }
+        }}
         placeholder={`Add a ${prettyCategory(category).toLowerCase()} tag…`}
         className="h-8 max-w-xs text-xs"
         maxLength={40}
       />
-      <Button type="button" size="sm" variant="outline" onClick={submit} disabled={busy || val.trim().length < 2}>
-        <Plus className="mr-1 h-3 w-3" />Add
+      <Button
+        type="button"
+        size="sm"
+        variant="outline"
+        onClick={submit}
+        disabled={busy || val.trim().length < 2}
+      >
+        <Plus className="mr-1 h-3 w-3" />
+        Add
       </Button>
     </div>
   );
 }
-
-
 
 /* ---------------- PROFILE ---------------- */
 
@@ -471,7 +598,9 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
       if (u.hostname.includes("youtube.com") || u.hostname === "youtu.be") return "youtube";
       if (u.hostname.includes("vimeo.com")) return "vimeo";
       if (u.hostname.includes("facebook.com") || u.hostname.includes("fb.watch")) return "facebook";
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
     return null;
   };
 
@@ -525,8 +654,19 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
 
   return (
     <Card className="space-y-4 p-4 md:p-5">
-      <ImageField label="Logo" url={logoUrl} onUpload={(f) => onUpload(f, "logo")} onClear={() => setLogoUrl(null)} square />
-      <ImageField label="Cover photo" url={coverUrl} onUpload={(f) => onUpload(f, "cover")} onClear={() => setCoverUrl(null)} />
+      <ImageField
+        label="Logo"
+        url={logoUrl}
+        onUpload={(f) => onUpload(f, "logo")}
+        onClear={() => setLogoUrl(null)}
+        square
+      />
+      <ImageField
+        label="Cover photo"
+        url={coverUrl}
+        onUpload={(f) => onUpload(f, "cover")}
+        onClear={() => setCoverUrl(null)}
+      />
 
       <div>
         <Label>Business name</Label>
@@ -620,10 +760,11 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
         </div>
       </div>
 
-      <VanitySlugField businessId={biz.id} currentVanity={biz.vanity_slug ?? null} currentSlug={biz.slug} />
-
-
-
+      <VanitySlugField
+        businessId={biz.id}
+        currentVanity={biz.vanity_slug ?? null}
+        currentSlug={biz.slug}
+      />
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
@@ -635,13 +776,20 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
               onChange={(e) => setThemeColor(e.target.value)}
               className="h-11 w-14 cursor-pointer rounded border border-border"
             />
-            <Input value={themeColor} onChange={(e) => setThemeColor(e.target.value)} maxLength={7} className="h-11" />
+            <Input
+              value={themeColor}
+              onChange={(e) => setThemeColor(e.target.value)}
+              maxLength={7}
+              className="h-11"
+            />
           </div>
         </div>
         <div>
           <Label>Primary call-to-action</Label>
           <Select value={ctaPrimary} onValueChange={setCtaPrimary}>
-            <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
+            <SelectTrigger className="h-11">
+              <SelectValue />
+            </SelectTrigger>
             <SelectContent>
               <SelectItem value="inquiry">Inquiry form</SelectItem>
               <SelectItem value="call">Call</SelectItem>
@@ -690,7 +838,9 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
       </div>
 
       <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={saving}>{saving ? "Saving…" : "Save changes"}</Button>
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? "Saving…" : "Save changes"}
+        </Button>
       </div>
     </Card>
   );
@@ -718,7 +868,11 @@ function ImageField({
             square ? "h-20 w-20" : "h-20 w-40"
           }`}
         >
-          {url ? <img src={url} alt="" className="h-full w-full object-cover" /> : <ImageIcon className="h-6 w-6 text-muted-foreground" />}
+          {url ? (
+            <img src={url} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <ImageIcon className="h-6 w-6 text-muted-foreground" />
+          )}
         </div>
         <div className="flex gap-2">
           <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-md border border-input bg-background px-3 text-sm hover:bg-accent">
@@ -736,7 +890,9 @@ function ImageField({
             />
           </label>
           {url && (
-            <Button variant="ghost" size="sm" onClick={onClear}>Remove</Button>
+            <Button variant="ghost" size="sm" onClick={onClear}>
+              Remove
+            </Button>
           )}
         </div>
       </div>
@@ -764,9 +920,7 @@ function ServicesTab({
   const [editing, setEditing] = useState<any | null>(null);
   const [showPicker, setShowPicker] = useState<boolean>(services.length === 0);
 
-  const existingKeys = new Set<string>(
-    services.map((s: any) => s.catalog_key).filter(Boolean),
-  );
+  const existingKeys = new Set<string>(services.map((s: any) => s.catalog_key).filter(Boolean));
 
   const groupedByCategory = services.reduce((acc: Record<string, any[]>, s: any) => {
     const key = s.category ?? "other";
@@ -782,8 +936,20 @@ function ServicesTab({
             ? "Start by picking from the catalog of fuel-station services & products."
             : "Pick more items from the catalog, or add a custom one."}
         </p>
-        <Button size="sm" variant={showPicker ? "secondary" : "default"} onClick={() => setShowPicker((v) => !v)}>
-          {showPicker ? <><X className="mr-1 h-4 w-4" /> Hide catalog</> : <><Plus className="mr-1 h-4 w-4" /> Add from catalog</>}
+        <Button
+          size="sm"
+          variant={showPicker ? "secondary" : "default"}
+          onClick={() => setShowPicker((v) => !v)}
+        >
+          {showPicker ? (
+            <>
+              <X className="mr-1 h-4 w-4" /> Hide catalog
+            </>
+          ) : (
+            <>
+              <Plus className="mr-1 h-4 w-4" /> Add from catalog
+            </>
+          )}
         </Button>
       </div>
 
@@ -795,7 +961,9 @@ function ServicesTab({
             const v = fromCatalogItem(item);
             setEditing({ ...v, businessId, sort_order: services.length });
           }}
-          onCustom={() => setEditing({ ...blankService(), businessId, sort_order: services.length })}
+          onCustom={() =>
+            setEditing({ ...blankService(), businessId, sort_order: services.length })
+          }
         />
       )}
 
@@ -811,7 +979,9 @@ function ServicesTab({
                 <h3 className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                   {CATEGORY_LABEL[cat] ?? "Other"}
                 </h3>
-                <Badge variant="outline" className="text-[10px]">{list.length}</Badge>
+                <Badge variant="outline" className="text-[10px]">
+                  {list.length}
+                </Badge>
               </div>
               <div className="space-y-2">
                 {list.map((s: any) => {
@@ -821,12 +991,18 @@ function ServicesTab({
                       {s.photo_url ? (
                         <img src={s.photo_url} alt="" className="h-14 w-14 rounded object-cover" />
                       ) : (
-                        <div className="flex h-14 w-14 items-center justify-center rounded bg-muted text-muted-foreground"><ImageIcon className="h-5 w-5" /></div>
+                        <div className="flex h-14 w-14 items-center justify-center rounded bg-muted text-muted-foreground">
+                          <ImageIcon className="h-5 w-5" />
+                        </div>
                       )}
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-1.5">
                           <span className="truncate font-medium">{s.title}</span>
-                          {!s.active && <Badge variant="secondary" className="text-[10px]">Hidden</Badge>}
+                          {!s.active && (
+                            <Badge variant="secondary" className="text-[10px]">
+                              Hidden
+                            </Badge>
+                          )}
                         </div>
                         {priceStr ? (
                           <div className="text-sm font-semibold text-primary">{priceStr}</div>
@@ -842,7 +1018,8 @@ function ServicesTab({
                           size="sm"
                           variant="ghost"
                           onClick={async () => {
-                            if (!(await confirm({ title: "Delete this item?", destructive: true }))) return;
+                            if (!(await confirm({ title: "Delete this item?", destructive: true })))
+                              return;
                             await del({ data: { businessId, id: s.id } });
                             onChange();
                           }}
@@ -911,7 +1088,9 @@ function ServiceEditor({
       <div className="flex items-center justify-between">
         <div className="font-medium">{initial.id ? "Edit item" : "New item"}</div>
         {value.catalog_key && (
-          <Badge variant="outline" className="text-[10px]">From catalog</Badge>
+          <Badge variant="outline" className="text-[10px]">
+            From catalog
+          </Badge>
         )}
       </div>
       <ImageField
@@ -923,7 +1102,12 @@ function ServiceEditor({
       />
       <div>
         <Label>Title *</Label>
-        <Input value={value.title} onChange={(e) => patch({ title: e.target.value })} maxLength={120} className="h-11 text-base" />
+        <Input
+          value={value.title}
+          onChange={(e) => patch({ title: e.target.value })}
+          maxLength={120}
+          className="h-11 text-base"
+        />
       </div>
       <PricingFields value={value} onChange={patch} />
       <div>
@@ -940,7 +1124,9 @@ function ServiceEditor({
         <Switch checked={value.active} onCheckedChange={(c) => patch({ active: c })} />
       </div>
       <div className="flex justify-end gap-2">
-        <Button variant="ghost" onClick={onClose}>Cancel</Button>
+        <Button variant="ghost" onClick={onClose}>
+          Cancel
+        </Button>
         <Button
           disabled={saving || value.title.trim().length === 0}
           onClick={async () => {
@@ -1006,7 +1192,8 @@ function ProductsTab({
     <div className="space-y-4">
       <div className="flex justify-end">
         <Button size="sm" onClick={() => setEditing(blank())}>
-          <Plus className="mr-1 h-4 w-4" />Add product
+          <Plus className="mr-1 h-4 w-4" />
+          Add product
         </Button>
       </div>
       {products.length === 0 ? (
@@ -1016,18 +1203,30 @@ function ProductsTab({
           {products.map((p) => (
             <Card key={p.id} className="overflow-hidden">
               <div className="aspect-square w-full bg-muted">
-                {p.photo_url ? <img src={p.photo_url} alt="" className="h-full w-full object-cover" /> : null}
+                {p.photo_url ? (
+                  <img src={p.photo_url} alt="" className="h-full w-full object-cover" />
+                ) : null}
               </div>
               <div className="p-2">
                 <div className="line-clamp-2 text-sm font-medium">{p.title}</div>
-                {p.price_php != null && <div className="text-xs">₱{Number(p.price_php).toLocaleString()}</div>}
+                {p.price_php != null && (
+                  <div className="text-xs">₱{Number(p.price_php).toLocaleString()}</div>
+                )}
                 <div className="mt-2 flex gap-1">
-                  <Button size="sm" variant="outline" className="flex-1 text-xs" onClick={() => setEditing(p)}>Edit</Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1 text-xs"
+                    onClick={() => setEditing(p)}
+                  >
+                    Edit
+                  </Button>
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={async () => {
-                      if (!(await confirm({ title: "Delete this product?", destructive: true }))) return;
+                      if (!(await confirm({ title: "Delete this product?", destructive: true })))
+                        return;
                       await del({ data: { businessId, id: p.id } });
                       onChange();
                     }}
@@ -1073,8 +1272,12 @@ function ProductEditor({
 }) {
   const [title, setTitle] = useState(initial.title ?? "");
   const [description, setDescription] = useState(initial.description ?? "");
-  const [price, setPrice] = useState<string>(initial.price_php != null ? String(initial.price_php) : "");
-  const [sale, setSale] = useState<string>(initial.sale_price_php != null ? String(initial.sale_price_php) : "");
+  const [price, setPrice] = useState<string>(
+    initial.price_php != null ? String(initial.price_php) : "",
+  );
+  const [sale, setSale] = useState<string>(
+    initial.sale_price_php != null ? String(initial.sale_price_php) : "",
+  );
   const [photoUrl, setPhotoUrl] = useState<string | null>(initial.photo_url ?? null);
   const [inStock, setInStock] = useState<boolean>(initial.in_stock ?? true);
   const [active, setActive] = useState<boolean>(initial.active ?? true);
@@ -1083,24 +1286,52 @@ function ProductEditor({
   return (
     <Card className="space-y-3 border-primary/40 p-4">
       <div className="font-medium">{initial.id ? "Edit product" : "New product"}</div>
-      <ImageField label="Photo" url={photoUrl} onUpload={async (f) => setPhotoUrl(await uploadMedia(userId, businessId, f))} onClear={() => setPhotoUrl(null)} square />
+      <ImageField
+        label="Photo"
+        url={photoUrl}
+        onUpload={async (f) => setPhotoUrl(await uploadMedia(userId, businessId, f))}
+        onClear={() => setPhotoUrl(null)}
+        square
+      />
       <div>
         <Label>Title *</Label>
-        <Input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={160} className="h-11 text-base" />
+        <Input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          maxLength={160}
+          className="h-11 text-base"
+        />
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
           <Label>Price (₱)</Label>
-          <Input type="number" inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} className="h-11 text-base" />
+          <Input
+            type="number"
+            inputMode="decimal"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            className="h-11 text-base"
+          />
         </div>
         <div>
           <Label>Sale price (₱)</Label>
-          <Input type="number" inputMode="decimal" value={sale} onChange={(e) => setSale(e.target.value)} className="h-11 text-base" />
+          <Input
+            type="number"
+            inputMode="decimal"
+            value={sale}
+            onChange={(e) => setSale(e.target.value)}
+            className="h-11 text-base"
+          />
         </div>
       </div>
       <div>
         <Label>Description</Label>
-        <Textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} maxLength={2000} />
+        <Textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows={3}
+          maxLength={2000}
+        />
       </div>
       <div className="grid gap-2 sm:grid-cols-2">
         <div className="flex items-center justify-between rounded-lg border border-border p-3">
@@ -1113,7 +1344,9 @@ function ProductEditor({
         </div>
       </div>
       <div className="flex justify-end gap-2">
-        <Button variant="ghost" onClick={onClose}>Cancel</Button>
+        <Button variant="ghost" onClick={onClose}>
+          Cancel
+        </Button>
         <Button
           disabled={saving || title.trim().length === 0}
           onClick={async () => {
@@ -1188,9 +1421,17 @@ function PostsTab({
           maxLength={4000}
           placeholder="Share an update with your customers (promo, schedule, new arrival…)"
         />
-        <ImageField label="Photo (optional)" url={photoUrl} onUpload={async (f) => setPhotoUrl(await uploadMedia(userId, businessId, f))} onClear={() => setPhotoUrl(null)} square />
+        <ImageField
+          label="Photo (optional)"
+          url={photoUrl}
+          onUpload={async (f) => setPhotoUrl(await uploadMedia(userId, businessId, f))}
+          onClear={() => setPhotoUrl(null)}
+          square
+        />
         <div className="flex justify-end">
-          <Button onClick={post} disabled={saving || body.trim().length === 0}>{saving ? "Posting…" : "Post update"}</Button>
+          <Button onClick={post} disabled={saving || body.trim().length === 0}>
+            {saving ? "Posting…" : "Post update"}
+          </Button>
         </div>
       </Card>
 
@@ -1201,7 +1442,9 @@ function PostsTab({
           {posts.map((p) => (
             <Card key={p.id} className="p-3">
               <div className="flex items-start justify-between gap-2">
-                <div className="text-xs text-muted-foreground">{new Date(p.created_at).toLocaleString()}</div>
+                <div className="text-xs text-muted-foreground">
+                  {new Date(p.created_at).toLocaleString()}
+                </div>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -1215,7 +1458,9 @@ function PostsTab({
                 </Button>
               </div>
               <p className="mt-1 whitespace-pre-wrap text-sm">{p.body}</p>
-              {p.photo_url && <img src={p.photo_url} alt="" className="mt-2 max-h-72 rounded-md object-cover" />}
+              {p.photo_url && (
+                <img src={p.photo_url} alt="" className="mt-2 max-h-72 rounded-md object-cover" />
+              )}
             </Card>
           ))}
         </div>
@@ -1238,7 +1483,11 @@ function InquiriesTab({
   const update = useServerFn(updateInquiryStatus);
 
   if (inquiries.length === 0) {
-    return <Card className="p-6 text-center text-sm text-muted-foreground">No inquiries yet. They'll appear here when customers send a message from your public page.</Card>;
+    return (
+      <Card className="p-6 text-center text-sm text-muted-foreground">
+        No inquiries yet. They'll appear here when customers send a message from your public page.
+      </Card>
+    );
   }
 
   return (
@@ -1249,7 +1498,9 @@ function InquiriesTab({
             <div className="font-medium">{i.name}</div>
             <div className="flex items-center gap-2">
               <Badge
-                variant={i.status === "new" ? "destructive" : i.status === "open" ? "default" : "secondary"}
+                variant={
+                  i.status === "new" ? "destructive" : i.status === "open" ? "default" : "secondary"
+                }
               >
                 {i.status}
               </Badge>
@@ -1260,7 +1511,9 @@ function InquiriesTab({
                   onChange();
                 }}
               >
-                <SelectTrigger className="h-8 w-32 text-xs"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="h-8 w-32 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="new">New</SelectItem>
                   <SelectItem value="open">Open</SelectItem>
@@ -1356,14 +1609,19 @@ function LocationTab({ biz, onSaved }: { biz: any; onSaved: () => void }) {
       <div>
         <h2 className="font-display text-lg font-semibold">Location</h2>
         <p className="text-sm text-muted-foreground">
-          Update your address and pin location. Customers use this for directions and proximity search.
+          Update your address and pin location. Customers use this for directions and proximity
+          search.
         </p>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <Label>Street address</Label>
-          <Input value={streetAddress} onChange={(e) => setStreetAddress(e.target.value)} placeholder="123 Rizal St." />
+          <Input
+            value={streetAddress}
+            onChange={(e) => setStreetAddress(e.target.value)}
+            placeholder="123 Rizal St."
+          />
         </div>
         <div>
           <Label>Region</Label>
@@ -1429,7 +1687,10 @@ function HoursTab({ biz, onSaved }: { biz: any; onSaved: () => void }) {
     setSaving(true);
     try {
       const payload: StructuredHours = { tz: TZ, primary, ...(store ? { store } : {}) };
-      const { error } = await (supabase as any).from("businesses").update({ hours: payload }).eq("id", biz.id);
+      const { error } = await (supabase as any)
+        .from("businesses")
+        .update({ hours: payload })
+        .eq("id", biz.id);
       if (error) throw new Error(error.message);
       toast.success("Hours saved");
       onSaved();
@@ -1445,7 +1706,8 @@ function HoursTab({ biz, onSaved }: { biz: any; onSaved: () => void }) {
       <div>
         <h2 className="font-display text-lg font-semibold">Hours</h2>
         <p className="text-sm text-muted-foreground">
-          Times are in Asia/Manila. Visitors see an "Open now / Closing soon / Opening soon / Closed" badge automatically.
+          Times are in Asia/Manila. Visitors see an "Open now / Closing soon / Opening soon /
+          Closed" badge automatically.
         </p>
       </div>
 
@@ -1462,15 +1724,24 @@ function HoursTab({ biz, onSaved }: { biz: any; onSaved: () => void }) {
             <input
               type="checkbox"
               checked={!!store}
-              onChange={(e) => setStore(e.target.checked ? (store ?? JSON.parse(JSON.stringify(primary))) : null)}
+              onChange={(e) =>
+                setStore(e.target.checked ? (store ?? JSON.parse(JSON.stringify(primary))) : null)
+              }
             />
             Convenience store / Sari-Sari Store has different hours
           </label>
           {store && (
             <div className="mt-3 space-y-2">
               <div className="flex items-center justify-between">
-                <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Store hours</div>
-                <Button type="button" size="sm" variant="ghost" onClick={() => setStore(JSON.parse(JSON.stringify(primary)))}>
+                <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Store hours
+                </div>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setStore(JSON.parse(JSON.stringify(primary)))}
+                >
                   Copy from station
                 </Button>
               </div>
@@ -1481,12 +1752,13 @@ function HoursTab({ biz, onSaved }: { biz: any; onSaved: () => void }) {
       )}
 
       <div className="flex justify-end">
-        <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save hours"}</Button>
+        <Button onClick={save} disabled={saving}>
+          {saving ? "Saving…" : "Save hours"}
+        </Button>
       </div>
     </Card>
   );
 }
-
 
 function VanitySlugField({
   businessId,
@@ -1500,7 +1772,8 @@ function VanitySlugField({
   const save = useServerFn(setVanitySlug);
   const [value, setValue] = useState(currentVanity ?? "");
   const [saving, setSaving] = useState(false);
-  const origin = typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com";
+  const origin =
+    typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com";
 
   const onSave = async () => {
     const trimmed = value.trim().toLowerCase();
@@ -1534,8 +1807,8 @@ function VanitySlugField({
       <div>
         <Label className="text-base font-semibold">Your short URL</Label>
         <p className="mt-1 text-xs text-muted-foreground">
-          A clean, memorable web address for your business — perfect for business cards, posters, and stickers.
-          Replaces the long auto-generated link.
+          A clean, memorable web address for your business — perfect for business cards, posters,
+          and stickers. Replaces the long auto-generated link.
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-2 rounded-md border border-border bg-background px-3 py-2 font-mono text-sm">
@@ -1549,12 +1822,18 @@ function VanitySlugField({
         />
       </div>
       <p className="text-xs text-muted-foreground">
-        3–32 characters · lowercase letters, numbers, and hyphens · cannot start or end with a hyphen.
+        3–32 characters · lowercase letters, numbers, and hyphens · cannot start or end with a
+        hyphen.
       </p>
       {preview && (
         <p className="text-xs">
           Will be reachable at{" "}
-          <a className="text-primary underline" href={`/b/${preview}`} target="_blank" rel="noreferrer">
+          <a
+            className="text-primary underline"
+            href={`/b/${preview}`}
+            target="_blank"
+            rel="noreferrer"
+          >
             {origin}/b/{preview}
           </a>
         </p>
@@ -1570,7 +1849,8 @@ function VanitySlugField({
         )}
       </div>
       <p className="text-[11px] text-muted-foreground">
-        Canonical permalink: <span className="font-mono">/businesses/{currentSlug}</span> (old links keep working).
+        Canonical permalink: <span className="font-mono">/businesses/{currentSlug}</span> (old links
+        keep working).
       </p>
     </Card>
   );

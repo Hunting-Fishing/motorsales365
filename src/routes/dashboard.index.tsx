@@ -1,7 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { confirm } from "@/components/ui/confirm-dialog";
 import { useEffect, useState } from "react";
-import { Plus, Trash2, Star, Eye, Rocket, RefreshCcw, CheckCircle2, Edit, Undo2, Clock, Heart, Bookmark, MessageSquare, TrendingUp, TrendingDown } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Star,
+  Eye,
+  Rocket,
+  RefreshCcw,
+  CheckCircle2,
+  Edit,
+  Undo2,
+  Clock,
+  Heart,
+  Bookmark,
+  MessageSquare,
+  TrendingUp,
+  TrendingDown,
+} from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -57,18 +73,38 @@ function MyListings() {
       supabase.from("listing_likes").select("listing_id").in("listing_id", ids),
       supabase.from("favorites").select("listing_id").in("listing_id", ids),
       supabase.from("messages").select("listing_id").in("listing_id", ids),
-      supabase.from("listing_views").select("listing_id,created_at").in("listing_id", ids).gte("created_at", since60),
+      supabase
+        .from("listing_views")
+        .select("listing_id,created_at")
+        .in("listing_id", ids)
+        .gte("created_at", since60),
     ]);
 
     const map: Record<string, Stats> = {};
     ids.forEach((id) => {
-      map[id] = { likes: 0, saves: 0, messages: 0, views7: 0, viewsPrev7: 0, views30: 0, viewsPrev30: 0, spark: Array(7).fill(0) };
+      map[id] = {
+        likes: 0,
+        saves: 0,
+        messages: 0,
+        views7: 0,
+        viewsPrev7: 0,
+        views30: 0,
+        viewsPrev30: 0,
+        spark: Array(7).fill(0),
+      };
     });
-    (likesRes.data ?? []).forEach((r: any) => { if (map[r.listing_id]) map[r.listing_id].likes++; });
-    (savesRes.data ?? []).forEach((r: any) => { if (map[r.listing_id]) map[r.listing_id].saves++; });
-    (msgsRes.data ?? []).forEach((r: any) => { if (map[r.listing_id]) map[r.listing_id].messages++; });
+    (likesRes.data ?? []).forEach((r: any) => {
+      if (map[r.listing_id]) map[r.listing_id].likes++;
+    });
+    (savesRes.data ?? []).forEach((r: any) => {
+      if (map[r.listing_id]) map[r.listing_id].saves++;
+    });
+    (msgsRes.data ?? []).forEach((r: any) => {
+      if (map[r.listing_id]) map[r.listing_id].messages++;
+    });
     (viewsRes.data ?? []).forEach((r: any) => {
-      const s = map[r.listing_id]; if (!s) return;
+      const s = map[r.listing_id];
+      if (!s) return;
       const age = now - new Date(r.created_at).getTime();
       if (age < 7 * day) s.views7++;
       else if (age < 14 * day) s.viewsPrev7++;
@@ -87,7 +123,9 @@ function MyListings() {
     setLoading(true);
     const { data } = await supabase
       .from("listings")
-      .select("id,title,price_php,status,plan,boost_until,view_count,published_at,created_at,expires_at,category_slug,listing_media(url,type)")
+      .select(
+        "id,title,price_php,status,plan,boost_until,view_count,published_at,created_at,expires_at,category_slug,listing_media(url,type)",
+      )
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
     setListings(data ?? []);
@@ -97,15 +135,21 @@ function MyListings() {
 
   useEffect(() => {
     load();
-    supabase.from("pricing_settings").select("key,value").then(({ data }) => {
-      const map: Record<string, number> = {};
-      (data ?? []).forEach((r: any) => (map[r.key] = Number(r.value)));
-      setPricing(map);
-    });
+    supabase
+      .from("pricing_settings")
+      .select("key,value")
+      .then(({ data }) => {
+        const map: Record<string, number> = {};
+        (data ?? []).forEach((r: any) => (map[r.key] = Number(r.value)));
+        setPricing(map);
+      });
   }, [user]);
 
   const remove = async (id: string) => {
-    if (!(await confirm({ title: "Delete this listing? This cannot be undone.", destructive: true }))) return;
+    if (
+      !(await confirm({ title: "Delete this listing? This cannot be undone.", destructive: true }))
+    )
+      return;
     const { error } = await supabase.from("listings").delete().eq("id", id);
     if (error) toast.error(error.message);
     else {
@@ -116,7 +160,10 @@ function MyListings() {
 
   const confirmMarkSold = async () => {
     if (!soldTarget) return;
-    const { error } = await supabase.from("listings").update({ status: "sold" }).eq("id", soldTarget.id);
+    const { error } = await supabase
+      .from("listings")
+      .update({ status: "sold" })
+      .eq("id", soldTarget.id);
     if (error) toast.error(error.message);
     else {
       toast.success("Marked as sold");
@@ -150,7 +197,9 @@ function MyListings() {
     const { error } = await supabase.from("listings").update({ status: next }).eq("id", l.id);
     if (error) toast.error(error.message);
     else {
-      toast.success(next === "pending_sale" ? "Marked as Pending Sale" : "Listing returned to Active");
+      toast.success(
+        next === "pending_sale" ? "Marked as Pending Sale" : "Listing returned to Active",
+      );
       load();
     }
   };
@@ -171,7 +220,6 @@ function MyListings() {
   };
 
   // Boost is now handled via <BoostDialog /> (Stripe-powered).
-
 
   const statusColor: Record<string, string> = {
     active: "bg-success text-success-foreground",
@@ -213,15 +261,21 @@ function MyListings() {
             const photo = (l.listing_media ?? []).find((m: any) => m.type === "photo");
             const boosted = l.boost_until && new Date(l.boost_until) > new Date();
             const expiring =
-              l.expires_at && new Date(l.expires_at).getTime() - Date.now() < 7 * 24 * 60 * 60 * 1000;
+              l.expires_at &&
+              new Date(l.expires_at).getTime() - Date.now() < 7 * 24 * 60 * 60 * 1000;
             return (
-              <div key={l.id} className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 sm:flex-row">
+              <div
+                key={l.id}
+                className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4 sm:flex-row"
+              >
                 <div className="h-24 w-32 shrink-0 overflow-hidden rounded-md bg-secondary">
                   <ImageWithSkeleton src={photo?.url || placeholderCar} alt="" />
                 </div>
                 <div className="flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge className={statusColor[l.status] ?? ""}>{l.status.replace("_", " ")}</Badge>
+                    <Badge className={statusColor[l.status] ?? ""}>
+                      {l.status.replace("_", " ")}
+                    </Badge>
                     {boosted && (
                       <Badge className="bg-accent text-accent-foreground">
                         <Star className="mr-1 h-3 w-3" />
@@ -242,7 +296,9 @@ function MyListings() {
                   >
                     {l.title}
                   </Link>
-                  <div className="mt-1 text-lg font-bold text-primary">{formatPHP(l.price_php)}</div>
+                  <div className="mt-1 text-lg font-bold text-primary">
+                    {formatPHP(l.price_php)}
+                  </div>
                   <div className="mt-1 flex flex-wrap gap-3 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Eye className="h-3 w-3" />
@@ -272,13 +328,17 @@ function MyListings() {
                       size="sm"
                       disabled={
                         boosted ||
-                        !(l.status === "active" ||
-                          (l.status === "pending_sale" && (pricing.pending_sale_boost_eligible ?? 1) === 1))
+                        !(
+                          l.status === "active" ||
+                          (l.status === "pending_sale" &&
+                            (pricing.pending_sale_boost_eligible ?? 1) === 1)
+                        )
                       }
                       title={
                         boosted
                           ? "Already boosted"
-                          : l.status === "pending_sale" && (pricing.pending_sale_boost_eligible ?? 1) !== 1
+                          : l.status === "pending_sale" &&
+                              (pricing.pending_sale_boost_eligible ?? 1) !== 1
                             ? "Boost disabled for Pending Sale listings"
                             : "Boost listing"
                       }
@@ -295,7 +355,9 @@ function MyListings() {
                       variant={l.status === "pending_sale" ? "default" : "outline"}
                       size="sm"
                       onClick={() => togglePendingSale(l)}
-                      title={l.status === "pending_sale" ? "Cancel pending sale" : "Mark as pending sale"}
+                      title={
+                        l.status === "pending_sale" ? "Cancel pending sale" : "Mark as pending sale"
+                      }
                     >
                       <Clock className="h-4 w-4" />
                     </Button>
@@ -336,8 +398,9 @@ function MyListings() {
             <AlertDialogDescription>
               {soldTarget ? (
                 <>
-                  Mark <span className="font-semibold text-foreground">"{soldTarget.title}"</span> as sold? It
-                  will be removed from the active market. You can undo this later if the sale doesn't complete.
+                  Mark <span className="font-semibold text-foreground">"{soldTarget.title}"</span>{" "}
+                  as sold? It will be removed from the active market. You can undo this later if the
+                  sale doesn't complete.
                 </>
               ) : null}
             </AlertDialogDescription>
@@ -361,8 +424,12 @@ function trendPct(now: number, prev: number): { pct: number; up: boolean } | nul
 
 function Sparkline({ values }: { values: number[] }) {
   const max = Math.max(1, ...values);
-  const w = 60, h = 18, step = w / Math.max(1, values.length - 1);
-  const points = values.map((v, i) => `${(i * step).toFixed(1)},${(h - (v / max) * h).toFixed(1)}`).join(" ");
+  const w = 60,
+    h = 18,
+    step = w / Math.max(1, values.length - 1);
+  const points = values
+    .map((v, i) => `${(i * step).toFixed(1)},${(h - (v / max) * h).toFixed(1)}`)
+    .join(" ");
   return (
     <svg width={w} height={h} className="text-primary" aria-hidden>
       <polyline fill="none" stroke="currentColor" strokeWidth="1.5" points={points} />
@@ -376,25 +443,44 @@ function ListingStats({ stats }: { stats?: Stats }) {
   const t30 = trendPct(stats.views30, stats.viewsPrev30);
   return (
     <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 rounded-lg border border-border/60 bg-secondary/40 px-3 py-2 text-xs">
-      <span className="flex items-center gap-1 font-medium"><Heart className="h-3 w-3 text-destructive" />{stats.likes} likes</span>
-      <span className="flex items-center gap-1 font-medium"><Bookmark className="h-3 w-3 text-primary" />{stats.saves} saves</span>
-      <span className="flex items-center gap-1 font-medium"><MessageSquare className="h-3 w-3" />{stats.messages} messages</span>
+      <span className="flex items-center gap-1 font-medium">
+        <Heart className="h-3 w-3 text-destructive" />
+        {stats.likes} likes
+      </span>
+      <span className="flex items-center gap-1 font-medium">
+        <Bookmark className="h-3 w-3 text-primary" />
+        {stats.saves} saves
+      </span>
+      <span className="flex items-center gap-1 font-medium">
+        <MessageSquare className="h-3 w-3" />
+        {stats.messages} messages
+      </span>
       <span className="flex items-center gap-1.5 text-muted-foreground">
         <Sparkline values={stats.spark} />
         <span>7d</span>
         {t7 ? (
-          <span className={`inline-flex items-center gap-0.5 font-medium ${t7.up ? "text-success" : "text-destructive"}`}>
-            {t7.up ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}{t7.pct}%
+          <span
+            className={`inline-flex items-center gap-0.5 font-medium ${t7.up ? "text-success" : "text-destructive"}`}
+          >
+            {t7.up ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+            {t7.pct}%
           </span>
-        ) : <span>—</span>}
+        ) : (
+          <span>—</span>
+        )}
       </span>
       <span className="flex items-center gap-1 text-muted-foreground">
         <span>30d</span>
         {t30 ? (
-          <span className={`inline-flex items-center gap-0.5 font-medium ${t30.up ? "text-success" : "text-destructive"}`}>
-            {t30.up ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}{t30.pct}%
+          <span
+            className={`inline-flex items-center gap-0.5 font-medium ${t30.up ? "text-success" : "text-destructive"}`}
+          >
+            {t30.up ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
+            {t30.pct}%
           </span>
-        ) : <span>—</span>}
+        ) : (
+          <span>—</span>
+        )}
       </span>
     </div>
   );

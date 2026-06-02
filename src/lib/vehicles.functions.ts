@@ -5,8 +5,17 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 const uuid = z.string().uuid();
 
 const SERVICE_TYPES = [
-  "oil_change","tire_change","brake_service","battery","tune_up",
-  "transmission","inspection","registration","insurance","accident_repair","other",
+  "oil_change",
+  "tire_change",
+  "brake_service",
+  "battery",
+  "tune_up",
+  "transmission",
+  "inspection",
+  "registration",
+  "insurance",
+  "accident_repair",
+  "other",
 ] as const;
 
 const vehicleInput = z.object({
@@ -169,10 +178,7 @@ export const deleteServiceRecord = createServerFn({ method: "POST" })
       .maybeSingle();
     if (lookupErr) throw new Error(lookupErr.message);
     if (!rec) throw new Error("Service record not found");
-    const { error } = await supabase
-      .from("vehicle_service_records")
-      .delete()
-      .eq("id", data.id);
+    const { error } = await supabase.from("vehicle_service_records").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });

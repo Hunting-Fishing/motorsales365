@@ -4,7 +4,12 @@ import { QrCode, Download, Printer, Copy, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { BrandLogo, logoSrc } from "@/components/brand-logo";
 import { canNativeShare, nativeShare } from "@/lib/share";
@@ -55,7 +60,11 @@ export function ShareQr({
       .catch(() => toast.error("Could not generate QR code"));
   }, [open, url]);
 
-  const slug = (fileSlug || title).toLowerCase().replace(/[^a-z0-9]+/g, "-").slice(0, 60) || "qr";
+  const slug =
+    (fileSlug || title)
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .slice(0, 60) || "qr";
 
   const downloadQr = () => {
     if (!qrDataUrl) return;
@@ -146,7 +155,12 @@ export function ShareQr({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {compact ? (
-          <Button variant={triggerVariant} size="sm" className={className} title="QR code & printable poster">
+          <Button
+            variant={triggerVariant}
+            size="sm"
+            className={className}
+            title="QR code & printable poster"
+          >
             <QrCode className="h-4 w-4" />
           </Button>
         ) : (
@@ -192,7 +206,8 @@ export function ShareQr({
           </Button>
         </div>
         <p className="text-xs text-muted-foreground">
-          Print, post, or share — every scan brings people straight to this page on 365 MotorSales Philippines.
+          Print, post, or share — every scan brings people straight to this page on 365 MotorSales
+          Philippines.
         </p>
       </DialogContent>
     </Dialog>

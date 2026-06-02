@@ -32,8 +32,7 @@ const listeners = new Set<(r: Request) => void>();
  *   if (!(await confirm({ title: "Delete this item?" }))) return;
  */
 export function confirm(opts: ConfirmOptions | string): Promise<boolean> {
-  const normalized: ConfirmOptions =
-    typeof opts === "string" ? { title: opts } : opts;
+  const normalized: ConfirmOptions = typeof opts === "string" ? { title: opts } : opts;
   return new Promise<boolean>((resolve) => {
     if (listeners.size === 0) {
       // Fallback so the app doesn't silently no-op if host not mounted.
@@ -87,10 +86,7 @@ export function ConfirmDialogHost() {
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={() => close(true)}
-            className={cn(
-              req?.destructive &&
-                buttonVariants({ variant: "destructive" }),
-            )}
+            className={cn(req?.destructive && buttonVariants({ variant: "destructive" }))}
           >
             {req?.confirmText ?? "Confirm"}
           </AlertDialogAction>

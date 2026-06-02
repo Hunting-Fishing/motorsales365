@@ -9,8 +9,12 @@ const SELLER_LABEL: Record<string, string> = {
 
 export function SandboxBanner() {
   const {
-    simulatedRoles, setSimulatedRoles, realIsAdmin,
-    simulatedSellerType, setSimulatedSellerType, isStaff,
+    simulatedRoles,
+    setSimulatedRoles,
+    realIsAdmin,
+    simulatedSellerType,
+    setSimulatedSellerType,
+    isStaff,
   } = useAuth();
   const hasRoleSim = realIsAdmin && simulatedRoles && simulatedRoles.length > 0;
   const hasSellerSim = isStaff && !!simulatedSellerType;
@@ -19,8 +23,7 @@ export function SandboxBanner() {
     <div className="sticky top-0 z-50 flex flex-wrap items-center justify-center gap-3 bg-amber-500 px-4 py-1.5 text-xs font-medium text-amber-950 shadow">
       {hasRoleSim && (
         <span className="flex items-center gap-2">
-          Sandbox: simulating roles{" "}
-          <span className="font-bold">{simulatedRoles!.join(", ")}</span>
+          Sandbox: simulating roles <span className="font-bold">{simulatedRoles!.join(", ")}</span>
           <button
             onClick={() => setSimulatedRoles(null)}
             className="rounded-full bg-amber-950/10 px-2 py-0.5 font-semibold hover:bg-amber-950/20"
@@ -32,7 +35,9 @@ export function SandboxBanner() {
       {hasSellerSim && (
         <span className="flex items-center gap-2">
           Viewing as{" "}
-          <span className="font-bold">{SELLER_LABEL[simulatedSellerType!] ?? simulatedSellerType}</span>
+          <span className="font-bold">
+            {SELLER_LABEL[simulatedSellerType!] ?? simulatedSellerType}
+          </span>
           <button
             onClick={() => setSimulatedSellerType(null)}
             className="rounded-full bg-amber-950/10 px-2 py-0.5 font-semibold hover:bg-amber-950/20"

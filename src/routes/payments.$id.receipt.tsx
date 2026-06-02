@@ -22,7 +22,11 @@ function ReceiptPage() {
 
   useEffect(() => {
     (async () => {
-      const { data, error } = await supabase.from("payments").select("*").eq("id", id).maybeSingle();
+      const { data, error } = await supabase
+        .from("payments")
+        .select("*")
+        .eq("id", id)
+        .maybeSingle();
       if (error || !data) {
         setError(error?.message ?? "Receipt not found");
         setLoading(false);
@@ -30,9 +34,17 @@ function ReceiptPage() {
       }
       setPayment(data);
       const [{ data: prof }, listingResp, { data: items }] = await Promise.all([
-        supabase.from("profiles").select("full_name,business_name,business_address,phone,first_name,last_name").eq("id", data.user_id).maybeSingle(),
+        supabase
+          .from("profiles")
+          .select("full_name,business_name,business_address,phone,first_name,last_name")
+          .eq("id", data.user_id)
+          .maybeSingle(),
         data.listing_id
-          ? supabase.from("listings").select("id,title,price_php").eq("id", data.listing_id).maybeSingle()
+          ? supabase
+              .from("listings")
+              .select("id,title,price_php")
+              .eq("id", data.listing_id)
+              .maybeSingle()
           : Promise.resolve({ data: null } as any),
         supabase
           .from("payment_line_items")
@@ -51,13 +63,17 @@ function ReceiptPage() {
   const toggle = (key: string) => setExpanded((m) => ({ ...m, [key]: !m[key] }));
 
   if (loading) {
-    return <div className="mx-auto max-w-3xl p-8 text-sm text-muted-foreground">Loading receipt…</div>;
+    return (
+      <div className="mx-auto max-w-3xl p-8 text-sm text-muted-foreground">Loading receipt…</div>
+    );
   }
   if (error || !payment) {
     return (
       <div className="mx-auto max-w-3xl p-8">
         <p className="text-sm text-destructive">{error ?? "Receipt not found."}</p>
-        <Button asChild variant="outline" className="mt-4"><Link to="/dashboard/billing">Back to billing</Link></Button>
+        <Button asChild variant="outline" className="mt-4">
+          <Link to="/dashboard/billing">Back to billing</Link>
+        </Button>
       </div>
     );
   }
@@ -76,10 +92,14 @@ function ReceiptPage() {
       <div className="mx-auto max-w-3xl px-4">
         <div className="mb-4 flex items-center justify-between print:hidden">
           <Button asChild variant="ghost" size="sm">
-            <Link to="/dashboard/billing"><ArrowLeft className="mr-1 h-4 w-4" />Back to billing</Link>
+            <Link to="/dashboard/billing">
+              <ArrowLeft className="mr-1 h-4 w-4" />
+              Back to billing
+            </Link>
           </Button>
           <Button size="sm" onClick={() => window.print()}>
-            <Printer className="mr-1 h-4 w-4" />Print / Save as PDF
+            <Printer className="mr-1 h-4 w-4" />
+            Print / Save as PDF
           </Button>
         </div>
 
@@ -88,12 +108,15 @@ function ReceiptPage() {
             <div>
               <div className="font-display text-2xl font-bold">365 Motorsales</div>
               <div className="mt-1 text-xs text-muted-foreground">
-                365motorsales.com<br />
+                365motorsales.com
+                <br />
                 partners@365motorsales.ph
               </div>
             </div>
             <div className="text-right">
-              <div className="text-xs uppercase tracking-wide text-muted-foreground">{docLabel}</div>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                {docLabel}
+              </div>
               <div className="mt-1 font-mono text-sm font-semibold">{docNumber}</div>
               <div className="mt-1 text-xs text-muted-foreground">
                 Issued {formatDate(payment.paid_at ?? payment.created_at)}
@@ -114,7 +137,9 @@ function ReceiptPage() {
             </div>
             <div className="sm:text-right">
               <div className="text-xs uppercase text-muted-foreground">Status</div>
-              <div className={`mt-1 text-sm font-semibold ${isPaid ? "text-emerald-600" : "text-amber-600"}`}>
+              <div
+                className={`mt-1 text-sm font-semibold ${isPaid ? "text-emerald-600" : "text-amber-600"}`}
+              >
                 {payment.status.toUpperCase()}
               </div>
               {payment.method && (
@@ -126,389 +151,468 @@ function ReceiptPage() {
             </div>
           </section>
 
-          {lineItems.length > 0 ? (() => {
-            const net = Number(payment.amount_php ?? 0);
-            const itemsTotal = lineItems.reduce((s, it) => s + Number(it.amount_php ?? 0), 0);
-            const itemsCredit = lineItems.reduce(
-              (s, it) => s + Number(it.prorated_credit_php ?? 0),
-              0,
-            );
-            const DAY = 86_400_000;
-            return (
-              <div className="-mx-2 overflow-x-auto sm:mx-0 print:mx-0 print:overflow-visible">
-              <table className="w-full min-w-[520px] border-t border-border text-sm print:min-w-0">
-
-                <thead>
-                  <tr className="text-left text-xs uppercase text-muted-foreground">
-                    <th className="py-3">Description</th>
-                    <th className="py-3 text-right">Charge</th>
-                    <th className="py-3 text-right">Credit</th>
-                    <th className="py-3 text-right">Net</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {lineItems.map((it) => {
-                    const amount = Number(it.amount_php ?? 0);
-                    const itemCredit = Number(it.prorated_credit_php ?? 0);
-                    const itemNet = Math.max(0, Math.round(amount - itemCredit));
-                    const periodStart = it.period_start ? new Date(it.period_start) : null;
-                    const periodEnd = it.period_end ? new Date(it.period_end) : null;
-                    const calcAt = it.credit_calculated_at
-                      ? new Date(it.credit_calculated_at)
-                      : payment.paid_at
-                        ? new Date(payment.paid_at)
-                        : null;
-                    const prevAmount = Number(it.previous_amount_php ?? 0);
-                    const totalDays = periodStart && periodEnd
-                      ? Math.max(1, Math.round((periodEnd.getTime() - periodStart.getTime()) / DAY))
-                      : null;
-                    const remainingDays = periodEnd && calcAt
-                      ? Math.max(0, Math.round((periodEnd.getTime() - calcAt.getTime()) / DAY))
-                      : null;
-                    const canExpand = itemCredit > 0 && periodStart && periodEnd && prevAmount > 0;
-                    const isOpen = !!expanded[it.id];
-                    return (
-                      <>
-                        <tr key={it.id} className="border-t border-border align-top">
-                          <td className="py-3">
-                            <div className="flex items-start gap-2">
-                              {canExpand ? (
-                                <button
-                                  type="button"
-                                  onClick={() => toggle(it.id)}
-                                  aria-expanded={isOpen}
-                                  aria-label={isOpen ? "Hide breakdown" : "Show breakdown"}
-                                  className="mt-0.5 text-muted-foreground hover:text-foreground print:hidden"
-                                >
-                                  {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                                </button>
-                              ) : (
-                                <span className="w-4 print:hidden" />
-                              )}
-                              <div>
-                                <div className="font-medium capitalize">{it.label}</div>
-                                <div className="text-[10px] uppercase tracking-wide text-muted-foreground">{it.kind}</div>
-                                {it.description && (
-                                  <div className="text-xs text-muted-foreground">{it.description}</div>
-                                )}
-                              </div>
-                            </div>
-                          </td>
-                          <td className="py-3 text-right font-medium">{formatPHP(amount)}</td>
-                          <td className="py-3 text-right text-emerald-600">
-                            {itemCredit > 0 ? `− ${formatPHP(itemCredit)}` : "—"}
-                          </td>
-                          <td className="py-3 text-right font-medium">{formatPHP(itemNet)}</td>
-                        </tr>
-                        {canExpand && (isOpen || typeof window === "undefined") && (
-                          <tr key={`${it.id}-detail`} className="border-t border-dashed border-border bg-muted/30 print:table-row">
-                            <td colSpan={4} className="py-3">
-                              <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                                Proration breakdown — {it.label}
-                              </div>
-                              <dl className="mt-2 grid gap-x-6 gap-y-2 text-xs sm:grid-cols-2">
-                                <div>
-                                  <dt className="text-muted-foreground">Period start</dt>
-                                  <dd className="font-mono">{formatDate(periodStart)}</dd>
-                                  <dd className="font-mono text-[10px] text-muted-foreground/70 break-all">{it.period_start}</dd>
-                                </div>
-                                <div>
-                                  <dt className="text-muted-foreground">Period end</dt>
-                                  <dd className="font-mono">{formatDate(periodEnd)}</dd>
-                                  <dd className="font-mono text-[10px] text-muted-foreground/70 break-all">{it.period_end}</dd>
-                                </div>
-                                <div>
-                                  <dt className="text-muted-foreground">
-                                    {it.credit_calculated_at ? "Calculated at" : "Paid at"}
-                                  </dt>
-                                  <dd className="font-mono">{calcAt ? formatDate(calcAt) : "—"}</dd>
-                                  <dd className="font-mono text-[10px] text-muted-foreground/70 break-all">
-                                    {it.credit_calculated_at ?? payment.paid_at ?? ""}
-                                  </dd>
-                                </div>
-                                <div>
-                                  <dt className="text-muted-foreground">Previous amount</dt>
-                                  <dd className="font-mono">{formatPHP(prevAmount)}</dd>
-                                  <dd className="font-mono text-[10px] text-muted-foreground/70">raw: {prevAmount}</dd>
-                                </div>
-                                <div>
-                                  <dt className="text-muted-foreground">totalDays</dt>
-                                  <dd className="font-mono">{totalDays}</dd>
-                                </div>
-                                <div>
-                                  <dt className="text-muted-foreground">remainingDays</dt>
-                                  <dd className="font-mono">{remainingDays}</dd>
-                                </div>
-                              </dl>
-                              {totalDays && remainingDays !== null && (
-                                <div className="mt-2 font-mono text-xs text-muted-foreground">
-                                  {formatPHP(prevAmount)} × {remainingDays} ÷ {totalDays} ={" "}
-                                  <span className="text-emerald-600">{formatPHP(itemCredit)}</span>
-                                </div>
-                              )}
-                            </td>
-                          </tr>
-                        )}
-                      </>
-                    );
-                  })}
-                </tbody>
-                <tfoot>
-                  <tr className="border-t border-border text-xs text-muted-foreground">
-                    <td className="py-2 text-right uppercase" colSpan={1}>Subtotal</td>
-                    <td className="py-2 text-right">{formatPHP(itemsTotal)}</td>
-                    <td className="py-2 text-right text-emerald-600">
-                      {itemsCredit > 0 ? `− ${formatPHP(itemsCredit)}` : "—"}
-                    </td>
-                    <td className="py-2 text-right">{formatPHP(Math.max(0, itemsTotal - itemsCredit))}</td>
-                  </tr>
-                  <tr className="border-t border-border">
-                    <td colSpan={3} className="py-3 text-right text-xs uppercase text-muted-foreground">
-                      Net due
-                    </td>
-                    <td className="py-3 text-right font-display text-lg font-bold">{formatPHP(net)}</td>
-                  </tr>
-                </tfoot>
-              </table>
-              </div>
-            );
-          })() : (
-
-          (() => {
-            const credit = Number(payment.prorated_credit_php ?? 0);
-            const gross = Number(payment.gross_amount_php ?? 0);
-            const net = Number(payment.amount_php ?? 0);
-            const planPrice = Number(payment.plan_price_php ?? 0);
-            const boost = Number(payment.boost_amount_php ?? 0);
-            const addons = Number(payment.addons_amount_php ?? 0);
-            const hasSplit = planPrice > 0 || boost > 0 || addons > 0;
-            const subtotal = hasSplit
-              ? planPrice + boost + addons
-              : gross > 0
-                ? gross
-                : net;
-            const hasBreakdown = credit > 0 || gross > 0 || hasSplit;
-            const planLabel = payment.new_plan
-              ? `Plan — ${payment.new_plan}`
-              : payment.kind?.replace(/_/g, " ") ?? "Plan";
-
-            // Automated ordering check: in dev, throw if a future edit ever
-            // reorders charges/credit/net incorrectly. Silent in production.
-            if (import.meta.env.DEV) {
-              try {
-                assertReceiptOrder(
-                  buildReceiptLines({
-                    plan_price_php: planPrice,
-                    boost_amount_php: boost,
-                    addons_amount_php: addons,
-                    gross_amount_php: gross,
-                    prorated_credit_php: credit,
-                    amount_php: net,
-                  }),
+          {lineItems.length > 0
+            ? (() => {
+                const net = Number(payment.amount_php ?? 0);
+                const itemsTotal = lineItems.reduce((s, it) => s + Number(it.amount_php ?? 0), 0);
+                const itemsCredit = lineItems.reduce(
+                  (s, it) => s + Number(it.prorated_credit_php ?? 0),
+                  0,
                 );
-              } catch (e) {
-                console.error("[receipt] ordering check failed:", e);
-              }
-            }
-            return (
-              <div className="-mx-2 overflow-x-auto sm:mx-0 print:mx-0 print:overflow-visible">
-              <table className="w-full min-w-[520px] border-t border-border text-sm print:min-w-0">
+                const DAY = 86_400_000;
+                return (
+                  <div className="-mx-2 overflow-x-auto sm:mx-0 print:mx-0 print:overflow-visible">
+                    <table className="w-full min-w-[520px] border-t border-border text-sm print:min-w-0">
+                      <thead>
+                        <tr className="text-left text-xs uppercase text-muted-foreground">
+                          <th className="py-3">Description</th>
+                          <th className="py-3 text-right">Charge</th>
+                          <th className="py-3 text-right">Credit</th>
+                          <th className="py-3 text-right">Net</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {lineItems.map((it) => {
+                          const amount = Number(it.amount_php ?? 0);
+                          const itemCredit = Number(it.prorated_credit_php ?? 0);
+                          const itemNet = Math.max(0, Math.round(amount - itemCredit));
+                          const periodStart = it.period_start ? new Date(it.period_start) : null;
+                          const periodEnd = it.period_end ? new Date(it.period_end) : null;
+                          const calcAt = it.credit_calculated_at
+                            ? new Date(it.credit_calculated_at)
+                            : payment.paid_at
+                              ? new Date(payment.paid_at)
+                              : null;
+                          const prevAmount = Number(it.previous_amount_php ?? 0);
+                          const totalDays =
+                            periodStart && periodEnd
+                              ? Math.max(
+                                  1,
+                                  Math.round((periodEnd.getTime() - periodStart.getTime()) / DAY),
+                                )
+                              : null;
+                          const remainingDays =
+                            periodEnd && calcAt
+                              ? Math.max(
+                                  0,
+                                  Math.round((periodEnd.getTime() - calcAt.getTime()) / DAY),
+                                )
+                              : null;
+                          const canExpand =
+                            itemCredit > 0 && periodStart && periodEnd && prevAmount > 0;
+                          const isOpen = !!expanded[it.id];
+                          return (
+                            <>
+                              <tr key={it.id} className="border-t border-border align-top">
+                                <td className="py-3">
+                                  <div className="flex items-start gap-2">
+                                    {canExpand ? (
+                                      <button
+                                        type="button"
+                                        onClick={() => toggle(it.id)}
+                                        aria-expanded={isOpen}
+                                        aria-label={isOpen ? "Hide breakdown" : "Show breakdown"}
+                                        className="mt-0.5 text-muted-foreground hover:text-foreground print:hidden"
+                                      >
+                                        {isOpen ? (
+                                          <ChevronDown className="h-4 w-4" />
+                                        ) : (
+                                          <ChevronRight className="h-4 w-4" />
+                                        )}
+                                      </button>
+                                    ) : (
+                                      <span className="w-4 print:hidden" />
+                                    )}
+                                    <div>
+                                      <div className="font-medium capitalize">{it.label}</div>
+                                      <div className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                                        {it.kind}
+                                      </div>
+                                      {it.description && (
+                                        <div className="text-xs text-muted-foreground">
+                                          {it.description}
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </td>
+                                <td className="py-3 text-right font-medium">{formatPHP(amount)}</td>
+                                <td className="py-3 text-right text-emerald-600">
+                                  {itemCredit > 0 ? `− ${formatPHP(itemCredit)}` : "—"}
+                                </td>
+                                <td className="py-3 text-right font-medium">
+                                  {formatPHP(itemNet)}
+                                </td>
+                              </tr>
+                              {canExpand && (isOpen || typeof window === "undefined") && (
+                                <tr
+                                  key={`${it.id}-detail`}
+                                  className="border-t border-dashed border-border bg-muted/30 print:table-row"
+                                >
+                                  <td colSpan={4} className="py-3">
+                                    <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                                      Proration breakdown — {it.label}
+                                    </div>
+                                    <dl className="mt-2 grid gap-x-6 gap-y-2 text-xs sm:grid-cols-2">
+                                      <div>
+                                        <dt className="text-muted-foreground">Period start</dt>
+                                        <dd className="font-mono">{formatDate(periodStart)}</dd>
+                                        <dd className="font-mono text-[10px] text-muted-foreground/70 break-all">
+                                          {it.period_start}
+                                        </dd>
+                                      </div>
+                                      <div>
+                                        <dt className="text-muted-foreground">Period end</dt>
+                                        <dd className="font-mono">{formatDate(periodEnd)}</dd>
+                                        <dd className="font-mono text-[10px] text-muted-foreground/70 break-all">
+                                          {it.period_end}
+                                        </dd>
+                                      </div>
+                                      <div>
+                                        <dt className="text-muted-foreground">
+                                          {it.credit_calculated_at ? "Calculated at" : "Paid at"}
+                                        </dt>
+                                        <dd className="font-mono">
+                                          {calcAt ? formatDate(calcAt) : "—"}
+                                        </dd>
+                                        <dd className="font-mono text-[10px] text-muted-foreground/70 break-all">
+                                          {it.credit_calculated_at ?? payment.paid_at ?? ""}
+                                        </dd>
+                                      </div>
+                                      <div>
+                                        <dt className="text-muted-foreground">Previous amount</dt>
+                                        <dd className="font-mono">{formatPHP(prevAmount)}</dd>
+                                        <dd className="font-mono text-[10px] text-muted-foreground/70">
+                                          raw: {prevAmount}
+                                        </dd>
+                                      </div>
+                                      <div>
+                                        <dt className="text-muted-foreground">totalDays</dt>
+                                        <dd className="font-mono">{totalDays}</dd>
+                                      </div>
+                                      <div>
+                                        <dt className="text-muted-foreground">remainingDays</dt>
+                                        <dd className="font-mono">{remainingDays}</dd>
+                                      </div>
+                                    </dl>
+                                    {totalDays && remainingDays !== null && (
+                                      <div className="mt-2 font-mono text-xs text-muted-foreground">
+                                        {formatPHP(prevAmount)} × {remainingDays} ÷ {totalDays} ={" "}
+                                        <span className="text-emerald-600">
+                                          {formatPHP(itemCredit)}
+                                        </span>
+                                      </div>
+                                    )}
+                                  </td>
+                                </tr>
+                              )}
+                            </>
+                          );
+                        })}
+                      </tbody>
+                      <tfoot>
+                        <tr className="border-t border-border text-xs text-muted-foreground">
+                          <td className="py-2 text-right uppercase" colSpan={1}>
+                            Subtotal
+                          </td>
+                          <td className="py-2 text-right">{formatPHP(itemsTotal)}</td>
+                          <td className="py-2 text-right text-emerald-600">
+                            {itemsCredit > 0 ? `− ${formatPHP(itemsCredit)}` : "—"}
+                          </td>
+                          <td className="py-2 text-right">
+                            {formatPHP(Math.max(0, itemsTotal - itemsCredit))}
+                          </td>
+                        </tr>
+                        <tr className="border-t border-border">
+                          <td
+                            colSpan={3}
+                            className="py-3 text-right text-xs uppercase text-muted-foreground"
+                          >
+                            Net due
+                          </td>
+                          <td className="py-3 text-right font-display text-lg font-bold">
+                            {formatPHP(net)}
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                );
+              })()
+            : (() => {
+                const credit = Number(payment.prorated_credit_php ?? 0);
+                const gross = Number(payment.gross_amount_php ?? 0);
+                const net = Number(payment.amount_php ?? 0);
+                const planPrice = Number(payment.plan_price_php ?? 0);
+                const boost = Number(payment.boost_amount_php ?? 0);
+                const addons = Number(payment.addons_amount_php ?? 0);
+                const hasSplit = planPrice > 0 || boost > 0 || addons > 0;
+                const subtotal = hasSplit ? planPrice + boost + addons : gross > 0 ? gross : net;
+                const hasBreakdown = credit > 0 || gross > 0 || hasSplit;
+                const planLabel = payment.new_plan
+                  ? `Plan — ${payment.new_plan}`
+                  : (payment.kind?.replace(/_/g, " ") ?? "Plan");
 
-                <thead>
-                  <tr className="text-left text-xs uppercase text-muted-foreground">
-                    <th className="py-3">Description</th>
-                    <th className="py-3 text-right">Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {hasSplit ? (
-                    <>
-                      {planPrice > 0 && (
-                        <tr className="border-t border-border">
-                          <td className="py-3">
-                            <div className="font-medium capitalize">{planLabel}</div>
-                            {payment.previous_plan && payment.new_plan && (
-                              <div className="text-xs text-muted-foreground">
-                                Changed from {payment.previous_plan} to {payment.new_plan}
+                // Automated ordering check: in dev, throw if a future edit ever
+                // reorders charges/credit/net incorrectly. Silent in production.
+                if (import.meta.env.DEV) {
+                  try {
+                    assertReceiptOrder(
+                      buildReceiptLines({
+                        plan_price_php: planPrice,
+                        boost_amount_php: boost,
+                        addons_amount_php: addons,
+                        gross_amount_php: gross,
+                        prorated_credit_php: credit,
+                        amount_php: net,
+                      }),
+                    );
+                  } catch (e) {
+                    console.error("[receipt] ordering check failed:", e);
+                  }
+                }
+                return (
+                  <div className="-mx-2 overflow-x-auto sm:mx-0 print:mx-0 print:overflow-visible">
+                    <table className="w-full min-w-[520px] border-t border-border text-sm print:min-w-0">
+                      <thead>
+                        <tr className="text-left text-xs uppercase text-muted-foreground">
+                          <th className="py-3">Description</th>
+                          <th className="py-3 text-right">Amount</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {hasSplit ? (
+                          <>
+                            {planPrice > 0 && (
+                              <tr className="border-t border-border">
+                                <td className="py-3">
+                                  <div className="font-medium capitalize">{planLabel}</div>
+                                  {payment.previous_plan && payment.new_plan && (
+                                    <div className="text-xs text-muted-foreground">
+                                      Changed from {payment.previous_plan} to {payment.new_plan}
+                                    </div>
+                                  )}
+                                  <div className="text-xs text-muted-foreground">
+                                    Monthly plan price
+                                  </div>
+                                </td>
+                                <td className="py-3 text-right font-medium">
+                                  {formatPHP(planPrice)}
+                                </td>
+                              </tr>
+                            )}
+                            {boost > 0 && (
+                              <tr className="border-t border-border">
+                                <td className="py-3">
+                                  <div className="font-medium">Boosted listing renewal</div>
+                                  {listing && (
+                                    <div className="text-xs text-muted-foreground">
+                                      For listing: {listing.title}
+                                    </div>
+                                  )}
+                                </td>
+                                <td className="py-3 text-right font-medium">{formatPHP(boost)}</td>
+                              </tr>
+                            )}
+                            {addons > 0 && (
+                              <tr className="border-t border-border">
+                                <td className="py-3">
+                                  <div className="font-medium">Add-ons</div>
+                                  {payment.addons_description && (
+                                    <div className="text-xs text-muted-foreground">
+                                      {payment.addons_description}
+                                    </div>
+                                  )}
+                                </td>
+                                <td className="py-3 text-right font-medium">{formatPHP(addons)}</td>
+                              </tr>
+                            )}
+                          </>
+                        ) : (
+                          <tr className="border-t border-border">
+                            <td className="py-3">
+                              <div className="font-medium capitalize">
+                                {payment.new_plan
+                                  ? `Plan upgrade — ${payment.new_plan}`
+                                  : payment.kind?.replace(/_/g, " ")}
                               </div>
-                            )}
-                            <div className="text-xs text-muted-foreground">Monthly plan price</div>
-                          </td>
-                          <td className="py-3 text-right font-medium">{formatPHP(planPrice)}</td>
-                        </tr>
-                      )}
-                      {boost > 0 && (
-                        <tr className="border-t border-border">
-                          <td className="py-3">
-                            <div className="font-medium">Boosted listing renewal</div>
-                            {listing && (
-                              <div className="text-xs text-muted-foreground">For listing: {listing.title}</div>
-                            )}
-                          </td>
-                          <td className="py-3 text-right font-medium">{formatPHP(boost)}</td>
-                        </tr>
-                      )}
-                      {addons > 0 && (
-                        <tr className="border-t border-border">
-                          <td className="py-3">
-                            <div className="font-medium">Add-ons</div>
-                            {payment.addons_description && (
-                              <div className="text-xs text-muted-foreground">{payment.addons_description}</div>
-                            )}
-                          </td>
-                          <td className="py-3 text-right font-medium">{formatPHP(addons)}</td>
-                        </tr>
-                      )}
-                    </>
-                  ) : (
-                    <tr className="border-t border-border">
-                      <td className="py-3">
-                        <div className="font-medium capitalize">
-                          {payment.new_plan
-                            ? `Plan upgrade — ${payment.new_plan}`
-                            : payment.kind?.replace(/_/g, " ")}
-                        </div>
-                        {payment.previous_plan && (
-                          <div className="text-xs text-muted-foreground">
-                            Changed from {payment.previous_plan}
-                            {payment.new_plan ? ` to ${payment.new_plan}` : ""}
-                          </div>
-                        )}
-                        {listing ? (
-                          <div className="text-xs text-muted-foreground">For listing: {listing.title}</div>
-                        ) : payment.notes ? (
-                          <div className="text-xs text-muted-foreground">{payment.notes}</div>
-                        ) : null}
-                      </td>
-                      <td className="py-3 text-right font-medium">{formatPHP(subtotal)}</td>
-                    </tr>
-                  )}
-                  {credit > 0 && (() => {
-                    const periodStart = payment.period_start ? new Date(payment.period_start) : null;
-                    const periodEnd = payment.period_end ? new Date(payment.period_end) : null;
-                    const calcAt = payment.credit_calculated_at
-                      ? new Date(payment.credit_calculated_at)
-                      : payment.paid_at
-                        ? new Date(payment.paid_at)
-                        : null;
-                    const prevPrice = Number(payment.previous_plan_price_php ?? 0);
-                    const DAY = 86_400_000;
-                    const totalDays = periodStart && periodEnd
-                      ? Math.max(1, Math.round((periodEnd.getTime() - periodStart.getTime()) / DAY))
-                      : null;
-                    const remainingDays = periodEnd && calcAt
-                      ? Math.max(0, Math.round((periodEnd.getTime() - calcAt.getTime()) / DAY))
-                      : null;
-                    const hasInputs = periodStart && periodEnd && prevPrice > 0;
-                    return (
-                      <>
-                        <tr className="border-t border-border text-emerald-600">
-                          <td className="py-3">
-                            <div className="font-medium">Prorated credit</div>
-                            <div className="text-xs text-emerald-700/80">
-                              Unused days from {payment.previous_plan ?? "previous plan"}
-                            </div>
-                          </td>
-                          <td className="py-3 text-right font-medium">− {formatPHP(credit)}</td>
-                        </tr>
-                        {hasInputs && (
-                          <tr className="border-t border-dashed border-border bg-muted/30">
-                            <td colSpan={2} className="py-3">
-                              <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                                Proration calculation
-                              </div>
-                              <dl className="mt-2 grid gap-x-6 gap-y-2 text-xs sm:grid-cols-2">
-                                <div>
-                                  <dt className="text-muted-foreground">Billing cycle start</dt>
-                                  <dd className="font-mono">{formatDate(periodStart)}</dd>
-                                  <dd className="font-mono text-[10px] text-muted-foreground/70 break-all">
-                                    {payment.period_start}
-                                  </dd>
-                                </div>
-                                <div>
-                                  <dt className="text-muted-foreground">Billing cycle end</dt>
-                                  <dd className="font-mono">{formatDate(periodEnd)}</dd>
-                                  <dd className="font-mono text-[10px] text-muted-foreground/70 break-all">
-                                    {payment.period_end}
-                                  </dd>
-                                </div>
-                                <div>
-                                  <dt className="text-muted-foreground">
-                                    {payment.credit_calculated_at ? "Calculated at" : "Paid at"}
-                                  </dt>
-                                  <dd className="font-mono">{calcAt ? formatDate(calcAt) : "—"}</dd>
-                                  <dd className="font-mono text-[10px] text-muted-foreground/70 break-all">
-                                    {payment.credit_calculated_at ?? payment.paid_at ?? ""}
-                                  </dd>
-                                </div>
-                                <div>
-                                  <dt className="text-muted-foreground">
-                                    {payment.previous_plan ?? "Previous plan"} monthly
-                                  </dt>
-                                  <dd className="font-mono">{formatPHP(prevPrice)}</dd>
-                                  <dd className="font-mono text-[10px] text-muted-foreground/70">
-                                    raw: {prevPrice}
-                                  </dd>
-                                </div>
-                                <div>
-                                  <dt className="text-muted-foreground">totalDays</dt>
-                                  <dd className="font-mono">{totalDays}</dd>
-                                  <dd className="font-mono text-[10px] text-muted-foreground/70">
-                                    (period_end − period_start) ÷ 86 400 000 ms
-                                  </dd>
-                                </div>
-                                <div>
-                                  <dt className="text-muted-foreground">remainingDays</dt>
-                                  <dd className="font-mono">{remainingDays}</dd>
-                                  <dd className="font-mono text-[10px] text-muted-foreground/70">
-                                    (period_end − {payment.credit_calculated_at ? "credit_calculated_at" : "paid_at"}) ÷ 86 400 000 ms
-                                  </dd>
-                                </div>
-                              </dl>
-                              {totalDays && remainingDays !== null && (
-                                <div className="mt-2 font-mono text-xs text-muted-foreground">
-                                  {formatPHP(prevPrice)} × {remainingDays} ÷ {totalDays} ={" "}
-                                  <span className="text-emerald-600">{formatPHP(credit)}</span>
+                              {payment.previous_plan && (
+                                <div className="text-xs text-muted-foreground">
+                                  Changed from {payment.previous_plan}
+                                  {payment.new_plan ? ` to ${payment.new_plan}` : ""}
                                 </div>
                               )}
+                              {listing ? (
+                                <div className="text-xs text-muted-foreground">
+                                  For listing: {listing.title}
+                                </div>
+                              ) : payment.notes ? (
+                                <div className="text-xs text-muted-foreground">{payment.notes}</div>
+                              ) : null}
+                            </td>
+                            <td className="py-3 text-right font-medium">{formatPHP(subtotal)}</td>
+                          </tr>
+                        )}
+                        {credit > 0 &&
+                          (() => {
+                            const periodStart = payment.period_start
+                              ? new Date(payment.period_start)
+                              : null;
+                            const periodEnd = payment.period_end
+                              ? new Date(payment.period_end)
+                              : null;
+                            const calcAt = payment.credit_calculated_at
+                              ? new Date(payment.credit_calculated_at)
+                              : payment.paid_at
+                                ? new Date(payment.paid_at)
+                                : null;
+                            const prevPrice = Number(payment.previous_plan_price_php ?? 0);
+                            const DAY = 86_400_000;
+                            const totalDays =
+                              periodStart && periodEnd
+                                ? Math.max(
+                                    1,
+                                    Math.round((periodEnd.getTime() - periodStart.getTime()) / DAY),
+                                  )
+                                : null;
+                            const remainingDays =
+                              periodEnd && calcAt
+                                ? Math.max(
+                                    0,
+                                    Math.round((periodEnd.getTime() - calcAt.getTime()) / DAY),
+                                  )
+                                : null;
+                            const hasInputs = periodStart && periodEnd && prevPrice > 0;
+                            return (
+                              <>
+                                <tr className="border-t border-border text-emerald-600">
+                                  <td className="py-3">
+                                    <div className="font-medium">Prorated credit</div>
+                                    <div className="text-xs text-emerald-700/80">
+                                      Unused days from {payment.previous_plan ?? "previous plan"}
+                                    </div>
+                                  </td>
+                                  <td className="py-3 text-right font-medium">
+                                    − {formatPHP(credit)}
+                                  </td>
+                                </tr>
+                                {hasInputs && (
+                                  <tr className="border-t border-dashed border-border bg-muted/30">
+                                    <td colSpan={2} className="py-3">
+                                      <div className="text-xs uppercase tracking-wide text-muted-foreground">
+                                        Proration calculation
+                                      </div>
+                                      <dl className="mt-2 grid gap-x-6 gap-y-2 text-xs sm:grid-cols-2">
+                                        <div>
+                                          <dt className="text-muted-foreground">
+                                            Billing cycle start
+                                          </dt>
+                                          <dd className="font-mono">{formatDate(periodStart)}</dd>
+                                          <dd className="font-mono text-[10px] text-muted-foreground/70 break-all">
+                                            {payment.period_start}
+                                          </dd>
+                                        </div>
+                                        <div>
+                                          <dt className="text-muted-foreground">
+                                            Billing cycle end
+                                          </dt>
+                                          <dd className="font-mono">{formatDate(periodEnd)}</dd>
+                                          <dd className="font-mono text-[10px] text-muted-foreground/70 break-all">
+                                            {payment.period_end}
+                                          </dd>
+                                        </div>
+                                        <div>
+                                          <dt className="text-muted-foreground">
+                                            {payment.credit_calculated_at
+                                              ? "Calculated at"
+                                              : "Paid at"}
+                                          </dt>
+                                          <dd className="font-mono">
+                                            {calcAt ? formatDate(calcAt) : "—"}
+                                          </dd>
+                                          <dd className="font-mono text-[10px] text-muted-foreground/70 break-all">
+                                            {payment.credit_calculated_at ?? payment.paid_at ?? ""}
+                                          </dd>
+                                        </div>
+                                        <div>
+                                          <dt className="text-muted-foreground">
+                                            {payment.previous_plan ?? "Previous plan"} monthly
+                                          </dt>
+                                          <dd className="font-mono">{formatPHP(prevPrice)}</dd>
+                                          <dd className="font-mono text-[10px] text-muted-foreground/70">
+                                            raw: {prevPrice}
+                                          </dd>
+                                        </div>
+                                        <div>
+                                          <dt className="text-muted-foreground">totalDays</dt>
+                                          <dd className="font-mono">{totalDays}</dd>
+                                          <dd className="font-mono text-[10px] text-muted-foreground/70">
+                                            (period_end − period_start) ÷ 86 400 000 ms
+                                          </dd>
+                                        </div>
+                                        <div>
+                                          <dt className="text-muted-foreground">remainingDays</dt>
+                                          <dd className="font-mono">{remainingDays}</dd>
+                                          <dd className="font-mono text-[10px] text-muted-foreground/70">
+                                            (period_end −{" "}
+                                            {payment.credit_calculated_at
+                                              ? "credit_calculated_at"
+                                              : "paid_at"}
+                                            ) ÷ 86 400 000 ms
+                                          </dd>
+                                        </div>
+                                      </dl>
+                                      {totalDays && remainingDays !== null && (
+                                        <div className="mt-2 font-mono text-xs text-muted-foreground">
+                                          {formatPHP(prevPrice)} × {remainingDays} ÷ {totalDays} ={" "}
+                                          <span className="text-emerald-600">
+                                            {formatPHP(credit)}
+                                          </span>
+                                        </div>
+                                      )}
+                                    </td>
+                                  </tr>
+                                )}
+                              </>
+                            );
+                          })()}
+                      </tbody>
+                      <tfoot>
+                        {hasBreakdown && (
+                          <tr className="border-t border-border text-xs text-muted-foreground">
+                            <td className="py-2 text-right uppercase">Subtotal</td>
+                            <td className="py-2 text-right">{formatPHP(subtotal)}</td>
+                          </tr>
+                        )}
+                        {credit > 0 && (
+                          <tr className="text-xs text-muted-foreground">
+                            <td className="py-1 text-right uppercase">Credit applied</td>
+                            <td className="py-1 text-right text-emerald-600">
+                              − {formatPHP(credit)}
                             </td>
                           </tr>
                         )}
-                      </>
-                    );
-                  })()}
-                </tbody>
-                <tfoot>
-                  {hasBreakdown && (
-                    <tr className="border-t border-border text-xs text-muted-foreground">
-                      <td className="py-2 text-right uppercase">Subtotal</td>
-                      <td className="py-2 text-right">{formatPHP(subtotal)}</td>
-                    </tr>
-                  )}
-                  {credit > 0 && (
-                    <tr className="text-xs text-muted-foreground">
-                      <td className="py-1 text-right uppercase">Credit applied</td>
-                      <td className="py-1 text-right text-emerald-600">− {formatPHP(credit)}</td>
-                    </tr>
-                  )}
-                  <tr className="border-t border-border">
-                    <td className="py-3 text-right text-xs uppercase text-muted-foreground">
-                      {credit > 0 ? "Net due" : "Total"}
-                    </td>
-                    <td className="py-3 text-right font-display text-lg font-bold">{formatPHP(net)}</td>
-                  </tr>
-                </tfoot>
-              </table>
-              </div>
-            );
-
-          })()
-          )}
+                        <tr className="border-t border-border">
+                          <td className="py-3 text-right text-xs uppercase text-muted-foreground">
+                            {credit > 0 ? "Net due" : "Total"}
+                          </td>
+                          <td className="py-3 text-right font-display text-lg font-bold">
+                            {formatPHP(net)}
+                          </td>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                );
+              })()}
 
           <footer className="mt-8 border-t border-border pt-4 text-xs text-muted-foreground">
             Thank you for using 365 Motorsales. For questions about this {docLabel.toLowerCase()},
-            email <a href="mailto:partners@365motorsales.ph" className="text-primary">partners@365motorsales.ph</a> and
-            reference <span className="font-mono">{docNumber}</span>.
+            email{" "}
+            <a href="mailto:partners@365motorsales.ph" className="text-primary">
+              partners@365motorsales.ph
+            </a>{" "}
+            and reference <span className="font-mono">{docNumber}</span>.
           </footer>
         </article>
       </div>

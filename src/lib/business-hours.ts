@@ -3,7 +3,13 @@
 export type DayKey = "mon" | "tue" | "wed" | "thu" | "fri" | "sat" | "sun";
 export const DAY_KEYS: DayKey[] = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 export const DAY_LABELS: Record<DayKey, string> = {
-  mon: "Mon", tue: "Tue", wed: "Wed", thu: "Thu", fri: "Fri", sat: "Sat", sun: "Sun",
+  mon: "Mon",
+  tue: "Tue",
+  wed: "Wed",
+  thu: "Thu",
+  fri: "Fri",
+  sat: "Sat",
+  sun: "Sun",
 };
 
 export type HourRange = { open: string; close: string }; // "HH:MM" 24h
@@ -35,13 +41,25 @@ export function isStructuredHours(h: any): h is StructuredHours {
 // Convert a Date to weekday + minutes-since-midnight in Asia/Manila.
 function nowInManila(now: Date): { day: DayKey; minutes: number; date: Date } {
   const fmt = new Intl.DateTimeFormat("en-US", {
-    timeZone: TZ, weekday: "short", hour: "2-digit", minute: "2-digit", hour12: false,
+    timeZone: TZ,
+    weekday: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
   });
   const parts = fmt.formatToParts(now);
   const wk = parts.find((p) => p.type === "weekday")?.value ?? "Mon";
   const hh = Number(parts.find((p) => p.type === "hour")?.value ?? "0");
   const mm = Number(parts.find((p) => p.type === "minute")?.value ?? "0");
-  const map: Record<string, DayKey> = { Mon: "mon", Tue: "tue", Wed: "wed", Thu: "thu", Fri: "fri", Sat: "sat", Sun: "sun" };
+  const map: Record<string, DayKey> = {
+    Mon: "mon",
+    Tue: "tue",
+    Wed: "wed",
+    Thu: "thu",
+    Fri: "fri",
+    Sat: "sat",
+    Sun: "sun",
+  };
   return { day: map[wk] ?? "mon", minutes: hh * 60 + mm, date: now };
 }
 
@@ -61,7 +79,13 @@ export function formatRange(r: HourRange): string {
 }
 
 const NEXT_DAY: Record<DayKey, DayKey> = {
-  mon: "tue", tue: "wed", wed: "thu", thu: "fri", fri: "sat", sat: "sun", sun: "mon",
+  mon: "tue",
+  tue: "wed",
+  wed: "thu",
+  thu: "fri",
+  fri: "sat",
+  sat: "sun",
+  sun: "mon",
 };
 
 export type HoursState = "open" | "closing_soon" | "opening_soon" | "closed" | "unknown";
@@ -91,7 +115,11 @@ export function getStatus(
       if (minutes >= o && minutes < c) {
         const remain = c - minutes;
         if (remain <= closingSoon) {
-          return { state: "closing_soon", label: `Closing soon`, detail: `Closes at ${fmtMin(c % (24 * 60))}` };
+          return {
+            state: "closing_soon",
+            label: `Closing soon`,
+            detail: `Closes at ${fmtMin(c % (24 * 60))}`,
+          };
         }
         return { state: "open", label: "Open now", detail: `Closes at ${fmtMin(c % (24 * 60))}` };
       }

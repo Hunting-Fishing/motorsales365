@@ -42,8 +42,7 @@ function timeAgo(iso: string): string {
   return `${d}d ago`;
 }
 
-const LISTING_SELECT =
-  "id,title,price_php,city,region,listing_media(url,type)";
+const LISTING_SELECT = "id,title,price_php,city,region,listing_media(url,type)";
 
 function pickCover(media: any): string | null {
   const photos = (media ?? []).filter((m: any) => m.type === "photo");
@@ -203,8 +202,12 @@ export function LiveActivityFeed() {
             </span>
             Live
           </div>
-          <h2 className="mt-2 font-display text-2xl font-bold md:text-3xl">Just listed & price drops</h2>
-          <p className="text-muted-foreground">Fresh inventory and lowered prices, updated in real time.</p>
+          <h2 className="mt-2 font-display text-2xl font-bold md:text-3xl">
+            Just listed & price drops
+          </h2>
+          <p className="text-muted-foreground">
+            Fresh inventory and lowered prices, updated in real time.
+          </p>
         </div>
       </div>
 
@@ -223,7 +226,12 @@ export function LiveActivityFeed() {
               >
                 <div className="relative h-14 w-20 shrink-0 overflow-hidden rounded-md bg-muted sm:h-16 sm:w-24">
                   {it.coverUrl ? (
-                    <img src={it.coverUrl} alt={it.title} className="h-full w-full object-cover" loading="lazy" />
+                    <img
+                      src={it.coverUrl}
+                      alt={it.title}
+                      className="h-full w-full object-cover"
+                      loading="lazy"
+                    />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-muted-foreground/40">
                       <Sparkles className="h-5 w-5" />
@@ -248,15 +256,21 @@ export function LiveActivityFeed() {
                   <p className="mt-0.5 truncate text-sm font-medium">{it.title}</p>
                   <div className="flex flex-wrap items-baseline gap-2 text-xs text-muted-foreground">
                     {it.kind === "new" ? (
-                      <span className="text-sm font-semibold text-primary">{formatPHP(it.price)}</span>
+                      <span className="text-sm font-semibold text-primary">
+                        {formatPHP(it.price)}
+                      </span>
                     ) : (
                       <>
-                        <span className="text-sm font-semibold text-primary">{formatPHP(it.newPrice)}</span>
+                        <span className="text-sm font-semibold text-primary">
+                          {formatPHP(it.newPrice)}
+                        </span>
                         <span className="line-through">{formatPHP(it.oldPrice)}</span>
                       </>
                     )}
                     {(it.city || it.region) && (
-                      <span className="truncate">· {[it.city, it.region].filter(Boolean).join(", ")}</span>
+                      <span className="truncate">
+                        · {[it.city, it.region].filter(Boolean).join(", ")}
+                      </span>
                     )}
                   </div>
                 </div>

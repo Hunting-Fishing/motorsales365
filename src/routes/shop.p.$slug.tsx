@@ -16,7 +16,10 @@ function getVisitorId(): string {
   if (typeof window === "undefined") return "";
   const k = "shop_visitor_id";
   let v = localStorage.getItem(k);
-  if (!v) { v = crypto.randomUUID(); localStorage.setItem(k, v); }
+  if (!v) {
+    v = crypto.randomUUID();
+    localStorage.setItem(k, v);
+  }
   return v;
 }
 
@@ -25,7 +28,10 @@ export const Route = createFileRoute("/shop/p/$slug")({
   head: ({ params }) => ({
     meta: [
       { title: `${params.slug} — Shop | 365 MotorSales` },
-      { name: "description", content: "Buy from trusted PH marketplaces. Curated by 365 MotorSales." },
+      {
+        name: "description",
+        content: "Buy from trusted PH marketplaces. Curated by 365 MotorSales.",
+      },
     ],
   }),
 });
@@ -49,7 +55,8 @@ function ProductPage() {
       const effective = l.sale_price_php ?? l.price_php;
       if (effective == null) continue;
       const v = Number(effective);
-      if (!best || v < best.price) best = { price: v, networkSlug: l.network.slug, networkName: l.network.name };
+      if (!best || v < best.price)
+        best = { price: v, networkSlug: l.network.slug, networkName: l.network.name };
     }
     return best;
   }, [links]);
@@ -64,9 +71,25 @@ function ProductPage() {
     return vals.length ? Math.min(...vals) : null;
   }, [history]);
 
-  if (isLoading) return <SiteLayout><div className="container mx-auto px-4 py-16 text-center text-muted-foreground">Loading…</div></SiteLayout>;
+  if (isLoading)
+    return (
+      <SiteLayout>
+        <div className="container mx-auto px-4 py-16 text-center text-muted-foreground">
+          Loading…
+        </div>
+      </SiteLayout>
+    );
   if (!p) {
-    return <SiteLayout><div className="container mx-auto px-4 py-16 text-center"><h1 className="text-2xl font-semibold">Product not found</h1><Link to="/shop" className="mt-4 inline-block text-primary underline">Back to shop</Link></div></SiteLayout>;
+    return (
+      <SiteLayout>
+        <div className="container mx-auto px-4 py-16 text-center">
+          <h1 className="text-2xl font-semibold">Product not found</h1>
+          <Link to="/shop" className="mt-4 inline-block text-primary underline">
+            Back to shop
+          </Link>
+        </div>
+      </SiteLayout>
+    );
   }
 
   const listPrice = p.price_php != null ? Number(p.price_php) : null;
@@ -86,20 +109,36 @@ function ProductPage() {
     <SiteLayout>
       <div className="container mx-auto px-4 py-8">
         <div className="mb-4 flex items-center gap-2 text-sm text-muted-foreground">
-          <Link to="/shop" className="hover:text-foreground">Shop</Link>
-          {p.category && <>
-            <span>/</span>
-            <Link to="/shop/$category" params={{ category: p.category.slug }} className="hover:text-foreground">{p.category.name}</Link>
-          </>}
+          <Link to="/shop" className="hover:text-foreground">
+            Shop
+          </Link>
+          {p.category && (
+            <>
+              <span>/</span>
+              <Link
+                to="/shop/$category"
+                params={{ category: p.category.slug }}
+                className="hover:text-foreground"
+              >
+                {p.category.name}
+              </Link>
+            </>
+          )}
         </div>
 
         <ShopifyStoreBanner />
 
         <div className="grid gap-8 md:grid-cols-2">
           <div>
-            {p.image_url
-              ? <ImageWithSkeleton src={p.image_url} alt={p.title} className="aspect-square w-full rounded-xl border object-cover" />
-              : <div className="aspect-square w-full rounded-xl border bg-muted" />}
+            {p.image_url ? (
+              <ImageWithSkeleton
+                src={p.image_url}
+                alt={p.title}
+                className="aspect-square w-full rounded-xl border object-cover"
+              />
+            ) : (
+              <div className="aspect-square w-full rounded-xl border bg-muted" />
+            )}
           </div>
           <div className="space-y-4">
             {p.brand && <Badge variant="secondary">{p.brand}</Badge>}
@@ -111,7 +150,9 @@ function ProductPage() {
                   <p className="text-3xl font-bold">₱{effectivePrice.toLocaleString()}</p>
                   {showStrikethrough && (
                     <>
-                      <p className="text-lg text-muted-foreground line-through">₱{listPrice!.toLocaleString()}</p>
+                      <p className="text-lg text-muted-foreground line-through">
+                        ₱{listPrice!.toLocaleString()}
+                      </p>
                       <Badge className="bg-green-600 hover:bg-green-700">{pctOff}% OFF</Badge>
                     </>
                   )}
@@ -132,15 +173,25 @@ function ProductPage() {
             <div className="pt-1">
               <ShopFavoriteButton productId={p.id} variant="label" />
             </div>
-            {p.description && <p className="whitespace-pre-line text-muted-foreground">{p.description}</p>}
+            {p.description && (
+              <p className="whitespace-pre-line text-muted-foreground">{p.description}</p>
+            )}
 
             <div className="space-y-2 pt-4">
               <p className="text-sm font-semibold">Compare prices</p>
-              {links.length === 0 && <p className="text-sm text-muted-foreground">No active links right now — please check back soon.</p>}
+              {links.length === 0 && (
+                <p className="text-sm text-muted-foreground">
+                  No active links right now — please check back soon.
+                </p>
+              )}
               {links.map((l) => {
                 const eff = l.sale_price_php ?? l.price_php;
-                const isCheapest = cheapest && l.network.slug === cheapest.networkSlug && eff != null;
-                const hasSale = l.sale_price_php != null && l.price_php != null && Number(l.sale_price_php) < Number(l.price_php);
+                const isCheapest =
+                  cheapest && l.network.slug === cheapest.networkSlug && eff != null;
+                const hasSale =
+                  l.sale_price_php != null &&
+                  l.price_php != null &&
+                  Number(l.sale_price_php) < Number(l.price_php);
                 return (
                   <a
                     key={l.id}
@@ -151,13 +202,21 @@ function ProductPage() {
                   >
                     <div className="flex items-center gap-3">
                       <span className="font-medium">{l.network.name}</span>
-                      {isCheapest && <Badge className="bg-green-600 text-[10px] hover:bg-green-700">Best price</Badge>}
+                      {isCheapest && (
+                        <Badge className="bg-green-600 text-[10px] hover:bg-green-700">
+                          Best price
+                        </Badge>
+                      )}
                     </div>
                     <div className="flex items-center gap-2">
                       {eff != null ? (
                         <div className="text-right">
                           <span className="font-bold">₱{Number(eff).toLocaleString()}</span>
-                          {hasSale && <span className="ml-1 text-xs text-muted-foreground line-through">₱{Number(l.price_php).toLocaleString()}</span>}
+                          {hasSale && (
+                            <span className="ml-1 text-xs text-muted-foreground line-through">
+                              ₱{Number(l.price_php).toLocaleString()}
+                            </span>
+                          )}
                         </div>
                       ) : (
                         <span className="text-xs text-muted-foreground">Check price</span>
@@ -173,14 +232,19 @@ function ProductPage() {
               <div className="rounded-lg border bg-card p-3">
                 <div className="mb-1 flex items-center justify-between text-xs">
                   <span className="font-semibold">Price history (90 days)</span>
-                  {thirtyDayLow != null && <span className="text-muted-foreground">30-day low ₱{thirtyDayLow.toLocaleString()}</span>}
+                  {thirtyDayLow != null && (
+                    <span className="text-muted-foreground">
+                      30-day low ₱{thirtyDayLow.toLocaleString()}
+                    </span>
+                  )}
                 </div>
                 <PriceSparkline history={history} />
               </div>
             )}
 
             <p className="pt-2 text-xs text-muted-foreground">
-              We earn a commission on qualifying purchases. You pay the marketplace directly at no extra cost.
+              We earn a commission on qualifying purchases. You pay the marketplace directly at no
+              extra cost.
             </p>
           </div>
         </div>
@@ -189,13 +253,16 @@ function ProductPage() {
           <div className="mt-10 rounded-xl border bg-card p-5">
             <h2 className="mb-3 text-lg font-semibold">Fitment</h2>
             {p.universal_fit ? (
-              <p className="text-sm text-muted-foreground">✅ Universal fit — works with any vehicle.</p>
+              <p className="text-sm text-muted-foreground">
+                ✅ Universal fit — works with any vehicle.
+              </p>
             ) : (
               <ul className="grid gap-2 text-sm sm:grid-cols-2">
                 {fitment.map((f) => {
-                  const yr = f.year_start || f.year_end
-                    ? ` (${f.year_start ?? "…"}–${f.year_end ?? "present"})`
-                    : "";
+                  const yr =
+                    f.year_start || f.year_end
+                      ? ` (${f.year_start ?? "…"}–${f.year_end ?? "present"})`
+                      : "";
                   const eng = f.engine ? ` — ${f.engine}` : "";
                   const label = [f.make ?? "Any make", f.model ?? "Any model"].join(" ") + yr + eng;
                   return (
@@ -203,7 +270,9 @@ function ProductPage() {
                       <span>•</span>
                       <span>
                         <strong>{label}</strong>
-                        {f.notes && <span className="block text-xs text-muted-foreground">{f.notes}</span>}
+                        {f.notes && (
+                          <span className="block text-xs text-muted-foreground">{f.notes}</span>
+                        )}
                       </span>
                     </li>
                   );

@@ -3,12 +3,28 @@ import { z } from "zod";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { getLead, assignLead, updateLeadStatus, addLeadNote, listOrgMembers } from "@/lib/leads.functions";
+import {
+  getLead,
+  assignLead,
+  updateLeadStatus,
+  addLeadNote,
+  listOrgMembers,
+} from "@/lib/leads.functions";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowLeft, MessageSquare, Truck, Wrench, Building2, User, Mail, Phone, Calendar } from "lucide-react";
+import {
+  ArrowLeft,
+  MessageSquare,
+  Truck,
+  Wrench,
+  Building2,
+  User,
+  Mail,
+  Phone,
+  Calendar,
+} from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { toast } from "sonner";
 
@@ -54,7 +70,8 @@ function LeadDetail() {
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
 
-  if (isLoading || !data) return <div className="p-8 text-center text-muted-foreground">Loading…</div>;
+  if (isLoading || !data)
+    return <div className="p-8 text-center text-muted-foreground">Loading…</div>;
 
   const { lead, activities } = data;
   const Icon = SOURCE_ICONS[lead.source] ?? MessageSquare;
@@ -62,24 +79,44 @@ function LeadDetail() {
   const reload = () => qc.invalidateQueries({ queryKey: ["lead", id] });
 
   const onAssign = async (uid: string | null) => {
-    try { await assignFn({ data: { id, userId: uid } }); toast.success("Assigned"); reload(); }
-    catch (e: any) { toast.error(e?.message ?? "Failed"); }
+    try {
+      await assignFn({ data: { id, userId: uid } });
+      toast.success("Assigned");
+      reload();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    }
   };
   const onStatus = async (s: "new" | "in_progress" | "won" | "lost") => {
-    try { await statusFn({ data: { id, status: s } }); toast.success("Status updated"); reload(); }
-    catch (e: any) { toast.error(e?.message ?? "Failed"); }
+    try {
+      await statusFn({ data: { id, status: s } });
+      toast.success("Status updated");
+      reload();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    }
   };
   const onAddNote = async () => {
     if (note.trim().length < 1) return;
     setSaving(true);
-    try { await noteFn({ data: { id, body: note.trim() } }); setNote(""); reload(); }
-    catch (e: any) { toast.error(e?.message ?? "Failed"); }
-    finally { setSaving(false); }
+    try {
+      await noteFn({ data: { id, body: note.trim() } });
+      setNote("");
+      reload();
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
     <div className="space-y-4">
-      <Link to="/dashboard/team/leads" search={{ orgId } as any} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
+      <Link
+        to="/dashboard/team/leads"
+        search={{ orgId } as any}
+        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+      >
         <ArrowLeft className="h-4 w-4" /> Back to inbox
       </Link>
 
@@ -97,15 +134,33 @@ function LeadDetail() {
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <div className="space-y-2 text-sm">
-            <div className="flex items-center gap-2"><User className="h-4 w-4 text-muted-foreground" />{lead.customer_name ?? "—"}</div>
-            {lead.customer_email && <div className="flex items-center gap-2"><Mail className="h-4 w-4 text-muted-foreground" />{lead.customer_email}</div>}
-            {lead.customer_phone && <div className="flex items-center gap-2"><Phone className="h-4 w-4 text-muted-foreground" />{lead.customer_phone}</div>}
-            <div className="flex items-center gap-2"><Calendar className="h-4 w-4 text-muted-foreground" />Created {formatDistanceToNow(new Date(lead.created_at), { addSuffix: true })}</div>
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4 text-muted-foreground" />
+              {lead.customer_name ?? "—"}
+            </div>
+            {lead.customer_email && (
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                {lead.customer_email}
+              </div>
+            )}
+            {lead.customer_phone && (
+              <div className="flex items-center gap-2">
+                <Phone className="h-4 w-4 text-muted-foreground" />
+                {lead.customer_phone}
+              </div>
+            )}
+            <div className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              Created {formatDistanceToNow(new Date(lead.created_at), { addSuffix: true })}
+            </div>
           </div>
 
           <div className="space-y-3">
             <div>
-              <label className="mb-1 block text-xs font-semibold text-muted-foreground">Status</label>
+              <label className="mb-1 block text-xs font-semibold text-muted-foreground">
+                Status
+              </label>
               <div className="flex flex-wrap gap-1">
                 {(["new", "in_progress", "won", "lost"] as const).map((s) => (
                   <button
@@ -119,7 +174,9 @@ function LeadDetail() {
               </div>
             </div>
             <div>
-              <label className="mb-1 block text-xs font-semibold text-muted-foreground">Assigned to</label>
+              <label className="mb-1 block text-xs font-semibold text-muted-foreground">
+                Assigned to
+              </label>
               <select
                 value={lead.assigned_to ?? ""}
                 onChange={(e) => onAssign(e.target.value || null)}
@@ -138,7 +195,11 @@ function LeadDetail() {
 
         {lead.listing_id && (
           <div className="mt-4">
-            <Link to="/listing/$id" params={{ id: lead.listing_id }} className="text-sm font-medium text-primary underline">
+            <Link
+              to="/listing/$id"
+              params={{ id: lead.listing_id }}
+              className="text-sm font-medium text-primary underline"
+            >
               View source listing →
             </Link>
           </div>
@@ -155,7 +216,9 @@ function LeadDetail() {
             rows={2}
             className="flex-1"
           />
-          <Button onClick={onAddNote} disabled={saving || note.trim().length < 1}>Add note</Button>
+          <Button onClick={onAddNote} disabled={saving || note.trim().length < 1}>
+            Add note
+          </Button>
         </div>
 
         <ul className="mt-5 space-y-3">
@@ -164,7 +227,9 @@ function LeadDetail() {
               <div className="mt-1 h-2 w-2 shrink-0 rounded-full bg-primary" />
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                  <span className="font-semibold text-foreground">{a.actor?.full_name ?? "System"}</span>
+                  <span className="font-semibold text-foreground">
+                    {a.actor?.full_name ?? "System"}
+                  </span>
                   <span>·</span>
                   <span>{a.kind.replace("_", " ")}</span>
                   <span>·</span>
@@ -172,7 +237,9 @@ function LeadDetail() {
                 </div>
                 {a.body && <p className="mt-0.5 whitespace-pre-wrap">{a.body}</p>}
                 {a.kind === "status_changed" && (
-                  <p className="mt-0.5 text-muted-foreground">{a.from_value} → {a.to_value}</p>
+                  <p className="mt-0.5 text-muted-foreground">
+                    {a.from_value} → {a.to_value}
+                  </p>
                 )}
               </div>
             </li>

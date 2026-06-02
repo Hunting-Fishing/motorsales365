@@ -27,14 +27,18 @@ function DashboardLearning() {
   return (
     <div>
       <h1 className="font-display text-2xl font-bold">My learning</h1>
-      <p className="text-sm text-muted-foreground">Courses you're enrolled in and certificates you've earned.</p>
+      <p className="text-sm text-muted-foreground">
+        Courses you're enrolled in and certificates you've earned.
+      </p>
 
       {isLoading ? (
         <p className="mt-6 text-muted-foreground">Loading…</p>
       ) : (data?.enrollments ?? []).length === 0 ? (
         <div className="mt-8 rounded-xl border border-dashed p-12 text-center">
           <GraduationCap className="mx-auto h-10 w-10 text-muted-foreground" />
-          <p className="mt-3 text-sm text-muted-foreground">You haven't enrolled in any courses yet.</p>
+          <p className="mt-3 text-sm text-muted-foreground">
+            You haven't enrolled in any courses yet.
+          </p>
           <Button asChild className="mt-4">
             <Link to="/learn">Browse courses</Link>
           </Button>
@@ -45,7 +49,11 @@ function DashboardLearning() {
             <Card key={e.id} className="overflow-hidden">
               <div className="aspect-video overflow-hidden bg-muted">
                 {e.course?.hero_image_url ? (
-                  <img src={e.course.hero_image_url} alt="" className="h-full w-full object-cover" />
+                  <img
+                    src={e.course.hero_image_url}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-muted-foreground">
                     <GraduationCap className="h-12 w-12" />

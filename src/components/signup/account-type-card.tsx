@@ -10,7 +10,14 @@ interface Props {
   badge?: string;
 }
 
-export function AccountTypeCard({ icon: Icon, label, description, selected, onSelect, badge }: Props) {
+export function AccountTypeCard({
+  icon: Icon,
+  label,
+  description,
+  selected,
+  onSelect,
+  badge,
+}: Props) {
   return (
     <button
       type="button"
@@ -40,7 +47,12 @@ export function AccountTypeCard({ icon: Icon, label, description, selected, onSe
       >
         <Icon className="h-6 w-6" />
       </div>
-      <h3 className={cn("font-display text-base font-bold leading-tight mb-2", selected ? "text-primary" : "text-foreground")}>
+      <h3
+        className={cn(
+          "font-display text-base font-bold leading-tight mb-2",
+          selected ? "text-primary" : "text-foreground",
+        )}
+      >
         {label}
       </h3>
       <p className="text-sm leading-relaxed text-muted-foreground">{description}</p>

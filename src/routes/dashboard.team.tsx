@@ -7,7 +7,14 @@ import { createOrganization } from "@/lib/organizations.functions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Building2, Users, Inbox, BarChart3, Plus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -17,7 +24,11 @@ export const Route = createFileRoute("/dashboard/team")({
 
 function TeamLayout() {
   const fetchOrgs = useServerFn(listMyOrgs);
-  const { data: orgs, isLoading, refetch } = useQuery({
+  const {
+    data: orgs,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["my-orgs"],
     queryFn: () => fetchOrgs(),
   });
@@ -54,7 +65,9 @@ function TeamLayout() {
             className="bg-transparent text-sm font-semibold outline-none"
           >
             {orgs.map((o: any) => (
-              <option key={o.id} value={o.id}>{o.name}</option>
+              <option key={o.id} value={o.id}>
+                {o.name}
+              </option>
             ))}
           </select>
         </div>
@@ -87,13 +100,20 @@ function TeamLayout() {
       <CreateOrgDialog
         open={createOpen}
         onOpenChange={setCreateOpen}
-        onCreated={(id) => { setSelectedOrgId(id); refetch(); }}
+        onCreated={(id) => {
+          setSelectedOrgId(id);
+          refetch();
+        }}
       />
     </div>
   );
 }
 
-function CreateOrgDialog({ open, onOpenChange, onCreated }: {
+function CreateOrgDialog({
+  open,
+  onOpenChange,
+  onCreated,
+}: {
   open: boolean;
   onOpenChange: (o: boolean) => void;
   onCreated: (id: string) => void;
@@ -123,16 +143,22 @@ function CreateOrgDialog({ open, onOpenChange, onCreated }: {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create a new team</DialogTitle>
-          <DialogDescription>Teams let you assign customer inquiries to sales reps and track who closes deals.</DialogDescription>
+          <DialogDescription>
+            Teams let you assign customer inquiries to sales reps and track who closes deals.
+          </DialogDescription>
         </DialogHeader>
         <Input
           placeholder="Team name (e.g. Quezon Auto)"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") submit();
+          }}
         />
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={creating}>Cancel</Button>
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={creating}>
+            Cancel
+          </Button>
           <Button onClick={submit} disabled={creating || name.trim().length < 2}>
             {creating ? "Creating…" : "Create team"}
           </Button>
@@ -169,7 +195,11 @@ function CreateOrgEmptyState({ onCreated }: { onCreated: () => void }) {
         Invite sales reps, assign customer inquiries, and track who's closing deals.
       </p>
       <div className="mt-5 flex gap-2">
-        <Input placeholder="Team name (e.g. Quezon Auto)" value={name} onChange={(e) => setName(e.target.value)} />
+        <Input
+          placeholder="Team name (e.g. Quezon Auto)"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
         <Button onClick={submit} disabled={creating || name.trim().length < 2}>
           {creating ? "Creating…" : "Create team"}
         </Button>

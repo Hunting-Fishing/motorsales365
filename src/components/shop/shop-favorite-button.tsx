@@ -24,12 +24,7 @@ interface Props {
   variant?: "icon" | "label";
 }
 
-export function ShopFavoriteButton({
-  productId,
-  className,
-  size = "md",
-  variant = "icon",
-}: Props) {
+export function ShopFavoriteButton({ productId, className, size = "md", variant = "icon" }: Props) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -37,8 +32,7 @@ export function ShopFavoriteButton({
   const isFav = favs.has(productId);
 
   const mutation = useMutation({
-    mutationFn: () =>
-      toggleShopFavorite({ data: { productId, favorite: !isFav } }),
+    mutationFn: () => toggleShopFavorite({ data: { productId, favorite: !isFav } }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["shop-fav-ids", user?.id] });
       qc.invalidateQueries({ queryKey: ["shop-fav-products", user?.id] });

@@ -11,14 +11,26 @@ const QUICK_LINKS = [
   { to: "/support/business", label: "Business & shop", icon: Store },
 ] as const;
 
-const HIDDEN_PREFIXES = ["/support", "/admin", "/login", "/signup", "/checkout", "/payments/", "/dashboard/messages"];
+const HIDDEN_PREFIXES = [
+  "/support",
+  "/admin",
+  "/login",
+  "/signup",
+  "/checkout",
+  "/payments/",
+  "/dashboard/messages",
+];
 
 export function FloatingHelpWidget() {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
 
   // Don't show on routes where it would get in the way
-  if (HIDDEN_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/") || pathname.startsWith(p))) {
+  if (
+    HIDDEN_PREFIXES.some(
+      (p) => pathname === p || pathname.startsWith(p + "/") || pathname.startsWith(p),
+    )
+  ) {
     return null;
   }
 

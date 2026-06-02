@@ -10,13 +10,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-export function PassportShareSection({
-  url,
-  vehicleName,
-}: {
-  url: string;
-  vehicleName: string;
-}) {
+export function PassportShareSection({ url, vehicleName }: { url: string; vehicleName: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = useCallback(async () => {
@@ -85,12 +79,7 @@ export function PassportShareSection({
               Scan to view verified service history
             </p>
             <div className="flex w-full gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1 gap-1.5"
-                onClick={handleCopy}
-              >
+              <Button variant="outline" size="sm" className="flex-1 gap-1.5" onClick={handleCopy}>
                 {copied ? (
                   <Check className="h-3.5 w-3.5 text-success" />
                 ) : (
@@ -113,21 +102,11 @@ export function PassportShareSection({
         </DialogContent>
       </Dialog>
 
-      <Button
-        variant="outline"
-        size="sm"
-        className="gap-1.5 print:hidden"
-        onClick={handlePrint}
-      >
+      <Button variant="outline" size="sm" className="gap-1.5 print:hidden" onClick={handlePrint}>
         <Printer className="h-3.5 w-3.5" /> Print
       </Button>
 
-      <Button
-        variant="ghost"
-        size="sm"
-        className="gap-1.5 print:hidden"
-        onClick={handleCopy}
-      >
+      <Button variant="ghost" size="sm" className="gap-1.5 print:hidden" onClick={handleCopy}>
         {copied ? (
           <Check className="h-3.5 w-3.5 text-success" />
         ) : (

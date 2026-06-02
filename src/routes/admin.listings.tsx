@@ -14,21 +14,36 @@ function AdminListings() {
   const [items, setItems] = useState<any[]>([]);
 
   const load = async () => {
-    const { data } = await supabase.from("listings")
+    const { data } = await supabase
+      .from("listings")
       .select("id,title,price_php,status,created_at,user_id,payments(id,status,amount_php,kind)")
-      .order("created_at", { ascending: false }).limit(100);
+      .order("created_at", { ascending: false })
+      .limit(100);
     setItems(data ?? []);
   };
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const setStatus = async (id: string, status: "active" | "hidden" | "expired" | "sold") => {
-    await supabase.from("listings").update({ status, published_at: status === "active" ? new Date().toISOString() : null }).eq("id", id);
-    toast.success(`Listing ${status}`); load();
+    await supabase
+      .from("listings")
+      .update({ status, published_at: status === "active" ? new Date().toISOString() : null })
+      .eq("id", id);
+    toast.success(`Listing ${status}`);
+    load();
   };
   const markPaid = async (paymentId: string, listingId: string) => {
-    await supabase.from("payments").update({ status: "paid", paid_at: new Date().toISOString() }).eq("id", paymentId);
-    await supabase.from("listings").update({ status: "active", published_at: new Date().toISOString() }).eq("id", listingId);
-    toast.success("Payment confirmed, listing active"); load();
+    await supabase
+      .from("payments")
+      .update({ status: "paid", paid_at: new Date().toISOString() })
+      .eq("id", paymentId);
+    await supabase
+      .from("listings")
+      .update({ status: "active", published_at: new Date().toISOString() })
+      .eq("id", listingId);
+    toast.success("Payment confirmed, listing active");
+    load();
   };
 
   return (
@@ -38,10 +53,21 @@ function AdminListings() {
         {items.map((l) => {
           const pendingPayment = (l.payments ?? []).find((p: any) => p.status === "pending");
           return (
-            <div key={l.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
+            <div
+              key={l.id}
+              className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4"
+            >
               <div>
-                <Link to="/listing/$id" params={{ id: l.id }} className="font-medium hover:text-primary">{l.title}</Link>
-                <div className="text-xs text-muted-foreground">{formatPHP(l.price_php)} · {formatDate(l.created_at)}</div>
+                <Link
+                  to="/listing/$id"
+                  params={{ id: l.id }}
+                  className="font-medium hover:text-primary"
+                >
+                  {l.title}
+                </Link>
+                <div className="text-xs text-muted-foreground">
+                  {formatPHP(l.price_php)} · {formatDate(l.created_at)}
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant="secondary">{l.status}</Badge>
@@ -50,13 +76,21 @@ function AdminListings() {
                     Mark paid ({formatPHP(pendingPayment.amount_php)})
                   </Button>
                 )}
-                <Button size="sm" variant="outline" onClick={() => setStatus(l.id, "hidden")}>Hide</Button>
-                <Button size="sm" variant="outline" onClick={() => setStatus(l.id, "active")}>Activate</Button>
+                <Button size="sm" variant="outline" onClick={() => setStatus(l.id, "hidden")}>
+                  Hide
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => setStatus(l.id, "active")}>
+                  Activate
+                </Button>
               </div>
             </div>
           );
         })}
-        {items.length === 0 && <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">No listings.</div>}
+        {items.length === 0 && (
+          <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
+            No listings.
+          </div>
+        )}
       </div>
     </div>
   );

@@ -6,10 +6,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription, DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 
 type StaffRole = "admin" | "moderator" | "support" | "sales" | "advertising";
@@ -30,32 +40,50 @@ export function AddUserDialog({ onCreated }: { onCreated?: () => void }) {
   const [password, setPassword] = useState(() => generatePassword());
   const [accountType, setAccountType] = useState<"staff" | "business">("staff");
   const [roles, setRoles] = useState<StaffRole[]>(["support"]);
-  const [sellerType, setSellerType] = useState<"private" | "dealer" | "repair_shop" | "insurance">("private");
+  const [sellerType, setSellerType] = useState<"private" | "dealer" | "repair_shop" | "insurance">(
+    "private",
+  );
   const [businessName, setBusinessName] = useState("");
   const [businessKind, setBusinessKind] = useState<"dealer" | "repair_shop" | "insurance" | "">("");
   const [markVerified, setMarkVerified] = useState(true);
 
   const reset = () => {
-    setEmail(""); setFullName(""); setPassword(generatePassword());
-    setAccountType("staff"); setRoles(["support"]);
-    setSellerType("private"); setBusinessName(""); setBusinessKind(""); setMarkVerified(true);
+    setEmail("");
+    setFullName("");
+    setPassword(generatePassword());
+    setAccountType("staff");
+    setRoles(["support"]);
+    setSellerType("private");
+    setBusinessName("");
+    setBusinessKind("");
+    setMarkVerified(true);
   };
 
   const toggleRole = (r: StaffRole) =>
-    setRoles((cur) => cur.includes(r) ? cur.filter((x) => x !== r) : [...cur, r]);
+    setRoles((cur) => (cur.includes(r) ? cur.filter((x) => x !== r) : [...cur, r]));
 
   const copyPw = async () => {
-    try { await navigator.clipboard.writeText(password); toast.success("Password copied"); }
-    catch { toast.error("Could not copy"); }
+    try {
+      await navigator.clipboard.writeText(password);
+      toast.success("Password copied");
+    } catch {
+      toast.error("Could not copy");
+    }
   };
 
   const submit = async () => {
-    if (!email || !fullName || !password) { toast.error("Fill all required fields"); return; }
+    if (!email || !fullName || !password) {
+      toast.error("Fill all required fields");
+      return;
+    }
     setSubmitting(true);
     try {
       const { data: sess } = await supabase.auth.getSession();
       const token = sess.session?.access_token;
-      if (!token) { toast.error("You must be signed in"); return; }
+      if (!token) {
+        toast.error("You must be signed in");
+        return;
+      }
 
       const body: any = {
         email: email.trim().toLowerCase(),
@@ -91,41 +119,78 @@ export function AddUserDialog({ onCreated }: { onCreated?: () => void }) {
   };
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset(); }}>
+    <Dialog
+      open={open}
+      onOpenChange={(v) => {
+        setOpen(v);
+        if (!v) reset();
+      }}
+    >
       <DialogTrigger asChild>
-        <Button size="sm"><UserPlus className="mr-2 h-4 w-4" />Add user</Button>
+        <Button size="sm">
+          <UserPlus className="mr-2 h-4 w-4" />
+          Add user
+        </Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Add a new user</DialogTitle>
           <DialogDescription>
-            Creates a fully-active account in the database with the chosen roles. They can sign in immediately with the temporary password.
+            Creates a fully-active account in the database with the chosen roles. They can sign in
+            immediately with the temporary password.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-3">
           <div className="grid gap-2">
             <Label>Email *</Label>
-            <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="user@example.com" />
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="user@example.com"
+            />
           </div>
           <div className="grid gap-2">
             <Label>Full name *</Label>
-            <Input value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="Jane Doe" />
+            <Input
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              placeholder="Jane Doe"
+            />
           </div>
           <div className="grid gap-2">
             <Label>Temporary password *</Label>
             <div className="flex gap-2">
-              <Input value={password} onChange={(e) => setPassword(e.target.value)} className="font-mono" />
-              <Button type="button" variant="outline" size="icon" onClick={copyPw} title="Copy"><Copy className="h-4 w-4" /></Button>
-              <Button type="button" variant="outline" size="icon" onClick={() => setPassword(generatePassword())} title="Regenerate"><RefreshCw className="h-4 w-4" /></Button>
+              <Input
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="font-mono"
+              />
+              <Button type="button" variant="outline" size="icon" onClick={copyPw} title="Copy">
+                <Copy className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => setPassword(generatePassword())}
+                title="Regenerate"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </Button>
             </div>
-            <p className="text-xs text-muted-foreground">Share securely. They can change it after first sign-in.</p>
+            <p className="text-xs text-muted-foreground">
+              Share securely. They can change it after first sign-in.
+            </p>
           </div>
 
           <div className="grid gap-2">
             <Label>Account type</Label>
             <Select value={accountType} onValueChange={(v: any) => setAccountType(v)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="staff">Staff / Employee</SelectItem>
                 <SelectItem value="business">Business / Customer</SelectItem>
@@ -145,22 +210,29 @@ export function AddUserDialog({ onCreated }: { onCreated?: () => void }) {
                       type="button"
                       onClick={() => toggleRole(r)}
                       className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                        on ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background text-muted-foreground hover:border-primary/50"
+                        on
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-background text-muted-foreground hover:border-primary/50"
                       }`}
                     >
-                      {on ? "✓ " : "+ "}{r}
+                      {on ? "✓ " : "+ "}
+                      {r}
                     </button>
                   );
                 })}
               </div>
-              <p className="text-xs text-muted-foreground">Staff accounts automatically get a Staff QR Referral row created.</p>
+              <p className="text-xs text-muted-foreground">
+                Staff accounts automatically get a Staff QR Referral row created.
+              </p>
             </div>
           ) : (
             <>
               <div className="grid gap-2">
                 <Label>Seller type</Label>
                 <Select value={sellerType} onValueChange={(v: any) => setSellerType(v)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="private">Private</SelectItem>
                     <SelectItem value="dealer">Dealer</SelectItem>
@@ -175,8 +247,13 @@ export function AddUserDialog({ onCreated }: { onCreated?: () => void }) {
               </div>
               <div className="grid gap-2">
                 <Label>Business kind (optional)</Label>
-                <Select value={businessKind || "none"} onValueChange={(v: any) => setBusinessKind(v === "none" ? "" : v)}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                <Select
+                  value={businessKind || "none"}
+                  onValueChange={(v: any) => setBusinessKind(v === "none" ? "" : v)}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">None</SelectItem>
                     <SelectItem value="dealer">Dealer</SelectItem>
@@ -186,7 +263,11 @@ export function AddUserDialog({ onCreated }: { onCreated?: () => void }) {
                 </Select>
               </div>
               <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" checked={markVerified} onChange={(e) => setMarkVerified(e.target.checked)} />
+                <input
+                  type="checkbox"
+                  checked={markVerified}
+                  onChange={(e) => setMarkVerified(e.target.checked)}
+                />
                 Mark as verified
               </label>
             </>
@@ -194,8 +275,12 @@ export function AddUserDialog({ onCreated }: { onCreated?: () => void }) {
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)} disabled={submitting}>Cancel</Button>
-          <Button onClick={submit} disabled={submitting}>{submitting ? "Creating…" : "Create user"}</Button>
+          <Button variant="outline" onClick={() => setOpen(false)} disabled={submitting}>
+            Cancel
+          </Button>
+          <Button onClick={submit} disabled={submitting}>
+            {submitting ? "Creating…" : "Create user"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

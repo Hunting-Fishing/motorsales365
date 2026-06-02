@@ -90,7 +90,8 @@ function BookableItemsSection({
           description: draft.description?.trim() || null,
           duration_min: Number(draft.duration_min),
           buffer_min: Number(draft.buffer_min ?? 0),
-          price_php: draft.price_php != null && draft.price_php !== "" ? Number(draft.price_php) : null,
+          price_php:
+            draft.price_php != null && draft.price_php !== "" ? Number(draft.price_php) : null,
           max_concurrent: Number(draft.max_concurrent ?? 1),
           require_approval: !!draft.require_approval,
           lead_time_hours: Number(draft.lead_time_hours ?? 2),
@@ -135,14 +136,23 @@ function BookableItemsSection({
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <Label>Title</Label>
-              <Input value={draft.title} onChange={(e) => setDraft({ ...draft, title: e.target.value })} maxLength={120} />
+              <Input
+                value={draft.title}
+                onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                maxLength={120}
+              />
             </div>
             <div>
               <Label>Price (PHP, optional)</Label>
               <Input
                 type="number"
                 value={draft.price_php ?? ""}
-                onChange={(e) => setDraft({ ...draft, price_php: e.target.value === "" ? null : Number(e.target.value) })}
+                onChange={(e) =>
+                  setDraft({
+                    ...draft,
+                    price_php: e.target.value === "" ? null : Number(e.target.value),
+                  })
+                }
               />
             </div>
             <div>
@@ -203,7 +213,9 @@ function BookableItemsSection({
             />
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setDraft(null)}>Cancel</Button>
+            <Button variant="outline" onClick={() => setDraft(null)}>
+              Cancel
+            </Button>
             <Button onClick={save}>Save</Button>
           </div>
         </div>
@@ -215,7 +227,10 @@ function BookableItemsSection({
 
       <div className="space-y-2">
         {items.map((it) => (
-          <div key={it.id} className="flex items-center justify-between rounded-md border border-border px-3 py-2">
+          <div
+            key={it.id}
+            className="flex items-center justify-between rounded-md border border-border px-3 py-2"
+          >
             <div className="min-w-0">
               <div className="flex items-center gap-2">
                 <span className="font-medium">{it.title}</span>
@@ -223,13 +238,14 @@ function BookableItemsSection({
                 {it.require_approval && <Badge variant="outline">approval</Badge>}
               </div>
               <div className="text-xs text-muted-foreground">
-                {it.duration_min}m
-                {it.price_php != null && <> · ₱{it.price_php}</>}
+                {it.duration_min}m{it.price_php != null && <> · ₱{it.price_php}</>}
                 {it.max_concurrent > 1 && <> · ×{it.max_concurrent}</>}
               </div>
             </div>
             <div className="flex gap-1">
-              <Button size="sm" variant="outline" onClick={() => setDraft(it)}>Edit</Button>
+              <Button size="sm" variant="outline" onClick={() => setDraft(it)}>
+                Edit
+              </Button>
               <Button size="sm" variant="ghost" onClick={() => del(it.id)}>
                 <Trash2 className="h-4 w-4" />
               </Button>
@@ -276,7 +292,9 @@ function WeeklyHoursSection({
   return (
     <Card className="p-5">
       <h2 className="mb-1 font-display text-lg font-semibold">Booking hours</h2>
-      <p className="mb-4 text-xs text-muted-foreground">Weekly open windows when customers can book. Add multiple per day for split hours.</p>
+      <p className="mb-4 text-xs text-muted-foreground">
+        Weekly open windows when customers can book. Add multiple per day for split hours.
+      </p>
       <div className="space-y-3">
         {WEEKDAYS.map((name, idx) => {
           const dayRows = rows.map((r, i) => ({ r, i })).filter((x) => x.r.weekday === idx);
@@ -331,7 +349,9 @@ function WeeklyHoursSection({
         })}
       </div>
       <div className="mt-4 flex justify-end">
-        <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save hours"}</Button>
+        <Button onClick={save} disabled={saving}>
+          {saving ? "Saving…" : "Save hours"}
+        </Button>
       </div>
     </Card>
   );
@@ -392,7 +412,12 @@ function ExceptionsSection({
         <div className="flex flex-wrap items-end gap-2">
           <div>
             <Label>Date</Label>
-            <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="h-9 w-44" />
+            <Input
+              type="date"
+              value={date}
+              onChange={(e) => setDate(e.target.value)}
+              className="h-9 w-44"
+            />
           </div>
           <div>
             <Label>Type</Label>
@@ -410,11 +435,21 @@ function ExceptionsSection({
             <>
               <div>
                 <Label>From</Label>
-                <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} className="h-9 w-28" />
+                <Input
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  className="h-9 w-28"
+                />
               </div>
               <div>
                 <Label>To</Label>
-                <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="h-9 w-28" />
+                <Input
+                  type="time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  className="h-9 w-28"
+                />
               </div>
             </>
           )}
@@ -422,7 +457,13 @@ function ExceptionsSection({
         <div className="flex items-end gap-2">
           <div className="flex-1">
             <Label>Note</Label>
-            <Input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Holiday, lunch break, etc." maxLength={200} className="h-9" />
+            <Input
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
+              placeholder="Holiday, lunch break, etc."
+              maxLength={200}
+              className="h-9"
+            />
           </div>
           <Button onClick={add}>Add</Button>
         </div>
@@ -437,13 +478,22 @@ function ExceptionsSection({
               : `Open only ${e.start_time}–${e.end_time}`;
           const variant = e.closed ? "secondary" : "outline";
           return (
-            <div key={e.id} className="flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm">
+            <div
+              key={e.id}
+              className="flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm"
+            >
               <div>
                 <span className="font-medium">{e.date}</span>
-                <Badge variant={variant} className="ml-2">{label}</Badge>
+                <Badge variant={variant} className="ml-2">
+                  {label}
+                </Badge>
                 {e.note && <span className="ml-2 text-muted-foreground">{e.note}</span>}
               </div>
-              <Button size="sm" variant="ghost" onClick={() => remove({ data: { businessId, id: e.id } }).then(onChange)}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => remove({ data: { businessId, id: e.id } }).then(onChange)}
+              >
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
@@ -501,7 +551,9 @@ function BookingsInboxSection({
             className={`rounded-full border px-3 py-1 text-xs ${filter === s ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"}`}
           >
             {s === "all" ? "All" : STATUS_LABEL[s]}
-            <span className="ml-1 opacity-70">({s === "all" ? bookings.length : bookings.filter((b) => b.status === s).length})</span>
+            <span className="ml-1 opacity-70">
+              ({s === "all" ? bookings.length : bookings.filter((b) => b.status === s).length})
+            </span>
           </button>
         ))}
       </div>
@@ -515,12 +567,24 @@ function BookingsInboxSection({
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="font-medium">{b.customer_name}</span>
-                  <Badge variant={b.status === "pending" ? "destructive" : b.status === "confirmed" ? "default" : "secondary"}>
+                  <Badge
+                    variant={
+                      b.status === "pending"
+                        ? "destructive"
+                        : b.status === "confirmed"
+                          ? "default"
+                          : "secondary"
+                    }
+                  >
                     {STATUS_LABEL[b.status]}
                   </Badge>
                 </div>
                 <div className="mt-0.5 text-xs text-muted-foreground">
-                  {new Date(b.starts_at).toLocaleString()} → {new Date(b.ends_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  {new Date(b.starts_at).toLocaleString()} →{" "}
+                  {new Date(b.ends_at).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </div>
                 <div className="mt-0.5 text-xs text-muted-foreground">
                   {b.customer_phone && <span>{b.customer_phone}</span>}
@@ -532,15 +596,33 @@ function BookingsInboxSection({
               <div className="flex flex-wrap gap-1">
                 {b.status === "pending" && (
                   <>
-                    <Button size="sm" onClick={() => setStatus(b.id, "confirmed")}>Confirm</Button>
-                    <Button size="sm" variant="outline" onClick={() => setStatus(b.id, "cancelled")}>Decline</Button>
+                    <Button size="sm" onClick={() => setStatus(b.id, "confirmed")}>
+                      Confirm
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setStatus(b.id, "cancelled")}
+                    >
+                      Decline
+                    </Button>
                   </>
                 )}
                 {b.status === "confirmed" && (
                   <>
-                    <Button size="sm" variant="outline" onClick={() => setStatus(b.id, "completed")}>Mark done</Button>
-                    <Button size="sm" variant="ghost" onClick={() => setStatus(b.id, "no_show")}>No-show</Button>
-                    <Button size="sm" variant="ghost" onClick={() => setStatus(b.id, "cancelled")}>Cancel</Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setStatus(b.id, "completed")}
+                    >
+                      Mark done
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => setStatus(b.id, "no_show")}>
+                      No-show
+                    </Button>
+                    <Button size="sm" variant="ghost" onClick={() => setStatus(b.id, "cancelled")}>
+                      Cancel
+                    </Button>
                   </>
                 )}
               </div>

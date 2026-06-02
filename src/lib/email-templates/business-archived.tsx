@@ -1,13 +1,29 @@
-import { Body, Container, Head, Heading, Html, Preview, Section, Text, Link } from "@react-email/components";
+import {
+  Body,
+  Container,
+  Head,
+  Heading,
+  Html,
+  Preview,
+  Section,
+  Text,
+  Link,
+} from "@react-email/components";
 import type { TemplateEntry } from "./registry";
 import { SITE_NAME, brandBar, card, container, footer, h1, main, muted, text } from "./_styles";
 
-interface Props { name?: string; business_name?: string; business_slug?: string }
+interface Props {
+  name?: string;
+  business_name?: string;
+  business_slug?: string;
+}
 
 const BusinessArchived = ({ name, business_name, business_slug }: Props) => (
   <Html lang="en">
     <Head />
-    <Preview>Your business {business_name ?? "your business"} has been archived on {SITE_NAME}.</Preview>
+    <Preview>
+      Your business {business_name ?? "your business"} has been archived on {SITE_NAME}.
+    </Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={brandBar} />
@@ -18,8 +34,8 @@ const BusinessArchived = ({ name, business_name, business_slug }: Props) => (
           <Text style={muted}>Status: Archived</Text>
         </Section>
         <Text style={text}>
-          While archived, this business is hidden from public search results, the directory map,
-          and direct shared links. Existing bookings and inquiries are preserved.
+          While archived, this business is hidden from public search results, the directory map, and
+          direct shared links. Existing bookings and inquiries are preserved.
         </Text>
         <Text style={text}>
           You can restore it at any time from your dashboard:{" "}
@@ -37,5 +53,9 @@ export const template = {
   subject: ({ business_name }: Props) =>
     `"${business_name ?? "Your business"}" has been archived on ${SITE_NAME}`,
   displayName: "Business archived",
-  previewData: { name: "Juan", business_name: "Quezon City Auto Repair", business_slug: "qc-auto-repair" },
+  previewData: {
+    name: "Juan",
+    business_name: "Quezon City Auto Repair",
+    business_slug: "qc-auto-repair",
+  },
 } satisfies TemplateEntry;

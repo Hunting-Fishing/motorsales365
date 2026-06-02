@@ -1,5 +1,5 @@
 export function formatPHP(value: number | string | null | undefined): string {
-  const num = typeof value === "string" ? parseFloat(value) : value ?? 0;
+  const num = typeof value === "string" ? parseFloat(value) : (value ?? 0);
   if (Number.isNaN(num)) return "₱0";
   return new Intl.NumberFormat("en-PH", {
     style: "currency",

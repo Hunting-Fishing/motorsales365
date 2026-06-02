@@ -103,7 +103,9 @@ export function ImageWithSkeleton({
   return (
     <div ref={wrapperRef} className={cn("relative h-full w-full", wrapperClassName)}>
       {!loaded && (
-        <Skeleton className={cn("absolute inset-0 h-full w-full rounded-none", skeletonClassName)} />
+        <Skeleton
+          className={cn("absolute inset-0 h-full w-full rounded-none", skeletonClassName)}
+        />
       )}
       {shouldLoad && (
         <img

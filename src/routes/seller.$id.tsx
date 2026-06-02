@@ -28,14 +28,21 @@ export const Route = createFileRoute("/seller/$id")({
     const url = `https://365motorsales.com/seller/${params.id}`;
     if (!p) {
       return {
-        meta: [{ title: "Seller — 365 MotorSales Philippines" }, { property: "og:url", content: url }],
+        meta: [
+          { title: "Seller — 365 MotorSales Philippines" },
+          { property: "og:url", content: url },
+        ],
         links: [{ rel: "canonical", href: url }],
       };
     }
     const name = p.business_name || p.full_name || "Seller";
     const loc = [p.business_city, p.business_region].filter(Boolean).join(", ");
     const title = `${name}${loc ? ` — ${loc}` : ""} | 365 MotorSales`;
-    const desc = `Listings from ${name}${loc ? ` in ${loc}` : ""} on 365 MotorSales Philippines.`.slice(0, 155);
+    const desc =
+      `Listings from ${name}${loc ? ` in ${loc}` : ""} on 365 MotorSales Philippines.`.slice(
+        0,
+        155,
+      );
     return {
       meta: [
         { title },
@@ -43,10 +50,12 @@ export const Route = createFileRoute("/seller/$id")({
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:url", content: url },
-        ...(p.avatar_url ? [
-          { property: "og:image", content: p.avatar_url },
-          { name: "twitter:image", content: p.avatar_url },
-        ] : []),
+        ...(p.avatar_url
+          ? [
+              { property: "og:image", content: p.avatar_url },
+              { name: "twitter:image", content: p.avatar_url },
+            ]
+          : []),
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
       ],
@@ -74,11 +83,13 @@ function SellerProfilePage() {
             "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,listing_media(url,type)",
           )
           .eq("user_id", id)
-          .in("status", ["active","pending_sale"])
+          .in("status", ["active", "pending_sale"])
           .order("created_at", { ascending: false }),
         (supabase as any)
           .from("rides")
-          .select("id,slug,name,year,make,model,cover_photo_url,like_count,is_for_sale,city,vehicle_type")
+          .select(
+            "id,slug,name,year,make,model,cover_photo_url,like_count,is_for_sale,city,vehicle_type",
+          )
           .eq("user_id", id)
           .eq("status", "published")
           .order("published_at", { ascending: false }),
@@ -98,11 +109,13 @@ function SellerProfilePage() {
             city: l.city,
             seller_type: l.seller_type,
             boost_until: l.boost_until,
-            category_slug: l.category_slug, view_count: l.view_count ?? 0,
+            category_slug: l.category_slug,
+            view_count: l.view_count ?? 0,
             cover_url: photos[0]?.url ?? null,
             photo_count: photos.length,
             has_video: videos.length > 0,
-            seller_verified: verified, status: l.status,
+            seller_verified: verified,
+            status: l.status,
           };
         }),
       );
@@ -124,13 +137,15 @@ function SellerProfilePage() {
       <SiteLayout>
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="font-display text-2xl font-bold">Seller not found</h1>
-          <Link to="/" className="mt-4 inline-block text-primary hover:underline">Go home</Link>
+          <Link to="/" className="mt-4 inline-block text-primary hover:underline">
+            Go home
+          </Link>
         </div>
       </SiteLayout>
     );
 
   const isBusiness = profile.seller_type === "business";
-  const displayName = isBusiness ? profile.business_name ?? profile.full_name : profile.full_name;
+  const displayName = isBusiness ? (profile.business_name ?? profile.full_name) : profile.full_name;
   const logoUrl = isBusiness ? profile.business_logo_url : profile.avatar_url;
   const location = [profile.business_city, profile.business_region].filter(Boolean).join(", ");
 
@@ -172,7 +187,12 @@ function SellerProfilePage() {
               )}
               <div className="mt-2 text-sm text-muted-foreground">
                 {listings.length} active {listings.length === 1 ? "listing" : "listings"}
-                {rides.length > 0 && <> · {rides.length} {rides.length === 1 ? "ride" : "rides"}</>}
+                {rides.length > 0 && (
+                  <>
+                    {" "}
+                    · {rides.length} {rides.length === 1 ? "ride" : "rides"}
+                  </>
+                )}
               </div>
             </div>
           </div>

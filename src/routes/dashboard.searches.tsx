@@ -50,7 +50,8 @@ function SavedSearchesPage() {
       ) : searches.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
           <Bookmark className="mx-auto mb-3 h-8 w-8" />
-          You haven't saved any searches yet. From any browse page, set your filters and click "Save search".
+          You haven't saved any searches yet. From any browse page, set your filters and click "Save
+          search".
         </div>
       ) : (
         <div className="space-y-3">

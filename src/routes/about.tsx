@@ -6,22 +6,35 @@ export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       { title: "About — 365 MotorSales Philippines" },
-      { name: "description", content: "365 MotorSales Philippines is the trusted marketplace for vehicles, equipment, and transport across the country." },
+      {
+        name: "description",
+        content:
+          "365 MotorSales Philippines is the trusted marketplace for vehicles, equipment, and transport across the country.",
+      },
     ],
   }),
   component: () => (
     <SiteLayout>
       <div className="container mx-auto max-w-3xl px-4 py-16">
-        <h1 className="font-display text-3xl font-bold sm:text-4xl">About 365 MotorSales Philippines</h1>
+        <h1 className="font-display text-3xl font-bold sm:text-4xl">
+          About 365 MotorSales Philippines
+        </h1>
         <p className="mt-4 text-muted-foreground">
-          We're building the standard marketplace for buying and selling cars, motorcycles, boats, airplanes, and heavy equipment across the Philippines —
-          serving private sellers and businesses alike with a clean, modern experience.
+          We're building the standard marketplace for buying and selling cars, motorcycles, boats,
+          airplanes, and heavy equipment across the Philippines — serving private sellers and
+          businesses alike with a clean, modern experience.
         </p>
         <p className="mt-4 text-muted-foreground">
-          Explore our directory of dealerships, gas stations, repair shops, parts suppliers, and more on the{" "}
-          <Link to="/map" className="underline">business map</Link> — find trusted help wherever you are in the Philippines.
+          Explore our directory of dealerships, gas stations, repair shops, parts suppliers, and
+          more on the{" "}
+          <Link to="/map" className="underline">
+            business map
+          </Link>{" "}
+          — find trusted help wherever you are in the Philippines.
         </p>
-        <Button asChild className="mt-6"><Link to="/sell">Post a listing</Link></Button>
+        <Button asChild className="mt-6">
+          <Link to="/sell">Post a listing</Link>
+        </Button>
       </div>
     </SiteLayout>
   ),

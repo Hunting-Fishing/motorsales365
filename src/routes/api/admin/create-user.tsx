@@ -74,7 +74,10 @@ export const Route = createFileRoute("/api/admin/create-user")({
             const { error: roleErr } = await sb.from("user_roles").insert(rows as any);
             if (roleErr) {
               return new Response(
-                JSON.stringify({ error: `User created but role assignment failed: ${roleErr.message}`, userId: newUserId }),
+                JSON.stringify({
+                  error: `User created but role assignment failed: ${roleErr.message}`,
+                  userId: newUserId,
+                }),
                 { status: 207 },
               );
             }
@@ -97,12 +100,14 @@ export const Route = createFileRoute("/api/admin/create-user")({
             await sb.from("profiles").update({ full_name: input.full_name }).eq("id", newUserId);
           }
 
-          return new Response(
-            JSON.stringify({ ok: true, userId: newUserId, email: input.email }),
-            { status: 200, headers: { "Content-Type": "application/json" } },
-          );
+          return new Response(JSON.stringify({ ok: true, userId: newUserId, email: input.email }), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          });
         } catch (e: any) {
-          return new Response(JSON.stringify({ error: e?.message ?? "Server error" }), { status: 500 });
+          return new Response(JSON.stringify({ error: e?.message ?? "Server error" }), {
+            status: 500,
+          });
         }
       },
     },

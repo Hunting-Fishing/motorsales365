@@ -7,7 +7,11 @@ interface BrandLogoProps {
   alt?: string;
 }
 
-export function BrandLogo({ className, size = 40, alt = "365 MotorSales Philippines" }: BrandLogoProps) {
+export function BrandLogo({
+  className,
+  size = 40,
+  alt = "365 MotorSales Philippines",
+}: BrandLogoProps) {
   return (
     <img
       src={logoSrc}

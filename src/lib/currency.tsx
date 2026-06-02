@@ -103,7 +103,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
       if (!c.rate_to_php || c.rate_to_php <= 0) return amountPhp;
       return amountPhp / c.rate_to_php;
     },
-    [map, code]
+    [map, code],
   );
 
   const format = useCallback(
@@ -117,12 +117,12 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
       }).format(value);
       return `${c.symbol}${formatted}`;
     },
-    [map, code, convert]
+    [map, code, convert],
   );
 
   const value: Ctx = useMemo(
     () => ({ code, setCode, currencies, current, loading, convert, format, refresh: load }),
-    [code, setCode, currencies, current, loading, convert, format, load]
+    [code, setCode, currencies, current, loading, convert, format, load],
   );
 
   return <CurrencyCtx.Provider value={value}>{children}</CurrencyCtx.Provider>;

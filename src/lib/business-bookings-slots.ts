@@ -1,7 +1,12 @@
 /** Pure client-safe helpers for booking slot computation. */
 
 export type AvailabilityRow = { weekday: number; start_time: string; end_time: string };
-export type ExceptionRow = { date: string; closed: boolean; start_time: string | null; end_time: string | null };
+export type ExceptionRow = {
+  date: string;
+  closed: boolean;
+  start_time: string | null;
+  end_time: string | null;
+};
 export type ExistingBooking = { bookable_item_id: string; starts_at: string; ends_at: string };
 
 function toMinutes(t: string) {

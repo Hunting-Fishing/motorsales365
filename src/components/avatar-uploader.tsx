@@ -73,7 +73,11 @@ export function AvatarUploader({ userId, value, fallback, onChange }: Props) {
       <div className="flex flex-col gap-2">
         <div className="flex gap-2">
           <Button type="button" size="sm" variant="secondary" onClick={pick} disabled={busy}>
-            {busy ? <Loader2 className="mr-2 size-4 animate-spin" /> : <Upload className="mr-2 size-4" />}
+            {busy ? (
+              <Loader2 className="mr-2 size-4 animate-spin" />
+            ) : (
+              <Upload className="mr-2 size-4" />
+            )}
             {value ? "Change photo" : "Upload photo"}
           </Button>
           {value && (

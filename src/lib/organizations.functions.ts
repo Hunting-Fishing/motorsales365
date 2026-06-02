@@ -30,11 +30,22 @@ export const createOrganization = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const slug = data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60)
-      + "-" + Math.random().toString(36).slice(2, 6);
+    const slug =
+      data.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+        .slice(0, 60) +
+      "-" +
+      Math.random().toString(36).slice(2, 6);
     const { data: org, error } = await supabase
       .from("organizations")
-      .insert({ name: data.name, slug, kind: (data.kind as any) ?? "dealer", created_by: userId } as any)
+      .insert({
+        name: data.name,
+        slug,
+        kind: (data.kind as any) ?? "dealer",
+        created_by: userId,
+      } as any)
       .select("id, name, slug")
       .single();
     if (error) throw new Error(error.message);
@@ -43,11 +54,13 @@ export const createOrganization = createServerFn({ method: "POST" })
 
 export const inviteOrgMember = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: { orgId: string; email: string; role: "admin" | "manager" | "member" | "viewer" }) => ({
-    orgId: uuid.parse(d.orgId),
-    email: z.string().email().toLowerCase().parse(d.email),
-    role: z.enum(["admin", "manager", "member", "viewer"]).parse(d.role),
-  }))
+  .inputValidator(
+    (d: { orgId: string; email: string; role: "admin" | "manager" | "member" | "viewer" }) => ({
+      orgId: uuid.parse(d.orgId),
+      email: z.string().email().toLowerCase().parse(d.email),
+      role: z.enum(["admin", "manager", "member", "viewer"]).parse(d.role),
+    }),
+  )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertOrgManager(supabase, userId, data.orgId);
@@ -71,20 +84,27 @@ export const inviteOrgMember = createServerFn({ method: "POST" })
         supabase.from("organizations").select("name").eq("id", data.orgId).maybeSingle(),
         supabase.from("profiles").select("full_name").eq("id", userId).maybeSingle(),
       ]);
-      const origin = (process.env.SITE_URL || process.env.VITE_SITE_URL || "https://365motorsales.com").replace(/\/+$/, "");
-      await supabase.rpc("enqueue_email" as any, {
-        queue_name: "transactional_emails",
-        payload: {
-          template: "team-invite",
-          to: data.email,
-          data: {
-            org_name: (org as any)?.name ?? "a team",
-            inviter_name: (inviter as any)?.full_name ?? "Your teammate",
-            role: data.role,
-            invite_url: `${origin}/invites/${token}`,
+      const origin = (
+        process.env.SITE_URL ||
+        process.env.VITE_SITE_URL ||
+        "https://365motorsales.com"
+      ).replace(/\/+$/, "");
+      await supabase.rpc(
+        "enqueue_email" as any,
+        {
+          queue_name: "transactional_emails",
+          payload: {
+            template: "team-invite",
+            to: data.email,
+            data: {
+              org_name: (org as any)?.name ?? "a team",
+              inviter_name: (inviter as any)?.full_name ?? "Your teammate",
+              role: data.role,
+              invite_url: `${origin}/invites/${token}`,
+            },
           },
-        },
-      } as any);
+        } as any,
+      );
     } catch {
       // swallow — surfaced via email_send_log in admin tooling
     }

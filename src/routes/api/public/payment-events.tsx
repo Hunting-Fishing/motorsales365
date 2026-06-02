@@ -13,11 +13,48 @@ import { createClient } from "@supabase/supabase-js";
  */
 
 type PaymentEvent =
-  | { type: "payment.succeeded"; provider: string; event_id: string; email: string; amount_php: number; description?: string; invoice_id?: string }
-  | { type: "payment.failed"; provider: string; event_id: string; email: string; amount_php: number; reason?: string }
-  | { type: "refund.issued"; provider: string; event_id: string; email: string; amount_php: number; reason?: string }
-  | { type: "subscription.renewed"; provider: string; event_id: string; email: string; amount_php: number; period_end: string; plan: string }
-  | { type: "subscription.cancelled"; provider: string; event_id: string; email: string; period_end: string; plan: string };
+  | {
+      type: "payment.succeeded";
+      provider: string;
+      event_id: string;
+      email: string;
+      amount_php: number;
+      description?: string;
+      invoice_id?: string;
+    }
+  | {
+      type: "payment.failed";
+      provider: string;
+      event_id: string;
+      email: string;
+      amount_php: number;
+      reason?: string;
+    }
+  | {
+      type: "refund.issued";
+      provider: string;
+      event_id: string;
+      email: string;
+      amount_php: number;
+      reason?: string;
+    }
+  | {
+      type: "subscription.renewed";
+      provider: string;
+      event_id: string;
+      email: string;
+      amount_php: number;
+      period_end: string;
+      plan: string;
+    }
+  | {
+      type: "subscription.cancelled";
+      provider: string;
+      event_id: string;
+      email: string;
+      period_end: string;
+      plan: string;
+    };
 
 const TEMPLATE_BY_TYPE: Record<PaymentEvent["type"], string> = {
   "payment.succeeded": "payment-receipt",

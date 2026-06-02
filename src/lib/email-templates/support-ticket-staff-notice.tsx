@@ -1,6 +1,26 @@
-import { Body, Container, Head, Heading, Html, Preview, Section, Text } from "@react-email/components";
+import {
+  Body,
+  Container,
+  Head,
+  Heading,
+  Html,
+  Preview,
+  Section,
+  Text,
+} from "@react-email/components";
 import type { TemplateEntry } from "./registry";
-import { SITE_NAME, SITE_URL, brandBar, card, container, footer, h1, main, muted, text } from "./_styles";
+import {
+  SITE_NAME,
+  SITE_URL,
+  brandBar,
+  card,
+  container,
+  footer,
+  h1,
+  main,
+  muted,
+  text,
+} from "./_styles";
 
 interface Props {
   name?: string;
@@ -29,8 +49,8 @@ const SupportTicketStaffNotice = ({ name, email, subject, topic, message, ticket
         </Section>
         <Text style={{ ...text, whiteSpace: "pre-wrap" }}>{message}</Text>
         <Text style={footer}>
-          Reply directly to <a href={`mailto:${email}`}>{email}</a>. Manage tickets in the admin console.{" "}
-          <br />
+          Reply directly to <a href={`mailto:${email}`}>{email}</a>. Manage tickets in the admin
+          console. <br />
           {SITE_NAME} · {SITE_URL}
         </Text>
       </Container>

@@ -11,7 +11,11 @@ export const Route = createFileRoute("/r/$code")({
   head: () => ({
     meta: [
       { title: "Referral — 365 MotorSales Philippines" },
-      { name: "description", content: "You've been invited to 365 MotorSales Philippines. Sign up via this referral link to unlock rewards." },
+      {
+        name: "description",
+        content:
+          "You've been invited to 365 MotorSales Philippines. Sign up via this referral link to unlock rewards.",
+      },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
@@ -89,11 +93,13 @@ function ReferralLanding() {
         const nowIso = new Date().toISOString();
         const { data: pr } = await sb
           .from("staff_promotions")
-          .select("id,title,description,kind,percent_off,flat_amount_php,applies_to,ends_at,terms,starts_at,active")
+          .select(
+            "id,title,description,kind,percent_off,flat_amount_php,applies_to,ends_at,terms,starts_at,active",
+          )
           .eq("staff_referral_id", staff.id)
           .eq("active", true);
-        const filtered = ((pr as any[]) || []).filter((p) =>
-          (!p.starts_at || p.starts_at <= nowIso) && (!p.ends_at || p.ends_at >= nowIso),
+        const filtered = ((pr as any[]) || []).filter(
+          (p) => (!p.starts_at || p.starts_at <= nowIso) && (!p.ends_at || p.ends_at >= nowIso),
         );
         setPromos(filtered as Promo[]);
       }
@@ -113,14 +119,20 @@ function ReferralLanding() {
               <p className="mt-2 text-muted-foreground">
                 This referral code isn’t active. You can still create an account and browse.
               </p>
-              <Button className="mt-6" onClick={() => navigate({ to: "/" })}>Continue to site</Button>
+              <Button className="mt-6" onClick={() => navigate({ to: "/" })}>
+                Continue to site
+              </Button>
             </div>
           ) : (
             <div className="rounded-xl border border-border bg-card p-8">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs uppercase tracking-wider text-muted-foreground">Referred by</p>
-                  <h1 className="font-display mt-1 text-3xl font-bold">{staffName} sent you here</h1>
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                    Referred by
+                  </p>
+                  <h1 className="font-display mt-1 text-3xl font-bold">
+                    {staffName} sent you here
+                  </h1>
                 </div>
                 {counted !== null && (
                   <Tooltip>
@@ -146,13 +158,13 @@ function ReferralLanding() {
                     <TooltipContent side="bottom" align="end" className="max-w-[260px] text-xs">
                       {counted ? (
                         <p>
-                          First scan from this device — counted toward {staffName}’s stats.
-                          Repeat visits won’t inflate their numbers.
+                          First scan from this device — counted toward {staffName}’s stats. Repeat
+                          visits won’t inflate their numbers.
                         </p>
                       ) : (
                         <p>
-                          You’ve already scanned this code from this device. We don’t count
-                          repeat scans, so {staffName}’s stats stay accurate.
+                          You’ve already scanned this code from this device. We don’t count repeat
+                          scans, so {staffName}’s stats stay accurate.
                         </p>
                       )}
                     </TooltipContent>
@@ -174,7 +186,8 @@ function ReferralLanding() {
                       <>This is your first visit to this referral page.</>
                     ) : (
                       <>
-                        You’ve opened this page <strong className="text-foreground">{visitCount}</strong> times
+                        You’ve opened this page{" "}
+                        <strong className="text-foreground">{visitCount}</strong> times
                         {firstSeenAt ? (
                           <> since {new Date(firstSeenAt).toLocaleDateString()}</>
                         ) : null}
@@ -193,16 +206,31 @@ function ReferralLanding() {
                       <li key={p.id} className="rounded-lg border border-border p-4">
                         <div className="flex items-center justify-between gap-3">
                           <div className="font-semibold">{p.title}</div>
-                          <span className="rounded-full bg-secondary px-2 py-0.5 text-xs uppercase">{p.kind}</span>
+                          <span className="rounded-full bg-secondary px-2 py-0.5 text-xs uppercase">
+                            {p.kind}
+                          </span>
                         </div>
-                        {p.description && <p className="mt-1 text-sm text-muted-foreground">{p.description}</p>}
+                        {p.description && (
+                          <p className="mt-1 text-sm text-muted-foreground">{p.description}</p>
+                        )}
                         <div className="mt-2 text-sm">
-                          {p.percent_off ? <span className="font-semibold">{p.percent_off}% off</span> : null}
-                          {p.flat_amount_php ? <span className="font-semibold">₱{p.flat_amount_php}</span> : null}
-                          {(p.percent_off || p.flat_amount_php) && <span className="text-muted-foreground"> · applies to {p.applies_to}</span>}
+                          {p.percent_off ? (
+                            <span className="font-semibold">{p.percent_off}% off</span>
+                          ) : null}
+                          {p.flat_amount_php ? (
+                            <span className="font-semibold">₱{p.flat_amount_php}</span>
+                          ) : null}
+                          {(p.percent_off || p.flat_amount_php) && (
+                            <span className="text-muted-foreground">
+                              {" "}
+                              · applies to {p.applies_to}
+                            </span>
+                          )}
                         </div>
                         {p.ends_at && (
-                          <p className="mt-1 text-xs text-muted-foreground">Ends {new Date(p.ends_at).toLocaleDateString()}</p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            Ends {new Date(p.ends_at).toLocaleDateString()}
+                          </p>
                         )}
                         {p.terms && <p className="mt-1 text-xs text-muted-foreground">{p.terms}</p>}
                       </li>
@@ -213,7 +241,9 @@ function ReferralLanding() {
 
               <div className="mt-6 flex gap-3">
                 <Button onClick={() => navigate({ to: "/signup" })}>Create an account</Button>
-                <Button variant="outline" onClick={() => navigate({ to: "/" })}>Browse listings</Button>
+                <Button variant="outline" onClick={() => navigate({ to: "/" })}>
+                  Browse listings
+                </Button>
               </div>
             </div>
           )}

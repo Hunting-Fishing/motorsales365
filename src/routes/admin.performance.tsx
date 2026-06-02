@@ -70,8 +70,8 @@ function AdminPerformance() {
         <div>
           <h1 className="mb-1 font-display text-2xl font-bold">Image performance</h1>
           <p className="text-sm text-muted-foreground">
-            Tune image preload distance and resolution. Changes apply instantly to this device — useful
-            for testing on Philippine mobile connections.
+            Tune image preload distance and resolution. Changes apply instantly to this device —
+            useful for testing on Philippine mobile connections.
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={reset}>
@@ -119,7 +119,8 @@ function AdminPerformance() {
             onValueChange={([v]) => update({ rootMargin: `${v}px` })}
           />
           <p className="mt-1 text-xs text-muted-foreground">
-            How far outside the viewport images start loading. Lower = save data; higher = smoother scroll.
+            How far outside the viewport images start loading. Lower = save data; higher = smoother
+            scroll.
           </p>
         </div>
 
@@ -145,7 +146,9 @@ function AdminPerformance() {
               value={s.thumbWidth}
               onChange={(e) => update({ thumbWidth: Number(e.target.value) || 0 })}
             />
-            <p className="mt-1 text-xs text-muted-foreground">Used for listing cards & thumbnails.</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Used for listing cards & thumbnails.
+            </p>
           </div>
           <div>
             <Label>Full-size width (px)</Label>
@@ -154,7 +157,9 @@ function AdminPerformance() {
               value={s.fullWidth}
               onChange={(e) => update({ fullWidth: Number(e.target.value) || 0 })}
             />
-            <p className="mt-1 text-xs text-muted-foreground">Used for the main listing gallery image.</p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Used for the main listing gallery image.
+            </p>
           </div>
         </div>
       </section>

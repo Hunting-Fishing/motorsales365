@@ -37,7 +37,9 @@ function AdminCurrencies() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const saveRow = async (row: Currency) => {
     const { error } = await sb
@@ -161,7 +163,9 @@ function AdminCurrencies() {
             />
           </div>
           <div>
-            <label className="text-xs uppercase tracking-wider text-muted-foreground">PHP / 1</label>
+            <label className="text-xs uppercase tracking-wider text-muted-foreground">
+              PHP / 1
+            </label>
             <Input
               type="number"
               step="0.0001"
@@ -197,97 +201,121 @@ function AdminCurrencies() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={10} className="px-3 py-8 text-center text-muted-foreground">Loading…</td></tr>
-              ) : rows.length === 0 ? (
-                <tr><td colSpan={10} className="px-3 py-8 text-center text-muted-foreground">No currencies.</td></tr>
-              ) : rows.map((r, i) => (
-                <tr key={r.code} className="border-t border-border">
-                  <td className="px-3 py-2 font-mono font-semibold">{r.code}</td>
-                  <td className="px-3 py-2">
-                    <Input
-                      value={r.name}
-                      onChange={(e) => {
-                        const next = [...rows]; next[i] = { ...r, name: e.target.value }; setRows(next);
-                      }}
-                      className="h-8"
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <Input
-                      value={r.symbol}
-                      onChange={(e) => {
-                        const next = [...rows]; next[i] = { ...r, symbol: e.target.value }; setRows(next);
-                      }}
-                      className="h-8 w-16 font-mono"
-                    />
-                  </td>
-                  <td className="px-3 py-2 text-right">
-                    <Input
-                      type="number"
-                      step="0.0001"
-                      value={r.rate_to_php}
-                      disabled={r.code === "PHP"}
-                      onChange={(e) => {
-                        const next = [...rows]; next[i] = { ...r, rate_to_php: Number(e.target.value) }; setRows(next);
-                      }}
-                      className="h-8 w-28 text-right tabular-nums"
-                    />
-                  </td>
-                  <td className="px-3 py-2 text-right">
-                    <Input
-                      type="number"
-                      value={r.decimals}
-                      min={0}
-                      max={4}
-                      onChange={(e) => {
-                        const next = [...rows]; next[i] = { ...r, decimals: Number(e.target.value) }; setRows(next);
-                      }}
-                      className="h-8 w-16 text-right"
-                    />
-                  </td>
-                  <td className="px-3 py-2 text-right">
-                    <Input
-                      type="number"
-                      value={r.sort_order}
-                      onChange={(e) => {
-                        const next = [...rows]; next[i] = { ...r, sort_order: Number(e.target.value) }; setRows(next);
-                      }}
-                      className="h-8 w-16 text-right"
-                    />
-                  </td>
-                  <td className="px-3 py-2 text-center">
-                    <Switch
-                      checked={r.auto_update}
-                      onCheckedChange={(v) => {
-                        const next = [...rows]; next[i] = { ...r, auto_update: v }; setRows(next);
-                      }}
-                    />
-                  </td>
-                  <td className="px-3 py-2 text-center">
-                    <Switch
-                      checked={r.active}
-                      onCheckedChange={(v) => {
-                        const next = [...rows]; next[i] = { ...r, active: v }; setRows(next);
-                      }}
-                    />
-                  </td>
-                  <td className="px-3 py-2 whitespace-nowrap text-xs text-muted-foreground">
-                    {new Date(r.last_updated_at).toLocaleString()}
-                  </td>
-                  <td className="px-3 py-2 text-right">
-                    <div className="flex justify-end gap-1">
-                      <Button size="sm" variant="outline" onClick={() => saveRow(r)}>
-                        <Save className="h-3.5 w-3.5" />
-                      </Button>
-                      {r.code !== "PHP" && (
-                        <Button size="sm" variant="ghost" onClick={() => removeRow(r.code)}>
-                          <Trash2 className="h-3.5 w-3.5 text-destructive" />
-                        </Button>
-                      )}
-                    </div>
+                <tr>
+                  <td colSpan={10} className="px-3 py-8 text-center text-muted-foreground">
+                    Loading…
                   </td>
                 </tr>
-              ))}
+              ) : rows.length === 0 ? (
+                <tr>
+                  <td colSpan={10} className="px-3 py-8 text-center text-muted-foreground">
+                    No currencies.
+                  </td>
+                </tr>
+              ) : (
+                rows.map((r, i) => (
+                  <tr key={r.code} className="border-t border-border">
+                    <td className="px-3 py-2 font-mono font-semibold">{r.code}</td>
+                    <td className="px-3 py-2">
+                      <Input
+                        value={r.name}
+                        onChange={(e) => {
+                          const next = [...rows];
+                          next[i] = { ...r, name: e.target.value };
+                          setRows(next);
+                        }}
+                        className="h-8"
+                      />
+                    </td>
+                    <td className="px-3 py-2">
+                      <Input
+                        value={r.symbol}
+                        onChange={(e) => {
+                          const next = [...rows];
+                          next[i] = { ...r, symbol: e.target.value };
+                          setRows(next);
+                        }}
+                        className="h-8 w-16 font-mono"
+                      />
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      <Input
+                        type="number"
+                        step="0.0001"
+                        value={r.rate_to_php}
+                        disabled={r.code === "PHP"}
+                        onChange={(e) => {
+                          const next = [...rows];
+                          next[i] = { ...r, rate_to_php: Number(e.target.value) };
+                          setRows(next);
+                        }}
+                        className="h-8 w-28 text-right tabular-nums"
+                      />
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      <Input
+                        type="number"
+                        value={r.decimals}
+                        min={0}
+                        max={4}
+                        onChange={(e) => {
+                          const next = [...rows];
+                          next[i] = { ...r, decimals: Number(e.target.value) };
+                          setRows(next);
+                        }}
+                        className="h-8 w-16 text-right"
+                      />
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      <Input
+                        type="number"
+                        value={r.sort_order}
+                        onChange={(e) => {
+                          const next = [...rows];
+                          next[i] = { ...r, sort_order: Number(e.target.value) };
+                          setRows(next);
+                        }}
+                        className="h-8 w-16 text-right"
+                      />
+                    </td>
+                    <td className="px-3 py-2 text-center">
+                      <Switch
+                        checked={r.auto_update}
+                        onCheckedChange={(v) => {
+                          const next = [...rows];
+                          next[i] = { ...r, auto_update: v };
+                          setRows(next);
+                        }}
+                      />
+                    </td>
+                    <td className="px-3 py-2 text-center">
+                      <Switch
+                        checked={r.active}
+                        onCheckedChange={(v) => {
+                          const next = [...rows];
+                          next[i] = { ...r, active: v };
+                          setRows(next);
+                        }}
+                      />
+                    </td>
+                    <td className="px-3 py-2 whitespace-nowrap text-xs text-muted-foreground">
+                      {new Date(r.last_updated_at).toLocaleString()}
+                    </td>
+                    <td className="px-3 py-2 text-right">
+                      <div className="flex justify-end gap-1">
+                        <Button size="sm" variant="outline" onClick={() => saveRow(r)}>
+                          <Save className="h-3.5 w-3.5" />
+                        </Button>
+                        {r.code !== "PHP" && (
+                          <Button size="sm" variant="ghost" onClick={() => removeRow(r.code)}>
+                            <Trash2 className="h-3.5 w-3.5 text-destructive" />
+                          </Button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

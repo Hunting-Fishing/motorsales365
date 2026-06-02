@@ -13,9 +13,17 @@ export const Route = createFileRoute("/learn/")({
   head: () => ({
     meta: [
       { title: "365 Learn — Auto repair, detailing & business courses" },
-      { name: "description", content: "Hands-on courses for repair, detailing, bodywork and running an auto business. Earn certificates from 365 Motorsales." },
+      {
+        name: "description",
+        content:
+          "Hands-on courses for repair, detailing, bodywork and running an auto business. Earn certificates from 365 Motorsales.",
+      },
       { property: "og:title", content: "365 Learn — Courses for the auto trade" },
-      { property: "og:description", content: "Video courses + quizzes + certificates. Pay per course or unlock everything with a 365 subscription." },
+      {
+        property: "og:description",
+        content:
+          "Video courses + quizzes + certificates. Pay per course or unlock everything with a 365 subscription.",
+      },
     ],
   }),
   component: LearnIndex,
@@ -40,9 +48,12 @@ function LearnIndex() {
           <div className="flex items-center gap-2 text-sm font-medium text-primary">
             <Sparkles className="h-4 w-4" /> 365 Learn
           </div>
-          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">Level up your skills in the auto trade</h1>
+          <h1 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
+            Level up your skills in the auto trade
+          </h1>
           <p className="mt-3 max-w-2xl text-muted-foreground">
-            Hands-on courses on repair, detailing, bodywork and running a sustainable auto business — taught by working pros. Pay per course or unlock everything with a 365 subscription.
+            Hands-on courses on repair, detailing, bodywork and running a sustainable auto business
+            — taught by working pros. Pay per course or unlock everything with a 365 subscription.
           </p>
           <div className="mt-6 flex flex-wrap gap-2">
             <Button asChild variant="outline" size="sm">
@@ -69,14 +80,18 @@ function LearnIndex() {
               variant={!category ? "default" : "outline"}
               className="cursor-pointer"
               onClick={() => setCategory(undefined)}
-            >All</Badge>
+            >
+              All
+            </Badge>
             {(cats?.categories ?? []).map((c) => (
               <Badge
                 key={c}
                 variant={category === c ? "default" : "outline"}
                 className="cursor-pointer"
                 onClick={() => setCategory(c)}
-              >{c}</Badge>
+              >
+                {c}
+              </Badge>
             ))}
           </div>
         </div>
@@ -101,12 +116,7 @@ function LearnIndex() {
         ) : (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {data!.courses.map((c: any) => (
-              <Link
-                key={c.id}
-                to="/learn/$slug"
-                params={{ slug: c.slug }}
-                className="group"
-              >
+              <Link key={c.id} to="/learn/$slug" params={{ slug: c.slug }} className="group">
                 <Card className="overflow-hidden transition-shadow hover:shadow-md">
                   <div className="aspect-video overflow-hidden bg-muted">
                     {c.hero_image_url ? (
@@ -123,15 +133,26 @@ function LearnIndex() {
                   </div>
                   <CardContent className="space-y-2 p-4">
                     <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-                      <span className="rounded-full bg-secondary px-2 py-0.5">{c.category ?? "General"}</span>
-                      <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{c.duration_minutes ?? 0}m</span>
+                      <span className="rounded-full bg-secondary px-2 py-0.5">
+                        {c.category ?? "General"}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {c.duration_minutes ?? 0}m
+                      </span>
                     </div>
                     <h3 className="line-clamp-2 font-semibold">{c.title}</h3>
-                    {c.summary && <p className="line-clamp-2 text-sm text-muted-foreground">{c.summary}</p>}
+                    {c.summary && (
+                      <p className="line-clamp-2 text-sm text-muted-foreground">{c.summary}</p>
+                    )}
                     <div className="flex items-center justify-between pt-1">
-                      <span className="text-xs text-muted-foreground">{c.instructor_name ?? "365 Motorsales"}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {c.instructor_name ?? "365 Motorsales"}
+                      </span>
                       {c.price_php != null ? (
-                        <span className="font-semibold">₱{Number(c.price_php).toLocaleString()}</span>
+                        <span className="font-semibold">
+                          ₱{Number(c.price_php).toLocaleString()}
+                        </span>
                       ) : (
                         <span className="text-xs text-primary">Subscription</span>
                       )}

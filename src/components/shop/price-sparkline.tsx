@@ -20,7 +20,12 @@ export function PriceSparkline({ history, width = 320, height = 64 }: Props) {
   const points = useMemo(() => {
     const pts = (history ?? [])
       .map((h) => {
-        const v = h.sale_price_php != null ? Number(h.sale_price_php) : h.price_php != null ? Number(h.price_php) : null;
+        const v =
+          h.sale_price_php != null
+            ? Number(h.sale_price_php)
+            : h.price_php != null
+              ? Number(h.price_php)
+              : null;
         return v != null && !Number.isNaN(v) ? { t: new Date(h.captured_at).getTime(), v } : null;
       })
       .filter((p): p is { t: number; v: number } => !!p);
@@ -47,11 +52,28 @@ export function PriceSparkline({ history, width = 320, height = 64 }: Props) {
   const last = points[points.length - 1];
   const first = points[0];
   const trend = last.v < first.v ? "down" : last.v > first.v ? "up" : "flat";
-  const stroke = trend === "down" ? "hsl(142 71% 45%)" : trend === "up" ? "hsl(0 84% 60%)" : "hsl(var(--muted-foreground))";
+  const stroke =
+    trend === "down"
+      ? "hsl(142 71% 45%)"
+      : trend === "up"
+        ? "hsl(0 84% 60%)"
+        : "hsl(var(--muted-foreground))";
 
   return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="w-full max-w-full">
-      <path d={path} fill="none" stroke={stroke} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+    <svg
+      width={width}
+      height={height}
+      viewBox={`0 0 ${width} ${height}`}
+      className="w-full max-w-full"
+    >
+      <path
+        d={path}
+        fill="none"
+        stroke={stroke}
+        strokeWidth={2}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }

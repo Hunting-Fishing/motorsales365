@@ -28,15 +28,23 @@ import { GoogleBusinessMap } from "@/components/businesses/google-business-map";
 import { ShareQr } from "@/components/share-qr";
 import { InquiryForm } from "@/components/business-page/inquiry-form";
 import { getBusinessPage } from "@/lib/business-pages.functions";
-import { PublicGallerySection, PublicContactSection, FeaturedVideoEmbed } from "@/components/business-page/public-sections";
+import {
+  PublicGallerySection,
+  PublicContactSection,
+  FeaturedVideoEmbed,
+} from "@/components/business-page/public-sections";
 import { ShareButtons } from "@/components/business-page/share-buttons";
 import { useTrackBusinessEvent, useTrackPageView } from "@/lib/use-track-business-event";
 import {
-  isStructuredHours, getStatus, legacyToRows, formatRange,
-  DAY_KEYS, DAY_LABELS, type StructuredHours, type HoursStatus,
+  isStructuredHours,
+  getStatus,
+  legacyToRows,
+  formatRange,
+  DAY_KEYS,
+  DAY_LABELS,
+  type StructuredHours,
+  type HoursStatus,
 } from "@/lib/business-hours";
-
-
 
 export const Route = createFileRoute("/businesses/$slug")({
   loader: async ({ params }) => {
@@ -66,7 +74,11 @@ export const Route = createFileRoute("/businesses/$slug")({
     }
     const loc = [b.city, b.region].filter(Boolean).join(", ");
     const title = `${b.name}${loc ? ` — ${loc}` : ""} | 365 MotorSales`;
-    const desc = (b.tagline || b.description || `${b.name}${loc ? ` in ${loc}` : ""} — automotive business on 365 MotorSales Philippines.`).slice(0, 155);
+    const desc = (
+      b.tagline ||
+      b.description ||
+      `${b.name}${loc ? ` in ${loc}` : ""} — automotive business on 365 MotorSales Philippines.`
+    ).slice(0, 155);
     const img = b.cover_url ?? b.logo_url ?? null;
     return {
       meta: [
@@ -108,7 +120,11 @@ export const Route = createFileRoute("/businesses/$slug")({
 
 function peso(n: number | null | undefined) {
   if (n == null) return null;
-  return new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP", maximumFractionDigits: 0 }).format(n);
+  return new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+    maximumFractionDigits: 0,
+  }).format(n);
 }
 
 function BusinessProfilePage() {
@@ -127,7 +143,12 @@ function BusinessProfilePage() {
   useTrackPageView(data?.business?.id ?? null);
   const track = useTrackBusinessEvent(data?.business?.id ?? null);
 
-  if (isLoading) return <SiteLayout><div className="container mx-auto p-8">Loading…</div></SiteLayout>;
+  if (isLoading)
+    return (
+      <SiteLayout>
+        <div className="container mx-auto p-8">Loading…</div>
+      </SiteLayout>
+    );
 
   const biz: any = data?.business;
   if (!biz) {
@@ -135,7 +156,9 @@ function BusinessProfilePage() {
       <SiteLayout>
         <div className="container mx-auto p-8 text-center">
           <h1 className="font-display text-2xl font-bold">Business not found</h1>
-          <Link to="/businesses" className="mt-4 inline-block text-primary underline">Back to directory</Link>
+          <Link to="/businesses" className="mt-4 inline-block text-primary underline">
+            Back to directory
+          </Link>
         </div>
       </SiteLayout>
     );
@@ -155,7 +178,9 @@ function BusinessProfilePage() {
   const myReview = reviews.find((r: any) => r.user_id === user?.id);
   const location = [biz.barangay, biz.city, biz.province, biz.region].filter(Boolean).join(", ");
   const accent = biz.theme_color || null;
-  const accentStyle = accent ? ({ ["--vendor-accent" as any]: accent } as React.CSSProperties) : undefined;
+  const accentStyle = accent
+    ? ({ ["--vendor-accent" as any]: accent } as React.CSSProperties)
+    : undefined;
 
   const submitReview = async () => {
     if (!user) {
@@ -181,7 +206,10 @@ function BusinessProfilePage() {
 
   const messengerHref = biz.messenger_url || null;
   const telHref = biz.phone ? `tel:${biz.phone}` : null;
-  const whatsappHref = waMeUrl(biz.phone, `Hi ${biz.name}, I found you on 365 Motor Sales and would like to ask about your services.`);
+  const whatsappHref = waMeUrl(
+    biz.phone,
+    `Hi ${biz.name}, I found you on 365 Motor Sales and would like to ask about your services.`,
+  );
 
   return (
     <SiteLayout>
@@ -190,7 +218,10 @@ function BusinessProfilePage() {
         <div className="relative">
           {biz.featured_video_url ? (
             <div className="container mx-auto px-4 pt-4">
-              <FeaturedVideoEmbed url={biz.featured_video_url} provider={biz.featured_video_provider ?? null} />
+              <FeaturedVideoEmbed
+                url={biz.featured_video_url}
+                provider={biz.featured_video_provider ?? null}
+              />
             </div>
           ) : (
             <div
@@ -205,7 +236,9 @@ function BusinessProfilePage() {
             </div>
           )}
 
-          <div className={`container mx-auto px-4 ${biz.featured_video_url ? "mt-4" : "-mt-16 md:-mt-20"}`}>
+          <div
+            className={`container mx-auto px-4 ${biz.featured_video_url ? "mt-4" : "-mt-16 md:-mt-20"}`}
+          >
             <Card className="overflow-hidden">
               <div className="flex flex-wrap items-start gap-4 p-5">
                 <div
@@ -221,11 +254,19 @@ function BusinessProfilePage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <h1 className="font-display text-2xl font-bold md:text-3xl">{biz.name}</h1>
-                    {biz.subscription_tier === "premium" && <Badge className="bg-amber-500 text-amber-950">Premium</Badge>}
-                    {biz.subscription_tier === "featured" && <Badge className="bg-primary">Featured</Badge>}
-                    {biz.subscription_tier === "listed" && <Badge variant="secondary">Listed</Badge>}
+                    {biz.subscription_tier === "premium" && (
+                      <Badge className="bg-amber-500 text-amber-950">Premium</Badge>
+                    )}
+                    {biz.subscription_tier === "featured" && (
+                      <Badge className="bg-primary">Featured</Badge>
+                    )}
+                    {biz.subscription_tier === "listed" && (
+                      <Badge variant="secondary">Listed</Badge>
+                    )}
                     {biz.price_label && (
-                      <Badge variant="secondary" className="font-semibold">{biz.price_label}</Badge>
+                      <Badge variant="secondary" className="font-semibold">
+                        {biz.price_label}
+                      </Badge>
                     )}
                   </div>
                   {typeLabel && <div className="text-sm text-muted-foreground">{typeLabel}</div>}
@@ -236,41 +277,77 @@ function BusinessProfilePage() {
                     <div className="mt-1 flex items-center gap-1 text-sm">
                       <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
                       <span className="font-medium">{Number(biz.rating_avg).toFixed(1)}</span>
-                      <span className="text-muted-foreground">({biz.rating_count} review{biz.rating_count === 1 ? "" : "s"})</span>
+                      <span className="text-muted-foreground">
+                        ({biz.rating_count} review{biz.rating_count === 1 ? "" : "s"})
+                      </span>
                     </div>
                   )}
                   {location && (
                     <div className="mt-1 flex items-start gap-1 text-sm text-muted-foreground">
                       <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-                      <span>{biz.street_address ? `${biz.street_address}, ` : ""}{location}</span>
+                      <span>
+                        {biz.street_address ? `${biz.street_address}, ` : ""}
+                        {location}
+                      </span>
                     </div>
                   )}
                   <div className="mt-3 flex flex-wrap gap-2">
                     {telHref && (
-                      <Button size="sm" asChild style={accent ? { backgroundColor: accent } : undefined} onClick={() => track("call_click")}>
-                        <a href={telHref}><Phone className="mr-1 h-4 w-4" />Call</a>
+                      <Button
+                        size="sm"
+                        asChild
+                        style={accent ? { backgroundColor: accent } : undefined}
+                        onClick={() => track("call_click")}
+                      >
+                        <a href={telHref}>
+                          <Phone className="mr-1 h-4 w-4" />
+                          Call
+                        </a>
                       </Button>
                     )}
                     {whatsappHref && (
-                      <Button size="sm" asChild className="bg-[#25D366] text-white hover:bg-[#1ebe5d]" onClick={() => track("whatsapp_click")}>
+                      <Button
+                        size="sm"
+                        asChild
+                        className="bg-[#25D366] text-white hover:bg-[#1ebe5d]"
+                        onClick={() => track("whatsapp_click")}
+                      >
                         <a href={whatsappHref} target="_blank" rel="noreferrer">
-                          <MessageCircle className="mr-1 h-4 w-4" />WhatsApp
+                          <MessageCircle className="mr-1 h-4 w-4" />
+                          WhatsApp
                         </a>
                       </Button>
                     )}
                     {messengerHref && (
-                      <Button size="sm" variant="outline" asChild onClick={() => track("messenger_click")}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        asChild
+                        onClick={() => track("messenger_click")}
+                      >
                         <a href={messengerHref} target="_blank" rel="noreferrer">
-                          <MessageCircle className="mr-1 h-4 w-4" />Messenger
+                          <MessageCircle className="mr-1 h-4 w-4" />
+                          Messenger
                         </a>
                       </Button>
                     )}
                     <Button size="sm" variant="outline" asChild>
-                      <a href="#inquiry"><Mail className="mr-1 h-4 w-4" />Get a quote</a>
+                      <a href="#inquiry">
+                        <Mail className="mr-1 h-4 w-4" />
+                        Get a quote
+                      </a>
                     </Button>
                     {biz.website && (
-                      <Button size="sm" variant="outline" asChild onClick={() => track("website_click")}>
-                        <a href={biz.website} target="_blank" rel="noreferrer"><Globe className="mr-1 h-4 w-4" />Website</a>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        asChild
+                        onClick={() => track("website_click")}
+                      >
+                        <a href={biz.website} target="_blank" rel="noreferrer">
+                          <Globe className="mr-1 h-4 w-4" />
+                          Website
+                        </a>
                       </Button>
                     )}
                     <ShareButtons
@@ -294,7 +371,9 @@ function BusinessProfilePage() {
                   ) : tagLabels.length > 0 ? (
                     <div className="mt-3 flex flex-wrap gap-1">
                       {tagLabels.map((l: string) => (
-                        <Badge key={l} variant="secondary">{l}</Badge>
+                        <Badge key={l} variant="secondary">
+                          {l}
+                        </Badge>
                       ))}
                     </div>
                   ) : null}
@@ -309,20 +388,29 @@ function BusinessProfilePage() {
           <div className="grid gap-6 md:grid-cols-2">
             <Card className="p-5">
               <h2 className="mb-2 font-display text-lg font-semibold">About</h2>
-              <p className="whitespace-pre-wrap text-sm text-muted-foreground">{biz.description || "No description provided."}</p>
+              <p className="whitespace-pre-wrap text-sm text-muted-foreground">
+                {biz.description || "No description provided."}
+              </p>
               {biz.brands_carried && (
                 <div className="mt-3">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Brands carried</div>
+                  <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                    Brands carried
+                  </div>
                   <div className="mt-1 text-sm">{biz.brands_carried}</div>
                 </div>
               )}
               {biz.hours && (
                 <div className="mt-4">
-                  <h3 className="mb-2 flex items-center gap-1 text-sm font-semibold"><Clock className="h-4 w-4" />Hours</h3>
-                  <BusinessHoursBlock hours={biz.hours} isFuelStation={biz.type_slug === "fuel_station"} />
+                  <h3 className="mb-2 flex items-center gap-1 text-sm font-semibold">
+                    <Clock className="h-4 w-4" />
+                    Hours
+                  </h3>
+                  <BusinessHoursBlock
+                    hours={biz.hours}
+                    isFuelStation={biz.type_slug === "fuel_station"}
+                  />
                 </div>
               )}
-
             </Card>
             <div>
               <GoogleBusinessMap
@@ -330,20 +418,22 @@ function BusinessProfilePage() {
                 center={biz.lat && biz.lng ? { lat: Number(biz.lat), lng: Number(biz.lng) } : null}
                 businesses={
                   biz.lat && biz.lng
-                    ? [{
-                        id: biz.id,
-                        slug: biz.slug,
-                        name: biz.name,
-                        type_slug: biz.type_slug,
-                        type_label: typeLabel,
-                        lat: Number(biz.lat),
-                        lng: Number(biz.lng),
-                        rating_avg: Number(biz.rating_avg),
-                        rating_count: biz.rating_count,
-                        city: biz.city,
-                        featured: biz.featured,
-                        price_label: biz.price_label,
-                      }]
+                    ? [
+                        {
+                          id: biz.id,
+                          slug: biz.slug,
+                          name: biz.name,
+                          type_slug: biz.type_slug,
+                          type_label: typeLabel,
+                          lat: Number(biz.lat),
+                          lng: Number(biz.lng),
+                          rating_avg: Number(biz.rating_avg),
+                          rating_count: biz.rating_count,
+                          city: biz.city,
+                          featured: biz.featured,
+                          price_label: biz.price_label,
+                        },
+                      ]
                     : []
                 }
               />
@@ -361,17 +451,25 @@ function BusinessProfilePage() {
                 {services.map((s: any) => (
                   <div key={s.id} className="flex gap-3 rounded-lg border border-border p-3">
                     {s.photo_url && (
-                      <img src={s.photo_url} alt="" className="h-16 w-16 shrink-0 rounded-md object-cover" />
+                      <img
+                        src={s.photo_url}
+                        alt=""
+                        className="h-16 w-16 shrink-0 rounded-md object-cover"
+                      />
                     )}
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
                         <div className="font-medium">{s.title}</div>
                         {s.price_label && (
-                          <Badge variant="secondary" className="shrink-0 font-semibold">{s.price_label}</Badge>
+                          <Badge variant="secondary" className="shrink-0 font-semibold">
+                            {s.price_label}
+                          </Badge>
                         )}
                       </div>
                       {s.description && (
-                        <p className="mt-1 text-xs text-muted-foreground line-clamp-2">{s.description}</p>
+                        <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                          {s.description}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -389,14 +487,23 @@ function BusinessProfilePage() {
               </div>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
                 {products.map((p: any) => {
-                  const onSale = p.sale_price_php != null && p.price_php != null && Number(p.sale_price_php) < Number(p.price_php);
+                  const onSale =
+                    p.sale_price_php != null &&
+                    p.price_php != null &&
+                    Number(p.sale_price_php) < Number(p.price_php);
                   return (
                     <div key={p.id} className="overflow-hidden rounded-lg border border-border">
                       <div className="aspect-square w-full bg-muted">
                         {p.photo_url ? (
-                          <img src={p.photo_url} alt={p.title} className="h-full w-full object-cover" />
+                          <img
+                            src={p.photo_url}
+                            alt={p.title}
+                            className="h-full w-full object-cover"
+                          />
                         ) : (
-                          <div className="flex h-full items-center justify-center text-muted-foreground"><ShoppingBag className="h-6 w-6" /></div>
+                          <div className="flex h-full items-center justify-center text-muted-foreground">
+                            <ShoppingBag className="h-6 w-6" />
+                          </div>
                         )}
                       </div>
                       <div className="p-2">
@@ -404,10 +511,15 @@ function BusinessProfilePage() {
                         <div className="mt-1 flex items-center gap-2">
                           {onSale ? (
                             <>
-                              <span className="text-sm font-bold" style={accent ? { color: accent } : undefined}>
+                              <span
+                                className="text-sm font-bold"
+                                style={accent ? { color: accent } : undefined}
+                              >
                                 {peso(Number(p.sale_price_php))}
                               </span>
-                              <span className="text-xs text-muted-foreground line-through">{peso(Number(p.price_php))}</span>
+                              <span className="text-xs text-muted-foreground line-through">
+                                {peso(Number(p.price_php))}
+                              </span>
                             </>
                           ) : p.price_php != null ? (
                             <span className="text-sm font-bold">{peso(Number(p.price_php))}</span>
@@ -415,15 +527,20 @@ function BusinessProfilePage() {
                             <span className="text-xs text-muted-foreground">Message for price</span>
                           )}
                         </div>
-                        {!p.in_stock && <div className="mt-1 text-xs text-destructive">Out of stock</div>}
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="mt-2 w-full text-xs"
-                          asChild
-                        >
-                          <a href={messengerHref || telHref || "#inquiry"} target={messengerHref ? "_blank" : undefined} rel="noreferrer">
-                            {messengerHref ? "Message to order" : telHref ? "Call to order" : "Inquire"}
+                        {!p.in_stock && (
+                          <div className="mt-1 text-xs text-destructive">Out of stock</div>
+                        )}
+                        <Button size="sm" variant="outline" className="mt-2 w-full text-xs" asChild>
+                          <a
+                            href={messengerHref || telHref || "#inquiry"}
+                            target={messengerHref ? "_blank" : undefined}
+                            rel="noreferrer"
+                          >
+                            {messengerHref
+                              ? "Message to order"
+                              : telHref
+                                ? "Call to order"
+                                : "Inquire"}
                           </a>
                         </Button>
                       </div>
@@ -444,9 +561,17 @@ function BusinessProfilePage() {
               <div className="space-y-3">
                 {posts.map((p: any) => (
                   <div key={p.id} className="rounded-lg border border-border p-3">
-                    <div className="text-xs text-muted-foreground">{new Date(p.created_at).toLocaleString()}</div>
+                    <div className="text-xs text-muted-foreground">
+                      {new Date(p.created_at).toLocaleString()}
+                    </div>
                     <p className="mt-1 whitespace-pre-wrap text-sm">{p.body}</p>
-                    {p.photo_url && <img src={p.photo_url} alt="" className="mt-2 max-h-72 rounded-md object-cover" />}
+                    {p.photo_url && (
+                      <img
+                        src={p.photo_url}
+                        alt=""
+                        className="mt-2 max-h-72 rounded-md object-cover"
+                      />
+                    )}
                   </div>
                 ))}
               </div>
@@ -468,24 +593,28 @@ function BusinessProfilePage() {
             <PublicContactSection channels={contactChannels} accent={accent} />
           )}
 
-
           {/* BOOKINGS CTA */}
-          {Array.isArray((data as any)?.bookableItems) && (data as any).bookableItems.length > 0 && (
-            <Card className="p-5">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h2 className="font-display text-lg font-semibold">Book an appointment</h2>
-                  <p className="text-sm text-muted-foreground">
-                    Pick a time that works for you — {(data as any).bookableItems.length} bookable service{(data as any).bookableItems.length === 1 ? "" : "s"}.
-                  </p>
+          {Array.isArray((data as any)?.bookableItems) &&
+            (data as any).bookableItems.length > 0 && (
+              <Card className="p-5">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <h2 className="font-display text-lg font-semibold">Book an appointment</h2>
+                    <p className="text-sm text-muted-foreground">
+                      Pick a time that works for you — {(data as any).bookableItems.length} bookable
+                      service{(data as any).bookableItems.length === 1 ? "" : "s"}.
+                    </p>
+                  </div>
+                  <Link
+                    to="/businesses/$slug/book"
+                    params={{ slug }}
+                    onClick={() => track("book_click")}
+                  >
+                    <Button style={{ backgroundColor: accent || undefined }}>Book now</Button>
+                  </Link>
                 </div>
-                <Link to="/businesses/$slug/book" params={{ slug }} onClick={() => track("book_click")}>
-                  <Button style={{ backgroundColor: accent || undefined }}>Book now</Button>
-                </Link>
-              </div>
-            </Card>
-          )}
-
+              </Card>
+            )}
 
           {/* INQUIRY */}
           <Card id="inquiry" className="p-5">
@@ -501,11 +630,20 @@ function BusinessProfilePage() {
             <h2 className="mb-4 font-display text-lg font-semibold">Reviews</h2>
             {user ? (
               <div className="mb-6 rounded-lg border border-border p-4">
-                <div className="mb-2 text-sm font-medium">{myReview ? "Update your review" : "Leave a review"}</div>
+                <div className="mb-2 text-sm font-medium">
+                  {myReview ? "Update your review" : "Leave a review"}
+                </div>
                 <div className="mb-3 flex gap-1">
                   {[1, 2, 3, 4, 5].map((n) => (
-                    <button key={n} type="button" onClick={() => setRating(n)} aria-label={`Rate ${n}`}>
-                      <Star className={`h-6 w-6 ${n <= rating ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground"}`} />
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => setRating(n)}
+                      aria-label={`Rate ${n}`}
+                    >
+                      <Star
+                        className={`h-6 w-6 ${n <= rating ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground"}`}
+                      />
                     </button>
                   ))}
                 </div>
@@ -524,7 +662,10 @@ function BusinessProfilePage() {
               </div>
             ) : (
               <div className="mb-6 rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
-                <Link to="/login" className="text-primary underline">Sign in</Link> to leave a review.
+                <Link to="/login" className="text-primary underline">
+                  Sign in
+                </Link>{" "}
+                to leave a review.
               </div>
             )}
             {reviews.length === 0 ? (
@@ -534,15 +675,22 @@ function BusinessProfilePage() {
                 {reviews.map((r: any) => (
                   <div key={r.id} className="rounded-lg border border-border p-3">
                     <div className="mb-1 flex items-center justify-between">
-                      <div className="text-sm font-medium">{reviewerNames[r.user_id] ?? "User"}</div>
+                      <div className="text-sm font-medium">
+                        {reviewerNames[r.user_id] ?? "User"}
+                      </div>
                       <div className="flex items-center gap-1 text-xs">
                         {Array.from({ length: 5 }).map((_, i) => (
-                          <Star key={i} className={`h-3 w-3 ${i < r.rating ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground"}`} />
+                          <Star
+                            key={i}
+                            className={`h-3 w-3 ${i < r.rating ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground"}`}
+                          />
                         ))}
                       </div>
                     </div>
                     {r.body && <p className="whitespace-pre-wrap text-sm">{r.body}</p>}
-                    <div className="mt-1 text-xs text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      {new Date(r.created_at).toLocaleDateString()}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -557,28 +705,54 @@ function BusinessProfilePage() {
         </div>
 
         {/* Sticky mobile CTA bar */}
-        {(telHref || whatsappHref || Array.isArray((data as any)?.bookableItems) && (data as any).bookableItems.length > 0) && (
+        {(telHref ||
+          whatsappHref ||
+          (Array.isArray((data as any)?.bookableItems) &&
+            (data as any).bookableItems.length > 0)) && (
           <div className="sticky bottom-0 left-0 right-0 z-30 border-t border-border bg-background/95 px-3 py-2 backdrop-blur md:hidden">
             <div className="flex gap-2">
-              {Array.isArray((data as any)?.bookableItems) && (data as any).bookableItems.length > 0 ? (
-                <Link to="/businesses/$slug/book" params={{ slug }} onClick={() => track("book_click")} className="flex-1">
-                  <Button size="sm" className="w-full" style={{ backgroundColor: accent || undefined }}>
-                    <CalendarDays className="mr-1 h-4 w-4" />Book now
+              {Array.isArray((data as any)?.bookableItems) &&
+              (data as any).bookableItems.length > 0 ? (
+                <Link
+                  to="/businesses/$slug/book"
+                  params={{ slug }}
+                  onClick={() => track("book_click")}
+                  className="flex-1"
+                >
+                  <Button
+                    size="sm"
+                    className="w-full"
+                    style={{ backgroundColor: accent || undefined }}
+                  >
+                    <CalendarDays className="mr-1 h-4 w-4" />
+                    Book now
                   </Button>
                 </Link>
               ) : (
                 <Button size="sm" className="flex-1" asChild>
-                  <a href="#inquiry"><Mail className="mr-1 h-4 w-4" />Get a quote</a>
+                  <a href="#inquiry">
+                    <Mail className="mr-1 h-4 w-4" />
+                    Get a quote
+                  </a>
                 </Button>
               )}
               {telHref && (
                 <Button size="sm" variant="outline" asChild onClick={() => track("call_click")}>
-                  <a href={telHref}><Phone className="h-4 w-4" /></a>
+                  <a href={telHref}>
+                    <Phone className="h-4 w-4" />
+                  </a>
                 </Button>
               )}
               {whatsappHref && (
-                <Button size="sm" asChild className="bg-[#25D366] text-white hover:bg-[#1ebe5d]" onClick={() => track("whatsapp_click")}>
-                  <a href={whatsappHref} target="_blank" rel="noreferrer"><MessageCircle className="h-4 w-4" /></a>
+                <Button
+                  size="sm"
+                  asChild
+                  className="bg-[#25D366] text-white hover:bg-[#1ebe5d]"
+                  onClick={() => track("whatsapp_click")}
+                >
+                  <a href={whatsappHref} target="_blank" rel="noreferrer">
+                    <MessageCircle className="h-4 w-4" />
+                  </a>
                 </Button>
               )}
             </div>
@@ -589,18 +763,30 @@ function BusinessProfilePage() {
   );
 }
 
-
 function statusClass(state: HoursStatus["state"]) {
   switch (state) {
-    case "open": return "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30";
-    case "closing_soon": return "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30";
-    case "opening_soon": return "bg-sky-500/15 text-sky-700 dark:text-sky-300 border-sky-500/30";
-    case "closed": return "bg-muted text-muted-foreground border-border";
-    default: return "hidden";
+    case "open":
+      return "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30";
+    case "closing_soon":
+      return "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30";
+    case "opening_soon":
+      return "bg-sky-500/15 text-sky-700 dark:text-sky-300 border-sky-500/30";
+    case "closed":
+      return "bg-muted text-muted-foreground border-border";
+    default:
+      return "hidden";
   }
 }
 
-function StatusPill({ hours, which, prefix }: { hours: any; which: "primary" | "store"; prefix?: string }) {
+function StatusPill({
+  hours,
+  which,
+  prefix,
+}: {
+  hours: any;
+  which: "primary" | "store";
+  prefix?: string;
+}) {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
     const id = window.setInterval(() => setNow(new Date()), 60_000);
@@ -609,7 +795,9 @@ function StatusPill({ hours, which, prefix }: { hours: any; which: "primary" | "
   const status = getStatus(hours, now, which);
   if (status.state === "unknown") return null;
   return (
-    <div className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${statusClass(status.state)}`}>
+    <div
+      className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${statusClass(status.state)}`}
+    >
       <span className="h-1.5 w-1.5 rounded-full bg-current" />
       {prefix ? <span className="opacity-70">{prefix}:</span> : null}
       <span>{status.label}</span>
@@ -625,7 +813,8 @@ function WeekGrid({ week }: { week: StructuredHours["primary"] }) {
         const ds = week[d];
         let text = "Closed";
         if (ds?.mode === "24h") text = "24 hours";
-        else if (ds?.mode === "open" && ds.ranges?.length) text = ds.ranges.map(formatRange).join(", ");
+        else if (ds?.mode === "open" && ds.ranges?.length)
+          text = ds.ranges.map(formatRange).join(", ");
         return (
           <div key={d} className="contents">
             <dt className="text-muted-foreground">{DAY_LABELS[d]}</dt>
@@ -656,18 +845,28 @@ function BusinessHoursBlock({ hours, isFuelStation }: { hours: any; isFuelStatio
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
-        <StatusPill hours={hours} which="primary" prefix={hasStore && isFuelStation ? "Pumps" : undefined} />
-        {hasStore && <StatusPill hours={hours} which="store" prefix={isFuelStation ? "Store" : "Store"} />}
+        <StatusPill
+          hours={hours}
+          which="primary"
+          prefix={hasStore && isFuelStation ? "Pumps" : undefined}
+        />
+        {hasStore && (
+          <StatusPill hours={hours} which="store" prefix={isFuelStation ? "Store" : "Store"} />
+        )}
       </div>
       <div>
         {hasStore && isFuelStation && (
-          <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Pumps</div>
+          <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Pumps
+          </div>
         )}
         <WeekGrid week={hours.primary} />
       </div>
       {hasStore && hours.store && (
         <div>
-          <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Store / Sari-Sari</div>
+          <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            Store / Sari-Sari
+          </div>
           <WeekGrid week={hours.store} />
         </div>
       )}
@@ -682,21 +881,56 @@ const TAG_GROUP_MAP: { label: string; cats: string[] }[] = [
   { label: "Fuels", cats: ["fuel_grade", "fuel"] },
   { label: "EV charging", cats: ["ev_charging"] },
   { label: "Station brand", cats: ["station_brand", "brand"] },
-  { label: "Services", cats: [
-    "station_services", "service", "service_mode", "maintenance",
-    "brakes", "drivetrain", "engine", "cooling", "suspension", "wheels",
-    "climate", "electrical", "exhaust", "diagnostics", "wash", "detail",
-    "paint", "body", "glass", "mobile", "roadside", "inspection",
-    "specialty", "performance",
-  ] },
-  { label: "Products on sale", cats: [
-    "station_products", "parts", "parts_sold", "inventory_type",
-    "equipment", "electronics", "interior", "exterior", "styling",
-    "protection",
-  ] },
+  {
+    label: "Services",
+    cats: [
+      "station_services",
+      "service",
+      "service_mode",
+      "maintenance",
+      "brakes",
+      "drivetrain",
+      "engine",
+      "cooling",
+      "suspension",
+      "wheels",
+      "climate",
+      "electrical",
+      "exhaust",
+      "diagnostics",
+      "wash",
+      "detail",
+      "paint",
+      "body",
+      "glass",
+      "mobile",
+      "roadside",
+      "inspection",
+      "specialty",
+      "performance",
+    ],
+  },
+  {
+    label: "Products on sale",
+    cats: [
+      "station_products",
+      "parts",
+      "parts_sold",
+      "inventory_type",
+      "equipment",
+      "electronics",
+      "interior",
+      "exterior",
+      "styling",
+      "protection",
+    ],
+  },
   { label: "Payment accepted", cats: ["station_payment", "payment", "financing"] },
   { label: "Languages", cats: ["language"] },
-  { label: "Coverage", cats: ["vehicle_scope", "coverage", "buyback", "channel", "logistics", "condition", "trust"] },
+  {
+    label: "Coverage",
+    cats: ["vehicle_scope", "coverage", "buyback", "channel", "logistics", "condition", "trust"],
+  },
   { label: "Hours", cats: ["hours", "operations"] },
 ];
 
@@ -722,7 +956,9 @@ function TagGroups({ tags }: { tags: TagItem[] }) {
           </div>
           <div className="mt-1 flex flex-wrap gap-1">
             {g.items.map((t) => (
-              <Badge key={t.slug} variant="secondary">{t.label}</Badge>
+              <Badge key={t.slug} variant="secondary">
+                {t.label}
+              </Badge>
             ))}
           </div>
         </div>
@@ -730,5 +966,3 @@ function TagGroups({ tags }: { tags: TagItem[] }) {
     </div>
   );
 }
-
-

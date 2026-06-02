@@ -6,7 +6,8 @@ export function PaymentTestModeBanner() {
   return (
     <div className="w-full border-b border-orange-300 bg-orange-100 px-4 py-2 text-center text-sm text-orange-800">
       All payments made in the preview are in test mode. Use card{" "}
-      <span className="font-mono font-medium">4242 4242 4242 4242</span> with any future expiry & CVC.
+      <span className="font-mono font-medium">4242 4242 4242 4242</span> with any future expiry &
+      CVC.
     </div>
   );
 }

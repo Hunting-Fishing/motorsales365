@@ -1,4 +1,14 @@
-import { Body, Button, Container, Head, Heading, Html, Preview, Section, Text } from "@react-email/components";
+import {
+  Body,
+  Button,
+  Container,
+  Head,
+  Heading,
+  Html,
+  Preview,
+  Section,
+  Text,
+} from "@react-email/components";
 import type { TemplateEntry } from "./registry";
 import { SITE_NAME, SITE_URL, brandBar, container, footer, h1, main, text } from "./_styles";
 
@@ -23,17 +33,29 @@ const TeamNewLead = ({ org_name, customer_name, subject, preview, source, lead_i
   return (
     <Html lang="en">
       <Head />
-      <Preview>New lead for {org_name ?? "your team"}: {subject ?? "Inquiry"}</Preview>
+      <Preview>
+        New lead for {org_name ?? "your team"}: {subject ?? "Inquiry"}
+      </Preview>
       <Body style={main}>
         <Container style={container}>
           <Section style={brandBar} />
           <Heading style={h1}>New lead in {org_name ?? "your inbox"}</Heading>
           <Text style={text}>
-            <strong>{customer_name ?? "A customer"}</strong> just sent a {SOURCE_LABEL[source ?? ""] ?? "new inquiry"}.
+            <strong>{customer_name ?? "A customer"}</strong> just sent a{" "}
+            {SOURCE_LABEL[source ?? ""] ?? "new inquiry"}.
           </Text>
-          <Section style={{ background: "#f5f7fb", borderRadius: 8, padding: "14px 16px", margin: "16px 0" }}>
+          <Section
+            style={{
+              background: "#f5f7fb",
+              borderRadius: 8,
+              padding: "14px 16px",
+              margin: "16px 0",
+            }}
+          >
             <Text style={{ ...text, margin: 0, fontWeight: 600 }}>{subject}</Text>
-            {preview ? <Text style={{ ...text, margin: "6px 0 0", color: "#475569" }}>{preview}</Text> : null}
+            {preview ? (
+              <Text style={{ ...text, margin: "6px 0 0", color: "#475569" }}>{preview}</Text>
+            ) : null}
           </Section>
           <Section style={{ textAlign: "center", margin: "24px 0" }}>
             <Button

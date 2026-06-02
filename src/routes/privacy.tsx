@@ -35,18 +35,19 @@ function PrivacyPage() {
           with the Philippines' <strong>Data Privacy Act of 2012 (RA 10173)</strong> and its
           Implementing Rules and Regulations. This policy explains what we collect, why, who we
           share it with, and the rights you have. It works together with our{" "}
-          <Link className="text-primary underline" to="/terms">Terms &amp; Conditions</Link>.
+          <Link className="text-primary underline" to="/terms">
+            Terms &amp; Conditions
+          </Link>
+          .
         </p>
 
         <p className="mt-3 text-muted-foreground">
           <strong>Appointment bookings.</strong> When you book a service through a business
           mini-site, we collect your name, contact details, requested time, and any notes you
           provide, and disclose them to that business so they can fulfil the appointment. The
-          business is a separate Personal Information Controller for the booking. We retain
-          booking records for service history, dispute resolution, and tax compliance.
+          business is a separate Personal Information Controller for the booking. We retain booking
+          records for service history, dispute resolution, and tax compliance.
         </p>
-
-
 
         <h2 className="mt-8 text-xl font-semibold">1. Who we are (Data Controller)</h2>
         <p className="mt-2 text-muted-foreground">
@@ -103,7 +104,9 @@ function PrivacyPage() {
 
         <h2 className="mt-6 text-xl font-semibold">3. How we use your data</h2>
         <ul className="mt-2 list-disc pl-6 text-muted-foreground">
-          <li>Operate the marketplace and business directory and display listings to other users.</li>
+          <li>
+            Operate the marketplace and business directory and display listings to other users.
+          </li>
           <li>Verify identity, business ownership, and reduce fraud or impersonation.</li>
           <li>Show accurate operating-hour indicators ("Open", "Closing soon", "Opens soon").</li>
           <li>Process payments for listings, boosts, subscriptions, and advertising.</li>
@@ -115,24 +118,32 @@ function PrivacyPage() {
 
         <h2 className="mt-6 text-xl font-semibold">4. Legal bases for processing</h2>
         <ul className="mt-2 list-disc pl-6 text-muted-foreground">
-          <li><strong>Contract:</strong> to provide the services you signed up for.</li>
-          <li><strong>Consent:</strong> for optional features such as precise location, analytics
-            cookies, and marketing emails.</li>
-          <li><strong>Legal obligation:</strong> tax records, anti-fraud, lawful disclosures.</li>
-          <li><strong>Legitimate interest:</strong> securing the platform, preventing abuse, and
-            improving the product.</li>
+          <li>
+            <strong>Contract:</strong> to provide the services you signed up for.
+          </li>
+          <li>
+            <strong>Consent:</strong> for optional features such as precise location, analytics
+            cookies, and marketing emails.
+          </li>
+          <li>
+            <strong>Legal obligation:</strong> tax records, anti-fraud, lawful disclosures.
+          </li>
+          <li>
+            <strong>Legitimate interest:</strong> securing the platform, preventing abuse, and
+            improving the product.
+          </li>
         </ul>
         <p className="mt-3 text-sm text-muted-foreground">
-          <strong>Mini-site analytics:</strong> when you visit a public business page on 365 MotorSales, we record
-          aggregated events (page view, contact-channel click, share, booking click) so the business owner can see
-          how their page performs. Along with each event we may store a coarse <strong>device type</strong>
-          (mobile, tablet, desktop, bot) derived from the User-Agent header and an approximate <strong>city, region,
-          and country</strong> derived from the request headers our hosting provider attaches based on IP. We do not
-          store raw IP addresses or precise location, and events are de-duplicated per browser session using a random
-          identifier so individual visitors are not tracked across sessions.
+          <strong>Mini-site analytics:</strong> when you visit a public business page on 365
+          MotorSales, we record aggregated events (page view, contact-channel click, share, booking
+          click) so the business owner can see how their page performs. Along with each event we may
+          store a coarse <strong>device type</strong>
+          (mobile, tablet, desktop, bot) derived from the User-Agent header and an approximate{" "}
+          <strong>city, region, and country</strong> derived from the request headers our hosting
+          provider attaches based on IP. We do not store raw IP addresses or precise location, and
+          events are de-duplicated per browser session using a random identifier so individual
+          visitors are not tracked across sessions.
         </p>
-
-
 
         <h2 className="mt-6 text-xl font-semibold">5. Sharing &amp; processors</h2>
         <p className="mt-2 text-muted-foreground">
@@ -140,29 +151,51 @@ function PrivacyPage() {
           agreements, including:
         </p>
         <ul className="mt-2 list-disc pl-6 text-muted-foreground">
-          <li><strong>Cloud hosting &amp; database:</strong> our managed backend provider.</li>
-          <li><strong>Payments:</strong> Stripe and other licensed processors for cards, GCash,
-            Maya, and bank transfer.</li>
-          <li><strong>Email:</strong> transactional and notification emails are sent through our
-            managed email infrastructure on the verified subdomain <code>notify.365motorsales.com</code>.</li>
-          <li><strong>Maps &amp; geocoding:</strong> map tiles via <strong>OpenStreetMap</strong> (Leaflet)
-            and address geocoding via <strong>OSM Nominatim</strong>. <strong>Google Places</strong>
-            is used only by admins to import public business listings into our directory.</li>
-          <li><strong>Analytics:</strong> <strong>Google Analytics 4</strong> (with IP anonymization),
-            loaded only after you accept optional cookies via the cookie banner.</li>
-          <li><strong>Customer support tools:</strong> to handle your tickets and inquiries.</li>
+          <li>
+            <strong>Cloud hosting &amp; database:</strong> our managed backend provider.
+          </li>
+          <li>
+            <strong>Payments:</strong> Stripe and other licensed processors for cards, GCash, Maya,
+            and bank transfer.
+          </li>
+          <li>
+            <strong>Email:</strong> transactional and notification emails are sent through our
+            managed email infrastructure on the verified subdomain{" "}
+            <code>notify.365motorsales.com</code>.
+          </li>
+          <li>
+            <strong>Maps &amp; geocoding:</strong> map tiles via <strong>OpenStreetMap</strong>{" "}
+            (Leaflet) and address geocoding via <strong>OSM Nominatim</strong>.{" "}
+            <strong>Google Places</strong>
+            is used only by admins to import public business listings into our directory.
+          </li>
+          <li>
+            <strong>Analytics:</strong> <strong>Google Analytics 4</strong> (with IP anonymization),
+            loaded only after you accept optional cookies via the cookie banner.
+          </li>
+          <li>
+            <strong>Customer support tools:</strong> to handle your tickets and inquiries.
+          </li>
         </ul>
         <p className="mt-2 text-muted-foreground">
-          We do not sell your personal data. We may disclose data when required by Philippine law,
-          a valid subpoena, or to protect rights and safety.
+          We do not sell your personal data. We may disclose data when required by Philippine law, a
+          valid subpoena, or to protect rights and safety.
         </p>
 
         <h2 className="mt-6 text-xl font-semibold">6. Cookies &amp; similar technologies</h2>
         <ul className="mt-2 list-disc pl-6 text-muted-foreground">
-          <li><strong>Essential cookies:</strong> login, session, security, CSRF.</li>
-          <li><strong>Preference cookies:</strong> language, currency, theme.</li>
-          <li><strong>Analytics cookies (optional):</strong> aggregate usage stats.</li>
-          <li><strong>Advertising cookies (optional):</strong> only if you opt in.</li>
+          <li>
+            <strong>Essential cookies:</strong> login, session, security, CSRF.
+          </li>
+          <li>
+            <strong>Preference cookies:</strong> language, currency, theme.
+          </li>
+          <li>
+            <strong>Analytics cookies (optional):</strong> aggregate usage stats.
+          </li>
+          <li>
+            <strong>Advertising cookies (optional):</strong> only if you opt in.
+          </li>
         </ul>
         <p className="mt-2 text-muted-foreground">
           You can decline non-essential cookies through the banner shown on first visit and change
@@ -197,8 +230,8 @@ function PrivacyPage() {
           is available via email/password or <strong>Google</strong>, with leaked-password
           protection (HIBP) on new and changed passwords and optional
           <strong> two-factor authentication (TOTP)</strong> for every account. Two-factor
-          authentication is <strong>required</strong> for administrator accounts. No system is
-          100% secure — please use a strong, unique password and enable 2FA where available.
+          authentication is <strong>required</strong> for administrator accounts. No system is 100%
+          secure — please use a strong, unique password and enable 2FA where available.
         </p>
 
         <h2 className="mt-6 text-xl font-semibold">11. Children</h2>
@@ -245,10 +278,10 @@ function PrivacyPage() {
           timestamps, watch-time per lesson, quiz answers and scores. This data is used to track
           your progress, gate access to subsequent modules, and issue certificates of completion.
           Certificate records (your display name, course title and issue date) are made publicly
-          verifiable at <code>/c/&lt;code&gt;</code> so third parties can confirm authenticity —
-          do not enrol under a name you do not wish to appear there. Clicks on Partner Training
-          listings are logged anonymously (no account identifier) and are used only to bill
-          sponsors and surface aggregate analytics.
+          verifiable at <code>/c/&lt;code&gt;</code> so third parties can confirm authenticity — do
+          not enrol under a name you do not wish to appear there. Clicks on Partner Training
+          listings are logged anonymously (no account identifier) and are used only to bill sponsors
+          and surface aggregate analytics.
         </p>
 
         <h2 className="mt-6 text-xl font-semibold">14. Changes to this policy</h2>

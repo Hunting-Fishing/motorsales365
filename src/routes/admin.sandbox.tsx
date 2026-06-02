@@ -19,8 +19,17 @@ const SELLER_TYPES: { value: SellerType; label: string }[] = [
 
 function SandboxPage() {
   const {
-    user, realRoles, effectiveRoles, realIsAdmin, simulatedRoles, setSimulatedRoles,
-    isStaff, realSellerType, effectiveSellerType, simulatedSellerType, setSimulatedSellerType,
+    user,
+    realRoles,
+    effectiveRoles,
+    realIsAdmin,
+    simulatedRoles,
+    setSimulatedRoles,
+    isStaff,
+    realSellerType,
+    effectiveSellerType,
+    simulatedSellerType,
+    setSimulatedSellerType,
   } = useAuth();
   const { flags, setFlag, setAll, reset } = useFeatureFlags();
 
@@ -47,13 +56,17 @@ function SandboxPage() {
           <div>
             <h2 className="text-lg font-semibold">Role simulator</h2>
             <p className="text-xs text-muted-foreground">
-              UI only — RLS still enforces your real database role ({realRoles.join(", ") || "user"}).
+              UI only — RLS still enforces your real database role ({realRoles.join(", ") || "user"}
+              ).
             </p>
           </div>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => { setSimulatedRoles(null); toast.success("Restored real roles"); }}
+            onClick={() => {
+              setSimulatedRoles(null);
+              toast.success("Restored real roles");
+            }}
             disabled={!simulatedRoles}
           >
             Reset to my real roles
@@ -79,15 +92,22 @@ function SandboxPage() {
                     : "border-border bg-background text-muted-foreground hover:border-primary/50"
                 }`}
               >
-                {active ? "✓ " : "+ "}{role}
+                {active ? "✓ " : "+ "}
+                {role}
               </button>
             );
           })}
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-2 text-xs text-muted-foreground sm:grid-cols-2">
-          <div><span className="font-semibold text-foreground">Real roles:</span> {realRoles.join(", ") || "user"}</div>
-          <div><span className="font-semibold text-foreground">Effective roles:</span> {effectiveRoles.join(", ") || "user"}</div>
+          <div>
+            <span className="font-semibold text-foreground">Real roles:</span>{" "}
+            {realRoles.join(", ") || "user"}
+          </div>
+          <div>
+            <span className="font-semibold text-foreground">Effective roles:</span>{" "}
+            {effectiveRoles.join(", ") || "user"}
+          </div>
         </div>
       </section>
 
@@ -96,14 +116,17 @@ function SandboxPage() {
           <div>
             <h2 className="text-lg font-semibold">Seller-type simulator</h2>
             <p className="text-xs text-muted-foreground">
-              Preview the app as a Private seller, Dealer, Repair shop, or Insurance account
-              so you can guide users through their screens. UI only — RLS unchanged.
+              Preview the app as a Private seller, Dealer, Repair shop, or Insurance account so you
+              can guide users through their screens. UI only — RLS unchanged.
             </p>
           </div>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => { setSimulatedSellerType(null); toast.success("Restored real seller type"); }}
+            onClick={() => {
+              setSimulatedSellerType(null);
+              toast.success("Restored real seller type");
+            }}
             disabled={!simulatedSellerType}
           >
             Reset
@@ -130,30 +153,43 @@ function SandboxPage() {
                     : "border-border bg-background text-muted-foreground hover:border-primary/50"
                 }`}
               >
-                {active ? "✓ " : "+ "}{label}
+                {active ? "✓ " : "+ "}
+                {label}
               </button>
             );
           })}
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-2 text-xs text-muted-foreground sm:grid-cols-2">
-          <div><span className="font-semibold text-foreground">Real seller type:</span> {realSellerType}</div>
-          <div><span className="font-semibold text-foreground">Effective seller type:</span> {effectiveSellerType}</div>
+          <div>
+            <span className="font-semibold text-foreground">Real seller type:</span>{" "}
+            {realSellerType}
+          </div>
+          <div>
+            <span className="font-semibold text-foreground">Effective seller type:</span>{" "}
+            {effectiveSellerType}
+          </div>
         </div>
       </section>
-
-
 
       <section className="rounded-xl border border-border bg-card p-5">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="text-lg font-semibold">Feature flags</h2>
-            <p className="text-xs text-muted-foreground">Toggle on/off to preview gated UI. Saved per device.</p>
+            <p className="text-xs text-muted-foreground">
+              Toggle on/off to preview gated UI. Saved per device.
+            </p>
           </div>
           <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => setAll(true)}>Enable all</Button>
-            <Button size="sm" variant="outline" onClick={() => setAll(false)}>Disable all</Button>
-            <Button size="sm" variant="outline" onClick={reset}>Reset</Button>
+            <Button size="sm" variant="outline" onClick={() => setAll(true)}>
+              Enable all
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => setAll(false)}>
+              Disable all
+            </Button>
+            <Button size="sm" variant="outline" onClick={reset}>
+              Reset
+            </Button>
           </div>
         </div>
         <div className="divide-y divide-border">
@@ -172,8 +208,14 @@ function SandboxPage() {
       <section className="rounded-xl border border-border bg-card p-5">
         <h2 className="mb-2 text-lg font-semibold">My account</h2>
         <dl className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
-          <div><dt className="text-xs text-muted-foreground">User ID</dt><dd className="font-mono">{user?.id}</dd></div>
-          <div><dt className="text-xs text-muted-foreground">Email</dt><dd>{user?.email}</dd></div>
+          <div>
+            <dt className="text-xs text-muted-foreground">User ID</dt>
+            <dd className="font-mono">{user?.id}</dd>
+          </div>
+          <div>
+            <dt className="text-xs text-muted-foreground">Email</dt>
+            <dd>{user?.email}</dd>
+          </div>
         </dl>
       </section>
     </div>

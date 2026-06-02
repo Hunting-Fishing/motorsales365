@@ -48,8 +48,7 @@ const COPY: Record<
   },
   or_cr: {
     title: "OR/CR renewal help",
-    description:
-      "LTO runner services and renewal checklists handled by a vetted partner.",
+    description: "LTO runner services and renewal checklists handled by a vetted partner.",
     cta: "Request OR/CR help",
     messagePlaceholder: "Renewal year, plate number, region…",
   },
@@ -89,12 +88,7 @@ interface Props {
   children?: React.ReactNode;
 }
 
-export function ServiceInquiryDialog({
-  inquiryType,
-  listingId,
-  vehicleSummary,
-  children,
-}: Props) {
+export function ServiceInquiryDialog({ inquiryType, listingId, vehicleSummary, children }: Props) {
   const { user } = useAuth();
   const copy = COPY[inquiryType];
   const [open, setOpen] = useState(false);
@@ -107,7 +101,6 @@ export function ServiceInquiryDialog({
   });
   const [phoneIso, setPhoneIso] = useState("PH");
   const [phoneNational, setPhoneNational] = useState("");
-
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();

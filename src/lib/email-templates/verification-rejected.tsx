@@ -1,8 +1,35 @@
-import { Body, Button, Container, Head, Heading, Html, Preview, Section, Text, Link } from "@react-email/components";
+import {
+  Body,
+  Button,
+  Container,
+  Head,
+  Heading,
+  Html,
+  Preview,
+  Section,
+  Text,
+  Link,
+} from "@react-email/components";
 import type { TemplateEntry } from "./registry";
-import { SITE_NAME, SITE_URL, brandBar, button, card, container, footer, h1, main, muted, text } from "./_styles";
+import {
+  SITE_NAME,
+  SITE_URL,
+  brandBar,
+  button,
+  card,
+  container,
+  footer,
+  h1,
+  main,
+  muted,
+  text,
+} from "./_styles";
 
-interface Props { name?: string; legal_name?: string; review_notes?: string }
+interface Props {
+  name?: string;
+  legal_name?: string;
+  review_notes?: string;
+}
 
 const VerificationRejected = ({ name, legal_name, review_notes }: Props) => (
   <Html lang="en">
@@ -22,15 +49,20 @@ const VerificationRejected = ({ name, legal_name, review_notes }: Props) => (
           <Text style={muted}>Status: Needs update</Text>
           {review_notes && (
             <Text style={{ ...text, margin: "12px 0 0" }}>
-              <strong>Reviewer notes:</strong><br />
+              <strong>Reviewer notes:</strong>
+              <br />
               {review_notes}
             </Text>
           )}
         </Section>
         <Section style={{ textAlign: "center", margin: "24px 0" }}>
-          <Button href={`${SITE_URL}/dashboard/verification`} style={button}>Update my application</Button>
+          <Button href={`${SITE_URL}/dashboard/verification`} style={button}>
+            Update my application
+          </Button>
         </Section>
-        <Text style={footer}>{SITE_NAME} · <Link href={SITE_URL}>{SITE_URL}</Link></Text>
+        <Text style={footer}>
+          {SITE_NAME} · <Link href={SITE_URL}>{SITE_URL}</Link>
+        </Text>
       </Container>
     </Body>
   </Html>
@@ -40,5 +72,9 @@ export const template = {
   component: VerificationRejected,
   subject: () => `Action needed: your verification on ${SITE_NAME}`,
   displayName: "Verification — needs update",
-  previewData: { name: "Juan", legal_name: "Quezon City Auto Repair Inc.", review_notes: "DTI certificate was unreadable — please re-upload a clearer scan." },
+  previewData: {
+    name: "Juan",
+    legal_name: "Quezon City Auto Repair Inc.",
+    review_notes: "DTI certificate was unreadable — please re-upload a clearer scan.",
+  },
 } satisfies TemplateEntry;

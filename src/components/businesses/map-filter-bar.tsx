@@ -36,7 +36,11 @@ export function MapFilterBar({
     setLocating(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        onChangeCenter({ lat: pos.coords.latitude, lng: pos.coords.longitude, label: "My location" });
+        onChangeCenter({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          label: "My location",
+        });
         if (!radiusKm) onChangeRadius(10);
         setLocating(false);
       },

@@ -6,7 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Search, Plus, X, Pencil } from "lucide-react";
 import { FUEL_STATION_CATALOG, UNIT_OPTIONS, type CatalogItem } from "@/data/fuel-station-catalog";
@@ -77,10 +83,7 @@ export function CatalogPicker({
     const hits: { group: string; item: CatalogItem }[] = [];
     for (const g of FUEL_STATION_CATALOG) {
       for (const it of g.items) {
-        if (
-          it.title.toLowerCase().includes(term) ||
-          it.description?.toLowerCase().includes(term)
-        ) {
+        if (it.title.toLowerCase().includes(term) || it.description?.toLowerCase().includes(term)) {
           hits.push({ group: g.label, item: it });
         }
       }
@@ -132,12 +135,22 @@ export function CatalogPicker({
         <div className="max-h-80 overflow-y-auto p-2">
           {filtered.length === 0 ? (
             <div className="p-6 text-center text-sm text-muted-foreground">
-              No matches. <button className="text-primary underline" onClick={onCustom}>Add a custom item</button>.
+              No matches.{" "}
+              <button className="text-primary underline" onClick={onCustom}>
+                Add a custom item
+              </button>
+              .
             </div>
           ) : (
             <div className="grid gap-1">
               {filtered.map(({ group, item }) => (
-                <CatalogRow key={item.key} item={item} groupLabel={group} disabled={existingKeys.has(item.key)} onPick={onPick} />
+                <CatalogRow
+                  key={item.key}
+                  item={item}
+                  groupLabel={group}
+                  disabled={existingKeys.has(item.key)}
+                  onPick={onPick}
+                />
               ))}
             </div>
           )}
@@ -160,7 +173,12 @@ export function CatalogPicker({
               )}
               <div className="grid max-h-72 gap-1 overflow-y-auto p-2 sm:grid-cols-2">
                 {g.items.map((item) => (
-                  <CatalogRow key={item.key} item={item} disabled={existingKeys.has(item.key)} onPick={onPick} />
+                  <CatalogRow
+                    key={item.key}
+                    item={item}
+                    disabled={existingKeys.has(item.key)}
+                    onPick={onPick}
+                  />
                 ))}
               </div>
             </TabsContent>
@@ -193,8 +211,16 @@ function CatalogRow({
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-1.5">
           <span className="truncate text-sm font-medium">{item.title}</span>
-          {item.unit && <Badge variant="outline" className="text-[10px]">{item.unit}</Badge>}
-          {disabled && <Badge variant="secondary" className="text-[10px]">Added</Badge>}
+          {item.unit && (
+            <Badge variant="outline" className="text-[10px]">
+              {item.unit}
+            </Badge>
+          )}
+          {disabled && (
+            <Badge variant="secondary" className="text-[10px]">
+              Added
+            </Badge>
+          )}
           {groupLabel && <span className="text-[10px] text-muted-foreground">· {groupLabel}</span>}
         </div>
         {item.description && (
@@ -242,18 +268,27 @@ export function PricingFields({
       </div>
       <div className="sm:col-span-1">
         <Label className="text-xs">Unit</Label>
-        <Select value={value.unit ?? "none"} onValueChange={(v) => onChange({ unit: v === "none" ? null : v })}>
-          <SelectTrigger><SelectValue placeholder="Unit" /></SelectTrigger>
+        <Select
+          value={value.unit ?? "none"}
+          onValueChange={(v) => onChange({ unit: v === "none" ? null : v })}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Unit" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="none">— none —</SelectItem>
             {UNIT_OPTIONS.map((u) => (
-              <SelectItem key={u.value} value={u.value}>{u.label}</SelectItem>
+              <SelectItem key={u.value} value={u.value}>
+                {u.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
       <div className="sm:col-span-3">
-        <Label className="text-xs">Custom price label (overrides price + unit on the public page)</Label>
+        <Label className="text-xs">
+          Custom price label (overrides price + unit on the public page)
+        </Label>
         <Input
           placeholder='e.g. "From ₱500" or "Market price"'
           value={value.price_label ?? ""}

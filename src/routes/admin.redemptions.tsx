@@ -6,15 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Download, Ticket, Percent, Coins, Users } from "lucide-react";
 import { formatPHP } from "@/lib/format";
 import { useCurrency } from "@/lib/currency";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 export const Route = createFileRoute("/admin/redemptions")({
   component: AdminRedemptions,
@@ -92,7 +84,11 @@ function AdminRedemptions() {
   useEffect(() => {
     (async () => {
       setLoading(true);
-      let q = sb.from("referral_redemptions").select("*").order("created_at", { ascending: false }).limit(1000);
+      let q = sb
+        .from("referral_redemptions")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(1000);
       if (staffFilter !== "all") q = q.eq("staff_referral_id", staffFilter);
       if (kindFilter !== "all") q = q.eq("kind", kindFilter);
       if (from) q = q.gte("created_at", new Date(from + "T00:00:00").toISOString());
@@ -138,16 +134,33 @@ function AdminRedemptions() {
       cur.discount += Number(r.discount_amount_php || 0);
     });
     return buckets
-      .map((k) => ({ kind: k, count: map.get(k)!.count, discount: Math.round(map.get(k)!.discount) }))
+      .map((k) => ({
+        kind: k,
+        count: map.get(k)!.count,
+        discount: Math.round(map.get(k)!.discount),
+      }))
       .filter((d) => d.count > 0 || d.discount > 0);
   }, [rows]);
 
   const exportCsv = () => {
     const headers = [
-      "created_at","staff_name","referral_code","user_name","user_id",
-      "kind","applies_to","promotion","percent_off","flat_amount_php",
-      "base_amount_php","discount_amount_php","final_amount_php",
-      "subscription_id","payment_id","listing_id","redemption_id",
+      "created_at",
+      "staff_name",
+      "referral_code",
+      "user_name",
+      "user_id",
+      "kind",
+      "applies_to",
+      "promotion",
+      "percent_off",
+      "flat_amount_php",
+      "base_amount_php",
+      "discount_amount_php",
+      "final_amount_php",
+      "subscription_id",
+      "payment_id",
+      "listing_id",
+      "redemption_id",
     ];
     const esc = (v: any) => {
       const s = v == null ? "" : String(v);
@@ -156,25 +169,29 @@ function AdminRedemptions() {
     const lines = [headers.join(",")];
     rows.forEach((r) => {
       const s = staffMap[r.staff_referral_id];
-      lines.push([
-        r.created_at,
-        s?.full_name ?? "",
-        r.referral_code,
-        userMap[r.user_id]?.full_name ?? "",
-        r.user_id,
-        r.kind,
-        r.applies_to,
-        promoMap[r.promotion_id]?.title ?? "",
-        r.percent_off ?? "",
-        r.flat_amount_php ?? "",
-        r.base_amount_php,
-        r.discount_amount_php,
-        r.final_amount_php,
-        r.subscription_id ?? "",
-        r.payment_id ?? "",
-        r.listing_id ?? "",
-        r.id,
-      ].map(esc).join(","));
+      lines.push(
+        [
+          r.created_at,
+          s?.full_name ?? "",
+          r.referral_code,
+          userMap[r.user_id]?.full_name ?? "",
+          r.user_id,
+          r.kind,
+          r.applies_to,
+          promoMap[r.promotion_id]?.title ?? "",
+          r.percent_off ?? "",
+          r.flat_amount_php ?? "",
+          r.base_amount_php,
+          r.discount_amount_php,
+          r.final_amount_php,
+          r.subscription_id ?? "",
+          r.payment_id ?? "",
+          r.listing_id ?? "",
+          r.id,
+        ]
+          .map(esc)
+          .join(","),
+      );
     });
     const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -209,7 +226,9 @@ function AdminRedemptions() {
           >
             <option value="all">All staff</option>
             {staffOptions.map((s) => (
-              <option key={s.id} value={s.id}>{s.full_name} ({s.referral_code})</option>
+              <option key={s.id} value={s.id}>
+                {s.full_name} ({s.referral_code})
+              </option>
             ))}
           </select>
         </div>
@@ -220,12 +239,21 @@ function AdminRedemptions() {
             onChange={(e) => setKindFilter(e.target.value as Kind)}
             className="mt-1 w-full rounded-md border border-border bg-background px-2 py-2 text-sm"
           >
-            {KINDS.map((k) => <option key={k} value={k}>{k}</option>)}
+            {KINDS.map((k) => (
+              <option key={k} value={k}>
+                {k}
+              </option>
+            ))}
           </select>
         </div>
         <div>
           <label className="text-xs uppercase tracking-wider text-muted-foreground">From</label>
-          <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="mt-1" />
+          <Input
+            type="date"
+            value={from}
+            onChange={(e) => setFrom(e.target.value)}
+            className="mt-1"
+          />
         </div>
         <div>
           <label className="text-xs uppercase tracking-wider text-muted-foreground">To</label>
@@ -234,10 +262,26 @@ function AdminRedemptions() {
       </section>
 
       <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Kpi icon={<Ticket className="h-4 w-4" />} label="Redemptions" value={rows.length.toLocaleString()} />
-        <Kpi icon={<Users className="h-4 w-4" />} label="Unique users" value={totals.uniqueUsers.toLocaleString()} />
-        <Kpi icon={<Percent className="h-4 w-4" />} label="Total discounted" value={formatPHP(totals.disc)} />
-        <Kpi icon={<Coins className="h-4 w-4" />} label="Final billed" value={formatPHP(totals.fin)} />
+        <Kpi
+          icon={<Ticket className="h-4 w-4" />}
+          label="Redemptions"
+          value={rows.length.toLocaleString()}
+        />
+        <Kpi
+          icon={<Users className="h-4 w-4" />}
+          label="Unique users"
+          value={totals.uniqueUsers.toLocaleString()}
+        />
+        <Kpi
+          icon={<Percent className="h-4 w-4" />}
+          label="Total discounted"
+          value={formatPHP(totals.disc)}
+        />
+        <Kpi
+          icon={<Coins className="h-4 w-4" />}
+          label="Final billed"
+          value={formatPHP(totals.fin)}
+        />
       </section>
 
       <section className="rounded-xl border border-border bg-card p-4">
@@ -301,8 +345,18 @@ function AdminRedemptions() {
                       : [Number(value).toLocaleString(), "Redemptions"]
                   }
                 />
-                <Bar yAxisId="left" dataKey="count" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} />
-                <Bar yAxisId="right" dataKey="discount" fill="hsl(var(--accent))" radius={[6, 6, 0, 0]} />
+                <Bar
+                  yAxisId="left"
+                  dataKey="count"
+                  fill="hsl(var(--primary))"
+                  radius={[6, 6, 0, 0]}
+                />
+                <Bar
+                  yAxisId="right"
+                  dataKey="discount"
+                  fill="hsl(var(--accent))"
+                  radius={[6, 6, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -325,9 +379,13 @@ function AdminRedemptions() {
                   return (
                     <tr key={d.kind} className="border-t border-border">
                       <td className="px-3 py-2">
-                        <span className="rounded bg-secondary px-2 py-0.5 text-xs uppercase">{d.kind}</span>
+                        <span className="rounded bg-secondary px-2 py-0.5 text-xs uppercase">
+                          {d.kind}
+                        </span>
                       </td>
-                      <td className="px-3 py-2 text-right tabular-nums">{d.count.toLocaleString()}</td>
+                      <td className="px-3 py-2 text-right tabular-nums">
+                        {d.count.toLocaleString()}
+                      </td>
                       <td className="px-3 py-2 text-right tabular-nums text-muted-foreground">
                         {share.toFixed(1)}%
                       </td>
@@ -341,7 +399,9 @@ function AdminRedemptions() {
               <tfoot>
                 <tr className="border-t border-border bg-muted/20 font-semibold">
                   <td className="px-3 py-2">Total</td>
-                  <td className="px-3 py-2 text-right tabular-nums">{rows.length.toLocaleString()}</td>
+                  <td className="px-3 py-2 text-right tabular-nums">
+                    {rows.length.toLocaleString()}
+                  </td>
                   <td className="px-3 py-2 text-right tabular-nums text-muted-foreground">100%</td>
                   <td className="px-3 py-2 text-right tabular-nums text-primary">
                     −{fmtMoney(totals.disc)}
@@ -370,44 +430,66 @@ function AdminRedemptions() {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={8} className="px-3 py-8 text-center text-muted-foreground">Loading…</td></tr>
+                <tr>
+                  <td colSpan={8} className="px-3 py-8 text-center text-muted-foreground">
+                    Loading…
+                  </td>
+                </tr>
               ) : rows.length === 0 ? (
-                <tr><td colSpan={8} className="px-3 py-8 text-center text-muted-foreground">No redemptions in this range.</td></tr>
-              ) : rows.map((r) => {
-                const s = staffMap[r.staff_referral_id];
-                return (
-                  <tr key={r.id} className="border-t border-border">
-                    <td className="px-3 py-2 whitespace-nowrap">{new Date(r.created_at).toLocaleString()}</td>
-                    <td className="px-3 py-2">
-                      <Link
-                        to="/admin/redemptions/$staffId"
-                        params={{ staffId: r.staff_referral_id }}
-                        className="block hover:underline"
-                      >
-                        <div className="font-medium text-primary">{s?.full_name ?? "—"}</div>
-                        <div className="font-mono text-xs text-muted-foreground">{r.referral_code}</div>
-                      </Link>
-                    </td>
-                    <td className="px-3 py-2">
-                      <div className="font-medium">{userMap[r.user_id]?.full_name ?? "—"}</div>
-                      <div className="font-mono text-[10px] text-muted-foreground">{r.user_id.slice(0, 8)}…</div>
-                    </td>
-                    <td className="px-3 py-2">
-                      <span className="rounded bg-secondary px-2 py-0.5 text-xs uppercase">{r.kind}</span>
-                    </td>
-                    <td className="px-3 py-2">
-                      <div>{promoMap[r.promotion_id]?.title ?? "—"}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {r.percent_off ? `${r.percent_off}% off` : ""}
-                        {r.flat_amount_php ? ` ₱${r.flat_amount_php} flat` : ""}
-                      </div>
-                    </td>
-                    <td className="px-3 py-2 text-right">{formatPHP(r.base_amount_php)}</td>
-                    <td className="px-3 py-2 text-right text-primary">−{formatPHP(r.discount_amount_php)}</td>
-                    <td className="px-3 py-2 text-right font-semibold">{formatPHP(r.final_amount_php)}</td>
-                  </tr>
-                );
-              })}
+                <tr>
+                  <td colSpan={8} className="px-3 py-8 text-center text-muted-foreground">
+                    No redemptions in this range.
+                  </td>
+                </tr>
+              ) : (
+                rows.map((r) => {
+                  const s = staffMap[r.staff_referral_id];
+                  return (
+                    <tr key={r.id} className="border-t border-border">
+                      <td className="px-3 py-2 whitespace-nowrap">
+                        {new Date(r.created_at).toLocaleString()}
+                      </td>
+                      <td className="px-3 py-2">
+                        <Link
+                          to="/admin/redemptions/$staffId"
+                          params={{ staffId: r.staff_referral_id }}
+                          className="block hover:underline"
+                        >
+                          <div className="font-medium text-primary">{s?.full_name ?? "—"}</div>
+                          <div className="font-mono text-xs text-muted-foreground">
+                            {r.referral_code}
+                          </div>
+                        </Link>
+                      </td>
+                      <td className="px-3 py-2">
+                        <div className="font-medium">{userMap[r.user_id]?.full_name ?? "—"}</div>
+                        <div className="font-mono text-[10px] text-muted-foreground">
+                          {r.user_id.slice(0, 8)}…
+                        </div>
+                      </td>
+                      <td className="px-3 py-2">
+                        <span className="rounded bg-secondary px-2 py-0.5 text-xs uppercase">
+                          {r.kind}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2">
+                        <div>{promoMap[r.promotion_id]?.title ?? "—"}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {r.percent_off ? `${r.percent_off}% off` : ""}
+                          {r.flat_amount_php ? ` ₱${r.flat_amount_php} flat` : ""}
+                        </div>
+                      </td>
+                      <td className="px-3 py-2 text-right">{formatPHP(r.base_amount_php)}</td>
+                      <td className="px-3 py-2 text-right text-primary">
+                        −{formatPHP(r.discount_amount_php)}
+                      </td>
+                      <td className="px-3 py-2 text-right font-semibold">
+                        {formatPHP(r.final_amount_php)}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>

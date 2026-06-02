@@ -1,4 +1,13 @@
-import { Body, Container, Head, Heading, Html, Preview, Section, Text } from "@react-email/components";
+import {
+  Body,
+  Container,
+  Head,
+  Heading,
+  Html,
+  Preview,
+  Section,
+  Text,
+} from "@react-email/components";
 import type { TemplateEntry } from "./registry";
 import { SITE_NAME, SITE_URL, brandBar, container, footer, h1, main, text } from "./_styles";
 
@@ -16,8 +25,16 @@ interface Props {
 }
 
 const BookingOwner = ({
-  owner_name, business_name, business_id, service_title, starts_at_human,
-  customer_name, customer_phone, customer_email, notes, status,
+  owner_name,
+  business_name,
+  business_id,
+  service_title,
+  starts_at_human,
+  customer_name,
+  customer_phone,
+  customer_email,
+  notes,
+  status,
 }: Props) => (
   <Html lang="en">
     <Head />
@@ -27,23 +44,42 @@ const BookingOwner = ({
     <Body style={main}>
       <Container style={container}>
         <Section style={brandBar} />
-        <Heading style={h1}>
-          {status === "pending" ? "New booking request" : "New booking"}
-        </Heading>
+        <Heading style={h1}>{status === "pending" ? "New booking request" : "New booking"}</Heading>
         <Text style={text}>{owner_name ? `Hi ${owner_name},` : "Hi,"}</Text>
         <Text style={text}>
-          You have a new {status === "pending" ? "booking request" : "confirmed booking"} on {business_name}.
+          You have a new {status === "pending" ? "booking request" : "confirmed booking"} on{" "}
+          {business_name}.
         </Text>
         <Text style={text}>
-          <strong>Service:</strong> {service_title}<br />
-          <strong>When:</strong> {starts_at_human}<br />
-          <strong>Customer:</strong> {customer_name}<br />
-          {customer_phone ? <><strong>Phone:</strong> {customer_phone}<br /></> : null}
-          {customer_email ? <><strong>Email:</strong> {customer_email}<br /></> : null}
-          {notes ? <><strong>Notes:</strong> {notes}</> : null}
+          <strong>Service:</strong> {service_title}
+          <br />
+          <strong>When:</strong> {starts_at_human}
+          <br />
+          <strong>Customer:</strong> {customer_name}
+          <br />
+          {customer_phone ? (
+            <>
+              <strong>Phone:</strong> {customer_phone}
+              <br />
+            </>
+          ) : null}
+          {customer_email ? (
+            <>
+              <strong>Email:</strong> {customer_email}
+              <br />
+            </>
+          ) : null}
+          {notes ? (
+            <>
+              <strong>Notes:</strong> {notes}
+            </>
+          ) : null}
         </Text>
         <Text style={text}>
-          Manage bookings: <a href={`${SITE_URL}/dashboard/businesses/${business_id}/edit`}>{SITE_URL}/dashboard/businesses/{business_id}/edit</a>
+          Manage bookings:{" "}
+          <a href={`${SITE_URL}/dashboard/businesses/${business_id}/edit`}>
+            {SITE_URL}/dashboard/businesses/{business_id}/edit
+          </a>
         </Text>
         <Text style={footer}>
           {SITE_NAME} · <a href={SITE_URL}>{SITE_URL}</a>

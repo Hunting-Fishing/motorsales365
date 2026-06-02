@@ -9,16 +9,37 @@ export const Route = createFileRoute("/admin/")({
 });
 
 function AdminOverview() {
-  const [stats, setStats] = useState({ active: 0, pending: 0, users: 0, revenue: 0, pendingVerifications: 0 });
+  const [stats, setStats] = useState({
+    active: 0,
+    pending: 0,
+    users: 0,
+    revenue: 0,
+    pendingVerifications: 0,
+  });
 
   useEffect(() => {
     const load = async () => {
-      const [{ count: active }, { count: pending }, { count: users }, { data: paid }, { count: pendingVerifications }] = await Promise.all([
-        supabase.from("listings").select("*", { count: "exact", head: true }).eq("status", "active"),
-        supabase.from("listings").select("*", { count: "exact", head: true }).eq("status", "pending_payment"),
+      const [
+        { count: active },
+        { count: pending },
+        { count: users },
+        { data: paid },
+        { count: pendingVerifications },
+      ] = await Promise.all([
+        supabase
+          .from("listings")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "active"),
+        supabase
+          .from("listings")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "pending_payment"),
         supabase.from("profiles").select("*", { count: "exact", head: true }),
         supabase.from("payments").select("amount_php").eq("status", "paid"),
-        supabase.from("verification_requests").select("*", { count: "exact", head: true }).eq("status", "pending"),
+        supabase
+          .from("verification_requests")
+          .select("*", { count: "exact", head: true })
+          .eq("status", "pending"),
       ]);
       const revenue = (paid ?? []).reduce((s, p: any) => s + Number(p.amount_php), 0);
       setStats({
@@ -63,7 +84,8 @@ function AdminOverview() {
             <div>
               <div className="font-semibold">Pending verifications</div>
               <div className="text-sm text-muted-foreground">
-                {stats.pendingVerifications} business{stats.pendingVerifications === 1 ? "" : "es"} waiting for review
+                {stats.pendingVerifications} business{stats.pendingVerifications === 1 ? "" : "es"}{" "}
+                waiting for review
               </div>
             </div>
           </div>

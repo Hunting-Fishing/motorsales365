@@ -1,11 +1,40 @@
 import { useState, useEffect, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Images, Phone, Mail, MessageCircle, X, ChevronLeft, ChevronRight, Instagram, Facebook, Linkedin } from "lucide-react";
+import {
+  Images,
+  Phone,
+  Mail,
+  MessageCircle,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Instagram,
+  Facebook,
+  Linkedin,
+} from "lucide-react";
 
-type Album = { id: string; title: string; description: string | null; cover_url: string | null; sort_order: number };
-type Photo = { id: string; album_id: string; url: string; caption: string | null; sort_order: number };
-type Channel = { id: string; kind: string; label: string | null; value: string; sort_order: number };
+type Album = {
+  id: string;
+  title: string;
+  description: string | null;
+  cover_url: string | null;
+  sort_order: number;
+};
+type Photo = {
+  id: string;
+  album_id: string;
+  url: string;
+  caption: string | null;
+  sort_order: number;
+};
+type Channel = {
+  id: string;
+  kind: string;
+  label: string | null;
+  value: string;
+  sort_order: number;
+};
 
 /* ============== GALLERY ============== */
 
@@ -27,7 +56,8 @@ export function PublicGallerySection({
 
   const close = useCallback(() => setLightboxIdx(null), []);
   const prev = useCallback(
-    () => setLightboxIdx((i) => (i === null ? null : (i - 1 + openPhotos.length) % openPhotos.length)),
+    () =>
+      setLightboxIdx((i) => (i === null ? null : (i - 1 + openPhotos.length) % openPhotos.length)),
     [openPhotos.length],
   );
   const next = useCallback(
@@ -64,7 +94,10 @@ export function PublicGallerySection({
               <button
                 key={a.id}
                 type="button"
-                onClick={() => { setOpenAlbumId(a.id); onAlbumOpen?.(a.id); }}
+                onClick={() => {
+                  setOpenAlbumId(a.id);
+                  onAlbumOpen?.(a.id);
+                }}
                 className="group relative aspect-square overflow-hidden rounded-lg border border-border bg-muted text-left"
               >
                 {cover ? (
@@ -80,7 +113,9 @@ export function PublicGallerySection({
                 )}
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent p-2 text-white">
                   <div className="truncate text-sm font-semibold">{a.title}</div>
-                  <div className="text-xs opacity-80">{count} photo{count === 1 ? "" : "s"}</div>
+                  <div className="text-xs opacity-80">
+                    {count} photo{count === 1 ? "" : "s"}
+                  </div>
                 </div>
               </button>
             );
@@ -89,7 +124,8 @@ export function PublicGallerySection({
       ) : (
         <div>
           <Button variant="ghost" size="sm" onClick={() => setOpenAlbumId(null)}>
-            <ChevronLeft className="mr-1 h-4 w-4" />All albums
+            <ChevronLeft className="mr-1 h-4 w-4" />
+            All albums
           </Button>
           <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">
             {openPhotos.map((p, i) => (
@@ -99,7 +135,12 @@ export function PublicGallerySection({
                 onClick={() => setLightboxIdx(i)}
                 className="aspect-square overflow-hidden rounded-md border border-border"
               >
-                <img src={p.url} alt={p.caption ?? ""} className="h-full w-full object-cover" loading="lazy" />
+                <img
+                  src={p.url}
+                  alt={p.caption ?? ""}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
               </button>
             ))}
           </div>
@@ -115,7 +156,10 @@ export function PublicGallerySection({
         >
           <button
             type="button"
-            onClick={(e) => { e.stopPropagation(); close(); }}
+            onClick={(e) => {
+              e.stopPropagation();
+              close();
+            }}
             className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
             aria-label="Close"
           >
@@ -125,7 +169,10 @@ export function PublicGallerySection({
             <>
               <button
                 type="button"
-                onClick={(e) => { e.stopPropagation(); prev(); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  prev();
+                }}
                 className="absolute left-4 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
                 aria-label="Previous"
               >
@@ -133,7 +180,10 @@ export function PublicGallerySection({
               </button>
               <button
                 type="button"
-                onClick={(e) => { e.stopPropagation(); next(); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  next();
+                }}
                 className="absolute right-4 rounded-full bg-white/10 p-2 text-white hover:bg-white/20"
                 aria-label="Next"
               >
@@ -244,14 +294,20 @@ export function PublicContactSection({
               <ChannelIcon kind={c.kind} />
               <div className="min-w-0 flex-1">
                 <div className="text-xs uppercase tracking-wide text-muted-foreground">
-                  {KIND_LABELS[c.kind] ?? c.kind}{c.label ? ` · ${c.label}` : ""}
+                  {KIND_LABELS[c.kind] ?? c.kind}
+                  {c.label ? ` · ${c.label}` : ""}
                 </div>
                 <div className="truncate text-sm font-medium">{c.value}</div>
               </div>
             </div>
           );
           return href ? (
-            <a key={c.id} href={href} target={href.startsWith("http") ? "_blank" : undefined} rel="noreferrer">
+            <a
+              key={c.id}
+              href={href}
+              target={href.startsWith("http") ? "_blank" : undefined}
+              rel="noreferrer"
+            >
               {content}
             </a>
           ) : (
@@ -291,13 +347,7 @@ function parseVideoEmbed(url: string, provider: string | null): string | null {
   return null;
 }
 
-export function FeaturedVideoEmbed({
-  url,
-  provider,
-}: {
-  url: string;
-  provider: string | null;
-}) {
+export function FeaturedVideoEmbed({ url, provider }: { url: string; provider: string | null }) {
   const embed = parseVideoEmbed(url, provider);
   if (!embed) return null;
   return (

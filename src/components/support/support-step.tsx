@@ -20,9 +20,7 @@ export function SupportStep({
       </span>
       <div className="min-w-0">
         <p className="font-medium leading-snug">{title}</p>
-        {children && (
-          <div className="mt-1 text-sm text-muted-foreground">{children}</div>
-        )}
+        {children && <div className="mt-1 text-sm text-muted-foreground">{children}</div>}
       </div>
     </li>
   );

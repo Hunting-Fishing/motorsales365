@@ -1,4 +1,10 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { REGION_OPTIONS, provincesOf, citiesOf } from "@/lib/psgc";
 
@@ -24,14 +30,23 @@ export function LocationDrilldown({
       <Select
         value={value.region ?? "__all__"}
         onValueChange={(v) =>
-          onChange({ region: v === "__all__" ? null : v, province: null, city: null, barangay: null })
+          onChange({
+            region: v === "__all__" ? null : v,
+            province: null,
+            city: null,
+            barangay: null,
+          })
         }
       >
-        <SelectTrigger><SelectValue placeholder="Region" /></SelectTrigger>
+        <SelectTrigger>
+          <SelectValue placeholder="Region" />
+        </SelectTrigger>
         <SelectContent>
           <SelectItem value="__all__">All regions</SelectItem>
           {REGION_OPTIONS.map((r) => (
-            <SelectItem key={r.value} value={r.value}>{r.label}</SelectItem>
+            <SelectItem key={r.value} value={r.value}>
+              {r.label}
+            </SelectItem>
           ))}
         </SelectContent>
       </Select>
@@ -43,22 +58,36 @@ export function LocationDrilldown({
         }
         disabled={!value.region || provinces.length === 0}
       >
-        <SelectTrigger><SelectValue placeholder={provinces.length === 0 ? "—" : "Province"} /></SelectTrigger>
+        <SelectTrigger>
+          <SelectValue placeholder={provinces.length === 0 ? "—" : "Province"} />
+        </SelectTrigger>
         <SelectContent>
           <SelectItem value="__all__">All provinces</SelectItem>
-          {provinces.map((p) => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+          {provinces.map((p) => (
+            <SelectItem key={p} value={p}>
+              {p}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 
       <Select
         value={value.city ?? "__all__"}
-        onValueChange={(v) => onChange({ ...value, city: v === "__all__" ? null : v, barangay: null })}
+        onValueChange={(v) =>
+          onChange({ ...value, city: v === "__all__" ? null : v, barangay: null })
+        }
         disabled={!value.region || cities.length === 0}
       >
-        <SelectTrigger><SelectValue placeholder={cities.length === 0 ? "—" : "City / Municipality"} /></SelectTrigger>
+        <SelectTrigger>
+          <SelectValue placeholder={cities.length === 0 ? "—" : "City / Municipality"} />
+        </SelectTrigger>
         <SelectContent>
           <SelectItem value="__all__">All cities</SelectItem>
-          {cities.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+          {cities.map((c) => (
+            <SelectItem key={c} value={c}>
+              {c}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 

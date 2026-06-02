@@ -10,7 +10,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { LocationPicker } from "@/components/location-picker";
 import { getUserPlanLimits, FREE_PLAN_LIMITS, type PlanLimits } from "@/lib/plan-limits";
 import { PhoneInput } from "@/components/phone-input";
@@ -73,7 +79,11 @@ function EditListingPage() {
     setCity(l.city ?? null);
     setBarangay(l.barangay ?? null);
     setCondition(l.condition ?? "Used");
-    { const p = parseE164(l.contact_phone ?? null); setPhoneIso(p.iso); setPhoneNational(p.national); }
+    {
+      const p = parseE164(l.contact_phone ?? null);
+      setPhoneIso(p.iso);
+      setPhoneNational(p.national);
+    }
     setAllowMessages(l.allow_messages);
 
     const { data: m } = await supabase
@@ -169,7 +179,10 @@ function EditListingPage() {
 
   const photos = media.filter((m) => m.type === "photo");
   const videos = media.filter((m) => m.type === "video");
-  const maxPhotos = listing.plan === "upgraded" ? Math.max(20, planLimits.maxPhotosPerListing) : Math.max(5, planLimits.maxPhotosPerListing);
+  const maxPhotos =
+    listing.plan === "upgraded"
+      ? Math.max(20, planLimits.maxPhotosPerListing)
+      : Math.max(5, planLimits.maxPhotosPerListing);
 
   return (
     <SiteLayout>
@@ -187,12 +200,20 @@ function EditListingPage() {
               </div>
               <div>
                 <Label>Price (₱)</Label>
-                <Input type="number" min="0" value={price} onChange={(e) => setPrice(e.target.value)} required />
+                <Input
+                  type="number"
+                  min="0"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  required
+                />
               </div>
               <div>
                 <Label>Condition</Label>
                 <Select value={condition} onValueChange={setCondition}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="Brand new">Brand new</SelectItem>
                     <SelectItem value="Used">Used</SelectItem>
@@ -202,7 +223,11 @@ function EditListingPage() {
               </div>
               <div className="sm:col-span-2">
                 <Label>Description</Label>
-                <Textarea rows={5} value={description} onChange={(e) => setDescription(e.target.value)} />
+                <Textarea
+                  rows={5}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
               </div>
             </div>
           </section>
@@ -221,7 +246,14 @@ function EditListingPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label>Contact phone</Label>
-                <PhoneInput iso={phoneIso} national={phoneNational} onChange={({ iso, national }) => { setPhoneIso(iso); setPhoneNational(national); }} />
+                <PhoneInput
+                  iso={phoneIso}
+                  national={phoneNational}
+                  onChange={({ iso, national }) => {
+                    setPhoneIso(iso);
+                    setPhoneNational(national);
+                  }}
+                />
               </div>
               <div className="flex items-center gap-2 pt-6">
                 <input
@@ -231,7 +263,9 @@ function EditListingPage() {
                   onChange={(e) => setAllowMessages(e.target.checked)}
                   className="h-4 w-4 rounded border-border"
                 />
-                <Label htmlFor="allow-msg" className="cursor-pointer">Allow buyer messages</Label>
+                <Label htmlFor="allow-msg" className="cursor-pointer">
+                  Allow buyer messages
+                </Label>
               </div>
             </div>
           </section>
@@ -242,7 +276,10 @@ function EditListingPage() {
             </h2>
             <div className="grid grid-cols-3 gap-2 sm:grid-cols-5">
               {photos.map((m) => (
-                <div key={m.id} className="relative aspect-square overflow-hidden rounded-md bg-secondary">
+                <div
+                  key={m.id}
+                  className="relative aspect-square overflow-hidden rounded-md bg-secondary"
+                >
                   <img src={m.url} alt="" className="h-full w-full object-cover" />
                   <button
                     type="button"
@@ -257,7 +294,13 @@ function EditListingPage() {
                 <label className="flex aspect-square cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed border-border text-muted-foreground hover:bg-secondary/50">
                   <Upload className="h-5 w-5" />
                   <span className="mt-1 text-xs">Add</span>
-                  <input type="file" accept="image/*" multiple className="hidden" onChange={addPhotos} />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    className="hidden"
+                    onChange={addPhotos}
+                  />
                 </label>
               )}
             </div>
@@ -266,9 +309,21 @@ function EditListingPage() {
                 <Label>Videos</Label>
                 <div className="mt-2 space-y-2">
                   {videos.map((m) => (
-                    <div key={m.id} className="flex items-center justify-between rounded-md border border-border p-2">
-                      <video src={m.url} controls className="h-16 w-28 rounded bg-black object-cover" />
-                      <Button type="button" variant="outline" size="sm" onClick={() => removeMedia(m)}>
+                    <div
+                      key={m.id}
+                      className="flex items-center justify-between rounded-md border border-border p-2"
+                    >
+                      <video
+                        src={m.url}
+                        controls
+                        className="h-16 w-28 rounded bg-black object-cover"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => removeMedia(m)}
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>

@@ -22,7 +22,15 @@ function Card({ title, icon: Icon, children }: { title: string; icon: any; child
   );
 }
 
-function BarList({ items, total, valueLabel }: { items: Bucket[]; total: number; valueLabel?: (n: number) => string }) {
+function BarList({
+  items,
+  total,
+  valueLabel,
+}: {
+  items: Bucket[];
+  total: number;
+  valueLabel?: (n: number) => string;
+}) {
   if (!items.length) return <div className="text-sm text-muted-foreground">No data yet.</div>;
   const max = Math.max(...items.map((i) => i.count), 1);
   return (
@@ -35,7 +43,8 @@ function BarList({ items, total, valueLabel }: { items: Bucket[]; total: number;
             <div className="flex items-center justify-between text-sm">
               <span className="truncate pr-2">{i.key}</span>
               <span className="tabular-nums text-muted-foreground">
-                {valueLabel ? valueLabel(i.count) : i.count} <span className="opacity-60">· {share}%</span>
+                {valueLabel ? valueLabel(i.count) : i.count}{" "}
+                <span className="opacity-60">· {share}%</span>
               </span>
             </div>
             <div className="mt-1 h-2 overflow-hidden rounded bg-secondary">
@@ -49,15 +58,17 @@ function BarList({ items, total, valueLabel }: { items: Bucket[]; total: number;
   );
 }
 
-function tally<T>(rows: T[], key: (r: T) => string | null | undefined, fallback = "Unknown"): Bucket[] {
+function tally<T>(
+  rows: T[],
+  key: (r: T) => string | null | undefined,
+  fallback = "Unknown",
+): Bucket[] {
   const m = new Map<string, number>();
   for (const r of rows) {
     const k = (key(r) || fallback).toString();
     m.set(k, (m.get(k) || 0) + 1);
   }
-  return [...m.entries()]
-    .map(([key, count]) => ({ key, count }))
-    .sort((a, b) => b.count - a.count);
+  return [...m.entries()].map(([key, count]) => ({ key, count })).sort((a, b) => b.count - a.count);
 }
 
 function AdminAnalytics() {
@@ -96,13 +107,25 @@ function AdminAnalytics() {
       const nowMs = Date.now();
       const sinceA = new Date(nowMs - days * 86400000).toISOString();
       const queries: any[] = [
-        supabase.from("listings").select("id,user_id,category_slug,region,province,city,status,plan,seller_type,view_count,price_php,created_at").limit(5000),
-        supabase.from("profiles").select("id,seller_type,business_kind,verification_status,business_region,created_at").limit(5000),
+        supabase
+          .from("listings")
+          .select(
+            "id,user_id,category_slug,region,province,city,status,plan,seller_type,view_count,price_php,created_at",
+          )
+          .limit(5000),
+        supabase
+          .from("profiles")
+          .select("id,seller_type,business_kind,verification_status,business_region,created_at")
+          .limit(5000),
         supabase.from("payments").select("amount_php,status,kind,created_at").limit(5000),
         supabase.from("subscriptions").select("plan_id,status,created_at").limit(5000),
         supabase.from("subscription_plans").select("id,name,price_php"),
         supabase.from("categories").select("slug,name"),
-        supabase.from("business_page_events").select("meta,occurred_at").gte("occurred_at", sinceA).limit(10000),
+        supabase
+          .from("business_page_events")
+          .select("meta,occurred_at")
+          .gte("occurred_at", sinceA)
+          .limit(10000),
       ];
       let bIndex = -1;
       if (compare) {
@@ -138,8 +161,10 @@ function AdminAnalytics() {
     })();
   }, [days, compare, daysB]);
 
-
-  const catMap = useMemo(() => Object.fromEntries(categories.map((c) => [c.slug, c.name])), [categories]);
+  const catMap = useMemo(
+    () => Object.fromEntries(categories.map((c) => [c.slug, c.name])),
+    [categories],
+  );
   const planMap = useMemo(() => Object.fromEntries(plans.map((p) => [p.id, p])), [plans]);
 
   // Top-line stats
@@ -148,7 +173,9 @@ function AdminAnalytics() {
   const totalUsers = profiles.length;
   const businessUsers = profiles.filter((p) => p.seller_type === "business").length;
   const totalViews = listings.reduce((s, l) => s + (l.view_count || 0), 0);
-  const totalRevenue = payments.filter((p) => p.status === "paid").reduce((s, p) => s + Number(p.amount_php || 0), 0);
+  const totalRevenue = payments
+    .filter((p) => p.status === "paid")
+    .reduce((s, p) => s + Number(p.amount_php || 0), 0);
 
   // Listings by category
   const byCategory = useMemo(
@@ -173,7 +200,11 @@ function AdminAnalytics() {
 
   // Business kinds (multi-service trends)
   const byBusinessKind = useMemo(
-    () => tally(profiles.filter((p) => p.seller_type === "business"), (p) => p.business_kind),
+    () =>
+      tally(
+        profiles.filter((p) => p.seller_type === "business"),
+        (p) => p.business_kind,
+      ),
     [profiles],
   );
 
@@ -204,7 +235,11 @@ function AdminAnalytics() {
     const top5Regions = byRegion.slice(0, 5).map((r) => r.key);
     return top5Regions.map((r) => {
       const subset = listings.filter((l) => (l.region || "Unknown") === r);
-      return { region: r, total: subset.length, cats: tally(subset, (l) => catMap[l.category_slug] || l.category_slug).slice(0, 5) };
+      return {
+        region: r,
+        total: subset.length,
+        cats: tally(subset, (l) => catMap[l.category_slug] || l.category_slug).slice(0, 5),
+      };
     });
   }, [byRegion, listings, catMap]);
 
@@ -218,12 +253,17 @@ function AdminAnalytics() {
     return listings.filter((l) => new Date(l.created_at).getTime() > cutoff).length;
   }, [listings]);
 
-  if (loading) return <div className="p-12 text-center text-muted-foreground">Loading analytics…</div>;
+  if (loading)
+    return <div className="p-12 text-center text-muted-foreground">Loading analytics…</div>;
 
   const top = [
     { label: "Total listings", value: totalListings, sub: `${activeListings} active` },
     { label: "Total users", value: totalUsers, sub: `${businessUsers} businesses` },
-    { label: "Total ad views", value: totalViews.toLocaleString(), sub: `${listings30} listings · 30d` },
+    {
+      label: "Total ad views",
+      value: totalViews.toLocaleString(),
+      sub: `${listings30} listings · 30d`,
+    },
     { label: "Revenue", value: formatPHP(totalRevenue), sub: `${signups30} signups · 30d` },
   ];
 
@@ -231,7 +271,9 @@ function AdminAnalytics() {
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-2xl font-bold">Site analytics</h1>
-        <p className="text-sm text-muted-foreground">Market insights — categories, regions, business activity, and tier usage.</p>
+        <p className="text-sm text-muted-foreground">
+          Market insights — categories, regions, business activity, and tier usage.
+        </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -247,7 +289,9 @@ function AdminAnalytics() {
       <Card title="Device locations heatmap — Philippines" icon={Smartphone}>
         <div className="mb-3 flex flex-wrap items-center gap-3">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-medium text-muted-foreground">{compare ? "Range A:" : "Range:"}</span>
+            <span className="text-xs font-medium text-muted-foreground">
+              {compare ? "Range A:" : "Range:"}
+            </span>
             {[7, 30, 90].map((d) => (
               <button
                 key={d}
@@ -298,7 +342,6 @@ function AdminAnalytics() {
           labelB={`Prior ${daysB}d`}
         />
       </Card>
-
 
       <div className="grid gap-4 lg:grid-cols-2">
         <Card title="Listings by category" icon={Tag}>
@@ -353,10 +396,22 @@ function AdminAnalytics() {
       <div className="rounded-xl border border-dashed border-border bg-card p-5 text-sm text-muted-foreground">
         <div className="font-semibold text-foreground">Sales & promotion insights</div>
         <ul className="mt-2 list-disc space-y-1 pl-5">
-          <li>High-opportunity regions appear at the top of "Listings by region" — target promotions where supply is dense.</li>
-          <li>Low-activity regions (bottom of region/province lists) are growth markets — consider outreach campaigns.</li>
-          <li>Business kinds with high listing counts but low subscription conversion are upsell candidates.</li>
-          <li>Track multi-service businesses via "Top businesses by activity" combined with their tag mix on each listing.</li>
+          <li>
+            High-opportunity regions appear at the top of "Listings by region" — target promotions
+            where supply is dense.
+          </li>
+          <li>
+            Low-activity regions (bottom of region/province lists) are growth markets — consider
+            outreach campaigns.
+          </li>
+          <li>
+            Business kinds with high listing counts but low subscription conversion are upsell
+            candidates.
+          </li>
+          <li>
+            Track multi-service businesses via "Top businesses by activity" combined with their tag
+            mix on each listing.
+          </li>
         </ul>
       </div>
     </div>

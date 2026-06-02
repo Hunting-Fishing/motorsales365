@@ -8,14 +8,27 @@ const iconUrl = "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png";
 const iconRetinaUrl = "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png";
 const shadowUrl = "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png";
 const DefaultIcon = L.icon({
-  iconUrl, iconRetinaUrl, shadowUrl,
-  iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34], shadowSize: [41, 41],
+  iconUrl,
+  iconRetinaUrl,
+  shadowUrl,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
 const PH_DEFAULT = { lat: 12.8797, lng: 121.774, zoom: 6 };
 
-function Recenter({ region, lat, lng }: { region: string | null; lat: number | null; lng: number | null }) {
+function Recenter({
+  region,
+  lat,
+  lng,
+}: {
+  region: string | null;
+  lat: number | null;
+  lng: number | null;
+}) {
   const map = useMap();
   const initialized = useRef(false);
   useEffect(() => {
@@ -38,13 +51,18 @@ function Recenter({ region, lat, lng }: { region: string | null; lat: number | n
 
 function ClickHandler({ onPick }: { onPick: (lat: number, lng: number) => void }) {
   useMapEvents({
-    click(e) { onPick(e.latlng.lat, e.latlng.lng); },
+    click(e) {
+      onPick(e.latlng.lat, e.latlng.lng);
+    },
   });
   return null;
 }
 
 export function LocationPickerInner({
-  lat, lng, region, onChange,
+  lat,
+  lng,
+  region,
+  onChange,
 }: {
   lat: number | null;
   lng: number | null;

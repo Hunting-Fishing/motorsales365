@@ -20,10 +20,18 @@ type ChecklistItem = { label: string; done: boolean; required: boolean };
 
 function buildChecklist(profile: any, totpEnabled: boolean): ChecklistItem[] {
   const isBusiness = profile?.seller_type === "business" || profile?.seller_type === "dealer";
-  const has = (v: any) => typeof v === "string" ? v.trim().length > 0 : !!v;
+  const has = (v: any) => (typeof v === "string" ? v.trim().length > 0 : !!v);
   const items: ChecklistItem[] = [
-    { label: "First & last name", done: has(profile?.first_name) && has(profile?.last_name), required: true },
-    { label: "Phone number", done: has(profile?.phone) || has(profile?.phone_e164), required: true },
+    {
+      label: "First & last name",
+      done: has(profile?.first_name) && has(profile?.last_name),
+      required: true,
+    },
+    {
+      label: "Phone number",
+      done: has(profile?.phone) || has(profile?.phone_e164),
+      required: true,
+    },
     { label: "Profile photo", done: has(profile?.avatar_url), required: false },
     { label: "Two-factor authentication (authenticator app)", done: totpEnabled, required: false },
   ];
@@ -31,7 +39,14 @@ function buildChecklist(profile: any, totpEnabled: boolean): ChecklistItem[] {
     items.push(
       { label: "Business name", done: has(profile?.business_name), required: true },
       { label: "Business address", done: has(profile?.business_address), required: true },
-      { label: "Business location (region/province/city)", done: has(profile?.business_region) && has(profile?.business_province) && has(profile?.business_city), required: true },
+      {
+        label: "Business location (region/province/city)",
+        done:
+          has(profile?.business_region) &&
+          has(profile?.business_province) &&
+          has(profile?.business_city),
+        required: true,
+      },
     );
   }
   return items;
@@ -75,27 +90,36 @@ function ProfilePage() {
     );
     setEmailSubmitting(false);
     if (error) return toast.error(error.message);
-    toast.success("Confirmation links sent to both your current and new email. Click both to complete the change.");
+    toast.success(
+      "Confirmation links sent to both your current and new email. Click both to complete the change.",
+    );
     setNewEmail("");
   };
 
   useEffect(() => {
     if (!user) return;
-    supabase.from("profiles").select("*").eq("id", user.id).maybeSingle().then(({ data }) => {
-      setProfile(data ?? {});
-      const seed = data?.phone_e164 || data?.phone || "";
-      setProfilePhone(parseE164(seed));
-    });
+    supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        setProfile(data ?? {});
+        const seed = data?.phone_e164 || data?.phone || "";
+        setProfilePhone(parseE164(seed));
+      });
     supabase.auth.mfa.listFactors().then(({ data }) => {
       const verified = (data?.totp ?? []).some((f: any) => f.status === "verified");
       setTotpEnabled(verified);
     });
   }, [user]);
 
-
   const removePhone = async () => {
     if (!user) return;
-    await supabase.from("profiles").update({ phone_e164: null, phone_verified_at: null }).eq("id", user.id);
+    await supabase
+      .from("profiles")
+      .update({ phone_e164: null, phone_verified_at: null })
+      .eq("id", user.id);
     setProfile((p: any) => ({ ...p, phone_e164: null, phone_verified_at: null }));
     toast.success("Phone removed.");
   };
@@ -129,7 +153,13 @@ function ProfilePage() {
     const l = (profile?.last_name ?? "").trim();
     if (f || l) return `${f[0] ?? ""}${l[0] ?? ""}`.toUpperCase() || "?";
     const fn = (profile?.full_name ?? "").trim();
-    if (fn) return fn.split(/\s+/).map((s: string) => s[0]).slice(0, 2).join("").toUpperCase();
+    if (fn)
+      return fn
+        .split(/\s+/)
+        .map((s: string) => s[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase();
     return user?.email?.[0]?.toUpperCase() ?? "?";
   }, [profile, user]);
 
@@ -214,15 +244,23 @@ function ProfilePage() {
           <>
             <div>
               <Label>Business name</Label>
-              <Input value={profile.business_name ?? ""} onChange={(e) => setProfile({ ...profile, business_name: e.target.value })} />
+              <Input
+                value={profile.business_name ?? ""}
+                onChange={(e) => setProfile({ ...profile, business_name: e.target.value })}
+              />
             </div>
             <div>
               <Label>Business address</Label>
-              <Input value={profile.business_address ?? ""} onChange={(e) => setProfile({ ...profile, business_address: e.target.value })} />
+              <Input
+                value={profile.business_address ?? ""}
+                onChange={(e) => setProfile({ ...profile, business_address: e.target.value })}
+              />
             </div>
             <div className="space-y-2">
               <Label className="block">Business location</Label>
-              <p className="text-xs text-muted-foreground">Based on the official PSA Philippine Standard Geographic Code.</p>
+              <p className="text-xs text-muted-foreground">
+                Based on the official PSA Philippine Standard Geographic Code.
+              </p>
               <LocationPicker
                 value={{
                   region: profile.business_region ?? null,
@@ -230,30 +268,33 @@ function ProfilePage() {
                   city: profile.business_city ?? null,
                   barangay: profile.business_barangay ?? null,
                 }}
-                onChange={(v) => setProfile({
-                  ...profile,
-                  business_region: v.region ?? null,
-                  business_province: v.province ?? null,
-                  business_city: v.city ?? null,
-                  business_barangay: v.barangay ?? null,
-                })}
+                onChange={(v) =>
+                  setProfile({
+                    ...profile,
+                    business_region: v.region ?? null,
+                    business_province: v.province ?? null,
+                    business_city: v.city ?? null,
+                    business_barangay: v.barangay ?? null,
+                  })
+                }
               />
             </div>
           </>
         )}
-        <Button onClick={save} disabled={saving}>{saving ? "Saving…" : "Save profile"}</Button>
+        <Button onClick={save} disabled={saving}>
+          {saving ? "Saving…" : "Save profile"}
+        </Button>
       </div>
 
       <CurrencyPreferenceCard />
-
-
 
       {/* Account email */}
       <div className="mt-6 space-y-4 rounded-xl border border-border bg-card p-6">
         <div>
           <h2 className="font-display text-lg font-bold">Account email</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Your sign-in email. Changing it sends a confirmation link to both your current and new addresses — click both to complete.
+            Your sign-in email. Changing it sends a confirmation link to both your current and new
+            addresses — click both to complete.
           </p>
         </div>
         <div>
@@ -292,8 +333,8 @@ function CurrencyPreferenceCard() {
       <div>
         <h2 className="font-display text-lg font-bold">Display currency</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          All listings are priced in Philippine Peso (₱). Pick a display currency to see
-          live conversions alongside the listed price across the site.
+          All listings are priced in Philippine Peso (₱). Pick a display currency to see live
+          conversions alongside the listed price across the site.
         </p>
       </div>
       <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
@@ -320,8 +361,9 @@ function CurrencyPreferenceCard() {
           </div>
           {code !== "PHP" && current.rate_to_php > 0 && (
             <div className="text-xs text-muted-foreground">
-              ≈ <span className="font-semibold text-foreground">{format(sample)}</span>{" "}
-              (1 {current.code} ≈ ₱{current.rate_to_php.toLocaleString("en-US", { maximumFractionDigits: 2 })})
+              ≈ <span className="font-semibold text-foreground">{format(sample)}</span> (1{" "}
+              {current.code} ≈ ₱
+              {current.rate_to_php.toLocaleString("en-US", { maximumFractionDigits: 2 })})
             </div>
           )}
         </div>
@@ -358,7 +400,9 @@ function ProfileCompletion({ profile, totpEnabled }: { profile: any; totpEnabled
         </div>
         <div className="text-right">
           <div className="font-display text-2xl font-bold">{percent}%</div>
-          <div className="text-xs text-muted-foreground">{totalDone} of {items.length}</div>
+          <div className="text-xs text-muted-foreground">
+            {totalDone} of {items.length}
+          </div>
         </div>
       </div>
       <Progress value={percent} className="mb-4 h-2" />
@@ -366,7 +410,8 @@ function ProfileCompletion({ profile, totpEnabled }: { profile: any; totpEnabled
         <div className="mb-4 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm">
           <AlertCircle className="mt-0.5 size-4 shrink-0 text-amber-600 dark:text-amber-400" />
           <span className="text-amber-700 dark:text-amber-300">
-            Your account isn't live yet. Add the missing required info below so drivers can find you.
+            Your account isn't live yet. Add the missing required info below so drivers can find
+            you.
           </span>
         </div>
       )}
@@ -376,14 +421,20 @@ function ProfileCompletion({ profile, totpEnabled }: { profile: any; totpEnabled
             {item.done ? (
               <CheckCircle2 className="size-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
             ) : (
-              <Circle className={`size-4 shrink-0 ${item.required ? "text-amber-500" : "text-muted-foreground"}`} />
+              <Circle
+                className={`size-4 shrink-0 ${item.required ? "text-amber-500" : "text-muted-foreground"}`}
+              />
             )}
-            <span className={item.done ? "text-muted-foreground line-through" : ""}>{item.label}</span>
+            <span className={item.done ? "text-muted-foreground line-through" : ""}>
+              {item.label}
+            </span>
             {!item.done && !item.required && (
               <span className="text-xs text-muted-foreground">(optional)</span>
             )}
             {!item.done && item.required && (
-              <span className="text-xs font-medium text-amber-600 dark:text-amber-400">Required</span>
+              <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
+                Required
+              </span>
             )}
           </li>
         ))}

@@ -55,10 +55,9 @@ async function refresh() {
     return { ok: false, error: "no usable rates", updated: 0 };
   }
 
-  const { data, error: rpcErr } = await supabaseAdmin.rpc(
-    "upsert_currency_rates" as any,
-    { _rates: items as any },
-  );
+  const { data, error: rpcErr } = await supabaseAdmin.rpc("upsert_currency_rates" as any, {
+    _rates: items as any,
+  });
   if (rpcErr) {
     return { ok: false, error: rpcErr.message, updated: 0 };
   }

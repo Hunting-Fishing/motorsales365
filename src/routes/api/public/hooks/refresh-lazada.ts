@@ -48,7 +48,9 @@ export const Route = createFileRoute("/api/public/hooks/refresh-lazada")({
         // Oldest-checked-first, joined with product.
         const { data: links, error } = await supabaseAdmin
           .from("shop_product_links")
-          .select("id, url, product_id, last_checked_at, price_php, sale_price_php, product:shop_products(id, price_php, deal_price_php, is_deal, active)")
+          .select(
+            "id, url, product_id, last_checked_at, price_php, sale_price_php, product:shop_products(id, price_php, deal_price_php, is_deal, active)",
+          )
           .eq("network_id", net.id)
           .order("last_checked_at", { ascending: true, nullsFirst: true })
           .limit(limit);
@@ -70,7 +72,10 @@ export const Route = createFileRoute("/api/public/hooks/refresh-lazada")({
             const data = await scrapeLazadaProduct(link.url);
 
             if (!data || (!data.price && !data.sale_price)) {
-              await supabaseAdmin.from("shop_product_links").update({ last_checked_at: now }).eq("id", link.id);
+              await supabaseAdmin
+                .from("shop_product_links")
+                .update({ last_checked_at: now })
+                .eq("id", link.id);
               continue;
             }
 
@@ -83,8 +88,10 @@ export const Route = createFileRoute("/api/public/hooks/refresh-lazada")({
               .update({ last_checked_at: now, price_php: list, sale_price_php: sale })
               .eq("id", link.id);
 
-            const prevList = (link as any).price_php != null ? Number((link as any).price_php) : null;
-            const prevSale = (link as any).sale_price_php != null ? Number((link as any).sale_price_php) : null;
+            const prevList =
+              (link as any).price_php != null ? Number((link as any).price_php) : null;
+            const prevSale =
+              (link as any).sale_price_php != null ? Number((link as any).sale_price_php) : null;
             const newList = list != null ? Number(list) : null;
             const newSale = sale != null ? Number(sale) : null;
             if (prevList !== newList || prevSale !== newSale) {
@@ -96,14 +103,24 @@ export const Route = createFileRoute("/api/public/hooks/refresh-lazada")({
               });
             }
 
-            const patch: { price_php?: number | null; deal_price_php?: number | null; is_deal?: boolean; updated_at?: string } = {};
-            if (list != null && Number(list) !== Number(product.price_php ?? 0)) patch.price_php = list;
+            const patch: {
+              price_php?: number | null;
+              deal_price_php?: number | null;
+              is_deal?: boolean;
+              updated_at?: string;
+            } = {};
+            if (list != null && Number(list) !== Number(product.price_php ?? 0))
+              patch.price_php = list;
             const newDealPrice = isDeal ? sale : null;
-            if (Number(newDealPrice ?? 0) !== Number(product.deal_price_php ?? 0)) patch.deal_price_php = newDealPrice;
+            if (Number(newDealPrice ?? 0) !== Number(product.deal_price_php ?? 0))
+              patch.deal_price_php = newDealPrice;
             if (Boolean(isDeal) !== Boolean(product.is_deal)) patch.is_deal = isDeal;
             if (Object.keys(patch).length > 0) {
               patch.updated_at = now;
-              const { error: upErr } = await supabaseAdmin.from("shop_products").update(patch).eq("id", product.id);
+              const { error: upErr } = await supabaseAdmin
+                .from("shop_products")
+                .update(patch)
+                .eq("id", product.id);
               if (upErr) failures.push(`${product.id}: ${upErr.message}`);
               else updated++;
             }
@@ -112,7 +129,13 @@ export const Route = createFileRoute("/api/public/hooks/refresh-lazada")({
           }
         }
 
-        return Response.json({ ok: true, scanned, updated, failures: failures.slice(0, 10), at: now });
+        return Response.json({
+          ok: true,
+          scanned,
+          updated,
+          failures: failures.slice(0, 10),
+          at: now,
+        });
       },
     },
   },

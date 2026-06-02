@@ -12,7 +12,10 @@ import { useGarage, formatVehicle } from "@/lib/garage";
 
 const brandSearch = z.object({
   category: fallback(z.string(), "").default(""),
-  sort: fallback(z.enum(["featured", "newest", "price_asc", "price_desc", "popular"]), "featured").default("featured"),
+  sort: fallback(
+    z.enum(["featured", "newest", "price_asc", "price_desc", "popular"]),
+    "featured",
+  ).default("featured"),
 });
 
 function slugToName(slug: string) {
@@ -27,7 +30,10 @@ export const Route = createFileRoute("/shop/brand/$slug")({
     return {
       meta: [
         { title: `${name} — Shop ${name} parts & accessories | 365 MotorSales` },
-        { name: "description", content: `Browse all ${name} products curated by 365 MotorSales — detailing, parts, tools and accessories.` },
+        {
+          name: "description",
+          content: `Browse all ${name} products curated by 365 MotorSales — detailing, parts, tools and accessories.`,
+        },
         { property: "og:title", content: `${name} on 365 MotorSales` },
       ],
       links: [{ rel: "canonical", href: `https://365motorsales.com/shop/brand/${params.slug}` }],
@@ -42,15 +48,23 @@ function BrandPage() {
   const [garage] = useGarage();
   const brandName = slugToName(slug);
 
-  const { data: catData } = useQuery({ queryKey: ["shop-cats"], queryFn: () => listShopCategories() });
+  const { data: catData } = useQuery({
+    queryKey: ["shop-cats"],
+    queryFn: () => listShopCategories(),
+  });
   const args = {
     brand: brandName,
     sort: search.sort,
     limit: 60,
     ...(search.category ? { categorySlug: search.category } : {}),
-    ...(garage ? { make: garage.make, model: garage.model, year: garage.year, engine: garage.engine } : {}),
+    ...(garage
+      ? { make: garage.make, model: garage.model, year: garage.year, engine: garage.engine }
+      : {}),
   };
-  const { data } = useQuery({ queryKey: ["shop-brand", slug, search], queryFn: () => listShopProducts({ data: args }) });
+  const { data } = useQuery({
+    queryKey: ["shop-brand", slug, search],
+    queryFn: () => listShopProducts({ data: args }),
+  });
   const products = data?.products ?? [];
 
   return (
@@ -61,7 +75,9 @@ function BrandPage() {
         <header className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="font-display text-3xl sm:text-4xl">{brandName}</h1>
-            <p className="mt-1 text-sm text-muted-foreground">All products from {brandName} on 365 MotorSales.</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              All products from {brandName} on 365 MotorSales.
+            </p>
           </div>
           {garage && <Badge variant="secondary">Filtered for: {formatVehicle(garage)}</Badge>}
         </header>
@@ -76,14 +92,20 @@ function BrandPage() {
             className="h-8 rounded-md border bg-background px-2 text-sm"
           >
             <option value="">All</option>
-            {catData?.categories.filter((c: any) => !c.parent_id).map((c) => (
-              <option key={c.id} value={c.slug}>{c.name}</option>
-            ))}
+            {catData?.categories
+              .filter((c: any) => !c.parent_id)
+              .map((c) => (
+                <option key={c.id} value={c.slug}>
+                  {c.name}
+                </option>
+              ))}
           </select>
           <label className="ml-3 text-xs text-muted-foreground">Sort</label>
           <select
             value={search.sort}
-            onChange={(e) => navigate({ search: (p: any) => ({ ...p, sort: e.target.value as any }) })}
+            onChange={(e) =>
+              navigate({ search: (p: any) => ({ ...p, sort: e.target.value as any }) })
+            }
             className="h-8 rounded-md border bg-background px-2 text-sm"
           >
             <option value="featured">Featured</option>
@@ -94,13 +116,24 @@ function BrandPage() {
           </select>
         </div>
 
-        {products.length === 0
-          ? <p className="text-muted-foreground">No {brandName} products found right now. <Link to="/shop" className="underline">Browse all shop</Link>.</p>
-          : <ProductGrid products={products} vehicle={garage} />}
+        {products.length === 0 ? (
+          <p className="text-muted-foreground">
+            No {brandName} products found right now.{" "}
+            <Link to="/shop" className="underline">
+              Browse all shop
+            </Link>
+            .
+          </p>
+        ) : (
+          <ProductGrid products={products} vehicle={garage} />
+        )}
 
         <p className="rounded-md border bg-muted/40 p-4 text-xs text-muted-foreground">
           Disclosure: 365 MotorSales earns a commission on qualifying purchases. See our{" "}
-          <Link to="/affiliate-disclosure" className="underline">affiliate disclosure</Link>.
+          <Link to="/affiliate-disclosure" className="underline">
+            affiliate disclosure
+          </Link>
+          .
         </p>
       </div>
     </SiteLayout>

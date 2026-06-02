@@ -1,6 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Loader2, Check, GitMerge, X, Sparkles, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Loader2,
+  Check,
+  GitMerge,
+  X,
+  Sparkles,
+  Search,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -9,10 +18,19 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 
@@ -102,7 +120,9 @@ function TypeSuggestionsAdmin() {
     setLoading(false);
   }, []);
 
-  useEffect(() => { load(); }, [load]);
+  useEffect(() => {
+    load();
+  }, [load]);
 
   const filtered = useMemo(() => {
     const base = filter === "all" ? items : items.filter((i) => i.status === filter);
@@ -124,10 +144,18 @@ function TypeSuggestionsAdmin() {
     [filtered, currentPage],
   );
 
-  useEffect(() => { setPage(1); }, [filter, query]);
+  useEffect(() => {
+    setPage(1);
+  }, [filter, query]);
 
   const counts = useMemo(() => {
-    const c: Record<string, number> = { all: items.length, pending: 0, approved: 0, merged: 0, rejected: 0 };
+    const c: Record<string, number> = {
+      all: items.length,
+      pending: 0,
+      approved: 0,
+      merged: 0,
+      rejected: 0,
+    };
     for (const i of items) c[i.status] = (c[i.status] ?? 0) + 1;
     return c;
   }, [items]);
@@ -157,7 +185,11 @@ function TypeSuggestionsAdmin() {
       if (kind === "approve") {
         const slug = slugify(newSlug);
         const label = newLabel.trim();
-        if (!slug || !label) { toast.error("Slug and label are required"); setSubmitting(false); return; }
+        if (!slug || !label) {
+          toast.error("Slug and label are required");
+          setSubmitting(false);
+          return;
+        }
         const { error: insErr } = await supabase
           .from("business_types")
           .upsert({ slug, label }, { onConflict: "slug" });
@@ -175,7 +207,11 @@ function TypeSuggestionsAdmin() {
         if (updErr) throw updErr;
         toast.success(`Added business type "${label}"`);
       } else if (kind === "merge") {
-        if (!mergeSlug) { toast.error("Pick a type to merge into"); setSubmitting(false); return; }
+        if (!mergeSlug) {
+          toast.error("Pick a type to merge into");
+          setSubmitting(false);
+          return;
+        }
         const { error } = await supabase
           .from("business_type_suggestions")
           .update({
@@ -262,85 +298,97 @@ function TypeSuggestionsAdmin() {
         </div>
       ) : filtered.length === 0 ? (
         <div className="rounded-xl border border-dashed border-border p-10 text-center text-muted-foreground">
-          {query ? `No suggestions match "${query}".` : `No ${filter === "all" ? "" : filter} suggestions.`}
+          {query
+            ? `No suggestions match "${query}".`
+            : `No ${filter === "all" ? "" : filter} suggestions.`}
         </div>
       ) : (
         <>
-        <div className="text-xs text-muted-foreground">
-          Showing {(currentPage - 1) * pageSize + 1}–{Math.min(currentPage * pageSize, filtered.length)} of {filtered.length}
-        </div>
-        <ul className="space-y-3">
-          {paged.map((s) => (
-            <li key={s.id} className="rounded-xl border border-border bg-card p-4">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-primary" />
-                    <h3 className="font-semibold">{s.proposed_label}</h3>
-                    <StatusBadge status={s.status} />
-                    {s.merged_into_slug && (
-                      <Badge variant="outline" className="text-xs">→ {s.merged_into_slug}</Badge>
+          <div className="text-xs text-muted-foreground">
+            Showing {(currentPage - 1) * pageSize + 1}–
+            {Math.min(currentPage * pageSize, filtered.length)} of {filtered.length}
+          </div>
+          <ul className="space-y-3">
+            {paged.map((s) => (
+              <li key={s.id} className="rounded-xl border border-border bg-card p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-primary" />
+                      <h3 className="font-semibold">{s.proposed_label}</h3>
+                      <StatusBadge status={s.status} />
+                      {s.merged_into_slug && (
+                        <Badge variant="outline" className="text-xs">
+                          → {s.merged_into_slug}
+                        </Badge>
+                      )}
+                    </div>
+                    {s.notes && (
+                      <p className="mt-2 text-sm text-muted-foreground whitespace-pre-wrap">
+                        {s.notes}
+                      </p>
+                    )}
+                    <div className="mt-2 text-xs text-muted-foreground">
+                      Submitted by {s.submitter_email ?? "unknown"} ·{" "}
+                      {new Date(s.created_at).toLocaleString()}
+                    </div>
+                    {s.admin_note && (
+                      <div className="mt-2 rounded-md bg-muted/50 p-2 text-xs">
+                        <span className="font-medium">Admin note:</span> {s.admin_note}
+                      </div>
                     )}
                   </div>
-                  {s.notes && <p className="mt-2 text-sm text-muted-foreground whitespace-pre-wrap">{s.notes}</p>}
-                  <div className="mt-2 text-xs text-muted-foreground">
-                    Submitted by {s.submitter_email ?? "unknown"} ·{" "}
-                    {new Date(s.created_at).toLocaleString()}
-                  </div>
-                  {s.admin_note && (
-                    <div className="mt-2 rounded-md bg-muted/50 p-2 text-xs">
-                      <span className="font-medium">Admin note:</span> {s.admin_note}
+                  {s.status === "pending" && (
+                    <div className="flex flex-wrap gap-2">
+                      <Button size="sm" onClick={() => openAction("approve", s)}>
+                        <Check className="mr-1 h-4 w-4" /> Approve
+                      </Button>
+                      <Button size="sm" variant="secondary" onClick={() => openAction("merge", s)}>
+                        <GitMerge className="mr-1 h-4 w-4" /> Merge
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => openAction("reject", s)}>
+                        <X className="mr-1 h-4 w-4" /> Reject
+                      </Button>
                     </div>
                   )}
                 </div>
-                {s.status === "pending" && (
-                  <div className="flex flex-wrap gap-2">
-                    <Button size="sm" onClick={() => openAction("approve", s)}>
-                      <Check className="mr-1 h-4 w-4" /> Approve
-                    </Button>
-                    <Button size="sm" variant="secondary" onClick={() => openAction("merge", s)}>
-                      <GitMerge className="mr-1 h-4 w-4" /> Merge
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => openAction("reject", s)}>
-                      <X className="mr-1 h-4 w-4" /> Reject
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </li>
-          ))}
-        </ul>
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 pt-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-            >
-              <ChevronLeft className="h-4 w-4" /> Prev
-            </Button>
-            <span className="text-sm text-muted-foreground">
-              Page {currentPage} of {totalPages}
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-            >
-              Next <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
+              </li>
+            ))}
+          </ul>
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 pt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                <ChevronLeft className="h-4 w-4" /> Prev
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Next <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
         </>
       )}
 
       <AuditTrail items={items} deciders={deciders} />
 
-
-
-      <Dialog open={!!action} onOpenChange={(o) => { if (!o) closeAction(); }}>
+      <Dialog
+        open={!!action}
+        onOpenChange={(o) => {
+          if (!o) closeAction();
+        }}
+      >
         <DialogContent>
           {action && (
             <>
@@ -358,16 +406,24 @@ function TypeSuggestionsAdmin() {
                   <>
                     <div className="space-y-1.5">
                       <Label htmlFor="lbl">Label</Label>
-                      <Input id="lbl" value={newLabel} onChange={(e) => setNewLabel(e.target.value)} />
+                      <Input
+                        id="lbl"
+                        value={newLabel}
+                        onChange={(e) => setNewLabel(e.target.value)}
+                      />
                     </div>
                     <div className="space-y-1.5">
                       <Label htmlFor="slg">Slug</Label>
                       <Input
                         id="slg"
                         value={newSlug}
-                        onChange={(e) => setNewSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "_"))}
+                        onChange={(e) =>
+                          setNewSlug(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, "_"))
+                        }
                       />
-                      <p className="text-xs text-muted-foreground">Lowercase, underscores only. Used in URLs.</p>
+                      <p className="text-xs text-muted-foreground">
+                        Lowercase, underscores only. Used in URLs.
+                      </p>
                     </div>
                   </>
                 )}
@@ -376,10 +432,14 @@ function TypeSuggestionsAdmin() {
                   <div className="space-y-1.5">
                     <Label>Merge into</Label>
                     <Select value={mergeSlug} onValueChange={setMergeSlug}>
-                      <SelectTrigger><SelectValue placeholder="Pick an existing type" /></SelectTrigger>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Pick an existing type" />
+                      </SelectTrigger>
                       <SelectContent>
                         {types.map((t) => (
-                          <SelectItem key={t.slug} value={t.slug}>{t.label} ({t.slug})</SelectItem>
+                          <SelectItem key={t.slug} value={t.slug}>
+                            {t.label} ({t.slug})
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
@@ -387,7 +447,9 @@ function TypeSuggestionsAdmin() {
                 )}
 
                 <div className="space-y-1.5">
-                  <Label htmlFor="note">Admin note {action.kind === "reject" ? "" : "(optional)"}</Label>
+                  <Label htmlFor="note">
+                    Admin note {action.kind === "reject" ? "" : "(optional)"}
+                  </Label>
                   <Textarea
                     id="note"
                     rows={3}
@@ -399,7 +461,9 @@ function TypeSuggestionsAdmin() {
               </div>
 
               <DialogFooter>
-                <Button variant="ghost" onClick={closeAction} disabled={submitting}>Cancel</Button>
+                <Button variant="ghost" onClick={closeAction} disabled={submitting}>
+                  Cancel
+                </Button>
                 <Button onClick={submit} disabled={submitting}>
                   {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Confirm
@@ -424,8 +488,7 @@ function AuditTrail({
   const decided = useMemo(() => {
     const list = items.filter((i) => i.status !== "pending" && i.decided_at);
     list.sort(
-      (a, b) =>
-        new Date(b.decided_at ?? 0).getTime() - new Date(a.decided_at ?? 0).getTime(),
+      (a, b) => new Date(b.decided_at ?? 0).getTime() - new Date(a.decided_at ?? 0).getTime(),
     );
     const q = trailQuery.trim().toLowerCase();
     if (!q) return list;
@@ -470,7 +533,8 @@ function AuditTrail({
         <ol className="mt-4 space-y-2">
           {decided.map((s) => {
             const decider = s.decided_by ? deciders[s.decided_by] : null;
-            const deciderLabel = decider?.full_name || (s.decided_by ? s.decided_by.slice(0, 8) + "…" : "unknown");
+            const deciderLabel =
+              decider?.full_name || (s.decided_by ? s.decided_by.slice(0, 8) + "…" : "unknown");
             return (
               <li
                 key={s.id}
@@ -480,12 +544,14 @@ function AuditTrail({
                   <StatusBadge status={s.status} />
                   <span className="font-medium">{s.proposed_label}</span>
                   {s.merged_into_slug && (
-                    <Badge variant="outline" className="text-xs">→ {s.merged_into_slug}</Badge>
+                    <Badge variant="outline" className="text-xs">
+                      → {s.merged_into_slug}
+                    </Badge>
                   )}
                 </div>
                 <div className="mt-1 text-xs text-muted-foreground">
-                  {s.decided_at ? new Date(s.decided_at).toLocaleString() : "—"} ·{" "}
-                  decided by <span className="font-medium text-foreground">{deciderLabel}</span>
+                  {s.decided_at ? new Date(s.decided_at).toLocaleString() : "—"} · decided by{" "}
+                  <span className="font-medium text-foreground">{deciderLabel}</span>
                   {s.submitter_email && <> · submitted by {s.submitter_email}</>}
                 </div>
                 {s.admin_note && (
@@ -501,7 +567,6 @@ function AuditTrail({
     </section>
   );
 }
-
 
 function StatusBadge({ status }: { status: Status }) {
   const map: Record<Status, string> = {

@@ -18,10 +18,17 @@ export function SupportArticleLayout({
     <SiteLayout>
       <div className="border-b border-border bg-secondary/30">
         <div className="container mx-auto max-w-4xl px-4 py-8 sm:py-10">
-          <nav aria-label="Breadcrumb" className="mb-4 flex items-center gap-1 text-sm text-muted-foreground">
-            <Link to="/" className="hover:text-foreground">Home</Link>
+          <nav
+            aria-label="Breadcrumb"
+            className="mb-4 flex items-center gap-1 text-sm text-muted-foreground"
+          >
+            <Link to="/" className="hover:text-foreground">
+              Home
+            </Link>
             <ChevronRight className="h-3.5 w-3.5" />
-            <Link to="/support" className="hover:text-foreground">Support</Link>
+            <Link to="/support" className="hover:text-foreground">
+              Support
+            </Link>
             <ChevronRight className="h-3.5 w-3.5" />
             <span className="text-foreground">{title}</span>
           </nav>

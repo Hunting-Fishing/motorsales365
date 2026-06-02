@@ -3,7 +3,12 @@ import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { InstallAppButton } from "@/components/install-app-button";
 
 export function SiteFooter() {
@@ -12,7 +17,10 @@ export function SiteFooter() {
 
   useEffect(() => {
     let cancelled = false;
-    if (!user) { setReferralCode(null); return; }
+    if (!user) {
+      setReferralCode(null);
+      return;
+    }
     (async () => {
       const { data } = await (supabase as any)
         .from("staff_referrals")
@@ -22,7 +30,9 @@ export function SiteFooter() {
         .maybeSingle();
       if (!cancelled) setReferralCode(data?.referral_code ?? null);
     })();
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
 
   const sections = [
@@ -75,11 +85,17 @@ export function SiteFooter() {
     <footer className="mt-16 border-t border-border bg-secondary/40">
       {/* Brand block */}
       <div className="container mx-auto px-4 pt-10 pb-2">
-        <Link to="/" className="flex items-center gap-2" aria-label="365 MotorSales Philippines home">
+        <Link
+          to="/"
+          className="flex items-center gap-2"
+          aria-label="365 MotorSales Philippines home"
+        >
           <BrandLogo size={48} />
           <div className="flex flex-col leading-none">
             <span className="font-display text-lg font-bold">365 MotorSales</span>
-            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">Philippines</span>
+            <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              Philippines
+            </span>
           </div>
         </Link>
         <p className="mt-3 max-w-md text-sm text-muted-foreground">
@@ -97,7 +113,13 @@ export function SiteFooter() {
                 <ul className="space-y-1 text-sm text-muted-foreground">
                   {s.links.map((l: any) => (
                     <li key={l.label}>
-                      <Link to={l.to} params={l.params} className="block rounded px-1 py-2 hover:text-foreground">{l.label}</Link>
+                      <Link
+                        to={l.to}
+                        params={l.params}
+                        className="block rounded px-1 py-2 hover:text-foreground"
+                      >
+                        {l.label}
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -115,7 +137,9 @@ export function SiteFooter() {
             <ul className="space-y-2 text-sm text-muted-foreground">
               {s.links.map((l: any) => (
                 <li key={l.label}>
-                  <Link to={l.to} params={l.params} className="hover:text-foreground">{l.label}</Link>
+                  <Link to={l.to} params={l.params} className="hover:text-foreground">
+                    {l.label}
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -130,7 +154,10 @@ export function SiteFooter() {
         </div>
         <p>© {new Date().getFullYear()} 365 MotorSales Philippines. All prices in ₱ PHP.</p>
         <p className="mt-1">Registered in the Philippines · Metro Manila · DPA-compliant.</p>
-        <p className="mt-1">As an affiliate, 365 MotorSales earns from qualifying purchases made through outbound Shop links.</p>
+        <p className="mt-1">
+          As an affiliate, 365 MotorSales earns from qualifying purchases made through outbound Shop
+          links.
+        </p>
       </div>
     </footer>
   );

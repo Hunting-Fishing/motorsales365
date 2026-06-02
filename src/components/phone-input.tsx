@@ -1,9 +1,5 @@
 import { useMemo, useState } from "react";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -68,10 +64,7 @@ export function PhoneInput({ iso, national, onChange, placeholder, id, disabled 
                     }}
                   >
                     <Check
-                      className={cn(
-                        "mr-2 size-4",
-                        c.iso === iso ? "opacity-100" : "opacity-0",
-                      )}
+                      className={cn("mr-2 size-4", c.iso === iso ? "opacity-100" : "opacity-0")}
                     />
                     <span className="mr-2 text-base leading-none">{c.flag}</span>
                     <span className="flex-1 truncate">{c.name}</span>

@@ -50,9 +50,7 @@ export function ShopFilterDrawer({
   }, [open, value]);
 
   const activeCount =
-    (value.categorySlug && !lockCategory ? 1 : 0) +
-    (value.brand ? 1 : 0) +
-    (value.vehicle ? 1 : 0);
+    (value.categorySlug && !lockCategory ? 1 : 0) + (value.brand ? 1 : 0) + (value.vehicle ? 1 : 0);
 
   const reset = () => {
     setDraft({
@@ -113,9 +111,7 @@ export function ShopFilterDrawer({
                     <ChipToggle
                       key={c.slug}
                       active={draft.categorySlug === c.slug}
-                      onClick={() =>
-                        setDraft((d) => ({ ...d, categorySlug: c.slug }))
-                      }
+                      onClick={() => setDraft((d) => ({ ...d, categorySlug: c.slug }))}
                     >
                       {c.name}
                     </ChipToggle>

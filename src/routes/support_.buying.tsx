@@ -28,9 +28,21 @@ export const Route = createFileRoute("/support_/buying")({
           "@type": "HowTo",
           name: "How to buy a vehicle on 365 MotorSales",
           step: [
-            { "@type": "HowToStep", name: "Choose a category", text: "Pick Cars, Motorcycles, Boats, Airplanes, Equipment or Towing from the top nav." },
-            { "@type": "HowToStep", name: "Apply filters", text: "Narrow results by make, model, year, engine, price and location." },
-            { "@type": "HowToStep", name: "Contact the seller", text: "Use on-platform messaging, inspect in person, and pay with traceable methods." },
+            {
+              "@type": "HowToStep",
+              name: "Choose a category",
+              text: "Pick Cars, Motorcycles, Boats, Airplanes, Equipment or Towing from the top nav.",
+            },
+            {
+              "@type": "HowToStep",
+              name: "Apply filters",
+              text: "Narrow results by make, model, year, engine, price and location.",
+            },
+            {
+              "@type": "HowToStep",
+              name: "Contact the seller",
+              text: "Use on-platform messaging, inspect in person, and pay with traceable methods.",
+            },
           ],
         }),
       },
@@ -58,7 +70,8 @@ function BuyingSupport() {
           <SupportSteps>
             <SupportStep n={1} title="Choose a category">
               Click <strong>Cars</strong>, <strong>Motorcycles</strong>, <strong>Boats</strong>,{" "}
-              <strong>Airplanes</strong>, <strong>Equipment</strong> or <strong>Towing</strong> from the top nav.
+              <strong>Airplanes</strong>, <strong>Equipment</strong> or <strong>Towing</strong> from
+              the top nav.
             </SupportStep>
             <SupportStep n={2} title="Apply filters">
               Use the Filters panel to narrow by make, model, year, engine, price and location.
@@ -76,10 +89,12 @@ function BuyingSupport() {
               Keep early conversations on 365 MotorSales — this protects both buyer and seller.
             </SupportStep>
             <SupportStep n={2} title="Inspect in person">
-              Always view the vehicle in daylight at a public, well-lit location. Bring a friend or mechanic.
+              Always view the vehicle in daylight at a public, well-lit location. Bring a friend or
+              mechanic.
             </SupportStep>
             <SupportStep n={3} title="Verify the paperwork">
-              Check that the OR/CR, chassis number and engine number match. Never pay a deposit before seeing the vehicle.
+              Check that the OR/CR, chassis number and engine number match. Never pay a deposit
+              before seeing the vehicle.
             </SupportStep>
             <SupportStep n={4} title="Use traceable payments">
               Bank transfer, GCash or Maya. Avoid large cash transactions.

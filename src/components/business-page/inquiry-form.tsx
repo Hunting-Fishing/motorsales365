@@ -9,7 +9,13 @@ import { Send, CheckCircle2 } from "lucide-react";
 import { PhoneInput } from "@/components/phone-input";
 import { buildE164 } from "@/data/country-codes";
 
-export function InquiryForm({ businessId, businessName }: { businessId: string; businessName: string }) {
+export function InquiryForm({
+  businessId,
+  businessName,
+}: {
+  businessId: string;
+  businessName: string;
+}) {
   const submit = useServerFn(submitBusinessInquiry);
   const [name, setName] = useState("");
   const [phoneIso, setPhoneIso] = useState("PH");
@@ -69,7 +75,10 @@ export function InquiryForm({ businessId, businessName }: { businessId: string; 
         <PhoneInput
           iso={phoneIso}
           national={phoneNational}
-          onChange={({ iso, national }) => { setPhoneIso(iso); setPhoneNational(national); }}
+          onChange={({ iso, national }) => {
+            setPhoneIso(iso);
+            setPhoneNational(national);
+          }}
           placeholder="Phone (optional)"
         />
       </div>

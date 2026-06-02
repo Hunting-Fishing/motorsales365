@@ -13,7 +13,9 @@ export type MapBusiness = {
   featured: boolean;
 };
 
-const InnerMap = lazy(() => import("./business-map-inner").then((m) => ({ default: m.BusinessMapInner })));
+const InnerMap = lazy(() =>
+  import("./business-map-inner").then((m) => ({ default: m.BusinessMapInner })),
+);
 
 export function BusinessMap(props: {
   businesses: MapBusiness[];
@@ -23,10 +25,16 @@ export function BusinessMap(props: {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!mounted) {
-    return <div className="h-[420px] w-full animate-pulse rounded-xl border border-border bg-muted md:h-[560px]" />;
+    return (
+      <div className="h-[420px] w-full animate-pulse rounded-xl border border-border bg-muted md:h-[560px]" />
+    );
   }
   return (
-    <Suspense fallback={<div className="h-[420px] w-full animate-pulse rounded-xl border border-border bg-muted md:h-[560px]" />}>
+    <Suspense
+      fallback={
+        <div className="h-[420px] w-full animate-pulse rounded-xl border border-border bg-muted md:h-[560px]" />
+      }
+    >
       <InnerMap {...props} />
     </Suspense>
   );

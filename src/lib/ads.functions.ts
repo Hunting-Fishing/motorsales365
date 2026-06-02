@@ -3,13 +3,23 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-const placementSchema = z.enum(["home_carousel", "browse_top", "rides_top", "listing_sidebar", "export_top", "shop_top", "shop_sidebar"]);
+const placementSchema = z.enum([
+  "home_carousel",
+  "browse_top",
+  "rides_top",
+  "listing_sidebar",
+  "export_top",
+  "shop_top",
+  "shop_sidebar",
+]);
 const statusSchema = z.enum(["draft", "scheduled", "active", "paused", "ended"]);
 
 // PUBLIC: fetch active ads for a placement
 export const getActiveAds = createServerFn({ method: "GET" })
   .inputValidator((input: { placement: string; limit?: number }) =>
-    z.object({ placement: placementSchema, limit: z.number().int().min(1).max(20).optional() }).parse(input),
+    z
+      .object({ placement: placementSchema, limit: z.number().int().min(1).max(20).optional() })
+      .parse(input),
   )
   .handler(async ({ data }) => {
     const { data: rows, error } = await (supabaseAdmin as any)
@@ -25,12 +35,15 @@ export const getActiveAds = createServerFn({ method: "GET" })
 
 // PUBLIC: record impression / click
 export const trackAdEvent = createServerFn({ method: "POST" })
-  .inputValidator((input: { adId: string; eventType: "impression" | "click"; visitorId?: string }) =>
-    z.object({
-      adId: z.string().uuid(),
-      eventType: z.enum(["impression", "click"]),
-      visitorId: z.string().uuid().optional(),
-    }).parse(input),
+  .inputValidator(
+    (input: { adId: string; eventType: "impression" | "click"; visitorId?: string }) =>
+      z
+        .object({
+          adId: z.string().uuid(),
+          eventType: z.enum(["impression", "click"]),
+          visitorId: z.string().uuid().optional(),
+        })
+        .parse(input),
   )
   .handler(async ({ data }) => {
     await supabaseAdmin.from("ad_events").insert({
@@ -60,20 +73,22 @@ export const listAds = createServerFn({ method: "GET" })
 export const upsertAd = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) =>
-    z.object({
-      id: z.string().uuid().optional(),
-      title: z.string().min(1).max(200),
-      advertiser_name: z.string().max(200).optional().nullable(),
-      advertiser_email: z.string().email().max(255).optional().nullable(),
-      image_url: z.string().url().max(2000),
-      target_url: z.string().url().max(2000),
-      placement: placementSchema,
-      caption: z.string().max(500).optional().nullable(),
-      starts_at: z.string().optional().nullable(),
-      ends_at: z.string().optional().nullable(),
-      priority: z.number().int().min(0).max(1000).default(0),
-      status: statusSchema.default("draft"),
-    }).parse(input),
+    z
+      .object({
+        id: z.string().uuid().optional(),
+        title: z.string().min(1).max(200),
+        advertiser_name: z.string().max(200).optional().nullable(),
+        advertiser_email: z.string().email().max(255).optional().nullable(),
+        image_url: z.string().url().max(2000),
+        target_url: z.string().url().max(2000),
+        placement: placementSchema,
+        caption: z.string().max(500).optional().nullable(),
+        starts_at: z.string().optional().nullable(),
+        ends_at: z.string().optional().nullable(),
+        priority: z.number().int().min(0).max(1000).default(0),
+        status: statusSchema.default("draft"),
+      })
+      .parse(input),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
@@ -83,7 +98,11 @@ export const upsertAd = createServerFn({ method: "POST" })
       if (error) throw new Error(error.message);
       return { id: data.id };
     }
-    const { data: row, error } = await supabase.from("advertisements").insert(payload).select("id").single();
+    const { data: row, error } = await supabase
+      .from("advertisements")
+      .insert(payload)
+      .select("id")
+      .single();
     if (error) throw new Error(error.message);
     return { id: row.id };
   });

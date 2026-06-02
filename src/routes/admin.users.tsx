@@ -5,7 +5,13 @@ import { ChevronLeft, ChevronRight, Info, Search, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { VerifiedBadge } from "@/components/verified-badge";
 import { formatDate } from "@/lib/format";
 import { AddUserDialog } from "@/components/admin/add-user-dialog";
@@ -36,12 +42,17 @@ function AdminUsers() {
 
   // Debounce search input
   useEffect(() => {
-    const t = setTimeout(() => { setSearch(searchInput); setPage(0); }, 300);
+    const t = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(0);
+    }, 300);
     return () => clearTimeout(t);
   }, [searchInput]);
 
   // Reset to first page when filters change
-  useEffect(() => { setPage(0); }, [roleFilter, sellerFilter, verFilter]);
+  useEffect(() => {
+    setPage(0);
+  }, [roleFilter, sellerFilter, verFilter]);
 
   const load = async () => {
     setLoading(true);
@@ -63,7 +74,10 @@ function AdminUsers() {
             .eq("role", roleFilter as any);
           restrictIds = Array.from(new Set((roleRows ?? []).map((r: any) => r.user_id)));
           if (restrictIds.length === 0) {
-            setUsers([]); setTotal(0); setLoading(false); return;
+            setUsers([]);
+            setTotal(0);
+            setLoading(false);
+            return;
           }
         }
       }
@@ -86,21 +100,30 @@ function AdminUsers() {
       if (search.trim()) {
         const s = search.trim().replace(/[%,()]/g, "");
         q = q.or(
-          `full_name.ilike.%${s}%,business_name.ilike.%${s}%,phone.ilike.%${s}%,phone_e164.ilike.%${s}%`
+          `full_name.ilike.%${s}%,business_name.ilike.%${s}%,phone.ilike.%${s}%,phone_e164.ilike.%${s}%`,
         );
       }
 
       const from = page * pageSize;
       const to = from + pageSize - 1;
       const { data: profs, count, error } = await q.range(from, to);
-      if (error) { toast.error(error.message); setLoading(false); return; }
+      if (error) {
+        toast.error(error.message);
+        setLoading(false);
+        return;
+      }
 
       const ids = (profs ?? []).map((p) => p.id);
-      let roleMap = new Map<string, string[]>();
+      const roleMap = new Map<string, string[]>();
       if (ids.length > 0) {
-        const { data: roles } = await supabase.from("user_roles").select("user_id,role").in("user_id", ids);
+        const { data: roles } = await supabase
+          .from("user_roles")
+          .select("user_id,role")
+          .in("user_id", ids);
         (roles ?? []).forEach((r: any) => {
-          const arr = roleMap.get(r.user_id) ?? []; arr.push(r.role); roleMap.set(r.user_id, arr);
+          const arr = roleMap.get(r.user_id) ?? [];
+          arr.push(r.role);
+          roleMap.set(r.user_id, arr);
         });
       }
       setUsers((profs ?? []).map((p) => ({ ...p, roles: roleMap.get(p.id) ?? [] })));
@@ -110,26 +133,54 @@ function AdminUsers() {
     }
   };
 
-  useEffect(() => { load(); }, [page, pageSize, search, roleFilter, sellerFilter, verFilter]);
-  useEffect(() => { setPage(0); }, [pageSize]);
+  useEffect(() => {
+    load();
+  }, [page, pageSize, search, roleFilter, sellerFilter, verFilter]);
+  useEffect(() => {
+    setPage(0);
+  }, [pageSize]);
 
-  const hasFilters = search || roleFilter !== "all" || sellerFilter !== "all" || verFilter !== "all";
+  const hasFilters =
+    search || roleFilter !== "all" || sellerFilter !== "all" || verFilter !== "all";
   const clearFilters = () => {
-    setSearchInput(""); setSearch("");
-    setRoleFilter("all"); setSellerFilter("all"); setVerFilter("all");
+    setSearchInput("");
+    setSearch("");
+    setRoleFilter("all");
+    setSellerFilter("all");
+    setVerFilter("all");
     setPage(0);
   };
 
   const toggleRole = async (userId: string, role: StaffRole, has: boolean) => {
     if (has) {
-      const { error } = await supabase.from("user_roles").delete().eq("user_id", userId).eq("role", role);
+      const { error } = await supabase
+        .from("user_roles")
+        .delete()
+        .eq("user_id", userId)
+        .eq("role", role);
       if (error) return toast.error(error.message);
-      await logAdminAudit({ actor_id: "", target_user_id: userId, action: "role_revoked", field: "role", old_value: role, new_value: null });
+      await logAdminAudit({
+        actor_id: "",
+        target_user_id: userId,
+        action: "role_revoked",
+        field: "role",
+        old_value: role,
+        new_value: null,
+      });
       toast.success(`${role} revoked`);
     } else {
-      const { error } = await supabase.from("user_roles").insert({ user_id: userId, role: role as any });
+      const { error } = await supabase
+        .from("user_roles")
+        .insert({ user_id: userId, role: role as any });
       if (error) return toast.error(error.message);
-      await logAdminAudit({ actor_id: "", target_user_id: userId, action: "role_granted", field: "role", old_value: null, new_value: role });
+      await logAdminAudit({
+        actor_id: "",
+        target_user_id: userId,
+        action: "role_granted",
+        field: "role",
+        old_value: null,
+        new_value: role,
+      });
       toast.success(`${role} granted`);
     }
     load();
@@ -142,8 +193,16 @@ function AdminUsers() {
       .eq("id", userId);
     if (error) toast.error(error.message);
     else {
-      await logAdminAudit({ actor_id: "", target_user_id: userId, action: "verification_changed", field: "verification_status", old_value: prev ?? "unverified", new_value: "verified" });
-      toast.success("Marked verified"); load();
+      await logAdminAudit({
+        actor_id: "",
+        target_user_id: userId,
+        action: "verification_changed",
+        field: "verification_status",
+        old_value: prev ?? "unverified",
+        new_value: "verified",
+      });
+      toast.success("Marked verified");
+      load();
     }
   };
   const revokeVerification = async (userId: string, prev?: string | null) => {
@@ -153,8 +212,16 @@ function AdminUsers() {
       .eq("id", userId);
     if (error) toast.error(error.message);
     else {
-      await logAdminAudit({ actor_id: "", target_user_id: userId, action: "verification_changed", field: "verification_status", old_value: prev ?? "verified", new_value: "unverified" });
-      toast.success("Verification revoked"); load();
+      await logAdminAudit({
+        actor_id: "",
+        target_user_id: userId,
+        action: "verification_changed",
+        field: "verification_status",
+        old_value: prev ?? "verified",
+        new_value: "unverified",
+      });
+      toast.success("Verification revoked");
+      load();
     }
   };
 
@@ -171,7 +238,10 @@ function AdminUsers() {
       <div className="mb-4 flex items-start gap-2 rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
         <Info className="mt-0.5 h-4 w-4 shrink-0" />
         <div>
-          <strong className="text-foreground">Users</strong> = create accounts and assign staff roles (admin, moderator, support, sales, advertising) or verify business accounts. For subscription, billing, and pause/ban controls use <strong className="text-foreground">Accounts</strong>.
+          <strong className="text-foreground">Users</strong> = create accounts and assign staff
+          roles (admin, moderator, support, sales, advertising) or verify business accounts. For
+          subscription, billing, and pause/ban controls use{" "}
+          <strong className="text-foreground">Accounts</strong>.
         </div>
       </div>
 
@@ -186,15 +256,23 @@ function AdminUsers() {
           />
         </div>
         <Select value={roleFilter} onValueChange={setRoleFilter}>
-          <SelectTrigger><SelectValue placeholder="Role" /></SelectTrigger>
+          <SelectTrigger>
+            <SelectValue placeholder="Role" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All roles</SelectItem>
             <SelectItem value="user_only">Standard users only</SelectItem>
-            {STAFF_ROLES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+            {STAFF_ROLES.map((r) => (
+              <SelectItem key={r} value={r}>
+                {r}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Select value={sellerFilter} onValueChange={setSellerFilter}>
-          <SelectTrigger><SelectValue placeholder="Seller type" /></SelectTrigger>
+          <SelectTrigger>
+            <SelectValue placeholder="Seller type" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All seller types</SelectItem>
             <SelectItem value="private">Private</SelectItem>
@@ -204,7 +282,9 @@ function AdminUsers() {
           </SelectContent>
         </Select>
         <Select value={verFilter} onValueChange={setVerFilter}>
-          <SelectTrigger><SelectValue placeholder="Verification" /></SelectTrigger>
+          <SelectTrigger>
+            <SelectValue placeholder="Verification" />
+          </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All verification</SelectItem>
             <SelectItem value="unverified">Unverified</SelectItem>
@@ -219,7 +299,8 @@ function AdminUsers() {
         <span>{loading ? "Loading…" : `Showing ${rangeStart}–${rangeEnd} of ${total}`}</span>
         {hasFilters && (
           <Button size="sm" variant="ghost" onClick={clearFilters}>
-            <X className="mr-1 h-3.5 w-3.5" />Clear filters
+            <X className="mr-1 h-3.5 w-3.5" />
+            Clear filters
           </Button>
         )}
       </div>
@@ -233,7 +314,10 @@ function AdminUsers() {
         {users.map((u) => {
           const isVerified = u.verification_status === "verified";
           return (
-            <div key={u.id} className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4">
+            <div
+              key={u.id}
+              className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card p-4"
+            >
               <div>
                 <div className="flex items-center gap-1.5 font-medium">
                   {u.full_name ?? "(no name)"}
@@ -241,7 +325,9 @@ function AdminUsers() {
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {u.seller_type} · joined {formatDate(u.created_at)}
-                  {u.verification_status && u.verification_status !== "unverified" && ` · ${u.verification_status}`}
+                  {u.verification_status &&
+                    u.verification_status !== "unverified" &&
+                    ` · ${u.verification_status}`}
                 </div>
                 <div className="mt-2 flex flex-wrap gap-1">
                   {STAFF_ROLES.map((role) => {
@@ -256,7 +342,8 @@ function AdminUsers() {
                             : "border-border bg-background text-muted-foreground hover:border-primary/50"
                         }`}
                       >
-                        {has ? "✓ " : "+ "}{role}
+                        {has ? "✓ " : "+ "}
+                        {role}
                       </button>
                     );
                   })}
@@ -264,9 +351,23 @@ function AdminUsers() {
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <EditUserDialog user={u} onSaved={load} />
-                {isVerified
-                  ? <Button size="sm" variant="outline" onClick={() => revokeVerification(u.id, u.verification_status)}>Revoke verified</Button>
-                  : <Button size="sm" variant="outline" onClick={() => verifyUser(u.id, u.verification_status)}>Mark verified</Button>}
+                {isVerified ? (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => revokeVerification(u.id, u.verification_status)}
+                  >
+                    Revoke verified
+                  </Button>
+                ) : (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => verifyUser(u.id, u.verification_status)}
+                  >
+                    Mark verified
+                  </Button>
+                )}
               </div>
             </div>
           );
@@ -274,49 +375,87 @@ function AdminUsers() {
       </div>
 
       {total > 0 && (
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <span>Rows per page</span>
-          <Select value={String(pageSize)} onValueChange={(v) => setPageSize(Number(v))}>
-            <SelectTrigger className="h-8 w-[80px]"><SelectValue /></SelectTrigger>
-            <SelectContent>
-              {PAGE_SIZE_OPTIONS.map((n) => <SelectItem key={n} value={String(n)}>{n}</SelectItem>)}
-            </SelectContent>
-          </Select>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span>Rows per page</span>
+            <Select value={String(pageSize)} onValueChange={(v) => setPageSize(Number(v))}>
+              <SelectTrigger className="h-8 w-[80px]">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {PAGE_SIZE_OPTIONS.map((n) => (
+                  <SelectItem key={n} value={String(n)}>
+                    {n}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={page === 0 || loading}
+              onClick={() => setPage(0)}
+            >
+              First
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={page === 0 || loading}
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+            >
+              <ChevronLeft className="mr-1 h-4 w-4" />
+              Prev
+            </Button>
+            <span className="text-xs text-muted-foreground whitespace-nowrap">
+              Page {page + 1} of {totalPages}
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={page + 1 >= totalPages || loading}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next
+              <ChevronRight className="ml-1 h-4 w-4" />
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={page + 1 >= totalPages || loading}
+              onClick={() => setPage(totalPages - 1)}
+            >
+              Last
+            </Button>
+          </div>
+          <form
+            className="flex items-center gap-2 text-xs text-muted-foreground"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const n = parseInt(pageInput, 10);
+              if (!isNaN(n) && n >= 1 && n <= totalPages) {
+                setPage(n - 1);
+                setPageInput("");
+              } else toast.error(`Enter a page between 1 and ${totalPages}`);
+            }}
+          >
+            <span>Jump to</span>
+            <Input
+              type="number"
+              min={1}
+              max={totalPages}
+              value={pageInput}
+              onChange={(e) => setPageInput(e.target.value)}
+              placeholder={String(page + 1)}
+              className="h-8 w-20"
+            />
+            <Button size="sm" variant="outline" type="submit">
+              Go
+            </Button>
+          </form>
         </div>
-        <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" disabled={page === 0 || loading} onClick={() => setPage(0)}>First</Button>
-          <Button size="sm" variant="outline" disabled={page === 0 || loading} onClick={() => setPage((p) => Math.max(0, p - 1))}>
-            <ChevronLeft className="mr-1 h-4 w-4" />Prev
-          </Button>
-          <span className="text-xs text-muted-foreground whitespace-nowrap">Page {page + 1} of {totalPages}</span>
-          <Button size="sm" variant="outline" disabled={page + 1 >= totalPages || loading} onClick={() => setPage((p) => p + 1)}>
-            Next<ChevronRight className="ml-1 h-4 w-4" />
-          </Button>
-          <Button size="sm" variant="outline" disabled={page + 1 >= totalPages || loading} onClick={() => setPage(totalPages - 1)}>Last</Button>
-        </div>
-        <form
-          className="flex items-center gap-2 text-xs text-muted-foreground"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const n = parseInt(pageInput, 10);
-            if (!isNaN(n) && n >= 1 && n <= totalPages) { setPage(n - 1); setPageInput(""); }
-            else toast.error(`Enter a page between 1 and ${totalPages}`);
-          }}
-        >
-          <span>Jump to</span>
-          <Input
-            type="number"
-            min={1}
-            max={totalPages}
-            value={pageInput}
-            onChange={(e) => setPageInput(e.target.value)}
-            placeholder={String(page + 1)}
-            className="h-8 w-20"
-          />
-          <Button size="sm" variant="outline" type="submit">Go</Button>
-        </form>
-      </div>
       )}
     </div>
   );

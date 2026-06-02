@@ -19,7 +19,9 @@ function AdminReports() {
   const load = async () => {
     let q = supabase
       .from("reports")
-      .select("id,reason,details,status,created_at,reporter_id,listing_id,listings:listing_id(title,status,user_id)")
+      .select(
+        "id,reason,details,status,created_at,reporter_id,listing_id,listings:listing_id(title,status,user_id)",
+      )
       .order("created_at", { ascending: false });
     if (filter !== "all") q = q.eq("status", filter);
     const { data } = await q;
@@ -43,7 +45,13 @@ function AdminReports() {
   };
 
   const removeListing = async (listingId: string, reportId: string) => {
-    if (!(await confirm({ title: "Permanently delete this listing? This cannot be undone.", destructive: true }))) return;
+    if (
+      !(await confirm({
+        title: "Permanently delete this listing? This cannot be undone.",
+        destructive: true,
+      }))
+    )
+      return;
     await supabase.from("listings").delete().eq("id", listingId);
     await supabase.from("reports").update({ status: "resolved" }).eq("id", reportId);
     toast.success("Listing deleted");
@@ -60,7 +68,9 @@ function AdminReports() {
               key={f}
               onClick={() => setFilter(f)}
               className={`rounded px-3 py-1 text-xs font-medium capitalize ${
-                filter === f ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary"
+                filter === f
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-secondary"
               }`}
             >
               {f}
@@ -86,7 +96,9 @@ function AdminReports() {
                     {r.listings?.status && (
                       <Badge variant="outline">listing: {r.listings.status}</Badge>
                     )}
-                    <span className="text-xs text-muted-foreground">{formatDate(r.created_at)}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {formatDate(r.created_at)}
+                    </span>
                   </div>
                   <Link
                     to="/listing/$id"
@@ -100,14 +112,25 @@ function AdminReports() {
                 </div>
                 {r.status !== "resolved" && (
                   <div className="flex flex-wrap gap-2">
-                    <Button size="sm" variant="outline" onClick={() => hideListing(r.listing_id, r.id)}>
-                      <ShieldOff className="mr-1 h-4 w-4" />Hide listing
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => hideListing(r.listing_id, r.id)}
+                    >
+                      <ShieldOff className="mr-1 h-4 w-4" />
+                      Hide listing
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => removeListing(r.listing_id, r.id)}>
-                      <Trash2 className="mr-1 h-4 w-4" />Delete
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => removeListing(r.listing_id, r.id)}
+                    >
+                      <Trash2 className="mr-1 h-4 w-4" />
+                      Delete
                     </Button>
                     <Button size="sm" onClick={() => resolve(r.id)}>
-                      <CheckCircle2 className="mr-1 h-4 w-4" />Dismiss
+                      <CheckCircle2 className="mr-1 h-4 w-4" />
+                      Dismiss
                     </Button>
                   </div>
                 )}

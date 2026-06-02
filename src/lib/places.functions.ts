@@ -81,8 +81,7 @@ export const findNearbyForImport = createServerFn({ method: "POST" })
       const norm = normalizeName(p.name);
       const dupe = (nearby ?? []).find((b: any) => {
         if (b.lat == null || b.lng == null) return false;
-        const distKm =
-          Math.sqrt((Number(b.lat) - p.lat) ** 2 + (Number(b.lng) - p.lng) ** 2) * 111;
+        const distKm = Math.sqrt((Number(b.lat) - p.lat) ** 2 + (Number(b.lng) - p.lng) ** 2) * 111;
         return distKm < 0.1 && normalizeName(b.name) === norm;
       });
       if (dupe) return { ...p, status: "duplicate_name", existing_business_id: (dupe as any).id };

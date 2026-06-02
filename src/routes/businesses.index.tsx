@@ -17,7 +17,11 @@ export const Route = createFileRoute("/businesses/")({
   head: () => ({
     meta: [
       { title: "Businesses Directory — 365 MotorSales Philippines" },
-      { name: "description", content: "Find local dealerships, repair shops, parts stores, towing companies and insurance providers across the Philippines on a barangay-level map." },
+      {
+        name: "description",
+        content:
+          "Find local dealerships, repair shops, parts stores, towing companies and insurance providers across the Philippines on a barangay-level map.",
+      },
     ],
   }),
   component: BusinessesIndex,
@@ -26,14 +30,24 @@ export const Route = createFileRoute("/businesses/")({
 type BusinessType = { slug: string; label: string; sort_order: number };
 type Tag = { slug: string; label: string; type_slug: string | null };
 type BusinessRow = {
-  id: string; slug: string; name: string; type_slug: string; description: string | null;
-  logo_url: string | null; region: string | null; province: string | null; city: string | null;
-  barangay: string | null; lat: number | null; lng: number | null;
-  rating_avg: number; rating_count: number; featured: boolean;
+  id: string;
+  slug: string;
+  name: string;
+  type_slug: string;
+  description: string | null;
+  logo_url: string | null;
+  region: string | null;
+  province: string | null;
+  city: string | null;
+  barangay: string | null;
+  lat: number | null;
+  lng: number | null;
+  rating_avg: number;
+  rating_count: number;
+  featured: boolean;
   price_label: string | null;
   subscription_tier: "free" | "listed" | "featured" | "premium" | null;
 };
-
 
 function BusinessesIndex() {
   const navigate = useNavigate();
@@ -47,15 +61,26 @@ function BusinessesIndex() {
   const [q, setQ] = useState("");
   const [typeSlug, setTypeSlug] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [loc, setLoc] = useState<LocationValue>({ region: null, province: null, city: null, barangay: null });
+  const [loc, setLoc] = useState<LocationValue>({
+    region: null,
+    province: null,
+    city: null,
+    barangay: null,
+  });
   const [center, setCenter] = useState<CenterPoint>(null);
   const [radiusKm, setRadiusKm] = useState<number | null>(null);
 
   useEffect(() => {
     (async () => {
       const [t1, t2] = await Promise.all([
-        (supabase as any).from("business_types").select("slug,label,sort_order").order("sort_order"),
-        (supabase as any).from("business_tags").select("slug,label,type_slug,sort_order").order("sort_order"),
+        (supabase as any)
+          .from("business_types")
+          .select("slug,label,sort_order")
+          .order("sort_order"),
+        (supabase as any)
+          .from("business_tags")
+          .select("slug,label,type_slug,sort_order")
+          .order("sort_order"),
       ]);
       setTypes(t1.data ?? []);
       setTags(t2.data ?? []);
@@ -67,7 +92,9 @@ function BusinessesIndex() {
     (async () => {
       let query = (supabase as any)
         .from("businesses")
-        .select("id,slug,name,type_slug,description,logo_url,region,province,city,barangay,lat,lng,rating_avg,rating_count,featured,price_label,subscription_tier")
+        .select(
+          "id,slug,name,type_slug,description,logo_url,region,province,city,barangay,lat,lng,rating_avg,rating_count,featured,price_label,subscription_tier",
+        )
         .eq("status", "active")
         .order("subscription_tier", { ascending: false })
         .order("featured", { ascending: false })
@@ -86,7 +113,7 @@ function BusinessesIndex() {
 
       // load tag links for filtering and rendering
       const ids = rows.map((r) => r.id);
-      let links: Record<string, string[]> = {};
+      const links: Record<string, string[]> = {};
       if (ids.length > 0) {
         const { data: ld } = await (supabase as any)
           .from("business_tag_links")
@@ -98,12 +125,13 @@ function BusinessesIndex() {
       }
       setTagLinks(links);
 
-      const filtered = selectedTags.length === 0
-        ? rows
-        : rows.filter((r) => {
-            const ts = links[r.id] ?? [];
-            return selectedTags.every((t) => ts.includes(t));
-          });
+      const filtered =
+        selectedTags.length === 0
+          ? rows
+          : rows.filter((r) => {
+              const ts = links[r.id] ?? [];
+              return selectedTags.every((t) => ts.includes(t));
+            });
 
       setItems(filtered);
       setLoading(false);
@@ -124,16 +152,28 @@ function BusinessesIndex() {
     if (!center || !radiusKm) return items;
     return items.filter((b) => {
       if (b.lat == null || b.lng == null) return false;
-      return haversineKm({ lat: center.lat, lng: center.lng }, { lat: Number(b.lat), lng: Number(b.lng) }) <= radiusKm;
+      return (
+        haversineKm(
+          { lat: center.lat, lng: center.lng },
+          { lat: Number(b.lat), lng: Number(b.lng) },
+        ) <= radiusKm
+      );
     });
   }, [items, center, radiusKm]);
 
   const mapBusinesses: GMapBusiness[] = filteredByRadius.map((b) => ({
-    id: b.id, slug: b.slug, name: b.name,
-    type_slug: b.type_slug, type_label: typeLabel(b.type_slug),
-    lat: b.lat ? Number(b.lat) : null, lng: b.lng ? Number(b.lng) : null,
-    rating_avg: Number(b.rating_avg), rating_count: b.rating_count,
-    city: b.city, featured: b.featured, price_label: b.price_label,
+    id: b.id,
+    slug: b.slug,
+    name: b.name,
+    type_slug: b.type_slug,
+    type_label: typeLabel(b.type_slug),
+    lat: b.lat ? Number(b.lat) : null,
+    lng: b.lng ? Number(b.lng) : null,
+    rating_avg: Number(b.rating_avg),
+    rating_count: b.rating_count,
+    city: b.city,
+    featured: b.featured,
+    price_label: b.price_label,
   }));
 
   return (
@@ -141,11 +181,18 @@ function BusinessesIndex() {
       <div className="container mx-auto px-4 py-6 md:py-10">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h1 className="font-display text-2xl font-bold tracking-tight md:text-3xl">Businesses</h1>
-            <p className="text-sm text-muted-foreground">Find dealers, mechanics, parts, towing & insurance near you.</p>
+            <h1 className="font-display text-2xl font-bold tracking-tight md:text-3xl">
+              Businesses
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Find dealers, mechanics, parts, towing & insurance near you.
+            </p>
           </div>
           <Button asChild size="sm" variant="outline">
-            <Link to="/businesses/submit"><Plus className="mr-1 h-4 w-4" />List your business</Link>
+            <Link to="/businesses/submit">
+              <Plus className="mr-1 h-4 w-4" />
+              List your business
+            </Link>
           </Button>
         </div>
 
@@ -163,15 +210,25 @@ function BusinessesIndex() {
 
           <div className="flex flex-wrap gap-2">
             <button
-              onClick={() => { setTypeSlug(null); setSelectedTags([]); }}
+              onClick={() => {
+                setTypeSlug(null);
+                setSelectedTags([]);
+              }}
               className={`rounded-full border px-3 py-1 text-xs font-medium transition ${typeSlug === null ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}
-            >All types</button>
+            >
+              All types
+            </button>
             {types.map((t) => (
               <button
                 key={t.slug}
-                onClick={() => { setTypeSlug(t.slug); setSelectedTags([]); }}
+                onClick={() => {
+                  setTypeSlug(t.slug);
+                  setSelectedTags([]);
+                }}
                 className={`rounded-full border px-3 py-1 text-xs font-medium transition ${typeSlug === t.slug ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}
-              >{t.label}</button>
+              >
+                {t.label}
+              </button>
             ))}
           </div>
 
@@ -183,10 +240,14 @@ function BusinessesIndex() {
                   <button
                     key={t.slug}
                     onClick={() =>
-                      setSelectedTags((prev) => on ? prev.filter((x) => x !== t.slug) : [...prev, t.slug])
+                      setSelectedTags((prev) =>
+                        on ? prev.filter((x) => x !== t.slug) : [...prev, t.slug],
+                      )
                     }
                     className={`rounded-full border px-3 py-1 text-xs transition ${on ? "border-foreground bg-foreground text-background" : "border-border hover:bg-secondary"}`}
-                  >{t.label}</button>
+                  >
+                    {t.label}
+                  </button>
                 );
               })}
             </div>
@@ -199,15 +260,24 @@ function BusinessesIndex() {
         <div className="grid gap-6 md:grid-cols-[1fr_1.2fr]">
           <div className="space-y-3">
             <div className="text-sm text-muted-foreground">
-              {loading ? "Loading…" : `${items.length} business${items.length === 1 ? "" : "es"} found`}
+              {loading
+                ? "Loading…"
+                : `${items.length} business${items.length === 1 ? "" : "es"} found`}
             </div>
             {loading ? (
-              <>{Array.from({ length: 4 }).map((_, i) => <Skeleton key={i} className="h-24 w-full" />)}</>
+              <>
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton key={i} className="h-24 w-full" />
+                ))}
+              </>
             ) : items.length === 0 ? (
               <Card className="p-6 text-center text-sm text-muted-foreground">
                 <StoreIcon className="mx-auto mb-2 h-6 w-6 opacity-50" />
                 No businesses match your filters. Try clearing some or{" "}
-                <Link to="/businesses/submit" className="text-primary underline">add one</Link>.
+                <Link to="/businesses/submit" className="text-primary underline">
+                  add one
+                </Link>
+                .
               </Card>
             ) : (
               items.map((b) => (
@@ -215,35 +285,61 @@ function BusinessesIndex() {
                   key={b.id}
                   to="/businesses/$slug"
                   params={{ slug: b.slug }}
-                  search={{
-                    src: q.trim() ? "name_search" : (selectedTags.length > 0 || typeSlug ? "relevant_search" : "directory"),
-                    q: q.trim() || undefined,
-                    type: typeSlug || undefined,
-                    tags: selectedTags.length > 0 ? selectedTags.join(",") : undefined,
-                  } as any}
+                  search={
+                    {
+                      src: q.trim()
+                        ? "name_search"
+                        : selectedTags.length > 0 || typeSlug
+                          ? "relevant_search"
+                          : "directory",
+                      q: q.trim() || undefined,
+                      type: typeSlug || undefined,
+                      tags: selectedTags.length > 0 ? selectedTags.join(",") : undefined,
+                    } as any
+                  }
                 >
-
                   <Card className="flex items-start gap-3 p-3 transition hover:border-primary hover:shadow-sm">
                     <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-muted">
-                      {b.logo_url ? <img src={b.logo_url} alt={b.name} className="h-full w-full object-cover" /> : <StoreIcon className="h-6 w-6 text-muted-foreground" />}
+                      {b.logo_url ? (
+                        <img src={b.logo_url} alt={b.name} className="h-full w-full object-cover" />
+                      ) : (
+                        <StoreIcon className="h-6 w-6 text-muted-foreground" />
+                      )}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <h3 className="truncate font-semibold">{b.name}</h3>
-                            {b.subscription_tier === "premium" && <Badge className="shrink-0 bg-amber-500 text-amber-950">Premium</Badge>}
-                            {b.subscription_tier === "featured" && <Badge className="shrink-0 bg-primary">Featured</Badge>}
-                            {b.subscription_tier === "listed" && <Badge variant="secondary" className="shrink-0">Listed</Badge>}
-                            {b.featured && !b.subscription_tier && <Badge variant="default" className="shrink-0">Featured</Badge>}
+                            {b.subscription_tier === "premium" && (
+                              <Badge className="shrink-0 bg-amber-500 text-amber-950">
+                                Premium
+                              </Badge>
+                            )}
+                            {b.subscription_tier === "featured" && (
+                              <Badge className="shrink-0 bg-primary">Featured</Badge>
+                            )}
+                            {b.subscription_tier === "listed" && (
+                              <Badge variant="secondary" className="shrink-0">
+                                Listed
+                              </Badge>
+                            )}
+                            {b.featured && !b.subscription_tier && (
+                              <Badge variant="default" className="shrink-0">
+                                Featured
+                              </Badge>
+                            )}
                           </div>
-                          <div className="text-xs text-muted-foreground">{typeLabel(b.type_slug)}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {typeLabel(b.type_slug)}
+                          </div>
                         </div>
 
                         {b.rating_count > 0 && (
                           <div className="flex shrink-0 items-center gap-1 text-xs font-medium">
                             <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
-                            {Number(b.rating_avg).toFixed(1)} <span className="text-muted-foreground">({b.rating_count})</span>
+                            {Number(b.rating_avg).toFixed(1)}{" "}
+                            <span className="text-muted-foreground">({b.rating_count})</span>
                           </div>
                         )}
                       </div>

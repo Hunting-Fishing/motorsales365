@@ -6,10 +6,20 @@ import { logAdminAudit, type AdminAuditEntry } from "@/lib/admin-audit";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription, DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 
 type StaffRole = "admin" | "moderator" | "support" | "sales" | "advertising";
@@ -21,7 +31,13 @@ export function EditUserDialog({
   user,
   onSaved,
 }: {
-  user: { id: string; full_name?: string | null; seller_type?: string | null; verification_status?: string | null; roles?: string[] };
+  user: {
+    id: string;
+    full_name?: string | null;
+    seller_type?: string | null;
+    verification_status?: string | null;
+    roles?: string[];
+  };
   onSaved?: () => void;
 }) {
   const [open, setOpen] = useState(false);
@@ -32,20 +48,26 @@ export function EditUserDialog({
 
   useEffect(() => {
     if (!open) return;
-    setRoles(((user.roles ?? []) as string[]).filter((r): r is StaffRole => (STAFF_ROLES as string[]).includes(r)));
-    setSellerType(((user.seller_type as SellerType) ?? "private"));
-    setVerification(((user.verification_status as VerificationStatus) ?? "unverified"));
+    setRoles(
+      ((user.roles ?? []) as string[]).filter((r): r is StaffRole =>
+        (STAFF_ROLES as string[]).includes(r),
+      ),
+    );
+    setSellerType((user.seller_type as SellerType) ?? "private");
+    setVerification((user.verification_status as VerificationStatus) ?? "unverified");
   }, [open, user]);
 
   const toggleRole = (r: StaffRole) =>
-    setRoles((cur) => cur.includes(r) ? cur.filter((x) => x !== r) : [...cur, r]);
+    setRoles((cur) => (cur.includes(r) ? cur.filter((x) => x !== r) : [...cur, r]));
 
   const submit = async () => {
     setSaving(true);
     try {
       // Sync roles: compute add/remove vs current
       const current = new Set<StaffRole>(
-        ((user.roles ?? []) as string[]).filter((r): r is StaffRole => (STAFF_ROLES as string[]).includes(r)),
+        ((user.roles ?? []) as string[]).filter((r): r is StaffRole =>
+          (STAFF_ROLES as string[]).includes(r),
+        ),
       );
       const next = new Set<StaffRole>(roles);
       const toAdd = [...next].filter((r) => !current.has(r));
@@ -67,20 +89,55 @@ export function EditUserDialog({
 
       const profileUpdate: any = { seller_type: sellerType, verification_status: verification };
       profileUpdate.verified_at = verification === "verified" ? new Date().toISOString() : null;
-      const { error: pErr } = await supabase.from("profiles").update(profileUpdate).eq("id", user.id);
+      const { error: pErr } = await supabase
+        .from("profiles")
+        .update(profileUpdate)
+        .eq("id", user.id);
       if (pErr) throw pErr;
 
       // Audit log entries (best-effort, never blocks)
       const auditRows: AdminAuditEntry[] = [];
-      toAdd.forEach((r) => auditRows.push({ actor_id: "", target_user_id: user.id, action: "role_granted", field: "role", old_value: null, new_value: r }));
-      toRemove.forEach((r) => auditRows.push({ actor_id: "", target_user_id: user.id, action: "role_revoked", field: "role", old_value: r, new_value: null }));
+      toAdd.forEach((r) =>
+        auditRows.push({
+          actor_id: "",
+          target_user_id: user.id,
+          action: "role_granted",
+          field: "role",
+          old_value: null,
+          new_value: r,
+        }),
+      );
+      toRemove.forEach((r) =>
+        auditRows.push({
+          actor_id: "",
+          target_user_id: user.id,
+          action: "role_revoked",
+          field: "role",
+          old_value: r,
+          new_value: null,
+        }),
+      );
       const prevVer = (user.verification_status as VerificationStatus) ?? "unverified";
       if (prevVer !== verification) {
-        auditRows.push({ actor_id: "", target_user_id: user.id, action: "verification_changed", field: "verification_status", old_value: prevVer, new_value: verification });
+        auditRows.push({
+          actor_id: "",
+          target_user_id: user.id,
+          action: "verification_changed",
+          field: "verification_status",
+          old_value: prevVer,
+          new_value: verification,
+        });
       }
       const prevSeller = (user.seller_type as SellerType) ?? "private";
       if (prevSeller !== sellerType) {
-        auditRows.push({ actor_id: "", target_user_id: user.id, action: "seller_type_changed", field: "seller_type", old_value: prevSeller, new_value: sellerType });
+        auditRows.push({
+          actor_id: "",
+          target_user_id: user.id,
+          action: "seller_type_changed",
+          field: "seller_type",
+          old_value: prevSeller,
+          new_value: sellerType,
+        });
       }
       if (auditRows.length) await logAdminAudit(auditRows);
 
@@ -97,12 +154,17 @@ export function EditUserDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline"><Pencil className="mr-2 h-3.5 w-3.5" />Edit</Button>
+        <Button size="sm" variant="outline">
+          <Pencil className="mr-2 h-3.5 w-3.5" />
+          Edit
+        </Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>Edit user</DialogTitle>
-          <DialogDescription>{user.full_name ?? "(no name)"} — update roles, seller type, and verification.</DialogDescription>
+          <DialogDescription>
+            {user.full_name ?? "(no name)"} — update roles, seller type, and verification.
+          </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -117,10 +179,13 @@ export function EditUserDialog({
                     type="button"
                     onClick={() => toggleRole(r)}
                     className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                      on ? "border-primary bg-primary text-primary-foreground" : "border-border bg-background text-muted-foreground hover:border-primary/50"
+                      on
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border bg-background text-muted-foreground hover:border-primary/50"
                     }`}
                   >
-                    {on ? "✓ " : "+ "}{r}
+                    {on ? "✓ " : "+ "}
+                    {r}
                   </button>
                 );
               })}
@@ -131,7 +196,9 @@ export function EditUserDialog({
           <div className="grid gap-2">
             <Label>Seller type</Label>
             <Select value={sellerType} onValueChange={(v: any) => setSellerType(v)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="private">Private</SelectItem>
                 <SelectItem value="dealer">Dealer</SelectItem>
@@ -144,7 +211,9 @@ export function EditUserDialog({
           <div className="grid gap-2">
             <Label>Verification status</Label>
             <Select value={verification} onValueChange={(v: any) => setVerification(v)}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="unverified">Unverified</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
@@ -156,8 +225,12 @@ export function EditUserDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>Cancel</Button>
-          <Button onClick={submit} disabled={saving}>{saving ? "Saving…" : "Save changes"}</Button>
+          <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>
+            Cancel
+          </Button>
+          <Button onClick={submit} disabled={saving}>
+            {saving ? "Saving…" : "Save changes"}
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

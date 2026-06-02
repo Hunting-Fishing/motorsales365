@@ -18,8 +18,12 @@ export function CookieBanner() {
   }, []);
 
   function set(value: "accepted" | "declined") {
-    try { localStorage.setItem(STORAGE_KEY, value); } catch {}
-    try { window.dispatchEvent(new CustomEvent("ms-consent-changed")); } catch {}
+    try {
+      localStorage.setItem(STORAGE_KEY, value);
+    } catch {}
+    try {
+      window.dispatchEvent(new CustomEvent("ms-consent-changed"));
+    } catch {}
     setVisible(false);
   }
 
@@ -34,12 +38,20 @@ export function CookieBanner() {
         <div className="min-w-0 flex-1">
           <p className="text-sm font-medium">We use cookies</p>
           <p className="mt-1 text-xs text-muted-foreground">
-            Essential cookies keep you signed in. Optional analytics cookies help us improve the marketplace.
-            See our <Link to="/privacy" className="underline hover:text-foreground">Privacy Policy</Link>.
+            Essential cookies keep you signed in. Optional analytics cookies help us improve the
+            marketplace. See our{" "}
+            <Link to="/privacy" className="underline hover:text-foreground">
+              Privacy Policy
+            </Link>
+            .
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
-            <Button size="sm" onClick={() => set("accepted")}>Accept all</Button>
-            <Button size="sm" variant="outline" onClick={() => set("declined")}>Decline optional</Button>
+            <Button size="sm" onClick={() => set("accepted")}>
+              Accept all
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => set("declined")}>
+              Decline optional
+            </Button>
           </div>
         </div>
         <button

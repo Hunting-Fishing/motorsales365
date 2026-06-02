@@ -20,7 +20,9 @@ export const Route = createFileRoute("/api/public/training-partners/$id/click")(
         // Fire-and-forget click log
         try {
           await supabaseAdmin.from("training_partner_clicks").insert({ partner_id: id });
-        } catch { /* ignore */ }
+        } catch {
+          /* ignore */
+        }
         return new Response(null, {
           status: 302,
           headers: { Location: (partner as any).website_url },

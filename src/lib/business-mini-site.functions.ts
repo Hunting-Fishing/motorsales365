@@ -270,7 +270,10 @@ export const setVanitySlug = createServerFn({ method: "POST" })
           .string()
           .min(3)
           .max(32)
-          .regex(/^[a-z0-9]([a-z0-9-]{1,30})[a-z0-9]$/, "lowercase letters, numbers, and hyphens only (3–32 chars)")
+          .regex(
+            /^[a-z0-9]([a-z0-9-]{1,30})[a-z0-9]$/,
+            "lowercase letters, numbers, and hyphens only (3–32 chars)",
+          )
           .nullable(),
       })
       .parse(input),

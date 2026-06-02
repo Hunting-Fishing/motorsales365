@@ -85,7 +85,8 @@ function buildItems(d: ChecklistInput): Item[] {
     {
       key: "bookings",
       label: "Enable bookings (optional)",
-      description: "Let customers book a slot directly — set at least one bookable service and weekly hours.",
+      description:
+        "Let customers book a slot directly — set at least one bookable service and weekly hours.",
       done: (d.bookableItems?.length ?? 0) >= 1 && (d.availability?.length ?? 0) >= 1,
       tabValue: "bookings",
     },
@@ -119,7 +120,8 @@ export function OnboardingChecklist({
           <h2 className="font-display text-base font-semibold">Mini-site complete</h2>
         </div>
         <p className="mt-1 text-sm text-muted-foreground">
-          Nice work — every recommended field is filled. Keep posts and gallery fresh to stay on top of the directory.
+          Nice work — every recommended field is filled. Keep posts and gallery fresh to stay on top
+          of the directory.
         </p>
       </Card>
     );
@@ -130,14 +132,13 @@ export function OnboardingChecklist({
       <div className="mb-3 flex items-center justify-between gap-3">
         <div>
           <h2 className="font-display text-base font-semibold">Set up your mini-site</h2>
-          <p className="text-xs text-muted-foreground">{done} of {total} complete · {pct}%</p>
+          <p className="text-xs text-muted-foreground">
+            {done} of {total} complete · {pct}%
+          </p>
         </div>
       </div>
       <div className="mb-3 h-2 w-full overflow-hidden rounded-full bg-muted">
-        <div
-          className="h-full bg-primary transition-all"
-          style={{ width: `${pct}%` }}
-        />
+        <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
       </div>
       <ul className="space-y-1.5">
         {items.map((it) => (
@@ -156,7 +157,9 @@ export function OnboardingChecklist({
                 <Circle className="h-5 w-5 shrink-0 text-muted-foreground" />
               )}
               <div className="min-w-0 flex-1">
-                <div className={cn("text-sm font-medium", it.done && "line-through")}>{it.label}</div>
+                <div className={cn("text-sm font-medium", it.done && "line-through")}>
+                  {it.label}
+                </div>
                 <div className="text-xs text-muted-foreground">{it.description}</div>
               </div>
               {!it.done && <ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground" />}

@@ -19,7 +19,11 @@ import {
 import { cn } from "@/lib/utils";
 import { SiteLayout } from "@/components/site-layout";
 import { getCreditedCode } from "@/lib/referral";
-import { AccountTypeGrid, SIGNUP_TYPES, type SignupIntent } from "@/components/signup/account-type-grid";
+import {
+  AccountTypeGrid,
+  SIGNUP_TYPES,
+  type SignupIntent,
+} from "@/components/signup/account-type-grid";
 import { LocationPicker, type LocationValue } from "@/components/location-picker";
 import { PhoneInput } from "@/components/phone-input";
 import { buildE164 } from "@/data/country-codes";
@@ -89,7 +93,12 @@ function SignupPage() {
   const [streetAddress, setStreetAddress] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [businessPostalCode, setBusinessPostalCode] = useState("");
-  const [location, setLocation] = useState<LocationValue>({ region: null, province: null, city: null, barangay: null });
+  const [location, setLocation] = useState<LocationValue>({
+    region: null,
+    province: null,
+    city: null,
+    barangay: null,
+  });
   const [refCode, setRefCode] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -101,10 +110,7 @@ function SignupPage() {
 
   const isBusinessLike = intent === "business" || intent === "service_provider";
   const intentMeta = useMemo(() => SIGNUP_TYPES.find((s) => s.id === intent), [intent]);
-  const kindOptions = useMemo(
-    () => BUSINESS_KIND_OPTIONS,
-    [],
-  );
+  const kindOptions = useMemo(() => BUSINESS_KIND_OPTIONS, []);
 
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   const phoneE164 = phoneNational.trim() ? buildE164(phoneIso, phoneNational) : "";
@@ -113,30 +119,79 @@ function SignupPage() {
   type Issue = { field: string; label: string; message: string };
   const issues = useMemo<Issue[]>(() => {
     const list: Issue[] = [];
-    if (!intent) list.push({ field: "intent", label: "Account type", message: "Choose what kind of account you'd like." });
-    if (!firstName.trim()) list.push({ field: "firstName", label: "First name", message: "Enter your first name." });
-    if (!lastName.trim()) list.push({ field: "lastName", label: "Last name", message: "Enter your last name." });
-    if (!email.trim()) list.push({ field: "email", label: "Email", message: "Enter your email address." });
-    else if (!emailValid) list.push({ field: "email", label: "Email", message: "Enter a valid email address." });
-    if (phoneNational.trim() && !phoneValid) list.push({ field: "phone", label: "Mobile", message: "Enter a valid mobile number or leave it blank." });
-    if (!location.city) list.push({ field: "city", label: "City / Town", message: "Choose your city or town." });
+    if (!intent)
+      list.push({
+        field: "intent",
+        label: "Account type",
+        message: "Choose what kind of account you'd like.",
+      });
+    if (!firstName.trim())
+      list.push({ field: "firstName", label: "First name", message: "Enter your first name." });
+    if (!lastName.trim())
+      list.push({ field: "lastName", label: "Last name", message: "Enter your last name." });
+    if (!email.trim())
+      list.push({ field: "email", label: "Email", message: "Enter your email address." });
+    else if (!emailValid)
+      list.push({ field: "email", label: "Email", message: "Enter a valid email address." });
+    if (phoneNational.trim() && !phoneValid)
+      list.push({
+        field: "phone",
+        label: "Mobile",
+        message: "Enter a valid mobile number or leave it blank.",
+      });
+    if (!location.city)
+      list.push({ field: "city", label: "City / Town", message: "Choose your city or town." });
     if (isBusinessLike && !businessName.trim()) {
-      list.push({ field: "businessName", label: intent === "service_provider" ? "Service name" : "Business name", message: "Required for business and service accounts." });
+      list.push({
+        field: "businessName",
+        label: intent === "service_provider" ? "Service name" : "Business name",
+        message: "Required for business and service accounts.",
+      });
     }
     if (isBusinessLike && !businessKind) {
-      list.push({ field: "businessKind", label: "Category", message: "Pick the category that best describes your business." });
+      list.push({
+        field: "businessKind",
+        label: "Category",
+        message: "Pick the category that best describes your business.",
+      });
     }
-    if (!password) list.push({ field: "password", label: "Password", message: "Choose a password." });
-    else if (password.length < 8) list.push({ field: "password", label: "Password", message: "Password must be at least 8 characters." });
-    if (!agreed) list.push({ field: "terms", label: "Terms", message: "Agree to the Terms and Privacy Policy to continue." });
+    if (!password)
+      list.push({ field: "password", label: "Password", message: "Choose a password." });
+    else if (password.length < 8)
+      list.push({
+        field: "password",
+        label: "Password",
+        message: "Password must be at least 8 characters.",
+      });
+    if (!agreed)
+      list.push({
+        field: "terms",
+        label: "Terms",
+        message: "Agree to the Terms and Privacy Policy to continue.",
+      });
     return list;
-  }, [intent, firstName, lastName, email, emailValid, phoneNational, phoneValid, location.city, isBusinessLike, businessName, businessKind, password, agreed]);
+  }, [
+    intent,
+    firstName,
+    lastName,
+    email,
+    emailValid,
+    phoneNational,
+    phoneValid,
+    location.city,
+    isBusinessLike,
+    businessName,
+    businessKind,
+    password,
+    agreed,
+  ]);
 
   const errorFor = (field: string) => {
     if (!submitAttempted && !touched[field]) return null;
     return issues.find((i) => i.field === field)?.message ?? null;
   };
-  const invalidCls = (field: string) => (errorFor(field) ? "border-destructive focus-visible:ring-destructive" : "");
+  const invalidCls = (field: string) =>
+    errorFor(field) ? "border-destructive focus-visible:ring-destructive" : "";
 
   useEffect(() => {
     const c = getCreditedCode();
@@ -179,7 +234,9 @@ function SignupPage() {
     e.preventDefault();
     setSubmitAttempted(true);
     if (issues.length > 0) {
-      toast.error(`Please fix ${issues.length} ${issues.length === 1 ? "field" : "fields"} before continuing.`);
+      toast.error(
+        `Please fix ${issues.length} ${issues.length === 1 ? "field" : "fields"} before continuing.`,
+      );
       // scroll to first error
       const first = issues[0].field;
       const el = document.getElementById(`field-${first}`) ?? document.getElementById(first);
@@ -200,10 +257,12 @@ function SignupPage() {
           last_name: lastName.trim(),
           phone: phoneE164 || undefined,
           business_name: isBusinessLike ? businessName.trim() : undefined,
-          business_address: isBusinessLike ? (businessAddress.trim() || undefined) : undefined,
-          business_kind: isBusinessLike ? (businessKind || undefined) : undefined,
+          business_address: isBusinessLike ? businessAddress.trim() || undefined : undefined,
+          business_kind: isBusinessLike ? businessKind || undefined : undefined,
           street_address: streetAddress.trim() || undefined,
-          postal_code: isBusinessLike ? (businessPostalCode.trim() || undefined) : (postalCode.trim() || undefined),
+          postal_code: isBusinessLike
+            ? businessPostalCode.trim() || undefined
+            : postalCode.trim() || undefined,
           signup_city: location.city ?? undefined,
           signup_region: location.region ?? undefined,
           signup_province: location.province ?? undefined,
@@ -214,7 +273,10 @@ function SignupPage() {
       },
     });
     setSubmitting(false);
-    if (error) { toast.error(error.message); return; }
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     // If email confirmation is required, no session is returned — send to pending screen.
     if (!data.session) {
       toast.success("Account created — check your email to verify.");
@@ -230,11 +292,22 @@ function SignupPage() {
   };
 
   const handleGoogle = async () => {
-    if (!intent) { toast.error("Please choose what kind of account you'd like first."); return; }
-    if (!agreed) { toast.error("Please agree to the Terms and Privacy Policy first."); return; }
+    if (!intent) {
+      toast.error("Please choose what kind of account you'd like first.");
+      return;
+    }
+    if (!agreed) {
+      toast.error("Please agree to the Terms and Privacy Policy first.");
+      return;
+    }
     stashPendingProfile();
-    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-    if (result.error) { toast.error("Could not sign up with Google"); return; }
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: window.location.origin,
+    });
+    if (result.error) {
+      toast.error("Could not sign up with Google");
+      return;
+    }
     if (result.redirected) return;
     navigate({ to: POST_SIGNUP_ROUTE[intent] });
   };
@@ -243,7 +316,9 @@ function SignupPage() {
     <SiteLayout>
       <div className="container mx-auto max-w-3xl px-4 py-12">
         <header className="mb-8 text-center">
-          <h1 className="font-display text-3xl font-bold sm:text-4xl">Create your 365 MotorSales account</h1>
+          <h1 className="font-display text-3xl font-bold sm:text-4xl">
+            Create your 365 MotorSales account
+          </h1>
           <p className="mt-2 text-muted-foreground">
             Pick what brings you here — we'll tailor your dashboard around it.
           </p>
@@ -251,7 +326,10 @@ function SignupPage() {
 
         <section aria-labelledby="account-type-heading" className="mb-8">
           <div className="mb-3 flex items-baseline justify-between">
-            <h2 id="account-type-heading" className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+            <h2
+              id="account-type-heading"
+              className="text-sm font-semibold uppercase tracking-wide text-muted-foreground"
+            >
               1. Account type
             </h2>
             {intent && (
@@ -276,7 +354,9 @@ function SignupPage() {
           aria-disabled={!intent}
         >
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">2. Your details</h2>
+            <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+              2. Your details
+            </h2>
             <span className="text-xs text-muted-foreground">
               <span className="text-destructive">*</span> required
             </span>
@@ -284,14 +364,40 @@ function SignupPage() {
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div id="field-firstName">
-              <Label htmlFor="first-name">First name <span className="text-destructive">*</span></Label>
-              <Input id="first-name" required value={firstName} onChange={(e) => setFirstName(e.target.value)} onBlur={() => markTouched("firstName")} autoComplete="given-name" aria-invalid={!!errorFor("firstName")} className={invalidCls("firstName")} />
-              {errorFor("firstName") && <p className="mt-1 text-xs text-destructive">{errorFor("firstName")}</p>}
+              <Label htmlFor="first-name">
+                First name <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="first-name"
+                required
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                onBlur={() => markTouched("firstName")}
+                autoComplete="given-name"
+                aria-invalid={!!errorFor("firstName")}
+                className={invalidCls("firstName")}
+              />
+              {errorFor("firstName") && (
+                <p className="mt-1 text-xs text-destructive">{errorFor("firstName")}</p>
+              )}
             </div>
             <div id="field-lastName">
-              <Label htmlFor="last-name">Last name <span className="text-destructive">*</span></Label>
-              <Input id="last-name" required value={lastName} onChange={(e) => setLastName(e.target.value)} onBlur={() => markTouched("lastName")} autoComplete="family-name" aria-invalid={!!errorFor("lastName")} className={invalidCls("lastName")} />
-              {errorFor("lastName") && <p className="mt-1 text-xs text-destructive">{errorFor("lastName")}</p>}
+              <Label htmlFor="last-name">
+                Last name <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="last-name"
+                required
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                onBlur={() => markTouched("lastName")}
+                autoComplete="family-name"
+                aria-invalid={!!errorFor("lastName")}
+                className={invalidCls("lastName")}
+              />
+              {errorFor("lastName") && (
+                <p className="mt-1 text-xs text-destructive">{errorFor("lastName")}</p>
+              )}
             </div>
           </div>
 
@@ -312,21 +418,48 @@ function SignupPage() {
               ) : (
                 <p className="mt-1 text-xs text-muted-foreground">
                   Pick your country, then enter your number.
-                  {phoneNational.trim() && phoneValid && <span className="ml-1 text-emerald-600">✓ {phoneE164}</span>}
+                  {phoneNational.trim() && phoneValid && (
+                    <span className="ml-1 text-emerald-600">✓ {phoneE164}</span>
+                  )}
                 </p>
               )}
             </div>
             <div id="field-email">
-              <Label htmlFor="email">Email <span className="text-destructive">*</span></Label>
-              <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} onBlur={() => markTouched("email")} autoComplete="email" aria-invalid={!!errorFor("email")} className={invalidCls("email")} />
-              {errorFor("email") && <p className="mt-1 text-xs text-destructive">{errorFor("email")}</p>}
+              <Label htmlFor="email">
+                Email <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onBlur={() => markTouched("email")}
+                autoComplete="email"
+                aria-invalid={!!errorFor("email")}
+                className={invalidCls("email")}
+              />
+              {errorFor("email") && (
+                <p className="mt-1 text-xs text-destructive">{errorFor("email")}</p>
+              )}
             </div>
           </div>
 
           <div id="field-city">
-            <Label className="mb-2 block">City / Town <span className="text-destructive">*</span></Label>
-            <LocationPicker value={location} onChange={(v) => { setLocation(v); markTouched("city"); }} showBarangay={false} />
-            {errorFor("city") && <p className="mt-1 text-xs text-destructive">{errorFor("city")}</p>}
+            <Label className="mb-2 block">
+              City / Town <span className="text-destructive">*</span>
+            </Label>
+            <LocationPicker
+              value={location}
+              onChange={(v) => {
+                setLocation(v);
+                markTouched("city");
+              }}
+              showBarangay={false}
+            />
+            {errorFor("city") && (
+              <p className="mt-1 text-xs text-destructive">{errorFor("city")}</p>
+            )}
           </div>
 
           {!isBusinessLike && (
@@ -357,12 +490,15 @@ function SignupPage() {
 
           {isBusinessLike && (
             <div className="space-y-4 rounded-xl border border-dashed border-border bg-muted/30 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Business details</p>
+              <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                Business details
+              </p>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div id="field-businessName">
                   <Label htmlFor="business-name">
-                    {intent === "service_provider" ? "Service name" : "Business / dealer name"} <span className="text-destructive">*</span>
+                    {intent === "service_provider" ? "Service name" : "Business / dealer name"}{" "}
+                    <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     id="business-name"
@@ -370,25 +506,47 @@ function SignupPage() {
                     value={businessName}
                     onChange={(e) => setBusinessName(e.target.value)}
                     onBlur={() => markTouched("businessName")}
-                    placeholder={intent === "service_provider" ? "e.g. Reyes Towing Services" : "e.g. Manila Auto Hub"}
+                    placeholder={
+                      intent === "service_provider"
+                        ? "e.g. Reyes Towing Services"
+                        : "e.g. Manila Auto Hub"
+                    }
                     aria-invalid={!!errorFor("businessName")}
                     className={invalidCls("businessName")}
                   />
-                  {errorFor("businessName") && <p className="mt-1 text-xs text-destructive">{errorFor("businessName")}</p>}
+                  {errorFor("businessName") && (
+                    <p className="mt-1 text-xs text-destructive">{errorFor("businessName")}</p>
+                  )}
                 </div>
                 <div id="field-businessKind">
-                  <Label htmlFor="business-kind">Category <span className="text-destructive">*</span></Label>
-                  <Select value={businessKind} onValueChange={(v) => { setBusinessKind(v); markTouched("businessKind"); }}>
-                    <SelectTrigger id="business-kind" aria-invalid={!!errorFor("businessKind")} className={invalidCls("businessKind")}>
+                  <Label htmlFor="business-kind">
+                    Category <span className="text-destructive">*</span>
+                  </Label>
+                  <Select
+                    value={businessKind}
+                    onValueChange={(v) => {
+                      setBusinessKind(v);
+                      markTouched("businessKind");
+                    }}
+                  >
+                    <SelectTrigger
+                      id="business-kind"
+                      aria-invalid={!!errorFor("businessKind")}
+                      className={invalidCls("businessKind")}
+                    >
                       <SelectValue placeholder="Choose a category" />
                     </SelectTrigger>
                     <SelectContent>
                       {kindOptions.map((o) => (
-                        <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                        <SelectItem key={o.value} value={o.value}>
+                          {o.label}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  {errorFor("businessKind") && <p className="mt-1 text-xs text-destructive">{errorFor("businessKind")}</p>}
+                  {errorFor("businessKind") && (
+                    <p className="mt-1 text-xs text-destructive">{errorFor("businessKind")}</p>
+                  )}
                 </div>
               </div>
 
@@ -415,13 +573,16 @@ function SignupPage() {
                 </div>
               </div>
               <p className="text-xs text-muted-foreground">
-                You can skip the street and postal for now, but your account won't go live or appear in the directory until a full business address is saved.
+                You can skip the street and postal for now, but your account won't go live or appear
+                in the directory until a full business address is saved.
               </p>
             </div>
           )}
 
           <div id="field-password">
-            <Label htmlFor="password">Password <span className="text-destructive">*</span></Label>
+            <Label htmlFor="password">
+              Password <span className="text-destructive">*</span>
+            </Label>
             <div className="relative">
               <Input
                 id="password"
@@ -447,25 +608,56 @@ function SignupPage() {
             {errorFor("password") ? (
               <p className="mt-1 text-xs text-destructive">{errorFor("password")}</p>
             ) : (
-              <p className="mt-1 text-xs text-muted-foreground">At least 8 characters. Use a mix of letters and numbers.</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                At least 8 characters. Use a mix of letters and numbers.
+              </p>
             )}
           </div>
 
-          <div id="field-terms" className={cn("flex items-start gap-3 rounded-lg border bg-muted/30 p-3", errorFor("terms") ? "border-destructive" : "border-border")}>
-            <Checkbox id="terms" checked={agreed} onCheckedChange={(v) => { setAgreed(v === true); markTouched("terms"); }} className="mt-0.5" />
+          <div
+            id="field-terms"
+            className={cn(
+              "flex items-start gap-3 rounded-lg border bg-muted/30 p-3",
+              errorFor("terms") ? "border-destructive" : "border-border",
+            )}
+          >
+            <Checkbox
+              id="terms"
+              checked={agreed}
+              onCheckedChange={(v) => {
+                setAgreed(v === true);
+                markTouched("terms");
+              }}
+              className="mt-0.5"
+            />
             <div className="flex-1">
-              <Label htmlFor="terms" className="text-sm font-normal leading-relaxed text-muted-foreground">
+              <Label
+                htmlFor="terms"
+                className="text-sm font-normal leading-relaxed text-muted-foreground"
+              >
                 I agree to the{" "}
-                <Link to="/terms" className="font-medium text-primary underline">Terms</Link> and{" "}
-                <Link to="/privacy" className="font-medium text-primary underline">Privacy Policy</Link>.
+                <Link to="/terms" className="font-medium text-primary underline">
+                  Terms
+                </Link>{" "}
+                and{" "}
+                <Link to="/privacy" className="font-medium text-primary underline">
+                  Privacy Policy
+                </Link>
+                .
               </Label>
-              {errorFor("terms") && <p className="mt-1 text-xs text-destructive">{errorFor("terms")}</p>}
+              {errorFor("terms") && (
+                <p className="mt-1 text-xs text-destructive">{errorFor("terms")}</p>
+              )}
             </div>
           </div>
 
-          {intent && (
-            issues.length > 0 ? (
-              <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-sm" role="alert" aria-live="polite">
+          {intent &&
+            (issues.length > 0 ? (
+              <div
+                className="rounded-lg border border-destructive/40 bg-destructive/5 p-4 text-sm"
+                role="alert"
+                aria-live="polite"
+              >
                 <div className="flex items-center gap-2 font-semibold text-destructive">
                   <AlertCircle className="h-4 w-4" />
                   Before you can create your {intentMeta?.label.toLowerCase()} account
@@ -474,7 +666,10 @@ function SignupPage() {
                   {issues.map((i) => (
                     <li key={i.field} className="flex gap-2">
                       <span className="text-destructive">•</span>
-                      <span><span className="font-medium">{i.label}:</span> <span className="text-muted-foreground">{i.message}</span></span>
+                      <span>
+                        <span className="font-medium">{i.label}:</span>{" "}
+                        <span className="text-muted-foreground">{i.message}</span>
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -484,11 +679,14 @@ function SignupPage() {
                 <CheckCircle2 className="h-4 w-4" />
                 All set — you're ready to create your account.
               </div>
-            )
-          )}
+            ))}
 
           <Button type="submit" disabled={submitting || !intent} className="w-full" size="lg">
-            {submitting ? "Creating account…" : intent ? `Create ${intentMeta?.label.toLowerCase()} account` : "Choose an account type to continue"}
+            {submitting
+              ? "Creating account…"
+              : intent
+                ? `Create ${intentMeta?.label.toLowerCase()} account`
+                : "Choose an account type to continue"}
           </Button>
 
           <div className="flex items-center gap-3">
@@ -497,13 +695,22 @@ function SignupPage() {
             <div className="h-px flex-1 bg-border" />
           </div>
 
-          <Button type="button" variant="outline" onClick={handleGoogle} disabled={!intent} className="w-full">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleGoogle}
+            disabled={!intent}
+            className="w-full"
+          >
             Continue with Google
           </Button>
         </form>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          Already have an account? <Link to="/login" className="font-semibold text-primary hover:underline">Sign in</Link>
+          Already have an account?{" "}
+          <Link to="/login" className="font-semibold text-primary hover:underline">
+            Sign in
+          </Link>
         </p>
       </div>
     </SiteLayout>
