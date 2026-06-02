@@ -38,7 +38,7 @@ export const saveProfile = createServerFn({ method: "POST" })
     }
     const { data: saved, error } = await supabase
       .from("profiles")
-      .upsert(patch)
+      .upsert(patch as { id: string })
       .eq("id", userId)
       .select("*")
       .single();
