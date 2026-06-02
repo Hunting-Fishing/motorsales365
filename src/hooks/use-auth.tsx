@@ -236,13 +236,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(false);
     });
 
-    // Hydrate immediately from the persisted session (localStorage) so
-    // refreshes don't flash the loading state.
-    supabase.auth.getSession().then(({ data }) => {
+    // Re-validate the persisted session with the Auth server (getUser) rather
+    // than trusting the localStorage token blindly. Falls back to getSession
+    // only to expose the access token shape that handleSession expects.
+    (async () => {
+      const { data: userData, error } = await supabase.auth.getUser();
       if (cancelled) return;
-      handleSession(data.session ?? null);
+      if (error || !userData.user) {
+        handleSession(null);
+      } else {
+        const { data: sessData } = await supabase.auth.getSession();
+        if (cancelled) return;
+        handleSession(sessData.session ?? null);
+      }
       setLoading(false);
-    });
+    })();
 
     return () => {
       cancelled = true;
