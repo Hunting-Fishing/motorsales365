@@ -203,6 +203,7 @@ const DRONE_SERVICES = ["Photo", "Video", "Mapping", "Inspection", "Agriculture"
 function SellPage() {
   const { user, loading: authLoading, effectiveSellerType } = useAuth();
   const navigate = useNavigate();
+  const { payment: paymentStatus, listingId: pendingListingId } = Route.useSearch();
 
   const [category, setCategory] = useState("car");
   const [title, setTitle] = useState("");
