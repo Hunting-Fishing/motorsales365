@@ -44,9 +44,9 @@ function ProductPage() {
   });
   const visitor = useMemo(() => getVisitorId(), []);
   const p = data?.product as any | undefined;
-  const links = (data?.links ?? []) as any[];
+  const links = useMemo(() => (data?.links ?? []) as any[], [data]);
   const fitment = (data?.fitment ?? []) as any[];
-  const history = (data?.history ?? []) as any[];
+  const history = useMemo(() => (data?.history ?? []) as any[], [data]);
 
   // Cheapest current price across all retailers
   const cheapest = useMemo(() => {
