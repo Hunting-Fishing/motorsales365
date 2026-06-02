@@ -115,6 +115,16 @@ const SELL_SEO: Record<string, { title: string; description: string }> = {
 };
 
 export const Route = createFileRoute("/sell")({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { payment?: "cancelled" | "failed"; listingId?: string } => {
+    const p = search.payment;
+    const payment = p === "cancelled" || p === "failed" ? p : undefined;
+    return {
+      payment,
+      listingId: typeof search.listingId === "string" ? search.listingId : undefined,
+    };
+  },
   head: () => ({
     meta: [
       { title: "Sell your vehicle — 365 MotorSales Philippines" },
@@ -193,6 +203,7 @@ const DRONE_SERVICES = ["Photo", "Video", "Mapping", "Inspection", "Agriculture"
 function SellPage() {
   const { user, loading: authLoading, effectiveSellerType } = useAuth();
   const navigate = useNavigate();
+  const { payment: paymentStatus, listingId: pendingListingId } = Route.useSearch();
 
   const [category, setCategory] = useState("car");
   const [title, setTitle] = useState("");
@@ -705,6 +716,40 @@ function SellPage() {
       <div className="container mx-auto max-w-3xl px-4 py-10">
         <h1 className="font-display text-3xl font-bold">Post a listing</h1>
         <p className="text-muted-foreground">Reach buyers across the Philippines.</p>
+
+        {paymentStatus && pendingListingId ? (
+          <div
+            role="alert"
+            className="mt-4 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-destructive/40 bg-destructive/5 p-4"
+          >
+            <div className="flex items-start gap-2">
+              <AlertCircle className="mt-0.5 h-5 w-5 text-destructive" />
+              <div>
+                <div className="font-semibold text-destructive">
+                  {paymentStatus === "cancelled"
+                    ? "Payment cancelled"
+                    : "Payment didn't go through"}
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Your listing is saved and still pending payment. You can resume checkout
+                  any time — nothing was charged.
+                </p>
+              </div>
+            </div>
+            <Button
+              size="sm"
+              onClick={() =>
+                navigate({
+                  to: "/listing/checkout",
+                  search: { listingId: pendingListingId },
+                })
+              }
+            >
+              Resume payment
+            </Button>
+          </div>
+        ) : null}
+
 
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4">
           <div>
