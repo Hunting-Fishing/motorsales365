@@ -528,6 +528,17 @@ function SellPage() {
       return;
     }
 
+    const textParsed = ListingTextSchema.safeParse({
+      title,
+      description,
+      price_php: Number(price),
+      contact_phone: phone || null,
+    });
+    if (!textParsed.success) {
+      toast.error(textParsed.error.issues[0]?.message ?? "Please check your listing details.");
+      return;
+    }
+
     setSubmitting(true);
     try {
       let lid = listingId;
