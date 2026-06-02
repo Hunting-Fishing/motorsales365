@@ -95,6 +95,17 @@ function ListingCheckoutPage() {
             <EmbeddedCheckout />
           </EmbeddedCheckoutProvider>
         </div>
+        <p className="mt-4 text-center text-xs text-muted-foreground">
+          Changed your mind?{" "}
+          <Link
+            to="/dashboard"
+            search={{ payment: "cancelled", listingId } as never}
+            className="underline"
+          >
+            Cancel and finish later
+          </Link>
+          . Your listing stays saved as pending until paid.
+        </p>
       </section>
     </SiteLayout>
   );
