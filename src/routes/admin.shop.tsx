@@ -283,7 +283,7 @@ function ProductsTab() {
                         <Button size="sm" variant="ghost" title="Outbound links" onClick={() => setLinksFor(p)}><LinkIcon className="h-4 w-4" /></Button>
                         <Button size="sm" variant="ghost" title="Vehicle fitment" onClick={() => setFitmentFor(p)}><Car className="h-4 w-4" /></Button>
                         <Button size="sm" variant="ghost" title="Edit" onClick={() => setEditing(p)}><Pencil className="h-4 w-4" /></Button>
-                        <Button size="sm" variant="ghost" title="Delete" onClick={() => { if (confirm(`Delete "${p.title}"?`)) del.mutate(p.id); }}><Trash2 className="h-4 w-4" /></Button>
+                        <Button size="sm" variant="ghost" title="Delete" onClick={async () => { if (await confirm({ title: `Delete "${p.title}"?`, destructive: true })) del.mutate(p.id); }}><Trash2 className="h-4 w-4" /></Button>
                       </div>
                     </td>
                   </tr>
