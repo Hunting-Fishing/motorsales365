@@ -117,6 +117,8 @@ export const Route = createFileRoute("/businesses/$slug")({
     };
   },
   component: BusinessProfilePage,
+  errorComponent: RouteErrorBoundary,
+  notFoundComponent: () => <RouteNotFoundBoundary message="Business not found." />,
 });
 
 function peso(n: number | null | undefined) {
