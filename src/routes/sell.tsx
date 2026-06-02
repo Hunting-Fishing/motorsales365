@@ -1258,6 +1258,51 @@ function SellPage() {
             </RadioGroup>
           </section>
 
+          <section className="space-y-3 rounded-xl border border-border bg-card p-6">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-lg font-semibold">Add a boost (optional)</h2>
+              {selectedBoost && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedBoost("")}
+                  className="text-xs text-muted-foreground hover:underline"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Boost is purchased right after your listing payment for maximum visibility.
+            </p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {boostOptions.map((b) => {
+                const active = selectedBoost === b.slug;
+                return (
+                  <button
+                    type="button"
+                    key={b.slug}
+                    onClick={() => setSelectedBoost(active ? "" : b.slug)}
+                    className={`rounded-lg border p-3 text-left text-sm transition ${
+                      active ? "border-primary bg-primary/5" : "border-border hover:bg-secondary/50"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-medium">{b.label}</span>
+                      <span className="text-foreground">{formatPHP(b.price_php)}</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {b.duration_days} day{b.duration_days === 1 ? "" : "s"}
+                    </div>
+                  </button>
+                );
+              })}
+              {boostOptions.length === 0 && (
+                <div className="text-xs text-muted-foreground">No boosts available right now.</div>
+              )}
+            </div>
+          </section>
+
+
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Photos & video</h2>
             {(() => {
