@@ -341,6 +341,10 @@ async function handleEvent(env: StripeEnv, event: Stripe.Event) {
         await enrollCourseFromSession(env, session);
         break;
       }
+      if (session.metadata?.kind === "listing_payment") {
+        await activateListingFromSession(env, session);
+        break;
+      }
       if (session.mode === "subscription" && session.subscription) {
         const stripe = createStripeClient(env);
         const subId =
