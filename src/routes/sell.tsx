@@ -115,6 +115,16 @@ const SELL_SEO: Record<string, { title: string; description: string }> = {
 };
 
 export const Route = createFileRoute("/sell")({
+  validateSearch: (
+    search: Record<string, unknown>,
+  ): { payment?: "cancelled" | "failed"; listingId?: string } => {
+    const p = search.payment;
+    const payment = p === "cancelled" || p === "failed" ? p : undefined;
+    return {
+      payment,
+      listingId: typeof search.listingId === "string" ? search.listingId : undefined,
+    };
+  },
   head: () => ({
     meta: [
       { title: "Sell your vehicle — 365 MotorSales Philippines" },
