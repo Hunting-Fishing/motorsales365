@@ -374,15 +374,12 @@ function SellPage() {
     },
   });
 
-  // Photo limit comes from the user's subscription plan; upgraded listings still bump to 20
-  const planPhotoMax = planLimits.maxPhotosPerListing;
-  const maxPhotos =
-    plan === "upgraded"
-      ? Math.max(20, planPhotoMax)
-      : plan === "standard"
-        ? Math.max(5, planPhotoMax)
-        : planPhotoMax;
+  // Strict per-plan caps: Free = 1 photo / 0 video, Standard = 5 / 1, Upgraded = 20 / 3.
+  // Subscription planLimits cannot raise these listing-tier caps.
+  const maxPhotos = plan === "upgraded" ? 20 : plan === "standard" ? 5 : 1;
   const maxVideos = plan === "upgraded" ? 3 : plan === "standard" ? 1 : 0;
+  // Surfaced for messaging only — actual enforcement uses maxPhotos above.
+  void planLimits;
   const totalFee =
     plan === "free"
       ? 0
@@ -517,9 +514,11 @@ function SellPage() {
     }
     if (photos.length > maxPhotos) {
       toast.error(
-        plan === "standard"
-          ? `Too many photos for Standard (max ${maxPhotos}). Remove some or upgrade.`
-          : `Too many photos (max ${maxPhotos}).`,
+        plan === "upgraded"
+          ? `Upgraded listings allow up to 20 photos.`
+          : plan === "standard"
+            ? `Standard listings allow up to 5 photos. Remove some or upgrade to add up to 20.`
+            : `Free listings allow only 1 photo. Choose Standard or Upgraded for more.`,
       );
       return;
     }
