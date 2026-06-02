@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   Search,
   Tag,
@@ -22,6 +22,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { SupportTicketForm } from "@/components/support/support-ticket-form";
+import { fetchSupportContact } from "@/lib/site-settings";
 
 const FAQS: { q: string; a: string }[] = [
   {
@@ -144,6 +145,16 @@ export const Route = createFileRoute("/support")({
 
 function SupportHubPage() {
   const [query, setQuery] = useState("");
+  const [supportContact, setSupportContact] = useState<{
+    whatsappHref: string | null;
+    messengerHref: string | null;
+  }>({ whatsappHref: null, messengerHref: null });
+
+  useEffect(() => {
+    fetchSupportContact()
+      .then(setSupportContact)
+      .catch(() => {});
+  }, []);
 
   const filteredFaqs = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -278,12 +289,20 @@ function SupportHubPage() {
                     <Mail className="h-4 w-4" /> support@365motorsales.com
                   </a>
                 </Button>
-                <Button asChild variant="ghost" className="w-full justify-start">
-                  {/* TODO: replace # with real Messenger / WhatsApp link */}
-                  <a href="#" aria-disabled="true">
-                    <MessageCircle className="h-4 w-4" /> Messenger / WhatsApp
-                  </a>
-                </Button>
+                {supportContact.whatsappHref && (
+                  <Button asChild variant="ghost" className="w-full justify-start">
+                    <a href={supportContact.whatsappHref} target="_blank" rel="noreferrer">
+                      <MessageCircle className="h-4 w-4" /> WhatsApp
+                    </a>
+                  </Button>
+                )}
+                {supportContact.messengerHref && (
+                  <Button asChild variant="ghost" className="w-full justify-start">
+                    <a href={supportContact.messengerHref} target="_blank" rel="noreferrer">
+                      <MessageCircle className="h-4 w-4" /> Messenger
+                    </a>
+                  </Button>
+                )}
               </div>
             </div>
             <Card>
