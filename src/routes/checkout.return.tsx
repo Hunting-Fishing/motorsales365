@@ -1,8 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { CheckCircle2 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
+import { getListingCheckoutStatus } from "@/lib/listing-payment.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
 
 export const Route = createFileRoute("/checkout/return")({
   validateSearch: (
@@ -28,10 +31,33 @@ function CheckoutReturn() {
   const { session_id, next, listingId, nextBoost } = Route.useSearch();
   const navigate = useNavigate();
 
-  // After a listing payment, if the seller also picked a boost, route them
-  // straight into the boost checkout once the listing is confirmed.
+  // For listing payments we verify the actual session status with Stripe so
+  // we can show a real failure message instead of always claiming success.
+  const isListingFlow = next === "listing" && !!session_id;
+  const statusQuery = useQuery({
+    queryKey: ["listing-checkout-status", session_id],
+    enabled: isListingFlow,
+    queryFn: () =>
+      getListingCheckoutStatus({
+        data: { sessionId: session_id!, environment: getStripeEnvironment() },
+      }),
+    retry: false,
+  });
+
+  const paid =
+    !isListingFlow ||
+    (statusQuery.data?.paymentStatus === "paid" ||
+      statusQuery.data?.paymentStatus === "no_payment_required");
+  const failed =
+    isListingFlow &&
+    statusQuery.data &&
+    statusQuery.data.paymentStatus !== "paid" &&
+    statusQuery.data.paymentStatus !== "no_payment_required";
+
+  // After a successful listing payment, if the seller also picked a boost,
+  // route them straight into the boost checkout.
   useEffect(() => {
-    if (next === "listing" && listingId && nextBoost) {
+    if (paid && next === "listing" && listingId && nextBoost) {
       const t = setTimeout(() => {
         navigate({
           to: "/boost/checkout",
@@ -40,9 +66,54 @@ function CheckoutReturn() {
       }, 1200);
       return () => clearTimeout(t);
     }
-  }, [next, listingId, nextBoost, navigate]);
+  }, [paid, next, listingId, nextBoost, navigate]);
 
-  const chainingToBoost = next === "listing" && listingId && nextBoost;
+  if (isListingFlow && statusQuery.isLoading) {
+    return (
+      <SiteLayout>
+        <section className="container mx-auto max-w-xl px-4 py-16 text-center">
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-muted-foreground" />
+          <p className="mt-4 text-sm text-muted-foreground">Confirming your payment…</p>
+        </section>
+      </SiteLayout>
+    );
+  }
+
+  if (failed) {
+    const retryId = statusQuery.data?.listingId ?? listingId;
+    return (
+      <SiteLayout>
+        <section className="container mx-auto max-w-xl px-4 py-16 text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+            <AlertCircle className="h-9 w-9" />
+          </div>
+          <h1 className="font-display text-3xl font-bold">Payment didn't complete</h1>
+          <p className="mt-2 text-muted-foreground">
+            {statusQuery.data?.status === "expired"
+              ? "Your checkout session expired before the payment was confirmed."
+              : "Your card was not charged. You can retry the payment — your listing is saved and still pending."}
+          </p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            {retryId ? (
+              <Button asChild>
+                <Link
+                  to="/listing/checkout"
+                  search={{ listingId: retryId, ...(nextBoost ? { boost: nextBoost } : {}) }}
+                >
+                  Retry payment
+                </Link>
+              </Button>
+            ) : null}
+            <Button asChild variant="outline">
+              <Link to="/dashboard">My listings</Link>
+            </Button>
+          </div>
+        </section>
+      </SiteLayout>
+    );
+  }
+
+  const chainingToBoost = paid && next === "listing" && listingId && nextBoost;
 
   return (
     <SiteLayout>
