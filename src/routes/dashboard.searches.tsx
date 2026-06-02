@@ -31,6 +31,8 @@ function SavedSearchesPage() {
 
   useEffect(() => {
     load();
+    // reason: `load` is recreated each render; depend only on user.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const remove = async (id: string) => {
