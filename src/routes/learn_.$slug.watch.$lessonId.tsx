@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { RouteErrorBoundary, RouteNotFoundBoundary } from "@/components/route-boundaries";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { SiteLayout } from "@/components/site-layout";
@@ -32,6 +33,8 @@ export const Route = createFileRoute("/learn_/$slug/watch/$lessonId")({
   },
   head: () => ({ meta: [{ title: "Lesson — 365 Learn" }] }),
   component: Watch,
+  errorComponent: RouteErrorBoundary,
+  notFoundComponent: () => <RouteNotFoundBoundary message="Lesson not found." />,
 });
 
 function Watch() {

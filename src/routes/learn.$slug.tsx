@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { RouteErrorBoundary, RouteNotFoundBoundary } from "@/components/route-boundaries";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { SiteLayout } from "@/components/site-layout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -33,6 +34,8 @@ export const Route = createFileRoute("/learn/$slug")({
     };
   },
   component: CourseDetail,
+  errorComponent: RouteErrorBoundary,
+  notFoundComponent: () => <RouteNotFoundBoundary message="Course not found." />,
 });
 
 function CourseDetail() {

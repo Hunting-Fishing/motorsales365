@@ -1,4 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { RouteErrorBoundary, RouteNotFoundBoundary } from "@/components/route-boundaries";
 import { useEffect, useState } from "react";
 import {
   MapPin,
@@ -140,6 +141,8 @@ export const Route = createFileRoute("/listing/$id")({
     };
   },
   component: ListingDetailPage,
+  errorComponent: RouteErrorBoundary,
+  notFoundComponent: () => <RouteNotFoundBoundary message="Listing not found." />,
 });
 
 interface ListingDetail {

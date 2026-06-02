@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { RouteErrorBoundary, RouteNotFoundBoundary } from "@/components/route-boundaries";
 import { useEffect, useState } from "react";
 import {
   MapPin,
@@ -116,6 +117,8 @@ export const Route = createFileRoute("/businesses/$slug")({
     };
   },
   component: BusinessProfilePage,
+  errorComponent: RouteErrorBoundary,
+  notFoundComponent: () => <RouteNotFoundBoundary message="Business not found." />,
 });
 
 function peso(n: number | null | undefined) {
