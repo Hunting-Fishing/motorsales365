@@ -51,7 +51,7 @@ function DashboardLearning() {
                 {e.course?.hero_image_url ? (
                   <img
                     src={e.course.hero_image_url}
-                    alt=""
+                    alt={e.course?.title ? `${e.course.title} course cover` : "Course cover"}
                     className="h-full w-full object-cover"
                   />
                 ) : (

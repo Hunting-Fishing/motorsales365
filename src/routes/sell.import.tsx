@@ -458,7 +458,7 @@ function ImportPage() {
                     >
                       <img
                         src={src}
-                        alt=""
+                        alt="Imported listing photo"
                         className="h-full w-full object-cover"
                         referrerPolicy="no-referrer"
                       />

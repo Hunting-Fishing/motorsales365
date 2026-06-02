@@ -67,7 +67,7 @@ export function AvatarUploader({ userId, value, fallback, onChange }: Props) {
   return (
     <div className="flex items-center gap-4">
       <Avatar className="size-20 border border-border">
-        <AvatarImage src={value ?? undefined} alt="" />
+        <AvatarImage src={value ?? undefined} alt="Profile avatar" />
         <AvatarFallback className="text-lg font-semibold">{fallback}</AvatarFallback>
       </Avatar>
       <div className="flex flex-col gap-2">

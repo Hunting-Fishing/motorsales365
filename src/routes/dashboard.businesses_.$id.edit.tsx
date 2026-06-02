@@ -869,7 +869,7 @@ function ImageField({
           }`}
         >
           {url ? (
-            <img src={url} alt="" className="h-full w-full object-cover" />
+            <img src={url} alt="Image preview" className="h-full w-full object-cover" />
           ) : (
             <ImageIcon className="h-6 w-6 text-muted-foreground" />
           )}
@@ -989,7 +989,7 @@ function ServicesTab({
                   return (
                     <Card key={s.id} className="flex items-center gap-3 p-3">
                       {s.photo_url ? (
-                        <img src={s.photo_url} alt="" className="h-14 w-14 rounded object-cover" />
+                        <img src={s.photo_url} alt={s.title ? `${s.title} service photo` : "Service photo"} className="h-14 w-14 rounded object-cover" />
                       ) : (
                         <div className="flex h-14 w-14 items-center justify-center rounded bg-muted text-muted-foreground">
                           <ImageIcon className="h-5 w-5" />
@@ -1204,7 +1204,7 @@ function ProductsTab({
             <Card key={p.id} className="overflow-hidden">
               <div className="aspect-square w-full bg-muted">
                 {p.photo_url ? (
-                  <img src={p.photo_url} alt="" className="h-full w-full object-cover" />
+                  <img src={p.photo_url} alt={p.title ? `${p.title} product photo` : "Product photo"} className="h-full w-full object-cover" />
                 ) : null}
               </div>
               <div className="p-2">
@@ -1459,7 +1459,7 @@ function PostsTab({
               </div>
               <p className="mt-1 whitespace-pre-wrap text-sm">{p.body}</p>
               {p.photo_url && (
-                <img src={p.photo_url} alt="" className="mt-2 max-h-72 rounded-md object-cover" />
+                <img src={p.photo_url} alt="Post photo" className="mt-2 max-h-72 rounded-md object-cover" />
               )}
             </Card>
           ))}

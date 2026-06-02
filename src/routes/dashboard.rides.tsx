@@ -78,7 +78,7 @@ function MyRidesPage() {
             <div key={r.id} className="flex gap-3 rounded-xl border border-border bg-card p-3">
               <div className="h-20 w-28 shrink-0 overflow-hidden rounded-md bg-secondary">
                 {r.cover_photo_url && (
-                  <img src={r.cover_photo_url} alt="" className="h-full w-full object-cover" />
+                  <img src={r.cover_photo_url} alt={`${r.name} cover photo`} className="h-full w-full object-cover" />
                 )}
               </div>
               <div className="flex-1 min-w-0">

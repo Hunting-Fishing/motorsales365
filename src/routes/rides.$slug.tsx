@@ -440,7 +440,7 @@ function RideProfilePage() {
                               >
                                 <img
                                   src={ph.url}
-                                  alt=""
+                                  alt={`${ride.name} service log photo`}
                                   className="aspect-square h-full w-full object-cover"
                                   loading="lazy"
                                 />
@@ -488,7 +488,7 @@ function RideProfilePage() {
             <div className="flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-secondary">
                 {ownerLogo ? (
-                  <img src={ownerLogo} alt="" className="h-full w-full object-cover" />
+                  <img src={ownerLogo} alt={`${ownerName} avatar`} className="h-full w-full object-cover" />
                 ) : (
                   <span className="text-lg font-semibold">{ownerName.charAt(0)}</span>
                 )}

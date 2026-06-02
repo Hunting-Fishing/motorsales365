@@ -345,7 +345,7 @@ function ProductsTab() {
                         {p.image_url ? (
                           <img
                             src={p.image_url}
-                            alt=""
+                            alt={p.title ? `${p.title} thumbnail` : "Product thumbnail"}
                             loading="lazy"
                             className="h-10 w-10 flex-shrink-0 rounded object-cover"
                           />
@@ -696,7 +696,7 @@ function ProductDialog({ initial, categories, onClose, onSaved }: any) {
             {form.image_url && (
               <img
                 src={form.image_url}
-                alt=""
+                alt="Product image preview"
                 className="mt-2 h-24 w-24 rounded border object-cover"
                 onError={(e) => ((e.target as HTMLImageElement).style.display = "none")}
               />

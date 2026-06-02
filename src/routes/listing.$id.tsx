@@ -395,7 +395,7 @@ function ListingDetailPage() {
                     onClick={() => setActiveIdx(i)}
                     className={`h-16 w-24 shrink-0 overflow-hidden rounded-md border-2 ${i === activeIdx ? "border-primary" : "border-transparent"}`}
                   >
-                    <ImageWithSkeleton src={p.url} alt="" />
+                    <ImageWithSkeleton src={p.url} alt={`${listing.title} photo ${i + 1}`} />
                   </button>
                 ))}
                 {videos.map((v) => (
