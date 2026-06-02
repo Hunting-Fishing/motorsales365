@@ -21,6 +21,10 @@ function ResetPasswordPage() {
     if (typeof window !== "undefined" && window.location.hash.includes("type=recovery")) {
       setMode("set");
     }
+    const { data: sub } = supabase.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY") setMode("set");
+    });
+    return () => sub.subscription.unsubscribe();
   }, []);
 
   const handleRequest = async (e: React.FormEvent) => {
