@@ -11,6 +11,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+} from "@/components/ui/dialog";
+import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { LocationPicker } from "@/components/location-picker";
@@ -176,13 +179,23 @@ function BrowsePage() {
     });
   };
 
-  const saveCurrentSearch = async () => {
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
+  const [saveName, setSaveName] = useState("");
+  const [savingSearch, setSavingSearch] = useState(false);
+
+  const openSaveDialog = () => {
     if (!user) {
       navigate({ to: "/login" });
       return;
     }
-    const name = window.prompt("Name this saved search", `${CATEGORY_LABEL[category] ?? category}${keyword ? ` — ${keyword}` : ""}`);
-    if (!name) return;
+    setSaveName(`${CATEGORY_LABEL[category] ?? category}${keyword ? ` — ${keyword}` : ""}`);
+    setSaveDialogOpen(true);
+  };
+
+  const confirmSaveSearch = async () => {
+    const name = saveName.trim();
+    if (!name || !user) return;
+    setSavingSearch(true);
     const { error } = await supabase.from("saved_searches").insert({
       user_id: user.id,
       name,
@@ -201,8 +214,13 @@ function BrowsePage() {
         engine: vEngine || null,
       },
     });
-    if (error) toast.error(error.message);
-    else toast.success("Search saved. Find it in your dashboard.");
+    setSavingSearch(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    setSaveDialogOpen(false);
+    toast.success("Search saved. Find it in your dashboard.");
   };
 
   return (
