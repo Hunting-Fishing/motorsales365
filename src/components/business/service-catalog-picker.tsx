@@ -265,18 +265,3 @@ export function PricingFields({
     </div>
   );
 }
-
-/* ---------------- Public price formatter ---------------- */
-
-export function formatServicePrice(svc: {
-  price_label?: string | null;
-  price_php?: number | null;
-  sale_price_php?: number | null;
-  unit?: string | null;
-}): string | null {
-  if (svc.price_label && svc.price_label.trim()) return svc.price_label;
-  const p = svc.sale_price_php ?? svc.price_php;
-  if (p == null) return null;
-  const unit = svc.unit ? `/${svc.unit}` : "";
-  return `₱${Number(p).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${unit}`;
-}
