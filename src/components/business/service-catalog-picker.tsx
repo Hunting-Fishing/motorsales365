@@ -20,6 +20,7 @@ import { blankService, type ServiceFormValue } from "./service-catalog-picker.ut
 
 // Re-export the helpers from the colocated utils module so existing call sites
 // importing them from this file continue to work.
+// eslint-disable-next-line react-refresh/only-export-components -- back-compat re-exports for existing call sites
 export { blankService, fromCatalogItem, formatServicePrice } from "./service-catalog-picker.utils";
 export type { ServiceFormValue } from "./service-catalog-picker.utils";
 
