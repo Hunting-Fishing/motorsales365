@@ -215,6 +215,7 @@ function SellPage() {
     setSellerType(effectiveSellerType === "private" ? "private" : "business");
   }, [effectiveSellerType]);
   const [plan, setPlan] = useState<"free" | "standard" | "upgraded">("free");
+  const [previewPlan, setPreviewPlan] = useState<"free" | "standard" | "upgraded" | null>(null);
   const [year, setYear] = useState("");
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
