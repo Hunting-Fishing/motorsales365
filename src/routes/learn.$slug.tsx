@@ -34,6 +34,8 @@ export const Route = createFileRoute("/learn/$slug")({
     };
   },
   component: CourseDetail,
+  errorComponent: RouteErrorBoundary,
+  notFoundComponent: () => <RouteNotFoundBoundary message="Course not found." />,
 });
 
 function CourseDetail() {
