@@ -86,6 +86,8 @@ function MessagesPage() {
 
   useEffect(() => {
     load();
+    // reason: `load` is recreated each render; depend only on user.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   // Realtime subscription
@@ -100,6 +102,8 @@ function MessagesPage() {
     return () => {
       supabase.removeChannel(channel);
     };
+    // reason: `load` is recreated each render; depend only on user.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const conversations = useMemo<ConversationSummary[]>(() => {

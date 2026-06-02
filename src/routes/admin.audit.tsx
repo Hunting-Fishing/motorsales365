@@ -111,6 +111,8 @@ function AdminAudit() {
 
   useEffect(() => {
     load();
+    // reason: `load` is recreated each render; depend only on its inputs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, search, actionFilter]);
 
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));

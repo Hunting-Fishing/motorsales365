@@ -54,6 +54,8 @@ function LoginPage() {
     return () => {
       if (redirectTimerRef.current) window.clearTimeout(redirectTimerRef.current);
     };
+    // reason: `goToDashboard` is recreated each render; depend only on auth state.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, loading]);
 
   const handleSubmit = async (e: React.FormEvent) => {

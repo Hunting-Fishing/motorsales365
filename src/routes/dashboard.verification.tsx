@@ -113,6 +113,8 @@ function VerificationPage() {
 
   useEffect(() => {
     load();
+    // reason: `load` is recreated each render; depend only on user.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const uploadDoc = async (file: File) => {

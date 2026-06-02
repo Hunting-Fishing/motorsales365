@@ -43,7 +43,7 @@ export function AdCarousel({ placement, limit = 6, className }: AdCarouselProps)
     queryFn: () => getActiveAds({ data: { placement, limit } }),
     staleTime: 5 * 60 * 1000,
   });
-  const ads = data?.ads ?? [];
+  const ads = useMemo(() => data?.ads ?? [], [data]);
   const trackedRef = useRef<Set<string>>(new Set());
   const visitorId = useMemo(() => getVisitorId(), []);
 
