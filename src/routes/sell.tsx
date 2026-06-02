@@ -215,6 +215,7 @@ function SellPage() {
     setSellerType(effectiveSellerType === "private" ? "private" : "business");
   }, [effectiveSellerType]);
   const [plan, setPlan] = useState<"free" | "standard" | "upgraded">("free");
+  const [previewPlan, setPreviewPlan] = useState<"free" | "standard" | "upgraded" | null>(null);
   const [year, setYear] = useState("");
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
@@ -1249,19 +1250,103 @@ function SellPage() {
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Photos & video</h2>
-            <div className="flex flex-wrap items-center gap-3 text-sm">
-              <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
-                {planLimits.planName}
-              </span>
-              <span className="text-muted-foreground">
-                <Camera className="mr-0.5 inline h-3.5 w-3.5 -translate-y-0.5" />
-                <strong className="text-foreground">{Math.max(0, maxPhotos - photos.length)}</strong> photo{maxPhotos - photos.length !== 1 ? "s" : ""} remaining
-              </span>
-              <span className="text-muted-foreground">
-                <VideoIcon className="mr-0.5 inline h-3.5 w-3.5 -translate-y-0.5" />
-                <strong className="text-foreground">{Math.max(0, maxVideos - (video ? 1 : 0))}</strong> video{maxVideos - (video ? 1 : 0) !== 1 ? "s" : ""} remaining
-              </span>
-            </div>
+            {(() => {
+              const tierCaps: Record<
+                "free" | "standard" | "upgraded",
+                { photos: number; videos: number; label: string; price: number }
+              > = {
+                free: { photos: 1, videos: 0, label: "Free", price: 0 },
+                standard: {
+                  photos: 5,
+                  videos: 1,
+                  label: "Standard",
+                  price: pricing.listing_fee_php ?? 20,
+                },
+                upgraded: {
+                  photos: 20,
+                  videos: 3,
+                  label: "Upgraded",
+                  price:
+                    (pricing.listing_fee_php ?? 20) + (pricing.upgrade_fee_php ?? 100),
+                },
+              };
+              const preview = previewPlan ?? plan;
+              const previewCaps = tierCaps[preview];
+              const remainingPhotos = Math.max(0, previewCaps.photos - photos.length);
+              const remainingVideos = Math.max(0, previewCaps.videos - (video ? 1 : 0));
+              const upgradeOptions = (["standard", "upgraded"] as const).filter(
+                (t) => tierCaps[t].photos > tierCaps[plan].photos,
+              );
+              return (
+                <>
+                  <div className="flex flex-wrap items-center gap-2 text-sm">
+                    <span className="rounded-full bg-secondary px-2.5 py-0.5 text-xs font-medium text-secondary-foreground">
+                      {previewCaps.label}
+                      {previewPlan && previewPlan !== plan ? " (preview)" : ""}
+                    </span>
+                    <span className="text-muted-foreground">
+                      <Camera className="mr-0.5 inline h-3.5 w-3.5 -translate-y-0.5" />
+                      <strong className="text-foreground">{remainingPhotos}</strong>{" "}
+                      photo{remainingPhotos !== 1 ? "s" : ""} remaining
+                    </span>
+                    <span className="text-muted-foreground">
+                      <VideoIcon className="mr-0.5 inline h-3.5 w-3.5 -translate-y-0.5" />
+                      <strong className="text-foreground">{remainingVideos}</strong>{" "}
+                      video{remainingVideos !== 1 ? "s" : ""} remaining
+                    </span>
+                    {upgradeOptions.length > 0 && (
+                      <div className="ml-auto flex flex-wrap gap-2">
+                        {upgradeOptions.map((tier) => {
+                          const caps = tierCaps[tier];
+                          const isBoost = tier === "upgraded";
+                          return (
+                            <Button
+                              key={tier}
+                              type="button"
+                              size="sm"
+                              variant={isBoost ? "default" : "outline"}
+                              onMouseEnter={() => setPreviewPlan(tier)}
+                              onMouseLeave={() => setPreviewPlan(null)}
+                              onFocus={() => setPreviewPlan(tier)}
+                              onBlur={() => setPreviewPlan(null)}
+                              onClick={() => {
+                                setPlan(tier);
+                                setPreviewPlan(null);
+                                toast.success(
+                                  `Switched to ${caps.label} — ${caps.photos} photos, ${caps.videos} video${caps.videos === 1 ? "" : "s"}.`,
+                                );
+                              }}
+                            >
+                              {isBoost ? "Boost to " : "Upgrade to "}
+                              {caps.label} · {formatPHP(caps.price)}
+                            </Button>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                  {previewPlan && previewPlan !== plan && (
+                    <div className="rounded-md border border-primary/30 bg-primary/5 p-3 text-xs text-foreground">
+                      With {previewCaps.label} you'd get{" "}
+                      <strong>{previewCaps.photos} photos</strong> and{" "}
+                      <strong>
+                        {previewCaps.videos} video{previewCaps.videos === 1 ? "" : "s"}
+                      </strong>{" "}
+                      ({previewCaps.photos - tierCaps[plan].photos > 0
+                        ? `+${previewCaps.photos - tierCaps[plan].photos} photos`
+                        : "same photos"}
+                      {previewCaps.videos - tierCaps[plan].videos > 0
+                        ? `, +${previewCaps.videos - tierCaps[plan].videos} video${previewCaps.videos - tierCaps[plan].videos === 1 ? "" : "s"}`
+                        : ""}
+                      ).
+                    </div>
+                  )}
+                  <div className="text-xs text-muted-foreground">
+                    Subscription plan: {planLimits.planName}
+                  </div>
+                </>
+              );
+            })()}
             {(photos.length > maxPhotos || (video && maxVideos < 1)) && (
               <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
                 Your media exceeds the {plan === "standard" ? "Standard" : "current"} plan limit (
