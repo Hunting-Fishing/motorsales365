@@ -526,11 +526,6 @@ function SellPage() {
       toast.error("Remove the video or upgrade your plan to include video.");
       return;
     }
-    if (video && maxVideos >= 1 && 1 > maxVideos) {
-      // single-video uploader; reserved guard if multi-video added later
-      toast.error(`This plan allows up to ${maxVideos} video${maxVideos > 1 ? "s" : ""}.`);
-      return;
-    }
 
     const textParsed = ListingTextSchema.safeParse({
       title,
