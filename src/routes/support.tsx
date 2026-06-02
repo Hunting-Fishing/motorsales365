@@ -284,12 +284,20 @@ function SupportHubPage() {
                     <Mail className="h-4 w-4" /> support@365motorsales.com
                   </a>
                 </Button>
-                <Button asChild variant="ghost" className="w-full justify-start">
-                  {/* TODO: replace # with real Messenger / WhatsApp link */}
-                  <a href="#" aria-disabled="true">
-                    <MessageCircle className="h-4 w-4" /> Messenger / WhatsApp
-                  </a>
-                </Button>
+                {supportContact.whatsappHref && (
+                  <Button asChild variant="ghost" className="w-full justify-start">
+                    <a href={supportContact.whatsappHref} target="_blank" rel="noreferrer">
+                      <MessageCircle className="h-4 w-4" /> WhatsApp
+                    </a>
+                  </Button>
+                )}
+                {supportContact.messengerHref && (
+                  <Button asChild variant="ghost" className="w-full justify-start">
+                    <a href={supportContact.messengerHref} target="_blank" rel="noreferrer">
+                      <MessageCircle className="h-4 w-4" /> Messenger
+                    </a>
+                  </Button>
+                )}
               </div>
             </div>
             <Card>
