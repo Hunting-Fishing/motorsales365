@@ -369,6 +369,9 @@ async function recordFailedListingPayment(
   } as any);
   // NOTE: We deliberately leave the listing in `pending_payment` so the seller
   // can retry from /listing/checkout?listingId=... without losing their draft.
+}
+
+
 
 async function enrollCourseFromSession(env: StripeEnv, session: Stripe.Checkout.Session) {
   const meta = session.metadata || {};
