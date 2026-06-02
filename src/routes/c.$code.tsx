@@ -23,6 +23,8 @@ export const Route = createFileRoute("/c/$code")({
     };
   },
   component: CertificatePage,
+  errorComponent: RouteErrorBoundary,
+  notFoundComponent: () => <RouteNotFoundBoundary message="Certificate not found." />,
 });
 
 function CertificatePage() {
