@@ -64,6 +64,8 @@ export const Route = createFileRoute("/seller/$id")({
     };
   },
   component: SellerProfilePage,
+  errorComponent: RouteErrorBoundary,
+  notFoundComponent: () => <RouteNotFoundBoundary message="Seller not found." />,
 });
 
 function SellerProfilePage() {
