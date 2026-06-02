@@ -185,6 +185,8 @@ function TowProviderDashboard() {
 
   useEffect(() => {
     load();
+    // reason: `load` is recreated each render; depend only on user.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   useEffect(() => {
@@ -197,6 +199,8 @@ function TowProviderDashboard() {
     return () => {
       supabase.removeChannel(ch);
     };
+    // reason: `load` is recreated each render; depend only on user.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const direct = useMemo(
