@@ -279,6 +279,61 @@ async function activateBoostFromSession(env: StripeEnv, session: Stripe.Checkout
     .eq("id", listingId);
 }
 
+async function activateListingFromSession(env: StripeEnv, session: Stripe.Checkout.Session) {
+  void env;
+  const meta = session.metadata || {};
+  const userId = meta.userId as string | undefined;
+  const listingId = meta.listingId as string | undefined;
+  const plan = (meta.plan as string | undefined) ?? "standard";
+  if (!userId || !listingId) {
+    console.error("[webhook] listing_payment missing metadata", session.id);
+    return;
+  }
+
+  // Idempotency: skip if we already recorded a payment for this session
+  const reference = `stripe_session:${session.id}`;
+  const { data: existingPayment } = await supabaseAdmin
+    .from("payments")
+    .select("id")
+    .eq("reference", reference)
+    .maybeSingle();
+  if (existingPayment) return;
+
+  const { data: listing } = await supabaseAdmin
+    .from("listings")
+    .select("id, user_id, status")
+    .eq("id", listingId)
+    .maybeSingle();
+  if (!listing || (listing as any).user_id !== userId) {
+    console.error("[webhook] listing_payment: listing not found / owner mismatch", listingId);
+    return;
+  }
+
+  await supabaseAdmin.from("payments").insert({
+    user_id: userId,
+    listing_id: listingId,
+    kind: (plan === "upgraded" ? "upgrade" : "listing") as any,
+    status: "paid" as any,
+    amount_php: (session.amount_total ?? 0) / 100,
+    method: "stripe",
+    reference,
+    paid_at: new Date().toISOString(),
+    new_plan: plan,
+  } as any);
+
+  // Only flip pending listings live; never resurrect a hidden/sold one
+  if ((listing as any).status === "pending_payment") {
+    await supabaseAdmin
+      .from("listings")
+      .update({
+        status: "active",
+        published_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", listingId);
+  }
+}
+
 async function enrollCourseFromSession(env: StripeEnv, session: Stripe.Checkout.Session) {
   const meta = session.metadata || {};
   const userId = meta.userId as string | undefined;
@@ -339,6 +394,10 @@ async function handleEvent(env: StripeEnv, event: Stripe.Event) {
       }
       if (session.metadata?.kind === "course") {
         await enrollCourseFromSession(env, session);
+        break;
+      }
+      if (session.metadata?.kind === "listing_payment") {
+        await activateListingFromSession(env, session);
         break;
       }
       if (session.mode === "subscription" && session.subscription) {

@@ -216,6 +216,10 @@ function SellPage() {
   }, [effectiveSellerType]);
   const [plan, setPlan] = useState<"free" | "standard" | "upgraded">("free");
   const [previewPlan, setPreviewPlan] = useState<"free" | "standard" | "upgraded" | null>(null);
+  const [selectedBoost, setSelectedBoost] = useState<string>("");
+  const [boostOptions, setBoostOptions] = useState<
+    Array<{ slug: string; label: string; price_php: number; duration_days: number }>
+  >([]);
   const [year, setYear] = useState("");
   const [make, setMake] = useState("");
   const [model, setModel] = useState("");
@@ -299,6 +303,18 @@ function SellPage() {
   useEffect(() => {
     if (user?.id) getUserPlanLimits(user.id).then(setPlanLimits);
   }, [user?.id]);
+
+  useEffect(() => {
+    supabase
+      .from("boost_products")
+      .select("slug,label,price_php,duration_days,active,sort_order")
+      .eq("active", true)
+      .order("sort_order", { ascending: true })
+      .then(({ data }) => {
+        setBoostOptions((data ?? []) as any);
+      });
+  }, []);
+
 
   // Prefill from a ride profile via ?from_ride=<id>
   useEffect(() => {
@@ -655,27 +671,21 @@ function SellPage() {
       }
 
       if (plan !== "free") {
-        // Create pending payment record (only once — guarded by a select first).
-        const { data: existingPayments } = await supabase
-          .from("payments")
-          .select("id")
-          .eq("listing_id", lid)
-          .limit(1);
-        if (!existingPayments || existingPayments.length === 0) {
-          await supabase.from("payments").insert({
-            user_id: user.id,
-            listing_id: lid,
-            kind: plan === "upgraded" ? "upgrade" : "listing",
-            amount_php: totalFee,
-            status: "pending",
-            method: "manual",
-          });
-        }
-        toast.success("Listing submitted! Awaiting payment confirmation.");
+        toast.success("Listing saved — pay to publish.");
+        navigate({
+          to: "/listing/checkout",
+          search: { listingId: lid, ...(selectedBoost ? { boost: selectedBoost } : {}) },
+        });
+      } else if (selectedBoost) {
+        toast.success("Free listing published! Continue to boost checkout.");
+        navigate({
+          to: "/boost/checkout",
+          search: { listingId: lid, slug: selectedBoost },
+        });
       } else {
         toast.success("Free listing published!");
+        navigate({ to: "/dashboard" });
       }
-      navigate({ to: "/dashboard" });
     } catch (err: any) {
       toast.error(err.message ?? "Failed to publish listing");
     } finally {
@@ -1247,6 +1257,51 @@ function SellPage() {
               </label>
             </RadioGroup>
           </section>
+
+          <section className="space-y-3 rounded-xl border border-border bg-card p-6">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-lg font-semibold">Add a boost (optional)</h2>
+              {selectedBoost && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedBoost("")}
+                  className="text-xs text-muted-foreground hover:underline"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              Boost is purchased right after your listing payment for maximum visibility.
+            </p>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {boostOptions.map((b) => {
+                const active = selectedBoost === b.slug;
+                return (
+                  <button
+                    type="button"
+                    key={b.slug}
+                    onClick={() => setSelectedBoost(active ? "" : b.slug)}
+                    className={`rounded-lg border p-3 text-left text-sm transition ${
+                      active ? "border-primary bg-primary/5" : "border-border hover:bg-secondary/50"
+                    }`}
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="font-medium">{b.label}</span>
+                      <span className="text-foreground">{formatPHP(b.price_php)}</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {b.duration_days} day{b.duration_days === 1 ? "" : "s"}
+                    </div>
+                  </button>
+                );
+              })}
+              {boostOptions.length === 0 && (
+                <div className="text-xs text-muted-foreground">No boosts available right now.</div>
+              )}
+            </div>
+          </section>
+
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
             <h2 className="font-display text-lg font-semibold">Photos & video</h2>
