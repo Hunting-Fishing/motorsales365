@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { RouteErrorBoundary, RouteNotFoundBoundary } from "@/components/route-boundaries";
 import { useEffect, useState } from "react";
 import { MapPin, Building2, User as UserIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
