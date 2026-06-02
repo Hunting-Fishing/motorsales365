@@ -319,7 +319,10 @@ function EditListingPage() {
       attributes.service_type = towServiceType || undefined;
       attributes.vehicle_capacity = towCapacity || undefined;
       attributes.coverage_regions = towCoverage
-        ? towCoverage.split(",").map((s) => s.trim()).filter(Boolean)
+        ? towCoverage
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
         : undefined;
       attributes.base_rate_php = towBaseRate ? Number(towBaseRate) : undefined;
       attributes.per_km_rate_php = towPerKm ? Number(towPerKm) : undefined;
@@ -346,7 +349,10 @@ function EditListingPage() {
       attributes.services = droneServices.length ? droneServices : undefined;
       attributes.licensed_operator = droneLicensed;
       attributes.coverage_regions = droneCoverage
-        ? droneCoverage.split(",").map((s) => s.trim()).filter(Boolean)
+        ? droneCoverage
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
         : undefined;
     }
     attributes.tags = serviceTags.length ? serviceTags : undefined;
@@ -627,10 +633,7 @@ function EditListingPage() {
                 </div>
                 <div>
                   <Label>Brands serviced (optional)</Label>
-                  <Input
-                    value={serviceBrands}
-                    onChange={(e) => setServiceBrands(e.target.value)}
-                  />
+                  <Input value={serviceBrands} onChange={(e) => setServiceBrands(e.target.value)} />
                 </div>
                 <div>
                   <Label>Warranty (optional)</Label>
@@ -808,10 +811,7 @@ function EditListingPage() {
                 </div>
                 <div className="sm:col-span-2">
                   <Label>Coverage regions (comma-separated)</Label>
-                  <Input
-                    value={droneCoverage}
-                    onChange={(e) => setDroneCoverage(e.target.value)}
-                  />
+                  <Input value={droneCoverage} onChange={(e) => setDroneCoverage(e.target.value)} />
                 </div>
                 <label className="flex items-center gap-2 text-sm sm:col-span-2">
                   <input
@@ -1068,19 +1068,18 @@ function EditListingPage() {
                       <div className="mt-2 space-y-2">
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <span className="flex-1 truncate">{videoFile.name}</span>
-                          {videoUpload.status !== "uploading" &&
-                            videoUpload.status !== "done" && (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setVideoFile(null);
-                                  setVideoUpload({ status: "idle", percent: 0 });
-                                }}
-                                className="hover:underline"
-                              >
-                                Cancel
-                              </button>
-                            )}
+                          {videoUpload.status !== "uploading" && videoUpload.status !== "done" && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setVideoFile(null);
+                                setVideoUpload({ status: "idle", percent: 0 });
+                              }}
+                              className="hover:underline"
+                            >
+                              Cancel
+                            </button>
+                          )}
                           {videoUpload.status === "done" && (
                             <CheckCircle2 className="h-4 w-4 text-emerald-600" />
                           )}
