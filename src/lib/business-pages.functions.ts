@@ -16,12 +16,13 @@ export const getBusinessPage = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }) => {
     const lookup = data.slug.toLowerCase();
-    let { data: biz, error } = await supabaseAdmin
+    const { data: initialBiz, error } = await supabaseAdmin
       .from("businesses")
       .select("*")
       .or(`slug.eq.${lookup},vanity_slug.eq.${lookup}`)
       .maybeSingle();
     if (error) throw new Error(error.message);
+    let biz = initialBiz;
     if (!biz) {
       // fall back to slug history → resolve to canonical
       const { data: hist } = await supabaseAdmin

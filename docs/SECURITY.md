@@ -88,7 +88,7 @@ in `scripts/verify-security.sh` (where applicable):
    (if `listing_id` is set) only for a listing they own.
 3. `staff_referrals`, `qr_scans`, `user_referrals`, `referral_redemptions`
    are readable only by the actual linked staff member (`staff_user_id =
-   auth.uid()`) — no email-claim shortcut.
+auth.uid()`) — no email-claim shortcut.
 4. `promotions.code` is readable only by admin + sales.
 5. `provider_tow_rates` is not publicly readable.
 6. `realtime.messages` defaults to deny; the app uses only
