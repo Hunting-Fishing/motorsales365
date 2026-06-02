@@ -26,6 +26,8 @@ export const Route = createFileRoute("/partner-training")({
     ],
   }),
   component: PartnersPage,
+  errorComponent: RouteErrorBoundary,
+  notFoundComponent: () => <RouteNotFoundBoundary />,
 });
 
 function PartnersPage() {
