@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { requireAdminRole } from "@/integrations/supabase/admin-middleware";
+import { requireAdminRoleAudited } from "@/integrations/supabase/admin-middleware";
 import { type StripeEnv, createStripeClient, validateReturnUrl } from "@/lib/stripe.server";
 
 async function resolveOrCreateCustomer(
@@ -346,7 +346,7 @@ export const createPortalSession = createServerFn({ method: "POST" })
  * Returns one row per plan with status: ok | missing | inactive | no_key.
  */
 export const verifyStripePlans = createServerFn({ method: "POST" })
-  .middleware([requireAdminRole])
+  .middleware([requireAdminRoleAudited("payments.verifyStripePlans")])
   .inputValidator((data: { environment: StripeEnv }) => {
     validateEnv(data.environment);
     return data;
@@ -603,7 +603,7 @@ export const getInvoiceDetails = createServerFn({ method: "POST" })
  * Idempotent: skips products that already have a tax_code set.
  */
 export const setStripeTaxCodes = createServerFn({ method: "POST" })
-  .middleware([requireAdminRole])
+  .middleware([requireAdminRoleAudited("payments.setStripeTaxCodes")])
   .inputValidator((data: { environment: StripeEnv }) => {
     validateEnv(data.environment);
     return data;

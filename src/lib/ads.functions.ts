@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireDomainRole } from "@/integrations/supabase/admin-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const placementSchema = z.enum([
@@ -33,34 +34,31 @@ export const getActiveAds = createServerFn({ method: "GET" })
     return { ads: rows ?? [] };
   });
 
-// PUBLIC: record impression / click
+// PUBLIC: track ad impression / click
 export const trackAdEvent = createServerFn({ method: "POST" })
-  .inputValidator(
-    (input: { adId: string; eventType: "impression" | "click"; visitorId?: string }) =>
-      z
-        .object({
-          adId: z.string().uuid(),
-          eventType: z.enum(["impression", "click"]),
-          visitorId: z.string().uuid().optional(),
-        })
-        .parse(input),
+  .inputValidator((input: { adId: string; eventType: "impression" | "click"; visitorId?: string }) =>
+    z
+      .object({
+        adId: z.string().uuid(),
+        eventType: z.enum(["impression", "click"]),
+        visitorId: z.string().max(120).optional(),
+      })
+      .parse(input),
   )
   .handler(async ({ data }) => {
-    await supabaseAdmin.from("ad_events").insert({
-      ad_id: data.adId,
-      event_type: data.eventType,
-      visitor_id: data.visitorId ?? null,
+    const col = data.eventType === "impression" ? "impression_count" : "click_count";
+    await supabaseAdmin.rpc("increment_ad_metric" as any, {
+      _ad_id: data.adId,
+      _column: col,
     });
     return { ok: true };
   });
 
-// ADMIN: list all ads
+// ADMIN: list all ads (ads_manager role)
 export const listAds = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("ads_manager", "ads.listAds")])
   .handler(async ({ context }) => {
-    const { supabase, userId } = context;
-    const { data: canManage } = await supabase.rpc("can_manage_ads", { _user_id: userId });
-    if (!canManage) throw new Error("Forbidden");
+    const { supabase } = context;
     const { data, error } = await supabase
       .from("advertisements")
       .select("*")
@@ -71,7 +69,7 @@ export const listAds = createServerFn({ method: "GET" })
 
 // ADMIN: upsert ad
 export const upsertAd = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("ads_manager", "ads.upsertAd")])
   .inputValidator((input: unknown) =>
     z
       .object({
@@ -92,8 +90,6 @@ export const upsertAd = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { data: canManage } = await supabase.rpc("can_manage_ads", { _user_id: userId });
-    if (!canManage) throw new Error("Forbidden");
     const payload = { ...data, created_by: userId };
     if (data.id) {
       const { error } = await supabase.from("advertisements").update(payload).eq("id", data.id);
@@ -110,12 +106,10 @@ export const upsertAd = createServerFn({ method: "POST" })
   });
 
 export const deleteAd = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("ads_manager", "ads.deleteAd")])
   .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const { data: canManage } = await supabase.rpc("can_manage_ads", { _user_id: userId });
-    if (!canManage) throw new Error("Forbidden");
+    const { supabase } = context;
     const { error } = await supabase.from("advertisements").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
