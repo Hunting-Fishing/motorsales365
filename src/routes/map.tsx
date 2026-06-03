@@ -354,7 +354,24 @@ function MapPage() {
             radiusKm={radiusKm}
             onChangeRadius={setRadiusKm}
           />
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={useMyLocation}
+              disabled={locating}
+            >
+              {locating ? (
+                <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Locate className="mr-1.5 h-3.5 w-3.5" />
+              )}
+              Use my location
+            </Button>
+          </div>
         </Card>
+
 
         {/* Mobile: full-bleed map + bottom sheet. Desktop: side-by-side grid. */}
         <div className="lg:grid lg:grid-cols-[360px_1fr] lg:gap-4">
