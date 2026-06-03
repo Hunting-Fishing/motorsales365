@@ -86,7 +86,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       ...(isRecurring && {
         subscription_data: { metadata: { userId, lookup_key: data.priceId } },
       }),
-    } as any);
+    } as Stripe.Checkout.SessionCreateParams);
 
     return session.client_secret;
   });
