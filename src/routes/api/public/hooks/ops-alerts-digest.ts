@@ -24,14 +24,15 @@ async function getLastSentAt(): Promise<number> {
     .select("value")
     .eq("key", STATE_KEY)
     .maybeSingle();
-  const v = (data as { value?: { ts?: number } } | null)?.value?.ts;
-  return typeof v === "number" ? v : 0;
+  const raw = (data as { value?: string } | null)?.value;
+  const n = raw ? Number(raw) : 0;
+  return Number.isFinite(n) ? n : 0;
 }
 
 async function setLastSentAt(ts: number) {
   await supabaseAdmin
     .from("site_settings")
-    .upsert({ key: STATE_KEY, value: { ts } as never }, { onConflict: "key" });
+    .upsert({ key: STATE_KEY, value: String(ts) } as never, { onConflict: "key" });
 }
 
 async function listAdminEmails(): Promise<string[]> {
