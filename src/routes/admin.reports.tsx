@@ -7,9 +7,18 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/format";
+import { RouteError, RouteNotFound } from "@/components/route-boundaries";
 
 export const Route = createFileRoute("/admin/reports")({
   component: AdminReports,
+  errorComponent: RouteError,
+  notFoundComponent: () => <RouteNotFound />,
+  head: () => ({
+    meta: [
+      { title: "Reports — Admin" },
+      { name: "robots", content: "noindex,nofollow" },
+    ],
+  }),
 });
 
 function AdminReports() {
