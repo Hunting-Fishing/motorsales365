@@ -137,9 +137,10 @@ function DayRow({
                   size="icon"
                   variant="ghost"
                   className="h-7 w-7"
+                  aria-label="Remove time range"
                   onClick={() => removeRange(i)}
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
+                  <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
                 </Button>
               )}
             </div>
