@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import Stripe from "stripe";
 import { createStripeClient, getWebhookSecret, type StripeEnv } from "@/lib/stripe.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { alertOps } from "@/lib/alerting.server";
 
 function parseEnv(url: URL): StripeEnv {
   const v = url.searchParams.get("env");
