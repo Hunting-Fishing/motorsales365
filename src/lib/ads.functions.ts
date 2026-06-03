@@ -36,9 +36,13 @@ export const getActiveAds = createServerFn({ method: "GET" })
 
 // PUBLIC: track ad impression / click
 export const trackAdEvent = createServerFn({ method: "POST" })
-  .inputValidator((input: { adId: string; eventType: "impression" | "click" }) =>
+  .inputValidator((input: { adId: string; eventType: "impression" | "click"; visitorId?: string }) =>
     z
-      .object({ adId: z.string().uuid(), eventType: z.enum(["impression", "click"]) })
+      .object({
+        adId: z.string().uuid(),
+        eventType: z.enum(["impression", "click"]),
+        visitorId: z.string().max(120).optional(),
+      })
       .parse(input),
   )
   .handler(async ({ data }) => {
