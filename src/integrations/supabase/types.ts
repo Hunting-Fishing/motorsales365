@@ -3837,6 +3837,51 @@ export type Database = {
         }
         Relationships: []
       }
+      route_audit_log: {
+        Row: {
+          actor_id: string
+          created_at: string
+          duration_ms: number | null
+          error_message: string | null
+          id: string
+          ip: string | null
+          method: string | null
+          outcome: string
+          role_required: string
+          route_label: string
+          target_summary: Json | null
+          user_agent: string | null
+        }
+        Insert: {
+          actor_id: string
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          ip?: string | null
+          method?: string | null
+          outcome: string
+          role_required: string
+          route_label: string
+          target_summary?: Json | null
+          user_agent?: string | null
+        }
+        Update: {
+          actor_id?: string
+          created_at?: string
+          duration_ms?: number | null
+          error_message?: string | null
+          id?: string
+          ip?: string | null
+          method?: string | null
+          outcome?: string
+          role_required?: string
+          route_label?: string
+          target_summary?: Json | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       saved_searches: {
         Row: {
           category_slug: string | null
