@@ -63,7 +63,7 @@ function RefundPage() {
         </p>
 
         <p className="mt-6 text-xs text-muted-foreground">
-          Last updated: June 1, 2026 (rev. education portal)
+          Last updated: June 3, 2026 (rev. export brokerage, referrals & org accounts)
         </p>
 
         <h2 className="mt-6 text-xl font-semibold">How to request</h2>
