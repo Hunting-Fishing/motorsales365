@@ -84,11 +84,9 @@ export const setExportAvailable = createServerFn({ method: "POST" })
 
 // STAFF: list inquiries
 export const listExportInquiries = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("support", "export.listExportInquiries")])
   .handler(async ({ context }) => {
-    const { supabase, userId } = context;
-    const { data: canSupport } = await supabase.rpc("can_support", { _user_id: userId });
-    if (!canSupport) throw new Error("Forbidden");
+    const { supabase } = context;
     const { data, error } = await supabase
       .from("export_inquiries")
       .select("*")
@@ -99,7 +97,7 @@ export const listExportInquiries = createServerFn({ method: "GET" })
 
 // STAFF: update inquiry
 export const updateExportInquiry = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("support", "export.updateExportInquiry")])
   .inputValidator((input: unknown) =>
     z
       .object({
@@ -111,11 +109,10 @@ export const updateExportInquiry = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
-    const { data: canSupport } = await supabase.rpc("can_support", { _user_id: userId });
-    if (!canSupport) throw new Error("Forbidden");
+    const { supabase } = context;
     const { id, ...rest } = data;
     const { error } = await supabase.from("export_inquiries").update(rest).eq("id", id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
