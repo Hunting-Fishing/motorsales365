@@ -98,8 +98,8 @@ export function SingleFileUploader({
           <Button type="button" size="sm" variant="ghost" onClick={handlePick} disabled={busy}>
             Replace
           </Button>
-          <Button type="button" size="icon" variant="ghost" onClick={clear} disabled={busy}>
-            <X className="h-4 w-4" />
+          <Button type="button" size="icon" variant="ghost" onClick={clear} disabled={busy} aria-label="Remove file">
+            <X className="h-4 w-4" aria-hidden="true" />
           </Button>
         </div>
       ) : (
