@@ -284,7 +284,20 @@ function PrivacyPage() {
           and surface aggregate analytics.
         </p>
 
-        <h2 className="mt-6 text-xl font-semibold">14. Changes to this policy</h2>
+        <h2 className="mt-6 text-xl font-semibold">
+          13b. Export brokerage, referrals &amp; organisation accounts
+        </h2>
+        <p className="mt-2 text-muted-foreground">
+          When you use the export-brokerage flow we collect the data needed to introduce you to
+          overseas buyers and logistics partners (shipping address, contact details, vehicle or
+          parts info, and any documents you upload). This information is shared only with the
+          parties you select for an introduction. Referral participation stores your referral
+          code, attributed sign-ups, and resulting credit balances; we use this to detect
+          self-referral and fraud. Organisation accounts record which user performed each action
+          inside the org (audit log) and which members can see shared listings or messages; the
+          account owner can view this activity for users they invite.
+        </p>
+
         <p className="mt-2 text-muted-foreground">
           We may update this policy when the Platform changes — for example new processors, new
           analytics tools, new data fields (such as business hours or pricing catalogs), or updated
