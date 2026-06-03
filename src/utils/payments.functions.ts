@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import type Stripe from "stripe";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireAdminRoleAudited } from "@/integrations/supabase/admin-middleware";
 import { type StripeEnv, createStripeClient, validateReturnUrl } from "@/lib/stripe.server";
@@ -60,7 +61,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     const stripePrice = prices.data[0];
     const isRecurring = stripePrice.type === "recurring";
 
-    const email = (claims as any)?.email as string | undefined;
+    const email = (claims as { email?: string } | null)?.email;
     const customerId = await resolveOrCreateCustomer(stripe, { email, userId });
 
     const { data: profile } = await supabase
@@ -85,7 +86,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       ...(isRecurring && {
         subscription_data: { metadata: { userId, lookup_key: data.priceId } },
       }),
-    } as any);
+    } as Stripe.Checkout.SessionCreateParams);
 
     return session.client_secret;
   });
@@ -288,7 +289,7 @@ export const listPaymentMethods = createServerFn({ method: "POST" })
     ]);
 
     const defaultPmId = !("deleted" in customer && customer.deleted)
-      ? (((customer as any).invoice_settings?.default_payment_method as string | null) ?? null)
+      ? ((customer as Stripe.Customer).invoice_settings?.default_payment_method as string | null) ?? null
       : null;
 
     return {
@@ -577,13 +578,13 @@ export const getInvoiceDetails = createServerFn({ method: "POST" })
       amount_remaining: toMajor(invoice.amount_remaining, invoice.currency),
       hosted_invoice_url: invoice.hosted_invoice_url ?? null,
       invoice_pdf: invoice.invoice_pdf ?? null,
-      period_start: (invoice.lines?.data?.[0] as any)?.period?.start ?? null,
-      period_end: (invoice.lines?.data?.[0] as any)?.period?.end ?? null,
-      lines: (invoice.lines?.data ?? []).map((line: any) => ({
+      period_start: (invoice.lines?.data?.[0] as Stripe.InvoiceLineItem | undefined)?.period?.start ?? null,
+      period_end: (invoice.lines?.data?.[0] as Stripe.InvoiceLineItem | undefined)?.period?.end ?? null,
+      lines: (invoice.lines?.data ?? []).map((line: Stripe.InvoiceLineItem) => ({
         id: line.id,
         description: line.description ?? "",
         quantity: line.quantity ?? 1,
-        unit_amount: toMajor(line.unit_amount, invoice.currency),
+        unit_amount: toMajor((line as Stripe.InvoiceLineItem & { unit_amount?: number | null }).unit_amount ?? null, invoice.currency),
         amount: toMajor(line.amount, invoice.currency),
         currency: invoice.currency,
         period_start: line.period?.start ?? null,
@@ -626,19 +627,20 @@ export const setStripeTaxCodes = createServerFn({ method: "POST" })
     ]);
 
     const targets: Array<{ lookupKey: string; taxCode: string; kind: "plan" | "boost" }> = [];
-    for (const p of plans ?? []) {
-      if ((p as any).stripe_lookup_key) {
+    type LookupRow = { stripe_lookup_key: string | null };
+    for (const p of (plans ?? []) as LookupRow[]) {
+      if (p.stripe_lookup_key) {
         targets.push({
-          lookupKey: (p as any).stripe_lookup_key,
+          lookupKey: p.stripe_lookup_key,
           taxCode: "txcd_10103001",
           kind: "plan",
         });
       }
     }
-    for (const b of boosts ?? []) {
-      if ((b as any).stripe_lookup_key) {
+    for (const b of (boosts ?? []) as LookupRow[]) {
+      if (b.stripe_lookup_key) {
         targets.push({
-          lookupKey: (b as any).stripe_lookup_key,
+          lookupKey: b.stripe_lookup_key,
           taxCode: "txcd_10000000",
           kind: "boost",
         });
@@ -661,7 +663,7 @@ export const setStripeTaxCodes = createServerFn({ method: "POST" })
         const productId =
           typeof prices.data[0].product === "string"
             ? prices.data[0].product
-            : (prices.data[0].product as any)?.id;
+            : (prices.data[0].product as Stripe.Product | Stripe.DeletedProduct)?.id;
         if (!productId) {
           results.push({ lookupKey: t.lookupKey, status: "error", message: "No product id" });
           continue;

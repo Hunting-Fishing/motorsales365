@@ -10,6 +10,13 @@ import { Card } from "@/components/ui/card";
 
 export const Route = createFileRoute("/my-qr")({
   component: MyQrPage,
+  head: () => ({
+    meta: [
+      { title: "My QR Code — 365 Motor Sales" },
+      { name: "description", content: "Your personal QR code for in-person referrals, redemptions, and verification." },
+      { name: "robots", content: "noindex,nofollow" },
+    ],
+  }),
 });
 
 const sb = supabase as any;
