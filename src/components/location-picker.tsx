@@ -172,11 +172,11 @@ export function LocationPicker({
         });
       });
       const { latitude, longitude } = pos.coords;
-      const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&accept-language=en&zoom=12`;
+      const url = `/api/public/reverse-geocode?lat=${latitude}&lng=${longitude}&zoom=12`;
       const res = await fetch(url, { headers: { Accept: "application/json" } });
       if (!res.ok) throw new Error("Reverse geocoding failed");
       const data = await res.json();
-      const a = data.address ?? {};
+      const a = (data.address ?? {}) as Record<string, string>;
       if (a.country_code && String(a.country_code).toLowerCase() !== "ph") {
         toast.error("Location is outside the Philippines.");
         return;

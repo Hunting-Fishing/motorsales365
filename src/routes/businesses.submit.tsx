@@ -220,11 +220,11 @@ function SubmitBusinessPage() {
   const reverseGeocode = async (la: number, ln: number) => {
     try {
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${la}&lon=${ln}&zoom=18&addressdetails=1`,
-        { headers: { Accept: "application/json", "Accept-Language": "en" } },
+        `/api/public/reverse-geocode?lat=${la}&lng=${ln}&zoom=18`,
+        { headers: { Accept: "application/json" } },
       );
       const json = await res.json();
-      const a = json?.address ?? {};
+      const a = (json?.address ?? {}) as Record<string, string>;
       const cityish = a.city || a.town || a.municipality || a.village || a.suburb || null;
       const provinceish = a.province || a.state_district || a.state || null;
       const regionish = a.region || a.state || null;
@@ -277,18 +277,18 @@ function SubmitBusinessPage() {
     }
     try {
       const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ph&q=${encodeURIComponent(parts)}`,
-        {
-          headers: { Accept: "application/json" },
-        },
+        `/api/public/geocode?q=${encodeURIComponent(parts)}`,
+        { headers: { Accept: "application/json" } },
       );
-      const json = await res.json();
-      if (Array.isArray(json) && json[0]) {
-        setCoords(Number(json[0].lat), Number(json[0].lon), { reverse: false });
-        toast.success("Found location on map");
-      } else {
-        toast.error("No match — drop the pin manually");
+      if (res.ok) {
+        const json = await res.json();
+        if (json && typeof json.lat === "number" && typeof json.lng === "number") {
+          setCoords(json.lat, json.lng, { reverse: false });
+          toast.success("Found location on map");
+          return;
+        }
       }
+      toast.error("No match — drop the pin manually");
     } catch {
       toast.error("Geocoding failed — drop the pin manually");
     }
