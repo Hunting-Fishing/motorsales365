@@ -49,13 +49,18 @@ function MessagesPage() {
 
   const load = async () => {
     if (!user) return;
+    // Cursor: take the most recent 500 messages, then sort ascending in memory
+    // so the conversation renders oldest→newest. Without `descending` here we'd
+    // silently truncate to the OLDEST 500 messages when the user has > 500 total.
     const { data } = await supabase
       .from("messages")
       .select("id,body,created_at,sender_id,recipient_id,listing_id,read_at")
       .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
-      .order("created_at", { ascending: true })
+      .order("created_at", { ascending: false })
       .limit(500);
-    const rows = (data ?? []) as MessageRow[];
+    const rows = ((data ?? []) as MessageRow[])
+      .slice()
+      .sort((a, b) => (a.created_at < b.created_at ? -1 : 1));
     setMessages(rows);
 
     const listingIds = Array.from(new Set(rows.map((m) => m.listing_id)));
