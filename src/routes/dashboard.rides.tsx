@@ -1,12 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Plus, Pencil, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Eye, EyeOff, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { useServerFn } from "@tanstack/react-start";
-import { publishRide } from "@/lib/rides.functions";
+import { publishRide, deleteRide } from "@/lib/rides.functions";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/dashboard/rides")({
@@ -18,6 +29,8 @@ function MyRidesPage() {
   const [rides, setRides] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const publish = useServerFn(publishRide);
+  const removeRide = useServerFn(deleteRide);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const load = async () => {
     if (!user) return;
@@ -41,6 +54,19 @@ function MyRidesPage() {
       load();
     } catch (e: any) {
       toast.error(e.message);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    setDeletingId(id);
+    try {
+      await removeRide({ data: { id } });
+      setRides((prev) => prev.filter((x) => x.id !== id));
+      toast.success("Ride deleted");
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -125,6 +151,37 @@ function MyRidesPage() {
                       </Link>
                     </Button>
                   )}
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-destructive hover:text-destructive"
+                        disabled={deletingId === r.id}
+                      >
+                        <Trash2 className="mr-1 h-3 w-3" />
+                        Delete
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Delete this ride?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          This permanently removes "{r.name}", its photos, and service
+                          history. This cannot be undone.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancel</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={() => handleDelete(r.id)}
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                        >
+                          Delete ride
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
             </div>

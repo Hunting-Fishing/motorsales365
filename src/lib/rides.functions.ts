@@ -137,3 +137,49 @@ export const linkRideToListing = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+export const deleteRide = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: unknown) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: ride } = await supabase
+      .from("rides" as never)
+      .select("id,user_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (!ride || (ride as any).user_id !== userId) throw new Error("Not your ride");
+
+    const paths: string[] = [];
+    const { data: photos } = await supabase
+      .from("ride_photos" as never)
+      .select("storage_path")
+      .eq("ride_id", data.id);
+    for (const p of (photos ?? []) as any[]) if (p.storage_path) paths.push(p.storage_path);
+
+    const { data: logs } = await supabase
+      .from("ride_service_logs" as never)
+      .select("id")
+      .eq("ride_id", data.id);
+    const logIds = ((logs ?? []) as any[]).map((l) => l.id);
+    if (logIds.length) {
+      const { data: logPhotos } = await supabase
+        .from("ride_service_log_photos" as never)
+        .select("storage_path")
+        .in("log_id", logIds);
+      for (const p of (logPhotos ?? []) as any[]) if (p.storage_path) paths.push(p.storage_path);
+    }
+
+    if (paths.length) {
+      const { error: storageErr } = await supabase.storage.from("ride-media").remove(paths);
+      if (storageErr) console.error("ride-media cleanup failed:", storageErr.message);
+    }
+
+    const { error } = await supabase
+      .from("rides" as never)
+      .delete()
+      .eq("id", data.id)
+      .eq("user_id", userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
