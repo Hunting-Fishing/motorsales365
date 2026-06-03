@@ -19,6 +19,7 @@ import {
   Check,
   Users,
   GraduationCap,
+  Share2,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
@@ -96,7 +97,12 @@ function DashboardLayout() {
   const nav = [
     ...NAV,
     ...(hasOrg ? [{ to: "/dashboard/team", label: "Team", Icon: Users }] : []),
-    ...(hasReferral ? [{ to: "/dashboard/referral", label: "My referral", Icon: QrCode }] : []),
+    ...(hasReferral
+      ? [
+          { to: "/dashboard/referral", label: "My referral", Icon: QrCode },
+          { to: "/dashboard/share-kit", label: "Share kit", Icon: Share2 },
+        ]
+      : []),
     ...(isStaff
       ? [{ to: "/admin", label: isAdmin ? "Admin" : "Staff console", Icon: Shield }]
       : []),

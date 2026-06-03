@@ -1,80 +1,64 @@
-# Remaining Issues After Phases 1–4
+## Member Share Kit (personalized ads + QR)
 
-Audit of what's still incomplete, inconsistent, or outright broken. Grouped by severity.
+Give signed-in staff (e.g. joan@365motorsales.com) a one-stop page where they can grab branded 365 Motor Sales advertisements with **their own referral QR + tracking link** automatically baked into every design.
 
-## 🔴 High — functional gaps from prior phases
+Scope: **staff with a `staff_referrals` record** (same audience as `/my-qr`). Non-staff members get a polite "no code yet" state. Broadening to all members stays for a follow-up.
 
-### 1. PaymentRails component is dead code
-`src/components/checkout/payment-rails.tsx` was built in Phase 3.3 but is **not imported anywhere**. The Stripe-only checkout (`/listing/checkout`, `/boost/checkout`, `/business/checkout`) never renders it. Either:
-- Mount it on the three checkout routes (read-only "Available methods" section), or
-- Delete it and the rail metadata until a second rail actually ships.
+### New route: `/dashboard/share-kit`
 
-### 2. Two feature-flag systems coexist and don't agree
-- `src/lib/feature-flags.tsx` — legacy hard-coded React Context with keys `towing`, `referrals`, `multiCurrency`, `adsInquiry`, `boosts`, `messaging`, `verifications`. Used by `__root.tsx`, `admin.sandbox.tsx`.
-- `src/lib/feature-flags.functions.ts` + `src/hooks/use-feature-flags.ts` — new DB-backed flags seeded with `payments.*`, `boost.escrow`, `subscriptions.annual`. Used by `admin.feature-flags.tsx` only.
+Add a link to it from `/dashboard/referral` and `/my-qr` so Joan finds it from either entry point.
 
-The new admin UI toggles flags that no runtime code reads, and the legacy flags can't be toggled from the admin page. Pick one:
-- **Option A (recommended)**: Migrate the 7 legacy keys into the `feature_flags` table (seed migration), switch consumers to `useFeatureFlag(key)`, delete `feature-flags.tsx`.
-- **Option B**: Keep both, rename the admin route to `/admin/payment-flags` to make the split explicit.
+Page layout:
+- Header: "Your Share Kit" + her name + active/inactive badge
+- Gallery of **template cards** (4–6 to start), each shows a live preview with her QR composited in
+- Each card: **Download PNG**, **Print A4 poster**, **Native share**, **Share to Facebook / Messenger / WhatsApp / X** quick links, **Copy link**
 
-### 3. `currency.functions.ts` uses `as never` cast
-`update({ display_currency: data.code } as never)` — `display_currency` IS in `types.ts` now, so the cast is stale and silently hides type errors. Remove the cast.
+### Templates (mix of uploaded artwork + clean SVG variants)
 
-### 4. Ride photo tables use `(supabase as any)` casts
-`ride_photos` and `ride_service_log_photos` exist in `types.ts` (lines 3663, 3745) but `ride-photo-uploader.tsx` and `service-log-photo-uploader.tsx` still cast `supabase as any` for every query — leftover from before the tables were typed. Remove the casts; queries will type-check.
+1. **Rear Shirt Ad** — uses the uploaded `365_Rear_Shirt_Logo.png` as a background, QR composited bottom-right with a white plate + "Scan to shop · {firstName}" caption.
+2. **Arm Band Ad** — uses `365_arm_band_ready_to_go_edit_no_sun.png`, QR replaces the placeholder QR area at the bottom (already sized for it).
+3. **Clean SVG: Square Social** (1080×1080) — bold red/blue 365 wordmark, vehicle category strip, QR + name + code.
+4. **Clean SVG: Story / Reel** (1080×1920) — vertical, big QR, "Scan to shop nationwide" headline.
+5. **Clean SVG: Landscape Banner** (1200×630, doubles as OG image) — for Facebook posts and link previews.
+6. **A4 Print Poster** — refreshed version of the existing `/r/$code/poster` styled to match the new ad system.
 
-## 🟡 Medium — drift / scope leakage
+Templates 3–6 are pure SVG/HTML so they stay razor-sharp at any export size and keep QR contrast perfect.
 
-### 5. Plan doc claims `preferred_currency` but code uses `display_currency`
-`.lovable/plan.md` Phase 4.1 promises a `preferred_currency` column with a check constraint. The migration that shipped is `display_currency text` with no check constraint and a different name. Either update the plan doc or rename the column. The mismatch will bite the next audit.
+### How sharing works
 
-### 6. a11y pass was narrow
-Phase 4.2 only touched 4 files (`single-file-uploader`, `gallery-contact-tabs`, `hours-editor`, `add-user-dialog`). Scope said "custom components in `checkout/`, `admin/`, `dashboard/`". Untouched icon-only buttons remain in:
-- `ride-photo-uploader.tsx`, `service-log-photo-uploader.tsx` (delete/cover buttons)
-- `boost-dialog.tsx`, `business-plan-dialog.tsx`
-- `mobile-tab-bar.tsx` (tab icons; verify aria-labels)
-- `share-qr.tsx`, `listing-qr.tsx` (copy/download buttons)
+For each template:
+- **Download PNG/JPG**: render the template to an offscreen canvas (uploaded image + drawn QR, or rasterized SVG), then trigger a `.png` download named `365-{template}-{code}.png`.
+- **Print A4 poster**: opens a print-styled route (reuse the `r.$code.poster.tsx` pattern, one route per template variant or a single `?template=` param).
+- **Native share**: `navigator.share({ files: [pngBlob], title, text, url })` when supported; falls back to copy link.
+- **Social quick links**: pre-filled URLs
+  - Facebook: `https://www.facebook.com/sharer/sharer.php?u={link}`
+  - Messenger (web): `https://www.facebook.com/dialog/send?link={link}&app_id=...&redirect_uri=...` (fallback: copy + toast)
+  - WhatsApp: `https://wa.me/?text={encoded text + link}`
+  - X / Twitter: `https://twitter.com/intent/tweet?text=...&url={link}`
+- **Copy link**: clipboard copy of `https://365motorsales.com/r/{code}`.
 
-### 7. Cron contract docs added to only 2 of N public hooks
-`fx/refresh.tsx` and `hooks/refresh-lazada.ts` got the CRON CONTRACT block. `ops-alerts-digest.ts` is also cron-triggered and has no contract comment — same risk.
+All shares point at `/r/{code}` so the existing scan-tracking pipeline (`qr_scans`, `user_referrals`, 90-day attribution) keeps working unchanged.
 
-## 🟢 Low — known deferrals (Phase 5 candidates)
+### Asset handling
 
-- 669 `as any` matches across 104 files (mostly justified — `regionCentroids`, leaflet `L as any`, generic event handlers).
-- `src/lib/education.functions.ts:837` — `as any` in a payment-adjacent code path; Phase 3 scope said money paths must not use `as any`. Worth a look.
-- No E2E / webhook tests (acknowledged Phase 5).
-- No `scripts/audit-coverage.ts` (acknowledged Phase 5).
-- PWA manifest screenshots (intentionally skipped).
+Upload the two PNGs via `lovable-assets` so they're CDN-hosted (large images, no need to bloat the repo):
+- `src/assets/share-kit/rear-shirt.png.asset.json`
+- `src/assets/share-kit/arm-band.png.asset.json`
 
-## Proposed Phase 5
+### Technical notes
 
-Order by ROI:
-1. **Decide on feature-flag consolidation** (issue #2) — biggest source of confusion.
-2. **Wire or delete PaymentRails** (issue #1).
-3. **Remove stale casts** (issues #3, #4) — pure cleanup, no behavior change.
-4. **Reconcile plan doc vs migration** (issue #5).
-5. **Finish a11y sweep** on the 6 remaining components (issue #6).
-6. **Add CRON CONTRACT to `ops-alerts-digest.ts`** (issue #7).
-7. **Review `education.functions.ts:837` cast** (low risk but in money path).
+- New file `src/lib/share-kit/templates.ts` — pure config: each template's id, label, size, base image (or SVG render fn), QR placement box `{x, y, w, h, plate?}`, caption text builder.
+- New component `src/components/share-kit/template-card.tsx` — renders preview via `<canvas>` (for image-based templates) or inline SVG (for vector templates). Memoizes the rendered Blob/dataURL for instant download/share.
+- New component `src/components/share-kit/qr-composer.ts` — utility that draws a QR (qrcode lib, already in deps) onto a canvas at the configured box with a rounded white plate behind it for scan reliability.
+- New route file `src/routes/dashboard.share-kit.tsx`.
+- New print route `src/routes/r.$code.poster_.$template.tsx` (or extend the existing poster route with a `template` search param) for the A4 print variants.
+- Add a "Share Kit" link to `/dashboard/referral` and `/my-qr`.
+- Reuse existing `staff_referrals` lookup (`referral_code`, `full_name`, `active`). No DB schema changes.
+- No business-logic / billing / data-handling changes → no `/terms` or `/privacy` update needed.
 
-No database schema changes required for any of these except optionally renaming `display_currency` → `preferred_currency` (issue #5) and seeding legacy flag keys (issue #2 Option A).
+### Out of scope (follow-ups)
 
-Approve to proceed, or tell me which subset to tackle.
-
-## Phase 5 — done (2026-06-03)
-
-- Deleted dead `src/components/checkout/payment-rails.tsx` (Phase 3.3 component was never wired into any checkout). Kept `src/lib/payments/provider.ts` as the rail registry consumed by feature flags.
-- Renamed `/admin/feature-flags` label to "Payment & plan flags" with copy distinguishing it from the device-level Sandbox flag store. URL unchanged (preserves bookmarks).
-- Removed stale type casts:
-  - `src/lib/currency.functions.ts` — dropped `as never` on `display_currency` update; types now agree.
-  - `src/components/rides/ride-photo-uploader.tsx` — dropped 4× `(supabase as any)` casts on `ride_photos` / `rides` (tables are typed in `types.ts:3663`).
-  - `src/components/rides/service-log-photo-uploader.tsx` — dropped 2× casts on `ride_service_log_photos`.
-  - `src/lib/education.functions.ts:837` — dropped `as any` on Stripe `checkout.sessions.create` options (course checkout, money path).
-- Added CRON CONTRACT block to `src/routes/api/public/hooks/ops-alerts-digest.ts` (third and last cron-triggered public route).
-- a11y pass round 2 — added `aria-label` + `aria-hidden` to icon-only buttons in: `share-qr.tsx`, `listing-qr.tsx` (compact triggers), `boost-dialog.tsx` (default trigger), `mobile-tab-bar.tsx` (icon span), `ride-photo-uploader.tsx` (cover/remove buttons).
-- Plan-doc drift note: Phase 4.1 referred to `preferred_currency`; the shipped column is `display_currency`. Keeping `display_currency` — name is fine, no migration needed.
-
-### Knowingly deferred (Phase 6 candidates)
-- Feature-flag system consolidation (chose Option B per plan — kept both, distinguished by label). A full Option-A migration of the 7 legacy device flags into `feature_flags` is still on the table.
-- `as any` audit of the remaining ~665 matches (mostly justified shims around leaflet/PSGC JSON).
-- E2E/webhook tests, CI coverage script, PWA manifest screenshots.
+- Auto-creating referral codes for non-staff members (Scope question deferred).
+- Admin-managed template library / per-staff custom backgrounds.
+- Server-side image composition (everything renders client-side; fine for the volumes involved).
+- A11y sweep of new icon-only buttons will be done as I build, matching the patterns already established.

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -159,11 +159,16 @@ function StaffReferral() {
             is credited to you.
           </p>
         </div>
-        <span
-          className={`rounded-full px-3 py-1 text-xs ${staff.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}
-        >
-          {staff.active ? "Active" : "Inactive"}
-        </span>
+        <div className="flex items-center gap-2">
+          <Link to="/dashboard/share-kit">
+            <Button size="sm">Open share kit</Button>
+          </Link>
+          <span
+            className={`rounded-full px-3 py-1 text-xs ${staff.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}
+          >
+            {staff.active ? "Active" : "Inactive"}
+          </span>
+        </div>
       </header>
 
       <section className="grid gap-6 md:grid-cols-[260px_1fr]">
