@@ -6,6 +6,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { enqueueTransactionalEmailServer } from "@/lib/email/server-enqueue.server";
+import { verifyInternalCronToken } from "@/integrations/supabase/internal-secrets.server";
 
 const STATE_KEY = "ops_alerts_digest_last_sent_at";
 const MIN_INTERVAL_MS = 15 * 60_000;
@@ -59,7 +60,12 @@ async function listAdminEmails(): Promise<string[]> {
 export const Route = createFileRoute("/api/public/hooks/ops-alerts-digest")({
   server: {
     handlers: {
-      POST: async () => {
+      POST: async ({ request }) => {
+        const authed = await verifyInternalCronToken({
+          jobName: "ops_alerts_digest",
+          tokenHeader: request.headers.get("x-cron-token"),
+        });
+        if (!authed) return new Response("Unauthorized", { status: 401 });
         try {
           const cutoff = new Date(Date.now() - MIN_ALERT_AGE_MS).toISOString();
           const { data: alerts, error } = await supabaseAdmin
