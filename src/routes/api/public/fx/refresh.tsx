@@ -10,6 +10,15 @@ import { verifyInternalCronToken } from "@/integrations/supabase/internal-secret
 // POST /api/public/fx/refresh
 //
 // No body required. Returns { ok, updated, rates }.
+//
+// ───────────────────────────────────────────────────────────────────────────
+// CRON CONTRACT — do not change without updating the pg_cron schedule.
+//   URL:    https://project--0738c881-614d-4885-8d75-1b7c90e0835e.lovable.app/api/public/fx/refresh
+//   Method: GET (no body, no signature required — read-only ratelimited)
+//   Auth:   verifyInternalCronToken (header `x-internal-cron-token`)
+//   If you rename or move this route the cron job stops silently. Update the
+//   pg_cron schedule in the Supabase project at the same time.
+// ───────────────────────────────────────────────────────────────────────────
 
 async function refresh() {
   // Load active auto-update currencies

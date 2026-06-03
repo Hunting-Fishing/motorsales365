@@ -205,6 +205,13 @@ const NAV: {
     roles: ["admin"],
     info: "Internal sandbox for testing flows without affecting production data.",
   },
+  {
+    to: "/admin/feature-flags",
+    label: "Feature flags",
+    Icon: Sparkles,
+    roles: ["admin"],
+    info: "Toggle in-house payment rails, boost types, and subscription plans.",
+  },
 ];
 
 function AdminLayout() {

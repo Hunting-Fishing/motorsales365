@@ -97,6 +97,7 @@ import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
 import { Route as AdminInquiriesRouteImport } from './routes/admin.inquiries'
+import { Route as AdminFeatureFlagsRouteImport } from './routes/admin.feature-flags'
 import { Route as AdminEducationRouteImport } from './routes/admin.education'
 import { Route as AdminCurrenciesRouteImport } from './routes/admin.currencies'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
@@ -579,6 +580,11 @@ const AdminInquiriesRoute = AdminInquiriesRouteImport.update({
   path: '/inquiries',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminFeatureFlagsRoute = AdminFeatureFlagsRouteImport.update({
+  id: '/feature-flags',
+  path: '/feature-flags',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminEducationRoute = AdminEducationRouteImport.update({
   id: '/education',
   path: '/education',
@@ -832,6 +838,7 @@ export interface FileRoutesByFullPath {
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/education': typeof AdminEducationRoute
+  '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -961,6 +968,7 @@ export interface FileRoutesByTo {
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/education': typeof AdminEducationRoute
+  '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -1092,6 +1100,7 @@ export interface FileRoutesById {
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/education': typeof AdminEducationRoute
+  '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
@@ -1225,6 +1234,7 @@ export interface FileRouteTypes {
     | '/admin/businesses'
     | '/admin/currencies'
     | '/admin/education'
+    | '/admin/feature-flags'
     | '/admin/inquiries'
     | '/admin/listings'
     | '/admin/performance'
@@ -1354,6 +1364,7 @@ export interface FileRouteTypes {
     | '/admin/businesses'
     | '/admin/currencies'
     | '/admin/education'
+    | '/admin/feature-flags'
     | '/admin/inquiries'
     | '/admin/listings'
     | '/admin/performance'
@@ -1484,6 +1495,7 @@ export interface FileRouteTypes {
     | '/admin/businesses'
     | '/admin/currencies'
     | '/admin/education'
+    | '/admin/feature-flags'
     | '/admin/inquiries'
     | '/admin/listings'
     | '/admin/performance'
@@ -2277,6 +2289,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminInquiriesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/feature-flags': {
+      id: '/admin/feature-flags'
+      path: '/feature-flags'
+      fullPath: '/admin/feature-flags'
+      preLoaderRoute: typeof AdminFeatureFlagsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/education': {
       id: '/admin/education'
       path: '/education'
@@ -2576,6 +2595,7 @@ interface AdminRouteChildren {
   AdminBusinessesRoute: typeof AdminBusinessesRoute
   AdminCurrenciesRoute: typeof AdminCurrenciesRoute
   AdminEducationRoute: typeof AdminEducationRoute
+  AdminFeatureFlagsRoute: typeof AdminFeatureFlagsRoute
   AdminInquiriesRoute: typeof AdminInquiriesRoute
   AdminListingsRoute: typeof AdminListingsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
@@ -2601,6 +2621,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBusinessesRoute: AdminBusinessesRoute,
   AdminCurrenciesRoute: AdminCurrenciesRoute,
   AdminEducationRoute: AdminEducationRoute,
+  AdminFeatureFlagsRoute: AdminFeatureFlagsRoute,
   AdminInquiriesRoute: AdminInquiriesRoute,
   AdminListingsRoute: AdminListingsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
