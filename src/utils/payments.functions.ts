@@ -603,20 +603,13 @@ export const getInvoiceDetails = createServerFn({ method: "POST" })
  * Idempotent: skips products that already have a tax_code set.
  */
 export const setStripeTaxCodes = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((data: { environment: StripeEnv }) => {
     validateEnv(data.environment);
     return data;
   })
-  .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+  .handler(async ({ data }) => {
 
-    const { data: isAdmin, error: roleErr } = await supabase.rpc("has_role", {
-      _user_id: userId,
-      _role: "admin",
-    });
-    if (roleErr) throw new Error(roleErr.message);
-    if (!isAdmin) throw new Error("Admin access required");
 
     const stripe = createStripeClient(data.environment);
 
