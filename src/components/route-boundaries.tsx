@@ -54,7 +54,7 @@ export function RouteError({ error, reset }: RouteErrorProps) {
   );
 }
 
-export function RouteNotFound() {
+export function RouteNotFound({ message }: { message?: string } = {}) {
   return (
     <main className="mx-auto flex min-h-[60dvh] max-w-xl flex-col items-center justify-center px-6 py-16 text-center">
       <div className="mb-4 rounded-full bg-muted p-3 text-muted-foreground">
@@ -62,7 +62,7 @@ export function RouteNotFound() {
       </div>
       <h1 className="text-2xl font-semibold text-foreground">Page not found</h1>
       <p className="mt-2 max-w-md text-sm text-muted-foreground">
-        The page you’re looking for moved or never existed.
+        {message ?? "The page you’re looking for moved or never existed."}
       </p>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
         <Button asChild variant="default">
