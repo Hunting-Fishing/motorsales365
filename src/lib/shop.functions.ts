@@ -519,10 +519,6 @@ export const adminDeleteProduct = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-async function assertShopManager(supabase: any, userId: string) {
-  const { data: ok } = await supabase.rpc("can_manage_shop", { _user_id: userId });
-  if (!ok) throw new Error("Forbidden");
-}
 
 export const adminListNetworks = createServerFn({ method: "GET" })
   .middleware([requireDomainRole("shop_manager", "shop.adminListNetworks")])
