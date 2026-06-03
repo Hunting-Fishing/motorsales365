@@ -22,6 +22,7 @@ import {
   Inbox,
   Shield,
   GraduationCap,
+  AlertTriangle,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";

@@ -100,6 +100,7 @@ import { Route as AdminCurrenciesRouteImport } from './routes/admin.currencies'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
+import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising'
 import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
 import { Route as DashboardTeamIndexRouteImport } from './routes/dashboard.team.index'
@@ -590,6 +591,11 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAlertsRoute = AdminAlertsRouteImport.update({
+  id: '/alerts',
+  path: '/alerts',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAdvertisingRoute = AdminAdvertisingRouteImport.update({
   id: '/advertising',
   path: '/advertising',
@@ -799,6 +805,7 @@ export interface FileRoutesByFullPath {
   '/verify-email': typeof VerifyEmailRoute
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
+  '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
@@ -924,6 +931,7 @@ export interface FileRoutesByTo {
   '/verify-email': typeof VerifyEmailRoute
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
+  '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
@@ -1051,6 +1059,7 @@ export interface FileRoutesById {
   '/verify-email': typeof VerifyEmailRoute
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
+  '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
@@ -1180,6 +1189,7 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/admin/accounts'
     | '/admin/advertising'
+    | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/audit'
     | '/admin/businesses'
@@ -1305,6 +1315,7 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/admin/accounts'
     | '/admin/advertising'
+    | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/audit'
     | '/admin/businesses'
@@ -1431,6 +1442,7 @@ export interface FileRouteTypes {
     | '/verify-email'
     | '/admin/accounts'
     | '/admin/advertising'
+    | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/audit'
     | '/admin/businesses'
@@ -2246,6 +2258,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/alerts': {
+      id: '/admin/alerts'
+      path: '/alerts'
+      fullPath: '/admin/alerts'
+      preLoaderRoute: typeof AdminAlertsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/advertising': {
       id: '/admin/advertising'
       path: '/advertising'
@@ -2490,6 +2509,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAccountsRoute: typeof AdminAccountsRoute
   AdminAdvertisingRoute: typeof AdminAdvertisingRoute
+  AdminAlertsRoute: typeof AdminAlertsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBusinessesRoute: typeof AdminBusinessesRoute
@@ -2514,6 +2534,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAccountsRoute: AdminAccountsRoute,
   AdminAdvertisingRoute: AdminAdvertisingRoute,
+  AdminAlertsRoute: AdminAlertsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminAuditRoute: AdminAuditRoute,
   AdminBusinessesRoute: AdminBusinessesRoute,
