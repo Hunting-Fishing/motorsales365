@@ -1,15 +1,19 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { createClient } from "@supabase/supabase-js";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { verifyInternalHmac } from "@/integrations/supabase/internal-secrets.server";
 
 /**
- * Webhook receiver for payment events (Stripe / PayMongo / Xendit).
- * Maps incoming event types to email templates and enqueues them to the
- * transactional email queue via supabase.rpc('enqueue_email').
+ * Internal payment-event fan-out. NOT a public webhook endpoint — Stripe
+ * webhooks land at /api/public/payments/webhook. This route exists so
+ * admin tooling and cron jobs can enqueue transactional emails (receipts,
+ * refunds, subscription lifecycle) without going through a provider.
  *
- * SECURITY: This route is hard-disabled until real provider signature
- * verification is wired. Enable by setting PAYMENT_WEBHOOK_ENABLED=1 AND
- * replacing the debug-token check with HMAC signature verification from
- * the chosen provider.
+ * Auth: HMAC-SHA256 over the raw body, key stored in
+ * public.internal_webhook_keys.name='payment_events' (service-role only).
+ * Header: x-internal-signature: <hex>
+ *
+ * Callers should prefer the in-process helper `enqueuePaymentEvent()` in
+ * src/lib/payment-events.server.ts when running inside the app.
  */
 
 type PaymentEvent =
@@ -80,21 +84,17 @@ export const Route = createFileRoute("/api/public/payment-events")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        if (process.env.PAYMENT_WEBHOOK_ENABLED !== "1") {
-          return new Response("Payment webhook disabled", { status: 503 });
-        }
-        // Caller must present the shared debug token. Real Stripe / PayMongo
-        // HMAC signature verification should be added before flipping
-        // PAYMENT_WEBHOOK_ENABLED=1 in any production-facing environment.
-        const debugToken = process.env.PAYMENT_WEBHOOK_DEBUG_TOKEN;
-        const auth = request.headers.get("x-debug-token");
-        if (!debugToken || auth !== debugToken) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        const rawBody = await request.text();
+        const ok = await verifyInternalHmac({
+          name: "payment_events",
+          rawBody,
+          signatureHeader: request.headers.get("x-internal-signature"),
+        });
+        if (!ok) return new Response("Unauthorized", { status: 401 });
 
         let body: PaymentEvent;
         try {
-          body = (await request.json()) as PaymentEvent;
+          body = JSON.parse(rawBody) as PaymentEvent;
         } catch {
           return new Response("Invalid JSON", { status: 400 });
         }
@@ -102,15 +102,8 @@ export const Route = createFileRoute("/api/public/payment-events")({
         const template = TEMPLATE_BY_TYPE[body.type];
         if (!template) return new Response("Unknown event type", { status: 400 });
 
-        const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-        const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-        if (!supabaseUrl || !supabaseServiceKey) {
-          return new Response("Server config error", { status: 500 });
-        }
-        const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
         // Suppression check
-        const { data: suppressed } = await supabase
+        const { data: suppressed } = await supabaseAdmin
           .from("suppressed_emails")
           .select("email")
           .eq("email", body.email.toLowerCase())
@@ -122,14 +115,14 @@ export const Route = createFileRoute("/api/public/payment-events")({
         const idempotencyKey = `${body.provider}-${body.event_id}`;
         const messageId = crypto.randomUUID();
 
-        await supabase.from("email_send_log").insert({
+        await supabaseAdmin.from("email_send_log").insert({
           message_id: messageId,
           template_name: template,
           recipient_email: body.email,
           status: "pending",
         });
 
-        const { error } = await supabase.rpc("enqueue_email", {
+        const { error } = await supabaseAdmin.rpc("enqueue_email", {
           queue_name: "transactional_emails",
           payload: {
             message_id: messageId,
@@ -147,7 +140,7 @@ export const Route = createFileRoute("/api/public/payment-events")({
         });
 
         if (error) {
-          await supabase.from("email_send_log").insert({
+          await supabaseAdmin.from("email_send_log").insert({
             message_id: messageId,
             template_name: template,
             recipient_email: body.email,

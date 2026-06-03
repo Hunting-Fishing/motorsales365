@@ -3,8 +3,12 @@
 // when online), with a cached offline page as the fallback. Static assets are
 // served by Cloudflare's edge cache already; we don't precache the app shell
 // because it changes every deploy.
+//
+// VERSION is replaced at build time by the Vite define plugin (__SW_VERSION__).
+// When this string differs from the previously-activated SW, all old caches
+// are dropped on activate so stale offline pages never linger across deploys.
 
-const VERSION = "v1";
+const VERSION = (typeof __SW_VERSION__ !== "undefined" && __SW_VERSION__) || "dev";
 const OFFLINE_CACHE = `offline-${VERSION}`;
 const OFFLINE_URL = "/offline.html";
 
@@ -21,10 +25,12 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
-      // Drop old caches from previous versions.
       const keys = await caches.keys();
       await Promise.all(keys.filter((k) => k !== OFFLINE_CACHE).map((k) => caches.delete(k)));
       await self.clients.claim();
+      // Surface the active version to any listening clients (devtools).
+      // eslint-disable-next-line no-console
+      console.info(`[sw] active version: ${VERSION}`);
     })(),
   );
 });
@@ -32,7 +38,6 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
-  // Only handle page navigations; let the browser deal with everything else.
   if (req.mode !== "navigate") return;
 
   event.respondWith(
