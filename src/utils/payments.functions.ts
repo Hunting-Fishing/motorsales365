@@ -289,7 +289,7 @@ export const listPaymentMethods = createServerFn({ method: "POST" })
     ]);
 
     const defaultPmId = !("deleted" in customer && customer.deleted)
-      ? (((customer as any).invoice_settings?.default_payment_method as string | null) ?? null)
+      ? ((customer as Stripe.Customer).invoice_settings?.default_payment_method as string | null) ?? null
       : null;
 
     return {
