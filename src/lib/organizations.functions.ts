@@ -65,54 +65,64 @@ export const inviteOrgMember = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertOrgManager(supabase, userId, data.orgId);
-    const token = crypto.randomUUID().replace(/-/g, "") + Math.random().toString(36).slice(2, 8);
-    const { data: invite, error } = await supabase
-      .from("organization_invites")
-      .insert({
-        organization_id: data.orgId,
-        email: data.email,
-        role: data.role as any,
-        token,
-        invited_by: userId,
-        expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
-      } as any)
-      .select("id, email, role, token")
-      .single();
-    if (error) throw new Error(error.message);
+    return withRouteAudit({
+      actorId: userId,
+      label: "organizations.inviteOrgMember",
+      role: "org_manager",
+      targetSummary: { org_id: data.orgId, email: data.email, role: data.role },
+      check: () => assertOrgManager(supabase, userId, data.orgId),
+      run: async () => {
+        const token =
+          crypto.randomUUID().replace(/-/g, "") + Math.random().toString(36).slice(2, 8);
+        const { data: invite, error } = await supabase
+          .from("organization_invites")
+          .insert({
+            organization_id: data.orgId,
+            email: data.email,
+            role: data.role as any,
+            token,
+            invited_by: userId,
+            expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
+          } as any)
+          .select("id, email, role, token")
+          .single();
+        if (error) throw new Error(error.message);
 
-    try {
-      const [{ data: org }, { data: inviter }] = await Promise.all([
-        supabase.from("organizations").select("name").eq("id", data.orgId).maybeSingle(),
-        supabase.from("profiles").select("full_name").eq("id", userId).maybeSingle(),
-      ]);
-      const origin = (
-        process.env.SITE_URL ||
-        process.env.VITE_SITE_URL ||
-        "https://365motorsales.com"
-      ).replace(/\/+$/, "");
-      await supabase.rpc(
-        "enqueue_email" as any,
-        {
-          queue_name: "transactional_emails",
-          payload: {
-            template: "team-invite",
-            to: data.email,
-            data: {
-              org_name: (org as any)?.name ?? "a team",
-              inviter_name: (inviter as any)?.full_name ?? "Your teammate",
-              role: data.role,
-              invite_url: `${origin}/invites/${token}`,
-            },
-          },
-        } as any,
-      );
-    } catch {
-      // swallow — surfaced via email_send_log in admin tooling
-    }
+        try {
+          const [{ data: org }, { data: inviter }] = await Promise.all([
+            supabase.from("organizations").select("name").eq("id", data.orgId).maybeSingle(),
+            supabase.from("profiles").select("full_name").eq("id", userId).maybeSingle(),
+          ]);
+          const origin = (
+            process.env.SITE_URL ||
+            process.env.VITE_SITE_URL ||
+            "https://365motorsales.com"
+          ).replace(/\/+$/, "");
+          await supabase.rpc(
+            "enqueue_email" as any,
+            {
+              queue_name: "transactional_emails",
+              payload: {
+                template: "team-invite",
+                to: data.email,
+                data: {
+                  org_name: (org as any)?.name ?? "a team",
+                  inviter_name: (inviter as any)?.full_name ?? "Your teammate",
+                  role: data.role,
+                  invite_url: `${origin}/invites/${token}`,
+                },
+              },
+            } as any,
+          );
+        } catch {
+          // swallow — surfaced via email_send_log in admin tooling
+        }
 
-    return invite;
+        return invite;
+      },
+    });
   });
+
 
 export const listOrgInvites = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
