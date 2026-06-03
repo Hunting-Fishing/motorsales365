@@ -92,6 +92,8 @@ export const upsertAd = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    const { data: canManage } = await supabase.rpc("can_manage_ads", { _user_id: userId });
+    if (!canManage) throw new Error("Forbidden");
     const payload = { ...data, created_by: userId };
     if (data.id) {
       const { error } = await supabase.from("advertisements").update(payload).eq("id", data.id);
