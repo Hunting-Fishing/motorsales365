@@ -22,6 +22,7 @@ import {
   Inbox,
   Shield,
   GraduationCap,
+  AlertTriangle,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
@@ -162,6 +163,13 @@ const NAV: {
     Icon: Users,
     roles: ["admin"],
     info: "Create new users (staff or business) and assign roles. For billing/status use Accounts.",
+  },
+  {
+    to: "/admin/alerts",
+    label: "Ops Alerts",
+    Icon: AlertTriangle,
+    roles: ["admin"],
+    info: "Backend failures (payment webhooks, email errors, geocoding) captured in-app. Investigate and acknowledge.",
   },
   {
     to: "/admin/audit",

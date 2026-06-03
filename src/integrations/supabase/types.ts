@@ -2735,6 +2735,42 @@ export type Database = {
           },
         ]
       }
+      ops_alerts: {
+        Row: {
+          acknowledged: boolean
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          created_at: string
+          details: Json
+          event: string
+          id: string
+          severity: string
+          source: string | null
+        }
+        Insert: {
+          acknowledged?: boolean
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          details?: Json
+          event: string
+          id?: string
+          severity?: string
+          source?: string | null
+        }
+        Update: {
+          acknowledged?: boolean
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          details?: Json
+          event?: string
+          id?: string
+          severity?: string
+          source?: string | null
+        }
+        Relationships: []
+      }
       organization_invites: {
         Row: {
           accepted_at: string | null
