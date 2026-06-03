@@ -4,17 +4,14 @@ import { Input } from "@/components/ui/input";
 
 export type PlacePick = { lat: number; lng: number; label: string };
 
-type NominatimResult = {
-  place_id: number;
-  lat: string;
-  lon: string;
-  display_name: string;
-  name?: string;
-  address?: Record<string, string>;
+type GeoSearchResult = {
+  id: string;
+  primary: string;
+  secondary: string;
+  lat: number;
+  lng: number;
+  label: string;
 };
-
-// Philippines bounding box (lon_min, lat_min, lon_max, lat_max)
-const PH_VIEWBOX = "116.0,4.5,127.0,21.5";
 
 export function PlacesAutocomplete({
   value,
