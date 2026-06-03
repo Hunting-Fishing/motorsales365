@@ -39,6 +39,12 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
+  head: () => ({
+    meta: [
+      { title: "Admin — 365 Motor Sales" },
+      { name: "robots", content: "noindex,nofollow" },
+    ],
+  }),
 });
 
 type Role = "admin" | "sales" | "moderator" | "support" | "advertising";
