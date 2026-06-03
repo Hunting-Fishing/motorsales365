@@ -1,93 +1,51 @@
-# Route Access Audit Log
+# Phase 2 Route Audit — Completion Plan
 
-Today we have `admin_audit_log`, but it only records targeted user-mutation events (role grants, verification, seller type). It does not answer "who called which protected route, when, and with what outcome." This plan adds that.
+Finish migrating all remaining role-gated server functions and the `/api/admin/create-user` HTTP route onto the audited middleware factories, then expose the audit data in the Admin UI. Everything stays in-house: no third-party services, all logging via `supabaseAdmin` to `public.route_audit_log` already in place.
 
-## What we're building
+## 1. Domain sweeps — replace inline role checks with `requireDomainRole(role, label)`
 
-1. A new `public.route_audit_log` table that records one row per call to any admin- or domain-role-gated server function (and the `/api/admin/*` HTTP route).
-2. A single audit point baked into the middleware/gate layer so every protected route is covered automatically — no per-handler boilerplate.
-3. A read-only admin UI section on `/admin/audit` to browse and filter the new log.
+For each function below, drop the manual `assertX` / `supabase.rpc("can_*")` block and chain the audited middleware. Labels use `module.function` for grep-ability.
 
-The existing `admin_audit_log` stays untouched; it remains the canonical record for user-mutation events. The new table is for access/coverage telemetry.
+### Shop (`src/lib/shop.functions.ts`) — role: `shop_manager`
+- `adminListProducts`, `adminGetProduct`, `adminUpsertProduct`, `adminDeleteProduct`, `adminListCategories`, `adminUpsertCategory`, `adminDeleteCategory`, `adminListBrands`, `adminUpsertBrand`, `adminDeleteBrand`, `adminListDepartments`, `adminUpsertDepartment`, `adminDeleteDepartment`, `scrapeShopUrl`
+- Remove `assertShopManager` helper after last caller is migrated.
 
-## Schema
+### Education (`src/lib/education.functions.ts`) — role: `moderator`
+- 11 `admin*` functions covering courses, lessons, modules, instructors, partner training. Replace `assertModerator` calls.
 
-```text
-public.route_audit_log
-- id              uuid pk
-- actor_id        uuid not null            -- caller's auth.uid()
-- role_required   text not null            -- 'admin'|'moderator'|'shop_manager'|'ads_manager'|'support'|'org_manager'
-- route_label     text not null            -- e.g. 'shop.adminUpsertProduct', 'api.admin.create-user'
-- method          text                     -- 'GET'|'POST'
-- outcome         text not null            -- 'allowed'|'denied'|'error'
-- error_message   text                     -- truncated, null on success
-- ip              text                     -- from x-forwarded-for / cf-connecting-ip
-- user_agent      text                     -- truncated to 500 chars
-- duration_ms     integer                  -- handler wall time, null on denied
-- target_summary  jsonb                    -- small, redacted summary of inputs (ids only)
-- created_at      timestamptz default now()
-```
+### Export brokerage (`src/lib/export-brokerage.functions.ts`) — role: `support`
+- `listExportInquiries`, `updateExportInquiry`.
 
-Indexes on `(actor_id, created_at desc)`, `(route_label, created_at desc)`, `(created_at desc)`, partial `(outcome) where outcome <> 'allowed'`.
+### Organizations (`src/lib/organizations.functions.ts`) — role: org-scoped (keep as-is)
+- `inviteOrgMember`, `updateMemberRole`, `removeMember`, `listOrgInvites` use `can_manage_org(_user_id, _org_id)` with a **per-call orgId**, which the generic `requireDomainRole` factory cannot express.
+- Add a dedicated `auditOrgAction(label, outcome, ...)` helper (thin wrapper over `logRouteAccess` with `role: "org_manager"`) and call it from inside the existing `assertOrgManager` / handler — both `denied` and `allowed` paths — with `targetSummary: { org_id }`.
+- Apply same pattern to `leads.functions.ts` (`assignLead`, `updateLeadStatus`, `getOrgPerformance`) where org membership is the gate.
 
-RLS: `admin` and `can_support` read; inserts only via `service_role` (server-side only). No anon, no authenticated insert.
+### Admin users HTTP route (`src/routes/api/admin/create-user.tsx`)
+- Wrap the existing inline admin check: log `denied` on 403, `allowed` + `targetSummary: { email, role }` on success, `error` on thrown exceptions. Uses `logRouteAccess` directly (not middleware — it's a raw TSS handler).
 
-## Server wiring (single audit point per gate)
+## 2. Admin UI — "Route access" tab in `src/routes/admin.audit.tsx`
 
-We already have two enforcement styles. Both get instrumented once:
+- Add a new server fn `listRouteAuditLog` (in a new `src/lib/route-audit.functions.ts`) gated by `requireAdminRoleAudited("audit.listRouteAccess")`. Inputs: optional `actorId`, `routeLabel` (ilike), `roleRequired`, `outcome`, `fromDate`, `toDate`, `limit` (default 100, max 500). Returns rows joined with `profiles` (actor full_name/email) via two queries (no FK).
+- Extend `admin.audit.tsx` with shadcn `Tabs`:
+  - **"User actions"** (existing `admin_audit_log` view).
+  - **"Route access"** (new) — filter form (actor search, route label, role select, outcome select, date range) + table: timestamp, actor, role, route, method, outcome (colored badge), duration, IP.
+- Pagination: simple "Load more" using `created_at` cursor.
 
-### A. Middleware-based gates (admin role)
+## 3. Verification
 
-Extend `src/integrations/supabase/admin-middleware.ts`:
-- `requireAdminRole` stays, but wraps `next()` to record outcome + duration.
-- New factory `requireDomainRole(role, { label })` that performs the appropriate `can_*` RPC, throws 403 on deny, and logs both allow and deny outcomes.
+1. `supabase--linter` clean after no schema changes (table already exists from prior migration).
+2. Smoke-test one route per domain as admin and as non-admin/non-role user; confirm `allowed` and `denied` rows appear with correct `route_label`, `role_required`, `ip`, `user_agent`, `duration_ms`.
+3. Hit `/api/admin/create-user` with bad payload → `error` row. With non-admin → `denied`. With admin → `allowed` + `targetSummary`.
+4. Load `/admin/audit` → "Route access" tab; verify filters work, non-admin gets 403, support role can read (RLS allows).
+5. Confirm no remaining `supabase.rpc("can_shop_manager"|"can_moderate"|"can_support"|"can_manage_ads", ...)` inline checks in `src/lib/*.functions.ts` and `src/utils/*.functions.ts` (ripgrep sweep).
 
-Switch the inline gates that currently live inside handlers (`assertShopManager`, `assertModerator`, `assertCanModerate`, `can_manage_ads` checks in `ads.functions.ts`, `can_support` checks in `export-brokerage.functions.ts`, `can_manage_org` checks in `leads.functions.ts` / `organizations.functions.ts`) to use the new middleware factory so logging is automatic. Where a handler needs `context.userId` after the gate, that still works because the middleware composes with `requireSupabaseAuth`.
+## Out of scope
+- Owner-scoped CRUD (vehicles, rides, garage, business-pages) — already gated by `userId` and not "admin-protected" surface.
+- Public reads, webhook routes with HMAC/signature (Stripe, payment-events, ops-alerts-digest) — already verified by signature.
+- Retention/cleanup of `route_audit_log` rows (add later if volume requires).
 
-Every `createServerFn` chain that uses a gate gets a `label` (e.g. `"shop.adminUpsertProduct"`). Labels are stable strings declared next to the route — used for filtering in the UI.
-
-### B. Raw HTTP route (`/api/admin/create-user`)
-
-Add a small `logRouteAccess()` helper from `internal-secrets.server.ts` neighbours and call it after the inline admin check + at the end of the handler (both allow and error paths). No middleware swap needed — this is the only non-`createServerFn` admin route.
-
-### Logging helper
-
-`src/integrations/supabase/route-audit.server.ts`:
-- `logRouteAccess({ actorId, role, label, method, outcome, error?, durationMs?, request?, targetSummary? })`
-- Best-effort: wraps in try/catch, never throws into the handler.
-- Uses `supabaseAdmin` (service role).
-- Extracts IP from `cf-connecting-ip` → `x-forwarded-for` (first hop) → null.
-- Truncates user-agent to 500 chars, error to 1000 chars.
-- `targetSummary` is opt-in per route: pass a small `{ id, …ids }` object — never raw bodies, never PII.
-
-## Admin UI
-
-Extend `src/routes/admin.audit.tsx` with a tabbed view:
-- Tab 1 (existing): "User changes" → current `admin_audit_log`.
-- Tab 2 (new): "Route access" → `route_audit_log` with filters for actor, route_label, role_required, outcome, and a date range. Default view: last 24h, denied + error first.
-
-A new server function `listRouteAuditLog` (gated by `requireAdminRole` — which itself logs, that's fine) returns paginated rows with the actor's email/full_name joined from `profiles`.
-
-## Out of scope (deliberate)
-
-- Read-only public endpoints (`/api/public/*` geocode, reverse-geocode, geo-search, shop/listing reads). No audit value, high volume.
-- Owner-scoped user CRUD (vehicles, rides, profile, business-pages owner edits). These aren't role-gated.
-- Webhook/cron routes that are HMAC/token-verified — they already log via `email_send_log` / their own tables.
-- Retention/cleanup. We'll address pruning in a follow-up once we know the volume.
-
-## Verification
-
-- Hit each gated route as admin and as non-admin; confirm `allowed` and `denied` rows appear.
-- `supabase--linter` clean.
-- `/admin/audit` "Route access" tab loads, filters work, non-admin/non-support cannot query the table directly (RLS test via `supabase--read_query` as `authenticated`).
-- Smoke an `/api/admin/create-user` call with a bad payload to confirm `error` outcome captured.
-
-## Deliverables
-
-- 1 migration: `route_audit_log` table, indexes, GRANTs, RLS policies.
-- 1 new file: `src/integrations/supabase/route-audit.server.ts`.
-- Updates to `src/integrations/supabase/admin-middleware.ts` (audit `requireAdminRole`, add `requireDomainRole`).
-- Migrate inline gates in `shop.functions.ts`, `education.functions.ts`, `ads.functions.ts`, `export-brokerage.functions.ts`, `leads.functions.ts`, `organizations.functions.ts`, `places.functions.ts`, `payments.functions.ts`, `admin-users.functions.ts` to the new middleware (or call `logRouteAccess` directly where the gate must remain inline).
-- Update `/api/admin/create-user` handler with logging.
-- 1 new server fn: `listRouteAuditLog`.
-- UI update to `src/routes/admin.audit.tsx`.
+## Technical notes
+- `requireDomainRole` already proxies `userId` via `requireSupabaseAuth` context; handler signatures need to switch from destructuring `context.supabase, context.userId` (currently from auth middleware) to the same — unchanged, since `requireDomainRole` composes `requireSupabaseAuth`.
+- For org-scoped audit, never call `requireDomainRole` (it doesn't know orgId); always use the inline helper + `logRouteAccess` to keep the org id in `targetSummary`.
+- `route_audit_log` insert path is best-effort and already wrapped in try/catch — no risk of breaking the underlying action.
