@@ -17,6 +17,7 @@ import { Route as SupportRouteImport } from './routes/support'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SellRouteImport } from './routes/sell'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -26,6 +27,7 @@ import { Route as PartnerTrainingRouteImport } from './routes/partner-training'
 import { Route as MyQrRouteImport } from './routes/my-qr'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as GuidelinesRouteImport } from './routes/guidelines'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ExportRouteImport } from './routes/export'
@@ -177,6 +179,11 @@ const SellRoute = SellRouteImport.update({
   path: '/sell',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -220,6 +227,11 @@ const MapRoute = MapRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GuidelinesRoute = GuidelinesRouteImport.update({
@@ -793,6 +805,7 @@ export interface FileRoutesByFullPath {
   '/export': typeof ExportRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
   '/my-qr': typeof MyQrRoute
@@ -802,6 +815,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sell': typeof SellRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -920,6 +934,7 @@ export interface FileRoutesByTo {
   '/export': typeof ExportRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
   '/my-qr': typeof MyQrRoute
@@ -929,6 +944,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sell': typeof SellRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1049,6 +1065,7 @@ export interface FileRoutesById {
   '/export': typeof ExportRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
   '/my-qr': typeof MyQrRoute
@@ -1058,6 +1075,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/refund-policy': typeof RefundPolicyRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/sell': typeof SellRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1180,6 +1198,7 @@ export interface FileRouteTypes {
     | '/export'
     | '/forgot-password'
     | '/guidelines'
+    | '/llms.txt'
     | '/login'
     | '/map'
     | '/my-qr'
@@ -1189,6 +1208,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/refund-policy'
     | '/reset-password'
+    | '/robots.txt'
     | '/sell'
     | '/signup'
     | '/sitemap.xml'
@@ -1307,6 +1327,7 @@ export interface FileRouteTypes {
     | '/export'
     | '/forgot-password'
     | '/guidelines'
+    | '/llms.txt'
     | '/login'
     | '/map'
     | '/my-qr'
@@ -1316,6 +1337,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/refund-policy'
     | '/reset-password'
+    | '/robots.txt'
     | '/sell'
     | '/signup'
     | '/sitemap.xml'
@@ -1435,6 +1457,7 @@ export interface FileRouteTypes {
     | '/export'
     | '/forgot-password'
     | '/guidelines'
+    | '/llms.txt'
     | '/login'
     | '/map'
     | '/my-qr'
@@ -1444,6 +1467,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/refund-policy'
     | '/reset-password'
+    | '/robots.txt'
     | '/sell'
     | '/signup'
     | '/sitemap.xml'
@@ -1565,6 +1589,7 @@ export interface RootRouteChildren {
   ExportRoute: typeof ExportRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   GuidelinesRoute: typeof GuidelinesRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
   LoginRoute: typeof LoginRoute
   MapRoute: typeof MapRoute
   MyQrRoute: typeof MyQrRoute
@@ -1574,6 +1599,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   RefundPolicyRoute: typeof RefundPolicyRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   SellRoute: typeof SellRouteWithChildren
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -1691,6 +1717,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SellRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -1752,6 +1785,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/guidelines': {
@@ -2714,6 +2754,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExportRoute: ExportRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   GuidelinesRoute: GuidelinesRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
   LoginRoute: LoginRoute,
   MapRoute: MapRoute,
   MyQrRoute: MyQrRoute,
@@ -2723,6 +2764,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   RefundPolicyRoute: RefundPolicyRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   SellRoute: SellRouteWithChildren,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
