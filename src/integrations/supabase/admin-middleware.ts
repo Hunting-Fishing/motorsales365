@@ -9,6 +9,7 @@
 // `context.userId` and an authenticated `context.supabase`.
 
 import { createMiddleware } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { requireSupabaseAuth } from "./auth-middleware";
 import { supabaseAdmin } from "./client.server";
 import { logRouteAccess, type AuditRole } from "./route-audit.server";
