@@ -663,7 +663,7 @@ export const setStripeTaxCodes = createServerFn({ method: "POST" })
         const productId =
           typeof prices.data[0].product === "string"
             ? prices.data[0].product
-            : (prices.data[0].product as any)?.id;
+            : (prices.data[0].product as Stripe.Product | Stripe.DeletedProduct)?.id;
         if (!productId) {
           results.push({ lookupKey: t.lookupKey, status: "error", message: "No product id" });
           continue;
