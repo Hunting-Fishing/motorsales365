@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import "leaflet.markercluster";
+import "leaflet.markercluster/dist/MarkerCluster.css";
+import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import { colorForType } from "./google-maps-loader";
+
 
 export type GMapBusiness = {
   id: string;
@@ -93,7 +97,9 @@ export function GoogleBusinessMap({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
+  const clusterRef = useRef<L.MarkerClusterGroup | null>(null);
   const circleRef = useRef<L.Circle | null>(null);
+
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
 
@@ -113,12 +119,21 @@ export function GoogleBusinessMap({
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       }).addTo(map);
       mapRef.current = map;
+      const cluster = (L as any).markerClusterGroup({
+        showCoverageOnHover: false,
+        spiderfyOnMaxZoom: true,
+        disableClusteringAtZoom: 16,
+        maxClusterRadius: 55,
+      }) as L.MarkerClusterGroup;
+      cluster.addTo(map);
+      clusterRef.current = cluster;
       setReady(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Map failed to load");
     }
     return () => {
-      markersRef.current.forEach((m) => m.remove());
+      clusterRef.current?.clearLayers();
+      clusterRef.current = null;
       markersRef.current = [];
       circleRef.current?.remove();
       circleRef.current = null;
@@ -127,12 +142,14 @@ export function GoogleBusinessMap({
     };
   }, []);
 
+
   // Render markers + adjust bounds whenever data changes
   useEffect(() => {
     const map = mapRef.current;
-    if (!ready || !map) return;
+    const cluster = clusterRef.current;
+    if (!ready || !map || !cluster) return;
 
-    markersRef.current.forEach((m) => m.remove());
+    cluster.clearLayers();
     markersRef.current = [];
 
     const valid = businesses.filter(
@@ -143,13 +160,14 @@ export function GoogleBusinessMap({
         Number.isFinite(Number(b.lng)),
     );
 
+    const newMarkers: L.Marker[] = [];
     valid.forEach((b) => {
       const color = colorForType(b.type_slug);
       const marker = L.marker([Number(b.lat), Number(b.lng)], {
         icon: pinDivIcon(color, b.featured, b.highlighted, b.type_slug),
         title: b.name,
         zIndexOffset: b.highlighted ? 1000 : b.featured ? 500 : 0,
-      }).addTo(map);
+      });
 
       const rating =
         b.rating_count > 0
@@ -167,8 +185,11 @@ export function GoogleBusinessMap({
       </div>`;
       marker.bindPopup(html, { closeButton: true, maxWidth: 260 });
       marker.on("click", () => onPinClick?.(b.slug));
-      markersRef.current.push(marker);
+      newMarkers.push(marker);
     });
+    cluster.addLayers(newMarkers);
+    markersRef.current = newMarkers;
+
 
     // Centre / fit logic
     if (center) {
