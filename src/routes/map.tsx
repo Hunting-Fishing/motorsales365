@@ -102,7 +102,38 @@ function MapPage() {
   const [radiusKm, setRadiusKm] = useState<number | null>(search.r ?? stored?.radiusKm ?? null);
   const [hoverId, setHoverId] = useState<string | null>(null);
 
+  const [locating, setLocating] = useState(false);
+
+  const useMyLocation = () => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      toast.error("Geolocation isn't supported on this device.");
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCenter({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+          label: "My location",
+        });
+        if (!radiusKm) setRadiusKm(10);
+        setLocating(false);
+      },
+      (err) => {
+        setLocating(false);
+        toast.error(
+          err.code === err.PERMISSION_DENIED
+            ? "Location permission was denied."
+            : "Couldn't get your location.",
+        );
+      },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 60_000 },
+    );
+  };
+
   useEffect(() => {
+
     navigate({
       to: "/map",
       search: {
