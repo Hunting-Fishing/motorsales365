@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 1, 2026 (rev. education portal & partner training)";
+  const lastUpdated = "June 3, 2026 (rev. export brokerage, learning, referrals & org accounts)";
 
   return (
     <SiteLayout>
@@ -438,6 +438,37 @@ function TermsPage() {
           floods, fire, pandemic, civil unrest, government action, telecommunications or power
           failures, or third-party service outages.
         </p>
+
+        <h2 className="mt-6 text-xl font-semibold">
+          18A. Export brokerage, learning, referrals &amp; organisation accounts
+        </h2>
+        <ul className="mt-2 list-disc pl-6 text-muted-foreground">
+          <li>
+            <strong>Export brokerage.</strong> Where 365 MotorSales facilitates introductions to
+            overseas buyers or logistics partners, we act solely as a listing and introduction
+            venue; we are not the shipper, exporter of record, or customs broker. You are
+            responsible for compliance with Philippine export rules and the destination
+            country's import, tax, and sanctions requirements.
+          </li>
+          <li>
+            <strong>Learning &amp; partner training.</strong> Courses, certifications, and partner
+            training are provided "as is" for educational purposes only and do not constitute
+            professional, legal, or mechanical advice. Completion does not create employment or
+            agency with 365 MotorSales.
+          </li>
+          <li>
+            <strong>Referrals.</strong> Referral credits and payouts are governed by the in-app
+            referral terms shown at enrolment. We may adjust, claw back, or void credits obtained
+            through fraud, self-referral, or abusive patterns, consistent with Section 9.
+          </li>
+          <li>
+            <strong>Organisation accounts.</strong> Where multiple users access a single
+            organisation account, the account owner is responsible for all activity under that
+            account, for inviting/removing members, and for ensuring members comply with these
+            Terms. Roles within an organisation do not extend privileges beyond what these Terms
+            and our published policies allow.
+          </li>
+        </ul>
 
         <h2 className="mt-6 text-xl font-semibold">18. Governing law &amp; venue</h2>
         <p className="mt-2 text-muted-foreground">

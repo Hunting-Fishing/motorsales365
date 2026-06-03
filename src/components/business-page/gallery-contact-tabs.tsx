@@ -276,16 +276,17 @@ export function GalleryTab({
                     <Button
                       variant="ghost"
                       size="icon"
+                      aria-label="Edit album"
                       onClick={() => {
                         setEditingId(a.id);
                         setEditTitle(a.title);
                         setEditDesc(a.description ?? "");
                       }}
                     >
-                      <Pencil className="h-4 w-4" />
+                      <Pencil className="h-4 w-4" aria-hidden="true" />
                     </Button>
-                    <Button variant="ghost" size="icon" onClick={() => removeAlbum(a.id)}>
-                      <Trash2 className="h-4 w-4 text-destructive" />
+                    <Button variant="ghost" size="icon" aria-label="Delete album" onClick={() => removeAlbum(a.id)}>
+                      <Trash2 className="h-4 w-4 text-destructive" aria-hidden="true" />
                     </Button>
                   </div>
                 </div>
@@ -589,8 +590,8 @@ export function ContactChannelsTab({
               </div>
               <div className="truncate text-sm text-muted-foreground">{c.value}</div>
             </div>
-            <Button variant="ghost" size="icon" onClick={() => remove(c.id)}>
-              <Trash2 className="h-4 w-4 text-destructive" />
+            <Button variant="ghost" size="icon" aria-label="Remove contact" onClick={() => remove(c.id)}>
+              <Trash2 className="h-4 w-4 text-destructive" aria-hidden="true" />
             </Button>
           </div>
         ))}

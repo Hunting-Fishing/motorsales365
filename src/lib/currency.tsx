@@ -4,10 +4,12 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { getMyDisplayCurrency, setMyDisplayCurrency } from "@/lib/currency.functions";
 
 export type Currency = {
   code: string;
@@ -81,11 +83,54 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     load();
   }, [load]);
 
+  // Sync display currency with the signed-in user's profile so the
+  // preference follows them across devices. Local storage stays as a
+  // fast-path fallback for anonymous visitors / SSR.
+  const syncedUserRef = useRef<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    const pullForUser = async (userId: string | null) => {
+      if (!userId) {
+        syncedUserRef.current = null;
+        return;
+      }
+      if (syncedUserRef.current === userId) return;
+      syncedUserRef.current = userId;
+      try {
+        const { code: remote } = await getMyDisplayCurrency();
+        if (cancelled) return;
+        if (remote && remote !== code) {
+          setCodeState(remote);
+          if (typeof window !== "undefined") {
+            window.localStorage.setItem(LS_KEY, remote);
+          }
+        } else if (!remote && code && code !== "PHP") {
+          // First-time sync: persist the locally-chosen code to the profile.
+          await setMyDisplayCurrency({ data: { code } });
+        }
+      } catch {
+        // Best-effort: ignore network/auth failures, keep local value.
+      }
+    };
+    supabase.auth.getUser().then(({ data }) => pullForUser(data.user?.id ?? null));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      pullForUser(session?.user?.id ?? null);
+    });
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
+    // We intentionally only run once on mount; `code` is read via closure.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const setCode = useCallback((next: string) => {
     setCodeState(next);
     if (typeof window !== "undefined") {
       window.localStorage.setItem(LS_KEY, next);
     }
+    // Persist to profile when signed in. Fire-and-forget.
+    void setMyDisplayCurrency({ data: { code: next } }).catch(() => {});
   }, []);
 
   const map = useMemo(() => {

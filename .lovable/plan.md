@@ -73,3 +73,11 @@ Per memory: changing fees/payments/boosts/refunds/business directory/services + 
 - Legal page updates bump dates per memory rule
 
 Approve to start with 3.1 → 3.5, then move to 4.1 → 4.3.
+## Phase 4 — done (2026-06-03)
+
+- Added `profiles.display_currency text` column via migration.
+- `src/lib/currency.functions.ts`: `getMyDisplayCurrency` / `setMyDisplayCurrency` server fns (RLS-scoped).
+- `src/lib/currency.tsx`: sync local `mref_currency` with profile on sign-in / change; localStorage retained as anon/SSR fast-path.
+- Legal pages refreshed: terms (new §18A export brokerage, learning, referrals, org accounts), privacy (new §13b), refund-policy. "Last updated" bumped to June 3, 2026.
+- a11y pass: aria-label + aria-hidden on icon-only buttons in single-file-uploader, gallery-contact-tabs (album edit/delete, contact remove), business hours-editor, admin add-user-dialog.
+- Skipped per scope: simulated roles & dev feature-flag overrides stay localStorage; PWA screenshots; E2E/webhook tests.
