@@ -29,6 +29,8 @@ function MyRidesPage() {
   const [rides, setRides] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const publish = useServerFn(publishRide);
+  const removeRide = useServerFn(deleteRide);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const load = async () => {
     if (!user) return;
@@ -52,6 +54,19 @@ function MyRidesPage() {
       load();
     } catch (e: any) {
       toast.error(e.message);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    setDeletingId(id);
+    try {
+      await removeRide({ data: { id } });
+      setRides((prev) => prev.filter((x) => x.id !== id));
+      toast.success("Ride deleted");
+    } catch (e: any) {
+      toast.error(e.message);
+    } finally {
+      setDeletingId(null);
     }
   };
 
