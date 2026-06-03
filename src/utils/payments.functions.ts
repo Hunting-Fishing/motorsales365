@@ -627,19 +627,20 @@ export const setStripeTaxCodes = createServerFn({ method: "POST" })
     ]);
 
     const targets: Array<{ lookupKey: string; taxCode: string; kind: "plan" | "boost" }> = [];
-    for (const p of plans ?? []) {
-      if ((p as any).stripe_lookup_key) {
+    type LookupRow = { stripe_lookup_key: string | null };
+    for (const p of (plans ?? []) as LookupRow[]) {
+      if (p.stripe_lookup_key) {
         targets.push({
-          lookupKey: (p as any).stripe_lookup_key,
+          lookupKey: p.stripe_lookup_key,
           taxCode: "txcd_10103001",
           kind: "plan",
         });
       }
     }
-    for (const b of boosts ?? []) {
-      if ((b as any).stripe_lookup_key) {
+    for (const b of (boosts ?? []) as LookupRow[]) {
+      if (b.stripe_lookup_key) {
         targets.push({
-          lookupKey: (b as any).stripe_lookup_key,
+          lookupKey: b.stripe_lookup_key,
           taxCode: "txcd_10000000",
           kind: "boost",
         });
