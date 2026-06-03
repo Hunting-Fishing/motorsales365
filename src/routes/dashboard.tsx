@@ -32,6 +32,12 @@ import {
 
 export const Route = createFileRoute("/dashboard")({
   component: DashboardLayout,
+  head: () => ({
+    meta: [
+      { title: "Dashboard — 365 Motor Sales" },
+      { name: "robots", content: "noindex,nofollow" },
+    ],
+  }),
 });
 
 const NAV: { to: string; label: string; Icon: any; exact?: boolean }[] = [
