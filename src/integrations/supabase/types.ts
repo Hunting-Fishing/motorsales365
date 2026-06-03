@@ -4887,6 +4887,45 @@ export type Database = {
         }
         Relationships: []
       }
+      user_garage_vehicles: {
+        Row: {
+          category: string
+          created_at: string
+          engine: string | null
+          id: string
+          make: string
+          model: string
+          trim: string | null
+          updated_at: string
+          user_id: string
+          year: number | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          engine?: string | null
+          id?: string
+          make: string
+          model: string
+          trim?: string | null
+          updated_at?: string
+          user_id: string
+          year?: number | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          engine?: string | null
+          id?: string
+          make?: string
+          model?: string
+          trim?: string | null
+          updated_at?: string
+          user_id?: string
+          year?: number | null
+        }
+        Relationships: []
+      }
       user_referrals: {
         Row: {
           credited_referral_code: string | null
