@@ -34,17 +34,9 @@ export type NearbyImportRow = NearbyPlace & {
 };
 
 export const findNearbyForImport = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((input: unknown) => NearbyInput.parse(input))
-  .handler(async ({ data, context }): Promise<{ rows: NearbyImportRow[] }> => {
-    // Admin gate
-    const { data: roleRow } = await context.supabase
-      .from("user_roles" as never)
-      .select("role")
-      .eq("user_id", context.userId)
-      .eq("role", "admin")
-      .maybeSingle();
-    if (!roleRow) throw new Error("Admin only");
+  .handler(async ({ data }): Promise<{ rows: NearbyImportRow[] }> => {
 
     const places = await searchNearbyPlaces({
       lat: data.lat,
