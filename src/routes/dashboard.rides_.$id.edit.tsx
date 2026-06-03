@@ -426,8 +426,8 @@ function EditRidePage() {
                 onBlur={() => saveMod(m)}
                 className="sm:col-span-4"
               />
-              <Button variant="ghost" size="icon" onClick={() => delMod(m.id)}>
-                <Trash2 className="h-4 w-4 text-destructive" />
+              <Button variant="ghost" size="icon" onClick={() => delMod(m.id)} aria-label="Delete modification">
+                <Trash2 className="h-4 w-4 text-destructive" aria-hidden="true" />
               </Button>
             </div>
           ))}
