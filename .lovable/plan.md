@@ -1,55 +1,75 @@
-# Continue Audit Repair — Next Sequential Steps
+# Phase 3 — Payments surface + Phase 4 — a11y / legal / state
 
-Picking up exactly where we left off, no jumps. Phase 0 + most of Phase 2 infrastructure are done. Next in strict order:
+## Phase 3 — Payments surface (in-house, no new SaaS)
 
-## Step 1 — Finish Phase 1: Type safety in money paths
+### 3.1 Provider abstraction
+Create `src/lib/payments/provider.ts`:
+- `PaymentProvider` discriminated-union type: `"stripe" | "paymongo" | "xendit"`.
+- `PaymentRail` interface — `{ id, label, enabled, supports: { oneTime, subscription, boost } }`.
+- `getEnabledRails()` reads from feature flags (3.2) and returns enabled list.
+- Default registry has Stripe `enabled: true`; PayMongo + Xendit registered but `enabled: false` (rail metadata only — no SDKs imported).
+- This is a typed seam; existing checkout code keeps calling Stripe directly. Future in-house providers plug in by adding a `.functions.ts` file and flipping the flag.
 
-Remove remaining `as any` casts in payment/webhook code.
+### 3.2 Feature-flag table (in-house, no external service)
+New migration adds `public.feature_flags`:
+- columns: `key text PK`, `enabled bool default false`, `payload jsonb default '{}'`, `updated_at timestamptz`
+- GRANT select to `anon, authenticated`; full to `service_role`
+- RLS: SELECT public-readable (flag state isn't a secret); INSERT/UPDATE/DELETE admin-only via `has_role(auth.uid(), 'admin')`
+- Seed rows: `payments.stripe=true`, `payments.paymongo=false`, `payments.xendit=false`, `boost.escrow=false`, `subscriptions.annual=true`
+- New `getFeatureFlags()` server fn (cached 60s) + `useFeatureFlag(key)` hook.
 
-Files:
-- `src/routes/api/public/payment-events.tsx` — replace `as any` with `Stripe.Event` / `Stripe.PaymentIntent` / `Stripe.Charge` types from the stripe SDK.
-- `src/utils/payments.functions.ts` — type the Stripe client responses and DB row shapes (use generated `Database` types).
-- `src/lib/payments/provider.ts` — narrow provider union type instead of `any`.
+### 3.3 Checkout UI surface
+- `src/components/checkout/payment-rails.tsx`: lists rails from `getEnabledRails()`, renders disabled ones with "Coming soon" pill behind a `showComingSoon` prop (default false).
+- No behavior change to current Stripe flow.
 
-Acceptance: 0 `as any` in those three files; `tsc` clean.
+### 3.4 Cron URL audit (close-out)
+- Verify the two cron migrations already use the stable `project--{id}.lovable.app` pattern (they do).
+- Add a code comment in `src/routes/api/public/fx/refresh.tsx` and `hooks/refresh-lazada.ts` documenting the cron contract so future edits don't break the schedule.
 
-## Step 2 — Phase 1 residual: admin write guard sweep
-
-Audit every server fn that performs admin writes for `requireAdminRoleAudited`. Confirm `admin.reports.tsx` loader has error boundary using the new `RouteError` component. Add 500-row pagination cursor to `dashboard.messages.tsx` query.
-
-## Step 3 — Phase 2: Per-route `head()` sweep (highest SEO impact)
-
-Add `head()` to public/shareable routes missing metadata. Per `tanstack-route-architecture` rules: title in `meta`, canonical on leaves only, og:url per-route, no og:image unless real asset exists.
-
-Public routes to update (title + description + og:title + og:description + og:url + canonical):
-- `/shop`, `/businesses`, `/learn`, `/rides`, `/map`, `/tow`, `/export`, `/checkout`
-- `/passport/*` leaves, `/seller/*` leaves
-- `/advertise`, `/partner-training`, `/my-qr`
-- Dynamic: `/r/$code`, `/c/$code` — derive from loader data
-
-Admin/dashboard routes get `meta: [{ name: "robots", content: "noindex,nofollow" }]`:
-- `/admin/*`, `/dashboard/*`, `/account/*`
-
-Acceptance: every route in `routeTree.gen.ts` has a `head()` or is explicitly noindex'd.
-
-## Step 4 — Phase 2: Wire JSON-LD + sitemap completion
-
-- Activate `use-dynamic-jsonld.ts` on `/shop/$id`, `/businesses/$id`, `/learn/$slug` (Product, LocalBusiness, Article).
-- Extend `src/routes/sitemap[.]xml.ts` with `/export`, `/tow`, `/partner-training`, `/advertise`, `/passport`, `/seller`, plus dynamic `/r/*` and `/c/*` from DB.
-- Attach `RouteError` / `RouteNotFound` to every route with a loader.
-
-## Step 5 — Phase 2 close: orphan route nav links
-
-Add nav entries (or remove the routes) for `/my-qr`, `/export`, `/partner-training`, `/r/$code/poster`. Default: link from dashboard sidebar.
+### 3.5 Admin flags UI
+- New `src/routes/admin.feature-flags.tsx` (noindex) — list flags, toggle enabled, edit `payload` JSON. Gated by `requireAdminRoleAudited("flags.toggle")`.
+- Add nav entry under admin layout.
 
 ---
 
-After Step 5, Phases 1+2 are 100% closed. Phases 3 (payments abstraction), 4 (a11y/legal/localStorage), 5 (tests) come next as separate plans.
+## Phase 4 — a11y / legal / state
+
+### 4.1 localStorage → server (selective)
+Migrate ONLY values that should sync across devices:
+- **Currency preference** → `profiles.preferred_currency` column. Hook reads from server when logged in, falls back to localStorage anonymous.
+- **Simulated roles** (admin "act as" testing) → keep localStorage, dev-only, gated by `import.meta.env.DEV`.
+- **Feature-flag overrides** (dev) → stay localStorage, dev-only.
+- **Referral attribution** → stay localStorage (anonymous, expires after 30 days). Document why.
+
+Migration: add `preferred_currency text` to `profiles` with check constraint.
+
+### 4.2 Accessibility pass on `src/components/`
+- Add `aria-label` to all icon-only buttons (`Button size="icon"` without text).
+- Add `aria-hidden="true"` to decorative lucide icons inside labeled buttons.
+- For clickable `<div>` / `<span>` patterns: convert to `<button>` OR add `role="button" tabIndex={0} onKeyDown` for Enter/Space.
+- Scope: `src/components/site-header.tsx`, `site-layout.tsx`, `ui/` shadcn primitives are already a11y-correct; focus on custom components (`checkout/`, `admin/`, `dashboard/`).
+
+### 4.3 Legal pages refresh
+Per memory: changing fees/payments/boosts/refunds/business directory/services + data handling requires `/terms` + `/privacy` + `/refund-policy` updates. The newer modules added since last review:
+- **Export brokerage** — add section to `/terms` (broker role, fees, dispute scope) and `/privacy` (export buyer data sharing).
+- **Learning / partner training** — add to `/terms` (course refunds, partner attribution) and `/refund-policy`.
+- **Referrals / organization accounts** — add to `/terms` (org admin responsibility) and `/privacy` (org-level data visibility).
+- Bump "Last updated" on all three pages.
+
+### 4.4 PWA manifest screenshots
+- Skip unless user explicitly wants generated screenshots — placeholder PNGs are worse than none.
+
+---
+
+## Out of scope (deferred to Phase 5)
+- E2E / webhook / payments unit tests
+- CI `scripts/audit-coverage.ts`
+- Removing the last `as any` in non-money paths
 
 ## Scope guarantees
-- No new APIs, no new SaaS, no new providers — in-house only
-- No business logic changes, only typing + metadata + nav wiring
+- No new external APIs, providers, or SaaS — provider seam is empty scaffolding
 - No edits to auto-generated files (`routeTree.gen.ts`, `types.ts`, `client.ts`)
-- Legal page updates only if a touched route changes user-facing terms (none in steps 1–5)
+- All admin writes gated by `requireAdminRoleAudited`
+- Legal page updates bump dates per memory rule
 
-Approve to execute Step 1 first.
+Approve to start with 3.1 → 3.5, then move to 4.1 → 4.3.
