@@ -135,8 +135,8 @@ function AdminAlerts() {
               <SelectItem value="all">All recent</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" size="icon" onClick={load} aria-label="Refresh">
-            <RefreshCw className="h-4 w-4" />
+          <Button variant="outline" size="icon" onClick={load} aria-label="Refresh alerts">
+            <RefreshCw className="h-4 w-4" aria-hidden="true" />
           </Button>
           {unackCount > 0 && (
             <Button onClick={acknowledgeAll}>

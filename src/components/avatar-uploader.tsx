@@ -74,19 +74,22 @@ export function AvatarUploader({ userId, value, fallback, onChange }: Props) {
         <div className="flex gap-2">
           <Button type="button" size="sm" variant="secondary" onClick={pick} disabled={busy}>
             {busy ? (
-              <Loader2 className="mr-2 size-4 animate-spin" />
+              <Loader2 className="mr-2 size-4 animate-spin" aria-hidden="true" />
             ) : (
-              <Upload className="mr-2 size-4" />
+              <Upload className="mr-2 size-4" aria-hidden="true" />
             )}
             {value ? "Change photo" : "Upload photo"}
           </Button>
           {value && (
-            <Button type="button" size="sm" variant="ghost" onClick={remove} disabled={busy}>
-              <Trash2 className="mr-2 size-4" /> Remove
+            <Button type="button" size="sm" variant="ghost" onClick={remove} disabled={busy} aria-label="Remove profile photo">
+              <Trash2 className="mr-2 size-4" aria-hidden="true" /> Remove
             </Button>
           )}
         </div>
         <p className="text-xs text-muted-foreground">PNG, JPG or WebP. Max 5MB.</p>
+        <span role="status" aria-live="polite" className="sr-only">
+          {busy ? "Uploading profile photo…" : ""}
+        </span>
       </div>
       <input
         ref={fileRef}
