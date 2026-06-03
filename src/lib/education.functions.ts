@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireDomainRole } from "@/integrations/supabase/admin-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 // ============ PUBLIC: CATALOG ============
@@ -490,11 +491,6 @@ export const listTrainingPartners = createServerFn({ method: "GET" }).handler(as
 
 // ============ ADMIN ============
 
-async function assertModerator(userId: string) {
-  const { data } = await supabaseAdmin.rpc("can_moderate", { _user_id: userId });
-  if (!data) throw new Error("Forbidden");
-}
-
 const courseInputSchema = z.object({
   id: z.string().uuid().optional(),
   slug: z
@@ -518,10 +514,9 @@ const courseInputSchema = z.object({
 });
 
 export const adminUpsertCourse = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("moderator", "education.adminUpsertCourse")])
   .inputValidator((input: unknown) => courseInputSchema.parse(input))
   .handler(async ({ data, context }) => {
-    await assertModerator(context.userId as string);
     const row: any = {
       slug: data.slug,
       title: data.title,
@@ -557,9 +552,8 @@ export const adminUpsertCourse = createServerFn({ method: "POST" })
   });
 
 export const adminListCourses = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("moderator", "education.adminListCourses")])
   .handler(async ({ context }) => {
-    await assertModerator(context.userId as string);
     const { data } = await supabaseAdmin
       .from("courses")
       .select("id, slug, title, status, category, price_php, published_at, created_at")
@@ -568,19 +562,17 @@ export const adminListCourses = createServerFn({ method: "GET" })
   });
 
 export const adminDeleteCourse = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("moderator", "education.adminDeleteCourse")])
   .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    await assertModerator(context.userId as string);
     await supabaseAdmin.from("courses").delete().eq("id", data.id);
     return { ok: true };
   });
 
 export const adminGetCourseFull = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("moderator", "education.adminGetCourseFull")])
   .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    await assertModerator(context.userId as string);
     const { data: course } = await supabaseAdmin
       .from("courses")
       .select("*")
@@ -617,10 +609,9 @@ const moduleSchema = z.object({
   position: z.number().int().min(0).max(1000),
 });
 export const adminUpsertModule = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("moderator", "education.adminUpsertModule")])
   .inputValidator((input: unknown) => moduleSchema.parse(input))
   .handler(async ({ data, context }) => {
-    await assertModerator(context.userId as string);
     if (data.id) {
       const { data: r } = await supabaseAdmin
         .from("course_modules")
@@ -648,10 +639,9 @@ export const adminUpsertModule = createServerFn({ method: "POST" })
   });
 
 export const adminDeleteModule = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("moderator", "education.adminDeleteModule")])
   .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    await assertModerator(context.userId as string);
     await supabaseAdmin.from("course_modules").delete().eq("id", data.id);
     return { ok: true };
   });
@@ -667,10 +657,9 @@ const lessonSchema = z.object({
   position: z.number().int().min(0).max(1000),
 });
 export const adminUpsertLesson = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("moderator", "education.adminUpsertLesson")])
   .inputValidator((input: unknown) => lessonSchema.parse(input))
   .handler(async ({ data, context }) => {
-    await assertModerator(context.userId as string);
     const row = {
       module_id: data.module_id,
       title: data.title,
@@ -698,10 +687,9 @@ export const adminUpsertLesson = createServerFn({ method: "POST" })
   });
 
 export const adminDeleteLesson = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("moderator", "education.adminDeleteLesson")])
   .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    await assertModerator(context.userId as string);
     await supabaseAdmin.from("course_lessons").delete().eq("id", data.id);
     return { ok: true };
   });
@@ -727,9 +715,8 @@ const partnerSchema = z.object({
 });
 
 export const adminListPartners = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("moderator", "education.adminListPartners")])
   .handler(async ({ context }) => {
-    await assertModerator(context.userId as string);
     const { data } = await supabaseAdmin
       .from("training_partners")
       .select("*")
@@ -739,10 +726,9 @@ export const adminListPartners = createServerFn({ method: "GET" })
   });
 
 export const adminUpsertPartner = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("moderator", "education.adminUpsertPartner")])
   .inputValidator((input: unknown) => partnerSchema.parse(input))
   .handler(async ({ data, context }) => {
-    await assertModerator(context.userId as string);
     const row: any = {
       slug: data.slug,
       name: data.name,
@@ -773,10 +759,9 @@ export const adminUpsertPartner = createServerFn({ method: "POST" })
   });
 
 export const adminDeletePartner = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("moderator", "education.adminDeletePartner")])
   .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    await assertModerator(context.userId as string);
     await supabaseAdmin.from("training_partners").delete().eq("id", data.id);
     return { ok: true };
   });

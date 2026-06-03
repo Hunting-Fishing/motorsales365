@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireDomainRole } from "@/integrations/supabase/admin-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { cleanShopUrl, detectNetworkSlug, isShortLink, looksLikeIconImage } from "@/lib/shop-url";
 import { scrapeLazadaProduct } from "@/lib/lazada-scraper.server";
@@ -470,16 +471,11 @@ const productSchema = z.object({
   universal_fit: z.boolean().optional(),
 });
 
-async function assertShopManagerInline(supabase: any, userId: string) {
-  const { data: ok } = await supabase.rpc("can_manage_shop", { _user_id: userId });
-  if (!ok) throw new Error("Forbidden");
-}
 
 export const adminListProducts = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("shop_manager", "shop.adminListProducts")])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    await assertShopManagerInline(supabase, userId);
     const { data, error } = await supabase
       .from("shop_products")
       .select(
@@ -492,11 +488,10 @@ export const adminListProducts = createServerFn({ method: "GET" })
   });
 
 export const adminUpsertProduct = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("shop_manager", "shop.adminUpsertProduct")])
   .inputValidator((input: unknown) => productSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertShopManagerInline(supabase, userId);
     const { id, ...rest } = data as any;
     const slug = rest.slug || slugify(rest.title);
     if (!slug) throw new Error("A slug or title is required");
@@ -516,24 +511,18 @@ export const adminUpsertProduct = createServerFn({ method: "POST" })
   });
 
 export const adminDeleteProduct = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("shop_manager", "shop.adminDeleteProduct")])
   .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    await assertShopManagerInline(context.supabase, context.userId);
     const { error } = await context.supabase.from("shop_products").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
 
-async function assertShopManager(supabase: any, userId: string) {
-  const { data: ok } = await supabase.rpc("can_manage_shop", { _user_id: userId });
-  if (!ok) throw new Error("Forbidden");
-}
 
 export const adminListNetworks = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("shop_manager", "shop.adminListNetworks")])
   .handler(async ({ context }) => {
-    await assertShopManager(context.supabase, context.userId);
     const { data, error } = await context.supabase
       .from("affiliate_networks")
       .select("*")
@@ -543,7 +532,7 @@ export const adminListNetworks = createServerFn({ method: "GET" })
   });
 
 export const adminUpsertNetwork = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("shop_manager", "shop.adminUpsertNetwork")])
   .inputValidator((input: unknown) =>
     z
       .object({
@@ -563,7 +552,6 @@ export const adminUpsertNetwork = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertShopManager(context.supabase, context.userId);
     if (data.id) {
       const { error } = await context.supabase
         .from("affiliate_networks")
@@ -582,7 +570,7 @@ export const adminUpsertNetwork = createServerFn({ method: "POST" })
   });
 
 export const adminUpsertLink = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("shop_manager", "shop.adminUpsertLink")])
   .inputValidator((input: unknown) =>
     z
       .object({
@@ -595,7 +583,6 @@ export const adminUpsertLink = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertShopManager(context.supabase, context.userId);
     const { supabase } = context;
     if (data.id) {
       const { error } = await supabase.from("shop_product_links").update(data).eq("id", data.id);
@@ -612,22 +599,20 @@ export const adminUpsertLink = createServerFn({ method: "POST" })
   });
 
 export const adminDeleteLink = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("shop_manager", "shop.adminDeleteLink")])
   .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    await assertShopManager(context.supabase, context.userId);
     const { error } = await context.supabase.from("shop_product_links").delete().eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
 
 export const adminProductLinks = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("shop_manager", "shop.adminProductLinks")])
   .inputValidator((input: { productId: string }) =>
     z.object({ productId: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertShopManager(context.supabase, context.userId);
     const { data: rows, error } = await context.supabase
       .from("shop_product_links")
       .select("*, network:affiliate_networks(id, slug, name)")
@@ -651,12 +636,11 @@ const fitmentSchema = z.object({
 });
 
 export const adminListFitment = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("shop_manager", "shop.adminListFitment")])
   .inputValidator((input: { productId: string }) =>
     z.object({ productId: z.string().uuid() }).parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertShopManager(context.supabase, context.userId);
     const { data: rows, error } = await context.supabase
       .from("shop_product_fitment")
       .select("*")
@@ -667,10 +651,9 @@ export const adminListFitment = createServerFn({ method: "GET" })
   });
 
 export const adminUpsertFitment = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("shop_manager", "shop.adminUpsertFitment")])
   .inputValidator((input: unknown) => fitmentSchema.parse(input))
   .handler(async ({ data, context }) => {
-    await assertShopManager(context.supabase, context.userId);
     if (data.id) {
       const { error } = await context.supabase
         .from("shop_product_fitment")
@@ -689,10 +672,9 @@ export const adminUpsertFitment = createServerFn({ method: "POST" })
   });
 
 export const adminDeleteFitment = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("shop_manager", "shop.adminDeleteFitment")])
   .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
-    await assertShopManager(context.supabase, context.userId);
     const { error } = await context.supabase
       .from("shop_product_fitment")
       .delete()
@@ -821,7 +803,7 @@ async function runNetworkScraper(
 }
 
 export const scrapeShopUrl = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireDomainRole("shop_manager", "shop.scrapeShopUrl")])
   .inputValidator((input: unknown) =>
     z
       .object({
@@ -835,8 +817,6 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       .parse(input),
   )
   .handler(async ({ data, context }) => {
-    await assertShopManager(context.supabase, context.userId);
-
     const apiKey = process.env.FIRECRAWL_API_KEY;
     const forcedSlug = data.networkSlug ?? null;
 
