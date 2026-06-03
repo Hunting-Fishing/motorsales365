@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { verifyInternalCronToken } from "@/integrations/supabase/internal-secrets.server";
 
 // Refresh FX rates from a free public API (exchangerate.host).
 // Stores rate_to_php for each active currency with auto_update=true.
@@ -68,8 +69,22 @@ async function refresh() {
 export const Route = createFileRoute("/api/public/fx/refresh")({
   server: {
     handlers: {
-      GET: async () => Response.json(await refresh()),
-      POST: async () => Response.json(await refresh()),
+      GET: async ({ request }) => {
+        const authed = await verifyInternalCronToken({
+          jobName: "fx_refresh",
+          tokenHeader: request.headers.get("x-cron-token"),
+        });
+        if (!authed) return new Response("Unauthorized", { status: 401 });
+        return Response.json(await refresh());
+      },
+      POST: async ({ request }) => {
+        const authed = await verifyInternalCronToken({
+          jobName: "fx_refresh",
+          tokenHeader: request.headers.get("x-cron-token"),
+        });
+        if (!authed) return new Response("Unauthorized", { status: 401 });
+        return Response.json(await refresh());
+      },
     },
   },
 });
