@@ -75,7 +75,7 @@ export function ImportPlacesPanel() {
       });
       setRows(res.rows);
       // Pre-select all "new"
-      setSelected(new Set(res.rows.filter((r) => r.status === "new").map((r) => r.place_id)));
+      setSelected(new Set(res.rows.filter((r: NearbyImportRow) => r.status === "new").map((r: NearbyImportRow) => r.place_id)));
       if (res.rows.length === 0) toast.info("No places found in this area");
     } catch (e: any) {
       toast.error(e?.message || "Search failed");
