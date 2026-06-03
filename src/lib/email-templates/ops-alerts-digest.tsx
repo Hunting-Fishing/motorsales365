@@ -49,13 +49,13 @@ const OpsAlertsDigest = ({ total = 0, alerts = [], oldest_at }: Props) => (
   <Html lang="en">
     <Head />
     <Preview>
-      {total} unacknowledged ops alert{total === 1 ? "" : "s"} on {SITE_NAME}
+      {`${total} unacknowledged ops alert${total === 1 ? "" : "s"} on ${SITE_NAME}`}
     </Preview>
     <Body style={main}>
       <Container style={container}>
         <Section style={brandBar} />
         <Heading style={h1}>
-          {total} unacknowledged alert{total === 1 ? "" : "s"}
+          {`${total} unacknowledged alert${total === 1 ? "" : "s"}`}
         </Heading>
         <Text style={text}>
           Backend errors have been piling up in the Ops Alerts queue. Open the admin console to
