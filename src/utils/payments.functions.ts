@@ -584,7 +584,7 @@ export const getInvoiceDetails = createServerFn({ method: "POST" })
         id: line.id,
         description: line.description ?? "",
         quantity: line.quantity ?? 1,
-        unit_amount: toMajor(line.unit_amount, invoice.currency),
+        unit_amount: toMajor((line as Stripe.InvoiceLineItem & { unit_amount?: number | null }).unit_amount ?? null, invoice.currency),
         amount: toMajor(line.amount, invoice.currency),
         currency: invoice.currency,
         period_start: line.period?.start ?? null,
