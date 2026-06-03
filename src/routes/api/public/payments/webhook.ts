@@ -504,6 +504,7 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
           event = await stripe.webhooks.constructEventAsync(body, signature, getWebhookSecret(env));
         } catch (err) {
           console.error("[webhook] signature verification failed:", err);
+          void alertOps("payments.webhook.signature_invalid", { env, err });
           return new Response("Invalid signature", { status: 401 });
         }
 
@@ -511,6 +512,7 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
           await handleEvent(env, event);
         } catch (err) {
           console.error(`[webhook] error handling ${event.type}:`, err);
+          void alertOps("payments.webhook.handler_error", { env, type: event.type, id: event.id, err });
           return new Response("handler error", { status: 500 });
         }
         return new Response("ok");

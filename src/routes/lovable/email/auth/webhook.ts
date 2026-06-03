@@ -10,6 +10,7 @@ import { MagicLinkEmail } from "@/lib/email-templates/magic-link";
 import { RecoveryEmail } from "@/lib/email-templates/recovery";
 import { EmailChangeEmail } from "@/lib/email-templates/email-change";
 import { ReauthenticationEmail } from "@/lib/email-templates/reauthentication";
+import { alertOps } from "@/lib/alerting.server";
 
 const EMAIL_SUBJECTS: Record<string, string> = {
   signup: "Confirm your email",
@@ -51,6 +52,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
 
         if (!apiKey) {
           console.error("LOVABLE_API_KEY not configured");
+          void alertOps("email.auth.config_missing", { key: "LOVABLE_API_KEY" });
           return Response.json({ error: "Server configuration error" }, { status: 500 });
         }
 
@@ -82,6 +84,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
           }
 
           console.error("Webhook verification failed", { error });
+          void alertOps("email.auth.verify_failed", { error });
           return Response.json({ error: "Invalid webhook payload" }, { status: 400 });
         }
 
@@ -131,6 +134,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
 
         if (!supabaseUrl || !supabaseServiceKey) {
           console.error("Missing Supabase environment variables");
+          void alertOps("email.auth.supabase_env_missing", { run_id });
           return Response.json({ error: "Server configuration error" }, { status: 500 });
         }
 
@@ -164,6 +168,7 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
 
         if (enqueueError) {
           console.error("Failed to enqueue auth email", { error: enqueueError, run_id, emailType });
+          void alertOps("email.auth.enqueue_failed", { run_id, emailType, error: enqueueError });
           await supabase.from("email_send_log").insert({
             message_id: messageId,
             template_name: emailType,
