@@ -41,7 +41,8 @@ async function userHasDomainRole(userId: string, role: DomainRole): Promise<bool
 // Records access under route_label="(unlabeled)". Prefer requireAdminRoleAudited(label).
 export const requireAdminRole = createMiddleware({ type: "function" })
   .middleware([requireSupabaseAuth])
-  .server(async ({ next, context, request }) => {
+  .server(async ({ next, context }) => {
+      const request = getRequest(); {
     const userId = (context as { userId?: string }).userId;
     if (!userId) {
       throw new Response("Unauthorized", { status: 401 });
@@ -89,7 +90,8 @@ export const requireAdminRole = createMiddleware({ type: "function" })
 export function requireAdminRoleAudited(label: string) {
   return createMiddleware({ type: "function" })
     .middleware([requireSupabaseAuth])
-    .server(async ({ next, context, request }) => {
+    .server(async ({ next, context }) => {
+      const request = getRequest(); {
       const userId = (context as { userId?: string }).userId;
       if (!userId) throw new Response("Unauthorized", { status: 401 });
       const ok = await userHasAdminRole(userId);
@@ -136,7 +138,8 @@ export function requireAdminRoleAudited(label: string) {
 export function requireDomainRole(role: DomainRole, label: string) {
   return createMiddleware({ type: "function" })
     .middleware([requireSupabaseAuth])
-    .server(async ({ next, context, request }) => {
+    .server(async ({ next, context }) => {
+      const request = getRequest(); {
       const userId = (context as { userId?: string }).userId;
       if (!userId) throw new Response("Unauthorized", { status: 401 });
       const ok = await userHasDomainRole(userId, role);
