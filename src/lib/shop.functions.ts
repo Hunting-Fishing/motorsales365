@@ -471,10 +471,6 @@ const productSchema = z.object({
   universal_fit: z.boolean().optional(),
 });
 
-async function assertShopManagerInline(supabase: any, userId: string) {
-  const { data: ok } = await supabase.rpc("can_manage_shop", { _user_id: userId });
-  if (!ok) throw new Error("Forbidden");
-}
 
 export const adminListProducts = createServerFn({ method: "GET" })
   .middleware([requireDomainRole("shop_manager", "shop.adminListProducts")])
