@@ -102,16 +102,10 @@ const ImportInput = z.object({
 });
 
 export const importPlaces = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((input: unknown) => ImportInput.parse(input))
-  .handler(async ({ data, context }) => {
-    const { data: roleRow } = await context.supabase
-      .from("user_roles" as never)
-      .select("role")
-      .eq("user_id", context.userId)
-      .eq("role", "admin")
-      .maybeSingle();
-    if (!roleRow) throw new Error("Admin only");
+  .handler(async ({ data }) => {
+
 
     const inserted: { id: string; slug: string; name: string }[] = [];
     const skipped: { name: string; reason: string }[] = [];
