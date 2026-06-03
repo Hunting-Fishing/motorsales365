@@ -27,7 +27,7 @@ export type RouteAuditRow = {
   duration_ms: number | null;
   ip: string | null;
   user_agent: string | null;
-  target_summary: Record<string, unknown> | null;
+  target_summary: Record<string, any> | null;
   created_at: string;
 };
 
