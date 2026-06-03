@@ -578,9 +578,9 @@ export const getInvoiceDetails = createServerFn({ method: "POST" })
       amount_remaining: toMajor(invoice.amount_remaining, invoice.currency),
       hosted_invoice_url: invoice.hosted_invoice_url ?? null,
       invoice_pdf: invoice.invoice_pdf ?? null,
-      period_start: (invoice.lines?.data?.[0] as any)?.period?.start ?? null,
-      period_end: (invoice.lines?.data?.[0] as any)?.period?.end ?? null,
-      lines: (invoice.lines?.data ?? []).map((line: any) => ({
+      period_start: (invoice.lines?.data?.[0] as Stripe.InvoiceLineItem | undefined)?.period?.start ?? null,
+      period_end: (invoice.lines?.data?.[0] as Stripe.InvoiceLineItem | undefined)?.period?.end ?? null,
+      lines: (invoice.lines?.data ?? []).map((line: Stripe.InvoiceLineItem) => ({
         id: line.id,
         description: line.description ?? "",
         quantity: line.quantity ?? 1,
