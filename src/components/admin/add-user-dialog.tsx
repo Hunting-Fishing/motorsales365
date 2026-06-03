@@ -165,8 +165,8 @@ export function AddUserDialog({ onCreated }: { onCreated?: () => void }) {
                 onChange={(e) => setPassword(e.target.value)}
                 className="font-mono"
               />
-              <Button type="button" variant="outline" size="icon" onClick={copyPw} title="Copy">
-                <Copy className="h-4 w-4" />
+              <Button type="button" variant="outline" size="icon" onClick={copyPw} title="Copy" aria-label="Copy password">
+                <Copy className="h-4 w-4" aria-hidden="true" />
               </Button>
               <Button
                 type="button"
@@ -174,8 +174,9 @@ export function AddUserDialog({ onCreated }: { onCreated?: () => void }) {
                 size="icon"
                 onClick={() => setPassword(generatePassword())}
                 title="Regenerate"
+                aria-label="Regenerate password"
               >
-                <RefreshCw className="h-4 w-4" />
+                <RefreshCw className="h-4 w-4" aria-hidden="true" />
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
