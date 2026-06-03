@@ -33,7 +33,7 @@ export type NearbyImportRow = NearbyPlace & {
 };
 
 export const findNearbyForImport = createServerFn({ method: "POST" })
-  .middleware([requireAdminRole])
+  .middleware([requireAdminRoleAudited("places.findNearbyForImport")])
   .inputValidator((input: unknown) => NearbyInput.parse(input))
   .handler(async ({ data }): Promise<{ rows: NearbyImportRow[] }> => {
 
@@ -101,7 +101,7 @@ const ImportInput = z.object({
 });
 
 export const importPlaces = createServerFn({ method: "POST" })
-  .middleware([requireAdminRole])
+  .middleware([requireAdminRoleAudited("places.importPlaces")])
   .inputValidator((input: unknown) => ImportInput.parse(input))
   .handler(async ({ data }) => {
 
