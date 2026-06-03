@@ -141,13 +141,21 @@ export const assignLead = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const orgId = await loadLeadOrg(supabase, userId, data.id);
-    await assertOrgManager(supabase, userId, orgId);
-    const { error } = await supabase
-      .from("leads")
-      .update({ assigned_to: data.userId })
-      .eq("id", data.id);
-    if (error) throw new Error(error.message);
-    return { ok: true };
+    return withRouteAudit({
+      actorId: userId,
+      label: "leads.assignLead",
+      role: "org_manager",
+      targetSummary: { org_id: orgId, lead_id: data.id, assignee: data.userId },
+      check: () => assertOrgManager(supabase, userId, orgId),
+      run: async () => {
+        const { error } = await supabase
+          .from("leads")
+          .update({ assigned_to: data.userId })
+          .eq("id", data.id);
+        if (error) throw new Error(error.message);
+        return { ok: true };
+      },
+    });
   });
 
 export const updateLeadStatus = createServerFn({ method: "POST" })
@@ -158,14 +166,23 @@ export const updateLeadStatus = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await loadLeadOrg(supabase, userId, data.id);
-    const { error } = await supabase
-      .from("leads")
-      .update({ status: data.status })
-      .eq("id", data.id);
-    if (error) throw new Error(error.message);
-    return { ok: true };
+    const orgId = await loadLeadOrg(supabase, userId, data.id);
+    return withRouteAudit({
+      actorId: userId,
+      label: "leads.updateLeadStatus",
+      role: "org_manager",
+      targetSummary: { org_id: orgId, lead_id: data.id, status: data.status },
+      run: async () => {
+        const { error } = await supabase
+          .from("leads")
+          .update({ status: data.status })
+          .eq("id", data.id);
+        if (error) throw new Error(error.message);
+        return { ok: true };
+      },
+    });
   });
+
 
 export const addLeadNote = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
