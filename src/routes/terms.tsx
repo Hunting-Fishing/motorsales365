@@ -470,6 +470,7 @@ function TermsPage() {
           </li>
         </ul>
 
+        <h2 className="mt-6 text-xl font-semibold">18. Governing law &amp; venue</h2>
         <p className="mt-2 text-muted-foreground">
           These Terms are governed by and construed in accordance with the laws of the Republic of
           the Philippines, without regard to its conflict-of-laws principles. Subject to Section 14
