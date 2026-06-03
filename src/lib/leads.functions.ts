@@ -215,45 +215,54 @@ export const getOrgPerformance = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertOrgMember(supabase, userId, data.orgId);
-    const since = new Date(Date.now() - data.sinceDays * 86400000).toISOString();
+    return withRouteAudit({
+      actorId: userId,
+      label: "leads.getOrgPerformance",
+      role: "org_manager",
+      targetSummary: { org_id: data.orgId, since_days: data.sinceDays },
+      check: () => assertOrgMember(supabase, userId, data.orgId),
+      run: async () => {
+        const since = new Date(Date.now() - data.sinceDays * 86400000).toISOString();
 
-    const [{ data: members, error: e1 }, { data: leads, error: e2 }] = await Promise.all([
-      supabase
-        .from("organization_members")
-        .select(
-          "user_id, role, profiles:profiles!organization_members_user_id_fkey(id, full_name, avatar_url)",
-        )
-        .eq("organization_id", data.orgId),
-      supabase
-        .from("leads")
-        .select("id, status, assigned_to, created_at")
-        .eq("organization_id", data.orgId)
-        .gte("created_at", since),
-    ]);
-    if (e1) throw new Error(e1.message);
-    if (e2) throw new Error(e2.message);
+        const [{ data: members, error: e1 }, { data: leads, error: e2 }] = await Promise.all([
+          supabase
+            .from("organization_members")
+            .select(
+              "user_id, role, profiles:profiles!organization_members_user_id_fkey(id, full_name, avatar_url)",
+            )
+            .eq("organization_id", data.orgId),
+          supabase
+            .from("leads")
+            .select("id, status, assigned_to, created_at")
+            .eq("organization_id", data.orgId)
+            .gte("created_at", since),
+        ]);
+        if (e1) throw new Error(e1.message);
+        if (e2) throw new Error(e2.message);
 
-    const rows = (members ?? []).map((m: any) => {
-      const mine = (leads ?? []).filter((l) => l.assigned_to === m.user_id);
-      const won = mine.filter((l) => l.status === "won").length;
-      const lost = mine.filter((l) => l.status === "lost").length;
-      const inProgress = mine.filter((l) => l.status === "in_progress").length;
-      const nw = mine.filter((l) => l.status === "new").length;
-      const closed = won + lost;
-      return {
-        userId: m.user_id,
-        role: m.role,
-        profile: m.profiles,
-        total: mine.length,
-        new: nw,
-        in_progress: inProgress,
-        won,
-        lost,
-        win_rate: closed === 0 ? null : Math.round((won / closed) * 100),
-      };
+        const rows = (members ?? []).map((m: any) => {
+          const mine = (leads ?? []).filter((l) => l.assigned_to === m.user_id);
+          const won = mine.filter((l) => l.status === "won").length;
+          const lost = mine.filter((l) => l.status === "lost").length;
+          const inProgress = mine.filter((l) => l.status === "in_progress").length;
+          const nw = mine.filter((l) => l.status === "new").length;
+          const closed = won + lost;
+          return {
+            userId: m.user_id,
+            role: m.role,
+            profile: m.profiles,
+            total: mine.length,
+            new: nw,
+            in_progress: inProgress,
+            won,
+            lost,
+            win_rate: closed === 0 ? null : Math.round((won / closed) * 100),
+          };
+        });
+
+        const unassigned = (leads ?? []).filter((l) => !l.assigned_to).length;
+        return { members: rows, unassigned, since };
+      },
     });
-
-    const unassigned = (leads ?? []).filter((l) => !l.assigned_to).length;
-    return { members: rows, unassigned, since };
   });
+
