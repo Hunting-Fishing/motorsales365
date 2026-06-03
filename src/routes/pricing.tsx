@@ -546,7 +546,7 @@ function PricingPage() {
         </div>
         <p className="mx-auto mt-6 max-w-2xl text-center text-xs text-muted-foreground">
           Plan changes activate instantly. Any unused portion of your current plan is applied as a
-          prorated credit on your next invoice. Live card payments are coming soon.
+          prorated credit on your next invoice.
         </p>
       </section>
 
