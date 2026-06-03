@@ -36,6 +36,7 @@ export function MobileTabBar() {
                       ? "inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm"
                       : "inline-flex h-6 w-6 items-center justify-center"
                   }
+                  aria-hidden="true"
                 >
                   <Icon className={primary ? "h-5 w-5" : "h-5 w-5"} />
                 </span>

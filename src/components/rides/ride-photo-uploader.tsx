@@ -73,19 +73,21 @@ function SortablePhoto({
           onClick={() => onMakeCover(photo)}
           className="pointer-events-auto rounded-full bg-white/90 p-1.5 text-foreground hover:bg-white"
           title={isCover ? "Cover photo" : "Make cover"}
+          aria-label={isCover ? "Current cover photo" : "Make this the cover photo"}
         >
           {isCover ? (
-            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-500" />
+            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-500" aria-hidden="true" />
           ) : (
-            <StarOff className="h-3.5 w-3.5" />
+            <StarOff className="h-3.5 w-3.5" aria-hidden="true" />
           )}
         </button>
         <button
           type="button"
           onClick={() => onRemove(photo)}
           className="pointer-events-auto rounded-full bg-destructive/90 p-1.5 text-destructive-foreground hover:bg-destructive"
+          aria-label="Remove photo"
         >
-          <Trash2 className="h-3.5 w-3.5" />
+          <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
         </button>
       </div>
 
@@ -139,7 +141,7 @@ export function RidePhotoUploader({
           file,
           contentType: file.type,
         });
-        const { error } = await (supabase as any).from("ride_photos").insert({
+        const { error } = await supabase.from("ride_photos").insert({
           ride_id: rideId,
           url: publicUrl,
           storage_path: path,
@@ -159,13 +161,13 @@ export function RidePhotoUploader({
 
   const remove = async (p: Photo) => {
     if (!(await confirm({ title: "Remove this photo?", destructive: true }))) return;
-    await (supabase as any).from("ride_photos").delete().eq("id", p.id);
+    await supabase.from("ride_photos").delete().eq("id", p.id);
     if (p.storage_path) await supabase.storage.from("ride-media").remove([p.storage_path]);
     onChange();
   };
 
   const makeCover = async (p: Photo) => {
-    await (supabase as any).from("rides").update({ cover_photo_url: p.url }).eq("id", rideId);
+    await supabase.from("rides").update({ cover_photo_url: p.url }).eq("id", rideId);
     onChange();
     toast.success("Cover updated");
   };
@@ -173,10 +175,10 @@ export function RidePhotoUploader({
   const persistOrder = async (next: Photo[]) => {
     // Optimistic: state already updated. Push sort_order updates in parallel.
     const updates = next.map((p, idx) =>
-      (supabase as any).from("ride_photos").update({ sort_order: idx }).eq("id", p.id),
+      supabase.from("ride_photos").update({ sort_order: idx }).eq("id", p.id),
     );
     const results = await Promise.all(updates);
-    const firstError = results.find((r: any) => r?.error)?.error;
+    const firstError = results.find((r) => r?.error)?.error;
     if (firstError) {
       toast.error(firstError.message ?? "Failed to save order");
       onChange(); // resync from server

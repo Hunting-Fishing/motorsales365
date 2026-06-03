@@ -2,6 +2,15 @@
 // Emits one digest email per admin user when there are unacknowledged
 // ops_alerts older than 15 minutes. Tracks "last notified at" in
 // site_settings so we don't re-spam admins between cron ticks.
+//
+// ───────────────────────────────────────────────────────────────────────────
+// CRON CONTRACT — do not change without updating the pg_cron schedule.
+//   URL:    https://project--0738c881-614d-4885-8d75-1b7c90e0835e.lovable.app/api/public/hooks/ops-alerts-digest
+//   Method: POST (no body)
+//   Auth:   verifyInternalCronToken (header `x-cron-token`)
+//   If you rename or move this route the cron job stops silently. Update the
+//   pg_cron schedule in the Supabase project at the same time.
+// ───────────────────────────────────────────────────────────────────────────
 
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";

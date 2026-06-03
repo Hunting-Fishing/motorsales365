@@ -207,10 +207,10 @@ const NAV: {
   },
   {
     to: "/admin/feature-flags",
-    label: "Feature flags",
+    label: "Payment & plan flags",
     Icon: Sparkles,
     roles: ["admin"],
-    info: "Toggle in-house payment rails, boost types, and subscription plans.",
+    info: "Server-side toggles for payment rails, boost types, and subscription plans. Distinct from the Sandbox device-level UI flags.",
   },
 ];
 

@@ -54,7 +54,7 @@ export function ServiceLogPhotoUploader({
           file,
           contentType: file.type,
         });
-        const { error } = await (supabase as any).from("ride_service_log_photos").insert({
+        const { error } = await supabase.from("ride_service_log_photos").insert({
           log_id: logId,
           url: publicUrl,
           storage_path: path,
@@ -74,7 +74,7 @@ export function ServiceLogPhotoUploader({
 
   const remove = async (p: ServiceLogPhoto) => {
     if (!(await confirm({ title: "Remove this photo?", destructive: true }))) return;
-    await (supabase as any).from("ride_service_log_photos").delete().eq("id", p.id);
+    await supabase.from("ride_service_log_photos").delete().eq("id", p.id);
     if (p.storage_path) await supabase.storage.from("ride-media").remove([p.storage_path]);
     onChange();
   };

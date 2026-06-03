@@ -16,8 +16,7 @@ export const getMyDisplayCurrency = createServerFn({ method: "GET" })
       .eq("id", userId)
       .maybeSingle();
     if (error) throw new Error(error.message);
-    const row = data as { display_currency: string | null } | null;
-    return { code: row?.display_currency ?? null };
+    return { code: data?.display_currency ?? null };
   });
 
 /**
@@ -33,7 +32,7 @@ export const setMyDisplayCurrency = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     const { error } = await supabase
       .from("profiles")
-      .update({ display_currency: data.code } as never)
+      .update({ display_currency: data.code })
       .eq("id", userId);
     if (error) throw new Error(error.message);
     return { ok: true as const };
