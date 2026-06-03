@@ -39,7 +39,10 @@ export async function alertOps(
   for (const [k, v] of Object.entries(details)) safeDetails[k] = serialize(v);
 
   // Always log so it appears in worker logs too
-  console.error(`[ops-alert][${severity}][${source}] ${event}`, safeDetails);
+  // Severity-gated logging: only high-severity alerts spam console.error.
+  const logger =
+    severity === "critical" || severity === "error" ? console.error : console.warn;
+  logger(`[ops-alert][${severity}][${source}] ${event}`, safeDetails);
 
   try {
     const { error } = await supabaseAdmin.from("ops_alerts").insert({
