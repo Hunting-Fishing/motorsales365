@@ -2252,6 +2252,42 @@ export type Database = {
           },
         ]
       }
+      internal_cron_tokens: {
+        Row: {
+          job_name: string
+          rotated_at: string
+          token: string
+        }
+        Insert: {
+          job_name: string
+          rotated_at?: string
+          token: string
+        }
+        Update: {
+          job_name?: string
+          rotated_at?: string
+          token?: string
+        }
+        Relationships: []
+      }
+      internal_webhook_keys: {
+        Row: {
+          name: string
+          rotated_at: string
+          secret: string
+        }
+        Insert: {
+          name: string
+          rotated_at?: string
+          secret: string
+        }
+        Update: {
+          name?: string
+          rotated_at?: string
+          secret?: string
+        }
+        Relationships: []
+      }
       lead_activities: {
         Row: {
           actor_id: string | null
@@ -5496,6 +5532,11 @@ export type Database = {
         }
         Returns: Json
       }
+      rotate_internal_cron_token: {
+        Args: { _job_name: string }
+        Returns: boolean
+      }
+      rotate_internal_webhook_key: { Args: { _name: string }; Returns: boolean }
       self_serve_change_plan: { Args: { _plan_id: string }; Returns: Json }
       suggest_business_tag: {
         Args: { _category: string; _label: string; _type_slug: string }
