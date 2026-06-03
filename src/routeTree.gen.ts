@@ -66,6 +66,7 @@ import { Route as DashboardVehiclesRouteImport } from './routes/dashboard.vehicl
 import { Route as DashboardTowRouteImport } from './routes/dashboard.tow'
 import { Route as DashboardTeamRouteImport } from './routes/dashboard.team'
 import { Route as DashboardShopFavoritesRouteImport } from './routes/dashboard.shop-favorites'
+import { Route as DashboardShareKitRouteImport } from './routes/dashboard.share-kit'
 import { Route as DashboardSearchesRouteImport } from './routes/dashboard.searches'
 import { Route as DashboardRidesRouteImport } from './routes/dashboard.rides'
 import { Route as DashboardReferralRouteImport } from './routes/dashboard.referral'
@@ -423,6 +424,11 @@ const DashboardTeamRoute = DashboardTeamRouteImport.update({
 const DashboardShopFavoritesRoute = DashboardShopFavoritesRouteImport.update({
   id: '/shop-favorites',
   path: '/shop-favorites',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardShareKitRoute = DashboardShareKitRouteImport.update({
+  id: '/share-kit',
+  path: '/share-kit',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardSearchesRoute = DashboardSearchesRouteImport.update({
@@ -870,6 +876,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
+  '/dashboard/share-kit': typeof DashboardShareKitRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
   '/dashboard/team': typeof DashboardTeamRouteWithChildren
   '/dashboard/tow': typeof DashboardTowRoute
@@ -1000,6 +1007,7 @@ export interface FileRoutesByTo {
   '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
+  '/dashboard/share-kit': typeof DashboardShareKitRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/vehicles': typeof DashboardVehiclesRoute
@@ -1132,6 +1140,7 @@ export interface FileRoutesById {
   '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
+  '/dashboard/share-kit': typeof DashboardShareKitRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
   '/dashboard/team': typeof DashboardTeamRouteWithChildren
   '/dashboard/tow': typeof DashboardTowRoute
@@ -1266,6 +1275,7 @@ export interface FileRouteTypes {
     | '/dashboard/referral'
     | '/dashboard/rides'
     | '/dashboard/searches'
+    | '/dashboard/share-kit'
     | '/dashboard/shop-favorites'
     | '/dashboard/team'
     | '/dashboard/tow'
@@ -1396,6 +1406,7 @@ export interface FileRouteTypes {
     | '/dashboard/referral'
     | '/dashboard/rides'
     | '/dashboard/searches'
+    | '/dashboard/share-kit'
     | '/dashboard/shop-favorites'
     | '/dashboard/tow'
     | '/dashboard/vehicles'
@@ -1527,6 +1538,7 @@ export interface FileRouteTypes {
     | '/dashboard/referral'
     | '/dashboard/rides'
     | '/dashboard/searches'
+    | '/dashboard/share-kit'
     | '/dashboard/shop-favorites'
     | '/dashboard/team'
     | '/dashboard/tow'
@@ -2070,6 +2082,13 @@ declare module '@tanstack/react-router' {
       path: '/shop-favorites'
       fullPath: '/dashboard/shop-favorites'
       preLoaderRoute: typeof DashboardShopFavoritesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/share-kit': {
+      id: '/dashboard/share-kit'
+      path: '/share-kit'
+      fullPath: '/dashboard/share-kit'
+      preLoaderRoute: typeof DashboardShareKitRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/searches': {
@@ -2671,6 +2690,7 @@ interface DashboardRouteChildren {
   DashboardReferralRoute: typeof DashboardReferralRoute
   DashboardRidesRoute: typeof DashboardRidesRoute
   DashboardSearchesRoute: typeof DashboardSearchesRoute
+  DashboardShareKitRoute: typeof DashboardShareKitRoute
   DashboardShopFavoritesRoute: typeof DashboardShopFavoritesRoute
   DashboardTeamRoute: typeof DashboardTeamRouteWithChildren
   DashboardTowRoute: typeof DashboardTowRoute
@@ -2693,6 +2713,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardReferralRoute: DashboardReferralRoute,
   DashboardRidesRoute: DashboardRidesRoute,
   DashboardSearchesRoute: DashboardSearchesRoute,
+  DashboardShareKitRoute: DashboardShareKitRoute,
   DashboardShopFavoritesRoute: DashboardShopFavoritesRoute,
   DashboardTeamRoute: DashboardTeamRouteWithChildren,
   DashboardTowRoute: DashboardTowRoute,
