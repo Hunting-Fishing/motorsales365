@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireAdminRole } from "@/integrations/supabase/admin-middleware";
+import { requireAdminRoleAudited } from "@/integrations/supabase/admin-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import {
   geocodeAddress,
