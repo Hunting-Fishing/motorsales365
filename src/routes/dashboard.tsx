@@ -53,6 +53,7 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean }[] = [
   { to: "/dashboard/tow", label: "Tow requests", Icon: Truck },
   { to: "/dashboard/businesses", label: "My businesses", Icon: Store },
   { to: "/dashboard/profile", label: "Profile", Icon: UserIcon },
+  { to: "/my-qr", label: "My QR code", Icon: QrCode },
   { to: "/dashboard/verification", label: "Verification", Icon: ShieldCheck },
   { to: "/dashboard/billing", label: "Billing", Icon: CreditCard },
 ];
