@@ -1,28 +1,27 @@
-## Step 7 — Proxy Nominatim through a server function
+## Step 8 — Bundle Leaflet marker icons locally
 
-Move all browser-side calls to `nominatim.openstreetmap.org` behind our own server, so we control the User-Agent, rate-limit, and cache (OSM's usage policy requires a descriptive UA and forbids heavy unattributed client traffic).
+Replace the runtime `https://unpkg.com/leaflet@1.9.4/dist/images/*` URLs with ESM asset imports from the installed `leaflet` package. This removes an external runtime dependency (faster, works offline / behind firewalls / in CSP-strict setups) and avoids broken markers if unpkg is unavailable.
 
 ### Changes
 
-1. **New public server route** `src/routes/api/public/geo-search.ts`
-   - `GET /api/public/geo-search?q=...&limit=7`
-   - Validates `q` (2–200 chars) and `limit` (1–10).
-   - Calls Nominatim `/search` with `countrycodes=ph`, `viewbox=116.0,4.5,127.0,21.5`, `bounded=1`, `addressdetails=1`, sets `User-Agent: 365MotorSales/1.0 (...)`.
-   - Maps results to a small DTO `{ id, primary, secondary, lat, lng, label }`.
-   - Returns JSON with `Cache-Control: public, max-age=300`.
-   - Mirrors the same shape as existing `/api/public/geocode` (single-result) but for autocomplete.
+1. **`src/components/businesses/business-map-inner.tsx`**
+   - Replace the 3 `unpkg.com` string constants with:
+     ```ts
+     import iconUrl from "leaflet/dist/images/marker-icon.png";
+     import iconRetinaUrl from "leaflet/dist/images/marker-icon-2x.png";
+     import shadowUrl from "leaflet/dist/images/marker-shadow.png";
+     ```
+   - `L.icon({ iconUrl, iconRetinaUrl, shadowUrl, ... })` stays the same.
 
-2. **Update `src/components/businesses/places-autocomplete.tsx`**
-   - Replace the direct `fetch("https://nominatim.openstreetmap.org/search…")` with `fetch("/api/public/geo-search?q=…&limit=7")`.
-   - Drop the client-side URL building / viewbox params (now server-owned).
-   - Keep the existing 350ms debounce, abort-controller, and keyboard handling untouched.
-   - Simplify the response mapping since the server already returns `{ primary, secondary, ... }`.
+2. **`src/components/businesses/location-picker-inner.tsx`** — same swap.
+
+3. **`src/components/admin/device-heatmap-inner.tsx`** — verify it already uses local CSS only; only edit if a marker icon is constructed.
 
 ### Out of scope
-- Map clustering, geolocation button (done in step 6).
-- Admin Places import flow already uses `places.server.ts` server-side — no change.
-- No DB changes, no new secrets.
+- No dependency add (`leaflet` is already installed).
+- No DB / route / behavior changes.
+- `google-business-map.tsx` uses custom DivIcons (colored pins), not the default Leaflet marker — no edit.
 
 ### Files touched
-- `src/routes/api/public/geo-search.ts` (new)
-- `src/components/businesses/places-autocomplete.tsx` (edited)
+- `src/components/businesses/business-map-inner.tsx`
+- `src/components/businesses/location-picker-inner.tsx`
