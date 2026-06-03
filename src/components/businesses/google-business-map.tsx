@@ -146,9 +146,10 @@ export function GoogleBusinessMap({
   // Render markers + adjust bounds whenever data changes
   useEffect(() => {
     const map = mapRef.current;
-    if (!ready || !map) return;
+    const cluster = clusterRef.current;
+    if (!ready || !map || !cluster) return;
 
-    markersRef.current.forEach((m) => m.remove());
+    cluster.clearLayers();
     markersRef.current = [];
 
     const valid = businesses.filter(
@@ -159,13 +160,14 @@ export function GoogleBusinessMap({
         Number.isFinite(Number(b.lng)),
     );
 
+    const newMarkers: L.Marker[] = [];
     valid.forEach((b) => {
       const color = colorForType(b.type_slug);
       const marker = L.marker([Number(b.lat), Number(b.lng)], {
         icon: pinDivIcon(color, b.featured, b.highlighted, b.type_slug),
         title: b.name,
         zIndexOffset: b.highlighted ? 1000 : b.featured ? 500 : 0,
-      }).addTo(map);
+      });
 
       const rating =
         b.rating_count > 0
@@ -183,8 +185,11 @@ export function GoogleBusinessMap({
       </div>`;
       marker.bindPopup(html, { closeButton: true, maxWidth: 260 });
       marker.on("click", () => onPinClick?.(b.slug));
-      markersRef.current.push(marker);
+      newMarkers.push(marker);
     });
+    cluster.addLayers(newMarkers);
+    markersRef.current = newMarkers;
+
 
     // Centre / fit logic
     if (center) {
