@@ -115,6 +115,7 @@ import { Route as DashboardTeamMembersRouteImport } from './routes/dashboard.tea
 import { Route as DashboardTeamLeadsRouteImport } from './routes/dashboard.team.leads'
 import { Route as DashboardRidesNewRouteImport } from './routes/dashboard.rides_.new'
 import { Route as BusinessesSlugBookRouteImport } from './routes/businesses.$slug.book'
+import { Route as ApiPublicReverseGeocodeRouteImport } from './routes/api/public/reverse-geocode'
 import { Route as ApiPublicPaymentEventsRouteImport } from './routes/api/public/payment-events'
 import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocode'
 import { Route as ApiPublicGeoSearchRouteImport } from './routes/api/public/geo-search'
@@ -665,6 +666,11 @@ const BusinessesSlugBookRoute = BusinessesSlugBookRouteImport.update({
   path: '/book',
   getParentRoute: () => BusinessesSlugRoute,
 } as any)
+const ApiPublicReverseGeocodeRoute = ApiPublicReverseGeocodeRouteImport.update({
+  id: '/api/public/reverse-geocode',
+  path: '/api/public/reverse-geocode',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPaymentEventsRoute = ApiPublicPaymentEventsRouteImport.update({
   id: '/api/public/payment-events',
   path: '/api/public/payment-events',
@@ -862,6 +868,7 @@ export interface FileRoutesByFullPath {
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
+  '/api/public/reverse-geocode': typeof ApiPublicReverseGeocodeRoute
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
@@ -985,6 +992,7 @@ export interface FileRoutesByTo {
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
+  '/api/public/reverse-geocode': typeof ApiPublicReverseGeocodeRoute
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
@@ -1112,6 +1120,7 @@ export interface FileRoutesById {
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
   '/api/public/geocode': typeof ApiPublicGeocodeRoute
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
+  '/api/public/reverse-geocode': typeof ApiPublicReverseGeocodeRoute
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
   '/dashboard/rides_/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
@@ -1240,6 +1249,7 @@ export interface FileRouteTypes {
     | '/api/public/geo-search'
     | '/api/public/geocode'
     | '/api/public/payment-events'
+    | '/api/public/reverse-geocode'
     | '/businesses/$slug/book'
     | '/dashboard/rides/new'
     | '/dashboard/team/leads'
@@ -1363,6 +1373,7 @@ export interface FileRouteTypes {
     | '/api/public/geo-search'
     | '/api/public/geocode'
     | '/api/public/payment-events'
+    | '/api/public/reverse-geocode'
     | '/businesses/$slug/book'
     | '/dashboard/rides/new'
     | '/dashboard/team/leads'
@@ -1489,6 +1500,7 @@ export interface FileRouteTypes {
     | '/api/public/geo-search'
     | '/api/public/geocode'
     | '/api/public/payment-events'
+    | '/api/public/reverse-geocode'
     | '/businesses/$slug/book'
     | '/dashboard/rides_/new'
     | '/dashboard/team/leads'
@@ -1578,6 +1590,7 @@ export interface RootRouteChildren {
   ApiPublicGeoSearchRoute: typeof ApiPublicGeoSearchRoute
   ApiPublicGeocodeRoute: typeof ApiPublicGeocodeRoute
   ApiPublicPaymentEventsRoute: typeof ApiPublicPaymentEventsRoute
+  ApiPublicReverseGeocodeRoute: typeof ApiPublicReverseGeocodeRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ShopBrandSlugRoute: typeof ShopBrandSlugRoute
   ShopDepartmentSlugRoute: typeof ShopDepartmentSlugRoute
@@ -2338,6 +2351,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BusinessesSlugBookRouteImport
       parentRoute: typeof BusinessesSlugRoute
     }
+    '/api/public/reverse-geocode': {
+      id: '/api/public/reverse-geocode'
+      path: '/api/public/reverse-geocode'
+      fullPath: '/api/public/reverse-geocode'
+      preLoaderRoute: typeof ApiPublicReverseGeocodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payment-events': {
       id: '/api/public/payment-events'
       path: '/api/public/payment-events'
@@ -2702,6 +2722,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicGeoSearchRoute: ApiPublicGeoSearchRoute,
   ApiPublicGeocodeRoute: ApiPublicGeocodeRoute,
   ApiPublicPaymentEventsRoute: ApiPublicPaymentEventsRoute,
+  ApiPublicReverseGeocodeRoute: ApiPublicReverseGeocodeRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ShopBrandSlugRoute: ShopBrandSlugRoute,
   ShopDepartmentSlugRoute: ShopDepartmentSlugRoute,

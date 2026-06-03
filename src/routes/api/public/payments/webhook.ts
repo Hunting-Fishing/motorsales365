@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import Stripe from "stripe";
 import { createStripeClient, getWebhookSecret, type StripeEnv } from "@/lib/stripe.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { alertOps } from "@/lib/alerting.server";
 
 function parseEnv(url: URL): StripeEnv {
   const v = url.searchParams.get("env");
@@ -37,6 +38,7 @@ async function upsertSubscription(env: StripeEnv, sub: Stripe.Subscription) {
 
   if (!planId) {
     console.error("[webhook] could not resolve plan_id for subscription", sub.id);
+    void alertOps("payments.subscription.plan_unresolved", { subId: sub.id, lookupKey, itemLookup });
     return;
   }
 
@@ -90,6 +92,7 @@ async function upsertBusinessSubscription(env: StripeEnv, sub: Stripe.Subscripti
   const planSlug = (sub.metadata?.planSlug as string | undefined) ?? null;
   if (!userId || !businessId) {
     console.error("[webhook] business sub missing metadata", sub.id);
+    void alertOps("payments.business_sub.missing_metadata", { subId: sub.id, userId, businessId });
     return;
   }
 
@@ -113,6 +116,7 @@ async function upsertBusinessSubscription(env: StripeEnv, sub: Stripe.Subscripti
   }
   if (!plan) {
     console.error("[webhook] business plan not found for sub", sub.id);
+    void alertOps("payments.business_sub.plan_not_found", { subId: sub.id, planSlug, itemLookup });
     return;
   }
 
@@ -221,6 +225,7 @@ async function activateBoostFromSession(env: StripeEnv, session: Stripe.Checkout
   const boostSlug = meta.boostSlug as string | undefined;
   if (!userId || !listingId || !boostSlug) {
     console.error("[webhook] boost session missing metadata", session.id);
+    void alertOps("payments.boost.missing_metadata", { sessionId: session.id, userId, listingId, boostSlug });
     return;
   }
 
@@ -287,6 +292,7 @@ async function activateListingFromSession(env: StripeEnv, session: Stripe.Checko
   const plan = (meta.plan as string | undefined) ?? "standard";
   if (!userId || !listingId) {
     console.error("[webhook] listing_payment missing metadata", session.id);
+    void alertOps("payments.listing.missing_metadata", { sessionId: session.id, userId, listingId });
     return;
   }
 
@@ -306,6 +312,7 @@ async function activateListingFromSession(env: StripeEnv, session: Stripe.Checko
     .maybeSingle();
   if (!listing || (listing as any).user_id !== userId) {
     console.error("[webhook] listing_payment: listing not found / owner mismatch", listingId);
+    void alertOps("payments.listing.owner_mismatch", { sessionId: session.id, listingId, userId });
     return;
   }
 
@@ -379,6 +386,7 @@ async function enrollCourseFromSession(env: StripeEnv, session: Stripe.Checkout.
   const courseId = meta.courseId as string | undefined;
   if (!userId || !courseId) {
     console.error("[webhook] course session missing metadata", session.id);
+    void alertOps("payments.course.missing_metadata", { sessionId: session.id, userId, courseId });
     return;
   }
   // Idempotent insert: unique(user_id, course_id) handles duplicate webhooks
@@ -496,6 +504,7 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
           event = await stripe.webhooks.constructEventAsync(body, signature, getWebhookSecret(env));
         } catch (err) {
           console.error("[webhook] signature verification failed:", err);
+          void alertOps("payments.webhook.signature_invalid", { env, err });
           return new Response("Invalid signature", { status: 401 });
         }
 
@@ -503,6 +512,7 @@ export const Route = createFileRoute("/api/public/payments/webhook")({
           await handleEvent(env, event);
         } catch (err) {
           console.error(`[webhook] error handling ${event.type}:`, err);
+          void alertOps("payments.webhook.handler_error", { env, type: event.type, id: event.id, err });
           return new Response("handler error", { status: 500 });
         }
         return new Response("ok");
