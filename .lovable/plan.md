@@ -1,79 +1,169 @@
-# Full-app readiness audit — what's left
 
-I swept the codebase end-to-end (113 routes, 112 public tables, all helpers, migrations, docs, plan files, and `coming soon` / `TODO` markers). Below is the complete remaining-work list, grouped by severity. Nothing destructive — this is a checklist, not an edit.
+# 365motorsales Launch-Readiness Plan
 
-## 1. Launch blockers (must do before "done")
+Goal: ship every item from the full-app audit in the correct order — security first, correctness second, SEO/a11y/polish last — so the next publish is genuinely launch-grade.
 
-**A. Go live on Stripe** — backend is fully wired in sandbox, but live money is gated on out-of-code steps owned by you (see `docs/STRIPE_GOLIVE.md`):
-1. Claim Stripe sandbox account in Connectors → Payments.
-2. Run Stripe activation wizard (business, bank, 2FA).
-3. Copy sandbox products to live, install Lovable app on live account.
-4. Lovable auto-provisions `STRIPE_LIVE_API_KEY` + `PAYMENTS_LIVE_WEBHOOK_SECRET`.
-5. Publish project → `pk_live_...` is written to `.env.production` → orange test-mode banner disappears.
+Work is grouped into 4 phases. Each phase is independently shippable; do not start a phase before the prior one is green.
 
-No code changes required. Until step 5, every checkout is sandbox.
+---
 
-**B. Pricing page copy lies a little** — `src/routes/pricing.tsx:549` still says *"Live card payments are coming soon."* That string should flip the moment live keys land. Either remove it now or gate it on `import.meta.env.PROD && !VITE_PAYMENTS_CLIENT_TOKEN.startsWith("pk_live")`.
+## Phase 1 — P0 Security & Correctness Blockers
 
-## 2. Coming-soon surfaces still in production UI
+Nothing else ships until these are done.
 
-`src/routes/payments.tsx` advertises 5 methods as `soon` and 5 as `planned`. Each is a real product decision:
+### 1.1 Harden `/api/public/payment-events`
+- Remove `PAYMENT_WEBHOOK_ENABLED` gate.
+- Replace `x-debug-token` check with provider-specific HMAC verification:
+  - `stripe-signature` (already handled in `/payments/webhook` — share verifier helper).
+  - `paymongo-signature` (SHA256 HMAC over raw body, `t=…,te=…,li=…`).
+  - `x-callback-token` (Xendit) — constant-time compare against `XENDIT_CALLBACK_TOKEN`.
+- Route on a `?provider=stripe|paymongo|xendit` query param; reject unknown providers with 400.
+- Read raw body **once** (`await request.text()`) before parsing — required for HMAC.
+- Keep service-role usage but only after signature passes.
+- Add `PAYMONGO_WEBHOOK_SECRET` and `XENDIT_CALLBACK_TOKEN` via `add_secret`.
 
-| Method | Status | What "shipping" means |
-|---|---|---|
-| Maya wallet | soon | Stripe PH supports it — enable PaymentMethod in Stripe Dashboard, add `"maya"` to checkout method list |
-| QR Ph | soon | Same — flip in Stripe + checkout config |
-| ShopeePay | planned | Not on Stripe PH yet; either remove card or wait |
-| InstaPay / PESONet | planned | Needs a bank-transfer rail (Xendit/Maya Business). Out-of-scope for Stripe-only stack |
-| Online banking (BPI/BDO/UnionBank) | planned | Same as above |
-| 7-Eleven / Cebuana / M Lhuillier | planned | Needs Dragonpay/Xendit OTC rail |
-| Manual bank deposit | planned | Build upload-proof flow + admin approval queue |
+### 1.2 Server-side admin guard
+- Add `requireAdminRole` middleware in `src/integrations/supabase/admin-middleware.ts` that chains `requireSupabaseAuth` then calls `has_role(userId,'admin')` via service-role client; throws 403 otherwise.
+- Apply to every destructive admin server fn: `admin-users.functions.ts`, `admin.reports.tsx` mutations, `business-pages.functions.ts` admin paths, `education.functions.ts` admin paths, `ads.functions.ts`, `referrals` admin, `pricing` admin, currencies, redemptions, type-suggestions, verifications.
+- Keep client `effectiveRoles` for UX hiding only.
 
-Recommendation: ship Maya + QR Ph this week (5-min Stripe toggles), and either build or hide the rest. Leaving "planned" cards live looks unfinished.
+### 1.3 Stripe gateway resilience
+- Wrap `createStripeClient`'s fetch with a 2-attempt retry on 5xx / network error, exponential backoff (250ms, 1s), max 1 retry on POSTs without idempotency key.
+- Surface `alertOps('stripe.gateway_unreachable', …, { severity:'critical' })` after final failure.
+- Document in `docs/STRIPE_GOLIVE.md` that gateway is single-tracked by design.
 
-**Other coming-soon strings:**
-- `src/routes/learn_.$slug.watch.$lessonId.tsx:133` — *"Video coming soon."* fallback when a lesson has no `video_url`. Fine as fallback, but no admin UI to bulk-fill missing videos.
-- `src/components/business/service-catalog-picker.tsx:75` — curated catalog message for business types you haven't seeded yet. Either expand `src/data/` catalogs or remove copy.
-- `src/components/listing-card.tsx:96` / `listing.$id.tsx:386` — *"Vehicle photo coming soon"* alt text when no cover. Harmless.
+### 1.4 Service worker version stamping
+- Replace hardcoded `VERSION = "v1"` in `public/sw.js` with a build-time replacement (`__SW_VERSION__`) injected by a tiny Vite plugin reading `package.json` version + git short SHA.
+- On activate, `caches.keys()` → delete any cache not matching current version.
 
-## 3. Half-built / inconsistent
+### 1.5 Type-safety sweep on money paths
+- Eliminate `as any` in: `src/utils/payments.functions.ts`, `src/routes/api/public/payments/webhook.ts`, `src/lib/listing-payment.functions.ts`, `src/lib/boosts.functions.ts`, `src/lib/business-subscriptions.functions.ts`.
+- Use generated Supabase types + `Stripe.*` types directly; introduce narrow Zod schemas for webhook payloads.
+- Target: 0 `as any` in those 5 files (rest of codebase can wait).
 
-**A. `src/components/ui/confirm-dialog.tsx:40` falls back to `window.confirm()`.** Means somewhere a Promise-based confirm is being used outside a Dialog provider context, and silently degrades to a native browser prompt. Should always render the dialog.
+**Phase 1 verification:** all migrations applied, secrets confirmed via `fetch_secrets`, test webhook from Stripe CLI + PayMongo sandbox + Xendit sandbox each return 200 with valid sig and 401 without, admin server fn returns 403 when called by non-admin.
 
-**B. Payment-events email webhook is opt-in.** `STRIPE_GOLIVE.md` §6 says `/api/public/payment-events` only fires when `PAYMENT_WEBHOOK_ENABLED=1`. If you actually want receipt / refund / failure emails on live, set that secret.
+---
 
-**C. Ops alerting persisted, but no email/Slack escalation.** `ops_alerts` table + `/admin/alerts` page exist; nobody gets paged. Options: (i) Supabase pg cron job that emails admins when `unacknowledged_count > 0`, (ii) re-introduce optional Slack webhook fed from the same `alertOps()` helper.
+## Phase 2 — P1 SEO, Error Handling, Accessibility
 
-**D. Security memory.** `docs/SECURITY.md` documents 18 accepted linter warnings but the in-product `@security-memory` may be stale. Worth a re-scan + memory update once live keys are in.
+### 2.1 Per-route `head()` sweep (46 missing routes)
+Build a shared `buildPageHead({title,description,path,image?,type?})` helper in `src/lib/seo/head.ts` that returns the `{meta,links}` shape with title, description, og:title/description/url/type, twitter card, and canonical `https://365motorsales.com${path}`.
 
-## 4. Operational gaps (not breaking, but visible)
+Add `head()` to every public/shareable route currently missing one:
+- `/` (home), `/shop`, `/shop.categories`, `/shop.$category`, `/shop.brand.$slug`, `/shop.department.$slug`, `/shop.p.$slug`
+- `/businesses`, `/businesses.$slug.book`, `/businesses.submit`
+- `/rides`, `/rides.$slug`, `/map`, `/tow`, `/export`, `/advertise`, `/partner-training`
+- `/learn`, `/learn.$slug`, `/learn_.$slug.watch.$lessonId`
+- `/passport.$slug`, `/seller.$id`, `/sell`, `/sell.import`, `/my-qr`
+- `/payments`, `/pricing`, `/checkout.return`, `/listing.checkout`, `/boost.checkout`, `/business.checkout`, `/payments.$id.receipt`
+- `/support*`, `/about`, `/contact`, `/guidelines`, `/affiliate-disclosure`
+- `/login`, `/signup`, `/forgot-password`, `/reset-password`, `/verify-email`, `/unsubscribe`
+- All dashboard routes get title only + `noindex` meta.
+- All admin routes get title + `noindex,nofollow`.
 
-- **No instance-size guidance.** With 112 public tables and growing traffic, Cloud → Overview → Advanced should be bumped before launch. Free-tier instance will throttle on the first marketing burst.
-- **No published-domain canonical check.** Project has `motorsales365.lovable.app` AND `www.365motorsales.com` AND apex. Verify `<link rel="canonical">` in `__root.tsx` resolves to apex on every route; otherwise SEO splits.
-- **Sitemap / robots** exist (`src/routes/sitemap[.]xml.ts`, `api/robots[.]txt.tsx`). Worth running an SEO scan to confirm coverage of the 113 routes.
-- **Service worker** (`public/sw.js`, `service-worker-register.tsx`) — confirm cache-busting on deploy or users get stale shell after publish.
-- **PWA install** (`install-app-button.tsx`) — manifest exists, but no audit of icon sizes / Apple touch icons / theme color across light/dark.
+Dynamic routes (`listing.$id`, `b.$slug`, `businesses.$slug`, `rides.$slug`, `shop.p.$slug`, `passport.$slug`, `learn.$slug`) derive title/desc/og:image from `loaderData`. Pull cover image from existing listing/product/business data — no placeholder images.
 
-## 5. Stuff I checked and is actually done
+### 2.2 JSON-LD wiring
+Use existing `use-dynamic-jsonld.ts` (or inline via `head().scripts`) on:
+- `listing.$id` → `Vehicle` + `Offer` + `BreadcrumbList`
+- `businesses.$slug` → `LocalBusiness` + `AggregateRating` (when reviews exist)
+- `shop.p.$slug` → `Product` + `Offer`
+- `learn.$slug` → `Course`
+- `learn_.$slug.watch.$lessonId` → `VideoObject` when `video_url` present
+- `__root.tsx` keeps existing `Organization` + `WebSite` (already good)
+- FAQ routes (support pages) → `FAQPage`
 
-For completeness so you know I looked:
+### 2.3 Consolidate robots.txt + sitemap
+- Delete `public/robots.txt`. Keep only dynamic `src/routes/api/robots[.]txt.tsx`.
+- Update dynamic robots: single canonical host `https://365motorsales.com`, `Sitemap: https://365motorsales.com/sitemap.xml`, disallow `/admin`, `/dashboard`, `/api/`, `/auth/*`, `/unsubscribe`, `/checkout.return`.
+- Expand `src/routes/sitemap[.]xml.ts` to include: `/export`, `/tow`, `/partner-training`, `/advertise`, `/my-qr`, all `/passport/$slug` (from DB), `/seller/$id` (from DB), `/r/$code` public referral landing pages, `/c/$code` campaign pages.
+- Add `public/llms.txt` describing the site for AI crawlers (site purpose, key sections, sitemap URL).
 
-- Auth (email/password + Google OAuth, role table, `has_role`, RLS everywhere) ✅
-- Stripe webhook signature verify + subscription/boost/listing/course flows ✅
-- Email infra (transactional + auth templates, pgmq queue, suppression list) ✅
-- Rides + listings + businesses + shop + learn + tow + advertise CRUD ✅
-- Admin: users, accounts, listings, businesses, verifications, audit, performance, alerts, sandbox, currencies, education, shop, reports, type-suggestions, redemptions, referrals, pricing, advertising, inquiries, analytics ✅
-- Geocoding proxied through `/api/public/{geocode,reverse-geocode,geo-search}` ✅
-- Marker clustering + geolocation on both rides map and businesses map ✅
-- Ops alerts table + admin viewer ✅
-- Security: helper-function whitelist documented, RLS on every public table I sampled ✅
+### 2.4 Error/NotFound boundaries on every route
+- Add `errorComponent: RouteErrorBoundary` and `notFoundComponent: RouteNotFoundBoundary` (both already in `src/components/route-boundaries.tsx`) to every `createFileRoute` that has a `loader`.
+- Set `defaultErrorComponent` on the router in `src/router.tsx`.
 
-## Recommended next move
+### 2.5 Ops alert digest auth
+- Add `apikey` query/header check on `/api/public/hooks/ops-alerts-digest` matching new `OPS_DIGEST_CRON_KEY` secret. Update pg_cron migration to pass it.
+- Same treatment for `/api/public/hooks/refresh-lazada` and `/api/public/fx/refresh` (audit).
+- Make pg_cron job URLs read from a `site_settings.app_url` row instead of hardcoded preview URL; update migration that originally created jobs.
 
-Pick one of these to scope into a build:
-1. **Flip the live-payments switch** — finish Stripe steps 1-5, then I clean up the pricing-page string and Maya/QR Ph toggles. ~30 min of code.
-2. **Tighten the "coming soon" UI** — collapse the planned payment-method cards into a "Roadmap" expander so the page stops feeling half-shipped. ~20 min.
-3. **Escalation for ops alerts** — add a pg_cron summary email to admins for any unack'd alert > 15 min. ~45 min.
-4. **Pre-launch hardening** — instance-size bump prompt + canonical-domain audit + SEO scan + PWA icon audit. Mostly verification, not code.
+### 2.6 Data correctness fixes
+- `admin.reports.tsx`: handle Supabase error responses on hide/remove, surface toast on failure.
+- `dashboard.messages.tsx`: paginate at 50/page with cursor on `created_at`.
+- `alertOps`: only `console.error` for `error`/`critical`; `console.warn` for `warning`; `console.info` for `info`.
 
-Tell me which (or "all of 1-3") and I'll switch to build and execute.
+### 2.7 Payments UI cleanup
+- Either wire Maya + QR Ph via Stripe PH `payment_method_types` (5-min toggle), or move them into the same "On the roadmap" accordion the planned methods live in. No "Coming soon" copy outside that accordion.
+- Remove ShopeePay/InstaPay/PESONet/BPI/BDO/UnionBank cards from above-fold entirely until a real rail exists.
+
+**Phase 2 verification:** run `seo_chat--trigger_scan`, fix findings, mark resolved; manual smoke of 10 routes confirms unique titles/descriptions; sitemap validates; broken loader on `listing.$id` shows boundary not blank.
+
+---
+
+## Phase 3 — P2 Accessibility & Polish
+
+### 3.1 Accessibility pass
+- Audit every icon-only button in `src/components/` (header, mobile-tab-bar, listing-card actions, share/qr buttons, admin tables). Add `aria-label` to button + `aria-hidden="true"` to inner `<Icon/>`.
+- Add `role="dialog"` + focus trap to Dialog/Sheet/Drawer wrappers (shadcn provides primitives; wire `aria-modal`, initial focus, `onKeyDown` Esc).
+- Add visible focus ring tokens in `src/styles.css` (`--ring`) where missing.
+- Ensure form labels associate with inputs via `htmlFor`/`id` everywhere (`signup`, `sell`, `dashboard.profile`, `dashboard.businesses_.$id.edit`).
+
+### 3.2 PWA polish
+- Add `shortcuts` (Sell, Browse rides, Shop, My garage) and `screenshots` (1 mobile + 1 desktop, generated) to `public/manifest.webmanifest`.
+- Verify all icon sizes render correctly on iOS install (apple-touch 180×180 confirmed) and Android (192/512/maskable confirmed).
+
+### 3.3 Legal pages re-review
+- Update `/terms` to cover: organizations/teams, export brokerage, learning/courses, referrals, shop affiliate disclosure.
+- Bump "Last updated" on `/terms`, `/privacy`, `/refund-policy`.
+- Cross-check against `mem://policies/terms-sync` and `mem://policies/privacy-sync` rules.
+
+### 3.4 Orphan routes
+- Either link from nav (footer + mobile tab) or `noindex`: `/my-qr`, `/export`, `/partner-training`, `/r/$code/poster`. Recommendation: footer link `/export`, `/partner-training`; keep `/my-qr` + `/r/$code/poster` `noindex` (utility pages).
+
+### 3.5 Minimum test coverage
+- Add Vitest smoke tests for: HMAC verifier (Stripe, PayMongo, Xendit each — happy + bad sig), `requireAdminRole` (admin → ok, non-admin → 403), `receipt-lines` (already exists), `buildPageHead`, currency formatter.
+- Add one Playwright E2E: `signup → verify → list a vehicle → checkout sandbox card → success`. Stored in `tests/e2e/`.
+
+---
+
+## Phase 4 — Live Switch
+
+### 4.1 Stripe go-live (out of code, owned by user)
+Follow `docs/STRIPE_GOLIVE.md` steps 1–5. No code change. Test-mode banner auto-clears.
+
+### 4.2 Pre-publish verification
+- Run `cloud_status`; require `ACTIVE_HEALTHY`.
+- Run `supabase--linter`; resolve any new findings.
+- Run security scan; update `security--update_memory`.
+- Run dependency scan.
+- Bump instance size (Cloud → Overview → Advanced).
+- Trigger SEO rescan; confirm 0 failing.
+- Verify canonical domain resolves to apex `https://365motorsales.com` on 10 sample routes.
+
+### 4.3 Publish
+Publish from Lovable. Smoke test live Stripe checkout end-to-end with a real card and immediately refund.
+
+---
+
+## Technical Notes
+
+- All new server endpoints under `/api/public/*` must verify signature/apikey BEFORE touching the DB.
+- All new server functions that mutate must use either `requireSupabaseAuth` (user-scoped) or `requireAdminRole` (admin-scoped). No exceptions.
+- `head()` helper centralises canonical generation so changing the apex domain is one-line.
+- SW version is build-time-stamped — no human intervention needed per release.
+- Migrations: one for `site_settings.app_url`, one to rewrite pg_cron jobs to read that value and pass `apikey`.
+- New secrets needed: `PAYMONGO_WEBHOOK_SECRET`, `XENDIT_CALLBACK_TOKEN`, `OPS_DIGEST_CRON_KEY`.
+
+---
+
+## Order of operations (single timeline)
+
+1. Secrets added (`PAYMONGO_WEBHOOK_SECRET`, `XENDIT_CALLBACK_TOKEN`, `OPS_DIGEST_CRON_KEY`).
+2. Phase 1.1 → 1.2 → 1.3 → 1.4 → 1.5.
+3. Phase 2.1 → 2.2 → 2.3 → 2.4 → 2.5 → 2.6 → 2.7.
+4. Phase 3.1 → 3.2 → 3.3 → 3.4 → 3.5.
+5. Phase 4 (user-driven Stripe go-live + publish).
+
+Estimated agent build time end-to-end: Phase 1 ~1 build, Phase 2 ~2 builds (head sweep is large), Phase 3 ~1 build, Phase 4 = user action + verification.
