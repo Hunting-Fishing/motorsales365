@@ -13,16 +13,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { scrapeLazadaProduct } from "@/lib/lazada-scraper.server";
+import { verifyInternalCronToken } from "@/integrations/supabase/internal-secrets.server";
 
 export const Route = createFileRoute("/api/public/hooks/refresh-lazada")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const apiKey = request.headers.get("apikey");
-        const expected = process.env.SUPABASE_ANON_KEY ?? process.env.SUPABASE_PUBLISHABLE_KEY;
-        if (!apiKey || !expected || apiKey !== expected) {
-          return new Response("Unauthorized", { status: 401 });
-        }
+        const authed = await verifyInternalCronToken({
+          jobName: "refresh_lazada",
+          tokenHeader: request.headers.get("x-cron-token"),
+        });
+        if (!authed) return new Response("Unauthorized", { status: 401 });
 
         let limit = 25;
         try {
