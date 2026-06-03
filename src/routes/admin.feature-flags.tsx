@@ -51,10 +51,12 @@ function AdminFeatureFlags() {
   return (
     <div className="space-y-4 p-4 md:p-6">
       <header>
-        <h1 className="text-2xl font-semibold text-foreground">Feature flags</h1>
+        <h1 className="text-2xl font-semibold text-foreground">Payment &amp; plan flags</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          In-house toggles for payment rails, boost types, and subscription plans.
-          Changes apply within 60 seconds on user sessions.
+          Server-side toggles for payment rails, boost types, and subscription plans.
+          Changes apply within 60 seconds on user sessions. For device-level UI
+          previews (towing, messaging, etc.) see the{" "}
+          <a href="/admin/sandbox" className="underline">Sandbox</a>.
         </p>
       </header>
 

@@ -834,7 +834,7 @@ export const createCourseCheckout = createServerFn({ method: "POST" })
         courseId: (course as any).id,
         courseSlug: (course as any).slug,
       },
-    } as any);
+    });
 
     return session.client_secret;
   });

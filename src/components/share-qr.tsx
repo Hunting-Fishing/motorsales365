@@ -161,8 +161,9 @@ export function ShareQr({
             size="sm"
             className={className}
             title="QR code & printable poster"
+            aria-label="Open QR code and printable poster"
           >
-            <QrCode className="h-4 w-4" />
+            <QrCode className="h-4 w-4" aria-hidden="true" />
           </Button>
         ) : (
           <Button variant={triggerVariant} className={className}>

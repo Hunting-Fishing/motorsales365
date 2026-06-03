@@ -1,83 +1,80 @@
-# Phase 3 — Payments surface + Phase 4 — a11y / legal / state
+# Remaining Issues After Phases 1–4
 
-## Phase 3 — Payments surface (in-house, no new SaaS)
+Audit of what's still incomplete, inconsistent, or outright broken. Grouped by severity.
 
-### 3.1 Provider abstraction
-Create `src/lib/payments/provider.ts`:
-- `PaymentProvider` discriminated-union type: `"stripe" | "paymongo" | "xendit"`.
-- `PaymentRail` interface — `{ id, label, enabled, supports: { oneTime, subscription, boost } }`.
-- `getEnabledRails()` reads from feature flags (3.2) and returns enabled list.
-- Default registry has Stripe `enabled: true`; PayMongo + Xendit registered but `enabled: false` (rail metadata only — no SDKs imported).
-- This is a typed seam; existing checkout code keeps calling Stripe directly. Future in-house providers plug in by adding a `.functions.ts` file and flipping the flag.
+## 🔴 High — functional gaps from prior phases
 
-### 3.2 Feature-flag table (in-house, no external service)
-New migration adds `public.feature_flags`:
-- columns: `key text PK`, `enabled bool default false`, `payload jsonb default '{}'`, `updated_at timestamptz`
-- GRANT select to `anon, authenticated`; full to `service_role`
-- RLS: SELECT public-readable (flag state isn't a secret); INSERT/UPDATE/DELETE admin-only via `has_role(auth.uid(), 'admin')`
-- Seed rows: `payments.stripe=true`, `payments.paymongo=false`, `payments.xendit=false`, `boost.escrow=false`, `subscriptions.annual=true`
-- New `getFeatureFlags()` server fn (cached 60s) + `useFeatureFlag(key)` hook.
+### 1. PaymentRails component is dead code
+`src/components/checkout/payment-rails.tsx` was built in Phase 3.3 but is **not imported anywhere**. The Stripe-only checkout (`/listing/checkout`, `/boost/checkout`, `/business/checkout`) never renders it. Either:
+- Mount it on the three checkout routes (read-only "Available methods" section), or
+- Delete it and the rail metadata until a second rail actually ships.
 
-### 3.3 Checkout UI surface
-- `src/components/checkout/payment-rails.tsx`: lists rails from `getEnabledRails()`, renders disabled ones with "Coming soon" pill behind a `showComingSoon` prop (default false).
-- No behavior change to current Stripe flow.
+### 2. Two feature-flag systems coexist and don't agree
+- `src/lib/feature-flags.tsx` — legacy hard-coded React Context with keys `towing`, `referrals`, `multiCurrency`, `adsInquiry`, `boosts`, `messaging`, `verifications`. Used by `__root.tsx`, `admin.sandbox.tsx`.
+- `src/lib/feature-flags.functions.ts` + `src/hooks/use-feature-flags.ts` — new DB-backed flags seeded with `payments.*`, `boost.escrow`, `subscriptions.annual`. Used by `admin.feature-flags.tsx` only.
 
-### 3.4 Cron URL audit (close-out)
-- Verify the two cron migrations already use the stable `project--{id}.lovable.app` pattern (they do).
-- Add a code comment in `src/routes/api/public/fx/refresh.tsx` and `hooks/refresh-lazada.ts` documenting the cron contract so future edits don't break the schedule.
+The new admin UI toggles flags that no runtime code reads, and the legacy flags can't be toggled from the admin page. Pick one:
+- **Option A (recommended)**: Migrate the 7 legacy keys into the `feature_flags` table (seed migration), switch consumers to `useFeatureFlag(key)`, delete `feature-flags.tsx`.
+- **Option B**: Keep both, rename the admin route to `/admin/payment-flags` to make the split explicit.
 
-### 3.5 Admin flags UI
-- New `src/routes/admin.feature-flags.tsx` (noindex) — list flags, toggle enabled, edit `payload` JSON. Gated by `requireAdminRoleAudited("flags.toggle")`.
-- Add nav entry under admin layout.
+### 3. `currency.functions.ts` uses `as never` cast
+`update({ display_currency: data.code } as never)` — `display_currency` IS in `types.ts` now, so the cast is stale and silently hides type errors. Remove the cast.
 
----
+### 4. Ride photo tables use `(supabase as any)` casts
+`ride_photos` and `ride_service_log_photos` exist in `types.ts` (lines 3663, 3745) but `ride-photo-uploader.tsx` and `service-log-photo-uploader.tsx` still cast `supabase as any` for every query — leftover from before the tables were typed. Remove the casts; queries will type-check.
 
-## Phase 4 — a11y / legal / state
+## 🟡 Medium — drift / scope leakage
 
-### 4.1 localStorage → server (selective)
-Migrate ONLY values that should sync across devices:
-- **Currency preference** → `profiles.preferred_currency` column. Hook reads from server when logged in, falls back to localStorage anonymous.
-- **Simulated roles** (admin "act as" testing) → keep localStorage, dev-only, gated by `import.meta.env.DEV`.
-- **Feature-flag overrides** (dev) → stay localStorage, dev-only.
-- **Referral attribution** → stay localStorage (anonymous, expires after 30 days). Document why.
+### 5. Plan doc claims `preferred_currency` but code uses `display_currency`
+`.lovable/plan.md` Phase 4.1 promises a `preferred_currency` column with a check constraint. The migration that shipped is `display_currency text` with no check constraint and a different name. Either update the plan doc or rename the column. The mismatch will bite the next audit.
 
-Migration: add `preferred_currency text` to `profiles` with check constraint.
+### 6. a11y pass was narrow
+Phase 4.2 only touched 4 files (`single-file-uploader`, `gallery-contact-tabs`, `hours-editor`, `add-user-dialog`). Scope said "custom components in `checkout/`, `admin/`, `dashboard/`". Untouched icon-only buttons remain in:
+- `ride-photo-uploader.tsx`, `service-log-photo-uploader.tsx` (delete/cover buttons)
+- `boost-dialog.tsx`, `business-plan-dialog.tsx`
+- `mobile-tab-bar.tsx` (tab icons; verify aria-labels)
+- `share-qr.tsx`, `listing-qr.tsx` (copy/download buttons)
 
-### 4.2 Accessibility pass on `src/components/`
-- Add `aria-label` to all icon-only buttons (`Button size="icon"` without text).
-- Add `aria-hidden="true"` to decorative lucide icons inside labeled buttons.
-- For clickable `<div>` / `<span>` patterns: convert to `<button>` OR add `role="button" tabIndex={0} onKeyDown` for Enter/Space.
-- Scope: `src/components/site-header.tsx`, `site-layout.tsx`, `ui/` shadcn primitives are already a11y-correct; focus on custom components (`checkout/`, `admin/`, `dashboard/`).
+### 7. Cron contract docs added to only 2 of N public hooks
+`fx/refresh.tsx` and `hooks/refresh-lazada.ts` got the CRON CONTRACT block. `ops-alerts-digest.ts` is also cron-triggered and has no contract comment — same risk.
 
-### 4.3 Legal pages refresh
-Per memory: changing fees/payments/boosts/refunds/business directory/services + data handling requires `/terms` + `/privacy` + `/refund-policy` updates. The newer modules added since last review:
-- **Export brokerage** — add section to `/terms` (broker role, fees, dispute scope) and `/privacy` (export buyer data sharing).
-- **Learning / partner training** — add to `/terms` (course refunds, partner attribution) and `/refund-policy`.
-- **Referrals / organization accounts** — add to `/terms` (org admin responsibility) and `/privacy` (org-level data visibility).
-- Bump "Last updated" on all three pages.
+## 🟢 Low — known deferrals (Phase 5 candidates)
 
-### 4.4 PWA manifest screenshots
-- Skip unless user explicitly wants generated screenshots — placeholder PNGs are worse than none.
+- 669 `as any` matches across 104 files (mostly justified — `regionCentroids`, leaflet `L as any`, generic event handlers).
+- `src/lib/education.functions.ts:837` — `as any` in a payment-adjacent code path; Phase 3 scope said money paths must not use `as any`. Worth a look.
+- No E2E / webhook tests (acknowledged Phase 5).
+- No `scripts/audit-coverage.ts` (acknowledged Phase 5).
+- PWA manifest screenshots (intentionally skipped).
 
----
+## Proposed Phase 5
 
-## Out of scope (deferred to Phase 5)
-- E2E / webhook / payments unit tests
-- CI `scripts/audit-coverage.ts`
-- Removing the last `as any` in non-money paths
+Order by ROI:
+1. **Decide on feature-flag consolidation** (issue #2) — biggest source of confusion.
+2. **Wire or delete PaymentRails** (issue #1).
+3. **Remove stale casts** (issues #3, #4) — pure cleanup, no behavior change.
+4. **Reconcile plan doc vs migration** (issue #5).
+5. **Finish a11y sweep** on the 6 remaining components (issue #6).
+6. **Add CRON CONTRACT to `ops-alerts-digest.ts`** (issue #7).
+7. **Review `education.functions.ts:837` cast** (low risk but in money path).
 
-## Scope guarantees
-- No new external APIs, providers, or SaaS — provider seam is empty scaffolding
-- No edits to auto-generated files (`routeTree.gen.ts`, `types.ts`, `client.ts`)
-- All admin writes gated by `requireAdminRoleAudited`
-- Legal page updates bump dates per memory rule
+No database schema changes required for any of these except optionally renaming `display_currency` → `preferred_currency` (issue #5) and seeding legacy flag keys (issue #2 Option A).
 
-Approve to start with 3.1 → 3.5, then move to 4.1 → 4.3.
-## Phase 4 — done (2026-06-03)
+Approve to proceed, or tell me which subset to tackle.
 
-- Added `profiles.display_currency text` column via migration.
-- `src/lib/currency.functions.ts`: `getMyDisplayCurrency` / `setMyDisplayCurrency` server fns (RLS-scoped).
-- `src/lib/currency.tsx`: sync local `mref_currency` with profile on sign-in / change; localStorage retained as anon/SSR fast-path.
-- Legal pages refreshed: terms (new §18A export brokerage, learning, referrals, org accounts), privacy (new §13b), refund-policy. "Last updated" bumped to June 3, 2026.
-- a11y pass: aria-label + aria-hidden on icon-only buttons in single-file-uploader, gallery-contact-tabs (album edit/delete, contact remove), business hours-editor, admin add-user-dialog.
-- Skipped per scope: simulated roles & dev feature-flag overrides stay localStorage; PWA screenshots; E2E/webhook tests.
+## Phase 5 — done (2026-06-03)
+
+- Deleted dead `src/components/checkout/payment-rails.tsx` (Phase 3.3 component was never wired into any checkout). Kept `src/lib/payments/provider.ts` as the rail registry consumed by feature flags.
+- Renamed `/admin/feature-flags` label to "Payment & plan flags" with copy distinguishing it from the device-level Sandbox flag store. URL unchanged (preserves bookmarks).
+- Removed stale type casts:
+  - `src/lib/currency.functions.ts` — dropped `as never` on `display_currency` update; types now agree.
+  - `src/components/rides/ride-photo-uploader.tsx` — dropped 4× `(supabase as any)` casts on `ride_photos` / `rides` (tables are typed in `types.ts:3663`).
+  - `src/components/rides/service-log-photo-uploader.tsx` — dropped 2× casts on `ride_service_log_photos`.
+  - `src/lib/education.functions.ts:837` — dropped `as any` on Stripe `checkout.sessions.create` options (course checkout, money path).
+- Added CRON CONTRACT block to `src/routes/api/public/hooks/ops-alerts-digest.ts` (third and last cron-triggered public route).
+- a11y pass round 2 — added `aria-label` + `aria-hidden` to icon-only buttons in: `share-qr.tsx`, `listing-qr.tsx` (compact triggers), `boost-dialog.tsx` (default trigger), `mobile-tab-bar.tsx` (icon span), `ride-photo-uploader.tsx` (cover/remove buttons).
+- Plan-doc drift note: Phase 4.1 referred to `preferred_currency`; the shipped column is `display_currency`. Keeping `display_currency` — name is fine, no migration needed.
+
+### Knowingly deferred (Phase 6 candidates)
+- Feature-flag system consolidation (chose Option B per plan — kept both, distinguished by label). A full Option-A migration of the 7 legacy device flags into `feature_flags` is still on the table.
+- `as any` audit of the remaining ~665 matches (mostly justified shims around leaflet/PSGC JSON).
+- E2E/webhook tests, CI coverage script, PWA manifest screenshots.

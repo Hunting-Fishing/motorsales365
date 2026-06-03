@@ -45,8 +45,8 @@ export function BoostDialog({ listingId, listingTitle, children }: Props) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {children ?? (
-          <Button variant="outline" size="sm" title="Boost listing">
-            <Rocket className="h-4 w-4" />
+          <Button variant="outline" size="sm" title="Boost listing" aria-label="Boost this listing">
+            <Rocket className="h-4 w-4" aria-hidden="true" />
           </Button>
         )}
       </DialogTrigger>
