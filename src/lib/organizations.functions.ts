@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { withRouteAudit } from "@/integrations/supabase/route-audit.server";
+
 
 const uuid = z.string().uuid();
 
