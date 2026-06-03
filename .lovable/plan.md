@@ -1,72 +1,79 @@
-## Launch readiness — remaining fixes
+# Full-app readiness audit — what's left
 
-Two items from the audit are still open. The other eight are confirmed done (including #5 garage persistence, which already syncs to Supabase via `garage.functions.ts`).
+I swept the codebase end-to-end (113 routes, 112 public tables, all helpers, migrations, docs, plan files, and `coming soon` / `TODO` markers). Below is the complete remaining-work list, grouped by severity. Nothing destructive — this is a checklist, not an edit.
 
-### Fix 1 — Proxy remaining client-side Nominatim calls
+## 1. Launch blockers (must do before "done")
 
-Three browser-side `nominatim.openstreetmap.org` fetches still bypass our server proxy. Move them through existing/new public API routes so we keep one User-Agent, one rate limit, and one place to swap providers later.
+**A. Go live on Stripe** — backend is fully wired in sandbox, but live money is gated on out-of-code steps owned by you (see `docs/STRIPE_GOLIVE.md`):
+1. Claim Stripe sandbox account in Connectors → Payments.
+2. Run Stripe activation wizard (business, bank, 2FA).
+3. Copy sandbox products to live, install Lovable app on live account.
+4. Lovable auto-provisions `STRIPE_LIVE_API_KEY` + `PAYMENTS_LIVE_WEBHOOK_SECRET`.
+5. Publish project → `pk_live_...` is written to `.env.production` → orange test-mode banner disappears.
 
-**New server route: `src/routes/api/public/reverse-geocode.ts`**
-- `GET ?lat=&lng=` → calls Nominatim `/reverse` with our UA, returns `{ address: {...}, displayName }`.
-- Validates lat ∈ [-90,90], lng ∈ [-180,180]; clamps `zoom` to 1–18 (default 18).
-- 5-minute `Cache-Control: public, max-age=300`.
-- On failure returns `{ error }` with appropriate status — never throws to client.
+No code changes required. Until step 5, every checkout is sandbox.
 
-**Update `src/routes/businesses.submit.tsx`**
-- `reverseGeocode()` (L220): fetch `/api/public/reverse-geocode?lat=...&lng=...&zoom=18` instead of nominatim directly.
-- `geocodeAddress()` (L270): fetch `/api/public/geocode?q=...` (existing route already wraps `geocodeAddress` in `places.server`).
+**B. Pricing page copy lies a little** — `src/routes/pricing.tsx:549` still says *"Live card payments are coming soon."* That string should flip the moment live keys land. Either remove it now or gate it on `import.meta.env.PROD && !VITE_PAYMENTS_CLIENT_TOKEN.startsWith("pk_live")`.
 
-**Update `src/components/location-picker.tsx`**
-- `useMyLocation()` (L175): fetch `/api/public/reverse-geocode?lat=...&lng=...&zoom=12`.
+## 2. Coming-soon surfaces still in production UI
 
-After these edits, `rg "nominatim.openstreetmap.org" src/` should only match the two server files (`places.server.ts`, `api/public/geo-search.ts`, new `reverse-geocode.ts`) and the privacy disclosure copy.
+`src/routes/payments.tsx` advertises 5 methods as `soon` and 5 as `planned`. Each is a real product decision:
 
-### Fix 2 — Webhook alerting on silent error branches
+| Method | Status | What "shipping" means |
+|---|---|---|
+| Maya wallet | soon | Stripe PH supports it — enable PaymentMethod in Stripe Dashboard, add `"maya"` to checkout method list |
+| QR Ph | soon | Same — flip in Stripe + checkout config |
+| ShopeePay | planned | Not on Stripe PH yet; either remove card or wait |
+| InstaPay / PESONet | planned | Needs a bank-transfer rail (Xendit/Maya Business). Out-of-scope for Stripe-only stack |
+| Online banking (BPI/BDO/UnionBank) | planned | Same as above |
+| 7-Eleven / Cebuana / M Lhuillier | planned | Needs Dragonpay/Xendit OTC rail |
+| Manual bank deposit | planned | Build upload-proof flow + admin approval queue |
 
-Today both webhook handlers only `console.error`. On a Cloudflare Worker, those logs are best-effort — a payment misroute or auth-email-enqueue failure can pass unnoticed until a user complains. Add a tiny alert helper that posts to a Slack/Discord-style webhook (whichever the user already uses; defaults to Slack-shaped incoming webhook payload).
+Recommendation: ship Maya + QR Ph this week (5-min Stripe toggles), and either build or hide the rest. Leaving "planned" cards live looks unfinished.
 
-**New helper: `src/lib/alerting.server.ts`**
-- `export async function alertOps(event: string, details: Record<string, unknown>): Promise<void>`
-- Reads `process.env.OPS_ALERT_WEBHOOK_URL` at call time (server-only). If unset → no-op + single `console.warn`.
-- Posts `{ text: "[365MS][${env}] ${event}", attachments: [{ title, text: JSON.stringify(details, null, 2).slice(0,3500) }] }`.
-- Swallows fetch errors (logs them) so alerting never crashes the caller.
-- Adds in-memory dedupe: same `event` key suppressed for 60s to avoid storm.
+**Other coming-soon strings:**
+- `src/routes/learn_.$slug.watch.$lessonId.tsx:133` — *"Video coming soon."* fallback when a lesson has no `video_url`. Fine as fallback, but no admin UI to bulk-fill missing videos.
+- `src/components/business/service-catalog-picker.tsx:75` — curated catalog message for business types you haven't seeded yet. Either expand `src/data/` catalogs or remove copy.
+- `src/components/listing-card.tsx:96` / `listing.$id.tsx:386` — *"Vehicle photo coming soon"* alt text when no cover. Harmless.
 
-**Wire into `src/routes/api/public/payments/webhook.ts`**
-Call `alertOps` at every `console.error` site that represents a real failure (not just bad-shape data we'd reject anyway). Specifically:
-- L498 signature verification failed → `alertOps('payments.webhook.signature_invalid', { err })`
-- L505 handler error → `alertOps('payments.webhook.handler_error', { type: event.type, id: event.id, err })`
-- L39 plan_id unresolved → `alertOps('payments.subscription.plan_unresolved', { sub: sub.id })`
-- L92, L115 business sub missing metadata / plan not found → same pattern
-- L223 boost session missing metadata
-- L289, L308 listing_payment missing metadata / owner mismatch
-- L381 course session missing metadata
+## 3. Half-built / inconsistent
 
-**Wire into `src/routes/lovable/email/auth/webhook.ts`**
-- L53 missing `LOVABLE_API_KEY` → `alertOps('email.auth.config_missing', {})`
-- L84 webhook verification failed → `alertOps('email.auth.verify_failed', { err })`
-- L133 missing Supabase env → `alertOps('email.auth.supabase_env_missing', {})`
-- L166 enqueue failure → `alertOps('email.auth.enqueue_failed', { run_id, emailType, err })`
+**A. `src/components/ui/confirm-dialog.tsx:40` falls back to `window.confirm()`.** Means somewhere a Promise-based confirm is being used outside a Dialog provider context, and silently degrades to a native browser prompt. Should always render the dialog.
 
-**Secret request**
-After plan approval, in build mode I'll call `add_secret` for `OPS_ALERT_WEBHOOK_URL` so the user can paste their Slack incoming webhook URL. Until they paste it, `alertOps` is a no-op (safe to merge).
+**B. Payment-events email webhook is opt-in.** `STRIPE_GOLIVE.md` §6 says `/api/public/payment-events` only fires when `PAYMENT_WEBHOOK_ENABLED=1`. If you actually want receipt / refund / failure emails on live, set that secret.
 
-### Out of scope
-- No DB migrations.
-- No UI changes (alert delivery is server-side only).
-- Not switching providers (Google Places stays a future swap; the proxy makes it a one-file change).
-- Not touching the Lovable email **queue process** route — it's not in the requested list and already retries via pgmq.
+**C. Ops alerting persisted, but no email/Slack escalation.** `ops_alerts` table + `/admin/alerts` page exist; nobody gets paged. Options: (i) Supabase pg cron job that emails admins when `unacknowledged_count > 0`, (ii) re-introduce optional Slack webhook fed from the same `alertOps()` helper.
 
-### Files touched
-- new `src/routes/api/public/reverse-geocode.ts`
-- new `src/lib/alerting.server.ts`
-- edit `src/routes/businesses.submit.tsx` (two fetches)
-- edit `src/components/location-picker.tsx` (one fetch)
-- edit `src/routes/api/public/payments/webhook.ts` (~8 alert call sites)
-- edit `src/routes/lovable/email/auth/webhook.ts` (~4 alert call sites)
-- request secret `OPS_ALERT_WEBHOOK_URL`
+**D. Security memory.** `docs/SECURITY.md` documents 18 accepted linter warnings but the in-product `@security-memory` may be stale. Worth a re-scan + memory update once live keys are in.
 
-### Verification
-- `rg "nominatim.openstreetmap.org" src/` → only server files + privacy copy.
-- Manually trigger Stripe webhook with bad signature in preview → Slack receives alert.
-- Confirm published build still compiles.
+## 4. Operational gaps (not breaking, but visible)
+
+- **No instance-size guidance.** With 112 public tables and growing traffic, Cloud → Overview → Advanced should be bumped before launch. Free-tier instance will throttle on the first marketing burst.
+- **No published-domain canonical check.** Project has `motorsales365.lovable.app` AND `www.365motorsales.com` AND apex. Verify `<link rel="canonical">` in `__root.tsx` resolves to apex on every route; otherwise SEO splits.
+- **Sitemap / robots** exist (`src/routes/sitemap[.]xml.ts`, `api/robots[.]txt.tsx`). Worth running an SEO scan to confirm coverage of the 113 routes.
+- **Service worker** (`public/sw.js`, `service-worker-register.tsx`) — confirm cache-busting on deploy or users get stale shell after publish.
+- **PWA install** (`install-app-button.tsx`) — manifest exists, but no audit of icon sizes / Apple touch icons / theme color across light/dark.
+
+## 5. Stuff I checked and is actually done
+
+For completeness so you know I looked:
+
+- Auth (email/password + Google OAuth, role table, `has_role`, RLS everywhere) ✅
+- Stripe webhook signature verify + subscription/boost/listing/course flows ✅
+- Email infra (transactional + auth templates, pgmq queue, suppression list) ✅
+- Rides + listings + businesses + shop + learn + tow + advertise CRUD ✅
+- Admin: users, accounts, listings, businesses, verifications, audit, performance, alerts, sandbox, currencies, education, shop, reports, type-suggestions, redemptions, referrals, pricing, advertising, inquiries, analytics ✅
+- Geocoding proxied through `/api/public/{geocode,reverse-geocode,geo-search}` ✅
+- Marker clustering + geolocation on both rides map and businesses map ✅
+- Ops alerts table + admin viewer ✅
+- Security: helper-function whitelist documented, RLS on every public table I sampled ✅
+
+## Recommended next move
+
+Pick one of these to scope into a build:
+1. **Flip the live-payments switch** — finish Stripe steps 1-5, then I clean up the pricing-page string and Maya/QR Ph toggles. ~30 min of code.
+2. **Tighten the "coming soon" UI** — collapse the planned payment-method cards into a "Roadmap" expander so the page stops feeling half-shipped. ~20 min.
+3. **Escalation for ops alerts** — add a pg_cron summary email to admins for any unack'd alert > 15 min. ~45 min.
+4. **Pre-launch hardening** — instance-size bump prompt + canonical-domain audit + SEO scan + PWA icon audit. Mostly verification, not code.
+
+Tell me which (or "all of 1-3") and I'll switch to build and execute.
