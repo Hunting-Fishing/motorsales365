@@ -3198,6 +3198,7 @@ export type Database = {
           business_province: string | null
           business_region: string | null
           created_at: string
+          display_currency: string | null
           fb_profile_id: string | null
           fb_profile_url: string | null
           fb_verification_code: string | null
@@ -3241,6 +3242,7 @@ export type Database = {
           business_province?: string | null
           business_region?: string | null
           created_at?: string
+          display_currency?: string | null
           fb_profile_id?: string | null
           fb_profile_url?: string | null
           fb_verification_code?: string | null
@@ -3284,6 +3286,7 @@ export type Database = {
           business_province?: string | null
           business_region?: string | null
           created_at?: string
+          display_currency?: string | null
           fb_profile_id?: string | null
           fb_profile_url?: string | null
           fb_verification_code?: string | null
