@@ -119,12 +119,21 @@ export function GoogleBusinessMap({
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       }).addTo(map);
       mapRef.current = map;
+      const cluster = (L as any).markerClusterGroup({
+        showCoverageOnHover: false,
+        spiderfyOnMaxZoom: true,
+        disableClusteringAtZoom: 16,
+        maxClusterRadius: 55,
+      }) as L.MarkerClusterGroup;
+      cluster.addTo(map);
+      clusterRef.current = cluster;
       setReady(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Map failed to load");
     }
     return () => {
-      markersRef.current.forEach((m) => m.remove());
+      clusterRef.current?.clearLayers();
+      clusterRef.current = null;
       markersRef.current = [];
       circleRef.current?.remove();
       circleRef.current = null;
@@ -132,6 +141,7 @@ export function GoogleBusinessMap({
       mapRef.current = null;
     };
   }, []);
+
 
   // Render markers + adjust bounds whenever data changes
   useEffect(() => {
