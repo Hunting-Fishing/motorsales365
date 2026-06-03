@@ -60,3 +60,21 @@ Order by ROI:
 No database schema changes required for any of these except optionally renaming `display_currency` → `preferred_currency` (issue #5) and seeding legacy flag keys (issue #2 Option A).
 
 Approve to proceed, or tell me which subset to tackle.
+
+## Phase 5 — done (2026-06-03)
+
+- Deleted dead `src/components/checkout/payment-rails.tsx` (Phase 3.3 component was never wired into any checkout). Kept `src/lib/payments/provider.ts` as the rail registry consumed by feature flags.
+- Renamed `/admin/feature-flags` label to "Payment & plan flags" with copy distinguishing it from the device-level Sandbox flag store. URL unchanged (preserves bookmarks).
+- Removed stale type casts:
+  - `src/lib/currency.functions.ts` — dropped `as never` on `display_currency` update; types now agree.
+  - `src/components/rides/ride-photo-uploader.tsx` — dropped 4× `(supabase as any)` casts on `ride_photos` / `rides` (tables are typed in `types.ts:3663`).
+  - `src/components/rides/service-log-photo-uploader.tsx` — dropped 2× casts on `ride_service_log_photos`.
+  - `src/lib/education.functions.ts:837` — dropped `as any` on Stripe `checkout.sessions.create` options (course checkout, money path).
+- Added CRON CONTRACT block to `src/routes/api/public/hooks/ops-alerts-digest.ts` (third and last cron-triggered public route).
+- a11y pass round 2 — added `aria-label` + `aria-hidden` to icon-only buttons in: `share-qr.tsx`, `listing-qr.tsx` (compact triggers), `boost-dialog.tsx` (default trigger), `mobile-tab-bar.tsx` (icon span), `ride-photo-uploader.tsx` (cover/remove buttons).
+- Plan-doc drift note: Phase 4.1 referred to `preferred_currency`; the shipped column is `display_currency`. Keeping `display_currency` — name is fine, no migration needed.
+
+### Knowingly deferred (Phase 6 candidates)
+- Feature-flag system consolidation (chose Option B per plan — kept both, distinguished by label). A full Option-A migration of the 7 legacy device flags into `feature_flags` is still on the table.
+- `as any` audit of the remaining ~665 matches (mostly justified shims around leaflet/PSGC JSON).
+- E2E/webhook tests, CI coverage script, PWA manifest screenshots.
