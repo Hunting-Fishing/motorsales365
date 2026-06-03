@@ -1,14 +1,10 @@
 // 365 MotorSales — minimal offline-fallback service worker.
-// Strategy: network-first for navigations (so users always see fresh content
-// when online), with a cached offline page as the fallback. Static assets are
-// served by Cloudflare's edge cache already; we don't precache the app shell
-// because it changes every deploy.
-//
-// VERSION is replaced at build time by the Vite define plugin (__SW_VERSION__).
-// When this string differs from the previously-activated SW, all old caches
-// are dropped on activate so stale offline pages never linger across deploys.
+// VERSION is derived from the ?v= query string on the registration URL
+// (set in src/components/service-worker-register.tsx using the Vite-injected
+// __BUILD_ID__). When the build id changes, the browser fetches a new SW URL,
+// install fires, and the old cache is dropped on activate.
 
-const VERSION = (typeof __SW_VERSION__ !== "undefined" && __SW_VERSION__) || "dev";
+const VERSION = new URL(self.location.href).searchParams.get("v") || "dev";
 const OFFLINE_CACHE = `offline-${VERSION}`;
 const OFFLINE_URL = "/offline.html";
 
@@ -28,7 +24,6 @@ self.addEventListener("activate", (event) => {
       const keys = await caches.keys();
       await Promise.all(keys.filter((k) => k !== OFFLINE_CACHE).map((k) => caches.delete(k)));
       await self.clients.claim();
-      // Surface the active version to any listening clients (devtools).
       // eslint-disable-next-line no-console
       console.info(`[sw] active version: ${VERSION}`);
     })(),

@@ -6,4 +6,14 @@
 // You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 
-export default defineConfig();
+// Stamp every build with a unique id so the service worker can bust its
+// offline cache on each deploy without us editing public/sw.js by hand.
+const BUILD_ID = `${new Date().toISOString().slice(0, 19).replace(/[-:T]/g, "")}`;
+
+export default defineConfig({
+  vite: {
+    define: {
+      __BUILD_ID__: JSON.stringify(BUILD_ID),
+    },
+  },
+});

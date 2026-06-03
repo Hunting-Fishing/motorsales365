@@ -1,18 +1,20 @@
 import { useEffect } from "react";
 
+declare const __BUILD_ID__: string;
+
 /**
- * Registers /sw.js once the page is interactive. SW only does offline
- * fallback (see public/sw.js); it does not cache app shell or API responses,
- * so there's no risk of serving stale routes after a deploy.
+ * Registers /sw.js once the page is interactive. The build id is appended
+ * as a query string so each deploy installs a fresh service worker (the
+ * SW reads ?v= and uses it as its cache name — see public/sw.js).
  */
 export function ServiceWorkerRegister() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (!("serviceWorker" in navigator)) return;
-    // Skip on localhost dev to avoid HMR conflicts.
     if (location.hostname === "localhost" || location.hostname === "127.0.0.1") return;
+    const buildId = typeof __BUILD_ID__ !== "undefined" ? __BUILD_ID__ : "dev";
     const onLoad = () => {
-      navigator.serviceWorker.register("/sw.js").catch(() => {
+      navigator.serviceWorker.register(`/sw.js?v=${buildId}`).catch(() => {
         // Best-effort; nothing depends on SW success.
       });
     };
