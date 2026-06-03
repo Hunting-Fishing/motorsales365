@@ -133,6 +133,7 @@ import { Route as DashboardRidesIdEditRouteImport } from './routes/dashboard.rid
 import { Route as DashboardBusinessesIdEditRouteImport } from './routes/dashboard.businesses_.$id.edit'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksRefreshLazadaRouteImport } from './routes/api/public/hooks/refresh-lazada'
+import { Route as ApiPublicHooksOpsAlertsDigestRouteImport } from './routes/api/public/hooks/ops-alerts-digest'
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
 import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
 
@@ -763,6 +764,12 @@ const ApiPublicHooksRefreshLazadaRoute =
     path: '/api/public/hooks/refresh-lazada',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksOpsAlertsDigestRoute =
+  ApiPublicHooksOpsAlertsDigestRouteImport.update({
+    id: '/api/public/hooks/ops-alerts-digest',
+    path: '/api/public/hooks/ops-alerts-digest',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicFxRefreshRoute = ApiPublicFxRefreshRouteImport.update({
   id: '/api/public/fx/refresh',
   path: '/api/public/fx/refresh',
@@ -890,6 +897,7 @@ export interface FileRoutesByFullPath {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
+  '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/dashboard/businesses/$id/edit': typeof DashboardBusinessesIdEditRoute
@@ -1015,6 +1023,7 @@ export interface FileRoutesByTo {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/dashboard/team': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
+  '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/dashboard/businesses/$id/edit': typeof DashboardBusinessesIdEditRoute
@@ -1144,6 +1153,7 @@ export interface FileRoutesById {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
+  '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/dashboard/businesses_/$id/edit': typeof DashboardBusinessesIdEditRoute
@@ -1274,6 +1284,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/dashboard/team/'
     | '/api/public/fx/refresh'
+    | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
     | '/dashboard/businesses/$id/edit'
@@ -1399,6 +1410,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/dashboard/team'
     | '/api/public/fx/refresh'
+    | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
     | '/dashboard/businesses/$id/edit'
@@ -1527,6 +1539,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/dashboard/team/'
     | '/api/public/fx/refresh'
+    | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
     | '/dashboard/businesses_/$id/edit'
@@ -1608,6 +1621,7 @@ export interface RootRouteChildren {
   ShopDepartmentSlugRoute: typeof ShopDepartmentSlugRoute
   ShopPSlugRoute: typeof ShopPSlugRoute
   ApiPublicFxRefreshRoute: typeof ApiPublicFxRefreshRoute
+  ApiPublicHooksOpsAlertsDigestRoute: typeof ApiPublicHooksOpsAlertsDigestRoute
   ApiPublicHooksRefreshLazadaRoute: typeof ApiPublicHooksRefreshLazadaRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   LearnSlugWatchLessonIdRoute: typeof LearnSlugWatchLessonIdRoute
@@ -2489,6 +2503,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksRefreshLazadaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/ops-alerts-digest': {
+      id: '/api/public/hooks/ops-alerts-digest'
+      path: '/api/public/hooks/ops-alerts-digest'
+      fullPath: '/api/public/hooks/ops-alerts-digest'
+      preLoaderRoute: typeof ApiPublicHooksOpsAlertsDigestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/fx/refresh': {
       id: '/api/public/fx/refresh'
       path: '/api/public/fx/refresh'
@@ -2749,6 +2770,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopDepartmentSlugRoute: ShopDepartmentSlugRoute,
   ShopPSlugRoute: ShopPSlugRoute,
   ApiPublicFxRefreshRoute: ApiPublicFxRefreshRoute,
+  ApiPublicHooksOpsAlertsDigestRoute: ApiPublicHooksOpsAlertsDigestRoute,
   ApiPublicHooksRefreshLazadaRoute: ApiPublicHooksRefreshLazadaRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   LearnSlugWatchLessonIdRoute: LearnSlugWatchLessonIdRoute,

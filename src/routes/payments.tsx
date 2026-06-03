@@ -12,6 +12,12 @@ import {
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 export const Route = createFileRoute("/payments")({
   head: () => ({
@@ -142,14 +148,45 @@ const STATUS_META: Record<
     cls: "bg-amber-500/15 text-amber-600 border-amber-500/30 dark:text-amber-400",
     icon: Clock,
   },
-  planned: { label: "Planned", cls: "bg-muted text-muted-foreground border-border", icon: Clock },
+  planned: { label: "Roadmap", cls: "bg-muted text-muted-foreground border-border", icon: Clock },
 };
+
+function MethodCard({ m }: { m: Method }) {
+  const meta = STATUS_META[m.status];
+  const Icon = m.icon;
+  const StatusIcon = meta.icon;
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <div className="rounded-lg bg-secondary p-2">
+            <Icon className="h-5 w-5" />
+          </div>
+          <div className="font-display font-semibold">{m.name}</div>
+        </div>
+        <Badge variant="outline" className={meta.cls}>
+          <StatusIcon className="mr-1 h-3 w-3" />
+          {meta.label}
+        </Badge>
+      </div>
+      <p className="mt-3 text-sm text-muted-foreground">{m.desc}</p>
+      {m.provider && <p className="mt-2 text-xs text-muted-foreground">via {m.provider}</p>}
+    </div>
+  );
+}
 
 function PaymentsPage() {
   const all = METHODS.flatMap((g) => g.items);
   const live = all.filter((m) => m.status === "live").length;
   const soon = all.filter((m) => m.status === "soon").length;
-  const planned = all.filter((m) => m.status === "planned").length;
+  const planned = all.filter((m) => m.status === "planned");
+
+  // Visible groups only show live + soon methods. Planned items get their own
+  // "Roadmap" expander so the main page reads as a shipped product.
+  const visibleGroups = METHODS.map((g) => ({
+    ...g,
+    items: g.items.filter((m) => m.status !== "planned"),
+  })).filter((g) => g.items.length > 0);
 
   return (
     <SiteLayout>
@@ -164,49 +201,56 @@ function PaymentsPage() {
             <Badge variant="outline" className={STATUS_META.live.cls}>
               {live} live
             </Badge>
-            <Badge variant="outline" className={STATUS_META.soon.cls}>
-              {soon} coming soon
-            </Badge>
-            <Badge variant="outline" className={STATUS_META.planned.cls}>
-              {planned} planned
-            </Badge>
+            {soon > 0 && (
+              <Badge variant="outline" className={STATUS_META.soon.cls}>
+                {soon} coming soon
+              </Badge>
+            )}
+            {planned.length > 0 && (
+              <Badge variant="outline" className={STATUS_META.planned.cls}>
+                {planned.length} on roadmap
+              </Badge>
+            )}
           </div>
         </div>
       </section>
 
       <section className="container mx-auto px-4 py-12 space-y-10">
-        {METHODS.map((group) => (
+        {visibleGroups.map((group) => (
           <div key={group.group}>
             <h2 className="mb-4 font-display text-xl font-semibold">{group.group}</h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {group.items.map((m) => {
-                const meta = STATUS_META[m.status];
-                const Icon = m.icon;
-                const StatusIcon = meta.icon;
-                return (
-                  <div key={m.name} className="rounded-xl border border-border bg-card p-5">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div className="rounded-lg bg-secondary p-2">
-                          <Icon className="h-5 w-5" />
-                        </div>
-                        <div className="font-display font-semibold">{m.name}</div>
-                      </div>
-                      <Badge variant="outline" className={meta.cls}>
-                        <StatusIcon className="mr-1 h-3 w-3" />
-                        {meta.label}
-                      </Badge>
-                    </div>
-                    <p className="mt-3 text-sm text-muted-foreground">{m.desc}</p>
-                    {m.provider && (
-                      <p className="mt-2 text-xs text-muted-foreground">via {m.provider}</p>
-                    )}
-                  </div>
-                );
-              })}
+              {group.items.map((m) => (
+                <MethodCard key={m.name} m={m} />
+              ))}
             </div>
           </div>
         ))}
+
+        {planned.length > 0 && (
+          <Accordion type="single" collapsible className="rounded-xl border border-border bg-card">
+            <AccordionItem value="roadmap" className="border-b-0">
+              <AccordionTrigger className="px-5 py-4 hover:no-underline">
+                <div className="flex items-center gap-3 text-left">
+                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-display font-semibold">
+                    On the roadmap ({planned.length})
+                  </span>
+                  <span className="hidden text-sm text-muted-foreground sm:inline">
+                    — payment rails we plan to add next
+                  </span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="px-5 pb-5">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {planned.map((m) => (
+                    <MethodCard key={m.name} m={m} />
+                  ))}
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        )}
 
         <div className="rounded-xl border border-border bg-card p-6 text-center">
           <h3 className="font-display text-lg font-semibold">Ready to upgrade?</h3>

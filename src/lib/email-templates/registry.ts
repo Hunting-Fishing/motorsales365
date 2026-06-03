@@ -32,6 +32,7 @@ import { template as verificationSubmitted } from "./verification-submitted";
 import { template as verificationApproved } from "./verification-approved";
 import { template as verificationRejected } from "./verification-rejected";
 import { template as bookingStatusChanged } from "./booking-status-changed";
+import { template as opsAlertsDigest } from "./ops-alerts-digest";
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   "signup-welcome": signupWelcome,
@@ -57,4 +58,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "verification-approved": verificationApproved,
   "verification-rejected": verificationRejected,
   "booking-status-changed": bookingStatusChanged,
+  "ops-alerts-digest": opsAlertsDigest,
 };
