@@ -1,7 +1,7 @@
 // Server-side role gates with built-in access auditing.
 //
 // Three middlewares are exported:
-//   - requireAdminRole               (admin-only, audited only if you don't pass a label)
+//   - requireAdminRole               (admin-only, audited as "(unlabeled)")
 //   - requireAdminRoleAudited(label) (admin-only, records every call to route_audit_log)
 //   - requireDomainRole(role, label) (gates by can_* RPC for non-admin staff roles)
 //
@@ -37,61 +37,17 @@ async function userHasDomainRole(userId: string, role: DomainRole): Promise<bool
   return !error && data === true;
 }
 
-// Backward-compatible: existing callers using requireAdminRole keep working.
-// Records access under route_label="(unlabeled)". Prefer requireAdminRoleAudited(label).
-export const requireAdminRole = createMiddleware({ type: "function" })
-  .middleware([requireSupabaseAuth])
-  .server(async ({ next, context }) => {
-      const request = getRequest(); {
-    const userId = (context as { userId?: string }).userId;
-    if (!userId) {
-      throw new Response("Unauthorized", { status: 401 });
-    }
-    const ok = await userHasAdminRole(userId);
-    if (!ok) {
-      await logRouteAccess({
-        actorId: userId,
-        role: "admin",
-        label: "(unlabeled)",
-        method: request?.method,
-        outcome: "denied",
-        request,
-      });
-      throw new Response("Forbidden", { status: 403 });
-    }
-    const start = Date.now();
-    try {
-      const result = await next({ context: { isAdmin: true as const } });
-      await logRouteAccess({
-        actorId: userId,
-        role: "admin",
-        label: "(unlabeled)",
-        method: request?.method,
-        outcome: "allowed",
-        durationMs: Date.now() - start,
-        request,
-      });
-      return result;
-    } catch (err) {
-      await logRouteAccess({
-        actorId: userId,
-        role: "admin",
-        label: "(unlabeled)",
-        method: request?.method,
-        outcome: "error",
-        errorMessage: err instanceof Error ? err.message : String(err),
-        durationMs: Date.now() - start,
-        request,
-      });
-      throw err;
-    }
-  });
-
-export function requireAdminRoleAudited(label: string) {
+function makeAdminGate(label: string) {
   return createMiddleware({ type: "function" })
     .middleware([requireSupabaseAuth])
     .server(async ({ next, context }) => {
-      const request = getRequest(); {
+      const request = (() => {
+        try {
+          return getRequest();
+        } catch {
+          return null;
+        }
+      })();
       const userId = (context as { userId?: string }).userId;
       if (!userId) throw new Response("Unauthorized", { status: 401 });
       const ok = await userHasAdminRole(userId);
@@ -100,7 +56,7 @@ export function requireAdminRoleAudited(label: string) {
           actorId: userId,
           role: "admin",
           label,
-          method: request?.method,
+          method: request?.method ?? null,
           outcome: "denied",
           request,
         });
@@ -113,7 +69,7 @@ export function requireAdminRoleAudited(label: string) {
           actorId: userId,
           role: "admin",
           label,
-          method: request?.method,
+          method: request?.method ?? null,
           outcome: "allowed",
           durationMs: Date.now() - start,
           request,
@@ -124,7 +80,7 @@ export function requireAdminRoleAudited(label: string) {
           actorId: userId,
           role: "admin",
           label,
-          method: request?.method,
+          method: request?.method ?? null,
           outcome: "error",
           errorMessage: err instanceof Error ? err.message : String(err),
           durationMs: Date.now() - start,
@@ -135,11 +91,17 @@ export function requireAdminRoleAudited(label: string) {
     });
 }
 
-export function requireDomainRole(role: DomainRole, label: string) {
+function makeDomainGate(role: DomainRole, label: string) {
   return createMiddleware({ type: "function" })
     .middleware([requireSupabaseAuth])
     .server(async ({ next, context }) => {
-      const request = getRequest(); {
+      const request = (() => {
+        try {
+          return getRequest();
+        } catch {
+          return null;
+        }
+      })();
       const userId = (context as { userId?: string }).userId;
       if (!userId) throw new Response("Unauthorized", { status: 401 });
       const ok = await userHasDomainRole(userId, role);
@@ -148,7 +110,7 @@ export function requireDomainRole(role: DomainRole, label: string) {
           actorId: userId,
           role,
           label,
-          method: request?.method,
+          method: request?.method ?? null,
           outcome: "denied",
           request,
         });
@@ -161,7 +123,7 @@ export function requireDomainRole(role: DomainRole, label: string) {
           actorId: userId,
           role,
           label,
-          method: request?.method,
+          method: request?.method ?? null,
           outcome: "allowed",
           durationMs: Date.now() - start,
           request,
@@ -172,7 +134,7 @@ export function requireDomainRole(role: DomainRole, label: string) {
           actorId: userId,
           role,
           label,
-          method: request?.method,
+          method: request?.method ?? null,
           outcome: "error",
           errorMessage: err instanceof Error ? err.message : String(err),
           durationMs: Date.now() - start,
@@ -181,4 +143,16 @@ export function requireDomainRole(role: DomainRole, label: string) {
         throw err;
       }
     });
+}
+
+// Backward-compatible export. Existing callers stay working; new code should
+// prefer requireAdminRoleAudited(label) so route_audit_log has useful labels.
+export const requireAdminRole = makeAdminGate("(unlabeled)");
+
+export function requireAdminRoleAudited(label: string) {
+  return makeAdminGate(label);
+}
+
+export function requireDomainRole(role: DomainRole, label: string) {
+  return makeDomainGate(role, label);
 }
