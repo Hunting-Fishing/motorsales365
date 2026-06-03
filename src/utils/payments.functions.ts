@@ -346,20 +346,15 @@ export const createPortalSession = createServerFn({ method: "POST" })
  * Returns one row per plan with status: ok | missing | inactive | no_key.
  */
 export const verifyStripePlans = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((data: { environment: StripeEnv }) => {
     validateEnv(data.environment);
     return data;
   })
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+    const { supabase } = context;
 
-    const { data: isAdmin, error: roleErr } = await supabase.rpc("has_role", {
-      _user_id: userId,
-      _role: "admin",
-    });
-    if (roleErr) throw new Error(roleErr.message);
-    if (!isAdmin) throw new Error("Admin access required");
+
 
     const { data: plans, error: planErr } = await supabase
       .from("subscription_plans")
