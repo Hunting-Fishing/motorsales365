@@ -36,13 +36,13 @@ export const getActiveAds = createServerFn({ method: "GET" })
 
 // PUBLIC: track ad impression / click
 export const trackAdEvent = createServerFn({ method: "POST" })
-  .inputValidator((input: { adId: string; event: "impression" | "click" }) =>
+  .inputValidator((input: { adId: string; eventType: "impression" | "click" }) =>
     z
-      .object({ adId: z.string().uuid(), event: z.enum(["impression", "click"]) })
+      .object({ adId: z.string().uuid(), eventType: z.enum(["impression", "click"]) })
       .parse(input),
   )
   .handler(async ({ data }) => {
-    const col = data.event === "impression" ? "impression_count" : "click_count";
+    const col = data.eventType === "impression" ? "impression_count" : "click_count";
     await supabaseAdmin.rpc("increment_ad_metric" as any, {
       _ad_id: data.adId,
       _column: col,
