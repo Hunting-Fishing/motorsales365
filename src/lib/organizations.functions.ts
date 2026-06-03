@@ -149,14 +149,22 @@ export const updateMemberRole = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertOrgManager(supabase, userId, data.orgId);
-    const { error } = await supabase
-      .from("organization_members")
-      .update({ role: data.role as any })
-      .eq("organization_id", data.orgId)
-      .eq("user_id", data.userId);
-    if (error) throw new Error(error.message);
-    return { ok: true };
+    return withRouteAudit({
+      actorId: userId,
+      label: "organizations.updateMemberRole",
+      role: "org_manager",
+      targetSummary: { org_id: data.orgId, target_user: data.userId, role: data.role },
+      check: () => assertOrgManager(supabase, userId, data.orgId),
+      run: async () => {
+        const { error } = await supabase
+          .from("organization_members")
+          .update({ role: data.role as any })
+          .eq("organization_id", data.orgId)
+          .eq("user_id", data.userId);
+        if (error) throw new Error(error.message);
+        return { ok: true };
+      },
+    });
   });
 
 export const removeMember = createServerFn({ method: "POST" })
@@ -167,12 +175,21 @@ export const removeMember = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    await assertOrgManager(supabase, userId, data.orgId);
-    const { error } = await supabase
-      .from("organization_members")
-      .delete()
-      .eq("organization_id", data.orgId)
-      .eq("user_id", data.userId);
-    if (error) throw new Error(error.message);
-    return { ok: true };
+    return withRouteAudit({
+      actorId: userId,
+      label: "organizations.removeMember",
+      role: "org_manager",
+      targetSummary: { org_id: data.orgId, target_user: data.userId },
+      check: () => assertOrgManager(supabase, userId, data.orgId),
+      run: async () => {
+        const { error } = await supabase
+          .from("organization_members")
+          .delete()
+          .eq("organization_id", data.orgId)
+          .eq("user_id", data.userId);
+        if (error) throw new Error(error.message);
+        return { ok: true };
+      },
+    });
   });
+
