@@ -19,19 +19,21 @@ export interface FeatureFlag {
 }
 
 export const listFeatureFlags = createServerFn({ method: "GET" }).handler(
-  async (): Promise<{ flags: FeatureFlag[] }> => {
+  async () => {
     // Anonymous read is intentional — flag enablement is not sensitive.
     const { data, error } = await supabase
       .from("feature_flags")
       .select("key,enabled,payload,description,updated_at")
       .order("key", { ascending: true });
     if (error) throw new Error(error.message);
-    return {
-      flags: ((data ?? []) as FeatureFlag[]).map((f) => ({
-        ...f,
-        payload: (f.payload ?? {}) as Record<string, unknown>,
-      })),
-    };
+    const flags: FeatureFlag[] = (data ?? []).map((f) => ({
+      key: f.key,
+      enabled: f.enabled,
+      payload: (f.payload ?? {}) as Record<string, unknown>,
+      description: f.description,
+      updated_at: f.updated_at,
+    }));
+    return { flags };
   },
 );
 
@@ -50,7 +52,8 @@ export const setFeatureFlag = createServerFn({ method: "POST" })
   .inputValidator((input) => ToggleSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase: admin } = context;
-    const patch: Record<string, unknown> = { enabled: data.enabled };
+    type FlagUpdate = { enabled: boolean; payload?: Record<string, unknown> };
+    const patch: FlagUpdate = { enabled: data.enabled };
     if (data.payload !== undefined) patch.payload = data.payload;
     const { error } = await admin
       .from("feature_flags")
