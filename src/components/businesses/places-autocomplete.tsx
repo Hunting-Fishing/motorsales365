@@ -4,17 +4,14 @@ import { Input } from "@/components/ui/input";
 
 export type PlacePick = { lat: number; lng: number; label: string };
 
-type NominatimResult = {
-  place_id: number;
-  lat: string;
-  lon: string;
-  display_name: string;
-  name?: string;
-  address?: Record<string, string>;
+type GeoSearchResult = {
+  id: string;
+  primary: string;
+  secondary: string;
+  lat: number;
+  lng: number;
+  label: string;
 };
-
-// Philippines bounding box (lon_min, lat_min, lon_max, lat_max)
-const PH_VIEWBOX = "116.0,4.5,127.0,21.5";
 
 export function PlacesAutocomplete({
   value,
@@ -55,34 +52,16 @@ export function PlacesAutocomplete({
       const ctrl = new AbortController();
       abortRef.current = ctrl;
       try {
-        const url = new URL("https://nominatim.openstreetmap.org/search");
+        const url = new URL("/api/public/geo-search", window.location.origin);
         url.searchParams.set("q", input);
-        url.searchParams.set("format", "json");
-        url.searchParams.set("addressdetails", "1");
         url.searchParams.set("limit", "7");
-        url.searchParams.set("countrycodes", "ph");
-        url.searchParams.set("viewbox", PH_VIEWBOX);
-        url.searchParams.set("bounded", "1");
         const res = await fetch(url.toString(), {
           signal: ctrl.signal,
           headers: { Accept: "application/json" },
         });
         if (!res.ok) throw new Error("Geocoder error");
-        const data = (await res.json()) as NominatimResult[];
-        const mapped = data.map((r) => {
-          const parts = r.display_name.split(", ");
-          const primary = r.name || parts[0] || r.display_name;
-          const secondary = parts.slice(primary === parts[0] ? 1 : 0).join(", ");
-          return {
-            id: String(r.place_id),
-            primary,
-            secondary,
-            lat: Number(r.lat),
-            lng: Number(r.lon),
-            label: r.display_name,
-          };
-        });
-        setSuggestions(mapped);
+        const data = (await res.json()) as { results: GeoSearchResult[] };
+        setSuggestions(data.results ?? []);
         setOpen(true);
         setHighlight(0);
       } catch (e) {
