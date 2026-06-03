@@ -2,7 +2,10 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import ogMap from "@/assets/og/map.jpg";
 import { useEffect, useMemo, useState } from "react";
 import { z } from "zod";
-import { Star, Store as StoreIcon, MapPin } from "lucide-react";
+import { Star, Store as StoreIcon, MapPin, Locate, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+
 import { SiteLayout } from "@/components/site-layout";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
