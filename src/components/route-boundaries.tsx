@@ -78,3 +78,7 @@ export function RouteNotFound() {
     </main>
   );
 }
+
+// Backwards-compatible aliases used by existing routes.
+export const RouteErrorBoundary = RouteError;
+export const RouteNotFoundBoundary = RouteNotFound;
