@@ -70,3 +70,72 @@ export async function logRouteAccess(args: LogRouteAccessArgs): Promise<void> {
     console.warn("[route-audit] insert failed", e);
   }
 }
+
+// Org-scoped (or any scope-bound) audit helper for cases where the role check
+// depends on a per-call argument (e.g. orgId), which the generic middleware
+// factories cannot express. Wraps an authorization check + a handler body and
+// records `denied`, `allowed`, or `error` rows to route_audit_log.
+import { getRequest } from "@tanstack/react-start/server";
+
+export async function withRouteAudit<T>(args: {
+  actorId: string;
+  label: string;
+  role: AuditRole;
+  targetSummary?: Record<string, unknown> | null;
+  check?: () => Promise<void> | void;
+  run: () => Promise<T>;
+}): Promise<T> {
+  const request = (() => {
+    try {
+      return getRequest();
+    } catch {
+      return null;
+    }
+  })();
+  const method = request?.method ?? null;
+  if (args.check) {
+    try {
+      await args.check();
+    } catch (err) {
+      await logRouteAccess({
+        actorId: args.actorId,
+        role: args.role,
+        label: args.label,
+        method,
+        outcome: "denied",
+        errorMessage: err instanceof Error ? err.message : String(err),
+        request,
+        targetSummary: args.targetSummary ?? null,
+      });
+      throw err;
+    }
+  }
+  const start = Date.now();
+  try {
+    const result = await args.run();
+    await logRouteAccess({
+      actorId: args.actorId,
+      role: args.role,
+      label: args.label,
+      method,
+      outcome: "allowed",
+      durationMs: Date.now() - start,
+      request,
+      targetSummary: args.targetSummary ?? null,
+    });
+    return result;
+  } catch (err) {
+    await logRouteAccess({
+      actorId: args.actorId,
+      role: args.role,
+      label: args.label,
+      method,
+      outcome: "error",
+      errorMessage: err instanceof Error ? err.message : String(err),
+      durationMs: Date.now() - start,
+      request,
+      targetSummary: args.targetSummary ?? null,
+    });
+    throw err;
+  }
+}
