@@ -60,7 +60,7 @@ function SortablePhoto({
         type="button"
         {...attributes}
         {...listeners}
-        className="absolute left-1.5 top-1.5 z-[2] cursor-grab rounded-full bg-white/90 p-1.5 text-foreground opacity-0 transition-opacity hover:bg-white group-hover:opacity-100 active:cursor-grabbing"
+        className="absolute left-1.5 top-1.5 z-[2] cursor-grab rounded-full bg-white/90 p-1.5 text-foreground opacity-0 transition-opacity hover:bg-white focus-visible:opacity-100 group-hover:opacity-100 active:cursor-grabbing"
         title="Drag to reorder"
         aria-label="Drag to reorder"
       >
