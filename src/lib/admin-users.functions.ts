@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireAdminRole } from "@/integrations/supabase/admin-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const Input = z.object({
@@ -18,17 +18,9 @@ export type TransferUserHit = {
 };
 
 export const searchTransferableUsers = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireAdminRole])
   .inputValidator((input: unknown) => Input.parse(input))
-  .handler(async ({ data, context }): Promise<{ rows: TransferUserHit[] }> => {
-    // Admin gate
-    const { data: roleRow } = await context.supabase
-      .from("user_roles" as never)
-      .select("role")
-      .eq("user_id", context.userId)
-      .eq("role", "admin")
-      .maybeSingle();
-    if (!roleRow) throw new Error("Admin only");
+  .handler(async ({ data }): Promise<{ rows: TransferUserHit[] }> => {
 
     const q = data.query.trim();
     const uuidRe = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
