@@ -97,7 +97,9 @@ export function GoogleBusinessMap({
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
+  const clusterRef = useRef<L.MarkerClusterGroup | null>(null);
   const circleRef = useRef<L.Circle | null>(null);
+
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
 
