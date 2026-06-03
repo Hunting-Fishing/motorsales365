@@ -2,6 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { z } from "zod";
+import { logRouteAccess } from "@/integrations/supabase/route-audit.server";
+
 
 const RoleEnum = z.enum(["admin", "moderator", "support", "sales", "advertising"]);
 const SellerTypeEnum = z.enum(["private", "dealer", "repair_shop", "insurance"]);
