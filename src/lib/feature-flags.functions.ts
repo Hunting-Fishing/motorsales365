@@ -10,10 +10,12 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { requireAdminRoleAudited } from "@/integrations/supabase/admin-middleware";
 
+import type { Json } from "@/integrations/supabase/types";
+
 export interface FeatureFlag {
   key: string;
   enabled: boolean;
-  payload: Record<string, unknown>;
+  payload: Json;
   description: string | null;
   updated_at: string;
 }
@@ -29,7 +31,7 @@ export const listFeatureFlags = createServerFn({ method: "GET" }).handler(
     const flags: FeatureFlag[] = (data ?? []).map((f) => ({
       key: f.key,
       enabled: f.enabled,
-      payload: (f.payload ?? {}) as Record<string, unknown>,
+      payload: (f.payload ?? {}) as Json,
       description: f.description,
       updated_at: f.updated_at,
     }));
@@ -52,9 +54,8 @@ export const setFeatureFlag = createServerFn({ method: "POST" })
   .inputValidator((input) => ToggleSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase: admin } = context;
-    type FlagUpdate = { enabled: boolean; payload?: Record<string, unknown> };
-    const patch: FlagUpdate = { enabled: data.enabled };
-    if (data.payload !== undefined) patch.payload = data.payload;
+    const patch: { enabled: boolean; payload?: Json } = { enabled: data.enabled };
+    if (data.payload !== undefined) patch.payload = data.payload as Json;
     const { error } = await admin
       .from("feature_flags")
       .update(patch)
