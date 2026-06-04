@@ -32,13 +32,23 @@ function generatePassword(len = 16) {
   return Array.from(arr, (n) => chars[n % chars.length]).join("");
 }
 
-export function AddUserDialog({ onCreated }: { onCreated?: () => void }) {
+export function AddUserDialog({
+  onCreated,
+  lockStaff = false,
+  enforceDomain,
+  triggerLabel = "Add user",
+}: {
+  onCreated?: () => void;
+  lockStaff?: boolean;
+  enforceDomain?: string;
+  triggerLabel?: string;
+}) {
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState(() => generatePassword());
-  const [accountType, setAccountType] = useState<"staff" | "business">("staff");
+  const [accountType, setAccountType] = useState<"staff" | "business">(lockStaff ? "staff" : "staff");
   const [roles, setRoles] = useState<StaffRole[]>(["support"]);
   const [sellerType, setSellerType] = useState<"private" | "business">("private");
   const [businessName, setBusinessName] = useState("");
@@ -72,6 +82,10 @@ export function AddUserDialog({ onCreated }: { onCreated?: () => void }) {
   const submit = async () => {
     if (!email || !fullName || !password) {
       toast.error("Fill all required fields");
+      return;
+    }
+    if (enforceDomain && !email.trim().toLowerCase().endsWith(enforceDomain.toLowerCase())) {
+      toast.error(`Email must end with ${enforceDomain}`);
       return;
     }
     setSubmitting(true);
