@@ -236,9 +236,11 @@ function AdminLayout() {
 
   // Enforce TOTP 2FA for admins. Sales / moderator / support / advertising
   // staff aren't required (they can opt in via profile).
+  // @365motorsales.com employees are exempt — 2FA is optional for them.
+  const is365Staff = (user?.email ?? "").toLowerCase().endsWith("@365motorsales.com");
   const [mfaState, setMfaState] = useState<"checking" | "ok" | "missing">("checking");
   useEffect(() => {
-    if (!user || !isAdmin) {
+    if (!user || !isAdmin || is365Staff) {
       setMfaState("ok");
       return;
     }
@@ -256,7 +258,7 @@ function AdminLayout() {
     return () => {
       cancelled = true;
     };
-  }, [user, isAdmin]);
+  }, [user, isAdmin, is365Staff]);
 
   useEffect(() => {
     if (loading) return;
