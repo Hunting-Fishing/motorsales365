@@ -184,11 +184,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loadRoles = useCallback(async (uid: string) => {
     const [{ data: roleRows }, { data: profileRow }] = await Promise.all([
       supabase.from("user_roles").select("role").eq("user_id", uid),
-      supabase.from("profiles").select("seller_type").eq("id", uid).maybeSingle(),
+      supabase.from("profiles").select("seller_type, full_name").eq("id", uid).maybeSingle(),
     ]);
     setRoles((roleRows ?? []).map((r: any) => r.role));
     const st = (profileRow as any)?.seller_type;
     setRealSellerType(VALID_SELLER_TYPES.includes(st) ? (st as SellerType) : "private");
+    setProfileName((profileRow as any)?.full_name ?? null);
   }, []);
 
   const handleSession = useCallback(
