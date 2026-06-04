@@ -2033,6 +2033,45 @@ export type Database = {
         }
         Relationships: []
       }
+      email_routes: {
+        Row: {
+          active: boolean
+          address: string
+          category: string | null
+          created_at: string
+          destination: string
+          id: string
+          notes: string | null
+          owner: string | null
+          source: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          address: string
+          category?: string | null
+          created_at?: string
+          destination: string
+          id?: string
+          notes?: string | null
+          owner?: string | null
+          source?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          address?: string
+          category?: string | null
+          created_at?: string
+          destination?: string
+          id?: string
+          notes?: string | null
+          owner?: string | null
+          source?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
