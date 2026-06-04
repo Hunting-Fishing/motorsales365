@@ -144,7 +144,12 @@ function ShareKitPage() {
       {context && (
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {TEMPLATES.map((t) => (
-            <TemplateCard key={t.id} template={t} context={context} />
+            <TemplateCard
+              key={t.id}
+              template={t}
+              context={context}
+              override={layouts?.[t.id]}
+            />
           ))}
         </div>
       )}
