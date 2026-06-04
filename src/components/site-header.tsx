@@ -49,6 +49,7 @@ export function SiteHeader() {
   const {
     user,
     loading,
+    profileName,
     isAdmin,
     isStaff,
     signOut,
