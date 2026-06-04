@@ -70,10 +70,9 @@ export const adminUpdateUserProfile = createServerFn({ method: "POST" })
       profilePatch.phone = phone;
       profilePatch.phone_e164 = normalizeE164(phone);
     }
-    if (data.verification_status === "verified") {
-      profilePatch.verified_at = new Date().toISOString();
-    } else if (data.verification_status && data.verification_status !== "verified") {
-      profilePatch.verified_at = null;
+    if (data.verification_status) {
+      profilePatch.verified_at =
+        data.verification_status === "verified" ? new Date().toISOString() : null;
     }
 
     if (Object.keys(profilePatch).length > 0) {
