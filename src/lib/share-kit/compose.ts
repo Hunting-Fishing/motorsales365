@@ -43,9 +43,44 @@ function roundedRect(
   ctx.closePath();
 }
 
+export type QrOverride = { cx: number; cy: number; size: number };
+
+async function drawBase(
+  template: ShareTemplate,
+  ctx: TemplateContext,
+): Promise<HTMLCanvasElement> {
+  const canvas = document.createElement("canvas");
+  canvas.width = template.width;
+  canvas.height = template.height;
+  const c = canvas.getContext("2d");
+  if (!c) throw new Error("2D canvas context unavailable");
+  c.fillStyle = template.background || "#ffffff";
+  c.fillRect(0, 0, template.width, template.height);
+  if (template.kind === "image" && template.imageUrl) {
+    const img = await loadImage(template.imageUrl);
+    const scale = Math.min(template.width / img.width, template.height / img.height);
+    const w = img.width * scale;
+    const h = img.height * scale;
+    c.drawImage(img, (template.width - w) / 2, (template.height - h) / 2, w, h);
+  } else if (template.kind === "svg" && template.renderSvg) {
+    const svg = template.renderSvg(ctx);
+    const img = await loadImage(svgToDataUrl(svg));
+    c.drawImage(img, 0, 0, template.width, template.height);
+  }
+  return canvas;
+}
+
+export async function composeBaseOnly(
+  template: ShareTemplate,
+  ctx: TemplateContext,
+): Promise<HTMLCanvasElement> {
+  return drawBase(template, ctx);
+}
+
 export async function composeTemplate(
   template: ShareTemplate,
   ctx: TemplateContext,
+  override?: QrOverride,
 ): Promise<HTMLCanvasElement> {
   const canvas = document.createElement("canvas");
   canvas.width = template.width;
@@ -71,8 +106,11 @@ export async function composeTemplate(
     c.drawImage(img, 0, 0, template.width, template.height);
   }
 
-  // QR
-  const qrSizePx = template.qr.size * template.width;
+  // QR (use override placement if provided)
+  const qrCxRel = override?.cx ?? template.qr.cx;
+  const qrCyRel = override?.cy ?? template.qr.cy;
+  const qrSizeRel = override?.size ?? template.qr.size;
+  const qrSizePx = qrSizeRel * template.width;
   const qrPng = await QRCode.toDataURL(ctx.link, {
     errorCorrectionLevel: "H",
     margin: 1,
@@ -81,8 +119,8 @@ export async function composeTemplate(
   });
   const qrImg = await loadImage(qrPng);
 
-  const qrCx = template.qr.cx * template.width;
-  const qrCy = template.qr.cy * template.height;
+  const qrCx = qrCxRel * template.width;
+  const qrCy = qrCyRel * template.height;
   const qrX = qrCx - qrSizePx / 2;
   const qrY = qrCy - qrSizePx / 2;
 

@@ -3998,6 +3998,33 @@ export type Database = {
           },
         ]
       }
+      share_kit_layouts: {
+        Row: {
+          cx: number
+          cy: number
+          size: number
+          template_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cx: number
+          cy: number
+          size: number
+          template_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cx?: number
+          cy?: number
+          size?: number
+          template_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       shop_categories: {
         Row: {
           active: boolean

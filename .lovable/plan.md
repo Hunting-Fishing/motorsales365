@@ -1,64 +1,72 @@
-## Member Share Kit (personalized ads + QR)
+## Share Kit QR Editor
 
-Give signed-in staff (e.g. joan@365motorsales.com) a one-stop page where they can grab branded 365 Motor Sales advertisements with **their own referral QR + tracking link** automatically baked into every design.
+Add an in-page editor to `/dashboard/share-kit` so staff can drag and resize their referral QR on every template, preview the result live, and have the layout saved per-user so downloads/shares always use their custom placement.
 
-Scope: **staff with a `staff_referrals` record** (same audience as `/my-qr`). Non-staff members get a polite "no code yet" state. Broadening to all members stays for a follow-up.
+### UX
 
-### New route: `/dashboard/share-kit`
+For each template card:
+- New **Edit layout** button opens an inline editor panel (replaces the static preview).
+- Editor shows the template at a scaled-down size with the composed QR overlaid as a draggable + resizable handle.
+  - Drag anywhere on the QR to reposition (constrained to canvas bounds).
+  - Corner handle to resize (min 8% of width, max 60%).
+  - Live re-render of the caption position (caption stays anchored under the QR).
+- Controls: **Save**, **Reset to default**, **Cancel**.
+- Saving writes the new `{cx, cy, size}` to the database and re-renders the preview + any subsequent Download / Share / native-share / social-link export uses the saved values.
+- Existing Download / Share / Copy / Facebook / WhatsApp buttons keep working unchanged — they just consume the saved overrides.
 
-Add a link to it from `/dashboard/referral` and `/my-qr` so Joan finds it from either entry point.
+### Data
 
-Page layout:
-- Header: "Your Share Kit" + her name + active/inactive badge
-- Gallery of **template cards** (4–6 to start), each shows a live preview with her QR composited in
-- Each card: **Download PNG**, **Print A4 poster**, **Native share**, **Share to Facebook / Messenger / WhatsApp / X** quick links, **Copy link**
+New table `share_kit_layouts`:
+- `user_id uuid` (FK auth.users, on delete cascade)
+- `template_id text`
+- `cx numeric` `cy numeric` `size numeric` (all 0–1 relative)
+- `updated_at timestamptz`
+- PK `(user_id, template_id)`
+- RLS: user can select/insert/update/delete only their own rows. Grants for `authenticated` + `service_role`.
 
-### Templates (mix of uploaded artwork + clean SVG variants)
+### Server functions (new `src/lib/share-kit-layouts.functions.ts`)
 
-1. **Rear Shirt Ad** — uses the uploaded `365_Rear_Shirt_Logo.png` as a background, QR composited bottom-right with a white plate + "Scan to shop · {firstName}" caption.
-2. **Arm Band Ad** — uses `365_arm_band_ready_to_go_edit_no_sun.png`, QR replaces the placeholder QR area at the bottom (already sized for it).
-3. **Clean SVG: Square Social** (1080×1080) — bold red/blue 365 wordmark, vehicle category strip, QR + name + code.
-4. **Clean SVG: Story / Reel** (1080×1920) — vertical, big QR, "Scan to shop nationwide" headline.
-5. **Clean SVG: Landscape Banner** (1200×630, doubles as OG image) — for Facebook posts and link previews.
-6. **A4 Print Poster** — refreshed version of the existing `/r/$code/poster` styled to match the new ad system.
+- `listShareKitLayouts()` → returns `Record<templateId, {cx,cy,size}>` for current user. Uses `requireSupabaseAuth`.
+- `upsertShareKitLayout({ templateId, cx, cy, size })` → validates with Zod (numbers in 0–1, size 0.08–0.6), upserts row.
+- `deleteShareKitLayout({ templateId })` → reset to default.
 
-Templates 3–6 are pure SVG/HTML so they stay razor-sharp at any export size and keep QR contrast perfect.
+### Client wiring
 
-### How sharing works
+- `src/lib/share-kit/compose.ts`: extend `composeTemplate(template, ctx, overrides?)` so when an override exists, it replaces `template.qr.cx/cy/size` before drawing. No other template field changes.
+- `src/routes/dashboard.share-kit.tsx`:
+  - On mount, call `listShareKitLayouts` via `useQuery`; pass the layouts map into each `<TemplateCard>` as `override`.
+- `src/components/share-kit/template-card.tsx`:
+  - Accept `override?: {cx,cy,size}` and pass to `composeTemplate`.
+  - Add `editing` state that swaps the static preview for a new `<TemplateEditor>` component.
+  - When editor saves → call `upsertShareKitLayout` (TanStack mutation) → invalidate the layouts query → exit editor.
+  - Reset button → `deleteShareKitLayout` → invalidate.
+- New `src/components/share-kit/template-editor.tsx`:
+  - Renders the base art via the same compose pipeline but WITHOUT the QR (new `composeBaseOnly` helper) at a scaled CSS size.
+  - Renders the draggable QR as an absolutely-positioned `<img>` (data URL of QR only, generated once via `qrcode`).
+  - Pointer-event handlers for drag (whole QR) and resize (bottom-right handle), with bounds clamping. Touch-friendly.
+  - Emits `{cx, cy, size}` on Save.
 
-For each template:
-- **Download PNG/JPG**: render the template to an offscreen canvas (uploaded image + drawn QR, or rasterized SVG), then trigger a `.png` download named `365-{template}-{code}.png`.
-- **Print A4 poster**: opens a print-styled route (reuse the `r.$code.poster.tsx` pattern, one route per template variant or a single `?template=` param).
-- **Native share**: `navigator.share({ files: [pngBlob], title, text, url })` when supported; falls back to copy link.
-- **Social quick links**: pre-filled URLs
-  - Facebook: `https://www.facebook.com/sharer/sharer.php?u={link}`
-  - Messenger (web): `https://www.facebook.com/dialog/send?link={link}&app_id=...&redirect_uri=...` (fallback: copy + toast)
-  - WhatsApp: `https://wa.me/?text={encoded text + link}`
-  - X / Twitter: `https://twitter.com/intent/tweet?text=...&url={link}`
-- **Copy link**: clipboard copy of `https://365motorsales.com/r/{code}`.
+### A11y
 
-All shares point at `/r/{code}` so the existing scan-tracking pipeline (`qr_scans`, `user_referrals`, 90-day attribution) keeps working unchanged.
+- Drag handle: `role="slider"` style is overkill; use keyboard arrows on a focused QR to nudge by 1% per arrow press, Shift+arrow by 5%. `+` / `-` keys to resize. `aria-label` describes current position.
+- Buttons get visible labels (Edit layout / Save / Reset / Cancel).
 
-### Asset handling
+### Out of scope
 
-Upload the two PNGs via `lovable-assets` so they're CDN-hosted (large images, no need to bloat the repo):
-- `src/assets/share-kit/rear-shirt.png.asset.json`
-- `src/assets/share-kit/arm-band.png.asset.json`
+- Editing caption text or colors.
+- Per-template QR styling (kept consistent).
+- Sharing custom layouts across users / admin templates.
+- Photo-based templates' caption box position (only QR is editable; caption follows QR).
+- Terms / Privacy updates (no data-handling change beyond storing a layout preference; covered by existing account data section).
 
-### Technical notes
+### Files
 
-- New file `src/lib/share-kit/templates.ts` — pure config: each template's id, label, size, base image (or SVG render fn), QR placement box `{x, y, w, h, plate?}`, caption text builder.
-- New component `src/components/share-kit/template-card.tsx` — renders preview via `<canvas>` (for image-based templates) or inline SVG (for vector templates). Memoizes the rendered Blob/dataURL for instant download/share.
-- New component `src/components/share-kit/qr-composer.ts` — utility that draws a QR (qrcode lib, already in deps) onto a canvas at the configured box with a rounded white plate behind it for scan reliability.
-- New route file `src/routes/dashboard.share-kit.tsx`.
-- New print route `src/routes/r.$code.poster_.$template.tsx` (or extend the existing poster route with a `template` search param) for the A4 print variants.
-- Add a "Share Kit" link to `/dashboard/referral` and `/my-qr`.
-- Reuse existing `staff_referrals` lookup (`referral_code`, `full_name`, `active`). No DB schema changes.
-- No business-logic / billing / data-handling changes → no `/terms` or `/privacy` update needed.
+**New**
+- `supabase/migrations/<ts>_share_kit_layouts.sql` (via migration tool)
+- `src/lib/share-kit-layouts.functions.ts`
+- `src/components/share-kit/template-editor.tsx`
 
-### Out of scope (follow-ups)
-
-- Auto-creating referral codes for non-staff members (Scope question deferred).
-- Admin-managed template library / per-staff custom backgrounds.
-- Server-side image composition (everything renders client-side; fine for the volumes involved).
-- A11y sweep of new icon-only buttons will be done as I build, matching the patterns already established.
+**Edited**
+- `src/lib/share-kit/compose.ts` (add override param + `composeBaseOnly`)
+- `src/components/share-kit/template-card.tsx` (override, editor toggle, mutations)
+- `src/routes/dashboard.share-kit.tsx` (load layouts, pass overrides)

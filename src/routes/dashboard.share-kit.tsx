@@ -1,10 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { TemplateCard } from "@/components/share-kit/template-card";
 import { TEMPLATES } from "@/lib/share-kit/templates";
+import { listShareKitLayouts } from "@/lib/share-kit-layouts.functions";
 
 export const Route = createFileRoute("/dashboard/share-kit")({
   component: ShareKitPage,
@@ -70,6 +73,13 @@ function ShareKitPage() {
     };
   }, [staff]);
 
+  const layoutsFn = useServerFn(listShareKitLayouts);
+  const { data: layouts } = useQuery({
+    queryKey: ["share-kit-layouts"],
+    queryFn: () => layoutsFn(),
+    enabled: !!user && !!staff,
+  });
+
   if (authLoading || loading) {
     return <div className="p-12 text-center text-muted-foreground">Loading your share kit…</div>;
   }
@@ -134,7 +144,12 @@ function ShareKitPage() {
       {context && (
         <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
           {TEMPLATES.map((t) => (
-            <TemplateCard key={t.id} template={t} context={context} />
+            <TemplateCard
+              key={t.id}
+              template={t}
+              context={context}
+              override={layouts?.[t.id]}
+            />
           ))}
         </div>
       )}
