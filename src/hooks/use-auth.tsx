@@ -116,6 +116,7 @@ interface AuthContextValue {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  profileName: string | null;
   isAdmin: boolean;
   isSales: boolean;
   isModerator: boolean;
