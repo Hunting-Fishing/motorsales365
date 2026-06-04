@@ -41,12 +41,31 @@ type StaffRole = (typeof STAFF_ROLES)[number];
 const PAGE_SIZE_OPTIONS = [25, 50, 100, 200] as const;
 
 function AdminUsers() {
+  const { user } = useAuth();
+  const isSuperAdmin = (user?.email ?? "").toLowerCase() === SUPER_ADMIN_EMAIL;
+  const genMagicLink = useServerFn(generateStaffMagicLink);
+  const [magicLink, setMagicLink] = useState<{ email: string; link: string } | null>(null);
+  const [magicLoadingId, setMagicLoadingId] = useState<string | null>(null);
+
+  const handleViewLogin = async (u: any) => {
+    setMagicLoadingId(u.id);
+    try {
+      const res = await genMagicLink({ data: { targetUserId: u.id } });
+      setMagicLink({ email: res.email, link: res.actionLink });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to generate sign-in link");
+    } finally {
+      setMagicLoadingId(null);
+    }
+  };
+
   const [users, setUsers] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState<number>(50);
   const [pageInput, setPageInput] = useState("");
   const [loading, setLoading] = useState(false);
+
 
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
