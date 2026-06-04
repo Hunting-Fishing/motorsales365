@@ -45,8 +45,25 @@ function AdminUsers() {
   const { user } = useAuth();
   const isSuperAdmin = (user?.email ?? "").toLowerCase() === SUPER_ADMIN_EMAIL;
   const genMagicLink = useServerFn(generateStaffMagicLink);
+  const fetchStaffIds = useServerFn(listStaffUserIds);
+  const [staffIds, setStaffIds] = useState<Set<string>>(new Set());
   const [magicLink, setMagicLink] = useState<{ email: string; link: string } | null>(null);
   const [magicLoadingId, setMagicLoadingId] = useState<string | null>(null);
+
+  // Load 365motorsales.com staff user IDs once for filtering + eye button gating.
+  useEffect(() => {
+    let cancelled = false;
+    (fetchStaffIds as any)()
+      .then((res: { ids: string[] }) => {
+        if (!cancelled) setStaffIds(new Set(res.ids));
+      })
+      .catch(() => {
+        // Non-admins / errors: ignore silently.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchStaffIds]);
 
   const handleViewLogin = async (u: any) => {
     setMagicLoadingId(u.id);
