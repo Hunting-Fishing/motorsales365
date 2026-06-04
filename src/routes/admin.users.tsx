@@ -343,6 +343,7 @@ function AdminUsers() {
             <SelectItem value="dealer">Dealer</SelectItem>
             <SelectItem value="repair_shop">Repair shop</SelectItem>
             <SelectItem value="insurance">Insurance</SelectItem>
+            <SelectItem value="staff_365">365 Staff</SelectItem>
           </SelectContent>
         </Select>
         <Select value={verFilter} onValueChange={setVerFilter}>
