@@ -19,6 +19,8 @@ import { EditProfileDialog } from "@/components/admin/edit-profile-dialog";
 import { ResetPasswordDialog } from "@/components/admin/reset-password-dialog";
 import { listStaff365, setStaff365Disabled } from "@/lib/admin-staff-list.functions";
 import { generateStaffMagicLink } from "@/lib/admin-magic-link.functions";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { EmailRoutingPanel } from "@/components/admin/email-routing-panel";
 
 const SUPER_ADMIN_EMAIL = "jordilwbailey@gmail.com";
 const STAFF_DOMAIN = "@365motorsales.com";
@@ -101,14 +103,22 @@ function Staff365Page() {
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-bold">365 Staff</h1>
-          <p className="text-xs text-muted-foreground">
-            All <strong>{STAFF_DOMAIN}</strong> employees. Full admin controls.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="mb-4">
+        <h1 className="font-display text-2xl font-bold">365 Staff</h1>
+        <p className="text-xs text-muted-foreground">
+          Manage <strong>{STAFF_DOMAIN}</strong> employees and every email address connected to
+          the business.
+        </p>
+      </div>
+
+      <Tabs defaultValue="staff">
+        <TabsList>
+          <TabsTrigger value="staff">Staff</TabsTrigger>
+          <TabsTrigger value="routing">Email Routing</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="staff" className="mt-4">
+      <div className="mb-4 flex flex-wrap items-center justify-end gap-2">
           <Button size="sm" variant="outline" onClick={load} disabled={loading}>
             <RefreshCw className={`mr-1 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             Refresh
@@ -119,7 +129,6 @@ function Staff365Page() {
             enforceDomain={STAFF_DOMAIN}
             triggerLabel="Create Employee"
           />
-        </div>
       </div>
 
       {err && (
@@ -201,6 +210,12 @@ function Staff365Page() {
           </div>
         ))}
       </div>
+        </TabsContent>
+
+        <TabsContent value="routing" className="mt-4">
+          <EmailRoutingPanel />
+        </TabsContent>
+      </Tabs>
 
       <Dialog open={!!magicLink} onOpenChange={(o) => !o && setMagicLink(null)}>
         <DialogContent>
