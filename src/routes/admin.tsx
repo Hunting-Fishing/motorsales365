@@ -240,7 +240,6 @@ function AdminLayout() {
   const is365Staff =
     emailLc.endsWith("@365motorsales.com") || emailLc === "jordilwbailey@gmail.com";
   const [mfaState, setMfaState] = useState<"checking" | "ok" | "missing">("checking");
-  const [mfaState, setMfaState] = useState<"checking" | "ok" | "missing">("checking");
   useEffect(() => {
     if (!user || !isAdmin || is365Staff) {
       setMfaState("ok");
