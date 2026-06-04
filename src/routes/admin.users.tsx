@@ -20,6 +20,7 @@ import { logAdminAudit } from "@/lib/admin-audit";
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { generateStaffMagicLink } from "@/lib/admin-magic-link.functions";
+import { listStaffUserIds } from "@/lib/admin-staff.functions";
 import {
   Dialog,
   DialogContent,
@@ -44,8 +45,25 @@ function AdminUsers() {
   const { user } = useAuth();
   const isSuperAdmin = (user?.email ?? "").toLowerCase() === SUPER_ADMIN_EMAIL;
   const genMagicLink = useServerFn(generateStaffMagicLink);
+  const fetchStaffIds = useServerFn(listStaffUserIds);
+  const [staffIds, setStaffIds] = useState<Set<string>>(new Set());
   const [magicLink, setMagicLink] = useState<{ email: string; link: string } | null>(null);
   const [magicLoadingId, setMagicLoadingId] = useState<string | null>(null);
+
+  // Load 365motorsales.com staff user IDs once for filtering + eye button gating.
+  useEffect(() => {
+    let cancelled = false;
+    (fetchStaffIds as any)()
+      .then((res: { ids: string[] }) => {
+        if (!cancelled) setStaffIds(new Set(res.ids));
+      })
+      .catch(() => {
+        // Non-admins / errors: ignore silently.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchStaffIds]);
 
   const handleViewLogin = async (u: any) => {
     setMagicLoadingId(u.id);
@@ -122,7 +140,18 @@ function AdminUsers() {
 
       if (restrictIds) q = q.in("id", restrictIds);
       if (excludeIds && excludeIds.length > 0) q = q.not("id", "in", `(${excludeIds.join(",")})`);
-      if (sellerFilter !== "all") q = q.eq("seller_type", sellerFilter as any);
+      if (sellerFilter === "staff_365") {
+        const ids = Array.from(staffIds);
+        if (ids.length === 0) {
+          setUsers([]);
+          setTotal(0);
+          setLoading(false);
+          return;
+        }
+        q = q.in("id", ids);
+      } else if (sellerFilter !== "all") {
+        q = q.eq("seller_type", sellerFilter as any);
+      }
       if (verFilter !== "all") {
         if (verFilter === "unverified") {
           q = q.or("verification_status.is.null,verification_status.eq.unverified");
@@ -170,7 +199,7 @@ function AdminUsers() {
     load();
     // reason: `load` is recreated each render; depend only on its inputs.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageSize, search, roleFilter, sellerFilter, verFilter]);
+  }, [page, pageSize, search, roleFilter, sellerFilter, verFilter, staffIds]);
   useEffect(() => {
     setPage(0);
   }, [pageSize]);
@@ -314,6 +343,7 @@ function AdminUsers() {
             <SelectItem value="dealer">Dealer</SelectItem>
             <SelectItem value="repair_shop">Repair shop</SelectItem>
             <SelectItem value="insurance">Insurance</SelectItem>
+            <SelectItem value="staff_365">365 Staff</SelectItem>
           </SelectContent>
         </Select>
         <Select value={verFilter} onValueChange={setVerFilter}>
@@ -385,7 +415,7 @@ function AdminUsers() {
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2">
-                {isSuperAdmin && (
+                {isSuperAdmin && staffIds.has(u.id) && (
                   <Button
                     size="sm"
                     variant="outline"
