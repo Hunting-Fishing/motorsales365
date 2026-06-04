@@ -103,14 +103,22 @@ function Staff365Page() {
 
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="font-display text-2xl font-bold">365 Staff</h1>
-          <p className="text-xs text-muted-foreground">
-            All <strong>{STAFF_DOMAIN}</strong> employees. Full admin controls.
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="mb-4">
+        <h1 className="font-display text-2xl font-bold">365 Staff</h1>
+        <p className="text-xs text-muted-foreground">
+          Manage <strong>{STAFF_DOMAIN}</strong> employees and every email address connected to
+          the business.
+        </p>
+      </div>
+
+      <Tabs defaultValue="staff">
+        <TabsList>
+          <TabsTrigger value="staff">Staff</TabsTrigger>
+          <TabsTrigger value="routing">Email Routing</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="staff" className="mt-4">
+      <div className="mb-4 flex flex-wrap items-center justify-end gap-2">
           <Button size="sm" variant="outline" onClick={load} disabled={loading}>
             <RefreshCw className={`mr-1 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             Refresh
@@ -121,7 +129,6 @@ function Staff365Page() {
             enforceDomain={STAFF_DOMAIN}
             triggerLabel="Create Employee"
           />
-        </div>
       </div>
 
       {err && (
