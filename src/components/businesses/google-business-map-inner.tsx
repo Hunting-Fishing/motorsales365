@@ -81,7 +81,7 @@ function pinDivIcon(
   });
 }
 
-export function GoogleBusinessMap({
+export function GoogleBusinessMapInner({
   businesses,
   height = 520,
   center,
