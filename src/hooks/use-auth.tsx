@@ -116,6 +116,7 @@ interface AuthContextValue {
   user: User | null;
   session: Session | null;
   loading: boolean;
+  profileName: string | null;
   isAdmin: boolean;
   isSales: boolean;
   isModerator: boolean;
@@ -170,6 +171,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [roles, setRoles] = useState<string[]>([]);
+  const [profileName, setProfileName] = useState<string | null>(null);
+
   const [realSellerType, setRealSellerType] = useState<SellerType>("private");
   const [simulatedRoles, setSimulatedRolesState] = useState<AppRole[] | null>(() => loadSim());
   const [simulatedSellerType, setSimulatedSellerTypeState] = useState<SellerType | null>(() =>
@@ -181,11 +184,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loadRoles = useCallback(async (uid: string) => {
     const [{ data: roleRows }, { data: profileRow }] = await Promise.all([
       supabase.from("user_roles").select("role").eq("user_id", uid),
-      supabase.from("profiles").select("seller_type").eq("id", uid).maybeSingle(),
+      supabase.from("profiles").select("seller_type, full_name").eq("id", uid).maybeSingle(),
     ]);
     setRoles((roleRows ?? []).map((r: any) => r.role));
     const st = (profileRow as any)?.seller_type;
     setRealSellerType(VALID_SELLER_TYPES.includes(st) ? (st as SellerType) : "private");
+    setProfileName((profileRow as any)?.full_name ?? null);
   }, []);
 
   const handleSession = useCallback(
@@ -207,6 +211,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         lastUidRef.current = null;
         setRoles([]);
         setRealSellerType("private");
+        setProfileName(null);
       }
     },
     [loadRoles],
@@ -309,6 +314,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         session,
         loading,
+        profileName,
         isAdmin,
         isSales,
         isModerator,
