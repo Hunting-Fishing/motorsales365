@@ -73,6 +73,13 @@ function ShareKitPage() {
     };
   }, [staff]);
 
+  const layoutsFn = useServerFn(listShareKitLayouts);
+  const { data: layouts } = useQuery({
+    queryKey: ["share-kit-layouts"],
+    queryFn: () => layoutsFn(),
+    enabled: !!user && !!staff,
+  });
+
   if (authLoading || loading) {
     return <div className="p-12 text-center text-muted-foreground">Loading your share kit…</div>;
   }
