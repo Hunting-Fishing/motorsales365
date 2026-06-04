@@ -16,6 +16,8 @@ import { VerifiedBadge } from "@/components/verified-badge";
 import { formatDate } from "@/lib/format";
 import { AddUserDialog } from "@/components/admin/add-user-dialog";
 import { EditUserDialog } from "@/components/admin/edit-user-dialog";
+import { EditProfileDialog } from "@/components/admin/edit-profile-dialog";
+import { ResetPasswordDialog } from "@/components/admin/reset-password-dialog";
 import { logAdminAudit } from "@/lib/admin-audit";
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
@@ -297,7 +299,17 @@ function AdminUsers() {
     <div>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-bold">Users</h1>
-        <AddUserDialog onCreated={load} />
+        <div className="flex flex-wrap items-center gap-2">
+          <AddUserDialog onCreated={load} />
+          {isSuperAdmin && (
+            <AddUserDialog
+              onCreated={load}
+              lockStaff
+              enforceDomain={STAFF_DOMAIN}
+              triggerLabel="Create Employee"
+            />
+          )}
+        </div>
       </div>
       <div className="mb-4 flex items-start gap-2 rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
         <Info className="mt-0.5 h-4 w-4 shrink-0" />
@@ -427,7 +439,9 @@ function AdminUsers() {
                     {magicLoadingId === u.id ? "…" : "Sign-in link"}
                   </Button>
                 )}
+                <EditProfileDialog user={u} onSaved={load} />
                 <EditUserDialog user={u} onSaved={load} />
+                {isSuperAdmin && <ResetPasswordDialog user={u} />}
                 {isVerified ? (
                   <Button
                     size="sm"
