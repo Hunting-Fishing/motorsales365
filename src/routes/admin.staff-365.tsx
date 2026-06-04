@@ -210,6 +210,12 @@ function Staff365Page() {
           </div>
         ))}
       </div>
+        </TabsContent>
+
+        <TabsContent value="routing" className="mt-4">
+          <EmailRoutingPanel />
+        </TabsContent>
+      </Tabs>
 
       <Dialog open={!!magicLink} onOpenChange={(o) => !o && setMagicLink(null)}>
         <DialogContent>
