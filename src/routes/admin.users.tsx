@@ -15,7 +15,6 @@ import {
 import { VerifiedBadge } from "@/components/verified-badge";
 import { formatDate } from "@/lib/format";
 import { AddUserDialog } from "@/components/admin/add-user-dialog";
-import { EditUserDialog } from "@/components/admin/edit-user-dialog";
 import { EditProfileDialog } from "@/components/admin/edit-profile-dialog";
 import { ResetPasswordDialog } from "@/components/admin/reset-password-dialog";
 import { logAdminAudit } from "@/lib/admin-audit";
@@ -440,7 +439,6 @@ function AdminUsers() {
                   </Button>
                 )}
                 <EditProfileDialog user={u} onSaved={load} />
-                <EditUserDialog user={u} onSaved={load} />
                 {isSuperAdmin && <ResetPasswordDialog user={u} />}
                 {isVerified ? (
                   <Button

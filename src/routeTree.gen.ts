@@ -89,6 +89,7 @@ import { Route as ApiRobotsDottxtRouteImport } from './routes/api/robots[.]txt'
 import { Route as AdminVerificationsRouteImport } from './routes/admin.verifications'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTypeSuggestionsRouteImport } from './routes/admin.type-suggestions'
+import { Route as AdminStaff365RouteImport } from './routes/admin.staff-365'
 import { Route as AdminShopRouteImport } from './routes/admin.shop'
 import { Route as AdminSandboxRouteImport } from './routes/admin.sandbox'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
@@ -541,6 +542,11 @@ const AdminTypeSuggestionsRoute = AdminTypeSuggestionsRouteImport.update({
   path: '/type-suggestions',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminStaff365Route = AdminStaff365RouteImport.update({
+  id: '/staff-365',
+  path: '/staff-365',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminShopRoute = AdminShopRouteImport.update({
   id: '/shop',
   path: '/shop',
@@ -854,6 +860,7 @@ export interface FileRoutesByFullPath {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
   '/admin/shop': typeof AdminShopRoute
+  '/admin/staff-365': typeof AdminStaff365Route
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
@@ -985,6 +992,7 @@ export interface FileRoutesByTo {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
   '/admin/shop': typeof AdminShopRoute
+  '/admin/staff-365': typeof AdminStaff365Route
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
@@ -1118,6 +1126,7 @@ export interface FileRoutesById {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
   '/admin/shop': typeof AdminShopRoute
+  '/admin/staff-365': typeof AdminStaff365Route
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
   '/admin/users': typeof AdminUsersRoute
   '/admin/verifications': typeof AdminVerificationsRoute
@@ -1253,6 +1262,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/sandbox'
     | '/admin/shop'
+    | '/admin/staff-365'
     | '/admin/type-suggestions'
     | '/admin/users'
     | '/admin/verifications'
@@ -1384,6 +1394,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/sandbox'
     | '/admin/shop'
+    | '/admin/staff-365'
     | '/admin/type-suggestions'
     | '/admin/users'
     | '/admin/verifications'
@@ -1516,6 +1527,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/sandbox'
     | '/admin/shop'
+    | '/admin/staff-365'
     | '/admin/type-suggestions'
     | '/admin/users'
     | '/admin/verifications'
@@ -2245,6 +2257,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTypeSuggestionsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/staff-365': {
+      id: '/admin/staff-365'
+      path: '/staff-365'
+      fullPath: '/admin/staff-365'
+      preLoaderRoute: typeof AdminStaff365RouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/shop': {
       id: '/admin/shop'
       path: '/shop'
@@ -2624,6 +2643,7 @@ interface AdminRouteChildren {
   AdminReportsRoute: typeof AdminReportsRoute
   AdminSandboxRoute: typeof AdminSandboxRoute
   AdminShopRoute: typeof AdminShopRoute
+  AdminStaff365Route: typeof AdminStaff365Route
   AdminTypeSuggestionsRoute: typeof AdminTypeSuggestionsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVerificationsRoute: typeof AdminVerificationsRoute
@@ -2650,6 +2670,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminReportsRoute: AdminReportsRoute,
   AdminSandboxRoute: AdminSandboxRoute,
   AdminShopRoute: AdminShopRoute,
+  AdminStaff365Route: AdminStaff365Route,
   AdminTypeSuggestionsRoute: AdminTypeSuggestionsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminVerificationsRoute: AdminVerificationsRoute,
