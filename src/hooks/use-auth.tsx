@@ -169,7 +169,8 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [rolesLoading, setRolesLoading] = useState(false);
   const [roles, setRoles] = useState<string[]>([]);
   const [profileName, setProfileName] = useState<string | null>(null);
 
@@ -182,14 +183,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const welcomeCheckedRef = useRef(new Set<string>());
 
   const loadRoles = useCallback(async (uid: string) => {
-    const [{ data: roleRows }, { data: profileRow }] = await Promise.all([
-      supabase.from("user_roles").select("role").eq("user_id", uid),
-      supabase.from("profiles").select("seller_type, full_name").eq("id", uid).maybeSingle(),
-    ]);
-    setRoles((roleRows ?? []).map((r: any) => r.role));
-    const st = (profileRow as any)?.seller_type;
-    setRealSellerType(VALID_SELLER_TYPES.includes(st) ? (st as SellerType) : "private");
-    setProfileName((profileRow as any)?.full_name ?? null);
+    setRolesLoading(true);
+    try {
+      const [{ data: roleRows }, { data: profileRow }] = await Promise.all([
+        supabase.from("user_roles").select("role").eq("user_id", uid),
+        supabase.from("profiles").select("seller_type, full_name").eq("id", uid).maybeSingle(),
+      ]);
+      setRoles((roleRows ?? []).map((r: any) => r.role));
+      const st = (profileRow as any)?.seller_type;
+      setRealSellerType(VALID_SELLER_TYPES.includes(st) ? (st as SellerType) : "private");
+      setProfileName((profileRow as any)?.full_name ?? null);
+    } finally {
+      setRolesLoading(false);
+    }
   }, []);
 
   const handleSession = useCallback(
@@ -200,6 +206,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (uid && uid !== lastUidRef.current) {
         lastUidRef.current = uid;
         const u = newSession!.user;
+        // Mark roles as loading synchronously so role-gated routes (e.g.
+        // /admin) don't briefly see roles=[] and bounce the user to
+        // /dashboard before the async role load completes.
+        setRolesLoading(true);
         setTimeout(() => {
           loadRoles(uid);
           if (!welcomeCheckedRef.current.has(uid)) {
@@ -212,10 +222,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setRoles([]);
         setRealSellerType("private");
         setProfileName(null);
+        setRolesLoading(false);
       }
     },
     [loadRoles],
   );
+
+  const loading = authLoading || (!!user && rolesLoading);
 
   const refreshSession = useCallback(
     async (providedSession?: Session | null) => {
