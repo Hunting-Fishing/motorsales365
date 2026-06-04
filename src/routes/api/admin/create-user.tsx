@@ -18,6 +18,7 @@ const Body = z.object({
   business_name: z.string().trim().max(160).optional(),
   business_kind: z.enum(["dealer", "repair_shop", "insurance"]).optional(),
   mark_verified: z.boolean().optional(),
+  enforce_domain: z.string().trim().max(120).optional(),
 });
 
 function admin() {
@@ -100,6 +101,16 @@ export const Route = createFileRoute("/api/admin/create-user")({
             return new Response(JSON.stringify({ error: parsed.error.flatten() }), { status: 400 });
           }
           const input = parsed.data;
+
+          if (
+            input.enforce_domain &&
+            !input.email.toLowerCase().endsWith(input.enforce_domain.toLowerCase())
+          ) {
+            return new Response(
+              JSON.stringify({ error: `Email must end with ${input.enforce_domain}` }),
+              { status: 400 },
+            );
+          }
 
           // Create auth user (email_confirm so they can sign in immediately)
           const { data: created, error: createErr } = await sb.auth.admin.createUser({
