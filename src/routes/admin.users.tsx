@@ -20,6 +20,7 @@ import { logAdminAudit } from "@/lib/admin-audit";
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { generateStaffMagicLink } from "@/lib/admin-magic-link.functions";
+import { listStaffUserIds } from "@/lib/admin-staff.functions";
 import {
   Dialog,
   DialogContent,
