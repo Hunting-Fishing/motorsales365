@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 
 export type HeatPoint = {
   region: string | null;
@@ -7,35 +7,28 @@ export type HeatPoint = {
   count: number;
 };
 
-const Inner = lazy(() =>
-  import("./device-heatmap-inner").then((m) => ({ default: m.DeviceHeatmapInner })),
-);
-
-export function DeviceHeatmap({
-  points,
-  pointsB,
-  labelA,
-  labelB,
-}: {
+type Props = {
   points: HeatPoint[];
   pointsB?: HeatPoint[] | null;
   labelA?: string;
   labelB?: string;
-}) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  if (!mounted) {
+};
+
+export function DeviceHeatmap(props: Props) {
+  const [Inner, setInner] = useState<ComponentType<Props> | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    import("./device-heatmap-inner").then((m) => {
+      if (!cancelled) setInner(() => m.DeviceHeatmapInner as ComponentType<Props>);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  if (!Inner) {
     return (
       <div className="h-[480px] w-full animate-pulse rounded-xl border border-border bg-muted" />
     );
   }
-  return (
-    <Suspense
-      fallback={
-        <div className="h-[480px] w-full animate-pulse rounded-xl border border-border bg-muted" />
-      }
-    >
-      <Inner points={points} pointsB={pointsB} labelA={labelA} labelB={labelB} />
-    </Suspense>
-  );
+  return <Inner {...props} />;
 }

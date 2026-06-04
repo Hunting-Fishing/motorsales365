@@ -1,24 +1,25 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 
-const Inner = lazy(() =>
-  import("./location-picker-inner").then((m) => ({ default: m.LocationPickerInner })),
-);
-
-export function LocationPicker(props: {
+type Props = {
   lat: number | null;
   lng: number | null;
   region: string | null;
   onChange: (lat: number, lng: number) => void;
-}) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  const fallback = (
-    <div className="h-[320px] w-full animate-pulse rounded-xl border border-border bg-muted" />
-  );
-  if (!mounted) return fallback;
-  return (
-    <Suspense fallback={fallback}>
-      <Inner {...props} />
-    </Suspense>
-  );
+};
+
+export function LocationPicker(props: Props) {
+  const [Inner, setInner] = useState<ComponentType<Props> | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    import("./location-picker-inner").then((m) => {
+      if (!cancelled) setInner(() => m.LocationPickerInner as ComponentType<Props>);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  if (!Inner) {
+    return <div className="h-[320px] w-full animate-pulse rounded-xl border border-border bg-muted" />;
+  }
+  return <Inner {...props} />;
 }

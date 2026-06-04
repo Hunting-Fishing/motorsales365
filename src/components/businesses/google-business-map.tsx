@@ -1,20 +1,23 @@
-import { lazy, Suspense, useEffect, useState, type ComponentProps } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 import type { GoogleBusinessMapInner as InnerType } from "./google-business-map-inner";
 
 export type { GMapBusiness } from "./google-business-map-inner";
 
-const Inner = lazy(() =>
-  import("./google-business-map-inner").then((m) => ({ default: m.GoogleBusinessMapInner })),
-);
-
-type InnerProps = ComponentProps<typeof InnerType>;
-
+type InnerProps = React.ComponentProps<typeof InnerType>;
 
 export function GoogleBusinessMap(props: InnerProps) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const [Inner, setInner] = useState<ComponentType<InnerProps> | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    import("./google-business-map-inner").then((m) => {
+      if (!cancelled) setInner(() => m.GoogleBusinessMapInner as ComponentType<InnerProps>);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   const height = (props as any).height ?? 520;
-  if (!mounted) {
+  if (!Inner) {
     return (
       <div
         className="w-full animate-pulse rounded-xl border border-border bg-muted"
@@ -22,16 +25,5 @@ export function GoogleBusinessMap(props: InnerProps) {
       />
     );
   }
-  return (
-    <Suspense
-      fallback={
-        <div
-          className="w-full animate-pulse rounded-xl border border-border bg-muted"
-          style={{ height }}
-        />
-      }
-    >
-      <Inner {...props} />
-    </Suspense>
-  );
+  return <Inner {...props} />;
 }
