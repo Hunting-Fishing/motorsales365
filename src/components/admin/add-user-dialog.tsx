@@ -104,6 +104,7 @@ export function AddUserDialog({
         account_type: accountType,
         roles: accountType === "staff" ? roles : [],
       };
+      if (enforceDomain) body.enforce_domain = enforceDomain;
       if (accountType === "business") {
         body.seller_type = sellerType;
         if (businessName.trim()) body.business_name = businessName.trim();
@@ -141,7 +142,7 @@ export function AddUserDialog({
       <DialogTrigger asChild>
         <Button size="sm">
           <UserPlus className="mr-2 h-4 w-4" />
-          Add user
+          {triggerLabel}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg">
@@ -198,18 +199,25 @@ export function AddUserDialog({
             </p>
           </div>
 
-          <div className="grid gap-2">
-            <Label>Account type</Label>
-            <Select value={accountType} onValueChange={(v: any) => setAccountType(v)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="staff">Staff / Employee</SelectItem>
-                <SelectItem value="business">Business / Customer</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          {!lockStaff && (
+            <div className="grid gap-2">
+              <Label>Account type</Label>
+              <Select value={accountType} onValueChange={(v: any) => setAccountType(v)}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="staff">Staff / Employee</SelectItem>
+                  <SelectItem value="business">Business / Customer</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          {enforceDomain && (
+            <p className="text-xs text-muted-foreground">
+              Email must end with <strong>{enforceDomain}</strong>.
+            </p>
+          )}
 
           {accountType === "staff" ? (
             <div className="grid gap-2">

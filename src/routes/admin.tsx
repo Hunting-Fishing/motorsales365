@@ -171,6 +171,13 @@ const NAV: {
     info: "Create new users (staff or business) and assign roles. For billing/status use Accounts.",
   },
   {
+    to: "/admin/staff-365",
+    label: "365 Staff",
+    Icon: Shield,
+    roles: ["admin"],
+    info: "Dedicated management for @365motorsales.com employees: edit profile, reset password, sign-in link, enable/disable.",
+  },
+  {
     to: "/admin/alerts",
     label: "Ops Alerts",
     Icon: AlertTriangle,
