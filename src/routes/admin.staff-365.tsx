@@ -28,7 +28,7 @@ export const Route = createFileRoute("/admin/staff-365")({
 });
 
 function Staff365Page() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const isSuperAdmin = (user?.email ?? "").toLowerCase() === SUPER_ADMIN_EMAIL;
   const fetchStaff = useServerFn(listStaff365);
   const toggleDisabled = useServerFn(setStaff365Disabled);
@@ -57,10 +57,19 @@ function Staff365Page() {
     if (isSuperAdmin) load();
   }, [isSuperAdmin, load]);
 
+  if (authLoading) {
+    return (
+      <div className="rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
+        Loading…
+      </div>
+    );
+  }
+
   if (!isSuperAdmin) {
     return (
       <div className="rounded-lg border border-border bg-card p-6 text-sm text-muted-foreground">
-        Only the super-admin can manage 365 staff.
+        Only the super-admin can manage 365 staff.{" "}
+        {user?.email ? `(signed in as ${user.email})` : "(not signed in)"}
       </div>
     );
   }
