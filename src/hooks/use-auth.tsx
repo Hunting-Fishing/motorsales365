@@ -237,7 +237,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           ? providedSession
           : (await supabase.auth.getSession()).data.session;
       handleSession(nextSession ?? null);
-      setLoading(false);
+      setAuthLoading(false);
       return nextSession ?? null;
     },
     [handleSession],
@@ -251,7 +251,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: sub } = supabase.auth.onAuthStateChange((_event, newSession) => {
       if (cancelled) return;
       handleSession(newSession);
-      setLoading(false);
+      setAuthLoading(false);
     });
 
     // Re-validate the persisted session with the Auth server (getUser) rather
@@ -267,7 +267,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (cancelled) return;
         handleSession(sessData.session ?? null);
       }
-      setLoading(false);
+      setAuthLoading(false);
     })();
 
     return () => {
@@ -279,7 +279,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     await supabase.auth.signOut();
     handleSession(null);
-    setLoading(false);
+    setAuthLoading(false);
   };
 
   const realRoles = roles as AppRole[];
