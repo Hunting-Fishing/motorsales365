@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { ChevronLeft, ChevronRight, Info, Search, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Copy, Eye, Info, Search, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,20 @@ import { formatDate } from "@/lib/format";
 import { AddUserDialog } from "@/components/admin/add-user-dialog";
 import { EditUserDialog } from "@/components/admin/edit-user-dialog";
 import { logAdminAudit } from "@/lib/admin-audit";
+import { useAuth } from "@/hooks/use-auth";
+import { useServerFn } from "@tanstack/react-start";
+import { generateStaffMagicLink } from "@/lib/admin-magic-link.functions";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+const SUPER_ADMIN_EMAIL = "jordilwbailey@gmail.com";
+const STAFF_DOMAIN = "@365motorsales.com";
 
 export const Route = createFileRoute("/admin/users")({
   component: AdminUsers,
@@ -27,12 +41,31 @@ type StaffRole = (typeof STAFF_ROLES)[number];
 const PAGE_SIZE_OPTIONS = [25, 50, 100, 200] as const;
 
 function AdminUsers() {
+  const { user } = useAuth();
+  const isSuperAdmin = (user?.email ?? "").toLowerCase() === SUPER_ADMIN_EMAIL;
+  const genMagicLink = useServerFn(generateStaffMagicLink);
+  const [magicLink, setMagicLink] = useState<{ email: string; link: string } | null>(null);
+  const [magicLoadingId, setMagicLoadingId] = useState<string | null>(null);
+
+  const handleViewLogin = async (u: any) => {
+    setMagicLoadingId(u.id);
+    try {
+      const res = await genMagicLink({ data: { targetUserId: u.id } });
+      setMagicLink({ email: res.email, link: res.actionLink });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to generate sign-in link");
+    } finally {
+      setMagicLoadingId(null);
+    }
+  };
+
   const [users, setUsers] = useState<any[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState<number>(50);
   const [pageInput, setPageInput] = useState("");
   const [loading, setLoading] = useState(false);
+
 
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
@@ -352,6 +385,19 @@ function AdminUsers() {
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2">
+                {isSuperAdmin &&
+                  (u.email ?? "").toLowerCase().endsWith(STAFF_DOMAIN) && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      title="Get one-time sign-in link"
+                      disabled={magicLoadingId === u.id}
+                      onClick={() => handleViewLogin(u)}
+                    >
+                      <Eye className="mr-1 h-4 w-4" />
+                      {magicLoadingId === u.id ? "…" : "Sign-in link"}
+                    </Button>
+                  )}
                 <EditUserDialog user={u} onSaved={load} />
                 {isVerified ? (
                   <Button
@@ -459,6 +505,37 @@ function AdminUsers() {
           </form>
         </div>
       )}
+
+      <Dialog open={!!magicLink} onOpenChange={(o) => !o && setMagicLink(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>One-time sign-in link</DialogTitle>
+            <DialogDescription>
+              Send this link to <strong>{magicLink?.email}</strong>. Opening it
+              signs them in without a password. The link can only be used once
+              and expires shortly.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="rounded-md border border-border bg-muted/40 p-2 text-xs break-all">
+            {magicLink?.link}
+          </div>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button
+              variant="outline"
+              onClick={async () => {
+                if (!magicLink) return;
+                await navigator.clipboard.writeText(magicLink.link);
+                toast.success("Sign-in link copied");
+              }}
+            >
+              <Copy className="mr-1 h-4 w-4" />
+              Copy link
+            </Button>
+            <Button onClick={() => setMagicLink(null)}>Done</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+

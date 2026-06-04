@@ -1,0 +1,56 @@
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+const ALLOWED_ADMIN_EMAIL = "jordilwbailey@gmail.com";
+const ALLOWED_TARGET_DOMAIN = "@365motorsales.com";
+
+/**
+ * Generates a one-time magic sign-in link for a target user.
+ * Restricted to a single admin (jordilwbailey@gmail.com) acting on
+ * @365motorsales.com staff accounts only. The link lets the target user
+ * sign in without entering a password — useful during testing when staff
+ * forget their password.
+ */
+export const generateStaffMagicLink = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z.object({ targetUserId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import(
+      "@/integrations/supabase/client.server"
+    );
+
+    // 1. Verify the caller is the single allowed admin email.
+    const callerEmail = (context.claims?.email as string | undefined)?.toLowerCase();
+    if (!callerEmail || callerEmail !== ALLOWED_ADMIN_EMAIL) {
+      throw new Error("Not permitted");
+    }
+
+    // 2. Look up the target user and confirm the email domain.
+    const { data: target, error: targetErr } =
+      await supabaseAdmin.auth.admin.getUserById(data.targetUserId);
+    if (targetErr || !target?.user?.email) {
+      throw new Error("Target user not found");
+    }
+    const targetEmail = target.user.email.toLowerCase();
+    if (!targetEmail.endsWith(ALLOWED_TARGET_DOMAIN)) {
+      throw new Error("Target must be a @365motorsales.com account");
+    }
+
+    // 3. Generate a magic link.
+    const { data: linkData, error: linkErr } =
+      await supabaseAdmin.auth.admin.generateLink({
+        type: "magiclink",
+        email: target.user.email,
+      });
+    if (linkErr || !linkData?.properties?.action_link) {
+      throw new Error(linkErr?.message ?? "Failed to generate link");
+    }
+
+    return {
+      email: target.user.email,
+      actionLink: linkData.properties.action_link,
+    };
+  });
