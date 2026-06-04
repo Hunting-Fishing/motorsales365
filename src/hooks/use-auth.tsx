@@ -314,6 +314,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         session,
         loading,
+        profileName,
         isAdmin,
         isSales,
         isModerator,
