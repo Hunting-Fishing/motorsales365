@@ -385,6 +385,19 @@ function AdminUsers() {
                 </div>
               </div>
               <div className="flex flex-wrap items-center gap-2">
+                {isSuperAdmin &&
+                  (u.email ?? "").toLowerCase().endsWith(STAFF_DOMAIN) && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      title="Get one-time sign-in link"
+                      disabled={magicLoadingId === u.id}
+                      onClick={() => handleViewLogin(u)}
+                    >
+                      <Eye className="mr-1 h-4 w-4" />
+                      {magicLoadingId === u.id ? "…" : "Sign-in link"}
+                    </Button>
+                  )}
                 <EditUserDialog user={u} onSaved={load} />
                 {isVerified ? (
                   <Button
