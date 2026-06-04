@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { ChevronLeft, ChevronRight, Info, Search, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Copy, Eye, Info, Search, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,20 @@ import { formatDate } from "@/lib/format";
 import { AddUserDialog } from "@/components/admin/add-user-dialog";
 import { EditUserDialog } from "@/components/admin/edit-user-dialog";
 import { logAdminAudit } from "@/lib/admin-audit";
+import { useAuth } from "@/hooks/use-auth";
+import { useServerFn } from "@tanstack/react-start";
+import { generateStaffMagicLink } from "@/lib/admin-magic-link.functions";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+
+const SUPER_ADMIN_EMAIL = "jordilwbailey@gmail.com";
+const STAFF_DOMAIN = "@365motorsales.com";
 
 export const Route = createFileRoute("/admin/users")({
   component: AdminUsers,
