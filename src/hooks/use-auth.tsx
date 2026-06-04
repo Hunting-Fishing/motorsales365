@@ -211,6 +211,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         lastUidRef.current = null;
         setRoles([]);
         setRealSellerType("private");
+        setProfileName(null);
       }
     },
     [loadRoles],
