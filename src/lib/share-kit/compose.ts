@@ -106,8 +106,11 @@ export async function composeTemplate(
     c.drawImage(img, 0, 0, template.width, template.height);
   }
 
-  // QR
-  const qrSizePx = template.qr.size * template.width;
+  // QR (use override placement if provided)
+  const qrCxRel = override?.cx ?? template.qr.cx;
+  const qrCyRel = override?.cy ?? template.qr.cy;
+  const qrSizeRel = override?.size ?? template.qr.size;
+  const qrSizePx = qrSizeRel * template.width;
   const qrPng = await QRCode.toDataURL(ctx.link, {
     errorCorrectionLevel: "H",
     margin: 1,
@@ -116,8 +119,8 @@ export async function composeTemplate(
   });
   const qrImg = await loadImage(qrPng);
 
-  const qrCx = template.qr.cx * template.width;
-  const qrCy = template.qr.cy * template.height;
+  const qrCx = qrCxRel * template.width;
+  const qrCy = qrCyRel * template.height;
   const qrX = qrCx - qrSizePx / 2;
   const qrY = qrCy - qrSizePx / 2;
 
