@@ -140,7 +140,18 @@ function AdminUsers() {
 
       if (restrictIds) q = q.in("id", restrictIds);
       if (excludeIds && excludeIds.length > 0) q = q.not("id", "in", `(${excludeIds.join(",")})`);
-      if (sellerFilter !== "all") q = q.eq("seller_type", sellerFilter as any);
+      if (sellerFilter === "staff_365") {
+        const ids = Array.from(staffIds);
+        if (ids.length === 0) {
+          setUsers([]);
+          setTotal(0);
+          setLoading(false);
+          return;
+        }
+        q = q.in("id", ids);
+      } else if (sellerFilter !== "all") {
+        q = q.eq("seller_type", sellerFilter as any);
+      }
       if (verFilter !== "all") {
         if (verFilter === "unverified") {
           q = q.or("verification_status.is.null,verification_status.eq.unverified");
