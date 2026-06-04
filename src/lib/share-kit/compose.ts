@@ -43,9 +43,44 @@ function roundedRect(
   ctx.closePath();
 }
 
+export type QrOverride = { cx: number; cy: number; size: number };
+
+async function drawBase(
+  template: ShareTemplate,
+  ctx: TemplateContext,
+): Promise<HTMLCanvasElement> {
+  const canvas = document.createElement("canvas");
+  canvas.width = template.width;
+  canvas.height = template.height;
+  const c = canvas.getContext("2d");
+  if (!c) throw new Error("2D canvas context unavailable");
+  c.fillStyle = template.background || "#ffffff";
+  c.fillRect(0, 0, template.width, template.height);
+  if (template.kind === "image" && template.imageUrl) {
+    const img = await loadImage(template.imageUrl);
+    const scale = Math.min(template.width / img.width, template.height / img.height);
+    const w = img.width * scale;
+    const h = img.height * scale;
+    c.drawImage(img, (template.width - w) / 2, (template.height - h) / 2, w, h);
+  } else if (template.kind === "svg" && template.renderSvg) {
+    const svg = template.renderSvg(ctx);
+    const img = await loadImage(svgToDataUrl(svg));
+    c.drawImage(img, 0, 0, template.width, template.height);
+  }
+  return canvas;
+}
+
+export async function composeBaseOnly(
+  template: ShareTemplate,
+  ctx: TemplateContext,
+): Promise<HTMLCanvasElement> {
+  return drawBase(template, ctx);
+}
+
 export async function composeTemplate(
   template: ShareTemplate,
   ctx: TemplateContext,
+  override?: QrOverride,
 ): Promise<HTMLCanvasElement> {
   const canvas = document.createElement("canvas");
   canvas.width = template.width;
