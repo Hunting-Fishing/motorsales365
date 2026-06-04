@@ -83,6 +83,12 @@ export function SiteHeader() {
             </div>
           </Link>
 
+          {user && profileName && (
+            <span className="hidden text-sm text-muted-foreground sm:inline">
+              Welcome: <span className="font-medium text-foreground">{profileName}</span>
+            </span>
+          )}
+
           <nav className="hidden items-center gap-0.5 xl:flex">
             {NAV.map((n) => (
               <Link
