@@ -84,6 +84,10 @@ export function AddUserDialog({
       toast.error("Fill all required fields");
       return;
     }
+    if (enforceDomain && !email.trim().toLowerCase().endsWith(enforceDomain.toLowerCase())) {
+      toast.error(`Email must end with ${enforceDomain}`);
+      return;
+    }
     setSubmitting(true);
     try {
       const { data: sess } = await supabase.auth.getSession();
