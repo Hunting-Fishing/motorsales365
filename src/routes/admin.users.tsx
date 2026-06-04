@@ -505,6 +505,37 @@ function AdminUsers() {
           </form>
         </div>
       )}
+
+      <Dialog open={!!magicLink} onOpenChange={(o) => !o && setMagicLink(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>One-time sign-in link</DialogTitle>
+            <DialogDescription>
+              Send this link to <strong>{magicLink?.email}</strong>. Opening it
+              signs them in without a password. The link can only be used once
+              and expires shortly.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="rounded-md border border-border bg-muted/40 p-2 text-xs break-all">
+            {magicLink?.link}
+          </div>
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button
+              variant="outline"
+              onClick={async () => {
+                if (!magicLink) return;
+                await navigator.clipboard.writeText(magicLink.link);
+                toast.success("Sign-in link copied");
+              }}
+            >
+              <Copy className="mr-1 h-4 w-4" />
+              Copy link
+            </Button>
+            <Button onClick={() => setMagicLink(null)}>Done</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
+
