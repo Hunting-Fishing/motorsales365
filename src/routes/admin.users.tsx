@@ -199,7 +199,7 @@ function AdminUsers() {
     load();
     // reason: `load` is recreated each render; depend only on its inputs.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, pageSize, search, roleFilter, sellerFilter, verFilter]);
+  }, [page, pageSize, search, roleFilter, sellerFilter, verFilter, staffIds]);
   useEffect(() => {
     setPage(0);
   }, [pageSize]);
