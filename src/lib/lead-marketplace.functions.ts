@@ -17,9 +17,11 @@ export const listOpenLeadOffers = createServerFn({ method: "GET" })
       .parse(input ?? {}),
   )
   .handler(async ({ data }) => {
-    const { data: rows, error } = await supabaseAdmin.rpc("list_open_lead_offers", {
+    const { data: rows, error } = await (supabaseAdmin as any).rpc("list_open_lead_offers", {
       _category_slug: data.categorySlug ?? null,
       _region: data.region ?? null,
+      _limit: data.limit ?? 60,
+    } as any);
       _limit: data.limit ?? 60,
     });
     if (error) throw new Error(error.message);
