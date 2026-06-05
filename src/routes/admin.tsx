@@ -176,6 +176,13 @@ const NAV: {
     info: "Dedicated management for @365motorsales.com employees: edit profile, reset password, sign-in link, enable/disable.",
   },
   {
+    to: "/admin/sales-reps",
+    label: "Sales Reps",
+    Icon: UserCog,
+    roles: ["admin"],
+    info: "Manage sales reps, their territories (region/province/city), and which users and businesses each rep owns.",
+  },
+  {
     to: "/admin/reports",
     label: "Activity",
     Icon: Inbox,

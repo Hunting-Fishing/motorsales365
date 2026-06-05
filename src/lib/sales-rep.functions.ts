@@ -517,3 +517,151 @@ export const adminBulkAssignByTerritory = createServerFn({ method: "POST" })
     }
     return { assigned };
   });
+
+/* ============= Admin wrappers ============= */
+
+export const adminAddTerritory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        rep_user_id: z.string().uuid(),
+        region: z.string().min(1).max(100),
+        province: z.string().max(100).nullable().optional(),
+        city: z.string().max(100).nullable().optional(),
+        is_primary: z.boolean().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    await requireAdmin(supabase, userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("sales_rep_territories").insert(data);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminRemoveTerritory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    await requireAdmin(supabase, userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("sales_rep_territories")
+      .delete()
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminSaveRepProfile = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        rep_user_id: z.string().uuid(),
+        title: z.string().max(80).nullable().optional(),
+        bio: z.string().max(600).nullable().optional(),
+        public_email: z.string().email().max(255).nullable().optional(),
+        public_phone: z.string().max(40).nullable().optional(),
+        photo_url: z.string().url().max(500).nullable().optional(),
+        accepting_new_clients: z.boolean().optional(),
+        active: z.boolean().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    await requireAdmin(supabase, userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { rep_user_id, ...rest } = data;
+    const { error } = await supabaseAdmin
+      .from("sales_rep_profiles")
+      .upsert({ user_id: rep_user_id, ...rest }, { onConflict: "user_id" });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminListAssignments = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        rep_user_id: z.string().uuid().optional(),
+        source: z.enum(["referral", "manual", "territory"]).optional(),
+        subject_type: z.enum(["user", "business"]).optional(),
+        active_only: z.boolean().default(true),
+        q: z.string().max(120).optional(),
+        limit: z.number().int().min(1).max(500).default(200),
+      })
+      .parse(input ?? {}),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    await requireAdmin(supabase, userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    let q = supabaseAdmin
+      .from("sales_rep_assignments")
+      .select("*")
+      .order("assigned_at", { ascending: false })
+      .limit(data.limit);
+    if (data.active_only) q = q.eq("active", true);
+    if (data.rep_user_id) q = q.eq("rep_user_id", data.rep_user_id);
+    if (data.source) q = q.eq("source", data.source);
+    if (data.subject_type) q = q.eq("subject_type", data.subject_type);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+
+    const userIds = (rows ?? []).filter((r: any) => r.subject_type === "user").map((r: any) => r.subject_id);
+    const bizIds = (rows ?? []).filter((r: any) => r.subject_type === "business").map((r: any) => r.subject_id);
+    const repIds = Array.from(new Set((rows ?? []).map((r: any) => r.rep_user_id)));
+
+    const [profilesRes, bizRes, repsRes] = await Promise.all([
+      userIds.length
+        ? supabaseAdmin
+            .from("profiles")
+            .select("id, full_name, first_name, last_name, signup_city, signup_region")
+            .in("id", userIds)
+        : Promise.resolve({ data: [] as any[] }),
+      bizIds.length
+        ? supabaseAdmin
+            .from("businesses")
+            .select("id, name, slug, business_city, business_region")
+            .in("id", bizIds)
+        : Promise.resolve({ data: [] as any[] }),
+      repIds.length
+        ? supabaseAdmin
+            .from("profiles")
+            .select("id, full_name, first_name, last_name")
+            .in("id", repIds)
+        : Promise.resolve({ data: [] as any[] }),
+    ]);
+
+    const profileMap = new Map((profilesRes.data ?? []).map((p: any) => [p.id, p]));
+    const bizMap = new Map((bizRes.data ?? []).map((b: any) => [b.id, b]));
+    const repMap = new Map((repsRes.data ?? []).map((r: any) => [r.id, r]));
+
+    const enriched = (rows ?? []).map((r: any) => ({
+      ...r,
+      subject: r.subject_type === "user" ? profileMap.get(r.subject_id) : bizMap.get(r.subject_id),
+      rep: repMap.get(r.rep_user_id) ?? null,
+    }));
+
+    const term = (data.q ?? "").trim().toLowerCase();
+    const filtered = term
+      ? enriched.filter((r: any) => {
+          const s = r.subject ?? {};
+          return (
+            (s.full_name ?? s.name ?? "").toLowerCase().includes(term) ||
+            (s.signup_city ?? s.business_city ?? "").toLowerCase().includes(term) ||
+            (s.signup_region ?? s.business_region ?? "").toLowerCase().includes(term)
+          );
+        })
+      : enriched;
+
+    return { assignments: filtered };
+  });

@@ -92,6 +92,7 @@ import { Route as AdminTypeSuggestionsRouteImport } from './routes/admin.type-su
 import { Route as AdminStaff365RouteImport } from './routes/admin.staff-365'
 import { Route as AdminShopRouteImport } from './routes/admin.shop'
 import { Route as AdminSandboxRouteImport } from './routes/admin.sandbox'
+import { Route as AdminSalesRepsRouteImport } from './routes/admin.sales-reps'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminReferralsRouteImport } from './routes/admin.referrals'
 import { Route as AdminRedemptionsRouteImport } from './routes/admin.redemptions'
@@ -558,6 +559,11 @@ const AdminSandboxRoute = AdminSandboxRouteImport.update({
   path: '/sandbox',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSalesRepsRoute = AdminSalesRepsRouteImport.update({
+  id: '/sales-reps',
+  path: '/sales-reps',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminReportsRoute = AdminReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
@@ -865,6 +871,7 @@ export interface FileRoutesByFullPath {
   '/admin/redemptions': typeof AdminRedemptionsRoute
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/sales-reps': typeof AdminSalesRepsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
   '/admin/shop': typeof AdminShopRoute
   '/admin/staff-365': typeof AdminStaff365Route
@@ -998,6 +1005,7 @@ export interface FileRoutesByTo {
   '/admin/redemptions': typeof AdminRedemptionsRoute
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/sales-reps': typeof AdminSalesRepsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
   '/admin/shop': typeof AdminShopRoute
   '/admin/staff-365': typeof AdminStaff365Route
@@ -1133,6 +1141,7 @@ export interface FileRoutesById {
   '/admin/redemptions': typeof AdminRedemptionsRoute
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/sales-reps': typeof AdminSalesRepsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
   '/admin/shop': typeof AdminShopRoute
   '/admin/staff-365': typeof AdminStaff365Route
@@ -1270,6 +1279,7 @@ export interface FileRouteTypes {
     | '/admin/redemptions'
     | '/admin/referrals'
     | '/admin/reports'
+    | '/admin/sales-reps'
     | '/admin/sandbox'
     | '/admin/shop'
     | '/admin/staff-365'
@@ -1403,6 +1413,7 @@ export interface FileRouteTypes {
     | '/admin/redemptions'
     | '/admin/referrals'
     | '/admin/reports'
+    | '/admin/sales-reps'
     | '/admin/sandbox'
     | '/admin/shop'
     | '/admin/staff-365'
@@ -1537,6 +1548,7 @@ export interface FileRouteTypes {
     | '/admin/redemptions'
     | '/admin/referrals'
     | '/admin/reports'
+    | '/admin/sales-reps'
     | '/admin/sandbox'
     | '/admin/shop'
     | '/admin/staff-365'
@@ -2290,6 +2302,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSandboxRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/sales-reps': {
+      id: '/admin/sales-reps'
+      path: '/sales-reps'
+      fullPath: '/admin/sales-reps'
+      preLoaderRoute: typeof AdminSalesRepsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/reports': {
       id: '/admin/reports'
       path: '/reports'
@@ -2661,6 +2680,7 @@ interface AdminRouteChildren {
   AdminRedemptionsRoute: typeof AdminRedemptionsRoute
   AdminReferralsRoute: typeof AdminReferralsRoute
   AdminReportsRoute: typeof AdminReportsRoute
+  AdminSalesRepsRoute: typeof AdminSalesRepsRoute
   AdminSandboxRoute: typeof AdminSandboxRoute
   AdminShopRoute: typeof AdminShopRoute
   AdminStaff365Route: typeof AdminStaff365Route
@@ -2689,6 +2709,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminRedemptionsRoute: AdminRedemptionsRoute,
   AdminReferralsRoute: AdminReferralsRoute,
   AdminReportsRoute: AdminReportsRoute,
+  AdminSalesRepsRoute: AdminSalesRepsRoute,
   AdminSandboxRoute: AdminSandboxRoute,
   AdminShopRoute: AdminShopRoute,
   AdminStaff365Route: AdminStaff365Route,
