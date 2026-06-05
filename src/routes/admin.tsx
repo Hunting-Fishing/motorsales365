@@ -192,13 +192,6 @@ const NAV: {
     info: "Backend failures (payment webhooks, email errors, geocoding) captured in-app. Investigate and acknowledge.",
   },
   {
-    to: "/admin/inquiries",
-    label: "Service inquiries",
-    Icon: Inbox,
-    roles: ["admin", "sales", "support"],
-    info: "Lead-gen inbox: financing, insurance, OR/CR, title transfer, inspection, towing requests from listing pages.",
-  },
-  {
     to: "/admin/sandbox",
     label: "Sandbox",
     Icon: FlaskConical,
