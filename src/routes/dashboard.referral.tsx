@@ -325,68 +325,39 @@ function StaffReferral() {
       </section>
 
       <section className="rounded-xl border border-border bg-card p-4">
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="font-display flex items-center gap-2 text-lg font-semibold">
               <Megaphone className="h-4 w-4 text-primary" /> 365 Advertisements
             </h2>
             <p className="text-xs text-muted-foreground">
-              Live ads currently running on 365 Motor Sales. Share these with prospects so they
-              know what's promoted across the platform.
+              Branded 365 Motor Sales ads with your personal QR baked in. Download, share, or
+              tweak the layout — every scan is credited to you for 90 days.
             </p>
           </div>
-          <span className="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground">
-            {ads.length} active
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground">
+              {TEMPLATES.length} designs
+            </span>
+            <Link to="/dashboard/share-kit">
+              <Button size="sm" variant="outline">
+                Open full share kit
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        {ads.length === 0 ? (
-          <p className="mt-3 text-sm text-muted-foreground">No active advertisements right now.</p>
-        ) : (
-          <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {ads.map((ad) => (
-              <li
-                key={ad.id}
-                className="overflow-hidden rounded-lg border border-border bg-background"
-              >
-                <a
-                  href={ad.target_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block aspect-video w-full overflow-hidden bg-muted"
-                >
-                  <img
-                    src={ad.image_url}
-                    alt={ad.title}
-                    className="h-full w-full object-cover transition-transform hover:scale-105"
-                    loading="lazy"
-                  />
-                </a>
-                <div className="space-y-1 p-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0">
-                      <div className="truncate font-medium">{ad.title}</div>
-                      <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                        {ad.placement.replace(/_/g, " ")}
-                      </div>
-                    </div>
-                    <a
-                      href={ad.target_url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="shrink-0 text-muted-foreground hover:text-primary"
-                      aria-label="Open ad"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
-                  </div>
-                  {ad.caption && (
-                    <p className="line-clamp-2 text-xs text-muted-foreground">{ad.caption}</p>
-                  )}
-                </div>
-              </li>
+        {adContext && (
+          <div className="mt-4 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            {TEMPLATES.map((t) => (
+              <TemplateCard
+                key={t.id}
+                template={t}
+                context={adContext}
+                override={layouts?.[t.id]}
+              />
             ))}
-          </ul>
+          </div>
         )}
       </section>
     </div>
