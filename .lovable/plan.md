@@ -1,90 +1,66 @@
-# Sales Rep System for 365 Motor Sales Staff
+## Goal
+Add an admin page at `/admin/sales-reps` to manage Sales Reps, their territories (regions/provinces/cities), and which businesses/users are assigned to them. Wires into existing `sales-rep.functions.ts` admin server fns.
 
-Turn Joan and other `sales`-role staff into proper Sales Reps with territories, an assigned book of business, a CRM-style dashboard, and a customer-facing rep card.
+## Route & access
+- File: `src/routes/admin.sales-reps.tsx`
+- Inherits the `/admin` layout gate (admin/sales roles). Visible only to `admin`.
+- Add nav entry in `src/routes/admin.tsx` (roles: `["admin"]`) labeled "Sales Reps".
 
-## Data model (new tables)
+## Page layout (Tabs)
 
-```text
-sales_rep_profiles       one row per staff sales rep
-  user_id (FK profiles, unique)        active, title, bio
-  photo override, public email/phone   accepting_new_clients flag
+**Tab 1 — Reps**
+- Table of all users with `sales` role (uses `adminListReps`): avatar, name, email, title, # active assignments, # territories, accepting new clients toggle, last activity.
+- Row click → opens Rep Detail drawer.
 
-sales_rep_territories    rep's coverage
-  rep_user_id, region, province, city  (city/province nullable = whole region)
-  is_primary
+**Tab 2 — Assignments**
+- Filters: rep, source (referral/manual/territory), subject_type (user/business), search.
+- Table: subject (user or business name + link), rep, source, assigned_at, assigned_by, active.
+- Row actions: Reassign (rep picker → `adminAssignRep`), Unassign (`adminUnassign`).
+- Bulk action: "Auto-assign by territory" button → confirm modal → `adminBulkAssignByTerritory` (shows count assigned).
 
-sales_rep_assignments    who Joan owns
-  rep_user_id
-  subject_type ('user' | 'business')
-  subject_id (uuid)
-  source ('referral' | 'manual' | 'territory' | 'customer_choice')
-  assigned_at, assigned_by, notes
-  active                               unique(subject_type, subject_id) where active
+**Tab 3 — Territories**
+- Grouped by rep. For each rep: list of (region, province, city, primary) chips with remove (×).
+- "Add territory" inline form per rep: region select (PH regions list), optional province, optional city, primary checkbox → `addMyTerritory` admin variant (add `adminAddTerritory` / `adminRemoveTerritory` thin wrappers in `sales-rep.functions.ts`).
 
-sales_rep_followups      per-customer follow-up log (the "Other" answer)
-  rep_user_id, subject_type, subject_id
-  kind ('note'|'call'|'email'|'sms'|'meeting'|'request')
-  status ('open'|'done'|'snoozed')
-  title, body, due_at, completed_at, created_at
-```
+## Rep Detail drawer (right-side Sheet)
+Sections:
+1. **Profile** — title, bio, public_phone, public_email, photo override, accepting_new_clients. Save → `adminSaveRepProfile` (new wrapper).
+2. **Territories** — same chips + add form as Tab 3, scoped to this rep.
+3. **Assignments** — table of accounts owned by this rep, with Reassign/Unassign.
+4. **Stats** — KPI cards: total referrals, signups (30d), active businesses, redemption revenue (reads `getMyRepStats` w/ admin override → add `adminGetRepStats`).
 
-RLS:
-- Rep sees own rows; admins see all.
-- Customers can SELECT their assigned rep's public card (via security-definer fn returning safe columns only — no internal notes).
-- Reassignment writes audit row in `admin_audit_log`.
+## "Stores / Locations / Business Rep" handling
+Treat businesses as one subject type in `sales_rep_assignments` (`subject_type='business'`). The Assignments tab and Rep Detail show businesses alongside users. No new tables — multi-location stores are already separate rows in `businesses`.
 
-Auto-assignment (DB triggers + server fn):
-1. **Referral** — on `user_referrals` insert, if `referred_by_staff_id` maps to a `sales` rep, create assignment (source=`referral`).
-2. **Manual** — admin UI writes directly.
-3. **Territory** — server fn `assignRepByTerritory(subject)` runs on profile/business save when no active assignment exists; picks rep whose territory matches `region`+`city`, ties broken by lowest active load.
+## New server fn wrappers (added to `src/lib/sales-rep.functions.ts`)
+- `adminAddTerritory({ rep_user_id, region, province?, city?, is_primary })`
+- `adminRemoveTerritory({ id })`
+- `adminListTerritories({ rep_user_id? })`
+- `adminSaveRepProfile({ rep_user_id, ...fields })`
+- `adminGetRepStats({ rep_user_id })`
+- `adminListAssignments({ rep_user_id?, source?, subject_type?, search? })`
 
-## Server functions (`src/lib/sales-rep.functions.ts`)
+Each gated by `requireSupabaseAuth` + an inline `has_role('admin')` check (pattern already in file).
 
-- `getMyRepProfile` / `saveMyRepProfile` (rep self-service)
-- `listMyTerritories` / `upsertMyTerritory` / `removeMyTerritory`
-- `listMyAssignments({ type, q, page })` — Joan's book of business
-- `getMyRepStats({ range })` — signups, conversions, revenue from `referral_redemptions`, QR scans, active leads
-- `listMyFollowups({ status })` / `createFollowup` / `updateFollowup` / `completeFollowup`
-- `getAssignedRep({ subjectType, subjectId })` — used by customer rep card
-- Admin: `adminListReps`, `adminAssignRep`, `adminReassign`, `adminBulkAssignByTerritory`
+## Components
+- `src/components/admin/sales-reps/RepsTable.tsx`
+- `src/components/admin/sales-reps/AssignmentsTable.tsx`
+- `src/components/admin/sales-reps/TerritoriesPanel.tsx`
+- `src/components/admin/sales-reps/RepDetailSheet.tsx`
+- `src/components/admin/sales-reps/AssignRepDialog.tsx` (rep combobox)
+- `src/lib/ph-regions.ts` — static list of PH regions for selects (already may exist; reuse if so).
 
-All protected with `requireSupabaseAuth`; admin variants gated by `has_role(uid,'admin')`.
+## Data fetching
+- TanStack Query: one query per tab keyed by filters. `queryClient.invalidateQueries` after mutations.
+- Mutations via `useMutation` + `useServerFn`, toast on success/error.
 
-## UI
-
-### Rep (Joan) — new section under `/dashboard`
-- `dashboard.rep.tsx` — overview: KPIs (signups this month, active accounts, open follow-ups, commissions), recent activity
-- `dashboard.rep.accounts.tsx` — assigned users + businesses, filters (status, region, source), row → drawer with profile, contact, follow-ups, message thread
-- `dashboard.rep.followups.tsx` — kanban/list: Open / Snoozed / Done, due-date sorting, quick-add
-- `dashboard.rep.territories.tsx` — multi-select regions + (optional) provinces/cities
-- `dashboard.rep.analytics.tsx` — date-range chart: signups, conversions, redemptions, QR scans
-
-### Admin — `/admin/sales-reps`
-- List reps with active accounts count, territories, last activity
-- Drawer: edit profile, territories, assign accounts, deactivate
-- Bulk territory backfill button
-
-### Customer-facing rep card
-- Component `RepCard` (photo, name, title, "Your 365 rep", Message + Email + Call buttons)
-- Render on `/dashboard` overview and on the owner's business page header (owner view only)
-- Uses `getAssignedRep` server fn
-
-## Wiring existing data
-
-- `staff_referrals` already keyed to `staff_user_id` — preserved; on first redemption or signup, auto-create `sales_rep_assignments` row.
-- `leads` already org-scoped — leave as-is, but `sales_rep_followups` is rep-scoped per assigned account (different concept).
-- `messages` reused for rep ↔ customer chat (rep card "Message" opens existing thread UI).
-
-## Out of scope (for this pass)
-- Commission/payout calculations beyond reading existing `referral_redemptions` totals.
-- Customer-initiated rep reassignment (you picked "show card", not "let them switch").
-- Cross-rep handoff workflow.
+## Out of scope
+- Editing the rep's user account itself (email/password) — handled in `/admin/staff-365`.
+- Customer-facing rep card and rep dashboard (Phases 3 & 4).
+- Followups admin view.
 
 ## Phasing
-1. Migration: tables + RLS + triggers + indexes.
-2. Server functions + admin assignment UI.
-3. Rep dashboard pages (accounts, follow-ups, territories, analytics).
-4. Customer-facing RepCard on dashboard + business page.
-5. Backfill: assign Joan's existing referrals + offer admin bulk-by-territory.
-
-Approve and I'll start with Phase 1 (migration).
+1. Add server fn wrappers.
+2. Build route + tabs + tables (read-only).
+3. Wire mutations (assign/unassign/territory CRUD/profile save).
+4. Add nav entry and verify admin-only visibility.
