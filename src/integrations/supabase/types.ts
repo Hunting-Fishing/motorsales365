@@ -3996,6 +3996,165 @@ export type Database = {
         }
         Relationships: []
       }
+      sales_rep_assignments: {
+        Row: {
+          active: boolean
+          assigned_at: string
+          assigned_by: string | null
+          created_at: string
+          ended_at: string | null
+          id: string
+          notes: string | null
+          rep_user_id: string
+          source: Database["public"]["Enums"]["sales_rep_source"]
+          subject_id: string
+          subject_type: Database["public"]["Enums"]["sales_rep_subject"]
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          assigned_at?: string
+          assigned_by?: string | null
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          notes?: string | null
+          rep_user_id: string
+          source?: Database["public"]["Enums"]["sales_rep_source"]
+          subject_id: string
+          subject_type: Database["public"]["Enums"]["sales_rep_subject"]
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          assigned_at?: string
+          assigned_by?: string | null
+          created_at?: string
+          ended_at?: string | null
+          id?: string
+          notes?: string | null
+          rep_user_id?: string
+          source?: Database["public"]["Enums"]["sales_rep_source"]
+          subject_id?: string
+          subject_type?: Database["public"]["Enums"]["sales_rep_subject"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sales_rep_followups: {
+        Row: {
+          body: string | null
+          completed_at: string | null
+          created_at: string
+          due_at: string | null
+          id: string
+          kind: Database["public"]["Enums"]["followup_kind"]
+          rep_user_id: string
+          status: Database["public"]["Enums"]["followup_status"]
+          subject_id: string
+          subject_type: Database["public"]["Enums"]["sales_rep_subject"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          completed_at?: string | null
+          created_at?: string
+          due_at?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["followup_kind"]
+          rep_user_id: string
+          status?: Database["public"]["Enums"]["followup_status"]
+          subject_id: string
+          subject_type: Database["public"]["Enums"]["sales_rep_subject"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          completed_at?: string | null
+          created_at?: string
+          due_at?: string | null
+          id?: string
+          kind?: Database["public"]["Enums"]["followup_kind"]
+          rep_user_id?: string
+          status?: Database["public"]["Enums"]["followup_status"]
+          subject_id?: string
+          subject_type?: Database["public"]["Enums"]["sales_rep_subject"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sales_rep_profiles: {
+        Row: {
+          accepting_new_clients: boolean
+          active: boolean
+          bio: string | null
+          created_at: string
+          photo_url: string | null
+          public_email: string | null
+          public_phone: string | null
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accepting_new_clients?: boolean
+          active?: boolean
+          bio?: string | null
+          created_at?: string
+          photo_url?: string | null
+          public_email?: string | null
+          public_phone?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accepting_new_clients?: boolean
+          active?: boolean
+          bio?: string | null
+          created_at?: string
+          photo_url?: string | null
+          public_email?: string | null
+          public_phone?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      sales_rep_territories: {
+        Row: {
+          city: string | null
+          created_at: string
+          id: string
+          is_primary: boolean
+          province: string | null
+          region: string
+          rep_user_id: string
+        }
+        Insert: {
+          city?: string | null
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          province?: string | null
+          region: string
+          rep_user_id: string
+        }
+        Update: {
+          city?: string | null
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          province?: string | null
+          region?: string
+          rep_user_id?: string
+        }
+        Relationships: []
+      }
       saved_searches: {
         Row: {
           category_slug: string | null
@@ -5649,6 +5808,19 @@ export type Database = {
       }
       expire_stale_pending_sales: { Args: never; Returns: number }
       gen_referral_code: { Args: { _name: string }; Returns: string }
+      get_assigned_rep_card: {
+        Args: { _subject_id: string; _subject_type: string }
+        Returns: {
+          accepting_new_clients: boolean
+          bio: string
+          full_name: string
+          photo_url: string
+          public_email: string
+          public_phone: string
+          rep_user_id: string
+          title: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -5801,6 +5973,8 @@ export type Database = {
       course_status: "draft" | "published" | "archived"
       enrollment_source: "purchase" | "subscription" | "admin_grant"
       export_inquiry_status: "new" | "qualified" | "quoted" | "won" | "lost"
+      followup_kind: "note" | "call" | "email" | "sms" | "meeting" | "request"
+      followup_status: "open" | "done" | "snoozed"
       lead_activity_kind:
         | "created"
         | "assigned"
@@ -5852,6 +6026,8 @@ export type Database = {
         | "utv"
         | "boat"
         | "other"
+      sales_rep_source: "referral" | "manual" | "territory" | "customer_choice"
+      sales_rep_subject: "user" | "business"
       seller_type: "private" | "business" | "staff"
       service_inquiry_status:
         | "new"
@@ -6071,6 +6247,8 @@ export const Constants = {
       course_status: ["draft", "published", "archived"],
       enrollment_source: ["purchase", "subscription", "admin_grant"],
       export_inquiry_status: ["new", "qualified", "quoted", "won", "lost"],
+      followup_kind: ["note", "call", "email", "sms", "meeting", "request"],
+      followup_status: ["open", "done", "snoozed"],
       lead_activity_kind: [
         "created",
         "assigned",
@@ -6127,6 +6305,8 @@ export const Constants = {
         "boat",
         "other",
       ],
+      sales_rep_source: ["referral", "manual", "territory", "customer_choice"],
+      sales_rep_subject: ["user", "business"],
       seller_type: ["private", "business", "staff"],
       service_inquiry_status: [
         "new",
