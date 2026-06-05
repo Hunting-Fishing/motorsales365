@@ -12,6 +12,10 @@ import {
   LogIn,
   UserPlus,
   LifeBuoy,
+  Briefcase,
+  Users,
+  BarChart3,
+  Inbox,
 } from "lucide-react";
 import { useAuth, type SellerType } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
