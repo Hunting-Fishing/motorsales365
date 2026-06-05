@@ -23,7 +23,7 @@ export const Route = createFileRoute("/shop/categories")({
         content: "Find the right products for your build, your daily, or your garage.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://365motorsales.com/shop/categories" }],
+    links: [{ rel: "canonical", href: "https://www.365motorsales.com/shop/categories" }],
   }),
 });
 

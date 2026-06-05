@@ -26,7 +26,7 @@ export const Route = createFileRoute("/seller/$id")({
   },
   head: ({ params, loaderData }) => {
     const p: any = loaderData?.seo;
-    const url = `https://365motorsales.com/seller/${params.id}`;
+    const url = `https://www.365motorsales.com/seller/${params.id}`;
     if (!p) {
       return {
         meta: [

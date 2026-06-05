@@ -16,10 +16,10 @@ export const Route = createFileRoute("/support_/buying")({
       { name: "description", content: DESC },
       { property: "og:title", content: `${TITLE} — 365 MotorSales Help` },
       { property: "og:description", content: DESC },
-      { property: "og:url", content: "https://365motorsales.com/support/buying" },
+      { property: "og:url", content: "https://www.365motorsales.com/support/buying" },
       { property: "og:type", content: "article" },
     ],
-    links: [{ rel: "canonical", href: "https://365motorsales.com/support/buying" }],
+    links: [{ rel: "canonical", href: "https://www.365motorsales.com/support/buying" }],
     scripts: [
       {
         type: "application/ld+json",

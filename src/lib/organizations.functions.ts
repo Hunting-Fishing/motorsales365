@@ -96,7 +96,7 @@ export const inviteOrgMember = createServerFn({ method: "POST" })
           const origin = (
             process.env.SITE_URL ||
             process.env.VITE_SITE_URL ||
-            "https://365motorsales.com"
+            "https://www.365motorsales.com"
           ).replace(/\/+$/, "");
           await supabase.rpc(
             "enqueue_email" as any,

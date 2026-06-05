@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-const ORIGIN = "https://365motorsales.com";
+const ORIGIN = "https://www.365motorsales.com";
 
 /**
  * llms.txt — guidance for LLM-based crawlers and AI search engines.

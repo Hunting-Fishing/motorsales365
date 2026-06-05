@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-const CANONICAL_ORIGIN = "https://365motorsales.com";
+const CANONICAL_ORIGIN = "https://www.365motorsales.com";
 
 export const Route = createFileRoute("/robots.txt")({
   server: {

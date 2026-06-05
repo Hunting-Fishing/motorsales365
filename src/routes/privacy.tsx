@@ -4,7 +4,7 @@ import { SiteLayout } from "@/components/site-layout";
 const TITLE = "Privacy Policy — 365 MotorSales Philippines";
 const DESCRIPTION =
   "How 365 MotorSales Philippines collects, uses, shares, and protects your personal data under the Data Privacy Act of 2012 (RA 10173).";
-const URL = "https://365motorsales.com/privacy";
+const URL = "https://www.365motorsales.com/privacy";
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({

@@ -29,11 +29,11 @@ export const Route = createFileRoute("/businesses/")({
         content:
           "Local dealerships, repair shops, parts stores, towing and insurance — mapped by barangay.",
       },
-      { property: "og:url", content: "https://365motorsales.com/businesses" },
-      { property: "og:image", content: `https://365motorsales.com${ogBusinesses}` },
-      { property: "twitter:image", content: `https://365motorsales.com${ogBusinesses}` },
+      { property: "og:url", content: "https://www.365motorsales.com/businesses" },
+      { property: "og:image", content: `https://www.365motorsales.com${ogBusinesses}` },
+      { property: "twitter:image", content: `https://www.365motorsales.com${ogBusinesses}` },
     ],
-    links: [{ rel: "canonical", href: "https://365motorsales.com/businesses" }],
+    links: [{ rel: "canonical", href: "https://www.365motorsales.com/businesses" }],
   }),
   component: BusinessesIndex,
 });

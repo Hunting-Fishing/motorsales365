@@ -55,4 +55,4 @@ export const footer = {
 } as const;
 
 export const SITE_NAME = "365 MotorSales";
-export const SITE_URL = "https://365motorsales.com";
+export const SITE_URL = "https://www.365motorsales.com";

@@ -4,7 +4,7 @@ import { SiteLayout } from "@/components/site-layout";
 const TITLE = "Terms & Conditions — 365 MotorSales Philippines";
 const DESCRIPTION =
   "Terms & Conditions for 365 MotorSales Philippines: accounts, listings, business directory, pricing, fees, payments, refunds, and Philippine law (RA 11967, RA 8792, RA 7394, RA 10173, RA 10175).";
-const URL = "https://365motorsales.com/terms";
+const URL = "https://www.365motorsales.com/terms";
 const SUPPORT_EMAIL = "legal@365motorsales.com";
 
 export const Route = createFileRoute("/terms")({

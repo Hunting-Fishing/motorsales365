@@ -98,7 +98,7 @@ export const Route = createFileRoute("/listing/$id")({
   },
   head: ({ params, loaderData }) => {
     const seo = loaderData?.seo;
-    const url = `https://365motorsales.com/listing/${params.id}`;
+    const url = `https://www.365motorsales.com/listing/${params.id}`;
     if (!seo) {
       return {
         meta: [

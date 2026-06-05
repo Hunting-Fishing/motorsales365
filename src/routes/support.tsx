@@ -122,10 +122,10 @@ export const Route = createFileRoute("/support")({
         content:
           "How-tos with annotated screenshots, FAQ and a support ticket form for the Philippines' vehicle marketplace.",
       },
-      { property: "og:url", content: "https://365motorsales.com/support" },
+      { property: "og:url", content: "https://www.365motorsales.com/support" },
       { property: "og:type", content: "website" },
     ],
-    links: [{ rel: "canonical", href: "https://365motorsales.com/support" }],
+    links: [{ rel: "canonical", href: "https://www.365motorsales.com/support" }],
     scripts: [
       {
         type: "application/ld+json",

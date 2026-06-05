@@ -12,7 +12,7 @@ export const Route = createFileRoute("/affiliate-disclosure")({
           "How 365 MotorSales earns commissions from shop links, and what that means for the prices and recommendations you see.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://365motorsales.com/affiliate-disclosure" }],
+    links: [{ rel: "canonical", href: "https://www.365motorsales.com/affiliate-disclosure" }],
   }),
 });
 

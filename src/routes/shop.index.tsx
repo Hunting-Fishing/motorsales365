@@ -49,7 +49,7 @@ export const Route = createFileRoute("/shop/")({
         content: "Detailing, tools, parts and accessories — best prices from top PH marketplaces.",
       },
     ],
-    links: [{ rel: "canonical", href: "https://365motorsales.com/shop" }],
+    links: [{ rel: "canonical", href: "https://www.365motorsales.com/shop" }],
   }),
 });
 

@@ -68,6 +68,7 @@ import { LocationPicker } from "@/components/businesses/location-picker";
 import { BookingsTab } from "@/components/business-page/bookings-tab";
 import { OnboardingChecklist } from "@/components/business-page/onboarding-checklist";
 import { AnalyticsTab } from "@/components/business-page/analytics-tab";
+import { siteOrigin } from "@/lib/site-config";
 
 export const Route = createFileRoute("/dashboard/businesses_/$id/edit")({
   component: EditBusinessPage,
@@ -1773,7 +1774,7 @@ function VanitySlugField({
   const [value, setValue] = useState(currentVanity ?? "");
   const [saving, setSaving] = useState(false);
   const origin =
-    typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com";
+    siteOrigin();
 
   const onSave = async () => {
     const trimmed = value.trim().toLowerCase();
