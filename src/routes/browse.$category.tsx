@@ -9,6 +9,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
 import { AdCarousel } from "@/components/ads/ad-carousel";
+import { SponsoredCategorySlot } from "@/components/ads/sponsored-category-slot";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
