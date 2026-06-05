@@ -135,8 +135,8 @@ function PromoCodesPanel() {
           />
         </Dialog>
       </div>
-      <div className="overflow-hidden rounded-lg border border-border">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto rounded-lg border border-border">
+        <table className="w-full min-w-[640px] text-sm">
           <thead className="bg-muted/50 text-left text-xs uppercase">
             <tr>
               <th className="px-3 py-2">Code</th>
@@ -157,16 +157,16 @@ function PromoCodesPanel() {
             )}
             {rows.map((r: any) => (
               <tr key={r.id} className="border-t border-border">
-                <td className="px-3 py-2 font-mono font-semibold">{r.code}</td>
-                <td className="px-3 py-2">{r.percent_off ?? "—"}%</td>
-                <td className="px-3 py-2">{r.applies_to}</td>
-                <td className="px-3 py-2">{r.expires_at ? formatDate(r.expires_at) : "—"}</td>
-                <td className="px-3 py-2">
+                <td className="px-3 py-2 font-mono font-semibold whitespace-nowrap">{r.code}</td>
+                <td className="px-3 py-2 whitespace-nowrap">{r.percent_off ?? "—"}%</td>
+                <td className="px-3 py-2 whitespace-nowrap">{r.applies_to}</td>
+                <td className="px-3 py-2 whitespace-nowrap">{r.expires_at ? formatDate(r.expires_at) : "—"}</td>
+                <td className="px-3 py-2 whitespace-nowrap">
                   <Badge variant={r.active ? "default" : "secondary"}>
                     {r.active ? "Active" : "Inactive"}
                   </Badge>
                 </td>
-                <td className="px-3 py-2 text-right">
+                <td className="px-3 py-2 text-right whitespace-nowrap">
                   <Button
                     variant="ghost"
                     size="sm"
@@ -174,6 +174,7 @@ function PromoCodesPanel() {
                       setEditing(r);
                       setOpen(true);
                     }}
+                    aria-label="Edit promo code"
                   >
                     <Pencil className="h-4 w-4" />
                   </Button>
@@ -183,6 +184,7 @@ function PromoCodesPanel() {
                     onClick={() => {
                       if (confirm(`Delete code ${r.code}?`)) mDel.mutate(r.id);
                     }}
+                    aria-label="Delete promo code"
                   >
                     <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
@@ -408,8 +410,8 @@ function CustomerDiscountsPanel() {
           {mIssue.isPending ? "Issuing…" : "Issue discount"}
         </Button>
       </div>
-      <div className="overflow-hidden rounded-lg border border-border">
-        <table className="w-full text-sm">
+      <div className="overflow-x-auto rounded-lg border border-border">
+        <table className="w-full min-w-[720px] text-sm">
           <thead className="bg-muted/50 text-left text-xs uppercase">
             <tr>
               <th className="px-3 py-2">Issued</th>
@@ -431,13 +433,13 @@ function CustomerDiscountsPanel() {
             {rows.map((r: any) => (
               <tr key={r.id} className="border-t border-border align-top">
                 <td className="px-3 py-2 whitespace-nowrap">{formatDate(r.created_at)}</td>
-                <td className="px-3 py-2 font-mono text-xs">
+                <td className="px-3 py-2 font-mono text-xs break-all">
                   {r.target_user_id ?? r.target_business_id}
                 </td>
-                <td className="px-3 py-2">
+                <td className="px-3 py-2 whitespace-nowrap">
                   {r.kind === "percent" ? `${r.percent_off}% off` : `₱${r.flat_amount_php}`}
                 </td>
-                <td className="px-3 py-2">{r.applies_to}</td>
+                <td className="px-3 py-2 whitespace-nowrap">{r.applies_to}</td>
                 <td className="px-3 py-2 max-w-xs truncate">{r.reason ?? "—"}</td>
                 <td className="px-3 py-2">
                   <Switch
