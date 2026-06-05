@@ -479,6 +479,63 @@ export type Database = {
         }
         Relationships: []
       }
+      bundle_purchases: {
+        Row: {
+          boost_credits_remaining: number
+          bundle_id: string
+          business_id: string | null
+          created_at: string
+          expires_at: string
+          id: string
+          listing_credits_remaining: number
+          price_paid_php: number
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          boost_credits_remaining?: number
+          bundle_id: string
+          business_id?: string | null
+          created_at?: string
+          expires_at: string
+          id?: string
+          listing_credits_remaining?: number
+          price_paid_php: number
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          boost_credits_remaining?: number
+          bundle_id?: string
+          business_id?: string | null
+          created_at?: string
+          expires_at?: string
+          id?: string
+          listing_credits_remaining?: number
+          price_paid_php?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bundle_purchases_bundle_id_fkey"
+            columns: ["bundle_id"]
+            isOneToOne: false
+            referencedRelation: "listing_bundles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bundle_purchases_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_availability: {
         Row: {
           business_id: string
@@ -2753,6 +2810,48 @@ export type Database = {
           },
         ]
       }
+      listing_bundles: {
+        Row: {
+          boost_credits: number
+          created_at: string
+          description: string | null
+          duration_days: number
+          id: string
+          is_active: boolean
+          listing_credits: number
+          name: string
+          price_php: number
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          boost_credits?: number
+          created_at?: string
+          description?: string | null
+          duration_days?: number
+          id?: string
+          is_active?: boolean
+          listing_credits?: number
+          name: string
+          price_php: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          boost_credits?: number
+          created_at?: string
+          description?: string | null
+          duration_days?: number
+          id?: string
+          is_active?: boolean
+          listing_credits?: number
+          name?: string
+          price_php?: number
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       listing_likes: {
         Row: {
           created_at: string
@@ -4341,27 +4440,36 @@ export type Database = {
       }
       saved_searches: {
         Row: {
+          alert_frequency: string
           category_slug: string | null
           created_at: string
           id: string
+          last_alerted_at: string | null
           name: string
           query: Json
+          updated_at: string
           user_id: string
         }
         Insert: {
+          alert_frequency?: string
           category_slug?: string | null
           created_at?: string
           id?: string
+          last_alerted_at?: string | null
           name: string
           query?: Json
+          updated_at?: string
           user_id: string
         }
         Update: {
+          alert_frequency?: string
           category_slug?: string | null
           created_at?: string
           id?: string
+          last_alerted_at?: string | null
           name?: string
           query?: Json
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
