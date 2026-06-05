@@ -738,6 +738,7 @@ function SellPage() {
             </div>
             <Button
               size="sm"
+              className="w-full sm:w-auto"
               onClick={() =>
                 navigate({
                   to: "/listing/checkout",
