@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import ogBrowse from "@/assets/og/browse.jpg";
 import { useEffect, useState } from "react";
-import { Search, BookmarkPlus } from "lucide-react";
+import { Search, BookmarkPlus, Rocket } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
