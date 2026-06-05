@@ -84,6 +84,14 @@ function StaffReferral() {
         .eq("staff_referral_id", (s as StaffRow).id)
         .order("created_at", { ascending: false });
       setPromos((pr as Promo[]) || []);
+
+      try {
+        const res = await getAllActiveAds();
+        setAds((res?.ads as any[]) || []);
+      } catch {
+        setAds([]);
+      }
+
       setLoading(false);
     })();
   }, [user]);
