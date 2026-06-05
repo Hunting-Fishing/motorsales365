@@ -109,8 +109,18 @@ async function maybeSendWelcomeEmail(user: User) {
   }
 }
 
-export type AppRole = "admin" | "sales" | "moderator" | "support" | "advertising" | "user";
+export type AppRole =
+  | "admin"
+  | "sales"
+  | "sales_junior"
+  | "sales_senior"
+  | "sales_manager"
+  | "moderator"
+  | "support"
+  | "advertising"
+  | "user";
 export type SellerType = "private" | "dealer" | "repair_shop" | "insurance";
+export type SalesTier = null | "junior" | "senior" | "manager";
 
 interface AuthContextValue {
   user: User | null;
@@ -123,6 +133,10 @@ interface AuthContextValue {
   isSupport: boolean;
   isAdvertising: boolean;
   isStaff: boolean;
+  salesTier: SalesTier;
+  canManageAds: boolean;
+  canCreatePromotions: boolean;
+  canIssueDiscounts: boolean;
   realRoles: AppRole[];
   effectiveRoles: AppRole[];
   realIsAdmin: boolean;
@@ -297,16 +311,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const isAdmin = effectiveRoles.includes("admin");
-  const isSales = effectiveRoles.includes("sales");
+  const isSales =
+    effectiveRoles.includes("sales") ||
+    effectiveRoles.includes("sales_junior") ||
+    effectiveRoles.includes("sales_senior") ||
+    effectiveRoles.includes("sales_manager");
   const isModerator = effectiveRoles.includes("moderator");
   const isSupport = effectiveRoles.includes("support");
   const isAdvertising = effectiveRoles.includes("advertising");
   const isStaff = isAdmin || isSales || isModerator || isSupport || isAdvertising;
 
-  // Seller-type simulation is allowed for any staff role (admin, sales, support,
-  // moderator, advertising). It's a view-only override — RLS is unaffected.
+  // Sales tier: manager > senior > junior. Legacy 'sales' role = senior.
+  const salesTier: SalesTier = effectiveRoles.includes("sales_manager")
+    ? "manager"
+    : effectiveRoles.includes("sales_senior") || effectiveRoles.includes("sales")
+      ? "senior"
+      : effectiveRoles.includes("sales_junior")
+        ? "junior"
+        : null;
+  const tierLvl =
+    salesTier === "manager" ? 3 : salesTier === "senior" ? 2 : salesTier === "junior" ? 1 : 0;
+  const canManageAds = isAdmin || isAdvertising || tierLvl >= 2;
+  const canCreatePromotions = isAdmin || tierLvl >= 2;
+  const canIssueDiscounts = isAdmin || tierLvl >= 3;
+
+  // Seller-type simulation is allowed for any staff role.
   const realIsStaff = realRoles.some((r) =>
-    ["admin", "sales", "moderator", "support", "advertising"].includes(r),
+    [
+      "admin",
+      "sales",
+      "sales_junior",
+      "sales_senior",
+      "sales_manager",
+      "moderator",
+      "support",
+      "advertising",
+    ].includes(r),
   );
   const effectiveSellerType: SellerType =
     realIsStaff && simulatedSellerType ? simulatedSellerType : realSellerType;
@@ -334,6 +374,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isSupport,
         isAdvertising,
         isStaff,
+        salesTier,
+        canManageAds,
+        canCreatePromotions,
+        canIssueDiscounts,
         realRoles,
         effectiveRoles,
         realIsAdmin,

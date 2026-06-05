@@ -2033,6 +2033,54 @@ export type Database = {
         }
         Relationships: []
       }
+      customer_discounts: {
+        Row: {
+          active: boolean
+          applies_to: string
+          created_at: string
+          expires_at: string | null
+          flat_amount_php: number | null
+          id: string
+          issued_by: string
+          kind: string
+          percent_off: number | null
+          reason: string | null
+          target_business_id: string | null
+          target_user_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          applies_to?: string
+          created_at?: string
+          expires_at?: string | null
+          flat_amount_php?: number | null
+          id?: string
+          issued_by: string
+          kind: string
+          percent_off?: number | null
+          reason?: string | null
+          target_business_id?: string | null
+          target_user_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          applies_to?: string
+          created_at?: string
+          expires_at?: string | null
+          flat_amount_php?: number | null
+          id?: string
+          issued_by?: string
+          kind?: string
+          percent_off?: number | null
+          reason?: string | null
+          target_business_id?: string | null
+          target_user_id?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_routes: {
         Row: {
           active: boolean
@@ -5608,6 +5656,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      has_sales_tier: {
+        Args: { _min_tier: string; _user_id: string }
+        Returns: boolean
+      }
       increment_listing_view: {
         Args: { _listing_id: string; _viewer_id?: string }
         Returns: undefined
@@ -5717,6 +5769,9 @@ export type Database = {
         | "moderator"
         | "support"
         | "advertising"
+        | "sales_junior"
+        | "sales_senior"
+        | "sales_manager"
       business_kind:
         | "repair_shop"
         | "insurance"
@@ -5982,6 +6037,9 @@ export const Constants = {
         "moderator",
         "support",
         "advertising",
+        "sales_junior",
+        "sales_senior",
+        "sales_manager",
       ],
       business_kind: [
         "repair_shop",
