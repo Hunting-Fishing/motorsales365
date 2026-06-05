@@ -341,6 +341,14 @@ function BusinessesIndex() {
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <h3 className="truncate font-semibold">{b.name}</h3>
+                            {b.owner_id && verifiedOwners.has(b.owner_id) && (
+                              <span
+                                title="Verified business"
+                                className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-sky-500/10 px-1.5 py-0.5 text-[10px] font-medium text-sky-600 dark:text-sky-400"
+                              >
+                                <BadgeCheck className="h-3 w-3" /> Verified
+                              </span>
+                            )}
                             {b.subscription_tier === "premium" && (
                               <Badge className="shrink-0 bg-amber-500 text-amber-950">
                                 Premium
