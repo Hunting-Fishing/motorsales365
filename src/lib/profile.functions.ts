@@ -14,7 +14,7 @@ const ProfilePatchSchema = z.object({
   phone_e164: z.string().trim().max(32).nullable().optional(),
   phone_verified_at: z.string().nullable().optional(),
   avatar_url: z.string().trim().max(2048).nullable().optional(),
-  seller_type: z.enum(["private", "business"]).nullable().optional(),
+  seller_type: z.enum(["private", "business", "staff"]).nullable().optional(),
   business_name: z.string().trim().max(200).nullable().optional(),
   business_address: z.string().trim().max(500).nullable().optional(),
   business_region: z.string().trim().max(100).nullable().optional(),
