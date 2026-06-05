@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { LocationPicker } from "@/components/location-picker";
+import { FeaturedTowProviders } from "@/components/tow/featured-tow-providers";
 
 const searchSchema = z.object({
   listing: z.string().optional(),
@@ -203,6 +204,10 @@ function TowPage() {
             </div>
           )}
         </div>
+      </div>
+
+      <div className="container mx-auto px-4 pt-6">
+        <FeaturedTowProviders region={pickup.region} />
       </div>
 
       <div className="container mx-auto grid gap-8 px-4 py-10 lg:grid-cols-[1fr_360px]">

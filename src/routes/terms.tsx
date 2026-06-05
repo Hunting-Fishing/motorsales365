@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 5, 2026 (rev. sponsored category slots, on-site advertising & business directory tiers)";
+  const lastUpdated = "June 5, 2026 (rev. sponsored category slots, on-site advertising, business directory tiers & featured tow provider spotlights)";
 
   return (
     <SiteLayout>
@@ -255,10 +255,13 @@ function TermsPage() {
         <p className="mt-2 text-muted-foreground">
           Posting and browsing listings is generally free. Certain optional features — including
           listing boosts, business plans, premium directory placement, and on-site advertising
-          (ad carousels and <strong>exclusive Sponsored Category Slots</strong>, where a single
+          (ad carousels, <strong>exclusive Sponsored Category Slots</strong>, where a single
           advertiser pays to appear as the featured sponsor at the top of a browse category for
-          a defined period) — require payment. Sponsored content is always clearly labeled as
-          "Sponsor", "Sponsored", or "Ad" and never displaces organic listings or search results.
+          a defined period, and <strong>Featured Tow Provider Spotlights</strong> on the
+          <code> /tow </code> page available to verified tow businesses on the Featured or
+          Premium plan) — require payment. Sponsored content is always clearly labeled as
+          "Sponsor", "Sponsored", "Featured", or "Ad" and never displaces organic listings or
+          search results.
           Current pricing is published on our{" "}
           <Link className="text-primary underline" to="/pricing">
             Pricing page
