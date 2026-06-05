@@ -21,6 +21,7 @@ type ChecklistItem = { label: string; done: boolean; required: boolean };
 
 function buildChecklist(profile: any, totpEnabled: boolean): ChecklistItem[] {
   const isBusiness = profile?.seller_type === "business" || profile?.seller_type === "dealer";
+  const isStaff = profile?.seller_type === "staff";
   const has = (v: any) => (typeof v === "string" ? v.trim().length > 0 : !!v);
   const items: ChecklistItem[] = [
     {
@@ -34,8 +35,12 @@ function buildChecklist(profile: any, totpEnabled: boolean): ChecklistItem[] {
       required: true,
     },
     { label: "Profile photo", done: has(profile?.avatar_url), required: false },
-    { label: "Two-factor authentication (authenticator app)", done: totpEnabled, required: false },
+    { label: "Two-factor authentication (authenticator app)", done: totpEnabled, required: !isStaff },
   ];
+  if (isStaff) {
+    // Staff don't need business fields; require 2FA instead.
+    items[items.length - 1].required = true;
+  }
   if (isBusiness) {
     items.push(
       { label: "Business name", done: has(profile?.business_name), required: true },
