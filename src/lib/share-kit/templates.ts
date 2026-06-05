@@ -160,13 +160,13 @@ function partsSvg(ctx: TemplateContext): string {
   <rect width="1080" height="1080" fill="url(#carbon)"/>
   <rect x="0" y="0" width="1080" height="10" fill="#fbbf24"/>
   <rect x="0" y="1070" width="1080" height="10" fill="#fbbf24"/>
-  <text x="540" y="130" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="56" fill="#fbbf24" letter-spacing="8">PARTS &amp; ACCESSORIES</text>
   ${brandLogo(480, 30, 120)}
   <text x="540" y="200" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="56" fill="#fbbf24" letter-spacing="8">PARTS &amp; ACCESSORIES</text>
   <text x="540" y="310" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="96" fill="#ffffff">OEM · AFTERMARKET</text>
   <text x="540" y="380" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="700" font-size="34" fill="#cbd5e1">Shipped nationwide · Cash on delivery available</text>
   <text x="540" y="1000" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="800" font-size="38" fill="#ffffff">${safe(ctx.name || "Your 365 Member")}</text>
   <text x="540" y="1045" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="24" fill="#fbbf24">${safe(ctx.code)} · 365motorsales.com</text>
+  ${trackingTag(30, 1062, "Parts & Accessories", "parts-shop", 16)}
 </svg>`;
 }
 
