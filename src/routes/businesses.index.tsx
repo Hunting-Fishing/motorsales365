@@ -287,6 +287,8 @@ function BusinessesIndex() {
         </Card>
 
         {/* Results + Map */}
+        <PremiumSponsorsRail typeSlug={typeSlug} region={loc.region} className="mb-6" />
+
         <div className="grid gap-6 md:grid-cols-[1fr_1.2fr]">
           <div className="space-y-3">
             <div className="text-sm text-muted-foreground">
