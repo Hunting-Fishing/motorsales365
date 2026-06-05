@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
+import { AdCarousel } from "@/components/ads/ad-carousel";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -380,6 +381,7 @@ function BrowsePage() {
 
         {/* Results */}
         <div>
+          <AdCarousel placement="browse_top" className="mb-6" />
           <div className="mb-4 text-sm text-muted-foreground">
             {loading ? "Loading…" : `${items.length} result${items.length === 1 ? "" : "s"}`}
           </div>

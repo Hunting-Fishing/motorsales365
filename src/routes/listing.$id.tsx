@@ -27,6 +27,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
+import { AdCarousel } from "@/components/ads/ad-carousel";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { VerifiedBadge } from "@/components/verified-badge";
@@ -593,6 +594,7 @@ function ListingDetailPage() {
 
         {/* Sidebar */}
         <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
+          <AdCarousel placement="listing_sidebar" />
           <div className="rounded-xl border border-border bg-card p-5">
             <h3 className="font-display text-lg font-semibold">Seller</h3>
             <div className="mt-2 flex items-center gap-3">

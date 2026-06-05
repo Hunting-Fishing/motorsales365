@@ -27,6 +27,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/site-layout";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
 import { LiveActivityFeed } from "@/components/live-activity-feed";
+import { AdCarousel } from "@/components/ads/ad-carousel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -319,6 +320,11 @@ function Index() {
             </div>
           ))}
         </div>
+      </section>
+
+      {/* Sponsored carousel */}
+      <section className="container mx-auto px-4 pt-8">
+        <AdCarousel placement="home_carousel" />
       </section>
 
       {/* Live activity feed */}
