@@ -2457,6 +2457,155 @@ export type Database = {
           },
         ]
       }
+      lead_offer_unlocks: {
+        Row: {
+          buyer_business_id: string | null
+          buyer_user_id: string
+          id: string
+          offer_id: string
+          payment_id: string | null
+          price_php: number
+          unlocked_at: string
+        }
+        Insert: {
+          buyer_business_id?: string | null
+          buyer_user_id: string
+          id?: string
+          offer_id: string
+          payment_id?: string | null
+          price_php?: number
+          unlocked_at?: string
+        }
+        Update: {
+          buyer_business_id?: string | null
+          buyer_user_id?: string
+          id?: string
+          offer_id?: string
+          payment_id?: string | null
+          price_php?: number
+          unlocked_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_offer_unlocks_buyer_business_id_fkey"
+            columns: ["buyer_business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_offer_unlocks_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "lead_offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_offer_unlocks_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "lead_offers_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "lead_offer_unlocks_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lead_offers: {
+        Row: {
+          budget_max_php: number | null
+          budget_min_php: number | null
+          category_slug: string
+          city: string | null
+          contact_email: string | null
+          contact_name: string | null
+          contact_notes: string | null
+          contact_phone: string | null
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          max_unlocks: number
+          posted_at: string
+          preview: string
+          price_php: number
+          province: string | null
+          region: string | null
+          source_id: string | null
+          source_kind: string | null
+          status: string
+          unlocks_count: number
+          updated_at: string
+          urgency: string
+          vehicle_make: string | null
+          vehicle_model: string | null
+          vehicle_year: number | null
+        }
+        Insert: {
+          budget_max_php?: number | null
+          budget_min_php?: number | null
+          category_slug: string
+          city?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_notes?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          max_unlocks?: number
+          posted_at?: string
+          preview: string
+          price_php?: number
+          province?: string | null
+          region?: string | null
+          source_id?: string | null
+          source_kind?: string | null
+          status?: string
+          unlocks_count?: number
+          updated_at?: string
+          urgency?: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: number | null
+        }
+        Update: {
+          budget_max_php?: number | null
+          budget_min_php?: number | null
+          category_slug?: string
+          city?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_notes?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          max_unlocks?: number
+          posted_at?: string
+          preview?: string
+          price_php?: number
+          province?: string | null
+          region?: string | null
+          source_id?: string | null
+          source_kind?: string | null
+          status?: string
+          unlocks_count?: number
+          updated_at?: string
+          urgency?: string
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: number | null
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           assigned_at: string | null
@@ -5696,6 +5845,69 @@ export type Database = {
           starts_at?: string | null
           target_url?: string | null
           title?: string | null
+        }
+        Relationships: []
+      }
+      lead_offers_public: {
+        Row: {
+          budget_max_php: number | null
+          budget_min_php: number | null
+          category_slug: string | null
+          city: string | null
+          expires_at: string | null
+          id: string | null
+          max_unlocks: number | null
+          posted_at: string | null
+          preview: string | null
+          price_php: number | null
+          province: string | null
+          region: string | null
+          status: string | null
+          unlocks_count: number | null
+          urgency: string | null
+          vehicle_make: string | null
+          vehicle_model: string | null
+          vehicle_year: number | null
+        }
+        Insert: {
+          budget_max_php?: number | null
+          budget_min_php?: number | null
+          category_slug?: string | null
+          city?: string | null
+          expires_at?: string | null
+          id?: string | null
+          max_unlocks?: number | null
+          posted_at?: string | null
+          preview?: string | null
+          price_php?: number | null
+          province?: string | null
+          region?: string | null
+          status?: string | null
+          unlocks_count?: number | null
+          urgency?: string | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: number | null
+        }
+        Update: {
+          budget_max_php?: number | null
+          budget_min_php?: number | null
+          category_slug?: string | null
+          city?: string | null
+          expires_at?: string | null
+          id?: string | null
+          max_unlocks?: number | null
+          posted_at?: string | null
+          preview?: string | null
+          price_php?: number | null
+          province?: string | null
+          region?: string | null
+          status?: string | null
+          unlocks_count?: number | null
+          urgency?: string | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_year?: number | null
         }
         Relationships: []
       }
