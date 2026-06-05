@@ -34,6 +34,7 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ExportRouteImport } from './routes/export'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as BundlesRouteImport } from './routes/bundles'
 import { Route as AffiliateDisclosureRouteImport } from './routes/affiliate-disclosure'
 import { Route as AdvertiseRouteImport } from './routes/advertise'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -53,6 +54,7 @@ import { Route as ShopCategoriesRouteImport } from './routes/shop.categories'
 import { Route as ShopCategoryRouteImport } from './routes/shop.$category'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
 import { Route as SellImportRouteImport } from './routes/sell.import'
+import { Route as SSlugRouteImport } from './routes/s.$slug'
 import { Route as RidesSlugRouteImport } from './routes/rides.$slug'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as PassportSlugRouteImport } from './routes/passport.$slug'
@@ -78,6 +80,7 @@ import { Route as DashboardLearningRouteImport } from './routes/dashboard.learni
 import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favorites'
 import { Route as DashboardBusinessesRouteImport } from './routes/dashboard.businesses'
 import { Route as DashboardBillingRouteImport } from './routes/dashboard.billing'
+import { Route as DashboardAdsRouteImport } from './routes/dashboard.ads'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as CCodeRouteImport } from './routes/c.$code'
 import { Route as BusinessesSubmitRouteImport } from './routes/businesses.submit'
@@ -273,6 +276,11 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BundlesRoute = BundlesRouteImport.update({
+  id: '/bundles',
+  path: '/bundles',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AffiliateDisclosureRoute = AffiliateDisclosureRouteImport.update({
   id: '/affiliate-disclosure',
   path: '/affiliate-disclosure',
@@ -367,6 +375,11 @@ const SellImportRoute = SellImportRouteImport.update({
   id: '/import',
   path: '/import',
   getParentRoute: () => SellRoute,
+} as any)
+const SSlugRoute = SSlugRouteImport.update({
+  id: '/s/$slug',
+  path: '/s/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const RidesSlugRoute = RidesSlugRouteImport.update({
   id: '/rides/$slug',
@@ -491,6 +504,11 @@ const DashboardBusinessesRoute = DashboardBusinessesRouteImport.update({
 const DashboardBillingRoute = DashboardBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardAdsRoute = DashboardAdsRouteImport.update({
+  id: '/ads',
+  path: '/ads',
   getParentRoute: () => DashboardRoute,
 } as any)
 const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
@@ -855,6 +873,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/advertise': typeof AdvertiseRoute
   '/affiliate-disclosure': typeof AffiliateDisclosureRoute
+  '/bundles': typeof BundlesRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/export': typeof ExportRoute
@@ -915,6 +934,7 @@ export interface FileRoutesByFullPath {
   '/businesses/submit': typeof BusinessesSubmitRoute
   '/c/$code': typeof CCodeRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
@@ -940,6 +960,7 @@ export interface FileRoutesByFullPath {
   '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
+  '/s/$slug': typeof SSlugRoute
   '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
   '/shop/$category': typeof ShopCategoryRoute
@@ -994,6 +1015,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/advertise': typeof AdvertiseRoute
   '/affiliate-disclosure': typeof AffiliateDisclosureRoute
+  '/bundles': typeof BundlesRoute
   '/contact': typeof ContactRoute
   '/export': typeof ExportRoute
   '/forgot-password': typeof ForgotPasswordRoute
@@ -1053,6 +1075,7 @@ export interface FileRoutesByTo {
   '/businesses/submit': typeof BusinessesSubmitRoute
   '/c/$code': typeof CCodeRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
@@ -1077,6 +1100,7 @@ export interface FileRoutesByTo {
   '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
+  '/s/$slug': typeof SSlugRoute
   '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
   '/shop/$category': typeof ShopCategoryRoute
@@ -1133,6 +1157,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/advertise': typeof AdvertiseRoute
   '/affiliate-disclosure': typeof AffiliateDisclosureRoute
+  '/bundles': typeof BundlesRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/export': typeof ExportRoute
@@ -1193,6 +1218,7 @@ export interface FileRoutesById {
   '/businesses/submit': typeof BusinessesSubmitRoute
   '/c/$code': typeof CCodeRoute
   '/checkout/return': typeof CheckoutReturnRoute
+  '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
@@ -1218,6 +1244,7 @@ export interface FileRoutesById {
   '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
+  '/s/$slug': typeof SSlugRoute
   '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
   '/shop/$category': typeof ShopCategoryRoute
@@ -1275,6 +1302,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/advertise'
     | '/affiliate-disclosure'
+    | '/bundles'
     | '/contact'
     | '/dashboard'
     | '/export'
@@ -1335,6 +1363,7 @@ export interface FileRouteTypes {
     | '/businesses/submit'
     | '/c/$code'
     | '/checkout/return'
+    | '/dashboard/ads'
     | '/dashboard/billing'
     | '/dashboard/businesses'
     | '/dashboard/favorites'
@@ -1360,6 +1389,7 @@ export interface FileRouteTypes {
     | '/passport/$slug'
     | '/r/$code'
     | '/rides/$slug'
+    | '/s/$slug'
     | '/sell/import'
     | '/seller/$id'
     | '/shop/$category'
@@ -1414,6 +1444,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/advertise'
     | '/affiliate-disclosure'
+    | '/bundles'
     | '/contact'
     | '/export'
     | '/forgot-password'
@@ -1473,6 +1504,7 @@ export interface FileRouteTypes {
     | '/businesses/submit'
     | '/c/$code'
     | '/checkout/return'
+    | '/dashboard/ads'
     | '/dashboard/billing'
     | '/dashboard/businesses'
     | '/dashboard/favorites'
@@ -1497,6 +1529,7 @@ export interface FileRouteTypes {
     | '/passport/$slug'
     | '/r/$code'
     | '/rides/$slug'
+    | '/s/$slug'
     | '/sell/import'
     | '/seller/$id'
     | '/shop/$category'
@@ -1552,6 +1585,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/advertise'
     | '/affiliate-disclosure'
+    | '/bundles'
     | '/contact'
     | '/dashboard'
     | '/export'
@@ -1612,6 +1646,7 @@ export interface FileRouteTypes {
     | '/businesses/submit'
     | '/c/$code'
     | '/checkout/return'
+    | '/dashboard/ads'
     | '/dashboard/billing'
     | '/dashboard/businesses'
     | '/dashboard/favorites'
@@ -1637,6 +1672,7 @@ export interface FileRouteTypes {
     | '/passport/$slug'
     | '/r/$code'
     | '/rides/$slug'
+    | '/s/$slug'
     | '/sell/import'
     | '/seller/$id'
     | '/shop/$category'
@@ -1693,6 +1729,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   AdvertiseRoute: typeof AdvertiseRoute
   AffiliateDisclosureRoute: typeof AffiliateDisclosureRoute
+  BundlesRoute: typeof BundlesRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   ExportRoute: typeof ExportRoute
@@ -1736,6 +1773,7 @@ export interface RootRouteChildren {
   PassportSlugRoute: typeof PassportSlugRoute
   RCodeRoute: typeof RCodeRouteWithChildren
   RidesSlugRoute: typeof RidesSlugRoute
+  SSlugRoute: typeof SSlugRoute
   SellerIdRoute: typeof SellerIdRoute
   ShopCategoryRoute: typeof ShopCategoryRoute
   ShopCategoriesRoute: typeof ShopCategoriesRoute
@@ -1946,6 +1984,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/bundles': {
+      id: '/bundles'
+      path: '/bundles'
+      fullPath: '/bundles'
+      preLoaderRoute: typeof BundlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/affiliate-disclosure': {
       id: '/affiliate-disclosure'
       path: '/affiliate-disclosure'
@@ -2078,6 +2123,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/sell/import'
       preLoaderRoute: typeof SellImportRouteImport
       parentRoute: typeof SellRoute
+    }
+    '/s/$slug': {
+      id: '/s/$slug'
+      path: '/s/$slug'
+      fullPath: '/s/$slug'
+      preLoaderRoute: typeof SSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/rides/$slug': {
       id: '/rides/$slug'
@@ -2252,6 +2304,13 @@ declare module '@tanstack/react-router' {
       path: '/billing'
       fullPath: '/dashboard/billing'
       preLoaderRoute: typeof DashboardBillingRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/ads': {
+      id: '/dashboard/ads'
+      path: '/ads'
+      fullPath: '/dashboard/ads'
+      preLoaderRoute: typeof DashboardAdsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/checkout/return': {
@@ -2825,6 +2884,7 @@ const DashboardTeamRouteWithChildren = DashboardTeamRoute._addFileChildren(
 )
 
 interface DashboardRouteChildren {
+  DashboardAdsRoute: typeof DashboardAdsRoute
   DashboardBillingRoute: typeof DashboardBillingRoute
   DashboardBusinessesRoute: typeof DashboardBusinessesRoute
   DashboardFavoritesRoute: typeof DashboardFavoritesRoute
@@ -2849,6 +2909,7 @@ interface DashboardRouteChildren {
 }
 
 const DashboardRouteChildren: DashboardRouteChildren = {
+  DashboardAdsRoute: DashboardAdsRoute,
   DashboardBillingRoute: DashboardBillingRoute,
   DashboardBusinessesRoute: DashboardBusinessesRoute,
   DashboardFavoritesRoute: DashboardFavoritesRoute,
@@ -2938,6 +2999,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   AdvertiseRoute: AdvertiseRoute,
   AffiliateDisclosureRoute: AffiliateDisclosureRoute,
+  BundlesRoute: BundlesRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   ExportRoute: ExportRoute,
@@ -2981,6 +3043,7 @@ const rootRouteChildren: RootRouteChildren = {
   PassportSlugRoute: PassportSlugRoute,
   RCodeRoute: RCodeRouteWithChildren,
   RidesSlugRoute: RidesSlugRoute,
+  SSlugRoute: SSlugRoute,
   SellerIdRoute: SellerIdRoute,
   ShopCategoryRoute: ShopCategoryRoute,
   ShopCategoriesRoute: ShopCategoriesRoute,

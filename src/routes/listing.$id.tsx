@@ -23,6 +23,7 @@ import { waMeUrl } from "@/lib/whatsapp";
 import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
 import { ServiceStrip } from "@/components/service-strip";
 import { AffiliatePartsSection } from "@/components/affiliate-parts-section";
+import { QuoteRequestCta } from "@/components/quote-request-cta";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -594,6 +595,13 @@ function ListingDetailPage() {
 
         {/* Sidebar */}
         <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
+          {listing.category_slug !== "services" && listing.category_slug !== "towing" && (
+            <QuoteRequestCta
+              listingId={listing.id}
+              region={listing.region ?? undefined}
+              budgetPhp={listing.price_php ?? undefined}
+            />
+          )}
           <AdCarousel placement="listing_sidebar" />
           <div className="rounded-xl border border-border bg-card p-5">
             <h3 className="font-display text-lg font-semibold">Seller</h3>
