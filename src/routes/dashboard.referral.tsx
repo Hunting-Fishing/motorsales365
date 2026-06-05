@@ -54,6 +54,7 @@ function StaffReferral() {
   const [promos, setPromos] = useState<Promo[]>([]);
   const [range, setRange] = useState<RangeKey>("30");
   const [stats, setStats] = useState({ scans: 0, visitors: 0, signups: 0 });
+  const [ads, setAds] = useState<Array<{ id: string; title: string; caption: string | null; image_url: string; target_url: string; placement: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
