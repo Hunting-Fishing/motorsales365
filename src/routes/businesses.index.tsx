@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import ogBusinesses from "@/assets/og/businesses.jpg";
 import { useEffect, useMemo, useState } from "react";
-import { Search, MapPin, Star, Store as StoreIcon, Plus } from "lucide-react";
+import { Search, MapPin, Star, Store as StoreIcon, Plus, BadgeCheck } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,8 @@ import { GoogleBusinessMap, type GMapBusiness } from "@/components/businesses/go
 import { MapFilterBar, type CenterPoint } from "@/components/businesses/map-filter-bar";
 import { haversineKm } from "@/components/businesses/google-maps-loader";
 import { LocationDrilldown, type LocationValue } from "@/components/businesses/location-drilldown";
+import { PremiumSponsorsRail } from "@/components/businesses/premium-sponsors-rail";
+import { getVerifiedOwnerIds } from "@/lib/business-directory.functions";
 
 export const Route = createFileRoute("/businesses/")({
     head: () => ({
