@@ -1,6 +1,18 @@
 import rearShirt from "@/assets/share-kit/rear-shirt.png.asset.json";
 import armBand from "@/assets/share-kit/arm-band.png.asset.json";
 import type { ShareTemplate, TemplateContext } from "./types";
+import { LOGO_DATA_URL } from "./logo-data";
+
+/** Brand logo embedded as <image> so the SVG renders the real mark, not text. */
+function brandLogo(x: number, y: number, size: number): string {
+  return `<image href="${LOGO_DATA_URL}" x="${x}" y="${y}" width="${size}" height="${size}" preserveAspectRatio="xMidYMid meet"/>`;
+}
+
+/** Small ad-tracking label baked into the corner of every generated ad. */
+function trackingTag(x: number, y: number, label: string, id: string, fontPx = 18): string {
+  const safe = (s: string) => escapeXml(s);
+  return `<text x="${x}" y="${y}" font-family="'JetBrains Mono',monospace" font-size="${fontPx}" fill="#94a3b8" opacity="0.85">AD · ${safe(label)} · ${safe(id)}</text>`;
+}
 
 function escapeXml(s: string): string {
   return s
