@@ -748,3 +748,103 @@ export const adminListAssignments = createServerFn({ method: "POST" })
 
     return { assignments: filtered };
   });
+
+export const adminListAuditLog = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        rep_user_id: z.string().uuid().optional(),
+        action: z
+          .enum([
+            "assign",
+            "reassign",
+            "unassign",
+            "territory_add",
+            "territory_remove",
+            "bulk_territory_assign",
+          ])
+          .optional(),
+        limit: z.number().int().min(1).max(500).default(200),
+      })
+      .parse(input ?? {}),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    await requireAdmin(supabase, userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    let q = supabaseAdmin
+      .from("sales_rep_audit_log")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(data.limit);
+    if (data.rep_user_id) q = q.eq("rep_user_id", data.rep_user_id);
+    if (data.action) q = q.eq("action", data.action);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+
+    const actorIds = Array.from(
+      new Set((rows ?? []).map((r: any) => r.actor_id).filter(Boolean)),
+    );
+    const repIds = Array.from(
+      new Set(
+        (rows ?? [])
+          .flatMap((r: any) => [r.rep_user_id, r.prev_rep_user_id])
+          .filter(Boolean),
+      ),
+    );
+    const userSubjectIds = (rows ?? [])
+      .filter((r: any) => r.subject_type === "user" && r.subject_id)
+      .map((r: any) => r.subject_id);
+    const bizSubjectIds = (rows ?? [])
+      .filter((r: any) => r.subject_type === "business" && r.subject_id)
+      .map((r: any) => r.subject_id);
+
+    const profileIds = Array.from(new Set([...actorIds, ...repIds, ...userSubjectIds]));
+
+    const [profilesRes, bizRes, authRes] = await Promise.all([
+      profileIds.length
+        ? supabaseAdmin
+            .from("profiles")
+            .select("id, full_name, first_name, last_name")
+            .in("id", profileIds)
+        : Promise.resolve({ data: [] as any[] }),
+      bizSubjectIds.length
+        ? supabaseAdmin
+            .from("businesses")
+            .select("id, name, slug")
+            .in("id", bizSubjectIds)
+        : Promise.resolve({ data: [] as any[] }),
+      actorIds.length
+        ? supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 })
+        : Promise.resolve({ data: { users: [] as any[] } } as any),
+    ]);
+
+    const nameOf = (p: any) =>
+      p?.full_name ||
+      [p?.first_name, p?.last_name].filter(Boolean).join(" ") ||
+      null;
+    const profileMap = new Map((profilesRes.data ?? []).map((p: any) => [p.id, p]));
+    const bizMap = new Map((bizRes.data ?? []).map((b: any) => [b.id, b]));
+    const emailMap = new Map(
+      (authRes.data?.users ?? []).map((u: any) => [u.id, (u.email ?? "").toLowerCase()]),
+    );
+
+    const enriched = (rows ?? []).map((r: any) => ({
+      ...r,
+      actor: r.actor_id
+        ? { name: nameOf(profileMap.get(r.actor_id)), email: emailMap.get(r.actor_id) ?? null }
+        : null,
+      rep_name: r.rep_user_id ? nameOf(profileMap.get(r.rep_user_id)) : null,
+      prev_rep_name: r.prev_rep_user_id ? nameOf(profileMap.get(r.prev_rep_user_id)) : null,
+      subject:
+        r.subject_type === "user"
+          ? { name: nameOf(profileMap.get(r.subject_id)) }
+          : r.subject_type === "business"
+            ? bizMap.get(r.subject_id) ?? null
+            : null,
+    }));
+
+    return { entries: enriched };
+  });
