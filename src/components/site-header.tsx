@@ -55,6 +55,7 @@ export function SiteHeader() {
     loading,
     profileName,
     isAdmin,
+    isSales,
     isStaff,
     signOut,
     realSellerType,
