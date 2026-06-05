@@ -83,8 +83,15 @@ const NAV: {
     to: "/admin/advertising",
     label: "Advertising",
     Icon: Megaphone,
-    roles: ["admin", "advertising"],
-    info: "Ad inquiries, placements and advertiser CRM.",
+    roles: ["admin", "advertising", "sales"],
+    info: "Ad inquiries, placements and advertiser CRM. Senior/manager sales tiers get full access; junior is read-only.",
+  },
+  {
+    to: "/admin/promotions",
+    label: "Promotions & Discounts",
+    Icon: Ticket,
+    roles: ["admin", "sales"],
+    info: "Site-wide promo codes plus one-off discounts issued to specific customers or businesses. Discounts require manager tier.",
   },
   {
     to: "/admin/shop",
