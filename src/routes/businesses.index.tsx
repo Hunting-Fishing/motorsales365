@@ -108,7 +108,7 @@ function BusinessesIndex() {
       let query = (supabase as any)
         .from("businesses")
         .select(
-          "id,slug,name,type_slug,description,logo_url,region,province,city,barangay,lat,lng,rating_avg,rating_count,featured,price_label,subscription_tier",
+          "id,slug,name,type_slug,description,logo_url,region,province,city,barangay,lat,lng,rating_avg,rating_count,featured,price_label,subscription_tier,owner_id",
         )
         .eq("status", "active")
         .order("subscription_tier", { ascending: false })
