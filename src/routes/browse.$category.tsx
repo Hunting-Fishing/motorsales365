@@ -384,20 +384,51 @@ function BrowsePage() {
         <div>
           <SponsoredCategorySlot categorySlug={category} className="mb-6" />
           <AdCarousel placement="browse_top" className="mb-6" />
-          <div className="mb-4 text-sm text-muted-foreground">
-            {loading ? "Loading…" : `${items.length} result${items.length === 1 ? "" : "s"}`}
-          </div>
-          {!loading && items.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
-              No listings match your filters yet.
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {items.map((l) => (
-                <ListingCard key={l.id} listing={l} />
-              ))}
-            </div>
-          )}
+          {(() => {
+            const now = Date.now();
+            const promoted = items.filter(
+              (l) => l.boost_until && new Date(l.boost_until).getTime() > now,
+            );
+            const organic = items.filter(
+              (l) => !l.boost_until || new Date(l.boost_until).getTime() <= now,
+            );
+            return (
+              <>
+                {promoted.length > 0 && (
+                  <section className="mb-6">
+                    <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
+                      <Rocket className="h-3.5 w-3.5 text-primary" />
+                      <span>Promoted listings</span>
+                      <span className="ml-auto text-[10px] normal-case tracking-normal">
+                        Sponsored
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                      {promoted.slice(0, 3).map((l) => (
+                        <ListingCard key={l.id} listing={l} />
+                      ))}
+                    </div>
+                  </section>
+                )}
+                <div className="mb-4 text-sm text-muted-foreground">
+                  {loading
+                    ? "Loading…"
+                    : `${organic.length} result${organic.length === 1 ? "" : "s"}`}
+                </div>
+                {!loading && organic.length === 0 && promoted.length === 0 ? (
+                  <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
+                    No listings match your filters yet.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                    {organic.map((l) => (
+                      <ListingCard key={l.id} listing={l} />
+                    ))}
+                  </div>
+                )}
+              </>
+            );
+          })()}
         </div>
       </div>
 
