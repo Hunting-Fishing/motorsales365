@@ -119,6 +119,7 @@ export const upsertAd = createServerFn({ method: "POST" })
         ends_at: z.string().optional().nullable(),
         priority: z.number().int().min(0).max(1000).default(0),
         status: statusSchema.default("draft"),
+        category_slug: categorySlugSchema.optional().nullable(),
       })
       .parse(input),
   )
