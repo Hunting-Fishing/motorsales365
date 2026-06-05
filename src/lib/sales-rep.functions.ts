@@ -546,8 +546,23 @@ export const adminBulkAssignByTerritory = createServerFn({ method: "POST" })
         source: "territory",
         assigned_by: userId,
       });
-      if (!error) assigned += 1;
+      if (!error) {
+        assigned += 1;
+        await supabaseAdmin.from("sales_rep_audit_log").insert({
+          actor_id: userId,
+          action: "assign",
+          rep_user_id: rep,
+          subject_type: "user",
+          subject_id: p.id,
+          details: { source: "territory", bulk: true },
+        });
+      }
     }
+    await supabaseAdmin.from("sales_rep_audit_log").insert({
+      actor_id: userId,
+      action: "bulk_territory_assign",
+      details: { assigned },
+    });
     return { assigned };
   });
 
