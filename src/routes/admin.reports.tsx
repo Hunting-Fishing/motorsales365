@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { AdminGroupTabs, ACTIVITY_TABS } from "@/components/admin/admin-group-tabs";
 import { confirm } from "@/components/ui/confirm-dialog";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -71,6 +72,7 @@ function AdminReports() {
 
   return (
     <div>
+      <AdminGroupTabs title="Activity" tabs={ACTIVITY_TABS} />
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-display text-2xl font-bold">Reports</h1>
         <div className="flex gap-1 rounded-md border border-border bg-card p-1">

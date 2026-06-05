@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { AdminGroupTabs, REFERRALS_TABS } from "@/components/admin/admin-group-tabs";
 import { confirm } from "@/components/ui/confirm-dialog";
 import { useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
@@ -591,6 +592,7 @@ function AdminReferrals() {
 
   return (
     <div className="space-y-6">
+      <AdminGroupTabs title="Referrals" tabs={REFERRALS_TABS} />
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-bold">Staff QR Referrals</h1>

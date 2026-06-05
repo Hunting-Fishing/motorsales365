@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { AdminGroupTabs, ACTIVITY_TABS } from "@/components/admin/admin-group-tabs";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -145,6 +146,7 @@ function UserActionsTab() {
 
   return (
     <div>
+      <AdminGroupTabs title="Activity" tabs={ACTIVITY_TABS} />
       <p className="mb-4 text-sm text-muted-foreground">
         Every role grant/revoke and verification status change made through the admin panel is
         recorded here with a timestamp and actor.

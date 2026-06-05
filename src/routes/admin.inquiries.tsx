@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { AdminGroupTabs, ACTIVITY_TABS } from "@/components/admin/admin-group-tabs";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Inbox, Search } from "lucide-react";
@@ -133,6 +134,7 @@ function AdminInquiriesPage() {
 
   return (
     <div className="space-y-4">
+      <AdminGroupTabs title="Activity" tabs={ACTIVITY_TABS} />
       <header className="flex items-center justify-between gap-3">
         <div>
           <h1 className="flex items-center gap-2 font-display text-2xl font-bold">
