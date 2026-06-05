@@ -33,11 +33,20 @@ export const saveProfile = createServerFn({ method: "POST" })
     const { supabase, userId, claims } = context as any;
     // Guard: only @365motorsales.com emails may self-select the "staff" seller type.
     if (data.seller_type === "staff") {
-      const email: string = (claims?.email ?? "").toLowerCase();
+      let email = String(claims?.email ?? "").toLowerCase();
+      if (!email) {
+        // Fallback: resolve email from the authenticated user if JWT claims omit it.
+        const { data: userData } = await supabase.auth.getUser();
+        email = String(userData?.user?.email ?? "").toLowerCase();
+      }
       if (!email.endsWith("@365motorsales.com")) {
-        throw new Error("Staff seller type is reserved for 365 Motor Sales team members.");
+        console.error("[saveProfile] staff guard rejected; resolved email:", email || "(empty)");
+        throw new Error(
+          `Staff seller type is reserved for 365 Motor Sales team members. (resolved email: ${email || "unknown"})`,
+        );
       }
     }
+
     // Strip undefined keys so we don't blank out columns the client didn't send.
     const patch: Record<string, unknown> = { id: userId };
     for (const [k, v] of Object.entries(data)) {
