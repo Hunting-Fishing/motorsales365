@@ -429,13 +429,21 @@ export const adminAssignRep = createServerFn({ method: "POST" })
     await requireAdmin(supabase, userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Deactivate existing active assignment for this subject
-    await supabaseAdmin
+    // Find existing active assignment to capture previous rep for audit
+    const { data: existing } = await supabaseAdmin
       .from("sales_rep_assignments")
-      .update({ active: false, ended_at: new Date().toISOString() })
+      .select("id, rep_user_id")
       .eq("subject_type", data.subject_type)
       .eq("subject_id", data.subject_id)
-      .eq("active", true);
+      .eq("active", true)
+      .maybeSingle();
+
+    if (existing) {
+      await supabaseAdmin
+        .from("sales_rep_assignments")
+        .update({ active: false, ended_at: new Date().toISOString() })
+        .eq("id", existing.id);
+    }
 
     const { error } = await supabaseAdmin.from("sales_rep_assignments").insert({
       rep_user_id: data.rep_user_id,
@@ -446,6 +454,16 @@ export const adminAssignRep = createServerFn({ method: "POST" })
       notes: data.notes,
     });
     if (error) throw new Error(error.message);
+
+    await supabaseAdmin.from("sales_rep_audit_log").insert({
+      actor_id: userId,
+      action: existing ? "reassign" : "assign",
+      rep_user_id: data.rep_user_id,
+      prev_rep_user_id: existing?.rep_user_id ?? null,
+      subject_type: data.subject_type,
+      subject_id: data.subject_id,
+      details: { notes: data.notes ?? null, source: "manual" },
+    });
     return { ok: true };
   });
 
@@ -456,11 +474,26 @@ export const adminUnassign = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await requireAdmin(supabase, userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row } = await supabaseAdmin
+      .from("sales_rep_assignments")
+      .select("rep_user_id, subject_type, subject_id, source")
+      .eq("id", data.id)
+      .maybeSingle();
     const { error } = await supabaseAdmin
       .from("sales_rep_assignments")
       .update({ active: false, ended_at: new Date().toISOString() })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
+    if (row) {
+      await supabaseAdmin.from("sales_rep_audit_log").insert({
+        actor_id: userId,
+        action: "unassign",
+        rep_user_id: row.rep_user_id,
+        subject_type: row.subject_type,
+        subject_id: row.subject_id,
+        details: { assignment_id: data.id, source: row.source },
+      });
+    }
     return { ok: true };
   });
 
