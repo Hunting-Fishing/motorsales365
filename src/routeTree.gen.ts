@@ -101,6 +101,7 @@ import { Route as AdminPromotionsRouteImport } from './routes/admin.promotions'
 import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
+import { Route as AdminLeadOffersRouteImport } from './routes/admin.lead-offers'
 import { Route as AdminInquiriesRouteImport } from './routes/admin.inquiries'
 import { Route as AdminFeatureFlagsRouteImport } from './routes/admin.feature-flags'
 import { Route as AdminEducationRouteImport } from './routes/admin.education'
@@ -110,6 +111,7 @@ import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising'
+import { Route as AdminAdCampaignsRouteImport } from './routes/admin.ad-campaigns'
 import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
 import { Route as DashboardTeamIndexRouteImport } from './routes/dashboard.team.index'
 import { Route as ShopPSlugRouteImport } from './routes/shop.p.$slug'
@@ -606,6 +608,11 @@ const AdminListingsRoute = AdminListingsRouteImport.update({
   path: '/listings',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLeadOffersRoute = AdminLeadOffersRouteImport.update({
+  id: '/lead-offers',
+  path: '/lead-offers',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminInquiriesRoute = AdminInquiriesRouteImport.update({
   id: '/inquiries',
   path: '/inquiries',
@@ -649,6 +656,11 @@ const AdminAlertsRoute = AdminAlertsRouteImport.update({
 const AdminAdvertisingRoute = AdminAdvertisingRouteImport.update({
   id: '/advertising',
   path: '/advertising',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAdCampaignsRoute = AdminAdCampaignsRouteImport.update({
+  id: '/ad-campaigns',
+  path: '/ad-campaigns',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminAccountsRoute = AdminAccountsRouteImport.update({
@@ -869,6 +881,7 @@ export interface FileRoutesByFullPath {
   '/unsubscribe': typeof UnsubscribeRoute
   '/verify-email': typeof VerifyEmailRoute
   '/admin/accounts': typeof AdminAccountsRoute
+  '/admin/ad-campaigns': typeof AdminAdCampaignsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -878,6 +891,7 @@ export interface FileRoutesByFullPath {
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
+  '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
@@ -1005,6 +1019,7 @@ export interface FileRoutesByTo {
   '/unsubscribe': typeof UnsubscribeRoute
   '/verify-email': typeof VerifyEmailRoute
   '/admin/accounts': typeof AdminAccountsRoute
+  '/admin/ad-campaigns': typeof AdminAdCampaignsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -1014,6 +1029,7 @@ export interface FileRoutesByTo {
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
+  '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
@@ -1143,6 +1159,7 @@ export interface FileRoutesById {
   '/unsubscribe': typeof UnsubscribeRoute
   '/verify-email': typeof VerifyEmailRoute
   '/admin/accounts': typeof AdminAccountsRoute
+  '/admin/ad-campaigns': typeof AdminAdCampaignsRoute
   '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
@@ -1152,6 +1169,7 @@ export interface FileRoutesById {
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
+  '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
@@ -1283,6 +1301,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/verify-email'
     | '/admin/accounts'
+    | '/admin/ad-campaigns'
     | '/admin/advertising'
     | '/admin/alerts'
     | '/admin/analytics'
@@ -1292,6 +1311,7 @@ export interface FileRouteTypes {
     | '/admin/education'
     | '/admin/feature-flags'
     | '/admin/inquiries'
+    | '/admin/lead-offers'
     | '/admin/listings'
     | '/admin/performance'
     | '/admin/pricing'
@@ -1419,6 +1439,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/verify-email'
     | '/admin/accounts'
+    | '/admin/ad-campaigns'
     | '/admin/advertising'
     | '/admin/alerts'
     | '/admin/analytics'
@@ -1428,6 +1449,7 @@ export interface FileRouteTypes {
     | '/admin/education'
     | '/admin/feature-flags'
     | '/admin/inquiries'
+    | '/admin/lead-offers'
     | '/admin/listings'
     | '/admin/performance'
     | '/admin/pricing'
@@ -1556,6 +1578,7 @@ export interface FileRouteTypes {
     | '/unsubscribe'
     | '/verify-email'
     | '/admin/accounts'
+    | '/admin/ad-campaigns'
     | '/admin/advertising'
     | '/admin/alerts'
     | '/admin/analytics'
@@ -1565,6 +1588,7 @@ export interface FileRouteTypes {
     | '/admin/education'
     | '/admin/feature-flags'
     | '/admin/inquiries'
+    | '/admin/lead-offers'
     | '/admin/listings'
     | '/admin/performance'
     | '/admin/pricing'
@@ -2391,6 +2415,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminListingsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/lead-offers': {
+      id: '/admin/lead-offers'
+      path: '/lead-offers'
+      fullPath: '/admin/lead-offers'
+      preLoaderRoute: typeof AdminLeadOffersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/inquiries': {
       id: '/admin/inquiries'
       path: '/inquiries'
@@ -2452,6 +2483,13 @@ declare module '@tanstack/react-router' {
       path: '/advertising'
       fullPath: '/admin/advertising'
       preLoaderRoute: typeof AdminAdvertisingRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/ad-campaigns': {
+      id: '/admin/ad-campaigns'
+      path: '/ad-campaigns'
+      fullPath: '/admin/ad-campaigns'
+      preLoaderRoute: typeof AdminAdCampaignsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/accounts': {
@@ -2704,6 +2742,7 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminAccountsRoute: typeof AdminAccountsRoute
+  AdminAdCampaignsRoute: typeof AdminAdCampaignsRoute
   AdminAdvertisingRoute: typeof AdminAdvertisingRoute
   AdminAlertsRoute: typeof AdminAlertsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
@@ -2713,6 +2752,7 @@ interface AdminRouteChildren {
   AdminEducationRoute: typeof AdminEducationRoute
   AdminFeatureFlagsRoute: typeof AdminFeatureFlagsRoute
   AdminInquiriesRoute: typeof AdminInquiriesRoute
+  AdminLeadOffersRoute: typeof AdminLeadOffersRoute
   AdminListingsRoute: typeof AdminListingsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
   AdminPricingRoute: typeof AdminPricingRoute
@@ -2733,6 +2773,7 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAccountsRoute: AdminAccountsRoute,
+  AdminAdCampaignsRoute: AdminAdCampaignsRoute,
   AdminAdvertisingRoute: AdminAdvertisingRoute,
   AdminAlertsRoute: AdminAlertsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
@@ -2742,6 +2783,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminEducationRoute: AdminEducationRoute,
   AdminFeatureFlagsRoute: AdminFeatureFlagsRoute,
   AdminInquiriesRoute: AdminInquiriesRoute,
+  AdminLeadOffersRoute: AdminLeadOffersRoute,
   AdminListingsRoute: AdminListingsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
   AdminPricingRoute: AdminPricingRoute,

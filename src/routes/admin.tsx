@@ -85,6 +85,20 @@ const NAV: {
     info: "Ad inquiries, placements and advertiser CRM. Senior/manager sales tiers get full access; junior is read-only.",
   },
   {
+    to: "/admin/ad-campaigns",
+    label: "Ad Campaigns",
+    Icon: Megaphone,
+    roles: ["admin", "advertising"],
+    info: "Create, schedule and manage sponsored ad placements (home carousel, browse banners, category sponsors).",
+  },
+  {
+    to: "/admin/lead-offers",
+    label: "Lead Marketplace",
+    Icon: Inbox,
+    roles: ["admin"],
+    info: "Post qualified buyer leads. Featured/Premium businesses pay per unlock to reveal contact info.",
+  },
+  {
     to: "/admin/promotions",
     label: "Promotions & Discounts",
     Icon: Ticket,
