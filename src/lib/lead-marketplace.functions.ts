@@ -21,8 +21,6 @@ export const listOpenLeadOffers = createServerFn({ method: "GET" })
       _category_slug: data.categorySlug ?? null,
       _region: data.region ?? null,
       _limit: data.limit ?? 60,
-    } as any);
-      _limit: data.limit ?? 60,
     });
     if (error) throw new Error(error.message);
     return { offers: (rows ?? []) as any[] };
