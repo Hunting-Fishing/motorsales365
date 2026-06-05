@@ -28,6 +28,7 @@ import { Route as MyQrRouteImport } from './routes/my-qr'
 import { Route as MapRouteImport } from './routes/map'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
+import { Route as LeadsMarketplaceRouteImport } from './routes/leads-marketplace'
 import { Route as GuidelinesRouteImport } from './routes/guidelines'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ExportRouteImport } from './routes/export'
@@ -238,6 +239,11 @@ const LoginRoute = LoginRouteImport.update({
 const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
   id: '/llms.txt',
   path: '/llms.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LeadsMarketplaceRoute = LeadsMarketplaceRouteImport.update({
+  id: '/leads-marketplace',
+  path: '/leads-marketplace',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GuidelinesRoute = GuidelinesRouteImport.update({
@@ -842,6 +848,7 @@ export interface FileRoutesByFullPath {
   '/export': typeof ExportRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
+  '/leads-marketplace': typeof LeadsMarketplaceRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
@@ -977,6 +984,7 @@ export interface FileRoutesByTo {
   '/export': typeof ExportRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
+  '/leads-marketplace': typeof LeadsMarketplaceRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
@@ -1114,6 +1122,7 @@ export interface FileRoutesById {
   '/export': typeof ExportRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
+  '/leads-marketplace': typeof LeadsMarketplaceRoute
   '/llms.txt': typeof LlmsDottxtRoute
   '/login': typeof LoginRoute
   '/map': typeof MapRoute
@@ -1253,6 +1262,7 @@ export interface FileRouteTypes {
     | '/export'
     | '/forgot-password'
     | '/guidelines'
+    | '/leads-marketplace'
     | '/llms.txt'
     | '/login'
     | '/map'
@@ -1388,6 +1398,7 @@ export interface FileRouteTypes {
     | '/export'
     | '/forgot-password'
     | '/guidelines'
+    | '/leads-marketplace'
     | '/llms.txt'
     | '/login'
     | '/map'
@@ -1524,6 +1535,7 @@ export interface FileRouteTypes {
     | '/export'
     | '/forgot-password'
     | '/guidelines'
+    | '/leads-marketplace'
     | '/llms.txt'
     | '/login'
     | '/map'
@@ -1662,6 +1674,7 @@ export interface RootRouteChildren {
   ExportRoute: typeof ExportRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   GuidelinesRoute: typeof GuidelinesRoute
+  LeadsMarketplaceRoute: typeof LeadsMarketplaceRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
   LoginRoute: typeof LoginRoute
   MapRoute: typeof MapRoute
@@ -1865,6 +1878,13 @@ declare module '@tanstack/react-router' {
       path: '/llms.txt'
       fullPath: '/llms.txt'
       preLoaderRoute: typeof LlmsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/leads-marketplace': {
+      id: '/leads-marketplace'
+      path: '/leads-marketplace'
+      fullPath: '/leads-marketplace'
+      preLoaderRoute: typeof LeadsMarketplaceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/guidelines': {
@@ -2881,6 +2901,7 @@ const rootRouteChildren: RootRouteChildren = {
   ExportRoute: ExportRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   GuidelinesRoute: GuidelinesRoute,
+  LeadsMarketplaceRoute: LeadsMarketplaceRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
   LoginRoute: LoginRoute,
   MapRoute: MapRoute,
