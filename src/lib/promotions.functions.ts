@@ -59,7 +59,7 @@ export const upsertPromotion = createServerFn({ method: "POST" })
   .inputValidator((input) => UpsertPromo.parse(input))
   .handler(async ({ data, context }) => {
     await assertCanCreatePromos(context.supabase, context.userId);
-    const payload = {
+    const payload: any = {
       code: data.code.toUpperCase(),
       percent_off: data.percent_off ?? null,
       applies_to: data.applies_to,
@@ -67,14 +67,14 @@ export const upsertPromotion = createServerFn({ method: "POST" })
       active: data.active,
     };
     if (data.id) {
-      const { error } = await context.supabase
+      const { error } = await (context.supabase as any)
         .from("promotions")
         .update(payload)
         .eq("id", data.id);
       if (error) throw new Error(error.message);
       return { id: data.id };
     }
-    const { data: row, error } = await context.supabase
+    const { data: row, error } = await (context.supabase as any)
       .from("promotions")
       .insert(payload)
       .select("id")
