@@ -713,9 +713,9 @@ function SellPage() {
 
   return (
     <SiteLayout>
-      <div className="container mx-auto max-w-3xl px-4 py-10">
-        <h1 className="font-display text-3xl font-bold">Post a listing</h1>
-        <p className="text-muted-foreground">Reach buyers across the Philippines.</p>
+      <div className="container mx-auto max-w-3xl px-4 py-6 sm:py-10">
+        <h1 className="font-display text-2xl sm:text-3xl font-bold">Post a listing</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">Reach buyers across the Philippines.</p>
 
         {paymentStatus && pendingListingId ? (
           <div
