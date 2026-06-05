@@ -269,6 +269,7 @@ export type Database = {
           advertiser_email: string | null
           advertiser_name: string | null
           caption: string | null
+          category_slug: string | null
           clicks_count: number
           created_at: string
           created_by: string | null
@@ -288,6 +289,7 @@ export type Database = {
           advertiser_email?: string | null
           advertiser_name?: string | null
           caption?: string | null
+          category_slug?: string | null
           clicks_count?: number
           created_at?: string
           created_by?: string | null
@@ -307,6 +309,7 @@ export type Database = {
           advertiser_email?: string | null
           advertiser_name?: string | null
           caption?: string | null
+          category_slug?: string | null
           clicks_count?: number
           created_at?: string
           created_by?: string | null
@@ -5657,6 +5660,7 @@ export type Database = {
       active_ads_public: {
         Row: {
           caption: string | null
+          category_slug: string | null
           created_at: string | null
           ends_at: string | null
           id: string | null
@@ -5669,6 +5673,7 @@ export type Database = {
         }
         Insert: {
           caption?: string | null
+          category_slug?: string | null
           created_at?: string | null
           ends_at?: string | null
           id?: string | null
@@ -5681,6 +5686,7 @@ export type Database = {
         }
         Update: {
           caption?: string | null
+          category_slug?: string | null
           created_at?: string | null
           ends_at?: string | null
           id?: string | null

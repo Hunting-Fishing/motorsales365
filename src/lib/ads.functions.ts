@@ -12,8 +12,10 @@ const placementSchema = z.enum([
   "export_top",
   "shop_top",
   "shop_sidebar",
+  "category_banner",
 ]);
 const statusSchema = z.enum(["draft", "scheduled", "active", "paused", "ended"]);
+const categorySlugSchema = z.string().min(1).max(64).regex(/^[a-z0-9_-]+$/);
 
 // PUBLIC: fetch active ads for a placement
 export const getActiveAds = createServerFn({ method: "GET" })
@@ -32,6 +34,24 @@ export const getActiveAds = createServerFn({ method: "GET" })
       .limit(data.limit ?? 6);
     if (error) throw new Error(error.message);
     return { ads: rows ?? [] };
+  });
+
+// PUBLIC: fetch the exclusive sponsor for a browse category (one banner per category)
+export const getCategorySponsor = createServerFn({ method: "GET" })
+  .inputValidator((input: { categorySlug: string }) =>
+    z.object({ categorySlug: categorySlugSchema }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { data: rows, error } = await (supabaseAdmin as any)
+      .from("active_ads_public")
+      .select("id, title, caption, image_url, target_url, placement, category_slug")
+      .eq("placement", "category_banner")
+      .eq("category_slug", data.categorySlug)
+      .order("priority", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(1);
+    if (error) throw new Error(error.message);
+    return { ad: (rows ?? [])[0] ?? null };
   });
 
 // PUBLIC: fetch all currently-active ads across placements (for staff/internal views)
@@ -99,6 +119,7 @@ export const upsertAd = createServerFn({ method: "POST" })
         ends_at: z.string().optional().nullable(),
         priority: z.number().int().min(0).max(1000).default(0),
         status: statusSchema.default("draft"),
+        category_slug: categorySlugSchema.optional().nullable(),
       })
       .parse(input),
   )
