@@ -1,12 +1,20 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Trash2, ArrowRight, Bookmark } from "lucide-react";
+import { Trash2, ArrowRight, Bookmark, Bell, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { formatDate, formatPHP } from "@/lib/format";
+import { updateSavedSearchAlerts } from "@/lib/saved-search-alerts.functions";
 
 export const Route = createFileRoute("/dashboard/searches")({
   component: SavedSearchesPage,
@@ -44,6 +52,24 @@ function SavedSearchesPage() {
     }
   };
 
+  const setAlert = async (id: string, frequency: "off" | "daily" | "instant") => {
+    try {
+      await updateSavedSearchAlerts({ data: { id, frequency } });
+      setSearches((rows) =>
+        rows.map((r) => (r.id === id ? { ...r, alert_frequency: frequency } : r)),
+      );
+      toast.success(
+        frequency === "off"
+          ? "Alerts turned off"
+          : frequency === "instant"
+          ? "Instant alerts enabled"
+          : "Daily digest enabled",
+      );
+    } catch (e: any) {
+      toast.error(e.message ?? "Failed to update");
+    }
+  };
+
   return (
     <div>
       <h1 className="mb-6 font-display text-2xl font-bold">Saved searches</h1>
@@ -76,7 +102,25 @@ function SavedSearchesPage() {
                       <span>· saved {formatDate(s.created_at)}</span>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Select
+                      value={s.alert_frequency ?? "off"}
+                      onValueChange={(v: any) => setAlert(s.id, v)}
+                    >
+                      <SelectTrigger className="h-8 w-[150px] text-xs">
+                        <Bell className="h-3 w-3 mr-1" />
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="off">Alerts off</SelectItem>
+                        <SelectItem value="daily">Daily digest</SelectItem>
+                        <SelectItem value="instant">
+                          <span className="inline-flex items-center gap-1">
+                            <Sparkles className="h-3 w-3 text-amber-500" /> Instant (Premium)
+                          </span>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
                     <Button asChild size="sm">
                       <Link
                         to="/browse/$category"
@@ -96,6 +140,15 @@ function SavedSearchesPage() {
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
                 </div>
               </div>
             );
