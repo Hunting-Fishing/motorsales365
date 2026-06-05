@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { siteOrigin } from "@/lib/site-config";
 
 export const Route = createFileRoute("/my-qr")({
   component: MyQrPage,
@@ -45,7 +46,7 @@ function MyQrPage() {
         setCode(data.referral_code);
         setName(data.full_name);
         setActive(Boolean(data.active));
-        const url = `${window.location.origin}/r/${data.referral_code}`;
+        const url = `${siteOrigin()}/r/${data.referral_code}`;
         const png = await QRCode.toDataURL(url, {
           width: 900,
           margin: 2,
@@ -88,7 +89,7 @@ function MyQrPage() {
     );
   }
 
-  const link = `${typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com"}/r/${code}`;
+  const link = `${siteOrigin()}/r/${code}`;
 
   return (
     <div className="container mx-auto max-w-xl px-4 py-10">

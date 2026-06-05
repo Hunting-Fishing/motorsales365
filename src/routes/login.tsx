@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SiteLayout } from "@/components/site-layout";
+import { siteOrigin } from "@/lib/site-config";
 
 export const Route = createFileRoute("/login")({
   component: LoginPage,
@@ -90,7 +91,7 @@ function LoginPage() {
     setGoogleSubmitting(true);
     try {
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
+        redirect_uri: siteOrigin(),
       });
       if (result.error) {
         toast.error("Could not sign in with Google");

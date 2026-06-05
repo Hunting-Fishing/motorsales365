@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { TemplateCard } from "@/components/share-kit/template-card";
 import { TEMPLATES } from "@/lib/share-kit/templates";
 import { listShareKitLayouts } from "@/lib/share-kit-layouts.functions";
+import { siteOrigin } from "@/lib/site-config";
 
 export const Route = createFileRoute("/dashboard/share-kit")({
   component: ShareKitPage,
@@ -64,7 +65,7 @@ function ShareKitPage() {
   const context = useMemo(() => {
     if (!staff) return null;
     const origin =
-      typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com";
+      siteOrigin();
     return {
       name: staff.full_name,
       firstName: staff.full_name.split(" ")[0] || staff.full_name,

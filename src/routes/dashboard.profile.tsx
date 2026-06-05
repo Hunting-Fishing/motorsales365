@@ -16,6 +16,7 @@ import { TotpSetupCard } from "@/components/totp-setup-card";
 import { buildE164, parseE164 } from "@/data/country-codes";
 import { useCurrency } from "@/lib/currency";
 import { saveProfile } from "@/lib/profile.functions";
+import { siteOrigin } from "@/lib/site-config";
 
 type ChecklistItem = { label: string; done: boolean; required: boolean };
 
@@ -93,7 +94,7 @@ function ProfilePage() {
     setEmailSubmitting(true);
     const { error } = await supabase.auth.updateUser(
       { email: target },
-      { emailRedirectTo: `${window.location.origin}/dashboard/profile` },
+      { emailRedirectTo: `${siteOrigin()}/dashboard/profile` },
     );
     setEmailSubmitting(false);
     if (error) return toast.error(error.message);

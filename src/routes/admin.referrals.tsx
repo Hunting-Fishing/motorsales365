@@ -58,6 +58,7 @@ import {
   Search,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { siteOrigin } from "@/lib/site-config";
 
 export const Route = createFileRoute("/admin/referrals")({
   component: AdminReferrals,
@@ -110,7 +111,7 @@ function slugify(name: string) {
 }
 
 const PUBLIC_BASE =
-  typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com";
+  siteOrigin();
 
 const sb = supabase as any;
 

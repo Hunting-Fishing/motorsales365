@@ -17,6 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Mail, Copy, Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { siteOrigin } from "@/lib/site-config";
 
 const searchSchema = z.object({ orgId: z.string().uuid() });
 
@@ -54,7 +55,7 @@ function MembersPage() {
     setInviting(true);
     try {
       const inv = await inviteFn({ data: { orgId, email: email.trim().toLowerCase(), role } });
-      const link = `${window.location.origin}/invites/${inv.token}`;
+      const link = `${siteOrigin()}/invites/${inv.token}`;
       await navigator.clipboard.writeText(link).catch(() => {});
       toast.success("Invite sent — link also copied to clipboard");
       setEmail("");
@@ -133,7 +134,7 @@ function MembersPage() {
                   size="sm"
                   onClick={() => {
                     navigator.clipboard.writeText(
-                      `${window.location.origin}/invites/${inv.token ?? ""}`,
+                      `${siteOrigin()}/invites/${inv.token ?? ""}`,
                     );
                     toast.success("Link copied");
                   }}

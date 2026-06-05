@@ -53,6 +53,7 @@ import { ListingPrice } from "@/components/listing-price";
 import placeholderCar from "@/assets/placeholder-car.webp";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ListingQr } from "@/components/listing-qr";
+import { siteUrl } from "@/lib/site-config";
 
 const REPORT_REASONS = [
   "Suspected scam or fraud",
@@ -631,7 +632,7 @@ function ListingDetailPage() {
                   href={
                     waMeUrl(
                       listing.contact_phone,
-                      `Hi! I'm interested in your listing "${listing.title}" on 365 Motor Sales: ${typeof window !== "undefined" ? window.location.href : ""}`,
+                      `Hi! I'm interested in your listing "${listing.title}" on 365 Motor Sales: ${siteUrl(typeof window !== "undefined" ? window.location.pathname : "/")}`,
                     )!
                   }
                   target="_blank"

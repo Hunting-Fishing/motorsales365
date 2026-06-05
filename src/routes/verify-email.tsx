@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { SiteLayout } from "@/components/site-layout";
+import { siteOrigin } from "@/lib/site-config";
 
 type Search = { email?: string; intent?: string };
 
@@ -55,7 +56,7 @@ function VerifyEmailPage() {
       type: "signup",
       email,
       options: {
-        emailRedirectTo: `${window.location.origin}/verify-email${intent ? `?intent=${intent}` : ""}`,
+        emailRedirectTo: `${siteOrigin()}/verify-email${intent ? `?intent=${intent}` : ""}`,
       },
     });
     setResending(false);

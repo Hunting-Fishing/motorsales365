@@ -4,6 +4,7 @@ import QRCode from "qrcode";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Printer } from "lucide-react";
+import { siteOrigin } from "@/lib/site-config";
 
 export const Route = createFileRoute("/r/$code/poster")({
   component: ReferralPoster,
@@ -28,7 +29,7 @@ function ReferralPoster() {
         setName((data as any).full_name);
         setActive(Boolean((data as any).active));
       }
-      const url = `${window.location.origin}/r/${code}`;
+      const url = `${siteOrigin()}/r/${code}`;
       const png = await QRCode.toDataURL(url, { width: 900, margin: 1, errorCorrectionLevel: "H" });
       setQrDataUrl(png);
     })();
@@ -81,7 +82,7 @@ function ReferralPoster() {
               Code <span className="font-mono">{code}</span>
             </div>
             <div className="mt-1 text-sm text-neutral-500">
-              {typeof window !== "undefined" ? window.location.origin : "365motorsales.com"}/r/
+              {siteOrigin()}/r/
               {code}
             </div>
             {!active && (

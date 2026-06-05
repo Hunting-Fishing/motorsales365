@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PhoneInput } from "@/components/phone-input";
 import { buildE164 } from "@/data/country-codes";
+import { siteOrigin } from "@/lib/site-config";
 
 export const Route = createFileRoute("/advertise")({
   head: () => ({
@@ -116,7 +117,7 @@ function AdvertisePage() {
       start_date: v.start_date || null,
       message: v.message,
       submitter_user_id: userData.user?.id ?? null,
-      source_url: typeof window !== "undefined" ? window.location.href : null,
+      source_url: typeof window !== "undefined" ? `${siteOrigin()}${window.location.pathname}` : null,
     });
     setSubmitting(false);
     if (error) {

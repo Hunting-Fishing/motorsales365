@@ -11,6 +11,7 @@ import { listShareKitLayouts } from "@/lib/share-kit-layouts.functions";
 import { Button } from "@/components/ui/button";
 import { Copy, Download, Printer, MousePointerClick, UserPlus, Percent, Users, Megaphone } from "lucide-react";
 import { toast } from "sonner";
+import { siteOrigin } from "@/lib/site-config";
 
 export const Route = createFileRoute("/dashboard/referral")({
   component: StaffReferral,
@@ -102,7 +103,7 @@ function StaffReferral() {
   const adContext = useMemo(() => {
     if (!staff) return null;
     const origin =
-      typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com";
+      siteOrigin();
     return {
       name: staff.full_name,
       firstName: staff.full_name.split(" ")[0] || staff.full_name,
@@ -140,11 +141,11 @@ function StaffReferral() {
   }, [staff, range]);
 
   const link = useMemo(
-    () => (staff ? `${window.location.origin}/r/${staff.referral_code}` : ""),
+    () => (staff ? `${siteOrigin()}/r/${staff.referral_code}` : ""),
     [staff],
   );
   const posterUrl = useMemo(
-    () => (staff ? `${window.location.origin}/r/${staff.referral_code}/poster` : ""),
+    () => (staff ? `${siteOrigin()}/r/${staff.referral_code}/poster` : ""),
     [staff],
   );
   const qrUrl = useMemo(() => {
