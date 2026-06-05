@@ -3,6 +3,7 @@ import ogRides from "@/assets/og/rides.jpg";
 import { useEffect, useMemo, useState } from "react";
 import { Search, Sparkles } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
+import { AdCarousel } from "@/components/ads/ad-carousel";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -147,6 +148,7 @@ function RidesHubPage() {
       </div>
 
       <div className="container mx-auto px-4 py-8">
+        <AdCarousel placement="rides_top" className="mb-6" />
         {loading ? (
           <div className="p-12 text-center text-muted-foreground">Loading…</div>
         ) : filtered.length === 0 ? (
