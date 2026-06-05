@@ -109,17 +109,10 @@ const NAV: {
   },
   {
     to: "/admin/referrals",
-    label: "Staff QR Referrals",
+    label: "Referrals",
     Icon: QrCode,
     roles: ["admin", "sales"],
-    info: "QR codes & referral codes for every staff member, including admins.",
-  },
-  {
-    to: "/admin/redemptions",
-    label: "Referral Redemptions",
-    Icon: Ticket,
-    roles: ["admin", "sales"],
-    info: "Discounts redeemed via staff referral codes.",
+    info: "Staff QR codes and redemption history in one workflow (tabs at top of page).",
   },
   {
     to: "/admin/pricing",
@@ -185,25 +178,18 @@ const NAV: {
     info: "Dedicated management for @365motorsales.com employees: edit profile, reset password, sign-in link, enable/disable.",
   },
   {
+    to: "/admin/reports",
+    label: "Activity",
+    Icon: Inbox,
+    roles: ["admin", "moderator", "support", "sales"],
+    info: "Unified inbox: user-submitted reports, service inquiries, and the admin audit log (tabs at top of page).",
+  },
+  {
     to: "/admin/alerts",
     label: "Ops Alerts",
     Icon: AlertTriangle,
     roles: ["admin"],
     info: "Backend failures (payment webhooks, email errors, geocoding) captured in-app. Investigate and acknowledge.",
-  },
-  {
-    to: "/admin/audit",
-    label: "Audit log",
-    Icon: ShieldAlert,
-    roles: ["admin", "support"],
-    info: "Timestamped record of every role grant/revoke and verification status change made via the admin panel.",
-  },
-  {
-    to: "/admin/reports",
-    label: "Reports",
-    Icon: Flag,
-    roles: ["admin", "moderator", "support"],
-    info: "User-submitted reports of listings, messages or scams.",
   },
   {
     to: "/admin/inquiries",
