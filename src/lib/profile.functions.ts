@@ -30,7 +30,14 @@ export const saveProfile = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => ProfilePatchSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
+    const { supabase, userId, claims } = context as any;
+    // Guard: only @365motorsales.com emails may self-select the "staff" seller type.
+    if (data.seller_type === "staff") {
+      const email: string = (claims?.email ?? "").toLowerCase();
+      if (!email.endsWith("@365motorsales.com")) {
+        throw new Error("Staff seller type is reserved for 365 Motor Sales team members.");
+      }
+    }
     // Strip undefined keys so we don't blank out columns the client didn't send.
     const patch: Record<string, unknown> = { id: userId };
     for (const [k, v] of Object.entries(data)) {
