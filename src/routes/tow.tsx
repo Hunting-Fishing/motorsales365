@@ -206,6 +206,10 @@ function TowPage() {
         </div>
       </div>
 
+      <div className="container mx-auto px-4 pt-6">
+        <FeaturedTowProviders region={pickup.region} />
+      </div>
+
       <div className="container mx-auto grid gap-8 px-4 py-10 lg:grid-cols-[1fr_360px]">
         <form onSubmit={handleSubmit} className="space-y-6">
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
