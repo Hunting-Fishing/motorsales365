@@ -67,6 +67,7 @@ function ProfilePage() {
   const [profile, setProfile] = useState<any>(null);
   const [totpEnabled, setTotpEnabled] = useState(false);
   const [saving, setSaving] = useState(false);
+  const isStaffEmail = (user?.email ?? "").toLowerCase().endsWith("@365motorsales.com");
 
   // Profile phone (country + national)
   const [profilePhone, setProfilePhone] = useState<{ iso: string; national: string }>({
