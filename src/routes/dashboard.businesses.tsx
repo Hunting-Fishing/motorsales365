@@ -24,6 +24,7 @@ import { ShareQr } from "@/components/share-qr";
 import { BusinessPlanDialog } from "@/components/business-plan-dialog";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { siteOrigin } from "@/lib/site-config";
 
 export const Route = createFileRoute("/dashboard/businesses")({
   component: MyBusinessesPage,
@@ -440,7 +441,7 @@ function MyBusinessesPage() {
                           : "Upgrade"}
                       </Button>
                       <ShareQr
-                        url={`${typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com"}/businesses/${b.slug}`}
+                        url={`${siteOrigin()}/businesses/${b.slug}`}
                         title={b.name}
                         subtitle={[b.city, b.region].filter(Boolean).join(", ") || null}
                         fileSlug={b.slug}

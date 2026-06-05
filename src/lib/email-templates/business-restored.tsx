@@ -38,7 +38,7 @@ const BusinessRestored = ({ name, business_name, business_slug }: Props) => (
           {business_slug ? (
             <>
               :{" "}
-              <Link href={`https://365motorsales.com/businesses/${business_slug}`}>
+              <Link href={`https://www.365motorsales.com/businesses/${business_slug}`}>
                 View it here
               </Link>
             </>

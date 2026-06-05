@@ -24,6 +24,7 @@ import { SIGNUP_TYPES, type SignupIntent } from "@/components/signup/account-typ
 import { LocationPicker, type LocationValue } from "@/components/location-picker";
 import { PhoneInput } from "@/components/phone-input";
 import { buildE164 } from "@/data/country-codes";
+import { siteOrigin } from "@/lib/site-config";
 
 type SignupSearch = { type?: SignupIntent };
 
@@ -268,7 +269,7 @@ function SignupPage() {
           referral_code: refCode || undefined,
           signup_intent: intent,
         },
-        emailRedirectTo: `${window.location.origin}/verify-email?intent=${intent}`,
+        emailRedirectTo: `${siteOrigin()}/verify-email?intent=${intent}`,
       },
     });
     setSubmitting(false);
@@ -301,7 +302,7 @@ function SignupPage() {
     }
     stashPendingProfile();
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      redirect_uri: siteOrigin(),
     });
     if (result.error) {
       toast.error("Could not sign up with Google");

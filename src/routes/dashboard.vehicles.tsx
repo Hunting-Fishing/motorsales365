@@ -479,7 +479,7 @@ function VehicleDetailDialog({
                     </Link>
                   </Button>
                   <PassportShareSection
-                    url={`https://365motorsales.com/passport/${data.vehicle.passport_slug}`}
+                    url={`https://www.365motorsales.com/passport/${data.vehicle.passport_slug}`}
                     vehicleName={
                       data.vehicle.nickname ||
                       `${data.vehicle.year ? data.vehicle.year + " " : ""}${data.vehicle.make} ${data.vehicle.model}`

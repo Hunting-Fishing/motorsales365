@@ -23,7 +23,7 @@ export const Route = createFileRoute("/businesses/$slug/book")({
       { title: "Book an appointment — 365 MotorSales Philippines" },
       { name: "robots", content: "noindex" },
     ],
-    links: [{ rel: "canonical", href: `https://365motorsales.com/businesses/${params.slug}/book` }],
+    links: [{ rel: "canonical", href: `https://www.365motorsales.com/businesses/${params.slug}/book` }],
   }),
   component: BookingPage,
 });

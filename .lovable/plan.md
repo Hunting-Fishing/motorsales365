@@ -1,66 +1,79 @@
 ## Goal
-Add an admin page at `/admin/sales-reps` to manage Sales Reps, their territories (regions/provinces/cities), and which businesses/users are assigned to them. Wires into existing `sales-rep.functions.ts` admin server fns.
 
-## Route & access
-- File: `src/routes/admin.sales-reps.tsx`
-- Inherits the `/admin` layout gate (admin/sales roles). Visible only to `admin`.
-- Add nav entry in `src/routes/admin.tsx` (roles: `["admin"]`) labeled "Sales Reps".
+Every link that leaves the app (auth email, password reset, referral, invite, QR code, share image, sitemap, OG tag) must point at **`https://www.365motorsales.com`** — never the `*.lovableproject.com` preview host. Right now seven auth calls and several share/invite links use bare `window.location.origin`, so anything you do while previewing inside Lovable bakes the preview URL into emails, QR codes, and DB rows.
 
-## Page layout (Tabs)
+The site is already published at `www.365motorsales.com` and `365motorsales.com`. This change only affects how URLs are *constructed* in the app — no DNS, no domain changes.
 
-**Tab 1 — Reps**
-- Table of all users with `sales` role (uses `adminListReps`): avatar, name, email, title, # active assignments, # territories, accepting new clients toggle, last activity.
-- Row click → opens Rep Detail drawer.
+---
 
-**Tab 2 — Assignments**
-- Filters: rep, source (referral/manual/territory), subject_type (user/business), search.
-- Table: subject (user or business name + link), rep, source, assigned_at, assigned_by, active.
-- Row actions: Reassign (rep picker → `adminAssignRep`), Unassign (`adminUnassign`).
-- Bulk action: "Auto-assign by territory" button → confirm modal → `adminBulkAssignByTerritory` (shows count assigned).
+## Step 1 — Add a single source of truth for the canonical site URL
 
-**Tab 3 — Territories**
-- Grouped by rep. For each rep: list of (region, province, city, primary) chips with remove (×).
-- "Add territory" inline form per rep: region select (PH regions list), optional province, optional city, primary checkbox → `addMyTerritory` admin variant (add `adminAddTerritory` / `adminRemoveTerritory` thin wrappers in `sales-rep.functions.ts`).
+New file `src/lib/site-config.ts` exporting:
 
-## Rep Detail drawer (right-side Sheet)
-Sections:
-1. **Profile** — title, bio, public_phone, public_email, photo override, accepting_new_clients. Save → `adminSaveRepProfile` (new wrapper).
-2. **Territories** — same chips + add form as Tab 3, scoped to this rep.
-3. **Assignments** — table of accounts owned by this rep, with Reassign/Unassign.
-4. **Stats** — KPI cards: total referrals, signups (30d), active businesses, redemption revenue (reads `getMyRepStats` w/ admin override → add `adminGetRepStats`).
+- `CANONICAL_HOSTS = ["www.365motorsales.com", "365motorsales.com"]`
+- `SITE_URL = "https://www.365motorsales.com"` (primary)
+- `siteOrigin()` — returns `window.location.origin` only when the hostname is in `CANONICAL_HOSTS`; otherwise returns `SITE_URL`. Use this anywhere a runtime origin is needed.
+- `siteUrl(path)` — convenience: `${siteOrigin()}${path}`.
 
-## "Stores / Locations / Business Rep" handling
-Treat businesses as one subject type in `sales_rep_assignments` (`subject_type='business'`). The Assignments tab and Rep Detail show businesses alongside users. No new tables — multi-location stores are already separate rows in `businesses`.
+This replaces every ad-hoc `window.location.origin || "https://365motorsales.com"` pattern with one helper that ignores `lovableproject.com`, `lovable.app`, `localhost`, and sandbox hosts.
 
-## New server fn wrappers (added to `src/lib/sales-rep.functions.ts`)
-- `adminAddTerritory({ rep_user_id, region, province?, city?, is_primary })`
-- `adminRemoveTerritory({ id })`
-- `adminListTerritories({ rep_user_id? })`
-- `adminSaveRepProfile({ rep_user_id, ...fields })`
-- `adminGetRepStats({ rep_user_id })`
-- `adminListAssignments({ rep_user_id?, source?, subject_type?, search? })`
+## Step 2 — Fix the seven auth flows (the real source of "lovable" leaking into emails)
 
-Each gated by `requireSupabaseAuth` + an inline `has_role('admin')` check (pattern already in file).
+Replace `window.location.origin` with `siteOrigin()` in:
 
-## Components
-- `src/components/admin/sales-reps/RepsTable.tsx`
-- `src/components/admin/sales-reps/AssignmentsTable.tsx`
-- `src/components/admin/sales-reps/TerritoriesPanel.tsx`
-- `src/components/admin/sales-reps/RepDetailSheet.tsx`
-- `src/components/admin/sales-reps/AssignRepDialog.tsx` (rep combobox)
-- `src/lib/ph-regions.ts` — static list of PH regions for selects (already may exist; reuse if so).
+- `src/routes/signup.tsx` — `emailRedirectTo` on signUp and `redirect_uri` on Google OAuth
+- `src/routes/verify-email.tsx` — `emailRedirectTo` on resend OTP
+- `src/routes/forgot-password.tsx` — `redirectTo` on `resetPasswordForEmail`
+- `src/routes/reset-password.tsx` — `redirectTo` on `updateUser`
+- `src/routes/login.tsx` — `redirect_uri` on Google OAuth
+- `src/routes/dashboard.profile.tsx` — `emailRedirectTo` on email-change
 
-## Data fetching
-- TanStack Query: one query per tab keyed by filters. `queryClient.invalidateQueries` after mutations.
-- Mutations via `useMutation` + `useServerFn`, toast on success/error.
+Result: every confirmation, reset, magic-link, and OAuth callback email goes back to `www.365motorsales.com/...` even if the action was triggered while previewing in Lovable.
 
-## Out of scope
-- Editing the rep's user account itself (email/password) — handled in `/admin/staff-365`.
-- Customer-facing rep card and rep dashboard (Phases 3 & 4).
-- Followups admin view.
+## Step 3 — Fix share / invite / QR / poster links
 
-## Phasing
-1. Add server fn wrappers.
-2. Build route + tabs + tables (read-only).
-3. Wire mutations (assign/unassign/territory CRUD/profile save).
-4. Add nav entry and verify admin-only visibility.
+Swap bare `window.location.origin` for `siteOrigin()` in:
+
+- `src/routes/dashboard.referral.tsx`, `dashboard.share-kit.tsx`, `admin.referrals.tsx`, `my-qr.tsx`, `r.$code.poster.tsx`
+- `src/components/listing-qr.tsx` (QR encodes the listing URL)
+- `src/routes/dashboard.team.members.tsx` (invite-token link copied to clipboard)
+- `src/routes/listing.$id.tsx` (WhatsApp share)
+- `src/routes/advertise.tsx` (`source_url` saved with lead)
+- `src/routes/r.$code.tsx` (`_landing` sent with referral tracking)
+
+After this, a staff member previewing the app, copying their referral link, or generating a QR poster always gets `https://www.365motorsales.com/r/...` — never `lovableproject.com`.
+
+## Step 4 — Unify SEO / canonical / sitemap on the same host
+
+Inconsistency today: `__root.tsx`, `sitemap.xml`, and Stripe use `www.`; `robots.txt`, `llms.txt`, many route `canonical`/`og:url` tags, and `organizations.functions.ts` use the apex. Pick **`www.`** as canonical (matches root layout, sitemap, and Stripe), then:
+
+- Import `SITE_URL` and replace the per-file hardcoded strings in: `sitemap[.]xml.ts`, `robots[.]txt.tsx`, `llms[.]txt.tsx`, `organizations.functions.ts`, `lib/email-templates/_styles.ts`.
+- Update the non-www canonical/og:url strings in: `rides.index.tsx`, `map.tsx`, `support.tsx` + four `support_.*.tsx`, `browse.$category.tsx`, `businesses.$slug.tsx`, `businesses.$slug.book.tsx`, `listing.$id.tsx`, `seller.$id.tsx`, `rides.$slug.tsx`, `shop.index.tsx`, `shop.categories.tsx`, `shop.brand.$slug.tsx`, `passport.$slug.tsx`, `privacy.tsx`, `terms.tsx`, `affiliate-disclosure.tsx`.
+- Fix the two email templates that bypass `SITE_URL`: `email-templates/business-archived.tsx` and `business-restored.tsx`.
+
+The apex (`365motorsales.com`) keeps working — Lovable already 301-redirects the non-primary domain to the primary — but every link we *generate* will use the canonical host so social cards, sitemap, and analytics don't double-count.
+
+## Step 5 — Configure Supabase auth Site URL & Redirect URLs
+
+In Lovable Cloud → Authentication → URL Configuration, set:
+
+- **Site URL**: `https://www.365motorsales.com`
+- **Additional Redirect URLs**: `https://365motorsales.com/**`, `https://www.365motorsales.com/**`, plus the existing preview entries so dev still works.
+
+This is what Supabase falls back to when `emailRedirectTo` is missing or filtered, and it's the final guarantee that auth emails can never contain a lovable URL. I'll prompt you to do this step in the Cloud dashboard once the code is in.
+
+---
+
+## Out of scope (not changing)
+
+- DNS, custom domain setup, SSL — already live.
+- Staff-email checks like `@365motorsales.com` (access control, not URLs).
+- Brand text inside share-kit SVG ads ("365motorsales.com" baked into the art) — that's a print mark, not a clickable URL, and it's already correct.
+- Lovable badge on the published site — toggled separately in publish settings if you want it hidden (Pro plan).
+
+## Technical details
+
+- `siteOrigin()` runs safely on SSR (no `window`) and on the client. Hostname check is case-insensitive and strips a trailing dot, so it tolerates `WWW.365motorsales.com.` too.
+- No new env vars — the canonical host is a code constant. If you later want preview/staging URLs, we add a `VITE_SITE_URL` override and `siteOrigin()` reads it; not needed today.
+- No database migration. No edge function redeploy unless we also touch `auth-email-hook` (we aren't in this pass).
+- Estimated ~25 files edited, no behavioural changes for end users — only the URL string changes.

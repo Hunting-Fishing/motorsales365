@@ -26,7 +26,7 @@ export const Route = createFileRoute("/rides/$slug")({
   },
   head: ({ params, loaderData }) => {
     const d: any = loaderData?.seo;
-    const url = `https://365motorsales.com/rides/${params.slug}`;
+    const url = `https://www.365motorsales.com/rides/${params.slug}`;
     if (!d) {
       return {
         meta: [{ title: "Ride — 365 MotorSales" }],

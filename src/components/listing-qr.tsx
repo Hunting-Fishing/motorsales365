@@ -14,6 +14,7 @@ import {
 import { BrandLogo } from "@/components/brand-logo";
 import logoSrc from "@/assets/logo-small.webp";
 import { formatPHP } from "@/lib/format";
+import { siteOrigin } from "@/lib/site-config";
 
 interface ListingQrProps {
   listingId: string;
@@ -32,7 +33,7 @@ interface ListingQrProps {
 function getListingUrl(id: string, baseUrl?: string) {
   const origin =
     baseUrl ??
-    (typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com");
+    siteOrigin();
   return `${origin.replace(/\/$/, "")}/listing/${id}`;
 }
 

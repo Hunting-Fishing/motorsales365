@@ -39,7 +39,7 @@ const BusinessArchived = ({ name, business_name, business_slug }: Props) => (
         </Text>
         <Text style={text}>
           You can restore it at any time from your dashboard:{" "}
-          <Link href="https://365motorsales.com/dashboard/businesses">My Businesses</Link>
+          <Link href="https://www.365motorsales.com/dashboard/businesses">My Businesses</Link>
           {business_slug ? ` (look for "${business_name}" and click Restore).` : "."}
         </Text>
         <Text style={footer}>If you didn't request this change, contact support right away.</Text>

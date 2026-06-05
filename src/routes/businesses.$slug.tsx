@@ -36,6 +36,7 @@ import {
 } from "@/components/business-page/public-sections";
 import { ShareButtons } from "@/components/business-page/share-buttons";
 import { useTrackBusinessEvent, useTrackPageView } from "@/lib/use-track-business-event";
+import { siteOrigin } from "@/lib/site-config";
 import {
   isStructuredHours,
   getStatus,
@@ -63,7 +64,7 @@ export const Route = createFileRoute("/businesses/$slug")({
   },
   head: ({ params, loaderData }) => {
     const b: any = loaderData?.seo;
-    const url = `https://365motorsales.com/businesses/${params.slug}`;
+    const url = `https://www.365motorsales.com/businesses/${params.slug}`;
     if (!b) {
       return {
         meta: [
@@ -354,12 +355,12 @@ function BusinessProfilePage() {
                       </Button>
                     )}
                     <ShareButtons
-                      url={`${typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com"}/businesses/${biz.slug}`}
+                      url={`${siteOrigin()}/businesses/${biz.slug}`}
                       title={biz.name}
                       onShare={(target) => track("share_click", { target })}
                     />
                     <ShareQr
-                      url={`${typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com"}/businesses/${biz.slug}`}
+                      url={`${siteOrigin()}/businesses/${biz.slug}`}
                       title={biz.name}
                       subtitle={location || null}
                       coverUrl={biz.cover_url || biz.logo_url || null}

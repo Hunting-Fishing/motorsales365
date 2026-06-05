@@ -65,7 +65,7 @@ export const Route = createFileRoute("/browse/$category")({
   validateSearch: searchSchema,
   head: ({ params }) => {
     const label = CATEGORY_LABEL[params.category] ?? "Listings";
-    const url = `https://365motorsales.com/browse/${params.category}`;
+    const url = `https://www.365motorsales.com/browse/${params.category}`;
     const title = `${label} for sale — 365 MotorSales Philippines`;
     const desc = `Browse ${label.toLowerCase()} for sale across the Philippines. Trusted private and business sellers on 365 MotorSales.`;
     return {
@@ -75,8 +75,8 @@ export const Route = createFileRoute("/browse/$category")({
         { property: "og:title", content: title },
         { property: "og:description", content: desc },
         { property: "og:url", content: url },
-        { property: "og:image", content: `https://365motorsales.com${ogBrowse}` },
-        { property: "twitter:image", content: `https://365motorsales.com${ogBrowse}` },
+        { property: "og:image", content: `https://www.365motorsales.com${ogBrowse}` },
+        { property: "twitter:image", content: `https://www.365motorsales.com${ogBrowse}` },
       ],
       links: [{ rel: "canonical", href: url }],
     };

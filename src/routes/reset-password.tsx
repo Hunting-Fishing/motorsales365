@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { SiteLayout } from "@/components/site-layout";
+import { siteOrigin } from "@/lib/site-config";
 
 export const Route = createFileRoute("/reset-password")({
   component: ResetPasswordPage,
@@ -58,7 +59,7 @@ function ResetPasswordPage() {
     e.preventDefault();
     setSubmitting(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${siteOrigin()}/reset-password`,
     });
     setSubmitting(false);
     if (error) {

@@ -36,7 +36,7 @@ export const Route = createFileRoute("/shop/brand/$slug")({
         },
         { property: "og:title", content: `${name} on 365 MotorSales` },
       ],
-      links: [{ rel: "canonical", href: `https://365motorsales.com/shop/brand/${params.slug}` }],
+      links: [{ rel: "canonical", href: `https://www.365motorsales.com/shop/brand/${params.slug}` }],
     };
   },
 });

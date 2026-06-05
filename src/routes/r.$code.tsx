@@ -6,6 +6,7 @@ import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { CheckCircle2, RotateCcw, Info } from "lucide-react";
+import { siteOrigin } from "@/lib/site-config";
 
 export const Route = createFileRoute("/r/$code")({
   head: () => ({
@@ -55,7 +56,7 @@ function ReferralLanding() {
         _code: code,
         _visitor_id: visitorId,
         _user_agent: ua,
-        _landing: window.location.href,
+        _landing: `${siteOrigin()}${window.location.pathname}${window.location.search}`,
       });
       if (error || !data?.ok) {
         setActive(false);

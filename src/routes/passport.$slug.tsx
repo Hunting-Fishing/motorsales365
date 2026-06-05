@@ -44,7 +44,7 @@ export const Route = createFileRoute("/passport/$slug")({
   },
   head: ({ loaderData, params }) => {
     const v = loaderData?.vehicle as any;
-    const url = `https://365motorsales.com/passport/${params.slug}`;
+    const url = `https://www.365motorsales.com/passport/${params.slug}`;
     if (!v) return { meta: [{ title: "Vehicle passport — 365 MotorSales" }] };
     const name = v.nickname || `${v.year ? v.year + " " : ""}${v.make} ${v.model}`;
     const title = `${name} — Vehicle passport | 365 MotorSales`;
@@ -92,7 +92,7 @@ function PassportPage() {
   const totalSpent = records.reduce((s: number, r: any) => s + Number(r.cost_php || 0), 0);
   const lastMileage = records.find((r: any) => r.mileage_km)?.mileage_km;
 
-  const fullUrl = `https://365motorsales.com/passport/${v.passport_slug}`;
+  const fullUrl = `https://www.365motorsales.com/passport/${v.passport_slug}`;
 
   return (
     <SiteLayout>
