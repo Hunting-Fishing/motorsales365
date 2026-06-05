@@ -760,7 +760,7 @@ function SellPage() {
               you.
             </p>
           </div>
-          <Button asChild variant="default" size="sm">
+          <Button asChild variant="default" size="sm" className="w-full sm:w-auto">
             <Link to="/sell/import">Import from Facebook</Link>
           </Button>
         </div>
