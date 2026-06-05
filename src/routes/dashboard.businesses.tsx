@@ -432,6 +432,11 @@ function MyBusinessesPage() {
                       Manage page
                     </Link>
                   </Button>
+                  <Button size="sm" variant="outline" asChild>
+                    <Link to="/dashboard/businesses_/$id/analytics" params={{ id: b.id }}>
+                      Analytics
+                    </Link>
+                  </Button>
                   {b.status === "active" && (
                     <>
                       <Button size="sm" variant="outline" onClick={() => setPlanTarget(b)}>
