@@ -381,6 +381,7 @@ function BrowsePage() {
 
         {/* Results */}
         <div>
+          <SponsoredCategorySlot categorySlug={params.category} className="mb-6" />
           <AdCarousel placement="browse_top" className="mb-6" />
           <div className="mb-4 text-sm text-muted-foreground">
             {loading ? "Loading…" : `${items.length} result${items.length === 1 ? "" : "s"}`}
