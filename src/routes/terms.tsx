@@ -251,17 +251,22 @@ function TermsPage() {
           </li>
         </ul>
 
-        <h2 className="mt-6 text-xl font-semibold">8. Fees, boosts &amp; subscriptions</h2>
+        <h2 className="mt-6 text-xl font-semibold">8. Fees, boosts, subscriptions &amp; advertising</h2>
         <p className="mt-2 text-muted-foreground">
           Posting and browsing listings is generally free. Certain optional features — including
-          listing boosts, business plans, premium directory placement, and advertising — require
-          payment. Current pricing is published on our{" "}
+          listing boosts, business plans, premium directory placement, and on-site advertising
+          (ad carousels and <strong>exclusive Sponsored Category Slots</strong>, where a single
+          advertiser pays to appear as the featured sponsor at the top of a browse category for
+          a defined period) — require payment. Sponsored content is always clearly labeled as
+          "Sponsor", "Sponsored", or "Ad" and never displaces organic listings or search results.
+          Current pricing is published on our{" "}
           <Link className="text-primary underline" to="/pricing">
             Pricing page
           </Link>{" "}
-          and is quoted in ₱ inclusive of VAT where applicable. Subscriptions renew automatically
-          until you cancel from your dashboard; cancellation stops future renewals but does not
-          entitle you to a refund of the current billing period except as provided in our{" "}
+          and is quoted in ₱ inclusive of VAT where applicable. Subscriptions and sponsorship
+          terms renew automatically until you cancel from your dashboard; cancellation stops
+          future renewals but does not entitle you to a refund of the current billing period
+          except as provided in our{" "}
           <Link className="text-primary underline" to="/refund-policy">
             Refund Policy
           </Link>{" "}
