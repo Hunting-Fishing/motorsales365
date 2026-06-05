@@ -18,9 +18,36 @@ function ResetPasswordPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && window.location.hash.includes("type=recovery")) {
+    if (typeof window === "undefined") return;
+
+    const url = new URL(window.location.href);
+    const hash = window.location.hash || "";
+    const code = url.searchParams.get("code");
+    const errorDesc =
+      url.searchParams.get("error_description") ||
+      hash.match(/error_description=([^&]+)/)?.[1];
+
+    if (errorDesc) {
+      toast.error(decodeURIComponent(errorDesc).replace(/\+/g, " "));
+    }
+
+    // PKCE flow: ?code=... → exchange for a session, then show set-password form
+    if (code) {
+      supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+        if (error) {
+          toast.error(error.message);
+          return;
+        }
+        setMode("set");
+        window.history.replaceState({}, "", "/reset-password");
+      });
+    }
+
+    // Implicit/hash flow: #access_token=...&type=recovery
+    if (hash.includes("type=recovery") || hash.includes("access_token")) {
       setMode("set");
     }
+
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event === "PASSWORD_RECOVERY") setMode("set");
     });
