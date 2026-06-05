@@ -1,78 +1,90 @@
-## Sales area audit + restructure
+# Sales Rep System for 365 Motor Sales Staff
 
-### Findings (current state)
+Turn Joan and other `sales`-role staff into proper Sales Reps with territories, an assigned book of business, a CRM-style dashboard, and a customer-facing rep card.
 
-Sidebar entries visible to `sales` role today: Overview, Accounts, Analytics, Advertising (❌ not granted), Affiliate Shop, Staff QR Referrals, Referral Redemptions, Listings (❌), Audit log (❌), Reports, Service inquiries.
+## Data model (new tables)
 
-Issues:
-- Joan (sales) cannot see `/admin/advertising` — route is gated to `admin` + `advertising` only.
-- Promotions/discounts have a DB table (`promotions` — 7 cols, code-based) and `staff_promotions` (personal staff coupons) but **no admin UI** to create/manage either.
-- `Reports` page is empty stub.
-- `Staff QR Referrals` + `Referral Redemptions` are two clicks for one workflow.
-- `Audit log` + `Reports` + `Service inquiries` are three separate "incoming activity" inboxes.
-- Role model is flat (`sales`, `admin`, etc.) — no junior/senior/manager distinction, so we can't give Joan more without giving every sales user the same.
+```text
+sales_rep_profiles       one row per staff sales rep
+  user_id (FK profiles, unique)        active, title, bio
+  photo override, public email/phone   accepting_new_clients flag
 
-### Plan
+sales_rep_territories    rep's coverage
+  rep_user_id, region, province, city  (city/province nullable = whole region)
+  is_primary
 
-**1. Tiered staff roles**
-- Extend `app_role` enum: add `sales_junior`, `sales_senior`, `sales_manager` (keep legacy `sales` as alias of senior for back-compat).
-- Update `useAuth` to expose `salesTier` + helpers `canManageAds`, `canCreatePromotions`, `canIssueDiscounts`.
-- Capability matrix:
+sales_rep_assignments    who Joan owns
+  rep_user_id
+  subject_type ('user' | 'business')
+  subject_id (uuid)
+  source ('referral' | 'manual' | 'territory' | 'customer_choice')
+  assigned_at, assigned_by, notes
+  active                               unique(subject_type, subject_id) where active
 
-  ```text
-  capability          junior  senior  manager
-  view advertising      ✓       ✓       ✓
-  manage advertising    —       ✓       ✓
-  create promotions     —       ✓       ✓
-  issue discounts       —       —       ✓   (also senior with manager approval flag later)
-  ```
+sales_rep_followups      per-customer follow-up log (the "Other" answer)
+  rep_user_id, subject_type, subject_id
+  kind ('note'|'call'|'email'|'sms'|'meeting'|'request')
+  status ('open'|'done'|'snoozed')
+  title, body, due_at, completed_at, created_at
+```
 
-- Assign Joan `sales_manager` via migration (one-shot for jordilwbailey@gmail.com to set, plus admin UI in `/admin/users` role dropdown).
+RLS:
+- Rep sees own rows; admins see all.
+- Customers can SELECT their assigned rep's public card (via security-definer fn returning safe columns only — no internal notes).
+- Reassignment writes audit row in `admin_audit_log`.
 
-**2. Advertising access for Joan**
-- Add `sales_senior` + `sales_manager` to `roles` array of the `/admin/advertising` nav entry and the route's role gate.
-- Server fns under `src/lib/ads.functions.ts`: replace `isAdmin || isAdvertising` checks with a `canManageAds` helper that also accepts the new tiers.
+Auto-assignment (DB triggers + server fn):
+1. **Referral** — on `user_referrals` insert, if `referred_by_staff_id` maps to a `sales` rep, create assignment (source=`referral`).
+2. **Manual** — admin UI writes directly.
+3. **Territory** — server fn `assignRepByTerritory(subject)` runs on profile/business save when no active assignment exists; picks rep whose territory matches `region`+`city`, ties broken by lowest active load.
 
-**3. New "Promotions & Discounts" section**
-- Route: `src/routes/admin.promotions.tsx` with two tabs:
-  - **Promo codes** — CRUD on `public.promotions` (code, % off, applies_to, expiry, active).
-  - **Customer discounts** — issue one-off discount to a specific account (writes to existing `account_audit_log` + a new `customer_discounts` table: target user/business, kind, value, reason, expires_at, issued_by).
-- Server fns in new `src/lib/promotions.functions.ts` (`listPromotions`, `upsertPromotion`, `deletePromotion`, `issueCustomerDiscount`, `listIssuedDiscounts`) — all gated by `canCreatePromotions` / `canIssueDiscounts`.
-- Nav entry gated to `admin`, `sales_senior`, `sales_manager`.
+## Server functions (`src/lib/sales-rep.functions.ts`)
 
-**4. Sidebar merges**
-- **Referrals** (new `/admin/referrals` shell with tabs):
-  - Tab "Staff QR codes" → existing `/admin/referrals` content.
-  - Tab "Redemptions" → existing `/admin/redemptions` content.
-  - Keep old URLs as redirects.
-- **Activity** (new `/admin/activity` shell with tabs):
-  - "Reports" · "Service inquiries" · "Audit log".
-  - Old URLs redirect into the matching tab via search param `?tab=`.
-- Remove the three old top-level entries, replace with two consolidated entries.
+- `getMyRepProfile` / `saveMyRepProfile` (rep self-service)
+- `listMyTerritories` / `upsertMyTerritory` / `removeMyTerritory`
+- `listMyAssignments({ type, q, page })` — Joan's book of business
+- `getMyRepStats({ range })` — signups, conversions, revenue from `referral_redemptions`, QR scans, active leads
+- `listMyFollowups({ status })` / `createFollowup` / `updateFollowup` / `completeFollowup`
+- `getAssignedRep({ subjectType, subjectId })` — used by customer rep card
+- Admin: `adminListReps`, `adminAssignRep`, `adminReassign`, `adminBulkAssignByTerritory`
 
-**5. Audit doc**
-- Write `docs/SALES_AUDIT.md` summarizing the findings above, the new role matrix, and the migration map (old route → new tab) so the team has a single reference.
+All protected with `requireSupabaseAuth`; admin variants gated by `has_role(uid,'admin')`.
 
-### Files
+## UI
 
-**Create**
-- `src/routes/admin.promotions.tsx`
-- `src/routes/admin.referrals.index.tsx` (tabbed shell — replaces current `admin.referrals.tsx` flat page)
-- `src/routes/admin.activity.tsx` (tabbed shell)
-- `src/lib/promotions.functions.ts`
-- `src/hooks/use-auth.tsx` additions (helpers)
-- `docs/SALES_AUDIT.md`
-- Migration: enum extension + `customer_discounts` table (+ GRANTs + RLS + `has_sales_tier` SQL helper) + Joan role grant.
+### Rep (Joan) — new section under `/dashboard`
+- `dashboard.rep.tsx` — overview: KPIs (signups this month, active accounts, open follow-ups, commissions), recent activity
+- `dashboard.rep.accounts.tsx` — assigned users + businesses, filters (status, region, source), row → drawer with profile, contact, follow-ups, message thread
+- `dashboard.rep.followups.tsx` — kanban/list: Open / Snoozed / Done, due-date sorting, quick-add
+- `dashboard.rep.territories.tsx` — multi-select regions + (optional) provinces/cities
+- `dashboard.rep.analytics.tsx` — date-range chart: signups, conversions, redemptions, QR scans
 
-**Edit**
-- `src/routes/admin.tsx` (NAV array: add promotions, replace referral pair + activity trio, update role gates).
-- `src/routes/admin.advertising.tsx` (role gate).
-- `src/lib/ads.functions.ts` (auth checks → `canManageAds`).
-- `src/components/admin/*` any role checks referencing `isSales`/`isAdvertising`.
+### Admin — `/admin/sales-reps`
+- List reps with active accounts count, territories, last activity
+- Drawer: edit profile, territories, assign accounts, deactivate
+- Bulk territory backfill button
 
-### Technical notes
+### Customer-facing rep card
+- Component `RepCard` (photo, name, title, "Your 365 rep", Message + Email + Call buttons)
+- Render on `/dashboard` overview and on the owner's business page header (owner view only)
+- Uses `getAssignedRep` server fn
 
-- Tier helpers derive from `user_roles` rows; manager implies senior implies junior for permission checks (computed in `useAuth`, plus a `has_sales_tier(_user_id, _min_tier)` SQL function for RLS).
-- `customer_discounts` RLS: insert/select for `sales_manager` + `admin`; target user can SELECT their own.
-- All new server fns use `requireSupabaseAuth` + tier check; admin-elevated writes (e.g. issuing discount on someone else's account) go through `supabaseAdmin` after the tier check passes.
-- Old route files become 1-line `<Navigate>` shims so existing bookmarks keep working.
+## Wiring existing data
+
+- `staff_referrals` already keyed to `staff_user_id` — preserved; on first redemption or signup, auto-create `sales_rep_assignments` row.
+- `leads` already org-scoped — leave as-is, but `sales_rep_followups` is rep-scoped per assigned account (different concept).
+- `messages` reused for rep ↔ customer chat (rep card "Message" opens existing thread UI).
+
+## Out of scope (for this pass)
+- Commission/payout calculations beyond reading existing `referral_redemptions` totals.
+- Customer-initiated rep reassignment (you picked "show card", not "let them switch").
+- Cross-rep handoff workflow.
+
+## Phasing
+1. Migration: tables + RLS + triggers + indexes.
+2. Server functions + admin assignment UI.
+3. Rep dashboard pages (accounts, follow-ups, territories, analytics).
+4. Customer-facing RepCard on dashboard + business page.
+5. Backfill: assign Joan's existing referrals + offer admin bulk-by-territory.
+
+Approve and I'll start with Phase 1 (migration).
