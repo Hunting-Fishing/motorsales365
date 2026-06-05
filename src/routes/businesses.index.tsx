@@ -150,6 +150,21 @@ function BusinessesIndex() {
 
       setItems(filtered);
       setLoading(false);
+
+      // Resolve verified-owner badges for visible rows
+      const ownerIds = Array.from(
+        new Set(filtered.map((r) => r.owner_id).filter((v): v is string => !!v)),
+      );
+      if (ownerIds.length) {
+        try {
+          const res = await getVerifiedOwnerIds({ data: { ownerIds } });
+          setVerifiedOwners(new Set(res.verifiedOwnerIds));
+        } catch {
+          setVerifiedOwners(new Set());
+        }
+      } else {
+        setVerifiedOwners(new Set());
+      }
     })();
   }, [q, typeSlug, selectedTags, loc.region, loc.province, loc.city, loc.barangay]);
 
