@@ -20,6 +20,7 @@ import {
   Users,
   GraduationCap,
   Share2,
+  Megaphone,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
