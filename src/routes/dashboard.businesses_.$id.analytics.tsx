@@ -17,7 +17,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { getBusinessAnalytics } from "@/lib/business-directory.functions";
 
-export const Route = createFileRoute("/_authenticated/dashboard/businesses_/$id/analytics")({
+export const Route = createFileRoute("/dashboard/businesses_/$id/analytics")({
   component: BusinessAnalyticsPage,
 });
 
