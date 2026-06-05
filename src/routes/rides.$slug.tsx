@@ -2,6 +2,7 @@ import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-ro
 import { useEffect, useState } from "react";
 import { Heart, MapPin, Pencil, Tag, Gauge, Settings, ExternalLink } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
+import { AffiliatePartsSection } from "@/components/affiliate-parts-section";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -400,6 +401,15 @@ function RideProfilePage() {
               </div>
             </section>
           )}
+
+          {/* Affiliate parts matched to this ride */}
+          <AffiliatePartsSection
+            make={ride.make}
+            model={ride.model}
+            year={ride.year ? Number(ride.year) : null}
+            vehicleId={ride.id}
+          />
+
 
           {/* Service log timeline */}
           {logs.length > 0 && (
