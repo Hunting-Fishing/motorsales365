@@ -1395,7 +1395,7 @@ function SellPage() {
                       video{remainingVideos !== 1 ? "s" : ""} remaining
                     </span>
                     {upgradeOptions.length > 0 && (
-                      <div className="ml-auto flex flex-wrap gap-2">
+                      <div className="flex w-full flex-wrap gap-2 sm:ml-auto sm:w-auto">
                         {upgradeOptions.map((tier) => {
                           const caps = tierCaps[tier];
                           const isBoost = tier === "upgraded";
@@ -1405,6 +1405,7 @@ function SellPage() {
                               type="button"
                               size="sm"
                               variant={isBoost ? "default" : "outline"}
+                              className="flex-1 sm:flex-none"
                               onMouseEnter={() => setPreviewPlan(tier)}
                               onMouseLeave={() => setPreviewPlan(null)}
                               onFocus={() => setPreviewPlan(tier)}
