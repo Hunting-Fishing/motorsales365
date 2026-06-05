@@ -36,6 +36,24 @@ export const getActiveAds = createServerFn({ method: "GET" })
     return { ads: rows ?? [] };
   });
 
+// PUBLIC: fetch the exclusive sponsor for a browse category (one banner per category)
+export const getCategorySponsor = createServerFn({ method: "GET" })
+  .inputValidator((input: { categorySlug: string }) =>
+    z.object({ categorySlug: categorySlugSchema }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { data: rows, error } = await (supabaseAdmin as any)
+      .from("active_ads_public")
+      .select("id, title, caption, image_url, target_url, placement, category_slug")
+      .eq("placement", "category_banner")
+      .eq("category_slug", data.categorySlug)
+      .order("priority", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(1);
+    if (error) throw new Error(error.message);
+    return { ad: (rows ?? [])[0] ?? null };
+  });
+
 // PUBLIC: fetch all currently-active ads across placements (for staff/internal views)
 export const getAllActiveAds = createServerFn({ method: "GET" })
   .handler(async () => {
