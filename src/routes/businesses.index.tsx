@@ -60,6 +60,7 @@ type BusinessRow = {
   featured: boolean;
   price_label: string | null;
   subscription_tier: "free" | "listed" | "featured" | "premium" | null;
+  owner_id: string | null;
 };
 
 function BusinessesIndex() {
