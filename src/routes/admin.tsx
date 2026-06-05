@@ -4,7 +4,6 @@ import {
   Settings,
   ListChecks,
   Users,
-  Users,
   CreditCard,
   ShieldCheck,
   Gauge,
