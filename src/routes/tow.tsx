@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { LocationPicker } from "@/components/location-picker";
+import { FeaturedTowProviders } from "@/components/tow/featured-tow-providers";
 
 const searchSchema = z.object({
   listing: z.string().optional(),
