@@ -21,6 +21,7 @@ type ChecklistItem = { label: string; done: boolean; required: boolean };
 
 function buildChecklist(profile: any, totpEnabled: boolean): ChecklistItem[] {
   const isBusiness = profile?.seller_type === "business" || profile?.seller_type === "dealer";
+  const isStaff = profile?.seller_type === "staff";
   const has = (v: any) => (typeof v === "string" ? v.trim().length > 0 : !!v);
   const items: ChecklistItem[] = [
     {
@@ -34,8 +35,12 @@ function buildChecklist(profile: any, totpEnabled: boolean): ChecklistItem[] {
       required: true,
     },
     { label: "Profile photo", done: has(profile?.avatar_url), required: false },
-    { label: "Two-factor authentication (authenticator app)", done: totpEnabled, required: false },
+    { label: "Two-factor authentication (authenticator app)", done: totpEnabled, required: !isStaff },
   ];
+  if (isStaff) {
+    // Staff don't need business fields; require 2FA instead.
+    items[items.length - 1].required = true;
+  }
   if (isBusiness) {
     items.push(
       { label: "Business name", done: has(profile?.business_name), required: true },
@@ -62,6 +67,7 @@ function ProfilePage() {
   const [profile, setProfile] = useState<any>(null);
   const [totpEnabled, setTotpEnabled] = useState(false);
   const [saving, setSaving] = useState(false);
+  const isStaffEmail = (user?.email ?? "").toLowerCase().endsWith("@365motorsales.com");
 
   // Profile phone (country + national)
   const [profilePhone, setProfilePhone] = useState<{ iso: string; national: string }>({
@@ -239,9 +245,9 @@ function ProfilePage() {
         <div>
           <Label className="mb-2 block">Default seller type</Label>
           <RadioGroup
-            value={profile.seller_type ?? "private"}
+            value={profile.seller_type ?? (isStaffEmail ? "staff" : "private")}
             onValueChange={(v) => setProfile({ ...profile, seller_type: v })}
-            className="grid gap-2 sm:grid-cols-2"
+            className={`grid gap-2 ${isStaffEmail ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}
           >
             <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-border p-3">
               <RadioGroupItem value="private" /> Private seller
@@ -249,7 +255,25 @@ function ProfilePage() {
             <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-border p-3">
               <RadioGroupItem value="business" /> Business seller
             </label>
+            {isStaffEmail && (
+              <label className="flex cursor-pointer items-center gap-2 rounded-lg border border-primary/50 bg-primary/5 p-3">
+                <RadioGroupItem value="staff" />
+                <span>
+                  365 Motor Sales staff
+                  <span className="ml-1 rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-primary">
+                    Team
+                  </span>
+                </span>
+              </label>
+            )}
           </RadioGroup>
+          {isStaffEmail && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              Detected a <code>@365motorsales.com</code> email — choose <strong>Staff</strong> if you're
+              on the team. You'll skip the private/business buyer-seller fields and use your team
+              permissions instead.
+            </p>
+          )}
         </div>
         {profile.seller_type === "business" && (
           <>
@@ -291,6 +315,15 @@ function ProfilePage() {
               />
             </div>
           </>
+        )}
+        {profile.seller_type === "staff" && (
+          <div className="rounded-lg border border-primary/30 bg-primary/5 p-4 text-sm">
+            <div className="font-medium text-foreground">Internal team account</div>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Your access to admin tools, promotions, advertising, and customer discounts is managed
+              from the Admin panel by an owner. You don't need to fill in business details here.
+            </p>
+          </div>
         )}
         <Button onClick={save} disabled={saving}>
           {saving ? "Saving…" : "Save profile"}
