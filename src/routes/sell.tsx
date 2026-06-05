@@ -720,7 +720,7 @@ function SellPage() {
         {paymentStatus && pendingListingId ? (
           <div
             role="alert"
-            className="mt-4 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-destructive/40 bg-destructive/5 p-4"
+            className="mt-4 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-destructive/40 bg-destructive/5 p-3 sm:p-4"
           >
             <div className="flex items-start gap-2">
               <AlertCircle className="mt-0.5 h-5 w-5 text-destructive" />
@@ -751,7 +751,7 @@ function SellPage() {
         ) : null}
 
 
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3 sm:p-4">
           <div>
             <div className="font-semibold">Already selling on Facebook Marketplace?</div>
             <p className="text-sm text-muted-foreground">
@@ -765,7 +765,7 @@ function SellPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-          <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
             <h2 className="font-display text-lg font-semibold">Category & basics</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
@@ -834,7 +834,7 @@ function SellPage() {
           </section>
 
           {SERVICE_CATEGORIES.has(category) && (
-            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+            <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
               <div>
                 <h2 className="font-display text-lg font-semibold">What do you offer?</h2>
                 <p className="text-xs text-muted-foreground">
@@ -849,7 +849,7 @@ function SellPage() {
             </section>
           )}
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
             <h2 className="font-display text-lg font-semibold">Details</h2>
             {category === "repair" || category === "bodyshop" || category === "salvage" ? (
               <div className="grid gap-4 sm:grid-cols-2">
@@ -1223,7 +1223,7 @@ function SellPage() {
             </div>
           </section>
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
             <h2 className="font-display text-lg font-semibold">Location</h2>
             <p className="text-xs text-muted-foreground">
               Based on the official PSA Philippine Standard Geographic Code.
@@ -1239,7 +1239,7 @@ function SellPage() {
             />
           </section>
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
             <h2 className="font-display text-lg font-semibold">Seller type</h2>
             <RadioGroup
               value={sellerType}
@@ -1265,7 +1265,7 @@ function SellPage() {
             </RadioGroup>
           </section>
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
             <h2 className="font-display text-lg font-semibold">Plan</h2>
             <RadioGroup
               value={plan}
@@ -1303,7 +1303,7 @@ function SellPage() {
             </RadioGroup>
           </section>
 
-          <section className="space-y-3 rounded-xl border border-border bg-card p-6">
+          <section className="space-y-3 rounded-xl border border-border bg-card p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <h2 className="font-display text-lg font-semibold">Add a boost (optional)</h2>
               {selectedBoost && (
@@ -1348,7 +1348,7 @@ function SellPage() {
           </section>
 
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
             <h2 className="font-display text-lg font-semibold">Photos & video</h2>
             {(() => {
               const tierCaps: Record<
@@ -1587,7 +1587,7 @@ function SellPage() {
             </div>
           </section>
 
-          <div className="flex flex-col items-stretch justify-between gap-3 rounded-xl border border-border bg-card p-6 sm:flex-row sm:items-center">
+          <div className="flex flex-col items-stretch justify-between gap-3 rounded-xl border border-border bg-card p-4 sm:p-6 sm:flex-row sm:items-center">
             <div>
               <div className="text-sm text-muted-foreground">Total listing fee</div>
               <div className="font-display text-2xl font-bold text-primary">
