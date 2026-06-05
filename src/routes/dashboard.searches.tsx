@@ -149,12 +149,3 @@ function SavedSearchesPage() {
     </div>
   );
 }
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
