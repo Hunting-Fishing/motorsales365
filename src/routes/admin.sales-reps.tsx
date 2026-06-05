@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, MapPin, Plus, Trash2, UserCog, X, Zap } from "lucide-react";
+import { Loader2, MapPin, Plus, Trash2, UserCog, X, Zap, History } from "lucide-react";
 import {
   adminListReps,
   adminListAssignments,
@@ -13,6 +13,7 @@ import {
   adminAddTerritory,
   adminRemoveTerritory,
   adminSaveRepProfile,
+  adminListAuditLog,
 } from "@/lib/sales-rep.functions";
 import { PSGC, regionLabel, provincesOf, citiesOf } from "@/lib/psgc";
 import { Button } from "@/components/ui/button";
