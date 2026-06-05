@@ -88,16 +88,28 @@ function StaffReferral() {
         .order("created_at", { ascending: false });
       setPromos((pr as Promo[]) || []);
 
-      try {
-        const res = await getAllActiveAds();
-        setAds((res?.ads as any[]) || []);
-      } catch {
-        setAds([]);
-      }
-
       setLoading(false);
     })();
   }, [user]);
+
+  const layoutsFn = useServerFn(listShareKitLayouts);
+  const { data: layouts } = useQuery({
+    queryKey: ["share-kit-layouts"],
+    queryFn: () => layoutsFn(),
+    enabled: !!user && !!staff,
+  });
+
+  const adContext = useMemo(() => {
+    if (!staff) return null;
+    const origin =
+      typeof window !== "undefined" ? window.location.origin : "https://365motorsales.com";
+    return {
+      name: staff.full_name,
+      firstName: staff.full_name.split(" ")[0] || staff.full_name,
+      code: staff.referral_code,
+      link: `${origin}/r/${staff.referral_code}`,
+    };
+  }, [staff]);
 
   useEffect(() => {
     if (!staff) return;
