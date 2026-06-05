@@ -34,8 +34,8 @@ const STATUS_TONE: Record<Status, string> = {
 };
 
 function AdminAdvertising() {
-  const { user, isAdmin, isAdvertising } = useAuth();
-  const hasAccess = isAdmin || isAdvertising;
+  const { user, canManageAds } = useAuth();
+  const hasAccess = canManageAds;
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [filter, setFilter] = useState<Status | "all">("new");
   const [mineOnly, setMineOnly] = useState(false);
