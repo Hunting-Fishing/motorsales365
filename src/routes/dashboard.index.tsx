@@ -248,6 +248,41 @@ function MyListings() {
         </Button>
       </div>
 
+      {(() => {
+        const now = Date.now();
+        const unboosted = listings.filter(
+          (l: any) =>
+            l.status === "active" &&
+            (!l.boost_until || new Date(l.boost_until).getTime() <= now),
+        );
+        if (unboosted.length === 0 || loading) return null;
+        return (
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border-2 border-dashed border-primary/30 bg-primary/5 p-4">
+            <div className="flex items-start gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                <Rocket className="h-4 w-4" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">
+                  Promote your {unboosted.length === 1 ? "listing" : `${unboosted.length} listings`}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Boosted listings appear at the top of search and category browse — get up to 5×
+                  more views.
+                </p>
+              </div>
+            </div>
+            <BoostDialog listingId={unboosted[0].id} listingTitle={unboosted[0].title}>
+              <Button size="sm">
+                <Rocket className="mr-1 h-4 w-4" /> Promote now
+              </Button>
+            </BoostDialog>
+          </div>
+        );
+      })()}
+
+
+
       {loading ? (
         <div className="p-8 text-center text-muted-foreground">Loading…</div>
       ) : listings.length === 0 ? (
