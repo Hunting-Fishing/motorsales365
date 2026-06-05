@@ -585,8 +585,24 @@ export const adminAddTerritory = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await requireAdmin(supabase, userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("sales_rep_territories").insert(data);
+    const { data: row, error } = await supabaseAdmin
+      .from("sales_rep_territories")
+      .insert(data)
+      .select("id")
+      .maybeSingle();
     if (error) throw new Error(error.message);
+    await supabaseAdmin.from("sales_rep_audit_log").insert({
+      actor_id: userId,
+      action: "territory_add",
+      rep_user_id: data.rep_user_id,
+      territory_id: row?.id ?? null,
+      details: {
+        region: data.region,
+        province: data.province ?? null,
+        city: data.city ?? null,
+        is_primary: !!data.is_primary,
+      },
+    });
     return { ok: true };
   });
 
@@ -597,11 +613,30 @@ export const adminRemoveTerritory = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await requireAdmin(supabase, userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row } = await supabaseAdmin
+      .from("sales_rep_territories")
+      .select("rep_user_id, region, province, city, is_primary")
+      .eq("id", data.id)
+      .maybeSingle();
     const { error } = await supabaseAdmin
       .from("sales_rep_territories")
       .delete()
       .eq("id", data.id);
     if (error) throw new Error(error.message);
+    await supabaseAdmin.from("sales_rep_audit_log").insert({
+      actor_id: userId,
+      action: "territory_remove",
+      rep_user_id: row?.rep_user_id ?? null,
+      territory_id: data.id,
+      details: row
+        ? {
+            region: row.region,
+            province: row.province,
+            city: row.city,
+            is_primary: row.is_primary,
+          }
+        : {},
+    });
     return { ok: true };
   });
 
