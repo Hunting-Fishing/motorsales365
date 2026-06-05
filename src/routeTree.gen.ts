@@ -54,6 +54,7 @@ import { Route as ShopCategoriesRouteImport } from './routes/shop.categories'
 import { Route as ShopCategoryRouteImport } from './routes/shop.$category'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
 import { Route as SellImportRouteImport } from './routes/sell.import'
+import { Route as SSlugRouteImport } from './routes/s.$slug'
 import { Route as RidesSlugRouteImport } from './routes/rides.$slug'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as PassportSlugRouteImport } from './routes/passport.$slug'
@@ -374,6 +375,11 @@ const SellImportRoute = SellImportRouteImport.update({
   id: '/import',
   path: '/import',
   getParentRoute: () => SellRoute,
+} as any)
+const SSlugRoute = SSlugRouteImport.update({
+  id: '/s/$slug',
+  path: '/s/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const RidesSlugRoute = RidesSlugRouteImport.update({
   id: '/rides/$slug',
@@ -954,6 +960,7 @@ export interface FileRoutesByFullPath {
   '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
+  '/s/$slug': typeof SSlugRoute
   '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
   '/shop/$category': typeof ShopCategoryRoute
@@ -1093,6 +1100,7 @@ export interface FileRoutesByTo {
   '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
+  '/s/$slug': typeof SSlugRoute
   '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
   '/shop/$category': typeof ShopCategoryRoute
@@ -1236,6 +1244,7 @@ export interface FileRoutesById {
   '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
+  '/s/$slug': typeof SSlugRoute
   '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
   '/shop/$category': typeof ShopCategoryRoute
@@ -1380,6 +1389,7 @@ export interface FileRouteTypes {
     | '/passport/$slug'
     | '/r/$code'
     | '/rides/$slug'
+    | '/s/$slug'
     | '/sell/import'
     | '/seller/$id'
     | '/shop/$category'
@@ -1519,6 +1529,7 @@ export interface FileRouteTypes {
     | '/passport/$slug'
     | '/r/$code'
     | '/rides/$slug'
+    | '/s/$slug'
     | '/sell/import'
     | '/seller/$id'
     | '/shop/$category'
@@ -1661,6 +1672,7 @@ export interface FileRouteTypes {
     | '/passport/$slug'
     | '/r/$code'
     | '/rides/$slug'
+    | '/s/$slug'
     | '/sell/import'
     | '/seller/$id'
     | '/shop/$category'
@@ -1761,6 +1773,7 @@ export interface RootRouteChildren {
   PassportSlugRoute: typeof PassportSlugRoute
   RCodeRoute: typeof RCodeRouteWithChildren
   RidesSlugRoute: typeof RidesSlugRoute
+  SSlugRoute: typeof SSlugRoute
   SellerIdRoute: typeof SellerIdRoute
   ShopCategoryRoute: typeof ShopCategoryRoute
   ShopCategoriesRoute: typeof ShopCategoriesRoute
@@ -2110,6 +2123,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/sell/import'
       preLoaderRoute: typeof SellImportRouteImport
       parentRoute: typeof SellRoute
+    }
+    '/s/$slug': {
+      id: '/s/$slug'
+      path: '/s/$slug'
+      fullPath: '/s/$slug'
+      preLoaderRoute: typeof SSlugRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/rides/$slug': {
       id: '/rides/$slug'
@@ -3023,6 +3043,7 @@ const rootRouteChildren: RootRouteChildren = {
   PassportSlugRoute: PassportSlugRoute,
   RCodeRoute: RCodeRouteWithChildren,
   RidesSlugRoute: RidesSlugRoute,
+  SSlugRoute: SSlugRoute,
   SellerIdRoute: SellerIdRoute,
   ShopCategoryRoute: ShopCategoryRoute,
   ShopCategoriesRoute: ShopCategoriesRoute,
