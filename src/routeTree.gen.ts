@@ -138,6 +138,7 @@ import { Route as LearnSlugWatchLessonIdRouteImport } from './routes/learn_.$slu
 import { Route as DashboardTeamLeadsIdRouteImport } from './routes/dashboard.team.leads_.$id'
 import { Route as DashboardRidesIdEditRouteImport } from './routes/dashboard.rides_.$id.edit'
 import { Route as DashboardBusinessesIdEditRouteImport } from './routes/dashboard.businesses_.$id.edit'
+import { Route as DashboardBusinessesIdAnalyticsRouteImport } from './routes/dashboard.businesses_.$id.analytics'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksRefreshLazadaRouteImport } from './routes/api/public/hooks/refresh-lazada'
 import { Route as ApiPublicHooksOpsAlertsDigestRouteImport } from './routes/api/public/hooks/ops-alerts-digest'
@@ -794,6 +795,12 @@ const DashboardBusinessesIdEditRoute =
     path: '/businesses/$id/edit',
     getParentRoute: () => DashboardRoute,
   } as any)
+const DashboardBusinessesIdAnalyticsRoute =
+  DashboardBusinessesIdAnalyticsRouteImport.update({
+    id: '/businesses_/$id/analytics',
+    path: '/businesses/$id/analytics',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -949,6 +956,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/dashboard/businesses/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
   '/dashboard/businesses/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
   '/dashboard/team/leads/$id': typeof DashboardTeamLeadsIdRoute
@@ -1082,6 +1090,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/dashboard/businesses/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
   '/dashboard/businesses/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
   '/dashboard/team/leads/$id': typeof DashboardTeamLeadsIdRoute
@@ -1219,6 +1228,7 @@ export interface FileRoutesById {
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/dashboard/businesses_/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
   '/dashboard/businesses_/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides_/$id/edit': typeof DashboardRidesIdEditRoute
   '/dashboard/team/leads_/$id': typeof DashboardTeamLeadsIdRoute
@@ -1357,6 +1367,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
+    | '/dashboard/businesses/$id/analytics'
     | '/dashboard/businesses/$id/edit'
     | '/dashboard/rides/$id/edit'
     | '/dashboard/team/leads/$id'
@@ -1490,6 +1501,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
+    | '/dashboard/businesses/$id/analytics'
     | '/dashboard/businesses/$id/edit'
     | '/dashboard/rides/$id/edit'
     | '/dashboard/team/leads/$id'
@@ -1626,6 +1638,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
+    | '/dashboard/businesses_/$id/analytics'
     | '/dashboard/businesses_/$id/edit'
     | '/dashboard/rides_/$id/edit'
     | '/dashboard/team/leads_/$id'
@@ -2624,6 +2637,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardBusinessesIdEditRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/businesses_/$id/analytics': {
+      id: '/dashboard/businesses_/$id/analytics'
+      path: '/businesses/$id/analytics'
+      fullPath: '/dashboard/businesses/$id/analytics'
+      preLoaderRoute: typeof DashboardBusinessesIdAnalyticsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -2761,6 +2781,7 @@ interface DashboardRouteChildren {
   DashboardVerificationRoute: typeof DashboardVerificationRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardRidesNewRoute: typeof DashboardRidesNewRoute
+  DashboardBusinessesIdAnalyticsRoute: typeof DashboardBusinessesIdAnalyticsRoute
   DashboardBusinessesIdEditRoute: typeof DashboardBusinessesIdEditRoute
   DashboardRidesIdEditRoute: typeof DashboardRidesIdEditRoute
 }
@@ -2784,6 +2805,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardVerificationRoute: DashboardVerificationRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardRidesNewRoute: DashboardRidesNewRoute,
+  DashboardBusinessesIdAnalyticsRoute: DashboardBusinessesIdAnalyticsRoute,
   DashboardBusinessesIdEditRoute: DashboardBusinessesIdEditRoute,
   DashboardRidesIdEditRoute: DashboardRidesIdEditRoute,
 }

@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import ogBusinesses from "@/assets/og/businesses.jpg";
 import { useEffect, useMemo, useState } from "react";
-import { Search, MapPin, Star, Store as StoreIcon, Plus } from "lucide-react";
+import { Search, MapPin, Star, Store as StoreIcon, Plus, BadgeCheck } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,8 @@ import { GoogleBusinessMap, type GMapBusiness } from "@/components/businesses/go
 import { MapFilterBar, type CenterPoint } from "@/components/businesses/map-filter-bar";
 import { haversineKm } from "@/components/businesses/google-maps-loader";
 import { LocationDrilldown, type LocationValue } from "@/components/businesses/location-drilldown";
+import { PremiumSponsorsRail } from "@/components/businesses/premium-sponsors-rail";
+import { getVerifiedOwnerIds } from "@/lib/business-directory.functions";
 
 export const Route = createFileRoute("/businesses/")({
     head: () => ({
@@ -58,6 +60,7 @@ type BusinessRow = {
   featured: boolean;
   price_label: string | null;
   subscription_tier: "free" | "listed" | "featured" | "premium" | null;
+  owner_id: string | null;
 };
 
 function BusinessesIndex() {
@@ -66,6 +69,7 @@ function BusinessesIndex() {
   const [tags, setTags] = useState<Tag[]>([]);
   const [items, setItems] = useState<BusinessRow[]>([]);
   const [tagLinks, setTagLinks] = useState<Record<string, string[]>>({});
+  const [verifiedOwners, setVerifiedOwners] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
   // filters
@@ -104,7 +108,7 @@ function BusinessesIndex() {
       let query = (supabase as any)
         .from("businesses")
         .select(
-          "id,slug,name,type_slug,description,logo_url,region,province,city,barangay,lat,lng,rating_avg,rating_count,featured,price_label,subscription_tier",
+          "id,slug,name,type_slug,description,logo_url,region,province,city,barangay,lat,lng,rating_avg,rating_count,featured,price_label,subscription_tier,owner_id",
         )
         .eq("status", "active")
         .order("subscription_tier", { ascending: false })
@@ -146,6 +150,21 @@ function BusinessesIndex() {
 
       setItems(filtered);
       setLoading(false);
+
+      // Resolve verified-owner badges for visible rows
+      const ownerIds = Array.from(
+        new Set(filtered.map((r) => r.owner_id).filter((v): v is string => !!v)),
+      );
+      if (ownerIds.length) {
+        try {
+          const res = await getVerifiedOwnerIds({ data: { ownerIds } });
+          setVerifiedOwners(new Set(res.verifiedOwnerIds));
+        } catch {
+          setVerifiedOwners(new Set());
+        }
+      } else {
+        setVerifiedOwners(new Set());
+      }
     })();
   }, [q, typeSlug, selectedTags, loc.region, loc.province, loc.city, loc.barangay]);
 
@@ -268,6 +287,8 @@ function BusinessesIndex() {
         </Card>
 
         {/* Results + Map */}
+        <PremiumSponsorsRail typeSlug={typeSlug} region={loc.region} className="mb-6" />
+
         <div className="grid gap-6 md:grid-cols-[1fr_1.2fr]">
           <div className="space-y-3">
             <div className="text-sm text-muted-foreground">
@@ -322,6 +343,14 @@ function BusinessesIndex() {
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
                             <h3 className="truncate font-semibold">{b.name}</h3>
+                            {b.owner_id && verifiedOwners.has(b.owner_id) && (
+                              <span
+                                title="Verified business"
+                                className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-sky-500/10 px-1.5 py-0.5 text-[10px] font-medium text-sky-600 dark:text-sky-400"
+                              >
+                                <BadgeCheck className="h-3 w-3" /> Verified
+                              </span>
+                            )}
                             {b.subscription_tier === "premium" && (
                               <Badge className="shrink-0 bg-amber-500 text-amber-950">
                                 Premium
