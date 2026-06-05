@@ -486,19 +486,61 @@ export function SiteHeader() {
                         </Link>
                       </SheetClose>
                     </div>
-                    {isAdmin && (
+                    {isStaff && (
                       <>
                         <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                          Admin
+                          {isAdmin ? "365 Staff" : "Sales Rep"}
                         </p>
-                        <SheetClose asChild>
-                          <Link
-                            to="/admin"
-                            className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
-                          >
-                            <Shield className="h-4 w-4" /> Admin console
-                          </Link>
-                        </SheetClose>
+                        <div className="flex flex-col gap-0.5">
+                          {isSales && (
+                            <>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/dashboard/team/leads"
+                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <Inbox className="h-4 w-4" /> My leads
+                                </Link>
+                              </SheetClose>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/dashboard/referral"
+                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <Briefcase className="h-4 w-4" /> My referrals
+                                </Link>
+                              </SheetClose>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/dashboard/team/performance"
+                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <BarChart3 className="h-4 w-4" /> Performance
+                                </Link>
+                              </SheetClose>
+                            </>
+                          )}
+                          {isAdmin && (
+                            <>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/admin/sales-reps"
+                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <Users className="h-4 w-4" /> Manage sales reps
+                                </Link>
+                              </SheetClose>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/admin"
+                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <Shield className="h-4 w-4" /> Admin console
+                                </Link>
+                              </SheetClose>
+                            </>
+                          )}
+                        </div>
                       </>
                     )}
                   </>
