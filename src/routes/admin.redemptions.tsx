@@ -204,6 +204,7 @@ function AdminRedemptions() {
 
   return (
     <div className="space-y-6">
+      <AdminGroupTabs title="Referrals" tabs={REFERRALS_TABS} />
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="font-display text-2xl font-bold">Referral redemptions</h1>

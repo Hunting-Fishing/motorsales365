@@ -145,6 +145,7 @@ function UserActionsTab() {
 
   return (
     <div>
+      <AdminGroupTabs title="Activity" tabs={ACTIVITY_TABS} />
       <p className="mb-4 text-sm text-muted-foreground">
         Every role grant/revoke and verification status change made through the admin panel is
         recorded here with a timestamp and actor.
