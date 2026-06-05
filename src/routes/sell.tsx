@@ -713,14 +713,14 @@ function SellPage() {
 
   return (
     <SiteLayout>
-      <div className="container mx-auto max-w-3xl px-4 py-10">
-        <h1 className="font-display text-3xl font-bold">Post a listing</h1>
-        <p className="text-muted-foreground">Reach buyers across the Philippines.</p>
+      <div className="container mx-auto max-w-3xl px-4 py-6 sm:py-10">
+        <h1 className="font-display text-2xl sm:text-3xl font-bold">Post a listing</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">Reach buyers across the Philippines.</p>
 
         {paymentStatus && pendingListingId ? (
           <div
             role="alert"
-            className="mt-4 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-destructive/40 bg-destructive/5 p-4"
+            className="mt-4 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-destructive/40 bg-destructive/5 p-3 sm:p-4"
           >
             <div className="flex items-start gap-2">
               <AlertCircle className="mt-0.5 h-5 w-5 text-destructive" />
@@ -738,6 +738,7 @@ function SellPage() {
             </div>
             <Button
               size="sm"
+              className="w-full sm:w-auto"
               onClick={() =>
                 navigate({
                   to: "/listing/checkout",
@@ -751,7 +752,7 @@ function SellPage() {
         ) : null}
 
 
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4">
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3 sm:p-4">
           <div>
             <div className="font-semibold">Already selling on Facebook Marketplace?</div>
             <p className="text-sm text-muted-foreground">
@@ -759,13 +760,13 @@ function SellPage() {
               you.
             </p>
           </div>
-          <Button asChild variant="default" size="sm">
+          <Button asChild variant="default" size="sm" className="w-full sm:w-auto">
             <Link to="/sell/import">Import from Facebook</Link>
           </Button>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-          <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
             <h2 className="font-display text-lg font-semibold">Category & basics</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
@@ -834,7 +835,7 @@ function SellPage() {
           </section>
 
           {SERVICE_CATEGORIES.has(category) && (
-            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+            <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
               <div>
                 <h2 className="font-display text-lg font-semibold">What do you offer?</h2>
                 <p className="text-xs text-muted-foreground">
@@ -849,7 +850,7 @@ function SellPage() {
             </section>
           )}
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
             <h2 className="font-display text-lg font-semibold">Details</h2>
             {category === "repair" || category === "bodyshop" || category === "salvage" ? (
               <div className="grid gap-4 sm:grid-cols-2">
@@ -1223,7 +1224,7 @@ function SellPage() {
             </div>
           </section>
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
             <h2 className="font-display text-lg font-semibold">Location</h2>
             <p className="text-xs text-muted-foreground">
               Based on the official PSA Philippine Standard Geographic Code.
@@ -1239,7 +1240,7 @@ function SellPage() {
             />
           </section>
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
             <h2 className="font-display text-lg font-semibold">Seller type</h2>
             <RadioGroup
               value={sellerType}
@@ -1265,7 +1266,7 @@ function SellPage() {
             </RadioGroup>
           </section>
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
             <h2 className="font-display text-lg font-semibold">Plan</h2>
             <RadioGroup
               value={plan}
@@ -1303,7 +1304,7 @@ function SellPage() {
             </RadioGroup>
           </section>
 
-          <section className="space-y-3 rounded-xl border border-border bg-card p-6">
+          <section className="space-y-3 rounded-xl border border-border bg-card p-4 sm:p-6">
             <div className="flex items-center justify-between">
               <h2 className="font-display text-lg font-semibold">Add a boost (optional)</h2>
               {selectedBoost && (
@@ -1348,7 +1349,7 @@ function SellPage() {
           </section>
 
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-6">
+          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
             <h2 className="font-display text-lg font-semibold">Photos & video</h2>
             {(() => {
               const tierCaps: Record<
@@ -1395,7 +1396,7 @@ function SellPage() {
                       video{remainingVideos !== 1 ? "s" : ""} remaining
                     </span>
                     {upgradeOptions.length > 0 && (
-                      <div className="ml-auto flex flex-wrap gap-2">
+                      <div className="flex w-full flex-wrap gap-2 sm:ml-auto sm:w-auto">
                         {upgradeOptions.map((tier) => {
                           const caps = tierCaps[tier];
                           const isBoost = tier === "upgraded";
@@ -1405,6 +1406,7 @@ function SellPage() {
                               type="button"
                               size="sm"
                               variant={isBoost ? "default" : "outline"}
+                              className="flex-1 sm:flex-none"
                               onMouseEnter={() => setPreviewPlan(tier)}
                               onMouseLeave={() => setPreviewPlan(null)}
                               onFocus={() => setPreviewPlan(tier)}
@@ -1587,7 +1589,7 @@ function SellPage() {
             </div>
           </section>
 
-          <div className="flex flex-col items-stretch justify-between gap-3 rounded-xl border border-border bg-card p-6 sm:flex-row sm:items-center">
+          <div className="flex flex-col items-stretch justify-between gap-3 rounded-xl border border-border bg-card p-4 sm:p-6 sm:flex-row sm:items-center">
             <div>
               <div className="text-sm text-muted-foreground">Total listing fee</div>
               <div className="font-display text-2xl font-bold text-primary">
@@ -1597,11 +1599,11 @@ function SellPage() {
                 Listing publishes after payment is confirmed.
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button asChild type="button" variant="outline">
+            <div className="flex flex-col-reverse gap-2 sm:flex-row">
+              <Button asChild type="button" variant="outline" className="w-full sm:w-auto">
                 <Link to="/dashboard">Cancel</Link>
               </Button>
-              <Button type="submit" disabled={submitting} size="lg">
+              <Button type="submit" disabled={submitting} size="lg" className="w-full sm:w-auto">
                 {submitting ? "Submitting…" : "Submit listing"}
               </Button>
             </div>
