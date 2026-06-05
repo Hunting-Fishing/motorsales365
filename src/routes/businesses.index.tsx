@@ -69,6 +69,7 @@ function BusinessesIndex() {
   const [tags, setTags] = useState<Tag[]>([]);
   const [items, setItems] = useState<BusinessRow[]>([]);
   const [tagLinks, setTagLinks] = useState<Record<string, string[]>>({});
+  const [verifiedOwners, setVerifiedOwners] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
   // filters
