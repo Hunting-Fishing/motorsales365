@@ -34,6 +34,20 @@ export const getActiveAds = createServerFn({ method: "GET" })
     return { ads: rows ?? [] };
   });
 
+// PUBLIC: fetch all currently-active ads across placements (for staff/internal views)
+export const getAllActiveAds = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const { data: rows, error } = await (supabaseAdmin as any)
+      .from("active_ads_public")
+      .select("id, title, caption, image_url, target_url, placement")
+      .order("placement", { ascending: true })
+      .order("priority", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (error) throw new Error(error.message);
+    return { ads: rows ?? [] };
+  });
+
 // PUBLIC: track ad impression / click
 export const trackAdEvent = createServerFn({ method: "POST" })
   .inputValidator((input: { adId: string; eventType: "impression" | "click"; visitorId?: string }) =>
