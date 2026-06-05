@@ -5852,7 +5852,7 @@ export type Database = {
         | "utv"
         | "boat"
         | "other"
-      seller_type: "private" | "business"
+      seller_type: "private" | "business" | "staff"
       service_inquiry_status:
         | "new"
         | "contacted"
@@ -6127,7 +6127,7 @@ export const Constants = {
         "boat",
         "other",
       ],
-      seller_type: ["private", "business"],
+      seller_type: ["private", "business", "staff"],
       service_inquiry_status: [
         "new",
         "contacted",
