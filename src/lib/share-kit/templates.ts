@@ -1,6 +1,18 @@
 import rearShirt from "@/assets/share-kit/rear-shirt.png.asset.json";
 import armBand from "@/assets/share-kit/arm-band.png.asset.json";
 import type { ShareTemplate, TemplateContext } from "./types";
+import { LOGO_DATA_URL } from "./logo-data";
+
+/** Brand logo embedded as <image> so the SVG renders the real mark, not text. */
+function brandLogo(x: number, y: number, size: number): string {
+  return `<image href="${LOGO_DATA_URL}" x="${x}" y="${y}" width="${size}" height="${size}" preserveAspectRatio="xMidYMid meet"/>`;
+}
+
+/** Small ad-tracking label baked into the corner of every generated ad. */
+function trackingTag(x: number, y: number, label: string, id: string, fontPx = 18): string {
+  const safe = (s: string) => escapeXml(s);
+  return `<text x="${x}" y="${y}" font-family="'JetBrains Mono',monospace" font-size="${fontPx}" fill="#94a3b8" opacity="0.85">AD · ${safe(label)} · ${safe(id)}</text>`;
+}
 
 function escapeXml(s: string): string {
   return s
@@ -32,8 +44,8 @@ function squareSvg(ctx: TemplateContext): string {
   <rect width="1080" height="1080" fill="url(#g)"/>
   <rect x="0" y="0" width="1080" height="12" fill="url(#accent)"/>
   <rect x="0" y="1068" width="1080" height="12" fill="url(#accent)"/>
-  <text x="540" y="120" text-anchor="middle" font-family="'Plus Jakarta Sans','Inter',Arial,sans-serif" font-weight="900" font-size="64" fill="#ffffff" letter-spacing="6">365 MOTOR SALES</text>
-  <text x="540" y="170" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="600" font-size="26" fill="#cbd5e1" letter-spacing="8">NATIONWIDE PHILIPPINES</text>
+  ${brandLogo(460, 50, 160)}
+  <text x="540" y="245" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="600" font-size="26" fill="#cbd5e1" letter-spacing="8">NATIONWIDE PHILIPPINES</text>
   <text x="540" y="295" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="92" fill="#ffffff">Buy. Sell. Tow.</text>
   <text x="540" y="385" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="800" font-size="56" fill="#fbbf24">Get an exclusive offer.</text>
   <g font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="700" font-size="28" fill="#e2e8f0">
@@ -45,6 +57,7 @@ function squareSvg(ctx: TemplateContext): string {
   </g>
   <text x="540" y="1010" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="800" font-size="36" fill="#ffffff">${safe(ctx.name || "Your 365 Member")}</text>
   <text x="540" y="1045" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="22" fill="#94a3b8">${safe(ctx.code)} · 365motorsales.com/r/${safe(ctx.code)}</text>
+  ${trackingTag(30, 1062, "Square Social", "square-social", 16)}
 </svg>`;
 }
 
@@ -55,14 +68,15 @@ function storySvg(ctx: TemplateContext): string {
   <rect width="1080" height="1920" fill="url(#g)"/>
   <rect x="0" y="0" width="1080" height="16" fill="url(#accent)"/>
   <rect x="0" y="1904" width="1080" height="16" fill="url(#accent)"/>
-  <text x="540" y="180" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="80" fill="#ffffff" letter-spacing="8">365</text>
-  <text x="540" y="240" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="700" font-size="32" fill="#cbd5e1" letter-spacing="10">MOTOR SALES PH</text>
-  <text x="540" y="430" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="120" fill="#ffffff">SCAN</text>
-  <text x="540" y="540" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="120" fill="#fbbf24">TO SHOP</text>
+  ${brandLogo(440, 100, 200)}
+  <text x="540" y="345" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="700" font-size="32" fill="#cbd5e1" letter-spacing="10">MOTOR SALES PH</text>
+  <text x="540" y="465" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="120" fill="#ffffff">SCAN</text>
+  <text x="540" y="575" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="120" fill="#fbbf24">TO SHOP</text>
   <text x="540" y="640" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="800" font-size="56" fill="#ffffff">NATIONWIDE</text>
   <text x="540" y="1680" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="800" font-size="44" fill="#ffffff">${safe(ctx.name || "Your 365 Member")}</text>
   <text x="540" y="1735" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="28" fill="#94a3b8">${safe(ctx.code)}</text>
   <text x="540" y="1810" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="700" font-size="30" fill="#e2e8f0">365motorsales.com</text>
+  ${trackingTag(30, 1895, "Story / Reel", "story-reel", 18)}
 </svg>`;
 }
 
@@ -74,13 +88,15 @@ function bannerSvg(ctx: TemplateContext): string {
   <rect x="0" y="0" width="1200" height="8" fill="url(#accent)"/>
   <rect x="0" y="622" width="1200" height="8" fill="url(#accent)"/>
   <g transform="translate(60,80)">
-    <text font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="42" fill="#cbd5e1" letter-spacing="6">365 MOTOR SALES</text>
+    ${brandLogo(0, -30, 110)}
+    <text x="130" y="50" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="42" fill="#cbd5e1" letter-spacing="6">365 MOTOR SALES</text>
     <text y="80" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="78" fill="#ffffff">Buy. Sell. Tow.</text>
     <text y="160" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="800" font-size="50" fill="#fbbf24">Exclusive offer inside.</text>
     <text y="240" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="700" font-size="28" fill="#e2e8f0">Cars · Motorcycles · Trucks · Heavy Equipment · Parts</text>
     <text y="340" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="800" font-size="34" fill="#ffffff">${safe(ctx.name || "Your 365 Member")}</text>
     <text y="380" font-family="'JetBrains Mono',monospace" font-size="22" fill="#94a3b8">${safe(ctx.code)} · 365motorsales.com/r/${safe(ctx.code)}</text>
   </g>
+  ${trackingTag(20, 620, "Landscape Banner", "banner-1200", 14)}
 </svg>`;
 }
 
@@ -95,13 +111,15 @@ function towSvg(ctx: TemplateContext): string {
   </defs>
   <rect width="1080" height="1350" fill="url(#tg)"/>
   <rect x="0" y="0" width="1080" height="14" fill="#fbbf24"/>
-  <rect x="0" y="1336" width="1080" height="14" fill="#fbbf24"/>
-  <text x="540" y="140" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="56" fill="#fbbf24" letter-spacing="10">24 / 7 EMERGENCY</text>
+  ${brandLogo(480, 40, 120)}
+  <text x="540" y="220" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="56" fill="#fbbf24" letter-spacing="10">24 / 7 EMERGENCY</text>
   <text x="540" y="260" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="140" fill="#ffffff">TOW SERVICE</text>
   <text x="540" y="340" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="800" font-size="44" fill="#ffffff">Nationwide Philippines</text>
   <text x="540" y="420" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="700" font-size="30" fill="#cbd5e1">Light · Medium · Heavy duty · Roadside</text>
   <text x="540" y="1240" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="800" font-size="40" fill="#ffffff">${safe(ctx.name || "Your 365 Member")}</text>
   <text x="540" y="1290" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="26" fill="#fbbf24">${safe(ctx.code)} · 365motorsales.com</text>
+  <rect x="0" y="1336" width="1080" height="14" fill="#fbbf24"/>
+  ${trackingTag(30, 1325, "24/7 Tow", "tow-247", 16)}
 </svg>`;
 }
 
@@ -116,7 +134,8 @@ function carsSvg(ctx: TemplateContext): string {
   </defs>
   <rect width="1080" height="1080" fill="url(#cg)"/>
   <rect x="0" y="0" width="1080" height="540" fill="#ffffff"/>
-  <text x="60" y="140" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="52" fill="#0b2a6b" letter-spacing="6">365 MOTOR SALES</text>
+  ${brandLogo(60, 40, 110)}
+  <text x="190" y="120" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="52" fill="#0b2a6b" letter-spacing="6">365 MOTOR SALES</text>
   <text x="60" y="260" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="120" fill="#0b1d4a">CARS</text>
   <text x="60" y="360" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="120" fill="#dc2626">FOR SALE</text>
   <text x="60" y="440" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="700" font-size="32" fill="#475569">Verified sellers · Nationwide listings</text>
@@ -124,6 +143,7 @@ function carsSvg(ctx: TemplateContext): string {
   <text x="60" y="780" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="700" font-size="32" fill="#e2e8f0">Sedans · SUVs · Trucks · Vans · Motorcycles</text>
   <text x="60" y="980" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="800" font-size="36" fill="#ffffff">${safe(ctx.name || "Your 365 Member")}</text>
   <text x="60" y="1030" font-family="'JetBrains Mono',monospace" font-size="22" fill="#cbd5e1">${safe(ctx.code)} · 365motorsales.com/r/${safe(ctx.code)}</text>
+  ${trackingTag(60, 1062, "Cars For Sale", "buy-cars", 16)}
 </svg>`;
 }
 
@@ -140,11 +160,13 @@ function partsSvg(ctx: TemplateContext): string {
   <rect width="1080" height="1080" fill="url(#carbon)"/>
   <rect x="0" y="0" width="1080" height="10" fill="#fbbf24"/>
   <rect x="0" y="1070" width="1080" height="10" fill="#fbbf24"/>
-  <text x="540" y="130" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="56" fill="#fbbf24" letter-spacing="8">PARTS &amp; ACCESSORIES</text>
-  <text x="540" y="240" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="96" fill="#ffffff">OEM · AFTERMARKET</text>
-  <text x="540" y="310" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="700" font-size="34" fill="#cbd5e1">Shipped nationwide · Cash on delivery available</text>
+  ${brandLogo(480, 30, 120)}
+  <text x="540" y="200" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="56" fill="#fbbf24" letter-spacing="8">PARTS &amp; ACCESSORIES</text>
+  <text x="540" y="310" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="900" font-size="96" fill="#ffffff">OEM · AFTERMARKET</text>
+  <text x="540" y="380" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="700" font-size="34" fill="#cbd5e1">Shipped nationwide · Cash on delivery available</text>
   <text x="540" y="1000" text-anchor="middle" font-family="'Plus Jakarta Sans',Arial,sans-serif" font-weight="800" font-size="38" fill="#ffffff">${safe(ctx.name || "Your 365 Member")}</text>
   <text x="540" y="1045" text-anchor="middle" font-family="'JetBrains Mono',monospace" font-size="24" fill="#fbbf24">${safe(ctx.code)} · 365motorsales.com</text>
+  ${trackingTag(30, 1062, "Parts & Accessories", "parts-shop", 16)}
 </svg>`;
 }
 
