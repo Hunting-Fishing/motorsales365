@@ -90,6 +90,7 @@ function SalesRepsAdmin() {
           <TabsTrigger value="reps">Reps</TabsTrigger>
           <TabsTrigger value="assignments">Assignments</TabsTrigger>
           <TabsTrigger value="territories">Territories</TabsTrigger>
+          <TabsTrigger value="audit">Audit log</TabsTrigger>
         </TabsList>
 
         <TabsContent value="reps" className="mt-4">
@@ -100,6 +101,9 @@ function SalesRepsAdmin() {
         </TabsContent>
         <TabsContent value="territories" className="mt-4">
           <TerritoriesTab />
+        </TabsContent>
+        <TabsContent value="audit" className="mt-4">
+          <AuditTab />
         </TabsContent>
       </Tabs>
 
