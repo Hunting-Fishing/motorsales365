@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Loader2, MapPin, Plus, Trash2, UserCog, X, Zap } from "lucide-react";
+import { Loader2, MapPin, Plus, Trash2, UserCog, X, Zap, History } from "lucide-react";
 import {
   adminListReps,
   adminListAssignments,
@@ -13,6 +13,7 @@ import {
   adminAddTerritory,
   adminRemoveTerritory,
   adminSaveRepProfile,
+  adminListAuditLog,
 } from "@/lib/sales-rep.functions";
 import { PSGC, regionLabel, provincesOf, citiesOf } from "@/lib/psgc";
 import { Button } from "@/components/ui/button";
@@ -89,6 +90,7 @@ function SalesRepsAdmin() {
           <TabsTrigger value="reps">Reps</TabsTrigger>
           <TabsTrigger value="assignments">Assignments</TabsTrigger>
           <TabsTrigger value="territories">Territories</TabsTrigger>
+          <TabsTrigger value="audit">Audit log</TabsTrigger>
         </TabsList>
 
         <TabsContent value="reps" className="mt-4">
@@ -99,6 +101,9 @@ function SalesRepsAdmin() {
         </TabsContent>
         <TabsContent value="territories" className="mt-4">
           <TerritoriesTab />
+        </TabsContent>
+        <TabsContent value="audit" className="mt-4">
+          <AuditTab />
         </TabsContent>
       </Tabs>
 
@@ -754,6 +759,157 @@ function KpiCard({ label, value }: { label: string; value: number | string }) {
     <div className="rounded-md border p-3">
       <div className="text-xs text-muted-foreground">{label}</div>
       <div className="text-xl font-semibold">{value}</div>
+    </div>
+  );
+}
+
+/* -------------------- Audit Log Tab -------------------- */
+
+const ACTION_LABEL: Record<string, string> = {
+  assign: "Assigned",
+  reassign: "Reassigned",
+  unassign: "Unassigned",
+  territory_add: "Territory added",
+  territory_remove: "Territory removed",
+  bulk_territory_assign: "Bulk auto-assign",
+};
+
+function AuditTab() {
+  const { data: repsData } = useReps();
+  const reps: Rep[] = repsData?.reps ?? [];
+  const [filters, setFilters] = useState<{
+    rep_user_id?: string;
+    action?:
+      | "assign"
+      | "reassign"
+      | "unassign"
+      | "territory_add"
+      | "territory_remove"
+      | "bulk_territory_assign";
+  }>({});
+  const fn = useServerFn(adminListAuditLog);
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-sales-audit", filters],
+    queryFn: () => fn({ data: filters }),
+  });
+  const rows = data?.entries ?? [];
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-end gap-2">
+        <div className="grid gap-1">
+          <Label className="text-xs">Rep</Label>
+          <Select
+            value={filters.rep_user_id ?? "all"}
+            onValueChange={(v) =>
+              setFilters((f) => ({ ...f, rep_user_id: v === "all" ? undefined : v }))
+            }
+          >
+            <SelectTrigger className="w-56">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All reps</SelectItem>
+              {reps.map((r) => (
+                <SelectItem key={r.user_id} value={r.user_id}>
+                  {repName(r)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="grid gap-1">
+          <Label className="text-xs">Action</Label>
+          <Select
+            value={filters.action ?? "all"}
+            onValueChange={(v) =>
+              setFilters((f) => ({ ...f, action: v === "all" ? undefined : (v as any) }))
+            }
+          >
+            <SelectTrigger className="w-52">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Any action</SelectItem>
+              {Object.entries(ACTION_LABEL).map(([k, v]) => (
+                <SelectItem key={k} value={k}>
+                  {v}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div className="overflow-hidden rounded-md border">
+        <table className="w-full text-sm">
+          <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+            <tr>
+              <th className="px-3 py-2">When</th>
+              <th className="px-3 py-2">Admin</th>
+              <th className="px-3 py-2">Action</th>
+              <th className="px-3 py-2">Rep</th>
+              <th className="px-3 py-2">Subject / Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            {isLoading ? (
+              <tr>
+                <td colSpan={5} className="p-6 text-center text-muted-foreground">
+                  <Loader2 className="mx-auto h-4 w-4 animate-spin" />
+                </td>
+              </tr>
+            ) : !rows.length ? (
+              <tr>
+                <td colSpan={5} className="p-6 text-center text-sm text-muted-foreground">
+                  <History className="mx-auto mb-2 h-5 w-5 opacity-60" />
+                  No audit entries yet.
+                </td>
+              </tr>
+            ) : (
+              rows.map((e: any) => {
+                const when = new Date(e.created_at);
+                const actor = e.actor?.name || e.actor?.email || "—";
+                const repLbl =
+                  e.action === "reassign" && e.prev_rep_name
+                    ? `${e.prev_rep_name ?? "—"} → ${e.rep_name ?? "—"}`
+                    : e.rep_name ?? "—";
+                const subj = e.subject as any;
+                const subjLbl =
+                  e.action.startsWith("territory")
+                    ? [e.details?.region, e.details?.province, e.details?.city]
+                        .filter(Boolean)
+                        .join(" › ")
+                    : e.action === "bulk_territory_assign"
+                      ? `${e.details?.assigned ?? 0} account(s) auto-assigned`
+                      : subj?.name
+                        ? `${subj.name}${e.subject_type === "business" ? " (business)" : ""}`
+                        : e.subject_id
+                          ? e.subject_id.slice(0, 8)
+                          : "—";
+                return (
+                  <tr key={e.id} className="border-t align-top">
+                    <td className="whitespace-nowrap px-3 py-2 text-xs text-muted-foreground">
+                      {when.toLocaleString()}
+                    </td>
+                    <td className="px-3 py-2">
+                      <div className="font-medium">{actor}</div>
+                      {e.actor?.email && e.actor?.name ? (
+                        <div className="text-xs text-muted-foreground">{e.actor.email}</div>
+                      ) : null}
+                    </td>
+                    <td className="px-3 py-2">
+                      <Badge variant="outline">{ACTION_LABEL[e.action] ?? e.action}</Badge>
+                    </td>
+                    <td className="px-3 py-2">{repLbl}</td>
+                    <td className="px-3 py-2">{subjLbl}</td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

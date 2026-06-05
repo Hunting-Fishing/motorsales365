@@ -429,13 +429,21 @@ export const adminAssignRep = createServerFn({ method: "POST" })
     await requireAdmin(supabase, userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    // Deactivate existing active assignment for this subject
-    await supabaseAdmin
+    // Find existing active assignment to capture previous rep for audit
+    const { data: existing } = await supabaseAdmin
       .from("sales_rep_assignments")
-      .update({ active: false, ended_at: new Date().toISOString() })
+      .select("id, rep_user_id")
       .eq("subject_type", data.subject_type)
       .eq("subject_id", data.subject_id)
-      .eq("active", true);
+      .eq("active", true)
+      .maybeSingle();
+
+    if (existing) {
+      await supabaseAdmin
+        .from("sales_rep_assignments")
+        .update({ active: false, ended_at: new Date().toISOString() })
+        .eq("id", existing.id);
+    }
 
     const { error } = await supabaseAdmin.from("sales_rep_assignments").insert({
       rep_user_id: data.rep_user_id,
@@ -446,6 +454,16 @@ export const adminAssignRep = createServerFn({ method: "POST" })
       notes: data.notes,
     });
     if (error) throw new Error(error.message);
+
+    await supabaseAdmin.from("sales_rep_audit_log").insert({
+      actor_id: userId,
+      action: existing ? "reassign" : "assign",
+      rep_user_id: data.rep_user_id,
+      prev_rep_user_id: existing?.rep_user_id ?? null,
+      subject_type: data.subject_type,
+      subject_id: data.subject_id,
+      details: { notes: data.notes ?? null, source: "manual" },
+    });
     return { ok: true };
   });
 
@@ -456,11 +474,26 @@ export const adminUnassign = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await requireAdmin(supabase, userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row } = await supabaseAdmin
+      .from("sales_rep_assignments")
+      .select("rep_user_id, subject_type, subject_id, source")
+      .eq("id", data.id)
+      .maybeSingle();
     const { error } = await supabaseAdmin
       .from("sales_rep_assignments")
       .update({ active: false, ended_at: new Date().toISOString() })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
+    if (row) {
+      await supabaseAdmin.from("sales_rep_audit_log").insert({
+        actor_id: userId,
+        action: "unassign",
+        rep_user_id: row.rep_user_id,
+        subject_type: row.subject_type,
+        subject_id: row.subject_id,
+        details: { assignment_id: data.id, source: row.source },
+      });
+    }
     return { ok: true };
   });
 
@@ -513,8 +546,23 @@ export const adminBulkAssignByTerritory = createServerFn({ method: "POST" })
         source: "territory",
         assigned_by: userId,
       });
-      if (!error) assigned += 1;
+      if (!error) {
+        assigned += 1;
+        await supabaseAdmin.from("sales_rep_audit_log").insert({
+          actor_id: userId,
+          action: "assign",
+          rep_user_id: rep,
+          subject_type: "user",
+          subject_id: p.id,
+          details: { source: "territory", bulk: true },
+        });
+      }
     }
+    await supabaseAdmin.from("sales_rep_audit_log").insert({
+      actor_id: userId,
+      action: "bulk_territory_assign",
+      details: { assigned },
+    });
     return { assigned };
   });
 
@@ -537,8 +585,24 @@ export const adminAddTerritory = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await requireAdmin(supabase, userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("sales_rep_territories").insert(data);
+    const { data: row, error } = await supabaseAdmin
+      .from("sales_rep_territories")
+      .insert(data)
+      .select("id")
+      .maybeSingle();
     if (error) throw new Error(error.message);
+    await supabaseAdmin.from("sales_rep_audit_log").insert({
+      actor_id: userId,
+      action: "territory_add",
+      rep_user_id: data.rep_user_id,
+      territory_id: row?.id ?? null,
+      details: {
+        region: data.region,
+        province: data.province ?? null,
+        city: data.city ?? null,
+        is_primary: !!data.is_primary,
+      },
+    });
     return { ok: true };
   });
 
@@ -549,11 +613,30 @@ export const adminRemoveTerritory = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await requireAdmin(supabase, userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: row } = await supabaseAdmin
+      .from("sales_rep_territories")
+      .select("rep_user_id, region, province, city, is_primary")
+      .eq("id", data.id)
+      .maybeSingle();
     const { error } = await supabaseAdmin
       .from("sales_rep_territories")
       .delete()
       .eq("id", data.id);
     if (error) throw new Error(error.message);
+    await supabaseAdmin.from("sales_rep_audit_log").insert({
+      actor_id: userId,
+      action: "territory_remove",
+      rep_user_id: row?.rep_user_id ?? null,
+      territory_id: data.id,
+      details: row
+        ? {
+            region: row.region,
+            province: row.province,
+            city: row.city,
+            is_primary: row.is_primary,
+          }
+        : {},
+    });
     return { ok: true };
   });
 
@@ -664,4 +747,104 @@ export const adminListAssignments = createServerFn({ method: "POST" })
       : enriched;
 
     return { assignments: filtered };
+  });
+
+export const adminListAuditLog = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        rep_user_id: z.string().uuid().optional(),
+        action: z
+          .enum([
+            "assign",
+            "reassign",
+            "unassign",
+            "territory_add",
+            "territory_remove",
+            "bulk_territory_assign",
+          ])
+          .optional(),
+        limit: z.number().int().min(1).max(500).default(200),
+      })
+      .parse(input ?? {}),
+  )
+  .handler(async ({ context, data }) => {
+    const { supabase, userId } = context;
+    await requireAdmin(supabase, userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    let q = supabaseAdmin
+      .from("sales_rep_audit_log")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(data.limit);
+    if (data.rep_user_id) q = q.eq("rep_user_id", data.rep_user_id);
+    if (data.action) q = q.eq("action", data.action);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+
+    const actorIds = Array.from(
+      new Set((rows ?? []).map((r: any) => r.actor_id).filter(Boolean)),
+    );
+    const repIds = Array.from(
+      new Set(
+        (rows ?? [])
+          .flatMap((r: any) => [r.rep_user_id, r.prev_rep_user_id])
+          .filter(Boolean),
+      ),
+    );
+    const userSubjectIds = (rows ?? [])
+      .filter((r: any) => r.subject_type === "user" && r.subject_id)
+      .map((r: any) => r.subject_id);
+    const bizSubjectIds = (rows ?? [])
+      .filter((r: any) => r.subject_type === "business" && r.subject_id)
+      .map((r: any) => r.subject_id);
+
+    const profileIds = Array.from(new Set([...actorIds, ...repIds, ...userSubjectIds]));
+
+    const [profilesRes, bizRes, authRes] = await Promise.all([
+      profileIds.length
+        ? supabaseAdmin
+            .from("profiles")
+            .select("id, full_name, first_name, last_name")
+            .in("id", profileIds)
+        : Promise.resolve({ data: [] as any[] }),
+      bizSubjectIds.length
+        ? supabaseAdmin
+            .from("businesses")
+            .select("id, name, slug")
+            .in("id", bizSubjectIds)
+        : Promise.resolve({ data: [] as any[] }),
+      actorIds.length
+        ? supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 })
+        : Promise.resolve({ data: { users: [] as any[] } } as any),
+    ]);
+
+    const nameOf = (p: any) =>
+      p?.full_name ||
+      [p?.first_name, p?.last_name].filter(Boolean).join(" ") ||
+      null;
+    const profileMap = new Map((profilesRes.data ?? []).map((p: any) => [p.id, p]));
+    const bizMap = new Map((bizRes.data ?? []).map((b: any) => [b.id, b]));
+    const emailMap = new Map(
+      (authRes.data?.users ?? []).map((u: any) => [u.id, (u.email ?? "").toLowerCase()]),
+    );
+
+    const enriched = (rows ?? []).map((r: any) => ({
+      ...r,
+      actor: r.actor_id
+        ? { name: nameOf(profileMap.get(r.actor_id)), email: emailMap.get(r.actor_id) ?? null }
+        : null,
+      rep_name: r.rep_user_id ? nameOf(profileMap.get(r.rep_user_id)) : null,
+      prev_rep_name: r.prev_rep_user_id ? nameOf(profileMap.get(r.prev_rep_user_id)) : null,
+      subject:
+        r.subject_type === "user"
+          ? { name: nameOf(profileMap.get(r.subject_id)) }
+          : r.subject_type === "business"
+            ? bizMap.get(r.subject_id) ?? null
+            : null,
+    }));
+
+    return { entries: enriched };
   });

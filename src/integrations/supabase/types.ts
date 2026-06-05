@@ -4041,6 +4041,45 @@ export type Database = {
         }
         Relationships: []
       }
+      sales_rep_audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          details: Json
+          id: string
+          prev_rep_user_id: string | null
+          rep_user_id: string | null
+          subject_id: string | null
+          subject_type: string | null
+          territory_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          prev_rep_user_id?: string | null
+          rep_user_id?: string | null
+          subject_id?: string | null
+          subject_type?: string | null
+          territory_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          details?: Json
+          id?: string
+          prev_rep_user_id?: string | null
+          rep_user_id?: string | null
+          subject_id?: string | null
+          subject_type?: string | null
+          territory_id?: string | null
+        }
+        Relationships: []
+      }
       sales_rep_followups: {
         Row: {
           body: string | null
