@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { AdminGroupTabs, REFERRALS_TABS } from "@/components/admin/admin-group-tabs";
 import { confirm } from "@/components/ui/confirm-dialog";
 import { useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
