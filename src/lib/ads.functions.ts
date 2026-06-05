@@ -12,8 +12,10 @@ const placementSchema = z.enum([
   "export_top",
   "shop_top",
   "shop_sidebar",
+  "category_banner",
 ]);
 const statusSchema = z.enum(["draft", "scheduled", "active", "paused", "ended"]);
+const categorySlugSchema = z.string().min(1).max(64).regex(/^[a-z0-9_-]+$/);
 
 // PUBLIC: fetch active ads for a placement
 export const getActiveAds = createServerFn({ method: "GET" })
