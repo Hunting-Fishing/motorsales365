@@ -2501,13 +2501,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "lead_offer_unlocks_offer_id_fkey"
-            columns: ["offer_id"]
-            isOneToOne: false
-            referencedRelation: "lead_offers_public"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "lead_offer_unlocks_payment_id_fkey"
             columns: ["payment_id"]
             isOneToOne: false
@@ -5848,69 +5841,6 @@ export type Database = {
         }
         Relationships: []
       }
-      lead_offers_public: {
-        Row: {
-          budget_max_php: number | null
-          budget_min_php: number | null
-          category_slug: string | null
-          city: string | null
-          expires_at: string | null
-          id: string | null
-          max_unlocks: number | null
-          posted_at: string | null
-          preview: string | null
-          price_php: number | null
-          province: string | null
-          region: string | null
-          status: string | null
-          unlocks_count: number | null
-          urgency: string | null
-          vehicle_make: string | null
-          vehicle_model: string | null
-          vehicle_year: number | null
-        }
-        Insert: {
-          budget_max_php?: number | null
-          budget_min_php?: number | null
-          category_slug?: string | null
-          city?: string | null
-          expires_at?: string | null
-          id?: string | null
-          max_unlocks?: number | null
-          posted_at?: string | null
-          preview?: string | null
-          price_php?: number | null
-          province?: string | null
-          region?: string | null
-          status?: string | null
-          unlocks_count?: number | null
-          urgency?: string | null
-          vehicle_make?: string | null
-          vehicle_model?: string | null
-          vehicle_year?: number | null
-        }
-        Update: {
-          budget_max_php?: number | null
-          budget_min_php?: number | null
-          category_slug?: string | null
-          city?: string | null
-          expires_at?: string | null
-          id?: string | null
-          max_unlocks?: number | null
-          posted_at?: string | null
-          preview?: string | null
-          price_php?: number | null
-          province?: string | null
-          region?: string | null
-          status?: string | null
-          unlocks_count?: number | null
-          urgency?: string | null
-          vehicle_make?: string | null
-          vehicle_model?: string | null
-          vehicle_year?: number | null
-        }
-        Relationships: []
-      }
       listing_active_boosts: {
         Row: {
           ends_at: string | null
@@ -6104,6 +6034,28 @@ export type Database = {
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
       is_towing_provider: { Args: { _user_id: string }; Returns: boolean }
+      list_open_lead_offers: {
+        Args: { _category_slug?: string; _limit?: number; _region?: string }
+        Returns: {
+          budget_max_php: number
+          budget_min_php: number
+          category_slug: string
+          city: string
+          expires_at: string
+          id: string
+          max_unlocks: number
+          posted_at: string
+          preview: string
+          price_php: number
+          province: string
+          region: string
+          unlocks_count: number
+          urgency: string
+          vehicle_make: string
+          vehicle_model: string
+          vehicle_year: number
+        }[]
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string
