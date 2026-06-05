@@ -12,6 +12,10 @@ import {
   LogIn,
   UserPlus,
   LifeBuoy,
+  Briefcase,
+  Users,
+  BarChart3,
+  Inbox,
 } from "lucide-react";
 import { useAuth, type SellerType } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -51,6 +55,7 @@ export function SiteHeader() {
     loading,
     profileName,
     isAdmin,
+    isSales,
     isStaff,
     signOut,
     realSellerType,
@@ -238,20 +243,56 @@ export function SiteHeader() {
                     Messages
                   </Link>
                 </DropdownMenuItem>
+                {isStaff && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <div className="px-2 pb-1 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      {isAdmin ? "365 Staff" : "Sales Rep"}
+                    </div>
+                    {isSales && (
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link to="/dashboard/team/leads">
+                            <Inbox className="mr-2 h-4 w-4" />
+                            My leads
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/dashboard/referral">
+                            <Briefcase className="mr-2 h-4 w-4" />
+                            My referrals
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/dashboard/team/performance">
+                            <BarChart3 className="mr-2 h-4 w-4" />
+                            Performance
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    {isAdmin && (
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin/sales-reps">
+                            <Users className="mr-2 h-4 w-4" />
+                            Manage sales reps
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin">
+                            <Shield className="mr-2 h-4 w-4" />
+                            Admin console
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
+                    <DropdownMenuSeparator />
+                  </>
+                )}
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard/profile">Profile</Link>
                 </DropdownMenuItem>
-                {isAdmin && (
-                  <>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link to="/admin">
-                        <Shield className="mr-2 h-4 w-4" />
-                        Admin
-                      </Link>
-                    </DropdownMenuItem>
-                  </>
-                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="mr-2 h-4 w-4" />
@@ -445,19 +486,61 @@ export function SiteHeader() {
                         </Link>
                       </SheetClose>
                     </div>
-                    {isAdmin && (
+                    {isStaff && (
                       <>
                         <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                          Admin
+                          {isAdmin ? "365 Staff" : "Sales Rep"}
                         </p>
-                        <SheetClose asChild>
-                          <Link
-                            to="/admin"
-                            className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
-                          >
-                            <Shield className="h-4 w-4" /> Admin console
-                          </Link>
-                        </SheetClose>
+                        <div className="flex flex-col gap-0.5">
+                          {isSales && (
+                            <>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/dashboard/team/leads"
+                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <Inbox className="h-4 w-4" /> My leads
+                                </Link>
+                              </SheetClose>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/dashboard/referral"
+                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <Briefcase className="h-4 w-4" /> My referrals
+                                </Link>
+                              </SheetClose>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/dashboard/team/performance"
+                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <BarChart3 className="h-4 w-4" /> Performance
+                                </Link>
+                              </SheetClose>
+                            </>
+                          )}
+                          {isAdmin && (
+                            <>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/admin/sales-reps"
+                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <Users className="h-4 w-4" /> Manage sales reps
+                                </Link>
+                              </SheetClose>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/admin"
+                                  className="flex items-center gap-2 rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <Shield className="h-4 w-4" /> Admin console
+                                </Link>
+                              </SheetClose>
+                            </>
+                          )}
+                        </div>
                       </>
                     )}
                   </>
