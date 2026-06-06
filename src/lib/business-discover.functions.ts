@@ -92,7 +92,11 @@ export const searchFbPagesForAdmin = createServerFn({ method: "POST" })
         .select("source_external_id")
         .eq("source", "facebook")
         .in("source_external_id", ids);
-      importedSet = new Set((rows ?? []).map((r: { source_external_id: string }) => r.source_external_id));
+      importedSet = new Set(
+        (rows ?? [])
+          .map((r: { source_external_id: string | null }) => r.source_external_id)
+          .filter((v): v is string => !!v),
+      );
     }
     return {
       results: results.map((r) => ({
