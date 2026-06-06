@@ -30,6 +30,7 @@ import {
   EVIDENCE_TYPE_LABELS,
   formatBytes,
 } from "@/components/business-page/evidence-uploader";
+import { ClaimAuditPanel } from "@/components/business-page/claim-audit-panel";
 
 export const Route = createFileRoute("/admin/claims")({
   component: ClaimsPage,
