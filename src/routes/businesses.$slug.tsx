@@ -1042,58 +1042,77 @@ function TagGroups({
   const primaryGroups = renderGroups(primary);
 
   return (
-    <div className="mt-3 space-y-3">
-      {primaryGroups.map((g) => (
-        <div key={`primary-${g.label}`}>
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            {g.label}
-          </div>
-          <div className="mt-1 flex flex-wrap gap-1">
-            {g.items.map((t) => (
-              <Badge key={t.slug} variant="secondary">
-                {t.label}
-              </Badge>
-            ))}
-          </div>
-        </div>
-      ))}
-
-      {Array.from(crossByType.entries()).map(([typeSlug, items]) => {
-        const typeLabel = typeLabels?.[typeSlug] ?? typeSlug;
-        const subGroups = renderGroups(items);
-        return (
-          <div
-            key={`cross-${typeSlug}`}
-            className="rounded-md border border-dashed border-border/70 bg-muted/20 p-2"
-          >
-            <div className="flex items-center gap-2">
-              <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-                Also offered
-              </div>
-              <Badge variant="outline" className="text-[10px]">
-                {typeLabel}
-              </Badge>
+    <TooltipProvider delayDuration={200}>
+      <div className="mt-3 space-y-3">
+        {primaryGroups.map((g) => (
+          <div key={`primary-${g.label}`}>
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              {g.label}
             </div>
-            <div className="mt-2 space-y-2">
-              {subGroups.map((g) => (
-                <div key={`${typeSlug}-${g.label}`}>
-                  <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/80">
-                    {g.label}
-                  </div>
-                  <div className="mt-1 flex flex-wrap gap-1">
-                    {g.items.map((t) => (
-                      <Badge key={t.slug} variant="secondary" className="bg-accent/40">
-                        {t.label}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
+            <div className="mt-1 flex flex-wrap gap-1">
+              {g.items.map((t) => (
+                <Tooltip key={t.slug}>
+                  <TooltipTrigger asChild>
+                    <Badge variant="secondary" className="cursor-help">
+                      {t.label}
+                    </Badge>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    {t.description || `${g.label} service`}
+                  </TooltipContent>
+                </Tooltip>
               ))}
             </div>
           </div>
-        );
-      })}
-    </div>
+        ))}
+
+        {Array.from(crossByType.entries()).map(([typeSlug, items]) => {
+          const typeLabel = typeLabels?.[typeSlug] ?? typeSlug;
+          const subGroups = renderGroups(items);
+          return (
+            <div
+              key={`cross-${typeSlug}`}
+              className="rounded-md border border-dashed border-border/70 bg-muted/20 p-2"
+            >
+              <div className="flex items-center gap-2">
+                <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Also offered
+                </div>
+                <Badge variant="outline" className="text-[10px]">
+                  {typeLabel}
+                </Badge>
+              </div>
+              <div className="mt-2 space-y-2">
+                {subGroups.map((g) => (
+                  <div key={`${typeSlug}-${g.label}`}>
+                    <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/80">
+                      {g.label}
+                    </div>
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {g.items.map((t) => (
+                        <Tooltip key={t.slug}>
+                          <TooltipTrigger asChild>
+                            <Badge
+                              variant="secondary"
+                              className="cursor-help bg-accent/40"
+                            >
+                              {t.label}
+                            </Badge>
+                          </TooltipTrigger>
+                          <TooltipContent side="top">
+                            {t.description || `${g.label} · ${typeLabel}`}
+                          </TooltipContent>
+                        </Tooltip>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </TooltipProvider>
   );
 }
 
