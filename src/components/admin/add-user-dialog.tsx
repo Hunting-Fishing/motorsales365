@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 
 type StaffRole = "admin" | "moderator" | "support" | "sales" | "advertising";
 const STAFF_ROLES: StaffRole[] = ["admin", "moderator", "support", "sales", "advertising"];
@@ -52,7 +53,7 @@ export function AddUserDialog({
   const [roles, setRoles] = useState<StaffRole[]>(["support"]);
   const [sellerType, setSellerType] = useState<"private" | "business">("private");
   const [businessName, setBusinessName] = useState("");
-  const [businessKind, setBusinessKind] = useState<"dealer" | "repair_shop" | "insurance" | "">("");
+  const [businessKind, setBusinessKind] = useState<string>("");
   const [markVerified, setMarkVerified] = useState(true);
 
   const reset = () => {
@@ -275,9 +276,9 @@ export function AddUserDialog({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">None</SelectItem>
-                    <SelectItem value="dealer">Dealer</SelectItem>
-                    <SelectItem value="repair_shop">Repair shop</SelectItem>
-                    <SelectItem value="insurance">Insurance</SelectItem>
+                    {BUSINESS_KIND_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
