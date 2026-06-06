@@ -910,7 +910,8 @@ type TagItem = { slug: string; label: string; category: string | null };
 const TAG_GROUP_MAP: { label: string; cats: string[] }[] = [
   { label: "Fuels", cats: ["fuel_grade", "fuel"] },
   { label: "EV charging", cats: ["ev_charging"] },
-  { label: "Station brand", cats: ["station_brand", "brand"] },
+  { label: "Brands", cats: ["station_brand", "brand"] },
+  { label: "Tires & wheels", cats: ["tires", "wheels"] },
   {
     label: "Services",
     cats: [
@@ -923,11 +924,11 @@ const TAG_GROUP_MAP: { label: string; cats: string[] }[] = [
       "engine",
       "cooling",
       "suspension",
-      "wheels",
       "climate",
       "electrical",
       "exhaust",
       "diagnostics",
+      "fuel",
       "wash",
       "detail",
       "paint",
