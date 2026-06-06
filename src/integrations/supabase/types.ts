@@ -919,6 +919,159 @@ export type Database = {
           },
         ]
       }
+      business_discovery_queue: {
+        Row: {
+          address: string | null
+          city: string | null
+          created_at: string
+          diff: Json | null
+          existing_business_id: string | null
+          external_id: string
+          first_seen_at: string
+          id: string
+          last_seen_at: string
+          lat: number | null
+          lng: number | null
+          name: string
+          our_type: string | null
+          phone: string | null
+          photo_name: string | null
+          rating: number | null
+          rating_count: number | null
+          region: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          search_id: string | null
+          source: string
+          status: string
+          types: string[]
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          diff?: Json | null
+          existing_business_id?: string | null
+          external_id: string
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          lat?: number | null
+          lng?: number | null
+          name: string
+          our_type?: string | null
+          phone?: string | null
+          photo_name?: string | null
+          rating?: number | null
+          rating_count?: number | null
+          region?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          search_id?: string | null
+          source?: string
+          status?: string
+          types?: string[]
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          created_at?: string
+          diff?: Json | null
+          existing_business_id?: string | null
+          external_id?: string
+          first_seen_at?: string
+          id?: string
+          last_seen_at?: string
+          lat?: number | null
+          lng?: number | null
+          name?: string
+          our_type?: string | null
+          phone?: string | null
+          photo_name?: string | null
+          rating?: number | null
+          rating_count?: number | null
+          region?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          search_id?: string | null
+          source?: string
+          status?: string
+          types?: string[]
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_discovery_queue_existing_business_id_fkey"
+            columns: ["existing_business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_discovery_queue_search_id_fkey"
+            columns: ["search_id"]
+            isOneToOne: false
+            referencedRelation: "business_discovery_searches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_discovery_searches: {
+        Row: {
+          active: boolean
+          city: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          last_error: string | null
+          last_found_count: number
+          last_new_count: number
+          last_run_at: string | null
+          last_status: string | null
+          place_type: string
+          query: string
+          region: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          city?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          last_error?: string | null
+          last_found_count?: number
+          last_new_count?: number
+          last_run_at?: string | null
+          last_status?: string | null
+          place_type: string
+          query: string
+          region?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          city?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          last_error?: string | null
+          last_found_count?: number
+          last_new_count?: number
+          last_run_at?: string | null
+          last_status?: string | null
+          place_type?: string
+          query?: string
+          region?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       business_gallery_albums: {
         Row: {
           business_id: string
