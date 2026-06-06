@@ -508,7 +508,7 @@ function FacebookTab({ onAdd }: { onAdd: (r: Row) => void }) {
         coverUrl: c.coverImage,
         about: c.about,
         sourceUrl: c.pageUrl,
-        region: null,
+        region: region || null,
         city: city || null,
         geoConfidence: c.geo.confidence,
         alreadyImported: c.alreadyImported,
