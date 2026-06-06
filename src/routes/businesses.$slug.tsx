@@ -388,7 +388,11 @@ function BusinessProfilePage() {
                   </div>
 
                   {(data?.tags?.length ?? 0) > 0 ? (
-                    <TagGroups tags={data!.tags as any} />
+                    <TagGroups
+                      tags={data!.tags as any}
+                      primaryTypeSlug={(data as any)?.primaryTypeSlug ?? null}
+                      typeLabels={(data as any)?.typeLabels ?? {}}
+                    />
                   ) : tagLabels.length > 0 ? (
                     <div className="mt-3 flex flex-wrap gap-1">
                       {tagLabels.map((l: string) => (
