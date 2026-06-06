@@ -1,11 +1,14 @@
-// Shared list of business categories used by signup, verification, and admin.
-// Keep this list in sync with the public.business_kind Postgres enum.
+// Shared list of business categories used by signup, verification, admin,
+// the public business directory (business_types.slug), and discovery search-terms.
+// MUST stay in sync with the public.business_types rows and the
+// public.business_kind Postgres enum.
 export const BUSINESS_KIND_OPTIONS: { value: string; label: string }[] = [
-  { value: "dealer", label: "Dealership / Showroom" },
+  { value: "dealership", label: "Dealership / Showroom" },
+  { value: "motorcycle_shop", label: "Motorcycle shop" },
   { value: "rental", label: "Vehicle rental" },
-  { value: "parts_shop", label: "Parts supplier / shop" },
+  { value: "parts_accessories", label: "Parts supplier / shop" },
   { value: "repair_shop", label: "Repair shop / mechanic" },
-  { value: "body_shop", label: "Body shop / paint" },
+  { value: "body_paint", label: "Body shop / paint" },
   { value: "tire_shop", label: "Tire shop / wheels" },
   { value: "battery_shop", label: "Battery shop" },
   { value: "towing", label: "Tow / roadside assistance" },
