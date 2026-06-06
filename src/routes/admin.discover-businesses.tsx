@@ -84,6 +84,8 @@ const FB_CATEGORY_TO_TYPE: { match: RegExp; slug: string }[] = [
   { match: /lto|registration/i, slug: "lto_services" },
   { match: /trucking|logistic|cargo|courier/i, slug: "transport" },
   { match: /fleet|corporate/i, slug: "corporate" },
+  { match: /\b(used|second[-\s]?hand|pre[-\s]?owned|pre[-\s]?loved|repo|repossessed|surplus)\b.*\b(car|truck|suv|pickup|van|vehicle|auto)/i, slug: "used_dealership" },
+  { match: /\b(car|truck|suv|pickup|van|vehicle|auto)\b.*\b(used|second[-\s]?hand|pre[-\s]?owned|repo|surplus)\b/i, slug: "used_dealership" },
   { match: /dealer|sales|showroom/i, slug: "dealership" },
   { match: /repair|mechanic|service|garage/i, slug: "repair_shop" },
 ];
