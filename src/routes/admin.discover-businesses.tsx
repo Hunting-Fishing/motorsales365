@@ -322,22 +322,9 @@ function ReviewRow({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {Array.from(
-                new Set([
-                  "repair_shop",
-                  "dealership",
-                  "motorcycle_shop",
-                  "tire_shop",
-                  "body_paint",
-                  "parts_accessories",
-                  "carwash",
-                  "fuel_station",
-                  "insurance",
-                  "towing",
-                ]),
-              ).map((t) => (
-                <SelectItem key={t} value={t}>
-                  {t}
+              {BUSINESS_KIND_OPTIONS.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
                 </SelectItem>
               ))}
             </SelectContent>
