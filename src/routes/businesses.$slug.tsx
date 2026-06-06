@@ -16,11 +16,9 @@ import {
   Info,
 } from "lucide-react";
 import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
   TooltipProvider,
 } from "@/components/ui/tooltip";
+import { PressableTooltip } from "@/components/ui/pressable-tooltip";
 import { waMeUrl } from "@/lib/whatsapp";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
@@ -1058,16 +1056,14 @@ function TagGroups({
             </div>
             <div className="mt-1 flex flex-wrap gap-1">
               {g.items.map((t) => (
-                <Tooltip key={t.slug}>
-                  <TooltipTrigger asChild>
-                    <Badge variant="secondary" className="cursor-help">
-                      {t.label}
-                    </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    {t.description || `${g.label} service`}
-                  </TooltipContent>
-                </Tooltip>
+                <PressableTooltip
+                  key={t.slug}
+                  content={t.description || `${g.label} service`}
+                >
+                  <Badge variant="secondary" className="cursor-help">
+                    {t.label}
+                  </Badge>
+                </PressableTooltip>
               ))}
             </div>
           </div>
@@ -1097,19 +1093,17 @@ function TagGroups({
                     </div>
                     <div className="mt-1 flex flex-wrap gap-1">
                       {g.items.map((t) => (
-                        <Tooltip key={t.slug}>
-                          <TooltipTrigger asChild>
-                            <Badge
-                              variant="secondary"
-                              className="cursor-help bg-accent/40"
-                            >
-                              {t.label}
-                            </Badge>
-                          </TooltipTrigger>
-                          <TooltipContent side="top">
-                            {t.description || `${g.label} · ${typeLabel}`}
-                          </TooltipContent>
-                        </Tooltip>
+                        <PressableTooltip
+                          key={t.slug}
+                          content={t.description || `${g.label} · ${typeLabel}`}
+                        >
+                          <Badge
+                            variant="secondary"
+                            className="cursor-help bg-accent/40"
+                          >
+                            {t.label}
+                          </Badge>
+                        </PressableTooltip>
                       ))}
                     </div>
                   </div>
