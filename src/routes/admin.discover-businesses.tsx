@@ -528,16 +528,48 @@ function FacebookTab({ onAdd }: { onAdd: (r: Row) => void }) {
     }
   }
 
-  async function runSearch() {
+  async function runSearch(termOverride?: string) {
+    const q = (termOverride ?? query).trim();
+    if (q.length < 2) {
+      toast.error("Pick a suggestion or type a search term.");
+      return;
+    }
+    if (termOverride) setQuery(termOverride);
     setBusy(true);
     try {
       const cityForSearch = [city, region].filter(Boolean).join(", ") || undefined;
-      const res = await search({ data: { query, city: cityForSearch } });
+      const res = await search({ data: { query: q, city: cityForSearch } });
       setResults(res.results);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Search failed");
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function runBulkForGroup() {
+    const terms = activeGroup.terms;
+    setBulkProgress({ done: 0, total: terms.length });
+    setBusy(true);
+    const seen = new Map<string, (typeof results)[number]>();
+    const cityForSearch = [city, region].filter(Boolean).join(", ") || undefined;
+    try {
+      for (let i = 0; i < terms.length; i++) {
+        try {
+          const res = await search({ data: { query: terms[i], city: cityForSearch } });
+          for (const r of res.results) if (!seen.has(r.pageId)) seen.set(r.pageId, r);
+        } catch (e) {
+          console.warn("FB search failed for", terms[i], e);
+        }
+        setBulkProgress({ done: i + 1, total: terms.length });
+        setResults(Array.from(seen.values()));
+      }
+      toast.success(
+        `Found ${seen.size} unique pages across ${terms.length} ${activeGroup.label} terms.`,
+      );
+    } finally {
+      setBusy(false);
+      setBulkProgress(null);
     }
   }
 
@@ -562,12 +594,57 @@ function FacebookTab({ onAdd }: { onAdd: (r: Row) => void }) {
       </Card>
 
       <Card className="space-y-3 p-4">
-        <Label>Or search Facebook pages</Label>
+        <div className="flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <Label>Search Facebook pages by 365 business field</Label>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Pick a category, then click a suggested term or sweep every term in that category at
+              once. Add a region/city to narrow results.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-end gap-2">
+            <div>
+              <Label className="text-xs">Business field</Label>
+              <Select value={groupKind} onValueChange={setGroupKind}>
+                <SelectTrigger className="w-[230px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {DISCOVER_SEARCH_GROUPS.map((g) => (
+                    <SelectItem key={g.kind} value={g.kind}>
+                      {g.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <Button variant="secondary" onClick={runBulkForGroup} disabled={busy}>
+              {bulkProgress
+                ? `Sweeping ${bulkProgress.done}/${bulkProgress.total}…`
+                : `Sweep all (${activeGroup.terms.length})`}
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-1.5">
+          {activeGroup.terms.map((t) => (
+            <button
+              key={t}
+              type="button"
+              onClick={() => runSearch(t)}
+              disabled={busy}
+              className="rounded-full border bg-background px-2.5 py-1 text-xs hover:bg-accent disabled:opacity-50"
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+
         <div className="grid gap-2 sm:grid-cols-2">
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="motorcycle parts, auto repair…"
+            placeholder="Or type your own keywords…"
           />
           <div className="grid gap-2 sm:grid-cols-2">
             <PhLocationPicker
@@ -582,10 +659,11 @@ function FacebookTab({ onAdd }: { onAdd: (r: Row) => void }) {
           </div>
         </div>
         <div className="flex justify-end">
-          <Button onClick={runSearch} disabled={busy || query.length < 2}>
+          <Button onClick={() => runSearch()} disabled={busy || query.length < 2}>
             {busy ? "Searching…" : "Search Facebook"}
           </Button>
         </div>
+
 
         <div className="space-y-2">
           {results.map((r) => (
