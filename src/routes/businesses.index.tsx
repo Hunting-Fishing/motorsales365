@@ -88,19 +88,19 @@ function BusinessesIndex() {
   const [radiusKm, setRadiusKm] = useState<number | null>(null);
 
   useEffect(() => {
+    setTypes(
+      BUSINESS_KIND_OPTIONS.map((o, i) => ({
+        slug: o.value,
+        label: o.label,
+        sort_order: i,
+      })),
+    );
     (async () => {
-      const [t1, t2] = await Promise.all([
-        (supabase as any)
-          .from("business_types")
-          .select("slug,label,sort_order")
-          .order("sort_order"),
-        (supabase as any)
-          .from("business_tags")
-          .select("slug,label,type_slug,sort_order")
-          .order("sort_order"),
-      ]);
-      setTypes(t1.data ?? []);
-      setTags(t2.data ?? []);
+      const { data: t2 } = await (supabase as any)
+        .from("business_tags")
+        .select("slug,label,type_slug,sort_order")
+        .order("sort_order");
+      setTags(t2 ?? []);
     })();
   }, []);
 
