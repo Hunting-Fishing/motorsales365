@@ -22,7 +22,7 @@ const ProfilePatch = z.object({
   signup_province: z.string().trim().max(120).nullable().optional(),
   // business
   business_name: z.string().trim().max(200).nullable().optional(),
-  business_kind: z.enum(["dealer", "repair_shop", "insurance"]).nullable().optional(),
+  business_kind: z.enum(BUSINESS_KIND_VALUES).nullable().optional(),
   business_address: z.string().trim().max(300).nullable().optional(),
   business_region: z.string().trim().max(120).nullable().optional(),
   business_province: z.string().trim().max(120).nullable().optional(),
