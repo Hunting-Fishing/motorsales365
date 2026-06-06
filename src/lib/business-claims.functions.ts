@@ -215,7 +215,7 @@ export const resubmitBusinessClaim = createServerFn({ method: "POST" })
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const update: Record<string, unknown> = {
+    const update: Database["public"]["Tables"]["business_claim_requests"]["Update"] = {
       status: "pending",
       decided_at: null,
       reviewer_notes: null,
