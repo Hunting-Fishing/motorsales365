@@ -169,13 +169,13 @@ function MapPage() {
   }, [center, radiusKm, typeSlug]);
 
   useEffect(() => {
-    (async () => {
-      const { data } = await (supabase as any)
-        .from("business_types")
-        .select("slug,label,sort_order")
-        .order("sort_order");
-      setTypes(data ?? []);
-    })();
+    setTypes(
+      BUSINESS_KIND_OPTIONS.map((o, i) => ({
+        slug: o.value,
+        label: o.label,
+        sort_order: i,
+      })),
+    );
   }, []);
 
   useEffect(() => {
