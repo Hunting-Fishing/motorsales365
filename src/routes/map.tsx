@@ -63,6 +63,7 @@ type Row = {
   rating_count: number;
   featured: boolean;
   price_label: string | null;
+  claim_state: "unclaimed" | "claim_pending" | "owned" | null;
 };
 
 const LS_KEY = "map:last-search";
