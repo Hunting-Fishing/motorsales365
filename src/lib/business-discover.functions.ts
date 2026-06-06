@@ -46,7 +46,7 @@ export const geocodeForImport = createServerFn({ method: "POST" })
 export const scrapeFbPageForAdmin = createServerFn({ method: "POST" })
   .middleware([requireAdminRoleAudited("businesses.discover.scrapeFbPage")])
   .inputValidator((d: unknown) =>
-    z.object({ url: z.string().url().max(500) }).parse(d),
+    z.object({ url: z.string().url().max(2000) }).parse(d),
   )
   .handler(async ({ data }): Promise<FbCandidate> => {
     if (!isFacebookPageUrl(data.url)) {
