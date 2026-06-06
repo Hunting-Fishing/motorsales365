@@ -168,6 +168,8 @@ export const getBusinessPage = createServerFn({ method: "GET" })
     return {
       business: biz,
       typeLabel: typeRow?.label ?? "",
+      primaryTypeSlug: (biz as any).type_slug ?? null,
+      typeLabels,
       tagLabels,
       tags,
       services: services ?? [],
