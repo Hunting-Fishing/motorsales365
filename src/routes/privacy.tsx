@@ -166,8 +166,15 @@ function PrivacyPage() {
           <li>
             <strong>Maps &amp; geocoding:</strong> map tiles via <strong>OpenStreetMap</strong>{" "}
             (Leaflet) and address geocoding via <strong>OSM Nominatim</strong>.{" "}
-            <strong>Google Places</strong>
-            is used only by admins to import public business listings into our directory.
+            <strong>Google Places</strong> is used by admins to seed the business directory with
+            publicly available listings (name, address, phone, website, hours, rating, place ID,
+            and one cover photo with attribution). Seeded businesses are marked{" "}
+            <em>Unclaimed</em> until the real owner claims the page; rightful owners can claim
+            their listing from the business page, or request removal at any time via{" "}
+            <Link className="text-primary underline" to="/support">
+              Support
+            </Link>
+            .
           </li>
           <li>
             <strong>Analytics:</strong> <strong>Google Analytics 4</strong> (with IP anonymization),
