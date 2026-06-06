@@ -241,3 +241,23 @@ export const resubmitBusinessClaim = createServerFn({ method: "POST" })
 
     return { ok: true };
   });
+
+export const getMyClaimsForBusiness = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { businessId: string }) =>
+    z.object({ businessId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: rows, error } = await supabase
+      .from("business_claim_requests")
+      .select(
+        "id,status,reviewer_notes,decided_at,created_at,updated_at,contact_method,contact_value,evidence_url,notes",
+      )
+      .eq("business_id", data.businessId)
+      .eq("claimant_user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (error) throw new Error(error.message);
+    return { claims: rows ?? [] };
+  });
