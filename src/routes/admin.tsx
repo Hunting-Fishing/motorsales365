@@ -162,11 +162,18 @@ const NAV: {
     info: "Approve and moderate the Business directory.",
   },
   {
-    to: "/admin/seed-businesses",
-    label: "Seed Directory",
+    to: "/admin/discover-businesses",
+    label: "Discover Businesses",
     Icon: Store,
     roles: ["admin", "moderator"],
-    info: "Import real businesses from Google Places to populate the map. Imported entries are 'Unclaimed' until the owner claims them.",
+    info: "Find businesses on Google and Facebook, verify the address resolves on the map, then import the ones you want.",
+  },
+  {
+    to: "/admin/seed-businesses",
+    label: "Seed Directory (Google only)",
+    Icon: Store,
+    roles: ["admin", "moderator"],
+    info: "Legacy Google-only importer. Use Discover Businesses for new work.",
   },
   {
     to: "/admin/claims",

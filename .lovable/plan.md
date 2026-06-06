@@ -1,73 +1,82 @@
-# Seeded business directory + claim flow
+# Admin Business Discovery (Google + Facebook) with Map-Ready Addresses
 
-Goal: make the map feel populated on day one by importing real Philippine motoring businesses (dealers, parts shops, service centers, tow operators, etc.) from Google Maps Platform — and let the real owner claim the entry to take it over.
+Goal: give admins a single place to discover, preview, and import auto/motor businesses from **Google Places** and **Facebook Pages** into the 365 Motorsales directory — with verified street addresses and lat/lng so every imported business shows correctly on `/map`.
 
-## Source strategy
+## What exists today
 
-- **Primary: Google Places API (New)** via the existing Google Maps Platform connector. It's the most reliable source: name, address, lat/lng, phone, website, hours, photos, rating, `place_id`. We already use the gateway elsewhere.
-- **Secondary (best-effort): Facebook Pages** via the linked Firecrawl connector. FB aggressively blocks scraping, so we treat FB as an *enrichment* step (paste a page URL → pull name/cover/about) rather than a bulk crawler. Bulk seeding stays on Google.
-- We map each Google "type" (e.g. `car_dealer`, `car_repair`, `car_wash`, `gas_station`, `auto_parts_store`) to one of our existing `business_types.slug` values; anything unmapped goes to a fallback type for staff to triage.
+- `admin.seed-businesses.tsx` — Google Places text search → multi-select → import (already works, types mapped, photos pulled).
+- `facebook-import.functions.ts` — only imports **marketplace listings** for end users. No admin path, no Page/business import.
+- `businesses` table already has `lat`, `lng`, `street_address`, `source`, `source_external_id`, `import_metadata`, `cover_url`, `photos`.
+- `/map` reads from `businesses` and needs `lat` + `lng` to plot a pin.
 
-Dedup: `businesses_source_external_id_unique` already enforces uniqueness on `(source, source_external_id)` — we use `source='google_places'` + `place_id`, and `source='facebook'` + page id.
+## What changes
 
-## Claim flow
+### 1. New unified admin page: `/admin/discover-businesses`
 
-Three new statuses + a request table:
-- New `business_status` value: `'unclaimed'` — shown on the directory/map but visually marked "Unclaimed — Is this yours?".
-- New table `business_claim_requests` (business_id, claimant_user_id, contact_method `email|phone|document`, contact_value, evidence_url, status `pending|approved|rejected`, reviewed_by, notes).
-- On the public business page (`/businesses/$slug`), an "Is this your business? Claim it" CTA appears only when `status='unclaimed'` and `owner_id IS NULL`.
-- Two paths to approval:
-  1. **Auto-verify** — if the claimant's verified account email/phone matches the listed `email`/`phone`, the request auto-approves: we set `owner_id = auth.uid()`, flip `status` to `'active'`, and send the welcome email.
-  2. **Staff review** — otherwise it goes to `/admin/claims` with the evidence (business permit photo, OR receipt, branded social link) for `can_moderate` staff to approve/reject.
+Replaces (and absorbs) `admin.seed-businesses.tsx`. Two tabs:
 
-## Admin seeding UI
+- **Google Places** — current flow, kept as-is but with the address-quality improvements below.
+- **Facebook Pages** — paste a Page URL, paste a list of Page URLs, or search by keyword + city. Admin reviews extracted data and imports.
 
-New page `/admin/seed-businesses`:
-- Pick a region/province/city (uses the existing PSGC dataset) and one or more Google types.
-- Server fn calls `places/v1/places:searchText` and `places:searchNearby` through the gateway, paginates, dedupes against `businesses` by `place_id`.
-- Preview table → "Import selected" inserts rows with `status='unclaimed'`, `source='google_places'`, `source_external_id=<place_id>`, `owner_id=NULL`.
-- Photos: store up to 3 Google photo references (we proxy via a signed server fn that fetches the photo media URL from the gateway, then uploads to the `business-gallery` bucket under a special `seed/<place_id>/...` path — *not* under a business id, so the existing storage policy doesn't apply; we use the admin client server-side).
-- Rate-limited and audited via `admin_audit_log`.
+Both tabs feed the same review/import table so admin can mix sources in one batch.
 
-## Map / directory presentation
+### 2. Facebook Page import (admin-only)
 
-- Map markers for unclaimed businesses use a muted/outline pin and a "Claim" chip in the popover.
-- Directory list shows an "Unclaimed" badge and a faint "Listed from public sources" note for transparency.
-- A site-wide toggle (admin feature flag `directory_show_unclaimed`) so we can hide them later if the directory fills with real signups.
+New server fns in `src/lib/facebook-business-import.functions.ts` (separate from the existing user-listing flow):
 
-## Technical details
+- `scrapeFbPageForAdmin({ url })` — staff-gated. Uses Firecrawl to scrape the Page, parses name, category, About/address text, phone, website, hours, profile + cover photo, page id.
+- `searchFbPagesForAdmin({ query, city })` — staff-gated. Uses Firecrawl search restricted to `site:facebook.com` for keyword + city, returns candidate Page URLs.
+- `importFbPagesForAdmin({ candidates })` — staff-gated. Upserts into `businesses` with `source='facebook'`, `source_external_id=<page id>`, `import_metadata={ fb_url, fb_about, fb_hours_raw }`. Re-imports are idempotent via the existing `(source, source_external_id)` unique constraint.
 
-Migration:
-- `ALTER TYPE business_status ADD VALUE 'unclaimed';`
-- `CREATE TABLE public.business_claim_requests (...)` + GRANTs + RLS:
-  - INSERT: authenticated users can create a claim for a business where `owner_id IS NULL`.
-  - SELECT: claimant sees own requests; `can_moderate` sees all.
-  - UPDATE: `can_moderate` only (status, reviewed_by, notes).
-- Tighten the existing `Owners update listings`-style policy on `businesses`: add a clause that when `status='unclaimed'`, only staff or the auto-approve server fn (service role) can change `owner_id` / `status`.
-- Storage: allow admin client writes to `business-gallery/seed/*` (server-side only; the existing public-read still applies).
+Photos are downloaded to Supabase Storage the same way Google photos are handled.
 
-Server functions:
-- `src/lib/business-seed.functions.ts` (admin-only via `can_moderate`):
-  - `searchGooglePlaces({ region, city, types, pageToken? })` — gateway call to Places API (New).
-  - `previewSeedCandidates({ placeIds })` — fetch place details + dedupe.
-  - `importSeedCandidates({ candidates })` — bulk insert + photo proxy.
-- `src/lib/business-claims.functions.ts`:
-  - `submitClaim({ businessId, contactMethod, contactValue, evidenceUrl? })` — runs auto-verify, otherwise queues for staff.
-  - `reviewClaim({ id, decision, notes })` — staff-only.
+### 3. Address → map-ready coordinates (the "shows on the map" piece)
 
-Routes:
-- `src/routes/admin.seed-businesses.tsx` — seeding UI.
-- `src/routes/admin.claims.tsx` — claim review queue.
-- Update `src/routes/businesses.$slug.tsx` to render the claim CTA + a `<ClaimDialog>` component.
-- Update `src/routes/map.tsx` and `src/routes/businesses.index.tsx` for the unclaimed badge/marker variant.
+This is the core upgrade. New helper `ensureGeocoded(business)` used by both Google and Facebook import paths:
 
-Compliance:
-- We store only the data Google's Places terms allow us to cache (name, address, types, place_id, contact); photos are re-hosted with attribution string saved alongside.
-- A short "Listed from public sources — claim or request removal" notice on every unclaimed page, plus a "Request removal" link that opens a support ticket.
-- Update `/terms` and `/privacy` to disclose the seeded-listings practice and removal process (per the project's terms-sync rule).
+- **Google**: already returns lat/lng — keep as-is, also store the formatted address in `street_address`.
+- **Facebook**: Pages rarely include lat/lng. Pipeline:
+    1. Take the best available address string (About → "Address" line, or the page location text).
+    2. If admin selected a city in the search form, append it.
+    3. Call existing `geocodePlace` (Google Geocoding via the Maps connector) to resolve to lat/lng + a clean `street_address`.
+    4. If geocoding fails or returns low confidence, mark the candidate with a yellow "Needs address" badge in the admin table.
 
-## Out of scope (can follow later)
+In the admin review table, every row shows:
 
-- Bulk Facebook page crawling (FB ToS + anti-scraping makes this unreliable).
-- Auto-refresh of seeded data on a schedule (we can add a `pg_cron` re-sync job once we see how stale entries get).
-- Showing seeded reviews — we only store rating count/avg for the badge; review text stays on Google.
+- Resolved `street_address`
+- A small map thumbnail (or "No coordinates" warning)
+- An inline "Fix address" field — admin can paste/edit the address and click **Re-geocode** before importing.
+
+Import is blocked for rows with no lat/lng, with a clear inline message. This guarantees nothing lands in `businesses` without map coordinates.
+
+### 4. Duplicate detection across sources
+
+Before insert, for each candidate:
+
+- Check `source + source_external_id` (already enforced).
+- Check name + lat/lng within ~100m of an existing business (reuse the logic in `places.functions.ts › findNearbyForImport`).
+- If a match is found, show "Possible duplicate of <name>" with a link, and offer **Merge** (attach `fb_url` / `google_place_id` to the existing row instead of creating a new one).
+
+### 5. Small UX polish in admin
+
+- Bulk **Select all importable**, **Select all with coordinates only**.
+- Filter chips: Source (Google/FB), Has coordinates, Has photo, Already imported.
+- After import: toast with counts per source + "View on map" link that opens `/map` filtered to the just-imported set.
+
+## Out of scope for this plan
+
+- Scheduled/automatic crawling — manual admin-triggered only.
+- Public-facing Facebook claim flow for owners (separate work, the existing user FB verification flow stays untouched).
+- Bulk CSV upload (can be added later if helpful).
+
+---
+
+## Technical notes (for the implementer)
+
+- New file: `src/lib/facebook-business-import.functions.ts` + `.server.ts` helpers (Firecrawl scrape, Page parser, photo downloader — mirror the Google helpers).
+- New file: `src/routes/admin.discover-businesses.tsx`. Keep `admin.seed-businesses.tsx` as a redirect for one release, then remove.
+- Reuse `geocodePlace` from `src/lib/places.functions.ts` for FB rows; add a `confidence` field to its return so the UI can flag low-confidence results.
+- All new server fns gated by `requireAdminRoleAudited("businesses.discover.*")` for the audit trail.
+- No DB schema changes required — `businesses.source` already accepts arbitrary strings; we'll use `'facebook'` for the new source. `import_metadata` (jsonb) absorbs FB-specific fields.
+- Firecrawl is already wired; ensure the connection is linked before first Facebook import (admin will see a clear error if not).
+- `/map` needs no changes — once rows have `lat`/`lng`, pins appear automatically.
