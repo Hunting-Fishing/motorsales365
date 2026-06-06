@@ -166,14 +166,7 @@ const NAV: {
     label: "Discover Businesses",
     Icon: Store,
     roles: ["admin", "moderator"],
-    info: "Find businesses on Google and Facebook, verify the address resolves on the map, then import the ones you want.",
-  },
-  {
-    to: "/admin/seed-businesses",
-    label: "Seed Directory (Google only)",
-    Icon: Store,
-    roles: ["admin", "moderator"],
-    info: "Legacy Google-only importer. Use Discover Businesses for new work.",
+    info: "One place to find businesses on Google and Facebook, run the hourly auto-sync, verify addresses on the map, and import the ones you want.",
   },
   {
     to: "/admin/claims",

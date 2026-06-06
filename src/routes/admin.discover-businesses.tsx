@@ -594,13 +594,6 @@ function FacebookTab({ onAdd }: { onAdd: (r: Row) => void }) {
         </div>
       </Card>
 
-      <p className="text-xs text-muted-foreground">
-        Need the old single-source Google flow?{" "}
-        <Link to="/admin/seed-businesses" className="underline">
-          Open Seed Directory
-        </Link>
-        .
-      </p>
     </div>
   );
 }
