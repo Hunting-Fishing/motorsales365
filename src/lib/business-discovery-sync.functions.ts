@@ -157,6 +157,7 @@ export const importQueueItems = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertStaff(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { findDuplicateBusiness, mergeIntoExisting } = await import("./business-dedupe.server");
 
     const { data: rows, error } = await (supabaseAdmin as any)
       .from("business_discovery_queue")
@@ -168,58 +169,100 @@ export const importQueueItems = createServerFn({ method: "POST" })
     const apiKey = process.env.GOOGLE_MAPS_API_KEY ?? "";
     const photoBase = "https://places.googleapis.com/v1";
 
-    const inserts = (rows ?? [])
-      .filter((r: any) => r.our_type && r.lat != null && r.lng != null)
-      .map((r: any) => {
+    const valid = (rows ?? []).filter((r: any) => r.our_type && r.lat != null && r.lng != null);
+    const skippedIds = (rows ?? []).filter((r: any) => !(r.our_type && r.lat != null && r.lng != null)).map((r: any) => r.id);
+
+    // Detect duplicates first; merge into existing business when found.
+    const mergedQueueIds: string[] = [];
+    const insertables: any[] = [];
+    const mergedSummary: { name: string; existingId: string; reason: string; fields: string[] }[] = [];
+
+    for (const r of valid) {
+      const dup = await findDuplicateBusiness({
+        name: r.name,
+        lat: r.lat,
+        lng: r.lng,
+        streetAddress: r.address,
+        source: "google_places",
+        externalId: r.external_id,
+      });
+      if (dup) {
         const photoUrl = r.photo_name
           ? `${photoBase}/${r.photo_name}/media?maxWidthPx=1200&key=${encodeURIComponent(apiKey)}`
           : null;
-        return {
-          slug: `${slugify(r.name) || "business"}-${String(r.external_id).slice(-6).toLowerCase()}`,
-          name: r.name,
-          type_slug: r.our_type,
-          street_address: r.address,
-          lat: r.lat,
-          lng: r.lng,
+        const res = await mergeIntoExisting(dup.id, {
+          source: "google_places",
+          externalId: r.external_id,
           phone: r.phone,
           website: r.website,
-          rating_avg: r.rating ?? 0,
-          rating_count: r.rating_count ?? 0,
+          street_address: r.address,
+          cover_url: photoUrl,
+          lat: r.lat,
+          lng: r.lng,
           region: r.region,
           city: r.city,
-          status: "active" as const,
-          claim_state: "unclaimed",
-          source: "google_places",
-          source_external_id: r.external_id,
-          attribution: "Listing data © Google",
-          import_metadata: { google_types: r.types, photo_name: r.photo_name, via: "auto_sync" },
-          photos: photoUrl ? [{ url: photoUrl, source: "google" }] : [],
-          cover_url: photoUrl,
-          owner_id: null,
-        };
+        });
+        mergedSummary.push({ name: r.name, existingId: dup.id, reason: dup.reason, fields: res.fields });
+        mergedQueueIds.push(r.id);
+        continue;
+      }
+      const photoUrl = r.photo_name
+        ? `${photoBase}/${r.photo_name}/media?maxWidthPx=1200&key=${encodeURIComponent(apiKey)}`
+        : null;
+      insertables.push({
+        slug: `${slugify(r.name) || "business"}-${String(r.external_id).slice(-6).toLowerCase()}`,
+        name: r.name,
+        type_slug: r.our_type,
+        street_address: r.address,
+        lat: r.lat,
+        lng: r.lng,
+        phone: r.phone,
+        website: r.website,
+        rating_avg: r.rating ?? 0,
+        rating_count: r.rating_count ?? 0,
+        region: r.region,
+        city: r.city,
+        status: "active" as const,
+        claim_state: "unclaimed",
+        source: "google_places",
+        source_external_id: r.external_id,
+        attribution: "Listing data © Google",
+        import_metadata: { google_types: r.types, photo_name: r.photo_name, via: "auto_sync" },
+        photos: photoUrl ? [{ url: photoUrl, source: "google" }] : [],
+        cover_url: photoUrl,
+        owner_id: null,
+        _queueId: r.id,
       });
+    }
 
     let imported = 0;
-    if (inserts.length) {
+    const insertedQueueIds: string[] = [];
+    if (insertables.length) {
+      const payload = insertables.map(({ _queueId, ...rest }) => rest);
       const { data: ins, error: insErr } = await (supabaseAdmin as any)
         .from("businesses")
-        .upsert(inserts, { onConflict: "source,source_external_id", ignoreDuplicates: true })
+        .upsert(payload, { onConflict: "source,source_external_id", ignoreDuplicates: true })
         .select("id");
       if (insErr) throw new Error(insErr.message);
       imported = ins?.length ?? 0;
+      for (const r of insertables) insertedQueueIds.push(r._queueId);
     }
 
-    const importedIds = (rows ?? []).filter((r: any) => r.our_type && r.lat != null && r.lng != null).map((r: any) => r.id);
-    const skippedIds = (rows ?? []).filter((r: any) => !(r.our_type && r.lat != null && r.lng != null)).map((r: any) => r.id);
-
-    if (importedIds.length) {
+    const allReviewedIds = [...insertedQueueIds, ...mergedQueueIds];
+    if (allReviewedIds.length) {
       await (supabaseAdmin as any)
         .from("business_discovery_queue")
         .update({ status: "imported", reviewed_at: new Date().toISOString(), reviewed_by: context.userId })
-        .in("id", importedIds);
+        .in("id", allReviewedIds);
     }
 
-    return { imported, marked_imported: importedIds.length, skipped: skippedIds.length };
+    return {
+      imported,
+      merged: mergedSummary.length,
+      merged_details: mergedSummary,
+      marked_imported: allReviewedIds.length,
+      skipped: skippedIds.length,
+    };
   });
 
 // ---------- Run now (manual trigger) ----------
