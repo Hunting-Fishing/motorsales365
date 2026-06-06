@@ -121,8 +121,9 @@ function DiscoverPage() {
           })),
         },
       });
+      const mergedCount = (res as { merged?: unknown[] }).merged?.length ?? 0;
       toast.success(
-        `Imported ${res.imported}. ${res.skipped.length ? `Skipped ${res.skipped.length} (no coords).` : ""}`,
+        `Imported ${res.imported}${mergedCount ? ` · merged ${mergedCount} duplicate${mergedCount === 1 ? "" : "s"}` : ""}${res.skipped.length ? ` · skipped ${res.skipped.length} (no coords)` : ""}.`,
       );
       setRows((prev) =>
         prev.map((r) => (picked.find((p) => p.key === r.key) ? { ...r, alreadyImported: true } : r)),

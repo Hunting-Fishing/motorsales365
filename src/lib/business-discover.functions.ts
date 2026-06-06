@@ -20,6 +20,7 @@ import {
   type FbPageData,
   type GeocodedAddress,
 } from "./business-discover.server";
+import { findDuplicateBusiness, mergeIntoExisting } from "./business-dedupe.server";
 
 function slugify(s: string): string {
   return (
@@ -138,6 +139,7 @@ export const importDiscoveredBusinesses = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => ImportInput.parse(d))
   .handler(async ({ data }) => {
     const skipped: { name: string; reason: string }[] = [];
+    const merged: { name: string; existingId: string; reason: string; fields: string[] }[] = [];
     const usable = data.rows.filter((r) => {
       if (r.lat == null || r.lng == null) {
         skipped.push({ name: r.name, reason: "Missing coordinates" });
@@ -146,9 +148,45 @@ export const importDiscoveredBusinesses = createServerFn({ method: "POST" })
       return true;
     });
 
-    if (!usable.length) return { imported: 0, rows: [], skipped };
+    if (!usable.length) return { imported: 0, rows: [], skipped, merged };
 
-    const upserts = usable.map((r) => {
+    // First, detect and merge duplicates against existing businesses.
+    const toInsert: typeof usable = [];
+    for (const r of usable) {
+      const dup = await findDuplicateBusiness({
+        name: r.name,
+        lat: r.lat,
+        lng: r.lng,
+        streetAddress: r.streetAddress,
+        source: r.source,
+        externalId: r.externalId,
+      });
+      if (dup) {
+        const res = await mergeIntoExisting(dup.id, {
+          source: r.source,
+          externalId: r.externalId,
+          phone: r.phone,
+          website: r.website,
+          street_address: r.streetAddress,
+          cover_url: r.coverUrl,
+          lat: r.lat,
+          lng: r.lng,
+          region: r.region ?? null,
+          city: r.city ?? null,
+          about: r.about ?? null,
+          sourceUrl: r.sourceUrl ?? null,
+        });
+        merged.push({ name: r.name, existingId: dup.id, reason: dup.reason, fields: res.fields });
+        continue;
+      }
+      toInsert.push(r);
+    }
+
+    if (!toInsert.length) {
+      return { imported: 0, rows: [], skipped, merged };
+    }
+
+    const upserts = toInsert.map((r) => {
       const base = slugify(r.name);
       const suffix = r.externalId.replace(/[^a-z0-9]/gi, "").slice(-6).toLowerCase() || "x";
       return {
@@ -196,6 +234,7 @@ export const importDiscoveredBusinesses = createServerFn({ method: "POST" })
       imported: (inserted as { id: string }[] | null)?.length ?? 0,
       rows: (inserted as { id: string; slug: string; name: string }[] | null) ?? [],
       skipped,
+      merged,
     };
   });
 
