@@ -32,6 +32,7 @@ import { resolvePsgc } from "@/lib/psgc";
 import { uploadWithRetry } from "@/lib/storage-upload";
 import { toast } from "sonner";
 import { useDynamicMeta } from "@/hooks/use-dynamic-meta";
+import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 import { useDynamicJsonLd } from "@/hooks/use-dynamic-jsonld";
 import { PhoneInput } from "@/components/phone-input";
 import { buildE164 } from "@/data/country-codes";
@@ -152,15 +153,14 @@ function SubmitBusinessPage() {
   }, [user, loading, navigate]);
 
   useEffect(() => {
+    setTypes(
+      BUSINESS_KIND_OPTIONS.map((o) => ({ slug: o.value, label: o.label })),
+    );
     (async () => {
-      const [{ data: t1 }, { data: t2 }] = await Promise.all([
-        (supabase as any).from("business_types").select("slug,label").order("sort_order"),
-        (supabase as any)
-          .from("business_tags")
-          .select("slug,label,type_slug,category,sort_order,is_popular")
-          .order("sort_order"),
-      ]);
-      setTypes(t1 ?? []);
+      const { data: t2 } = await (supabase as any)
+        .from("business_tags")
+        .select("slug,label,type_slug,category,sort_order,is_popular")
+        .order("sort_order");
       setTags(t2 ?? []);
     })();
   }, []);

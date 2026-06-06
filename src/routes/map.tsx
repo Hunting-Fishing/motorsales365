@@ -15,6 +15,7 @@ import { GoogleBusinessMap, type GMapBusiness } from "@/components/businesses/go
 import { MapFilterBar, type CenterPoint } from "@/components/businesses/map-filter-bar";
 import { MapBottomSheet } from "@/components/businesses/map-bottom-sheet";
 import { haversineKm } from "@/components/businesses/google-maps-loader";
+import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 
 const searchSchema = z.object({
   lat: z.coerce.number().min(-90).max(90).optional(),
@@ -169,13 +170,13 @@ function MapPage() {
   }, [center, radiusKm, typeSlug]);
 
   useEffect(() => {
-    (async () => {
-      const { data } = await (supabase as any)
-        .from("business_types")
-        .select("slug,label,sort_order")
-        .order("sort_order");
-      setTypes(data ?? []);
-    })();
+    setTypes(
+      BUSINESS_KIND_OPTIONS.map((o, i) => ({
+        slug: o.value,
+        label: o.label,
+        sort_order: i,
+      })),
+    );
   }, []);
 
   useEffect(() => {
