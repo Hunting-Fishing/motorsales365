@@ -148,13 +148,30 @@ function AdminBusinessesPage() {
                         {b.featured && <Badge>Featured</Badge>}
                         <Badge variant="outline">{b.status}</Badge>
                       </div>
-                      <div className="text-xs text-muted-foreground">
-                        {b.type_slug} ·{" "}
-                        {[b.city, b.region].filter(Boolean).join(", ") || "no location"}
+                      <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                        <span>Type:</span>
+                        <Select
+                          value={b.type_slug}
+                          onValueChange={(v) => moderate(b.id, { type_slug: v } as any)}
+                        >
+                          <SelectTrigger className="h-7 w-[200px]">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {BUSINESS_KIND_OPTIONS.map((opt) => (
+                              <SelectItem key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <span>
+                          · {[b.city, b.region].filter(Boolean).join(", ") || "no location"}
+                        </span>
                         {b.rating_count > 0 && (
                           <>
-                            {" "}
-                            · <Star className="inline h-3 w-3 fill-yellow-500 text-yellow-500" />{" "}
+                            <span>·</span>
+                            <Star className="inline h-3 w-3 fill-yellow-500 text-yellow-500" />{" "}
                             {Number(b.rating_avg).toFixed(1)} ({b.rating_count})
                           </>
                         )}
@@ -162,6 +179,7 @@ function AdminBusinessesPage() {
                       <div className="mt-1 text-xs text-muted-foreground">
                         Owner: <code>{b.owner_id ?? "none"}</code>
                       </div>
+
                     </div>
                     <div className="flex flex-wrap gap-2">
                       {b.status !== "active" && (
