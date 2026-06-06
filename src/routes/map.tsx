@@ -15,6 +15,7 @@ import { GoogleBusinessMap, type GMapBusiness } from "@/components/businesses/go
 import { MapFilterBar, type CenterPoint } from "@/components/businesses/map-filter-bar";
 import { MapBottomSheet } from "@/components/businesses/map-bottom-sheet";
 import { haversineKm } from "@/components/businesses/google-maps-loader";
+import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 
 const searchSchema = z.object({
   lat: z.coerce.number().min(-90).max(90).optional(),
