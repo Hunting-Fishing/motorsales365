@@ -740,6 +740,62 @@ export type Database = {
           },
         ]
       }
+      business_claim_requests: {
+        Row: {
+          business_id: string
+          claimant_user_id: string
+          contact_method: string
+          contact_value: string | null
+          created_at: string
+          decided_at: string | null
+          evidence_url: string | null
+          id: string
+          notes: string | null
+          reviewer_notes: string | null
+          reviewer_user_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          claimant_user_id: string
+          contact_method: string
+          contact_value?: string | null
+          created_at?: string
+          decided_at?: string | null
+          evidence_url?: string | null
+          id?: string
+          notes?: string | null
+          reviewer_notes?: string | null
+          reviewer_user_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          claimant_user_id?: string
+          contact_method?: string
+          contact_value?: string | null
+          created_at?: string
+          decided_at?: string | null
+          evidence_url?: string | null
+          id?: string
+          notes?: string | null
+          reviewer_notes?: string | null
+          reviewer_user_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_claim_requests_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_contact_channels: {
         Row: {
           business_id: string
@@ -1437,9 +1493,11 @@ export type Database = {
       }
       businesses: {
         Row: {
+          attribution: string | null
           barangay: string | null
           brands_carried: string | null
           city: string | null
+          claim_state: string
           cover_url: string | null
           created_at: string
           cta_primary: string
@@ -1451,6 +1509,7 @@ export type Database = {
           featured_video_url: string | null
           hours: Json | null
           id: string
+          import_metadata: Json | null
           lat: number | null
           lng: number | null
           logo_url: string | null
@@ -1467,6 +1526,7 @@ export type Database = {
           rating_avg: number
           rating_count: number
           region: string | null
+          removal_requested_at: string | null
           show_contact: boolean
           show_gallery: boolean
           show_posts: boolean
@@ -1486,9 +1546,11 @@ export type Database = {
           website: string | null
         }
         Insert: {
+          attribution?: string | null
           barangay?: string | null
           brands_carried?: string | null
           city?: string | null
+          claim_state?: string
           cover_url?: string | null
           created_at?: string
           cta_primary?: string
@@ -1500,6 +1562,7 @@ export type Database = {
           featured_video_url?: string | null
           hours?: Json | null
           id?: string
+          import_metadata?: Json | null
           lat?: number | null
           lng?: number | null
           logo_url?: string | null
@@ -1516,6 +1579,7 @@ export type Database = {
           rating_avg?: number
           rating_count?: number
           region?: string | null
+          removal_requested_at?: string | null
           show_contact?: boolean
           show_gallery?: boolean
           show_posts?: boolean
@@ -1535,9 +1599,11 @@ export type Database = {
           website?: string | null
         }
         Update: {
+          attribution?: string | null
           barangay?: string | null
           brands_carried?: string | null
           city?: string | null
+          claim_state?: string
           cover_url?: string | null
           created_at?: string
           cta_primary?: string
@@ -1549,6 +1615,7 @@ export type Database = {
           featured_video_url?: string | null
           hours?: Json | null
           id?: string
+          import_metadata?: Json | null
           lat?: number | null
           lng?: number | null
           logo_url?: string | null
@@ -1565,6 +1632,7 @@ export type Database = {
           rating_avg?: number
           rating_count?: number
           region?: string | null
+          removal_requested_at?: string | null
           show_contact?: boolean
           show_gallery?: boolean
           show_posts?: boolean
@@ -6082,6 +6150,10 @@ export type Database = {
           _subscription_id?: string
         }
         Returns: Json
+      }
+      approve_business_claim: {
+        Args: { _auto: boolean; _claim_id: string }
+        Returns: undefined
       }
       can_manage_ads: { Args: { _user_id: string }; Returns: boolean }
       can_manage_org: {

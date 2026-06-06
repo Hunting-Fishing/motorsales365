@@ -162,6 +162,20 @@ const NAV: {
     info: "Approve and moderate the Business directory.",
   },
   {
+    to: "/admin/seed-businesses",
+    label: "Seed Directory",
+    Icon: Store,
+    roles: ["admin", "moderator"],
+    info: "Import real businesses from Google Places to populate the map. Imported entries are 'Unclaimed' until the owner claims them.",
+  },
+  {
+    to: "/admin/claims",
+    label: "Business Claims",
+    Icon: ShieldCheck,
+    roles: ["admin", "moderator"],
+    info: "Review claim requests for seeded businesses.",
+  },
+  {
     to: "/admin/type-suggestions",
     label: "Type suggestions",
     Icon: Sparkles,
