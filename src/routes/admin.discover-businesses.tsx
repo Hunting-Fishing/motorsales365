@@ -524,7 +524,8 @@ function FacebookTab({ onAdd }: { onAdd: (r: Row) => void }) {
   async function runSearch() {
     setBusy(true);
     try {
-      const res = await search({ data: { query, city: city || undefined } });
+      const cityForSearch = [city, region].filter(Boolean).join(", ") || undefined;
+      const res = await search({ data: { query, city: cityForSearch } });
       setResults(res.results);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Search failed");
