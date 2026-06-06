@@ -416,14 +416,15 @@ function GoogleTab({ onAdd }: { onAdd: (r: Row) => void }) {
             </SelectContent>
           </Select>
         </div>
-        <div>
-          <Label>Region</Label>
-          <Input value={region} onChange={(e) => setRegion(e.target.value)} placeholder="NCR" />
-        </div>
-        <div>
-          <Label>City</Label>
-          <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Quezon City" />
-        </div>
+        <PhLocationPicker
+          region={region}
+          city={city}
+          onChange={(v) => {
+            setRegion(v.region);
+            setCity(v.city);
+          }}
+        />
+
         <div className="lg:col-span-2">
           <Label>Keywords (optional)</Label>
           <Input
