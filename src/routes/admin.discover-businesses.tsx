@@ -32,6 +32,7 @@ import {
 import { AutoSyncTab } from "@/components/admin/auto-sync-tab";
 import { PhLocationPicker } from "@/components/admin/ph-location-picker";
 import { DISCOVER_SEARCH_GROUPS } from "@/data/discover-search-terms";
+import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 
 
 export const Route = createFileRoute("/admin/discover-businesses")({
