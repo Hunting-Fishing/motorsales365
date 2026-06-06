@@ -9,6 +9,7 @@ import {
   Store as StoreIcon,
   ArrowRightLeft,
   Search,
+  Pencil,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -16,9 +17,18 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { ImportPlacesPanel } from "@/components/admin/import-places-panel";
 import { TransferBusinessOwnerDialog } from "@/components/admin/transfer-business-owner-dialog";
+import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
+
 
 export const Route = createFileRoute("/admin/businesses")({
   component: AdminBusinessesPage,
