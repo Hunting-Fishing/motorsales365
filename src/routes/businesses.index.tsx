@@ -15,6 +15,7 @@ import { haversineKm } from "@/components/businesses/google-maps-loader";
 import { LocationDrilldown, type LocationValue } from "@/components/businesses/location-drilldown";
 import { PremiumSponsorsRail } from "@/components/businesses/premium-sponsors-rail";
 import { getVerifiedOwnerIds } from "@/lib/business-directory.functions";
+import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 
 export const Route = createFileRoute("/businesses/")({
     head: () => ({
