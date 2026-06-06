@@ -482,6 +482,7 @@ function FacebookTab({ onAdd }: { onAdd: (r: Row) => void }) {
   const search = useServerFn(searchFbPagesForAdmin);
   const [url, setUrl] = useState("");
   const [query, setQuery] = useState("");
+  const [region, setRegion] = useState("");
   const [city, setCity] = useState("");
   const [busy, setBusy] = useState(false);
   const [results, setResults] = useState<
