@@ -76,12 +76,17 @@ const FIELD_MASK = [
 ].join(",");
 
 async function runOnePlacesSearch(s: SearchRow): Promise<PlaceResult[]> {
-  const textQuery = [s.query, s.city, s.region, "Philippines"].filter(Boolean).join(", ");
+  // Bake the place type into the query as a keyword (Google's strict
+  // `includedType` rejects many of our internal slugs and returns zero hits).
+  const typeKeyword = (s.place_type ?? "").replace(/_/g, " ");
+  const textQuery = [s.query, typeKeyword, s.city, s.region, "Philippines"]
+    .filter(Boolean)
+    .join(", ");
   const body = {
     textQuery,
-    includedType: s.place_type,
     maxResultCount: 20,
     regionCode: "PH",
+    languageCode: "en",
   };
   const res = await fetch(`${GATEWAY}/places/v1/places:searchText`, {
     method: "POST",
