@@ -66,22 +66,32 @@ type Row = {
 };
 
 const FB_CATEGORY_TO_TYPE: { match: RegExp; slug: string }[] = [
-  { match: /motorcycle/i, slug: "motorcycle_shop" },
-  { match: /tire/i, slug: "tire_shop" },
-  { match: /body|paint/i, slug: "body_paint" },
-  { match: /parts|accessor/i, slug: "parts_accessories" },
-  { match: /wash/i, slug: "carwash" },
-  { match: /gas|fuel|petrol/i, slug: "fuel_station" },
+  { match: /motorcycle|scooter/i, slug: "motorcycle_shop" },
+  { match: /rent(al)?\b|rent[-\s]?a[-\s]?car/i, slug: "rental" },
+  { match: /tint|audio|stereo/i, slug: "audio_tint" },
+  { match: /tire|vulcan|wheel/i, slug: "tire_shop" },
+  { match: /batter/i, slug: "battery_shop" },
+  { match: /body|paint|collision/i, slug: "body_paint" },
+  { match: /parts|accessor|surplus/i, slug: "parts_accessories" },
+  { match: /wash|detail/i, slug: "carwash" },
+  { match: /gas|fuel|petrol|station/i, slug: "fuel_station" },
   { match: /insur/i, slug: "insurance" },
-  { match: /tow/i, slug: "towing" },
-  { match: /dealer|sales/i, slug: "dealership" },
+  { match: /loan|financ/i, slug: "financing" },
+  { match: /tow|roadside|wrecker/i, slug: "towing" },
+  { match: /salvage|junk|scrap/i, slug: "salvage" },
+  { match: /inspect|emission|pmvic/i, slug: "inspection" },
+  { match: /driving school|driving lesson/i, slug: "driving_school" },
+  { match: /lto|registration/i, slug: "lto_services" },
+  { match: /trucking|logistic|cargo|courier/i, slug: "transport" },
+  { match: /fleet|corporate/i, slug: "corporate" },
+  { match: /dealer|sales|showroom/i, slug: "dealership" },
   { match: /repair|mechanic|service|garage/i, slug: "repair_shop" },
 ];
 
 function guessTypeFromCategory(cat: string | null): string {
   if (!cat) return "repair_shop";
   for (const m of FB_CATEGORY_TO_TYPE) if (m.match.test(cat)) return m.slug;
-  return "repair_shop";
+  return "other";
 }
 
 function DiscoverPage() {
