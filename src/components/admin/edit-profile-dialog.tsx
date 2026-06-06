@@ -78,7 +78,7 @@ export function EditProfileDialog({
     signup_region: "",
     signup_province: "",
     business_name: "",
-    business_kind: "" as "" | "dealer" | "repair_shop" | "insurance",
+    business_kind: "" as string,
     business_address: "",
     business_region: "",
     business_province: "",
@@ -394,9 +394,9 @@ export function EditProfileDialog({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">None</SelectItem>
-                    <SelectItem value="dealer">Dealer</SelectItem>
-                    <SelectItem value="repair_shop">Repair shop</SelectItem>
-                    <SelectItem value="insurance">Insurance</SelectItem>
+                    {BUSINESS_KIND_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>
