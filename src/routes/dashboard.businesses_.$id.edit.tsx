@@ -454,12 +454,15 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
   return (
     <Card className="space-y-5 p-4 md:p-5">
       <div>
-        <h2 className="font-display text-lg font-semibold">Tags</h2>
+        <h2 className="font-display text-lg font-semibold">Tags & offerings</h2>
         <p className="text-sm text-muted-foreground">
-          Pick what your station offers — fuel grades (91/95/97/100 RON), diesel types, EV charging
-          connectors, and amenities. These show as filterable badges on your public page.
+          Pick everything this business offers. Tags from your primary type appear first; you can
+          also add offerings from other categories (e.g. a used car dealership that also does tire
+          repair, vulcanizing, or A/C service). These show as filterable badges and let customers
+          discover you under more categories.
         </p>
       </div>
+
 
       {selected.size > 0 && (
         <div className="rounded-lg border border-border bg-secondary/40 p-3">
