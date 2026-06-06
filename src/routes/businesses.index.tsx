@@ -370,6 +370,15 @@ function BusinessesIndex() {
                                 Featured
                               </Badge>
                             )}
+                            {b.claim_state === "unclaimed" && (
+                              <Badge
+                                variant="outline"
+                                className="shrink-0 border-dashed text-[10px] text-muted-foreground"
+                                title="Added from public sources — not yet claimed by the owner"
+                              >
+                                Unclaimed
+                              </Badge>
+                            )}
                           </div>
                           <div className="text-xs text-muted-foreground">
                             {typeLabel(b.type_slug)}
