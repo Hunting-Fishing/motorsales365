@@ -740,6 +740,53 @@ export type Database = {
           },
         ]
       }
+      business_claim_evidence: {
+        Row: {
+          claim_id: string
+          created_at: string
+          evidence_type: string
+          file_name: string
+          file_size: number
+          id: string
+          mime_type: string
+          notes: string | null
+          storage_path: string
+          uploader_user_id: string
+        }
+        Insert: {
+          claim_id: string
+          created_at?: string
+          evidence_type: string
+          file_name: string
+          file_size: number
+          id?: string
+          mime_type: string
+          notes?: string | null
+          storage_path: string
+          uploader_user_id: string
+        }
+        Update: {
+          claim_id?: string
+          created_at?: string
+          evidence_type?: string
+          file_name?: string
+          file_size?: number
+          id?: string
+          mime_type?: string
+          notes?: string | null
+          storage_path?: string
+          uploader_user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_claim_evidence_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "business_claim_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_claim_requests: {
         Row: {
           business_id: string
