@@ -153,7 +153,9 @@ function VerificationPage() {
       return;
     }
     if (
-      ["repair_shop", "insurance", "dealer"].includes(form.business_kind) &&
+      ["repair_shop", "insurance", "dealership", "motorcycle_shop", "body_paint", "parts_accessories"].includes(
+        form.business_kind,
+      ) &&
       !form.dti_sec_registration.trim()
     ) {
       toast.error("DTI/SEC registration number is required for this business type");
