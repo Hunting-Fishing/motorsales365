@@ -95,6 +95,7 @@ import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTypeSuggestionsRouteImport } from './routes/admin.type-suggestions'
 import { Route as AdminStaff365RouteImport } from './routes/admin.staff-365'
 import { Route as AdminShopRouteImport } from './routes/admin.shop'
+import { Route as AdminSeedBusinessesRouteImport } from './routes/admin.seed-businesses'
 import { Route as AdminSandboxRouteImport } from './routes/admin.sandbox'
 import { Route as AdminSalesRepsRouteImport } from './routes/admin.sales-reps'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
@@ -109,6 +110,7 @@ import { Route as AdminInquiriesRouteImport } from './routes/admin.inquiries'
 import { Route as AdminFeatureFlagsRouteImport } from './routes/admin.feature-flags'
 import { Route as AdminEducationRouteImport } from './routes/admin.education'
 import { Route as AdminCurrenciesRouteImport } from './routes/admin.currencies'
+import { Route as AdminClaimsRouteImport } from './routes/admin.claims'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
@@ -581,6 +583,11 @@ const AdminShopRoute = AdminShopRouteImport.update({
   path: '/shop',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminSeedBusinessesRoute = AdminSeedBusinessesRouteImport.update({
+  id: '/seed-businesses',
+  path: '/seed-businesses',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSandboxRoute = AdminSandboxRouteImport.update({
   id: '/sandbox',
   path: '/sandbox',
@@ -649,6 +656,11 @@ const AdminEducationRoute = AdminEducationRouteImport.update({
 const AdminCurrenciesRoute = AdminCurrenciesRouteImport.update({
   id: '/currencies',
   path: '/currencies',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminClaimsRoute = AdminClaimsRouteImport.update({
+  id: '/claims',
+  path: '/claims',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminBusinessesRoute = AdminBusinessesRouteImport.update({
@@ -906,6 +918,7 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
+  '/admin/claims': typeof AdminClaimsRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
@@ -920,6 +933,7 @@ export interface FileRoutesByFullPath {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/sales-reps': typeof AdminSalesRepsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
+  '/admin/seed-businesses': typeof AdminSeedBusinessesRoute
   '/admin/shop': typeof AdminShopRoute
   '/admin/staff-365': typeof AdminStaff365Route
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
@@ -1047,6 +1061,7 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
+  '/admin/claims': typeof AdminClaimsRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
@@ -1061,6 +1076,7 @@ export interface FileRoutesByTo {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/sales-reps': typeof AdminSalesRepsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
+  '/admin/seed-businesses': typeof AdminSeedBusinessesRoute
   '/admin/shop': typeof AdminShopRoute
   '/admin/staff-365': typeof AdminStaff365Route
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
@@ -1190,6 +1206,7 @@ export interface FileRoutesById {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
+  '/admin/claims': typeof AdminClaimsRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
@@ -1204,6 +1221,7 @@ export interface FileRoutesById {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/sales-reps': typeof AdminSalesRepsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
+  '/admin/seed-businesses': typeof AdminSeedBusinessesRoute
   '/admin/shop': typeof AdminShopRoute
   '/admin/staff-365': typeof AdminStaff365Route
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
@@ -1335,6 +1353,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/audit'
     | '/admin/businesses'
+    | '/admin/claims'
     | '/admin/currencies'
     | '/admin/education'
     | '/admin/feature-flags'
@@ -1349,6 +1368,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/sales-reps'
     | '/admin/sandbox'
+    | '/admin/seed-businesses'
     | '/admin/shop'
     | '/admin/staff-365'
     | '/admin/type-suggestions'
@@ -1476,6 +1496,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/audit'
     | '/admin/businesses'
+    | '/admin/claims'
     | '/admin/currencies'
     | '/admin/education'
     | '/admin/feature-flags'
@@ -1490,6 +1511,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/sales-reps'
     | '/admin/sandbox'
+    | '/admin/seed-businesses'
     | '/admin/shop'
     | '/admin/staff-365'
     | '/admin/type-suggestions'
@@ -1618,6 +1640,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/audit'
     | '/admin/businesses'
+    | '/admin/claims'
     | '/admin/currencies'
     | '/admin/education'
     | '/admin/feature-flags'
@@ -1632,6 +1655,7 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/sales-reps'
     | '/admin/sandbox'
+    | '/admin/seed-businesses'
     | '/admin/shop'
     | '/admin/staff-365'
     | '/admin/type-suggestions'
@@ -2411,6 +2435,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminShopRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/seed-businesses': {
+      id: '/admin/seed-businesses'
+      path: '/seed-businesses'
+      fullPath: '/admin/seed-businesses'
+      preLoaderRoute: typeof AdminSeedBusinessesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/sandbox': {
       id: '/admin/sandbox'
       path: '/sandbox'
@@ -2507,6 +2538,13 @@ declare module '@tanstack/react-router' {
       path: '/currencies'
       fullPath: '/admin/currencies'
       preLoaderRoute: typeof AdminCurrenciesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/claims': {
+      id: '/admin/claims'
+      path: '/claims'
+      fullPath: '/admin/claims'
+      preLoaderRoute: typeof AdminClaimsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/businesses': {
@@ -2807,6 +2845,7 @@ interface AdminRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBusinessesRoute: typeof AdminBusinessesRoute
+  AdminClaimsRoute: typeof AdminClaimsRoute
   AdminCurrenciesRoute: typeof AdminCurrenciesRoute
   AdminEducationRoute: typeof AdminEducationRoute
   AdminFeatureFlagsRoute: typeof AdminFeatureFlagsRoute
@@ -2821,6 +2860,7 @@ interface AdminRouteChildren {
   AdminReportsRoute: typeof AdminReportsRoute
   AdminSalesRepsRoute: typeof AdminSalesRepsRoute
   AdminSandboxRoute: typeof AdminSandboxRoute
+  AdminSeedBusinessesRoute: typeof AdminSeedBusinessesRoute
   AdminShopRoute: typeof AdminShopRoute
   AdminStaff365Route: typeof AdminStaff365Route
   AdminTypeSuggestionsRoute: typeof AdminTypeSuggestionsRoute
@@ -2838,6 +2878,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminAuditRoute: AdminAuditRoute,
   AdminBusinessesRoute: AdminBusinessesRoute,
+  AdminClaimsRoute: AdminClaimsRoute,
   AdminCurrenciesRoute: AdminCurrenciesRoute,
   AdminEducationRoute: AdminEducationRoute,
   AdminFeatureFlagsRoute: AdminFeatureFlagsRoute,
@@ -2852,6 +2893,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminReportsRoute: AdminReportsRoute,
   AdminSalesRepsRoute: AdminSalesRepsRoute,
   AdminSandboxRoute: AdminSandboxRoute,
+  AdminSeedBusinessesRoute: AdminSeedBusinessesRoute,
   AdminShopRoute: AdminShopRoute,
   AdminStaff365Route: AdminStaff365Route,
   AdminTypeSuggestionsRoute: AdminTypeSuggestionsRoute,
