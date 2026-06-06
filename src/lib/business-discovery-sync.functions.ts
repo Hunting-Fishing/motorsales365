@@ -24,6 +24,10 @@ const PlaceTypeEnum = z.enum([
   "car_body_shop",
   "insurance_agency",
   "towing_service",
+  "car_rental",
+  "driving_school",
+  "finance",
+  "moving_company",
 ]);
 
 // ---------- Searches ----------

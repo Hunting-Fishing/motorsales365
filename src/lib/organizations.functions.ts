@@ -45,7 +45,7 @@ export const createOrganization = createServerFn({ method: "POST" })
       .insert({
         name: data.name,
         slug,
-        kind: (data.kind as any) ?? "dealer",
+        kind: (data.kind as any) ?? "dealership",
         created_by: userId,
       } as any)
       .select("id, name, slug")

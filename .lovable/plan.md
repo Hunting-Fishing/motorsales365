@@ -1,82 +1,93 @@
-# Admin Business Discovery (Google + Facebook) with Map-Ready Addresses
+## Problem
 
-Goal: give admins a single place to discover, preview, and import auto/motor businesses from **Google Places** and **Facebook Pages** into the 365 Motorsales directory — with verified street addresses and lat/lng so every imported business shows correctly on `/map`.
+The discover-businesses screen currently shows **two different category vocabularies**:
 
-## What exists today
+1. **Search-terms group dropdown** (image 1) — uses `BUSINESS_KIND_OPTIONS` (22 values: `dealer`, `rental`, `parts_shop`, `repair_shop`, `body_shop`, `tire_shop`, `battery_shop`, `towing`, `fuel_station`, `carwash`, `salvage`, `accessories`, `audio_tint`, `inspection`, `driving_school`, `lto_services`, `insurance`, `financing`, `transport`, `corporate`, `other`).
+2. **Per-row "category" dropdown on imported preview** (image 2) — uses `business_types.slug` (11 values: `dealership`, `repair_shop`, `motorcycle_shop`, `tire_shop`, `body_paint`, `parts_accessories`, `carwash`, `fuel_station`, `insurance`, `salvage`, `towing`).
 
-- `admin.seed-businesses.tsx` — Google Places text search → multi-select → import (already works, types mapped, photos pulled).
-- `facebook-import.functions.ts` — only imports **marketplace listings** for end users. No admin path, no Page/business import.
-- `businesses` table already has `lat`, `lng`, `street_address`, `source`, `source_external_id`, `import_metadata`, `cover_url`, `photos`.
-- `/map` reads from `businesses` and needs `lat` + `lng` to plot a pin.
+These overlap but don't match (`dealer` vs `dealership`, `parts_shop` vs `parts_accessories`, `body_shop` vs `body_paint`, plus 11 fields from the signup list have no `business_types` row, so an imported FB page in those fields cannot be filed correctly).
 
-## What changes
+## Goal
 
-### 1. New unified admin page: `/admin/discover-businesses`
+One shared category list across signup, discover search-terms, and the imported-row category picker, so any field you can pick during discovery is the same field stored on the resulting business and the same field a business owner picks at signup.
 
-Replaces (and absorbs) `admin.seed-businesses.tsx`. Two tabs:
+## Approach — make `business_types` the single source
 
-- **Google Places** — current flow, kept as-is but with the address-quality improvements below.
-- **Facebook Pages** — paste a Page URL, paste a list of Page URLs, or search by keyword + city. Admin reviews extracted data and imports.
+`business_types` is the table the directory, map, filters and routing already key off (`businesses.type_slug` is a FK-style text). It's the harder one to change after the fact, so we align everything to it and grow it to cover the full 365 field list.
 
-Both tabs feed the same review/import table so admin can mix sources in one batch.
+### 1. Expand `business_types` (DB migration)
 
-### 2. Facebook Page import (admin-only)
+Add the missing slugs (with labels + sort_order) so the table covers every 365 field:
 
-New server fns in `src/lib/facebook-business-import.functions.ts` (separate from the existing user-listing flow):
+```
+rental             — Vehicle rental
+parts_accessories  — already exists, re-label to "Parts supplier / shop"
+battery_shop       — Battery shop
+accessories        — Accessories / customization
+audio_tint         — Audio & window tint
+inspection         — Inspection / emissions
+driving_school     — Driving school
+lto_services       — LTO / registration services
+financing          — Financing / loans
+transport          — Transport / logistics
+corporate          — Corporate / fleet
+other              — Other
+```
 
-- `scrapeFbPageForAdmin({ url })` — staff-gated. Uses Firecrawl to scrape the Page, parses name, category, About/address text, phone, website, hours, profile + cover photo, page id.
-- `searchFbPagesForAdmin({ query, city })` — staff-gated. Uses Firecrawl search restricted to `site:facebook.com` for keyword + city, returns candidate Page URLs.
-- `importFbPagesForAdmin({ candidates })` — staff-gated. Upserts into `businesses` with `source='facebook'`, `source_external_id=<page id>`, `import_metadata={ fb_url, fb_about, fb_hours_raw }`. Re-imports are idempotent via the existing `(source, source_external_id)` unique constraint.
+(Existing `dealership`, `repair_shop`, `motorcycle_shop`, `tire_shop`, `body_paint`, `carwash`, `fuel_station`, `insurance`, `salvage`, `towing` stay as-is so existing businesses keep working.)
 
-Photos are downloaded to Supabase Storage the same way Google photos are handled.
+### 2. Replace `BUSINESS_KIND_OPTIONS` with a derived list
 
-### 3. Address → map-ready coordinates (the "shows on the map" piece)
+`src/data/business-kinds.ts` becomes a thin wrapper that reads from a single hard-coded list of `{ slug, label }` matching `business_types`. Old slugs (`dealer`, `parts_shop`, `body_shop`) are removed; existing profile rows in those values are migrated:
 
-This is the core upgrade. New helper `ensureGeocoded(business)` used by both Google and Facebook import paths:
+```sql
+update public.profiles set business_kind = 'dealership'        where business_kind = 'dealer';
+update public.profiles set business_kind = 'parts_accessories' where business_kind = 'parts_shop';
+update public.profiles set business_kind = 'body_paint'        where business_kind = 'body_shop';
+```
 
-- **Google**: already returns lat/lng — keep as-is, also store the formatted address in `street_address`.
-- **Facebook**: Pages rarely include lat/lng. Pipeline:
-    1. Take the best available address string (About → "Address" line, or the page location text).
-    2. If admin selected a city in the search form, append it.
-    3. Call existing `geocodePlace` (Google Geocoding via the Maps connector) to resolve to lat/lng + a clean `street_address`.
-    4. If geocoding fails or returns low confidence, mark the candidate with a yellow "Needs address" badge in the admin table.
+Then rebuild the `business_kind` enum to match the new canonical list (drop old labels, add new ones).
 
-In the admin review table, every row shows:
+### 3. Rewrite `src/data/discover-search-terms.ts`
 
-- Resolved `street_address`
-- A small map thumbnail (or "No coordinates" warning)
-- An inline "Fix address" field — admin can paste/edit the address and click **Re-geocode** before importing.
+Re-key every group by the new canonical slug (`dealership`, `repair_shop`, `motorcycle_shop`, `body_paint`, `parts_accessories`, `tire_shop`, `battery_shop`, `towing`, `fuel_station`, `carwash`, `salvage`, `accessories`, `audio_tint`, `inspection`, `driving_school`, `lto_services`, `insurance`, `financing`, `transport`, `corporate`, `rental`, `other`). Curated FB/Google search terms stay; only the `kind` field changes.
 
-Import is blocked for rows with no lat/lng, with a clear inline message. This guarantees nothing lands in `businesses` without map coordinates.
+### 4. Update the FB-category → slug mapper
 
-### 4. Duplicate detection across sources
+In `src/routes/admin.discover-businesses.tsx` (`FB_CATEGORY_TO_TYPE`) and `src/lib/business-discovery-sync.server.ts` (`GOOGLE_TYPE_TO_SLUG`, `places.server.ts`) — replace any stale slug with the canonical one and add rules for the new fields (e.g. `/rent|rental/i → rental`, `/insur/i → insurance`, `/tint|audio/i → audio_tint`, etc.).
 
-Before insert, for each candidate:
+### 5. Wire the per-row category dropdown
 
-- Check `source + source_external_id` (already enforced).
-- Check name + lat/lng within ~100m of an existing business (reuse the logic in `places.functions.ts › findNearbyForImport`).
-- If a match is found, show "Possible duplicate of <name>" with a link, and offer **Merge** (attach `fb_url` / `google_place_id` to the existing row instead of creating a new one).
+The dropdown in image 2 already reads from `business_types`. Once step 1 lands it will automatically show all 22 fields, matching the discover-group dropdown 1:1. No UI change needed beyond verifying the option list source.
 
-### 5. Small UX polish in admin
+### 6. Sweep code references
 
-- Bulk **Select all importable**, **Select all with coordinates only**.
-- Filter chips: Source (Google/FB), Has coordinates, Has photo, Already imported.
-- After import: toast with counts per source + "View on map" link that opens `/map` filtered to the just-imported set.
+`rg` for `"dealer"`, `"parts_shop"`, `"body_shop"` literals and update:
+- `src/routes/signup.tsx`
+- `src/lib/admin-profile.functions.ts` (the `z.enum(["dealer","repair_shop","insurance"])` — extend or drop the narrow allow-list)
+- `src/lib/business-seed.functions.ts`, `business-discovery-sync.server.ts`, `places.server.ts` mapper tables
+- `email-templates/verification-submitted.tsx` sample data
+- `admin.discover-businesses.tsx` hard-coded array on lines 328-332
 
-## Out of scope for this plan
+### 7. Smoke test
 
-- Scheduled/automatic crawling — manual admin-triggered only.
-- Public-facing Facebook claim flow for owners (separate work, the existing user FB verification flow stays untouched).
-- Bulk CSV upload (can be added later if helpful).
+- Discover a FB page → row category dropdown shows all 22 fields, defaults sensibly, imports cleanly.
+- Existing businesses (`type_slug` already in `dealership`/`repair_shop`/etc.) still render on `/businesses` and `/map`.
+- Existing profiles whose `business_kind` was `dealer`/`parts_shop`/`body_shop` now show as `dealership`/`parts_accessories`/`body_paint` on `/admin/accounts`.
+- Signup category picker shows the same 22 options.
 
----
+## Files touched
 
-## Technical notes (for the implementer)
+- `supabase/migrations/<new>.sql` — add 12 `business_types` rows, rename/migrate `business_kind` enum, backfill `profiles.business_kind`.
+- `src/data/business-kinds.ts` — rewrite to canonical 22-slug list.
+- `src/data/discover-search-terms.ts` — rekey groups.
+- `src/routes/admin.discover-businesses.tsx` — update FB-category map + hard-coded array.
+- `src/lib/business-seed.functions.ts`, `src/lib/business-discovery-sync.server.ts`, `src/lib/places.server.ts` — update Google-type → slug maps.
+- `src/lib/admin-profile.functions.ts` — broaden validator enum.
+- `src/components/admin/edit-profile-dialog.tsx`, `src/routes/signup.tsx`, `src/routes/admin.accounts.tsx`, etc. — auto-pick up new options via `BUSINESS_KIND_OPTIONS`.
 
-- New file: `src/lib/facebook-business-import.functions.ts` + `.server.ts` helpers (Firecrawl scrape, Page parser, photo downloader — mirror the Google helpers).
-- New file: `src/routes/admin.discover-businesses.tsx`. Keep `admin.seed-businesses.tsx` as a redirect for one release, then remove.
-- Reuse `geocodePlace` from `src/lib/places.functions.ts` for FB rows; add a `confidence` field to its return so the UI can flag low-confidence results.
-- All new server fns gated by `requireAdminRoleAudited("businesses.discover.*")` for the audit trail.
-- No DB schema changes required — `businesses.source` already accepts arbitrary strings; we'll use `'facebook'` for the new source. `import_metadata` (jsonb) absorbs FB-specific fields.
-- Firecrawl is already wired; ensure the connection is linked before first Facebook import (admin will see a clear error if not).
-- `/map` needs no changes — once rows have `lat`/`lng`, pins appear automatically.
+## Risk / rollback
+
+- Enum rebuild requires drop-and-recreate with column re-cast; we do it in one transactional migration with the backfill UPDATEs first.
+- No data loss: every removed enum value has a 1:1 mapping to the replacement slug.
+- If the new `business_types` rows aren't wanted in the public directory yet, we can hide them from `/businesses` nav with a `visible` flag (add column) — but that's optional polish, not part of the merge.

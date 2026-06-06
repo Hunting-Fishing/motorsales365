@@ -21,6 +21,10 @@ const TYPE_MAP: Record<string, string> = {
   car_body_shop: "body_paint",
   insurance_agency: "insurance",
   towing_service: "towing",
+  car_rental: "rental",
+  driving_school: "driving_school",
+  finance: "financing",
+  moving_company: "transport",
 };
 
 export const AVAILABLE_PLACE_TYPES = Object.keys(TYPE_MAP);

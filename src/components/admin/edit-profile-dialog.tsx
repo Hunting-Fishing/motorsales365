@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { adminUpdateUserProfile } from "@/lib/admin-profile.functions";
 import { logAdminAudit, type AdminAuditEntry } from "@/lib/admin-audit";
+import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -77,7 +78,7 @@ export function EditProfileDialog({
     signup_region: "",
     signup_province: "",
     business_name: "",
-    business_kind: "" as "" | "dealer" | "repair_shop" | "insurance",
+    business_kind: "" as string,
     business_address: "",
     business_region: "",
     business_province: "",
@@ -393,9 +394,9 @@ export function EditProfileDialog({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">None</SelectItem>
-                    <SelectItem value="dealer">Dealer</SelectItem>
-                    <SelectItem value="repair_shop">Repair shop</SelectItem>
-                    <SelectItem value="insurance">Insurance</SelectItem>
+                    {BUSINESS_KIND_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

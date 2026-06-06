@@ -71,10 +71,20 @@ const PLACE_TYPE_MAP: Record<string, string[]> = {
   body_paint: ["car_repair"],
   parts_accessories: ["auto_parts_store"],
   tire_shop: ["auto_parts_store"],
+  battery_shop: ["auto_parts_store"],
+  accessories: ["auto_parts_store"],
+  audio_tint: ["auto_parts_store"],
   motorcycle_shop: ["motorcycle_dealer"],
   carwash: ["car_wash"],
   towing: ["car_repair"],
+  rental: ["car_rental"],
   insurance: ["insurance_agency"],
+  driving_school: ["driving_school"],
+  inspection: ["car_repair"],
+  lto_services: ["local_government_office"],
+  financing: ["finance"],
+  transport: ["moving_company"],
+  salvage: ["auto_parts_store"],
 };
 
 export async function searchNearbyPlaces(opts: {

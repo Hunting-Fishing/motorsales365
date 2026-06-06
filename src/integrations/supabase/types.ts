@@ -6574,12 +6574,12 @@ export type Database = {
       business_kind:
         | "repair_shop"
         | "insurance"
-        | "dealer"
+        | "dealership"
         | "other"
         | "corporate"
-        | "parts_shop"
+        | "parts_accessories"
         | "towing"
-        | "body_shop"
+        | "body_paint"
         | "carwash"
         | "salvage"
         | "rental"
@@ -6594,6 +6594,7 @@ export type Database = {
         | "driving_school"
         | "lto_services"
         | "transport"
+        | "motorcycle_shop"
       business_status: "pending" | "active" | "rejected" | "hidden"
       business_tier: "free" | "listed" | "featured" | "premium"
       course_level: "beginner" | "intermediate" | "advanced"
@@ -6847,12 +6848,12 @@ export const Constants = {
       business_kind: [
         "repair_shop",
         "insurance",
-        "dealer",
+        "dealership",
         "other",
         "corporate",
-        "parts_shop",
+        "parts_accessories",
         "towing",
-        "body_shop",
+        "body_paint",
         "carwash",
         "salvage",
         "rental",
@@ -6867,6 +6868,7 @@ export const Constants = {
         "driving_school",
         "lto_services",
         "transport",
+        "motorcycle_shop",
       ],
       business_status: ["pending", "active", "rejected", "hidden"],
       business_tier: ["free", "listed", "featured", "premium"],

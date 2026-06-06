@@ -9,7 +9,7 @@ export type DiscoverGroup = {
 
 export const DISCOVER_SEARCH_GROUPS: DiscoverGroup[] = [
   {
-    kind: "dealer",
+    kind: "dealership",
     label: "Dealership / Showroom",
     terms: [
       "car dealer",
@@ -24,11 +24,20 @@ export const DISCOVER_SEARCH_GROUPS: DiscoverGroup[] = [
       "Isuzu dealer",
       "used car dealer",
       "second hand car",
+      "truck dealer",
+    ],
+  },
+  {
+    kind: "motorcycle_shop",
+    label: "Motorcycle shop",
+    terms: [
       "motorcycle dealer",
       "Yamaha dealer",
       "Kawasaki dealer",
       "Honda motorcycle dealer",
-      "truck dealer",
+      "motorcycle shop",
+      "motorcycle parts",
+      "motorcycle repair",
     ],
   },
   {
@@ -37,13 +46,12 @@ export const DISCOVER_SEARCH_GROUPS: DiscoverGroup[] = [
     terms: ["car rental", "van rental", "self drive rental", "motorcycle rental", "scooter rental"],
   },
   {
-    kind: "parts_shop",
+    kind: "parts_accessories",
     label: "Parts supplier / shop",
     terms: [
       "auto parts",
       "auto supply",
       "spare parts",
-      "motorcycle parts",
       "surplus parts",
       "Japan surplus parts",
       "engine parts",
@@ -57,7 +65,6 @@ export const DISCOVER_SEARCH_GROUPS: DiscoverGroup[] = [
     terms: [
       "auto repair shop",
       "car mechanic",
-      "motorcycle repair",
       "engine overhaul",
       "transmission repair",
       "diesel mechanic",
@@ -66,7 +73,7 @@ export const DISCOVER_SEARCH_GROUPS: DiscoverGroup[] = [
     ],
   },
   {
-    kind: "body_shop",
+    kind: "body_paint",
     label: "Body shop / paint",
     terms: ["auto body shop", "car paint shop", "auto paint", "dent repair", "collision repair"],
   },

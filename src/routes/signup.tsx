@@ -44,30 +44,9 @@ const POST_SIGNUP_ROUTE: Record<SignupIntent, string> = {
 };
 
 // All business / service categories are selectable regardless of the high-level
-// intent (Business vs Service provider). Admins can re-categorize later if needed.
-const BUSINESS_KIND_OPTIONS: { value: string; label: string }[] = [
-  { value: "dealer", label: "Dealership / Showroom" },
-  { value: "rental", label: "Vehicle rental" },
-  { value: "parts_shop", label: "Parts supplier / shop" },
-  { value: "repair_shop", label: "Repair shop / mechanic" },
-  { value: "body_shop", label: "Body shop / paint" },
-  { value: "tire_shop", label: "Tire shop / wheels" },
-  { value: "battery_shop", label: "Battery shop" },
-  { value: "towing", label: "Tow / roadside assistance" },
-  { value: "fuel_station", label: "Fuel station" },
-  { value: "carwash", label: "Carwash / detailing" },
-  { value: "salvage", label: "Salvage yard / scrap" },
-  { value: "accessories", label: "Accessories / customization" },
-  { value: "audio_tint", label: "Audio / window tint" },
-  { value: "inspection", label: "Inspection / emissions" },
-  { value: "driving_school", label: "Driving school" },
-  { value: "lto_services", label: "LTO / registration services" },
-  { value: "insurance", label: "Insurance" },
-  { value: "financing", label: "Financing / loans" },
-  { value: "transport", label: "Transport / logistics" },
-  { value: "corporate", label: "Corporate / fleet" },
-  { value: "other", label: "Other" },
-];
+// intent (Business vs Service provider). Sourced from the canonical list so
+// signup, admin, and discovery all share the same vocabulary.
+import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 
 // Phone is now captured as { iso, national } via PhoneInput and normalized to
 // E.164 via buildE164 on submit.
