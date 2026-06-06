@@ -29,6 +29,7 @@ import {
   importDiscoveredBusinesses,
   type FbCandidate,
 } from "@/lib/business-discover.functions";
+import { AutoSyncTab } from "@/components/admin/auto-sync-tab";
 
 export const Route = createFileRoute("/admin/discover-businesses")({
   component: DiscoverPage,
@@ -148,11 +149,15 @@ function DiscoverPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="google" className="w-full">
+      <Tabs defaultValue="auto" className="w-full">
         <TabsList>
+          <TabsTrigger value="auto">Auto-sync (Google)</TabsTrigger>
           <TabsTrigger value="google">Google Places</TabsTrigger>
           <TabsTrigger value="facebook">Facebook Pages</TabsTrigger>
         </TabsList>
+        <TabsContent value="auto" className="mt-4">
+          <AutoSyncTab />
+        </TabsContent>
         <TabsContent value="google" className="mt-4">
           <GoogleTab onAdd={addRow} />
         </TabsContent>
