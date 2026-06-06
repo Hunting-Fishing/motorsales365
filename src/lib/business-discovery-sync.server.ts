@@ -124,8 +124,8 @@ export type SyncSummary = {
 };
 
 export async function runDiscoverySync(opts: { searchIds?: string[] } = {}): Promise<SyncSummary> {
-  const q = supabaseAdmin
-    .from("business_discovery_searches" as never)
+  const q = (supabaseAdmin as any)
+    .from("business_discovery_searches")
     .select("id, query, city, region, place_type")
     .eq("active", true);
   const { data: searches, error } = opts.searchIds && opts.searchIds.length
@@ -148,8 +148,8 @@ export async function runDiscoverySync(opts: { searchIds?: string[] } = {}): Pro
       const places = await runOnePlacesSearch(s);
       summary.found += places.length;
       if (places.length === 0) {
-        await supabaseAdmin
-          .from("business_discovery_searches" as never)
+        await (supabaseAdmin as any)
+          .from("business_discovery_searches")
           .update({ last_run_at: now, last_status: "ok", last_error: null, last_found_count: 0, last_new_count: 0 })
           .eq("id", s.id);
         continue;
@@ -165,8 +165,8 @@ export async function runDiscoverySync(opts: { searchIds?: string[] } = {}): Pro
       const existingMap = new Map((existing ?? []).map((e: any) => [e.source_external_id, e]));
 
       // Already-queued rows so we update last_seen_at rather than insert dupes
-      const { data: queued } = await supabaseAdmin
-        .from("business_discovery_queue" as never)
+      const { data: queued } = await (supabaseAdmin as any)
+        .from("business_discovery_queue")
         .select("id, external_id, status")
         .eq("source", "google_places")
         .in("external_id", placeIds);
@@ -203,8 +203,8 @@ export async function runDiscoverySync(opts: { searchIds?: string[] } = {}): Pro
         if (existingQueue) {
           // Refresh existing pending row (or keep dismissed/imported as-is on status).
           if ((existingQueue as any).status === "pending") {
-            await supabaseAdmin
-              .from("business_discovery_queue" as never)
+            await (supabaseAdmin as any)
+              .from("business_discovery_queue")
               .update(baseRow)
               .eq("id", (existingQueue as any).id);
             summary.refreshed++;
@@ -214,8 +214,8 @@ export async function runDiscoverySync(opts: { searchIds?: string[] } = {}): Pro
           // Already imported, nothing changed — skip queuing.
           continue;
         } else {
-          const { error: insErr } = await supabaseAdmin
-            .from("business_discovery_queue" as never)
+          const { error: insErr } = await (supabaseAdmin as any)
+            .from("business_discovery_queue")
             .insert({ ...baseRow, status: "pending" });
           if (!insErr) {
             inserted++;
@@ -225,8 +225,8 @@ export async function runDiscoverySync(opts: { searchIds?: string[] } = {}): Pro
         }
       }
 
-      await supabaseAdmin
-        .from("business_discovery_searches" as never)
+      await (supabaseAdmin as any)
+        .from("business_discovery_searches")
         .update({
           last_run_at: now,
           last_status: "ok",
@@ -238,8 +238,8 @@ export async function runDiscoverySync(opts: { searchIds?: string[] } = {}): Pro
     } catch (e: any) {
       const msg = e?.message ?? "unknown error";
       summary.errors.push({ search_id: s.id, message: msg });
-      await supabaseAdmin
-        .from("business_discovery_searches" as never)
+      await (supabaseAdmin as any)
+        .from("business_discovery_searches")
         .update({ last_run_at: now, last_status: "error", last_error: msg.slice(0, 500) })
         .eq("id", s.id);
     }

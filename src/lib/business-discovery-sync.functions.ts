@@ -158,8 +158,8 @@ export const importQueueItems = createServerFn({ method: "POST" })
     await assertStaff(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
-    const { data: rows, error } = await supabaseAdmin
-      .from("business_discovery_queue" as never)
+    const { data: rows, error } = await (supabaseAdmin as any)
+      .from("business_discovery_queue")
       .select("*")
       .in("id", data.ids)
       .eq("status", "pending");
@@ -213,8 +213,8 @@ export const importQueueItems = createServerFn({ method: "POST" })
     const skippedIds = (rows ?? []).filter((r: any) => !(r.our_type && r.lat != null && r.lng != null)).map((r: any) => r.id);
 
     if (importedIds.length) {
-      await supabaseAdmin
-        .from("business_discovery_queue" as never)
+      await (supabaseAdmin as any)
+        .from("business_discovery_queue")
         .update({ status: "imported", reviewed_at: new Date().toISOString(), reviewed_by: context.userId })
         .in("id", importedIds);
     }
