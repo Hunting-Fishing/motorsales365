@@ -268,6 +268,20 @@ function BusinessProfilePage() {
                     {biz.subscription_tier === "listed" && (
                       <Badge variant="secondary">Listed</Badge>
                     )}
+                    {biz.claim_state === "unclaimed" && (
+                      <Badge
+                        variant="outline"
+                        className="border-dashed text-muted-foreground"
+                        title="This listing was added from public sources and has not been claimed by the owner yet."
+                      >
+                        Unclaimed
+                      </Badge>
+                    )}
+                    {biz.claim_state === "claim_pending" && (
+                      <Badge variant="outline" className="border-dashed">
+                        Claim pending
+                      </Badge>
+                    )}
                     {biz.price_label && (
                       <Badge variant="secondary" className="font-semibold">
                         {biz.price_label}
