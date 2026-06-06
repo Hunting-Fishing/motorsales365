@@ -37,6 +37,7 @@ import {
 import { ShareButtons } from "@/components/business-page/share-buttons";
 import { ClaimCta } from "@/components/business-page/claim-cta";
 import { ClaimStatusSection } from "@/components/business-page/claim-status-section";
+import { ClaimHistoryTimeline } from "@/components/business-page/claim-history-timeline";
 import { useTrackBusinessEvent, useTrackPageView } from "@/lib/use-track-business-event";
 import { siteOrigin } from "@/lib/site-config";
 import {
