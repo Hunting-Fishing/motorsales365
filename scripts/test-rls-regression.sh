@@ -30,6 +30,12 @@ SQL_FILE="$DIR/rls-regression.sql"
 
 if ! out=$(psql -v ON_ERROR_STOP=1 -X -q -f "$SQL_FILE" 2>&1); then
   echo "$out"
+  if echo "$out" | grep -qE "permission denied (for|to) (schema auth|set role)"; then
+    YLW=$'\033[33m'
+    echo "${YLW}SKIP${RST}  rls-regression requires a service_role/postgres DB connection."
+    echo "       Re-run with DATABASE_URL pointed at the service-role connection string."
+    exit 0
+  fi
   echo "${RED}FAIL${RST}  rls-regression reported a failure."
   exit 1
 fi
