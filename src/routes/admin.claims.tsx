@@ -473,6 +473,9 @@ function ClaimsPage() {
                   </div>
                 </div>
 
+                <ClaimAuditPanel claimId={c.id} />
+
+
                 <Textarea
                   placeholder="Internal review notes (sent to claimant on rejection)"
                   value={notes[c.id] ?? ""}
