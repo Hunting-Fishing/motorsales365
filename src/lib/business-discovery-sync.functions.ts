@@ -32,7 +32,7 @@ export const listDiscoverySearches = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await assertStaff(context);
-    const { data, error } = await context.supabase
+    const { data, error } = await (context.supabase as any)
       .from("business_discovery_searches")
       .select("*")
       .order("created_at", { ascending: false });
@@ -53,7 +53,7 @@ export const createDiscoverySearch = createServerFn({ method: "POST" })
   .inputValidator((d) => CreateSearchInput.parse(d))
   .handler(async ({ data, context }) => {
     await assertStaff(context);
-    const { data: row, error } = await context.supabase
+    const { data: row, error } = await (context.supabase as any)
       .from("business_discovery_searches")
       .insert({
         query: data.query,
@@ -81,7 +81,7 @@ export const updateDiscoverySearch = createServerFn({ method: "POST" })
     await assertStaff(context);
     const patch: Record<string, unknown> = {};
     if (typeof data.active === "boolean") patch.active = data.active;
-    const { error } = await context.supabase
+    const { error } = await (context.supabase as any)
       .from("business_discovery_searches")
       .update(patch)
       .eq("id", data.id);
@@ -96,7 +96,7 @@ export const deleteDiscoverySearch = createServerFn({ method: "POST" })
   .inputValidator((d) => IdInput.parse(d))
   .handler(async ({ data, context }) => {
     await assertStaff(context);
-    const { error } = await context.supabase
+    const { error } = await (context.supabase as any)
       .from("business_discovery_searches")
       .delete()
       .eq("id", data.id);
@@ -116,7 +116,7 @@ export const listDiscoveryQueue = createServerFn({ method: "GET" })
   .inputValidator((d) => ListQueueInput.parse(d ?? {}))
   .handler(async ({ data, context }) => {
     await assertStaff(context);
-    const { data: rows, error } = await context.supabase
+    const { data: rows, error } = await (context.supabase as any)
       .from("business_discovery_queue")
       .select("*")
       .eq("status", data.status)
@@ -133,7 +133,7 @@ export const dismissQueueItems = createServerFn({ method: "POST" })
   .inputValidator((d) => IdsInput.parse(d))
   .handler(async ({ data, context }) => {
     await assertStaff(context);
-    const { error } = await context.supabase
+    const { error } = await (context.supabase as any)
       .from("business_discovery_queue")
       .update({ status: "dismissed", reviewed_at: new Date().toISOString(), reviewed_by: context.userId })
       .in("id", data.ids);
