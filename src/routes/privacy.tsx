@@ -22,7 +22,7 @@ export const Route = createFileRoute("/privacy")({
 });
 
 function PrivacyPage() {
-  const lastUpdated = "June 3, 2026 (rev. export brokerage, referrals & organisation accounts)";
+  const lastUpdated = "June 6, 2026 (rev. seeded public business listings & claim flow)";
 
   return (
     <SiteLayout>
