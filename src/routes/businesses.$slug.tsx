@@ -36,6 +36,7 @@ import {
 } from "@/components/business-page/public-sections";
 import { ShareButtons } from "@/components/business-page/share-buttons";
 import { ClaimCta } from "@/components/business-page/claim-cta";
+import { ClaimStatusSection } from "@/components/business-page/claim-status-section";
 import { useTrackBusinessEvent, useTrackPageView } from "@/lib/use-track-business-event";
 import { siteOrigin } from "@/lib/site-config";
 import {
@@ -410,6 +411,7 @@ function BusinessProfilePage() {
               claimState={biz.claim_state}
             />
           )}
+          <ClaimStatusSection businessId={biz.id} />
           {/* ABOUT + HOURS + MAP */}
           <div className="grid gap-6 md:grid-cols-2">
             <Card className="p-5">

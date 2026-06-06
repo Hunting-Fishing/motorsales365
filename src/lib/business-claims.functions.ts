@@ -169,3 +169,22 @@ export const listPendingClaims = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     return { claims: data ?? [] };
   });
+
+export const getMyClaimForBusiness = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { businessId: string }) =>
+    z.object({ businessId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: row, error } = await supabase
+      .from("business_claim_requests")
+      .select("id,status,reviewer_notes,decided_at,created_at,contact_method,contact_value,evidence_url")
+      .eq("business_id", data.businessId)
+      .eq("claimant_user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return { claim: row ?? null };
+  });
