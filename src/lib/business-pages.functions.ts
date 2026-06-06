@@ -125,13 +125,14 @@ export const getBusinessPage = createServerFn({ method: "GET" })
     if (tagSlugs.length > 0) {
       const { data: tagRows } = await supabaseAdmin
         .from("business_tags")
-        .select("slug,label,category,type_slug")
+        .select("slug,label,category,type_slug,description")
         .in("slug", tagSlugs);
       tags = (tagRows ?? []).map((r: any) => ({
         slug: r.slug,
         label: r.label,
         category: r.category ?? null,
         type_slug: r.type_slug ?? null,
+        description: r.description ?? null,
       }));
       tagLabels = tags.map((t) => t.label);
       const otherTypeSlugs = Array.from(
