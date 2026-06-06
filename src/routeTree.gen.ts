@@ -109,6 +109,7 @@ import { Route as AdminLeadOffersRouteImport } from './routes/admin.lead-offers'
 import { Route as AdminInquiriesRouteImport } from './routes/admin.inquiries'
 import { Route as AdminFeatureFlagsRouteImport } from './routes/admin.feature-flags'
 import { Route as AdminEducationRouteImport } from './routes/admin.education'
+import { Route as AdminDiscoverBusinessesRouteImport } from './routes/admin.discover-businesses'
 import { Route as AdminCurrenciesRouteImport } from './routes/admin.currencies'
 import { Route as AdminClaimsRouteImport } from './routes/admin.claims'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
@@ -653,6 +654,11 @@ const AdminEducationRoute = AdminEducationRouteImport.update({
   path: '/education',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminDiscoverBusinessesRoute = AdminDiscoverBusinessesRouteImport.update({
+  id: '/discover-businesses',
+  path: '/discover-businesses',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCurrenciesRoute = AdminCurrenciesRouteImport.update({
   id: '/currencies',
   path: '/currencies',
@@ -920,6 +926,7 @@ export interface FileRoutesByFullPath {
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/claims': typeof AdminClaimsRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
+  '/admin/discover-businesses': typeof AdminDiscoverBusinessesRoute
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
@@ -1063,6 +1070,7 @@ export interface FileRoutesByTo {
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/claims': typeof AdminClaimsRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
+  '/admin/discover-businesses': typeof AdminDiscoverBusinessesRoute
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
@@ -1208,6 +1216,7 @@ export interface FileRoutesById {
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/claims': typeof AdminClaimsRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
+  '/admin/discover-businesses': typeof AdminDiscoverBusinessesRoute
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
@@ -1355,6 +1364,7 @@ export interface FileRouteTypes {
     | '/admin/businesses'
     | '/admin/claims'
     | '/admin/currencies'
+    | '/admin/discover-businesses'
     | '/admin/education'
     | '/admin/feature-flags'
     | '/admin/inquiries'
@@ -1498,6 +1508,7 @@ export interface FileRouteTypes {
     | '/admin/businesses'
     | '/admin/claims'
     | '/admin/currencies'
+    | '/admin/discover-businesses'
     | '/admin/education'
     | '/admin/feature-flags'
     | '/admin/inquiries'
@@ -1642,6 +1653,7 @@ export interface FileRouteTypes {
     | '/admin/businesses'
     | '/admin/claims'
     | '/admin/currencies'
+    | '/admin/discover-businesses'
     | '/admin/education'
     | '/admin/feature-flags'
     | '/admin/inquiries'
@@ -2533,6 +2545,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEducationRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/discover-businesses': {
+      id: '/admin/discover-businesses'
+      path: '/discover-businesses'
+      fullPath: '/admin/discover-businesses'
+      preLoaderRoute: typeof AdminDiscoverBusinessesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/currencies': {
       id: '/admin/currencies'
       path: '/currencies'
@@ -2847,6 +2866,7 @@ interface AdminRouteChildren {
   AdminBusinessesRoute: typeof AdminBusinessesRoute
   AdminClaimsRoute: typeof AdminClaimsRoute
   AdminCurrenciesRoute: typeof AdminCurrenciesRoute
+  AdminDiscoverBusinessesRoute: typeof AdminDiscoverBusinessesRoute
   AdminEducationRoute: typeof AdminEducationRoute
   AdminFeatureFlagsRoute: typeof AdminFeatureFlagsRoute
   AdminInquiriesRoute: typeof AdminInquiriesRoute
@@ -2880,6 +2900,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminBusinessesRoute: AdminBusinessesRoute,
   AdminClaimsRoute: AdminClaimsRoute,
   AdminCurrenciesRoute: AdminCurrenciesRoute,
+  AdminDiscoverBusinessesRoute: AdminDiscoverBusinessesRoute,
   AdminEducationRoute: AdminEducationRoute,
   AdminFeatureFlagsRoute: AdminFeatureFlagsRoute,
   AdminInquiriesRoute: AdminInquiriesRoute,
