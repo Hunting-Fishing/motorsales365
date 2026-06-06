@@ -1631,6 +1631,7 @@ export type Database = {
       business_tags: {
         Row: {
           category: string | null
+          description: string | null
           is_popular: boolean
           label: string
           slug: string
@@ -1639,6 +1640,7 @@ export type Database = {
         }
         Insert: {
           category?: string | null
+          description?: string | null
           is_popular?: boolean
           label: string
           slug: string
@@ -1647,6 +1649,7 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          description?: string | null
           is_popular?: boolean
           label?: string
           slug?: string
