@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { Database } from "@/integrations/supabase/types";
 import { z } from "zod";
 import { logRouteAccess } from "@/integrations/supabase/route-audit.server";
+import { BUSINESS_KIND_VALUES } from "@/data/business-kinds";
 
 
 const RoleEnum = z.enum(["admin", "moderator", "support", "sales", "advertising"]);
@@ -16,7 +17,7 @@ const Body = z.object({
   roles: z.array(RoleEnum).default([]),
   seller_type: SellerTypeEnum.optional(),
   business_name: z.string().trim().max(160).optional(),
-  business_kind: z.enum(["dealer", "repair_shop", "insurance"]).optional(),
+  business_kind: z.enum(BUSINESS_KIND_VALUES).optional(),
   mark_verified: z.boolean().optional(),
   enforce_domain: z.string().trim().max(120).optional(),
 });
