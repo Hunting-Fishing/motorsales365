@@ -3,6 +3,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { Database } from "@/integrations/supabase/types";
 
 const SubmitInput = z.object({
   businessId: z.string().uuid(),
@@ -179,7 +180,7 @@ export const getMyClaimForBusiness = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const { data: row, error } = await supabase
       .from("business_claim_requests")
-      .select("id,status,reviewer_notes,decided_at,created_at,contact_method,contact_value,evidence_url")
+      .select("id,status,reviewer_notes,decided_at,created_at,contact_method,contact_value,evidence_url,notes")
       .eq("business_id", data.businessId)
       .eq("claimant_user_id", userId)
       .order("created_at", { ascending: false })
@@ -187,4 +188,56 @@ export const getMyClaimForBusiness = createServerFn({ method: "GET" })
       .maybeSingle();
     if (error) throw new Error(error.message);
     return { claim: row ?? null };
+  });
+
+const ResubmitInput = z.object({
+  claimId: z.string().uuid(),
+  contactMethod: z.enum(["email", "phone", "document", "social"]).optional(),
+  contactValue: z.string().min(1).max(500).optional(),
+  evidenceUrl: z.string().url().max(2000).optional(),
+  notes: z.string().max(2000).optional(),
+});
+
+export const resubmitBusinessClaim = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => ResubmitInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: existing, error: findErr } = await supabase
+      .from("business_claim_requests")
+      .select("id,business_id,status,claimant_user_id")
+      .eq("id", data.claimId)
+      .single();
+    if (findErr) throw new Error(findErr.message);
+    if (!existing) throw new Error("Claim not found");
+    if (existing.claimant_user_id !== userId) throw new Error("Forbidden");
+    if (existing.status !== "rejected") throw new Error("Only rejected claims can be resubmitted");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const update: Database["public"]["Tables"]["business_claim_requests"]["Update"] = {
+      status: "pending",
+      decided_at: null,
+      reviewer_notes: null,
+      reviewer_user_id: null,
+    };
+    if (data.contactMethod !== undefined) update.contact_method = data.contactMethod;
+    if (data.contactValue !== undefined) update.contact_value = data.contactValue || null;
+    if (data.evidenceUrl !== undefined) update.evidence_url = data.evidenceUrl || null;
+    if (data.notes !== undefined) update.notes = data.notes || null;
+
+    const { error: updErr } = await supabaseAdmin
+      .from("business_claim_requests")
+      .update(update)
+      .eq("id", data.claimId);
+    if (updErr) throw new Error(updErr.message);
+
+    await supabaseAdmin
+      .from("businesses")
+      .update({ claim_state: "claim_pending" })
+      .eq("id", existing.business_id)
+      .eq("claim_state", "unclaimed");
+
+    return { ok: true };
   });
