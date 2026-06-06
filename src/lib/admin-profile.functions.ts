@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { BUSINESS_KIND_VALUES } from "@/data/business-kinds";
 
 const ALLOWED_ADMIN_EMAIL = "jordilwbailey@gmail.com";
 
