@@ -78,15 +78,20 @@ export const searchGooglePlaces = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await assertStaff(context);
 
-    const textQuery = [data.query, data.city, data.region, "Philippines"]
+    // Bake the place type into the text query as a keyword instead of using
+    // Google's strict `includedType` filter — many of our internal type slugs
+    // (motorcycle_repair, auto_body_shop, tire_shop, etc.) aren't valid
+    // "primary types" for the New Places API and silently return zero results.
+    const typeKeyword = data.placeType.replace(/_/g, " ");
+    const textQuery = [data.query, typeKeyword, data.city, data.region, "Philippines"]
       .filter(Boolean)
       .join(", ");
 
     const body: Record<string, unknown> = {
       textQuery,
-      includedType: data.placeType,
       maxResultCount: 20,
       regionCode: "PH",
+      languageCode: "en",
     };
     if (data.pageToken) body.pageToken = data.pageToken;
 
