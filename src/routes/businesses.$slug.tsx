@@ -13,6 +13,7 @@ import {
   ShoppingBag,
   Sparkles,
   CalendarDays,
+  Info,
 } from "lucide-react";
 import { waMeUrl } from "@/lib/whatsapp";
 import { useServerFn } from "@tanstack/react-start";
@@ -405,6 +406,34 @@ function BusinessProfilePage() {
                 </div>
               </div>
             </Card>
+
+            {/* Legend */}
+            {(data?.tags?.length ?? 0) > 0 && (
+              <div className="mt-3 rounded-md border border-border/70 bg-muted/30 p-3">
+                <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  <Info className="h-3.5 w-3.5" />
+                  About these services
+                </div>
+                <div className="grid gap-2 text-xs text-muted-foreground sm:grid-cols-2">
+                  <div className="flex items-start gap-2">
+                    <Badge variant="secondary" className="mt-0.5 shrink-0 text-[10px]">
+                      Example
+                    </Badge>
+                    <span>
+                      Services this business offers as part of its primary category (e.g., tire repair at a tire shop).
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Badge variant="secondary" className="mt-0.5 shrink-0 bg-accent/40 text-[10px]">
+                      Example
+                    </Badge>
+                    <span>
+                      Services offered outside the main category — labeled “Also offered” with the matching business type.
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
