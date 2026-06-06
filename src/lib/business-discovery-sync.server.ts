@@ -8,7 +8,7 @@ const GATEWAY = "https://connector-gateway.lovable.dev/google_maps";
 // run without importing client-safe modules from this server file.
 const TYPE_MAP: Record<string, string> = {
   car_dealer: "dealership",
-  used_car_dealer: "dealership",
+  used_car_dealer: "used_dealership",
   car_repair: "repair_shop",
   car_wash: "carwash",
   gas_station: "fuel_station",
