@@ -245,7 +245,7 @@ export type AuditEntry = {
     | "evidence_removed"
     | "reviewer_note";
   notes: string | null;
-  details: Record<string, unknown>;
+  details: Record<string, any>;
   created_at: string;
 };
 
