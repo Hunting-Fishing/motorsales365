@@ -63,6 +63,7 @@ type Row = {
   rating_count: number;
   featured: boolean;
   price_label: string | null;
+  claim_state: "unclaimed" | "claim_pending" | "owned" | null;
 };
 
 const LS_KEY = "map:last-search";
@@ -183,7 +184,7 @@ function MapPage() {
       let query = (supabase as any)
         .from("businesses")
         .select(
-          "id,slug,name,type_slug,city,barangay,province,lat,lng,rating_avg,rating_count,featured,price_label",
+          "id,slug,name,type_slug,city,barangay,province,lat,lng,rating_avg,rating_count,featured,price_label,claim_state",
         )
         .eq("status", "active")
         .not("lat", "is", null)
@@ -295,6 +296,15 @@ function MapPage() {
                       {b.featured && (
                         <Badge variant="default" className="shrink-0 text-[10px]">
                           Featured
+                        </Badge>
+                      )}
+                      {b.claim_state === "unclaimed" && (
+                        <Badge
+                          variant="outline"
+                          className="shrink-0 border-dashed text-[10px] text-muted-foreground"
+                          title="Added from public sources — not yet claimed by the owner"
+                        >
+                          Unclaimed
                         </Badge>
                       )}
                     </div>

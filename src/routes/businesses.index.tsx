@@ -61,6 +61,7 @@ type BusinessRow = {
   price_label: string | null;
   subscription_tier: "free" | "listed" | "featured" | "premium" | null;
   owner_id: string | null;
+  claim_state: "unclaimed" | "claim_pending" | "owned" | null;
 };
 
 function BusinessesIndex() {
@@ -108,7 +109,7 @@ function BusinessesIndex() {
       let query = (supabase as any)
         .from("businesses")
         .select(
-          "id,slug,name,type_slug,description,logo_url,region,province,city,barangay,lat,lng,rating_avg,rating_count,featured,price_label,subscription_tier,owner_id",
+          "id,slug,name,type_slug,description,logo_url,region,province,city,barangay,lat,lng,rating_avg,rating_count,featured,price_label,subscription_tier,owner_id,claim_state",
         )
         .eq("status", "active")
         .order("subscription_tier", { ascending: false })
@@ -367,6 +368,15 @@ function BusinessesIndex() {
                             {b.featured && !b.subscription_tier && (
                               <Badge variant="default" className="shrink-0">
                                 Featured
+                              </Badge>
+                            )}
+                            {b.claim_state === "unclaimed" && (
+                              <Badge
+                                variant="outline"
+                                className="shrink-0 border-dashed text-[10px] text-muted-foreground"
+                                title="Added from public sources — not yet claimed by the owner"
+                              >
+                                Unclaimed
                               </Badge>
                             )}
                           </div>

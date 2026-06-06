@@ -35,6 +35,7 @@ import {
   FeaturedVideoEmbed,
 } from "@/components/business-page/public-sections";
 import { ShareButtons } from "@/components/business-page/share-buttons";
+import { ClaimCta } from "@/components/business-page/claim-cta";
 import { useTrackBusinessEvent, useTrackPageView } from "@/lib/use-track-business-event";
 import { siteOrigin } from "@/lib/site-config";
 import {
@@ -267,6 +268,20 @@ function BusinessProfilePage() {
                     {biz.subscription_tier === "listed" && (
                       <Badge variant="secondary">Listed</Badge>
                     )}
+                    {biz.claim_state === "unclaimed" && (
+                      <Badge
+                        variant="outline"
+                        className="border-dashed text-muted-foreground"
+                        title="This listing was added from public sources and has not been claimed by the owner yet."
+                      >
+                        Unclaimed
+                      </Badge>
+                    )}
+                    {biz.claim_state === "claim_pending" && (
+                      <Badge variant="outline" className="border-dashed">
+                        Claim pending
+                      </Badge>
+                    )}
                     {biz.price_label && (
                       <Badge variant="secondary" className="font-semibold">
                         {biz.price_label}
@@ -388,6 +403,13 @@ function BusinessProfilePage() {
         </div>
 
         <div className="container mx-auto px-4 py-6 md:py-10 space-y-6">
+          {biz.claim_state && biz.claim_state !== "owned" && (
+            <ClaimCta
+              businessId={biz.id}
+              businessName={biz.name}
+              claimState={biz.claim_state}
+            />
+          )}
           {/* ABOUT + HOURS + MAP */}
           <div className="grid gap-6 md:grid-cols-2">
             <Card className="p-5">
