@@ -27,6 +27,7 @@ import {
   importQueueItems,
   runDiscoverySyncNow,
 } from "@/lib/business-discovery-sync.functions";
+import { PhLocationPicker } from "@/components/admin/ph-location-picker";
 
 type SearchRow = {
   id: string;
@@ -198,14 +199,14 @@ export function AutoSyncTab() {
             <Label className="text-xs">Query</Label>
             <Input value={newQuery} onChange={(e) => setNewQuery(e.target.value)} placeholder="e.g. used car dealership" />
           </div>
-          <div>
-            <Label className="text-xs">City</Label>
-            <Input value={newCity} onChange={(e) => setNewCity(e.target.value)} placeholder="Manila" />
-          </div>
-          <div>
-            <Label className="text-xs">Region</Label>
-            <Input value={newRegion} onChange={(e) => setNewRegion(e.target.value)} placeholder="NCR" />
-          </div>
+          <PhLocationPicker
+            region={newRegion}
+            city={newCity}
+            onChange={(v) => {
+              setNewRegion(v.region);
+              setNewCity(v.city);
+            }}
+          />
           <div>
             <Label className="text-xs">Type</Label>
             <Select value={newType} onValueChange={setNewType}>

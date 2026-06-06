@@ -30,6 +30,7 @@ import {
   type FbCandidate,
 } from "@/lib/business-discover.functions";
 import { AutoSyncTab } from "@/components/admin/auto-sync-tab";
+import { PhLocationPicker } from "@/components/admin/ph-location-picker";
 
 export const Route = createFileRoute("/admin/discover-businesses")({
   component: DiscoverPage,
@@ -415,14 +416,15 @@ function GoogleTab({ onAdd }: { onAdd: (r: Row) => void }) {
             </SelectContent>
           </Select>
         </div>
-        <div>
-          <Label>Region</Label>
-          <Input value={region} onChange={(e) => setRegion(e.target.value)} placeholder="NCR" />
-        </div>
-        <div>
-          <Label>City</Label>
-          <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Quezon City" />
-        </div>
+        <PhLocationPicker
+          region={region}
+          city={city}
+          onChange={(v) => {
+            setRegion(v.region);
+            setCity(v.city);
+          }}
+        />
+
         <div className="lg:col-span-2">
           <Label>Keywords (optional)</Label>
           <Input
@@ -480,6 +482,7 @@ function FacebookTab({ onAdd }: { onAdd: (r: Row) => void }) {
   const search = useServerFn(searchFbPagesForAdmin);
   const [url, setUrl] = useState("");
   const [query, setQuery] = useState("");
+  const [region, setRegion] = useState("");
   const [city, setCity] = useState("");
   const [busy, setBusy] = useState(false);
   const [results, setResults] = useState<
@@ -505,7 +508,7 @@ function FacebookTab({ onAdd }: { onAdd: (r: Row) => void }) {
         coverUrl: c.coverImage,
         about: c.about,
         sourceUrl: c.pageUrl,
-        region: null,
+        region: region || null,
         city: city || null,
         geoConfidence: c.geo.confidence,
         alreadyImported: c.alreadyImported,
@@ -521,7 +524,8 @@ function FacebookTab({ onAdd }: { onAdd: (r: Row) => void }) {
   async function runSearch() {
     setBusy(true);
     try {
-      const res = await search({ data: { query, city: city || undefined } });
+      const cityForSearch = [city, region].filter(Boolean).join(", ") || undefined;
+      const res = await search({ data: { query, city: cityForSearch } });
       setResults(res.results);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Search failed");
@@ -552,17 +556,30 @@ function FacebookTab({ onAdd }: { onAdd: (r: Row) => void }) {
 
       <Card className="space-y-3 p-4">
         <Label>Or search Facebook pages</Label>
-        <div className="grid gap-2 sm:grid-cols-[2fr_1fr_auto]">
+        <div className="grid gap-2 sm:grid-cols-2">
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="motorcycle parts, auto repair…"
           />
-          <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Cebu" />
+          <div className="grid gap-2 sm:grid-cols-2">
+            <PhLocationPicker
+              region={region}
+              city={city}
+              compact
+              onChange={(v) => {
+                setRegion(v.region);
+                setCity(v.city);
+              }}
+            />
+          </div>
+        </div>
+        <div className="flex justify-end">
           <Button onClick={runSearch} disabled={busy || query.length < 2}>
-            {busy ? "Searching…" : "Search"}
+            {busy ? "Searching…" : "Search Facebook"}
           </Button>
         </div>
+
         <div className="space-y-2">
           {results.map((r) => (
             <div key={r.pageId} className="flex items-start gap-3 rounded border bg-background p-3">
