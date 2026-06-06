@@ -95,7 +95,6 @@ import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTypeSuggestionsRouteImport } from './routes/admin.type-suggestions'
 import { Route as AdminStaff365RouteImport } from './routes/admin.staff-365'
 import { Route as AdminShopRouteImport } from './routes/admin.shop'
-import { Route as AdminSeedBusinessesRouteImport } from './routes/admin.seed-businesses'
 import { Route as AdminSandboxRouteImport } from './routes/admin.sandbox'
 import { Route as AdminSalesRepsRouteImport } from './routes/admin.sales-reps'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
@@ -585,11 +584,6 @@ const AdminShopRoute = AdminShopRouteImport.update({
   path: '/shop',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminSeedBusinessesRoute = AdminSeedBusinessesRouteImport.update({
-  id: '/seed-businesses',
-  path: '/seed-businesses',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminSandboxRoute = AdminSandboxRouteImport.update({
   id: '/sandbox',
   path: '/sandbox',
@@ -947,7 +941,6 @@ export interface FileRoutesByFullPath {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/sales-reps': typeof AdminSalesRepsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
-  '/admin/seed-businesses': typeof AdminSeedBusinessesRoute
   '/admin/shop': typeof AdminShopRoute
   '/admin/staff-365': typeof AdminStaff365Route
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
@@ -1092,7 +1085,6 @@ export interface FileRoutesByTo {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/sales-reps': typeof AdminSalesRepsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
-  '/admin/seed-businesses': typeof AdminSeedBusinessesRoute
   '/admin/shop': typeof AdminShopRoute
   '/admin/staff-365': typeof AdminStaff365Route
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
@@ -1239,7 +1231,6 @@ export interface FileRoutesById {
   '/admin/reports': typeof AdminReportsRoute
   '/admin/sales-reps': typeof AdminSalesRepsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
-  '/admin/seed-businesses': typeof AdminSeedBusinessesRoute
   '/admin/shop': typeof AdminShopRoute
   '/admin/staff-365': typeof AdminStaff365Route
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
@@ -1388,7 +1379,6 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/sales-reps'
     | '/admin/sandbox'
-    | '/admin/seed-businesses'
     | '/admin/shop'
     | '/admin/staff-365'
     | '/admin/type-suggestions'
@@ -1533,7 +1523,6 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/sales-reps'
     | '/admin/sandbox'
-    | '/admin/seed-businesses'
     | '/admin/shop'
     | '/admin/staff-365'
     | '/admin/type-suggestions'
@@ -1679,7 +1668,6 @@ export interface FileRouteTypes {
     | '/admin/reports'
     | '/admin/sales-reps'
     | '/admin/sandbox'
-    | '/admin/seed-businesses'
     | '/admin/shop'
     | '/admin/staff-365'
     | '/admin/type-suggestions'
@@ -2461,13 +2449,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminShopRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/seed-businesses': {
-      id: '/admin/seed-businesses'
-      path: '/seed-businesses'
-      fullPath: '/admin/seed-businesses'
-      preLoaderRoute: typeof AdminSeedBusinessesRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/sandbox': {
       id: '/admin/sandbox'
       path: '/sandbox'
@@ -2901,7 +2882,6 @@ interface AdminRouteChildren {
   AdminReportsRoute: typeof AdminReportsRoute
   AdminSalesRepsRoute: typeof AdminSalesRepsRoute
   AdminSandboxRoute: typeof AdminSandboxRoute
-  AdminSeedBusinessesRoute: typeof AdminSeedBusinessesRoute
   AdminShopRoute: typeof AdminShopRoute
   AdminStaff365Route: typeof AdminStaff365Route
   AdminTypeSuggestionsRoute: typeof AdminTypeSuggestionsRoute
@@ -2935,7 +2915,6 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminReportsRoute: AdminReportsRoute,
   AdminSalesRepsRoute: AdminSalesRepsRoute,
   AdminSandboxRoute: AdminSandboxRoute,
-  AdminSeedBusinessesRoute: AdminSeedBusinessesRoute,
   AdminShopRoute: AdminShopRoute,
   AdminStaff365Route: AdminStaff365Route,
   AdminTypeSuggestionsRoute: AdminTypeSuggestionsRoute,
