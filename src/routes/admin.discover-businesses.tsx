@@ -31,6 +31,8 @@ import {
 } from "@/lib/business-discover.functions";
 import { AutoSyncTab } from "@/components/admin/auto-sync-tab";
 import { PhLocationPicker } from "@/components/admin/ph-location-picker";
+import { DISCOVER_SEARCH_GROUPS } from "@/data/discover-search-terms";
+
 
 export const Route = createFileRoute("/admin/discover-businesses")({
   component: DiscoverPage,
