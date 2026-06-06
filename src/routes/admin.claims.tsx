@@ -30,6 +30,7 @@ import {
   EVIDENCE_TYPE_LABELS,
   formatBytes,
 } from "@/components/business-page/evidence-uploader";
+import { ClaimAuditPanel } from "@/components/business-page/claim-audit-panel";
 
 export const Route = createFileRoute("/admin/claims")({
   component: ClaimsPage,
@@ -303,6 +304,7 @@ function ClaimsPage() {
       await review({ data: { id, decision, notes: notes[id] || undefined } });
       toast.success(`Claim ${decision}d`);
       qc.invalidateQueries({ queryKey: ["admin-claims"] });
+      qc.invalidateQueries({ queryKey: ["claim-audit", id] });
     } catch (e: any) {
       toast.error(e?.message ?? "Failed");
     } finally {
@@ -471,6 +473,9 @@ function ClaimsPage() {
                     )}
                   </div>
                 </div>
+
+                <ClaimAuditPanel claimId={c.id} />
+
 
                 <Textarea
                   placeholder="Internal review notes (sent to claimant on rejection)"

@@ -231,6 +231,68 @@ export const listPendingClaims = createServerFn({ method: "GET" })
     return { claims, evidenceByClaim, claimantById };
   });
 
+export type AuditEntry = {
+  id: string;
+  claim_id: string;
+  actor_user_id: string | null;
+  action:
+    | "submitted"
+    | "resubmitted"
+    | "approved"
+    | "auto_approved"
+    | "rejected"
+    | "evidence_added"
+    | "evidence_removed"
+    | "reviewer_note";
+  notes: string | null;
+  details: Record<string, any>;
+  created_at: string;
+};
+
+export const getClaimAuditLog = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input: { claimId: string }) =>
+    z.object({ claimId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: rows, error } = await supabase
+      .from("business_claim_audit")
+      .select("id,claim_id,actor_user_id,action,notes,details,created_at")
+      .eq("claim_id", data.claimId)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) throw new Error(error.message);
+
+    const actorIds = Array.from(
+      new Set((rows ?? []).map((r) => r.actor_user_id).filter((x): x is string => !!x)),
+    );
+
+    const actorById: Record<string, { id: string; name: string | null; email: string | null }> = {};
+    if (actorIds.length > 0) {
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("id,full_name,first_name,last_name")
+        .in("id", actorIds);
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      for (const id of actorIds) {
+        const p = profs?.find((x) => x.id === id);
+        const { data: au } = await supabaseAdmin.auth.admin.getUserById(id);
+        actorById[id] = {
+          id,
+          name:
+            p?.full_name ||
+            [p?.first_name, p?.last_name].filter(Boolean).join(" ") ||
+            null,
+          email: au?.user?.email ?? null,
+        };
+      }
+    }
+
+    return { entries: (rows ?? []) as AuditEntry[], actorById };
+  });
+
+
 
 
 export const getMyClaimForBusiness = createServerFn({ method: "GET" })

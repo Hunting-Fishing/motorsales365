@@ -740,6 +740,44 @@ export type Database = {
           },
         ]
       }
+      business_claim_audit: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          claim_id: string
+          created_at: string
+          details: Json
+          id: string
+          notes: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          claim_id: string
+          created_at?: string
+          details?: Json
+          id?: string
+          notes?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          claim_id?: string
+          created_at?: string
+          details?: Json
+          id?: string
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_claim_audit_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "business_claim_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_claim_evidence: {
         Row: {
           claim_id: string
