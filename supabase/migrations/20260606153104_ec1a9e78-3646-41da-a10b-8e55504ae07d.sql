@@ -1,0 +1,1 @@
+ALTER TYPE public.business_kind ADD VALUE IF NOT EXISTS 'used_dealership';

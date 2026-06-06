@@ -6595,6 +6595,7 @@ export type Database = {
         | "lto_services"
         | "transport"
         | "motorcycle_shop"
+        | "used_dealership"
       business_status: "pending" | "active" | "rejected" | "hidden"
       business_tier: "free" | "listed" | "featured" | "premium"
       course_level: "beginner" | "intermediate" | "advanced"
@@ -6869,6 +6870,7 @@ export const Constants = {
         "lto_services",
         "transport",
         "motorcycle_shop",
+        "used_dealership",
       ],
       business_status: ["pending", "active", "rejected", "hidden"],
       business_tier: ["free", "listed", "featured", "premium"],
