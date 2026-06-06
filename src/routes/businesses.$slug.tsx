@@ -403,6 +403,13 @@ function BusinessProfilePage() {
         </div>
 
         <div className="container mx-auto px-4 py-6 md:py-10 space-y-6">
+          {biz.claim_state && biz.claim_state !== "owned" && (
+            <ClaimCta
+              businessId={biz.id}
+              businessName={biz.name}
+              claimState={biz.claim_state}
+            />
+          )}
           {/* ABOUT + HOURS + MAP */}
           <div className="grid gap-6 md:grid-cols-2">
             <Card className="p-5">
