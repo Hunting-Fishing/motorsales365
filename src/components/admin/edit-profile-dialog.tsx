@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { adminUpdateUserProfile } from "@/lib/admin-profile.functions";
 import { logAdminAudit, type AdminAuditEntry } from "@/lib/admin-audit";
+import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
