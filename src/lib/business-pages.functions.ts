@@ -132,6 +132,7 @@ export const getBusinessPage = createServerFn({ method: "GET" })
         label: r.label,
         category: r.category ?? null,
         type_slug: r.type_slug ?? null,
+        description: r.description ?? null,
       }));
       tagLabels = tags.map((t) => t.label);
       const otherTypeSlugs = Array.from(
