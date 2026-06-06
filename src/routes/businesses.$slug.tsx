@@ -16,11 +16,9 @@ import {
   Info,
 } from "lucide-react";
 import {
-  Tooltip,
-  TooltipTrigger,
-  TooltipContent,
   TooltipProvider,
 } from "@/components/ui/tooltip";
+import { PressableTooltip } from "@/components/ui/pressable-tooltip";
 import { waMeUrl } from "@/lib/whatsapp";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
