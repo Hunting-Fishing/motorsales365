@@ -336,7 +336,7 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
         (supabase as any)
           .from("business_tags")
           .select("slug,label,type_slug,category,sort_order,is_popular")
-          .or(`type_slug.eq.${typeSlug},type_slug.is.null`)
+          .order("type_slug")
           .order("sort_order"),
         (supabase as any)
           .from("business_tag_links")
@@ -352,6 +352,7 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
       cancelled = true;
     };
   }, [businessId, typeSlug]);
+
 
   const toggle = (slug: string) => {
     setSelected((prev) => {
@@ -393,35 +394,45 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
     );
   }
 
+  // Group by "${type_slug}::${category}" so cross-type offerings (e.g. a used
+  // car dealership that also does A/C service or tire repair) appear in their
+  // own sections, prefixed with the type label.
   const grouped: Record<string, TagRow[]> = {};
   for (const t of allTags) {
-    const key = t.category ?? "other";
+    const cat = t.category ?? "other";
+    const typeKey = t.type_slug ?? "_universal";
+    const key = `${typeKey}::${cat}`;
     (grouped[key] = grouped[key] ?? []).push(t);
   }
-  const ORDER = [
-    "fuel_grade",
-    "ev_charging",
-    "station_products",
-    "station_services",
-    "station_payment",
-    "station_brand",
-  ];
   const groupKeys = Object.keys(grouped).sort((a, b) => {
-    const ai = ORDER.indexOf(a);
-    const bi = ORDER.indexOf(b);
-    if (ai !== -1 || bi !== -1) return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    const [aType] = a.split("::");
+    const [bType] = b.split("::");
+    // Own type first, then universal, then everything else alphabetically.
+    const rank = (tk: string) => (tk === typeSlug ? 0 : tk === "_universal" ? 1 : 2);
+    const ra = rank(aType);
+    const rb = rank(bType);
+    if (ra !== rb) return ra - rb;
     return a.localeCompare(b);
   });
+  const typeLabel = (tk: string) => {
+    if (tk === "_universal") return "Universal";
+    return tk
+      .split("_")
+      .map((w) => w[0].toUpperCase() + w.slice(1))
+      .join(" ");
+  };
 
-  const addCustom = async (category: string, label: string) => {
+  const addCustom = async (groupKey: string, label: string) => {
     const trimmed = label.trim();
     if (trimmed.length < 2) {
       toast.error("Tag must be at least 2 characters");
       return;
     }
+    const [typeKey, category] = groupKey.split("::");
+    const _type_slug = typeKey === "_universal" ? null : typeKey;
     const { data, error } = await (supabase as any).rpc("suggest_business_tag", {
       _label: trimmed,
-      _type_slug: typeSlug,
+      _type_slug,
       _category: category,
     });
     if (error) {
@@ -429,26 +440,29 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
       return;
     }
     const newSlug = data as string;
-    // Refresh tag catalog so the new tag appears in its group
     const { data: t } = await (supabase as any)
       .from("business_tags")
       .select("slug,label,type_slug,category,sort_order,is_popular")
-      .or(`type_slug.eq.${typeSlug},type_slug.is.null`)
+      .order("type_slug")
       .order("sort_order");
     setAllTags((t ?? []) as TagRow[]);
     setSelected((prev) => new Set(prev).add(newSlug));
     toast.success("Tag added — remember to click Save tags");
   };
 
+
   return (
     <Card className="space-y-5 p-4 md:p-5">
       <div>
-        <h2 className="font-display text-lg font-semibold">Tags</h2>
+        <h2 className="font-display text-lg font-semibold">Tags & offerings</h2>
         <p className="text-sm text-muted-foreground">
-          Pick what your station offers — fuel grades (91/95/97/100 RON), diesel types, EV charging
-          connectors, and amenities. These show as filterable badges on your public page.
+          Pick everything this business offers. Tags from your primary type appear first; you can
+          also add offerings from other categories (e.g. a used car dealership that also does tire
+          repair, vulcanizing, or A/C service). These show as filterable badges and let customers
+          discover you under more categories.
         </p>
       </div>
+
 
       {selected.size > 0 && (
         <div className="rounded-lg border border-border bg-secondary/40 p-3">
@@ -474,33 +488,43 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
         </div>
       )}
 
-      {groupKeys.map((k) => (
-        <div key={k}>
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {prettyCategory(k)}
+      {groupKeys.map((k) => {
+        const [typeKey, category] = k.split("::");
+        const isOwn = typeKey === typeSlug || typeKey === "_universal";
+        return (
+          <div key={k}>
+            <div className="mb-2 flex flex-wrap items-baseline gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {!isOwn && (
+                <span className="rounded bg-secondary px-1.5 py-0.5 text-[10px] normal-case tracking-normal text-foreground/80">
+                  Also offered · {typeLabel(typeKey)}
+                </span>
+              )}
+              <span>{prettyCategory(category)}</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {grouped[k].map((t) => {
+                const active = selected.has(t.slug);
+                return (
+                  <button
+                    key={t.slug}
+                    type="button"
+                    onClick={() => toggle(t.slug)}
+                    className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                      active
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
+            <AddCustomTagInline category={category} onAdd={(label) => addCustom(k, label)} />
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            {grouped[k].map((t) => {
-              const active = selected.has(t.slug);
-              return (
-                <button
-                  key={t.slug}
-                  type="button"
-                  onClick={() => toggle(t.slug)}
-                  className={`rounded-full border px-3 py-1 text-xs transition-colors ${
-                    active
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
-                  }`}
-                >
-                  {t.label}
-                </button>
-              );
-            })}
-          </div>
-          <AddCustomTagInline category={k} onAdd={(label) => addCustom(k, label)} />
-        </div>
-      ))}
+        );
+      })}
+
 
       <div className="flex justify-end">
         <Button onClick={save} disabled={saving}>
