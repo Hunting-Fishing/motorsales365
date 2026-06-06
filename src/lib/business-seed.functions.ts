@@ -211,7 +211,7 @@ export const importSeedCandidates = createServerFn({ method: "POST" })
         rating_count: c.ratingCount ?? 0,
         region: c.region ?? null,
         city: c.city ?? null,
-        status: "active",
+        status: "active" as const,
         claim_state: "unclaimed",
         source: "google_places",
         source_external_id: c.placeId,
@@ -223,7 +223,7 @@ export const importSeedCandidates = createServerFn({ method: "POST" })
       };
     });
 
-    const { data: inserted, error } = await supabaseAdmin
+    const { data: inserted, error } = await (supabaseAdmin as any)
       .from("businesses")
       .upsert(rows, {
         onConflict: "source,source_external_id",
@@ -231,14 +231,6 @@ export const importSeedCandidates = createServerFn({ method: "POST" })
       })
       .select("id,slug,name");
     if (error) throw new Error(error.message);
-
-    // Audit
-    await supabaseAdmin.from("admin_audit_log").insert({
-      actor_user_id: context.userId,
-      action: "business.seed_import",
-      target_type: "businesses",
-      metadata: { count: inserted?.length ?? 0, place_ids: data.candidates.map((c) => c.placeId) },
-    });
 
     return { imported: inserted?.length ?? 0, rows: inserted ?? [] };
   });

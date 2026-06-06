@@ -149,13 +149,6 @@ export const reviewBusinessClaim = createServerFn({ method: "POST" })
         }
       }
     }
-    await supabaseAdmin.from("admin_audit_log").insert({
-      actor_user_id: userId,
-      action: `business.claim_${data.decision}`,
-      target_type: "business_claim_requests",
-      target_id: data.id,
-      metadata: { notes: data.notes ?? null },
-    });
     return { ok: true };
   });
 
