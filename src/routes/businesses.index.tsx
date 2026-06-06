@@ -61,6 +61,7 @@ type BusinessRow = {
   price_label: string | null;
   subscription_tier: "free" | "listed" | "featured" | "premium" | null;
   owner_id: string | null;
+  claim_state: "unclaimed" | "claim_pending" | "owned" | null;
 };
 
 function BusinessesIndex() {
