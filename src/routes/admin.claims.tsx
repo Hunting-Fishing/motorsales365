@@ -304,6 +304,7 @@ function ClaimsPage() {
       await review({ data: { id, decision, notes: notes[id] || undefined } });
       toast.success(`Claim ${decision}d`);
       qc.invalidateQueries({ queryKey: ["admin-claims"] });
+      qc.invalidateQueries({ queryKey: ["claim-audit", id] });
     } catch (e: any) {
       toast.error(e?.message ?? "Failed");
     } finally {
