@@ -184,7 +184,7 @@ function MapPage() {
       let query = (supabase as any)
         .from("businesses")
         .select(
-          "id,slug,name,type_slug,city,barangay,province,lat,lng,rating_avg,rating_count,featured,price_label",
+          "id,slug,name,type_slug,city,barangay,province,lat,lng,rating_avg,rating_count,featured,price_label,claim_state",
         )
         .eq("status", "active")
         .not("lat", "is", null)
