@@ -114,20 +114,46 @@ export const getBusinessPage = createServerFn({ method: "GET" })
     ]);
 
     let tagLabels: string[] = [];
-    let tags: { slug: string; label: string; category: string | null }[] = [];
+    let tags: {
+      slug: string;
+      label: string;
+      category: string | null;
+      type_slug: string | null;
+    }[] = [];
+    const typeLabels: Record<string, string> = {};
     const tagSlugs = (tagLinks ?? []).map((l: any) => l.tag_slug);
     if (tagSlugs.length > 0) {
       const { data: tagRows } = await supabaseAdmin
         .from("business_tags")
-        .select("slug,label,category")
+        .select("slug,label,category,type_slug")
         .in("slug", tagSlugs);
       tags = (tagRows ?? []).map((r: any) => ({
         slug: r.slug,
         label: r.label,
         category: r.category ?? null,
+        type_slug: r.type_slug ?? null,
       }));
       tagLabels = tags.map((t) => t.label);
+      const otherTypeSlugs = Array.from(
+        new Set(
+          tags
+            .map((t) => t.type_slug)
+            .filter(
+              (s): s is string => !!s && s !== (biz as any).type_slug,
+            ),
+        ),
+      );
+      if (otherTypeSlugs.length > 0) {
+        const { data: typeRows } = await supabaseAdmin
+          .from("business_types")
+          .select("slug,label")
+          .in("slug", otherTypeSlugs);
+        for (const t of typeRows ?? []) {
+          typeLabels[(t as any).slug] = (t as any).label;
+        }
+      }
     }
+
 
     const uids = Array.from(new Set((reviews ?? []).map((r: any) => r.user_id)));
     const reviewerNames: Record<string, string> = {};
@@ -142,6 +168,8 @@ export const getBusinessPage = createServerFn({ method: "GET" })
     return {
       business: biz,
       typeLabel: typeRow?.label ?? "",
+      primaryTypeSlug: (biz as any).type_slug ?? null,
+      typeLabels,
       tagLabels,
       tags,
       services: services ?? [],

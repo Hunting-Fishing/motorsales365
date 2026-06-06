@@ -388,7 +388,11 @@ function BusinessProfilePage() {
                   </div>
 
                   {(data?.tags?.length ?? 0) > 0 ? (
-                    <TagGroups tags={data!.tags as any} />
+                    <TagGroups
+                      tags={data!.tags as any}
+                      primaryTypeSlug={(data as any)?.primaryTypeSlug ?? null}
+                      typeLabels={(data as any)?.typeLabels ?? {}}
+                    />
                   ) : tagLabels.length > 0 ? (
                     <div className="mt-3 flex flex-wrap gap-1">
                       {tagLabels.map((l: string) => (
@@ -905,7 +909,12 @@ function BusinessHoursBlock({ hours, isFuelStation }: { hours: any; isFuelStatio
 }
 
 // ---------- Grouped tag display ----------
-type TagItem = { slug: string; label: string; category: string | null };
+type TagItem = {
+  slug: string;
+  label: string;
+  category: string | null;
+  type_slug?: string | null;
+};
 
 const TAG_GROUP_MAP: { label: string; cats: string[] }[] = [
   { label: "Fuels", cats: ["fuel_grade", "fuel"] },
@@ -928,7 +937,6 @@ const TAG_GROUP_MAP: { label: string; cats: string[] }[] = [
       "electrical",
       "exhaust",
       "diagnostics",
-      "fuel",
       "wash",
       "detail",
       "paint",
@@ -965,7 +973,7 @@ const TAG_GROUP_MAP: { label: string; cats: string[] }[] = [
   { label: "Hours", cats: ["hours", "operations"] },
 ];
 
-function TagGroups({ tags }: { tags: TagItem[] }) {
+function renderGroups(tags: TagItem[]): { label: string; items: TagItem[] }[] {
   const groups: { label: string; items: TagItem[] }[] = [];
   const used = new Set<string>();
   for (const g of TAG_GROUP_MAP) {
@@ -977,11 +985,37 @@ function TagGroups({ tags }: { tags: TagItem[] }) {
   }
   const other = tags.filter((t) => !used.has(t.slug));
   if (other.length > 0) groups.push({ label: "Other", items: other });
+  return groups;
+}
+
+function TagGroups({
+  tags,
+  primaryTypeSlug,
+  typeLabels,
+}: {
+  tags: TagItem[];
+  primaryTypeSlug?: string | null;
+  typeLabels?: Record<string, string>;
+}) {
+  // Split into primary (matches business type or untyped) vs cross-type offerings.
+  const primary = tags.filter(
+    (t) => !t.type_slug || !primaryTypeSlug || t.type_slug === primaryTypeSlug,
+  );
+  const crossByType = new Map<string, TagItem[]>();
+  for (const t of tags) {
+    if (t.type_slug && primaryTypeSlug && t.type_slug !== primaryTypeSlug) {
+      const list = crossByType.get(t.type_slug) ?? [];
+      list.push(t);
+      crossByType.set(t.type_slug, list);
+    }
+  }
+
+  const primaryGroups = renderGroups(primary);
 
   return (
-    <div className="mt-3 space-y-2">
-      {groups.map((g) => (
-        <div key={g.label}>
+    <div className="mt-3 space-y-3">
+      {primaryGroups.map((g) => (
+        <div key={`primary-${g.label}`}>
           <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             {g.label}
           </div>
@@ -994,6 +1028,43 @@ function TagGroups({ tags }: { tags: TagItem[] }) {
           </div>
         </div>
       ))}
+
+      {Array.from(crossByType.entries()).map(([typeSlug, items]) => {
+        const typeLabel = typeLabels?.[typeSlug] ?? typeSlug;
+        const subGroups = renderGroups(items);
+        return (
+          <div
+            key={`cross-${typeSlug}`}
+            className="rounded-md border border-dashed border-border/70 bg-muted/20 p-2"
+          >
+            <div className="flex items-center gap-2">
+              <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Also offered
+              </div>
+              <Badge variant="outline" className="text-[10px]">
+                {typeLabel}
+              </Badge>
+            </div>
+            <div className="mt-2 space-y-2">
+              {subGroups.map((g) => (
+                <div key={`${typeSlug}-${g.label}`}>
+                  <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground/80">
+                    {g.label}
+                  </div>
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {g.items.map((t) => (
+                      <Badge key={t.slug} variant="secondary" className="bg-accent/40">
+                        {t.label}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
+
