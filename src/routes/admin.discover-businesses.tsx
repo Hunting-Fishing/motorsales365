@@ -30,6 +30,7 @@ import {
   type FbCandidate,
 } from "@/lib/business-discover.functions";
 import { AutoSyncTab } from "@/components/admin/auto-sync-tab";
+import { PhLocationPicker } from "@/components/admin/ph-location-picker";
 
 export const Route = createFileRoute("/admin/discover-businesses")({
   component: DiscoverPage,
