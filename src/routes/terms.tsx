@@ -183,6 +183,22 @@ function TermsPage() {
           removal of the business profile and, where required, referral to the DTI E-Commerce Bureau
           or other competent authority.
         </p>
+        <p className="mt-3 text-muted-foreground">
+          <strong>Seeded directory listings &amp; ownership claims.</strong> To help users discover
+          motor-related businesses across the Philippines, the Platform may add public listings
+          sourced from third-party data providers (such as Google Places) consisting of business
+          name, address, map pin, phone, website, hours, rating summary, and a single attributed
+          cover photo. These entries are clearly marked <em>Unclaimed</em> until the rightful
+          owner claims and verifies the page. Owners may claim their listing from the business
+          page using a matching contact channel or supporting document; once verified, the owner
+          gains full editorial control. If you are the owner and prefer that your business is not
+          listed, you may request removal at any time via{" "}
+          <Link className="text-primary underline" to="/support">
+            Support
+          </Link>{" "}
+          and we will remove the page promptly. Seeded listings do not imply any endorsement of,
+          or affiliation with, 365 MotorSales by the business.
+        </p>
 
         <h2 className="mt-6 text-xl font-semibold">
           6. Pricing display, currency &amp; promo pricing
