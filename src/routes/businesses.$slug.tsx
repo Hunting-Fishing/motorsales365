@@ -1056,16 +1056,14 @@ function TagGroups({
             </div>
             <div className="mt-1 flex flex-wrap gap-1">
               {g.items.map((t) => (
-                <Tooltip key={t.slug}>
-                  <TooltipTrigger asChild>
-                    <Badge variant="secondary" className="cursor-help">
-                      {t.label}
-                    </Badge>
-                  </TooltipTrigger>
-                  <TooltipContent side="top">
-                    {t.description || `${g.label} service`}
-                  </TooltipContent>
-                </Tooltip>
+                <PressableTooltip
+                  key={t.slug}
+                  content={t.description || `${g.label} service`}
+                >
+                  <Badge variant="secondary" className="cursor-help">
+                    {t.label}
+                  </Badge>
+                </PressableTooltip>
               ))}
             </div>
           </div>
@@ -1095,19 +1093,17 @@ function TagGroups({
                     </div>
                     <div className="mt-1 flex flex-wrap gap-1">
                       {g.items.map((t) => (
-                        <Tooltip key={t.slug}>
-                          <TooltipTrigger asChild>
-                            <Badge
-                              variant="secondary"
-                              className="cursor-help bg-accent/40"
-                            >
-                              {t.label}
-                            </Badge>
-                          </TooltipTrigger>
-                          <TooltipContent side="top">
-                            {t.description || `${g.label} · ${typeLabel}`}
-                          </TooltipContent>
-                        </Tooltip>
+                        <PressableTooltip
+                          key={t.slug}
+                          content={t.description || `${g.label} · ${typeLabel}`}
+                        >
+                          <Badge
+                            variant="secondary"
+                            className="cursor-help bg-accent/40"
+                          >
+                            {t.label}
+                          </Badge>
+                        </PressableTooltip>
                       ))}
                     </div>
                   </div>
