@@ -153,7 +153,7 @@ function VerificationPage() {
       return;
     }
     if (
-      ["repair_shop", "insurance", "dealership", "motorcycle_shop", "body_paint", "parts_accessories"].includes(
+      ["repair_shop", "insurance", "dealership", "used_dealership", "motorcycle_shop", "body_paint", "parts_accessories"].includes(
         form.business_kind,
       ) &&
       !form.dti_sec_registration.trim()

@@ -3,7 +3,8 @@
 // MUST stay in sync with the public.business_types rows and the
 // public.business_kind Postgres enum.
 export const BUSINESS_KIND_OPTIONS: { value: string; label: string }[] = [
-  { value: "dealership", label: "Dealership / Showroom" },
+  { value: "dealership", label: "Dealership / New cars" },
+  { value: "used_dealership", label: "Used car dealer" },
   { value: "motorcycle_shop", label: "Motorcycle shop" },
   { value: "rental", label: "Vehicle rental" },
   { value: "parts_accessories", label: "Parts supplier / shop" },
