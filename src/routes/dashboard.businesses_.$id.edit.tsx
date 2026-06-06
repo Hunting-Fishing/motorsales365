@@ -485,33 +485,43 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
         </div>
       )}
 
-      {groupKeys.map((k) => (
-        <div key={k}>
-          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            {prettyCategory(k)}
+      {groupKeys.map((k) => {
+        const [typeKey, category] = k.split("::");
+        const isOwn = typeKey === typeSlug || typeKey === "_universal";
+        return (
+          <div key={k}>
+            <div className="mb-2 flex flex-wrap items-baseline gap-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {!isOwn && (
+                <span className="rounded bg-secondary px-1.5 py-0.5 text-[10px] normal-case tracking-normal text-foreground/80">
+                  Also offered · {typeLabel(typeKey)}
+                </span>
+              )}
+              <span>{prettyCategory(category)}</span>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {grouped[k].map((t) => {
+                const active = selected.has(t.slug);
+                return (
+                  <button
+                    key={t.slug}
+                    type="button"
+                    onClick={() => toggle(t.slug)}
+                    className={`rounded-full border px-3 py-1 text-xs transition-colors ${
+                      active
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                    }`}
+                  >
+                    {t.label}
+                  </button>
+                );
+              })}
+            </div>
+            <AddCustomTagInline category={category} onAdd={(label) => addCustom(k, label)} />
           </div>
-          <div className="flex flex-wrap gap-1.5">
-            {grouped[k].map((t) => {
-              const active = selected.has(t.slug);
-              return (
-                <button
-                  key={t.slug}
-                  type="button"
-                  onClick={() => toggle(t.slug)}
-                  className={`rounded-full border px-3 py-1 text-xs transition-colors ${
-                    active
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border bg-background text-muted-foreground hover:border-primary/40 hover:text-foreground"
-                  }`}
-                >
-                  {t.label}
-                </button>
-              );
-            })}
-          </div>
-          <AddCustomTagInline category={k} onAdd={(label) => addCustom(k, label)} />
-        </div>
-      ))}
+        );
+      })}
+
 
       <div className="flex justify-end">
         <Button onClick={save} disabled={saving}>
