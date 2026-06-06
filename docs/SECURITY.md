@@ -119,8 +119,18 @@ the URL is passed to Stripe.
 
 1. `./scripts/verify-security.sh` — should print `PASS` with every
    allow-listed function showing `OK`.
-2. `supabase--linter` — remaining warnings should match the counts above.
-3. `security--run_security_scan` — remaining items should be limited to
+2. `./scripts/test-rls-regression.sh` — runs `scripts/rls-regression.sql`
+   in a rolled-back transaction. Asserts the post-fix behavior of the
+   "Owners update listings" policy on `public.listings` (status / plan /
+   `boost_until` / `expires_at` are frozen, multi-row owner updates
+   succeed) and the "Authenticated upload to business gallery" policy on
+   `storage.objects` (uploads require the first path segment to be a
+   `businesses.id` the caller owns or can manage via their org).
+   Requires a service-role / postgres `DATABASE_URL`; with a read-only
+   role the script prints `SKIP` and exits 0.
+3. `supabase--linter` — remaining warnings should match the counts above.
+4. `security--run_security_scan` — remaining items should be limited to
    the intentional categories above plus any scanner false-positives that
    re-flag already-hardened server functions (the scanner does not
    re-read source on every run).
+
