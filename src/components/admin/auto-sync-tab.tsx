@@ -162,7 +162,7 @@ export function AutoSyncTab() {
     if (!selectedIds.length) return;
     try {
       const res = await importNow({ data: { ids: selectedIds } });
-      toast.success(`Imported ${res.imported}${res.skipped ? ` · skipped ${res.skipped} (no type/coords)` : ""}`);
+      toast.success(`Imported ${res.imported}${(res as any).merged ? ` · merged ${(res as any).merged} duplicate(s)` : ""}${res.skipped ? ` · skipped ${res.skipped} (no type/coords)` : ""}`);
       setSelected({});
       refresh();
     } catch (e) {
