@@ -487,9 +487,14 @@ function FacebookTab({ onAdd }: { onAdd: (r: Row) => void }) {
   const [region, setRegion] = useState("");
   const [city, setCity] = useState("");
   const [busy, setBusy] = useState(false);
+  const [groupKind, setGroupKind] = useState<string>(DISCOVER_SEARCH_GROUPS[0].kind);
+  const [bulkProgress, setBulkProgress] = useState<{ done: number; total: number } | null>(null);
   const [results, setResults] = useState<
     { url: string; title: string; snippet: string; pageId: string; alreadyImported: boolean }[]
   >([]);
+  const activeGroup =
+    DISCOVER_SEARCH_GROUPS.find((g) => g.kind === groupKind) ?? DISCOVER_SEARCH_GROUPS[0];
+
 
   async function scrapeOne(pageUrl: string) {
     if (!pageUrl) return;
