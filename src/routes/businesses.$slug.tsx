@@ -949,6 +949,7 @@ type TagItem = {
   label: string;
   category: string | null;
   type_slug?: string | null;
+  description?: string | null;
 };
 
 const TAG_GROUP_MAP: { label: string; cats: string[] }[] = [
