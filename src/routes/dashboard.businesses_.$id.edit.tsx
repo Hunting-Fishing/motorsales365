@@ -394,35 +394,45 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
     );
   }
 
+  // Group by "${type_slug}::${category}" so cross-type offerings (e.g. a used
+  // car dealership that also does A/C service or tire repair) appear in their
+  // own sections, prefixed with the type label.
   const grouped: Record<string, TagRow[]> = {};
   for (const t of allTags) {
-    const key = t.category ?? "other";
+    const cat = t.category ?? "other";
+    const typeKey = t.type_slug ?? "_universal";
+    const key = `${typeKey}::${cat}`;
     (grouped[key] = grouped[key] ?? []).push(t);
   }
-  const ORDER = [
-    "fuel_grade",
-    "ev_charging",
-    "station_products",
-    "station_services",
-    "station_payment",
-    "station_brand",
-  ];
   const groupKeys = Object.keys(grouped).sort((a, b) => {
-    const ai = ORDER.indexOf(a);
-    const bi = ORDER.indexOf(b);
-    if (ai !== -1 || bi !== -1) return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+    const [aType] = a.split("::");
+    const [bType] = b.split("::");
+    // Own type first, then universal, then everything else alphabetically.
+    const rank = (tk: string) => (tk === typeSlug ? 0 : tk === "_universal" ? 1 : 2);
+    const ra = rank(aType);
+    const rb = rank(bType);
+    if (ra !== rb) return ra - rb;
     return a.localeCompare(b);
   });
+  const typeLabel = (tk: string) => {
+    if (tk === "_universal") return "Universal";
+    return tk
+      .split("_")
+      .map((w) => w[0].toUpperCase() + w.slice(1))
+      .join(" ");
+  };
 
-  const addCustom = async (category: string, label: string) => {
+  const addCustom = async (groupKey: string, label: string) => {
     const trimmed = label.trim();
     if (trimmed.length < 2) {
       toast.error("Tag must be at least 2 characters");
       return;
     }
+    const [typeKey, category] = groupKey.split("::");
+    const _type_slug = typeKey === "_universal" ? null : typeKey;
     const { data, error } = await (supabase as any).rpc("suggest_business_tag", {
       _label: trimmed,
-      _type_slug: typeSlug,
+      _type_slug,
       _category: category,
     });
     if (error) {
@@ -430,16 +440,16 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
       return;
     }
     const newSlug = data as string;
-    // Refresh tag catalog so the new tag appears in its group
     const { data: t } = await (supabase as any)
       .from("business_tags")
       .select("slug,label,type_slug,category,sort_order,is_popular")
-      .or(`type_slug.eq.${typeSlug},type_slug.is.null`)
+      .order("type_slug")
       .order("sort_order");
     setAllTags((t ?? []) as TagRow[]);
     setSelected((prev) => new Set(prev).add(newSlug));
     toast.success("Tag added — remember to click Save tags");
   };
+
 
   return (
     <Card className="space-y-5 p-4 md:p-5">
