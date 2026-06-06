@@ -259,5 +259,125 @@ export const getMyClaimsForBusiness = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(50);
     if (error) throw new Error(error.message);
-    return { claims: rows ?? [] };
+    const claims = rows ?? [];
+    if (claims.length === 0) return { claims: [], evidenceByClaim: {} as Record<string, EvidenceRow[]> };
+
+    const ids = claims.map((c) => c.id);
+    const { data: ev } = await supabase
+      .from("business_claim_evidence")
+      .select("id,claim_id,evidence_type,file_name,file_size,mime_type,storage_path,notes,created_at")
+      .in("claim_id", ids)
+      .order("created_at", { ascending: true });
+
+    const evidenceByClaim: Record<string, EvidenceRow[]> = {};
+    for (const e of ev ?? []) {
+      (evidenceByClaim[e.claim_id] ||= []).push(e as EvidenceRow);
+    }
+    return { claims, evidenceByClaim };
+  });
+
+// ---------- Evidence uploads (receipt-style) ----------
+
+const EVIDENCE_TYPES = [
+  "facebook_ownership",
+  "google_business",
+  "business_license",
+  "utility_bill",
+  "id_document",
+  "website_proof",
+  "other",
+] as const;
+
+export type EvidenceRow = {
+  id: string;
+  claim_id: string;
+  evidence_type: (typeof EVIDENCE_TYPES)[number];
+  file_name: string;
+  file_size: number;
+  mime_type: string;
+  storage_path: string;
+  notes: string | null;
+  created_at: string;
+};
+
+const RecordEvidenceInput = z.object({
+  claimId: z.string().uuid(),
+  evidenceType: z.enum(EVIDENCE_TYPES),
+  fileName: z.string().min(1).max(255),
+  fileSize: z.number().int().min(0).max(25 * 1024 * 1024),
+  mimeType: z.string().min(1).max(255),
+  storagePath: z.string().min(1).max(1024),
+  notes: z.string().max(1000).optional(),
+});
+
+export const recordClaimEvidence = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => RecordEvidenceInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    // Verify the user owns this claim
+    const { data: claim, error: claimErr } = await supabase
+      .from("business_claim_requests")
+      .select("id,claimant_user_id")
+      .eq("id", data.claimId)
+      .maybeSingle();
+    if (claimErr) throw new Error(claimErr.message);
+    if (!claim || claim.claimant_user_id !== userId) throw new Error("Forbidden");
+
+    const { data: row, error } = await supabase
+      .from("business_claim_evidence")
+      .insert({
+        claim_id: data.claimId,
+        uploader_user_id: userId,
+        evidence_type: data.evidenceType,
+        file_name: data.fileName,
+        file_size: data.fileSize,
+        mime_type: data.mimeType,
+        storage_path: data.storagePath,
+        notes: data.notes ?? null,
+      })
+      .select("id,claim_id,evidence_type,file_name,file_size,mime_type,storage_path,notes,created_at")
+      .single();
+    if (error) throw new Error(error.message);
+    return { evidence: row as EvidenceRow };
+  });
+
+export const getEvidenceSignedUrl = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ evidenceId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: ev, error } = await supabase
+      .from("business_claim_evidence")
+      .select("storage_path")
+      .eq("id", data.evidenceId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!ev) throw new Error("Not found");
+    const { data: signed, error: sErr } = await supabase.storage
+      .from("claim-evidence")
+      .createSignedUrl(ev.storage_path, 60 * 5);
+    if (sErr) throw new Error(sErr.message);
+    return { url: signed.signedUrl };
+  });
+
+export const deleteClaimEvidence = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ evidenceId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: ev, error } = await supabase
+      .from("business_claim_evidence")
+      .select("id,uploader_user_id,storage_path")
+      .eq("id", data.evidenceId)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    if (!ev || ev.uploader_user_id !== userId) throw new Error("Forbidden");
+    await supabase.storage.from("claim-evidence").remove([ev.storage_path]);
+    const { error: delErr } = await supabase
+      .from("business_claim_evidence")
+      .delete()
+      .eq("id", data.evidenceId);
+    if (delErr) throw new Error(delErr.message);
+    return { ok: true };
   });
