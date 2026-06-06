@@ -411,6 +411,7 @@ function BusinessProfilePage() {
               claimState={biz.claim_state}
             />
           )}
+          <ClaimStatusSection businessId={biz.id} />
           {/* ABOUT + HOURS + MAP */}
           <div className="grid gap-6 md:grid-cols-2">
             <Card className="p-5">
