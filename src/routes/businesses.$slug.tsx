@@ -413,6 +413,7 @@ function BusinessProfilePage() {
             />
           )}
           <ClaimStatusSection businessId={biz.id} />
+          <ClaimHistoryTimeline businessId={biz.id} />
           {/* ABOUT + HOURS + MAP */}
           <div className="grid gap-6 md:grid-cols-2">
             <Card className="p-5">
