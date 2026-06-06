@@ -168,8 +168,70 @@ export const listPendingClaims = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false })
       .limit(100);
     if (error) throw new Error(error.message);
-    return { claims: data ?? [] };
+    const claims = data ?? [];
+    if (claims.length === 0) {
+      return { claims: [], evidenceByClaim: {}, claimantById: {} };
+    }
+
+    const claimIds = claims.map((c) => c.id);
+    const claimantIds = Array.from(new Set(claims.map((c) => c.claimant_user_id)));
+
+    const { data: evidence } = await supabase
+      .from("business_claim_evidence")
+      .select(
+        "id,claim_id,evidence_type,file_name,file_size,mime_type,storage_path,notes,created_at,uploader_user_id",
+      )
+      .in("claim_id", claimIds)
+      .order("created_at", { ascending: true });
+
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("id,full_name,first_name,last_name,avatar_url,phone,created_at")
+      .in("id", claimantIds);
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const claimantById: Record<
+      string,
+      {
+        id: string;
+        email: string | null;
+        email_confirmed: boolean;
+        phone: string | null;
+        phone_confirmed: boolean;
+        full_name: string | null;
+        avatar_url: string | null;
+        created_at: string | null;
+      }
+    > = {};
+
+    for (const cid of claimantIds) {
+      const prof = profiles?.find((p) => p.id === cid);
+      const { data: au } = await supabaseAdmin.auth.admin.getUserById(cid);
+      const user = au?.user;
+      claimantById[cid] = {
+        id: cid,
+        email: user?.email ?? null,
+        email_confirmed: !!user?.email_confirmed_at,
+        phone: user?.phone ?? prof?.phone ?? null,
+        phone_confirmed: !!user?.phone_confirmed_at,
+        full_name:
+          prof?.full_name ||
+          [prof?.first_name, prof?.last_name].filter(Boolean).join(" ") ||
+          null,
+        avatar_url: prof?.avatar_url ?? null,
+        created_at: prof?.created_at ?? user?.created_at ?? null,
+      };
+    }
+
+    const evidenceByClaim: Record<string, typeof evidence> = {};
+    for (const e of evidence ?? []) {
+      (evidenceByClaim[e.claim_id] ||= []).push(e);
+    }
+
+    return { claims, evidenceByClaim, claimantById };
   });
+
+
 
 export const getMyClaimForBusiness = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
