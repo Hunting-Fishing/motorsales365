@@ -336,7 +336,7 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
         (supabase as any)
           .from("business_tags")
           .select("slug,label,type_slug,category,sort_order,is_popular")
-          .or(`type_slug.eq.${typeSlug},type_slug.is.null`)
+          .order("type_slug")
           .order("sort_order"),
         (supabase as any)
           .from("business_tag_links")
@@ -352,6 +352,7 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
       cancelled = true;
     };
   }, [businessId, typeSlug]);
+
 
   const toggle = (slug: string) => {
     setSelected((prev) => {
