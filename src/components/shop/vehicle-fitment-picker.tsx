@@ -171,7 +171,7 @@ export function VehicleFitmentPicker({
       </div>
 
       {/* Engine — only renders meaningfully once model is picked. Optional. */}
-      <div className={compact ? "space-y-1" : "space-y-1 sm:col-span-2 md:col-span-2"}>
+      <div className="space-y-1">
         <Label className="text-xs">Engine (optional)</Label>
         {engineMode === "custom" || (model && engines.length === 0) ? (
           <div className="flex gap-2">
@@ -223,18 +223,48 @@ export function VehicleFitmentPicker({
         )}
       </div>
 
+      {/* Transmission — optional, narrows trans-specific parts (clutch, ATF, mounts). */}
+      <div className="space-y-1">
+        <Label className="text-xs">Transmission (optional)</Label>
+        <Select
+          value={transmission || "__any__"}
+          onValueChange={(v) => setTransmission(v === "__any__" ? "" : v)}
+          disabled={transmissions.length === 0}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Any transmission" />
+          </SelectTrigger>
+          <SelectContent className="max-h-72">
+            <SelectItem value="__any__">Any transmission</SelectItem>
+            {transmissions.map((t) => (
+              <SelectItem key={t.value} value={t.value}>
+                {t.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className={compact ? "" : "sm:col-span-2 md:col-span-2"}>
         <Button
           type="button"
           className="w-full md:w-auto"
           disabled={!canSubmit}
           onClick={() =>
-            onSubmit({ category, make, model, year: yearNum, engine: engine || undefined })
+            onSubmit({
+              category,
+              make,
+              model,
+              year: yearNum,
+              engine: engine || undefined,
+              transmission: transmission || undefined,
+            })
           }
         >
           {submitLabel}
         </Button>
       </div>
+
     </div>
   );
 }
