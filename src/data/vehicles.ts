@@ -130,7 +130,6 @@ export const CAR_MODEL_YEARS: ModelYearMap = {
     "HR-V": { start: 1998 },
     "CR-V": { start: 1995 },
     "ZR-V": { start: 2022 },
-    Pilot: { start: 2002 },
     Odyssey: { start: 1994 },
     Mobilio: { start: 2001 },
     Stream: { start: 2000, end: 2014 },
