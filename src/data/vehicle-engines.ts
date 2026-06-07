@@ -373,82 +373,12 @@ export const VEHICLE_ENGINES: EngineCatalog = {
   },
 };
 
-/** Generic engine fallback per category — used when a model has no curated
- *  list yet. Gives users sensible displacement-based picks without leaving
- *  them with a blank free-text field. */
-export const GENERIC_ENGINES_BY_CATEGORY: Partial<Record<VehicleCategory, EngineSpec[]>> = {
-  car: [
-    { label: "1.0L Gasoline" },
-    { label: "1.2L Gasoline" },
-    { label: "1.3L Gasoline" },
-    { label: "1.5L Gasoline" },
-    { label: "1.6L Gasoline" },
-    { label: "1.8L Gasoline" },
-    { label: "2.0L Gasoline" },
-    { label: "2.4L Gasoline" },
-    { label: "2.5L Gasoline" },
-    { label: "3.0L V6 Gasoline" },
-    { label: "3.5L V6 Gasoline" },
-    { label: "5.0L V8 Gasoline" },
-    { label: "1.5L Diesel" },
-    { label: "1.9L Diesel" },
-    { label: "2.2L Diesel" },
-    { label: "2.5L Diesel" },
-    { label: "2.8L Diesel" },
-    { label: "3.0L Diesel" },
-    { label: "3.2L Diesel" },
-    { label: "1.5L Turbo" },
-    { label: "2.0L Turbo" },
-    { label: "Hybrid" },
-    { label: "Electric (EV)" },
-  ],
-  motorcycle: [
-    { label: "100cc" },
-    { label: "110cc" },
-    { label: "125cc" },
-    { label: "150cc" },
-    { label: "155cc" },
-    { label: "160cc" },
-    { label: "200cc" },
-    { label: "250cc" },
-    { label: "300cc" },
-    { label: "400cc" },
-    { label: "600cc" },
-    { label: "1000cc+" },
-    { label: "Electric (EV)" },
-  ],
-  heavy_truck: [
-    { label: "4.0L Diesel" },
-    { label: "5.0L Diesel" },
-    { label: "6.0L Diesel" },
-    { label: "7.0L Diesel" },
-    { label: "8.0L Diesel" },
-    { label: "10.0L Diesel" },
-    { label: "12.0L Diesel" },
-  ],
-  atv_utv: [
-    { label: "150cc" },
-    { label: "250cc" },
-    { label: "400cc" },
-    { label: "500cc" },
-    { label: "700cc" },
-    { label: "800cc" },
-    { label: "1000cc" },
-  ],
-  marine: [
-    { label: "Outboard 2-stroke" },
-    { label: "Outboard 4-stroke" },
-    { label: "Inboard Gasoline" },
-    { label: "Inboard Diesel" },
-    { label: "Jet ski 4-stroke" },
-  ],
-  heavy_equipment: [
-    { label: "Diesel — under 100 HP" },
-    { label: "Diesel — 100–200 HP" },
-    { label: "Diesel — 200–400 HP" },
-    { label: "Diesel — 400+ HP" },
-  ],
-};
+/** No generic engine fallback. We only ship factual, model-year-verified
+ *  engines (sourced from manufacturer spec sheets for the Asia/PH market).
+ *  When a model isn't covered yet, the picker switches to a free-text input
+ *  so the user can enter the real engine themselves — never a fabricated
+ *  "1.5L Gasoline"-style generic. Coverage is expanded by adding entries
+ *  to VEHICLE_ENGINES above. */
 
 /** Transmission options per category. Used to narrow part compatibility
  *  (clutch kits, gearbox filters, ATF, mounts, etc.). */
@@ -512,7 +442,9 @@ export function getEnginesFor(
   if (!make || !model) return [];
   const list = VEHICLE_ENGINES[category]?.[make]?.[model];
   if (!list || list.length === 0) {
-    return GENERIC_ENGINES_BY_CATEGORY[category] ?? [];
+    // No curated factual data for this model yet — return empty so the UI
+    // switches to a free-text input instead of showing fake generic options.
+    return [];
   }
   const ys = yearStart ?? undefined;
   const ye = yearEnd ?? ys;
