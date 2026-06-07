@@ -5191,6 +5191,7 @@ export type Database = {
           model: string | null
           notes: string | null
           product_id: string
+          transmission: string | null
           year_end: number | null
           year_start: number | null
         }
@@ -5203,6 +5204,7 @@ export type Database = {
           model?: string | null
           notes?: string | null
           product_id: string
+          transmission?: string | null
           year_end?: number | null
           year_start?: number | null
         }
@@ -5215,6 +5217,7 @@ export type Database = {
           model?: string | null
           notes?: string | null
           product_id?: string
+          transmission?: string | null
           year_end?: number | null
           year_start?: number | null
         }
