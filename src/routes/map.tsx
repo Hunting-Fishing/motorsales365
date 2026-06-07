@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GoogleBusinessMap, type GMapBusiness } from "@/components/businesses/google-business-map";
 import { MapFilterBar, type CenterPoint } from "@/components/businesses/map-filter-bar";
-import { MapBottomSheet } from "@/components/businesses/map-bottom-sheet";
+import { MapBottomSheet, type MapBottomSheetHandle } from "@/components/businesses/map-bottom-sheet";
 import { haversineKm } from "@/components/businesses/google-maps-loader";
 import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 
