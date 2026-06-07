@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type ReactNode } from "react";
 import { ChevronUp } from "lucide-react";
 
 type Snap = "peek" | "half" | "full";
