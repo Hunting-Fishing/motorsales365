@@ -170,8 +170,23 @@ function MapPage() {
             lng: center.lng,
             label: center.label,
             radiusKm: radiusKm ?? null,
+            viewport: viewport ?? null,
+            selectedSlug: selectedSlug ?? null,
           };
           window.localStorage.setItem(LS_KEY, JSON.stringify(payload));
+        } else if (viewport || selectedSlug) {
+          // Preserve viewport / selection even when center is cleared.
+          const existing = readStoredSearch();
+          if (existing) {
+            window.localStorage.setItem(
+              LS_KEY,
+              JSON.stringify({
+                ...existing,
+                viewport: viewport ?? existing.viewport ?? null,
+                selectedSlug: selectedSlug ?? null,
+              }),
+            );
+          }
         } else {
           window.localStorage.removeItem(LS_KEY);
         }
@@ -180,7 +195,7 @@ function MapPage() {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [center, radiusKm, typeSlug]);
+  }, [center, radiusKm, typeSlug, viewport, selectedSlug]);
 
   useEffect(() => {
     setTypes(
