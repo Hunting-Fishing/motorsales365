@@ -448,7 +448,14 @@ function MapPage() {
               highlightedSlug={selectedSlug}
               onPinClick={(slug: string) => {
                 setSelectedSlug(slug);
-                navigate({ to: "/businesses/$slug", params: { slug } });
+                setHoverId(null);
+                // Desktop: scroll the matching card into view in the sidebar.
+                const desktopEl = desktopListRef.current?.querySelector<HTMLElement>(
+                  `[data-slug="${CSS.escape(slug)}"]`,
+                );
+                desktopEl?.scrollIntoView({ behavior: "smooth", block: "center" });
+                // Mobile: expand the bottom sheet and scroll the matching card.
+                bottomSheetRef.current?.scrollToSlug(slug);
               }}
             />
           </div>
