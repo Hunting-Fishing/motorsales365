@@ -18,7 +18,7 @@ import {
   getYearOptions,
   type VehicleCategory,
 } from "@/data/vehicles";
-import { getEnginesFor } from "@/data/vehicle-engines";
+import { getEnginesFor, getTransmissionsFor } from "@/data/vehicle-engines";
 import type { GarageVehicle } from "@/lib/garage";
 
 interface Props {
