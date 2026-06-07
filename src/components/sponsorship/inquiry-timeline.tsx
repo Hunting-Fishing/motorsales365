@@ -39,6 +39,21 @@ const ACTION_TONE: Record<string, string> = {
   edited: "text-amber-600",
 };
 
+const FIELD_LABEL: Record<string, string> = {
+  contact_name: "Contact name",
+  company: "Company",
+  phone: "Phone",
+  placement: "Placement",
+  budget_range: "Budget",
+  start_date: "Start date",
+  message: "Message",
+};
+
+const fmtVal = (v: unknown) => {
+  if (v === null || v === undefined || v === "") return "—";
+  return String(v);
+};
+
 export function InquiryTimeline({
   entries,
   showInternal = false,
