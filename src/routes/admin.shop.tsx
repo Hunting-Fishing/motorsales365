@@ -1211,6 +1211,7 @@ function FitmentDialog({ product, onClose }: any) {
           year_start: form.year_start ? Number(form.year_start) : null,
           year_end: form.year_end ? Number(form.year_end) : null,
           engine: form.engine || null,
+          transmission: form.transmission || null,
           notes: form.notes || null,
         } as any,
       }),
