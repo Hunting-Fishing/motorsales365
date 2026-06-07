@@ -79,9 +79,26 @@ export const MapBottomSheet = forwardRef<MapBottomSheetHandle, { header: ReactNo
     setSnap((s) => (s === "peek" ? "half" : s === "half" ? "full" : "peek"));
   };
 
+  const expandToHalf = () => {
+    const snaps = snapsForViewport();
+    setSnap((s) => (s === "peek" ? "half" : s));
+    setHeight((h) => (h < snaps.half ? snaps.half : h));
+  };
+
   useImperativeHandle(ref, () => ({
     scrollToTop: () => {
       if (scrollRef.current) scrollRef.current.scrollTop = 0;
+    },
+    expand: expandToHalf,
+    scrollToSlug: (slug: string) => {
+      expandToHalf();
+      // Wait for the snap transition before scrolling.
+      window.setTimeout(() => {
+        const root = scrollRef.current;
+        if (!root) return;
+        const el = root.querySelector<HTMLElement>(`[data-slug="${CSS.escape(slug)}"]`);
+        if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 240);
     },
   }));
 
