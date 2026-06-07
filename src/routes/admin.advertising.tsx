@@ -297,10 +297,23 @@ function AdminAdvertising() {
                 </div>
                 <div className="text-xs text-muted-foreground">{i.company || i.email}</div>
                 <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">{i.message}</div>
+                <div className="mt-1 flex flex-wrap gap-1">
+                  {((i.sections as string[]) ?? []).slice(0, 3).map((s: string) => (
+                    <Badge key={s} variant="outline" className="text-[10px]">
+                      {sectionLabel(s)}
+                    </Badge>
+                  ))}
+                  {((i.sections as string[]) ?? []).length > 3 && (
+                    <Badge variant="outline" className="text-[10px]">
+                      +{(i.sections as string[]).length - 3}
+                    </Badge>
+                  )}
+                  {(!i.sections || (i.sections as string[]).length === 0) && i.placement && (
+                    <Badge variant="outline" className="text-[10px]">{i.placement}</Badge>
+                  )}
+                </div>
                 <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
-                  <span>
-                    {formatDate(i.created_at)} · {i.placement}
-                  </span>
+                  <span>{formatDate(i.created_at)}</span>
                   {i.assigned_to && (
                     <span
                       className={i.assigned_to === user?.id ? "text-primary font-semibold" : ""}
