@@ -1202,6 +1202,68 @@ export type Database = {
           },
         ]
       }
+      business_location_corrections: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          note: string | null
+          previous_lat: number | null
+          previous_lng: number | null
+          proposed_lat: number
+          proposed_lng: number
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          submitter_ip: string | null
+          submitter_user_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          previous_lat?: number | null
+          previous_lng?: number | null
+          proposed_lat: number
+          proposed_lng: number
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitter_ip?: string | null
+          submitter_user_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          note?: string | null
+          previous_lat?: number | null
+          previous_lng?: number | null
+          proposed_lat?: number
+          proposed_lng?: number
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          submitter_ip?: string | null
+          submitter_user_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_location_corrections_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_page_events: {
         Row: {
           business_id: string
