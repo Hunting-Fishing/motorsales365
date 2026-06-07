@@ -1254,6 +1254,7 @@ function FitmentDialog({ product, onClose }: any) {
                     <th className="p-2">Model</th>
                     <th className="p-2">Years</th>
                     <th className="p-2">Engine</th>
+                    <th className="p-2">Transmission</th>
                     <th className="p-2">Notes</th>
                     <th className="p-2"></th>
                   </tr>
