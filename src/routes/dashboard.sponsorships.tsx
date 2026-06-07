@@ -24,6 +24,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
+import { InquiryTimeline, type AuditEntry } from "@/components/sponsorship/inquiry-timeline";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDate } from "@/lib/format";
 
@@ -66,6 +67,7 @@ type Inquiry = {
   start_date: string | null;
   message: string;
   status: string;
+  last_rejection_reason: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -94,18 +96,37 @@ function SponsorshipsPage() {
   const [busy, setBusy] = useState(true);
   const [editing, setEditing] = useState<Inquiry | null>(null);
   const [saving, setSaving] = useState(false);
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
+  const [timelines, setTimelines] = useState<Record<string, AuditEntry[]>>({});
 
   const load = async () => {
     setBusy(true);
     const { data, error } = await supabase
       .from("ad_inquiries")
       .select(
-        "id,contact_name,company,email,phone,placement,budget_range,start_date,message,status,created_at,updated_at",
+        "id,contact_name,company,email,phone,placement,budget_range,start_date,message,status,last_rejection_reason,created_at,updated_at",
       )
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
     else setItems((data ?? []) as Inquiry[]);
     setBusy(false);
+  };
+
+  const toggleTimeline = async (id: string) => {
+    setExpanded((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+    if (!timelines[id]) {
+      const { data } = await supabase
+        .from("ad_inquiry_audit")
+        .select("id,action,from_value,to_value,metadata,created_at")
+        .eq("inquiry_id", id)
+        .order("created_at", { ascending: false });
+      setTimelines((t) => ({ ...t, [id]: (data ?? []) as AuditEntry[] }));
+    }
   };
 
   useEffect(() => {
@@ -213,12 +234,23 @@ function SponsorshipsPage() {
                   {i.message}
                 </p>
                 {rejected && (
-                  <div className="rounded-md bg-destructive/10 border border-destructive/20 p-3 text-xs text-destructive-foreground/90">
-                    This inquiry was not approved. You can update the details below and resubmit
-                    it — our team will review it again.
+                  <div className="rounded-md bg-destructive/10 border border-destructive/20 p-3 text-xs space-y-1">
+                    <p className="font-semibold text-destructive">This inquiry was not approved.</p>
+                    {i.last_rejection_reason && (
+                      <p>
+                        <span className="font-semibold">Reason: </span>
+                        {i.last_rejection_reason}
+                      </p>
+                    )}
+                    <p className="text-muted-foreground">
+                      You can update the details and resubmit — our team will review it again.
+                    </p>
                   </div>
                 )}
-                <div className="flex justify-end">
+                <div className="flex flex-wrap justify-end gap-2">
+                  <Button size="sm" variant="ghost" onClick={() => toggleTimeline(i.id)}>
+                    {expanded.has(i.id) ? "Hide timeline" : "View timeline"}
+                  </Button>
                   {rejected ? (
                     <Button size="sm" onClick={() => setEditing({ ...i })}>
                       <RefreshCw className="h-3 w-3 mr-1" /> Edit & resubmit
@@ -234,6 +266,14 @@ function SponsorshipsPage() {
                     </Button>
                   ) : null}
                 </div>
+                {expanded.has(i.id) && (
+                  <div className="mt-3 rounded-md border bg-background p-4">
+                    <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Submission timeline
+                    </h4>
+                    <InquiryTimeline entries={timelines[i.id] ?? []} />
+                  </div>
+                )}
               </div>
             );
           })}

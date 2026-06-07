@@ -102,6 +102,7 @@ export type Database = {
           email: string
           id: string
           internal_notes: string | null
+          last_rejection_reason: string | null
           message: string
           phone: string | null
           placement: Database["public"]["Enums"]["ad_placement"]
@@ -120,6 +121,7 @@ export type Database = {
           email: string
           id?: string
           internal_notes?: string | null
+          last_rejection_reason?: string | null
           message: string
           phone?: string | null
           placement?: Database["public"]["Enums"]["ad_placement"]
@@ -138,6 +140,7 @@ export type Database = {
           email?: string
           id?: string
           internal_notes?: string | null
+          last_rejection_reason?: string | null
           message?: string
           phone?: string | null
           placement?: Database["public"]["Enums"]["ad_placement"]
@@ -157,6 +160,7 @@ export type Database = {
           from_value: string | null
           id: string
           inquiry_id: string
+          metadata: Json
           to_value: string | null
         }
         Insert: {
@@ -166,6 +170,7 @@ export type Database = {
           from_value?: string | null
           id?: string
           inquiry_id: string
+          metadata?: Json
           to_value?: string | null
         }
         Update: {
@@ -175,6 +180,7 @@ export type Database = {
           from_value?: string | null
           id?: string
           inquiry_id?: string
+          metadata?: Json
           to_value?: string | null
         }
         Relationships: [

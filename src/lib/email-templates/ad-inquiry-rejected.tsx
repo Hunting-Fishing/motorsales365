@@ -27,9 +27,10 @@ interface Props {
   contact_name?: string;
   company?: string;
   placement?: string;
+  reason?: string;
 }
 
-const AdInquiryRejected = ({ contact_name, company, placement }: Props) => (
+const AdInquiryRejected = ({ contact_name, company, placement, reason }: Props) => (
   <Html lang="en">
     <Head />
     <Preview>Update on your {SITE_NAME} advertising inquiry</Preview>
@@ -48,10 +49,14 @@ const AdInquiryRejected = ({ contact_name, company, placement }: Props) => (
           <Text style={text}>
             <strong>Requested placement:</strong> {placement ?? "—"}
           </Text>
+          {reason ? (
+            <Text style={text}>
+              <strong>Reason:</strong> {reason}
+            </Text>
+          ) : null}
           <Text style={text}>
             This decision isn't permanent — placements, inventory, and partnership criteria change
-            often. You're welcome to submit a new inquiry in the future, especially if your
-            offering, format, or budget changes.
+            often. You're welcome to update your submission and resubmit it from your dashboard.
           </Text>
         </Section>
         <Text style={text}>
@@ -77,5 +82,6 @@ export const template = {
     contact_name: "Maria",
     company: "Bright Auto Academy",
     placement: "sponsored_post",
+    reason: "Your placement is currently fully booked for the next 30 days.",
   },
 } satisfies TemplateEntry;
