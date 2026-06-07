@@ -442,7 +442,9 @@ export function getEnginesFor(
   if (!make || !model) return [];
   const list = VEHICLE_ENGINES[category]?.[make]?.[model];
   if (!list || list.length === 0) {
-    return GENERIC_ENGINES_BY_CATEGORY[category] ?? [];
+    // No curated factual data for this model yet — return empty so the UI
+    // switches to a free-text input instead of showing fake generic options.
+    return [];
   }
   const ys = yearStart ?? undefined;
   const ye = yearEnd ?? ys;
