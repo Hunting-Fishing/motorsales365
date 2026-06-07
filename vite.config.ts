@@ -11,6 +11,9 @@ import { defineConfig } from "@lovable.dev/vite-tanstack-config";
 const BUILD_ID = `${new Date().toISOString().slice(0, 19).replace(/[-:T]/g, "")}`;
 
 export default defineConfig({
+  tanstackStart: {
+    server: { entry: "server" },
+  },
   vite: {
     define: {
       __BUILD_ID__: JSON.stringify(BUILD_ID),
