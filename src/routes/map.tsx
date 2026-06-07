@@ -97,6 +97,8 @@ function MapPage() {
   const [types, setTypes] = useState<BusinessType[]>([]);
   const [items, setItems] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
+  const desktopListRef = useRef<HTMLDivElement | null>(null);
+  const bottomSheetRef = useRef<MapBottomSheetHandle | null>(null);
 
   // URL wins for lat/lng; pull selection + viewport from localStorage regardless.
   const stored = readStoredSearch();
