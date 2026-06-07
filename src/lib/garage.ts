@@ -5,9 +5,10 @@ import {
   setGarageVehicle,
   clearGarageVehicle,
 } from "@/lib/garage.functions";
+import type { VehicleCategory } from "@/data/vehicles";
 
 export type GarageVehicle = {
-  category: "car" | "motorcycle";
+  category: VehicleCategory;
   make: string;
   model: string;
   year?: number;
