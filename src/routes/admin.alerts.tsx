@@ -113,6 +113,47 @@ function AdminAlerts() {
     setLoading(false);
   }
 
+  function matchesFilters(a: Alert): boolean {
+    if (status === "unack" && a.acknowledged) return false;
+    if (eventFilter !== "__all" && a.event !== eventFilter) return false;
+    if (severityFilter !== "__all" && a.severity !== severityFilter) return false;
+    if (fromDate && new Date(a.created_at) < new Date(fromDate)) return false;
+    if (toDate) {
+      const end = new Date(toDate);
+      end.setHours(23, 59, 59, 999);
+      if (new Date(a.created_at) > end) return false;
+    }
+    const needle = urlQuery.trim().toLowerCase();
+    if (needle) {
+      const u = pickUrl(a.details ?? {});
+      if (!u || !u.toLowerCase().includes(needle)) return false;
+    }
+    return true;
+  }
+
+  function upsertRow(incoming: Alert) {
+    if (!matchesFilters(incoming)) {
+      // Row no longer matches (e.g. just acknowledged while filter is "unack") — drop it
+      setRows((prev) => prev.filter((r) => r.id !== incoming.id));
+      return;
+    }
+    setRows((prev) => {
+      const without = prev.filter((r) => r.id !== incoming.id);
+      const next = [incoming, ...without];
+      // Sort newest-first by created_at; stable tiebreak on id so equal timestamps
+      // never re-order between renders.
+      next.sort((a, b) => {
+        const d = new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        return d !== 0 ? d : a.id.localeCompare(b.id);
+      });
+      return next.slice(0, PAGE_SIZE);
+    });
+  }
+
+  function removeRow(id: string) {
+    setRows((prev) => prev.filter((r) => r.id !== id));
+  }
+
   useEffect(() => {
     load();
     const t = setInterval(load, 30_000);
@@ -120,8 +161,21 @@ function AdminAlerts() {
       .channel("ops_alerts_admin")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "ops_alerts" },
-        () => load(),
+        { event: "INSERT", schema: "public", table: "ops_alerts" },
+        (payload) => upsertRow(payload.new as unknown as Alert),
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "ops_alerts" },
+        (payload) => upsertRow(payload.new as unknown as Alert),
+      )
+      .on(
+        "postgres_changes",
+        { event: "DELETE", schema: "public", table: "ops_alerts" },
+        (payload) => {
+          const id = (payload.old as { id?: string } | null)?.id;
+          if (id) removeRow(id);
+        },
       )
       .subscribe();
     return () => {
@@ -129,7 +183,7 @@ function AdminAlerts() {
       supabase.removeChannel(ch);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status, eventFilter, severityFilter, fromDate, toDate]);
+  }, [status, eventFilter, severityFilter, fromDate, toDate, urlQuery]);
 
   // Re-run filtering when URL query changes (no DB round-trip needed)
   useEffect(() => {
