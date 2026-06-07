@@ -65,11 +65,21 @@ export function BusinessReadyRail({ className }: { className?: string }) {
       </div>
 
       <Card
-        className="overflow-hidden border-2 border-primary/20 ring-1 ring-primary/5"
+        className="relative overflow-hidden border-2 border-primary/20 ring-1 ring-primary/5"
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
-        <div className="grid grid-cols-1 md:grid-cols-[260px_1fr]">
+        {/* Full-bleed banner background */}
+        <img
+          src={brCover.url}
+          alt=""
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+          loading="lazy"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-background/95 via-background/75 to-background/85" />
+
+        <div className="relative grid grid-cols-1 md:grid-cols-[260px_1fr]">
           {/* Brand panel */}
           <a
             href="https://www.learntoday.work/courses"
