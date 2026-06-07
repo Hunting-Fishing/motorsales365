@@ -307,16 +307,20 @@ function MapPage() {
                 key={b.id}
                 role="button"
                 tabIndex={0}
-                onClick={() => navigate({ to: "/businesses/$slug", params: { slug: b.slug } })}
+                onClick={() => {
+                  setSelectedSlug(b.slug);
+                  navigate({ to: "/businesses/$slug", params: { slug: b.slug } });
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
+                    setSelectedSlug(b.slug);
                     navigate({ to: "/businesses/$slug", params: { slug: b.slug } });
                   }
                 }}
                 onMouseEnter={() => setHoverId(b.id)}
                 onMouseLeave={() => setHoverId((id) => (id === b.id ? null : id))}
-                className={`min-h-16 cursor-pointer p-4 transition hover:border-primary active:scale-[0.99] ${hoverId === b.id ? "border-primary ring-1 ring-primary/40" : ""}`}
+                className={`min-h-16 cursor-pointer p-4 transition hover:border-primary active:scale-[0.99] ${hoverId === b.id || selectedSlug === b.slug ? "border-primary ring-1 ring-primary/40" : ""}`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
