@@ -193,9 +193,14 @@ function AdvertisePage() {
                   <span className="font-medium text-foreground">{form.email}</span> within 1–2
                   business days.
                 </p>
-                <Button variant="outline" onClick={() => setDone(false)}>
-                  Submit another inquiry
-                </Button>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  <Button variant="outline" onClick={() => setDone(false)}>
+                    Submit another inquiry
+                  </Button>
+                  <Button asChild>
+                    <Link to="/dashboard/sponsorships">View my sponsorships</Link>
+                  </Button>
+                </div>
               </div>
             ) : (
               <form onSubmit={submit} className="space-y-4" noValidate>
