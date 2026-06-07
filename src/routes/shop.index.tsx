@@ -127,6 +127,7 @@ function ShopIndex() {
         model: v.model,
         year: v.year,
         engine: v.engine ?? "",
+        transmission: v.transmission ?? "",
       }),
     });
   };
@@ -134,7 +135,14 @@ function ShopIndex() {
   const clearVehicle = () => {
     setGarageState(null);
     navigate({
-      search: (prev: any) => ({ ...prev, make: "", model: "", year: undefined, engine: "" }),
+      search: (prev: any) => ({
+        ...prev,
+        make: "",
+        model: "",
+        year: undefined,
+        engine: "",
+        transmission: "",
+      }),
     });
   };
 
@@ -153,6 +161,7 @@ function ShopIndex() {
         model: next.vehicle?.model ?? "",
         year: next.vehicle?.year,
         engine: next.vehicle?.engine ?? "",
+        transmission: next.vehicle?.transmission ?? "",
       }),
     });
   };
