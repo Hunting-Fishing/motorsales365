@@ -196,10 +196,11 @@ export function GoogleBusinessMapInner({
     const newMarkers: L.Marker[] = [];
     valid.forEach((b) => {
       const color = colorForType(b.type_slug);
+      const isHighlighted = b.highlighted || (highlightedSlug != null && b.slug === highlightedSlug);
       const marker = L.marker([Number(b.lat), Number(b.lng)], {
-        icon: pinDivIcon(color, b.featured, b.highlighted, b.type_slug),
+        icon: pinDivIcon(color, b.featured, isHighlighted, b.type_slug),
         title: b.name,
-        zIndexOffset: b.highlighted ? 1000 : b.featured ? 500 : 0,
+        zIndexOffset: isHighlighted ? 1000 : b.featured ? 500 : 0,
       });
 
       const rating =
@@ -224,21 +225,27 @@ export function GoogleBusinessMapInner({
     markersRef.current = newMarkers;
 
 
-    // Centre / fit logic
-    if (center) {
-      if (radiusKm && radiusKm > 0) {
-        const zoom = Math.max(8, Math.round(14 - Math.log2(radiusKm)));
-        map.setView([center.lat, center.lng], zoom);
-      } else {
-        map.setView([center.lat, center.lng], 12);
+    // Centre / fit logic — only when the requested center/radius changes,
+    // so user pan/zoom is preserved across re-renders and on remount with
+    // a restored viewport.
+    const centerKey = center ? `${center.lat},${center.lng},${radiusKm ?? ""}` : null;
+    if (centerKey !== appliedCenterKeyRef.current) {
+      appliedCenterKeyRef.current = centerKey;
+      if (center) {
+        if (radiusKm && radiusKm > 0) {
+          const zoom = Math.max(8, Math.round(14 - Math.log2(radiusKm)));
+          map.setView([center.lat, center.lng], zoom);
+        } else {
+          map.setView([center.lat, center.lng], 12);
+        }
+      } else if (valid.length > 1) {
+        const bounds = L.latLngBounds(
+          valid.map((b) => [Number(b.lat), Number(b.lng)] as [number, number]),
+        );
+        map.fitBounds(bounds, { padding: [48, 48] });
+      } else if (valid.length === 1) {
+        map.setView([Number(valid[0].lat), Number(valid[0].lng)], 14);
       }
-    } else if (valid.length > 1) {
-      const bounds = L.latLngBounds(
-        valid.map((b) => [Number(b.lat), Number(b.lng)] as [number, number]),
-      );
-      map.fitBounds(bounds, { padding: [48, 48] });
-    } else if (valid.length === 1) {
-      map.setView([Number(valid[0].lat), Number(valid[0].lng)], 14);
     }
 
     // Radius circle
