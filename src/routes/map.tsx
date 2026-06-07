@@ -468,6 +468,7 @@ function MapPage() {
 
       {/* Mobile draggable bottom sheet */}
       <MapBottomSheet
+        ref={bottomSheetRef}
         header={
           <div className="flex items-center gap-2">
             <span className="font-semibold">Results</span>
