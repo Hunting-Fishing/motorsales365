@@ -31,6 +31,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { GoogleBusinessMap } from "@/components/businesses/google-business-map";
+import { SuggestLocationDialog } from "@/components/businesses/suggest-location-dialog";
 import { ShareQr } from "@/components/share-qr";
 import { InquiryForm } from "@/components/business-page/inquiry-form";
 import { getBusinessPage } from "@/lib/business-pages.functions";
@@ -523,6 +524,18 @@ function BusinessProfilePage() {
                     : []
                 }
               />
+              {biz.lat && biz.lng && (
+                <div className="mt-2 flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                  <span>Pin in the wrong spot?</span>
+                  <SuggestLocationDialog
+                    businessId={biz.id}
+                    businessName={biz.name}
+                    currentLat={Number(biz.lat)}
+                    currentLng={Number(biz.lng)}
+                    region={biz.region ?? null}
+                  />
+                </div>
+              )}
             </div>
           </div>
 

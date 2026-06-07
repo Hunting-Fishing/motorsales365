@@ -104,6 +104,7 @@ import { Route as AdminRedemptionsRouteImport } from './routes/admin.redemptions
 import { Route as AdminPromotionsRouteImport } from './routes/admin.promotions'
 import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
+import { Route as AdminLocationCorrectionsRouteImport } from './routes/admin.location-corrections'
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
 import { Route as AdminLeadOffersRouteImport } from './routes/admin.lead-offers'
 import { Route as AdminInquiriesRouteImport } from './routes/admin.inquiries'
@@ -630,6 +631,12 @@ const AdminPerformanceRoute = AdminPerformanceRouteImport.update({
   path: '/performance',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLocationCorrectionsRoute =
+  AdminLocationCorrectionsRouteImport.update({
+    id: '/location-corrections',
+    path: '/location-corrections',
+    getParentRoute: () => AdminRoute,
+  } as any)
 const AdminListingsRoute = AdminListingsRouteImport.update({
   id: '/listings',
   path: '/listings',
@@ -939,6 +946,7 @@ export interface FileRoutesByFullPath {
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
+  '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
@@ -1084,6 +1092,7 @@ export interface FileRoutesByTo {
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
+  '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
@@ -1231,6 +1240,7 @@ export interface FileRoutesById {
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
+  '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
@@ -1380,6 +1390,7 @@ export interface FileRouteTypes {
     | '/admin/inquiries'
     | '/admin/lead-offers'
     | '/admin/listings'
+    | '/admin/location-corrections'
     | '/admin/performance'
     | '/admin/pricing'
     | '/admin/promotions'
@@ -1525,6 +1536,7 @@ export interface FileRouteTypes {
     | '/admin/inquiries'
     | '/admin/lead-offers'
     | '/admin/listings'
+    | '/admin/location-corrections'
     | '/admin/performance'
     | '/admin/pricing'
     | '/admin/promotions'
@@ -1671,6 +1683,7 @@ export interface FileRouteTypes {
     | '/admin/inquiries'
     | '/admin/lead-offers'
     | '/admin/listings'
+    | '/admin/location-corrections'
     | '/admin/performance'
     | '/admin/pricing'
     | '/admin/promotions'
@@ -2524,6 +2537,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPerformanceRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/location-corrections': {
+      id: '/admin/location-corrections'
+      path: '/location-corrections'
+      fullPath: '/admin/location-corrections'
+      preLoaderRoute: typeof AdminLocationCorrectionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/listings': {
       id: '/admin/listings'
       path: '/listings'
@@ -2893,6 +2913,7 @@ interface AdminRouteChildren {
   AdminInquiriesRoute: typeof AdminInquiriesRoute
   AdminLeadOffersRoute: typeof AdminLeadOffersRoute
   AdminListingsRoute: typeof AdminListingsRoute
+  AdminLocationCorrectionsRoute: typeof AdminLocationCorrectionsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
   AdminPricingRoute: typeof AdminPricingRoute
   AdminPromotionsRoute: typeof AdminPromotionsRoute
@@ -2927,6 +2948,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminInquiriesRoute: AdminInquiriesRoute,
   AdminLeadOffersRoute: AdminLeadOffersRoute,
   AdminListingsRoute: AdminListingsRoute,
+  AdminLocationCorrectionsRoute: AdminLocationCorrectionsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
   AdminPricingRoute: AdminPricingRoute,
   AdminPromotionsRoute: AdminPromotionsRoute,
