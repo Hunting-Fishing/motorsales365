@@ -68,7 +68,15 @@ type Row = {
 };
 
 const LS_KEY = "map:last-search";
-type StoredSearch = { lat: number; lng: number; label?: string; radiusKm?: number | null };
+type StoredSearch = {
+  lat: number;
+  lng: number;
+  label?: string;
+  radiusKm?: number | null;
+  zoom?: number | null;
+  viewport?: { lat: number; lng: number; zoom: number } | null;
+  selectedSlug?: string | null;
+};
 
 function readStoredSearch(): StoredSearch | null {
   if (typeof window === "undefined") return null;
