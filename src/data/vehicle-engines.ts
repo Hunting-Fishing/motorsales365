@@ -99,6 +99,47 @@ export const VEHICLE_ENGINES: EngineCatalog = {
     Mitsubishi: {
       Mirage: [{ label: "1.2L Gasoline (3A92)", code: "3A92", start: 2012 }],
       "Mirage G4": [{ label: "1.2L Gasoline (3A92)", code: "3A92", start: 2013 }],
+      Lancer: [
+        { label: "1.6L Gasoline (4G18)", code: "4G18", start: 2003, end: 2008 },
+        { label: "2.0L Gasoline (4B11)", code: "4B11", start: 2007, end: 2017 },
+        { label: "1.8L Gasoline (4B10)", code: "4B10", start: 2007, end: 2017 },
+        { label: "2.0L Turbo (4B11T, Evo X)", code: "4B11T", start: 2007, end: 2016 },
+      ],
+      "Lancer EX": [
+        { label: "1.6L Gasoline (4G18)", code: "4G18", start: 2008, end: 2017 },
+        { label: "2.0L Gasoline (4B11)", code: "4B11", start: 2008, end: 2017 },
+      ],
+      ASX: [
+        { label: "2.0L Gasoline (4B11)", code: "4B11", start: 2010 },
+        { label: "1.6L Diesel (4N13)", code: "4N13", start: 2012, end: 2019 },
+      ],
+      Outlander: [
+        { label: "2.4L Gasoline (4B12)", code: "4B12", start: 2012 },
+        { label: "3.0L V6 (6B31)", code: "6B31", start: 2012, end: 2019 },
+        { label: "2.0L PHEV (4B11)", code: "4B11", start: 2013 },
+      ],
+      Pajero: [
+        { label: "2.5L Diesel (4D56)", code: "4D56", start: 1986, end: 2006 },
+        { label: "2.8L Diesel (4M40)", code: "4M40", start: 1993, end: 2006 },
+        { label: "3.0L V6 Gasoline (6G72)", code: "6G72", start: 1991, end: 2021 },
+        { label: "3.2L Diesel (4M41)", code: "4M41", start: 2000, end: 2021 },
+        { label: "3.5L V6 Gasoline (6G74)", code: "6G74", start: 1994, end: 2006 },
+        { label: "3.8L V6 Gasoline (6G75)", code: "6G75", start: 2003, end: 2021 },
+      ],
+      "Pajero Sport": [
+        { label: "2.5L Diesel (4D56)", code: "4D56", start: 2008, end: 2015 },
+        { label: "2.4L Diesel (4N15)", code: "4N15", start: 2015 },
+        { label: "3.0L V6 Gasoline (6B31)", code: "6B31", start: 2008, end: 2016 },
+      ],
+      Adventure: [
+        { label: "2.5L Diesel (4D56)", code: "4D56", start: 1997, end: 2017 },
+        { label: "1.8L Gasoline (4G93)", code: "4G93", start: 1997, end: 2008 },
+      ],
+      Galant: [
+        { label: "2.0L Gasoline (4G63)", code: "4G63", start: 1996, end: 2012 },
+        { label: "2.4L Gasoline (4G69)", code: "4G69", start: 2003, end: 2012 },
+        { label: "3.8L V6 (6G75)", code: "6G75", start: 2003, end: 2012 },
+      ],
       Montero: [
         { label: "2.5L Diesel (4D56)", code: "4D56", start: 2008, end: 2016 },
         { label: "2.4L Diesel (4N15)", code: "4N15", start: 2016 },
@@ -332,8 +373,135 @@ export const VEHICLE_ENGINES: EngineCatalog = {
   },
 };
 
+/** Generic engine fallback per category — used when a model has no curated
+ *  list yet. Gives users sensible displacement-based picks without leaving
+ *  them with a blank free-text field. */
+export const GENERIC_ENGINES_BY_CATEGORY: Partial<Record<VehicleCategory, EngineSpec[]>> = {
+  car: [
+    { label: "1.0L Gasoline" },
+    { label: "1.2L Gasoline" },
+    { label: "1.3L Gasoline" },
+    { label: "1.5L Gasoline" },
+    { label: "1.6L Gasoline" },
+    { label: "1.8L Gasoline" },
+    { label: "2.0L Gasoline" },
+    { label: "2.4L Gasoline" },
+    { label: "2.5L Gasoline" },
+    { label: "3.0L V6 Gasoline" },
+    { label: "3.5L V6 Gasoline" },
+    { label: "5.0L V8 Gasoline" },
+    { label: "1.5L Diesel" },
+    { label: "1.9L Diesel" },
+    { label: "2.2L Diesel" },
+    { label: "2.5L Diesel" },
+    { label: "2.8L Diesel" },
+    { label: "3.0L Diesel" },
+    { label: "3.2L Diesel" },
+    { label: "1.5L Turbo" },
+    { label: "2.0L Turbo" },
+    { label: "Hybrid" },
+    { label: "Electric (EV)" },
+  ],
+  motorcycle: [
+    { label: "100cc" },
+    { label: "110cc" },
+    { label: "125cc" },
+    { label: "150cc" },
+    { label: "155cc" },
+    { label: "160cc" },
+    { label: "200cc" },
+    { label: "250cc" },
+    { label: "300cc" },
+    { label: "400cc" },
+    { label: "600cc" },
+    { label: "1000cc+" },
+    { label: "Electric (EV)" },
+  ],
+  heavy_truck: [
+    { label: "4.0L Diesel" },
+    { label: "5.0L Diesel" },
+    { label: "6.0L Diesel" },
+    { label: "7.0L Diesel" },
+    { label: "8.0L Diesel" },
+    { label: "10.0L Diesel" },
+    { label: "12.0L Diesel" },
+  ],
+  atv_utv: [
+    { label: "150cc" },
+    { label: "250cc" },
+    { label: "400cc" },
+    { label: "500cc" },
+    { label: "700cc" },
+    { label: "800cc" },
+    { label: "1000cc" },
+  ],
+  marine: [
+    { label: "Outboard 2-stroke" },
+    { label: "Outboard 4-stroke" },
+    { label: "Inboard Gasoline" },
+    { label: "Inboard Diesel" },
+    { label: "Jet ski 4-stroke" },
+  ],
+  heavy_equipment: [
+    { label: "Diesel — under 100 HP" },
+    { label: "Diesel — 100–200 HP" },
+    { label: "Diesel — 200–400 HP" },
+    { label: "Diesel — 400+ HP" },
+  ],
+};
+
+/** Transmission options per category. Used to narrow part compatibility
+ *  (clutch kits, gearbox filters, ATF, mounts, etc.). */
+export type TransmissionOption = { value: string; label: string };
+
+export const TRANSMISSIONS_BY_CATEGORY: Partial<Record<VehicleCategory, TransmissionOption[]>> = {
+  car: [
+    { value: "Manual", label: "Manual (MT)" },
+    { value: "Automatic", label: "Automatic (AT)" },
+    { value: "CVT", label: "CVT" },
+    { value: "DCT", label: "Dual-Clutch (DCT)" },
+    { value: "AMT", label: "Automated Manual (AMT)" },
+    { value: "Tiptronic", label: "Tiptronic / Sport AT" },
+    { value: "EV Single-Speed", label: "EV Single-Speed" },
+  ],
+  motorcycle: [
+    { value: "Manual", label: "Manual clutch" },
+    { value: "Automatic", label: "Automatic (CVT scooter)" },
+    { value: "Semi-Auto", label: "Semi-automatic (underbone)" },
+    { value: "DCT", label: "DCT" },
+  ],
+  heavy_truck: [
+    { value: "Manual", label: "Manual" },
+    { value: "Automatic", label: "Automatic" },
+    { value: "AMT", label: "Automated Manual (AMT)" },
+  ],
+  atv_utv: [
+    { value: "Manual", label: "Manual" },
+    { value: "CVT", label: "CVT" },
+    { value: "Automatic", label: "Automatic" },
+  ],
+  marine: [
+    { value: "Direct Drive", label: "Direct drive" },
+    { value: "Stern Drive", label: "Stern drive" },
+    { value: "V-Drive", label: "V-drive" },
+    { value: "Jet Drive", label: "Jet drive" },
+  ],
+  heavy_equipment: [
+    { value: "Manual", label: "Manual" },
+    { value: "Powershift", label: "Powershift" },
+    { value: "Hydrostatic", label: "Hydrostatic" },
+    { value: "Automatic", label: "Automatic" },
+  ],
+};
+
+export function getTransmissionsFor(category: VehicleCategory): TransmissionOption[] {
+  return TRANSMISSIONS_BY_CATEGORY[category] ?? [];
+}
+
 /** Return engine specs that are valid for the given make/model and (optional)
- *  year range. Year overlap is inclusive. */
+ *  year range. Year overlap is inclusive. When no curated list exists for the
+ *  model, falls back to a category-wide generic list so the dropdown is never
+ *  empty. */
 export function getEnginesFor(
   category: VehicleCategory,
   make?: string | null,
@@ -343,15 +511,20 @@ export function getEnginesFor(
 ): EngineSpec[] {
   if (!make || !model) return [];
   const list = VEHICLE_ENGINES[category]?.[make]?.[model];
-  if (!list) return [];
+  if (!list || list.length === 0) {
+    return GENERIC_ENGINES_BY_CATEGORY[category] ?? [];
+  }
   const ys = yearStart ?? undefined;
   const ye = yearEnd ?? ys;
   if (!ys) return list;
-  return list.filter((e) => {
+  const filtered = list.filter((e) => {
     const es = e.start ?? 1900;
     const ee = e.end ?? 9999;
     const a = ys;
     const b = ye ?? ys;
     return es <= b && ee >= a;
   });
+  // If the year is out of range for every curated entry, fall back to the
+  // full curated list rather than going empty — better UX for older cars.
+  return filtered.length > 0 ? filtered : list;
 }

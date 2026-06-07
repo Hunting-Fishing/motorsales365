@@ -28,6 +28,7 @@ const shopSearch = z.object({
   model: fallback(z.string(), "").default(""),
   year: fallback(z.number().optional(), undefined).default(undefined),
   engine: fallback(z.string(), "").default(""),
+  transmission: fallback(z.string(), "").default(""),
   brand: fallback(z.string(), "").default(""),
   category: fallback(z.string(), "").default(""),
 });
@@ -67,6 +68,7 @@ function ShopIndex() {
           model: search.model,
           year: search.year,
           engine: search.engine || undefined,
+          transmission: search.transmission || undefined,
         }
       : garage;
 
@@ -125,6 +127,7 @@ function ShopIndex() {
         model: v.model,
         year: v.year,
         engine: v.engine ?? "",
+        transmission: v.transmission ?? "",
       }),
     });
   };
@@ -132,7 +135,14 @@ function ShopIndex() {
   const clearVehicle = () => {
     setGarageState(null);
     navigate({
-      search: (prev: any) => ({ ...prev, make: "", model: "", year: undefined, engine: "" }),
+      search: (prev: any) => ({
+        ...prev,
+        make: "",
+        model: "",
+        year: undefined,
+        engine: "",
+        transmission: "",
+      }),
     });
   };
 
@@ -151,6 +161,7 @@ function ShopIndex() {
         model: next.vehicle?.model ?? "",
         year: next.vehicle?.year,
         engine: next.vehicle?.engine ?? "",
+        transmission: next.vehicle?.transmission ?? "",
       }),
     });
   };
@@ -211,6 +222,7 @@ function ShopIndex() {
                     model: "",
                     year: undefined,
                     engine: "",
+                    transmission: "",
                     brand: "",
                     category: "",
                   }),

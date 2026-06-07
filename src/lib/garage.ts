@@ -16,7 +16,10 @@ export type GarageVehicle = {
   trim?: string;
   /** Engine variant label, e.g. "2.4L Diesel (2GD-FTV)". Optional. */
   engine?: string;
+  /** Transmission, e.g. "Manual", "Automatic", "CVT". Optional. */
+  transmission?: string;
 };
+
 
 const KEY = "garage_vehicle_v1";
 const EVT = "garage:changed";
