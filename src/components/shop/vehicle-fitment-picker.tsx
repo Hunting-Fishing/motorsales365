@@ -87,6 +87,7 @@ export function VehicleFitmentPicker({
               setMake("");
               setModel("");
               setEngine("");
+              setTransmission("");
             }}
           >
             <SelectTrigger>
