@@ -235,6 +235,16 @@ function BusinessProfilePage() {
   return (
     <SiteLayout>
       <div style={accentStyle}>
+        {hasMapState && (
+          <div className="container mx-auto px-4 pt-3">
+            <Link
+              to="/map"
+              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/80 px-3 py-1.5 text-xs font-medium text-foreground shadow-sm backdrop-blur hover:bg-muted"
+            >
+              <MapPin className="h-3.5 w-3.5" />← Back to map
+            </Link>
+          </div>
+        )}
         {/* HERO */}
         <div className="relative">
           {biz.featured_video_url ? (
