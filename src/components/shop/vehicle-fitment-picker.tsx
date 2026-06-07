@@ -45,6 +45,7 @@ export function VehicleFitmentPicker({
   const [model, setModel] = useState<string>(initial?.model ?? "");
   const [engine, setEngine] = useState<string>(initial?.engine ?? "");
   const [engineMode, setEngineMode] = useState<"select" | "custom">("select");
+  const [transmission, setTransmission] = useState<string>(initial?.transmission ?? "");
 
   const years = useMemo(() => getYearOptions(), []);
   const yearNum = year ? Number(year) : undefined;
