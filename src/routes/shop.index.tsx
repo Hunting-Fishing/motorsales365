@@ -92,6 +92,7 @@ function ShopIndex() {
           model: activeVehicle.model,
           year: activeVehicle.year,
           engine: activeVehicle.engine,
+          transmission: activeVehicle.transmission,
         }
       : {}),
     ...(search.brand ? { brand: search.brand } : {}),
