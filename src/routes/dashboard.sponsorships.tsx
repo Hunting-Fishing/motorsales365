@@ -38,14 +38,7 @@ export const Route = createFileRoute("/dashboard/sponsorships")({
   }),
 });
 
-const PLACEMENTS = [
-  { value: "homepage_banner", label: "Homepage banner" },
-  { value: "category_banner", label: "Category banner" },
-  { value: "listing_sidebar", label: "Listing sidebar" },
-  { value: "newsletter", label: "Newsletter sponsorship" },
-  { value: "sponsored_post", label: "Sponsored post / Academy spot (/learn)" },
-  { value: "other", label: "Something else" },
-] as const;
+import { SECTIONS, FORMATS, sectionLabel, formatLabel } from "@/components/advertise/placements";
 
 const STATUS_TONE: Record<string, { label: string; tone: string }> = {
   new: { label: "Pending review", tone: "bg-blue-500 text-white" },
@@ -63,8 +56,15 @@ type Inquiry = {
   email: string;
   phone: string | null;
   placement: string;
+  sections: string[] | null;
+  formats: string[] | null;
+  target_url: string | null;
   budget_range: string | null;
   start_date: string | null;
+  end_date: string | null;
+  duration_days: number | null;
+  creative_ready: boolean | null;
+  audience_notes: string | null;
   message: string;
   status: string;
   last_rejection_reason: string | null;
