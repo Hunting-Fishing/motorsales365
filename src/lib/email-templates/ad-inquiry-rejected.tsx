@@ -54,9 +54,13 @@ const AdInquiryRejected = ({ contact_name, company, placement }: Props) => (
             offering, format, or budget changes.
           </Text>
         </Section>
+        <Text style={text}>
+          You can also edit your existing submission and resubmit it for another review from your
+          dashboard.
+        </Text>
         <Section style={{ margin: "20px 0" }}>
-          <Button href={`${SITE_URL}/advertise`} style={button}>
-            Submit a new inquiry
+          <Button href={`${SITE_URL}/dashboard/sponsorships`} style={button}>
+            Edit & resubmit
           </Button>
         </Section>
         <Text style={footer}>{SITE_NAME} partnerships</Text>
