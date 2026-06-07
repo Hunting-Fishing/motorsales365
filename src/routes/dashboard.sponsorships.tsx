@@ -38,7 +38,7 @@ export const Route = createFileRoute("/dashboard/sponsorships")({
   }),
 });
 
-import { SECTIONS, FORMATS, sectionLabel, formatLabel } from "@/components/advertise/placements";
+import { SECTIONS, sectionLabel, formatLabel } from "@/components/advertise/placements";
 
 const STATUS_TONE: Record<string, { label: string; tone: string }> = {
   new: { label: "Pending review", tone: "bg-blue-500 text-white" },
