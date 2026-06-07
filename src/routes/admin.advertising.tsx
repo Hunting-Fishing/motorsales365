@@ -54,6 +54,7 @@ function AdminAdvertising() {
     let q = supabase.from("ad_inquiries").select("*").order("created_at", { ascending: false });
     if (filter !== "all") q = q.eq("status", filter);
     if (mineOnly && user?.id) q = q.eq("assigned_to", user.id);
+    if (sectionFilter !== "all") q = q.contains("sections", [sectionFilter]);
     const { data, error } = await q;
     if (error) {
       toast.error(error.message);
