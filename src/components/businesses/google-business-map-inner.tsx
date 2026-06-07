@@ -263,7 +263,7 @@ export function GoogleBusinessMapInner({
     }
     // reason: we depend on center.lat/center.lng explicitly to avoid re-runs on object identity changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, businesses, center?.lat, center?.lng, radiusKm, onPinClick]);
+  }, [ready, businesses, center?.lat, center?.lng, radiusKm, onPinClick, highlightedSlug]);
 
   // Invalidate size when container size changes (e.g. bottom sheet snaps)
   useEffect(() => {
