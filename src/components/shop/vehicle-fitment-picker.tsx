@@ -174,24 +174,31 @@ export function VehicleFitmentPicker({
       <div className="space-y-1">
         <Label className="text-xs">Engine (optional)</Label>
         {engineMode === "custom" || (model && engines.length === 0) ? (
-          <div className="flex gap-2">
-            <Input
-              value={engine}
-              placeholder="e.g. 2.4L Diesel (2GD-FTV)"
-              onChange={(e) => setEngine(e.target.value)}
-            />
-            {engines.length > 0 && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setEngineMode("select");
-                  setEngine("");
-                }}
-              >
-                Use list
-              </Button>
+          <div className="space-y-1">
+            <div className="flex gap-2">
+              <Input
+                value={engine}
+                placeholder="e.g. 2.4L Diesel (2GD-FTV)"
+                onChange={(e) => setEngine(e.target.value)}
+              />
+              {engines.length > 0 && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setEngineMode("select");
+                    setEngine("");
+                  }}
+                >
+                  Use list
+                </Button>
+              )}
+            </div>
+            {model && engines.length === 0 && (
+              <p className="text-[10px] text-muted-foreground">
+                No verified engine list for this model yet — type the exact engine if you know it, or leave blank.
+              </p>
             )}
           </div>
         ) : (
