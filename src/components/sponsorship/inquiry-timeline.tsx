@@ -44,13 +44,22 @@ const FIELD_LABEL: Record<string, string> = {
   company: "Company",
   phone: "Phone",
   placement: "Placement",
+  sections: "Placements",
+  formats: "Formats",
+  target_url: "Landing URL",
   budget_range: "Budget",
   start_date: "Start date",
+  end_date: "End date",
+  duration_days: "Duration (days)",
+  creative_ready: "Creative ready",
+  audience_notes: "Audience notes",
   message: "Message",
 };
 
 const fmtVal = (v: unknown) => {
   if (v === null || v === undefined || v === "") return "—";
+  if (Array.isArray(v)) return v.length === 0 ? "—" : v.join(", ");
+  if (typeof v === "boolean") return v ? "Yes" : "No";
   return String(v);
 };
 

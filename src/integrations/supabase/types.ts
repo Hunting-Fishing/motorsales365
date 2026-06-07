@@ -95,59 +95,80 @@ export type Database = {
       ad_inquiries: {
         Row: {
           assigned_to: string | null
+          audience_notes: string | null
           budget_range: string | null
           company: string | null
           contact_name: string
           created_at: string
+          creative_ready: boolean
+          duration_days: number | null
           email: string
+          end_date: string | null
+          formats: string[]
           id: string
           internal_notes: string | null
           last_rejection_reason: string | null
           message: string
           phone: string | null
           placement: Database["public"]["Enums"]["ad_placement"]
+          sections: string[]
           source_url: string | null
           start_date: string | null
           status: Database["public"]["Enums"]["ad_inquiry_status"]
           submitter_user_id: string | null
+          target_url: string | null
           updated_at: string
         }
         Insert: {
           assigned_to?: string | null
+          audience_notes?: string | null
           budget_range?: string | null
           company?: string | null
           contact_name: string
           created_at?: string
+          creative_ready?: boolean
+          duration_days?: number | null
           email: string
+          end_date?: string | null
+          formats?: string[]
           id?: string
           internal_notes?: string | null
           last_rejection_reason?: string | null
           message: string
           phone?: string | null
           placement?: Database["public"]["Enums"]["ad_placement"]
+          sections?: string[]
           source_url?: string | null
           start_date?: string | null
           status?: Database["public"]["Enums"]["ad_inquiry_status"]
           submitter_user_id?: string | null
+          target_url?: string | null
           updated_at?: string
         }
         Update: {
           assigned_to?: string | null
+          audience_notes?: string | null
           budget_range?: string | null
           company?: string | null
           contact_name?: string
           created_at?: string
+          creative_ready?: boolean
+          duration_days?: number | null
           email?: string
+          end_date?: string | null
+          formats?: string[]
           id?: string
           internal_notes?: string | null
           last_rejection_reason?: string | null
           message?: string
           phone?: string | null
           placement?: Database["public"]["Enums"]["ad_placement"]
+          sections?: string[]
           source_url?: string | null
           start_date?: string | null
           status?: Database["public"]["Enums"]["ad_inquiry_status"]
           submitter_user_id?: string | null
+          target_url?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -6634,6 +6655,7 @@ export type Database = {
         | "export_top"
         | "shop_top"
         | "shop_sidebar"
+        | "learn_rail"
       ad_status: "draft" | "scheduled" | "active" | "paused" | "ended"
       app_role:
         | "admin"
@@ -6907,6 +6929,7 @@ export const Constants = {
         "export_top",
         "shop_top",
         "shop_sidebar",
+        "learn_rail",
       ],
       ad_status: ["draft", "scheduled", "active", "paused", "ended"],
       app_role: [

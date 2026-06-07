@@ -38,14 +38,7 @@ export const Route = createFileRoute("/dashboard/sponsorships")({
   }),
 });
 
-const PLACEMENTS = [
-  { value: "homepage_banner", label: "Homepage banner" },
-  { value: "category_banner", label: "Category banner" },
-  { value: "listing_sidebar", label: "Listing sidebar" },
-  { value: "newsletter", label: "Newsletter sponsorship" },
-  { value: "sponsored_post", label: "Sponsored post / Academy spot (/learn)" },
-  { value: "other", label: "Something else" },
-] as const;
+import { SECTIONS, sectionLabel, formatLabel } from "@/components/advertise/placements";
 
 const STATUS_TONE: Record<string, { label: string; tone: string }> = {
   new: { label: "Pending review", tone: "bg-blue-500 text-white" },
@@ -63,8 +56,15 @@ type Inquiry = {
   email: string;
   phone: string | null;
   placement: string;
+  sections: string[] | null;
+  formats: string[] | null;
+  target_url: string | null;
   budget_range: string | null;
   start_date: string | null;
+  end_date: string | null;
+  duration_days: number | null;
+  creative_ready: boolean | null;
+  audience_notes: string | null;
   message: string;
   status: string;
   last_rejection_reason: string | null;
@@ -104,7 +104,7 @@ function SponsorshipsPage() {
     const { data, error } = await supabase
       .from("ad_inquiries")
       .select(
-        "id,contact_name,company,email,phone,placement,budget_range,start_date,message,status,last_rejection_reason,created_at,updated_at",
+        "id,contact_name,company,email,phone,placement,sections,formats,target_url,budget_range,start_date,end_date,duration_days,creative_ready,audience_notes,message,status,last_rejection_reason,created_at,updated_at",
       )
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
@@ -225,10 +225,24 @@ function SponsorshipsPage() {
                     {i.company || i.contact_name}
                   </span>
                   <Badge className={tone.tone}>{tone.label}</Badge>
-                  <Badge variant="outline">{i.placement}</Badge>
                   <span className="text-xs text-muted-foreground ml-auto">
                     Submitted {formatDate(i.created_at)}
                   </span>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {((i.sections ?? []) as string[]).map((s) => (
+                    <Badge key={s} variant="outline" className="text-[10px]">
+                      {sectionLabel(s)}
+                    </Badge>
+                  ))}
+                  {((i.formats ?? []) as string[]).map((f) => (
+                    <Badge key={f} variant="secondary" className="text-[10px]">
+                      {formatLabel(f)}
+                    </Badge>
+                  ))}
+                  {(!i.sections || i.sections.length === 0) && i.placement && (
+                    <Badge variant="outline" className="text-[10px]">{i.placement}</Badge>
+                  )}
                 </div>
                 <p className="text-sm text-muted-foreground line-clamp-3 whitespace-pre-wrap">
                   {i.message}
@@ -323,7 +337,7 @@ function SponsorshipsPage() {
                 </div>
               </div>
               <div>
-                <Label>Placement</Label>
+                <Label>Primary placement</Label>
                 <Select
                   value={editing.placement}
                   onValueChange={(v) => setEditing({ ...editing, placement: v })}
@@ -332,13 +346,17 @@ function SponsorshipsPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {PLACEMENTS.map((p) => (
-                      <SelectItem key={p.value} value={p.value}>
-                        {p.label}
+                    {SECTIONS.map((s) => (
+                      <SelectItem key={s.value} value={s.placement}>
+                        {s.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  To change multiple placements, formats, or schedule details, submit a new inquiry from{" "}
+                  <Link to="/advertise" className="underline">/advertise</Link>.
+                </p>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>

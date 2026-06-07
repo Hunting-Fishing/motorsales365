@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Megaphone, Mail, Building2, Phone, Calendar, Banknote, ExternalLink } from "lucide-react";
+import { Megaphone, Mail, Building2, Phone, Calendar, Banknote, ExternalLink, Layers, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { formatDate } from "@/lib/format";
 import { InquiryTimeline } from "@/components/sponsorship/inquiry-timeline";
+import { SECTIONS, FORMATS, sectionLabel, formatLabel } from "@/components/advertise/placements";
 
 export const Route = createFileRoute("/admin/advertising")({
   component: AdminAdvertising,
@@ -39,6 +40,7 @@ function AdminAdvertising() {
   const hasAccess = canManageAds;
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [filter, setFilter] = useState<Status | "all">("new");
+  const [sectionFilter, setSectionFilter] = useState<string>("all");
   const [mineOnly, setMineOnly] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
@@ -52,6 +54,7 @@ function AdminAdvertising() {
     let q = supabase.from("ad_inquiries").select("*").order("created_at", { ascending: false });
     if (filter !== "all") q = q.eq("status", filter);
     if (mineOnly && user?.id) q = q.eq("assigned_to", user.id);
+    if (sectionFilter !== "all") q = q.contains("sections", [sectionFilter]);
     const { data, error } = await q;
     if (error) {
       toast.error(error.message);
@@ -86,7 +89,7 @@ function AdminAdvertising() {
 
   useEffect(() => {
     if (hasAccess) load(); /* eslint-disable-next-line */
-  }, [filter, mineOnly, hasAccess]);
+  }, [filter, sectionFilter, mineOnly, hasAccess]);
 
   const active = useMemo(() => inquiries.find((i) => i.id === activeId), [inquiries, activeId]);
 
@@ -205,12 +208,25 @@ function AdminAdvertising() {
           >
             Assigned to me
           </Button>
+          <Select value={sectionFilter} onValueChange={setSectionFilter}>
+            <SelectTrigger className="w-56">
+              <SelectValue placeholder="All sections" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All sections</SelectItem>
+              {SECTIONS.map((s) => (
+                <SelectItem key={s.value} value={s.value}>
+                  {s.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Select value={filter} onValueChange={(v) => setFilter(v as any)}>
             <SelectTrigger className="w-44">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="all">All statuses</SelectItem>
               {STATUSES.map((s) => (
                 <SelectItem key={s} value={s}>
                   {s}
@@ -281,10 +297,23 @@ function AdminAdvertising() {
                 </div>
                 <div className="text-xs text-muted-foreground">{i.company || i.email}</div>
                 <div className="mt-1 line-clamp-2 text-xs text-muted-foreground">{i.message}</div>
+                <div className="mt-1 flex flex-wrap gap-1">
+                  {((i.sections as string[]) ?? []).slice(0, 3).map((s: string) => (
+                    <Badge key={s} variant="outline" className="text-[10px]">
+                      {sectionLabel(s)}
+                    </Badge>
+                  ))}
+                  {((i.sections as string[]) ?? []).length > 3 && (
+                    <Badge variant="outline" className="text-[10px]">
+                      +{(i.sections as string[]).length - 3}
+                    </Badge>
+                  )}
+                  {(!i.sections || (i.sections as string[]).length === 0) && i.placement && (
+                    <Badge variant="outline" className="text-[10px]">{i.placement}</Badge>
+                  )}
+                </div>
                 <div className="mt-1 flex items-center justify-between text-[11px] text-muted-foreground">
-                  <span>
-                    {formatDate(i.created_at)} · {i.placement}
-                  </span>
+                  <span>{formatDate(i.created_at)}</span>
                   {i.assigned_to && (
                     <span
                       className={i.assigned_to === user?.id ? "text-primary font-semibold" : ""}
@@ -375,10 +404,53 @@ function AdminAdvertising() {
                   <Info icon={<Phone className="h-4 w-4" />} label="Phone" value={active.phone} />
                 )}
                 <Info
-                  icon={<Building2 className="h-4 w-4" />}
-                  label="Placement"
-                  value={active.placement}
+                  icon={<Layers className="h-4 w-4" />}
+                  label="Placements"
+                  value={
+                    <div className="flex flex-wrap gap-1">
+                      {((active.sections as string[]) ?? []).length > 0 ? (
+                        (active.sections as string[]).map((s) => (
+                          <Badge key={s} variant="secondary" className="text-[10px]">
+                            {sectionLabel(s)}
+                          </Badge>
+                        ))
+                      ) : (
+                        <span>{active.placement}</span>
+                      )}
+                    </div>
+                  }
                 />
+                {((active.formats as string[]) ?? []).length > 0 && (
+                  <Info
+                    icon={<Sparkles className="h-4 w-4" />}
+                    label="Formats"
+                    value={
+                      <div className="flex flex-wrap gap-1">
+                        {(active.formats as string[]).map((f) => (
+                          <Badge key={f} variant="outline" className="text-[10px]">
+                            {formatLabel(f)}
+                          </Badge>
+                        ))}
+                      </div>
+                    }
+                  />
+                )}
+                {active.target_url && (
+                  <Info
+                    icon={<ExternalLink className="h-4 w-4" />}
+                    label="Landing URL"
+                    value={
+                      <a
+                        className="truncate text-primary underline"
+                        href={active.target_url}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {active.target_url}
+                      </a>
+                    }
+                  />
+                )}
                 {active.budget_range && (
                   <Info
                     icon={<Banknote className="h-4 w-4" />}
@@ -386,13 +458,24 @@ function AdminAdvertising() {
                     value={active.budget_range}
                   />
                 )}
-                {active.start_date && (
+                {(active.start_date || active.end_date || active.duration_days) && (
                   <Info
                     icon={<Calendar className="h-4 w-4" />}
-                    label="Start date"
-                    value={active.start_date}
+                    label="Schedule"
+                    value={[
+                      active.start_date && `from ${active.start_date}`,
+                      active.end_date && `to ${active.end_date}`,
+                      active.duration_days && `${active.duration_days} days`,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
                   />
                 )}
+                <Info
+                  icon={<Building2 className="h-4 w-4" />}
+                  label="Creative ready"
+                  value={active.creative_ready ? "Yes" : "No"}
+                />
                 {active.source_url && (
                   <Info
                     icon={<ExternalLink className="h-4 w-4" />}
@@ -410,6 +493,29 @@ function AdminAdvertising() {
                   />
                 )}
               </div>
+
+              {active.audience_notes && (
+                <div>
+                  <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Audience notes
+                  </h3>
+                  <p className="whitespace-pre-wrap rounded-lg border border-border bg-secondary/40 p-3 text-sm">
+                    {active.audience_notes}
+                  </p>
+                </div>
+              )}
+
+              {active.status === "won" && (
+                <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3 flex flex-wrap items-center justify-between gap-2">
+                  <div className="text-sm">
+                    <span className="font-semibold text-emerald-700">Approved.</span>{" "}
+                    Convert this inquiry into a live ad campaign.
+                  </div>
+                  <Button asChild size="sm" variant="outline">
+                    <Link to="/admin/ad-campaigns">Open ad campaigns</Link>
+                  </Button>
+                </div>
+              )}
 
               <div>
                 <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">

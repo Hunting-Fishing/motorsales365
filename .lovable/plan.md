@@ -1,80 +1,89 @@
 ## Goal
 
-Replace the empty / partially-covered engine catalog with **verified, source-cited engine and transmission lists for every make + model + year range** currently listed in `src/data/vehicles.ts` (Asia/PH market). When the picker shows an engine, it must be a real one the manufacturer actually sold for that model-year — never a guess.
+Turn `/advertise` from a single contact form into a real self-serve sponsorship intake that mirrors every advertisable surface in the app (Marketplace, Learn, Businesses, Rides, Shop, Export, Newsletter, etc.), and make sure every selection flows cleanly into the existing admin advertising console.
 
-## Scope reality check
+## What's there today
 
-`src/data/vehicles.ts` has **~348 makes** across 6 categories. `vehicle-engines.ts` currently has factual data for ~15 car makes and ~4 motorcycle makes. Completing the rest is a large research effort (each entry needs manufacturer spec-sheet verification). I'll ship it in **phases**, each phase a self-contained, reviewable commit, so you can see progress and the shop stays usable throughout.
+- `/advertise` has 6 generic placements (`homepage_banner`, `category_banner`, `listing_sidebar`, `newsletter`, `sponsored_post`, `other`) and one free-text message.
+- DB enum `ad_placement` already supports a richer set: `homepage_banner`, `home_carousel`, `category_banner`, `browse_top`, `rides_top`, `export_top`, `shop_top`, `shop_sidebar`, `listing_sidebar`, `newsletter`, `sponsored_post`, `other`. Learn / Academy has no dedicated enum value (currently bundled under `sponsored_post`).
+- `ad_inquiries` only stores placement + message + budget + start date. No section, format, duration, end date, creative-ready flag, or target URL.
+- Admin (`/admin/advertising`) reads/edits this table and has a separate `/admin/ad-campaigns` for live `advertisements`. Today it shows only `placement` — it needs to surface the new structured fields.
 
-## Phasing (priority = PH market share + listing volume)
+## New `/advertise` page structure
 
-```text
-Phase 1 — Top Japanese cars (highest PH volume)
-  Toyota (expand), Mitsubishi (expand), Honda (expand), Nissan (expand),
-  Isuzu (expand), Mazda (expand), Suzuki (expand), Subaru, Lexus
+1. **Hero** — value prop + "View placement catalog" anchor + "Request a sponsorship" anchor.
+2. **Placement catalog** (visual grid, the core upgrade). Each card shows:
+   - Location (where on the site it appears) with a small wireframe/preview thumbnail
+   - Supported formats (banner, carousel slide, sponsored card, sidebar tile, newsletter slot, sponsored lesson/Academy card)
+   - Audience note (who sees it)
+   - Typical pricing tier badge (Starter / Growth / Premium) — labels only, no hard price
+   - "Select this placement" button → scrolls to form and prefills `section` + `format`
+3. **Sections covered** (drives the `section` field):
+   - `marketplace_home` — Homepage hero/carousel
+   - `marketplace_category` — Cars / Motorcycles / Boats / Airplanes / Heavy Equipment / Parts category pages
+   - `marketplace_listing` — Listing detail sidebar
+   - `browse` — Browse results top banner
+   - `rides` — Rides feed top
+   - `export` — Export inquiries top
+   - `shop` — Shop top + sidebar
+   - `learn` — Academy / Learn rail (Sponsor your Academy spot)
+   - `businesses` — Business directory featured spot
+   - `newsletter` — Email newsletter sponsorship
+   - `custom` — Something else
+4. **Multi-step request form** (replaces the current single form):
+   - Step 1 — Placement (section + format, prefilled from catalog click; multi-select allowed)
+   - Step 2 — Campaign details (target URL, creative-ready toggle, target audience notes, start date, end date / duration, monthly budget range)
+   - Step 3 — Contact (name, company, email, phone)
+   - Review + submit
+5. **Trust strip** at the bottom: "All submissions reviewed by our advertising team" + link to `/dashboard/sponsorships` for status.
 
-Phase 2 — Korean + American + remaining mainstream cars
-  Hyundai, Kia, Ford (expand), Chevrolet (expand), Geely, MG, Chery,
-  Changan, BYD, GAC, Foton, Jeep, Dodge, Ram
+## Data changes (single migration)
 
-Phase 3 — European cars
-  BMW, Mercedes-Benz, Audi, Volkswagen, Volvo, Peugeot, Mini,
-  Porsche, Land Rover, Jaguar
+Extend `ad_inquiries` with structured fields. Keep `placement` for back-compat and continue writing the primary section value into it.
 
-Phase 4 — Motorcycles (full Asia coverage)
-  Honda, Yamaha, Suzuki, Kawasaki (expand all 4) +
-  KTM, Ducati, BMW Motorrad, Harley-Davidson, Royal Enfield,
-  Vespa, SYM, Kymco, Rusi, Motorstar, CFMoto, Benelli, Aprilia
+- Add enum value `learn_rail` to `ad_placement` (so Academy/Learn is first-class, not bundled under `sponsored_post`).
+- Add columns to `ad_inquiries`:
+  - `sections text[]` — multi-select of section keys above
+  - `formats text[]` — e.g. `banner`, `carousel_slide`, `sidebar_tile`, `sponsored_card`, `newsletter_slot`, `academy_card`
+  - `target_url text`
+  - `end_date date`
+  - `duration_days int`
+  - `creative_ready boolean default false`
+  - `audience_notes text`
+- Backfill: copy existing `placement` into `sections` for old rows.
+- Audit: extend the existing `tg_audit_ad_inquiry` `changes` field to include the new columns so the timeline diff already built keeps working.
+- RLS: no policy changes; existing submitter/admin policies cover the new columns.
 
-Phase 5 — Heavy Truck / Bus
-  Isuzu, Hino, Fuso, UD, Foton, Hyundai HD, Daewoo, Higer, Yutong, Volvo, Scania
+## Admin integration (`/admin/advertising`)
 
-Phase 6 — ATV / UTV
-  Polaris, Can-Am, Honda, Yamaha, Kawasaki, Suzuki, CFMoto, Arctic Cat, Kymco
+- Inquiry list row: show first section + formats count instead of raw enum.
+- Detail panel additions:
+  - Sections (badges, editable multi-select)
+  - Formats (badges, editable multi-select)
+  - Target URL (link out)
+  - End date / duration
+  - Creative-ready indicator
+  - Audience notes (read-only block)
+- Filters: add Section and Format filter chips above the list.
+- "Convert to campaign" affordance: a button that deep-links to `/admin/ad-campaigns` with the inquiry's section/format/target URL prefilled in querystring (no schema change to `advertisements` needed).
+- Approval/rejection flow (already built) is unchanged; rejected sponsors keep editing via `/dashboard/sponsorships`.
 
-Phase 7 — Marine
-  Yamaha, Suzuki, Honda, Mercury, Tohatsu, Evinrude, Volvo Penta
+## Files touched
 
-Phase 8 — Heavy Equipment
-  Caterpillar, Komatsu, Hitachi, Kubota, Kobelco, Volvo CE, JCB, Hyundai HCE, Sany, XCMG
-```
+- `supabase/migrations/<new>.sql` — enum value + new columns + backfill + audit trigger update.
+- `src/routes/advertise.tsx` — full rebuild: catalog grid, multi-step form, prefill logic, new schema.
+- `src/components/advertise/placement-catalog.tsx` *(new)* — catalog card grid + section/format metadata source of truth.
+- `src/components/advertise/placement-preview.tsx` *(new)* — tiny SVG wireframes per section.
+- `src/routes/admin.advertising.tsx` — list row + detail panel + filters + "Convert to campaign" link; show new fields; render sections/formats in timeline labels.
+- `src/routes/dashboard.sponsorships.tsx` — display sections/formats badges on each card so sponsors see exactly what they requested; edit dialog updated to the new fields.
+- `src/lib/email-templates/ad-inquiry-*.tsx` — include section/format summary in the confirmation, approved, and rejected emails.
 
-Each phase: I read the make's models from `vehicles.ts`, research the engine + transmission options actually offered per model-year in Asia (PH/JP/TH/ID/IN/MY market trims), then write the entries to `VEHICLE_ENGINES` and `TRANSMISSIONS_BY_CATEGORY`.
+## Out of scope
 
-## Sources I'll use
+- No payment/checkout on `/advertise` — still inquiry-based, pricing tiers are indicative only.
+- No changes to live ad delivery (`advertisements` table, ad serving) beyond the admin deep-link.
+- No new public Learn-sponsor route; the existing `/advertise?section=learn` prefill from the Learn rail keeps working.
 
-- Manufacturer regional press kits & spec sheets (toyota.com.ph, mitsubishi-motors.com.ph, hondaph.com, etc.)
-- Wikipedia model-generation pages (cross-checked against manufacturer data, never as sole source)
-- Local outlets for trim history (autodeal.com.ph, carmudi.com.ph, paultan.org for ASEAN)
+## Open question
 
-Entries that can't be cleanly verified get **omitted** — the picker already falls back to free-text for uncovered models, which is the honest UX.
-
-## Per-make output format
-
-For each model, an array of `EngineSpec` entries with `{ label, code, start, end }` already supported by the file. Example shape (Suzuki Ertiga):
-
-```text
-Ertiga: [
-  { label: "1.4L Gasoline (K14B)", code: "K14B", start: 2012, end: 2019 },
-  { label: "1.5L Gasoline (K15B)", code: "K15B", start: 2019 },
-]
-```
-
-Transmissions stay category-level (MT / AT / CVT / DCT / AMT) — those are universal types and already correct.
-
-## Technical notes
-
-- **No schema changes.** All work lives in `src/data/vehicle-engines.ts`.
-- **No UI changes** beyond what's already shipped (free-text fallback works correctly).
-- I'll spawn read-only research subagents per make-batch so I can verify many models in parallel without polluting my own context with raw research output.
-- After each phase I'll run a quick lint pass to confirm no duplicate model keys and no overlapping year ranges within a single engine entry.
-
-## How I'll deliver
-
-- **Phase 1 first**, as one commit you can review. If the format and quality match what you want, I continue through Phase 8 in subsequent commits.
-- After every phase, a one-line status: "Phase N done — X makes, Y models, Z engine variants added."
-- Final phase ends with a coverage report (% of nameplates in vehicles.ts that now have at least one curated engine).
-
-## What I need from you before starting
-
-Just a go-ahead. If you'd rather I do all 8 phases back-to-back without pausing for review between them, say so and I'll batch them.
+Pricing on the catalog cards — show indicative price ranges (e.g. "₱15k–40k/mo"), show only tier labels (Starter/Growth/Premium), or hide pricing entirely and keep it conversation-only? Default if unanswered: **tier labels only**, no peso figures.
