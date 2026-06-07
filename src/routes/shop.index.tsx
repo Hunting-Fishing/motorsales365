@@ -222,6 +222,7 @@ function ShopIndex() {
                     model: "",
                     year: undefined,
                     engine: "",
+                    transmission: "",
                     brand: "",
                     category: "",
                   }),
