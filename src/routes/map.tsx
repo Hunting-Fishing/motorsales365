@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import ogMap from "@/assets/og/map.jpg";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { Star, Store as StoreIcon, MapPin, Locate, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
