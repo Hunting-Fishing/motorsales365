@@ -92,13 +92,28 @@ export const MapBottomSheet = forwardRef<MapBottomSheetHandle, { header: ReactNo
     expand: expandToHalf,
     scrollToSlug: (slug: string) => {
       expandToHalf();
-      // Wait for the snap transition before scrolling.
-      window.setTimeout(() => {
-        const root = scrollRef.current;
-        if (!root) return;
+      const root = scrollRef.current;
+      if (!root) return;
+
+      const scrollToCard = () => {
         const el = root.querySelector<HTMLElement>(`[data-slug="${CSS.escape(slug)}"]`);
-        if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
-      }, 240);
+        if (!el) return false;
+        // Compute offset relative to the scroll container so the card lands at the top,
+        // regardless of where scrollIntoView would otherwise place it.
+        const top = el.offsetTop - root.offsetTop;
+        root.scrollTo({ top: Math.max(0, top - 4), behavior: "smooth" });
+        return true;
+      };
+
+      // Wait for the sheet's height transition (220ms) to finish before scrolling,
+      // then retry on the next frame in case layout hasn't settled yet.
+      const tryScroll = (attempt: number) => {
+        if (scrollToCard()) return;
+        if (attempt < 6) {
+          window.requestAnimationFrame(() => tryScroll(attempt + 1));
+        }
+      };
+      window.setTimeout(() => tryScroll(0), 260);
     },
   }));
 
