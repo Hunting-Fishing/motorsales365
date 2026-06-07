@@ -1188,6 +1188,7 @@ function FitmentDialog({ product, onClose }: any) {
     year_start: "",
     year_end: "",
     engine: "",
+    transmission: "",
     notes: "",
   };
   const [form, setForm] = useState(emptyForm);
@@ -1210,6 +1211,7 @@ function FitmentDialog({ product, onClose }: any) {
           year_start: form.year_start ? Number(form.year_start) : null,
           year_end: form.year_end ? Number(form.year_end) : null,
           engine: form.engine || null,
+          transmission: form.transmission || null,
           notes: form.notes || null,
         } as any,
       }),
@@ -1252,6 +1254,7 @@ function FitmentDialog({ product, onClose }: any) {
                     <th className="p-2">Model</th>
                     <th className="p-2">Years</th>
                     <th className="p-2">Engine</th>
+                    <th className="p-2">Transmission</th>
                     <th className="p-2">Notes</th>
                     <th className="p-2"></th>
                   </tr>
@@ -1273,6 +1276,9 @@ function FitmentDialog({ product, onClose }: any) {
                       </td>
                       <td className="p-2">
                         {f.engine ?? <span className="text-muted-foreground">any</span>}
+                      </td>
+                      <td className="p-2">
+                        {f.transmission ?? <span className="text-muted-foreground">any</span>}
                       </td>
                       <td className="p-2 text-xs text-muted-foreground">{f.notes ?? ""}</td>
                       <td className="p-2">
@@ -1421,6 +1427,17 @@ function FitmentDialog({ product, onClose }: any) {
                   No catalog entries for this model — type the engine manually.
                 </p>
               )}
+            </div>
+            <div>
+              <Label>Transmission</Label>
+              <Input
+                value={form.transmission}
+                onChange={(e) => setForm({ ...form, transmission: e.target.value })}
+                placeholder="e.g. 6MT, A340, Aisin AW TF-80SC"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Optional. Use to scope tools to a specific gearbox.
+              </p>
             </div>
             <div className="sm:col-span-2 md:col-span-3">
               <Label>Notes</Label>
