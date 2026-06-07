@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { GraduationCap, Clock, Search, Sparkles } from "lucide-react";
+import { GraduationCap, Clock, Search, Sparkles, Megaphone, ArrowRight } from "lucide-react";
 import { listCourses, listCourseCategories } from "@/lib/education.functions";
 import { FeaturedTrainingRail } from "@/components/learn/featured-training-rail";
 import { BusinessReadyRail } from "@/components/learn/business-ready-rail";
@@ -169,6 +169,40 @@ function LearnIndex() {
             ))}
           </div>
         )}
+
+        {/* Sponsor your Academy CTA */}
+        <section className="mt-10">
+          <div className="relative overflow-hidden rounded-2xl border-2 border-dashed border-primary/30 bg-gradient-to-br from-primary/5 via-background to-primary/10 p-6 sm:p-10">
+            <div className="flex flex-col items-start gap-5 md:flex-row md:items-center md:justify-between">
+              <div className="flex items-start gap-4">
+                <div className="rounded-xl bg-primary/10 p-3 text-primary">
+                  <Megaphone className="h-6 w-6" />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider text-primary">
+                    Promotional Ad Space Available
+                  </p>
+                  <h2 className="mt-1 font-display text-2xl font-bold sm:text-3xl">
+                    Sponsor your Academy, Institution, School, or Learning Center here
+                  </h2>
+                  <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
+                    Feature your training programs to Filipino auto buyers, sellers, and aspiring
+                    mechanics. Get a dedicated card on /learn, rotational carousel placement, and
+                    direct enrollment links to your courses.
+                  </p>
+                </div>
+              </div>
+              <Button asChild size="lg" className="shrink-0">
+                <Link to="/advertise">
+                  Claim your spot <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+          <p className="mt-2 text-center text-[11px] text-muted-foreground">
+            Inquiries are reviewed by our advertising team within 1–2 business days.
+          </p>
+        </section>
       </div>
     </SiteLayout>
   );

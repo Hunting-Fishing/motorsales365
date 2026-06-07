@@ -39,7 +39,7 @@ const PLACEMENTS = [
   { value: "category_banner", label: "Category banner (Cars, Motorcycles, etc.)" },
   { value: "listing_sidebar", label: "Listing sidebar" },
   { value: "newsletter", label: "Newsletter sponsorship" },
-  { value: "sponsored_post", label: "Sponsored post / featured business" },
+  { value: "sponsored_post", label: "Sponsored post / featured business / Academy spot (/learn)" },
   { value: "other", label: "Something else" },
 ] as const;
 
