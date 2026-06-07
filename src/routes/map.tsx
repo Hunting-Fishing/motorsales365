@@ -412,6 +412,16 @@ function MapPage() {
               )}
               Use my location
             </Button>
+            {selectedSlug && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedSlug(null)}
+              >
+                Clear selection
+              </Button>
+            )}
           </div>
         </Card>
 
