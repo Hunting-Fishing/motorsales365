@@ -1,67 +1,80 @@
-# Crowdsourced Business Location Corrections
+## Goal
 
-Let users propose a corrected lat/lng for any business (like Google Maps' "Move this location"). Admins review pending suggestions and approve (apply to the business) or reject (revert/dismiss).
+Replace the empty / partially-covered engine catalog with **verified, source-cited engine and transmission lists for every make + model + year range** currently listed in `src/data/vehicles.ts` (Asia/PH market). When the picker shows an engine, it must be a real one the manufacturer actually sold for that model-year — never a guess.
 
-## UX
+## Scope reality check
 
-**Public business page (`/businesses/$slug`)**
-- Add a small "Suggest a better location" button near the map / address block.
-- Opens a dialog with a draggable-pin map (reuse `LocationPickerInner`) pre-centered on the current business location.
-- Optional note field ("Why is this the correct spot?", 0–300 chars).
-- Submit creates a `pending` `business_location_corrections` row. Logged-in users record their `user_id`; anonymous users are allowed but rate-limited by IP/business (1 pending suggestion per business per IP).
-- Toast: "Thanks — your suggestion will be reviewed."
+`src/data/vehicles.ts` has **~348 makes** across 6 categories. `vehicle-engines.ts` currently has factual data for ~15 car makes and ~4 motorcycle makes. Completing the rest is a large research effort (each entry needs manufacturer spec-sheet verification). I'll ship it in **phases**, each phase a self-contained, reviewable commit, so you can see progress and the shop stays usable throughout.
 
-**Admin panel — new page `/admin/location-corrections`**
-- Linked from `admin.index.tsx` admin nav.
-- Table of pending suggestions (default filter) with: business name + link, current lat/lng, proposed lat/lng, distance moved (km), submitter (name or "Anonymous"), note, submitted date.
-- Row expands to a side-by-side mini-map showing the old pin vs. the proposed pin.
-- Actions per row: **Approve** (writes proposed lat/lng to `businesses`, marks row `approved`, stores `previous_lat/lng` for rollback) and **Reject** (marks `rejected`).
-- For already-approved rows, an **Undo / Revert** action restores `previous_lat/lng` on the business and marks row `reverted`.
-- Filters: status (pending/approved/rejected/reverted), date range, business search.
-- Realtime subscription on `business_location_corrections` (same pattern as `ops_alerts` page) so new submissions appear without refresh.
+## Phasing (priority = PH market share + listing volume)
 
-## Technical
+```text
+Phase 1 — Top Japanese cars (highest PH volume)
+  Toyota (expand), Mitsubishi (expand), Honda (expand), Nissan (expand),
+  Isuzu (expand), Mazda (expand), Suzuki (expand), Subaru, Lexus
 
-**Database migration** — new table `public.business_location_corrections`:
-- `id uuid pk`, `business_id uuid fk businesses(id) on delete cascade`
-- `proposed_lat numeric, proposed_lng numeric` (validated 1e-6 precision, range checked)
-- `previous_lat numeric, previous_lng numeric` (snapshot at submit time)
-- `note text` (max 300)
-- `submitter_user_id uuid null` (nullable for anon), `submitter_ip text null`
-- `status text` enum-checked: `pending|approved|rejected|reverted`, default `pending`
-- `reviewed_by uuid null`, `reviewed_at timestamptz null`, `review_note text null`
-- `created_at`, `updated_at` + trigger
-- Indexes: `(status, created_at desc)`, `(business_id)`
-- GRANTs: `select, insert` for `anon` + `authenticated`; full for `service_role`; `update` only via server functions (admin).
-- RLS:
-  - Anyone can `insert` (rate limiting enforced in server fn, not policy).
-  - Submitter (when logged in) can `select` their own row; anyone can `select` rows where `status = 'pending'` for the business they're on (optional — keep it simple: only admins read all, submitter reads own).
-  - Admins (`has_role(auth.uid(), 'admin')`) can `select`/`update` all.
-- Realtime: `alter publication supabase_realtime add table business_location_corrections; alter table ... replica identity full`.
+Phase 2 — Korean + American + remaining mainstream cars
+  Hyundai, Kia, Ford (expand), Chevrolet (expand), Geely, MG, Chery,
+  Changan, BYD, GAC, Foton, Jeep, Dodge, Ram
 
-**Server functions** — new `src/lib/location-corrections.functions.ts`:
-- `submitLocationCorrection({ businessId, lat, lng, note })` — public; validates coords with Zod, looks up current `businesses.lat/lng` for the snapshot, enforces "1 pending per (business, user/ip)" via `supabaseAdmin`, inserts row. Uses request headers for IP (best-effort).
-- `listLocationCorrections({ status?, fromDate?, toDate?, query? })` — admin (middleware `requireAdmin` or inline `has_role` check using `requireSupabaseAuth`), returns rows joined with business name/slug.
-- `reviewLocationCorrection({ id, action: 'approve'|'reject'|'revert', reviewNote? })` — admin; on approve: updates `businesses.lat/lng` to proposed values; on revert: restores `previous_lat/lng`; updates row status + `reviewed_by/reviewed_at`. Logs to existing `admin_audit_log` (action: `'location_correction_'+action`).
+Phase 3 — European cars
+  BMW, Mercedes-Benz, Audi, Volkswagen, Volvo, Peugeot, Mini,
+  Porsche, Land Rover, Jaguar
 
-**Components**:
-- `src/components/businesses/suggest-location-dialog.tsx` — dialog wrapping the existing `LocationPicker` lazy component, with submit button.
-- Add trigger button to `src/routes/businesses.$slug.tsx` near the existing map/address.
+Phase 4 — Motorcycles (full Asia coverage)
+  Honda, Yamaha, Suzuki, Kawasaki (expand all 4) +
+  KTM, Ducati, BMW Motorrad, Harley-Davidson, Royal Enfield,
+  Vespa, SYM, Kymco, Rusi, Motorstar, CFMoto, Benelli, Aprilia
 
-**Admin route** — `src/routes/admin.location-corrections.tsx`:
-- Mirrors `admin.alerts.tsx` structure (filters, realtime, ack-like actions, dedup/upsert).
-- Side-by-side map preview uses `LocationPickerInner` in read-only mode (no click handler) showing both markers.
-- Add link in `admin.index.tsx` (admin home/nav).
+Phase 5 — Heavy Truck / Bus
+  Isuzu, Hino, Fuso, UD, Foton, Hyundai HD, Daewoo, Higer, Yutong, Volvo, Scania
 
-## Files
-- New: `supabase/migrations/<ts>_business_location_corrections.sql`
-- New: `src/lib/location-corrections.functions.ts`
-- New: `src/components/businesses/suggest-location-dialog.tsx`
-- New: `src/routes/admin.location-corrections.tsx`
-- Edited: `src/routes/businesses.$slug.tsx` (add trigger button)
-- Edited: `src/routes/admin.index.tsx` (admin nav link)
+Phase 6 — ATV / UTV
+  Polaris, Can-Am, Honda, Yamaha, Kawasaki, Suzuki, CFMoto, Arctic Cat, Kymco
 
-## Out of scope
-- Reputation/voting on suggestions
-- Auto-approve when many users agree
-- Suggestions for fields other than lat/lng (name, hours, etc.)
+Phase 7 — Marine
+  Yamaha, Suzuki, Honda, Mercury, Tohatsu, Evinrude, Volvo Penta
+
+Phase 8 — Heavy Equipment
+  Caterpillar, Komatsu, Hitachi, Kubota, Kobelco, Volvo CE, JCB, Hyundai HCE, Sany, XCMG
+```
+
+Each phase: I read the make's models from `vehicles.ts`, research the engine + transmission options actually offered per model-year in Asia (PH/JP/TH/ID/IN/MY market trims), then write the entries to `VEHICLE_ENGINES` and `TRANSMISSIONS_BY_CATEGORY`.
+
+## Sources I'll use
+
+- Manufacturer regional press kits & spec sheets (toyota.com.ph, mitsubishi-motors.com.ph, hondaph.com, etc.)
+- Wikipedia model-generation pages (cross-checked against manufacturer data, never as sole source)
+- Local outlets for trim history (autodeal.com.ph, carmudi.com.ph, paultan.org for ASEAN)
+
+Entries that can't be cleanly verified get **omitted** — the picker already falls back to free-text for uncovered models, which is the honest UX.
+
+## Per-make output format
+
+For each model, an array of `EngineSpec` entries with `{ label, code, start, end }` already supported by the file. Example shape (Suzuki Ertiga):
+
+```text
+Ertiga: [
+  { label: "1.4L Gasoline (K14B)", code: "K14B", start: 2012, end: 2019 },
+  { label: "1.5L Gasoline (K15B)", code: "K15B", start: 2019 },
+]
+```
+
+Transmissions stay category-level (MT / AT / CVT / DCT / AMT) — those are universal types and already correct.
+
+## Technical notes
+
+- **No schema changes.** All work lives in `src/data/vehicle-engines.ts`.
+- **No UI changes** beyond what's already shipped (free-text fallback works correctly).
+- I'll spawn read-only research subagents per make-batch so I can verify many models in parallel without polluting my own context with raw research output.
+- After each phase I'll run a quick lint pass to confirm no duplicate model keys and no overlapping year ranges within a single engine entry.
+
+## How I'll deliver
+
+- **Phase 1 first**, as one commit you can review. If the format and quality match what you want, I continue through Phase 8 in subsequent commits.
+- After every phase, a one-line status: "Phase N done — X makes, Y models, Z engine variants added."
+- Final phase ends with a coverage report (% of nameplates in vehicles.ts that now have at least one curated engine).
+
+## What I need from you before starting
+
+Just a go-ahead. If you'd rather I do all 8 phases back-to-back without pausing for review between them, say so and I'll batch them.
