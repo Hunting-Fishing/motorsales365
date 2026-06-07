@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { GraduationCap, Clock, Search, Sparkles } from "lucide-react";
 import { listCourses, listCourseCategories } from "@/lib/education.functions";
 import { FeaturedTrainingRail } from "@/components/learn/featured-training-rail";
+import { BusinessReadyRail } from "@/components/learn/business-ready-rail";
 
 export const Route = createFileRoute("/learn/")({
   head: () => ({
@@ -67,6 +68,8 @@ function LearnIndex() {
         </div>
 
         <FeaturedTrainingRail className="mb-8" />
+
+        <BusinessReadyRail className="mb-8" />
 
         <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="relative flex-1">
