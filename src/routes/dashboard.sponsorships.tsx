@@ -337,7 +337,7 @@ function SponsorshipsPage() {
                 </div>
               </div>
               <div>
-                <Label>Placement</Label>
+                <Label>Primary placement</Label>
                 <Select
                   value={editing.placement}
                   onValueChange={(v) => setEditing({ ...editing, placement: v })}
@@ -346,13 +346,17 @@ function SponsorshipsPage() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {PLACEMENTS.map((p) => (
-                      <SelectItem key={p.value} value={p.value}>
-                        {p.label}
+                    {SECTIONS.map((s) => (
+                      <SelectItem key={s.value} value={s.placement}>
+                        {s.label}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
+                <p className="text-[11px] text-muted-foreground mt-1">
+                  To change multiple placements, formats, or schedule details, submit a new inquiry from{" "}
+                  <Link to="/advertise" className="underline">/advertise</Link>.
+                </p>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
