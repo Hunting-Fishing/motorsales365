@@ -419,7 +419,12 @@ function MapPage() {
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={() => setSelectedSlug(null)}
+                onClick={() => {
+                  setSelectedSlug(null);
+                  setHoverId(null);
+                  desktopListRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+                  bottomSheetRef.current?.scrollToTop();
+                }}
               >
                 Clear selection
               </Button>
