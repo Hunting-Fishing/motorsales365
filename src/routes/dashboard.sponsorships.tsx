@@ -225,10 +225,24 @@ function SponsorshipsPage() {
                     {i.company || i.contact_name}
                   </span>
                   <Badge className={tone.tone}>{tone.label}</Badge>
-                  <Badge variant="outline">{i.placement}</Badge>
                   <span className="text-xs text-muted-foreground ml-auto">
                     Submitted {formatDate(i.created_at)}
                   </span>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {((i.sections ?? []) as string[]).map((s) => (
+                    <Badge key={s} variant="outline" className="text-[10px]">
+                      {sectionLabel(s)}
+                    </Badge>
+                  ))}
+                  {((i.formats ?? []) as string[]).map((f) => (
+                    <Badge key={f} variant="secondary" className="text-[10px]">
+                      {formatLabel(f)}
+                    </Badge>
+                  ))}
+                  {(!i.sections || i.sections.length === 0) && i.placement && (
+                    <Badge variant="outline" className="text-[10px]">{i.placement}</Badge>
+                  )}
                 </div>
                 <p className="text-sm text-muted-foreground line-clamp-3 whitespace-pre-wrap">
                   {i.message}
