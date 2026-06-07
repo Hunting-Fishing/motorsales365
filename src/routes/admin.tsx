@@ -225,6 +225,13 @@ const NAV: {
     info: "Backend failures (payment webhooks, email errors, geocoding) captured in-app. Investigate and acknowledge.",
   },
   {
+    to: "/admin/location-corrections",
+    label: "Location fixes",
+    Icon: MapPin,
+    roles: ["admin", "moderator"],
+    info: "User-submitted map pin corrections. Approve to apply the new lat/lng, or revert an approved change.",
+  },
+  {
     to: "/admin/sandbox",
     label: "Sandbox",
     Icon: FlaskConical,
