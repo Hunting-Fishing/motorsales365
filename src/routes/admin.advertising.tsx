@@ -404,10 +404,53 @@ function AdminAdvertising() {
                   <Info icon={<Phone className="h-4 w-4" />} label="Phone" value={active.phone} />
                 )}
                 <Info
-                  icon={<Building2 className="h-4 w-4" />}
-                  label="Placement"
-                  value={active.placement}
+                  icon={<Layers className="h-4 w-4" />}
+                  label="Placements"
+                  value={
+                    <div className="flex flex-wrap gap-1">
+                      {((active.sections as string[]) ?? []).length > 0 ? (
+                        (active.sections as string[]).map((s) => (
+                          <Badge key={s} variant="secondary" className="text-[10px]">
+                            {sectionLabel(s)}
+                          </Badge>
+                        ))
+                      ) : (
+                        <span>{active.placement}</span>
+                      )}
+                    </div>
+                  }
                 />
+                {((active.formats as string[]) ?? []).length > 0 && (
+                  <Info
+                    icon={<Sparkles className="h-4 w-4" />}
+                    label="Formats"
+                    value={
+                      <div className="flex flex-wrap gap-1">
+                        {(active.formats as string[]).map((f) => (
+                          <Badge key={f} variant="outline" className="text-[10px]">
+                            {formatLabel(f)}
+                          </Badge>
+                        ))}
+                      </div>
+                    }
+                  />
+                )}
+                {active.target_url && (
+                  <Info
+                    icon={<ExternalLink className="h-4 w-4" />}
+                    label="Landing URL"
+                    value={
+                      <a
+                        className="truncate text-primary underline"
+                        href={active.target_url}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {active.target_url}
+                      </a>
+                    }
+                  />
+                )}
                 {active.budget_range && (
                   <Info
                     icon={<Banknote className="h-4 w-4" />}
@@ -415,13 +458,24 @@ function AdminAdvertising() {
                     value={active.budget_range}
                   />
                 )}
-                {active.start_date && (
+                {(active.start_date || active.end_date || active.duration_days) && (
                   <Info
                     icon={<Calendar className="h-4 w-4" />}
-                    label="Start date"
-                    value={active.start_date}
+                    label="Schedule"
+                    value={[
+                      active.start_date && `from ${active.start_date}`,
+                      active.end_date && `to ${active.end_date}`,
+                      active.duration_days && `${active.duration_days} days`,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
                   />
                 )}
+                <Info
+                  icon={<Building2 className="h-4 w-4" />}
+                  label="Creative ready"
+                  value={active.creative_ready ? "Yes" : "No"}
+                />
                 {active.source_url && (
                   <Info
                     icon={<ExternalLink className="h-4 w-4" />}
@@ -439,6 +493,29 @@ function AdminAdvertising() {
                   />
                 )}
               </div>
+
+              {active.audience_notes && (
+                <div>
+                  <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    Audience notes
+                  </h3>
+                  <p className="whitespace-pre-wrap rounded-lg border border-border bg-secondary/40 p-3 text-sm">
+                    {active.audience_notes}
+                  </p>
+                </div>
+              )}
+
+              {active.status === "won" && (
+                <div className="rounded-lg border border-emerald-500/30 bg-emerald-500/5 p-3 flex flex-wrap items-center justify-between gap-2">
+                  <div className="text-sm">
+                    <span className="font-semibold text-emerald-700">Approved.</span>{" "}
+                    Convert this inquiry into a live ad campaign.
+                  </div>
+                  <Button asChild size="sm" variant="outline">
+                    <Link to="/admin/ad-campaigns">Open ad campaigns</Link>
+                  </Button>
+                </div>
+              )}
 
               <div>
                 <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
