@@ -4610,15 +4610,157 @@ export function getModelsForYear(
   return found.models.filter((m) => modelMatchesYear(category, make, m, year));
 }
 
-/** Makes that have ≥1 model available in the given year. Unmapped makes always pass. */
+/** First model year a brand actually sold vehicles in the Asia / PH market.
+ *  Used to hide brands from year dropdowns before they existed (e.g. no
+ *  "1990 Tesla"). Brands not listed here are treated as long-established
+ *  and shown for any year. Keep entries factual — manufacturer first-sale
+ *  year in any major Asia market, not just PH launch. */
+const MAKE_FIRST_YEAR: Partial<Record<VehicleCategory, Record<string, number>>> = {
+  car: {
+    Tesla: 2008,
+    Genesis: 2015,
+    Lucid: 2021,
+    Rivian: 2021,
+    Polestar: 2017,
+    "Lynk & Co": 2016,
+    Lynk: 2016,
+    BYD: 2003,
+    Geely: 1997,
+    Chery: 1999,
+    Changan: 1984,
+    GAC: 2008,
+    MG: 2007, // SAIC revival
+    JAC: 1999,
+    Foton: 2007, // passenger vehicles
+    Maxus: 2011,
+    Jetour: 2018,
+    Tank: 2021,
+    Wuling: 2002,
+    Ora: 2018,
+    Neta: 2018,
+    Hozon: 2018,
+    NIO: 2018,
+    XPeng: 2018,
+    Zeekr: 2021,
+    "Great Wall": 1996,
+    GWM: 1996,
+    Haval: 2013,
+    Hongqi: 2016, // modern revival
+    Ineos: 2022,
+    Cupra: 2018,
+    Kaiyi: 2014,
+    BAIC: 2010,
+    Dongfeng: 1969,
+    Skywell: 2017,
+    Maxima: 1981,
+    Lexus: 1989,
+    Infiniti: 1989,
+    Acura: 1986,
+    Scion: 2003,
+    Hummer: 1992,
+    Saturn: 1990,
+    Daewoo: 1982,
+    Kia: 1974,
+    Hyundai: 1968,
+    SsangYong: 1988,
+    KGM: 2023,
+    Tata: 1991,
+    Mahindra: 1947,
+    Smart: 1998,
+    Dacia: 1968,
+    Seat: 1953,
+    Skoda: 1925,
+  },
+  motorcycle: {
+    Zero: 2009, // electric
+    Energica: 2014,
+    CFMoto: 1989,
+    Benelli: 1911, // (modern Qianjiang revival 2005)
+    "Royal Enfield": 1901,
+    Husqvarna: 1903,
+    KTM: 1992, // motorcycle production
+    Aprilia: 1968,
+    Vespa: 1946,
+    Lambretta: 1947,
+    Rusi: 2002,
+    Motorstar: 2003,
+    Skygo: 2005,
+    Racal: 2005,
+    SYM: 1962,
+    Kymco: 1963,
+    "Bajaj": 1945,
+    TVS: 1979,
+  },
+  heavy_truck: {
+    BYD: 2010,
+    Foton: 1996,
+    Higer: 1998,
+    Yutong: 1963,
+    Sany: 2002,
+    Shacman: 2002,
+    Sinotruk: 1956,
+    JAC: 1964,
+    Dongfeng: 1969,
+    XCMG: 1989,
+  },
+  atv_utv: {
+    "Can-Am": 2006, // ATV/UTV brand under BRP
+    CFMoto: 1989,
+    "Arctic Cat": 1962,
+    Polaris: 1985, // ATVs
+    Segway: 2019, // powersports
+  },
+  marine: {
+    "Sea-Doo": 1968,
+    Tohatsu: 1956,
+    "Volvo Penta": 1907,
+    Suzuki: 1965, // marine
+  },
+  heavy_equipment: {
+    Sany: 1989,
+    XCMG: 1989,
+    Zoomlion: 1992,
+    LiuGong: 1958,
+    SDLG: 1972,
+    Lonking: 1993,
+    BYD: 2010, // electric forklifts
+    Bobcat: 1958,
+    JCB: 1945,
+    Kobelco: 1930,
+    Kubota: 1890,
+  },
+};
+
+/** Makes that have ≥1 model available in the given year, alphabetized.
+ *  Hides brands that did not exist / had not sold vehicles in that year. */
 export function getMakesForYear(category: VehicleCategory, year: number | undefined): MakeModels[] {
   const makes = getMakes(category);
-  if (!year) return makes;
+  const firstYearMap = MAKE_FIRST_YEAR[category] ?? {};
+  const firstYearKeys = new Map(
+    Object.entries(firstYearMap).map(([k, v]) => [k.toLowerCase(), v]),
+  );
   const map = getModelYears(category);
   const mappedMakeKeys = new Set(Object.keys(map).map((k) => k.toLowerCase()));
-  return makes.filter((m) => {
-    if (!mappedMakeKeys.has(m.make.toLowerCase())) return true; // unmapped → keep
-    return m.models.some((mod) => modelMatchesYear(category, m.make, mod, year));
+
+  const filtered = makes.filter((m) => {
+    const key = m.make.toLowerCase();
+    // 1. Brand-existed-in-year gate (hard cutoff).
+    if (year) {
+      const firstYear = firstYearKeys.get(key);
+      if (firstYear !== undefined && year < firstYear) return false;
+    }
+    // 2. Model-year gate — only applies to brands we have model-year data for.
+    if (year && mappedMakeKeys.has(key)) {
+      return m.models.some((mod) => modelMatchesYear(category, m.make, mod, year));
+    }
+    return true;
+  });
+
+  // Always alphabetize. "Other" stays pinned to the bottom for usability.
+  return [...filtered].sort((a, b) => {
+    if (a.make === "Other") return 1;
+    if (b.make === "Other") return -1;
+    return a.make.localeCompare(b.make, undefined, { sensitivity: "base" });
   });
 }
 
