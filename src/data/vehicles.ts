@@ -5,7 +5,22 @@
 // including grey-market/JDM imports often listed on PH used-car platforms.
 // Brand coverage cross-checked against autodeal.com.ph/brands.
 
-export type VehicleCategory = "car" | "motorcycle";
+export type VehicleCategory =
+  | "car"
+  | "motorcycle"
+  | "heavy_truck"
+  | "atv_utv"
+  | "marine"
+  | "heavy_equipment";
+
+export const VEHICLE_CATEGORY_LABELS: Record<VehicleCategory, string> = {
+  car: "Car / Truck",
+  motorcycle: "Motorcycle",
+  heavy_truck: "Heavy Truck / Bus",
+  atv_utv: "ATV / UTV",
+  marine: "Boat / Marine",
+  heavy_equipment: "Heavy Equipment",
+};
 
 export type MakeModels = {
   make: string;
