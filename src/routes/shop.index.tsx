@@ -116,13 +116,7 @@ function ShopIndex() {
   const latest = latestData?.products ?? [];
   const deals = dealsData?.products ?? [];
 
-  const onPickVehicle = (v: {
-    category: "car" | "motorcycle";
-    make: string;
-    model: string;
-    year?: number;
-    engine?: string;
-  }) => {
+  const onPickVehicle = (v: GarageVehicle) => {
     setGarageState(v);
     navigate({
       search: (prev: any) => ({
