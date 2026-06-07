@@ -58,6 +58,7 @@ export function VehicleFitmentPicker({
     () => getEnginesFor(category, make, model, yearNum),
     [category, make, model, yearNum],
   );
+  const transmissions = useMemo(() => getTransmissionsFor(category), [category]);
 
   // If model/make/year changes and the current engine is no longer offered
   // (and we're not in custom mode), drop it so we don't carry a stale label.
