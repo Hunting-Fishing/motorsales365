@@ -46,6 +46,8 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "ad-inquiry-received": adInquiryReceived,
   "ad-inquiry-staff-notice": adInquiryStaffNotice,
   "ad-inquiry-reply": adInquiryReply,
+  "ad-inquiry-approved": adInquiryApproved,
+  "ad-inquiry-rejected": adInquiryRejected,
   "team-invite": teamInvite,
   "team-new-lead": teamNewLead,
   "support-ticket-received": supportTicketReceived,
