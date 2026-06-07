@@ -453,7 +453,10 @@ function MapPage() {
           </div>
 
           {/* Desktop list (sidebar) */}
-          <div className="hidden lg:order-1 lg:block lg:max-h-[calc(100dvh-260px)] lg:overflow-y-auto lg:pr-1">
+          <div
+            ref={desktopListRef}
+            className="hidden lg:order-1 lg:block lg:max-h-[calc(100dvh-260px)] lg:overflow-y-auto lg:pr-1"
+          >
             <div className="mb-2 text-xs text-muted-foreground">{countLabel}</div>
             {resultsList}
           </div>
