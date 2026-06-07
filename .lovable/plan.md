@@ -1,89 +1,49 @@
 ## Goal
 
-Turn `/advertise` from a single contact form into a real self-serve sponsorship intake that mirrors every advertisable surface in the app (Marketplace, Learn, Businesses, Rides, Shop, Export, Newsletter, etc.), and make sure every selection flows cleanly into the existing admin advertising console.
+Replace the abstract blue SVG wireframes in the `/advertise` Placement Catalog with realistic, page-accurate mini-snapshots of each target surface (Marketplace home, Category, Listing, Browse, Rides, Shop, Learn, Businesses, Newsletter, Custom) with a clearly marked **"Your advertisement here"** placeholder occupying the exact slot the ad would fill.
 
-## What's there today
+## What changes
 
-- `/advertise` has 6 generic placements (`homepage_banner`, `category_banner`, `listing_sidebar`, `newsletter`, `sponsored_post`, `other`) and one free-text message.
-- DB enum `ad_placement` already supports a richer set: `homepage_banner`, `home_carousel`, `category_banner`, `browse_top`, `rides_top`, `export_top`, `shop_top`, `shop_sidebar`, `listing_sidebar`, `newsletter`, `sponsored_post`, `other`. Learn / Academy has no dedicated enum value (currently bundled under `sponsored_post`).
-- `ad_inquiries` only stores placement + message + budget + start date. No section, format, duration, end date, creative-ready flag, or target URL.
-- Admin (`/admin/advertising`) reads/edits this table and has a separate `/admin/ad-campaigns` for live `advertisements`. Today it shows only `placement` — it needs to surface the new structured fields.
+Only the visual preview component used inside each catalog card. No data model, no form, no admin, no DB changes. Pure presentation work in `src/components/advertise/`.
 
-## New `/advertise` page structure
+## Approach
 
-1. **Hero** — value prop + "View placement catalog" anchor + "Request a sponsorship" anchor.
-2. **Placement catalog** (visual grid, the core upgrade). Each card shows:
-   - Location (where on the site it appears) with a small wireframe/preview thumbnail
-   - Supported formats (banner, carousel slide, sponsored card, sidebar tile, newsletter slot, sponsored lesson/Academy card)
-   - Audience note (who sees it)
-   - Typical pricing tier badge (Starter / Growth / Premium) — labels only, no hard price
-   - "Select this placement" button → scrolls to form and prefills `section` + `format`
-3. **Sections covered** (drives the `section` field):
-   - `marketplace_home` — Homepage hero/carousel
-   - `marketplace_category` — Cars / Motorcycles / Boats / Airplanes / Heavy Equipment / Parts category pages
-   - `marketplace_listing` — Listing detail sidebar
-   - `browse` — Browse results top banner
-   - `rides` — Rides feed top
-   - `export` — Export inquiries top
-   - `shop` — Shop top + sidebar
-   - `learn` — Academy / Learn rail (Sponsor your Academy spot)
-   - `businesses` — Business directory featured spot
-   - `newsletter` — Email newsletter sponsorship
-   - `custom` — Something else
-4. **Multi-step request form** (replaces the current single form):
-   - Step 1 — Placement (section + format, prefilled from catalog click; multi-select allowed)
-   - Step 2 — Campaign details (target URL, creative-ready toggle, target audience notes, start date, end date / duration, monthly budget range)
-   - Step 3 — Contact (name, company, email, phone)
-   - Review + submit
-5. **Trust strip** at the bottom: "All submissions reviewed by our advertising team" + link to `/dashboard/sponsorships` for status.
+Rewrite `src/components/advertise/placement-preview.tsx` from tiny 160×80 abstract SVGs into per-section **mock page snapshots** built with Tailwind + real theme tokens, sized to fit the existing card slot (roughly `aspect-[16/10]`, full card width).
 
-## Data changes (single migration)
+Each preview will render:
+- A faux browser chrome bar (3 traffic dots + URL pill showing the relevant path, e.g. `365motorsales.com/learn`)
+- A faux site header strip (logo block + nav pills) using `bg-card` / `text-muted-foreground`
+- Page-specific content silhouettes that match the real route's layout (hero, category grid, listing detail two-column, rides feed cards, shop product grid, learn course rail, newsletter email frame, business directory list, etc.) — drawn with neutral `bg-muted` blocks so they read as "a page"
+- An **ad slot overlay** placed exactly where that placement appears, styled with:
+  - Dashed `border-primary` border
+  - `bg-primary/10` fill
+  - Centered label: **"Your advertisement here"** + a small `text-[10px]` sub-label naming the format (e.g. "Banner · 970×250", "Sidebar tile · 300×600", "Carousel slide", "Newsletter slot", "Academy card")
+  - Subtle pulse animation (`animate-pulse` on the border) so the eye lands on it
 
-Extend `ad_inquiries` with structured fields. Keep `placement` for back-compat and continue writing the primary section value into it.
-
-- Add enum value `learn_rail` to `ad_placement` (so Academy/Learn is first-class, not bundled under `sponsored_post`).
-- Add columns to `ad_inquiries`:
-  - `sections text[]` — multi-select of section keys above
-  - `formats text[]` — e.g. `banner`, `carousel_slide`, `sidebar_tile`, `sponsored_card`, `newsletter_slot`, `academy_card`
-  - `target_url text`
-  - `end_date date`
-  - `duration_days int`
-  - `creative_ready boolean default false`
-  - `audience_notes text`
-- Backfill: copy existing `placement` into `sections` for old rows.
-- Audit: extend the existing `tg_audit_ad_inquiry` `changes` field to include the new columns so the timeline diff already built keeps working.
-- RLS: no policy changes; existing submitter/admin policies cover the new columns.
-
-## Admin integration (`/admin/advertising`)
-
-- Inquiry list row: show first section + formats count instead of raw enum.
-- Detail panel additions:
-  - Sections (badges, editable multi-select)
-  - Formats (badges, editable multi-select)
-  - Target URL (link out)
-  - End date / duration
-  - Creative-ready indicator
-  - Audience notes (read-only block)
-- Filters: add Section and Format filter chips above the list.
-- "Convert to campaign" affordance: a button that deep-links to `/admin/ad-campaigns` with the inquiry's section/format/target URL prefilled in querystring (no schema change to `advertisements` needed).
-- Approval/rejection flow (already built) is unchanged; rejected sponsors keep editing via `/dashboard/sponsorships`.
+Per-section ad-slot positions:
+- `marketplace_home` — full-width banner above the featured carousel
+- `marketplace_category` — top banner above the category grid
+- `marketplace_listing` — right-column sidebar tile next to the listing gallery
+- `browse` — top banner above the search results list
+- `rides` — top banner above the rides feed cards
+- `export` — top banner above the export inquiry table
+- `shop` — top banner + a secondary sidebar tile (show both, with the banner as the primary highlight)
+- `learn` — sponsored Academy card inside the course rail (highlighted card among siblings)
+- `businesses` — featured row at the top of the directory list
+- `newsletter` — full-width slot inside an email envelope frame (keep the email-shaped outer card)
+- `custom` — generic page with a centered dashed slot and "Custom partnership" label
 
 ## Files touched
 
-- `supabase/migrations/<new>.sql` — enum value + new columns + backfill + audit trigger update.
-- `src/routes/advertise.tsx` — full rebuild: catalog grid, multi-step form, prefill logic, new schema.
-- `src/components/advertise/placement-catalog.tsx` *(new)* — catalog card grid + section/format metadata source of truth.
-- `src/components/advertise/placement-preview.tsx` *(new)* — tiny SVG wireframes per section.
-- `src/routes/admin.advertising.tsx` — list row + detail panel + filters + "Convert to campaign" link; show new fields; render sections/formats in timeline labels.
-- `src/routes/dashboard.sponsorships.tsx` — display sections/formats badges on each card so sponsors see exactly what they requested; edit dialog updated to the new fields.
-- `src/lib/email-templates/ad-inquiry-*.tsx` — include section/format summary in the confirmation, approved, and rejected emails.
+- `src/components/advertise/placement-preview.tsx` — full rewrite. Same exported API (`<PlacementPreview section={...} />`) so `advertise.tsx` keeps working without changes.
+- `src/routes/advertise.tsx` — only if the current card markup forces a fixed small height on the preview slot; in that case relax to `aspect-[16/10]` and ensure `overflow-hidden rounded-md`. No other changes.
 
 ## Out of scope
 
-- No payment/checkout on `/advertise` — still inquiry-based, pricing tiers are indicative only.
-- No changes to live ad delivery (`advertisements` table, ad serving) beyond the admin deep-link.
-- No new public Learn-sponsor route; the existing `/advertise?section=learn` prefill from the Learn rail keeps working.
+- No changes to the form, sections data, formats, tiers, admin, dashboard, timeline, or DB.
+- No real screenshots of the live site — these are styled mock snapshots using theme tokens, so they stay on-brand and don't go stale when pages change.
+- No new dependencies.
 
 ## Open question
 
-Pricing on the catalog cards — show indicative price ranges (e.g. "₱15k–40k/mo"), show only tier labels (Starter/Growth/Premium), or hide pricing entirely and keep it conversation-only? Default if unanswered: **tier labels only**, no peso figures.
+Do you want the ad-slot label to stay generic **"Your advertisement here"** on every card, or should it also show the **tier badge** (Starter / Growth / Premium) inside the slot? Default if unanswered: generic label only, tier badge stays on the card header where it already is.
