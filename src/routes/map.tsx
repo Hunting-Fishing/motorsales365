@@ -425,7 +425,13 @@ function MapPage() {
               businesses={mapBusinesses}
               center={center ? { lat: center.lat, lng: center.lng } : null}
               radiusKm={radiusKm}
-              onPinClick={(slug: string) => navigate({ to: "/businesses/$slug", params: { slug } })}
+              initialViewport={viewport}
+              onViewportChange={setViewport}
+              highlightedSlug={selectedSlug}
+              onPinClick={(slug: string) => {
+                setSelectedSlug(slug);
+                navigate({ to: "/businesses/$slug", params: { slug } });
+              }}
             />
           </div>
 
