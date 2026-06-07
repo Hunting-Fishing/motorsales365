@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import {
   CAR_MAKES,
   MOTORCYCLE_MAKES,
+  VEHICLE_CATEGORY_LABELS,
   getMakesForYear,
   getModelsForYear,
   getYearOptions,
@@ -90,8 +91,11 @@ export function VehicleFitmentPicker({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="car">Car / Truck</SelectItem>
-              <SelectItem value="motorcycle">Motorcycle</SelectItem>
+              {(Object.keys(VEHICLE_CATEGORY_LABELS) as VehicleCategory[]).map((c) => (
+                <SelectItem key={c} value={c}>
+                  {VEHICLE_CATEGORY_LABELS[c]}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

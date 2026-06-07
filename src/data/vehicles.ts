@@ -5,7 +5,22 @@
 // including grey-market/JDM imports often listed on PH used-car platforms.
 // Brand coverage cross-checked against autodeal.com.ph/brands.
 
-export type VehicleCategory = "car" | "motorcycle";
+export type VehicleCategory =
+  | "car"
+  | "motorcycle"
+  | "heavy_truck"
+  | "atv_utv"
+  | "marine"
+  | "heavy_equipment";
+
+export const VEHICLE_CATEGORY_LABELS: Record<VehicleCategory, string> = {
+  car: "Car / Truck",
+  motorcycle: "Motorcycle",
+  heavy_truck: "Heavy Truck / Bus",
+  atv_utv: "ATV / UTV",
+  marine: "Boat / Marine",
+  heavy_equipment: "Heavy Equipment",
+};
 
 export type MakeModels = {
   make: string;
@@ -4486,8 +4501,101 @@ export const MOTORCYCLE_MAKES: MakeModels[] = [
   { make: "Other", models: ["Other"] },
 ];
 
+// ============================================================
+// Additional vehicle categories: heavy trucks/buses, ATV/UTV,
+// marine, heavy equipment. Curated lists tuned for the PH market.
+// Models default to "available all years" — engine field falls
+// back to free-text input when no engine catalog entry exists.
+// ============================================================
+
+export const HEAVY_TRUCK_MAKES: MakeModels[] = [
+  { make: "Isuzu", models: ["Elf", "Forward", "Giga", "N-Series", "F-Series", "Traviz", "QKR", "NLR", "NPR", "NQR", "FRR", "FVR", "FVZ", "GVR"] },
+  { make: "Hino", models: ["300 Series", "500 Series", "700 Series", "Dutro", "Ranger", "Profia", "XZU", "FC", "FG", "FM", "FS"] },
+  { make: "Fuso", models: ["Canter", "Fighter", "Super Great", "Rosa", "FE", "FI", "FJ", "FK", "FN"] },
+  { make: "UD Trucks", models: ["Kuzer", "Croner", "Quester", "Quon", "Condor"] },
+  { make: "Foton", models: ["Tornado", "Auman", "Forland", "Aumark", "View Traveller", "Toano"] },
+  { make: "Hyundai", models: ["HD45", "HD65", "HD72", "HD78", "Mighty", "County", "Universe", "Xcient", "Pavise"] },
+  { make: "Mercedes-Benz", models: ["Actros", "Arocs", "Atego", "Axor", "Sprinter (Heavy)"] },
+  { make: "Volvo", models: ["FH", "FM", "FMX", "FE", "FL"] },
+  { make: "Scania", models: ["P-Series", "G-Series", "R-Series", "S-Series"] },
+  { make: "MAN", models: ["TGS", "TGX", "TGM", "TGL"] },
+  { make: "Sinotruk", models: ["HOWO", "Sitrak", "HOHAN"] },
+  { make: "Shacman", models: ["X3000", "F3000", "M3000", "L3000"] },
+  { make: "Dongfeng", models: ["KX", "KL", "KR", "Captain", "Furika"] },
+  { make: "JAC", models: ["N56", "N75", "N80", "N120", "K5"] },
+  { make: "Yutong", models: ["ZK6107", "ZK6122", "ZK6128", "ZK6938", "E12"] },
+  { make: "King Long", models: ["XMQ6113", "XMQ6127", "XMQ6900", "U11", "U12"] },
+  { make: "Higer", models: ["KLQ6109", "KLQ6119", "KLQ6125"] },
+  { make: "Ford", models: ["Cargo", "F-MAX"] },
+  { make: "Other", models: ["Other"] },
+];
+
+export const ATV_UTV_MAKES: MakeModels[] = [
+  { make: "Polaris", models: ["Sportsman 450", "Sportsman 570", "Sportsman 850", "Sportsman 1000", "RZR 200", "RZR 570", "RZR 900", "RZR XP 1000", "RZR Turbo R", "Ranger 500", "Ranger 1000", "Ranger Crew"] },
+  { make: "Can-Am", models: ["Outlander 450", "Outlander 570", "Outlander 650", "Outlander 850", "Outlander 1000", "Renegade", "Maverick Sport", "Maverick X3", "Defender", "Commander"] },
+  { make: "Yamaha", models: ["Raptor 90", "Raptor 250", "Raptor 700R", "Grizzly 350", "Grizzly 700", "Kodiak 450", "Kodiak 700", "YXZ1000R", "Wolverine X2", "Wolverine X4"] },
+  { make: "Honda", models: ["TRX90X", "TRX250X", "TRX420 Rancher", "TRX500 Foreman", "TRX520 Rubicon", "TRX700XX", "Pioneer 500", "Pioneer 700", "Pioneer 1000", "Talon 1000"] },
+  { make: "Kawasaki", models: ["KFX50", "KFX90", "KFX450R", "Brute Force 300", "Brute Force 750", "Mule SX", "Mule Pro-FX", "Teryx", "Teryx KRX 1000"] },
+  { make: "Suzuki", models: ["LT-Z50", "LT-Z90", "LT-Z400", "KingQuad 400", "KingQuad 500", "KingQuad 750"] },
+  { make: "CFMoto", models: ["CForce 400", "CForce 600", "CForce 800", "CForce 1000", "ZForce 800", "ZForce 950", "UForce 600", "UForce 1000"] },
+  { make: "Linhai", models: ["300", "400", "500", "Yamaha-Linhai 260", "M550", "M565"] },
+  { make: "Arctic Cat", models: ["Alterra 300", "Alterra 450", "Alterra 600", "Alterra 700", "Wildcat XX", "Prowler Pro"] },
+  { make: "Segway Powersports", models: ["Snarler AT6", "Fugleman UT10", "Villain SX10"] },
+  { make: "Other", models: ["Other"] },
+];
+
+export const MARINE_MAKES: MakeModels[] = [
+  { make: "Yamaha Marine", models: ["F2.5", "F4", "F6", "F8", "F9.9", "F15", "F20", "F25", "F40", "F60", "F70", "F90", "F115", "F150", "F200", "F225", "F250", "F300", "F350", "F425 XTO", "WaveRunner EX", "WaveRunner VX", "WaveRunner FX", "WaveRunner GP", "WaveRunner SuperJet"] },
+  { make: "Suzuki Marine", models: ["DF2.5", "DF6", "DF9.9", "DF15", "DF20", "DF25", "DF40", "DF60", "DF90", "DF115", "DF140", "DF150", "DF175", "DF200", "DF250", "DF300", "DF325", "DF350"] },
+  { make: "Honda Marine", models: ["BF2.3", "BF5", "BF8", "BF9.9", "BF15", "BF20", "BF30", "BF40", "BF50", "BF60", "BF75", "BF90", "BF100", "BF115", "BF135", "BF150", "BF200", "BF225", "BF250"] },
+  { make: "Mercury Marine", models: ["2.5 FourStroke", "3.5 FourStroke", "4 FourStroke", "5 FourStroke", "8 FourStroke", "9.9 FourStroke", "15 FourStroke", "20 FourStroke", "25 FourStroke", "30 FourStroke", "40 FourStroke", "50 FourStroke", "75 FourStroke", "115 Pro XS", "150 FourStroke", "200 Pro XS", "250 Verado", "300 Verado", "400 Verado", "450R Racing", "600 Verado V12"] },
+  { make: "Tohatsu", models: ["MFS2.5", "MFS3.5", "MFS5", "MFS6", "MFS8", "MFS9.8", "MFS15", "MFS20", "MFS25", "MFS30", "MFS40", "MFS50", "MFS60", "MFS75", "MFS90", "MFS100", "MFS115", "MFS140"] },
+  { make: "Evinrude", models: ["E-TEC 25", "E-TEC 50", "E-TEC 90", "E-TEC 115", "E-TEC G2 150", "E-TEC G2 200", "E-TEC G2 250", "E-TEC G2 300"] },
+  { make: "Sea-Doo", models: ["Spark", "GTI 130", "GTI SE 170", "GTX 170", "GTX 230", "GTX 300", "RXP-X 325", "RXT-X 325", "Wake Pro", "Fish Pro"] },
+  { make: "Kawasaki Jet Ski", models: ["STX 160", "Ultra LX", "Ultra 310", "Ultra 310R", "SX-R 160", "Jet Ski Ultra 160LX"] },
+  { make: "Volvo Penta", models: ["D3", "D4", "D6", "D8", "D11", "D13", "D16", "V6-200", "V6-240", "V6-280", "V8-350", "V8-380", "V8-430"] },
+  { make: "Mariner", models: ["F2.5", "F4", "F6", "F8", "F9.9", "F15", "F25", "F40", "F60", "F100", "F150"] },
+  { make: "Parsun", models: ["F2.6", "F4", "F5", "F6", "F8", "F9.8", "F15", "F20", "F25", "F40", "F60"] },
+  { make: "Other", models: ["Other"] },
+];
+
+export const HEAVY_EQUIPMENT_MAKES: MakeModels[] = [
+  { make: "Caterpillar", models: ["302.7 CR", "305 CR", "308 CR", "312", "320", "330", "336", "349", "390", "D3", "D5", "D6", "D8", "D9", "950 GC", "966", "980", "988", "TH408D", "924K", "Backhoe 416", "Backhoe 420", "Backhoe 432"] },
+  { make: "Komatsu", models: ["PC30", "PC55", "PC78", "PC130", "PC200", "PC210", "PC300", "PC400", "PC450", "PC650", "PC850", "D31", "D39", "D51", "D61", "D65", "D85", "D155", "WA80", "WA200", "WA320", "WA380", "WA470", "WA500", "WA600", "WB93R"] },
+  { make: "Hitachi", models: ["ZX17U", "ZX30U", "ZX55U", "ZX85", "ZX130", "ZX200", "ZX240", "ZX330", "ZX350", "ZX490", "ZX670", "ZX870", "ZW180", "ZW220", "ZW310"] },
+  { make: "Kobelco", models: ["SK17", "SK35", "SK55", "SK75", "SK130", "SK200", "SK210", "SK260", "SK330", "SK350", "SK500"] },
+  { make: "Volvo CE", models: ["EC20D", "EC55", "EC140", "EC200", "EC210", "EC220", "EC250", "EC300", "EC350", "EC480", "L60H", "L90H", "L110H", "L120H", "L150H", "L180H", "L220H", "A25G", "A30G", "A40G"] },
+  { make: "Doosan", models: ["DX30Z", "DX55", "DX140", "DX190", "DX225", "DX300", "DX340", "DX380", "DX490", "DX530", "DL200", "DL250", "DL300", "DL420", "DL550"] },
+  { make: "Hyundai CE", models: ["R17Z-9A", "R35Z", "R55-9", "R145", "R220", "R225", "R300", "R380", "R480", "R520", "HL740", "HL955", "HL965", "HL975"] },
+  { make: "JCB", models: ["3CX", "4CX", "5CX", "JS130", "JS160", "JS200", "JS220", "JS330", "JS370", "TM320", "Loadall 535", "Loadall 540", "Loadall 550"] },
+  { make: "Case CE", models: ["CX26C", "CX55B", "CX130D", "CX160D", "CX210D", "CX300D", "CX490D", "580N", "580SN", "590SN", "695ST", "721G", "821G", "1021G", "1121G"] },
+  { make: "John Deere", models: ["35G", "50G", "85G", "135G", "210G", "245G", "300G", "350G", "470G", "544K", "624K", "724K", "844K", "310SL", "410L", "710L"] },
+  { make: "Bobcat", models: ["S70", "S510", "S550", "S570", "S590", "S650", "S740", "S770", "T595", "T650", "T770", "T870", "E10", "E26", "E35", "E50", "E85"] },
+  { make: "Toyota Industrial", models: ["Forklift 8FG", "Forklift 8FD", "Forklift 7FBE", "Forklift 8FBE", "Forklift 8FG/D 25", "Forklift 8FG/D 30"] },
+  { make: "Mitsubishi Forklift", models: ["FG15N", "FG18N", "FG25N", "FG30N", "FD15N", "FD25N", "FD30N", "FD35N", "FD40N", "FD50N"] },
+  { make: "Kubota", models: ["U17", "U27-4", "U35", "U55", "KX018", "KX040", "KX057", "KX080", "L3301", "L4701", "M7060", "M8540", "M9540"] },
+  { make: "Sany", models: ["SY16C", "SY35U", "SY50C", "SY75C", "SY135C", "SY200C", "SY215C", "SY245H", "SY305H", "SY365H", "SY485H", "SY750H", "STC250", "STC500", "STC750"] },
+  { make: "XCMG", models: ["XE15U", "XE35U", "XE60D", "XE150D", "XE210C", "XE235C", "XE305D", "XE370D", "XE470D", "XE490DK", "LW300FN", "LW500FN", "LW600KN", "ZL50GN", "QY25K", "QY50K", "QY70K"] },
+  { make: "LiuGong", models: ["906E", "908E", "915E", "920E", "922E", "925E", "933E", "936E", "942E", "950E", "856H", "877H", "835H"] },
+  { make: "Other", models: ["Other"] },
+];
+
 export function getMakes(category: VehicleCategory): MakeModels[] {
-  return category === "motorcycle" ? MOTORCYCLE_MAKES : CAR_MAKES;
+  switch (category) {
+    case "motorcycle":
+      return MOTORCYCLE_MAKES;
+    case "heavy_truck":
+      return HEAVY_TRUCK_MAKES;
+    case "atv_utv":
+      return ATV_UTV_MAKES;
+    case "marine":
+      return MARINE_MAKES;
+    case "heavy_equipment":
+      return HEAVY_EQUIPMENT_MAKES;
+    case "car":
+    default:
+      return CAR_MAKES;
+  }
 }
 
 /** Models for the given make filtered by year (unmapped models stay visible). */

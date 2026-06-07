@@ -20,7 +20,7 @@ import { ShopFavoriteButton } from "@/components/shop/shop-favorite-button";
 import { ShopMobileCtaBar } from "@/components/shop/shop-mobile-cta-bar";
 import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
 
-import { useGarage, formatVehicle } from "@/lib/garage";
+import { useGarage, formatVehicle, type GarageVehicle } from "@/lib/garage";
 import { X } from "lucide-react";
 
 const shopSearch = z.object({
@@ -116,13 +116,7 @@ function ShopIndex() {
   const latest = latestData?.products ?? [];
   const deals = dealsData?.products ?? [];
 
-  const onPickVehicle = (v: {
-    category: "car" | "motorcycle";
-    make: string;
-    model: string;
-    year?: number;
-    engine?: string;
-  }) => {
+  const onPickVehicle = (v: GarageVehicle) => {
     setGarageState(v);
     navigate({
       search: (prev: any) => ({
