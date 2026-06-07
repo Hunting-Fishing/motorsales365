@@ -28,6 +28,7 @@ const shopSearch = z.object({
   model: fallback(z.string(), "").default(""),
   year: fallback(z.number().optional(), undefined).default(undefined),
   engine: fallback(z.string(), "").default(""),
+  transmission: fallback(z.string(), "").default(""),
   brand: fallback(z.string(), "").default(""),
   category: fallback(z.string(), "").default(""),
 });
