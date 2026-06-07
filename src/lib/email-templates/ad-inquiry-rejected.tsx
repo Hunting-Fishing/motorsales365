@@ -82,5 +82,6 @@ export const template = {
     contact_name: "Maria",
     company: "Bright Auto Academy",
     placement: "sponsored_post",
+    reason: "Your placement is currently fully booked for the next 30 days.",
   },
 } satisfies TemplateEntry;
