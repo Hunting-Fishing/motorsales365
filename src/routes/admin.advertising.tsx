@@ -40,6 +40,7 @@ function AdminAdvertising() {
   const hasAccess = canManageAds;
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [filter, setFilter] = useState<Status | "all">("new");
+  const [sectionFilter, setSectionFilter] = useState<string>("all");
   const [mineOnly, setMineOnly] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
