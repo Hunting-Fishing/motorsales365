@@ -208,12 +208,25 @@ function AdminAdvertising() {
           >
             Assigned to me
           </Button>
+          <Select value={sectionFilter} onValueChange={setSectionFilter}>
+            <SelectTrigger className="w-56">
+              <SelectValue placeholder="All sections" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All sections</SelectItem>
+              {SECTIONS.map((s) => (
+                <SelectItem key={s.value} value={s.value}>
+                  {s.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           <Select value={filter} onValueChange={(v) => setFilter(v as any)}>
             <SelectTrigger className="w-44">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="all">All statuses</SelectItem>
               {STATUSES.map((s) => (
                 <SelectItem key={s} value={s}>
                   {s}
