@@ -1277,6 +1277,9 @@ function FitmentDialog({ product, onClose }: any) {
                       <td className="p-2">
                         {f.engine ?? <span className="text-muted-foreground">any</span>}
                       </td>
+                      <td className="p-2">
+                        {f.transmission ?? <span className="text-muted-foreground">any</span>}
+                      </td>
                       <td className="p-2 text-xs text-muted-foreground">{f.notes ?? ""}</td>
                       <td className="p-2">
                         <Button size="sm" variant="ghost" onClick={() => del.mutate(f.id)}>
