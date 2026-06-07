@@ -85,15 +85,9 @@ export function BusinessReadyRail({ className }: { className?: string }) {
             href="https://www.learntoday.work/courses"
             target="_blank"
             rel="nofollow sponsored noreferrer"
-            className="group relative flex flex-col items-center justify-center gap-3 overflow-hidden bg-gradient-to-br from-primary/10 via-primary/5 to-background p-6 text-center"
+            className="group relative flex flex-col items-center justify-center gap-3 p-6 text-center md:border-r md:border-border/40"
           >
-            <img
-              src={brCover.url}
-              alt=""
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-10 transition-opacity group-hover:opacity-20"
-              loading="lazy"
-            />
+
             <img
               src={brLogo.url}
               alt="Business Ready"
