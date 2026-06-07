@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import ogMap from "@/assets/og/map.jpg";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { Star, Store as StoreIcon, MapPin, Locate, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { GoogleBusinessMap, type GMapBusiness } from "@/components/businesses/google-business-map";
 import { MapFilterBar, type CenterPoint } from "@/components/businesses/map-filter-bar";
-import { MapBottomSheet } from "@/components/businesses/map-bottom-sheet";
+import { MapBottomSheet, type MapBottomSheetHandle } from "@/components/businesses/map-bottom-sheet";
 import { haversineKm } from "@/components/businesses/google-maps-loader";
 import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 
@@ -97,6 +97,8 @@ function MapPage() {
   const [types, setTypes] = useState<BusinessType[]>([]);
   const [items, setItems] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
+  const desktopListRef = useRef<HTMLDivElement | null>(null);
+  const bottomSheetRef = useRef<MapBottomSheetHandle | null>(null);
 
   // URL wins for lat/lng; pull selection + viewport from localStorage regardless.
   const stored = readStoredSearch();
@@ -417,7 +419,12 @@ function MapPage() {
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={() => setSelectedSlug(null)}
+                onClick={() => {
+                  setSelectedSlug(null);
+                  setHoverId(null);
+                  desktopListRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+                  bottomSheetRef.current?.scrollToTop();
+                }}
               >
                 Clear selection
               </Button>
@@ -446,7 +453,10 @@ function MapPage() {
           </div>
 
           {/* Desktop list (sidebar) */}
-          <div className="hidden lg:order-1 lg:block lg:max-h-[calc(100dvh-260px)] lg:overflow-y-auto lg:pr-1">
+          <div
+            ref={desktopListRef}
+            className="hidden lg:order-1 lg:block lg:max-h-[calc(100dvh-260px)] lg:overflow-y-auto lg:pr-1"
+          >
             <div className="mb-2 text-xs text-muted-foreground">{countLabel}</div>
             {resultsList}
           </div>
@@ -458,6 +468,7 @@ function MapPage() {
 
       {/* Mobile draggable bottom sheet */}
       <MapBottomSheet
+        ref={bottomSheetRef}
         header={
           <div className="flex items-center gap-2">
             <span className="font-semibold">Results</span>

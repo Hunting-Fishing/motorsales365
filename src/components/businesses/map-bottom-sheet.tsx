@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState, type ReactNode } from "react";
 import { ChevronUp } from "lucide-react";
 
 type Snap = "peek" | "half" | "full";
@@ -20,7 +20,9 @@ function snapsForViewport(): Record<Snap, number> {
  * Three snap points: peek (header only), half (~50dvh), full (~85dvh).
  * Renders nothing on lg+ — parent should hide it via `lg:hidden`.
  */
-export function MapBottomSheet({ header, children }: { header: ReactNode; children: ReactNode }) {
+export type MapBottomSheetHandle = { scrollToTop: () => void };
+
+export const MapBottomSheet = forwardRef<MapBottomSheetHandle, { header: ReactNode; children: ReactNode }>(function MapBottomSheet({ header, children }, ref) {
   const [snap, setSnap] = useState<Snap>("peek");
   const [height, setHeight] = useState(PEEK_PX);
   const [dragging, setDragging] = useState(false);
@@ -73,6 +75,12 @@ export function MapBottomSheet({ header, children }: { header: ReactNode; childr
     setSnap((s) => (s === "peek" ? "half" : s === "half" ? "full" : "peek"));
   };
 
+  useImperativeHandle(ref, () => ({
+    scrollToTop: () => {
+      if (scrollRef.current) scrollRef.current.scrollTop = 0;
+    },
+  }));
+
   return (
     <div
       className="fixed inset-x-0 bottom-0 z-30 flex flex-col rounded-t-2xl border-t border-border bg-card shadow-2xl lg:hidden"
@@ -115,4 +123,4 @@ export function MapBottomSheet({ header, children }: { header: ReactNode; childr
       </div>
     </div>
   );
-}
+});
