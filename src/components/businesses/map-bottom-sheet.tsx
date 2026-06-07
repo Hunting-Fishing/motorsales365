@@ -20,7 +20,11 @@ function snapsForViewport(): Record<Snap, number> {
  * Three snap points: peek (header only), half (~50dvh), full (~85dvh).
  * Renders nothing on lg+ — parent should hide it via `lg:hidden`.
  */
-export type MapBottomSheetHandle = { scrollToTop: () => void };
+export type MapBottomSheetHandle = {
+  scrollToTop: () => void;
+  scrollToSlug: (slug: string) => void;
+  expand: () => void;
+};
 
 export const MapBottomSheet = forwardRef<MapBottomSheetHandle, { header: ReactNode; children: ReactNode }>(function MapBottomSheet({ header, children }, ref) {
   const [snap, setSnap] = useState<Snap>("peek");
