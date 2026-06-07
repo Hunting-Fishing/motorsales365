@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { ExternalLink, Sparkles, ChevronLeft, ChevronRight, GraduationCap, ArrowRight } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { ExternalLink, Sparkles, ChevronLeft, ChevronRight } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
