@@ -98,19 +98,24 @@ function MapPage() {
   const [items, setItems] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // URL wins as source of truth; fall back to localStorage when URL is bare.
-  const stored = search.lat == null || search.lng == null ? readStoredSearch() : null;
+  // URL wins for lat/lng; pull selection + viewport from localStorage regardless.
+  const stored = readStoredSearch();
+  const urlHasCenter = search.lat != null && search.lng != null;
 
   const [typeSlug, setTypeSlug] = useState<string | null>(search.type ?? null);
   const [center, setCenter] = useState<CenterPoint>(
-    search.lat != null && search.lng != null
-      ? { lat: search.lat, lng: search.lng, label: search.q }
+    urlHasCenter
+      ? { lat: search.lat!, lng: search.lng!, label: search.q }
       : stored
         ? { lat: stored.lat, lng: stored.lng, label: stored.label }
         : null,
   );
   const [radiusKm, setRadiusKm] = useState<number | null>(search.r ?? stored?.radiusKm ?? null);
   const [hoverId, setHoverId] = useState<string | null>(null);
+  const [selectedSlug, setSelectedSlug] = useState<string | null>(stored?.selectedSlug ?? null);
+  const [viewport, setViewport] = useState<{ lat: number; lng: number; zoom: number } | null>(
+    stored?.viewport ?? null,
+  );
 
   const [locating, setLocating] = useState(false);
 
