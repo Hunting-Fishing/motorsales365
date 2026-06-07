@@ -211,6 +211,7 @@ export const listShopProducts = createServerFn({ method: "GET" })
         model?: string;
         year?: number;
         engine?: string;
+        transmission?: string;
         includeUniversal?: boolean;
         brand?: string;
         priceMin?: number;
