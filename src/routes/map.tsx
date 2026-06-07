@@ -68,7 +68,15 @@ type Row = {
 };
 
 const LS_KEY = "map:last-search";
-type StoredSearch = { lat: number; lng: number; label?: string; radiusKm?: number | null };
+type StoredSearch = {
+  lat: number;
+  lng: number;
+  label?: string;
+  radiusKm?: number | null;
+  zoom?: number | null;
+  viewport?: { lat: number; lng: number; zoom: number } | null;
+  selectedSlug?: string | null;
+};
 
 function readStoredSearch(): StoredSearch | null {
   if (typeof window === "undefined") return null;
@@ -90,19 +98,24 @@ function MapPage() {
   const [items, setItems] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // URL wins as source of truth; fall back to localStorage when URL is bare.
-  const stored = search.lat == null || search.lng == null ? readStoredSearch() : null;
+  // URL wins for lat/lng; pull selection + viewport from localStorage regardless.
+  const stored = readStoredSearch();
+  const urlHasCenter = search.lat != null && search.lng != null;
 
   const [typeSlug, setTypeSlug] = useState<string | null>(search.type ?? null);
   const [center, setCenter] = useState<CenterPoint>(
-    search.lat != null && search.lng != null
-      ? { lat: search.lat, lng: search.lng, label: search.q }
+    urlHasCenter
+      ? { lat: search.lat!, lng: search.lng!, label: search.q }
       : stored
         ? { lat: stored.lat, lng: stored.lng, label: stored.label }
         : null,
   );
   const [radiusKm, setRadiusKm] = useState<number | null>(search.r ?? stored?.radiusKm ?? null);
   const [hoverId, setHoverId] = useState<string | null>(null);
+  const [selectedSlug, setSelectedSlug] = useState<string | null>(stored?.selectedSlug ?? null);
+  const [viewport, setViewport] = useState<{ lat: number; lng: number; zoom: number } | null>(
+    stored?.viewport ?? null,
+  );
 
   const [locating, setLocating] = useState(false);
 
@@ -157,8 +170,23 @@ function MapPage() {
             lng: center.lng,
             label: center.label,
             radiusKm: radiusKm ?? null,
+            viewport: viewport ?? null,
+            selectedSlug: selectedSlug ?? null,
           };
           window.localStorage.setItem(LS_KEY, JSON.stringify(payload));
+        } else if (viewport || selectedSlug) {
+          // Preserve viewport / selection even when center is cleared.
+          const existing = readStoredSearch();
+          if (existing) {
+            window.localStorage.setItem(
+              LS_KEY,
+              JSON.stringify({
+                ...existing,
+                viewport: viewport ?? existing.viewport ?? null,
+                selectedSlug: selectedSlug ?? null,
+              }),
+            );
+          }
         } else {
           window.localStorage.removeItem(LS_KEY);
         }
@@ -167,7 +195,7 @@ function MapPage() {
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [center, radiusKm, typeSlug]);
+  }, [center, radiusKm, typeSlug, viewport, selectedSlug]);
 
   useEffect(() => {
     setTypes(
@@ -279,16 +307,20 @@ function MapPage() {
                 key={b.id}
                 role="button"
                 tabIndex={0}
-                onClick={() => navigate({ to: "/businesses/$slug", params: { slug: b.slug } })}
+                onClick={() => {
+                  setSelectedSlug(b.slug);
+                  navigate({ to: "/businesses/$slug", params: { slug: b.slug } });
+                }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
+                    setSelectedSlug(b.slug);
                     navigate({ to: "/businesses/$slug", params: { slug: b.slug } });
                   }
                 }}
                 onMouseEnter={() => setHoverId(b.id)}
                 onMouseLeave={() => setHoverId((id) => (id === b.id ? null : id))}
-                className={`min-h-16 cursor-pointer p-4 transition hover:border-primary active:scale-[0.99] ${hoverId === b.id ? "border-primary ring-1 ring-primary/40" : ""}`}
+                className={`min-h-16 cursor-pointer p-4 transition hover:border-primary active:scale-[0.99] ${hoverId === b.id || selectedSlug === b.slug ? "border-primary ring-1 ring-primary/40" : ""}`}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
@@ -380,6 +412,16 @@ function MapPage() {
               )}
               Use my location
             </Button>
+            {selectedSlug && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setSelectedSlug(null)}
+              >
+                Clear selection
+              </Button>
+            )}
           </div>
         </Card>
 
@@ -393,7 +435,13 @@ function MapPage() {
               businesses={mapBusinesses}
               center={center ? { lat: center.lat, lng: center.lng } : null}
               radiusKm={radiusKm}
-              onPinClick={(slug: string) => navigate({ to: "/businesses/$slug", params: { slug } })}
+              initialViewport={viewport}
+              onViewportChange={setViewport}
+              highlightedSlug={selectedSlug}
+              onPinClick={(slug: string) => {
+                setSelectedSlug(slug);
+                navigate({ to: "/businesses/$slug", params: { slug } });
+              }}
             />
           </div>
 

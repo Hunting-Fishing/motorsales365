@@ -81,24 +81,37 @@ function pinDivIcon(
   });
 }
 
+export type MapViewport = { lat: number; lng: number; zoom: number };
+
 export function GoogleBusinessMapInner({
   businesses,
   height = 520,
   center,
   radiusKm,
   onPinClick,
+  initialViewport,
+  onViewportChange,
+  highlightedSlug,
 }: {
   businesses: GMapBusiness[];
   height?: number | string;
   center?: { lat: number; lng: number } | null;
   radiusKm?: number | null;
   onPinClick?: (slug: string) => void;
+  initialViewport?: MapViewport | null;
+  onViewportChange?: (v: MapViewport) => void;
+  highlightedSlug?: string | null;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null);
   const circleRef = useRef<L.Circle | null>(null);
+  const appliedCenterKeyRef = useRef<string | null>(null);
+  const onViewportChangeRef = useRef(onViewportChange);
+  useEffect(() => {
+    onViewportChangeRef.current = onViewportChange;
+  }, [onViewportChange]);
 
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
@@ -107,9 +120,13 @@ export function GoogleBusinessMapInner({
   useEffect(() => {
     if (!containerRef.current) return;
     try {
+      const startCenter: [number, number] = initialViewport
+        ? [initialViewport.lat, initialViewport.lng]
+        : PH_CENTER;
+      const startZoom = initialViewport?.zoom ?? 6;
       const map = L.map(containerRef.current, {
-        center: PH_CENTER,
-        zoom: 6,
+        center: startCenter,
+        zoom: startZoom,
         zoomControl: true,
         scrollWheelZoom: true,
         attributionControl: true,
@@ -127,6 +144,20 @@ export function GoogleBusinessMapInner({
       }) as L.MarkerClusterGroup;
       cluster.addTo(map);
       clusterRef.current = cluster;
+
+      // If we restored a viewport, prevent the data effect from snapping back
+      // to a center we've already honored.
+      if (initialViewport && center) {
+        appliedCenterKeyRef.current = `${center.lat},${center.lng},${radiusKm ?? ""}`;
+      }
+
+      const emit = () => {
+        const c = map.getCenter();
+        onViewportChangeRef.current?.({ lat: c.lat, lng: c.lng, zoom: map.getZoom() });
+      };
+      map.on("moveend", emit);
+      map.on("zoomend", emit);
+
       setReady(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Map failed to load");
@@ -140,6 +171,8 @@ export function GoogleBusinessMapInner({
       mapRef.current?.remove();
       mapRef.current = null;
     };
+    // reason: init only — initialViewport/center/radiusKm captured once at mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
@@ -163,10 +196,11 @@ export function GoogleBusinessMapInner({
     const newMarkers: L.Marker[] = [];
     valid.forEach((b) => {
       const color = colorForType(b.type_slug);
+      const isHighlighted = b.highlighted || (highlightedSlug != null && b.slug === highlightedSlug);
       const marker = L.marker([Number(b.lat), Number(b.lng)], {
-        icon: pinDivIcon(color, b.featured, b.highlighted, b.type_slug),
+        icon: pinDivIcon(color, b.featured, isHighlighted, b.type_slug),
         title: b.name,
-        zIndexOffset: b.highlighted ? 1000 : b.featured ? 500 : 0,
+        zIndexOffset: isHighlighted ? 1000 : b.featured ? 500 : 0,
       });
 
       const rating =
@@ -191,21 +225,27 @@ export function GoogleBusinessMapInner({
     markersRef.current = newMarkers;
 
 
-    // Centre / fit logic
-    if (center) {
-      if (radiusKm && radiusKm > 0) {
-        const zoom = Math.max(8, Math.round(14 - Math.log2(radiusKm)));
-        map.setView([center.lat, center.lng], zoom);
-      } else {
-        map.setView([center.lat, center.lng], 12);
+    // Centre / fit logic — only when the requested center/radius changes,
+    // so user pan/zoom is preserved across re-renders and on remount with
+    // a restored viewport.
+    const centerKey = center ? `${center.lat},${center.lng},${radiusKm ?? ""}` : null;
+    if (centerKey !== appliedCenterKeyRef.current) {
+      appliedCenterKeyRef.current = centerKey;
+      if (center) {
+        if (radiusKm && radiusKm > 0) {
+          const zoom = Math.max(8, Math.round(14 - Math.log2(radiusKm)));
+          map.setView([center.lat, center.lng], zoom);
+        } else {
+          map.setView([center.lat, center.lng], 12);
+        }
+      } else if (valid.length > 1) {
+        const bounds = L.latLngBounds(
+          valid.map((b) => [Number(b.lat), Number(b.lng)] as [number, number]),
+        );
+        map.fitBounds(bounds, { padding: [48, 48] });
+      } else if (valid.length === 1) {
+        map.setView([Number(valid[0].lat), Number(valid[0].lng)], 14);
       }
-    } else if (valid.length > 1) {
-      const bounds = L.latLngBounds(
-        valid.map((b) => [Number(b.lat), Number(b.lng)] as [number, number]),
-      );
-      map.fitBounds(bounds, { padding: [48, 48] });
-    } else if (valid.length === 1) {
-      map.setView([Number(valid[0].lat), Number(valid[0].lng)], 14);
     }
 
     // Radius circle
@@ -223,7 +263,7 @@ export function GoogleBusinessMapInner({
     }
     // reason: we depend on center.lat/center.lng explicitly to avoid re-runs on object identity changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ready, businesses, center?.lat, center?.lng, radiusKm, onPinClick]);
+  }, [ready, businesses, center?.lat, center?.lng, radiusKm, onPinClick, highlightedSlug]);
 
   // Invalidate size when container size changes (e.g. bottom sheet snaps)
   useEffect(() => {
