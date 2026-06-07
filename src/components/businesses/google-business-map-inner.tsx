@@ -81,24 +81,37 @@ function pinDivIcon(
   });
 }
 
+export type MapViewport = { lat: number; lng: number; zoom: number };
+
 export function GoogleBusinessMapInner({
   businesses,
   height = 520,
   center,
   radiusKm,
   onPinClick,
+  initialViewport,
+  onViewportChange,
+  highlightedSlug,
 }: {
   businesses: GMapBusiness[];
   height?: number | string;
   center?: { lat: number; lng: number } | null;
   radiusKm?: number | null;
   onPinClick?: (slug: string) => void;
+  initialViewport?: MapViewport | null;
+  onViewportChange?: (v: MapViewport) => void;
+  highlightedSlug?: string | null;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
   const clusterRef = useRef<L.MarkerClusterGroup | null>(null);
   const circleRef = useRef<L.Circle | null>(null);
+  const appliedCenterKeyRef = useRef<string | null>(null);
+  const onViewportChangeRef = useRef(onViewportChange);
+  useEffect(() => {
+    onViewportChangeRef.current = onViewportChange;
+  }, [onViewportChange]);
 
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
