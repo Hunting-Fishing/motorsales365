@@ -294,7 +294,7 @@ function AdminAdvertising() {
                     {formatDate(active.created_at)}
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Button
                     size="sm"
                     variant={active.assigned_to === user?.id ? "default" : "outline"}
@@ -302,6 +302,32 @@ function AdminAdvertising() {
                   >
                     {active.assigned_to === user?.id ? "Assigned to you" : "Assign to me"}
                   </Button>
+                  {active.status !== "won" && active.status !== "lost" && (
+                    <>
+                      <Button
+                        size="sm"
+                        className="bg-emerald-600 text-white hover:bg-emerald-700"
+                        onClick={() => {
+                          if (confirm("Approve this sponsorship submission? The sponsor will be emailed.")) {
+                            setStatus(active.id, "won");
+                          }
+                        }}
+                      >
+                        Approve
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => {
+                          if (confirm("Reject this sponsorship submission? The sponsor will be emailed.")) {
+                            setStatus(active.id, "lost");
+                          }
+                        }}
+                      >
+                        Reject
+                      </Button>
+                    </>
+                  )}
                   <Select
                     value={active.status}
                     onValueChange={(v) => setStatus(active.id, v as Status)}
