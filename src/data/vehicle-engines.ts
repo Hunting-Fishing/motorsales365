@@ -19,7 +19,9 @@ export type EngineSpec = {
   end?: number;
 };
 
-export type EngineCatalog = Record<VehicleCategory, Record<string, Record<string, EngineSpec[]>>>;
+export type EngineCatalog = Partial<
+  Record<VehicleCategory, Record<string, Record<string, EngineSpec[]>>>
+>;
 
 export const VEHICLE_ENGINES: EngineCatalog = {
   car: {
