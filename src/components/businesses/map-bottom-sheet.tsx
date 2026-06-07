@@ -75,6 +75,12 @@ export const MapBottomSheet = forwardRef<MapBottomSheetHandle, { header: ReactNo
     setSnap((s) => (s === "peek" ? "half" : s === "half" ? "full" : "peek"));
   };
 
+  useImperativeHandle(ref, () => ({
+    scrollToTop: () => {
+      if (scrollRef.current) scrollRef.current.scrollTop = 0;
+    },
+  }));
+
   return (
     <div
       className="fixed inset-x-0 bottom-0 z-30 flex flex-col rounded-t-2xl border-t border-border bg-card shadow-2xl lg:hidden"
