@@ -151,6 +151,15 @@ function BusinessProfilePage() {
   const [rating, setRating] = useState(5);
   const [body, setBody] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [hasMapState, setHasMapState] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      setHasMapState(!!window.localStorage.getItem("map:last-search"));
+    } catch {
+      setHasMapState(false);
+    }
+  }, []);
 
   useTrackPageView(data?.business?.id ?? null);
   const track = useTrackBusinessEvent(data?.business?.id ?? null);
