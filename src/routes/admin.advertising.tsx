@@ -89,7 +89,7 @@ function AdminAdvertising() {
 
   useEffect(() => {
     if (hasAccess) load(); /* eslint-disable-next-line */
-  }, [filter, mineOnly, hasAccess]);
+  }, [filter, sectionFilter, mineOnly, hasAccess]);
 
   const active = useMemo(() => inquiries.find((i) => i.id === activeId), [inquiries, activeId]);
 
