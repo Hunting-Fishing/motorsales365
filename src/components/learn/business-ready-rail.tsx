@@ -74,10 +74,11 @@ export function BusinessReadyRail({ className }: { className?: string }) {
           src={brCover.url}
           alt=""
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 h-full w-full object-contain object-center"
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover object-center"
           loading="lazy"
         />
-        <div className="pointer-events-none absolute inset-0 bg-background/60" />
+        <div className="pointer-events-none absolute inset-0 bg-background/70" />
+
 
 
         <div className="relative grid grid-cols-1 md:grid-cols-[260px_1fr]">
