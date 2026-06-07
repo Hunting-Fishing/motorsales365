@@ -1188,6 +1188,7 @@ function FitmentDialog({ product, onClose }: any) {
     year_start: "",
     year_end: "",
     engine: "",
+    transmission: "",
     notes: "",
   };
   const [form, setForm] = useState(emptyForm);
