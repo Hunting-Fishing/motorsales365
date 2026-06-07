@@ -232,6 +232,7 @@ export const listShopProducts = createServerFn({ method: "GET" })
           model: z.string().max(120).optional(),
           year: z.number().int().min(1900).max(2100).optional(),
           engine: z.string().max(120).optional(),
+          transmission: z.string().max(120).optional(),
           includeUniversal: z.boolean().optional(),
           brand: z.string().max(120).optional(),
           priceMin: z.number().nonnegative().optional(),
