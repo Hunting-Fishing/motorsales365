@@ -104,7 +104,7 @@ function SponsorshipsPage() {
     const { data, error } = await supabase
       .from("ad_inquiries")
       .select(
-        "id,contact_name,company,email,phone,placement,budget_range,start_date,message,status,last_rejection_reason,created_at,updated_at",
+        "id,contact_name,company,email,phone,placement,sections,formats,target_url,budget_range,start_date,end_date,duration_days,creative_ready,audience_notes,message,status,last_rejection_reason,created_at,updated_at",
       )
       .order("created_at", { ascending: false });
     if (error) toast.error(error.message);
