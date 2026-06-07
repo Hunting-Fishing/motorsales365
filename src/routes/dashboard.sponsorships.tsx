@@ -137,7 +137,7 @@ function SponsorshipsPage() {
         contact_name: editing.contact_name,
         company: editing.company || null,
         phone: editing.phone || null,
-        placement: editing.placement as Inquiry["placement"],
+        placement: editing.placement as Inquiry["placement"] as any,
         budget_range: editing.budget_range || null,
         start_date: editing.start_date || null,
         message: editing.message,

@@ -68,6 +68,7 @@ import { Route as DashboardVerificationRouteImport } from './routes/dashboard.ve
 import { Route as DashboardVehiclesRouteImport } from './routes/dashboard.vehicles'
 import { Route as DashboardTowRouteImport } from './routes/dashboard.tow'
 import { Route as DashboardTeamRouteImport } from './routes/dashboard.team'
+import { Route as DashboardSponsorshipsRouteImport } from './routes/dashboard.sponsorships'
 import { Route as DashboardShopFavoritesRouteImport } from './routes/dashboard.shop-favorites'
 import { Route as DashboardShareKitRouteImport } from './routes/dashboard.share-kit'
 import { Route as DashboardSearchesRouteImport } from './routes/dashboard.searches'
@@ -449,6 +450,11 @@ const DashboardTowRoute = DashboardTowRouteImport.update({
 const DashboardTeamRoute = DashboardTeamRouteImport.update({
   id: '/team',
   path: '/team',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardSponsorshipsRoute = DashboardSponsorshipsRouteImport.update({
+  id: '/sponsorships',
+  path: '/sponsorships',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardShopFavoritesRoute = DashboardShopFavoritesRouteImport.update({
@@ -983,6 +989,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/searches': typeof DashboardSearchesRoute
   '/dashboard/share-kit': typeof DashboardShareKitRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
+  '/dashboard/sponsorships': typeof DashboardSponsorshipsRoute
   '/dashboard/team': typeof DashboardTeamRouteWithChildren
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/vehicles': typeof DashboardVehiclesRoute
@@ -1129,6 +1136,7 @@ export interface FileRoutesByTo {
   '/dashboard/searches': typeof DashboardSearchesRoute
   '/dashboard/share-kit': typeof DashboardShareKitRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
+  '/dashboard/sponsorships': typeof DashboardSponsorshipsRoute
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/vehicles': typeof DashboardVehiclesRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
@@ -1277,6 +1285,7 @@ export interface FileRoutesById {
   '/dashboard/searches': typeof DashboardSearchesRoute
   '/dashboard/share-kit': typeof DashboardShareKitRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
+  '/dashboard/sponsorships': typeof DashboardSponsorshipsRoute
   '/dashboard/team': typeof DashboardTeamRouteWithChildren
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/vehicles': typeof DashboardVehiclesRoute
@@ -1427,6 +1436,7 @@ export interface FileRouteTypes {
     | '/dashboard/searches'
     | '/dashboard/share-kit'
     | '/dashboard/shop-favorites'
+    | '/dashboard/sponsorships'
     | '/dashboard/team'
     | '/dashboard/tow'
     | '/dashboard/vehicles'
@@ -1573,6 +1583,7 @@ export interface FileRouteTypes {
     | '/dashboard/searches'
     | '/dashboard/share-kit'
     | '/dashboard/shop-favorites'
+    | '/dashboard/sponsorships'
     | '/dashboard/tow'
     | '/dashboard/vehicles'
     | '/dashboard/verification'
@@ -1720,6 +1731,7 @@ export interface FileRouteTypes {
     | '/dashboard/searches'
     | '/dashboard/share-kit'
     | '/dashboard/shop-favorites'
+    | '/dashboard/sponsorships'
     | '/dashboard/team'
     | '/dashboard/tow'
     | '/dashboard/vehicles'
@@ -2283,6 +2295,13 @@ declare module '@tanstack/react-router' {
       path: '/team'
       fullPath: '/dashboard/team'
       preLoaderRoute: typeof DashboardTeamRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/sponsorships': {
+      id: '/dashboard/sponsorships'
+      path: '/sponsorships'
+      fullPath: '/dashboard/sponsorships'
+      preLoaderRoute: typeof DashboardSponsorshipsRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/shop-favorites': {
@@ -3003,6 +3022,7 @@ interface DashboardRouteChildren {
   DashboardSearchesRoute: typeof DashboardSearchesRoute
   DashboardShareKitRoute: typeof DashboardShareKitRoute
   DashboardShopFavoritesRoute: typeof DashboardShopFavoritesRoute
+  DashboardSponsorshipsRoute: typeof DashboardSponsorshipsRoute
   DashboardTeamRoute: typeof DashboardTeamRouteWithChildren
   DashboardTowRoute: typeof DashboardTowRoute
   DashboardVehiclesRoute: typeof DashboardVehiclesRoute
@@ -3028,6 +3048,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardSearchesRoute: DashboardSearchesRoute,
   DashboardShareKitRoute: DashboardShareKitRoute,
   DashboardShopFavoritesRoute: DashboardShopFavoritesRoute,
+  DashboardSponsorshipsRoute: DashboardSponsorshipsRoute,
   DashboardTeamRoute: DashboardTeamRouteWithChildren,
   DashboardTowRoute: DashboardTowRoute,
   DashboardVehiclesRoute: DashboardVehiclesRoute,
