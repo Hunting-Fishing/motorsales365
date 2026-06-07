@@ -151,6 +151,15 @@ function BusinessProfilePage() {
   const [rating, setRating] = useState(5);
   const [body, setBody] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [hasMapState, setHasMapState] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      setHasMapState(!!window.localStorage.getItem("map:last-search"));
+    } catch {
+      setHasMapState(false);
+    }
+  }, []);
 
   useTrackPageView(data?.business?.id ?? null);
   const track = useTrackBusinessEvent(data?.business?.id ?? null);
@@ -226,6 +235,16 @@ function BusinessProfilePage() {
   return (
     <SiteLayout>
       <div style={accentStyle}>
+        {hasMapState && (
+          <div className="container mx-auto px-4 pt-3">
+            <Link
+              to="/map"
+              className="inline-flex items-center gap-1.5 rounded-full border border-border bg-background/80 px-3 py-1.5 text-xs font-medium text-foreground shadow-sm backdrop-blur hover:bg-muted"
+            >
+              <MapPin className="h-3.5 w-3.5" />← Back to map
+            </Link>
+          </div>
+        )}
         {/* HERO */}
         <div className="relative">
           {biz.featured_video_url ? (
@@ -764,7 +783,12 @@ function BusinessProfilePage() {
             )}
           </Card>
 
-          <div className="text-center">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-center">
+            {hasMapState && (
+              <Link to="/map" className="text-sm text-muted-foreground hover:text-foreground">
+                ← Back to map
+              </Link>
+            )}
             <Link to="/businesses" className="text-sm text-muted-foreground hover:text-foreground">
               ← Back to directory
             </Link>
