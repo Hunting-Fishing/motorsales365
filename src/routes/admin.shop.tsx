@@ -1428,6 +1428,17 @@ function FitmentDialog({ product, onClose }: any) {
                 </p>
               )}
             </div>
+            <div>
+              <Label>Transmission</Label>
+              <Input
+                value={form.transmission}
+                onChange={(e) => setForm({ ...form, transmission: e.target.value })}
+                placeholder="e.g. 6MT, A340, Aisin AW TF-80SC"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">
+                Optional. Use to scope tools to a specific gearbox.
+              </p>
+            </div>
             <div className="sm:col-span-2 md:col-span-3">
               <Label>Notes</Label>
               <Input
