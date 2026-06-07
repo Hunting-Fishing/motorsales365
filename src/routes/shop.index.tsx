@@ -68,6 +68,7 @@ function ShopIndex() {
           model: search.model,
           year: search.year,
           engine: search.engine || undefined,
+          transmission: search.transmission || undefined,
         }
       : garage;
 
