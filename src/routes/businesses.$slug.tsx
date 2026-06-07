@@ -783,7 +783,12 @@ function BusinessProfilePage() {
             )}
           </Card>
 
-          <div className="text-center">
+          <div className="flex flex-wrap items-center justify-center gap-4 text-center">
+            {hasMapState && (
+              <Link to="/map" className="text-sm text-muted-foreground hover:text-foreground">
+                ← Back to map
+              </Link>
+            )}
             <Link to="/businesses" className="text-sm text-muted-foreground hover:text-foreground">
               ← Back to directory
             </Link>
