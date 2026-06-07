@@ -193,10 +193,7 @@ function LearnIndex() {
                 </div>
               </div>
               <Button asChild size="lg" className="shrink-0">
-                <Link
-                  to="/advertise"
-                  search={{ placement: "sponsored_post", interest: "academy_sponsor" } as never}
-                >
+                <Link to="/advertise">
                   Claim your spot <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
