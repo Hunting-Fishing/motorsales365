@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { useRouterState } from "@tanstack/react-router";
 import { SiteHeader } from "./site-header";
 import { SiteFooter } from "./site-footer";
 import { CookieBanner } from "./cookie-banner";
@@ -8,6 +9,9 @@ import { FloatingHelpWidget } from "./support/floating-help-widget";
 import bannerImage from "@/assets/banner.webp";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  // Pages that need a clean, solid background (watermark would bleed through content).
+  const cleanBg = pathname.startsWith("/shop");
   return (
     <div className="flex min-h-dvh flex-col pb-[calc(64px+env(safe-area-inset-bottom))] md:pb-0">
       <PaymentTestModeBanner />
@@ -22,7 +26,9 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       <div className="sticky top-0 z-50">
         <SiteHeader />
       </div>
-      <main className="brand-watermark flex-1">{children}</main>
+      <main className={cleanBg ? "flex-1 bg-background" : "brand-watermark flex-1"}>
+        {children}
+      </main>
       <SiteFooter />
       <CookieBanner />
       <FloatingHelpWidget />
