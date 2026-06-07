@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { GraduationCap, Clock, Search, Sparkles } from "lucide-react";
+import { GraduationCap, Clock, Search, Sparkles, Megaphone, ArrowRight } from "lucide-react";
 import { listCourses, listCourseCategories } from "@/lib/education.functions";
 import { FeaturedTrainingRail } from "@/components/learn/featured-training-rail";
 import { BusinessReadyRail } from "@/components/learn/business-ready-rail";
