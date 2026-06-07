@@ -76,7 +76,10 @@ export function InquiryTimeline({
         const tone = ACTION_TONE[e.action] ?? "text-muted-foreground";
         const label = ACTION_LABEL[e.action] ?? e.action.replace(/_/g, " ");
         const reason = e.metadata?.reason as string | undefined;
-        const fields = e.metadata?.fields as string[] | undefined;
+        const legacyFields = e.metadata?.fields as string[] | undefined;
+        const changes = e.metadata?.changes as
+          | Record<string, { from: unknown; to: unknown }>
+          | undefined;
         return (
           <li key={e.id} className="relative">
             <span className="absolute -left-[27px] top-0.5 grid h-5 w-5 place-items-center rounded-full bg-background border border-border">
@@ -99,11 +102,39 @@ export function InquiryTimeline({
                 {reason}
               </p>
             )}
-            {fields && fields.length > 0 && (
+            {changes && Object.keys(changes).length > 0 ? (
+              <div className="mt-2 rounded-md border bg-secondary/30 divide-y text-xs">
+                {Object.entries(changes).map(([field, diff]) => (
+                  <div key={field} className="p-2">
+                    <div className="font-semibold text-foreground mb-1">
+                      {FIELD_LABEL[field] ?? field.replace(/_/g, " ")}
+                    </div>
+                    <div className="grid gap-1 sm:grid-cols-2">
+                      <div className="rounded bg-destructive/10 px-2 py-1">
+                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                          Before
+                        </div>
+                        <div className="whitespace-pre-wrap break-words line-through text-muted-foreground">
+                          {fmtVal(diff?.from)}
+                        </div>
+                      </div>
+                      <div className="rounded bg-emerald-500/10 px-2 py-1">
+                        <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                          After
+                        </div>
+                        <div className="whitespace-pre-wrap break-words text-foreground">
+                          {fmtVal(diff?.to)}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : legacyFields && legacyFields.length > 0 ? (
               <p className="text-xs text-muted-foreground mt-0.5">
-                Updated: {fields.map((f) => f.replace(/_/g, " ")).join(", ")}
+                Updated: {legacyFields.map((f) => FIELD_LABEL[f] ?? f.replace(/_/g, " ")).join(", ")}
               </p>
-            )}
+            ) : null}
           </li>
         );
       })}
