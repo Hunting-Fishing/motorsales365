@@ -120,9 +120,13 @@ export function GoogleBusinessMapInner({
   useEffect(() => {
     if (!containerRef.current) return;
     try {
+      const startCenter: [number, number] = initialViewport
+        ? [initialViewport.lat, initialViewport.lng]
+        : PH_CENTER;
+      const startZoom = initialViewport?.zoom ?? 6;
       const map = L.map(containerRef.current, {
-        center: PH_CENTER,
-        zoom: 6,
+        center: startCenter,
+        zoom: startZoom,
         zoomControl: true,
         scrollWheelZoom: true,
         attributionControl: true,
@@ -140,6 +144,20 @@ export function GoogleBusinessMapInner({
       }) as L.MarkerClusterGroup;
       cluster.addTo(map);
       clusterRef.current = cluster;
+
+      // If we restored a viewport, prevent the data effect from snapping back
+      // to a center we've already honored.
+      if (initialViewport && center) {
+        appliedCenterKeyRef.current = `${center.lat},${center.lng},${radiusKm ?? ""}`;
+      }
+
+      const emit = () => {
+        const c = map.getCenter();
+        onViewportChangeRef.current?.({ lat: c.lat, lng: c.lng, zoom: map.getZoom() });
+      };
+      map.on("moveend", emit);
+      map.on("zoomend", emit);
+
       setReady(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Map failed to load");
@@ -153,6 +171,8 @@ export function GoogleBusinessMapInner({
       mapRef.current?.remove();
       mapRef.current = null;
     };
+    // reason: init only — initialViewport/center/radiusKm captured once at mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
