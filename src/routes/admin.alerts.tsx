@@ -116,7 +116,18 @@ function AdminAlerts() {
   useEffect(() => {
     load();
     const t = setInterval(load, 30_000);
-    return () => clearInterval(t);
+    const ch = supabase
+      .channel("ops_alerts_admin")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "ops_alerts" },
+        () => load(),
+      )
+      .subscribe();
+    return () => {
+      clearInterval(t);
+      supabase.removeChannel(ch);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, eventFilter, severityFilter, fromDate, toDate]);
 
