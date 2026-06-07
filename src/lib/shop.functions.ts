@@ -280,12 +280,13 @@ export const listShopProducts = createServerFn({ method: "GET" })
     if (data.make && data.model) {
       let fq = supabaseAdmin
         .from("shop_product_fitment")
-        .select("product_id, make, model, year_start, year_end, engine");
+        .select("product_id, make, model, year_start, year_end, engine, transmission");
       // make matches or is null (any-make rule)
       fq = fq.or(`make.is.null,make.ilike.${data.make}`);
       const { data: rows, error: fErr } = await fq.limit(5000);
       if (fErr) throw new Error(fErr.message);
       const visitorEngine = data.engine?.trim().toLowerCase();
+      const visitorTransmission = data.transmission?.trim().toLowerCase();
       const matched = (rows ?? []).filter((r: any) => {
         const modelOk = !r.model || r.model.toLowerCase() === data.model!.toLowerCase();
         if (!modelOk) return false;
@@ -301,6 +302,15 @@ export const listShopProducts = createServerFn({ method: "GET" })
         if (ruleEngine) {
           if (!visitorEngine) return true; // visitor hasn't narrowed yet
           if (ruleEngine !== visitorEngine) return false;
+        }
+        // Transmission rule: same logic. When the visitor leaves transmission
+        // as "Any", we don't enforce transmission-specific rules so generic
+        // parts still show. When the visitor picks one, rules pinning a
+        // different transmission are excluded.
+        const ruleTransmission = (r.transmission ?? "").trim().toLowerCase();
+        if (ruleTransmission) {
+          if (!visitorTransmission) return true;
+          if (ruleTransmission !== visitorTransmission) return false;
         }
         return true;
       });
