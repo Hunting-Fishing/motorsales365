@@ -99,6 +99,47 @@ export const VEHICLE_ENGINES: EngineCatalog = {
     Mitsubishi: {
       Mirage: [{ label: "1.2L Gasoline (3A92)", code: "3A92", start: 2012 }],
       "Mirage G4": [{ label: "1.2L Gasoline (3A92)", code: "3A92", start: 2013 }],
+      Lancer: [
+        { label: "1.6L Gasoline (4G18)", code: "4G18", start: 2003, end: 2008 },
+        { label: "2.0L Gasoline (4B11)", code: "4B11", start: 2007, end: 2017 },
+        { label: "1.8L Gasoline (4B10)", code: "4B10", start: 2007, end: 2017 },
+        { label: "2.0L Turbo (4B11T, Evo X)", code: "4B11T", start: 2007, end: 2016 },
+      ],
+      "Lancer EX": [
+        { label: "1.6L Gasoline (4G18)", code: "4G18", start: 2008, end: 2017 },
+        { label: "2.0L Gasoline (4B11)", code: "4B11", start: 2008, end: 2017 },
+      ],
+      ASX: [
+        { label: "2.0L Gasoline (4B11)", code: "4B11", start: 2010 },
+        { label: "1.6L Diesel (4N13)", code: "4N13", start: 2012, end: 2019 },
+      ],
+      Outlander: [
+        { label: "2.4L Gasoline (4B12)", code: "4B12", start: 2012 },
+        { label: "3.0L V6 (6B31)", code: "6B31", start: 2012, end: 2019 },
+        { label: "2.0L PHEV (4B11)", code: "4B11", start: 2013 },
+      ],
+      Pajero: [
+        { label: "2.5L Diesel (4D56)", code: "4D56", start: 1986, end: 2006 },
+        { label: "2.8L Diesel (4M40)", code: "4M40", start: 1993, end: 2006 },
+        { label: "3.0L V6 Gasoline (6G72)", code: "6G72", start: 1991, end: 2021 },
+        { label: "3.2L Diesel (4M41)", code: "4M41", start: 2000, end: 2021 },
+        { label: "3.5L V6 Gasoline (6G74)", code: "6G74", start: 1994, end: 2006 },
+        { label: "3.8L V6 Gasoline (6G75)", code: "6G75", start: 2003, end: 2021 },
+      ],
+      "Pajero Sport": [
+        { label: "2.5L Diesel (4D56)", code: "4D56", start: 2008, end: 2015 },
+        { label: "2.4L Diesel (4N15)", code: "4N15", start: 2015 },
+        { label: "3.0L V6 Gasoline (6B31)", code: "6B31", start: 2008, end: 2016 },
+      ],
+      Adventure: [
+        { label: "2.5L Diesel (4D56)", code: "4D56", start: 1997, end: 2017 },
+        { label: "1.8L Gasoline (4G93)", code: "4G93", start: 1997, end: 2008 },
+      ],
+      Galant: [
+        { label: "2.0L Gasoline (4G63)", code: "4G63", start: 1996, end: 2012 },
+        { label: "2.4L Gasoline (4G69)", code: "4G69", start: 2003, end: 2012 },
+        { label: "3.8L V6 (6G75)", code: "6G75", start: 2003, end: 2012 },
+      ],
       Montero: [
         { label: "2.5L Diesel (4D56)", code: "4D56", start: 2008, end: 2016 },
         { label: "2.4L Diesel (4N15)", code: "4N15", start: 2016 },
