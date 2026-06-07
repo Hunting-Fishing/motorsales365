@@ -1900,14 +1900,15 @@ export function getEnginesFor(
   const ys = yearStart ?? undefined;
   const ye = yearEnd ?? ys;
   if (!ys) return list;
-  const filtered = list.filter((e) => {
+  // Strict year-range validation: only return engines whose production range
+  // overlaps the selected year(s). If none match, return [] — the UI surfaces
+  // "no engines for this year" rather than showing options that did not exist
+  // for that model-year.
+  return list.filter((e) => {
     const es = e.start ?? 1900;
     const ee = e.end ?? 9999;
     const a = ys;
     const b = ye ?? ys;
     return es <= b && ee >= a;
   });
-  // If the year is out of range for every curated entry, fall back to the
-  // full curated list rather than going empty — better UX for older cars.
-  return filtered.length > 0 ? filtered : list;
 }
