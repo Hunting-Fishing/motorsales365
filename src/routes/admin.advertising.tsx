@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Megaphone, Mail, Building2, Phone, Calendar, Banknote, ExternalLink } from "lucide-react";
+import { Megaphone, Mail, Building2, Phone, Calendar, Banknote, ExternalLink, Layers, Sparkles } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { formatDate } from "@/lib/format";
 import { InquiryTimeline } from "@/components/sponsorship/inquiry-timeline";
+import { SECTIONS, FORMATS, sectionLabel, formatLabel } from "@/components/advertise/placements";
 
 export const Route = createFileRoute("/admin/advertising")({
   component: AdminAdvertising,
