@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import {
   CAR_MAKES,
   MOTORCYCLE_MAKES,
+  VEHICLE_CATEGORY_LABELS,
   getMakesForYear,
   getModelsForYear,
   getYearOptions,
