@@ -307,6 +307,7 @@ function MapPage() {
             return (
               <Card
                 key={b.id}
+                data-slug={b.slug}
                 role="button"
                 tabIndex={0}
                 onClick={() => {
