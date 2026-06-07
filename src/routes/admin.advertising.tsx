@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatDate } from "@/lib/format";
+import { InquiryTimeline } from "@/components/sponsorship/inquiry-timeline";
 
 export const Route = createFileRoute("/admin/advertising")({
   component: AdminAdvertising,
@@ -89,11 +90,29 @@ function AdminAdvertising() {
 
   const active = useMemo(() => inquiries.find((i) => i.id === activeId), [inquiries, activeId]);
 
-  const setStatus = async (id: string, status: Status) => {
-    const { error } = await supabase.from("ad_inquiries").update({ status }).eq("id", id);
+  const setStatus = async (id: string, status: Status, extra: Record<string, any> = {}) => {
+    const { error } = await supabase
+      .from("ad_inquiries")
+      .update({ status, ...extra })
+      .eq("id", id);
     if (error) return toast.error(error.message);
     toast.success(`Marked ${status}`);
+    if (activeId === id) await loadThread(id);
     load();
+  };
+
+  const rejectActive = async (id: string) => {
+    const reason = window.prompt(
+      "Reason for rejection (will be emailed to the sponsor and recorded in the timeline):",
+      "",
+    );
+    if (reason === null) return;
+    const trimmed = reason.trim();
+    if (trimmed.length < 5) {
+      toast.error("Please provide a brief reason (5+ characters).");
+      return;
+    }
+    await setStatus(id, "lost", { last_rejection_reason: trimmed });
   };
 
   const saveNotes = async () => {
@@ -318,11 +337,7 @@ function AdminAdvertising() {
                       <Button
                         size="sm"
                         variant="destructive"
-                        onClick={() => {
-                          if (confirm("Reject this sponsorship submission? The sponsor will be emailed.")) {
-                            setStatus(active.id, "lost");
-                          }
-                        }}
+                        onClick={() => rejectActive(active.id)}
                       >
                         Reject
                       </Button>
@@ -454,30 +469,16 @@ function AdminAdvertising() {
               </div>
 
               <div>
-                <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Activity log
+                <h3 className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Submission timeline
                 </h3>
-                {audit.length === 0 ? (
-                  <p className="text-xs text-muted-foreground">No activity yet.</p>
-                ) : (
-                  <ul className="space-y-1 rounded-lg border border-border bg-background p-3 text-xs">
-                    {audit.map((a) => (
-                      <li key={a.id} className="flex justify-between gap-2">
-                        <span>
-                          <span className="font-semibold">{a.action.replace(/_/g, " ")}</span>
-                          {a.from_value && (
-                            <>
-                              {" "}
-                              · <span className="text-muted-foreground">{a.from_value}</span> →{" "}
-                            </>
-                          )}
-                          {a.to_value && <span className="text-primary">{a.to_value}</span>}
-                        </span>
-                        <span className="text-muted-foreground">{formatDate(a.created_at)}</span>
-                      </li>
-                    ))}
-                  </ul>
+                {active.last_rejection_reason && active.status === "lost" && (
+                  <div className="mb-3 rounded-md border border-destructive/30 bg-destructive/10 p-2 text-xs">
+                    <span className="font-semibold">Latest rejection reason: </span>
+                    {active.last_rejection_reason}
+                  </div>
                 )}
+                <InquiryTimeline entries={audit as any} showInternal />
               </div>
             </div>
           )}
