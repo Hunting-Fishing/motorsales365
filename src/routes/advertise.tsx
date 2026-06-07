@@ -40,6 +40,7 @@ const PLACEMENTS = [
   { value: "listing_sidebar", label: "Listing sidebar" },
   { value: "newsletter", label: "Newsletter sponsorship" },
   { value: "sponsored_post", label: "Sponsored post / featured business" },
+  { value: "academy_sponsor", label: "Academy / School / Training Center spot (/learn)" },
   { value: "other", label: "Something else" },
 ] as const;
 
