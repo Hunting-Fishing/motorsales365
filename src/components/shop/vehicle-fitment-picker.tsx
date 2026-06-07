@@ -170,7 +170,9 @@ export function VehicleFitmentPicker({
         </Select>
       </div>
 
-      {/* Engine — only renders meaningfully once model is picked. Optional. */}
+      {/* Engine — only renders meaningfully once make+model are picked. Optional.
+          When a year is also selected, the engine list is strictly filtered to
+          engines that were actually offered for that model-year. */}
       <div className="space-y-1">
         <Label className="text-xs">Engine (optional)</Label>
         {engineMode === "custom" || (model && engines.length === 0) ? (
@@ -180,6 +182,7 @@ export function VehicleFitmentPicker({
                 value={engine}
                 placeholder="e.g. 2.4L Diesel (2GD-FTV)"
                 onChange={(e) => setEngine(e.target.value)}
+                disabled={!model}
               />
               {engines.length > 0 && (
                 <Button
@@ -197,7 +200,9 @@ export function VehicleFitmentPicker({
             </div>
             {model && engines.length === 0 && (
               <p className="text-[10px] text-muted-foreground">
-                No verified engine list for this model yet — type the exact engine if you know it, or leave blank.
+                {yearNum
+                  ? `No verified engines listed for the ${yearNum} ${make} ${model}. Type the exact engine if known, or clear the year to see all options.`
+                  : "No verified engine list for this model yet — type the exact engine if you know it, or leave blank."}
               </p>
             )}
           </div>
@@ -230,16 +235,17 @@ export function VehicleFitmentPicker({
         )}
       </div>
 
-      {/* Transmission — optional, narrows trans-specific parts (clutch, ATF, mounts). */}
+      {/* Transmission — optional, narrows trans-specific parts. Gated behind
+          make+model so users can't pick a transmission for an unselected vehicle. */}
       <div className="space-y-1">
         <Label className="text-xs">Transmission (optional)</Label>
         <Select
           value={transmission || "__any__"}
           onValueChange={(v) => setTransmission(v === "__any__" ? "" : v)}
-          disabled={transmissions.length === 0}
+          disabled={!model || transmissions.length === 0}
         >
           <SelectTrigger>
-            <SelectValue placeholder="Any transmission" />
+            <SelectValue placeholder={model ? "Any transmission" : "Pick model first"} />
           </SelectTrigger>
           <SelectContent className="max-h-72">
             <SelectItem value="__any__">Any transmission</SelectItem>
