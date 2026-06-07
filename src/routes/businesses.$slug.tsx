@@ -31,6 +31,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
 import { GoogleBusinessMap } from "@/components/businesses/google-business-map";
+import { SuggestLocationDialog } from "@/components/businesses/suggest-location-dialog";
 import { ShareQr } from "@/components/share-qr";
 import { InquiryForm } from "@/components/business-page/inquiry-form";
 import { getBusinessPage } from "@/lib/business-pages.functions";
