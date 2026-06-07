@@ -91,8 +91,11 @@ export function VehicleFitmentPicker({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="car">Car / Truck</SelectItem>
-              <SelectItem value="motorcycle">Motorcycle</SelectItem>
+              {(Object.keys(VEHICLE_CATEGORY_LABELS) as VehicleCategory[]).map((c) => (
+                <SelectItem key={c} value={c}>
+                  {VEHICLE_CATEGORY_LABELS[c]}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
