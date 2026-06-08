@@ -44,6 +44,7 @@ import {
   type VehicleQuality,
   type VehicleQualityIssue,
 } from "@/components/vehicle-quality-fields";
+import { VinScanDialog } from "@/components/vin-scan-dialog";
 import { z } from "zod";
 
 const ListingTextSchema = z.object({
@@ -1296,6 +1297,18 @@ function SellPage() {
                 value={vehicleQuality}
                 onChange={setVehicleQuality}
                 issues={vehicleQualityIssues}
+                vinScanSlot={
+                  <VinScanDialog
+                    onResult={(r) => {
+                      setVehicleQuality((prev) => ({ ...prev, vin_chassis: r.vin }));
+                      if (r.year) setYear(r.year);
+                      if (r.make) setMake(r.make);
+                      if (r.model) setModel(r.model);
+                      if (r.fuel) setFuel(r.fuel);
+                      if (r.transmission) setTransmission(r.transmission);
+                    }}
+                  />
+                }
               />
             )}
           </section>

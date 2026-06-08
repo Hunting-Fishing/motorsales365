@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 import { z } from "zod";
+import { vinChecksumValid } from "@/components/vin-scan-dialog";
 
 export type VehicleQuality = {
   variant?: string;
@@ -122,6 +123,10 @@ export const VehicleQualitySchema = z
       .refine(
         (v) => !v || VIN_REGEX.test(v),
         "VIN/chassis must be 11–17 letters/numbers (no I, O, or Q)",
+      )
+      .refine(
+        (v) => !v || v.length !== 17 || vinChecksumValid(v),
+        "VIN check-digit failed — please re-scan or re-type",
       ),
     financing_available: z.boolean().optional(),
     trade_accepted: z.boolean().optional(),
@@ -258,9 +263,11 @@ type Props = {
   onChange: (next: VehicleQuality) => void;
   /** Show per-field errors after a failed submit. Pass the issues array from validateVehicleQuality. */
   issues?: VehicleQualityIssue[];
+  /** Optional scanner slot rendered next to the VIN field (e.g. <VinScanDialog />). */
+  vinScanSlot?: React.ReactNode;
 };
 
-export function VehicleQualityFields({ category, value, onChange, issues = [] }: Props) {
+export function VehicleQualityFields({ category, value, onChange, issues = [], vinScanSlot }: Props) {
   const set = <K extends keyof VehicleQuality>(k: K, v: VehicleQuality[K]) =>
     onChange({ ...value, [k]: v });
 
@@ -457,14 +464,17 @@ export function VehicleQualityFields({ category, value, onChange, issues = [] }:
             error={errFor("vin_chassis")}
             hint="11–17 letters and numbers, no I/O/Q. Shown only when a buyer requests verification."
           >
-            <Input
-              placeholder="Optional"
-              value={value.vin_chassis ?? ""}
-              maxLength={17}
-              onChange={(e) =>
-                set("vin_chassis", e.target.value.toUpperCase().replace(/\s+/g, ""))
-              }
-            />
+            <div className="flex gap-2">
+              <Input
+                placeholder="Optional"
+                value={value.vin_chassis ?? ""}
+                maxLength={17}
+                onChange={(e) =>
+                  set("vin_chassis", e.target.value.toUpperCase().replace(/\s+/g, ""))
+                }
+              />
+              {vinScanSlot}
+            </div>
           </FieldShell>
         </div>
       </div>
