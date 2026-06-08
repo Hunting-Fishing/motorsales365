@@ -264,6 +264,15 @@ function SellerProfilePage() {
               </div>
             )}
           </TabsContent>
+          <TabsContent value="reviews" className="mt-6">
+            <SellerReviews
+              sellerId={id}
+              currentUserId={user?.id ?? null}
+              ratingAvg={profile.seller_rating_avg}
+              ratingCount={profile.seller_rating_count}
+              onChange={() => setReloadKey((k) => k + 1)}
+            />
+          </TabsContent>
         </Tabs>
       </div>
     </SiteLayout>
