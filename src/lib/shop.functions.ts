@@ -760,13 +760,44 @@ export const toggleShopFavorite = createServerFn({ method: "POST" })
 
 // ============ URL SCRAPE (admin) ============
 
-function pickPricePhp(price: unknown, currency: unknown): number | null {
+type FxMap = Record<string, number>; // upper-cased currency → rate_to_php
+
+async function loadFxMap(): Promise<FxMap> {
+  const { data } = await supabaseAdmin
+    .from("currencies")
+    .select("code, rate_to_php")
+    .eq("active", true);
+  const map: FxMap = {};
+  for (const row of (data ?? []) as any[]) {
+    if (row?.code && row?.rate_to_php) {
+      map[String(row.code).toUpperCase()] = Number(row.rate_to_php);
+    }
+  }
+  if (!map.PHP) map.PHP = 1;
+  return map;
+}
+
+/**
+ * Convert a scraped price into PHP. If currency is unknown or zero/invalid,
+ * returns null and pushes a warning so the admin UI can prompt for manual entry.
+ */
+function pickPricePhp(
+  price: unknown,
+  currency: unknown,
+  fx?: FxMap,
+  warnings?: string[],
+): number | null {
   const n = typeof price === "number" ? price : Number(String(price ?? "").replace(/[^0-9.]/g, ""));
   if (!Number.isFinite(n) || n <= 0) return null;
   const cur = String(currency ?? "").toUpperCase();
-  // We only store PHP. If the marketplace returned PHP or no currency, keep the number.
   if (!cur || cur === "PHP" || cur === "₱") return Math.round(n * 100) / 100;
-  return null; // unknown FX — let admin fill manually
+  const rate = fx?.[cur];
+  if (rate && rate > 0) {
+    warnings?.push(`Converted ${cur} ${n} → PHP at rate ${rate} (today's FX).`);
+    return Math.round(n * rate * 100) / 100;
+  }
+  warnings?.push(`Source price was ${cur} ${n}; unknown FX, please enter PHP price manually.`);
+  return null;
 }
 
 function fuzzyCategoryMatch(
