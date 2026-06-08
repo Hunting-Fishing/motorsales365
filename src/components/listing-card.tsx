@@ -34,6 +34,8 @@ export interface ListingCardData {
   category_slug: string;
   seller_verified?: boolean;
   seller_dealer_plan?: string | null;
+  seller_dealer_period_end?: string | null;
+  seller_dealer_cancel_at_period_end?: boolean | null;
   status?: string;
   attributes?: Record<string, any> | null;
   view_count?: number;
@@ -117,7 +119,13 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
             </Badge>
             {listing.seller_verified && <VerifiedBadge size="sm" showLabel />}
             {listing.seller_type === "business" && listing.seller_dealer_plan && (
-              <DealerSubscriptionBadge planName={listing.seller_dealer_plan} size="sm" />
+              <DealerSubscriptionBadge
+                planName={listing.seller_dealer_plan}
+                currentPeriodEnd={listing.seller_dealer_period_end ?? null}
+                cancelAtPeriodEnd={Boolean(listing.seller_dealer_cancel_at_period_end)}
+                size="sm"
+                showRenewal
+              />
             )}
             {listing.status === "pending_sale" && (
               <Badge className="bg-warning text-warning-foreground">Pending Sale</Badge>
