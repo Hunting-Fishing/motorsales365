@@ -39,8 +39,10 @@ import {
   VehicleQualityFields,
   vehicleQualityToAttributes,
   hydrateVehicleQuality,
+  validateVehicleQuality,
   VEHICLE_QUALITY_KEYS,
   type VehicleQuality,
+  type VehicleQualityIssue,
 } from "@/components/vehicle-quality-fields";
 
 const CATEGORIES = [
