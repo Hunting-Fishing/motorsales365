@@ -591,6 +591,16 @@ function SellPage() {
       return;
     }
 
+    if (category === "car" || category === "motorcycle") {
+      const vqCheck = validateVehicleQuality(vehicleQuality);
+      if (!vqCheck.ok) {
+        setVehicleQualityIssues(vqCheck.issues);
+        toast.error(vqCheck.issues[0]?.message ?? "Please review the vehicle details.");
+        return;
+      }
+      setVehicleQualityIssues([]);
+    }
+
     setSubmitting(true);
     try {
       let lid = listingId;
