@@ -44,6 +44,7 @@ import {
   type VehicleQuality,
   type VehicleQualityIssue,
 } from "@/components/vehicle-quality-fields";
+import { VinScanDialog } from "@/components/vin-scan-dialog";
 import { z } from "zod";
 
 const ListingTextSchema = z.object({
