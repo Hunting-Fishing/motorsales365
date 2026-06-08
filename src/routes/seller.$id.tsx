@@ -12,7 +12,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatDate } from "@/lib/format";
 import { SellerReputationBadges } from "@/components/seller-reputation-badges";
 import { SellerReviews } from "@/components/seller-reviews";
-import { useAuth } from "@/contexts/auth-context";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/seller/$id")({
   loader: async ({ params }) => {
