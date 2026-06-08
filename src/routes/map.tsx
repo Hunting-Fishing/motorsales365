@@ -278,7 +278,7 @@ function MapPage() {
   }));
 
   const countLabel = loading
-    ? "Loading…"
+    ? "Loading nearby businesses…"
     : `${sorted.length} result${sorted.length === 1 ? "" : "s"}${center && radiusKm ? ` within ${radiusKm} km` : ""}`;
 
   const resultsList = (

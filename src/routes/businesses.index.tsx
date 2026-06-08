@@ -350,7 +350,7 @@ function BusinessesIndex() {
             <div className="flex items-center justify-between gap-3">
               <div className="text-sm text-muted-foreground">
                 {loading
-                  ? "Loading…"
+                  ? "Finding businesses near you…"
                   : `${sortedItems.length} business${sortedItems.length === 1 ? "" : "es"} found`}
               </div>
               {typeSlug === "repair_shop" && !loading && (

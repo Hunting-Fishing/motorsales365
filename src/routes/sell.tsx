@@ -724,9 +724,38 @@ function SellPage() {
   if (authLoading)
     return (
       <SiteLayout>
-        <div className="p-12 text-center">Loading…</div>
+        <div className="container mx-auto max-w-3xl px-4 py-6 sm:py-10">
+          <h1 className="font-display text-2xl font-bold sm:text-3xl">Post a listing</h1>
+          <p className="text-sm text-muted-foreground sm:text-base">
+            Reach buyers across the Philippines.
+          </p>
+
+          <div className="mt-6 space-y-4 rounded-xl border border-border bg-card p-5 sm:p-6">
+            <h2 className="font-display text-lg font-semibold">How selling works</h2>
+            <ol className="ml-5 list-decimal space-y-1 text-sm text-muted-foreground">
+              <li>Create a free account (or sign in).</li>
+              <li>Add up to 12 photos and 1 walkaround video (free plan).</li>
+              <li>Buyers message you directly — no commissions.</li>
+              <li>Close the sale safely with our OR/CR checklist.</li>
+            </ol>
+            <div className="flex flex-wrap gap-2 pt-2 text-sm">
+              <Link to="/login" className="rounded-md bg-primary px-3 py-2 text-primary-foreground">
+                Sign in to post
+              </Link>
+              <Link to="/start-selling" className="rounded-md border border-border px-3 py-2">
+                Learn how it works
+              </Link>
+              <Link to="/pricing" className="rounded-md border border-border px-3 py-2">
+                See plans & pricing
+              </Link>
+            </div>
+          </div>
+
+          <p className="mt-4 text-xs text-muted-foreground">Checking your account…</p>
+        </div>
       </SiteLayout>
     );
+
 
   return (
     <SiteLayout>

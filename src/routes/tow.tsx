@@ -178,9 +178,55 @@ function TowPage() {
   if (loading)
     return (
       <SiteLayout>
-        <div className="p-12 text-center">Loading…</div>
+        <div className="border-b border-border bg-secondary/40">
+          <div className="container mx-auto px-4 py-10">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                <Truck className="h-6 w-6" />
+              </div>
+              <div>
+                <h1 className="font-display text-3xl font-bold md:text-4xl">Request a tow</h1>
+                <p className="text-muted-foreground">
+                  Arrange towing or delivery for a vehicle anywhere in the Philippines.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="container mx-auto grid gap-8 px-4 py-10 lg:grid-cols-[1fr_360px]">
+          <div className="space-y-6">
+            <section className="space-y-3 rounded-xl border border-border bg-card p-6">
+              <h2 className="font-display text-lg font-semibold">How it works</h2>
+              <ol className="ml-5 list-decimal space-y-1 text-sm text-muted-foreground">
+                <li>Describe your vehicle and pickup / drop-off location.</li>
+                <li>We match you with verified PH towing & roadside providers.</li>
+                <li>Compare bids, pick a provider, and pay on completion.</li>
+              </ol>
+            </section>
+            <section className="rounded-xl border border-border bg-card p-6 text-sm text-muted-foreground">
+              Sign in to submit a tow request and track responses.{" "}
+              <Link to="/login" className="text-primary underline">
+                Sign in
+              </Link>{" "}
+              or{" "}
+              <Link to="/signup" className="text-primary underline">
+                create an account
+              </Link>
+              .
+            </section>
+          </div>
+          <aside className="space-y-3 rounded-xl border border-border bg-card p-6 text-sm">
+            <h2 className="font-display text-base font-semibold">Why 365 MotorSales</h2>
+            <ul className="space-y-2 text-muted-foreground">
+              <li className="flex gap-2"><CheckCircle2 className="h-4 w-4 text-primary" /> Verified PH providers</li>
+              <li className="flex gap-2"><Clock className="h-4 w-4 text-primary" /> 24/7 roadside coverage</li>
+              <li className="flex gap-2"><Truck className="h-4 w-4 text-primary" /> Flatbed, wheel-lift, heavy-duty</li>
+            </ul>
+          </aside>
+        </div>
       </SiteLayout>
     );
+
 
   return (
     <SiteLayout>
