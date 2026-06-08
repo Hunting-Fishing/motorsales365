@@ -24,6 +24,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { getActiveDealerStatus } from "@/lib/seller-status.functions";
 import { SiteLayout } from "@/components/site-layout";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
 import { LiveActivityFeed } from "@/components/live-activity-feed";
@@ -91,7 +92,7 @@ function Index() {
         .order("published_at", { ascending: false, nullsFirst: false })
         .limit(12);
 
-      const map = (rows: any[] | null): ListingCardData[] =>
+      const map = (rows: any[] | null, dealers: Record<string, { planName: string }>): ListingCardData[] =>
         (rows ?? []).map((r) => {
           const photos = (r.listing_media ?? []).filter((m: any) => m.type === "photo");
           const videos = (r.listing_media ?? []).filter((m: any) => m.type === "video");
@@ -109,12 +110,25 @@ function Index() {
             photo_count: photos.length,
             has_video: videos.length > 0,
             seller_verified: r.profiles?.verification_status === "verified",
+            seller_dealer_plan: dealers[r.user_id]?.planName ?? null,
             status: r.status,
             attributes: r.attributes,
           };
         });
-      setFeatured(map(boostedRows));
-      setRecent(map(recentRows));
+      const userIds = Array.from(
+        new Set([...(boostedRows ?? []), ...(recentRows ?? [])].map((r: any) => r.user_id).filter(Boolean)),
+      );
+      let dealers: Record<string, { planName: string }> = {};
+      if (userIds.length > 0) {
+        try {
+          const res = await getActiveDealerStatus({ data: { userIds } });
+          dealers = res.dealers;
+        } catch {
+          /* ignore */
+        }
+      }
+      setFeatured(map(boostedRows, dealers));
+      setRecent(map(recentRows, dealers));
     };
     load();
   }, []);

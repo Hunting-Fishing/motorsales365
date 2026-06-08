@@ -32,6 +32,8 @@ import { AdCarousel } from "@/components/ads/ad-carousel";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { VerifiedBadge } from "@/components/verified-badge";
+import { DealerSubscriptionBadge } from "@/components/dealer-subscription-badge";
+import { getActiveDealerStatus } from "@/lib/seller-status.functions";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
@@ -176,6 +178,7 @@ function ListingDetailPage() {
   const [listing, setListing] = useState<ListingDetail | null>(null);
   const [media, setMedia] = useState<{ id: string; url: string; type: "photo" | "video" }[]>([]);
   const [seller, setSeller] = useState<any>(null);
+  const [sellerDealerPlan, setSellerDealerPlan] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeIdx, setActiveIdx] = useState(0);
   const [favorited, setFavorited] = useState(false);
@@ -212,6 +215,13 @@ function ListingDetailPage() {
         .eq("id", l.user_id)
         .maybeSingle();
       setSeller(p);
+
+      try {
+        const { dealers } = await getActiveDealerStatus({ data: { userIds: [l.user_id] } });
+        setSellerDealerPlan(dealers[l.user_id]?.planName ?? null);
+      } catch {
+        setSellerDealerPlan(null);
+      }
 
       // Increment view count via RPC (counts every page load, anon allowed)
       supabase.rpc("increment_listing_view", {
@@ -436,6 +446,12 @@ function ListingDetailPage() {
                 <Badge variant={listing.seller_type === "business" ? "default" : "secondary"}>
                   {listing.seller_type === "business" ? "Business seller" : "Private seller"}
                 </Badge>
+                {listing.seller_type === "business" && sellerDealerPlan && (
+                  <DealerSubscriptionBadge planName={sellerDealerPlan} size="md" />
+                )}
+                {seller?.verification_status === "verified" && (
+                  <VerifiedBadge size="md" showLabel />
+                )}
                 {boosted && (
                   <Badge className="bg-accent text-accent-foreground">
                     <Star className="mr-1 h-3 w-3" />
@@ -622,8 +638,11 @@ function ListingDetailPage() {
                     <VerifiedBadge size="sm" showLabel />
                   )}
                 </div>
-                <div className="text-xs text-muted-foreground">
-                  {listing.seller_type === "business" ? "Business" : "Private"} seller
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span>{listing.seller_type === "business" ? "Business" : "Private"} seller</span>
+                  {listing.seller_type === "business" && sellerDealerPlan && (
+                    <DealerSubscriptionBadge planName={sellerDealerPlan} size="sm" />
+                  )}
                 </div>
               </div>
             </div>

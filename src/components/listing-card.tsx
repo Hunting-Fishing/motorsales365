@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { VerifiedBadge } from "@/components/verified-badge";
+import { DealerSubscriptionBadge } from "@/components/dealer-subscription-badge";
 import { ListingPrice } from "@/components/listing-price";
 import placeholderCar from "@/assets/placeholder-car.webp";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
@@ -32,6 +33,7 @@ export interface ListingCardData {
   has_video?: boolean;
   category_slug: string;
   seller_verified?: boolean;
+  seller_dealer_plan?: string | null;
   status?: string;
   attributes?: Record<string, any> | null;
   view_count?: number;
@@ -114,6 +116,9 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
               {listing.seller_type === "business" ? "Business" : "Private"}
             </Badge>
             {listing.seller_verified && <VerifiedBadge size="sm" showLabel />}
+            {listing.seller_type === "business" && listing.seller_dealer_plan && (
+              <DealerSubscriptionBadge planName={listing.seller_dealer_plan} size="sm" />
+            )}
             {listing.status === "pending_sale" && (
               <Badge className="bg-warning text-warning-foreground">Pending Sale</Badge>
             )}

@@ -5,6 +5,7 @@ import { Search, BookmarkPlus, Rocket } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { getActiveDealerStatus } from "@/lib/seller-status.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
@@ -165,6 +166,18 @@ function BrowsePage() {
         }
       }
 
+      const userIds = Array.from(
+        new Set((data ?? []).map((r: any) => r.user_id).filter(Boolean)),
+      );
+      let dealers: Record<string, { planName: string }> = {};
+      if (userIds.length > 0) {
+        try {
+          const res = await getActiveDealerStatus({ data: { userIds } });
+          dealers = res.dealers;
+        } catch {
+          /* ignore */
+        }
+      }
       const mapped = (data ?? []).map((r: any) => {
         const photos = (r.listing_media ?? []).filter((m: any) => m.type === "photo");
         const videos = (r.listing_media ?? []).filter((m: any) => m.type === "video");
@@ -182,6 +195,7 @@ function BrowsePage() {
           photo_count: photos.length,
           has_video: videos.length > 0,
           seller_verified: r.profiles?.verification_status === "verified",
+          seller_dealer_plan: dealers[r.user_id]?.planName ?? null,
           status: r.status,
           attributes: r.attributes,
         } as ListingCardData;
