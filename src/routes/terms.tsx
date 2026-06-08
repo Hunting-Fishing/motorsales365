@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 6, 2026 (rev. seeded public business listings & ownership claim flow)";
+  const lastUpdated = "June 8, 2026 (rev. added Renew &amp; Boost biweekly listing promotion)";
 
   return (
     <SiteLayout>
@@ -282,9 +282,13 @@ function TermsPage() {
           <Link className="text-primary underline" to="/pricing">
             Pricing page
           </Link>{" "}
-          and is quoted in ₱ inclusive of VAT where applicable. Subscriptions and sponsorship
-          terms renew automatically until you cancel from your dashboard; cancellation stops
-          future renewals but does not entitle you to a refund of the current billing period
+          and is quoted in ₱ inclusive of VAT where applicable. The{" "}
+          <strong>Renew &amp; Boost (2 weeks)</strong> option is a one-time ₱150 charge that pins
+          your vehicle listing to the top of search for 14 days and simultaneously renews the
+          listing's expiry by the standard listing-active period; it does not auto-renew and you
+          must repeat the purchase every 2 weeks if you want to stay on top. Subscriptions and
+          sponsorship terms renew automatically until you cancel from your dashboard; cancellation
+          stops future renewals but does not entitle you to a refund of the current billing period
           except as provided in our{" "}
           <Link className="text-primary underline" to="/refund-policy">
             Refund Policy

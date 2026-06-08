@@ -277,10 +277,21 @@ async function activateBoostFromSession(env: StripeEnv, session: Stripe.Checkout
     payment_id: (payRow as any)?.id ?? null,
   } as any);
 
-  // Mirror onto legacy boost_until so existing UI/search still sees the boost.
+  // Mirror onto legacy boost_until so existing UI/search still sees the boost,
+  // and renew the listing's expires_at so a boost purchase also extends the ad.
+  const { data: expirySetting } = await supabaseAdmin
+    .from("pricing_settings")
+    .select("value")
+    .eq("key", "listing_expiry_days")
+    .maybeSingle();
+  const expiryDays = Number((expirySetting as any)?.value ?? 60) || 60;
+  const newExpiry = new Date(now.getTime() + expiryDays * 24 * 60 * 60 * 1000);
   await supabaseAdmin
     .from("listings")
-    .update({ boost_until: ends.toISOString() })
+    .update({
+      boost_until: ends.toISOString(),
+      expires_at: newExpiry.toISOString(),
+    })
     .eq("id", listingId);
 }
 
