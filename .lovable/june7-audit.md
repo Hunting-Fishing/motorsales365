@@ -17,7 +17,7 @@ Purpose: working checklist of issues to correct before launch. Check items off a
 - [x] 2. Resolve pricing / photo-limit inconsistency
 - [x] 3. Add real or seeded listings
 - [x] 4. Add visible seller onboarding page
-- [ ] 5. Add real business directory listings
+- [x] 5. Add real business directory listings
 - [ ] 6. Fix "Loading…" pages for SEO and trust (SSR fallback content)
 - [ ] 7. Clarify export page liability conflict
 - [ ] 8. Add trust / verification explainer page
@@ -167,3 +167,4 @@ Examples: "Looking for Toyota Vios under ₱300k in Ilocos" · "Need multicab in
 - 2026-06-08 — Item #3 done. Seeded **12 sample listings** (5 cars, 4 motorcycles, 1 equipment, 1 drone, 1 boat) across NCR / Region I / VII / XI, each with one photo. All owned by "365 MotorSales" profile (`a3999f39…`), titles prefixed `[Sample]`, `source='seed'`, `attributes.seed=true`. Cleanup: `DELETE FROM listings WHERE source='seed'` (cascades to media).
 - 2026-06-08 — Item #4 done. New public route `/start-selling` (no auth) covering: hero + CTA, 4-step "How it works", what-you-need (OR/CR checklist + photo tips), plan comparison snapshot linking to `/pricing`, tips to sell faster, scam-prevention card, 365 Verified explainer linking to `/dashboard/verification`, dealer section, final CTA. Footer "Sell" column now leads with **How selling works → Post a listing**.
 - 2026-06-08 — Tightened sell-flow media validation. Refactored single `video` state to `videos: File[]` with per-item `videoUploads[]`, retry, and progress. Caps are now Free = 12 photos / 1 video, Paid (Standard & Upgraded) = 20 photos / **3 videos** (Standard was previously 2). `handleVideo` slices to remaining cap with overflow toast; submit blocks if `photos.length > maxPhotos` or `videos.length > maxVideos`. Plan radio copy and Standard/Upgraded tierCaps updated to reflect 3 videos on paid tiers.
+- 2026-06-08 — Item #5 done. Seeded 14 sample business directory profiles across PH categories (repair, towing, parts, tire, carwash, motorcycle, used dealer, body/paint, battery, audio/tint, salvage, driving school, insurance, financing) spanning NCR, Region I, VI, VII, XI. All owned by 365 MotorSales platform account, `status='active'`, `source='seed'`, `source_external_id='seed-biz-NN'`, names prefixed `[Sample]`. Cleanup: `DELETE FROM businesses WHERE source='seed'`.
