@@ -131,7 +131,7 @@ function SellerProfilePage() {
       setLoading(false);
     };
     load();
-  }, [id]);
+  }, [id, reloadKey]);
 
   if (loading)
     return (
