@@ -12,21 +12,28 @@ import { Badge } from "@/components/ui/badge";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { listExportListings, submitExportInquiry } from "@/lib/export-brokerage.functions";
 import { toast } from "sonner";
-import { Ship, Globe, ShieldCheck, FileCheck2 } from "lucide-react";
+import { Ship, Globe, ShieldCheck, FileCheck2, Info } from "lucide-react";
 
 export const Route = createFileRoute("/export")({
   component: ExportPage,
   head: () => ({
     meta: [
-      { title: "365 Export — International vehicle brokerage from the Philippines" },
+      { title: "365 Export Connect — Find PH vehicles & export partners" },
       {
         name: "description",
         content:
-          "Buy verified vehicles from the Philippines, shipped to your port. Brokerage, inspection, and documentation handled end-to-end.",
+          "Browse Philippine vehicles flagged for export and connect with independent brokers, inspection providers, and shipping partners. 365 MotorSales is the introduction venue, not the broker or shipper.",
+      },
+      { property: "og:title", content: "365 Export Connect — Philippines vehicle export network" },
+      {
+        property: "og:description",
+        content:
+          "Connect with independent export brokers, inspectors, and shipping partners for Philippine vehicles. 365 is the listing venue, not the broker or shipper.",
       },
     ],
   }),
 });
+
 
 function ExportPage() {
   const [search, setSearch] = useState("");
