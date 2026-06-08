@@ -1466,12 +1466,11 @@ function SellPage() {
                 </>
               );
             })()}
-            {(photos.length > maxPhotos || (video && maxVideos < 1)) && (
+            {(photos.length > maxPhotos || videos.length > maxVideos) && (
               <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-                Your media exceeds the {plan === "standard" ? "Standard" : "current"} plan limit (
-                {maxPhotos} photos
-                {maxVideos > 0 ? `, ${maxVideos} video${maxVideos > 1 ? "s" : ""}` : ", no video"}).
-                Remove items or switch to Upgraded to submit.
+                Your media exceeds the {plan === "free" ? "Free" : "current"} plan limit (
+                {maxPhotos} photos, {maxVideos} video{maxVideos === 1 ? "" : "s"}).
+                Remove items{plan === "free" ? " or switch to a paid plan" : ""} to submit.
               </div>
             )}
             <div>
