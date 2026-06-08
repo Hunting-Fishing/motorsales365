@@ -403,10 +403,10 @@ function SellPage() {
     },
   });
 
-  // Strict per-plan caps: Free = 12 photos / 1 video, Standard = 20 / 2, Upgraded = 20 / 3.
+  // Strict per-plan caps: Free = 12 photos / 1 video, paid (Standard & Upgraded) = 20 photos / 3 videos.
   // Subscription planLimits cannot raise these listing-tier caps.
-  const maxPhotos = plan === "upgraded" ? 20 : plan === "standard" ? 20 : 12;
-  const maxVideos = plan === "upgraded" ? 3 : plan === "standard" ? 2 : 1;
+  const maxPhotos = plan === "free" ? 12 : 20;
+  const maxVideos = plan === "free" ? 1 : 3;
   // Surfaced for messaging only — actual enforcement uses maxPhotos above.
   void planLimits;
   const totalFee =
