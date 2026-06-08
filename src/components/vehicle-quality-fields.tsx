@@ -464,14 +464,17 @@ export function VehicleQualityFields({ category, value, onChange, issues = [], v
             error={errFor("vin_chassis")}
             hint="11–17 letters and numbers, no I/O/Q. Shown only when a buyer requests verification."
           >
-            <Input
-              placeholder="Optional"
-              value={value.vin_chassis ?? ""}
-              maxLength={17}
-              onChange={(e) =>
-                set("vin_chassis", e.target.value.toUpperCase().replace(/\s+/g, ""))
-              }
-            />
+            <div className="flex gap-2">
+              <Input
+                placeholder="Optional"
+                value={value.vin_chassis ?? ""}
+                maxLength={17}
+                onChange={(e) =>
+                  set("vin_chassis", e.target.value.toUpperCase().replace(/\s+/g, ""))
+                }
+              />
+              {vinScanSlot}
+            </div>
           </FieldShell>
         </div>
       </div>
