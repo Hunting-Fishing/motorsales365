@@ -22,7 +22,7 @@ export const Route = createFileRoute("/privacy")({
 });
 
 function PrivacyPage() {
-  const lastUpdated = "June 6, 2026 (rev. seeded public business listings & claim flow)";
+  const lastUpdated = "June 8, 2026 (rev. contact email domain)";
 
   return (
     <SiteLayout>
@@ -53,8 +53,8 @@ function PrivacyPage() {
         <p className="mt-2 text-muted-foreground">
           365 MotorSales Philippines is the Personal Information Controller for data collected
           through the Platform. Our Data Protection Officer (DPO) can be reached at{" "}
-          <a className="text-primary underline" href="mailto:dpo@365motorsales.ph">
-            dpo@365motorsales.ph
+          <a className="text-primary underline" href="mailto:dpo@365motorsales.com">
+            dpo@365motorsales.com
           </a>
           .
         </p>
@@ -273,8 +273,8 @@ function PrivacyPage() {
         <h2 className="mt-6 text-xl font-semibold">13. Contact</h2>
         <p className="mt-2 text-muted-foreground">
           For privacy questions or to exercise your rights, contact our Data Protection Officer at{" "}
-          <a className="text-primary underline" href="mailto:dpo@365motorsales.ph">
-            dpo@365motorsales.ph
+          <a className="text-primary underline" href="mailto:dpo@365motorsales.com">
+            dpo@365motorsales.com
           </a>
           . We respond within 15 business days.
         </p>

@@ -29,32 +29,32 @@ function ContactPage() {
           <Card
             icon={<Mail className="h-5 w-5" />}
             title="General support"
-            body="hello@365motorsales.ph"
-            href="mailto:hello@365motorsales.ph"
+            body="hello@365motorsales.com"
+            href="mailto:hello@365motorsales.com"
           />
           <Card
             icon={<MessageSquare className="h-5 w-5" />}
             title="Trust & safety"
-            body="safety@365motorsales.ph"
-            href="mailto:safety@365motorsales.ph"
+            body="safety@365motorsales.com"
+            href="mailto:safety@365motorsales.com"
           />
           <Card
             icon={<Mail className="h-5 w-5" />}
             title="Billing & refunds"
-            body="billing@365motorsales.ph"
-            href="mailto:billing@365motorsales.ph"
+            body="billing@365motorsales.com"
+            href="mailto:billing@365motorsales.com"
           />
           <Card
             icon={<Mail className="h-5 w-5" />}
             title="Partnerships & ads"
-            body="partners@365motorsales.ph"
-            href="mailto:partners@365motorsales.ph"
+            body="partners@365motorsales.com"
+            href="mailto:partners@365motorsales.com"
           />
           <Card
             icon={<Phone className="h-5 w-5" />}
             title="Phone (Mon–Sat, 9am–6pm)"
-            body="+63 917 000 0000"
-            href="tel:+639170000000"
+            body="+63 969 606 3830"
+            href="tel:+639696063830"
           />
           <Card
             icon={<MapPin className="h-5 w-5" />}
@@ -66,8 +66,8 @@ function ContactPage() {
         <div className="mt-10 rounded-xl border border-border bg-secondary/40 p-5 text-sm text-muted-foreground">
           <p>
             For privacy or data requests, contact our Data Protection Officer at{" "}
-            <a className="text-primary underline" href="mailto:dpo@365motorsales.ph">
-              dpo@365motorsales.ph
+            <a className="text-primary underline" href="mailto:dpo@365motorsales.com">
+              dpo@365motorsales.com
             </a>
             . See our{" "}
             <Link to="/privacy" className="underline hover:text-foreground">

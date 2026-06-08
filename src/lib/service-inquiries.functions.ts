@@ -73,7 +73,7 @@ export const createServiceInquiry = createServerFn({ method: "POST" })
         queue_name: "transactional_emails",
         payload: {
           template: "service-inquiry-staff-notice",
-          to: "partners@365motorsales.ph",
+          to: "partners@365motorsales.com",
           data: {
             inquiry_id: (row as any).id,
             inquiry_type: data.inquiryType,

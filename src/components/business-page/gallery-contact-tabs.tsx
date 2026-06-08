@@ -437,9 +437,9 @@ const KIND_LABELS: Record<string, string> = {
 };
 
 const KIND_PLACEHOLDER: Record<string, string> = {
-  phone: "+63 917 000 0000",
-  whatsapp: "+63 917 000 0000",
-  viber: "+63 917 000 0000",
+  phone: "+63 969 606 3830",
+  whatsapp: "+63 969 606 3830",
+  viber: "+63 969 606 3830",
   telegram: "@yourhandle",
   instagram: "@yourhandle",
   tiktok: "@yourhandle",
