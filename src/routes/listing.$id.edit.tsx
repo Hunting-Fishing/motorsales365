@@ -44,6 +44,7 @@ import {
   type VehicleQuality,
   type VehicleQualityIssue,
 } from "@/components/vehicle-quality-fields";
+import { VinScanDialog } from "@/components/vin-scan-dialog";
 
 const CATEGORIES = [
   { slug: "car", name: "Car" },
