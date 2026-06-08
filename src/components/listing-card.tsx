@@ -33,6 +33,7 @@ export interface ListingCardData {
   has_video?: boolean;
   category_slug: string;
   seller_verified?: boolean;
+  seller_dealer_plan?: string | null;
   status?: string;
   attributes?: Record<string, any> | null;
   view_count?: number;
