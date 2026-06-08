@@ -223,7 +223,7 @@ function ExportInquiryForm() {
         },
       }),
     onSuccess: () => {
-      toast.success("Inquiry sent. Our team will be in touch shortly.");
+      toast.success("Request received. An independent export partner will be in touch shortly.");
       setForm({
         buyer_name: "",
         buyer_email: "",
