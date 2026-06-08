@@ -123,7 +123,12 @@ function BusinessesIndex() {
       if (loc.province) query = query.eq("province", loc.province);
       if (loc.city) query = query.eq("city", loc.city);
       if (loc.barangay) query = query.ilike("barangay", `%${loc.barangay}%`);
-      if (q.trim()) query = query.ilike("name", `%${q.trim()}%`);
+      if (q.trim()) {
+        const term = q.trim().replace(/[,()]/g, " ");
+        query = query.or(
+          `name.ilike.%${term}%,description.ilike.%${term}%,brands_carried.ilike.%${term}%`,
+        );
+      }
 
       const { data } = await query;
       const rows: BusinessRow[] = data ?? [];
