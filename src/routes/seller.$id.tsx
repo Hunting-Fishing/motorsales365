@@ -73,10 +73,12 @@ export const Route = createFileRoute("/seller/$id")({
 
 function SellerProfilePage() {
   const { id } = Route.useParams();
+  const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [listings, setListings] = useState<ListingCardData[]>([]);
   const [rides, setRides] = useState<RideCardData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     const load = async () => {
