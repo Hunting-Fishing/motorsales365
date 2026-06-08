@@ -206,6 +206,31 @@ function BusinessesIndex() {
     });
   }, [items, center, radiusKm]);
 
+  const sortedItems = useMemo(() => {
+    if (sortBy === "popular") {
+      return [...items].sort((a, b) => {
+        if (b.rating_count !== a.rating_count) return b.rating_count - a.rating_count;
+        return (b.rating_avg ?? 0) - (a.rating_avg ?? 0);
+      });
+    }
+    if (sortBy === "nearest" && center) {
+      return [...items].sort((a, b) => {
+        if (a.lat == null || a.lng == null) return 1;
+        if (b.lat == null || b.lng == null) return -1;
+        const da = haversineKm(
+          { lat: center.lat, lng: center.lng },
+          { lat: Number(a.lat), lng: Number(a.lng) },
+        );
+        const db = haversineKm(
+          { lat: center.lat, lng: center.lng },
+          { lat: Number(b.lat), lng: Number(b.lng) },
+        );
+        return da - db;
+      });
+    }
+    return items;
+  }, [items, sortBy, center]);
+
   const mapBusinesses: GMapBusiness[] = filteredByRadius.map((b) => ({
     id: b.id,
     slug: b.slug,
