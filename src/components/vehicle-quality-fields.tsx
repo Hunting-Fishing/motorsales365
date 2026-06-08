@@ -263,9 +263,11 @@ type Props = {
   onChange: (next: VehicleQuality) => void;
   /** Show per-field errors after a failed submit. Pass the issues array from validateVehicleQuality. */
   issues?: VehicleQualityIssue[];
+  /** Optional scanner slot rendered next to the VIN field (e.g. <VinScanDialog />). */
+  vinScanSlot?: React.ReactNode;
 };
 
-export function VehicleQualityFields({ category, value, onChange, issues = [] }: Props) {
+export function VehicleQualityFields({ category, value, onChange, issues = [], vinScanSlot }: Props) {
   const set = <K extends keyof VehicleQuality>(k: K, v: VehicleQuality[K]) =>
     onChange({ ...value, [k]: v });
 
