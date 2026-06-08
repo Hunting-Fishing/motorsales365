@@ -440,24 +440,33 @@ function SellPage() {
   };
 
   const handleVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] ?? null;
-    if (!file) {
-      setVideo(null);
-      setVideoUpload({ status: "idle", percent: 0 });
-      return;
-    }
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
     if (maxVideos < 1) {
       toast.error("Videos are not included in this plan.");
       e.target.value = "";
       return;
     }
-    setVideo(file);
-    setVideoUpload({ status: "idle", percent: 0 });
+    const remaining = maxVideos - videos.length;
+    if (files.length > remaining) {
+      const overflow = files.length - Math.max(remaining, 0);
+      toast.error(
+        plan === "free"
+          ? `Free listings allow up to ${maxVideos} video. ${overflow} video(s) skipped — upgrade to add up to 3.`
+          : `Up to ${maxVideos} videos allowed. ${overflow} video(s) skipped.`,
+      );
+    }
+    const accepted = files.slice(0, Math.max(remaining, 0));
+    setVideos((v) => [...v, ...accepted].slice(0, maxVideos));
+    setVideoUploads((u) =>
+      [...u, ...accepted.map(() => ({ status: "idle" as const, percent: 0 }))].slice(0, maxVideos),
+    );
+    e.target.value = "";
   };
 
-  const removeVideo = () => {
-    setVideo(null);
-    setVideoUpload({ status: "idle", percent: 0 });
+  const removeVideo = (i: number) => {
+    setVideos((v) => v.filter((_, idx) => idx !== i));
+    setVideoUploads((u) => u.filter((_, idx) => idx !== i));
   };
 
   const setPhotoState = (i: number, patch: Partial<UploadState>) => {
