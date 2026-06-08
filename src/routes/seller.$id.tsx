@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { RouteErrorBoundary, RouteNotFoundBoundary } from "@/components/route-boundaries";
 import { useEffect, useState } from "react";
-import { MapPin, Building2, User as UserIcon } from "lucide-react";
+import { MapPin, Building2, User as UserIcon, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/site-layout";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,9 @@ import { ListingCard, type ListingCardData } from "@/components/listing-card";
 import { RideCard, type RideCardData } from "@/components/rides/ride-card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatDate } from "@/lib/format";
+import { SellerReputationBadges } from "@/components/seller-reputation-badges";
+import { SellerReviews } from "@/components/seller-reviews";
+import { useAuth } from "@/contexts/auth-context";
 
 export const Route = createFileRoute("/seller/$id")({
   loader: async ({ params }) => {
