@@ -72,6 +72,7 @@ export function SiteFooter() {
       title: "Company",
       links: [
         { to: "/about", label: "About" },
+        { to: "/company", label: "Company verification" },
         { to: "/contact", label: "Contact" },
         { to: "/support", label: "Help & Support" },
         { to: "/report", label: "Report a scam" },
