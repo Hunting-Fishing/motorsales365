@@ -270,23 +270,39 @@ function BusinessesIndex() {
           </div>
 
           {visibleTags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {visibleTags.map((t) => {
-                const on = selectedTags.includes(t.slug);
-                return (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  {typeSlug === "repair_shop" ? "Filter by service" : "Services & features"}
+                </p>
+                {selectedTags.length > 0 && (
                   <button
-                    key={t.slug}
-                    onClick={() =>
-                      setSelectedTags((prev) =>
-                        on ? prev.filter((x) => x !== t.slug) : [...prev, t.slug],
-                      )
-                    }
-                    className={`rounded-full border px-3 py-1 text-xs transition ${on ? "border-foreground bg-foreground text-background" : "border-border hover:bg-secondary"}`}
+                    type="button"
+                    onClick={() => setSelectedTags([])}
+                    className="text-xs text-muted-foreground underline-offset-2 hover:underline"
                   >
-                    {t.label}
+                    Clear ({selectedTags.length})
                   </button>
-                );
-              })}
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {visibleTags.map((t) => {
+                  const on = selectedTags.includes(t.slug);
+                  return (
+                    <button
+                      key={t.slug}
+                      onClick={() =>
+                        setSelectedTags((prev) =>
+                          on ? prev.filter((x) => x !== t.slug) : [...prev, t.slug],
+                        )
+                      }
+                      className={`rounded-full border px-3 py-1 text-xs transition ${on ? "border-foreground bg-foreground text-background" : "border-border hover:bg-secondary"}`}
+                    >
+                      {t.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
 
