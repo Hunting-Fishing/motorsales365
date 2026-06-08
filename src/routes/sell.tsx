@@ -562,8 +562,12 @@ function SellPage() {
       );
       return;
     }
-    if (video && maxVideos < 1) {
-      toast.error("Remove the video or upgrade your plan to include video.");
+    if (videos.length > maxVideos) {
+      toast.error(
+        plan === "free"
+          ? `Free listings allow up to 1 video. Remove some or upgrade to add up to 3.`
+          : `Paid listings allow up to 3 videos.`,
+      );
       return;
     }
 
