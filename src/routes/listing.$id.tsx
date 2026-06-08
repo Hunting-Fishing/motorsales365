@@ -179,6 +179,8 @@ function ListingDetailPage() {
   const [media, setMedia] = useState<{ id: string; url: string; type: "photo" | "video" }[]>([]);
   const [seller, setSeller] = useState<any>(null);
   const [sellerDealerPlan, setSellerDealerPlan] = useState<string | null>(null);
+  const [sellerDealerPeriodEnd, setSellerDealerPeriodEnd] = useState<string | null>(null);
+  const [sellerDealerCancelAtPeriodEnd, setSellerDealerCancelAtPeriodEnd] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
   const [activeIdx, setActiveIdx] = useState(0);
   const [favorited, setFavorited] = useState(false);
@@ -218,9 +220,14 @@ function ListingDetailPage() {
 
       try {
         const { dealers } = await getActiveDealerStatus({ data: { userIds: [l.user_id] } });
-        setSellerDealerPlan(dealers[l.user_id]?.planName ?? null);
+        const info = dealers[l.user_id];
+        setSellerDealerPlan(info?.planName ?? null);
+        setSellerDealerPeriodEnd(info?.currentPeriodEnd ?? null);
+        setSellerDealerCancelAtPeriodEnd(Boolean(info?.cancelAtPeriodEnd));
       } catch {
         setSellerDealerPlan(null);
+        setSellerDealerPeriodEnd(null);
+        setSellerDealerCancelAtPeriodEnd(false);
       }
 
       // Increment view count via RPC (counts every page load, anon allowed)

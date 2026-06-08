@@ -111,6 +111,8 @@ function Index() {
             has_video: videos.length > 0,
             seller_verified: r.profiles?.verification_status === "verified",
             seller_dealer_plan: dealers[r.user_id]?.planName ?? null,
+            seller_dealer_period_end: dealers[r.user_id]?.currentPeriodEnd ?? null,
+            seller_dealer_cancel_at_period_end: dealers[r.user_id]?.cancelAtPeriodEnd ?? false,
             status: r.status,
             attributes: r.attributes,
           };
@@ -118,7 +120,7 @@ function Index() {
       const userIds = Array.from(
         new Set([...(boostedRows ?? []), ...(recentRows ?? [])].map((r: any) => r.user_id).filter(Boolean)),
       );
-      let dealers: Record<string, { planName: string }> = {};
+      let dealers: Record<string, { planName: string; currentPeriodEnd: string | null; cancelAtPeriodEnd: boolean; status: string }> = {};
       if (userIds.length > 0) {
         try {
           const res = await getActiveDealerStatus({ data: { userIds } });
