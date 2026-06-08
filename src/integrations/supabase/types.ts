@@ -3944,6 +3944,9 @@ export type Database = {
           phone_e164: string | null
           phone_verified_at: string | null
           postal_code: string | null
+          reviews_updated_at: string | null
+          seller_rating_avg: number
+          seller_rating_count: number
           seller_type: Database["public"]["Enums"]["seller_type"]
           signup_city: string | null
           signup_intent: string | null
@@ -3988,6 +3991,9 @@ export type Database = {
           phone_e164?: string | null
           phone_verified_at?: string | null
           postal_code?: string | null
+          reviews_updated_at?: string | null
+          seller_rating_avg?: number
+          seller_rating_count?: number
           seller_type?: Database["public"]["Enums"]["seller_type"]
           signup_city?: string | null
           signup_intent?: string | null
@@ -4032,6 +4038,9 @@ export type Database = {
           phone_e164?: string | null
           phone_verified_at?: string | null
           postal_code?: string | null
+          reviews_updated_at?: string | null
+          seller_rating_avg?: number
+          seller_rating_count?: number
           seller_type?: Database["public"]["Enums"]["seller_type"]
           signup_city?: string | null
           signup_intent?: string | null
@@ -4902,6 +4911,67 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      seller_reviews: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          listing_id: string | null
+          rating: number
+          reviewer_id: string
+          seller_id: string
+          status: string
+          transaction_completed: boolean
+          updated_at: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          rating: number
+          reviewer_id: string
+          seller_id: string
+          status?: string
+          transaction_completed?: boolean
+          updated_at?: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          rating?: number
+          reviewer_id?: string
+          seller_id?: string
+          status?: string
+          transaction_completed?: boolean
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "seller_reviews_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_reviews_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "seller_reviews_seller_id_fkey"
+            columns: ["seller_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       service_inquiries: {
         Row: {
@@ -6554,6 +6624,9 @@ export type Database = {
           full_name: string | null
           id: string | null
           is_founding_member: boolean | null
+          reviews_updated_at: string | null
+          seller_rating_avg: number | null
+          seller_rating_count: number | null
           seller_type: Database["public"]["Enums"]["seller_type"] | null
           verification_status:
             | Database["public"]["Enums"]["verification_status"]
@@ -6581,6 +6654,9 @@ export type Database = {
           full_name?: string | null
           id?: string | null
           is_founding_member?: boolean | null
+          reviews_updated_at?: string | null
+          seller_rating_avg?: number | null
+          seller_rating_count?: number | null
           seller_type?: Database["public"]["Enums"]["seller_type"] | null
           verification_status?:
             | Database["public"]["Enums"]["verification_status"]
@@ -6608,6 +6684,9 @@ export type Database = {
           full_name?: string | null
           id?: string | null
           is_founding_member?: boolean | null
+          reviews_updated_at?: string | null
+          seller_rating_avg?: number | null
+          seller_rating_count?: number | null
           seller_type?: Database["public"]["Enums"]["seller_type"] | null
           verification_status?:
             | Database["public"]["Enums"]["verification_status"]
@@ -6751,6 +6830,7 @@ export type Database = {
           read_ct: number
         }[]
       }
+      recompute_seller_rating: { Args: { _seller: string }; Returns: undefined }
       record_qr_scan: {
         Args: {
           _browser?: string

@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { RouteErrorBoundary, RouteNotFoundBoundary } from "@/components/route-boundaries";
 import { useEffect, useState } from "react";
-import { MapPin, Building2, User as UserIcon } from "lucide-react";
+import { MapPin, Building2, User as UserIcon, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/site-layout";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,9 @@ import { ListingCard, type ListingCardData } from "@/components/listing-card";
 import { RideCard, type RideCardData } from "@/components/rides/ride-card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { formatDate } from "@/lib/format";
+import { SellerReputationBadges } from "@/components/seller-reputation-badges";
+import { SellerReviews } from "@/components/seller-reviews";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/seller/$id")({
   loader: async ({ params }) => {
@@ -70,10 +73,12 @@ export const Route = createFileRoute("/seller/$id")({
 
 function SellerProfilePage() {
   const { id } = Route.useParams();
+  const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [listings, setListings] = useState<ListingCardData[]>([]);
   const [rides, setRides] = useState<RideCardData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     const load = async () => {
@@ -126,7 +131,7 @@ function SellerProfilePage() {
       setLoading(false);
     };
     load();
-  }, [id]);
+  }, [id, reloadKey]);
 
   if (loading)
     return (
@@ -175,7 +180,29 @@ function SellerProfilePage() {
                 {profile.verification_status === "verified" && (
                   <VerifiedBadge size="md" showLabel />
                 )}
+                {Number(profile.seller_rating_count ?? 0) > 0 && (
+                  <span className="inline-flex items-center gap-1 text-sm">
+                    <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                    <span className="font-semibold">
+                      {Number(profile.seller_rating_avg ?? 0).toFixed(1)}
+                    </span>
+                    <span className="text-muted-foreground">
+                      ({profile.seller_rating_count})
+                    </span>
+                  </span>
+                )}
               </div>
+              <SellerReputationBadges
+                className="mt-2"
+                profile={{
+                  verification_status: profile.verification_status,
+                  fb_verified_at: profile.fb_verified_at,
+                  is_founding_member: profile.is_founding_member,
+                  seller_rating_avg: profile.seller_rating_avg,
+                  seller_rating_count: profile.seller_rating_count,
+                  active_listings: listings.length,
+                }}
+              />
               {isBusiness && profile.business_address && (
                 <div className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
                   <MapPin className="h-4 w-4" />
@@ -207,6 +234,9 @@ function SellerProfilePage() {
           <TabsList>
             <TabsTrigger value="listings">Listings ({listings.length})</TabsTrigger>
             <TabsTrigger value="rides">Rides ({rides.length})</TabsTrigger>
+            <TabsTrigger value="reviews">
+              Reviews ({profile.seller_rating_count ?? 0})
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="listings" className="mt-6">
             {listings.length === 0 ? (
@@ -233,6 +263,15 @@ function SellerProfilePage() {
                 ))}
               </div>
             )}
+          </TabsContent>
+          <TabsContent value="reviews" className="mt-6">
+            <SellerReviews
+              sellerId={id}
+              currentUserId={user?.id ?? null}
+              ratingAvg={profile.seller_rating_avg}
+              ratingCount={profile.seller_rating_count}
+              onChange={() => setReloadKey((k) => k + 1)}
+            />
           </TabsContent>
         </Tabs>
       </div>
