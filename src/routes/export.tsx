@@ -108,6 +108,11 @@ function ExportPage() {
             </Card>
           ))}
         </div>
+        <p className="mt-4 text-center text-sm text-muted-foreground">
+          <Link to="/export/trust" className="text-primary underline">
+            Learn how we screen and verify partners →
+          </Link>
+        </p>
       </section>
 
 
