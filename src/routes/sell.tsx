@@ -37,6 +37,11 @@ import { useDynamicMeta } from "@/hooks/use-dynamic-meta";
 import { useDynamicJsonLd } from "@/hooks/use-dynamic-jsonld";
 import { PhoneInput } from "@/components/phone-input";
 import { buildE164 } from "@/data/country-codes";
+import {
+  VehicleQualityFields,
+  vehicleQualityToAttributes,
+  type VehicleQuality,
+} from "@/components/vehicle-quality-fields";
 import { z } from "zod";
 
 const ListingTextSchema = z.object({
