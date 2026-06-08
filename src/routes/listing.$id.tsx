@@ -638,8 +638,11 @@ function ListingDetailPage() {
                     <VerifiedBadge size="sm" showLabel />
                   )}
                 </div>
-                <div className="text-xs text-muted-foreground">
-                  {listing.seller_type === "business" ? "Business" : "Private"} seller
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span>{listing.seller_type === "business" ? "Business" : "Private"} seller</span>
+                  {listing.seller_type === "business" && sellerDealerPlan && (
+                    <DealerSubscriptionBadge planName={sellerDealerPlan} size="sm" />
+                  )}
                 </div>
               </div>
             </div>
