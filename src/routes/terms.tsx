@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 6, 2026 (rev. seeded public business listings & ownership claim flow)";
+  const lastUpdated = "June 8, 2026 (rev. added Renew &amp; Boost biweekly listing promotion)";
 
   return (
     <SiteLayout>
