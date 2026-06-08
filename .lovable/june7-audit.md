@@ -17,7 +17,7 @@ Purpose: working checklist of issues to correct before launch. Check items off a
 - [x] 2. Resolve pricing / photo-limit inconsistency
 - [x] 3. Add real or seeded listings
 - [x] 4. Add visible seller onboarding page
-- [ ] 5. Add real business directory listings
+- [x] 5. Add real business directory listings
 - [ ] 6. Fix "Loading…" pages for SEO and trust (SSR fallback content)
 - [ ] 7. Clarify export page liability conflict
 - [ ] 8. Add trust / verification explainer page
