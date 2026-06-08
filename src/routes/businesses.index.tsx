@@ -372,7 +372,7 @@ function BusinessesIndex() {
                   <Skeleton key={i} className="h-24 w-full" />
                 ))}
               </>
-            ) : items.length === 0 ? (
+            ) : sortedItems.length === 0 ? (
               <Card className="p-6 text-center text-sm text-muted-foreground">
                 <StoreIcon className="mx-auto mb-2 h-6 w-6 opacity-50" />
                 No businesses match your filters. Try clearing some or{" "}
