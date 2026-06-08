@@ -841,6 +841,8 @@ async function runNetworkScraper(
   switch (slug) {
     case "lazada":
       return fetchLazadaProductData(url);
+    case "aliexpress":
+      return fetchAliExpressProductData(url);
     // Other networks fall through to Firecrawl for now (phase 2).
     default:
       return null;
