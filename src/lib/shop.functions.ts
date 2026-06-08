@@ -1393,7 +1393,7 @@ async function rescrapeOne(productId: string): Promise<{
 
   if (Object.keys(patch).length > 0) {
     patch.updated_at = new Date().toISOString();
-    const { error: uErr } = await supabaseAdmin.from("shop_products").update(patch).eq("id", productId);
+    const { error: uErr } = await supabaseAdmin.from("shop_products").update(patch as never).eq("id", productId);
     if (uErr) return { ok: false, updatedFields, warnings, error: uErr.message };
   }
 
