@@ -231,6 +231,7 @@ function EditListingPage() {
     setTransmission(a.transmission ?? "");
     setFuel(a.fuel ?? "");
     setEngine(a.engine ?? "");
+    setVehicleQuality(hydrateVehicleQuality(a));
 
     setTowServiceType(a.service_type ?? "");
     setTowCapacity(a.vehicle_capacity ?? "");
