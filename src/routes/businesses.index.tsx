@@ -347,10 +347,24 @@ function BusinessesIndex() {
 
         <div className="grid gap-6 md:grid-cols-[1fr_1.2fr]">
           <div className="space-y-3">
-            <div className="text-sm text-muted-foreground">
-              {loading
-                ? "Loading…"
-                : `${items.length} business${items.length === 1 ? "" : "es"} found`}
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-sm text-muted-foreground">
+                {loading
+                  ? "Loading…"
+                  : `${sortedItems.length} business${sortedItems.length === 1 ? "" : "es"} found`}
+              </div>
+              {typeSlug === "repair_shop" && !loading && (
+                <Select value={sortBy} onValueChange={(v: string) => setSortBy(v as typeof sortBy)}>
+                  <SelectTrigger className="h-8 w-auto text-xs">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="relevance">Relevance</SelectItem>
+                    <SelectItem value="nearest">Nearest</SelectItem>
+                    <SelectItem value="popular">Most popular</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
             </div>
             {loading ? (
               <>
