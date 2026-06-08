@@ -110,7 +110,7 @@ function ReceiptPage() {
               <div className="mt-1 text-xs text-muted-foreground">
                 365motorsales.com
                 <br />
-                partners@365motorsales.ph
+                partners@365motorsales.com
               </div>
             </div>
             <div className="text-right">

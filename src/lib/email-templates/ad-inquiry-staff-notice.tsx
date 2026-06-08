@@ -104,7 +104,7 @@ export const template = {
   subject: (d) =>
     `New ad inquiry — ${d.contact_name ?? "advertiser"}${d.company ? ` (${d.company})` : ""}`,
   displayName: "Ad inquiry staff notice",
-  to: "partners@365motorsales.ph",
+  to: "partners@365motorsales.com",
   previewData: {
     contact_name: "Maria Santos",
     company: "AutoParts PH",

@@ -63,14 +63,14 @@ function RefundPage() {
         </p>
 
         <p className="mt-6 text-xs text-muted-foreground">
-          Last updated: June 3, 2026 (rev. export brokerage, referrals & org accounts)
+          Last updated: June 8, 2026 (rev. contact email domain)
         </p>
 
         <h2 className="mt-6 text-xl font-semibold">How to request</h2>
         <p className="mt-2 text-muted-foreground">
           Email{" "}
-          <a className="text-primary underline" href="mailto:billing@365motorsales.ph">
-            billing@365motorsales.ph
+          <a className="text-primary underline" href="mailto:billing@365motorsales.com">
+            billing@365motorsales.com
           </a>{" "}
           with your account email, the transaction date, and a brief explanation. We respond within
           3 business days.

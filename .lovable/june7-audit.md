@@ -13,7 +13,7 @@ Purpose: working checklist of issues to correct before launch. Check items off a
 ## Priority Build Order
 
 ### Do these FIRST (pre-launch blockers)
-- [ ] 1. Fix contact phone and email domain inconsistency
+- [x] 1. Fix contact phone and email domain inconsistency
 - [ ] 2. Resolve pricing / photo-limit inconsistency
 - [ ] 3. Add real or seeded listings
 - [ ] 4. Add visible seller onboarding page

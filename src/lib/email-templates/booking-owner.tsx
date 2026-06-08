@@ -103,7 +103,7 @@ export const template = {
     service_title: "Oil change",
     starts_at_human: "Mon, Jun 2 2026 · 10:00 AM",
     customer_name: "Maria",
-    customer_phone: "+63 917 000 0000",
+    customer_phone: "+63 969 606 3830",
     customer_email: "maria@example.com",
     notes: "Diesel engine, please prepare 5W-40.",
     status: "pending",

@@ -60,8 +60,8 @@ function GuidelinesPage() {
         <p className="mt-2 text-muted-foreground">
           Use the <strong>Report</strong> button on any listing or seller profile. Our team reviews
           reports within 48 hours. Urgent safety issues can be emailed to{" "}
-          <a className="text-primary underline" href="mailto:safety@365motorsales.ph">
-            safety@365motorsales.ph
+          <a className="text-primary underline" href="mailto:safety@365motorsales.com">
+            safety@365motorsales.com
           </a>
           .
         </p>
