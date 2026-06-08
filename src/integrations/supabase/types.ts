@@ -6337,6 +6337,121 @@ export type Database = {
         }
         Relationships: []
       }
+      wanted_post_responses: {
+        Row: {
+          business_id: string | null
+          contact_value: string | null
+          created_at: string
+          id: string
+          listing_id: string | null
+          message: string
+          updated_at: string
+          user_id: string
+          wanted_post_id: string
+        }
+        Insert: {
+          business_id?: string | null
+          contact_value?: string | null
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          message: string
+          updated_at?: string
+          user_id: string
+          wanted_post_id: string
+        }
+        Update: {
+          business_id?: string | null
+          contact_value?: string | null
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          message?: string
+          updated_at?: string
+          user_id?: string
+          wanted_post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wanted_post_responses_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wanted_post_responses_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "wanted_post_responses_wanted_post_id_fkey"
+            columns: ["wanted_post_id"]
+            isOneToOne: false
+            referencedRelation: "wanted_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wanted_posts: {
+        Row: {
+          budget_max_php: number | null
+          budget_min_php: number | null
+          category: Database["public"]["Enums"]["wanted_post_category"]
+          city: string | null
+          contact_method: Database["public"]["Enums"]["wanted_contact_method"]
+          contact_value: string | null
+          created_at: string
+          description: string
+          expires_at: string
+          id: string
+          region: string | null
+          response_count: number
+          status: Database["public"]["Enums"]["wanted_post_status"]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          budget_max_php?: number | null
+          budget_min_php?: number | null
+          category?: Database["public"]["Enums"]["wanted_post_category"]
+          city?: string | null
+          contact_method?: Database["public"]["Enums"]["wanted_contact_method"]
+          contact_value?: string | null
+          created_at?: string
+          description: string
+          expires_at?: string
+          id?: string
+          region?: string | null
+          response_count?: number
+          status?: Database["public"]["Enums"]["wanted_post_status"]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          budget_max_php?: number | null
+          budget_min_php?: number | null
+          category?: Database["public"]["Enums"]["wanted_post_category"]
+          city?: string | null
+          contact_method?: Database["public"]["Enums"]["wanted_contact_method"]
+          contact_value?: string | null
+          created_at?: string
+          description?: string
+          expires_at?: string
+          id?: string
+          region?: string | null
+          response_count?: number
+          status?: Database["public"]["Enums"]["wanted_post_status"]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       active_ads_public: {
@@ -6818,6 +6933,17 @@ export type Database = {
         | "rejected"
         | "more_info"
       verification_status: "unverified" | "pending" | "verified" | "rejected"
+      wanted_contact_method: "platform" | "phone" | "messenger" | "any"
+      wanted_post_category:
+        | "car"
+        | "motorcycle"
+        | "truck"
+        | "equipment"
+        | "part"
+        | "service"
+        | "tow"
+        | "other"
+      wanted_post_status: "open" | "closed" | "expired"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -7104,6 +7230,18 @@ export const Constants = {
         "more_info",
       ],
       verification_status: ["unverified", "pending", "verified", "rejected"],
+      wanted_contact_method: ["platform", "phone", "messenger", "any"],
+      wanted_post_category: [
+        "car",
+        "motorcycle",
+        "truck",
+        "equipment",
+        "part",
+        "service",
+        "tow",
+        "other",
+      ],
+      wanted_post_status: ["open", "closed", "expired"],
     },
   },
 } as const
