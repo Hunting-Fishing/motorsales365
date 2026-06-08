@@ -1302,3 +1302,148 @@ function extractJsonLdProduct(html: string): LdProduct | null {
   }
   return null;
 }
+
+// ============ RESCRAPE / BACKFILL (admin) ============
+
+async function rescrapeOne(productId: string): Promise<{
+  ok: boolean;
+  updatedFields: string[];
+  warnings: string[];
+  error?: string;
+}> {
+  const updatedFields: string[] = [];
+  const warnings: string[] = [];
+
+  const { data: product, error: pErr } = await supabaseAdmin
+    .from("shop_products")
+    .select("id, title, brand, description, image_url, price_php, deal_price_php, is_deal")
+    .eq("id", productId)
+    .maybeSingle();
+  if (pErr || !product) return { ok: false, updatedFields, warnings, error: pErr?.message ?? "Product not found" };
+
+  const { data: links } = await supabaseAdmin
+    .from("shop_product_links")
+    .select("id, url, network_id, network:affiliate_networks(slug)")
+    .eq("product_id", productId)
+    .order("created_at", { ascending: true });
+  const link = (links ?? [])[0] as any;
+  if (!link?.url) return { ok: false, updatedFields, warnings, error: "No source URL on file for this product" };
+
+  const networkSlug: string | null = link.network?.slug ?? detectNetworkSlug(link.url);
+  const cleaned = cleanShopUrl(link.url);
+
+  // Try network-specific scraper, then Firecrawl if available.
+  let marketplace = await runNetworkScraper(networkSlug, cleaned);
+  let metadata: any = null;
+  let html: string | null = null;
+  let extracted: any = null;
+  const apiKey = process.env.FIRECRAWL_API_KEY;
+  if (!marketplace && apiKey) {
+    try {
+      const { default: Firecrawl } = await import("@mendable/firecrawl-js");
+      const fc = new Firecrawl({ apiKey });
+      const r: any = await fc.scrape(cleaned, {
+        formats: ["rawHtml", { type: "json", prompt: "Extract product title, brand, description, numeric price, ISO currency code, primary image_url." } as any] as any,
+        onlyMainContent: true,
+        waitFor: 2500,
+        location: { country: "PH", languages: ["en"] },
+      } as any);
+      extracted = r?.json ?? r?.data?.json ?? null;
+      metadata = r?.metadata ?? r?.data?.metadata ?? null;
+      html = r?.rawHtml ?? r?.data?.rawHtml ?? null;
+    } catch (e: any) {
+      warnings.push(`Firecrawl failed: ${e?.message ?? "unknown"}`);
+    }
+  }
+
+  const ld = html ? extractJsonLdProduct(html) : null;
+  const fx = await loadFxMap();
+
+  const pick = (...vals: any[]) =>
+    vals.map((v) => (v == null ? "" : String(v).trim())).find((v) => v.length > 0) ?? "";
+
+  const newBrand = sanitizeBrand(pick(marketplace?.brand, ld?.brand, extracted?.brand).slice(0, 120) || null);
+  const newDesc = pick(marketplace?.description, ld?.description, extracted?.description, metadata?.ogDescription).slice(0, 2000) || null;
+  const newImage = pickFirstNonIconImage(marketplace?.image_url, ld?.image, metadata?.ogImage, extracted?.image_url);
+  const rawPrice = marketplace?.price ?? ld?.price ?? extracted?.price ?? metadata?.["og:price:amount"] ?? null;
+  const rawCur = marketplace?.currency ?? ld?.currency ?? extracted?.currency ?? metadata?.["og:price:currency"] ?? null;
+  const newPrice = pickPricePhp(rawPrice, rawCur, fx, warnings);
+  const salePhp = marketplace?.sale_price
+    ? pickPricePhp(marketplace.sale_price, marketplace?.currency ?? rawCur ?? "PHP", fx)
+    : null;
+  const isDeal = !!(salePhp && newPrice && salePhp < newPrice);
+
+  const patch: Record<string, any> = {};
+  // Only fill fields that are currently empty, or where price clearly changed.
+  if (!product.brand && newBrand) { patch.brand = newBrand; updatedFields.push("brand"); }
+  if ((!product.description || product.description.length < 40) && newDesc) {
+    patch.description = newDesc; updatedFields.push("description");
+  }
+  if (!product.image_url && newImage) { patch.image_url = newImage; updatedFields.push("image_url"); }
+  if (newPrice != null && Number(newPrice) !== Number(product.price_php ?? 0)) {
+    patch.price_php = newPrice; updatedFields.push("price_php");
+  }
+  const newDealPrice = isDeal ? salePhp : null;
+  if (Number(newDealPrice ?? 0) !== Number(product.deal_price_php ?? 0)) {
+    patch.deal_price_php = newDealPrice; updatedFields.push("deal_price_php");
+  }
+  if (Boolean(isDeal) !== Boolean(product.is_deal)) {
+    patch.is_deal = isDeal; updatedFields.push("is_deal");
+  }
+
+  if (Object.keys(patch).length > 0) {
+    patch.updated_at = new Date().toISOString();
+    const { error: uErr } = await supabaseAdmin.from("shop_products").update(patch).eq("id", productId);
+    if (uErr) return { ok: false, updatedFields, warnings, error: uErr.message };
+  }
+
+  // Also update the link's price snapshot.
+  if (newPrice != null) {
+    await supabaseAdmin
+      .from("shop_product_links")
+      .update({
+        price_php: newPrice,
+        sale_price_php: isDeal ? salePhp : null,
+        last_checked_at: new Date().toISOString(),
+      })
+      .eq("id", link.id);
+  } else {
+    await supabaseAdmin
+      .from("shop_product_links")
+      .update({ last_checked_at: new Date().toISOString() })
+      .eq("id", link.id);
+  }
+
+  return { ok: true, updatedFields, warnings };
+}
+
+export const rescrapeShopProduct = createServerFn({ method: "POST" })
+  .middleware([requireDomainRole("shop_manager", "shop.rescrapeShopProduct")])
+  .inputValidator((input: unknown) => z.object({ productId: z.string().uuid() }).parse(input))
+  .handler(async ({ data }) => rescrapeOne(data.productId));
+
+export const backfillMissingShopPrices = createServerFn({ method: "POST" })
+  .middleware([requireDomainRole("shop_manager", "shop.backfillMissingShopPrices")])
+  .handler(async () => {
+    const { data: rows } = await supabaseAdmin
+      .from("shop_products")
+      .select("id")
+      .is("price_php", null)
+      .eq("active", true)
+      .limit(50);
+    let scanned = 0, filledPrice = 0, stillMissing = 0;
+    const errors: string[] = [];
+    for (const r of (rows ?? []) as any[]) {
+      scanned++;
+      try {
+        const res = await rescrapeOne(r.id);
+        if (res.updatedFields.includes("price_php")) filledPrice++;
+        else stillMissing++;
+        if (res.error) errors.push(`${r.id}: ${res.error}`);
+      } catch (e: any) {
+        stillMissing++;
+        errors.push(`${r.id}: ${e?.message ?? "scrape failed"}`);
+      }
+    }
+    return { scanned, filledPrice, stillMissing, errors: errors.slice(0, 20) };
+  });
