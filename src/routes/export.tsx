@@ -167,12 +167,30 @@ function ExportPage() {
       <section id="inquiry" className="border-t bg-muted/30">
         <div className="container mx-auto px-4 py-12">
           <div className="mx-auto max-w-2xl">
-            <h2 className="font-display text-2xl">Request an export quote</h2>
+            <h2 className="font-display text-2xl">Request a partner intro</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Tell us what you're looking for. A broker will reply within 1–2 business days.
+              Tell us what you're looking for. We'll forward your request to one or more
+              independent export partners who typically reply within 1–2 business days.
             </p>
+            <Card className="mt-4 border-primary/30 bg-primary/5">
+              <CardContent className="flex gap-3 p-4 text-sm text-muted-foreground">
+                <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <div>
+                  <strong className="text-foreground">How this works.</strong> 365 MotorSales
+                  introduces you to independent brokers, inspectors, and shipping partners. We do
+                  not act as broker, escrow agent, shipper, or customs agent. All quotes,
+                  contracts, payments, inspections, documentation, and shipping are arranged
+                  directly between you and the partner you choose. See our{" "}
+                  <Link to="/terms" className="text-primary underline">
+                    Terms
+                  </Link>{" "}
+                  for details.
+                </div>
+              </CardContent>
+            </Card>
             <ExportInquiryForm />
           </div>
+
         </div>
       </section>
     </SiteLayout>
