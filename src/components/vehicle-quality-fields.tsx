@@ -123,6 +123,10 @@ export const VehicleQualitySchema = z
       .refine(
         (v) => !v || VIN_REGEX.test(v),
         "VIN/chassis must be 11–17 letters/numbers (no I, O, or Q)",
+      )
+      .refine(
+        (v) => !v || v.length !== 17 || vinChecksumValid(v),
+        "VIN check-digit failed — please re-scan or re-type",
       ),
     financing_available: z.boolean().optional(),
     trade_accepted: z.boolean().optional(),
