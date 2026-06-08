@@ -240,7 +240,7 @@ function BusinessesIndex() {
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search businesses by name…"
+              placeholder="Search by shop name, service or brand…"
               className="pl-9"
             />
           </div>
