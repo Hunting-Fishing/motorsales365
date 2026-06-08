@@ -1295,6 +1295,7 @@ function SellPage() {
                 category={category as "car" | "motorcycle"}
                 value={vehicleQuality}
                 onChange={setVehicleQuality}
+                issues={vehicleQualityIssues}
               />
             )}
           </section>
