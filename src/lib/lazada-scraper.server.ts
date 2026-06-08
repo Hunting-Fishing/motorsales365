@@ -210,33 +210,68 @@ async function fetchViaPdpHtml(
 
     if (data) {
       const item = data.item ?? data.product ?? {};
-      const skuBase = data.skuBase ?? {};
+      const skuBase = data.skuBase ?? data.productOption?.skuBase ?? {};
       const skus = Array.isArray(skuBase.skus) ? skuBase.skus : [];
       const matchedSku =
         skus.find((s: any) => String(s.skuId ?? "") === (ids.skuId ?? "")) ?? skus[0] ?? null;
-      const priceInfo =
-        data.skuInfos?.[matchedSku?.skuId]?.price ?? data.price ?? matchedSku?.price ?? {};
-      const list = num(priceInfo?.originalPrice ?? priceInfo?.priceWithTax);
-      const sale = num(priceInfo?.salePrice ?? priceInfo?.price);
+
+      // Lazada PDPs put price in many places depending on the page variant;
+      // try them in order and accept the first non-null pair.
+      const priceCandidates: any[] = [
+        matchedSku?.price,
+        data.skuInfos?.[matchedSku?.skuId]?.price,
+        data.skuInfos?.[matchedSku?.skuId],
+        data.price,
+        data.bizData?.price,
+        data.bizData?.skuInfo?.price,
+        data.priceModel,
+        data.priceModule,
+      ].filter(Boolean);
+
+      let list: number | undefined;
+      let sale: number | undefined;
+      let currency: string | undefined;
+      for (const pi of priceCandidates) {
+        if (list == null) {
+          list = num(
+            pi?.originalPrice ?? pi?.priceWithTax ?? pi?.priceBeforeDiscount ?? pi?.listPrice,
+          );
+        }
+        if (sale == null) {
+          sale = num(pi?.salePrice ?? pi?.price ?? pi?.discountPrice ?? pi?.skuPrice);
+        }
+        if (!currency && typeof pi?.currency === "string") currency = pi.currency;
+        if (list != null && sale != null) break;
+      }
+      // If only one of {list, sale} was found, treat it as the current price.
+      if (list == null && sale != null) list = sale;
+      if (sale == null && list != null) sale = list;
 
       const image =
         (Array.isArray(item.images) && item.images[0]) ||
         skuBase?.props?.[0]?.values?.[0]?.image ||
+        (Array.isArray(data?.images) && data.images[0]) ||
         data?.image ||
         undefined;
 
       if (image && !VALID_IMG_RE.test(String(image))) {
-        // Not a real Lazada image — bail to avoid pollution.
+        // Not a real Lazada image — try JSON-LD before giving up.
+        const ld = extractJsonLdFromHtml(html, url, ids);
+        if (ld) return ld;
         return null;
       }
 
       const title = item?.title ?? data?.title;
-      if (!title) return null;
+      if (!title) {
+        const ld = extractJsonLdFromHtml(html, url, ids);
+        if (ld) return ld;
+        return null;
+      }
 
       const category =
         data?.breadcrumb?.[data.breadcrumb.length - 1]?.title ?? data?.category?.name;
 
-      return {
+      const result: LazadaProductData = {
         title: String(title),
         brand: data?.brand?.name ?? item?.brand,
         description:
@@ -249,18 +284,32 @@ async function fetchViaPdpHtml(
               : undefined,
         image_url: image ? String(image) : undefined,
         price: list,
-        sale_price: sale && list && sale < list ? sale : sale,
-        currency: priceInfo?.currency ?? "PHP",
+        sale_price: sale != null && list != null && sale < list ? sale : undefined,
+        currency: currency ?? "PHP",
         category_hint: category,
         url,
         itemId: ids.itemId,
         skuId: ids.skuId,
       };
+
+      // If PDP gave us title but no price, try JSON-LD; merge prices in.
+      if (result.price == null) {
+        const ld = extractJsonLdFromHtml(html, url, ids);
+        if (ld?.price != null) {
+          result.price = ld.price;
+          result.sale_price = ld.sale_price;
+        }
+      }
+      if (result.price == null) {
+        console.warn("[lazada-scraper] PDP found product but no price", ids.itemId);
+      }
+      return result;
     }
 
     // Fallback C — JSON-LD Product inside the same HTML.
     return extractJsonLdFromHtml(html, url, ids);
-  } catch {
+  } catch (e) {
+    console.warn("[lazada-scraper] PDP failed", ids.itemId, (e as any)?.message);
     return null;
   }
 }
