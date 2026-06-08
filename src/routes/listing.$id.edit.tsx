@@ -144,6 +144,7 @@ function EditListingPage() {
   const [fuel, setFuel] = useState("");
   const [engine, setEngine] = useState("");
   const [vehicleQuality, setVehicleQuality] = useState<VehicleQuality>({});
+  const [vehicleQualityIssues, setVehicleQualityIssues] = useState<VehicleQualityIssue[]>([]);
 
   // Towing
   const [towServiceType, setTowServiceType] = useState("");
