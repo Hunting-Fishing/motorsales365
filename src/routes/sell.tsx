@@ -1548,58 +1548,69 @@ function SellPage() {
             <div>
               <Label className="flex items-center gap-2">
                 <VideoIcon className="h-4 w-4" />
-                Video (max {maxVideos})
+                Videos ({videos.length}/{maxVideos})
               </Label>
               <Input
                 type="file"
                 accept="video/*"
+                multiple={maxVideos > 1}
                 onChange={handleVideo}
                 className="mt-2"
-                disabled={videoUpload.status === "uploading"}
+                disabled={
+                  videos.length >= maxVideos ||
+                  videoUploads.some((u) => u.status === "uploading")
+                }
               />
-              {video && (
-                <div className="mt-2 space-y-1">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span className="truncate flex-1">{video.name}</span>
-                    {videoUpload.status === "done" && (
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-                    )}
-                    {videoUpload.status !== "uploading" && videoUpload.status !== "done" && (
-                      <button
-                        type="button"
-                        onClick={removeVideo}
-                        className="text-foreground hover:underline"
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
-                  {videoUpload.status === "uploading" && (
-                    <div className="flex items-center gap-2">
-                      <Progress value={videoUpload.percent} className="h-1.5 flex-1" />
-                      <span className="text-xs text-muted-foreground">{videoUpload.percent}%</span>
-                    </div>
-                  )}
-                  {videoUpload.status === "error" && (
-                    <div className="flex items-center gap-2 rounded border border-destructive/40 bg-destructive/10 px-2 py-1.5 text-xs text-destructive">
-                      <AlertCircle className="h-3.5 w-3.5" />
-                      <span className="flex-1 truncate">
-                        {videoUpload.error ?? "Upload failed"}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={retryVideo}
-                        className="inline-flex items-center gap-1 rounded bg-background px-1.5 py-0.5 text-foreground hover:bg-secondary"
-                      >
-                        <RotateCw className="h-3 w-3" /> Retry
-                      </button>
-                    </div>
-                  )}
-                </div>
+              {videos.length > 0 && (
+                <ul className="mt-2 space-y-2">
+                  {videos.map((file, i) => {
+                    const u = videoUploads[i] ?? { status: "idle" as const, percent: 0 };
+                    return (
+                      <li key={i} className="space-y-1">
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span className="truncate flex-1">{file.name}</span>
+                          {u.status === "done" && (
+                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                          )}
+                          {u.status !== "uploading" && u.status !== "done" && (
+                            <button
+                              type="button"
+                              onClick={() => removeVideo(i)}
+                              className="text-foreground hover:underline"
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                        {u.status === "uploading" && (
+                          <div className="flex items-center gap-2">
+                            <Progress value={u.percent} className="h-1.5 flex-1" />
+                            <span className="text-xs text-muted-foreground">{u.percent}%</span>
+                          </div>
+                        )}
+                        {u.status === "error" && (
+                          <div className="flex items-center gap-2 rounded border border-destructive/40 bg-destructive/10 px-2 py-1.5 text-xs text-destructive">
+                            <AlertCircle className="h-3.5 w-3.5" />
+                            <span className="flex-1 truncate">
+                              {u.error ?? "Upload failed"}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => retryVideo(i)}
+                              className="inline-flex items-center gap-1 rounded bg-background px-1.5 py-0.5 text-foreground hover:bg-secondary"
+                            >
+                              <RotateCw className="h-3 w-3" /> Retry
+                            </button>
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
               )}
-              {plan === "standard" && (
+              {plan === "free" && (
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Standard includes 1 video. Upgrade to add up to 3.
+                  Free includes 1 video. Upgrade to add up to 3.
                 </p>
               )}
             </div>
