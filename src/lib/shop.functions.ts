@@ -1223,6 +1223,24 @@ async function fetchLazadaProductData(input: string): Promise<MarketplaceProduct
   };
 }
 
+async function fetchAliExpressProductData(
+  input: string,
+): Promise<MarketplaceProductData | null> {
+  const result = await scrapeAliExpressProduct(input);
+  if (!result) return null;
+  return {
+    title: result.title,
+    brand: result.brand,
+    description: result.description,
+    image_url: result.image_url,
+    price: result.price,
+    sale_price: result.sale_price,
+    currency: result.currency,
+    category_hint: result.category_hint,
+    url: result.url,
+  };
+}
+
 type LdProduct = {
   name?: string;
   brand?: string;
