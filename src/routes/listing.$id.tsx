@@ -216,6 +216,13 @@ function ListingDetailPage() {
         .maybeSingle();
       setSeller(p);
 
+      try {
+        const { dealers } = await getActiveDealerStatus({ data: { userIds: [l.user_id] } });
+        setSellerDealerPlan(dealers[l.user_id]?.planName ?? null);
+      } catch {
+        setSellerDealerPlan(null);
+      }
+
       // Increment view count via RPC (counts every page load, anon allowed)
       supabase.rpc("increment_listing_view", {
         _listing_id: id,
