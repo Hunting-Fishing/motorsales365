@@ -16,7 +16,7 @@ Purpose: working checklist of issues to correct before launch. Check items off a
 - [x] 1. Fix contact phone and email domain inconsistency
 - [x] 2. Resolve pricing / photo-limit inconsistency
 - [x] 3. Add real or seeded listings
-- [ ] 4. Add visible seller onboarding page
+- [x] 4. Add visible seller onboarding page
 - [ ] 5. Add real business directory listings
 - [ ] 6. Fix "Loading…" pages for SEO and trust (SSR fallback content)
 - [ ] 7. Clarify export page liability conflict
@@ -165,3 +165,4 @@ Examples: "Looking for Toyota Vios under ₱300k in Ilocos" · "Need multicab in
 - 2026-06-08 — Item #1 done (phone + email standardized).
 - 2026-06-08 — Item #2 done. Standardized free Private Seller tier at **12 photos / 1 video**; paid tiers at **20 photos**. Updated `pricing.tsx`, `sell.tsx` (tier caps, copy, validation), `plan-limits.ts` defaults, and `subscription_plans.Private Seller.max_photos_per_listing` 20 → 12.
 - 2026-06-08 — Item #3 done. Seeded **12 sample listings** (5 cars, 4 motorcycles, 1 equipment, 1 drone, 1 boat) across NCR / Region I / VII / XI, each with one photo. All owned by "365 MotorSales" profile (`a3999f39…`), titles prefixed `[Sample]`, `source='seed'`, `attributes.seed=true`. Cleanup: `DELETE FROM listings WHERE source='seed'` (cascades to media).
+- 2026-06-08 — Item #4 done. New public route `/start-selling` (no auth) covering: hero + CTA, 4-step "How it works", what-you-need (OR/CR checklist + photo tips), plan comparison snapshot linking to `/pricing`, tips to sell faster, scam-prevention card, 365 Verified explainer linking to `/dashboard/verification`, dealer section, final CTA. Footer "Sell" column now leads with **How selling works → Post a listing**.

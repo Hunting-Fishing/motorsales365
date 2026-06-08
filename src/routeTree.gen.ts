@@ -14,6 +14,7 @@ import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TowRouteImport } from './routes/tow'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SupportRouteImport } from './routes/support'
+import { Route as StartSellingRouteImport } from './routes/start-selling'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SellRouteImport } from './routes/sell'
@@ -180,6 +181,11 @@ const TermsRoute = TermsRouteImport.update({
 const SupportRoute = SupportRouteImport.update({
   id: '/support',
   path: '/support',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StartSellingRoute = StartSellingRouteImport.update({
+  id: '/start-selling',
+  path: '/start-selling',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
@@ -932,6 +938,7 @@ export interface FileRoutesByFullPath {
   '/sell': typeof SellRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/start-selling': typeof StartSellingRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
@@ -1079,6 +1086,7 @@ export interface FileRoutesByTo {
   '/sell': typeof SellRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/start-selling': typeof StartSellingRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
@@ -1228,6 +1236,7 @@ export interface FileRoutesById {
   '/sell': typeof SellRouteWithChildren
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/start-selling': typeof StartSellingRoute
   '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
@@ -1379,6 +1388,7 @@ export interface FileRouteTypes {
     | '/sell'
     | '/signup'
     | '/sitemap.xml'
+    | '/start-selling'
     | '/support'
     | '/terms'
     | '/tow'
@@ -1526,6 +1536,7 @@ export interface FileRouteTypes {
     | '/sell'
     | '/signup'
     | '/sitemap.xml'
+    | '/start-selling'
     | '/support'
     | '/terms'
     | '/tow'
@@ -1674,6 +1685,7 @@ export interface FileRouteTypes {
     | '/sell'
     | '/signup'
     | '/sitemap.xml'
+    | '/start-selling'
     | '/support'
     | '/terms'
     | '/tow'
@@ -1824,6 +1836,7 @@ export interface RootRouteChildren {
   SellRoute: typeof SellRouteWithChildren
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  StartSellingRoute: typeof StartSellingRoute
   SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
   TowRoute: typeof TowRoute
@@ -1917,6 +1930,13 @@ declare module '@tanstack/react-router' {
       path: '/support'
       fullPath: '/support'
       preLoaderRoute: typeof SupportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/start-selling': {
+      id: '/start-selling'
+      path: '/start-selling'
+      fullPath: '/start-selling'
+      preLoaderRoute: typeof StartSellingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sitemap.xml': {
@@ -3147,6 +3167,7 @@ const rootRouteChildren: RootRouteChildren = {
   SellRoute: SellRouteWithChildren,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  StartSellingRoute: StartSellingRoute,
   SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
   TowRoute: TowRoute,
