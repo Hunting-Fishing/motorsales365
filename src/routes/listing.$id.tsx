@@ -178,6 +178,7 @@ function ListingDetailPage() {
   const [listing, setListing] = useState<ListingDetail | null>(null);
   const [media, setMedia] = useState<{ id: string; url: string; type: "photo" | "video" }[]>([]);
   const [seller, setSeller] = useState<any>(null);
+  const [sellerDealerPlan, setSellerDealerPlan] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeIdx, setActiveIdx] = useState(0);
   const [favorited, setFavorited] = useState(false);
