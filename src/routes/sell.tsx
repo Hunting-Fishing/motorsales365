@@ -289,7 +289,7 @@ function SellPage() {
     path?: string;
   };
   const [photoUploads, setPhotoUploads] = useState<UploadState[]>([]);
-  const [videoUpload, setVideoUpload] = useState<UploadState>({ status: "idle", percent: 0 });
+  const [videoUploads, setVideoUploads] = useState<UploadState[]>([]);
   const [listingId, setListingId] = useState<string | null>(null);
 
   const [pricing, setPricing] = useState<Record<string, number>>({});
