@@ -8,11 +8,11 @@ export interface PlanLimits {
 
 /**
  * Defaults for users without an active paid subscription.
- * Matches the Private Seller plan: 5 active listings, 20 photos.
+ * Matches the Private Seller plan: 5 active listings, 12 photos.
  */
 export const FREE_PLAN_LIMITS: PlanLimits = {
   planName: "Private Seller",
-  maxPhotosPerListing: 20,
+  maxPhotosPerListing: 12,
   listingsPerMonth: 5,
 };
 
