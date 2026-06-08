@@ -123,7 +123,12 @@ function BusinessesIndex() {
       if (loc.province) query = query.eq("province", loc.province);
       if (loc.city) query = query.eq("city", loc.city);
       if (loc.barangay) query = query.ilike("barangay", `%${loc.barangay}%`);
-      if (q.trim()) query = query.ilike("name", `%${q.trim()}%`);
+      if (q.trim()) {
+        const term = q.trim().replace(/[,()]/g, " ");
+        query = query.or(
+          `name.ilike.%${term}%,description.ilike.%${term}%,brands_carried.ilike.%${term}%`,
+        );
+      }
 
       const { data } = await query;
       const rows: BusinessRow[] = data ?? [];
@@ -235,7 +240,7 @@ function BusinessesIndex() {
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              placeholder="Search businesses by name…"
+              placeholder="Search by shop name, service or brand…"
               className="pl-9"
             />
           </div>
@@ -265,23 +270,39 @@ function BusinessesIndex() {
           </div>
 
           {visibleTags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {visibleTags.map((t) => {
-                const on = selectedTags.includes(t.slug);
-                return (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                  {typeSlug === "repair_shop" ? "Filter by service" : "Services & features"}
+                </p>
+                {selectedTags.length > 0 && (
                   <button
-                    key={t.slug}
-                    onClick={() =>
-                      setSelectedTags((prev) =>
-                        on ? prev.filter((x) => x !== t.slug) : [...prev, t.slug],
-                      )
-                    }
-                    className={`rounded-full border px-3 py-1 text-xs transition ${on ? "border-foreground bg-foreground text-background" : "border-border hover:bg-secondary"}`}
+                    type="button"
+                    onClick={() => setSelectedTags([])}
+                    className="text-xs text-muted-foreground underline-offset-2 hover:underline"
                   >
-                    {t.label}
+                    Clear ({selectedTags.length})
                   </button>
-                );
-              })}
+                )}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {visibleTags.map((t) => {
+                  const on = selectedTags.includes(t.slug);
+                  return (
+                    <button
+                      key={t.slug}
+                      onClick={() =>
+                        setSelectedTags((prev) =>
+                          on ? prev.filter((x) => x !== t.slug) : [...prev, t.slug],
+                        )
+                      }
+                      className={`rounded-full border px-3 py-1 text-xs transition ${on ? "border-foreground bg-foreground text-background" : "border-border hover:bg-secondary"}`}
+                    >
+                      {t.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
 
