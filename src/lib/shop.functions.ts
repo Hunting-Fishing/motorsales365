@@ -1376,7 +1376,7 @@ async function rescrapeOne(productId: string): Promise<{
     : null;
   const isDeal = !!(salePhp && newPrice && salePhp < newPrice);
 
-  const patch: Record<string, any> = {};
+  const patch: ShopProductUpdate = {};
   // Only fill fields that are currently empty, or where price clearly changed.
   if (!product.brand && newBrand) { patch.brand = newBrand; updatedFields.push("brand"); }
   if ((!product.description || product.description.length < 40) && newDesc) {
