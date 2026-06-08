@@ -1305,7 +1305,7 @@ function SellPage() {
                   <div className="font-medium">
                     Standard — {formatPHP(pricing.listing_fee_php ?? 20)}
                   </div>
-                  <div className="text-xs text-muted-foreground">Up to 20 photos, 2 videos</div>
+                  <div className="text-xs text-muted-foreground">Up to 20 photos, 3 videos</div>
                 </div>
               </label>
               <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 hover:bg-secondary/50">
