@@ -37,6 +37,11 @@ import { useDynamicMeta } from "@/hooks/use-dynamic-meta";
 import { useDynamicJsonLd } from "@/hooks/use-dynamic-jsonld";
 import { PhoneInput } from "@/components/phone-input";
 import { buildE164 } from "@/data/country-codes";
+import {
+  VehicleQualityFields,
+  vehicleQualityToAttributes,
+  type VehicleQuality,
+} from "@/components/vehicle-quality-fields";
 import { z } from "zod";
 
 const ListingTextSchema = z.object({
@@ -238,6 +243,7 @@ function SellPage() {
   const [transmission, setTransmission] = useState("");
   const [fuel, setFuel] = useState("");
   const [engine, setEngine] = useState("");
+  const [vehicleQuality, setVehicleQuality] = useState<VehicleQuality>({});
 
   // Towing service-specific fields
   const [towServiceType, setTowServiceType] = useState("");
@@ -595,6 +601,9 @@ function SellPage() {
         if (transmission) attributes.transmission = transmission;
         if (fuel) attributes.fuel = fuel;
         if (engine) attributes.engine = engine;
+        if (category === "car" || category === "motorcycle") {
+          Object.assign(attributes, vehicleQualityToAttributes(vehicleQuality));
+        }
         if (category === "towing") {
           if (towServiceType) attributes.service_type = towServiceType;
           if (towCapacity) attributes.vehicle_capacity = towCapacity;
@@ -1268,6 +1277,13 @@ function SellPage() {
                 />
               </div>
             </div>
+            {(category === "car" || category === "motorcycle") && (
+              <VehicleQualityFields
+                category={category as "car" | "motorcycle"}
+                value={vehicleQuality}
+                onChange={setVehicleQuality}
+              />
+            )}
           </section>
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">

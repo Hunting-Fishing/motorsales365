@@ -539,7 +539,11 @@ function ListingDetailPage() {
                     >
                       <dt className="capitalize text-muted-foreground">{k.replace(/_/g, " ")}</dt>
                       <dd className="font-medium text-right">
-                        {Array.isArray(v) ? v.join(", ") : String(v)}
+                        {Array.isArray(v)
+                          ? v.join(", ")
+                          : typeof v === "boolean"
+                            ? v ? "Yes" : "No"
+                            : String(v)}
                       </dd>
                     </div>
                   ))}

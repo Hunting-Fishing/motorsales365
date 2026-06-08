@@ -35,6 +35,13 @@ import { uploadWithRetry } from "@/lib/storage-upload";
 import { getUserPlanLimits, FREE_PLAN_LIMITS, type PlanLimits } from "@/lib/plan-limits";
 import { PhoneInput } from "@/components/phone-input";
 import { parseE164, buildE164 } from "@/data/country-codes";
+import {
+  VehicleQualityFields,
+  vehicleQualityToAttributes,
+  hydrateVehicleQuality,
+  VEHICLE_QUALITY_KEYS,
+  type VehicleQuality,
+} from "@/components/vehicle-quality-fields";
 
 const CATEGORIES = [
   { slug: "car", name: "Car" },
@@ -134,6 +141,7 @@ function EditListingPage() {
   const [transmission, setTransmission] = useState("");
   const [fuel, setFuel] = useState("");
   const [engine, setEngine] = useState("");
+  const [vehicleQuality, setVehicleQuality] = useState<VehicleQuality>({});
 
   // Towing
   const [towServiceType, setTowServiceType] = useState("");
@@ -223,6 +231,7 @@ function EditListingPage() {
     setTransmission(a.transmission ?? "");
     setFuel(a.fuel ?? "");
     setEngine(a.engine ?? "");
+    setVehicleQuality(hydrateVehicleQuality(a));
 
     setTowServiceType(a.service_type ?? "");
     setTowCapacity(a.vehicle_capacity ?? "");
@@ -306,6 +315,7 @@ function EditListingPage() {
       "engine",
     ];
     for (const k of vehicleKeys) delete attributes[k];
+    for (const k of VEHICLE_QUALITY_KEYS) delete attributes[k];
     if (year) attributes.year = year;
     if (make) attributes.make = make;
     if (model) attributes.model = model;
@@ -314,6 +324,9 @@ function EditListingPage() {
     if (transmission) attributes.transmission = transmission;
     if (fuel) attributes.fuel = fuel;
     if (engine) attributes.engine = engine;
+    if (category === "car" || category === "motorcycle") {
+      Object.assign(attributes, vehicleQualityToAttributes(vehicleQuality));
+    }
 
     if (category === "towing") {
       attributes.service_type = towServiceType || undefined;
@@ -933,6 +946,11 @@ function EditListingPage() {
                     </Select>
                   </div>
                 </div>
+                <VehicleQualityFields
+                  category={category as "car" | "motorcycle"}
+                  value={vehicleQuality}
+                  onChange={setVehicleQuality}
+                />
               </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
