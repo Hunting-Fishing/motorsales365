@@ -58,8 +58,8 @@ export function BoostDialog({ listingId, listingTitle, children }: Props) {
           </DialogTitle>
           <DialogDescription>
             {listingTitle
-              ? `Get more eyes on “${listingTitle}”. Pay once — no subscription required (except Category Sponsor).`
-              : "Get more eyes on your listing with a paid boost."}
+              ? `Get more eyes on “${listingTitle}”. Every boost also renews your ad's expiry — repeat the 2-week boost to keep your listing on top.`
+              : "Boost your listing to the top of search and renew its expiry in one payment."}
           </DialogDescription>
         </DialogHeader>
 
