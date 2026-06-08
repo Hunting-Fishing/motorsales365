@@ -43,12 +43,15 @@ import { Route as AdvertiseRouteImport } from './routes/advertise'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WantedIndexRouteImport } from './routes/wanted.index'
 import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as RidesIndexRouteImport } from './routes/rides.index'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as BusinessesIndexRouteImport } from './routes/businesses.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as WantedNewRouteImport } from './routes/wanted.new'
+import { Route as WantedIdRouteImport } from './routes/wanted.$id'
 import { Route as SupportSellingRouteImport } from './routes/support_.selling'
 import { Route as SupportBuyingRouteImport } from './routes/support_.buying'
 import { Route as SupportBusinessRouteImport } from './routes/support_.business'
@@ -68,6 +71,7 @@ import { Route as InvitesTokenRouteImport } from './routes/invites.$token'
 import { Route as GoProductIdRouteImport } from './routes/go.$productId'
 import { Route as ExportTrustRouteImport } from './routes/export.trust'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as DashboardWantedRouteImport } from './routes/dashboard.wanted'
 import { Route as DashboardVerificationRouteImport } from './routes/dashboard.verification'
 import { Route as DashboardVehiclesRouteImport } from './routes/dashboard.vehicles'
 import { Route as DashboardTowRouteImport } from './routes/dashboard.tow'
@@ -332,6 +336,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WantedIndexRoute = WantedIndexRouteImport.update({
+  id: '/wanted/',
+  path: '/wanted/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopIndexRoute = ShopIndexRouteImport.update({
   id: '/shop/',
   path: '/shop/',
@@ -361,6 +370,16 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminRoute,
+} as any)
+const WantedNewRoute = WantedNewRouteImport.update({
+  id: '/wanted/new',
+  path: '/wanted/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WantedIdRoute = WantedIdRouteImport.update({
+  id: '/wanted/$id',
+  path: '/wanted/$id',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const SupportSellingRoute = SupportSellingRouteImport.update({
   id: '/support_/selling',
@@ -456,6 +475,11 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardWantedRoute = DashboardWantedRouteImport.update({
+  id: '/wanted',
+  path: '/wanted',
+  getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardVerificationRoute = DashboardVerificationRouteImport.update({
   id: '/verification',
@@ -1028,6 +1052,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/vehicles': typeof DashboardVehiclesRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
+  '/dashboard/wanted': typeof DashboardWantedRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/go/$productId': typeof GoProductIdRoute
@@ -1047,12 +1072,15 @@ export interface FileRoutesByFullPath {
   '/support/business': typeof SupportBusinessRoute
   '/support/buying': typeof SupportBuyingRoute
   '/support/selling': typeof SupportSellingRoute
+  '/wanted/$id': typeof WantedIdRoute
+  '/wanted/new': typeof WantedNewRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop/': typeof ShopIndexRoute
+  '/wanted/': typeof WantedIndexRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1179,6 +1207,7 @@ export interface FileRoutesByTo {
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/vehicles': typeof DashboardVehiclesRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
+  '/dashboard/wanted': typeof DashboardWantedRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/go/$productId': typeof GoProductIdRoute
@@ -1198,12 +1227,15 @@ export interface FileRoutesByTo {
   '/support/business': typeof SupportBusinessRoute
   '/support/buying': typeof SupportBuyingRoute
   '/support/selling': typeof SupportSellingRoute
+  '/wanted/$id': typeof WantedIdRoute
+  '/wanted/new': typeof WantedNewRoute
   '/admin': typeof AdminIndexRoute
   '/businesses': typeof BusinessesIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/learn': typeof LearnIndexRoute
   '/rides': typeof RidesIndexRoute
   '/shop': typeof ShopIndexRoute
+  '/wanted': typeof WantedIndexRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1334,6 +1366,7 @@ export interface FileRoutesById {
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/vehicles': typeof DashboardVehiclesRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
+  '/dashboard/wanted': typeof DashboardWantedRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/go/$productId': typeof GoProductIdRoute
@@ -1353,12 +1386,15 @@ export interface FileRoutesById {
   '/support_/business': typeof SupportBusinessRoute
   '/support_/buying': typeof SupportBuyingRoute
   '/support_/selling': typeof SupportSellingRoute
+  '/wanted/$id': typeof WantedIdRoute
+  '/wanted/new': typeof WantedNewRoute
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop/': typeof ShopIndexRoute
+  '/wanted/': typeof WantedIndexRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1490,6 +1526,7 @@ export interface FileRouteTypes {
     | '/dashboard/tow'
     | '/dashboard/vehicles'
     | '/dashboard/verification'
+    | '/dashboard/wanted'
     | '/email/unsubscribe'
     | '/export/trust'
     | '/go/$productId'
@@ -1509,12 +1546,15 @@ export interface FileRouteTypes {
     | '/support/business'
     | '/support/buying'
     | '/support/selling'
+    | '/wanted/$id'
+    | '/wanted/new'
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
     | '/learn/'
     | '/rides/'
     | '/shop/'
+    | '/wanted/'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -1641,6 +1681,7 @@ export interface FileRouteTypes {
     | '/dashboard/tow'
     | '/dashboard/vehicles'
     | '/dashboard/verification'
+    | '/dashboard/wanted'
     | '/email/unsubscribe'
     | '/export/trust'
     | '/go/$productId'
@@ -1660,12 +1701,15 @@ export interface FileRouteTypes {
     | '/support/business'
     | '/support/buying'
     | '/support/selling'
+    | '/wanted/$id'
+    | '/wanted/new'
     | '/admin'
     | '/businesses'
     | '/dashboard'
     | '/learn'
     | '/rides'
     | '/shop'
+    | '/wanted'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -1795,6 +1839,7 @@ export interface FileRouteTypes {
     | '/dashboard/tow'
     | '/dashboard/vehicles'
     | '/dashboard/verification'
+    | '/dashboard/wanted'
     | '/email/unsubscribe'
     | '/export/trust'
     | '/go/$productId'
@@ -1814,12 +1859,15 @@ export interface FileRouteTypes {
     | '/support_/business'
     | '/support_/buying'
     | '/support_/selling'
+    | '/wanted/$id'
+    | '/wanted/new'
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
     | '/learn/'
     | '/rides/'
     | '/shop/'
+    | '/wanted/'
     | '/admin/redemptions_/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -1918,10 +1966,13 @@ export interface RootRouteChildren {
   SupportBusinessRoute: typeof SupportBusinessRoute
   SupportBuyingRoute: typeof SupportBuyingRoute
   SupportSellingRoute: typeof SupportSellingRoute
+  WantedIdRoute: typeof WantedIdRoute
+  WantedNewRoute: typeof WantedNewRoute
   BusinessesIndexRoute: typeof BusinessesIndexRoute
   LearnIndexRoute: typeof LearnIndexRoute
   RidesIndexRoute: typeof RidesIndexRoute
   ShopIndexRoute: typeof ShopIndexRoute
+  WantedIndexRoute: typeof WantedIndexRoute
   ApiAdminCreateUserRoute: typeof ApiAdminCreateUserRoute
   ApiPublicGeoSearchRoute: typeof ApiPublicGeoSearchRoute
   ApiPublicGeocodeRoute: typeof ApiPublicGeocodeRoute
@@ -2185,6 +2236,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/wanted/': {
+      id: '/wanted/'
+      path: '/wanted'
+      fullPath: '/wanted/'
+      preLoaderRoute: typeof WantedIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/': {
       id: '/shop/'
       path: '/shop'
@@ -2226,6 +2284,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
+    }
+    '/wanted/new': {
+      id: '/wanted/new'
+      path: '/wanted/new'
+      fullPath: '/wanted/new'
+      preLoaderRoute: typeof WantedNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wanted/$id': {
+      id: '/wanted/$id'
+      path: '/wanted/$id'
+      fullPath: '/wanted/$id'
+      preLoaderRoute: typeof WantedIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/support_/selling': {
       id: '/support_/selling'
@@ -2359,6 +2431,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/dashboard/wanted': {
+      id: '/dashboard/wanted'
+      path: '/wanted'
+      fullPath: '/dashboard/wanted'
+      preLoaderRoute: typeof DashboardWantedRouteImport
+      parentRoute: typeof DashboardRoute
     }
     '/dashboard/verification': {
       id: '/dashboard/verification'
@@ -3126,6 +3205,7 @@ interface DashboardRouteChildren {
   DashboardTowRoute: typeof DashboardTowRoute
   DashboardVehiclesRoute: typeof DashboardVehiclesRoute
   DashboardVerificationRoute: typeof DashboardVerificationRoute
+  DashboardWantedRoute: typeof DashboardWantedRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
   DashboardRidesNewRoute: typeof DashboardRidesNewRoute
   DashboardBusinessesIdAnalyticsRoute: typeof DashboardBusinessesIdAnalyticsRoute
@@ -3153,6 +3233,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardTowRoute: DashboardTowRoute,
   DashboardVehiclesRoute: DashboardVehiclesRoute,
   DashboardVerificationRoute: DashboardVerificationRoute,
+  DashboardWantedRoute: DashboardWantedRoute,
   DashboardIndexRoute: DashboardIndexRoute,
   DashboardRidesNewRoute: DashboardRidesNewRoute,
   DashboardBusinessesIdAnalyticsRoute: DashboardBusinessesIdAnalyticsRoute,
@@ -3292,10 +3373,13 @@ const rootRouteChildren: RootRouteChildren = {
   SupportBusinessRoute: SupportBusinessRoute,
   SupportBuyingRoute: SupportBuyingRoute,
   SupportSellingRoute: SupportSellingRoute,
+  WantedIdRoute: WantedIdRoute,
+  WantedNewRoute: WantedNewRoute,
   BusinessesIndexRoute: BusinessesIndexRoute,
   LearnIndexRoute: LearnIndexRoute,
   RidesIndexRoute: RidesIndexRoute,
   ShopIndexRoute: ShopIndexRoute,
+  WantedIndexRoute: WantedIndexRoute,
   ApiAdminCreateUserRoute: ApiAdminCreateUserRoute,
   ApiPublicGeoSearchRoute: ApiPublicGeoSearchRoute,
   ApiPublicGeocodeRoute: ApiPublicGeocodeRoute,

@@ -33,7 +33,7 @@ Purpose: working checklist of issues to correct before launch. Check items off a
 - [ ] Parts / tool affiliate shop
 - [ ] Learn / course sponsorships
 - [ ] Export lead referral (not direct brokerage unless legally structured)
-- [ ] Buyer "wanted" posts
+- [x] Buyer "wanted" posts
 - [ ] Vehicle Passport subscription / premium history report
 
 ---
