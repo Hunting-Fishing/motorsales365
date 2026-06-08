@@ -180,7 +180,29 @@ function SellerProfilePage() {
                 {profile.verification_status === "verified" && (
                   <VerifiedBadge size="md" showLabel />
                 )}
+                {Number(profile.seller_rating_count ?? 0) > 0 && (
+                  <span className="inline-flex items-center gap-1 text-sm">
+                    <Star className="h-4 w-4 fill-yellow-500 text-yellow-500" />
+                    <span className="font-semibold">
+                      {Number(profile.seller_rating_avg ?? 0).toFixed(1)}
+                    </span>
+                    <span className="text-muted-foreground">
+                      ({profile.seller_rating_count})
+                    </span>
+                  </span>
+                )}
               </div>
+              <SellerReputationBadges
+                className="mt-2"
+                profile={{
+                  verification_status: profile.verification_status,
+                  fb_verified_at: profile.fb_verified_at,
+                  is_founding_member: profile.is_founding_member,
+                  seller_rating_avg: profile.seller_rating_avg,
+                  seller_rating_count: profile.seller_rating_count,
+                  active_listings: listings.length,
+                }}
+              />
               {isBusiness && profile.business_address && (
                 <div className="mt-1 flex items-center gap-1 text-sm text-muted-foreground">
                   <MapPin className="h-4 w-4" />
