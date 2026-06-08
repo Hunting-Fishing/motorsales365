@@ -4239,33 +4239,64 @@ export type Database = {
       }
       reports: {
         Row: {
+          business_id: string | null
+          category: string | null
           created_at: string
           details: string | null
+          evidence_urls: string[]
           id: string
-          listing_id: string
+          listing_id: string | null
           reason: string
-          reporter_id: string
+          reporter_email: string | null
+          reporter_id: string | null
+          reporter_name: string | null
+          reporter_phone: string | null
           status: string
+          target_type: string
+          target_url: string | null
         }
         Insert: {
+          business_id?: string | null
+          category?: string | null
           created_at?: string
           details?: string | null
+          evidence_urls?: string[]
           id?: string
-          listing_id: string
+          listing_id?: string | null
           reason: string
-          reporter_id: string
+          reporter_email?: string | null
+          reporter_id?: string | null
+          reporter_name?: string | null
+          reporter_phone?: string | null
           status?: string
+          target_type?: string
+          target_url?: string | null
         }
         Update: {
+          business_id?: string | null
+          category?: string | null
           created_at?: string
           details?: string | null
+          evidence_urls?: string[]
           id?: string
-          listing_id?: string
+          listing_id?: string | null
           reason?: string
-          reporter_id?: string
+          reporter_email?: string | null
+          reporter_id?: string | null
+          reporter_name?: string | null
+          reporter_phone?: string | null
           status?: string
+          target_type?: string
+          target_url?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "reports_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "reports_listing_id_fkey"
             columns: ["listing_id"]
