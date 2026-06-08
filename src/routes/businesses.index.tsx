@@ -9,6 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { GoogleBusinessMap, type GMapBusiness } from "@/components/businesses/google-business-map";
 import { MapFilterBar, type CenterPoint } from "@/components/businesses/map-filter-bar";
 import { haversineKm } from "@/components/businesses/google-maps-loader";
