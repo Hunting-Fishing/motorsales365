@@ -21,7 +21,7 @@ Purpose: working checklist of issues to correct before launch. Check items off a
 - [x] 6. Fix "Loading…" pages for SEO and trust (SSR fallback content)
 - [x] 7. Clarify export page liability conflict
 - [x] 8. Add trust / verification explainer page
-- [ ] 9. Add scam-report and buyer-safety workflows
+- [x] 9. Add scam-report and buyer-safety workflows
 - [ ] 10. Add affiliate products to Shop
 
 ### Then build monetization
