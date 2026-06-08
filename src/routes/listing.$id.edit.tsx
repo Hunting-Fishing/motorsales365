@@ -962,6 +962,7 @@ function EditListingPage() {
                   category={category as "car" | "motorcycle"}
                   value={vehicleQuality}
                   onChange={setVehicleQuality}
+                  issues={vehicleQualityIssues}
                 />
               </div>
             ) : (
