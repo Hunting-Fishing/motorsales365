@@ -234,6 +234,9 @@ function SellerProfilePage() {
           <TabsList>
             <TabsTrigger value="listings">Listings ({listings.length})</TabsTrigger>
             <TabsTrigger value="rides">Rides ({rides.length})</TabsTrigger>
+            <TabsTrigger value="reviews">
+              Reviews ({profile.seller_rating_count ?? 0})
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="listings" className="mt-6">
             {listings.length === 0 ? (
