@@ -9,6 +9,13 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { GoogleBusinessMap, type GMapBusiness } from "@/components/businesses/google-business-map";
 import { MapFilterBar, type CenterPoint } from "@/components/businesses/map-filter-bar";
 import { haversineKm } from "@/components/businesses/google-maps-loader";
@@ -86,6 +93,7 @@ function BusinessesIndex() {
   });
   const [center, setCenter] = useState<CenterPoint>(null);
   const [radiusKm, setRadiusKm] = useState<number | null>(null);
+  const [sortBy, setSortBy] = useState<"relevance" | "nearest" | "popular">("relevance");
 
   useEffect(() => {
     setTypes(
@@ -197,6 +205,31 @@ function BusinessesIndex() {
       );
     });
   }, [items, center, radiusKm]);
+
+  const sortedItems = useMemo(() => {
+    if (sortBy === "popular") {
+      return [...items].sort((a, b) => {
+        if (b.rating_count !== a.rating_count) return b.rating_count - a.rating_count;
+        return (b.rating_avg ?? 0) - (a.rating_avg ?? 0);
+      });
+    }
+    if (sortBy === "nearest" && center) {
+      return [...items].sort((a, b) => {
+        if (a.lat == null || a.lng == null) return 1;
+        if (b.lat == null || b.lng == null) return -1;
+        const da = haversineKm(
+          { lat: center.lat, lng: center.lng },
+          { lat: Number(a.lat), lng: Number(a.lng) },
+        );
+        const db = haversineKm(
+          { lat: center.lat, lng: center.lng },
+          { lat: Number(b.lat), lng: Number(b.lng) },
+        );
+        return da - db;
+      });
+    }
+    return items;
+  }, [items, sortBy, center]);
 
   const mapBusinesses: GMapBusiness[] = filteredByRadius.map((b) => ({
     id: b.id,
@@ -314,10 +347,24 @@ function BusinessesIndex() {
 
         <div className="grid gap-6 md:grid-cols-[1fr_1.2fr]">
           <div className="space-y-3">
-            <div className="text-sm text-muted-foreground">
-              {loading
-                ? "Loading…"
-                : `${items.length} business${items.length === 1 ? "" : "es"} found`}
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-sm text-muted-foreground">
+                {loading
+                  ? "Loading…"
+                  : `${sortedItems.length} business${sortedItems.length === 1 ? "" : "es"} found`}
+              </div>
+              {typeSlug === "repair_shop" && !loading && (
+                <Select value={sortBy} onValueChange={(v: string) => setSortBy(v as typeof sortBy)}>
+                  <SelectTrigger className="h-8 w-auto text-xs">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="relevance">Relevance</SelectItem>
+                    <SelectItem value="nearest">Nearest</SelectItem>
+                    <SelectItem value="popular">Most popular</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
             </div>
             {loading ? (
               <>
@@ -325,7 +372,7 @@ function BusinessesIndex() {
                   <Skeleton key={i} className="h-24 w-full" />
                 ))}
               </>
-            ) : items.length === 0 ? (
+            ) : sortedItems.length === 0 ? (
               <Card className="p-6 text-center text-sm text-muted-foreground">
                 <StoreIcon className="mx-auto mb-2 h-6 w-6 opacity-50" />
                 No businesses match your filters. Try clearing some or{" "}
@@ -335,7 +382,7 @@ function BusinessesIndex() {
                 .
               </Card>
             ) : (
-              items.map((b) => (
+              sortedItems.map((b) => (
                 <Link
                   key={b.id}
                   to="/businesses/$slug"
