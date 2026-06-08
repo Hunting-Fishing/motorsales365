@@ -946,6 +946,11 @@ function EditListingPage() {
                     </Select>
                   </div>
                 </div>
+                <VehicleQualityFields
+                  category={category as "car" | "motorcycle"}
+                  value={vehicleQuality}
+                  onChange={setVehicleQuality}
+                />
               </div>
             ) : (
               <div className="grid gap-4 sm:grid-cols-2">
