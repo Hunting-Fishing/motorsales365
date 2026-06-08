@@ -12,6 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Progress } from "@/components/ui/progress";
 import { CheckCircle2, AlertCircle } from "lucide-react";
 import { z } from "zod";
+import { vinChecksumValid } from "@/components/vin-scan-dialog";
 
 export type VehicleQuality = {
   variant?: string;
