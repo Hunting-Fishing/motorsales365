@@ -277,7 +277,8 @@ function SellPage() {
   const [serviceWarranty, setServiceWarranty] = useState("");
 
   const [photos, setPhotos] = useState<File[]>([]);
-  const [video, setVideo] = useState<File | null>(null);
+  const [videos, setVideos] = useState<File[]>([]);
+
   const [submitting, setSubmitting] = useState(false);
 
   type UploadState = {
