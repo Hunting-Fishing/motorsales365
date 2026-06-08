@@ -302,6 +302,98 @@ function AdvertisePage() {
         </div>
       </section>
 
+      {/* Public rate card */}
+      <section id="rate-card" className="border-b border-border bg-secondary/30">
+        <div className="container mx-auto max-w-6xl px-4 py-14">
+          <div className="mb-6">
+            <h2 className="font-display text-2xl font-bold">Public rate card</h2>
+            <p className="text-sm text-muted-foreground">
+              Indicative monthly rates in Philippine Peso. Final pricing depends on flight length,
+              creative, targeting, and inventory availability — confirmed in your proposal.
+            </p>
+          </div>
+
+          <div className="overflow-x-auto rounded-xl border border-border bg-card">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/50 text-left text-xs uppercase tracking-wide text-muted-foreground">
+                <tr>
+                  <th className="px-4 py-3 font-semibold">Placement</th>
+                  <th className="px-4 py-3 font-semibold">Indicative rate</th>
+                  <th className="px-4 py-3 font-semibold">Notes</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {[
+                  { p: "Homepage hero sponsor", r: "₱2,500 – ₱10,000 / mo", n: "Top of /, highest reach. Limited slots." },
+                  { p: "Category banner (Cars, Motorcycles, etc.)", r: "₱1,000 – ₱5,000 / mo", n: "Top of one chosen category page." },
+                  { p: "Listing detail sidebar tile", r: "₱750 – ₱3,000 / mo", n: "Rendered next to every individual listing." },
+                  { p: "Business directory featured", r: "₱500 – ₱2,000 / mo", n: "Pinned on /businesses results." },
+                  { p: "Learn / Academy sponsor card", r: "₱500 – ₱2,500 / mo", n: "Sidebar of /learn course pages." },
+                  { p: "Newsletter sponsor slot", r: "₱500 – ₱2,000 / send", n: "Per newsletter send, not per month." },
+                  { p: "Local province sponsor", r: "₱500 – ₱3,000 / mo", n: "Geo-targeted to one PH province." },
+                ].map((row) => (
+                  <tr key={row.p}>
+                    <td className="px-4 py-3 font-medium">{row.p}</td>
+                    <td className="px-4 py-3 text-primary">{row.r}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{row.n}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-8">
+            <h3 className="font-display text-lg font-semibold">Bundles</h3>
+            <p className="text-sm text-muted-foreground">
+              Mix-and-match packages for sellers, dealers, and brands.
+            </p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                {
+                  name: "Local Shop",
+                  price: "₱499 / mo",
+                  desc: "1 category banner + 1 business directory feature in your province.",
+                  tier: "Starter",
+                },
+                {
+                  name: "Dealer Visibility",
+                  price: "₱1,499 / mo",
+                  desc: "Category banner + sidebar tile across all listings in your category.",
+                  tier: "Growth",
+                },
+                {
+                  name: "Province Domination",
+                  price: "₱4,999 / mo",
+                  desc: "Hero rotation + category banner + newsletter mention, all geo-targeted to one province.",
+                  tier: "Premium",
+                },
+                {
+                  name: "National Brand",
+                  price: "Custom",
+                  desc: "Multi-placement national campaign with dedicated account management.",
+                  tier: "Custom",
+                },
+              ].map((b) => (
+                <div key={b.name} className="rounded-xl border border-border bg-card p-4">
+                  <div className="flex items-start justify-between gap-2">
+                    <h4 className="font-semibold">{b.name}</h4>
+                    <Badge variant="outline" className={TIER_TONE[b.tier]}>{b.tier}</Badge>
+                  </div>
+                  <p className="mt-1 text-lg font-bold text-primary">{b.price}</p>
+                  <p className="mt-2 text-xs text-muted-foreground">{b.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <p className="mt-6 text-xs text-muted-foreground">
+            Rates are indicative and may be adjusted by inventory, targeting, and creative
+            requirements. All bookings are confirmed in a written proposal before invoicing.
+          </p>
+        </div>
+      </section>
+
+
       {/* Request form */}
       <section id="request">
         <div className="container mx-auto max-w-4xl px-4 py-14">

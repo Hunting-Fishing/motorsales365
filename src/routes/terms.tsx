@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 8, 2026 (rev. added Renew &amp; Boost biweekly listing promotion)";
+  const lastUpdated = "June 8, 2026 (rev. published advertising rate card on /advertise)";
 
   return (
     <SiteLayout>
@@ -278,11 +278,18 @@ function TermsPage() {
           Premium plan) — require payment. Sponsored content is always clearly labeled as
           "Sponsor", "Sponsored", "Featured", or "Ad" and never displaces organic listings or
           search results.
-          Current pricing is published on our{" "}
+          Current listing/subscription pricing is published on our{" "}
           <Link className="text-primary underline" to="/pricing">
             Pricing page
+          </Link>
+          ; indicative advertising and sponsorship rates (homepage hero, category banners, sidebar
+          tiles, business directory features, Academy sponsor cards, newsletter slots, province
+          sponsors, and bundles) are published on our{" "}
+          <Link className="text-primary underline" to="/advertise">
+            Advertise page
           </Link>{" "}
-          and is quoted in ₱ inclusive of VAT where applicable. The{" "}
+          and are confirmed in a written proposal before invoicing. Prices are quoted in ₱
+          inclusive of VAT where applicable. The{" "}
           <strong>Renew &amp; Boost (2 weeks)</strong> option is a one-time ₱150 charge that pins
           your vehicle listing to the top of search for 14 days and simultaneously renews the
           listing's expiry by the standard listing-active period; it does not auto-renew and you
