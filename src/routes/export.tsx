@@ -48,11 +48,16 @@ function ExportPage() {
       <section className="border-b bg-gradient-to-b from-primary/10 to-background">
         <div className="container mx-auto px-4 py-16 md:py-24">
           <div className="mx-auto max-w-3xl text-center">
-            <Badge className="mb-4">New division</Badge>
-            <h1 className="font-display text-4xl md:text-6xl tracking-tight">365 Export</h1>
+            <Badge className="mb-4">Partner network</Badge>
+            <h1 className="font-display text-4xl md:text-6xl tracking-tight">365 Export Connect</h1>
             <p className="mt-4 text-lg text-muted-foreground">
-              International brokerage for vehicles sourced in the Philippines. We handle inspection,
-              documentation, and shipping — you receive the vehicle at your port.
+              Discover Philippine vehicles flagged for international export and get matched with
+              independent brokers, inspection providers, and shipping partners.
+            </p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              365 MotorSales is the listing and introduction venue. We are not the broker, escrow
+              agent, shipper, exporter of record, or customs agent — those services are provided
+              by independent partners you choose to engage.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-2">
               <a href="#catalog">
@@ -60,7 +65,7 @@ function ExportPage() {
               </a>
               <a href="#inquiry">
                 <Button size="lg" variant="outline">
-                  Request a quote
+                  Request a partner intro
                 </Button>
               </a>
             </div>
@@ -75,23 +80,23 @@ function ExportPage() {
           {[
             {
               Icon: ShieldCheck,
-              t: "Verified sellers only",
-              d: "Every export-ready unit comes from a verified seller on 365 MotorSales.",
+              t: "Verified PH sellers",
+              d: "Listings come from sellers verified on 365 MotorSales. Buyers transact directly with the seller or their chosen partner.",
             },
             {
               Icon: FileCheck2,
-              t: "Full documentation",
-              d: "Deregistration, export permits, bill of lading — handled by our brokers.",
+              t: "Documentation partners",
+              d: "Deregistration, export permits, and bill of lading are coordinated by independent customs brokers and forwarders.",
             },
             {
               Icon: Ship,
-              t: "Door-to-port shipping",
-              d: "RoRo and container options to major ports worldwide.",
+              t: "Shipping partners",
+              d: "RoRo and container quotes through independent shipping lines and freight forwarders.",
             },
             {
               Icon: Globe,
-              t: "Pay in your currency",
-              d: "Quotes in USD/JPY/EUR. Escrow via international wire.",
+              t: "Pay your partner directly",
+              d: "Quotes and payment are arranged between you and the partner. 365 does not hold funds or act as escrow.",
             },
           ].map(({ Icon, t, d }) => (
             <Card key={t}>
@@ -104,6 +109,7 @@ function ExportPage() {
           ))}
         </div>
       </section>
+
 
       <section id="catalog" className="container mx-auto px-4 py-10">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
