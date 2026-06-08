@@ -299,6 +299,15 @@ function EditListingPage() {
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !listing) return;
+    if (category === "car" || category === "motorcycle") {
+      const vqCheck = validateVehicleQuality(vehicleQuality);
+      if (!vqCheck.ok) {
+        setVehicleQualityIssues(vqCheck.issues);
+        toast.error(vqCheck.issues[0]?.message ?? "Please review the vehicle details.");
+        return;
+      }
+      setVehicleQualityIssues([]);
+    }
     setSaving(true);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
