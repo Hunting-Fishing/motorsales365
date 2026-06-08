@@ -120,23 +120,6 @@ function ExportPage() {
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
             <h2 className="font-display text-2xl">Export-ready catalog</h2>
-          ].map(({ Icon, t, d }) => (
-            <Card key={t}>
-              <CardContent className="p-5">
-                <Icon className="mb-3 h-6 w-6 text-primary" />
-                <h3 className="font-semibold">{t}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{d}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-
-      <section id="catalog" className="container mx-auto px-4 py-10">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-          <div>
-            <h2 className="font-display text-2xl">Export-ready catalog</h2>
             <p className="text-sm text-muted-foreground">
               Vehicles flagged by verified sellers as available for international export.
             </p>
