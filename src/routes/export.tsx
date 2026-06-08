@@ -12,21 +12,28 @@ import { Badge } from "@/components/ui/badge";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { listExportListings, submitExportInquiry } from "@/lib/export-brokerage.functions";
 import { toast } from "sonner";
-import { Ship, Globe, ShieldCheck, FileCheck2 } from "lucide-react";
+import { Ship, Globe, ShieldCheck, FileCheck2, Info } from "lucide-react";
 
 export const Route = createFileRoute("/export")({
   component: ExportPage,
   head: () => ({
     meta: [
-      { title: "365 Export — International vehicle brokerage from the Philippines" },
+      { title: "365 Export Connect — Find PH vehicles & export partners" },
       {
         name: "description",
         content:
-          "Buy verified vehicles from the Philippines, shipped to your port. Brokerage, inspection, and documentation handled end-to-end.",
+          "Browse Philippine vehicles flagged for export and connect with independent brokers, inspection providers, and shipping partners. 365 MotorSales is the introduction venue, not the broker or shipper.",
+      },
+      { property: "og:title", content: "365 Export Connect — Philippines vehicle export network" },
+      {
+        property: "og:description",
+        content:
+          "Connect with independent export brokers, inspectors, and shipping partners for Philippine vehicles. 365 is the listing venue, not the broker or shipper.",
       },
     ],
   }),
 });
+
 
 function ExportPage() {
   const [search, setSearch] = useState("");
@@ -41,11 +48,16 @@ function ExportPage() {
       <section className="border-b bg-gradient-to-b from-primary/10 to-background">
         <div className="container mx-auto px-4 py-16 md:py-24">
           <div className="mx-auto max-w-3xl text-center">
-            <Badge className="mb-4">New division</Badge>
-            <h1 className="font-display text-4xl md:text-6xl tracking-tight">365 Export</h1>
+            <Badge className="mb-4">Partner network</Badge>
+            <h1 className="font-display text-4xl md:text-6xl tracking-tight">365 Export Connect</h1>
             <p className="mt-4 text-lg text-muted-foreground">
-              International brokerage for vehicles sourced in the Philippines. We handle inspection,
-              documentation, and shipping — you receive the vehicle at your port.
+              Discover Philippine vehicles flagged for international export and get matched with
+              independent brokers, inspection providers, and shipping partners.
+            </p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              365 MotorSales is the listing and introduction venue. We are not the broker, escrow
+              agent, shipper, exporter of record, or customs agent — those services are provided
+              by independent partners you choose to engage.
             </p>
             <div className="mt-6 flex flex-wrap justify-center gap-2">
               <a href="#catalog">
@@ -53,7 +65,7 @@ function ExportPage() {
               </a>
               <a href="#inquiry">
                 <Button size="lg" variant="outline">
-                  Request a quote
+                  Request a partner intro
                 </Button>
               </a>
             </div>
@@ -68,23 +80,23 @@ function ExportPage() {
           {[
             {
               Icon: ShieldCheck,
-              t: "Verified sellers only",
-              d: "Every export-ready unit comes from a verified seller on 365 MotorSales.",
+              t: "Verified PH sellers",
+              d: "Listings come from sellers verified on 365 MotorSales. Buyers transact directly with the seller or their chosen partner.",
             },
             {
               Icon: FileCheck2,
-              t: "Full documentation",
-              d: "Deregistration, export permits, bill of lading — handled by our brokers.",
+              t: "Documentation partners",
+              d: "Deregistration, export permits, and bill of lading are coordinated by independent customs brokers and forwarders.",
             },
             {
               Icon: Ship,
-              t: "Door-to-port shipping",
-              d: "RoRo and container options to major ports worldwide.",
+              t: "Shipping partners",
+              d: "RoRo and container quotes through independent shipping lines and freight forwarders.",
             },
             {
               Icon: Globe,
-              t: "Pay in your currency",
-              d: "Quotes in USD/JPY/EUR. Escrow via international wire.",
+              t: "Pay your partner directly",
+              d: "Quotes and payment are arranged between you and the partner. 365 does not hold funds or act as escrow.",
             },
           ].map(({ Icon, t, d }) => (
             <Card key={t}>
@@ -97,6 +109,7 @@ function ExportPage() {
           ))}
         </div>
       </section>
+
 
       <section id="catalog" className="container mx-auto px-4 py-10">
         <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
@@ -154,12 +167,30 @@ function ExportPage() {
       <section id="inquiry" className="border-t bg-muted/30">
         <div className="container mx-auto px-4 py-12">
           <div className="mx-auto max-w-2xl">
-            <h2 className="font-display text-2xl">Request an export quote</h2>
+            <h2 className="font-display text-2xl">Request a partner intro</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              Tell us what you're looking for. A broker will reply within 1–2 business days.
+              Tell us what you're looking for. We'll forward your request to one or more
+              independent export partners who typically reply within 1–2 business days.
             </p>
+            <Card className="mt-4 border-primary/30 bg-primary/5">
+              <CardContent className="flex gap-3 p-4 text-sm text-muted-foreground">
+                <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <div>
+                  <strong className="text-foreground">How this works.</strong> 365 MotorSales
+                  introduces you to independent brokers, inspectors, and shipping partners. We do
+                  not act as broker, escrow agent, shipper, or customs agent. All quotes,
+                  contracts, payments, inspections, documentation, and shipping are arranged
+                  directly between you and the partner you choose. See our{" "}
+                  <Link to="/terms" className="text-primary underline">
+                    Terms
+                  </Link>{" "}
+                  for details.
+                </div>
+              </CardContent>
+            </Card>
             <ExportInquiryForm />
           </div>
+
         </div>
       </section>
     </SiteLayout>
@@ -192,7 +223,7 @@ function ExportInquiryForm() {
         },
       }),
     onSuccess: () => {
-      toast.success("Inquiry sent. Our team will be in touch shortly.");
+      toast.success("Request received. An independent export partner will be in touch shortly.");
       setForm({
         buyer_name: "",
         buyer_email: "",
