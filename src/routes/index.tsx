@@ -92,7 +92,7 @@ function Index() {
         .order("published_at", { ascending: false, nullsFirst: false })
         .limit(12);
 
-      const map = (rows: any[] | null, dealers: Record<string, { planName: string }>): ListingCardData[] =>
+      const map = (rows: any[] | null, dealers: Record<string, { planName: string; currentPeriodEnd: string | null; cancelAtPeriodEnd: boolean; status: string }>): ListingCardData[] =>
         (rows ?? []).map((r) => {
           const photos = (r.listing_media ?? []).filter((m: any) => m.type === "photo");
           const videos = (r.listing_media ?? []).filter((m: any) => m.type === "video");
