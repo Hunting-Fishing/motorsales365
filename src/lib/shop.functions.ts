@@ -6,6 +6,9 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { cleanShopUrl, detectNetworkSlug, isShortLink, looksLikeIconImage } from "@/lib/shop-url";
 import { scrapeLazadaProduct } from "@/lib/lazada-scraper.server";
 import { scrapeAliExpressProduct } from "@/lib/aliexpress-scraper.server";
+import type { Database } from "@/integrations/supabase/types";
+
+type ShopProductUpdate = Database["public"]["Tables"]["shop_products"]["Update"];
 
 // ============ PUBLIC ============
 
