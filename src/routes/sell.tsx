@@ -499,28 +499,32 @@ function SellPage() {
     }
   };
 
-  const uploadVideo = async (file: File, lid: string) => {
-    setVideoUpload({ status: "uploading", percent: 0 });
+  const setVideoState = (i: number, patch: Partial<UploadState>) => {
+    setVideoUploads((u) => u.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
+  };
+
+  const uploadOneVideo = async (i: number, file: File, lid: string) => {
+    setVideoState(i, { status: "uploading", percent: 0, error: undefined });
     try {
-      const path = `${user!.id}/${lid}/${Date.now()}-${file.name}`;
+      const path = `${user!.id}/${lid}/${Date.now()}-${i}-${file.name}`;
       const { publicUrl } = await uploadWithRetry({
         bucket: "listing-videos",
         path,
         file,
         contentType: file.type || "video/mp4",
-        onProgress: (e) => setVideoUpload((s) => ({ ...s, percent: e.percent })),
+        onProgress: (e) => setVideoState(i, { percent: e.percent }),
       });
-      setVideoUpload({ status: "done", percent: 100, url: publicUrl, path });
+      setVideoState(i, { status: "done", percent: 100, url: publicUrl, path });
       await supabase.from("listing_media").insert({
         listing_id: lid,
         type: "video",
         url: publicUrl,
         storage_path: path,
-        sort_order: 0,
+        sort_order: i,
       });
       return true;
     } catch (err: any) {
-      setVideoUpload((s) => ({ ...s, status: "error", error: err?.message ?? "Upload failed" }));
+      setVideoState(i, { status: "error", error: err?.message ?? "Upload failed" });
       return false;
     }
   };
@@ -530,9 +534,9 @@ function SellPage() {
     await uploadOnePhoto(i, photos[i], listingId);
   };
 
-  const retryVideo = async () => {
-    if (!listingId || !video) return;
-    await uploadVideo(video, listingId);
+  const retryVideo = async (i: number) => {
+    if (!listingId || !videos[i]) return;
+    await uploadOneVideo(i, videos[i], listingId);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
