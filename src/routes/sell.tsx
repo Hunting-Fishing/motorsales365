@@ -277,7 +277,8 @@ function SellPage() {
   const [serviceWarranty, setServiceWarranty] = useState("");
 
   const [photos, setPhotos] = useState<File[]>([]);
-  const [video, setVideo] = useState<File | null>(null);
+  const [videos, setVideos] = useState<File[]>([]);
+
   const [submitting, setSubmitting] = useState(false);
 
   type UploadState = {
@@ -288,7 +289,7 @@ function SellPage() {
     path?: string;
   };
   const [photoUploads, setPhotoUploads] = useState<UploadState[]>([]);
-  const [videoUpload, setVideoUpload] = useState<UploadState>({ status: "idle", percent: 0 });
+  const [videoUploads, setVideoUploads] = useState<UploadState[]>([]);
   const [listingId, setListingId] = useState<string | null>(null);
 
   const [pricing, setPricing] = useState<Record<string, number>>({});
@@ -402,10 +403,10 @@ function SellPage() {
     },
   });
 
-  // Strict per-plan caps: Free = 12 photos / 1 video, Standard = 20 / 2, Upgraded = 20 / 3.
+  // Strict per-plan caps: Free = 12 photos / 1 video, paid (Standard & Upgraded) = 20 photos / 3 videos.
   // Subscription planLimits cannot raise these listing-tier caps.
-  const maxPhotos = plan === "upgraded" ? 20 : plan === "standard" ? 20 : 12;
-  const maxVideos = plan === "upgraded" ? 3 : plan === "standard" ? 2 : 1;
+  const maxPhotos = plan === "free" ? 12 : 20;
+  const maxVideos = plan === "free" ? 1 : 3;
   // Surfaced for messaging only — actual enforcement uses maxPhotos above.
   void planLimits;
   const totalFee =
@@ -439,24 +440,33 @@ function SellPage() {
   };
 
   const handleVideo = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] ?? null;
-    if (!file) {
-      setVideo(null);
-      setVideoUpload({ status: "idle", percent: 0 });
-      return;
-    }
+    const files = Array.from(e.target.files ?? []);
+    if (files.length === 0) return;
     if (maxVideos < 1) {
       toast.error("Videos are not included in this plan.");
       e.target.value = "";
       return;
     }
-    setVideo(file);
-    setVideoUpload({ status: "idle", percent: 0 });
+    const remaining = maxVideos - videos.length;
+    if (files.length > remaining) {
+      const overflow = files.length - Math.max(remaining, 0);
+      toast.error(
+        plan === "free"
+          ? `Free listings allow up to ${maxVideos} video. ${overflow} video(s) skipped — upgrade to add up to 3.`
+          : `Up to ${maxVideos} videos allowed. ${overflow} video(s) skipped.`,
+      );
+    }
+    const accepted = files.slice(0, Math.max(remaining, 0));
+    setVideos((v) => [...v, ...accepted].slice(0, maxVideos));
+    setVideoUploads((u) =>
+      [...u, ...accepted.map(() => ({ status: "idle" as const, percent: 0 }))].slice(0, maxVideos),
+    );
+    e.target.value = "";
   };
 
-  const removeVideo = () => {
-    setVideo(null);
-    setVideoUpload({ status: "idle", percent: 0 });
+  const removeVideo = (i: number) => {
+    setVideos((v) => v.filter((_, idx) => idx !== i));
+    setVideoUploads((u) => u.filter((_, idx) => idx !== i));
   };
 
   const setPhotoState = (i: number, patch: Partial<UploadState>) => {
@@ -489,28 +499,32 @@ function SellPage() {
     }
   };
 
-  const uploadVideo = async (file: File, lid: string) => {
-    setVideoUpload({ status: "uploading", percent: 0 });
+  const setVideoState = (i: number, patch: Partial<UploadState>) => {
+    setVideoUploads((u) => u.map((s, idx) => (idx === i ? { ...s, ...patch } : s)));
+  };
+
+  const uploadOneVideo = async (i: number, file: File, lid: string) => {
+    setVideoState(i, { status: "uploading", percent: 0, error: undefined });
     try {
-      const path = `${user!.id}/${lid}/${Date.now()}-${file.name}`;
+      const path = `${user!.id}/${lid}/${Date.now()}-${i}-${file.name}`;
       const { publicUrl } = await uploadWithRetry({
         bucket: "listing-videos",
         path,
         file,
         contentType: file.type || "video/mp4",
-        onProgress: (e) => setVideoUpload((s) => ({ ...s, percent: e.percent })),
+        onProgress: (e) => setVideoState(i, { percent: e.percent }),
       });
-      setVideoUpload({ status: "done", percent: 100, url: publicUrl, path });
+      setVideoState(i, { status: "done", percent: 100, url: publicUrl, path });
       await supabase.from("listing_media").insert({
         listing_id: lid,
         type: "video",
         url: publicUrl,
         storage_path: path,
-        sort_order: 0,
+        sort_order: i,
       });
       return true;
     } catch (err: any) {
-      setVideoUpload((s) => ({ ...s, status: "error", error: err?.message ?? "Upload failed" }));
+      setVideoState(i, { status: "error", error: err?.message ?? "Upload failed" });
       return false;
     }
   };
@@ -520,9 +534,9 @@ function SellPage() {
     await uploadOnePhoto(i, photos[i], listingId);
   };
 
-  const retryVideo = async () => {
-    if (!listingId || !video) return;
-    await uploadVideo(video, listingId);
+  const retryVideo = async (i: number) => {
+    if (!listingId || !videos[i]) return;
+    await uploadOneVideo(i, videos[i], listingId);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -548,8 +562,12 @@ function SellPage() {
       );
       return;
     }
-    if (video && maxVideos < 1) {
-      toast.error("Remove the video or upgrade your plan to include video.");
+    if (videos.length > maxVideos) {
+      toast.error(
+        plan === "free"
+          ? `Free listings allow up to 1 video. Remove some or upgrade to add up to 3.`
+          : `Paid listings allow up to 3 videos.`,
+      );
       return;
     }
 
@@ -669,8 +687,9 @@ function SellPage() {
         const ok = await uploadOnePhoto(i, photos[i], lid);
         if (!ok) allOk = false;
       }
-      if (video && videoUpload.status !== "done") {
-        const ok = await uploadVideo(video, lid);
+      for (let i = 0; i < videos.length; i++) {
+        if (videoUploads[i]?.status === "done") continue;
+        const ok = await uploadOneVideo(i, videos[i], lid);
         if (!ok) allOk = false;
       }
 
@@ -1286,7 +1305,7 @@ function SellPage() {
                   <div className="font-medium">
                     Standard — {formatPHP(pricing.listing_fee_php ?? 20)}
                   </div>
-                  <div className="text-xs text-muted-foreground">Up to 20 photos, 2 videos</div>
+                  <div className="text-xs text-muted-foreground">Up to 20 photos, 3 videos</div>
                 </div>
               </label>
               <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 hover:bg-secondary/50">
@@ -1357,7 +1376,7 @@ function SellPage() {
                 free: { photos: 12, videos: 1, label: "Free", price: 0 },
                 standard: {
                   photos: 20,
-                  videos: 2,
+                  videos: 3,
                   label: "Standard",
                   price: pricing.listing_fee_php ?? 20,
                 },
@@ -1372,7 +1391,7 @@ function SellPage() {
               const preview = previewPlan ?? plan;
               const previewCaps = tierCaps[preview];
               const remainingPhotos = Math.max(0, previewCaps.photos - photos.length);
-              const remainingVideos = Math.max(0, previewCaps.videos - (video ? 1 : 0));
+              const remainingVideos = Math.max(0, previewCaps.videos - videos.length);
               const upgradeOptions = (["standard", "upgraded"] as const).filter(
                 (t) => tierCaps[t].photos > tierCaps[plan].photos,
               );
@@ -1447,12 +1466,11 @@ function SellPage() {
                 </>
               );
             })()}
-            {(photos.length > maxPhotos || (video && maxVideos < 1)) && (
+            {(photos.length > maxPhotos || videos.length > maxVideos) && (
               <div className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-                Your media exceeds the {plan === "standard" ? "Standard" : "current"} plan limit (
-                {maxPhotos} photos
-                {maxVideos > 0 ? `, ${maxVideos} video${maxVideos > 1 ? "s" : ""}` : ", no video"}).
-                Remove items or switch to Upgraded to submit.
+                Your media exceeds the {plan === "free" ? "Free" : "current"} plan limit (
+                {maxPhotos} photos, {maxVideos} video{maxVideos === 1 ? "" : "s"}).
+                Remove items{plan === "free" ? " or switch to a paid plan" : ""} to submit.
               </div>
             )}
             <div>
@@ -1530,58 +1548,69 @@ function SellPage() {
             <div>
               <Label className="flex items-center gap-2">
                 <VideoIcon className="h-4 w-4" />
-                Video (max {maxVideos})
+                Videos ({videos.length}/{maxVideos})
               </Label>
               <Input
                 type="file"
                 accept="video/*"
+                multiple={maxVideos > 1}
                 onChange={handleVideo}
                 className="mt-2"
-                disabled={videoUpload.status === "uploading"}
+                disabled={
+                  videos.length >= maxVideos ||
+                  videoUploads.some((u) => u.status === "uploading")
+                }
               />
-              {video && (
-                <div className="mt-2 space-y-1">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span className="truncate flex-1">{video.name}</span>
-                    {videoUpload.status === "done" && (
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-                    )}
-                    {videoUpload.status !== "uploading" && videoUpload.status !== "done" && (
-                      <button
-                        type="button"
-                        onClick={removeVideo}
-                        className="text-foreground hover:underline"
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
-                  {videoUpload.status === "uploading" && (
-                    <div className="flex items-center gap-2">
-                      <Progress value={videoUpload.percent} className="h-1.5 flex-1" />
-                      <span className="text-xs text-muted-foreground">{videoUpload.percent}%</span>
-                    </div>
-                  )}
-                  {videoUpload.status === "error" && (
-                    <div className="flex items-center gap-2 rounded border border-destructive/40 bg-destructive/10 px-2 py-1.5 text-xs text-destructive">
-                      <AlertCircle className="h-3.5 w-3.5" />
-                      <span className="flex-1 truncate">
-                        {videoUpload.error ?? "Upload failed"}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={retryVideo}
-                        className="inline-flex items-center gap-1 rounded bg-background px-1.5 py-0.5 text-foreground hover:bg-secondary"
-                      >
-                        <RotateCw className="h-3 w-3" /> Retry
-                      </button>
-                    </div>
-                  )}
-                </div>
+              {videos.length > 0 && (
+                <ul className="mt-2 space-y-2">
+                  {videos.map((file, i) => {
+                    const u = videoUploads[i] ?? { status: "idle" as const, percent: 0 };
+                    return (
+                      <li key={i} className="space-y-1">
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <span className="truncate flex-1">{file.name}</span>
+                          {u.status === "done" && (
+                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
+                          )}
+                          {u.status !== "uploading" && u.status !== "done" && (
+                            <button
+                              type="button"
+                              onClick={() => removeVideo(i)}
+                              className="text-foreground hover:underline"
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                        {u.status === "uploading" && (
+                          <div className="flex items-center gap-2">
+                            <Progress value={u.percent} className="h-1.5 flex-1" />
+                            <span className="text-xs text-muted-foreground">{u.percent}%</span>
+                          </div>
+                        )}
+                        {u.status === "error" && (
+                          <div className="flex items-center gap-2 rounded border border-destructive/40 bg-destructive/10 px-2 py-1.5 text-xs text-destructive">
+                            <AlertCircle className="h-3.5 w-3.5" />
+                            <span className="flex-1 truncate">
+                              {u.error ?? "Upload failed"}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => retryVideo(i)}
+                              className="inline-flex items-center gap-1 rounded bg-background px-1.5 py-0.5 text-foreground hover:bg-secondary"
+                            >
+                              <RotateCw className="h-3 w-3" /> Retry
+                            </button>
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
               )}
-              {plan === "standard" && (
+              {plan === "free" && (
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Standard includes 1 video. Upgrade to add up to 3.
+                  Free includes 1 video. Upgrade to add up to 3.
                 </p>
               )}
             </div>
