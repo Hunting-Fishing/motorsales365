@@ -246,6 +246,7 @@ function SellPage() {
   const [fuel, setFuel] = useState("");
   const [engine, setEngine] = useState("");
   const [vehicleQuality, setVehicleQuality] = useState<VehicleQuality>({});
+  const [vehicleQualityIssues, setVehicleQualityIssues] = useState<VehicleQualityIssue[]>([]);
 
   // Towing service-specific fields
   const [towServiceType, setTowServiceType] = useState("");
