@@ -454,7 +454,13 @@ function ListingDetailPage() {
                   {listing.seller_type === "business" ? "Business seller" : "Private seller"}
                 </Badge>
                 {listing.seller_type === "business" && sellerDealerPlan && (
-                  <DealerSubscriptionBadge planName={sellerDealerPlan} size="md" />
+                  <DealerSubscriptionBadge
+                    planName={sellerDealerPlan}
+                    currentPeriodEnd={sellerDealerPeriodEnd}
+                    cancelAtPeriodEnd={sellerDealerCancelAtPeriodEnd}
+                    size="md"
+                    showRenewal
+                  />
                 )}
                 {seller?.verification_status === "verified" && (
                   <VerifiedBadge size="md" showLabel />
@@ -648,7 +654,13 @@ function ListingDetailPage() {
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span>{listing.seller_type === "business" ? "Business" : "Private"} seller</span>
                   {listing.seller_type === "business" && sellerDealerPlan && (
-                    <DealerSubscriptionBadge planName={sellerDealerPlan} size="sm" />
+                    <DealerSubscriptionBadge
+                      planName={sellerDealerPlan}
+                      currentPeriodEnd={sellerDealerPeriodEnd}
+                      cancelAtPeriodEnd={sellerDealerCancelAtPeriodEnd}
+                      size="sm"
+                      showRenewal
+                    />
                   )}
                 </div>
               </div>
