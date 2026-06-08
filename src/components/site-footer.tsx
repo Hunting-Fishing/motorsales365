@@ -52,6 +52,13 @@ export function SiteFooter() {
       links: [{ to: "/tow", label: "Request a tow" }],
     },
     {
+      title: "Export",
+      links: [
+        { to: "/export", label: "365 Export Connect" },
+        { to: "/export/trust", label: "Trust & verification" },
+      ],
+    },
+    {
       title: "Sell",
       links: [
         { to: "/start-selling", label: "How selling works" },
