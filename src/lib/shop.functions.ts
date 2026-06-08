@@ -1018,7 +1018,9 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       extracted?.image_url,
     );
 
-    // Price: JSON-LD > og:price > extractor.
+    // Price: marketplace > JSON-LD > og:price > extractor.
+    const warnings: string[] = [];
+    const fx = await loadFxMap();
     const rawPrice =
       marketplace?.price ??
       ld?.price ??
@@ -1033,11 +1035,16 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       metadata?.["product:price:currency"] ??
       extracted?.currency ??
       null;
-    const price_php = pickPricePhp(rawPrice, rawCurrency);
+    const price_php = pickPricePhp(rawPrice, rawCurrency, fx, warnings);
     const sale_price_php = marketplace?.sale_price
-      ? pickPricePhp(marketplace.sale_price, marketplace?.currency ?? "PHP")
+      ? pickPricePhp(marketplace.sale_price, marketplace?.currency ?? rawCurrency ?? "PHP", fx)
       : null;
     const is_deal = !!(sale_price_php && price_php && sale_price_php < price_php);
+    if (rawPrice && price_php == null) {
+      warnings.push("Could not store price — please enter PHP price manually.");
+    } else if (!rawPrice) {
+      warnings.push("Source page did not expose a price — please enter PHP price manually.");
+    }
 
     const category_id = fuzzyCategoryMatch(
       String(marketplace?.category_hint ?? extracted?.category_hint ?? title ?? ""),
@@ -1069,6 +1076,7 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       networkSlug: forcedSlug ?? detectNetworkSlug(finalCleanedUrl) ?? networkSlug,
       detectedSlug: detectNetworkSlug(finalCleanedUrl) ?? detectedSlug,
       networkId,
+      warnings,
       suggested: {
         title,
         brand,
