@@ -284,7 +284,7 @@ function StartSellingPage() {
               <Link to="/sell">Post a listing</Link>
             </Button>
             <Button asChild size="lg" variant="outline">
-              <Link to="/support/selling">Selling FAQ</Link>
+              <Link to="/support_/selling">Selling FAQ</Link>
             </Button>
           </div>
         </Card>
