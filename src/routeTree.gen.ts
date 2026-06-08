@@ -36,6 +36,7 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ExportRouteImport } from './routes/export'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CompanyRouteImport } from './routes/company'
 import { Route as BundlesRouteImport } from './routes/bundles'
 import { Route as AffiliateDisclosureRouteImport } from './routes/affiliate-disclosure'
 import { Route as AdvertiseRouteImport } from './routes/advertise'
@@ -294,6 +295,11 @@ const DashboardRoute = DashboardRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CompanyRoute = CompanyRouteImport.update({
+  id: '/company',
+  path: '/company',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BundlesRoute = BundlesRouteImport.update({
@@ -936,6 +942,7 @@ export interface FileRoutesByFullPath {
   '/advertise': typeof AdvertiseRoute
   '/affiliate-disclosure': typeof AffiliateDisclosureRoute
   '/bundles': typeof BundlesRoute
+  '/company': typeof CompanyRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/export': typeof ExportRouteWithChildren
@@ -1088,6 +1095,7 @@ export interface FileRoutesByTo {
   '/advertise': typeof AdvertiseRoute
   '/affiliate-disclosure': typeof AffiliateDisclosureRoute
   '/bundles': typeof BundlesRoute
+  '/company': typeof CompanyRoute
   '/contact': typeof ContactRoute
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
@@ -1240,6 +1248,7 @@ export interface FileRoutesById {
   '/advertise': typeof AdvertiseRoute
   '/affiliate-disclosure': typeof AffiliateDisclosureRoute
   '/bundles': typeof BundlesRoute
+  '/company': typeof CompanyRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
   '/export': typeof ExportRouteWithChildren
@@ -1395,6 +1404,7 @@ export interface FileRouteTypes {
     | '/advertise'
     | '/affiliate-disclosure'
     | '/bundles'
+    | '/company'
     | '/contact'
     | '/dashboard'
     | '/export'
@@ -1547,6 +1557,7 @@ export interface FileRouteTypes {
     | '/advertise'
     | '/affiliate-disclosure'
     | '/bundles'
+    | '/company'
     | '/contact'
     | '/export'
     | '/forgot-password'
@@ -1698,6 +1709,7 @@ export interface FileRouteTypes {
     | '/advertise'
     | '/affiliate-disclosure'
     | '/bundles'
+    | '/company'
     | '/contact'
     | '/dashboard'
     | '/export'
@@ -1852,6 +1864,7 @@ export interface RootRouteChildren {
   AdvertiseRoute: typeof AdvertiseRoute
   AffiliateDisclosureRoute: typeof AffiliateDisclosureRoute
   BundlesRoute: typeof BundlesRoute
+  CompanyRoute: typeof CompanyRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
   ExportRoute: typeof ExportRouteWithChildren
@@ -2121,6 +2134,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/company': {
+      id: '/company'
+      path: '/company'
+      fullPath: '/company'
+      preLoaderRoute: typeof CompanyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/bundles': {
@@ -3218,6 +3238,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdvertiseRoute: AdvertiseRoute,
   AffiliateDisclosureRoute: AffiliateDisclosureRoute,
   BundlesRoute: BundlesRoute,
+  CompanyRoute: CompanyRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
   ExportRoute: ExportRouteWithChildren,
