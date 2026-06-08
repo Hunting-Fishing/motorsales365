@@ -14,7 +14,7 @@ Purpose: working checklist of issues to correct before launch. Check items off a
 
 ### Do these FIRST (pre-launch blockers)
 - [x] 1. Fix contact phone and email domain inconsistency
-- [ ] 2. Resolve pricing / photo-limit inconsistency
+- [x] 2. Resolve pricing / photo-limit inconsistency
 - [ ] 3. Add real or seeded listings
 - [ ] 4. Add visible seller onboarding page
 - [ ] 5. Add real business directory listings
@@ -162,3 +162,5 @@ Examples: "Looking for Toyota Vios under ₱300k in Ilocos" · "Need multicab in
 
 ## Progress Log
 - 2026-06-08 — Audit file created from uploaded doc. Starting at item #1 (contact phone + email domain inconsistency).
+- 2026-06-08 — Item #1 done (phone + email standardized).
+- 2026-06-08 — Item #2 done. Standardized free Private Seller tier at **12 photos / 1 video**; paid tiers at **20 photos**. Updated `pricing.tsx`, `sell.tsx` (tier caps, copy, validation), `plan-limits.ts` defaults, and `subscription_plans.Private Seller.max_photos_per_listing` 20 → 12.

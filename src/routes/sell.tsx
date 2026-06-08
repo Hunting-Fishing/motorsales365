@@ -402,10 +402,10 @@ function SellPage() {
     },
   });
 
-  // Strict per-plan caps: Free = 1 photo / 0 video, Standard = 5 / 1, Upgraded = 20 / 3.
+  // Strict per-plan caps: Free = 12 photos / 1 video, Standard = 20 / 2, Upgraded = 20 / 3.
   // Subscription planLimits cannot raise these listing-tier caps.
-  const maxPhotos = plan === "upgraded" ? 20 : plan === "standard" ? 5 : 1;
-  const maxVideos = plan === "upgraded" ? 3 : plan === "standard" ? 1 : 0;
+  const maxPhotos = plan === "upgraded" ? 20 : plan === "standard" ? 20 : 12;
+  const maxVideos = plan === "upgraded" ? 3 : plan === "standard" ? 2 : 1;
   // Surfaced for messaging only — actual enforcement uses maxPhotos above.
   void planLimits;
   const totalFee =
@@ -420,8 +420,8 @@ function SellPage() {
     if (files.length > remaining) {
       const overflow = files.length - Math.max(remaining, 0);
       toast.error(
-        plan === "standard"
-          ? `Standard listings allow up to ${maxPhotos} photos. ${overflow} photo(s) skipped — upgrade to add up to 20.`
+        plan === "free"
+          ? `Free listings allow up to ${maxPhotos} photos. ${overflow} photo(s) skipped — upgrade to add up to 20.`
           : `Up to ${maxPhotos} photos allowed. ${overflow} photo(s) skipped.`,
       );
     }
@@ -542,11 +542,9 @@ function SellPage() {
     }
     if (photos.length > maxPhotos) {
       toast.error(
-        plan === "upgraded"
-          ? `Upgraded listings allow up to 20 photos.`
-          : plan === "standard"
-            ? `Standard listings allow up to 5 photos. Remove some or upgrade to add up to 20.`
-            : `Free listings allow only 1 photo. Choose Standard or Upgraded for more.`,
+        plan === "free"
+          ? `Free listings allow up to 12 photos. Remove some or upgrade to add up to 20.`
+          : `Paid listings allow up to 20 photos.`,
       );
       return;
     }
@@ -1278,7 +1276,7 @@ function SellPage() {
                 <div>
                   <div className="font-medium">Free — ₱0</div>
                   <div className="text-xs text-muted-foreground">
-                    1 photo, no video. Limit 1 listing per week.
+                    Up to 12 photos, 1 video. 5 active listings.
                   </div>
                 </div>
               </label>
@@ -1288,7 +1286,7 @@ function SellPage() {
                   <div className="font-medium">
                     Standard — {formatPHP(pricing.listing_fee_php ?? 20)}
                   </div>
-                  <div className="text-xs text-muted-foreground">Up to 5 photos, 1 video</div>
+                  <div className="text-xs text-muted-foreground">Up to 20 photos, 2 videos</div>
                 </div>
               </label>
               <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 hover:bg-secondary/50">
@@ -1356,10 +1354,10 @@ function SellPage() {
                 "free" | "standard" | "upgraded",
                 { photos: number; videos: number; label: string; price: number }
               > = {
-                free: { photos: 1, videos: 0, label: "Free", price: 0 },
+                free: { photos: 12, videos: 1, label: "Free", price: 0 },
                 standard: {
-                  photos: 5,
-                  videos: 1,
+                  photos: 20,
+                  videos: 2,
                   label: "Standard",
                   price: pricing.listing_fee_php ?? 20,
                 },

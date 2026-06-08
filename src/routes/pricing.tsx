@@ -274,7 +274,7 @@ function PricingPage() {
 
       <section className="container mx-auto grid gap-4 px-4 py-12 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { t: "Free listing", p: 0, d: "Up to 20 photos and 1 video. Live for 60 days. No fees." },
+          { t: "Free listing", p: 0, d: "Up to 12 photos and 1 video. Live for 60 days. No fees." },
           { t: "Search Boost", p: 99, d: "Higher placement in search results for 7 days." },
           { t: "Province Boost", p: 199, d: "Featured at the top of your province for 7 days." },
           { t: "Homepage Spotlight", p: 499, d: "Rotating homepage placement for 7 days." },
