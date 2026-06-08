@@ -32,6 +32,8 @@ import { AdCarousel } from "@/components/ads/ad-carousel";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { VerifiedBadge } from "@/components/verified-badge";
+import { DealerSubscriptionBadge } from "@/components/dealer-subscription-badge";
+import { getActiveDealerStatus } from "@/lib/seller-status.functions";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
