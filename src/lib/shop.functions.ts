@@ -6,6 +6,9 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { cleanShopUrl, detectNetworkSlug, isShortLink, looksLikeIconImage } from "@/lib/shop-url";
 import { scrapeLazadaProduct } from "@/lib/lazada-scraper.server";
 import { scrapeAliExpressProduct } from "@/lib/aliexpress-scraper.server";
+import type { Database } from "@/integrations/supabase/types";
+
+type ShopProductUpdate = Database["public"]["Tables"]["shop_products"]["Update"];
 
 // ============ PUBLIC ============
 
@@ -1373,7 +1376,7 @@ async function rescrapeOne(productId: string): Promise<{
     : null;
   const isDeal = !!(salePhp && newPrice && salePhp < newPrice);
 
-  const patch: Record<string, any> = {};
+  const patch: ShopProductUpdate = {};
   // Only fill fields that are currently empty, or where price clearly changed.
   if (!product.brand && newBrand) { patch.brand = newBrand; updatedFields.push("brand"); }
   if ((!product.description || product.description.length < 40) && newDesc) {
@@ -1393,7 +1396,7 @@ async function rescrapeOne(productId: string): Promise<{
 
   if (Object.keys(patch).length > 0) {
     patch.updated_at = new Date().toISOString();
-    const { error: uErr } = await supabaseAdmin.from("shop_products").update(patch as never).eq("id", productId);
+    const { error: uErr } = await supabaseAdmin.from("shop_products").update(patch).eq("id", productId);
     if (uErr) return { ok: false, updatedFields, warnings, error: uErr.message };
   }
 
