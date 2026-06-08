@@ -21,6 +21,7 @@ import {
   GraduationCap,
   Share2,
   Megaphone,
+  Rocket,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
@@ -60,6 +61,7 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean }[] = [
   { to: "/my-qr", label: "My QR code", Icon: QrCode },
   { to: "/dashboard/verification", label: "Verification", Icon: ShieldCheck },
   { to: "/dashboard/billing", label: "Billing", Icon: CreditCard },
+  { to: "/dashboard/boosts", label: "Boost history", Icon: Rocket },
 ];
 
 function DashboardLayout() {

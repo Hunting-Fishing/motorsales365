@@ -83,6 +83,7 @@ import { Route as DashboardLikesRouteImport } from './routes/dashboard.likes'
 import { Route as DashboardLearningRouteImport } from './routes/dashboard.learning'
 import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favorites'
 import { Route as DashboardBusinessesRouteImport } from './routes/dashboard.businesses'
+import { Route as DashboardBoostsRouteImport } from './routes/dashboard.boosts'
 import { Route as DashboardBillingRouteImport } from './routes/dashboard.billing'
 import { Route as DashboardAdsRouteImport } from './routes/dashboard.ads'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
@@ -528,6 +529,11 @@ const DashboardFavoritesRoute = DashboardFavoritesRouteImport.update({
 const DashboardBusinessesRoute = DashboardBusinessesRouteImport.update({
   id: '/businesses',
   path: '/businesses',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardBoostsRoute = DashboardBoostsRouteImport.update({
+  id: '/boosts',
+  path: '/boosts',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardBillingRoute = DashboardBillingRouteImport.update({
@@ -998,6 +1004,7 @@ export interface FileRoutesByFullPath {
   '/checkout/return': typeof CheckoutReturnRoute
   '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
+  '/dashboard/boosts': typeof DashboardBoostsRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/learning': typeof DashboardLearningRoute
@@ -1148,6 +1155,7 @@ export interface FileRoutesByTo {
   '/checkout/return': typeof CheckoutReturnRoute
   '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
+  '/dashboard/boosts': typeof DashboardBoostsRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/learning': typeof DashboardLearningRoute
@@ -1300,6 +1308,7 @@ export interface FileRoutesById {
   '/checkout/return': typeof CheckoutReturnRoute
   '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
+  '/dashboard/boosts': typeof DashboardBoostsRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/learning': typeof DashboardLearningRoute
@@ -1454,6 +1463,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/dashboard/ads'
     | '/dashboard/billing'
+    | '/dashboard/boosts'
     | '/dashboard/businesses'
     | '/dashboard/favorites'
     | '/dashboard/learning'
@@ -1604,6 +1614,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/dashboard/ads'
     | '/dashboard/billing'
+    | '/dashboard/boosts'
     | '/dashboard/businesses'
     | '/dashboard/favorites'
     | '/dashboard/learning'
@@ -1755,6 +1766,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/dashboard/ads'
     | '/dashboard/billing'
+    | '/dashboard/boosts'
     | '/dashboard/businesses'
     | '/dashboard/favorites'
     | '/dashboard/learning'
@@ -2440,6 +2452,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardBusinessesRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/boosts': {
+      id: '/dashboard/boosts'
+      path: '/boosts'
+      fullPath: '/dashboard/boosts'
+      preLoaderRoute: typeof DashboardBoostsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/billing': {
       id: '/dashboard/billing'
       path: '/billing'
@@ -3070,6 +3089,7 @@ const DashboardTeamRouteWithChildren = DashboardTeamRoute._addFileChildren(
 interface DashboardRouteChildren {
   DashboardAdsRoute: typeof DashboardAdsRoute
   DashboardBillingRoute: typeof DashboardBillingRoute
+  DashboardBoostsRoute: typeof DashboardBoostsRoute
   DashboardBusinessesRoute: typeof DashboardBusinessesRoute
   DashboardFavoritesRoute: typeof DashboardFavoritesRoute
   DashboardLearningRoute: typeof DashboardLearningRoute
@@ -3096,6 +3116,7 @@ interface DashboardRouteChildren {
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAdsRoute: DashboardAdsRoute,
   DashboardBillingRoute: DashboardBillingRoute,
+  DashboardBoostsRoute: DashboardBoostsRoute,
   DashboardBusinessesRoute: DashboardBusinessesRoute,
   DashboardFavoritesRoute: DashboardFavoritesRoute,
   DashboardLearningRoute: DashboardLearningRoute,
