@@ -164,3 +164,4 @@ Examples: "Looking for Toyota Vios under ₱300k in Ilocos" · "Need multicab in
 - 2026-06-08 — Audit file created from uploaded doc. Starting at item #1 (contact phone + email domain inconsistency).
 - 2026-06-08 — Item #1 done (phone + email standardized).
 - 2026-06-08 — Item #2 done. Standardized free Private Seller tier at **12 photos / 1 video**; paid tiers at **20 photos**. Updated `pricing.tsx`, `sell.tsx` (tier caps, copy, validation), `plan-limits.ts` defaults, and `subscription_plans.Private Seller.max_photos_per_listing` 20 → 12.
+- 2026-06-08 — Item #3 done. Seeded **12 sample listings** (5 cars, 4 motorcycles, 1 equipment, 1 drone, 1 boat) across NCR / Region I / VII / XI, each with one photo. All owned by "365 MotorSales" profile (`a3999f39…`), titles prefixed `[Sample]`, `source='seed'`, `attributes.seed=true`. Cleanup: `DELETE FROM listings WHERE source='seed'` (cascades to media).
