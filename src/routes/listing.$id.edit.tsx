@@ -39,8 +39,10 @@ import {
   VehicleQualityFields,
   vehicleQualityToAttributes,
   hydrateVehicleQuality,
+  validateVehicleQuality,
   VEHICLE_QUALITY_KEYS,
   type VehicleQuality,
+  type VehicleQualityIssue,
 } from "@/components/vehicle-quality-fields";
 
 const CATEGORIES = [
@@ -142,6 +144,7 @@ function EditListingPage() {
   const [fuel, setFuel] = useState("");
   const [engine, setEngine] = useState("");
   const [vehicleQuality, setVehicleQuality] = useState<VehicleQuality>({});
+  const [vehicleQualityIssues, setVehicleQualityIssues] = useState<VehicleQualityIssue[]>([]);
 
   // Towing
   const [towServiceType, setTowServiceType] = useState("");
@@ -296,6 +299,15 @@ function EditListingPage() {
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !listing) return;
+    if (category === "car" || category === "motorcycle") {
+      const vqCheck = validateVehicleQuality(vehicleQuality);
+      if (!vqCheck.ok) {
+        setVehicleQualityIssues(vqCheck.issues);
+        toast.error(vqCheck.issues[0]?.message ?? "Please review the vehicle details.");
+        return;
+      }
+      setVehicleQualityIssues([]);
+    }
     setSaving(true);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -950,6 +962,7 @@ function EditListingPage() {
                   category={category as "car" | "motorcycle"}
                   value={vehicleQuality}
                   onChange={setVehicleQuality}
+                  issues={vehicleQualityIssues}
                 />
               </div>
             ) : (

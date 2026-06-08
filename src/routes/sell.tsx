@@ -40,7 +40,9 @@ import { buildE164 } from "@/data/country-codes";
 import {
   VehicleQualityFields,
   vehicleQualityToAttributes,
+  validateVehicleQuality,
   type VehicleQuality,
+  type VehicleQualityIssue,
 } from "@/components/vehicle-quality-fields";
 import { z } from "zod";
 
@@ -244,6 +246,7 @@ function SellPage() {
   const [fuel, setFuel] = useState("");
   const [engine, setEngine] = useState("");
   const [vehicleQuality, setVehicleQuality] = useState<VehicleQuality>({});
+  const [vehicleQualityIssues, setVehicleQualityIssues] = useState<VehicleQualityIssue[]>([]);
 
   // Towing service-specific fields
   const [towServiceType, setTowServiceType] = useState("");
@@ -586,6 +589,16 @@ function SellPage() {
     if (!textParsed.success) {
       toast.error(textParsed.error.issues[0]?.message ?? "Please check your listing details.");
       return;
+    }
+
+    if (category === "car" || category === "motorcycle") {
+      const vqCheck = validateVehicleQuality(vehicleQuality);
+      if (!vqCheck.ok) {
+        setVehicleQualityIssues(vqCheck.issues);
+        toast.error(vqCheck.issues[0]?.message ?? "Please review the vehicle details.");
+        return;
+      }
+      setVehicleQualityIssues([]);
     }
 
     setSubmitting(true);
@@ -1282,6 +1295,7 @@ function SellPage() {
                 category={category as "car" | "motorcycle"}
                 value={vehicleQuality}
                 onChange={setVehicleQuality}
+                issues={vehicleQualityIssues}
               />
             )}
           </section>
