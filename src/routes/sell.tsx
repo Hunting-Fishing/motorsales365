@@ -1376,7 +1376,7 @@ function SellPage() {
                 free: { photos: 12, videos: 1, label: "Free", price: 0 },
                 standard: {
                   photos: 20,
-                  videos: 2,
+                  videos: 3,
                   label: "Standard",
                   price: pricing.listing_fee_php ?? 20,
                 },
@@ -1391,7 +1391,7 @@ function SellPage() {
               const preview = previewPlan ?? plan;
               const previewCaps = tierCaps[preview];
               const remainingPhotos = Math.max(0, previewCaps.photos - photos.length);
-              const remainingVideos = Math.max(0, previewCaps.videos - (video ? 1 : 0));
+              const remainingVideos = Math.max(0, previewCaps.videos - videos.length);
               const upgradeOptions = (["standard", "upgraded"] as const).filter(
                 (t) => tierCaps[t].photos > tierCaps[plan].photos,
               );
