@@ -77,7 +77,11 @@ export function BoostDialog({ listingId, listingTitle, children }: Props) {
               >
                 <div className="flex items-start justify-between gap-2">
                   <span className="font-semibold">{p.label}</span>
-                  {p.recurring && <Badge variant="secondary">Monthly</Badge>}
+                  {p.recurring ? (
+                    <Badge variant="secondary">Auto-renew</Badge>
+                  ) : p.duration_days === 14 ? (
+                    <Badge>Renew + Boost</Badge>
+                  ) : null}
                 </div>
                 {p.description && <p className="text-xs text-muted-foreground">{p.description}</p>}
                 <div className="mt-auto flex items-baseline justify-between pt-2">
@@ -86,7 +90,7 @@ export function BoostDialog({ listingId, listingTitle, children }: Props) {
                   </span>
                   <span className="text-xs text-muted-foreground">
                     {p.recurring
-                      ? "per month"
+                      ? `every ${p.duration_days} days`
                       : `${p.duration_days} day${p.duration_days === 1 ? "" : "s"}`}
                   </span>
                 </div>
