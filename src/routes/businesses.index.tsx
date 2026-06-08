@@ -382,7 +382,7 @@ function BusinessesIndex() {
                 .
               </Card>
             ) : (
-              items.map((b) => (
+              sortedItems.map((b) => (
                 <Link
                   key={b.id}
                   to="/businesses/$slug"
