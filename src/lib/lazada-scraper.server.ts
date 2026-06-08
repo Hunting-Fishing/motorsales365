@@ -171,7 +171,8 @@ async function fetchViaMtop(
       itemId: ids.itemId,
       skuId: ids.skuId,
     };
-  } catch {
+  } catch (e) {
+    console.warn("[lazada-scraper] mtop failed", ids.itemId, (e as any)?.message);
     return null;
   }
 }
