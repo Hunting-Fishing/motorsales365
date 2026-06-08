@@ -40,7 +40,9 @@ import { buildE164 } from "@/data/country-codes";
 import {
   VehicleQualityFields,
   vehicleQualityToAttributes,
+  validateVehicleQuality,
   type VehicleQuality,
+  type VehicleQualityIssue,
 } from "@/components/vehicle-quality-fields";
 import { z } from "zod";
 
