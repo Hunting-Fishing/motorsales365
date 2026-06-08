@@ -315,6 +315,7 @@ function EditListingPage() {
       "engine",
     ];
     for (const k of vehicleKeys) delete attributes[k];
+    for (const k of VEHICLE_QUALITY_KEYS) delete attributes[k];
     if (year) attributes.year = year;
     if (make) attributes.make = make;
     if (model) attributes.model = model;
@@ -323,6 +324,9 @@ function EditListingPage() {
     if (transmission) attributes.transmission = transmission;
     if (fuel) attributes.fuel = fuel;
     if (engine) attributes.engine = engine;
+    if (category === "car" || category === "motorcycle") {
+      Object.assign(attributes, vehicleQualityToAttributes(vehicleQuality));
+    }
 
     if (category === "towing") {
       attributes.service_type = towServiceType || undefined;
