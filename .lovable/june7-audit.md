@@ -14,7 +14,7 @@ Purpose: working checklist of issues to correct before launch. Check items off a
 
 ### Do these FIRST (pre-launch blockers)
 - [x] 1. Fix contact phone and email domain inconsistency
-- [ ] 2. Resolve pricing / photo-limit inconsistency
+- [x] 2. Resolve pricing / photo-limit inconsistency
 - [ ] 3. Add real or seeded listings
 - [ ] 4. Add visible seller onboarding page
 - [ ] 5. Add real business directory listings
