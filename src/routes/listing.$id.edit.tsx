@@ -35,6 +35,13 @@ import { uploadWithRetry } from "@/lib/storage-upload";
 import { getUserPlanLimits, FREE_PLAN_LIMITS, type PlanLimits } from "@/lib/plan-limits";
 import { PhoneInput } from "@/components/phone-input";
 import { parseE164, buildE164 } from "@/data/country-codes";
+import {
+  VehicleQualityFields,
+  vehicleQualityToAttributes,
+  hydrateVehicleQuality,
+  VEHICLE_QUALITY_KEYS,
+  type VehicleQuality,
+} from "@/components/vehicle-quality-fields";
 
 const CATEGORIES = [
   { slug: "car", name: "Car" },
