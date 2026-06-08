@@ -687,8 +687,9 @@ function SellPage() {
         const ok = await uploadOnePhoto(i, photos[i], lid);
         if (!ok) allOk = false;
       }
-      if (video && videoUpload.status !== "done") {
-        const ok = await uploadVideo(video, lid);
+      for (let i = 0; i < videos.length; i++) {
+        if (videoUploads[i]?.status === "done") continue;
+        const ok = await uploadOneVideo(i, videos[i], lid);
         if (!ok) allOk = false;
       }
 
