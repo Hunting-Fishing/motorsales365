@@ -108,6 +108,28 @@ function ExportPage() {
             </Card>
           ))}
         </div>
+        <p className="mt-4 text-center text-sm text-muted-foreground">
+          <Link to="/export/trust" className="text-primary underline">
+            Learn how we screen and verify partners →
+          </Link>
+        </p>
+      </section>
+
+
+      <section id="catalog" className="container mx-auto px-4 py-10">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="font-display text-2xl">Export-ready catalog</h2>
+          ].map(({ Icon, t, d }) => (
+            <Card key={t}>
+              <CardContent className="p-5">
+                <Icon className="mb-3 h-6 w-6 text-primary" />
+                <h3 className="font-semibold">{t}</h3>
+                <p className="mt-1 text-sm text-muted-foreground">{d}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </section>
 
 

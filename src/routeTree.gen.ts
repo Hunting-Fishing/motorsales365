@@ -64,6 +64,7 @@ import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
 import { Route as InvitesTokenRouteImport } from './routes/invites.$token'
 import { Route as GoProductIdRouteImport } from './routes/go.$productId'
+import { Route as ExportTrustRouteImport } from './routes/export.trust'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as DashboardVerificationRouteImport } from './routes/dashboard.verification'
 import { Route as DashboardVehiclesRouteImport } from './routes/dashboard.vehicles'
@@ -432,6 +433,11 @@ const GoProductIdRoute = GoProductIdRouteImport.update({
   id: '/go/$productId',
   path: '/go/$productId',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ExportTrustRoute = ExportTrustRouteImport.update({
+  id: '/trust',
+  path: '/trust',
+  getParentRoute: () => ExportRoute,
 } as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
@@ -920,7 +926,7 @@ export interface FileRoutesByFullPath {
   '/bundles': typeof BundlesRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
-  '/export': typeof ExportRoute
+  '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
   '/leads-marketplace': typeof LeadsMarketplaceRoute
@@ -1002,6 +1008,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/vehicles': typeof DashboardVehiclesRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/export/trust': typeof ExportTrustRoute
   '/go/$productId': typeof GoProductIdRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
@@ -1068,7 +1075,7 @@ export interface FileRoutesByTo {
   '/affiliate-disclosure': typeof AffiliateDisclosureRoute
   '/bundles': typeof BundlesRoute
   '/contact': typeof ContactRoute
-  '/export': typeof ExportRoute
+  '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
   '/leads-marketplace': typeof LeadsMarketplaceRoute
@@ -1149,6 +1156,7 @@ export interface FileRoutesByTo {
   '/dashboard/vehicles': typeof DashboardVehiclesRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/export/trust': typeof ExportTrustRoute
   '/go/$productId': typeof GoProductIdRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
@@ -1218,7 +1226,7 @@ export interface FileRoutesById {
   '/bundles': typeof BundlesRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
-  '/export': typeof ExportRoute
+  '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
   '/leads-marketplace': typeof LeadsMarketplaceRoute
@@ -1300,6 +1308,7 @@ export interface FileRoutesById {
   '/dashboard/vehicles': typeof DashboardVehiclesRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/export/trust': typeof ExportTrustRoute
   '/go/$productId': typeof GoProductIdRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
@@ -1452,6 +1461,7 @@ export interface FileRouteTypes {
     | '/dashboard/vehicles'
     | '/dashboard/verification'
     | '/email/unsubscribe'
+    | '/export/trust'
     | '/go/$productId'
     | '/invites/$token'
     | '/learn/$slug'
@@ -1599,6 +1609,7 @@ export interface FileRouteTypes {
     | '/dashboard/vehicles'
     | '/dashboard/verification'
     | '/email/unsubscribe'
+    | '/export/trust'
     | '/go/$productId'
     | '/invites/$token'
     | '/learn/$slug'
@@ -1749,6 +1760,7 @@ export interface FileRouteTypes {
     | '/dashboard/vehicles'
     | '/dashboard/verification'
     | '/email/unsubscribe'
+    | '/export/trust'
     | '/go/$productId'
     | '/invites/$token'
     | '/learn/$slug'
@@ -1818,7 +1830,7 @@ export interface RootRouteChildren {
   BundlesRoute: typeof BundlesRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
-  ExportRoute: typeof ExportRoute
+  ExportRoute: typeof ExportRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   GuidelinesRoute: typeof GuidelinesRoute
   LeadsMarketplaceRoute: typeof LeadsMarketplaceRoute
@@ -2281,6 +2293,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/go/$productId'
       preLoaderRoute: typeof GoProductIdRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/export/trust': {
+      id: '/export/trust'
+      path: '/trust'
+      fullPath: '/export/trust'
+      preLoaderRoute: typeof ExportTrustRouteImport
+      parentRoute: typeof ExportRoute
     }
     '/email/unsubscribe': {
       id: '/email/unsubscribe'
@@ -3084,6 +3103,17 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
   DashboardRouteChildren,
 )
 
+interface ExportRouteChildren {
+  ExportTrustRoute: typeof ExportTrustRoute
+}
+
+const ExportRouteChildren: ExportRouteChildren = {
+  ExportTrustRoute: ExportTrustRoute,
+}
+
+const ExportRouteWithChildren =
+  ExportRoute._addFileChildren(ExportRouteChildren)
+
 interface PaymentsRouteChildren {
   PaymentsIdReceiptRoute: typeof PaymentsIdReceiptRoute
 }
@@ -3149,7 +3179,7 @@ const rootRouteChildren: RootRouteChildren = {
   BundlesRoute: BundlesRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
-  ExportRoute: ExportRoute,
+  ExportRoute: ExportRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   GuidelinesRoute: GuidelinesRoute,
   LeadsMarketplaceRoute: LeadsMarketplaceRoute,
