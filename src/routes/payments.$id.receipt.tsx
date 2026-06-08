@@ -609,8 +609,8 @@ function ReceiptPage() {
           <footer className="mt-8 border-t border-border pt-4 text-xs text-muted-foreground">
             Thank you for using 365 Motorsales. For questions about this {docLabel.toLowerCase()},
             email{" "}
-            <a href="mailto:partners@365motorsales.ph" className="text-primary">
-              partners@365motorsales.ph
+            <a href="mailto:partners@365motorsales.com" className="text-primary">
+              partners@365motorsales.com
             </a>{" "}
             and reference <span className="font-mono">{docNumber}</span>.
           </footer>
