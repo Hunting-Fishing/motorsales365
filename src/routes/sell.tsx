@@ -601,6 +601,9 @@ function SellPage() {
         if (transmission) attributes.transmission = transmission;
         if (fuel) attributes.fuel = fuel;
         if (engine) attributes.engine = engine;
+        if (category === "car" || category === "motorcycle") {
+          Object.assign(attributes, vehicleQualityToAttributes(vehicleQuality));
+        }
         if (category === "towing") {
           if (towServiceType) attributes.service_type = towServiceType;
           if (towCapacity) attributes.vehicle_capacity = towCapacity;
