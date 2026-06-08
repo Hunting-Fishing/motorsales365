@@ -446,6 +446,12 @@ function ListingDetailPage() {
                 <Badge variant={listing.seller_type === "business" ? "default" : "secondary"}>
                   {listing.seller_type === "business" ? "Business seller" : "Private seller"}
                 </Badge>
+                {listing.seller_type === "business" && sellerDealerPlan && (
+                  <DealerSubscriptionBadge planName={sellerDealerPlan} size="md" />
+                )}
+                {seller?.verification_status === "verified" && (
+                  <VerifiedBadge size="md" showLabel />
+                )}
                 {boosted && (
                   <Badge className="bg-accent text-accent-foreground">
                     <Star className="mr-1 h-3 w-3" />
