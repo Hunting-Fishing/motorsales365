@@ -93,6 +93,7 @@ function BusinessesIndex() {
   });
   const [center, setCenter] = useState<CenterPoint>(null);
   const [radiusKm, setRadiusKm] = useState<number | null>(null);
+  const [sortBy, setSortBy] = useState<"relevance" | "nearest" | "popular">("relevance");
 
   useEffect(() => {
     setTypes(
