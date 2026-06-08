@@ -5,6 +5,7 @@ import { Search, BookmarkPlus, Rocket } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
+import { getActiveDealerStatus } from "@/lib/seller-status.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
