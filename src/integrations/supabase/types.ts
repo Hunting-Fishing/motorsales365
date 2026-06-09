@@ -3875,6 +3875,106 @@ export type Database = {
         }
         Relationships: []
       }
+      passport_premium_products: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          duration_days: number
+          id: string
+          label: string
+          price_php: number
+          slug: string
+          sort_order: number
+          stripe_lookup_key: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          duration_days: number
+          id?: string
+          label: string
+          price_php: number
+          slug: string
+          sort_order?: number
+          stripe_lookup_key?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          duration_days?: number
+          id?: string
+          label?: string
+          price_php?: number
+          slug?: string
+          sort_order?: number
+          stripe_lookup_key?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      passport_premium_purchases: {
+        Row: {
+          created_at: string
+          ends_at: string
+          id: string
+          payment_id: string | null
+          product_slug: string
+          starts_at: string
+          stripe_session_id: string | null
+          user_id: string
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          id?: string
+          payment_id?: string | null
+          product_slug: string
+          starts_at?: string
+          stripe_session_id?: string | null
+          user_id: string
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          id?: string
+          payment_id?: string | null
+          product_slug?: string
+          starts_at?: string
+          stripe_session_id?: string | null
+          user_id?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "passport_premium_purchases_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "passport_premium_purchases_product_slug_fkey"
+            columns: ["product_slug"]
+            isOneToOne: false
+            referencedRelation: "passport_premium_products"
+            referencedColumns: ["slug"]
+          },
+          {
+            foreignKeyName: "passport_premium_purchases_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payment_line_items: {
         Row: {
           amount_php: number
@@ -6548,6 +6648,7 @@ export type Database = {
           owner_user_id: string
           ownership_count: number
           passport_premium: boolean
+          passport_premium_until: string | null
           passport_slug: string | null
           plate_number: string | null
           transferred_to_listing_id: string | null
@@ -6569,6 +6670,7 @@ export type Database = {
           owner_user_id: string
           ownership_count?: number
           passport_premium?: boolean
+          passport_premium_until?: string | null
           passport_slug?: string | null
           plate_number?: string | null
           transferred_to_listing_id?: string | null
@@ -6590,6 +6692,7 @@ export type Database = {
           owner_user_id?: string
           ownership_count?: number
           passport_premium?: boolean
+          passport_premium_until?: string | null
           passport_slug?: string | null
           plate_number?: string | null
           transferred_to_listing_id?: string | null
