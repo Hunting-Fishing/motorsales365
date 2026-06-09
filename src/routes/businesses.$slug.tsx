@@ -14,6 +14,7 @@ import {
   Sparkles,
   CalendarDays,
   Info,
+  Award,
 } from "lucide-react";
 import {
   TooltipProvider,
