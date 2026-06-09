@@ -339,6 +339,66 @@ function VehicleDialog({
               />
             </div>
           )}
+
+          <div className="rounded-md border border-border p-3 space-y-3">
+            <p className="text-sm font-medium">Passport disclosures</p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div>
+                <Label>Ownership #</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={20}
+                  value={form.ownershipCount}
+                  onChange={(e) => setForm((f) => ({ ...f, ownershipCount: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label>Flood history</Label>
+                <Select value={form.floodLevel} onValueChange={(v) => setForm((f) => ({ ...f, floodLevel: v }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None reported</SelectItem>
+                    <SelectItem value="minor">Minor</SelectItem>
+                    <SelectItem value="major">Major</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Accident history</Label>
+                <Select value={form.accidentLevel} onValueChange={(v) => setForm((f) => ({ ...f, accidentLevel: v }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None reported</SelectItem>
+                    <SelectItem value="minor">Minor</SelectItem>
+                    <SelectItem value="major">Major</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label>Disclosure notes (optional)</Label>
+              <Textarea
+                rows={2}
+                maxLength={1000}
+                value={form.discNotes}
+                onChange={(e) => setForm((f) => ({ ...f, discNotes: e.target.value }))}
+                placeholder="Repaired front bumper after parking incident, 2024."
+              />
+            </div>
+            <div>
+              <Label>Modifications & upgrades</Label>
+              <Textarea
+                rows={3}
+                maxLength={2000}
+                value={form.modifications}
+                onChange={(e) => setForm((f) => ({ ...f, modifications: e.target.value }))}
+                placeholder="Aftermarket alloys, K&N filter, dashcam, tinted windows…"
+              />
+            </div>
+          </div>
+
+
           <div className="flex items-center justify-between rounded-md border border-border p-3">
             <div className="text-sm">
               <p className="font-medium">Public passport</p>
