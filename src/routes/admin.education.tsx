@@ -176,6 +176,77 @@ function CoursesTab() {
   );
 }
 
+function SponsorCell({ course, onChanged }: { course: any; onChanged: () => void }) {
+  const [open, setOpen] = useState(false);
+  const { data: partnersData } = useQuery({
+    queryKey: ["admin-partners"],
+    queryFn: () => adminListPartners(),
+    enabled: open,
+  });
+  const setSponsor = useServerFn(adminSetCourseSponsor);
+  const [partnerId, setPartnerId] = useState<string>(course.sponsor_partner_id ?? "");
+  const [until, setUntil] = useState<string>(
+    course.sponsored_until ? new Date(course.sponsored_until).toISOString().slice(0, 10) : "",
+  );
+  const active =
+    course.sponsor_partner_id &&
+    (!course.sponsored_until || new Date(course.sponsored_until) > new Date());
+  return (
+    <>
+      <Button size="sm" variant={active ? "default" : "outline"} onClick={() => setOpen(true)}>
+        {active ? "Sponsored" : "Set sponsor"}
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Sponsor "{course.title}"</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Training partner</Label>
+              <Select value={partnerId || "none"} onValueChange={(v) => setPartnerId(v === "none" ? "" : v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a partner" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">— No sponsor —</SelectItem>
+                  {(partnersData?.partners ?? []).map((p: any) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Sponsored until</Label>
+              <Input type="date" value={until} onChange={(e) => setUntil(e.target.value)} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button
+              onClick={async () => {
+                await setSponsor({
+                  data: {
+                    courseId: course.id,
+                    sponsorPartnerId: partnerId || null,
+                    sponsoredUntil: until ? new Date(until).toISOString() : null,
+                  },
+                });
+                setOpen(false);
+                onChanged();
+              }}
+            >
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
 function CourseFormDialog({
   courseId,
   initial,
