@@ -2821,6 +2821,140 @@ export type Database = {
         }
         Relationships: []
       }
+      inspection_orders: {
+        Row: {
+          buyer_id: string
+          contact_email: string
+          contact_name: string
+          contact_phone: string | null
+          created_at: string
+          id: string
+          listing_id: string | null
+          notes: string | null
+          payment_id: string | null
+          preferred_date: string | null
+          provider_id: string | null
+          region: string | null
+          service_id: string
+          status: string
+          updated_at: string
+          vehicle_summary: string | null
+        }
+        Insert: {
+          buyer_id: string
+          contact_email: string
+          contact_name: string
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          notes?: string | null
+          payment_id?: string | null
+          preferred_date?: string | null
+          provider_id?: string | null
+          region?: string | null
+          service_id: string
+          status?: string
+          updated_at?: string
+          vehicle_summary?: string | null
+        }
+        Update: {
+          buyer_id?: string
+          contact_email?: string
+          contact_name?: string
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          listing_id?: string | null
+          notes?: string | null
+          payment_id?: string | null
+          preferred_date?: string | null
+          provider_id?: string | null
+          region?: string | null
+          service_id?: string
+          status?: string
+          updated_at?: string
+          vehicle_summary?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "inspection_orders_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inspection_orders_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inspection_orders_provider_id_fkey"
+            columns: ["provider_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "inspection_orders_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "inspection_services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      inspection_services: {
+        Row: {
+          active: boolean
+          category: string
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          name: string
+          price_php_max: number | null
+          price_php_min: number
+          pricing_unit: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          category: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          name: string
+          price_php_max?: number | null
+          price_php_min?: number
+          pricing_unit?: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          name?: string
+          price_php_max?: number | null
+          price_php_min?: number
+          pricing_unit?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       internal_cron_tokens: {
         Row: {
           job_name: string
