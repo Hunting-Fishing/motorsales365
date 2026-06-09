@@ -316,3 +316,15 @@ function Stat({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
+function DisclosureBadge({ level }: { level?: string }) {
+  const l = (level || "unknown").toLowerCase();
+  const map: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+    none: { label: "None reported", variant: "secondary" },
+    minor: { label: "Minor", variant: "outline" },
+    major: { label: "Major", variant: "destructive" },
+    unknown: { label: "Not disclosed", variant: "outline" },
+  };
+  const cfg = map[l] || map.unknown;
+  return <Badge variant={cfg.variant} className="text-[10px]">{cfg.label}</Badge>;
+}
