@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 9, 2026 (added Vehicle Passport Premium upgrade in §8)";
+  const lastUpdated = "June 9, 2026 (added sponsored course placements and 365-trained mechanic directory)";
 
   return (
     <SiteLayout>
