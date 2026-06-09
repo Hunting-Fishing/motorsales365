@@ -32,6 +32,16 @@ async function upsertSubscription(env: StripeEnv, sub: Stripe.Subscription) {
   const lookupKey = (sub.metadata?.lookup_key as string | undefined) ?? null;
   if (!userId) return;
 
+  // 365 Dispatch subscriptions go to dispatch_subscriptions and toggle provider flags.
+  const itemLookupKey = sub.items.data[0]?.price?.lookup_key ?? null;
+  const dispatchLookup =
+    (lookupKey && lookupKey.startsWith("dispatch_") ? lookupKey : null) ||
+    (itemLookupKey && itemLookupKey.startsWith("dispatch_") ? itemLookupKey : null);
+  if (sub.metadata?.kind === "dispatch" || dispatchLookup) {
+    await upsertDispatchSubscription(env, sub, dispatchLookup);
+    return;
+  }
+
   const item = sub.items.data[0];
   const itemLookup = item?.price?.lookup_key ?? null;
   const planId = (await resolvePlanId(lookupKey)) ?? (await resolvePlanId(itemLookup));
