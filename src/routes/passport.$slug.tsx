@@ -101,11 +101,13 @@ export const Route = createFileRoute("/passport/$slug")({
 });
 
 function PassportPage() {
-  const { vehicle, records } = Route.useLoaderData();
+  const { vehicle, records, photos } = Route.useLoaderData() as any;
   const v: any = vehicle;
   const name = v.nickname || `${v.year ? v.year + " " : ""}${v.make} ${v.model}`;
   const totalSpent = records.reduce((s: number, r: any) => s + Number(r.cost_php || 0), 0);
   const lastMileage = records.find((r: any) => r.mileage_km)?.mileage_km;
+  const disclosures = (v.disclosures || {}) as { flood?: string; accident?: string; notes?: string };
+  const ownerCount = Number(v.ownership_count || 1);
 
   const fullUrl = `https://www.365motorsales.com/passport/${v.passport_slug}`;
 
