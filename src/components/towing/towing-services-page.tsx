@@ -10,10 +10,14 @@ import {
   MapPin,
   Plus,
   Siren,
+  Star,
+  Crown,
+  Network,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -27,7 +31,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { LocationPicker } from "@/components/location-picker";
-import { ListingCard, type ListingCardData } from "@/components/listing-card";
 import { FeaturedTowProviders } from "@/components/tow/featured-tow-providers";
 
 const SERVICE_CHIPS = [
@@ -59,6 +62,28 @@ type Loc = {
 };
 const emptyLoc: Loc = { region: null, province: null, city: null, barangay: null };
 
+type ProviderRow = {
+  id: string;
+  slug: string;
+  name: string;
+  logo_url: string | null;
+  cover_url: string | null;
+  city: string | null;
+  province: string | null;
+  region: string | null;
+  rating_avg: number;
+  rating_count: number;
+  tagline: string | null;
+  phone: string | null;
+  subscription_tier: string | null;
+  claim_state: string | null;
+  owner_id: string;
+  attributes?: any;
+  available_24_7: boolean;
+  payments: string[];
+  services: string[];
+};
+
 export function TowingServicesPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -71,8 +96,13 @@ export function TowingServicesPage() {
   const [open247, setOpen247] = useState(false);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [payment, setPayment] = useState<string>("any");
-  const [items, setItems] = useState<ListingCardData[]>([]);
+  const [providers, setProviders] = useState<ProviderRow[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Direct-provider request (bypasses auto-dispatch)
+  const [requestedProvider, setRequestedProvider] = useState<{ id: string; name: string } | null>(null);
+  const [providerSearch, setProviderSearch] = useState("");
+  const [providerOptions, setProviderOptions] = useState<{ id: string; name: string; owner_id: string }[]>([]);
 
   // Emergency request form
   const [pickup, setPickup] = useState<Loc>(emptyLoc);
@@ -87,39 +117,107 @@ export function TowingServicesPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
     const run = async () => {
       setLoading(true);
-      let q = supabase
-        .from("listings")
+      // Source providers from `businesses` (real tow companies live there),
+      // joined with `provider_tow_rates` for 24/7 availability.
+      let q = (supabase as any)
+        .from("businesses")
         .select(
-          "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status)",
+          "id,slug,name,logo_url,cover_url,city,province,region,rating_avg,rating_count,tagline,phone,subscription_tier,claim_state,owner_id,attributes,provider_tow_rates!provider_tow_rates_user_id_fkey(available_24_7)",
         )
-        .in("status", ["active", "pending_sale"])
-        .eq("category_slug", "towing")
-        .order("boost_until", { ascending: false, nullsFirst: false })
-        .order("published_at", { ascending: false, nullsFirst: false })
+        .eq("status", "active")
+        .eq("type_slug", "towing")
+        .order("subscription_tier", { ascending: false })
+        .order("rating_avg", { ascending: false })
         .limit(60);
       if (region) q = q.eq("region", region);
       if (province) q = q.eq("province", province);
       if (city) q = q.eq("city", city);
-      if (open247) q = q.eq("attributes->>available_24_7", "true");
-      const { data } = await q;
-      let rows = (data ?? []) as any[];
+      const { data, error } = await q;
+      if (cancelled) return;
+      if (error) {
+        // Fallback without the provider_tow_rates join if FK alias differs
+        const fb = await (supabase as any)
+          .from("businesses")
+          .select(
+            "id,slug,name,logo_url,cover_url,city,province,region,rating_avg,rating_count,tagline,phone,subscription_tier,claim_state,owner_id,attributes",
+          )
+          .eq("status", "active")
+          .eq("type_slug", "towing")
+          .limit(60);
+        const ownerIds = (fb.data ?? []).map((b: any) => b.owner_id);
+        const { data: rates } = ownerIds.length
+          ? await (supabase as any)
+              .from("provider_tow_rates")
+              .select("user_id, available_24_7")
+              .in("user_id", ownerIds)
+          : { data: [] };
+        const rateMap: Record<string, boolean> = {};
+        for (const r of (rates ?? []) as any[]) rateMap[r.user_id] = !!r.available_24_7;
+        const merged = (fb.data ?? []).map((b: any) => ({
+          ...b,
+          provider_tow_rates: rateMap[b.owner_id] ? [{ available_24_7: true }] : [],
+        }));
+        applyAndSet(merged);
+        return;
+      }
+      applyAndSet(data ?? []);
+    };
 
-      // Client-side filters for JSON attrs not easily expressible
+    function applyAndSet(rows: any[]) {
+      let mapped: ProviderRow[] = rows.map((b: any) => {
+        const a = b.attributes ?? {};
+        const ptr = Array.isArray(b.provider_tow_rates) ? b.provider_tow_rates[0] : b.provider_tow_rates;
+        return {
+          id: b.id,
+          slug: b.slug,
+          name: b.name,
+          logo_url: b.logo_url,
+          cover_url: b.cover_url,
+          city: b.city,
+          province: b.province,
+          region: b.region,
+          rating_avg: Number(b.rating_avg ?? 0),
+          rating_count: Number(b.rating_count ?? 0),
+          tagline: b.tagline,
+          phone: b.phone,
+          subscription_tier: b.subscription_tier,
+          claim_state: b.claim_state,
+          owner_id: b.owner_id,
+          attributes: a,
+          available_24_7: !!(a.available_24_7 || ptr?.available_24_7),
+          payments: Array.isArray(a.payments) ? a.payments.map(String) : [],
+          services: [
+            ...(Array.isArray(a.services) ? a.services.map(String) : []),
+            ...(a.service_type ? [String(a.service_type)] : []),
+            ...(a.vehicle_capacity ? [String(a.vehicle_capacity)] : []),
+          ],
+        };
+      });
+
+      if (open247) mapped = mapped.filter((p) => p.available_24_7);
+      if (verifiedOnly) {
+        mapped = mapped.filter(
+          (p) =>
+            p.claim_state === "approved" ||
+            p.claim_state === "verified" ||
+            ["featured", "premium", "enterprise", "platinum"].includes(
+              String(p.subscription_tier ?? "").toLowerCase(),
+            ),
+        );
+      }
+      if (payment !== "any") {
+        mapped = mapped.filter((p) =>
+          p.payments.some((m) => m.toLowerCase() === payment.toLowerCase()),
+        );
+      }
       if (activeService) {
         const needle = activeService.toLowerCase();
-        rows = rows.filter((r) => {
-          const a = r.attributes ?? {};
-          const blob = [
-            a.service_type,
-            a.vehicle_capacity,
-            ...(Array.isArray(a.services) ? a.services : []),
-          ]
-            .filter(Boolean)
-            .join(" ")
-            .toLowerCase();
-          // Map chip → keywords
+        mapped = mapped.filter((p) => {
+          const blob = p.services.join(" ").toLowerCase();
+          if (!blob) return true; // legacy rows with no services tag: don't exclude
           if (needle.includes("car")) return blob.includes("sedan") || blob.includes("car") || blob.includes("suv");
           if (needle.includes("motorcycle")) return blob.includes("motorcycle");
           if (needle.includes("flatbed")) return blob.includes("flatbed");
@@ -130,46 +228,38 @@ export function TowingServicesPage() {
           return true;
         });
       }
-      if (payment !== "any") {
-        rows = rows.filter((r) => {
-          const pays = r.attributes?.payments;
-          if (!Array.isArray(pays)) return false;
-          return pays.map((p: string) => p.toLowerCase()).includes(payment.toLowerCase());
-        });
-      }
-      if (verifiedOnly) {
-        rows = rows.filter((r) => r.profiles?.verification_status === "verified");
-      }
-
-      const mapped: ListingCardData[] = rows.map((r) => {
-        const photos = (r.listing_media ?? []).filter((m: any) => m.type === "photo");
-        const videos = (r.listing_media ?? []).filter((m: any) => m.type === "video");
-        return {
-          id: r.id,
-          title: r.title,
-          price_php: Number(r.price_php),
-          region: r.region,
-          city: r.city,
-          seller_type: r.seller_type,
-          boost_until: r.boost_until,
-          category_slug: r.category_slug,
-          view_count: r.view_count ?? 0,
-          cover_url: photos[0]?.url ?? null,
-          photo_count: photos.length,
-          has_video: videos.length > 0,
-          seller_verified: r.profiles?.verification_status === "verified",
-          seller_dealer_plan: null,
-          seller_dealer_period_end: null,
-          seller_dealer_cancel_at_period_end: false,
-          status: r.status,
-          attributes: r.attributes,
-        } as ListingCardData;
-      });
-      setItems(mapped);
+      setProviders(mapped);
       setLoading(false);
-    };
+    }
+
     run();
+    return () => {
+      cancelled = true;
+    };
   }, [activeService, region, province, city, open247, verifiedOnly, payment]);
+
+  // Search tow companies for direct-request combobox
+  useEffect(() => {
+    let active = true;
+    const t = setTimeout(async () => {
+      if (providerSearch.trim().length < 2) {
+        if (active) setProviderOptions([]);
+        return;
+      }
+      const { data } = await (supabase as any)
+        .from("businesses")
+        .select("id,name,owner_id")
+        .eq("status", "active")
+        .eq("type_slug", "towing")
+        .ilike("name", `%${providerSearch.trim()}%`)
+        .limit(8);
+      if (active) setProviderOptions((data ?? []) as any);
+    }, 200);
+    return () => {
+      active = false;
+      clearTimeout(t);
+    };
+  }, [providerSearch]);
 
   const handleEmergencySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -198,9 +288,10 @@ export function TowingServicesPage() {
         .filter(Boolean)
         .join("\n");
 
-      const { error } = await supabase.from("tow_requests").insert({
+      const { error } = await (supabase as any).from("tow_requests").insert({
         requester_id: user.id,
         provider_id: null,
+        requested_provider_id: requestedProvider?.id ?? null,
         listing_id: null,
         pickup_region: pickup.region,
         pickup_province: pickup.province,
@@ -215,12 +306,18 @@ export function TowingServicesPage() {
         notes: noteBlob || null,
       });
       if (error) throw error;
-      toast.success("Emergency tow request posted — nearby providers will respond.");
+      toast.success(
+        requestedProvider
+          ? `Request sent to ${requestedProvider.name}.`
+          : "Emergency tow request posted — nearby 365 Dispatch providers will respond within 5 minutes.",
+      );
       setPickupAddress("");
       setDropoffAddress("");
       setVehicleSummary("");
       setContactPhone("");
       setNotes("");
+      setRequestedProvider(null);
+      setProviderSearch("");
     } catch (err: any) {
       toast.error(err.message ?? "Failed to submit request");
     } finally {
@@ -228,14 +325,25 @@ export function TowingServicesPage() {
     }
   };
 
-  const promoted = useMemo(() => {
-    const now = Date.now();
-    return items.filter((l) => l.boost_until && new Date(l.boost_until).getTime() > now);
-  }, [items]);
-  const organic = useMemo(() => {
-    const now = Date.now();
-    return items.filter((l) => !l.boost_until || new Date(l.boost_until).getTime() <= now);
-  }, [items]);
+  const promoted = useMemo(
+    () =>
+      providers.filter((p) =>
+        ["featured", "premium", "enterprise", "platinum"].includes(
+          String(p.subscription_tier ?? "").toLowerCase(),
+        ),
+      ),
+    [providers],
+  );
+  const organic = useMemo(
+    () =>
+      providers.filter(
+        (p) =>
+          !["featured", "premium", "enterprise", "platinum"].includes(
+            String(p.subscription_tier ?? "").toLowerCase(),
+          ),
+      ),
+    [providers],
+  );
 
   return (
     <>
@@ -260,7 +368,7 @@ export function TowingServicesPage() {
                 </h1>
                 <p className="max-w-2xl text-muted-foreground">
                   Find verified towing and vehicle-transport providers across the Philippines,
-                  or post an emergency tow request and get matched in minutes.
+                  or post an emergency tow request via the 365 Dispatch network.
                 </p>
               </div>
             </div>
@@ -269,6 +377,11 @@ export function TowingServicesPage() {
                 <a href="#emergency-tow">
                   <Siren className="mr-2 h-4 w-4" /> Request emergency tow
                 </a>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <Link to="/dispatch">
+                  <Network className="mr-2 h-4 w-4" /> Join 365 Dispatch
+                </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
                 <Link to="/sell" search={{ payment: undefined, listingId: undefined }}>
@@ -367,12 +480,13 @@ export function TowingServicesPage() {
         {promoted.length > 0 && (
           <section className="mb-6">
             <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
+              <Crown className="h-3.5 w-3.5 text-primary" />
               <Badge variant="secondary">Promoted</Badge>
               <span className="ml-auto text-[10px] normal-case tracking-normal">Sponsored</span>
             </div>
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {promoted.slice(0, 3).map((l) => (
-                <ListingCard key={l.id} listing={l} />
+              {promoted.slice(0, 6).map((p) => (
+                <ProviderCard key={p.id} p={p} />
               ))}
             </div>
           </section>
@@ -389,8 +503,8 @@ export function TowingServicesPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-            {organic.map((l) => (
-              <ListingCard key={l.id} listing={l} />
+            {organic.map((p) => (
+              <ProviderCard key={p.id} p={p} />
             ))}
           </div>
         )}
@@ -406,7 +520,8 @@ export function TowingServicesPage() {
             <div>
               <h2 className="font-display text-2xl font-bold">Emergency tow request</h2>
               <p className="text-sm text-muted-foreground">
-                Post your request to all verified providers in your area.
+                Posted to the 365 Dispatch network. Top matched providers see it for 5 minutes
+                before it broadens.
               </p>
             </div>
           </div>
@@ -458,6 +573,59 @@ export function TowingServicesPage() {
                     ))}
                   </SelectContent>
                 </Select>
+              </div>
+
+              <div className="rounded-lg border border-border bg-muted/40 p-3">
+                <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Request a specific provider (optional)
+                </Label>
+                {requestedProvider ? (
+                  <div className="mt-2 flex items-center justify-between rounded-md bg-card p-2">
+                    <span className="text-sm">
+                      <strong>{requestedProvider.name}</strong> will receive this request directly.
+                    </span>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        setRequestedProvider(null);
+                        setProviderSearch("");
+                      }}
+                    >
+                      Clear
+                    </Button>
+                  </div>
+                ) : (
+                  <>
+                    <Input
+                      className="mt-2"
+                      placeholder="Type a tow company name…"
+                      value={providerSearch}
+                      onChange={(e) => setProviderSearch(e.target.value)}
+                    />
+                    {providerOptions.length > 0 && (
+                      <div className="mt-2 max-h-40 overflow-y-auto rounded-md border border-border bg-card">
+                        {providerOptions.map((opt) => (
+                          <button
+                            key={opt.id}
+                            type="button"
+                            className="block w-full px-3 py-2 text-left text-sm hover:bg-muted"
+                            onClick={() => {
+                              setRequestedProvider({ id: opt.owner_id, name: opt.name });
+                              setProviderOptions([]);
+                            }}
+                          >
+                            {opt.name}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Leave empty to let 365 Dispatch auto-match the best provider.
+                    </p>
+                  </>
+                )}
               </div>
             </section>
 
@@ -516,7 +684,7 @@ export function TowingServicesPage() {
               />
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <p className="text-xs text-muted-foreground">
-                  Open requests are shared with verified PH tow providers. You'll see bids on
+                  Open requests are routed via the 365 Dispatch network. You'll see responses on
                   your dashboard.
                 </p>
                 <Button type="submit" size="lg" disabled={submitting}>
@@ -529,10 +697,10 @@ export function TowingServicesPage() {
         </div>
       </div>
 
-      {/* List your company CTA */}
+      {/* CTAs */}
       <div className="border-t border-border">
-        <div className="container mx-auto px-4 py-12">
-          <div className="flex flex-col items-center justify-between gap-4 rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-8 md:flex-row">
+        <div className="container mx-auto grid gap-4 px-4 py-12 md:grid-cols-2">
+          <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent p-8">
             <div>
               <h2 className="font-display text-xl font-bold md:text-2xl">
                 Run a towing or transport company?
@@ -548,8 +716,115 @@ export function TowingServicesPage() {
               </Link>
             </Button>
           </div>
+          <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-amber-400/40 bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent p-8">
+            <div>
+              <h2 className="font-display text-xl font-bold md:text-2xl">
+                Join the 365 Dispatch Network
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Get auto-matched to nationwide emergency tow requests for a flat monthly
+                fee. Three tiers from ₱499/mo.
+              </p>
+            </div>
+            <Button asChild size="lg" variant="default">
+              <Link to="/dispatch">
+                <Network className="mr-2 h-4 w-4" /> See dispatch plans
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
     </>
+  );
+}
+
+function ProviderCard({ p }: { p: ProviderRow }) {
+  const tier = String(p.subscription_tier ?? "").toLowerCase();
+  const isPromoted = ["featured", "premium", "enterprise", "platinum"].includes(tier);
+  const isVerified =
+    p.claim_state === "approved" || p.claim_state === "verified" || isPromoted;
+  return (
+    <Card className="overflow-hidden transition-all hover:border-primary/40 hover:shadow-md">
+      <div className="relative aspect-[16/8] w-full overflow-hidden bg-muted">
+        {p.cover_url ? (
+          <img src={p.cover_url} alt={p.name} loading="lazy" className="h-full w-full object-cover" />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <Truck className="h-10 w-10 text-muted-foreground/40" />
+          </div>
+        )}
+        {isPromoted && (
+          <Badge className="absolute right-2 top-2 bg-primary text-primary-foreground shadow">
+            {tier === "premium" ? "Premium" : "Featured"}
+          </Badge>
+        )}
+        {p.available_24_7 && (
+          <Badge variant="secondary" className="absolute left-2 top-2 shadow">
+            <Clock className="mr-1 h-3 w-3" /> 24/7
+          </Badge>
+        )}
+      </div>
+      <div className="space-y-2 p-3">
+        <div className="flex items-start gap-3">
+          {p.logo_url && (
+            <div className="-mt-8 h-12 w-12 shrink-0 overflow-hidden rounded-lg border-2 border-background bg-background shadow">
+              <img src={p.logo_url} alt="" className="h-full w-full object-cover" />
+            </div>
+          )}
+          <div className="min-w-0 flex-1">
+            <Link
+              to="/businesses/$slug"
+              params={{ slug: p.slug }}
+              className="block truncate font-semibold hover:underline"
+            >
+              {p.name}
+            </Link>
+            {p.tagline && (
+              <p className="line-clamp-1 text-xs text-muted-foreground">{p.tagline}</p>
+            )}
+          </div>
+          {isVerified && (
+            <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-600" aria-label="Verified" />
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+          {(p.city || p.region) && (
+            <span className="flex items-center gap-1">
+              <MapPin className="h-3 w-3" />
+              {[p.city, p.province, p.region].filter(Boolean).join(", ")}
+            </span>
+          )}
+          {p.rating_count > 0 && (
+            <span className="flex items-center gap-1">
+              <Star className="h-3 w-3 fill-yellow-500 text-yellow-500" />
+              {p.rating_avg.toFixed(1)} ({p.rating_count})
+            </span>
+          )}
+        </div>
+        {p.payments.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {p.payments.slice(0, 4).map((pm) => (
+              <Badge key={pm} variant="outline" className="text-[10px]">
+                {pm}
+              </Badge>
+            ))}
+          </div>
+        )}
+        <div className="flex gap-2 pt-1">
+          <Button asChild size="sm" className="flex-1">
+            <Link to="/businesses/$slug" params={{ slug: p.slug }}>
+              View profile
+            </Link>
+          </Button>
+          {p.phone && (
+            <Button asChild size="sm" variant="outline">
+              <a href={`tel:${p.phone}`} aria-label={`Call ${p.name}`}>
+                <PhoneCall className="h-4 w-4" />
+              </a>
+            </Button>
+          )}
+        </div>
+      </div>
+    </Card>
   );
 }

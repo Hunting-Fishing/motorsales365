@@ -2553,6 +2553,54 @@ export type Database = {
         }
         Relationships: []
       }
+      dispatch_subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          environment: string
+          id: string
+          metadata: Json
+          plan_slug: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_price_id: string | null
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          environment?: string
+          id?: string
+          metadata?: Json
+          plan_slug: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          environment?: string
+          id?: string
+          metadata?: Json
+          plan_slug?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_price_id?: string | null
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       email_routes: {
         Row: {
           active: boolean
@@ -4510,7 +4558,11 @@ export type Database = {
       provider_tow_rates: {
         Row: {
           available_24_7: boolean
+          avg_rating: number | null
+          avg_response_sec: number | null
           created_at: string
+          dispatch_enabled: boolean
+          dispatch_regions: string[]
           flat_base_php: number | null
           min_php: number | null
           notes: string | null
@@ -4520,7 +4572,11 @@ export type Database = {
         }
         Insert: {
           available_24_7?: boolean
+          avg_rating?: number | null
+          avg_response_sec?: number | null
           created_at?: string
+          dispatch_enabled?: boolean
+          dispatch_regions?: string[]
           flat_base_php?: number | null
           min_php?: number | null
           notes?: string | null
@@ -4530,7 +4586,11 @@ export type Database = {
         }
         Update: {
           available_24_7?: boolean
+          avg_rating?: number | null
+          avg_response_sec?: number | null
           created_at?: string
+          dispatch_enabled?: boolean
+          dispatch_regions?: string[]
           flat_base_php?: number | null
           min_php?: number | null
           notes?: string | null
@@ -6368,6 +6428,9 @@ export type Database = {
           completed_at: string | null
           completion_notes: string | null
           created_at: string
+          dispatch_expansions: number
+          dispatch_status: string
+          dispatch_window_ends_at: string | null
           dropoff_address: string | null
           dropoff_city: string | null
           dropoff_province: string | null
@@ -6377,6 +6440,7 @@ export type Database = {
           final_price_php: number | null
           id: string
           listing_id: string | null
+          matched_provider_ids: string[]
           needed_at: string | null
           notes: string | null
           picked_up_at: string | null
@@ -6385,6 +6449,7 @@ export type Database = {
           pickup_province: string | null
           pickup_region: string | null
           provider_id: string | null
+          requested_provider_id: string | null
           requester_id: string
           status: string
           updated_at: string
@@ -6394,6 +6459,9 @@ export type Database = {
           completed_at?: string | null
           completion_notes?: string | null
           created_at?: string
+          dispatch_expansions?: number
+          dispatch_status?: string
+          dispatch_window_ends_at?: string | null
           dropoff_address?: string | null
           dropoff_city?: string | null
           dropoff_province?: string | null
@@ -6403,6 +6471,7 @@ export type Database = {
           final_price_php?: number | null
           id?: string
           listing_id?: string | null
+          matched_provider_ids?: string[]
           needed_at?: string | null
           notes?: string | null
           picked_up_at?: string | null
@@ -6411,6 +6480,7 @@ export type Database = {
           pickup_province?: string | null
           pickup_region?: string | null
           provider_id?: string | null
+          requested_provider_id?: string | null
           requester_id: string
           status?: string
           updated_at?: string
@@ -6420,6 +6490,9 @@ export type Database = {
           completed_at?: string | null
           completion_notes?: string | null
           created_at?: string
+          dispatch_expansions?: number
+          dispatch_status?: string
+          dispatch_window_ends_at?: string | null
           dropoff_address?: string | null
           dropoff_city?: string | null
           dropoff_province?: string | null
@@ -6429,6 +6502,7 @@ export type Database = {
           final_price_php?: number | null
           id?: string
           listing_id?: string | null
+          matched_provider_ids?: string[]
           needed_at?: string | null
           notes?: string | null
           picked_up_at?: string | null
@@ -6437,6 +6511,7 @@ export type Database = {
           pickup_province?: string | null
           pickup_region?: string | null
           provider_id?: string | null
+          requested_provider_id?: string | null
           requester_id?: string
           status?: string
           updated_at?: string
@@ -7294,6 +7369,19 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
+      dispatch_expand_stale: { Args: never; Returns: number }
+      dispatch_match_providers: {
+        Args: { _request_id: string; _take?: number }
+        Returns: string[]
+      }
+      dispatch_plan_capacity: {
+        Args: { _plan: string }
+        Returns: {
+          max_jobs: number
+          max_regions: number
+          priority: number
+        }[]
+      }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
@@ -7301,6 +7389,7 @@ export type Database = {
       expire_stale_pending_sales: { Args: never; Returns: number }
       gen_referral_code: { Args: { _name: string }; Returns: string }
       generate_invoice_number: { Args: never; Returns: string }
+      get_active_dispatch_plan: { Args: { _user: string }; Returns: string }
       get_assigned_rep_card: {
         Args: { _subject_id: string; _subject_type: string }
         Returns: {
