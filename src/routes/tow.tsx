@@ -343,7 +343,7 @@ function TowPage() {
               params={{ category: "towing" }}
               className="font-medium text-primary underline"
             >
-              See towing & trucking listings
+              See towing & transport services
             </Link>
             .
           </p>

@@ -81,9 +81,9 @@ const SELL_SEO: Record<string, { title: string; description: string }> = {
       "Post backhoes, excavators, loaders, and other heavy equipment for sale across the Philippines.",
   },
   towing: {
-    title: "List your towing & trucking service — 365 MotorSales",
+    title: "List your towing & transport service — 365 MotorSales",
     description:
-      "Offer flatbed, wrecker, and roadside towing services to drivers across the Philippines.",
+      "Offer flatbed, wrecker, long-distance, and roadside towing services to drivers across the Philippines.",
   },
   carwash: {
     title: "List your car wash business — 365 MotorSales Philippines",
@@ -160,7 +160,7 @@ const CATEGORIES = [
   { slug: "boat", name: "Boat" },
   { slug: "airplane", name: "Airplane" },
   { slug: "equipment", name: "Heavy Equipment" },
-  { slug: "towing", name: "Towing & Trucking service" },
+  { slug: "towing", name: "Towing & Transport Services" },
   { slug: "carwash", name: "Car Wash" },
   { slug: "parts", name: "Parts & Accessories" },
   { slug: "drone", name: "Drones & Aerial" },
@@ -171,12 +171,17 @@ const CATEGORIES = [
 ];
 
 const TOW_SERVICE_TYPES = [
+  "Tow car",
+  "Tow motorcycle",
   "Flatbed",
   "Wheel-lift / Hook",
   "Heavy wrecker",
   "Self-loader",
   "Box truck",
   "Lowboy / Trailer",
+  "Long-distance transport",
+  "Heavy equipment hauling",
+  "Recovery/winch-out",
   "Roadside assist",
 ];
 const TOW_CAPACITIES = [

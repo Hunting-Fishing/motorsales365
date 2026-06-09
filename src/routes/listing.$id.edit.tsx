@@ -52,7 +52,7 @@ const CATEGORIES = [
   { slug: "boat", name: "Boat" },
   { slug: "airplane", name: "Airplane" },
   { slug: "equipment", name: "Heavy Equipment" },
-  { slug: "towing", name: "Towing & Trucking service" },
+  { slug: "towing", name: "Towing & Transport Services" },
   { slug: "carwash", name: "Car Wash" },
   { slug: "parts", name: "Parts & Accessories" },
   { slug: "drone", name: "Drones & Aerial" },
@@ -63,12 +63,17 @@ const CATEGORIES = [
 ];
 
 const TOW_SERVICE_TYPES = [
+  "Tow car",
+  "Tow motorcycle",
   "Flatbed",
   "Wheel-lift / Hook",
   "Heavy wrecker",
   "Self-loader",
   "Box truck",
   "Lowboy / Trailer",
+  "Long-distance transport",
+  "Heavy equipment hauling",
+  "Recovery/winch-out",
   "Roadside assist",
 ];
 const TOW_CAPACITIES = [

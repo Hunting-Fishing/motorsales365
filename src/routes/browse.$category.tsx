@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getActiveDealerStatus } from "@/lib/seller-status.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
+import { TowingServicesPage } from "@/components/towing/towing-services-page";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
 import { AdCarousel } from "@/components/ads/ad-carousel";
 import { SponsoredCategorySlot } from "@/components/ads/sponsored-category-slot";
@@ -97,6 +98,15 @@ function BrowsePage() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
   const { user } = useAuth();
+
+  if (category === "towing") {
+    return (
+      <SiteLayout>
+        <TowingServicesPage />
+      </SiteLayout>
+    );
+  }
+
 
   const [keyword, setKeyword] = useState(search.q ?? "");
   const [region, setRegion] = useState<string | null>(search.region ?? null);
