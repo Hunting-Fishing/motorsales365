@@ -127,14 +127,18 @@ function LoginPage() {
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
           <div>
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">Email or username</Label>
             <Input
               id="email"
-              type="email"
+              type="text"
               required
+              autoCapitalize="none"
+              autoComplete="username"
+              placeholder="you@example.com or steve@dealer-slug"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
+
           </div>
           <div>
             <div className="flex items-center justify-between">
