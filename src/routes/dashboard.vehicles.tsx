@@ -218,6 +218,13 @@ function VehicleDialog({
         nickname: form.nickname.trim() || null,
         coverUrl: form.coverUrl.trim() || null,
         isPublic: form.isPublic,
+        ownershipCount: form.ownershipCount ? Number(form.ownershipCount) : 1,
+        disclosures: {
+          flood: form.floodLevel || "none",
+          accident: form.accidentLevel || "none",
+          notes: form.discNotes.trim() || null,
+        },
+        modifications: form.modifications.trim() || null,
       };
       if (vehicle) {
         await updateFn({ data: { id: vehicle.id, ...payload } });
