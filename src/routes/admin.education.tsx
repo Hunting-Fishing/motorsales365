@@ -39,6 +39,7 @@ import {
   adminListPartners,
   adminUpsertPartner,
   adminDeletePartner,
+  adminSetCourseSponsor,
 } from "@/lib/education.functions";
 
 export const Route = createFileRoute("/admin/education")({
