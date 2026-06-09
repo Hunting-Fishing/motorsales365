@@ -838,3 +838,101 @@ export const createCourseCheckout = createServerFn({ method: "POST" })
 
     return session.client_secret;
   });
+
+// ============ #17 — CERTIFIED MECHANICS / BUSINESS BADGES ============
+
+const MECHANIC_CATEGORIES = ["Motorcycles", "Trucks", "Buying", "Documents"];
+
+/**
+ * Public: list businesses whose owner has at least one course certificate.
+ * Used by /learn/mechanics to surface trained pros from the directory.
+ */
+export const listMechanicBusinesses = createServerFn({ method: "GET" })
+  .inputValidator((input: { city?: string; limit?: number } = {}) =>
+    z
+      .object({
+        city: z.string().max(80).optional(),
+        limit: z.number().int().min(1).max(60).optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    // 1. Pull certificates joined to courses to filter to mechanic categories.
+    const { data: certs } = await supabaseAdmin
+      .from("course_certificates")
+      .select("user_id, course_id, code, issued_at, courses!inner(category, title, slug)")
+      .in("courses.category", MECHANIC_CATEGORIES);
+    if (!certs?.length) return { businesses: [] };
+
+    // group cert count per user
+    const byUser = new Map<string, { count: number; categories: Set<string> }>();
+    for (const c of certs as any[]) {
+      const entry = byUser.get(c.user_id) ?? { count: 0, categories: new Set<string>() };
+      entry.count += 1;
+      if (c.courses?.category) entry.categories.add(c.courses.category);
+      byUser.set(c.user_id, entry);
+    }
+    const ownerIds = Array.from(byUser.keys());
+
+    // 2. Pull active businesses owned by those users.
+    let q = supabaseAdmin
+      .from("businesses")
+      .select(
+        "id, slug, name, logo_url, city, region, type_slug, rating_avg, rating_count, owner_id",
+      )
+      .eq("status", "active")
+      .in("owner_id", ownerIds);
+    if (data.city) q = q.ilike("city", `%${data.city}%`);
+    const { data: rows } = await q.limit(data.limit ?? 48);
+
+    return {
+      businesses: (rows ?? []).map((b: any) => ({
+        ...b,
+        certificate_count: byUser.get(b.owner_id)?.count ?? 0,
+        certificate_categories: Array.from(byUser.get(b.owner_id)?.categories ?? []),
+      })),
+    };
+  });
+
+/**
+ * Public: list course certificates earned by a business owner.
+ * Used on /businesses/:slug to display a Certified Training badge.
+ */
+export const listOwnerCertificates = createServerFn({ method: "GET" })
+  .inputValidator((input: { ownerId: string }) =>
+    z.object({ ownerId: z.string().uuid() }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { data: certs } = await supabaseAdmin
+      .from("course_certificates")
+      .select("code, issued_at, courses(title, slug, category)")
+      .eq("user_id", data.ownerId)
+      .order("issued_at", { ascending: false })
+      .limit(12);
+    return { certificates: certs ?? [] };
+  });
+
+// ============ #17 — ADMIN SPONSORSHIP CONTROLS ============
+
+export const adminSetCourseSponsor = createServerFn({ method: "POST" })
+  .middleware([requireDomainRole("moderator", "education.adminSetCourseSponsor")])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        courseId: z.string().uuid(),
+        sponsorPartnerId: z.string().uuid().nullable(),
+        sponsoredUntil: z.string().datetime().nullable(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { error } = await supabaseAdmin
+      .from("courses")
+      .update({
+        sponsor_partner_id: data.sponsorPartnerId,
+        sponsored_until: data.sponsoredUntil,
+      })
+      .eq("id", data.courseId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
