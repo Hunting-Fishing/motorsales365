@@ -13,6 +13,8 @@ import { formatDate } from "@/lib/format";
 import { SellerReputationBadges } from "@/components/seller-reputation-badges";
 import { SellerReviews } from "@/components/seller-reviews";
 import { useAuth } from "@/hooks/use-auth";
+import { useQuery } from "@tanstack/react-query";
+import { getSellerReputationStats } from "@/lib/reputation.functions";
 
 export const Route = createFileRoute("/seller/$id")({
   loader: async ({ params }) => {
