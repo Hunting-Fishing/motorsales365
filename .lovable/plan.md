@@ -1,54 +1,83 @@
+## Remaining Audit Work — Build Plan
 
-## Issue #3 — Seed Sample Listings
+Tackle the unfinished items in priority order, and add **cross-file "sync headers"** at the top of every related file so future edits stay consistent.
 
-Database currently has **0 listings**, so the homepage and category pages show "No listings yet — be the first to post one." Per the audit, the fix is to seed example inventory that is clearly marked as a sample so visitors see a populated marketplace without us misrepresenting real stock.
+### Cross-file consistency convention (new)
 
-### Approach
+Every file that participates in a shared feature gets a top comment block:
 
-Insert ~12 seed listings via a single SQL migration, owned by the existing platform profile **"365 MotorSales"** (`a3999f39-3641-4e16-a11b-f2b6563b8a8f`). Every seed is tagged so we can find and bulk-remove them later, and every title is prefixed `[Sample]` so users immediately understand these aren't live stock.
+```ts
+/**
+ * SYNC GROUP: vehicle-passport
+ * Sibling files (keep in sync):
+ *  - src/routes/passport.$slug.tsx
+ *  - src/components/passport/passport-card.tsx
+ *  - src/lib/passport.functions.ts
+ *  - supabase migration: 20260609_vehicle_passport.sql
+ * Source of truth: .lovable/sync-groups.md#vehicle-passport
+ * On change: bump VERSION below + update sync-groups.md
+ * VERSION: 1
+ */
+```
 
-### Seed mix (12 listings)
+Plus a new `.lovable/sync-groups.md` registry listing every group, its files, schema columns, and the "must-also-update" pages (Terms, Privacy, Refund). This becomes the single source of truth — a quick `rg "SYNC GROUP: <name>"` reveals every file to touch.
 
-Across PH regions (NCR, Region I / Ilocos, Region VII / Cebu, Region XI / Davao) and price bands:
+### Build order
 
-**Cars (5)**
-- [Sample] 2019 Toyota Vios 1.3 E MT — ₱525,000 — Quezon City, NCR
-- [Sample] 2021 Honda City 1.5 S CVT — ₱768,000 — Cebu City, Region VII
-- [Sample] 2017 Mitsubishi Montero Sport GLS — ₱899,000 — Davao City, Region XI
-- [Sample] 2015 Toyota Hilux G 4x2 MT — ₱720,000 — Laoag City, Region I
-- [Sample] 2022 Ford Ranger XLT 2.0 AT — ₱1,395,000 — Makati, NCR
+**1. #14 — 365 Vehicle Passport** (highest leverage)
+- New `vehicle_passports` table (slug, owner_id, vehicle_id, public bool, ownership_count, qr_token) + `passport_events` (owner change, service, mod, accident, photo) + `passport_documents`.
+- Public route `/passport/$slug` (SSR, OG tags from loader) — timeline, photos, mods, service history, ownership count (no PII), accident/flood disclosure.
+- Owner controls: `/dashboard/vehicles/$id/passport` — public/private toggle, QR download, "Transfer on sale" action that links a passport to a listing and re-assigns on sale.
+- Premium tier hook (free = basic timeline; paid = full history report PDF) — wires to existing `subscription_plans`.
+- Sync group ties: `passport`, `listings`, `user_garage_vehicles`, `/terms` §data-handling, `/privacy`.
 
-**Motorcycles (4)**
-- [Sample] 2023 Honda Click 160 — ₱115,000 — Quezon City
-- [Sample] 2020 Yamaha NMAX 155 — ₱98,500 — Cebu City
-- [Sample] 2019 Kawasaki Rouser NS200 — ₱82,000 — Davao City
-- [Sample] 2024 Yamaha Mio Gear — ₱72,500 — Vigan, Region I
+**2. #20 — Inspection & transaction-safety upsells**
+- New `inspection_services` catalog (OR/CR review ₱199–499, ID verify ₱99–299, pre-purchase inspection ₱500–2,500, history report ₱199–999, transaction assistance flat/%).
+- New `inspection_orders` table (buyer_id, listing_id, service_id, status, provider_id, payment_id).
+- Route `/services/inspection` (public rate card) + checkout flow reusing existing `payments` table.
+- Buyer CTA "Request inspection" on `/listing/$id`.
+- Language: "transaction assistance" / "payment release partner" — never "escrow."
+- Sync group: `inspection`, `/terms` §services, `/refund-policy`, `/listing/$id`.
 
-**Other vehicles (3)**
-- [Sample] 2018 Isuzu Elf 4HK1 Dropside — ₱785,000 — Pasig (category: equipment)
-- [Sample] DJI Mavic 3 Pro with Fly More Combo — ₱165,000 — Makati (category: drone)
-- [Sample] 2020 Yamaha WaveRunner VX Cruiser — ₱520,000 — Mactan (category: boat)
+**3. #7-ext — PH Vehicle-Document Workflow checklist**
+- Per-listing checklist persisted in `listings.attributes.doc_checklist`: OR/CR present, owner matches CR, deed of sale ready, valid IDs, chassis matches CR, engine matches CR, plate matches, LTO alarm clear, encumbrance/chattel mortgage check, HPG clearance (high-value), flood/accident disclosure.
+- New `DocumentChecklist` component shown on `/sell`, `/listing/$id/edit`, and a read-only badge row on `/listing/$id`.
+- "Transfer of ownership" guide page `/learn/transfer-of-ownership` linked from listing detail.
+- Sync group: `vehicle-quality` (extends existing `VehicleQualityFields`).
 
-All set to `status='active'`, `plan='standard'`, `seller_type='private'`, `published_at=now()`, `expires_at=now()+60 days`, with a short description noting "Sample listing for platform demonstration — not real stock." `attributes` will carry `{"seed": true, "sample": true}` for easy filtering/removal.
+**4. #9-ext — Payments: expand for PH market**
+- Add Maya, QR Ph, GCash send-to-number, manual payment upload (private bucket `payment-proofs`), PayPal (international export only).
+- `payment_methods` enum extension + UI on `/checkout` and `/dashboard/billing`.
+- Receipt/invoice PDF download from `/payments/$id/receipt` (already exists — add downloadable PDF).
+- "Pay with GCash" mini-guide page.
+- Sync group: `payments`, `/terms` §payments, `/refund-policy`, `/pricing`.
 
-### Photos
+**5. #11 — Business Directory profile depth**
+- Extend `businesses` UI (no schema change): ensure each profile shows Claim button, Verified/Unclaimed badge, hours, services, photos, reviews tab, sponsored upgrade CTA.
+- Add "Claim this business" inline CTA on every unclaimed `/businesses/$slug`.
+- Sync group: `business-directory`.
 
-Each listing gets 1 placeholder image row in `listing_media` using a stable Unsplash URL relevant to the vehicle (cars/bikes/etc.). No uploads needed — these are external URLs the existing `ListingCard` already handles.
+**6. #17 — Learn commercial purpose**
+- Wire existing `courses` + `training_partners` tables to: paid-course marketplace tiles on `/learn`, sponsored training schools row, mechanic certification badge on `business_profiles`, "Hire trained mechanic" directory filter, tool-affiliate row beneath each course (pulls from `shop_products` by category tag).
+- Sync group: `learn`, `/businesses`, `/shop`.
 
-### What we will NOT do
+**7. Monetization track wiring** (mostly UI surfacing; backend already exists)
+- Boosted listings: surface `/dashboard/boosts` CTA on owner's listing card.
+- Dealer subscriptions: link `/pricing` Dealer tiers from `/start-selling` and `/dashboard`.
+- Business directory paid profiles: "Upgrade to Featured" CTA on owner's `/dashboard/businesses`.
+- Sponsored ad placements: ensure `/advertise` inquiry form reaches `ad_inquiries` (already does — verify).
+- Inspection referrals + Vehicle Passport premium fold into items #20 and #14.
 
-- No fake reviews, fake user accounts, or fake message threads.
-- No paid-tier or boosted seeds (keeps boost ranking honest).
-- No edits to listing UI, RLS, or any business logic — pure data seed.
-- No changes to the Terms / Privacy pages (no policy impact).
+### Audit log
+Each completed step appends a dated line to `.lovable/june7-audit.md` and updates `.lovable/sync-groups.md`.
 
-### Files / changes
+### Order of execution (one batch per turn for review)
+1. Sync-groups registry + Vehicle Passport (#14)
+2. Inspection services (#20)
+3. PH document checklist (#7-ext)
+4. PH payments expansion (#9-ext)
+5. Business directory depth (#11)
+6. Learn commercialization (#17)
+7. Monetization surfacing pass
 
-1. **Supabase migration** — inserts 12 rows into `listings` + 12 rows into `listing_media`, all owned by the 365 MotorSales profile, all flagged `attributes->>'seed' = 'true'`.
-2. **`.lovable/june7-audit.md`** — mark item #3 done with a one-line progress log entry noting the seed count, owner, and the "remove via `attributes->>'seed'`" cleanup recipe.
-
-### Verification
-
-After the migration runs:
-- `SELECT count(*) FROM listings WHERE status='active'` → 12
-- Visit `/` and `/browse/car`, `/browse/motorcycle` — cards render with `[Sample]` prefix and the placeholder photo.
+Approve to start with **step 1 (sync registry + Vehicle Passport)**.
