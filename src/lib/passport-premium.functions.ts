@@ -61,12 +61,12 @@ export const createPassportPremiumCheckout = createServerFn({ method: "POST" })
     // Verify the vehicle belongs to the user
     const { data: vehicle, error: vErr } = await supabase
       .from("vehicles")
-      .select("id, owner_id, year, make, model")
+      .select("id, owner_user_id, year, make, model")
       .eq("id", data.vehicleId)
       .maybeSingle();
     if (vErr) throw new Error(vErr.message);
     if (!vehicle) throw new Error("Vehicle not found");
-    if ((vehicle as any).owner_id !== userId) throw new Error("You don't own this vehicle");
+    if ((vehicle as any).owner_user_id !== userId) throw new Error("You don't own this vehicle");
 
     const { data: product, error: pErr } = await supabase
       .from("passport_premium_products")
