@@ -1,5 +1,13 @@
+/**
+ * SYNC GROUP: vehicle-passport
+ * Source of truth: .lovable/sync-groups.md#vehicle-passport
+ * Siblings: src/routes/dashboard.vehicles.tsx, src/lib/vehicles.functions.ts,
+ *           src/components/passport-share-section.tsx
+ * On change: bump VERSION + update sync-groups.md
+ * VERSION: 2
+ */
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ShieldCheck, Car, Wrench, ExternalLink, Calendar } from "lucide-react";
+import { ShieldCheck, Car, Wrench, ExternalLink, Calendar, Users, Droplet, AlertTriangle, Settings2 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/site-layout";
