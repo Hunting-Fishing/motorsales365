@@ -295,6 +295,81 @@ async function activateBoostFromSession(env: StripeEnv, session: Stripe.Checkout
     .eq("id", listingId);
 }
 
+async function activatePassportPremiumFromSession(env: StripeEnv, session: Stripe.Checkout.Session) {
+  void env;
+  const meta = session.metadata || {};
+  if (meta.kind !== "passport_premium") return;
+  const userId = meta.userId as string | undefined;
+  const vehicleId = meta.vehicleId as string | undefined;
+  const productSlug = meta.productSlug as string | undefined;
+  if (!userId || !vehicleId || !productSlug) {
+    console.error("[webhook] passport_premium session missing metadata", session.id);
+    void alertOps("payments.passport_premium.missing_metadata", { sessionId: session.id, userId, vehicleId, productSlug });
+    return;
+  }
+
+  // Idempotency: skip if we already recorded this session
+  const { data: existing } = await supabaseAdmin
+    .from("passport_premium_purchases")
+    .select("id")
+    .eq("stripe_session_id", session.id)
+    .maybeSingle();
+  if (existing) return;
+
+  const { data: product } = await supabaseAdmin
+    .from("passport_premium_products")
+    .select("duration_days")
+    .eq("slug", productSlug)
+    .maybeSingle();
+  const days = ((product as any)?.duration_days as number | undefined) ?? 365;
+
+  // Extend from current premium expiry if it's still in the future, else from now
+  const { data: vehicleRow } = await supabaseAdmin
+    .from("vehicles")
+    .select("passport_premium_until")
+    .eq("id", vehicleId)
+    .maybeSingle();
+  const now = new Date();
+  const existingUntil = (vehicleRow as any)?.passport_premium_until
+    ? new Date((vehicleRow as any).passport_premium_until)
+    : null;
+  const base = existingUntil && existingUntil > now ? existingUntil : now;
+  const newUntil = new Date(base.getTime() + days * 24 * 60 * 60 * 1000);
+
+  const reference = `stripe_session:${session.id}`;
+  const { data: payRow } = await supabaseAdmin
+    .from("payments")
+    .insert({
+      user_id: userId,
+      kind: "passport_premium" as any,
+      status: "paid" as any,
+      amount_php: (session.amount_total ?? 0) / 100,
+      method: "stripe",
+      reference,
+      paid_at: new Date().toISOString(),
+    } as any)
+    .select("id")
+    .maybeSingle();
+
+  await supabaseAdmin.from("passport_premium_purchases").insert({
+    vehicle_id: vehicleId,
+    user_id: userId,
+    product_slug: productSlug,
+    starts_at: now.toISOString(),
+    ends_at: newUntil.toISOString(),
+    payment_id: (payRow as any)?.id ?? null,
+    stripe_session_id: session.id,
+  } as any);
+
+  await supabaseAdmin
+    .from("vehicles")
+    .update({
+      passport_premium: true,
+      passport_premium_until: newUntil.toISOString(),
+    } as any)
+    .eq("id", vehicleId);
+}
+
 async function activateListingFromSession(env: StripeEnv, session: Stripe.Checkout.Session) {
   void env;
   const meta = session.metadata || {};
