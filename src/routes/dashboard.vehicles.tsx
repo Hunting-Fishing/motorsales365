@@ -183,6 +183,7 @@ function VehicleDialog({
 }) {
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
+  const initialDisc = (vehicle?.disclosures || {}) as { flood?: string; accident?: string; notes?: string };
   const [form, setForm] = useState({
     make: vehicle?.make ?? "",
     model: vehicle?.model ?? "",
@@ -193,6 +194,11 @@ function VehicleDialog({
     nickname: vehicle?.nickname ?? "",
     coverUrl: vehicle?.cover_url ?? "",
     isPublic: vehicle?.is_public ?? false,
+    ownershipCount: String(vehicle?.ownership_count ?? 1),
+    floodLevel: initialDisc.flood ?? "none",
+    accidentLevel: initialDisc.accident ?? "none",
+    discNotes: initialDisc.notes ?? "",
+    modifications: vehicle?.modifications ?? "",
   });
   const [saving, setSaving] = useState(false);
   const createFn = useServerFn(createVehicle);
