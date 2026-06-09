@@ -234,8 +234,6 @@ function PassportPage() {
           </div>
         )}
 
-
-
         <div className="mt-6 rounded-xl border border-border bg-card p-5 print:border-0 print:bg-white print:p-0">
           <h2 className="font-display text-lg font-semibold">Service history</h2>
           <p className="text-xs text-muted-foreground print:text-gray-500">
