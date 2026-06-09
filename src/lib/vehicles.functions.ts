@@ -83,8 +83,59 @@ export const getMyVehicle = createServerFn({ method: "POST" })
       .select("*")
       .eq("vehicle_id", data.id)
       .order("performed_at", { ascending: false });
-    return { vehicle, records: records ?? [] };
+    const { data: photos } = await supabase
+      .from("vehicle_photos")
+      .select("*")
+      .eq("vehicle_id", data.id)
+      .order("sort_order", { ascending: true });
+    return { vehicle, records: records ?? [], photos: photos ?? [] };
   });
+
+export const addVehiclePhoto = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { vehicleId: string; url: string; caption?: string | null }) => ({
+    vehicleId: uuid.parse(d.vehicleId),
+    url: z.string().url().max(2000).parse(d.url),
+    caption: d.caption ? z.string().trim().max(160).parse(d.caption) : null,
+  }))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    // verify ownership
+    const { data: v } = await supabase
+      .from("vehicles")
+      .select("id")
+      .eq("id", data.vehicleId)
+      .eq("owner_user_id", userId)
+      .maybeSingle();
+    if (!v) throw new Error("Vehicle not found");
+    const { data: row, error } = await supabase
+      .from("vehicle_photos")
+      .insert({
+        vehicle_id: data.vehicleId,
+        owner_user_id: userId,
+        url: data.url,
+        caption: data.caption,
+      })
+      .select("*")
+      .single();
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+export const deleteVehiclePhoto = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { id: string }) => ({ id: uuid.parse(d.id) }))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { error } = await supabase
+      .from("vehicle_photos")
+      .delete()
+      .eq("id", data.id)
+      .eq("owner_user_id", userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 
 export const createVehicle = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
