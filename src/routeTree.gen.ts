@@ -118,6 +118,7 @@ import { Route as AdminRedemptionsRouteImport } from './routes/admin.redemptions
 import { Route as AdminPromotionsRouteImport } from './routes/admin.promotions'
 import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
+import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminLocationCorrectionsRouteImport } from './routes/admin.location-corrections'
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
 import { Route as AdminLeadOffersRouteImport } from './routes/admin.lead-offers'
@@ -715,6 +716,11 @@ const AdminPerformanceRoute = AdminPerformanceRouteImport.update({
   path: '/performance',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminLocationCorrectionsRoute =
   AdminLocationCorrectionsRouteImport.update({
     id: '/location-corrections',
@@ -1035,6 +1041,7 @@ export interface FileRoutesByFullPath {
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
+  '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
@@ -1195,6 +1202,7 @@ export interface FileRoutesByTo {
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
+  '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
@@ -1357,6 +1365,7 @@ export interface FileRoutesById {
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
+  '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
@@ -1521,6 +1530,7 @@ export interface FileRouteTypes {
     | '/admin/lead-offers'
     | '/admin/listings'
     | '/admin/location-corrections'
+    | '/admin/payments'
     | '/admin/performance'
     | '/admin/pricing'
     | '/admin/promotions'
@@ -1681,6 +1691,7 @@ export interface FileRouteTypes {
     | '/admin/lead-offers'
     | '/admin/listings'
     | '/admin/location-corrections'
+    | '/admin/payments'
     | '/admin/performance'
     | '/admin/pricing'
     | '/admin/promotions'
@@ -1842,6 +1853,7 @@ export interface FileRouteTypes {
     | '/admin/lead-offers'
     | '/admin/listings'
     | '/admin/location-corrections'
+    | '/admin/payments'
     | '/admin/performance'
     | '/admin/pricing'
     | '/admin/promotions'
@@ -2813,6 +2825,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPerformanceRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/payments': {
+      id: '/admin/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AdminPaymentsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/location-corrections': {
       id: '/admin/location-corrections'
       path: '/location-corrections'
@@ -3190,6 +3209,7 @@ interface AdminRouteChildren {
   AdminLeadOffersRoute: typeof AdminLeadOffersRoute
   AdminListingsRoute: typeof AdminListingsRoute
   AdminLocationCorrectionsRoute: typeof AdminLocationCorrectionsRoute
+  AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
   AdminPricingRoute: typeof AdminPricingRoute
   AdminPromotionsRoute: typeof AdminPromotionsRoute
@@ -3225,6 +3245,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLeadOffersRoute: AdminLeadOffersRoute,
   AdminListingsRoute: AdminListingsRoute,
   AdminLocationCorrectionsRoute: AdminLocationCorrectionsRoute,
+  AdminPaymentsRoute: AdminPaymentsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
   AdminPricingRoute: AdminPricingRoute,
   AdminPromotionsRoute: AdminPromotionsRoute,
