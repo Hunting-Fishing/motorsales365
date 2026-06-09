@@ -75,6 +75,11 @@ export const Route = createFileRoute("/seller/$id")({
 
 function SellerProfilePage() {
   const { id } = Route.useParams();
+  const { data: repStats } = useQuery({
+    queryKey: ["seller-rep-stats", id],
+    queryFn: () => getSellerReputationStats({ data: { sellerId: id } }),
+    staleTime: 5 * 60 * 1000,
+  });
   const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [listings, setListings] = useState<ListingCardData[]>([]);
