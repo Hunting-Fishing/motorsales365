@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 9, 2026 (added sponsored course placements and 365-trained mechanic directory)";
+  const lastUpdated = "June 9, 2026 (added manual PH payment methods: GCash, Maya, QR Ph, bank transfer, PayPal — with proof-of-payment review)";
 
   return (
     <SiteLayout>
