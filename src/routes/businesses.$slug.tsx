@@ -199,6 +199,13 @@ function BusinessProfilePage() {
   const photos = (data as any)?.photos ?? [];
   const contactChannels = (data as any)?.contactChannels ?? [];
 
+  const { data: certData } = useQuery({
+    queryKey: ["business-owner-certs", biz?.owner_id],
+    queryFn: () => listOwnerCertificates({ data: { ownerId: biz.owner_id } }),
+    enabled: Boolean(biz?.owner_id),
+  });
+  const ownerCertificates: any[] = (certData?.certificates as any[]) ?? [];
+
   const myReview = reviews.find((r: any) => r.user_id === user?.id);
   const location = [biz.barangay, biz.city, biz.province, biz.region].filter(Boolean).join(", ");
   const accent = biz.theme_color || null;
