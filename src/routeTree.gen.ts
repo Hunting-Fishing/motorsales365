@@ -65,6 +65,7 @@ import { Route as SellImportRouteImport } from './routes/sell.import'
 import { Route as SSlugRouteImport } from './routes/s.$slug'
 import { Route as RidesSlugRouteImport } from './routes/rides.$slug'
 import { Route as RCodeRouteImport } from './routes/r.$code'
+import { Route as PayManualRouteImport } from './routes/pay.manual'
 import { Route as PassportSlugRouteImport } from './routes/passport.$slug'
 import { Route as PassportPremiumCheckoutRouteImport } from './routes/passport-premium.checkout'
 import { Route as ListingCheckoutRouteImport } from './routes/listing.checkout'
@@ -72,6 +73,7 @@ import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as LearnMechanicsRouteImport } from './routes/learn.mechanics'
 import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
 import { Route as InvitesTokenRouteImport } from './routes/invites.$token'
+import { Route as HelpPayWithGcashRouteImport } from './routes/help.pay-with-gcash'
 import { Route as GoProductIdRouteImport } from './routes/go.$productId'
 import { Route as ExportTrustRouteImport } from './routes/export.trust'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
@@ -118,6 +120,7 @@ import { Route as AdminRedemptionsRouteImport } from './routes/admin.redemptions
 import { Route as AdminPromotionsRouteImport } from './routes/admin.promotions'
 import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
+import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminLocationCorrectionsRouteImport } from './routes/admin.location-corrections'
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
 import { Route as AdminLeadOffersRouteImport } from './routes/admin.lead-offers'
@@ -450,6 +453,11 @@ const RCodeRoute = RCodeRouteImport.update({
   path: '/r/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PayManualRoute = PayManualRouteImport.update({
+  id: '/pay/manual',
+  path: '/pay/manual',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PassportSlugRoute = PassportSlugRouteImport.update({
   id: '/passport/$slug',
   path: '/passport/$slug',
@@ -483,6 +491,11 @@ const LearnSlugRoute = LearnSlugRouteImport.update({
 const InvitesTokenRoute = InvitesTokenRouteImport.update({
   id: '/invites/$token',
   path: '/invites/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpPayWithGcashRoute = HelpPayWithGcashRouteImport.update({
+  id: '/help/pay-with-gcash',
+  path: '/help/pay-with-gcash',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GoProductIdRoute = GoProductIdRouteImport.update({
@@ -713,6 +726,11 @@ const AdminPricingRoute = AdminPricingRouteImport.update({
 const AdminPerformanceRoute = AdminPerformanceRouteImport.update({
   id: '/performance',
   path: '/performance',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminLocationCorrectionsRoute =
@@ -1035,6 +1053,7 @@ export interface FileRoutesByFullPath {
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
+  '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
@@ -1081,6 +1100,7 @@ export interface FileRoutesByFullPath {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/go/$productId': typeof GoProductIdRoute
+  '/help/pay-with-gcash': typeof HelpPayWithGcashRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
   '/learn/mechanics': typeof LearnMechanicsRoute
@@ -1088,6 +1108,7 @@ export interface FileRoutesByFullPath {
   '/listing/checkout': typeof ListingCheckoutRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
+  '/pay/manual': typeof PayManualRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
   '/s/$slug': typeof SSlugRoute
@@ -1195,6 +1216,7 @@ export interface FileRoutesByTo {
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
+  '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
@@ -1240,6 +1262,7 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/go/$productId': typeof GoProductIdRoute
+  '/help/pay-with-gcash': typeof HelpPayWithGcashRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
   '/learn/mechanics': typeof LearnMechanicsRoute
@@ -1247,6 +1270,7 @@ export interface FileRoutesByTo {
   '/listing/checkout': typeof ListingCheckoutRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
+  '/pay/manual': typeof PayManualRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
   '/s/$slug': typeof SSlugRoute
@@ -1357,6 +1381,7 @@ export interface FileRoutesById {
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
+  '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/promotions': typeof AdminPromotionsRoute
@@ -1403,6 +1428,7 @@ export interface FileRoutesById {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/go/$productId': typeof GoProductIdRoute
+  '/help/pay-with-gcash': typeof HelpPayWithGcashRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
   '/learn/mechanics': typeof LearnMechanicsRoute
@@ -1410,6 +1436,7 @@ export interface FileRoutesById {
   '/listing/checkout': typeof ListingCheckoutRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
+  '/pay/manual': typeof PayManualRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
   '/s/$slug': typeof SSlugRoute
@@ -1521,6 +1548,7 @@ export interface FileRouteTypes {
     | '/admin/lead-offers'
     | '/admin/listings'
     | '/admin/location-corrections'
+    | '/admin/payments'
     | '/admin/performance'
     | '/admin/pricing'
     | '/admin/promotions'
@@ -1567,6 +1595,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/export/trust'
     | '/go/$productId'
+    | '/help/pay-with-gcash'
     | '/invites/$token'
     | '/learn/$slug'
     | '/learn/mechanics'
@@ -1574,6 +1603,7 @@ export interface FileRouteTypes {
     | '/listing/checkout'
     | '/passport-premium/checkout'
     | '/passport/$slug'
+    | '/pay/manual'
     | '/r/$code'
     | '/rides/$slug'
     | '/s/$slug'
@@ -1681,6 +1711,7 @@ export interface FileRouteTypes {
     | '/admin/lead-offers'
     | '/admin/listings'
     | '/admin/location-corrections'
+    | '/admin/payments'
     | '/admin/performance'
     | '/admin/pricing'
     | '/admin/promotions'
@@ -1726,6 +1757,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/export/trust'
     | '/go/$productId'
+    | '/help/pay-with-gcash'
     | '/invites/$token'
     | '/learn/$slug'
     | '/learn/mechanics'
@@ -1733,6 +1765,7 @@ export interface FileRouteTypes {
     | '/listing/checkout'
     | '/passport-premium/checkout'
     | '/passport/$slug'
+    | '/pay/manual'
     | '/r/$code'
     | '/rides/$slug'
     | '/s/$slug'
@@ -1842,6 +1875,7 @@ export interface FileRouteTypes {
     | '/admin/lead-offers'
     | '/admin/listings'
     | '/admin/location-corrections'
+    | '/admin/payments'
     | '/admin/performance'
     | '/admin/pricing'
     | '/admin/promotions'
@@ -1888,6 +1922,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/export/trust'
     | '/go/$productId'
+    | '/help/pay-with-gcash'
     | '/invites/$token'
     | '/learn/$slug'
     | '/learn/mechanics'
@@ -1895,6 +1930,7 @@ export interface FileRouteTypes {
     | '/listing/checkout'
     | '/passport-premium/checkout'
     | '/passport/$slug'
+    | '/pay/manual'
     | '/r/$code'
     | '/rides/$slug'
     | '/s/$slug'
@@ -2000,6 +2036,7 @@ export interface RootRouteChildren {
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   GoProductIdRoute: typeof GoProductIdRoute
+  HelpPayWithGcashRoute: typeof HelpPayWithGcashRoute
   InvitesTokenRoute: typeof InvitesTokenRoute
   LearnSlugRoute: typeof LearnSlugRoute
   LearnMechanicsRoute: typeof LearnMechanicsRoute
@@ -2007,6 +2044,7 @@ export interface RootRouteChildren {
   ListingCheckoutRoute: typeof ListingCheckoutRoute
   PassportPremiumCheckoutRoute: typeof PassportPremiumCheckoutRoute
   PassportSlugRoute: typeof PassportSlugRoute
+  PayManualRoute: typeof PayManualRoute
   RCodeRoute: typeof RCodeRouteWithChildren
   RidesSlugRoute: typeof RidesSlugRoute
   SSlugRoute: typeof SSlugRoute
@@ -2442,6 +2480,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pay/manual': {
+      id: '/pay/manual'
+      path: '/pay/manual'
+      fullPath: '/pay/manual'
+      preLoaderRoute: typeof PayManualRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/passport/$slug': {
       id: '/passport/$slug'
       path: '/passport/$slug'
@@ -2489,6 +2534,13 @@ declare module '@tanstack/react-router' {
       path: '/invites/$token'
       fullPath: '/invites/$token'
       preLoaderRoute: typeof InvitesTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help/pay-with-gcash': {
+      id: '/help/pay-with-gcash'
+      path: '/help/pay-with-gcash'
+      fullPath: '/help/pay-with-gcash'
+      preLoaderRoute: typeof HelpPayWithGcashRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/go/$productId': {
@@ -2811,6 +2863,13 @@ declare module '@tanstack/react-router' {
       path: '/performance'
       fullPath: '/admin/performance'
       preLoaderRoute: typeof AdminPerformanceRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/payments': {
+      id: '/admin/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AdminPaymentsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/location-corrections': {
@@ -3190,6 +3249,7 @@ interface AdminRouteChildren {
   AdminLeadOffersRoute: typeof AdminLeadOffersRoute
   AdminListingsRoute: typeof AdminListingsRoute
   AdminLocationCorrectionsRoute: typeof AdminLocationCorrectionsRoute
+  AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
   AdminPricingRoute: typeof AdminPricingRoute
   AdminPromotionsRoute: typeof AdminPromotionsRoute
@@ -3225,6 +3285,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLeadOffersRoute: AdminLeadOffersRoute,
   AdminListingsRoute: AdminListingsRoute,
   AdminLocationCorrectionsRoute: AdminLocationCorrectionsRoute,
+  AdminPaymentsRoute: AdminPaymentsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
   AdminPricingRoute: AdminPricingRoute,
   AdminPromotionsRoute: AdminPromotionsRoute,
@@ -3439,6 +3500,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   GoProductIdRoute: GoProductIdRoute,
+  HelpPayWithGcashRoute: HelpPayWithGcashRoute,
   InvitesTokenRoute: InvitesTokenRoute,
   LearnSlugRoute: LearnSlugRoute,
   LearnMechanicsRoute: LearnMechanicsRoute,
@@ -3446,6 +3508,7 @@ const rootRouteChildren: RootRouteChildren = {
   ListingCheckoutRoute: ListingCheckoutRoute,
   PassportPremiumCheckoutRoute: PassportPremiumCheckoutRoute,
   PassportSlugRoute: PassportSlugRoute,
+  PayManualRoute: PayManualRoute,
   RCodeRoute: RCodeRouteWithChildren,
   RidesSlugRoute: RidesSlugRoute,
   SSlugRoute: SSlugRoute,

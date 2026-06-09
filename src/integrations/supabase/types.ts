@@ -4048,6 +4048,48 @@ export type Database = {
           },
         ]
       }
+      payment_method_config: {
+        Row: {
+          account_name: string | null
+          account_number: string | null
+          created_at: string
+          enabled: boolean
+          instructions_md: string | null
+          is_manual: boolean
+          label: string
+          method: string
+          qr_image_url: string | null
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          account_name?: string | null
+          account_number?: string | null
+          created_at?: string
+          enabled?: boolean
+          instructions_md?: string | null
+          is_manual?: boolean
+          label: string
+          method: string
+          qr_image_url?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          account_name?: string | null
+          account_number?: string | null
+          created_at?: string
+          enabled?: boolean
+          instructions_md?: string | null
+          is_manual?: boolean
+          label?: string
+          method?: string
+          qr_image_url?: string | null
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           addons_amount_php: number | null
@@ -4058,6 +4100,7 @@ export type Database = {
           credit_calculated_at: string | null
           gross_amount_php: number | null
           id: string
+          invoice_number: string | null
           kind: Database["public"]["Enums"]["payment_kind"]
           listing_id: string | null
           method: string | null
@@ -4069,8 +4112,13 @@ export type Database = {
           plan_price_php: number | null
           previous_plan: string | null
           previous_plan_price_php: number | null
+          proof_uploaded_at: string | null
+          proof_url: string | null
           prorated_credit_php: number | null
           reference: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
           status: Database["public"]["Enums"]["payment_status"]
           user_id: string
         }
@@ -4083,6 +4131,7 @@ export type Database = {
           credit_calculated_at?: string | null
           gross_amount_php?: number | null
           id?: string
+          invoice_number?: string | null
           kind: Database["public"]["Enums"]["payment_kind"]
           listing_id?: string | null
           method?: string | null
@@ -4094,8 +4143,13 @@ export type Database = {
           plan_price_php?: number | null
           previous_plan?: string | null
           previous_plan_price_php?: number | null
+          proof_uploaded_at?: string | null
+          proof_url?: string | null
           prorated_credit_php?: number | null
           reference?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: Database["public"]["Enums"]["payment_status"]
           user_id: string
         }
@@ -4108,6 +4162,7 @@ export type Database = {
           credit_calculated_at?: string | null
           gross_amount_php?: number | null
           id?: string
+          invoice_number?: string | null
           kind?: Database["public"]["Enums"]["payment_kind"]
           listing_id?: string | null
           method?: string | null
@@ -4119,8 +4174,13 @@ export type Database = {
           plan_price_php?: number | null
           previous_plan?: string | null
           previous_plan_price_php?: number | null
+          proof_uploaded_at?: string | null
+          proof_url?: string | null
           prorated_credit_php?: number | null
           reference?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
           status?: Database["public"]["Enums"]["payment_status"]
           user_id?: string
         }
@@ -4130,6 +4190,20 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -7122,6 +7196,7 @@ export type Database = {
       }
       expire_stale_pending_sales: { Args: never; Returns: number }
       gen_referral_code: { Args: { _name: string }; Returns: string }
+      generate_invoice_number: { Args: never; Returns: string }
       get_assigned_rep_card: {
         Args: { _subject_id: string; _subject_type: string }
         Returns: {
