@@ -8,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { getActiveDealerStatus } from "@/lib/seller-status.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
+import { TowingServicesPage } from "@/components/towing/towing-services-page";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
 import { AdCarousel } from "@/components/ads/ad-carousel";
 import { SponsoredCategorySlot } from "@/components/ads/sponsored-category-slot";
@@ -54,7 +55,7 @@ const CATEGORY_LABEL: Record<string, string> = {
   boat: "Boats",
   airplane: "Airplanes",
   equipment: "Heavy Equipment",
-  towing: "Towing & Trucking",
+  towing: "Towing & Transport Services",
   carwash: "Car Wash",
   parts: "Parts & Accessories",
   drone: "Drones & Aerial",
@@ -69,8 +70,13 @@ export const Route = createFileRoute("/browse/$category")({
   head: ({ params }) => {
     const label = CATEGORY_LABEL[params.category] ?? "Listings";
     const url = `https://www.365motorsales.com/browse/${params.category}`;
-    const title = `${label} for sale — 365 MotorSales Philippines`;
-    const desc = `Browse ${label.toLowerCase()} for sale across the Philippines. Trusted private and business sellers on 365 MotorSales.`;
+    const isTowing = params.category === "towing";
+    const title = isTowing
+      ? "Towing & Transport Services in the Philippines — 365 MotorSales"
+      : `${label} for sale — 365 MotorSales Philippines`;
+    const desc = isTowing
+      ? "Find verified towing and vehicle transport providers across the Philippines. Flatbed, long-distance, heavy hauling, recovery, and 24/7 emergency tow requests."
+      : `Browse ${label.toLowerCase()} for sale across the Philippines. Trusted private and business sellers on 365 MotorSales.`;
     return {
       meta: [
         { title },
@@ -92,6 +98,15 @@ function BrowsePage() {
   const search = Route.useSearch();
   const navigate = Route.useNavigate();
   const { user } = useAuth();
+
+  if (category === "towing") {
+    return (
+      <SiteLayout>
+        <TowingServicesPage />
+      </SiteLayout>
+    );
+  }
+
 
   const [keyword, setKeyword] = useState(search.q ?? "");
   const [region, setRegion] = useState<string | null>(search.region ?? null);

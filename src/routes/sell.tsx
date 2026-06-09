@@ -81,9 +81,9 @@ const SELL_SEO: Record<string, { title: string; description: string }> = {
       "Post backhoes, excavators, loaders, and other heavy equipment for sale across the Philippines.",
   },
   towing: {
-    title: "List your towing & trucking service — 365 MotorSales",
+    title: "List your towing & transport service — 365 MotorSales",
     description:
-      "Offer flatbed, wrecker, and roadside towing services to drivers across the Philippines.",
+      "Offer flatbed, wrecker, long-distance, and roadside towing services to drivers across the Philippines.",
   },
   carwash: {
     title: "List your car wash business — 365 MotorSales Philippines",
@@ -160,7 +160,7 @@ const CATEGORIES = [
   { slug: "boat", name: "Boat" },
   { slug: "airplane", name: "Airplane" },
   { slug: "equipment", name: "Heavy Equipment" },
-  { slug: "towing", name: "Towing & Trucking service" },
+  { slug: "towing", name: "Towing & Transport Services" },
   { slug: "carwash", name: "Car Wash" },
   { slug: "parts", name: "Parts & Accessories" },
   { slug: "drone", name: "Drones & Aerial" },
@@ -171,12 +171,17 @@ const CATEGORIES = [
 ];
 
 const TOW_SERVICE_TYPES = [
+  "Tow car",
+  "Tow motorcycle",
   "Flatbed",
   "Wheel-lift / Hook",
   "Heavy wrecker",
   "Self-loader",
   "Box truck",
   "Lowboy / Trailer",
+  "Long-distance transport",
+  "Heavy equipment hauling",
+  "Recovery/winch-out",
   "Roadside assist",
 ];
 const TOW_CAPACITIES = [
@@ -256,6 +261,7 @@ function SellPage() {
   const [towBaseRate, setTowBaseRate] = useState("");
   const [towPerKm, setTowPerKm] = useState("");
   const [tow247, setTow247] = useState(false);
+  const [towPayments, setTowPayments] = useState<string[]>([]);
 
   // Car Wash fields
   const [washServices, setWashServices] = useState<string[]>([]);
@@ -629,6 +635,7 @@ function SellPage() {
           if (towBaseRate) attributes.base_rate_php = Number(towBaseRate);
           if (towPerKm) attributes.per_km_rate_php = Number(towPerKm);
           attributes.available_24_7 = tow247;
+          if (towPayments.length) attributes.payments = towPayments;
         }
         if (category === "carwash") {
           if (washServices.length) attributes.services = washServices;
@@ -1213,6 +1220,30 @@ function SellPage() {
                   />
                   Available 24/7
                 </label>
+                <div className="sm:col-span-2">
+                  <Label className="mb-2 block">Accepted payments</Label>
+                  <div className="flex flex-wrap gap-3">
+                    {["GCash", "Maya", "Cash", "Bank transfer"].map((p) => {
+                      const checked = towPayments.includes(p);
+                      return (
+                        <label key={p} className="flex items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={(e) =>
+                              setTowPayments((prev) =>
+                                e.target.checked
+                                  ? [...prev, p]
+                                  : prev.filter((x) => x !== p),
+                              )
+                            }
+                          />
+                          {p}
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             ) : category === "car" || category === "motorcycle" ? (
               <div className="space-y-4">

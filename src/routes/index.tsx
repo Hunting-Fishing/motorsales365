@@ -54,7 +54,7 @@ const VEHICLE_CATEGORIES = [
 ] as const;
 
 const SERVICE_CATEGORIES = [
-  { slug: "towing", name: "Towing & Trucking", Icon: Truck },
+  { slug: "towing", name: "Towing & Transport", Icon: Truck },
   { slug: "repair", name: "Repair Shop", Icon: WrenchIcon },
   { slug: "bodyshop", name: "Body Shop", Icon: SprayCan },
   { slug: "carwash", name: "Car Wash", Icon: Droplets },
