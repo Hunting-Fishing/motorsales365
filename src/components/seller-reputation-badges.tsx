@@ -10,6 +10,8 @@ export interface SellerBadgeInput {
   seller_rating_count?: number | null;
   active_listings?: number | null;
   sold_count?: number | null;
+  documents_verified_count?: number | null;
+  fast_response?: boolean | null;
 }
 
 interface Badge {
