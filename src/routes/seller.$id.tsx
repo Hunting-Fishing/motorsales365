@@ -13,6 +13,8 @@ import { formatDate } from "@/lib/format";
 import { SellerReputationBadges } from "@/components/seller-reputation-badges";
 import { SellerReviews } from "@/components/seller-reviews";
 import { useAuth } from "@/hooks/use-auth";
+import { useQuery } from "@tanstack/react-query";
+import { getSellerReputationStats } from "@/lib/reputation.functions";
 
 export const Route = createFileRoute("/seller/$id")({
   loader: async ({ params }) => {
@@ -73,6 +75,11 @@ export const Route = createFileRoute("/seller/$id")({
 
 function SellerProfilePage() {
   const { id } = Route.useParams();
+  const { data: repStats } = useQuery({
+    queryKey: ["seller-rep-stats", id],
+    queryFn: () => getSellerReputationStats({ data: { sellerId: id } }),
+    staleTime: 5 * 60 * 1000,
+  });
   const { user } = useAuth();
   const [profile, setProfile] = useState<any>(null);
   const [listings, setListings] = useState<ListingCardData[]>([]);
@@ -201,6 +208,8 @@ function SellerProfilePage() {
                   seller_rating_avg: profile.seller_rating_avg,
                   seller_rating_count: profile.seller_rating_count,
                   active_listings: listings.length,
+                  documents_verified_count: repStats?.documents_verified_count,
+                  fast_response: repStats?.fast_response,
                 }}
               />
               {isBusiness && profile.business_address && (

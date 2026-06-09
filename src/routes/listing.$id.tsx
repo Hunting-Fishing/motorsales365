@@ -35,6 +35,9 @@ import { Badge } from "@/components/ui/badge";
 import { VerifiedBadge } from "@/components/verified-badge";
 import { DealerSubscriptionBadge } from "@/components/dealer-subscription-badge";
 import { getActiveDealerStatus } from "@/lib/seller-status.functions";
+import { SellerReputationBadges } from "@/components/seller-reputation-badges";
+import { getSellerReputationStats } from "@/lib/reputation.functions";
+import { useQuery } from "@tanstack/react-query";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
@@ -182,6 +185,12 @@ function ListingDetailPage() {
   const [sellerDealerPlan, setSellerDealerPlan] = useState<string | null>(null);
   const [sellerDealerPeriodEnd, setSellerDealerPeriodEnd] = useState<string | null>(null);
   const [sellerDealerCancelAtPeriodEnd, setSellerDealerCancelAtPeriodEnd] = useState<boolean>(false);
+  const { data: sellerRepStats } = useQuery({
+    queryKey: ["seller-rep-stats", listing?.user_id],
+    queryFn: () => getSellerReputationStats({ data: { sellerId: listing!.user_id } }),
+    enabled: !!listing?.user_id,
+    staleTime: 5 * 60 * 1000,
+  });
   const [loading, setLoading] = useState(true);
   const [activeIdx, setActiveIdx] = useState(0);
   const [favorited, setFavorited] = useState(false);
@@ -705,6 +714,19 @@ function ListingDetailPage() {
                     />
                   )}
                 </div>
+                <SellerReputationBadges
+                  className="mt-2"
+                  size="sm"
+                  profile={{
+                    verification_status: seller?.verification_status,
+                    fb_verified_at: seller?.fb_verified_at,
+                    is_founding_member: seller?.is_founding_member,
+                    seller_rating_avg: seller?.seller_rating_avg,
+                    seller_rating_count: seller?.seller_rating_count,
+                    documents_verified_count: sellerRepStats?.documents_verified_count,
+                    fast_response: sellerRepStats?.fast_response,
+                  }}
+                />
               </div>
             </div>
 
