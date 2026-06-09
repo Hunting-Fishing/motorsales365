@@ -203,6 +203,8 @@ function SellerProfilePage() {
                   seller_rating_avg: profile.seller_rating_avg,
                   seller_rating_count: profile.seller_rating_count,
                   active_listings: listings.length,
+                  documents_verified_count: repStats?.documents_verified_count,
+                  fast_response: repStats?.fast_response,
                 }}
               />
               {isBusiness && profile.business_address && (
