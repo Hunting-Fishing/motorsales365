@@ -2553,6 +2553,41 @@ export type Database = {
         }
         Relationships: []
       }
+      dispatch_job_events: {
+        Row: {
+          created_at: string
+          event: string
+          id: string
+          metadata: Json
+          provider_id: string
+          request_id: string
+        }
+        Insert: {
+          created_at?: string
+          event: string
+          id?: string
+          metadata?: Json
+          provider_id: string
+          request_id: string
+        }
+        Update: {
+          created_at?: string
+          event?: string
+          id?: string
+          metadata?: Json
+          provider_id?: string
+          request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dispatch_job_events_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "tow_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       dispatch_subscriptions: {
         Row: {
           cancel_at_period_end: boolean

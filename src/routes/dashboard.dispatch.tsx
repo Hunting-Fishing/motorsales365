@@ -145,15 +145,20 @@ function DispatchDashboard() {
             Auto-matched emergency tow jobs in your coverage area.
           </p>
         </div>
-        {planMeta ? (
-          <Badge className={planMeta.color}>{planMeta.label}</Badge>
-        ) : (
-          <Button asChild size="sm">
-            <Link to="/dispatch" hash="plans">
-              <Network className="mr-2 h-4 w-4" /> Subscribe to Dispatch
-            </Link>
+        <div className="flex items-center gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link to="/dashboard/dispatch/history">Job history</Link>
           </Button>
-        )}
+          {planMeta ? (
+            <Badge className={planMeta.color}>{planMeta.label}</Badge>
+          ) : (
+            <Button asChild size="sm">
+              <Link to="/dispatch" hash="plans">
+                <Network className="mr-2 h-4 w-4" /> Subscribe to Dispatch
+              </Link>
+            </Button>
+          )}
+        </div>
       </header>
 
       {!plan && (

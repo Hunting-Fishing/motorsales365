@@ -52,6 +52,9 @@ export const declineDispatchedJob = createServerFn({ method: "POST" })
       .from("tow_requests")
       .update({ matched_provider_ids: next, updated_at: new Date().toISOString() })
       .eq("id", data.requestId);
+    await supabase
+      .from("dispatch_job_events")
+      .insert({ request_id: data.requestId, provider_id: userId, event: "declined" });
     return { ok: true };
   });
 
