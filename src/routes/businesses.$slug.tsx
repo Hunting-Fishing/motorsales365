@@ -36,6 +36,7 @@ import { SuggestLocationDialog } from "@/components/businesses/suggest-location-
 import { ShareQr } from "@/components/share-qr";
 import { InquiryForm } from "@/components/business-page/inquiry-form";
 import { getBusinessPage } from "@/lib/business-pages.functions";
+import { listOwnerCertificates } from "@/lib/education.functions";
 import {
   PublicGallerySection,
   PublicContactSection,
