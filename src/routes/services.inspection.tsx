@@ -84,7 +84,7 @@ function priceLabel(min: number, max: number | null, unit: string) {
 }
 
 function InspectionPage() {
-  const { service: presetService, listing: presetListing } = useSearch({ from: Route.id });
+  const { service: presetService, listing: presetListing } = Route.useSearch();
   const navigate = useNavigate();
   const { user, loading: authLoading } = useAuth();
 
