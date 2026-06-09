@@ -5,7 +5,7 @@
  * Public rate card + request form for inspection / transaction-safety upsells (audit #20).
  * VERSION: 1
  */
-import { createFileRoute, Link, useNavigate, useSearch } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
