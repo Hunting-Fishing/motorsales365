@@ -14,7 +14,7 @@ export const getPublicPassport = createServerFn({ method: "GET" })
     const { data: vehicle, error } = await supabaseAdmin
       .from("vehicles")
       .select(
-        "id, make, model, year, color, plate_number, nickname, cover_url, is_public, passport_slug, created_at, ownership_count, disclosures, modifications",
+        "id, make, model, year, color, plate_number, nickname, cover_url, is_public, passport_slug, created_at, ownership_count, disclosures, modifications, passport_premium, passport_premium_until",
       )
       .eq("passport_slug", data.slug)
       .eq("is_public", true)
