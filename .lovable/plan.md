@@ -1,47 +1,63 @@
-## Status after exploration
+# Phase 3 #17 — Learn Monetization
 
-Most of Phase 2 is already shipped:
+## Current state
 
-- **#1 Seed listings** — 12 sample listings live in DB ✓
-- **#10 Shop affiliate products** — 48 products live ✓
-- **#11 Business directory seeds** — 14 sample businesses live ✓
-- **#12 Public seller landing** — `start-selling.tsx` (294 lines) exists ✓
-- **#2 SSR fallback** — `tow.tsx`, `businesses.index.tsx`, `map.tsx` are 400–510-line route components, not "Loading…" stubs ✓
+- Schema is fully built: `courses`, `course_modules`, `course_lessons`, `course_quizzes`, `course_enrollments`, `course_certificates`, `training_partners` (with `tier` + `sponsored_until`), `training_partner_clicks`.
+- Routes exist: `/learn`, `/learn/$slug`, `/learn/$slug/watch/$lessonId`, `/partner-training`, `/dashboard/learning`, `/c/$code` (certificates).
+- `FeaturedTrainingRail` already renders sponsored partners on `/learn`.
+- **Tables are empty** — 0 courses, 0 training partners. So the monetization features look invisible in preview.
+- No "Hire a trained mechanic" surface on business profiles. No course-completion badge shown on `/b/$slug`. No sponsor-school field on courses.
 
-Genuinely open items in Phase 2:
+## What ships this batch
 
-- **#7 PH buyer document checklist** — no component exists; listing detail only references an `or_cr` inquiry type
-- **#13 Structured listing fields** — sell form does not collect OR/CR status, flood/accident, registered-owner status, plate ending, fuel type, variant, financing/trade-accepted, negotiable. Listings table uses JSONB `attributes`, so no migration needed — just form + display fields
+### A. Seed real content (data-only, no schema change)
+1. Seed **6 published courses** across categories (Buying Used Cars in PH, OR/CR & LTO Basics, Motorcycle Maintenance 101, Diesel Truck Pre-Purchase, EV Ownership in PH, Selling Your Car Safely). Each gets 2–3 modules, 3–5 lessons, 1 quiz, hero image (use existing royalty-free / generated). 2 courses marked paid (have `price_php`), 4 free.
+2. Seed **8 training partners** (mix of `standard` and `featured` tiers; 3 with `sponsored_until` in future).
 
-## This batch (Phase 2, slim)
+### B. Course completion badge on business profile (#17 sub-item)
+3. Add a "Certified Training" section on `/b/$slug` that lists course certificates earned by the business owner (`profiles.id == businesses.owner_id`). Query `course_certificates` joined to `courses` for that user, show badge + course title + issue date, link to `/c/$code`.
 
-### A. Buyer Document Checklist (#7)
+### C. "Hire a trained mechanic" directory (#17 sub-item)
+4. Add a new route `/learn/mechanics` listing businesses whose owner has at least one mechanic-category course certificate. Filter by city, link to `/b/$slug`. Add a link card from `/learn` index ("Need help? Hire a trained mechanic →").
 
-1. Create `src/components/buyer-document-checklist.tsx` — collapsible card with 10 PH-specific items: OR/CR present, registered owner matches seller, deed of sale ready, valid IDs ready, chassis # matches CR, engine # matches CR, plate # matches, no encumbrance / chattel mortgage, flood/accident disclosed, HPG clearance recommended for high-value units. Each item is a checkbox (purely client-side / `useState`) so the buyer can tick them off during inspection. Link to `/verified` and `/guidelines` at the bottom.
-2. Mount it on `src/routes/listing.$id.tsx` for category `car` / `motorcycle` / `truck` (not parts). Render in the sidebar below the seller card on desktop, full-width below gallery on mobile.
+### D. Sponsored course slot (#17 sub-item)
+5. Add `sponsor_partner_id` (uuid, nullable, FK → `training_partners`) and `sponsored_until` (timestamptz, nullable) to `courses`. When set + active, the course detail page (`/learn/$slug`) shows a "Sponsored by <Partner>" ribbon linking to partner site (`rel="nofollow sponsored"`). Admin can manage from existing `admin.education.tsx`.
 
-### B. Structured listing fields (#13)
+### E. Admin surface
+6. Extend `src/routes/admin.education.tsx` with a "Sponsorship" tab/column to set `sponsor_partner_id` + `sponsored_until` on a course, and to bump a training partner to `featured` with a sponsorship end date.
 
-3. Extend the sell form (`src/routes/sell.tsx`) vehicle-attributes section with new optional fields stored in `attributes` JSONB:
-   - `fuel_type` (Gasoline / Diesel / Hybrid / EV / LPG)
-   - `or_cr_status` (Complete / OR only / CR only / Lost — duplicate available / None)
-   - `registered_owner_status` (1st owner / 2nd / 3rd+ / Casa-released / Auction)
-   - `plate_ending` (free text)
-   - `flood_history` / `accident_history` (Yes-disclosed / No / Unknown)
-   - `negotiable` (boolean)
-   - `financing_available` (boolean)
-   - `trade_accepted` (boolean)
-   - `last_registration_date` (date)
-   - `variant` (free text, e.g. "1.5G CVT")
-4. Display the same fields on `src/routes/listing.$id.tsx` in the existing specs grid; show "—" when not provided.
-5. Update `mem://index.md` rule reference if needed — not changing fees/payments, so no Terms/Privacy bump required.
+## Out of scope (separate batches)
+- Stripe checkout for paid courses (schema has `price_id` — existing Stripe boost/subscription pattern can be reused later).
+- Mechanic certification exam flow (current quiz/certificate flow already works; we just surface the badge).
+- #9 PH payments expansion — next batch after this one.
 
-### Out of this batch
+## Technical details
 
-Phase 3 items (#9 Maya/QR Ph, #16 ad rate card content depth, #17 learn monetization, #19 wanted enhancements, #20 inspection upsells) — separate batch.
+- **Migration**: add 2 columns to `courses`:
+  ```sql
+  ALTER TABLE public.courses
+    ADD COLUMN sponsor_partner_id uuid REFERENCES public.training_partners(id) ON DELETE SET NULL,
+    ADD COLUMN sponsored_until timestamptz;
+  ```
+  No new tables, no new grants needed.
+- **Seed**: use `supabase--insert` for courses, modules, lessons, quizzes, partners. No code path changes for seeding.
+- **Files touched**:
+  - `src/lib/education.functions.ts` — add `listMechanicBusinesses()`, `listOwnerCertificates(ownerId)`.
+  - `src/routes/learn.mechanics.tsx` — new route.
+  - `src/routes/b.$slug.tsx` — add Certified Training section (read-only display).
+  - `src/routes/learn.$slug.tsx` — render sponsor ribbon when `sponsor_partner_id` + future `sponsored_until`.
+  - `src/routes/learn.index.tsx` — add link card to `/learn/mechanics`.
+  - `src/routes/admin.education.tsx` — sponsorship controls.
+  - `src/components/learn/featured-training-rail.tsx` — no change (already works once partners exist).
+- **Terms/Privacy**: sponsorship surfaces are paid placements → bump `/terms` "Last updated" and add a one-line disclosure under the Advertising section. No `/privacy` change.
 
 ## Execution order
 
-1. Build BuyerDocumentChecklist component → wire into listing page.
-2. Add 10 attribute fields to sell form + listing detail display.
-3. Smoke-test in preview (open a listing, open /sell as an existing user, check field renders).
+1. Migration: add `sponsor_partner_id` + `sponsored_until` to `courses`.
+2. Seed training_partners (8 rows) + courses with modules/lessons/quizzes (6 courses).
+3. Build `/learn/mechanics` + `listMechanicBusinesses` + link from `/learn`.
+4. Add Certified Training section to `/b/$slug`.
+5. Add sponsor ribbon to `/learn/$slug`.
+6. Extend admin.education with sponsorship controls.
+7. Bump `/terms` Last updated.
+8. Smoke-test in preview.
