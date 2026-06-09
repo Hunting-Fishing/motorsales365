@@ -570,7 +570,9 @@ export const adminListCourses = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data } = await supabaseAdmin
       .from("courses")
-      .select("id, slug, title, status, category, price_php, published_at, created_at")
+      .select(
+        "id, slug, title, status, category, price_php, published_at, created_at, sponsor_partner_id, sponsored_until",
+      )
       .order("created_at", { ascending: false });
     return { courses: data ?? [] };
   });
