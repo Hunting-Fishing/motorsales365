@@ -176,6 +176,7 @@ import { Route as ApiSellerStaffCreateRouteImport } from './routes/api/seller/st
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksRefreshLazadaRouteImport } from './routes/api/public/hooks/refresh-lazada'
 import { Route as ApiPublicHooksOpsAlertsDigestRouteImport } from './routes/api/public/hooks/ops-alerts-digest'
+import { Route as ApiPublicHooksDispatchExpandRouteImport } from './routes/api/public/hooks/dispatch-expand'
 import { Route as ApiPublicHooksDiscoverSyncRouteImport } from './routes/api/public/hooks/discover-sync'
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
 import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
@@ -1027,6 +1028,12 @@ const ApiPublicHooksOpsAlertsDigestRoute =
     path: '/api/public/hooks/ops-alerts-digest',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksDispatchExpandRoute =
+  ApiPublicHooksDispatchExpandRouteImport.update({
+    id: '/api/public/hooks/dispatch-expand',
+    path: '/api/public/hooks/dispatch-expand',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksDiscoverSyncRoute =
   ApiPublicHooksDiscoverSyncRouteImport.update({
     id: '/api/public/hooks/discover-sync',
@@ -1199,6 +1206,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
+  '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -1368,6 +1376,7 @@ export interface FileRoutesByTo {
   '/dashboard/team': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
+  '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -1541,6 +1550,7 @@ export interface FileRoutesById {
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
+  '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -1715,6 +1725,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/'
     | '/api/public/fx/refresh'
     | '/api/public/hooks/discover-sync'
+    | '/api/public/hooks/dispatch-expand'
     | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
@@ -1884,6 +1895,7 @@ export interface FileRouteTypes {
     | '/dashboard/team'
     | '/api/public/fx/refresh'
     | '/api/public/hooks/discover-sync'
+    | '/api/public/hooks/dispatch-expand'
     | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
@@ -2056,6 +2068,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/'
     | '/api/public/fx/refresh'
     | '/api/public/hooks/discover-sync'
+    | '/api/public/hooks/dispatch-expand'
     | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
@@ -2161,6 +2174,7 @@ export interface RootRouteChildren {
   ShopPSlugRoute: typeof ShopPSlugRoute
   ApiPublicFxRefreshRoute: typeof ApiPublicFxRefreshRoute
   ApiPublicHooksDiscoverSyncRoute: typeof ApiPublicHooksDiscoverSyncRoute
+  ApiPublicHooksDispatchExpandRoute: typeof ApiPublicHooksDispatchExpandRoute
   ApiPublicHooksOpsAlertsDigestRoute: typeof ApiPublicHooksOpsAlertsDigestRoute
   ApiPublicHooksRefreshLazadaRoute: typeof ApiPublicHooksRefreshLazadaRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -3347,6 +3361,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksOpsAlertsDigestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/dispatch-expand': {
+      id: '/api/public/hooks/dispatch-expand'
+      path: '/api/public/hooks/dispatch-expand'
+      fullPath: '/api/public/hooks/dispatch-expand'
+      preLoaderRoute: typeof ApiPublicHooksDispatchExpandRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/discover-sync': {
       id: '/api/public/hooks/discover-sync'
       path: '/api/public/hooks/discover-sync'
@@ -3694,6 +3715,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopPSlugRoute: ShopPSlugRoute,
   ApiPublicFxRefreshRoute: ApiPublicFxRefreshRoute,
   ApiPublicHooksDiscoverSyncRoute: ApiPublicHooksDiscoverSyncRoute,
+  ApiPublicHooksDispatchExpandRoute: ApiPublicHooksDispatchExpandRoute,
   ApiPublicHooksOpsAlertsDigestRoute: ApiPublicHooksOpsAlertsDigestRoute,
   ApiPublicHooksRefreshLazadaRoute: ApiPublicHooksRefreshLazadaRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
