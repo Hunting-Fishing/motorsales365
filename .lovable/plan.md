@@ -1,63 +1,65 @@
-# Phase 3 #17 — Learn Monetization
+# Plan — Audit #9: PH Payments Expansion + Admin Control
 
-## Current state
+Reuses what's already in the repo (no duplicates): `payments` table + `method` column, `payment_line_items`, `feature_flags.payments.*`, `src/lib/payments/provider.ts` rail registry, `admin.pricing.tsx`, public `/payments` page, `payments.$id.receipt.tsx`, and the existing Stripe checkout flow. No new payment SDKs (PayMongo/Xendit require user keys — left as already-registered rails behind feature flags).
 
-- Schema is fully built: `courses`, `course_modules`, `course_lessons`, `course_quizzes`, `course_enrollments`, `course_certificates`, `training_partners` (with `tier` + `sponsored_until`), `training_partner_clicks`.
-- Routes exist: `/learn`, `/learn/$slug`, `/learn/$slug/watch/$lessonId`, `/partner-training`, `/dashboard/learning`, `/c/$code` (certificates).
-- `FeaturedTrainingRail` already renders sponsored partners on `/learn`.
-- **Tables are empty** — 0 courses, 0 training partners. So the monetization features look invisible in preview.
-- No "Hire a trained mechanic" surface on business profiles. No course-completion badge shown on `/b/$slug`. No sponsor-school field on courses.
+## Scope (from audit)
+Maya, QR Ph, manual upload, GCash backup, PayPal, invoice/receipt download, "Pay with GCash" guide.
 
-## What ships this batch
+## 1. Schema (single migration)
+Add to `public.payments`:
+- `proof_url text` — uploaded receipt image/PDF
+- `proof_uploaded_at timestamptz`
+- `reviewed_by uuid` (FK profiles), `reviewed_at timestamptz`, `review_notes text`
+- `invoice_number text unique` — auto-generated `INV-YYYYMM-#####`
 
-### A. Seed real content (data-only, no schema change)
-1. Seed **6 published courses** across categories (Buying Used Cars in PH, OR/CR & LTO Basics, Motorcycle Maintenance 101, Diesel Truck Pre-Purchase, EV Ownership in PH, Selling Your Car Safely). Each gets 2–3 modules, 3–5 lessons, 1 quiz, hero image (use existing royalty-free / generated). 2 courses marked paid (have `price_php`), 4 free.
-2. Seed **8 training partners** (mix of `standard` and `featured` tiers; 3 with `sponsored_until` in future).
+New table `public.payment_method_config` (admin-controlled per-method metadata):
+- `method text PK` (e.g. `gcash_manual`, `maya_manual`, `qrph`, `bank_transfer`, `paypal_manual`, `stripe`)
+- `enabled bool`, `label text`, `instructions_md text`, `account_name text`, `account_number text`, `qr_image_url text`, `sort_order int`, `is_manual bool`
+- RLS: public read where `enabled=true`; admin full write. Standard GRANTs.
 
-### B. Course completion badge on business profile (#17 sub-item)
-3. Add a "Certified Training" section on `/b/$slug` that lists course certificates earned by the business owner (`profiles.id == businesses.owner_id`). Query `course_certificates` joined to `courses` for that user, show badge + course title + issue date, link to `/c/$code`.
+Create storage bucket `payment-proofs` (private) — buyer uploads, admin reads.
 
-### C. "Hire a trained mechanic" directory (#17 sub-item)
-4. Add a new route `/learn/mechanics` listing businesses whose owner has at least one mechanic-category course certificate. Filter by city, link to `/b/$slug`. Add a link card from `/learn` index ("Need help? Hire a trained mechanic →").
+## 2. Server functions (`src/lib/payments-manual.functions.ts`)
+- `listPaymentMethods()` — public, returns enabled methods for checkout picker.
+- `submitManualPayment({ kind, refId, method, amount_php, reference, proof_path })` — auth'd, inserts pending `payments` row, generates `invoice_number`.
+- `adminListPendingPayments()`, `adminApprovePayment(id, notes)`, `adminRejectPayment(id, notes)` — admin-only; on approve, calls existing activation paths (listing publish, boost activation, subscription extend) based on `kind`.
+- `getInvoicePdf(paymentId)` — auth'd (owner or admin); renders HTML invoice server-side and returns a PDF blob (use `@react-pdf/renderer` already? check; else generate printable HTML route).
 
-### D. Sponsored course slot (#17 sub-item)
-5. Add `sponsor_partner_id` (uuid, nullable, FK → `training_partners`) and `sponsored_until` (timestamptz, nullable) to `courses`. When set + active, the course detail page (`/learn/$slug`) shows a "Sponsored by <Partner>" ribbon linking to partner site (`rel="nofollow sponsored"`). Admin can manage from existing `admin.education.tsx`.
+## 3. Admin: single new route `/admin/payments` (no duplicate of admin.pricing)
+Tabs:
+1. **Methods** — table of `payment_method_config`: toggle enabled, edit instructions, upload QR image, reorder.
+2. **Rails** — toggles for `feature_flags.payments.stripe|paymongo|xendit` (reuses existing flag system).
+3. **Pending Review** — queue of manual payments with proof preview, approve/reject.
+4. **All Payments** — searchable history with status/method filters, link to invoice PDF.
 
-### E. Admin surface
-6. Extend `src/routes/admin.education.tsx` with a "Sponsorship" tab/column to set `sponsor_partner_id` + `sponsored_until` on a course, and to bump a training partner to `featured` with a sponsorship end date.
+Add nav link in `admin.tsx`. Leave `admin.pricing.tsx` focused on plan pricing/Stripe verification (no overlap).
 
-## Out of scope (separate batches)
-- Stripe checkout for paid courses (schema has `price_id` — existing Stripe boost/subscription pattern can be reused later).
-- Mechanic certification exam flow (current quiz/certificate flow already works; we just surface the badge).
-- #9 PH payments expansion — next batch after this one.
+## 4. Checkout integration
+Update the 4 existing checkout routes (`listing.checkout`, `boost.checkout`, `business.checkout`, `passport-premium.checkout`) to render a **method picker** sourced from `listPaymentMethods()`:
+- Stripe selected → existing embedded checkout (unchanged).
+- Manual method selected → instructions panel (markdown + QR image) + reference field + proof uploader → calls `submitManualPayment` → redirects to `/payments` dashboard with "pending review" toast.
 
-## Technical details
+## 5. Invoice / receipt download
+- Extend `payments.$id.receipt.tsx` with a "Download PDF" button calling `getInvoicePdf`.
+- Add a new `/dashboard/billing` link to per-payment receipt (already exists, just wire download).
 
-- **Migration**: add 2 columns to `courses`:
-  ```sql
-  ALTER TABLE public.courses
-    ADD COLUMN sponsor_partner_id uuid REFERENCES public.training_partners(id) ON DELETE SET NULL,
-    ADD COLUMN sponsored_until timestamptz;
-  ```
-  No new tables, no new grants needed.
-- **Seed**: use `supabase--insert` for courses, modules, lessons, quizzes, partners. No code path changes for seeding.
-- **Files touched**:
-  - `src/lib/education.functions.ts` — add `listMechanicBusinesses()`, `listOwnerCertificates(ownerId)`.
-  - `src/routes/learn.mechanics.tsx` — new route.
-  - `src/routes/b.$slug.tsx` — add Certified Training section (read-only display).
-  - `src/routes/learn.$slug.tsx` — render sponsor ribbon when `sponsor_partner_id` + future `sponsored_until`.
-  - `src/routes/learn.index.tsx` — add link card to `/learn/mechanics`.
-  - `src/routes/admin.education.tsx` — sponsorship controls.
-  - `src/components/learn/featured-training-rail.tsx` — no change (already works once partners exist).
-- **Terms/Privacy**: sponsorship surfaces are paid placements → bump `/terms` "Last updated" and add a one-line disclosure under the Advertising section. No `/privacy` change.
+## 6. Public "Pay with GCash" guide
+New route `/help/pay-with-gcash` — step-by-step (open GCash → scan QR / send to number → enter reference → upload proof on 365). Linked from `/payments` page and from the manual-method instructions panel.
 
-## Execution order
+## 7. Seed `payment_method_config`
+Insert rows for: `stripe` (managed), `gcash_manual`, `maya_manual`, `qrph` (uses same QR image field), `bank_transfer`, `paypal_manual`. Defaults: stripe enabled, GCash enabled, others disabled — admin turns on after filling account details.
 
-1. Migration: add `sponsor_partner_id` + `sponsored_until` to `courses`.
-2. Seed training_partners (8 rows) + courses with modules/lessons/quizzes (6 courses).
-3. Build `/learn/mechanics` + `listMechanicBusinesses` + link from `/learn`.
-4. Add Certified Training section to `/b/$slug`.
-5. Add sponsor ribbon to `/learn/$slug`.
-6. Extend admin.education with sponsorship controls.
-7. Bump `/terms` Last updated.
-8. Smoke-test in preview.
+## 8. Terms / privacy bump
+- `/terms` — add manual-payment / proof-of-payment / refund timing for manual methods + bump date.
+- `/privacy` — note proof-of-payment image retention + bump date.
+
+## Files
+- New: migration, `src/lib/payments-manual.functions.ts`, `src/routes/admin.payments.tsx`, `src/routes/help.pay-with-gcash.tsx`, `src/components/checkout/method-picker.tsx`, `src/components/checkout/manual-pay-form.tsx`, `src/components/admin/payment-method-editor.tsx`.
+- Edited: 4 checkout routes, `src/routes/payments.$id.receipt.tsx`, `src/routes/payments.tsx` (sync method labels from DB), `src/routes/admin.tsx` (nav), `src/routes/terms.tsx`, `src/routes/privacy.tsx`, `src/integrations/supabase/types.ts` (auto).
+
+## Out of scope (deferred, explicit)
+- Live PayMongo / Xendit SDK integration (needs user-supplied API keys; rails stay flag-gated).
+- Automated GCash API (no public PH consumer API; manual + proof is the standard pattern).
+- Stripe go-live (separate flow).
+
+Approve to proceed.
