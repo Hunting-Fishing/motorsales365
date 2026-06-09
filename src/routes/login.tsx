@@ -65,7 +65,20 @@ function LoginPage() {
     inFlightRef.current = true;
     setSubmitting(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      // Resolve sub-user logins (e.g. "steve@laoagcarsales") to the real auth email.
+      let signInEmail = email.trim();
+      const looksLikeStaffLogin =
+        signInEmail.includes("@") && !signInEmail.split("@")[1]?.includes(".");
+      if (looksLikeStaffLogin) {
+        const { data: resolved } = await (supabase as any).rpc("resolve_login_to_email", {
+          _input: signInEmail.toLowerCase(),
+        });
+        if (resolved) signInEmail = resolved as string;
+      }
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: signInEmail,
+        password,
+      });
       if (error) {
         const msg = error.message.toLowerCase();
         if (msg.includes("confirm") || msg.includes("not confirmed")) {
@@ -84,6 +97,7 @@ function LoginPage() {
       setSubmitting(false);
     }
   };
+
 
   const handleGoogle = async () => {
     if (inFlightRef.current || authBusy) return;
