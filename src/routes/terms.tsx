@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 9, 2026 (added §11a — optional inspection & transaction-safety services)";
+  const lastUpdated = "June 9, 2026 (added Vehicle Passport Premium upgrade in §8)";
 
   return (
     <SiteLayout>
@@ -293,10 +293,14 @@ function TermsPage() {
           <strong>Renew &amp; Boost (2 weeks)</strong> option is a one-time ₱150 charge that pins
           your vehicle listing to the top of search for 14 days and simultaneously renews the
           listing's expiry by the standard listing-active period; it does not auto-renew and you
-          must repeat the purchase every 2 weeks if you want to stay on top. Subscriptions and
-          sponsorship terms renew automatically until you cancel from your dashboard; cancellation
-          stops future renewals but does not entitle you to a refund of the current billing period
-          except as provided in our{" "}
+          must repeat the purchase every 2 weeks if you want to stay on top. The{" "}
+          <strong>Vehicle Passport Premium</strong> upgrade (₱299 / 12 months) is a one-time
+          per-vehicle purchase that adds a Premium badge to the public passport page, unlocks the
+          downloadable PDF history report and branded share card, and extends service-record
+          storage. It does not auto-renew; purchasing again extends the existing premium window.
+          Subscriptions and sponsorship terms renew automatically until you cancel from your
+          dashboard; cancellation stops future renewals but does not entitle you to a refund of the
+          current billing period except as provided in our{" "}
           <Link className="text-primary underline" to="/refund-policy">
             Refund Policy
           </Link>{" "}

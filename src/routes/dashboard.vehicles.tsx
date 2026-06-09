@@ -58,6 +58,7 @@ import { Badge } from "@/components/ui/badge";
 import { formatDate, formatPHP } from "@/lib/format";
 import { PassportShareSection } from "@/components/passport-share-section";
 import { PassportVerificationSection } from "@/components/passport-verification-section";
+import { PassportPremiumSection } from "@/components/passport-premium-section";
 import { SingleFileUploader } from "@/components/single-file-uploader";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/use-auth";
@@ -582,6 +583,12 @@ function VehicleDetailDialog({
             <div className="mt-2">
               <PassportVerificationSection vehicleId={data.vehicle.id} />
             </div>
+
+            <div className="mt-2">
+              <PassportPremiumSection vehicleId={data.vehicle.id} />
+            </div>
+
+
 
 
 
