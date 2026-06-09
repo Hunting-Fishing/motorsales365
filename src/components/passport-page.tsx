@@ -80,6 +80,11 @@ export function PassportPage({
               <Badge variant="secondary" className="gap-1 print:hidden">
                 <ShieldCheck className="h-3 w-3" /> Verified passport
               </Badge>
+              {v.passport_premium && v.passport_premium_until && new Date(v.passport_premium_until) > new Date() && (
+                <Badge className="gap-1 bg-amber-500 text-white print:hidden">
+                  <Crown className="h-3 w-3" /> Premium
+                </Badge>
+              )}
               <span className="hidden text-xs uppercase tracking-wide text-muted-foreground print:inline">
                 Verified vehicle passport — 365motorsales.com
               </span>
