@@ -525,6 +525,10 @@ async function handleEvent(env: StripeEnv, event: Stripe.Event) {
         await activateBoostFromSession(env, session);
         break;
       }
+      if (session.metadata?.kind === "passport_premium") {
+        await activatePassportPremiumFromSession(env, session);
+        break;
+      }
       if (session.metadata?.kind === "course") {
         await enrollCourseFromSession(env, session);
         break;
