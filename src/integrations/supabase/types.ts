@@ -4090,11 +4090,64 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_review_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          from_state: string | null
+          id: string
+          note: string | null
+          payment_id: string
+          to_state: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          from_state?: string | null
+          id?: string
+          note?: string | null
+          payment_id: string
+          to_state: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          from_state?: string | null
+          id?: string
+          note?: string | null
+          payment_id?: string
+          to_state?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_review_events_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_review_events_actor_id_fkey"
+            columns: ["actor_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payment_review_events_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       payments: {
         Row: {
           addons_amount_php: number | null
           addons_description: string | null
           amount_php: number
+          approved_at: string | null
           boost_amount_php: number | null
           created_at: string
           credit_calculated_at: string | null
@@ -4116,7 +4169,12 @@ export type Database = {
           proof_url: string | null
           prorated_credit_php: number | null
           reference: string | null
+          rejected_at: string | null
+          rejection_reason: string | null
           review_notes: string | null
+          review_started_at: string | null
+          review_started_by: string | null
+          review_state: string
           reviewed_at: string | null
           reviewed_by: string | null
           status: Database["public"]["Enums"]["payment_status"]
@@ -4126,6 +4184,7 @@ export type Database = {
           addons_amount_php?: number | null
           addons_description?: string | null
           amount_php: number
+          approved_at?: string | null
           boost_amount_php?: number | null
           created_at?: string
           credit_calculated_at?: string | null
@@ -4147,7 +4206,12 @@ export type Database = {
           proof_url?: string | null
           prorated_credit_php?: number | null
           reference?: string | null
+          rejected_at?: string | null
+          rejection_reason?: string | null
           review_notes?: string | null
+          review_started_at?: string | null
+          review_started_by?: string | null
+          review_state?: string
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: Database["public"]["Enums"]["payment_status"]
@@ -4157,6 +4221,7 @@ export type Database = {
           addons_amount_php?: number | null
           addons_description?: string | null
           amount_php?: number
+          approved_at?: string | null
           boost_amount_php?: number | null
           created_at?: string
           credit_calculated_at?: string | null
@@ -4178,7 +4243,12 @@ export type Database = {
           proof_url?: string | null
           prorated_credit_php?: number | null
           reference?: string | null
+          rejected_at?: string | null
+          rejection_reason?: string | null
           review_notes?: string | null
+          review_started_at?: string | null
+          review_started_by?: string | null
+          review_state?: string
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: Database["public"]["Enums"]["payment_status"]
@@ -4190,6 +4260,20 @@ export type Database = {
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_review_started_by_fkey"
+            columns: ["review_started_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_review_started_by_fkey"
+            columns: ["review_started_by"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
           {

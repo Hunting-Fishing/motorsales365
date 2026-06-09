@@ -1,65 +1,69 @@
-# Plan — Audit #9: PH Payments Expansion + Admin Control
+# Full Manual Payment Status Workflow
 
-Reuses what's already in the repo (no duplicates): `payments` table + `method` column, `payment_line_items`, `feature_flags.payments.*`, `src/lib/payments/provider.ts` rail registry, `admin.pricing.tsx`, public `/payments` page, `payments.$id.receipt.tsx`, and the existing Stripe checkout flow. No new payment SDKs (PayMongo/Xendit require user keys — left as already-registered rails behind feature flags).
+Today the admin flow is binary: a pending manual payment jumps straight to `paid` or `failed` on a single click. We'll add an explicit **Pending → Reviewed → Approved/Rejected** lifecycle with timestamps, reviewer notes, and an audit trail — all controlled from the existing `/admin/payments` page.
 
-## Scope (from audit)
-Maya, QR Ph, manual upload, GCash backup, PayPal, invoice/receipt download, "Pay with GCash" guide.
+## Stages
 
-## 1. Schema (single migration)
-Add to `public.payments`:
-- `proof_url text` — uploaded receipt image/PDF
-- `proof_uploaded_at timestamptz`
-- `reviewed_by uuid` (FK profiles), `reviewed_at timestamptz`, `review_notes text`
-- `invoice_number text unique` — auto-generated `INV-YYYYMM-#####`
+```text
+submitted  →  pending      (auto on submit; proof uploaded)
+pending    →  in_review    (admin claims it, optional note)
+in_review  →  approved     (status=paid, side-effects fire)
+in_review  →  rejected     (status=failed, reason required)
+in_review  →  pending      (release back to queue)
+approved   →  refunded     (existing flow, unchanged)
+```
 
-New table `public.payment_method_config` (admin-controlled per-method metadata):
-- `method text PK` (e.g. `gcash_manual`, `maya_manual`, `qrph`, `bank_transfer`, `paypal_manual`, `stripe`)
-- `enabled bool`, `label text`, `instructions_md text`, `account_name text`, `account_number text`, `qr_image_url text`, `sort_order int`, `is_manual bool`
-- RLS: public read where `enabled=true`; admin full write. Standard GRANTs.
+A reviewer must move a payment into `in_review` before approving or rejecting — this prevents two admins acting on the same row and forces a deliberate review step.
 
-Create storage bucket `payment-proofs` (private) — buyer uploads, admin reads.
+## Database (single migration)
 
-## 2. Server functions (`src/lib/payments-manual.functions.ts`)
-- `listPaymentMethods()` — public, returns enabled methods for checkout picker.
-- `submitManualPayment({ kind, refId, method, amount_php, reference, proof_path })` — auth'd, inserts pending `payments` row, generates `invoice_number`.
-- `adminListPendingPayments()`, `adminApprovePayment(id, notes)`, `adminRejectPayment(id, notes)` — admin-only; on approve, calls existing activation paths (listing publish, boost activation, subscription extend) based on `kind`.
-- `getInvoicePdf(paymentId)` — auth'd (owner or admin); renders HTML invoice server-side and returns a PDF blob (use `@react-pdf/renderer` already? check; else generate printable HTML route).
+1. Extend `payment_status` enum: add `in_review`, `approved`, `rejected`. Keep `paid`/`failed` as terminal aliases used by side-effects so existing code (boost activation, subscription renewal, receipts) keeps working.
+2. Add columns to `public.payments`:
+   - `review_started_at timestamptz`
+   - `review_started_by uuid references profiles(id)`
+   - `approved_at timestamptz`
+   - `rejected_at timestamptz`
+   - `rejection_reason text`
+3. New table `public.payment_review_events` (full audit log):
+   - `payment_id`, `actor_id`, `from_status`, `to_status`, `note`, `created_at`
+   - GRANTs + RLS: admins manage; owner of payment can SELECT their own events.
+4. Trigger `tg_payment_status_audit` on `payments` — inserts a row in `payment_review_events` on every status transition (captures `auth.uid()`).
+5. Update the "Users insert own payments" RLS check to include the new statuses in the forbidden-on-insert list (still forces `pending`).
 
-## 3. Admin: single new route `/admin/payments` (no duplicate of admin.pricing)
-Tabs:
-1. **Methods** — table of `payment_method_config`: toggle enabled, edit instructions, upload QR image, reorder.
-2. **Rails** — toggles for `feature_flags.payments.stripe|paymongo|xendit` (reuses existing flag system).
-3. **Pending Review** — queue of manual payments with proof preview, approve/reject.
-4. **All Payments** — searchable history with status/method filters, link to invoice PDF.
+## Server functions (`src/lib/payments-manual.functions.ts`)
 
-Add nav link in `admin.tsx`. Leave `admin.pricing.tsx` focused on plan pricing/Stripe verification (no overlap).
+Reuse existing admin guard. Replace the two-call API with the staged workflow:
 
-## 4. Checkout integration
-Update the 4 existing checkout routes (`listing.checkout`, `boost.checkout`, `business.checkout`, `passport-premium.checkout`) to render a **method picker** sourced from `listPaymentMethods()`:
-- Stripe selected → existing embedded checkout (unchanged).
-- Manual method selected → instructions panel (markdown + QR image) + reference field + proof uploader → calls `submitManualPayment` → redirects to `/payments` dashboard with "pending review" toast.
+- `adminClaimPaymentReview({ id, note? })` — pending → in_review, stamps `review_started_at/by`.
+- `adminReleasePaymentReview({ id, note? })` — in_review → pending (only if claimed by same admin or admin override).
+- `adminApprovePayment({ id, notes? })` — in_review → approved (also sets `status=paid`, `paid_at`, `approved_at`, `reviewed_by/at`). Keeps current downstream activation calls.
+- `adminRejectPayment({ id, reason })` — in_review → rejected (also sets `status=failed`, `rejected_at`, `rejection_reason`, `reviewed_by/at`). Reason required, min 5 chars.
+- `adminListPayments({ status?, method?, q?, limit })` — unified list replacing `adminListPendingPayments`, supports filtering by any stage and free-text search on reference/invoice/user.
+- `adminGetPaymentDetail({ id })` — returns payment + profile + line items + full `payment_review_events` timeline + signed `proof_url`.
 
-## 5. Invoice / receipt download
-- Extend `payments.$id.receipt.tsx` with a "Download PDF" button calling `getInvoicePdf`.
-- Add a new `/dashboard/billing` link to per-payment receipt (already exists, just wire download).
+## Admin UI (`src/routes/admin.payments.tsx`)
 
-## 6. Public "Pay with GCash" guide
-New route `/help/pay-with-gcash` — step-by-step (open GCash → scan QR / send to number → enter reference → upload proof on 365). Linked from `/payments` page and from the manual-method instructions panel.
+Reuse the existing 4 tabs; rebuild the **Pending Review** + **All Payments** tabs around the new state machine:
 
-## 7. Seed `payment_method_config`
-Insert rows for: `stripe` (managed), `gcash_manual`, `maya_manual`, `qrph` (uses same QR image field), `bank_transfer`, `paypal_manual`. Defaults: stripe enabled, GCash enabled, others disabled — admin turns on after filling account details.
+- **Queue tab**: three columns/sub-tabs — *Pending*, *In Review (mine)*, *In Review (others)*. Each row shows amount, method, user, invoice #, age. Primary action depends on stage:
+  - Pending → "Start review" (claim)
+  - In Review (mine) → "Approve" / "Reject" / "Release back"
+  - In Review (others) → read-only with reviewer name
+- **Detail drawer** (opens from any row): proof preview, line items, full timeline of `payment_review_events`, reviewer notes thread, action buttons gated by current stage. Approval modal has optional internal note; rejection modal requires a reason (saved to `rejection_reason` + audit).
+- **All Payments tab**: filter chips for every stage (Pending, In Review, Approved, Rejected, Refunded), method filter, search box, CSV export button.
 
-## 8. Terms / privacy bump
-- `/terms` — add manual-payment / proof-of-payment / refund timing for manual methods + bump date.
-- `/privacy` — note proof-of-payment image retention + bump date.
+No changes to checkout, receipts, Methods tab, or Rails tab.
 
 ## Files
-- New: migration, `src/lib/payments-manual.functions.ts`, `src/routes/admin.payments.tsx`, `src/routes/help.pay-with-gcash.tsx`, `src/components/checkout/method-picker.tsx`, `src/components/checkout/manual-pay-form.tsx`, `src/components/admin/payment-method-editor.tsx`.
-- Edited: 4 checkout routes, `src/routes/payments.$id.receipt.tsx`, `src/routes/payments.tsx` (sync method labels from DB), `src/routes/admin.tsx` (nav), `src/routes/terms.tsx`, `src/routes/privacy.tsx`, `src/integrations/supabase/types.ts` (auto).
 
-## Out of scope (deferred, explicit)
-- Live PayMongo / Xendit SDK integration (needs user-supplied API keys; rails stay flag-gated).
-- Automated GCash API (no public PH consumer API; manual + proof is the standard pattern).
-- Stripe go-live (separate flow).
+- `supabase/migrations/<ts>_payment_workflow.sql` (new)
+- `src/lib/payments-manual.functions.ts` (edit — replace approve/reject, add claim/release/list/detail)
+- `src/routes/admin.payments.tsx` (edit — Queue + Detail drawer + All Payments filters)
+- `src/components/admin/payment-review-drawer.tsx` (new — detail/timeline/actions)
+- `src/integrations/supabase/types.ts` (regenerated after migration)
 
-Approve to proceed.
+## Out of scope
+
+- Public-facing receipt/PDF changes (already show invoice + paid date).
+- Refund workflow (separate, already exists as `refunded` terminal).
+- Email notifications to the buyer on approve/reject — easy follow-up using the existing `enqueue_email` helper if you want it; say the word and I'll add it in the same pass.
