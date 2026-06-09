@@ -353,6 +353,27 @@ function TermsPage() {
             possible.
           </li>
         </ul>
+        <p className="mt-3 text-muted-foreground">
+          <strong>11a. Optional inspection &amp; transaction-safety services.</strong> 365 MotorSales
+          publishes a catalog of optional add-on services at{" "}
+          <Link className="text-primary underline" to="/services/inspection">
+            /services/inspection
+          </Link>{" "}
+          — OR/CR document review, seller ID verification, pre-purchase mechanic inspection,
+          vehicle history / Passport reports, and transaction assistance. Prices shown are
+          indicative PHP ranges; the final quote is confirmed in writing before any work begins.
+          365 is <strong>not</strong> an escrow agent, broker, or guarantor of these services: where
+          the actual work is performed by an independent partner (mechanic, document reviewer,
+          payment-release partner), the contract for that work is between the buyer and that
+          partner, and 365's role is limited to introduction, scheduling, and coordination. Refunds
+          for pre-paid 365 fees are governed by our{" "}
+          <Link className="text-primary underline" to="/refund-policy">
+            Refund Policy
+          </Link>
+          .
+        </p>
+
+
 
         <h2 className="mt-6 text-xl font-semibold">
           12. User-generated content &amp; intellectual property
