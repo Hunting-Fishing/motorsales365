@@ -100,6 +100,7 @@ function CoursesTab() {
                 <th className="px-3 py-2">Category</th>
                 <th className="px-3 py-2">Price</th>
                 <th className="px-3 py-2">Status</th>
+                <th className="px-3 py-2">Sponsor</th>
                 <th className="px-3 py-2"></th>
               </tr>
             </thead>
@@ -114,6 +115,9 @@ function CoursesTab() {
                     <Badge variant={c.status === "published" ? "default" : "outline"}>
                       {c.status}
                     </Badge>
+                  </td>
+                  <td className="px-3 py-2">
+                    <SponsorCell course={c} onChanged={() => qc.invalidateQueries({ queryKey: ["admin-courses"] })} />
                   </td>
                   <td className="px-3 py-2 text-right">
                     <Button size="sm" variant="ghost" asChild>
@@ -141,7 +145,7 @@ function CoursesTab() {
               ))}
               {(data?.courses ?? []).length === 0 && (
                 <tr>
-                  <td className="px-3 py-6 text-center text-muted-foreground" colSpan={6}>
+                  <td className="px-3 py-6 text-center text-muted-foreground" colSpan={7}>
                     No courses yet.
                   </td>
                 </tr>
