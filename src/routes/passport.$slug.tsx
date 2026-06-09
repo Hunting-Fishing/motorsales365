@@ -167,8 +167,12 @@ function PassportPage() {
               <div>
                 <p className="text-sm font-medium">Scan to verify online</p>
                 <p className="text-xs text-muted-foreground">{fullUrl}</p>
+              </div>
+            </div>
           </div>
         </div>
+
+
 
         {/* Disclosures & ownership */}
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
