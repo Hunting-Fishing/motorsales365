@@ -62,9 +62,23 @@ function RefundPage() {
           cannot refund or mediate fees paid to third parties.
         </p>
 
-        <p className="mt-6 text-xs text-muted-foreground">
-          Last updated: June 8, 2026 (rev. contact email domain)
+        <h2 className="mt-6 text-xl font-semibold">
+          Inspection &amp; transaction-safety services
+        </h2>
+        <p className="mt-2 text-muted-foreground">
+          Pre-paid 365 fees for OR/CR document review, seller ID verification, vehicle history
+          reports, and transaction-assistance coordination are refundable in full if the work has
+          not started, and pro-rated based on completed milestones once it has. Fees for
+          pre-purchase mechanic inspections performed by independent partners are governed by that
+          partner's own refund terms — 365 will help mediate but cannot guarantee a third-party
+          refund. Mechanic-booking commissions are non-refundable once the inspection has been
+          completed.
         </p>
+
+        <p className="mt-6 text-xs text-muted-foreground">
+          Last updated: June 9, 2026 (added inspection &amp; transaction-safety services section)
+        </p>
+
 
         <h2 className="mt-6 text-xl font-semibold">How to request</h2>
         <p className="mt-2 text-muted-foreground">
