@@ -135,6 +135,13 @@ const NAV: {
     info: "Subscription plans, listing fees and global pricing settings.",
   },
   {
+    to: "/admin/payments",
+    label: "Payments Control",
+    Icon: CreditCard,
+    roles: ["admin"],
+    info: "Configure PH payment methods (GCash, Maya, QR Ph, bank transfer, PayPal), review manual payments, and audit all transactions.",
+  },
+  {
     to: "/admin/currencies",
     label: "Currencies",
     Icon: Globe,
