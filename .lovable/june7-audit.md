@@ -29,7 +29,7 @@ Purpose: working checklist of issues to correct before launch. Check items off a
 - [ ] Dealer subscriptions
 - [ ] Business directory paid profiles
 - [ ] Sponsored ad placements
-- [ ] Inspection referrals
+- [x] Inspection referrals
 - [ ] Parts / tool affiliate shop
 - [ ] Learn / course sponsorships
 - [ ] Export lead referral (not direct brokerage unless legally structured)
