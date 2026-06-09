@@ -18,6 +18,7 @@ import {
   ClipboardCheck,
   Wrench,
   MessageCircle,
+  ShieldCheck,
 } from "lucide-react";
 import { waMeUrl } from "@/lib/whatsapp";
 import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
