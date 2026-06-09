@@ -1,3 +1,11 @@
+/**
+ * SYNC GROUP: vehicle-passport
+ * Source of truth: .lovable/sync-groups.md#vehicle-passport
+ * Siblings: src/routes/passport.$slug.tsx, src/routes/dashboard.vehicles.tsx,
+ *           src/components/passport-share-section.tsx
+ * On change: bump VERSION + update sync-groups.md
+ * VERSION: 2
+ */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -18,6 +26,17 @@ const SERVICE_TYPES = [
   "other",
 ] as const;
 
+const DISCLOSURE_LEVEL = z.enum(["none", "minor", "major"]).optional().nullable();
+const disclosuresSchema = z
+  .object({
+    flood: DISCLOSURE_LEVEL,
+    accident: DISCLOSURE_LEVEL,
+    notes: z.string().trim().max(1000).optional().nullable(),
+  })
+  .partial()
+  .optional()
+  .nullable();
+
 const vehicleInput = z.object({
   make: z.string().trim().min(1).max(60),
   model: z.string().trim().min(1).max(80),
@@ -28,6 +47,9 @@ const vehicleInput = z.object({
   nickname: z.string().trim().max(60).optional().nullable(),
   coverUrl: z.string().url().max(2000).optional().nullable(),
   isPublic: z.boolean().optional(),
+  ownershipCount: z.number().int().min(1).max(20).optional().nullable(),
+  disclosures: disclosuresSchema,
+  modifications: z.string().trim().max(2000).optional().nullable(),
 });
 
 export const listMyVehicles = createServerFn({ method: "GET" })
@@ -61,8 +83,59 @@ export const getMyVehicle = createServerFn({ method: "POST" })
       .select("*")
       .eq("vehicle_id", data.id)
       .order("performed_at", { ascending: false });
-    return { vehicle, records: records ?? [] };
+    const { data: photos } = await supabase
+      .from("vehicle_photos")
+      .select("*")
+      .eq("vehicle_id", data.id)
+      .order("sort_order", { ascending: true });
+    return { vehicle, records: records ?? [], photos: photos ?? [] };
   });
+
+export const addVehiclePhoto = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { vehicleId: string; url: string; caption?: string | null }) => ({
+    vehicleId: uuid.parse(d.vehicleId),
+    url: z.string().url().max(2000).parse(d.url),
+    caption: d.caption ? z.string().trim().max(160).parse(d.caption) : null,
+  }))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    // verify ownership
+    const { data: v } = await supabase
+      .from("vehicles")
+      .select("id")
+      .eq("id", data.vehicleId)
+      .eq("owner_user_id", userId)
+      .maybeSingle();
+    if (!v) throw new Error("Vehicle not found");
+    const { data: row, error } = await supabase
+      .from("vehicle_photos")
+      .insert({
+        vehicle_id: data.vehicleId,
+        owner_user_id: userId,
+        url: data.url,
+        caption: data.caption,
+      })
+      .select("*")
+      .single();
+    if (error) throw new Error(error.message);
+    return row;
+  });
+
+export const deleteVehiclePhoto = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { id: string }) => ({ id: uuid.parse(d.id) }))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { error } = await supabase
+      .from("vehicle_photos")
+      .delete()
+      .eq("id", data.id)
+      .eq("owner_user_id", userId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 
 export const createVehicle = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -82,6 +155,9 @@ export const createVehicle = createServerFn({ method: "POST" })
         nickname: data.nickname ?? null,
         cover_url: data.coverUrl ?? null,
         is_public: data.isPublic ?? false,
+        ownership_count: data.ownershipCount ?? 1,
+        disclosures: (data.disclosures ?? {}) as any,
+        modifications: data.modifications ?? null,
       })
       .select("*")
       .single();
@@ -106,12 +182,16 @@ export const updateVehicle = createServerFn({ method: "POST" })
         nickname: data.nickname ?? null,
         cover_url: data.coverUrl ?? null,
         is_public: data.isPublic ?? false,
+        ownership_count: data.ownershipCount ?? 1,
+        disclosures: (data.disclosures ?? {}) as any,
+        modifications: data.modifications ?? null,
       })
       .eq("id", data.id)
       .eq("owner_user_id", userId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
 
 export const deleteVehicle = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

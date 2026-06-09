@@ -1,3 +1,11 @@
+/**
+ * SYNC GROUP: vehicle-passport
+ * Source of truth: .lovable/sync-groups.md#vehicle-passport
+ * Siblings: src/routes/passport.$slug.tsx, src/routes/dashboard.vehicles.tsx,
+ *           src/lib/vehicles.functions.ts
+ * On change: bump VERSION + update sync-groups.md
+ * VERSION: 2
+ */
 import { useState, useCallback } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { Share2, Link2, Printer, Check } from "lucide-react";

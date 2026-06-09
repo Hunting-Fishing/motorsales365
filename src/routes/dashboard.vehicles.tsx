@@ -1,3 +1,11 @@
+/**
+ * SYNC GROUP: vehicle-passport
+ * Source of truth: .lovable/sync-groups.md#vehicle-passport
+ * Siblings: src/routes/passport.$slug.tsx, src/lib/vehicles.functions.ts,
+ *           src/components/passport-share-section.tsx
+ * On change: bump VERSION + update sync-groups.md
+ * VERSION: 2
+ */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { confirm } from "@/components/ui/confirm-dialog";
 import { useEffect, useState } from "react";
@@ -175,6 +183,7 @@ function VehicleDialog({
 }) {
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
+  const initialDisc = (vehicle?.disclosures || {}) as { flood?: string; accident?: string; notes?: string };
   const [form, setForm] = useState({
     make: vehicle?.make ?? "",
     model: vehicle?.model ?? "",
@@ -185,6 +194,11 @@ function VehicleDialog({
     nickname: vehicle?.nickname ?? "",
     coverUrl: vehicle?.cover_url ?? "",
     isPublic: vehicle?.is_public ?? false,
+    ownershipCount: String(vehicle?.ownership_count ?? 1),
+    floodLevel: initialDisc.flood ?? "none",
+    accidentLevel: initialDisc.accident ?? "none",
+    discNotes: initialDisc.notes ?? "",
+    modifications: vehicle?.modifications ?? "",
   });
   const [saving, setSaving] = useState(false);
   const createFn = useServerFn(createVehicle);
@@ -204,6 +218,13 @@ function VehicleDialog({
         nickname: form.nickname.trim() || null,
         coverUrl: form.coverUrl.trim() || null,
         isPublic: form.isPublic,
+        ownershipCount: form.ownershipCount ? Number(form.ownershipCount) : 1,
+        disclosures: {
+          flood: form.floodLevel || "none",
+          accident: form.accidentLevel || "none",
+          notes: form.discNotes.trim() || null,
+        },
+        modifications: form.modifications.trim() || null,
       };
       if (vehicle) {
         await updateFn({ data: { id: vehicle.id, ...payload } });
@@ -318,6 +339,66 @@ function VehicleDialog({
               />
             </div>
           )}
+
+          <div className="rounded-md border border-border p-3 space-y-3">
+            <p className="text-sm font-medium">Passport disclosures</p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div>
+                <Label>Ownership #</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  max={20}
+                  value={form.ownershipCount}
+                  onChange={(e) => setForm((f) => ({ ...f, ownershipCount: e.target.value }))}
+                />
+              </div>
+              <div>
+                <Label>Flood history</Label>
+                <Select value={form.floodLevel} onValueChange={(v) => setForm((f) => ({ ...f, floodLevel: v }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None reported</SelectItem>
+                    <SelectItem value="minor">Minor</SelectItem>
+                    <SelectItem value="major">Major</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Accident history</Label>
+                <Select value={form.accidentLevel} onValueChange={(v) => setForm((f) => ({ ...f, accidentLevel: v }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None reported</SelectItem>
+                    <SelectItem value="minor">Minor</SelectItem>
+                    <SelectItem value="major">Major</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div>
+              <Label>Disclosure notes (optional)</Label>
+              <Textarea
+                rows={2}
+                maxLength={1000}
+                value={form.discNotes}
+                onChange={(e) => setForm((f) => ({ ...f, discNotes: e.target.value }))}
+                placeholder="Repaired front bumper after parking incident, 2024."
+              />
+            </div>
+            <div>
+              <Label>Modifications & upgrades</Label>
+              <Textarea
+                rows={3}
+                maxLength={2000}
+                value={form.modifications}
+                onChange={(e) => setForm((f) => ({ ...f, modifications: e.target.value }))}
+                placeholder="Aftermarket alloys, K&N filter, dashcam, tinted windows…"
+              />
+            </div>
+          </div>
+
+
           <div className="flex items-center justify-between rounded-md border border-border p-3">
             <div className="text-sm">
               <p className="font-medium">Public passport</p>

@@ -6231,6 +6231,44 @@ export type Database = {
           },
         ]
       }
+      vehicle_photos: {
+        Row: {
+          caption: string | null
+          created_at: string
+          id: string
+          owner_user_id: string
+          sort_order: number
+          url: string
+          vehicle_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          owner_user_id: string
+          sort_order?: number
+          url: string
+          vehicle_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          id?: string
+          owner_user_id?: string
+          sort_order?: number
+          url?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_photos_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_service_records: {
         Row: {
           cost_php: number | null
@@ -6289,14 +6327,19 @@ export type Database = {
           color: string | null
           cover_url: string | null
           created_at: string
+          disclosures: Json
           id: string
           is_public: boolean
           make: string
           model: string
+          modifications: string | null
           nickname: string | null
           owner_user_id: string
+          ownership_count: number
+          passport_premium: boolean
           passport_slug: string | null
           plate_number: string | null
+          transferred_to_listing_id: string | null
           updated_at: string
           vin: string | null
           year: number | null
@@ -6305,14 +6348,19 @@ export type Database = {
           color?: string | null
           cover_url?: string | null
           created_at?: string
+          disclosures?: Json
           id?: string
           is_public?: boolean
           make: string
           model: string
+          modifications?: string | null
           nickname?: string | null
           owner_user_id: string
+          ownership_count?: number
+          passport_premium?: boolean
           passport_slug?: string | null
           plate_number?: string | null
+          transferred_to_listing_id?: string | null
           updated_at?: string
           vin?: string | null
           year?: number | null
@@ -6321,19 +6369,32 @@ export type Database = {
           color?: string | null
           cover_url?: string | null
           created_at?: string
+          disclosures?: Json
           id?: string
           is_public?: boolean
           make?: string
           model?: string
+          modifications?: string | null
           nickname?: string | null
           owner_user_id?: string
+          ownership_count?: number
+          passport_premium?: boolean
           passport_slug?: string | null
           plate_number?: string | null
+          transferred_to_listing_id?: string | null
           updated_at?: string
           vin?: string | null
           year?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "vehicles_transferred_to_listing_id_fkey"
+            columns: ["transferred_to_listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       verification_requests: {
         Row: {

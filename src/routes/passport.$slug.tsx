@@ -1,5 +1,13 @@
+/**
+ * SYNC GROUP: vehicle-passport
+ * Source of truth: .lovable/sync-groups.md#vehicle-passport
+ * Siblings: src/routes/dashboard.vehicles.tsx, src/lib/vehicles.functions.ts,
+ *           src/components/passport-share-section.tsx
+ * On change: bump VERSION + update sync-groups.md
+ * VERSION: 2
+ */
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ShieldCheck, Car, Wrench, ExternalLink, Calendar } from "lucide-react";
+import { ShieldCheck, Car, Wrench, ExternalLink, Calendar, Users, Droplet, AlertTriangle, Settings2 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/site-layout";
@@ -26,21 +34,28 @@ export const Route = createFileRoute("/passport/$slug")({
     const { data: vehicle, error } = await supabase
       .from("vehicles")
       .select(
-        "id, make, model, year, color, plate_number, nickname, cover_url, is_public, passport_slug, created_at",
+        "id, make, model, year, color, plate_number, nickname, cover_url, is_public, passport_slug, created_at, ownership_count, disclosures, modifications",
       )
       .eq("passport_slug", params.slug)
       .eq("is_public", true)
       .maybeSingle();
     if (error) throw new Error(error.message);
     if (!vehicle) throw notFound();
-    const { data: records } = await supabase
-      .from("vehicle_service_records")
-      .select(
-        "id, performed_at, mileage_km, service_type, title, shop_name, cost_php, notes, receipt_url",
-      )
-      .eq("vehicle_id", vehicle.id)
-      .order("performed_at", { ascending: false });
-    return { vehicle, records: records ?? [] };
+    const [{ data: records }, { data: photos }] = await Promise.all([
+      supabase
+        .from("vehicle_service_records")
+        .select(
+          "id, performed_at, mileage_km, service_type, title, shop_name, cost_php, notes, receipt_url",
+        )
+        .eq("vehicle_id", vehicle.id)
+        .order("performed_at", { ascending: false }),
+      supabase
+        .from("vehicle_photos")
+        .select("id, url, caption, sort_order")
+        .eq("vehicle_id", vehicle.id)
+        .order("sort_order", { ascending: true }),
+    ]);
+    return { vehicle, records: records ?? [], photos: photos ?? [] };
   },
   head: ({ loaderData, params }) => {
     const v = loaderData?.vehicle as any;
@@ -86,11 +101,13 @@ export const Route = createFileRoute("/passport/$slug")({
 });
 
 function PassportPage() {
-  const { vehicle, records } = Route.useLoaderData();
+  const { vehicle, records, photos } = Route.useLoaderData() as any;
   const v: any = vehicle;
   const name = v.nickname || `${v.year ? v.year + " " : ""}${v.make} ${v.model}`;
   const totalSpent = records.reduce((s: number, r: any) => s + Number(r.cost_php || 0), 0);
   const lastMileage = records.find((r: any) => r.mileage_km)?.mileage_km;
+  const disclosures = (v.disclosures || {}) as { flood?: string; accident?: string; notes?: string };
+  const ownerCount = Number(v.ownership_count || 1);
 
   const fullUrl = `https://www.365motorsales.com/passport/${v.passport_slug}`;
 
@@ -154,6 +171,72 @@ function PassportPage() {
             </div>
           </div>
         </div>
+
+
+
+        {/* Disclosures & ownership */}
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <div className="rounded-xl border border-border bg-card p-5">
+            <h3 className="flex items-center gap-2 font-display text-base font-semibold">
+              <Users className="h-4 w-4" /> Ownership
+            </h3>
+            <p className="mt-2 text-sm">
+              {ownerCount === 1 ? "1st owner (original)" : `Owner #${ownerCount}`}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Reported by current owner. Names are not shown publicly.
+            </p>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-5">
+            <h3 className="flex items-center gap-2 font-display text-base font-semibold">
+              <AlertTriangle className="h-4 w-4" /> Disclosures
+            </h3>
+            <div className="mt-2 space-y-1.5 text-sm">
+              <div className="flex items-center gap-2">
+                <Droplet className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-muted-foreground">Flood:</span>
+                <DisclosureBadge level={disclosures.flood} />
+              </div>
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-muted-foreground">Accident:</span>
+                <DisclosureBadge level={disclosures.accident} />
+              </div>
+            </div>
+            {disclosures.notes && (
+              <p className="mt-2 text-xs text-muted-foreground">{disclosures.notes}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Modifications */}
+        {v.modifications && (
+          <div className="mt-6 rounded-xl border border-border bg-card p-5">
+            <h3 className="flex items-center gap-2 font-display text-base font-semibold">
+              <Settings2 className="h-4 w-4" /> Modifications & upgrades
+            </h3>
+            <p className="mt-2 whitespace-pre-wrap text-sm">{v.modifications}</p>
+          </div>
+        )}
+
+        {/* Photo gallery */}
+        {photos.length > 0 && (
+          <div className="mt-6 rounded-xl border border-border bg-card p-5">
+            <h3 className="font-display text-base font-semibold">Photos</h3>
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {photos.map((p: any) => (
+                <figure key={p.id} className="overflow-hidden rounded-md border border-border bg-muted">
+                  <img src={p.url} alt={p.caption || name} loading="lazy" className="aspect-square w-full object-cover" />
+                  {p.caption && (
+                    <figcaption className="px-2 py-1 text-[11px] text-muted-foreground">{p.caption}</figcaption>
+                  )}
+                </figure>
+              ))}
+            </div>
+          </div>
+        )}
+
+
 
         <div className="mt-6 rounded-xl border border-border bg-card p-5 print:border-0 print:bg-white print:p-0">
           <h2 className="font-display text-lg font-semibold">Service history</h2>
@@ -232,4 +315,16 @@ function Stat({ label, value }: { label: string; value: string }) {
       </p>
     </div>
   );
+}
+
+function DisclosureBadge({ level }: { level?: string }) {
+  const l = (level || "unknown").toLowerCase();
+  const map: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
+    none: { label: "None reported", variant: "secondary" },
+    minor: { label: "Minor", variant: "outline" },
+    major: { label: "Major", variant: "destructive" },
+    unknown: { label: "Not disclosed", variant: "outline" },
+  };
+  const cfg = map[l] || map.unknown;
+  return <Badge variant={cfg.variant} className="text-[10px]">{cfg.label}</Badge>;
 }
