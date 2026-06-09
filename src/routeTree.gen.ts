@@ -35,6 +35,7 @@ import { Route as LeadsMarketplaceRouteImport } from './routes/leads-marketplace
 import { Route as GuidelinesRouteImport } from './routes/guidelines'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ExportRouteImport } from './routes/export'
+import { Route as DispatchRouteImport } from './routes/dispatch'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CompanyRouteImport } from './routes/company'
@@ -305,6 +306,11 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
 const ExportRoute = ExportRouteImport.update({
   id: '/export',
   path: '/export',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DispatchRoute = DispatchRouteImport.update({
+  id: '/dispatch',
+  path: '/dispatch',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DashboardRoute = DashboardRouteImport.update({
@@ -1037,6 +1043,7 @@ export interface FileRoutesByFullPath {
   '/company': typeof CompanyRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/dispatch': typeof DispatchRoute
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
@@ -1204,6 +1211,7 @@ export interface FileRoutesByTo {
   '/bundles': typeof BundlesRoute
   '/company': typeof CompanyRoute
   '/contact': typeof ContactRoute
+  '/dispatch': typeof DispatchRoute
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
@@ -1373,6 +1381,7 @@ export interface FileRoutesById {
   '/company': typeof CompanyRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
+  '/dispatch': typeof DispatchRoute
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
@@ -1544,6 +1553,7 @@ export interface FileRouteTypes {
     | '/company'
     | '/contact'
     | '/dashboard'
+    | '/dispatch'
     | '/export'
     | '/forgot-password'
     | '/guidelines'
@@ -1711,6 +1721,7 @@ export interface FileRouteTypes {
     | '/bundles'
     | '/company'
     | '/contact'
+    | '/dispatch'
     | '/export'
     | '/forgot-password'
     | '/guidelines'
@@ -1879,6 +1890,7 @@ export interface FileRouteTypes {
     | '/company'
     | '/contact'
     | '/dashboard'
+    | '/dispatch'
     | '/export'
     | '/forgot-password'
     | '/guidelines'
@@ -2049,6 +2061,7 @@ export interface RootRouteChildren {
   CompanyRoute: typeof CompanyRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
+  DispatchRoute: typeof DispatchRoute
   ExportRoute: typeof ExportRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   GuidelinesRoute: typeof GuidelinesRoute
@@ -2321,6 +2334,13 @@ declare module '@tanstack/react-router' {
       path: '/export'
       fullPath: '/export'
       preLoaderRoute: typeof ExportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dispatch': {
+      id: '/dispatch'
+      path: '/dispatch'
+      fullPath: '/dispatch'
+      preLoaderRoute: typeof DispatchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dashboard': {
@@ -3546,6 +3566,7 @@ const rootRouteChildren: RootRouteChildren = {
   CompanyRoute: CompanyRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
+  DispatchRoute: DispatchRoute,
   ExportRoute: ExportRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   GuidelinesRoute: GuidelinesRoute,
