@@ -57,6 +57,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { formatDate, formatPHP } from "@/lib/format";
 import { PassportShareSection } from "@/components/passport-share-section";
+import { PassportVerificationSection } from "@/components/passport-verification-section";
 import { SingleFileUploader } from "@/components/single-file-uploader";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/hooks/use-auth";
@@ -577,6 +578,12 @@ function VehicleDetailDialog({
                 <Trash2 className="mr-1.5 h-3.5 w-3.5" /> Delete
               </Button>
             </div>
+
+            <div className="mt-2">
+              <PassportVerificationSection vehicleId={data.vehicle.id} />
+            </div>
+
+
 
             <div className="mt-2 rounded-xl border border-border bg-card p-4">
               <div className="flex items-center justify-between gap-2">

@@ -6365,6 +6365,83 @@ export type Database = {
           },
         ]
       }
+      vehicle_passport_verifications: {
+        Row: {
+          accident_disclosure: boolean
+          chassis_number: string | null
+          cr_number: string | null
+          created_at: string
+          decided_at: string | null
+          document_urls: string[]
+          engine_number: string | null
+          flood_disclosure: boolean
+          id: string
+          inspection_date: string | null
+          inspection_notes: string | null
+          inspection_provider: string | null
+          or_number: string | null
+          plate_number: string | null
+          review_notes: string | null
+          reviewer_id: string | null
+          status: Database["public"]["Enums"]["passport_verification_status"]
+          submitted_by: string
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          accident_disclosure?: boolean
+          chassis_number?: string | null
+          cr_number?: string | null
+          created_at?: string
+          decided_at?: string | null
+          document_urls?: string[]
+          engine_number?: string | null
+          flood_disclosure?: boolean
+          id?: string
+          inspection_date?: string | null
+          inspection_notes?: string | null
+          inspection_provider?: string | null
+          or_number?: string | null
+          plate_number?: string | null
+          review_notes?: string | null
+          reviewer_id?: string | null
+          status?: Database["public"]["Enums"]["passport_verification_status"]
+          submitted_by: string
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          accident_disclosure?: boolean
+          chassis_number?: string | null
+          cr_number?: string | null
+          created_at?: string
+          decided_at?: string | null
+          document_urls?: string[]
+          engine_number?: string | null
+          flood_disclosure?: boolean
+          id?: string
+          inspection_date?: string | null
+          inspection_notes?: string | null
+          inspection_provider?: string | null
+          or_number?: string | null
+          plate_number?: string | null
+          review_notes?: string | null
+          reviewer_id?: string | null
+          status?: Database["public"]["Enums"]["passport_verification_status"]
+          submitted_by?: string
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_passport_verifications_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: true
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicle_photos: {
         Row: {
           caption: string | null
@@ -6941,6 +7018,19 @@ export type Database = {
           title: string
         }[]
       }
+      get_public_passport_verification: {
+        Args: { _slug: string }
+        Returns: {
+          accident_disclosure: boolean
+          chassis_last4: string
+          decided_at: string
+          flood_disclosure: boolean
+          inspection_date: string
+          inspection_provider: string
+          plate_masked: string
+          status: Database["public"]["Enums"]["passport_verification_status"]
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -7145,6 +7235,11 @@ export type Database = {
       media_type: "photo" | "video"
       org_role: "owner" | "admin" | "member"
       partner_tier: "featured" | "standard"
+      passport_verification_status:
+        | "pending"
+        | "more_info"
+        | "approved"
+        | "rejected"
       payment_kind: "listing" | "upgrade" | "boost" | "subscription" | "course"
       payment_status: "pending" | "paid" | "failed" | "refunded"
       referral_kind: "promo" | "deal" | "rate" | "incentive" | "other"
@@ -7436,6 +7531,12 @@ export const Constants = {
       media_type: ["photo", "video"],
       org_role: ["owner", "admin", "member"],
       partner_tier: ["featured", "standard"],
+      passport_verification_status: [
+        "pending",
+        "more_info",
+        "approved",
+        "rejected",
+      ],
       payment_kind: ["listing", "upgrade", "boost", "subscription", "course"],
       payment_status: ["pending", "paid", "failed", "refunded"],
       referral_kind: ["promo", "deal", "rate", "incentive", "other"],
