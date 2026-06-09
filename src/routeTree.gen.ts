@@ -69,6 +69,7 @@ import { Route as PassportSlugRouteImport } from './routes/passport.$slug'
 import { Route as PassportPremiumCheckoutRouteImport } from './routes/passport-premium.checkout'
 import { Route as ListingCheckoutRouteImport } from './routes/listing.checkout'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
+import { Route as LearnMechanicsRouteImport } from './routes/learn.mechanics'
 import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
 import { Route as InvitesTokenRouteImport } from './routes/invites.$token'
 import { Route as GoProductIdRouteImport } from './routes/go.$productId'
@@ -467,6 +468,11 @@ const ListingCheckoutRoute = ListingCheckoutRouteImport.update({
 const ListingIdRoute = ListingIdRouteImport.update({
   id: '/listing/$id',
   path: '/listing/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnMechanicsRoute = LearnMechanicsRouteImport.update({
+  id: '/learn/mechanics',
+  path: '/learn/mechanics',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LearnSlugRoute = LearnSlugRouteImport.update({
@@ -1077,6 +1083,7 @@ export interface FileRoutesByFullPath {
   '/go/$productId': typeof GoProductIdRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
@@ -1235,6 +1242,7 @@ export interface FileRoutesByTo {
   '/go/$productId': typeof GoProductIdRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
@@ -1397,6 +1405,7 @@ export interface FileRoutesById {
   '/go/$productId': typeof GoProductIdRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
@@ -1560,6 +1569,7 @@ export interface FileRouteTypes {
     | '/go/$productId'
     | '/invites/$token'
     | '/learn/$slug'
+    | '/learn/mechanics'
     | '/listing/$id'
     | '/listing/checkout'
     | '/passport-premium/checkout'
@@ -1718,6 +1728,7 @@ export interface FileRouteTypes {
     | '/go/$productId'
     | '/invites/$token'
     | '/learn/$slug'
+    | '/learn/mechanics'
     | '/listing/$id'
     | '/listing/checkout'
     | '/passport-premium/checkout'
@@ -1879,6 +1890,7 @@ export interface FileRouteTypes {
     | '/go/$productId'
     | '/invites/$token'
     | '/learn/$slug'
+    | '/learn/mechanics'
     | '/listing/$id'
     | '/listing/checkout'
     | '/passport-premium/checkout'
@@ -1990,6 +2002,7 @@ export interface RootRouteChildren {
   GoProductIdRoute: typeof GoProductIdRoute
   InvitesTokenRoute: typeof InvitesTokenRoute
   LearnSlugRoute: typeof LearnSlugRoute
+  LearnMechanicsRoute: typeof LearnMechanicsRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   ListingCheckoutRoute: typeof ListingCheckoutRoute
   PassportPremiumCheckoutRoute: typeof PassportPremiumCheckoutRoute
@@ -2455,6 +2468,13 @@ declare module '@tanstack/react-router' {
       path: '/listing/$id'
       fullPath: '/listing/$id'
       preLoaderRoute: typeof ListingIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn/mechanics': {
+      id: '/learn/mechanics'
+      path: '/learn/mechanics'
+      fullPath: '/learn/mechanics'
+      preLoaderRoute: typeof LearnMechanicsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/learn/$slug': {
@@ -3421,6 +3441,7 @@ const rootRouteChildren: RootRouteChildren = {
   GoProductIdRoute: GoProductIdRoute,
   InvitesTokenRoute: InvitesTokenRoute,
   LearnSlugRoute: LearnSlugRoute,
+  LearnMechanicsRoute: LearnMechanicsRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   ListingCheckoutRoute: ListingCheckoutRoute,
   PassportPremiumCheckoutRoute: PassportPremiumCheckoutRoute,
@@ -3468,13 +3489,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

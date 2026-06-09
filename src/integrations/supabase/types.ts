@@ -2405,6 +2405,8 @@ export type Database = {
           price_php: number | null
           published_at: string | null
           slug: string
+          sponsor_partner_id: string | null
+          sponsored_until: string | null
           status: Database["public"]["Enums"]["course_status"]
           summary: string | null
           title: string
@@ -2425,6 +2427,8 @@ export type Database = {
           price_php?: number | null
           published_at?: string | null
           slug: string
+          sponsor_partner_id?: string | null
+          sponsored_until?: string | null
           status?: Database["public"]["Enums"]["course_status"]
           summary?: string | null
           title: string
@@ -2445,12 +2449,22 @@ export type Database = {
           price_php?: number | null
           published_at?: string | null
           slug?: string
+          sponsor_partner_id?: string | null
+          sponsored_until?: string | null
           status?: Database["public"]["Enums"]["course_status"]
           summary?: string | null
           title?: string
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "courses_sponsor_partner_id_fkey"
+            columns: ["sponsor_partner_id"]
+            isOneToOne: false
+            referencedRelation: "training_partners"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       currencies: {
         Row: {

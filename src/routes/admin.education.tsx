@@ -39,6 +39,7 @@ import {
   adminListPartners,
   adminUpsertPartner,
   adminDeletePartner,
+  adminSetCourseSponsor,
 } from "@/lib/education.functions";
 
 export const Route = createFileRoute("/admin/education")({
@@ -99,6 +100,7 @@ function CoursesTab() {
                 <th className="px-3 py-2">Category</th>
                 <th className="px-3 py-2">Price</th>
                 <th className="px-3 py-2">Status</th>
+                <th className="px-3 py-2">Sponsor</th>
                 <th className="px-3 py-2"></th>
               </tr>
             </thead>
@@ -113,6 +115,9 @@ function CoursesTab() {
                     <Badge variant={c.status === "published" ? "default" : "outline"}>
                       {c.status}
                     </Badge>
+                  </td>
+                  <td className="px-3 py-2">
+                    <SponsorCell course={c} onChanged={() => qc.invalidateQueries({ queryKey: ["admin-courses"] })} />
                   </td>
                   <td className="px-3 py-2 text-right">
                     <Button size="sm" variant="ghost" asChild>
@@ -140,7 +145,7 @@ function CoursesTab() {
               ))}
               {(data?.courses ?? []).length === 0 && (
                 <tr>
-                  <td className="px-3 py-6 text-center text-muted-foreground" colSpan={6}>
+                  <td className="px-3 py-6 text-center text-muted-foreground" colSpan={7}>
                     No courses yet.
                   </td>
                 </tr>
@@ -167,6 +172,77 @@ function CoursesTab() {
           }}
         />
       )}
+    </>
+  );
+}
+
+function SponsorCell({ course, onChanged }: { course: any; onChanged: () => void }) {
+  const [open, setOpen] = useState(false);
+  const { data: partnersData } = useQuery({
+    queryKey: ["admin-partners"],
+    queryFn: () => adminListPartners(),
+    enabled: open,
+  });
+  const setSponsor = useServerFn(adminSetCourseSponsor);
+  const [partnerId, setPartnerId] = useState<string>(course.sponsor_partner_id ?? "");
+  const [until, setUntil] = useState<string>(
+    course.sponsored_until ? new Date(course.sponsored_until).toISOString().slice(0, 10) : "",
+  );
+  const active =
+    course.sponsor_partner_id &&
+    (!course.sponsored_until || new Date(course.sponsored_until) > new Date());
+  return (
+    <>
+      <Button size="sm" variant={active ? "default" : "outline"} onClick={() => setOpen(true)}>
+        {active ? "Sponsored" : "Set sponsor"}
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Sponsor "{course.title}"</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Training partner</Label>
+              <Select value={partnerId || "none"} onValueChange={(v) => setPartnerId(v === "none" ? "" : v)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a partner" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">— No sponsor —</SelectItem>
+                  {(partnersData?.partners ?? []).map((p: any) => (
+                    <SelectItem key={p.id} value={p.id}>
+                      {p.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Sponsored until</Label>
+              <Input type="date" value={until} onChange={(e) => setUntil(e.target.value)} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
+            <Button
+              onClick={async () => {
+                await setSponsor({
+                  data: {
+                    courseId: course.id,
+                    sponsorPartnerId: partnerId || null,
+                    sponsoredUntil: until ? new Date(until).toISOString() : null,
+                  },
+                });
+                setOpen(false);
+                onChanged();
+              }}
+            >
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

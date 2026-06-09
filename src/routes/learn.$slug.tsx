@@ -78,6 +78,35 @@ function CourseDetail() {
   return (
     <SiteLayout>
       <div className="container mx-auto px-4 py-8">
+        {(data as any)?.sponsor && (
+          <a
+            href={(data as any).sponsor.website_url}
+            target="_blank"
+            rel="nofollow sponsored noreferrer"
+            className="mb-4 flex items-center gap-3 rounded-lg border-2 border-primary/30 bg-primary/5 p-3 text-sm transition-colors hover:bg-primary/10"
+          >
+            {(data as any).sponsor.logo_url && (
+              <img
+                src={(data as any).sponsor.logo_url}
+                alt={(data as any).sponsor.name}
+                loading="lazy"
+                className="h-10 w-10 rounded border bg-background object-contain"
+              />
+            )}
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] font-semibold uppercase tracking-wider text-primary">
+                Sponsored by
+              </div>
+              <div className="truncate font-semibold">{(data as any).sponsor.name}</div>
+              {(data as any).sponsor.location && (
+                <div className="truncate text-xs text-muted-foreground">
+                  {(data as any).sponsor.location}
+                </div>
+              )}
+            </div>
+            <span className="shrink-0 text-xs text-muted-foreground">Visit →</span>
+          </a>
+        )}
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <Link to="/learn" className="text-sm text-muted-foreground hover:underline">

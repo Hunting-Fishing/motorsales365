@@ -61,6 +61,9 @@ function LearnIndex() {
             <Button asChild variant="outline" size="sm">
               <Link to="/pricing">View subscriptions</Link>
             </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/learn/mechanics">Hire a trained mechanic</Link>
+            </Button>
             <Button asChild variant="ghost" size="sm">
               <Link to="/partner-training">Sponsored training schools</Link>
             </Button>
