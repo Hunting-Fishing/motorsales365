@@ -140,9 +140,7 @@ export function SellerReputationBadges({
   );
 }
 
-// Re-export stubs for future expansion
+// Stubs for badges not yet computed.
 export const FUTURE_BADGES = {
-  responds_fast: { label: "Responds Fast", icon: Clock, requires: "avg reply < 1h" },
-  documents_checked: { label: "Documents Checked", icon: FileCheck2, requires: "OR/CR verified" },
   inspection_completed: { label: "Inspection Completed", icon: Award, requires: "365 inspection partner" },
 };
