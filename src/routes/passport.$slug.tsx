@@ -167,9 +167,71 @@ function PassportPage() {
               <div>
                 <p className="text-sm font-medium">Scan to verify online</p>
                 <p className="text-xs text-muted-foreground">{fullUrl}</p>
+          </div>
+        </div>
+
+        {/* Disclosures & ownership */}
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <div className="rounded-xl border border-border bg-card p-5">
+            <h3 className="flex items-center gap-2 font-display text-base font-semibold">
+              <Users className="h-4 w-4" /> Ownership
+            </h3>
+            <p className="mt-2 text-sm">
+              {ownerCount === 1 ? "1st owner (original)" : `Owner #${ownerCount}`}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Reported by current owner. Names are not shown publicly.
+            </p>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-5">
+            <h3 className="flex items-center gap-2 font-display text-base font-semibold">
+              <AlertTriangle className="h-4 w-4" /> Disclosures
+            </h3>
+            <div className="mt-2 space-y-1.5 text-sm">
+              <div className="flex items-center gap-2">
+                <Droplet className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-muted-foreground">Flood:</span>
+                <DisclosureBadge level={disclosures.flood} />
+              </div>
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-3.5 w-3.5 text-muted-foreground" />
+                <span className="text-muted-foreground">Accident:</span>
+                <DisclosureBadge level={disclosures.accident} />
               </div>
             </div>
+            {disclosures.notes && (
+              <p className="mt-2 text-xs text-muted-foreground">{disclosures.notes}</p>
+            )}
           </div>
+        </div>
+
+        {/* Modifications */}
+        {v.modifications && (
+          <div className="mt-6 rounded-xl border border-border bg-card p-5">
+            <h3 className="flex items-center gap-2 font-display text-base font-semibold">
+              <Settings2 className="h-4 w-4" /> Modifications & upgrades
+            </h3>
+            <p className="mt-2 whitespace-pre-wrap text-sm">{v.modifications}</p>
+          </div>
+        )}
+
+        {/* Photo gallery */}
+        {photos.length > 0 && (
+          <div className="mt-6 rounded-xl border border-border bg-card p-5">
+            <h3 className="font-display text-base font-semibold">Photos</h3>
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3">
+              {photos.map((p: any) => (
+                <figure key={p.id} className="overflow-hidden rounded-md border border-border bg-muted">
+                  <img src={p.url} alt={p.caption || name} loading="lazy" className="aspect-square w-full object-cover" />
+                  {p.caption && (
+                    <figcaption className="px-2 py-1 text-[11px] text-muted-foreground">{p.caption}</figcaption>
+                  )}
+                </figure>
+              ))}
+            </div>
+          </div>
+        )}
+
         </div>
 
         <div className="mt-6 rounded-xl border border-border bg-card p-5 print:border-0 print:bg-white print:p-0">
