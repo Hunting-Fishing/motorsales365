@@ -1,3 +1,11 @@
+/**
+ * SYNC GROUP: vehicle-passport
+ * Source of truth: .lovable/sync-groups.md#vehicle-passport
+ * Siblings: src/routes/passport.$slug.tsx, src/lib/vehicles.functions.ts,
+ *           src/components/passport-share-section.tsx
+ * On change: bump VERSION + update sync-groups.md
+ * VERSION: 2
+ */
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { confirm } from "@/components/ui/confirm-dialog";
 import { useEffect, useState } from "react";
