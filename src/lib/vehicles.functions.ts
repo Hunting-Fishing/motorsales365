@@ -1,3 +1,11 @@
+/**
+ * SYNC GROUP: vehicle-passport
+ * Source of truth: .lovable/sync-groups.md#vehicle-passport
+ * Siblings: src/routes/passport.$slug.tsx, src/routes/dashboard.vehicles.tsx,
+ *           src/components/passport-share-section.tsx
+ * On change: bump VERSION + update sync-groups.md
+ * VERSION: 2
+ */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -18,6 +26,17 @@ const SERVICE_TYPES = [
   "other",
 ] as const;
 
+const DISCLOSURE_LEVEL = z.enum(["none", "minor", "major"]).optional().nullable();
+const disclosuresSchema = z
+  .object({
+    flood: DISCLOSURE_LEVEL,
+    accident: DISCLOSURE_LEVEL,
+    notes: z.string().trim().max(1000).optional().nullable(),
+  })
+  .partial()
+  .optional()
+  .nullable();
+
 const vehicleInput = z.object({
   make: z.string().trim().min(1).max(60),
   model: z.string().trim().min(1).max(80),
@@ -28,6 +47,9 @@ const vehicleInput = z.object({
   nickname: z.string().trim().max(60).optional().nullable(),
   coverUrl: z.string().url().max(2000).optional().nullable(),
   isPublic: z.boolean().optional(),
+  ownershipCount: z.number().int().min(1).max(20).optional().nullable(),
+  disclosures: disclosuresSchema,
+  modifications: z.string().trim().max(2000).optional().nullable(),
 });
 
 export const listMyVehicles = createServerFn({ method: "GET" })
