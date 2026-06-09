@@ -35,6 +35,9 @@ import { Badge } from "@/components/ui/badge";
 import { VerifiedBadge } from "@/components/verified-badge";
 import { DealerSubscriptionBadge } from "@/components/dealer-subscription-badge";
 import { getActiveDealerStatus } from "@/lib/seller-status.functions";
+import { SellerReputationBadges } from "@/components/seller-reputation-badges";
+import { getSellerReputationStats } from "@/lib/reputation.functions";
+import { useQuery } from "@tanstack/react-query";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
