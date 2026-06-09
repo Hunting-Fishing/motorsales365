@@ -82,6 +82,7 @@ import { Route as DashboardVerificationRouteImport } from './routes/dashboard.ve
 import { Route as DashboardVehiclesRouteImport } from './routes/dashboard.vehicles'
 import { Route as DashboardTowRouteImport } from './routes/dashboard.tow'
 import { Route as DashboardTeamRouteImport } from './routes/dashboard.team'
+import { Route as DashboardStaffRouteImport } from './routes/dashboard.staff'
 import { Route as DashboardSponsorshipsRouteImport } from './routes/dashboard.sponsorships'
 import { Route as DashboardShopFavoritesRouteImport } from './routes/dashboard.shop-favorites'
 import { Route as DashboardShareKitRouteImport } from './routes/dashboard.share-kit'
@@ -166,6 +167,9 @@ import { Route as DashboardTeamLeadsIdRouteImport } from './routes/dashboard.tea
 import { Route as DashboardRidesIdEditRouteImport } from './routes/dashboard.rides_.$id.edit'
 import { Route as DashboardBusinessesIdEditRouteImport } from './routes/dashboard.businesses_.$id.edit'
 import { Route as DashboardBusinessesIdAnalyticsRouteImport } from './routes/dashboard.businesses_.$id.analytics'
+import { Route as ApiSellerStaffResetPasswordRouteImport } from './routes/api/seller/staff/reset-password'
+import { Route as ApiSellerStaffDeactivateRouteImport } from './routes/api/seller/staff/deactivate'
+import { Route as ApiSellerStaffCreateRouteImport } from './routes/api/seller/staff/create'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksRefreshLazadaRouteImport } from './routes/api/public/hooks/refresh-lazada'
 import { Route as ApiPublicHooksOpsAlertsDigestRouteImport } from './routes/api/public/hooks/ops-alerts-digest'
@@ -536,6 +540,11 @@ const DashboardTowRoute = DashboardTowRouteImport.update({
 const DashboardTeamRoute = DashboardTeamRouteImport.update({
   id: '/team',
   path: '/team',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardStaffRoute = DashboardStaffRouteImport.update({
+  id: '/staff',
+  path: '/staff',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardSponsorshipsRoute = DashboardSponsorshipsRouteImport.update({
@@ -965,6 +974,23 @@ const DashboardBusinessesIdAnalyticsRoute =
     path: '/businesses/$id/analytics',
     getParentRoute: () => DashboardRoute,
   } as any)
+const ApiSellerStaffResetPasswordRoute =
+  ApiSellerStaffResetPasswordRouteImport.update({
+    id: '/api/seller/staff/reset-password',
+    path: '/api/seller/staff/reset-password',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiSellerStaffDeactivateRoute =
+  ApiSellerStaffDeactivateRouteImport.update({
+    id: '/api/seller/staff/deactivate',
+    path: '/api/seller/staff/deactivate',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiSellerStaffCreateRoute = ApiSellerStaffCreateRouteImport.update({
+  id: '/api/seller/staff/create',
+  path: '/api/seller/staff/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicPaymentsWebhookRoute =
   ApiPublicPaymentsWebhookRouteImport.update({
     id: '/api/public/payments/webhook',
@@ -1092,6 +1118,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/share-kit': typeof DashboardShareKitRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
   '/dashboard/sponsorships': typeof DashboardSponsorshipsRoute
+  '/dashboard/staff': typeof DashboardStaffRoute
   '/dashboard/team': typeof DashboardTeamRouteWithChildren
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/vehicles': typeof DashboardVehiclesRoute
@@ -1154,6 +1181,9 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
+  '/api/seller/staff/deactivate': typeof ApiSellerStaffDeactivateRoute
+  '/api/seller/staff/reset-password': typeof ApiSellerStaffResetPasswordRoute
   '/dashboard/businesses/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
   '/dashboard/businesses/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
@@ -1255,6 +1285,7 @@ export interface FileRoutesByTo {
   '/dashboard/share-kit': typeof DashboardShareKitRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
   '/dashboard/sponsorships': typeof DashboardSponsorshipsRoute
+  '/dashboard/staff': typeof DashboardStaffRoute
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/vehicles': typeof DashboardVehiclesRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
@@ -1316,6 +1347,9 @@ export interface FileRoutesByTo {
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
+  '/api/seller/staff/deactivate': typeof ApiSellerStaffDeactivateRoute
+  '/api/seller/staff/reset-password': typeof ApiSellerStaffResetPasswordRoute
   '/dashboard/businesses/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
   '/dashboard/businesses/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
@@ -1420,6 +1454,7 @@ export interface FileRoutesById {
   '/dashboard/share-kit': typeof DashboardShareKitRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
   '/dashboard/sponsorships': typeof DashboardSponsorshipsRoute
+  '/dashboard/staff': typeof DashboardStaffRoute
   '/dashboard/team': typeof DashboardTeamRouteWithChildren
   '/dashboard/tow': typeof DashboardTowRoute
   '/dashboard/vehicles': typeof DashboardVehiclesRoute
@@ -1482,6 +1517,9 @@ export interface FileRoutesById {
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
+  '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
+  '/api/seller/staff/deactivate': typeof ApiSellerStaffDeactivateRoute
+  '/api/seller/staff/reset-password': typeof ApiSellerStaffResetPasswordRoute
   '/dashboard/businesses_/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
   '/dashboard/businesses_/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides_/$id/edit': typeof DashboardRidesIdEditRoute
@@ -1587,6 +1625,7 @@ export interface FileRouteTypes {
     | '/dashboard/share-kit'
     | '/dashboard/shop-favorites'
     | '/dashboard/sponsorships'
+    | '/dashboard/staff'
     | '/dashboard/team'
     | '/dashboard/tow'
     | '/dashboard/vehicles'
@@ -1649,6 +1688,9 @@ export interface FileRouteTypes {
     | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
+    | '/api/seller/staff/create'
+    | '/api/seller/staff/deactivate'
+    | '/api/seller/staff/reset-password'
     | '/dashboard/businesses/$id/analytics'
     | '/dashboard/businesses/$id/edit'
     | '/dashboard/rides/$id/edit'
@@ -1750,6 +1792,7 @@ export interface FileRouteTypes {
     | '/dashboard/share-kit'
     | '/dashboard/shop-favorites'
     | '/dashboard/sponsorships'
+    | '/dashboard/staff'
     | '/dashboard/tow'
     | '/dashboard/vehicles'
     | '/dashboard/verification'
@@ -1811,6 +1854,9 @@ export interface FileRouteTypes {
     | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
+    | '/api/seller/staff/create'
+    | '/api/seller/staff/deactivate'
+    | '/api/seller/staff/reset-password'
     | '/dashboard/businesses/$id/analytics'
     | '/dashboard/businesses/$id/edit'
     | '/dashboard/rides/$id/edit'
@@ -1914,6 +1960,7 @@ export interface FileRouteTypes {
     | '/dashboard/share-kit'
     | '/dashboard/shop-favorites'
     | '/dashboard/sponsorships'
+    | '/dashboard/staff'
     | '/dashboard/team'
     | '/dashboard/tow'
     | '/dashboard/vehicles'
@@ -1976,6 +2023,9 @@ export interface FileRouteTypes {
     | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
+    | '/api/seller/staff/create'
+    | '/api/seller/staff/deactivate'
+    | '/api/seller/staff/reset-password'
     | '/dashboard/businesses_/$id/analytics'
     | '/dashboard/businesses_/$id/edit'
     | '/dashboard/rides_/$id/edit'
@@ -2077,6 +2127,9 @@ export interface RootRouteChildren {
   ApiPublicHooksOpsAlertsDigestRoute: typeof ApiPublicHooksOpsAlertsDigestRoute
   ApiPublicHooksRefreshLazadaRoute: typeof ApiPublicHooksRefreshLazadaRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
+  ApiSellerStaffCreateRoute: typeof ApiSellerStaffCreateRoute
+  ApiSellerStaffDeactivateRoute: typeof ApiSellerStaffDeactivateRoute
+  ApiSellerStaffResetPasswordRoute: typeof ApiSellerStaffResetPasswordRoute
   LearnSlugWatchLessonIdRoute: typeof LearnSlugWatchLessonIdRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -2597,6 +2650,13 @@ declare module '@tanstack/react-router' {
       path: '/team'
       fullPath: '/dashboard/team'
       preLoaderRoute: typeof DashboardTeamRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/staff': {
+      id: '/dashboard/staff'
+      path: '/staff'
+      fullPath: '/dashboard/staff'
+      preLoaderRoute: typeof DashboardStaffRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/sponsorships': {
@@ -3187,6 +3247,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardBusinessesIdAnalyticsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/api/seller/staff/reset-password': {
+      id: '/api/seller/staff/reset-password'
+      path: '/api/seller/staff/reset-password'
+      fullPath: '/api/seller/staff/reset-password'
+      preLoaderRoute: typeof ApiSellerStaffResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/seller/staff/deactivate': {
+      id: '/api/seller/staff/deactivate'
+      path: '/api/seller/staff/deactivate'
+      fullPath: '/api/seller/staff/deactivate'
+      preLoaderRoute: typeof ApiSellerStaffDeactivateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/seller/staff/create': {
+      id: '/api/seller/staff/create'
+      path: '/api/seller/staff/create'
+      fullPath: '/api/seller/staff/create'
+      preLoaderRoute: typeof ApiSellerStaffCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/payments/webhook': {
       id: '/api/public/payments/webhook'
       path: '/api/public/payments/webhook'
@@ -3342,6 +3423,7 @@ interface DashboardRouteChildren {
   DashboardShareKitRoute: typeof DashboardShareKitRoute
   DashboardShopFavoritesRoute: typeof DashboardShopFavoritesRoute
   DashboardSponsorshipsRoute: typeof DashboardSponsorshipsRoute
+  DashboardStaffRoute: typeof DashboardStaffRoute
   DashboardTeamRoute: typeof DashboardTeamRouteWithChildren
   DashboardTowRoute: typeof DashboardTowRoute
   DashboardVehiclesRoute: typeof DashboardVehiclesRoute
@@ -3370,6 +3452,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardShareKitRoute: DashboardShareKitRoute,
   DashboardShopFavoritesRoute: DashboardShopFavoritesRoute,
   DashboardSponsorshipsRoute: DashboardSponsorshipsRoute,
+  DashboardStaffRoute: DashboardStaffRoute,
   DashboardTeamRoute: DashboardTeamRouteWithChildren,
   DashboardTowRoute: DashboardTowRoute,
   DashboardVehiclesRoute: DashboardVehiclesRoute,
@@ -3541,6 +3624,9 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksOpsAlertsDigestRoute: ApiPublicHooksOpsAlertsDigestRoute,
   ApiPublicHooksRefreshLazadaRoute: ApiPublicHooksRefreshLazadaRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
+  ApiSellerStaffCreateRoute: ApiSellerStaffCreateRoute,
+  ApiSellerStaffDeactivateRoute: ApiSellerStaffDeactivateRoute,
+  ApiSellerStaffResetPasswordRoute: ApiSellerStaffResetPasswordRoute,
   LearnSlugWatchLessonIdRoute: LearnSlugWatchLessonIdRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,

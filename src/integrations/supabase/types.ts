@@ -4345,7 +4345,10 @@ export type Database = {
           full_name: string | null
           id: string
           is_founding_member: boolean
+          is_staff_account: boolean
           last_name: string | null
+          login_username: string | null
+          parent_org_id: string | null
           phone: string | null
           phone_e164: string | null
           phone_verified_at: string | null
@@ -4392,7 +4395,10 @@ export type Database = {
           full_name?: string | null
           id: string
           is_founding_member?: boolean
+          is_staff_account?: boolean
           last_name?: string | null
+          login_username?: string | null
+          parent_org_id?: string | null
           phone?: string | null
           phone_e164?: string | null
           phone_verified_at?: string | null
@@ -4439,7 +4445,10 @@ export type Database = {
           full_name?: string | null
           id?: string
           is_founding_member?: boolean
+          is_staff_account?: boolean
           last_name?: string | null
+          login_username?: string | null
+          parent_org_id?: string | null
           phone?: string | null
           phone_e164?: string | null
           phone_verified_at?: string | null
@@ -4458,7 +4467,15 @@ export type Database = {
           verified_at?: string | null
           welcome_email_sent_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_parent_org_id_fkey"
+            columns: ["parent_org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       promotions: {
         Row: {
@@ -6127,6 +6144,7 @@ export type Database = {
           id: string
           listings_per_month: number | null
           max_photos_per_listing: number
+          max_seats: number | null
           name: string
           price_php: number
           sort_order: number
@@ -6139,6 +6157,7 @@ export type Database = {
           id?: string
           listings_per_month?: number | null
           max_photos_per_listing?: number
+          max_seats?: number | null
           name: string
           price_php: number
           sort_order?: number
@@ -6151,6 +6170,7 @@ export type Database = {
           id?: string
           listings_per_month?: number | null
           max_photos_per_listing?: number
+          max_seats?: number | null
           name?: string
           price_php?: number
           sort_order?: number
@@ -7364,7 +7384,9 @@ export type Database = {
         }
         Returns: number
       }
+      org_max_seats: { Args: { _org_id: string }; Returns: number }
       org_role: { Args: { _org_id: string; _user_id: string }; Returns: string }
+      org_seat_count: { Args: { _org_id: string }; Returns: number }
       pick_referral_promo: {
         Args: { _base_amount: number; _kind: string; _user_id: string }
         Returns: {
@@ -7403,6 +7425,7 @@ export type Database = {
         }
         Returns: Json
       }
+      resolve_login_to_email: { Args: { _input: string }; Returns: string }
       rotate_internal_cron_token: {
         Args: { _job_name: string }
         Returns: boolean

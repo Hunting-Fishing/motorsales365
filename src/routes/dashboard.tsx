@@ -104,6 +104,8 @@ function DashboardLayout() {
   const nav = [
     ...NAV,
     ...(hasOrg ? [{ to: "/dashboard/team", label: "Team", Icon: Users }] : []),
+    ...(hasOrg ? [{ to: "/dashboard/staff", label: "Staff & Access", Icon: Users }] : []),
+
     ...(hasReferral
       ? [
           { to: "/dashboard/referral", label: "My referral", Icon: QrCode },
