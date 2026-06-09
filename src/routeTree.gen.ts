@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
+import { Route as VerifiedRouteImport } from './routes/verified'
 import { Route as UnsubscribeRouteImport } from './routes/unsubscribe'
 import { Route as TowRouteImport } from './routes/tow'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -171,6 +172,11 @@ import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/a
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: '/verify-email',
   path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifiedRoute = VerifiedRouteImport.update({
+  id: '/verified',
+  path: '/verified',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UnsubscribeRoute = UnsubscribeRouteImport.update({
@@ -1005,6 +1011,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/verified': typeof VerifiedRoute
   '/verify-email': typeof VerifyEmailRoute
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/ad-campaigns': typeof AdminAdCampaignsRoute
@@ -1163,6 +1170,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/verified': typeof VerifiedRoute
   '/verify-email': typeof VerifyEmailRoute
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/ad-campaigns': typeof AdminAdCampaignsRoute
@@ -1323,6 +1331,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/tow': typeof TowRoute
   '/unsubscribe': typeof UnsubscribeRoute
+  '/verified': typeof VerifiedRoute
   '/verify-email': typeof VerifyEmailRoute
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/ad-campaigns': typeof AdminAdCampaignsRoute
@@ -1485,6 +1494,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tow'
     | '/unsubscribe'
+    | '/verified'
     | '/verify-email'
     | '/admin/accounts'
     | '/admin/ad-campaigns'
@@ -1643,6 +1653,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tow'
     | '/unsubscribe'
+    | '/verified'
     | '/verify-email'
     | '/admin/accounts'
     | '/admin/ad-campaigns'
@@ -1802,6 +1813,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tow'
     | '/unsubscribe'
+    | '/verified'
     | '/verify-email'
     | '/admin/accounts'
     | '/admin/ad-campaigns'
@@ -1963,6 +1975,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   TowRoute: typeof TowRoute
   UnsubscribeRoute: typeof UnsubscribeRoute
+  VerifiedRoute: typeof VerifiedRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   ApiRobotsDottxtRoute: typeof ApiRobotsDottxtRoute
   BSlugRoute: typeof BSlugRoute
@@ -2029,6 +2042,13 @@ declare module '@tanstack/react-router' {
       path: '/verify-email'
       fullPath: '/verify-email'
       preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verified': {
+      id: '/verified'
+      path: '/verified'
+      fullPath: '/verified'
+      preLoaderRoute: typeof VerifiedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/unsubscribe': {
@@ -3386,6 +3406,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   TowRoute: TowRoute,
   UnsubscribeRoute: UnsubscribeRoute,
+  VerifiedRoute: VerifiedRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   ApiRobotsDottxtRoute: ApiRobotsDottxtRoute,
   BSlugRoute: BSlugRoute,

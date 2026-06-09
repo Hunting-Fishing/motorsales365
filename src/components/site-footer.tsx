@@ -74,6 +74,7 @@ export function SiteFooter() {
       links: [
         { to: "/about", label: "About" },
         { to: "/company", label: "Company verification" },
+        { to: "/verified", label: "365 Verified explained" },
         { to: "/contact", label: "Contact" },
         { to: "/support", label: "Help & Support" },
         { to: "/report", label: "Report a scam" },

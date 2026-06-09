@@ -1,83 +1,46 @@
-## Remaining Audit Work — Build Plan
+ns# Remaining Audit Implementation Plan
 
-Tackle the unfinished items in priority order, and add **cross-file "sync headers"** at the top of every related file so future edits stay consistent.
+Work is grouped into 3 phases. Phase 1 ships immediately (high impact, low effort). Phases 2–3 follow after review.
 
-### Cross-file consistency convention (new)
+## Phase 1 — Trust Quick-Wins (ship first)
 
-Every file that participates in a shared feature gets a top comment block:
+These are content/consistency fixes that unblock publishing credibility. No schema changes.
 
-```ts
-/**
- * SYNC GROUP: vehicle-passport
- * Sibling files (keep in sync):
- *  - src/routes/passport.$slug.tsx
- *  - src/components/passport/passport-card.tsx
- *  - src/lib/passport.functions.ts
- *  - supabase migration: 20260609_vehicle_passport.sql
- * Source of truth: .lovable/sync-groups.md#vehicle-passport
- * On change: bump VERSION below + update sync-groups.md
- * VERSION: 1
- */
-```
+1. **#3 Pricing consistency** — Audit `src/routes/index.tsx` (homepage seller blurb) and `src/routes/pricing.tsx` (and any plan tables) so photo/video limits match. Standardize on **20 photos, 1 video, 60-day listings, 5 active ads** for the free private-seller plan.
+2. **#4 Contact info** — Replace placeholder `+63 917 000 0000` in `src/routes/contact.tsx` with `+63 969 606 3830`. Add Viber/Messenger/Facebook links + business hours block.
+3. **#5 Email domain consistency** — Standardize all support emails on `@365motorsales.com` across `contact.tsx`, `terms.tsx`, `privacy.tsx`, `refund-policy.tsx`, footer.
+4. **#8 Export liability fix** — Rewrite `src/routes/export.tsx` to Option A (marketplace-only): 365 "connects buyers with independent export brokers, inspection providers, and shipping partners" and explicitly disclaims broker/escrow/shipper/legal-rep roles. Align language with `/terms`.
+5. **#15 Company Verification page** — New route `src/routes/company-verification.tsx` with: legal business name, DTI/SEC reg # (placeholder + note), business/service address, DPO email, support escalation flow, refund process link, takedown/complaint process, affiliate & advertising disclosures, law-enforcement contact. Link from footer.
+6. **#6 "365 Verified" explainer page** — New route `src/routes/verified.tsx` listing verification levels (Email, Phone, ID, Document, Premium Passport) and buyer-safety tools (Report listing, Request OR/CR check, Safe meetup guide, Scam checklist, Never-pay-before-docs warning). Link from header/footer + listing trust badges.
 
-Plus a new `.lovable/sync-groups.md` registry listing every group, its files, schema columns, and the "must-also-update" pages (Terms, Privacy, Refund). This becomes the single source of truth — a quick `rg "SYNC GROUP: <name>"` reveals every file to touch.
+Update `/terms` "Last updated" date (per memory rule).
 
-### Build order
+## Phase 2 — Content & Onboarding
 
-**1. #14 — 365 Vehicle Passport** (highest leverage)
-- New `vehicle_passports` table (slug, owner_id, vehicle_id, public bool, ownership_count, qr_token) + `passport_events` (owner change, service, mod, accident, photo) + `passport_documents`.
-- Public route `/passport/$slug` (SSR, OG tags from loader) — timeline, photos, mods, service history, ownership count (no PII), accident/flood disclosure.
-- Owner controls: `/dashboard/vehicles/$id/passport` — public/private toggle, QR download, "Transfer on sale" action that links a passport to a listing and re-assigns on sale.
-- Premium tier hook (free = basic timeline; paid = full history report PDF) — wires to existing `subscription_plans`.
-- Sync group ties: `passport`, `listings`, `user_garage_vehicles`, `/terms` §data-handling, `/privacy`.
+7. **#12 Public seller landing page** — New route `src/routes/sell.tsx` (server-rendered, no auth gate) with How it works, What you need, Plan comparison, Listing examples, Photo guide, OR/CR warning, Scam prevention, Dealer benefits. The existing authenticated post-listing flow stays under `/dashboard/...`.
+8. **#2 SSR fallback content** — Add static headline + CTA + sample cards + FAQ to `sell-vehicle`, `request-a-tow`, `businesses`, `map` route components so crawlers and slow loads see meaningful content above the dynamic data block.
+9. **#7 PH buyer document checklist** — New `BuyerDocumentChecklist` component shown on every listing detail page (`src/routes/listing.$id.tsx`) under the seller card: OR/CR present, owner match, deed of sale, valid IDs, chassis/engine/plate match, encumbrance check, HPG clearance, flood/accident disclosure, transfer-of-ownership guide link.
+10. **#13 Structured listing fields** — Extend the listing form (`src/components/listing-form.tsx` or equivalent) and `vehicles` schema with: variant, fuel_type, registered_owner_status, or_cr_status, plate_ending, flood_history, accident_history, financing_available, trade_accepted, last_registration_date, price_negotiable. Mirror motorcycle-specific fields. Migration adds nullable columns; display in listing detail.
+11. **#1 Seed inventory** — Add 8–12 clearly-flagged **"Sample listing"** vehicles + 6 sample business profiles via a seed migration, owned by a system "365 Demo" user. Each carries an `is_sample` boolean so we can hide once real inventory arrives.
+12. **#10 Shop affiliate products** — Seed 15+ affiliate items (OBD2, dash cams, helmets, jump starters, etc.) into the shop catalog with category filters.
+13. **#11 Business directory seeding** — Same approach: 10+ sample profiles across repair, towing, dealers, parts, detailing, insurance.
 
-**2. #20 — Inspection & transaction-safety upsells**
-- New `inspection_services` catalog (OR/CR review ₱199–499, ID verify ₱99–299, pre-purchase inspection ₱500–2,500, history report ₱199–999, transaction assistance flat/%).
-- New `inspection_orders` table (buyer_id, listing_id, service_id, status, provider_id, payment_id).
-- Route `/services/inspection` (public rate card) + checkout flow reusing existing `payments` table.
-- Buyer CTA "Request inspection" on `/listing/$id`.
-- Language: "transaction assistance" / "payment release partner" — never "escrow."
-- Sync group: `inspection`, `/terms` §services, `/refund-policy`, `/listing/$id`.
+## Phase 3 — Growth & Monetization
 
-**3. #7-ext — PH Vehicle-Document Workflow checklist**
-- Per-listing checklist persisted in `listings.attributes.doc_checklist`: OR/CR present, owner matches CR, deed of sale ready, valid IDs, chassis matches CR, engine matches CR, plate matches, LTO alarm clear, encumbrance/chattel mortgage check, HPG clearance (high-value), flood/accident disclosure.
-- New `DocumentChecklist` component shown on `/sell`, `/listing/$id/edit`, and a read-only badge row on `/listing/$id`.
-- "Transfer of ownership" guide page `/learn/transfer-of-ownership` linked from listing detail.
-- Sync group: `vehicle-quality` (extends existing `VehicleQualityFields`).
+14. **#9 Additional PH payment options** — Add Maya, QR Ph, bank-transfer manual upload, PayPal toggles to checkout + receipt download. (Stripe rails where supported; manual flow for bank transfer with admin verification.)
+15. **#16 Public ad rate card** — New `src/routes/advertise.tsx` with placement matrix + starter bundles (Local Shop ₱499, Dealer Visibility ₱1,499, Province Domination ₱4,999, National custom).
+16. **#17 Learn monetization** — Add course-marketplace scaffolding, sponsored slots, mechanic certification badges on business profile, "Hire trained mechanic" filter, per-course affiliate product strip.
+17. **#19 Wanted (buyer requests)** — New `wanted_posts` table + `/wanted` route + post form. Sellers/shops can respond via existing messages system.
+18. **#20 Inspection / transaction-assistance upsells** — Paid service products (pre-purchase inspection, document verification, transaction-assistance partner). Use the existing boost/passport-premium Stripe pattern. Avoid the word "escrow".
 
-**4. #9-ext — Payments: expand for PH market**
-- Add Maya, QR Ph, GCash send-to-number, manual payment upload (private bucket `payment-proofs`), PayPal (international export only).
-- `payment_methods` enum extension + UI on `/checkout` and `/dashboard/billing`.
-- Receipt/invoice PDF download from `/payments/$id/receipt` (already exists — add downloadable PDF).
-- "Pay with GCash" mini-guide page.
-- Sync group: `payments`, `/terms` §payments, `/refund-policy`, `/pricing`.
+## Technical Notes
 
-**5. #11 — Business Directory profile depth**
-- Extend `businesses` UI (no schema change): ensure each profile shows Claim button, Verified/Unclaimed badge, hours, services, photos, reviews tab, sponsored upgrade CTA.
-- Add "Claim this business" inline CTA on every unclaimed `/businesses/$slug`.
-- Sync group: `business-directory`.
+- Phases 1–2 items 7–9 require **no schema changes**; can ship in one batch.
+- Items 10, 11, 13, 17 need migrations — each in its own migration file with GRANTs + RLS per project rules.
+- Stripe additions (item 18) reuse `passport-premium` checkout pattern + webhook.
+- Every change touching fees/services/data triggers Terms/Privacy/Refund sync (per memory `mem://policies/terms-sync`).
+- All new routes need `head()` metadata (title, description, og:*) — no shared metadata.
 
-**6. #17 — Learn commercial purpose**
-- Wire existing `courses` + `training_partners` tables to: paid-course marketplace tiles on `/learn`, sponsored training schools row, mechanic certification badge on `business_profiles`, "Hire trained mechanic" directory filter, tool-affiliate row beneath each course (pulls from `shop_products` by category tag).
-- Sync group: `learn`, `/businesses`, `/shop`.
+## Execution Order
 
-**7. Monetization track wiring** (mostly UI surfacing; backend already exists)
-- Boosted listings: surface `/dashboard/boosts` CTA on owner's listing card.
-- Dealer subscriptions: link `/pricing` Dealer tiers from `/start-selling` and `/dashboard`.
-- Business directory paid profiles: "Upgrade to Featured" CTA on owner's `/dashboard/businesses`.
-- Sponsored ad placements: ensure `/advertise` inquiry form reaches `ad_inquiries` (already does — verify).
-- Inspection referrals + Vehicle Passport premium fold into items #20 and #14.
-
-### Audit log
-Each completed step appends a dated line to `.lovable/june7-audit.md` and updates `.lovable/sync-groups.md`.
-
-### Order of execution (one batch per turn for review)
-1. Sync-groups registry + Vehicle Passport (#14)
-2. Inspection services (#20)
-3. PH document checklist (#7-ext)
-4. PH payments expansion (#9-ext)
-5. Business directory depth (#11)
-6. Learn commercialization (#17)
-7. Monetization surfacing pass
-
-Approve to start with **step 1 (sync registry + Vehicle Passport)**.
+Start with **Phase 1 (#3, #4, #5, #8, #15, #6)** in one batch since it's all frontend content + 2 new static routes. Pause for review, then proceed to Phase 2.
