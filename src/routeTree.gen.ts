@@ -153,6 +153,7 @@ import { Route as DashboardTeamPerformanceRouteImport } from './routes/dashboard
 import { Route as DashboardTeamMembersRouteImport } from './routes/dashboard.team.members'
 import { Route as DashboardTeamLeadsRouteImport } from './routes/dashboard.team.leads'
 import { Route as DashboardRidesNewRouteImport } from './routes/dashboard.rides_.new'
+import { Route as DashboardDispatchHistoryRouteImport } from './routes/dashboard.dispatch.history'
 import { Route as BusinessesSlugBookRouteImport } from './routes/businesses.$slug.book'
 import { Route as ApiPublicReverseGeocodeRouteImport } from './routes/api/public/reverse-geocode'
 import { Route as ApiPublicPaymentEventsRouteImport } from './routes/api/public/payment-events'
@@ -903,6 +904,12 @@ const DashboardRidesNewRoute = DashboardRidesNewRouteImport.update({
   path: '/rides/new',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardDispatchHistoryRoute =
+  DashboardDispatchHistoryRouteImport.update({
+    id: '/history',
+    path: '/history',
+    getParentRoute: () => DashboardDispatchRoute,
+  } as any)
 const BusinessesSlugBookRoute = BusinessesSlugBookRouteImport.update({
   id: '/book',
   path: '/book',
@@ -1133,7 +1140,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/boosts': typeof DashboardBoostsRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
-  '/dashboard/dispatch': typeof DashboardDispatchRoute
+  '/dashboard/dispatch': typeof DashboardDispatchRouteWithChildren
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/learning': typeof DashboardLearningRoute
   '/dashboard/likes': typeof DashboardLikesRoute
@@ -1192,6 +1199,7 @@ export interface FileRoutesByFullPath {
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/api/public/reverse-geocode': typeof ApiPublicReverseGeocodeRoute
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
+  '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
@@ -1304,7 +1312,7 @@ export interface FileRoutesByTo {
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/boosts': typeof DashboardBoostsRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
-  '/dashboard/dispatch': typeof DashboardDispatchRoute
+  '/dashboard/dispatch': typeof DashboardDispatchRouteWithChildren
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/learning': typeof DashboardLearningRoute
   '/dashboard/likes': typeof DashboardLikesRoute
@@ -1362,6 +1370,7 @@ export interface FileRoutesByTo {
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/api/public/reverse-geocode': typeof ApiPublicReverseGeocodeRoute
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
+  '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
@@ -1477,7 +1486,7 @@ export interface FileRoutesById {
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/boosts': typeof DashboardBoostsRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
-  '/dashboard/dispatch': typeof DashboardDispatchRoute
+  '/dashboard/dispatch': typeof DashboardDispatchRouteWithChildren
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/learning': typeof DashboardLearningRoute
   '/dashboard/likes': typeof DashboardLikesRoute
@@ -1536,6 +1545,7 @@ export interface FileRoutesById {
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/api/public/reverse-geocode': typeof ApiPublicReverseGeocodeRoute
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
+  '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
   '/dashboard/rides_/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
   '/dashboard/team/members': typeof DashboardTeamMembersRoute
@@ -1711,6 +1721,7 @@ export interface FileRouteTypes {
     | '/api/public/payment-events'
     | '/api/public/reverse-geocode'
     | '/businesses/$slug/book'
+    | '/dashboard/dispatch/history'
     | '/dashboard/rides/new'
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
@@ -1881,6 +1892,7 @@ export interface FileRouteTypes {
     | '/api/public/payment-events'
     | '/api/public/reverse-geocode'
     | '/businesses/$slug/book'
+    | '/dashboard/dispatch/history'
     | '/dashboard/rides/new'
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
@@ -2054,6 +2066,7 @@ export interface FileRouteTypes {
     | '/api/public/payment-events'
     | '/api/public/reverse-geocode'
     | '/businesses/$slug/book'
+    | '/dashboard/dispatch/history'
     | '/dashboard/rides_/new'
     | '/dashboard/team/leads'
     | '/dashboard/team/members'
@@ -3200,6 +3213,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRidesNewRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/dispatch/history': {
+      id: '/dashboard/dispatch/history'
+      path: '/history'
+      fullPath: '/dashboard/dispatch/history'
+      preLoaderRoute: typeof DashboardDispatchHistoryRouteImport
+      parentRoute: typeof DashboardDispatchRoute
+    }
     '/businesses/$slug/book': {
       id: '/businesses/$slug/book'
       path: '/book'
@@ -3466,6 +3486,17 @@ const AdminRouteChildren: AdminRouteChildren = {
 
 const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
+interface DashboardDispatchRouteChildren {
+  DashboardDispatchHistoryRoute: typeof DashboardDispatchHistoryRoute
+}
+
+const DashboardDispatchRouteChildren: DashboardDispatchRouteChildren = {
+  DashboardDispatchHistoryRoute: DashboardDispatchHistoryRoute,
+}
+
+const DashboardDispatchRouteWithChildren =
+  DashboardDispatchRoute._addFileChildren(DashboardDispatchRouteChildren)
+
 interface DashboardTeamRouteChildren {
   DashboardTeamLeadsRoute: typeof DashboardTeamLeadsRoute
   DashboardTeamMembersRoute: typeof DashboardTeamMembersRoute
@@ -3491,7 +3522,7 @@ interface DashboardRouteChildren {
   DashboardBillingRoute: typeof DashboardBillingRoute
   DashboardBoostsRoute: typeof DashboardBoostsRoute
   DashboardBusinessesRoute: typeof DashboardBusinessesRoute
-  DashboardDispatchRoute: typeof DashboardDispatchRoute
+  DashboardDispatchRoute: typeof DashboardDispatchRouteWithChildren
   DashboardFavoritesRoute: typeof DashboardFavoritesRoute
   DashboardLearningRoute: typeof DashboardLearningRoute
   DashboardLikesRoute: typeof DashboardLikesRoute
@@ -3521,7 +3552,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardBillingRoute: DashboardBillingRoute,
   DashboardBoostsRoute: DashboardBoostsRoute,
   DashboardBusinessesRoute: DashboardBusinessesRoute,
-  DashboardDispatchRoute: DashboardDispatchRoute,
+  DashboardDispatchRoute: DashboardDispatchRouteWithChildren,
   DashboardFavoritesRoute: DashboardFavoritesRoute,
   DashboardLearningRoute: DashboardLearningRoute,
   DashboardLikesRoute: DashboardLikesRoute,
