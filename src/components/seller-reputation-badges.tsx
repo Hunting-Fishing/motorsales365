@@ -69,6 +69,24 @@ export function computeSellerBadges(p: SellerBadgeInput): Badge[] {
       tone: "bg-violet-500/10 text-violet-700",
     });
   }
+  if ((p.documents_verified_count ?? 0) >= 1) {
+    badges.push({
+      key: "documents",
+      label: "Documents Checked",
+      icon: FileCheck2,
+      tip: "OR/CR documents reviewed and approved on at least one vehicle passport.",
+      tone: "bg-sky-500/10 text-sky-700",
+    });
+  }
+  if (p.fast_response) {
+    badges.push({
+      key: "fast",
+      label: "Responds Fast",
+      icon: Clock,
+      tip: "Replies to buyer messages quickly — typically within an hour.",
+      tone: "bg-teal-500/10 text-teal-700",
+    });
+  }
   if (p.is_founding_member) {
     badges.push({
       key: "founding",
