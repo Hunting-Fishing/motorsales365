@@ -55,6 +55,7 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean }[] = [
   { to: "/dashboard/searches", label: "Saved searches", Icon: Search },
   { to: "/dashboard/messages", label: "Messages", Icon: MessageSquare },
   { to: "/dashboard/tow", label: "Tow requests", Icon: Truck },
+  { to: "/dashboard/dispatch", label: "365 Dispatch", Icon: Truck },
   { to: "/dashboard/businesses", label: "My businesses", Icon: Store },
   { to: "/dashboard/ads", label: "Ad campaigns", Icon: Megaphone },
   { to: "/dashboard/sponsorships", label: "Sponsorships", Icon: Megaphone },

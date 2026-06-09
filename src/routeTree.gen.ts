@@ -78,6 +78,7 @@ import { Route as HelpPayWithGcashRouteImport } from './routes/help.pay-with-gca
 import { Route as GoProductIdRouteImport } from './routes/go.$productId'
 import { Route as ExportTrustRouteImport } from './routes/export.trust'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as DispatchCheckoutRouteImport } from './routes/dispatch.checkout'
 import { Route as DashboardWantedRouteImport } from './routes/dashboard.wanted'
 import { Route as DashboardVerificationRouteImport } from './routes/dashboard.verification'
 import { Route as DashboardVehiclesRouteImport } from './routes/dashboard.vehicles'
@@ -95,6 +96,7 @@ import { Route as DashboardMessagesRouteImport } from './routes/dashboard.messag
 import { Route as DashboardLikesRouteImport } from './routes/dashboard.likes'
 import { Route as DashboardLearningRouteImport } from './routes/dashboard.learning'
 import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favorites'
+import { Route as DashboardDispatchRouteImport } from './routes/dashboard.dispatch'
 import { Route as DashboardBusinessesRouteImport } from './routes/dashboard.businesses'
 import { Route as DashboardBoostsRouteImport } from './routes/dashboard.boosts'
 import { Route as DashboardBillingRouteImport } from './routes/dashboard.billing'
@@ -174,6 +176,7 @@ import { Route as ApiSellerStaffCreateRouteImport } from './routes/api/seller/st
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksRefreshLazadaRouteImport } from './routes/api/public/hooks/refresh-lazada'
 import { Route as ApiPublicHooksOpsAlertsDigestRouteImport } from './routes/api/public/hooks/ops-alerts-digest'
+import { Route as ApiPublicHooksDispatchExpandRouteImport } from './routes/api/public/hooks/dispatch-expand'
 import { Route as ApiPublicHooksDiscoverSyncRouteImport } from './routes/api/public/hooks/discover-sync'
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
 import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
@@ -523,6 +526,11 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DispatchCheckoutRoute = DispatchCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => DispatchRoute,
+} as any)
 const DashboardWantedRoute = DashboardWantedRouteImport.update({
   id: '/wanted',
   path: '/wanted',
@@ -606,6 +614,11 @@ const DashboardLearningRoute = DashboardLearningRouteImport.update({
 const DashboardFavoritesRoute = DashboardFavoritesRouteImport.update({
   id: '/favorites',
   path: '/favorites',
+  getParentRoute: () => DashboardRoute,
+} as any)
+const DashboardDispatchRoute = DashboardDispatchRouteImport.update({
+  id: '/dispatch',
+  path: '/dispatch',
   getParentRoute: () => DashboardRoute,
 } as any)
 const DashboardBusinessesRoute = DashboardBusinessesRouteImport.update({
@@ -1015,6 +1028,12 @@ const ApiPublicHooksOpsAlertsDigestRoute =
     path: '/api/public/hooks/ops-alerts-digest',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksDispatchExpandRoute =
+  ApiPublicHooksDispatchExpandRouteImport.update({
+    id: '/api/public/hooks/dispatch-expand',
+    path: '/api/public/hooks/dispatch-expand',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksDiscoverSyncRoute =
   ApiPublicHooksDiscoverSyncRouteImport.update({
     id: '/api/public/hooks/discover-sync',
@@ -1043,7 +1062,7 @@ export interface FileRoutesByFullPath {
   '/company': typeof CompanyRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
-  '/dispatch': typeof DispatchRoute
+  '/dispatch': typeof DispatchRouteWithChildren
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
@@ -1114,6 +1133,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/boosts': typeof DashboardBoostsRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
+  '/dashboard/dispatch': typeof DashboardDispatchRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/learning': typeof DashboardLearningRoute
   '/dashboard/likes': typeof DashboardLikesRoute
@@ -1131,6 +1151,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/vehicles': typeof DashboardVehiclesRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/dashboard/wanted': typeof DashboardWantedRoute
+  '/dispatch/checkout': typeof DispatchCheckoutRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/go/$productId': typeof GoProductIdRoute
@@ -1185,6 +1206,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
+  '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -1211,7 +1233,7 @@ export interface FileRoutesByTo {
   '/bundles': typeof BundlesRoute
   '/company': typeof CompanyRoute
   '/contact': typeof ContactRoute
-  '/dispatch': typeof DispatchRoute
+  '/dispatch': typeof DispatchRouteWithChildren
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
@@ -1282,6 +1304,7 @@ export interface FileRoutesByTo {
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/boosts': typeof DashboardBoostsRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
+  '/dashboard/dispatch': typeof DashboardDispatchRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/learning': typeof DashboardLearningRoute
   '/dashboard/likes': typeof DashboardLikesRoute
@@ -1298,6 +1321,7 @@ export interface FileRoutesByTo {
   '/dashboard/vehicles': typeof DashboardVehiclesRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/dashboard/wanted': typeof DashboardWantedRoute
+  '/dispatch/checkout': typeof DispatchCheckoutRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/go/$productId': typeof GoProductIdRoute
@@ -1352,6 +1376,7 @@ export interface FileRoutesByTo {
   '/dashboard/team': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
+  '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -1381,7 +1406,7 @@ export interface FileRoutesById {
   '/company': typeof CompanyRoute
   '/contact': typeof ContactRoute
   '/dashboard': typeof DashboardRouteWithChildren
-  '/dispatch': typeof DispatchRoute
+  '/dispatch': typeof DispatchRouteWithChildren
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
@@ -1452,6 +1477,7 @@ export interface FileRoutesById {
   '/dashboard/billing': typeof DashboardBillingRoute
   '/dashboard/boosts': typeof DashboardBoostsRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
+  '/dashboard/dispatch': typeof DashboardDispatchRoute
   '/dashboard/favorites': typeof DashboardFavoritesRoute
   '/dashboard/learning': typeof DashboardLearningRoute
   '/dashboard/likes': typeof DashboardLikesRoute
@@ -1469,6 +1495,7 @@ export interface FileRoutesById {
   '/dashboard/vehicles': typeof DashboardVehiclesRoute
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/dashboard/wanted': typeof DashboardWantedRoute
+  '/dispatch/checkout': typeof DispatchCheckoutRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/go/$productId': typeof GoProductIdRoute
@@ -1523,6 +1550,7 @@ export interface FileRoutesById {
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
+  '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -1624,6 +1652,7 @@ export interface FileRouteTypes {
     | '/dashboard/billing'
     | '/dashboard/boosts'
     | '/dashboard/businesses'
+    | '/dashboard/dispatch'
     | '/dashboard/favorites'
     | '/dashboard/learning'
     | '/dashboard/likes'
@@ -1641,6 +1670,7 @@ export interface FileRouteTypes {
     | '/dashboard/vehicles'
     | '/dashboard/verification'
     | '/dashboard/wanted'
+    | '/dispatch/checkout'
     | '/email/unsubscribe'
     | '/export/trust'
     | '/go/$productId'
@@ -1695,6 +1725,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/'
     | '/api/public/fx/refresh'
     | '/api/public/hooks/discover-sync'
+    | '/api/public/hooks/dispatch-expand'
     | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
@@ -1792,6 +1823,7 @@ export interface FileRouteTypes {
     | '/dashboard/billing'
     | '/dashboard/boosts'
     | '/dashboard/businesses'
+    | '/dashboard/dispatch'
     | '/dashboard/favorites'
     | '/dashboard/learning'
     | '/dashboard/likes'
@@ -1808,6 +1840,7 @@ export interface FileRouteTypes {
     | '/dashboard/vehicles'
     | '/dashboard/verification'
     | '/dashboard/wanted'
+    | '/dispatch/checkout'
     | '/email/unsubscribe'
     | '/export/trust'
     | '/go/$productId'
@@ -1862,6 +1895,7 @@ export interface FileRouteTypes {
     | '/dashboard/team'
     | '/api/public/fx/refresh'
     | '/api/public/hooks/discover-sync'
+    | '/api/public/hooks/dispatch-expand'
     | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
@@ -1961,6 +1995,7 @@ export interface FileRouteTypes {
     | '/dashboard/billing'
     | '/dashboard/boosts'
     | '/dashboard/businesses'
+    | '/dashboard/dispatch'
     | '/dashboard/favorites'
     | '/dashboard/learning'
     | '/dashboard/likes'
@@ -1978,6 +2013,7 @@ export interface FileRouteTypes {
     | '/dashboard/vehicles'
     | '/dashboard/verification'
     | '/dashboard/wanted'
+    | '/dispatch/checkout'
     | '/email/unsubscribe'
     | '/export/trust'
     | '/go/$productId'
@@ -2032,6 +2068,7 @@ export interface FileRouteTypes {
     | '/dashboard/team/'
     | '/api/public/fx/refresh'
     | '/api/public/hooks/discover-sync'
+    | '/api/public/hooks/dispatch-expand'
     | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
@@ -2061,7 +2098,7 @@ export interface RootRouteChildren {
   CompanyRoute: typeof CompanyRoute
   ContactRoute: typeof ContactRoute
   DashboardRoute: typeof DashboardRouteWithChildren
-  DispatchRoute: typeof DispatchRoute
+  DispatchRoute: typeof DispatchRouteWithChildren
   ExportRoute: typeof ExportRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   GuidelinesRoute: typeof GuidelinesRoute
@@ -2137,6 +2174,7 @@ export interface RootRouteChildren {
   ShopPSlugRoute: typeof ShopPSlugRoute
   ApiPublicFxRefreshRoute: typeof ApiPublicFxRefreshRoute
   ApiPublicHooksDiscoverSyncRoute: typeof ApiPublicHooksDiscoverSyncRoute
+  ApiPublicHooksDispatchExpandRoute: typeof ApiPublicHooksDispatchExpandRoute
   ApiPublicHooksOpsAlertsDigestRoute: typeof ApiPublicHooksOpsAlertsDigestRoute
   ApiPublicHooksRefreshLazadaRoute: typeof ApiPublicHooksRefreshLazadaRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -2637,6 +2675,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dispatch/checkout': {
+      id: '/dispatch/checkout'
+      path: '/checkout'
+      fullPath: '/dispatch/checkout'
+      preLoaderRoute: typeof DispatchCheckoutRouteImport
+      parentRoute: typeof DispatchRoute
+    }
     '/dashboard/wanted': {
       id: '/dashboard/wanted'
       path: '/wanted'
@@ -2754,6 +2799,13 @@ declare module '@tanstack/react-router' {
       path: '/favorites'
       fullPath: '/dashboard/favorites'
       preLoaderRoute: typeof DashboardFavoritesRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/dispatch': {
+      id: '/dashboard/dispatch'
+      path: '/dispatch'
+      fullPath: '/dashboard/dispatch'
+      preLoaderRoute: typeof DashboardDispatchRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/businesses': {
@@ -3309,6 +3361,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksOpsAlertsDigestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/dispatch-expand': {
+      id: '/api/public/hooks/dispatch-expand'
+      path: '/api/public/hooks/dispatch-expand'
+      fullPath: '/api/public/hooks/dispatch-expand'
+      preLoaderRoute: typeof ApiPublicHooksDispatchExpandRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/discover-sync': {
       id: '/api/public/hooks/discover-sync'
       path: '/api/public/hooks/discover-sync'
@@ -3432,6 +3491,7 @@ interface DashboardRouteChildren {
   DashboardBillingRoute: typeof DashboardBillingRoute
   DashboardBoostsRoute: typeof DashboardBoostsRoute
   DashboardBusinessesRoute: typeof DashboardBusinessesRoute
+  DashboardDispatchRoute: typeof DashboardDispatchRoute
   DashboardFavoritesRoute: typeof DashboardFavoritesRoute
   DashboardLearningRoute: typeof DashboardLearningRoute
   DashboardLikesRoute: typeof DashboardLikesRoute
@@ -3461,6 +3521,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardBillingRoute: DashboardBillingRoute,
   DashboardBoostsRoute: DashboardBoostsRoute,
   DashboardBusinessesRoute: DashboardBusinessesRoute,
+  DashboardDispatchRoute: DashboardDispatchRoute,
   DashboardFavoritesRoute: DashboardFavoritesRoute,
   DashboardLearningRoute: DashboardLearningRoute,
   DashboardLikesRoute: DashboardLikesRoute,
@@ -3487,6 +3548,18 @@ const DashboardRouteChildren: DashboardRouteChildren = {
 
 const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
   DashboardRouteChildren,
+)
+
+interface DispatchRouteChildren {
+  DispatchCheckoutRoute: typeof DispatchCheckoutRoute
+}
+
+const DispatchRouteChildren: DispatchRouteChildren = {
+  DispatchCheckoutRoute: DispatchCheckoutRoute,
+}
+
+const DispatchRouteWithChildren = DispatchRoute._addFileChildren(
+  DispatchRouteChildren,
 )
 
 interface ExportRouteChildren {
@@ -3566,7 +3639,7 @@ const rootRouteChildren: RootRouteChildren = {
   CompanyRoute: CompanyRoute,
   ContactRoute: ContactRoute,
   DashboardRoute: DashboardRouteWithChildren,
-  DispatchRoute: DispatchRoute,
+  DispatchRoute: DispatchRouteWithChildren,
   ExportRoute: ExportRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
   GuidelinesRoute: GuidelinesRoute,
@@ -3642,6 +3715,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopPSlugRoute: ShopPSlugRoute,
   ApiPublicFxRefreshRoute: ApiPublicFxRefreshRoute,
   ApiPublicHooksDiscoverSyncRoute: ApiPublicHooksDiscoverSyncRoute,
+  ApiPublicHooksDispatchExpandRoute: ApiPublicHooksDispatchExpandRoute,
   ApiPublicHooksOpsAlertsDigestRoute: ApiPublicHooksOpsAlertsDigestRoute,
   ApiPublicHooksRefreshLazadaRoute: ApiPublicHooksRefreshLazadaRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,

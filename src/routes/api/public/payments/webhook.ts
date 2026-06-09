@@ -32,6 +32,16 @@ async function upsertSubscription(env: StripeEnv, sub: Stripe.Subscription) {
   const lookupKey = (sub.metadata?.lookup_key as string | undefined) ?? null;
   if (!userId) return;
 
+  // 365 Dispatch subscriptions go to dispatch_subscriptions and toggle provider flags.
+  const itemLookupKey = sub.items.data[0]?.price?.lookup_key ?? null;
+  const dispatchLookup =
+    (lookupKey && lookupKey.startsWith("dispatch_") ? lookupKey : null) ||
+    (itemLookupKey && itemLookupKey.startsWith("dispatch_") ? itemLookupKey : null);
+  if (sub.metadata?.kind === "dispatch" || dispatchLookup) {
+    await upsertDispatchSubscription(env, sub, dispatchLookup);
+    return;
+  }
+
   const item = sub.items.data[0];
   const itemLookup = item?.price?.lookup_key ?? null;
   const planId = (await resolvePlanId(lookupKey)) ?? (await resolvePlanId(itemLookup));
@@ -85,6 +95,62 @@ async function upsertSubscription(env: StripeEnv, sub: Stripe.Subscription) {
     await supabaseAdmin.from("subscriptions").insert(row);
   }
 }
+
+async function upsertDispatchSubscription(
+  env: StripeEnv,
+  sub: Stripe.Subscription,
+  dispatchLookup: string | null,
+) {
+  const userId = (sub.metadata?.userId as string | undefined) ?? null;
+  if (!userId) return;
+  const item = sub.items.data[0];
+  const lookup = dispatchLookup ?? item?.price?.lookup_key ?? null;
+  // Strip "_monthly" suffix for plan_slug stored in dispatch_subscriptions
+  const planSlug = lookup ? lookup.replace(/_monthly$/, "") : "dispatch_starter";
+  const periodEnd = (item as any)?.current_period_end ?? (sub as any).current_period_end;
+  const status = sub.status === "trialing" ? "active" : sub.status;
+  const isActive = status === "active";
+
+  const row = {
+    user_id: userId,
+    plan_slug: planSlug,
+    status,
+    current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
+    cancel_at_period_end: !!sub.cancel_at_period_end,
+    environment: env,
+    stripe_customer_id:
+      typeof sub.customer === "string" ? sub.customer : (sub.customer?.id ?? null),
+    stripe_subscription_id: sub.id,
+    stripe_price_id: item?.price?.id ?? null,
+    metadata: { lookup_key: lookup },
+    updated_at: new Date().toISOString(),
+  } as any;
+
+  const { data: existing } = await supabaseAdmin
+    .from("dispatch_subscriptions")
+    .select("id")
+    .eq("stripe_subscription_id", sub.id)
+    .maybeSingle();
+
+  if (existing) {
+    await supabaseAdmin
+      .from("dispatch_subscriptions")
+      .update(row)
+      .eq("id", (existing as any).id);
+  } else {
+    await supabaseAdmin.from("dispatch_subscriptions").insert(row);
+  }
+
+  // Auto-toggle dispatch_enabled on provider rates so the match function picks them up.
+  await supabaseAdmin
+    .from("provider_tow_rates")
+    .upsert(
+      { user_id: userId, dispatch_enabled: isActive, updated_at: new Date().toISOString() },
+      { onConflict: "user_id" },
+    );
+}
+
+
 
 async function upsertBusinessSubscription(env: StripeEnv, sub: Stripe.Subscription) {
   const userId = (sub.metadata?.userId as string | undefined) ?? null;
