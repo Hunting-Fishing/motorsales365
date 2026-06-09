@@ -1,69 +1,99 @@
-# Full Manual Payment Status Workflow
+## Goal
 
-Today the admin flow is binary: a pending manual payment jumps straight to `paid` or `failed` on a single click. We'll add an explicit **Pending → Reviewed → Approved/Rejected** lifecycle with timestamps, reviewer notes, and an audit trail — all controlled from the existing `/admin/payments` page.
+Let any seller who signs up create sub-users (e.g. `steve@laoagcarsales`) directly from their profile — no email activation. Sub-users sign in to 365motorsales.com and act on behalf of the seller account: post/edit the seller's vehicle listings and reply to customer messages. Each seller account is fully isolated from every other seller.
 
-## Stages
+## Model
 
+Reuse the existing `organizations` + `organization_members` tables (already used for the Team / Leads inbox) as the "seller account". Every seller signup gets one auto-created organization; sub-users are extra rows in `organization_members`.
+
+Two roles only:
+- **Owner** — the original signup. Full control + billing + can add/remove staff.
+- **Staff** — sub-user. Can post/edit listings and reply to customer messages under the seller account. Cannot manage billing or other staff.
+
+We collapse the existing 5-role enum down at the policy level: Owner = current `owner`; Staff = current `member`. `admin/manager/viewer` are hidden from the UI but kept in the enum for backward compatibility with the Leads inbox.
+
+## Sub-user creation (direct, no email)
+
+New admin server route `POST /api/seller/staff/create` (server route, uses `supabaseAdmin`):
+- Owner-only (checked via `can_manage_org`).
+- Body: `{ orgId, username, password, fullName }`.
+- Synthesizes an email like `username@laoagcarsales.staff.365motorsales.local` (from the org slug) so Supabase Auth has a unique key, but the sub-user signs in with **username + password** on the login page. The synthetic email is hidden from the UI.
+- Creates the auth user with `email_confirm: true` (instant activation, no email sent).
+- Inserts `organization_members` row with role = `member` (Staff).
+- Stamps `profiles.parent_org_id` and `profiles.login_username` for lookup at sign-in.
+- Enforces seat limit before creating (see Plan limits below).
+
+Login page change: accept either email or `username@orgslug`. If the input contains no `@`, resolve `login_username` → synthetic email and call `signInWithPassword` with that. Owners still log in with their real email.
+
+Owner can reset a sub-user's password or deactivate (revoke role + disable auth user) from the same screen.
+
+## Listings & messages access for Staff
+
+Today `listings` RLS is owner-only (`auth.uid() = user_id`). We extend it so any org member of the listing's `organization_id` can update/delete and read draft/inactive rows:
+
+- New helper `public.user_can_edit_listing(_listing_id uuid)` — true if `user_id = auth.uid()` OR the listing has an `organization_id` and the caller is an org member.
+- Rewrite "Owners update/delete listings" + the private-read policy to use it.
+- INSERT policy stays `auth.uid() = user_id` but new listings created by a Staff member auto-set `organization_id` to the staff's org via a BEFORE INSERT trigger (so the owner can also see/edit them).
+- Same pattern applied to `listing_media`, `listing_boosts`, `messages`, `service_inquiries` (any "owner of the listing" check becomes "owner OR org member of the listing's org").
+
+## Plan-based seat limits
+
+Extend `subscription_plans` with `max_seats int` (null = unlimited). Defaults:
+- Free / Private Seller: **1** (owner only — no sub-users).
+- Pro / Dealer: **5**.
+- Business / Enterprise: **null** (unlimited).
+
+Seat-count helper `public.org_seat_count(_org_id uuid)` used by `create-staff` route:
 ```text
-submitted  →  pending      (auto on submit; proof uploaded)
-pending    →  in_review    (admin claims it, optional note)
-in_review  →  approved     (status=paid, side-effects fire)
-in_review  →  rejected     (status=failed, reason required)
-in_review  →  pending      (release back to queue)
-approved   →  refunded     (existing flow, unchanged)
+if seat_count >= plan.max_seats → 402 { upgrade_required: true, current_plan, max_seats }
 ```
+UI shows "3 of 5 seats used · Upgrade for more" on the Staff page.
 
-A reviewer must move a payment into `in_review` before approving or rejecting — this prevents two admins acting on the same row and forces a deliberate review step.
+## UI
 
-## Database (single migration)
+**Profile → "Staff & Access" tab** (new route `/dashboard/staff`, owner-only):
+- Header: seller account name + seat usage badge.
+- Table: username, full name, last sign-in, status, actions (Reset password, Deactivate).
+- "Add staff" dialog: full name, username (validated against org slug), password, confirm password. On submit → instant activation toast with the new sign-in URL.
 
-1. Extend `payment_status` enum: add `in_review`, `approved`, `rejected`. Keep `paid`/`failed` as terminal aliases used by side-effects so existing code (boost activation, subscription renewal, receipts) keeps working.
-2. Add columns to `public.payments`:
-   - `review_started_at timestamptz`
-   - `review_started_by uuid references profiles(id)`
-   - `approved_at timestamptz`
-   - `rejected_at timestamptz`
-   - `rejection_reason text`
-3. New table `public.payment_review_events` (full audit log):
-   - `payment_id`, `actor_id`, `from_status`, `to_status`, `note`, `created_at`
-   - GRANTs + RLS: admins manage; owner of payment can SELECT their own events.
-4. Trigger `tg_payment_status_audit` on `payments` — inserts a row in `payment_review_events` on every status transition (captures `auth.uid()`).
-5. Update the "Users insert own payments" RLS check to include the new statuses in the forbidden-on-insert list (still forces `pending`).
+The existing `/dashboard/team` (Leads/CRM) stays as-is for organizations that use the lead inbox; the new Staff page is the primary surface for the seller-account use case.
 
-## Server functions (`src/lib/payments-manual.functions.ts`)
+## Isolation guarantees (already enforced, called out for safety)
 
-Reuse existing admin guard. Replace the two-call API with the staged workflow:
+- `is_org_member` / `can_manage_org` security-definer functions gate everything.
+- `organizations`, `organization_members`, `listings`, `messages`, `service_inquiries` keep RLS on with `auth.uid()`-scoped checks — no cross-account reads possible.
+- The synthetic staff email lives in `auth.users` only; never exposed on public pages.
+- Staff cannot read/modify billing tables (`subscriptions`, `payments`) — those policies stay owner-scoped.
 
-- `adminClaimPaymentReview({ id, note? })` — pending → in_review, stamps `review_started_at/by`.
-- `adminReleasePaymentReview({ id, note? })` — in_review → pending (only if claimed by same admin or admin override).
-- `adminApprovePayment({ id, notes? })` — in_review → approved (also sets `status=paid`, `paid_at`, `approved_at`, `reviewed_by/at`). Keeps current downstream activation calls.
-- `adminRejectPayment({ id, reason })` — in_review → rejected (also sets `status=failed`, `rejected_at`, `rejection_reason`, `reviewed_by/at`). Reason required, min 5 chars.
-- `adminListPayments({ status?, method?, q?, limit })` — unified list replacing `adminListPendingPayments`, supports filtering by any stage and free-text search on reference/invoice/user.
-- `adminGetPaymentDetail({ id })` — returns payment + profile + line items + full `payment_review_events` timeline + signed `proof_url`.
+## Technical changes
 
-## Admin UI (`src/routes/admin.payments.tsx`)
+### Migration
+- `ALTER TABLE profiles ADD COLUMN login_username citext UNIQUE, ADD COLUMN parent_org_id uuid, ADD COLUMN is_staff_account boolean DEFAULT false`.
+- `ALTER TABLE subscription_plans ADD COLUMN max_seats int`.
+- Functions: `user_can_edit_listing`, `org_seat_count`, `resolve_username_to_email`.
+- Rewrite RLS on `listings` (UPDATE/DELETE/private SELECT), `listing_media`, `messages`, `service_inquiries` to use org membership.
+- Trigger `tg_set_listing_org` on `listings` BEFORE INSERT to stamp `organization_id` from the staff's org.
+- Trigger `tg_auto_create_seller_org` on `profiles` AFTER INSERT — when a new seller signup happens, auto-create their organization and owner membership.
+- Backfill: for every existing profile with no membership, create an org + owner row.
 
-Reuse the existing 4 tabs; rebuild the **Pending Review** + **All Payments** tabs around the new state machine:
+### Server routes / functions
+- `src/routes/api/seller/staff/create.tsx` (POST, owner-only, service role).
+- `src/routes/api/seller/staff/reset-password.tsx` (POST, owner-only).
+- `src/routes/api/seller/staff/deactivate.tsx` (POST, owner-only).
+- `src/lib/seller-staff.functions.ts` — `listStaff`, `getSeatUsage` (read-only RPCs for the UI).
+- `src/lib/seller-staff.ts` — `resolveLoginInput(input)` client helper for the login page.
 
-- **Queue tab**: three columns/sub-tabs — *Pending*, *In Review (mine)*, *In Review (others)*. Each row shows amount, method, user, invoice #, age. Primary action depends on stage:
-  - Pending → "Start review" (claim)
-  - In Review (mine) → "Approve" / "Reject" / "Release back"
-  - In Review (others) → read-only with reviewer name
-- **Detail drawer** (opens from any row): proof preview, line items, full timeline of `payment_review_events`, reviewer notes thread, action buttons gated by current stage. Approval modal has optional internal note; rejection modal requires a reason (saved to `rejection_reason` + audit).
-- **All Payments tab**: filter chips for every stage (Pending, In Review, Approved, Rejected, Refunded), method filter, search box, CSV export button.
+### UI
+- `src/routes/_authenticated/dashboard.staff.tsx` — new Staff & Access page.
+- `src/components/seller/staff-table.tsx`, `add-staff-dialog.tsx`, `reset-password-dialog.tsx`.
+- Login page: add username-or-email handling.
+- Profile nav: new "Staff & Access" link, visible only to owners.
 
-No changes to checkout, receipts, Methods tab, or Rails tab.
+### Terms
+Per project memory, update `/terms` to disclose sub-user/staff accounts (owner is responsible for actions taken by staff under their account) and bump "Last updated".
 
-## Files
-
-- `supabase/migrations/<ts>_payment_workflow.sql` (new)
-- `src/lib/payments-manual.functions.ts` (edit — replace approve/reject, add claim/release/list/detail)
-- `src/routes/admin.payments.tsx` (edit — Queue + Detail drawer + All Payments filters)
-- `src/components/admin/payment-review-drawer.tsx` (new — detail/timeline/actions)
-- `src/integrations/supabase/types.ts` (regenerated after migration)
-
-## Out of scope
-
-- Public-facing receipt/PDF changes (already show invoice + paid date).
-- Refund workflow (separate, already exists as `refunded` terminal).
-- Email notifications to the buyer on approve/reject — easy follow-up using the existing `enqueue_email` helper if you want it; say the word and I'll add it in the same pass.
+## Out of scope (can follow up)
+- Granular per-listing permissions (which staff can edit which listings).
+- Staff activity audit log UI (rows are still captured in `route_audit_log`).
+- Email notifications to staff (intentionally none, per your spec).
+- Seat-based add-on billing in Stripe (we only enforce the cap; upgrade flow points to existing plan upgrade page).
