@@ -65,6 +65,7 @@ import { Route as SellImportRouteImport } from './routes/sell.import'
 import { Route as SSlugRouteImport } from './routes/s.$slug'
 import { Route as RidesSlugRouteImport } from './routes/rides.$slug'
 import { Route as RCodeRouteImport } from './routes/r.$code'
+import { Route as PayManualRouteImport } from './routes/pay.manual'
 import { Route as PassportSlugRouteImport } from './routes/passport.$slug'
 import { Route as PassportPremiumCheckoutRouteImport } from './routes/passport-premium.checkout'
 import { Route as ListingCheckoutRouteImport } from './routes/listing.checkout'
@@ -449,6 +450,11 @@ const RidesSlugRoute = RidesSlugRouteImport.update({
 const RCodeRoute = RCodeRouteImport.update({
   id: '/r/$code',
   path: '/r/$code',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PayManualRoute = PayManualRouteImport.update({
+  id: '/pay/manual',
+  path: '/pay/manual',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PassportSlugRoute = PassportSlugRouteImport.update({
@@ -1095,6 +1101,7 @@ export interface FileRoutesByFullPath {
   '/listing/checkout': typeof ListingCheckoutRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
+  '/pay/manual': typeof PayManualRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
   '/s/$slug': typeof SSlugRoute
@@ -1255,6 +1262,7 @@ export interface FileRoutesByTo {
   '/listing/checkout': typeof ListingCheckoutRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
+  '/pay/manual': typeof PayManualRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
   '/s/$slug': typeof SSlugRoute
@@ -1419,6 +1427,7 @@ export interface FileRoutesById {
   '/listing/checkout': typeof ListingCheckoutRoute
   '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
+  '/pay/manual': typeof PayManualRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
   '/s/$slug': typeof SSlugRoute
@@ -1584,6 +1593,7 @@ export interface FileRouteTypes {
     | '/listing/checkout'
     | '/passport-premium/checkout'
     | '/passport/$slug'
+    | '/pay/manual'
     | '/r/$code'
     | '/rides/$slug'
     | '/s/$slug'
@@ -1744,6 +1754,7 @@ export interface FileRouteTypes {
     | '/listing/checkout'
     | '/passport-premium/checkout'
     | '/passport/$slug'
+    | '/pay/manual'
     | '/r/$code'
     | '/rides/$slug'
     | '/s/$slug'
@@ -1907,6 +1918,7 @@ export interface FileRouteTypes {
     | '/listing/checkout'
     | '/passport-premium/checkout'
     | '/passport/$slug'
+    | '/pay/manual'
     | '/r/$code'
     | '/rides/$slug'
     | '/s/$slug'
@@ -2019,6 +2031,7 @@ export interface RootRouteChildren {
   ListingCheckoutRoute: typeof ListingCheckoutRoute
   PassportPremiumCheckoutRoute: typeof PassportPremiumCheckoutRoute
   PassportSlugRoute: typeof PassportSlugRoute
+  PayManualRoute: typeof PayManualRoute
   RCodeRoute: typeof RCodeRouteWithChildren
   RidesSlugRoute: typeof RidesSlugRoute
   SSlugRoute: typeof SSlugRoute
@@ -2452,6 +2465,13 @@ declare module '@tanstack/react-router' {
       path: '/r/$code'
       fullPath: '/r/$code'
       preLoaderRoute: typeof RCodeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pay/manual': {
+      id: '/pay/manual'
+      path: '/pay/manual'
+      fullPath: '/pay/manual'
+      preLoaderRoute: typeof PayManualRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/passport/$slug': {
@@ -3467,6 +3487,7 @@ const rootRouteChildren: RootRouteChildren = {
   ListingCheckoutRoute: ListingCheckoutRoute,
   PassportPremiumCheckoutRoute: PassportPremiumCheckoutRoute,
   PassportSlugRoute: PassportSlugRoute,
+  PayManualRoute: PayManualRoute,
   RCodeRoute: RCodeRouteWithChildren,
   RidesSlugRoute: RidesSlugRoute,
   SSlugRoute: SSlugRoute,
