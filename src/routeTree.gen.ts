@@ -65,6 +65,7 @@ import { Route as SSlugRouteImport } from './routes/s.$slug'
 import { Route as RidesSlugRouteImport } from './routes/rides.$slug'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as PassportSlugRouteImport } from './routes/passport.$slug'
+import { Route as PassportPremiumCheckoutRouteImport } from './routes/passport-premium.checkout'
 import { Route as ListingCheckoutRouteImport } from './routes/listing.checkout'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
@@ -445,6 +446,11 @@ const RCodeRoute = RCodeRouteImport.update({
 const PassportSlugRoute = PassportSlugRouteImport.update({
   id: '/passport/$slug',
   path: '/passport/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PassportPremiumCheckoutRoute = PassportPremiumCheckoutRouteImport.update({
+  id: '/passport-premium/checkout',
+  path: '/passport-premium/checkout',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ListingCheckoutRoute = ListingCheckoutRouteImport.update({
@@ -1066,6 +1072,7 @@ export interface FileRoutesByFullPath {
   '/learn/$slug': typeof LearnSlugRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
+  '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
@@ -1222,6 +1229,7 @@ export interface FileRoutesByTo {
   '/learn/$slug': typeof LearnSlugRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
+  '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
@@ -1382,6 +1390,7 @@ export interface FileRoutesById {
   '/learn/$slug': typeof LearnSlugRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
+  '/passport-premium/checkout': typeof PassportPremiumCheckoutRoute
   '/passport/$slug': typeof PassportSlugRoute
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
@@ -1543,6 +1552,7 @@ export interface FileRouteTypes {
     | '/learn/$slug'
     | '/listing/$id'
     | '/listing/checkout'
+    | '/passport-premium/checkout'
     | '/passport/$slug'
     | '/r/$code'
     | '/rides/$slug'
@@ -1699,6 +1709,7 @@ export interface FileRouteTypes {
     | '/learn/$slug'
     | '/listing/$id'
     | '/listing/checkout'
+    | '/passport-premium/checkout'
     | '/passport/$slug'
     | '/r/$code'
     | '/rides/$slug'
@@ -1858,6 +1869,7 @@ export interface FileRouteTypes {
     | '/learn/$slug'
     | '/listing/$id'
     | '/listing/checkout'
+    | '/passport-premium/checkout'
     | '/passport/$slug'
     | '/r/$code'
     | '/rides/$slug'
@@ -1967,6 +1979,7 @@ export interface RootRouteChildren {
   LearnSlugRoute: typeof LearnSlugRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   ListingCheckoutRoute: typeof ListingCheckoutRoute
+  PassportPremiumCheckoutRoute: typeof PassportPremiumCheckoutRoute
   PassportSlugRoute: typeof PassportSlugRoute
   RCodeRoute: typeof RCodeRouteWithChildren
   RidesSlugRoute: typeof RidesSlugRoute
@@ -2401,6 +2414,13 @@ declare module '@tanstack/react-router' {
       path: '/passport/$slug'
       fullPath: '/passport/$slug'
       preLoaderRoute: typeof PassportSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/passport-premium/checkout': {
+      id: '/passport-premium/checkout'
+      path: '/passport-premium/checkout'
+      fullPath: '/passport-premium/checkout'
+      preLoaderRoute: typeof PassportPremiumCheckoutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/listing/checkout': {
@@ -3382,6 +3402,7 @@ const rootRouteChildren: RootRouteChildren = {
   LearnSlugRoute: LearnSlugRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   ListingCheckoutRoute: ListingCheckoutRoute,
+  PassportPremiumCheckoutRoute: PassportPremiumCheckoutRoute,
   PassportSlugRoute: PassportSlugRoute,
   RCodeRoute: RCodeRouteWithChildren,
   RidesSlugRoute: RidesSlugRoute,
