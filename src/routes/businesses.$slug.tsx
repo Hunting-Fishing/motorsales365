@@ -150,6 +150,12 @@ function BusinessProfilePage() {
     queryKey: ["business-page", slug],
     queryFn: () => fetchPage({ data: { slug } }),
   });
+  const ownerId = (data?.business as any)?.owner_id ?? null;
+  const { data: certData } = useQuery({
+    queryKey: ["business-owner-certs", ownerId],
+    queryFn: () => listOwnerCertificates({ data: { ownerId } }),
+    enabled: Boolean(ownerId),
+  });
 
   const [rating, setRating] = useState(5);
   const [body, setBody] = useState("");
