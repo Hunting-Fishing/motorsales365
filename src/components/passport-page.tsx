@@ -16,6 +16,7 @@ import {
   Droplet,
   AlertTriangle,
   Settings2,
+  Crown,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { SiteLayout } from "@/components/site-layout";
