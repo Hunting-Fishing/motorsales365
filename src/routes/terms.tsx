@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 8, 2026 (rev. published advertising rate card on /advertise)";
+  const lastUpdated = "June 9, 2026 (added §11a — optional inspection & transaction-safety services)";
 
   return (
     <SiteLayout>
