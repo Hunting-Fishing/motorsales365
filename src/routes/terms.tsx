@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 9, 2026 (added §11a — optional inspection & transaction-safety services)";
+  const lastUpdated = "June 9, 2026 (added Vehicle Passport Premium upgrade in §8)";
 
   return (
     <SiteLayout>
