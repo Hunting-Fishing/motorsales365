@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -11,21 +11,35 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Check, X, ExternalLink, Save } from "lucide-react";
+import { Loader2, Save } from "lucide-react";
 import { formatPHP, formatDate } from "@/lib/format";
 import {
   adminListAllMethods,
   adminUpdateMethod,
-  adminListPendingPayments,
-  adminApprovePayment,
-  adminRejectPayment,
-  adminListAllPayments,
+  adminListPayments,
   type ManualPaymentMethod,
+  type ReviewState,
 } from "@/lib/payments-manual.functions";
+import { PaymentReviewDrawer } from "@/components/admin/payment-review-drawer";
 
 export const Route = createFileRoute("/admin/payments")({
   component: AdminPayments,
 });
+
+const STATE_LABEL: Record<string, string> = {
+  awaiting_review: "Pending",
+  in_review: "In review",
+  approved: "Approved",
+  rejected: "Rejected",
+  not_applicable: "Auto",
+};
+const STATE_VARIANT: Record<string, "default" | "outline" | "secondary" | "destructive"> = {
+  awaiting_review: "secondary",
+  in_review: "default",
+  approved: "default",
+  rejected: "destructive",
+  not_applicable: "outline",
+};
 
 function AdminPayments() {
   return (
@@ -36,15 +50,15 @@ function AdminPayments() {
           Configure methods, review manual payments, and audit transactions.
         </p>
       </div>
-      <Tabs defaultValue="pending">
+      <Tabs defaultValue="queue">
         <TabsList>
-          <TabsTrigger value="pending">Pending Review</TabsTrigger>
+          <TabsTrigger value="queue">Review Queue</TabsTrigger>
           <TabsTrigger value="methods">Methods</TabsTrigger>
           <TabsTrigger value="rails">Rails</TabsTrigger>
           <TabsTrigger value="all">All Payments</TabsTrigger>
         </TabsList>
-        <TabsContent value="pending" className="mt-4">
-          <PendingTab />
+        <TabsContent value="queue" className="mt-4">
+          <QueueTab />
         </TabsContent>
         <TabsContent value="methods" className="mt-4">
           <MethodsTab />
@@ -60,134 +74,119 @@ function AdminPayments() {
   );
 }
 
-function PendingTab() {
-  const list = useServerFn(adminListPendingPayments);
-  const approve = useServerFn(adminApprovePayment);
-  const reject = useServerFn(adminRejectPayment);
-  const [rows, setRows] = useState<any[]>([]);
+function QueueTab() {
+  const list = useServerFn(adminListPayments);
+  const [pending, setPending] = useState<any[]>([]);
+  const [inReview, setInReview] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [busy, setBusy] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(null);
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      setRows(await list());
+      const [p, ir] = await Promise.all([
+        list({ data: { review_state: "awaiting_review", limit: 200 } }),
+        list({ data: { review_state: "in_review", limit: 200 } }),
+      ]);
+      setPending(p);
+      setInReview(ir);
     } catch (e: any) {
       toast.error(e?.message ?? "Failed to load");
     } finally {
       setLoading(false);
     }
-  };
+  }, [list]);
 
   useEffect(() => {
     refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const openProof = async (path: string) => {
-    const { data } = await supabase.storage
-      .from("payment-proofs")
-      .createSignedUrl(path, 300);
-    if (data?.signedUrl) window.open(data.signedUrl, "_blank");
-  };
-
-  const handleApprove = async (id: string) => {
-    setBusy(id);
-    try {
-      await approve({ data: { id } });
-      toast.success("Payment approved");
-      await refresh();
-    } catch (e: any) {
-      toast.error(e?.message ?? "Failed");
-    } finally {
-      setBusy(null);
-    }
-  };
-
-  const handleReject = async (id: string) => {
-    const notes = window.prompt("Rejection reason (shown to buyer):");
-    if (!notes) return;
-    setBusy(id);
-    try {
-      await reject({ data: { id, notes } });
-      toast.success("Payment rejected");
-      await refresh();
-    } catch (e: any) {
-      toast.error(e?.message ?? "Failed");
-    } finally {
-      setBusy(null);
-    }
-  };
+  }, [refresh]);
 
   if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
-  if (!rows.length)
-    return (
-      <Card>
-        <CardContent className="p-8 text-center text-sm text-muted-foreground">
-          No pending manual payments.
-        </CardContent>
-      </Card>
-    );
 
   return (
-    <div className="space-y-3">
-      {rows.map((p) => (
-        <Card key={p.id}>
-          <CardContent className="p-4">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs">{p.invoice_number ?? p.id.slice(0, 8)}</span>
-                  <Badge variant="outline">{p.kind}</Badge>
-                  <Badge>{p.method}</Badge>
-                </div>
-                <div className="text-sm">
-                  <span className="font-medium">
-                    {p.profile?.business_name || p.profile?.full_name || "Unknown"}
-                  </span>{" "}
-                  · {formatPHP(Number(p.amount_php))}
-                </div>
-                {p.reference && (
-                  <div className="text-xs text-muted-foreground">Ref: {p.reference}</div>
-                )}
-                {p.notes && (
-                  <div className="text-xs text-muted-foreground">Notes: {p.notes}</div>
-                )}
-                <div className="text-xs text-muted-foreground">
-                  Submitted {formatDate(p.created_at)}
-                </div>
-              </div>
-              <div className="flex flex-col items-end gap-2">
-                {p.proof_url && (
-                  <Button size="sm" variant="outline" onClick={() => openProof(p.proof_url)}>
-                    <ExternalLink className="mr-1 h-3 w-3" />
-                    View proof
-                  </Button>
-                )}
-                <div className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    disabled={busy === p.id}
-                    onClick={() => handleReject(p.id)}
-                  >
-                    <X className="mr-1 h-3 w-3" />
-                    Reject
-                  </Button>
-                  <Button size="sm" disabled={busy === p.id} onClick={() => handleApprove(p.id)}>
-                    {busy === p.id ? (
-                      <Loader2 className="mr-1 h-3 w-3 animate-spin" />
-                    ) : (
-                      <Check className="mr-1 h-3 w-3" />
-                    )}
-                    Approve
-                  </Button>
-                </div>
-              </div>
-            </div>
+    <div className="space-y-6">
+      <Section title={`Pending (${pending.length})`} rows={pending} onOpen={setSelected} emptyText="No pending manual payments." />
+      <Section title={`In review (${inReview.length})`} rows={inReview} onOpen={setSelected} emptyText="Nothing currently in review." showReviewer />
+      <PaymentReviewDrawer
+        paymentId={selected}
+        open={!!selected}
+        onClose={() => setSelected(null)}
+        onChanged={refresh}
+      />
+    </div>
+  );
+}
+
+function Section({
+  title,
+  rows,
+  onOpen,
+  emptyText,
+  showReviewer,
+}: {
+  title: string;
+  rows: any[];
+  onOpen: (id: string) => void;
+  emptyText: string;
+  showReviewer?: boolean;
+}) {
+  return (
+    <div className="space-y-2">
+      <h2 className="text-sm font-semibold">{title}</h2>
+      {rows.length === 0 ? (
+        <Card>
+          <CardContent className="p-6 text-center text-sm text-muted-foreground">
+            {emptyText}
           </CardContent>
         </Card>
-      ))}
+      ) : (
+        <div className="space-y-2">
+          {rows.map((p) => (
+            <Card key={p.id} className="cursor-pointer transition hover:bg-accent/30" onClick={() => onOpen(p.id)}>
+              <CardContent className="p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div className="space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-mono text-xs">
+                        {p.invoice_number ?? p.id.slice(0, 8)}
+                      </span>
+                      <Badge variant="outline">{p.kind}</Badge>
+                      {p.method && <Badge>{p.method}</Badge>}
+                      <Badge variant={STATE_VARIANT[p.review_state] ?? "outline"}>
+                        {STATE_LABEL[p.review_state] ?? p.review_state}
+                      </Badge>
+                    </div>
+                    <div className="text-sm">
+                      <span className="font-medium">
+                        {p.profile?.business_name || p.profile?.full_name || "Unknown"}
+                      </span>{" "}
+                      · {formatPHP(Number(p.amount_php))}
+                    </div>
+                    {p.reference && (
+                      <div className="text-xs text-muted-foreground">Ref: {p.reference}</div>
+                    )}
+                    <div className="text-xs text-muted-foreground">
+                      Submitted {formatDate(p.created_at)}
+                      {showReviewer && p.claimer_profile && (
+                        <>
+                          {" · Claimed by "}
+                          <span className="font-medium">
+                            {p.claimer_profile.full_name || p.claimer_profile.business_name}
+                          </span>
+                          {p.review_started_at && ` at ${formatDate(p.review_started_at)}`}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); onOpen(p.id); }}>
+                    Open
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -240,9 +239,7 @@ function MethodsTab() {
                   <span className="ml-2 font-mono text-xs text-muted-foreground">{m.method}</span>
                 </CardTitle>
                 <div className="flex items-center gap-2">
-                  <Label htmlFor={`en-${m.method}`} className="text-xs">
-                    Enabled
-                  </Label>
+                  <Label htmlFor={`en-${m.method}`} className="text-xs">Enabled</Label>
                   <Switch
                     id={`en-${m.method}`}
                     checked={!!v.enabled}
@@ -255,10 +252,7 @@ function MethodsTab() {
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <Label className="text-xs">Display label</Label>
-                  <Input
-                    value={v.label ?? ""}
-                    onChange={(e) => patch(m.method, { label: e.target.value })}
-                  />
+                  <Input value={v.label ?? ""} onChange={(e) => patch(m.method, { label: e.target.value })} />
                 </div>
                 <div>
                   <Label className="text-xs">Sort order</Label>
@@ -334,15 +328,10 @@ function RailsTab() {
     setLoading(false);
   };
 
-  useEffect(() => {
-    load();
-  }, []);
+  useEffect(() => { load(); }, []);
 
   const toggle = async (key: string, enabled: boolean) => {
-    const { error } = await supabase
-      .from("feature_flags")
-      .update({ enabled })
-      .eq("key", key);
+    const { error } = await supabase.from("feature_flags").update({ enabled }).eq("key", key);
     if (error) toast.error(error.message);
     else toast.success("Updated");
     await load();
@@ -360,14 +349,9 @@ function RailsTab() {
           <div key={f.key} className="flex items-center justify-between rounded-md border p-3">
             <div>
               <div className="font-mono text-sm">{f.key}</div>
-              {f.description && (
-                <div className="text-xs text-muted-foreground">{f.description}</div>
-              )}
+              {f.description && <div className="text-xs text-muted-foreground">{f.description}</div>}
             </div>
-            <Switch
-              checked={!!f.enabled}
-              onCheckedChange={(c) => toggle(f.key, c)}
-            />
+            <Switch checked={!!f.enabled} onCheckedChange={(c) => toggle(f.key, c)} />
           </div>
         ))}
       </CardContent>
@@ -375,85 +359,116 @@ function RailsTab() {
   );
 }
 
-function AllPaymentsTab() {
-  const list = useServerFn(adminListAllPayments);
-  const [rows, setRows] = useState<any[]>([]);
-  const [status, setStatus] = useState<string>("");
-  const [loading, setLoading] = useState(false);
+const REVIEW_STATES: (ReviewState | "all")[] = [
+  "all",
+  "awaiting_review",
+  "in_review",
+  "approved",
+  "rejected",
+  "not_applicable",
+];
 
-  const load = async () => {
+function AllPaymentsTab() {
+  const list = useServerFn(adminListPayments);
+  const [rows, setRows] = useState<any[]>([]);
+  const [state, setState] = useState<ReviewState | "all">("all");
+  const [q, setQ] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
     setLoading(true);
     try {
-      setRows(await list({ data: { status: status || undefined, limit: 200 } }));
+      setRows(await list({ data: { review_state: state, q: q || undefined, limit: 300 } }));
     } finally {
       setLoading(false);
     }
-  };
+  }, [list, state, q]);
 
-  useEffect(() => {
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [status]);
+  useEffect(() => { load(); }, [load]);
 
   return (
     <Card>
       <CardContent className="space-y-3 p-4">
         <div className="flex flex-wrap items-center gap-2">
-          {["", "pending", "paid", "failed", "refunded"].map((s) => (
+          {REVIEW_STATES.map((s) => (
             <Button
-              key={s || "all"}
+              key={s}
               size="sm"
-              variant={status === s ? "default" : "outline"}
-              onClick={() => setStatus(s)}
+              variant={state === s ? "default" : "outline"}
+              onClick={() => setState(s)}
             >
-              {s || "All"}
+              {s === "all" ? "All" : STATE_LABEL[s]}
             </Button>
           ))}
+          <Input
+            placeholder="Search invoice or reference…"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && load()}
+            className="ml-auto max-w-xs"
+          />
+          <Button size="sm" variant="outline" onClick={load} disabled={loading}>
+            {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : "Search"}
+          </Button>
         </div>
-        {loading ? (
-          <div className="p-6 text-sm text-muted-foreground">Loading…</div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="text-left text-xs uppercase text-muted-foreground">
-                <tr>
-                  <th className="py-2">Invoice</th>
-                  <th>Kind</th>
-                  <th>Method</th>
-                  <th className="text-right">Amount</th>
-                  <th>Status</th>
-                  <th>Created</th>
-                  <th></th>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="text-left text-xs uppercase text-muted-foreground">
+              <tr>
+                <th className="py-2">Invoice</th>
+                <th>Buyer</th>
+                <th>Kind</th>
+                <th>Method</th>
+                <th className="text-right">Amount</th>
+                <th>Review</th>
+                <th>Status</th>
+                <th>Created</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr
+                  key={r.id}
+                  className="cursor-pointer border-t hover:bg-accent/30"
+                  onClick={() => setSelected(r.id)}
+                >
+                  <td className="py-2 font-mono text-xs">
+                    {r.invoice_number ?? r.id.slice(0, 8)}
+                  </td>
+                  <td className="text-xs">
+                    {r.profile?.business_name || r.profile?.full_name || "—"}
+                  </td>
+                  <td>{r.kind}</td>
+                  <td>{r.method ?? "—"}</td>
+                  <td className="text-right">{formatPHP(Number(r.amount_php))}</td>
+                  <td>
+                    <Badge variant={STATE_VARIANT[r.review_state] ?? "outline"}>
+                      {STATE_LABEL[r.review_state] ?? r.review_state}
+                    </Badge>
+                  </td>
+                  <td>
+                    <Badge variant={r.status === "paid" ? "default" : "outline"}>{r.status}</Badge>
+                  </td>
+                  <td className="text-xs text-muted-foreground">{formatDate(r.created_at)}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {rows.map((r) => (
-                  <tr key={r.id} className="border-t">
-                    <td className="py-2 font-mono text-xs">
-                      {r.invoice_number ?? r.id.slice(0, 8)}
-                    </td>
-                    <td>{r.kind}</td>
-                    <td>{r.method ?? "—"}</td>
-                    <td className="text-right">{formatPHP(Number(r.amount_php))}</td>
-                    <td>
-                      <Badge variant={r.status === "paid" ? "default" : "outline"}>
-                        {r.status}
-                      </Badge>
-                    </td>
-                    <td className="text-xs text-muted-foreground">{formatDate(r.created_at)}</td>
-                    <td>
-                      <Button asChild size="sm" variant="ghost">
-                        <a href={`/payments/${r.id}/receipt`} target="_blank" rel="noreferrer">
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
+              ))}
+              {!rows.length && !loading && (
+                <tr>
+                  <td colSpan={8} className="p-6 text-center text-sm text-muted-foreground">
+                    No payments match these filters.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <PaymentReviewDrawer
+          paymentId={selected}
+          open={!!selected}
+          onClose={() => setSelected(null)}
+          onChanged={load}
+        />
       </CardContent>
     </Card>
   );
