@@ -75,8 +75,18 @@ function RefundPage() {
           completed.
         </p>
 
+        <h2 className="mt-6 text-xl font-semibold">Vehicle Passport Premium</h2>
+        <p className="mt-2 text-muted-foreground">
+          Passport Premium (₱299 / 12 months per vehicle) is delivered immediately — the badge,
+          PDF history report, branded share card, and extended record storage activate as soon as
+          payment clears — and is <strong>non-refundable</strong> after activation. If the upgrade
+          fails to activate due to a platform error, we will either restore it or refund in full.
+          Purchasing again on the same vehicle extends the existing premium window rather than
+          stacking two terms.
+        </p>
+
         <p className="mt-6 text-xs text-muted-foreground">
-          Last updated: June 9, 2026 (added inspection &amp; transaction-safety services section)
+          Last updated: June 9, 2026 (added Vehicle Passport Premium section)
         </p>
 
 
