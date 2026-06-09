@@ -569,6 +569,43 @@ function ListingDetailPage() {
             />
           )}
 
+          {/* Buyer-safety upsell — links to /services/inspection (audit #20) */}
+          {(listing.category_slug === "cars" ||
+            listing.category_slug === "motorcycles" ||
+            listing.category_slug === "trucks") && (
+            <aside className="mt-6 rounded-xl border border-border bg-card p-5">
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                  <ShieldCheck className="h-5 w-5" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h3 className="font-display text-base font-semibold">
+                    Before you pay — buyer safety add-ons
+                  </h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Optional OR/CR review, seller ID verification, or a pre-purchase mechanic
+                    inspection through a 365-vetted partner. Pricing from ₱99.
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Link
+                      to="/services/inspection"
+                      search={{ listing: listing.id } as any}
+                      className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90"
+                    >
+                      Request inspection
+                    </Link>
+                    <Link
+                      to="/services/inspection"
+                      className="inline-flex items-center justify-center rounded-md border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted"
+                    >
+                      See the rate card
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </aside>
+          )}
+
           <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
             <span>Listed {formatDate(listing.published_at)}</span>
             <span>·</span>
