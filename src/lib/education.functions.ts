@@ -54,7 +54,7 @@ export const getCourse = createServerFn({ method: "GET" })
       .eq("status", "published")
       .maybeSingle();
     if (error) throw new Error(error.message);
-    if (!course) return { course: null, modules: [], lessons: [], quizzes: [] };
+    if (!course) return { course: null, modules: [], lessons: [], quizzes: [], sponsor: null };
 
     const [{ data: modules }, { data: quizzes }] = await Promise.all([
       supabaseAdmin
@@ -78,7 +78,21 @@ export const getCourse = createServerFn({ method: "GET" })
         .order("position");
       lessons = ls ?? [];
     }
-    return { course, modules: modules ?? [], lessons, quizzes: quizzes ?? [] };
+
+    // Fetch sponsor partner if course is sponsored and within window
+    let sponsor: any = null;
+    const sponsorId = (course as any).sponsor_partner_id as string | null;
+    const sponsoredUntil = (course as any).sponsored_until as string | null;
+    if (sponsorId && (!sponsoredUntil || new Date(sponsoredUntil) > new Date())) {
+      const { data: p } = await supabaseAdmin
+        .from("training_partners")
+        .select("name, slug, logo_url, website_url, location")
+        .eq("id", sponsorId)
+        .eq("active", true)
+        .maybeSingle();
+      sponsor = p ?? null;
+    }
+    return { course, modules: modules ?? [], lessons, quizzes: quizzes ?? [], sponsor };
   });
 
 // ============ ENROLLMENT / ACCESS ============
