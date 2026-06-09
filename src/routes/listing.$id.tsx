@@ -714,6 +714,19 @@ function ListingDetailPage() {
                     />
                   )}
                 </div>
+                <SellerReputationBadges
+                  className="mt-2"
+                  size="sm"
+                  profile={{
+                    verification_status: seller?.verification_status,
+                    fb_verified_at: seller?.fb_verified_at,
+                    is_founding_member: seller?.is_founding_member,
+                    seller_rating_avg: seller?.seller_rating_avg,
+                    seller_rating_count: seller?.seller_rating_count,
+                    documents_verified_count: sellerRepStats?.documents_verified_count,
+                    fast_response: sellerRepStats?.fast_response,
+                  }}
+                />
               </div>
             </div>
 
