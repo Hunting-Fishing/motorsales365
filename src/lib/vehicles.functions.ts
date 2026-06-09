@@ -104,6 +104,9 @@ export const createVehicle = createServerFn({ method: "POST" })
         nickname: data.nickname ?? null,
         cover_url: data.coverUrl ?? null,
         is_public: data.isPublic ?? false,
+        ownership_count: data.ownershipCount ?? 1,
+        disclosures: (data.disclosures ?? {}) as any,
+        modifications: data.modifications ?? null,
       })
       .select("*")
       .single();
@@ -128,12 +131,16 @@ export const updateVehicle = createServerFn({ method: "POST" })
         nickname: data.nickname ?? null,
         cover_url: data.coverUrl ?? null,
         is_public: data.isPublic ?? false,
+        ownership_count: data.ownershipCount ?? 1,
+        disclosures: (data.disclosures ?? {}) as any,
+        modifications: data.modifications ?? null,
       })
       .eq("id", data.id)
       .eq("owner_user_id", userId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
 
 export const deleteVehicle = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
