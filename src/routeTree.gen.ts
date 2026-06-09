@@ -58,6 +58,7 @@ import { Route as SupportBusinessRouteImport } from './routes/support_.business'
 import { Route as SupportAccountRouteImport } from './routes/support_.account'
 import { Route as ShopCategoriesRouteImport } from './routes/shop.categories'
 import { Route as ShopCategoryRouteImport } from './routes/shop.$category'
+import { Route as ServicesInspectionRouteImport } from './routes/services.inspection'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
 import { Route as SellImportRouteImport } from './routes/sell.import'
 import { Route as SSlugRouteImport } from './routes/s.$slug'
@@ -409,6 +410,11 @@ const ShopCategoriesRoute = ShopCategoriesRouteImport.update({
 const ShopCategoryRoute = ShopCategoryRouteImport.update({
   id: '/shop/$category',
   path: '/shop/$category',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesInspectionRoute = ServicesInspectionRouteImport.update({
+  id: '/services/inspection',
+  path: '/services/inspection',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SellerIdRoute = SellerIdRouteImport.update({
@@ -1066,6 +1072,7 @@ export interface FileRoutesByFullPath {
   '/s/$slug': typeof SSlugRoute
   '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
+  '/services/inspection': typeof ServicesInspectionRoute
   '/shop/$category': typeof ShopCategoryRoute
   '/shop/categories': typeof ShopCategoriesRoute
   '/support/account': typeof SupportAccountRoute
@@ -1221,6 +1228,7 @@ export interface FileRoutesByTo {
   '/s/$slug': typeof SSlugRoute
   '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
+  '/services/inspection': typeof ServicesInspectionRoute
   '/shop/$category': typeof ShopCategoryRoute
   '/shop/categories': typeof ShopCategoriesRoute
   '/support/account': typeof SupportAccountRoute
@@ -1380,6 +1388,7 @@ export interface FileRoutesById {
   '/s/$slug': typeof SSlugRoute
   '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
+  '/services/inspection': typeof ServicesInspectionRoute
   '/shop/$category': typeof ShopCategoryRoute
   '/shop/categories': typeof ShopCategoriesRoute
   '/support_/account': typeof SupportAccountRoute
@@ -1540,6 +1549,7 @@ export interface FileRouteTypes {
     | '/s/$slug'
     | '/sell/import'
     | '/seller/$id'
+    | '/services/inspection'
     | '/shop/$category'
     | '/shop/categories'
     | '/support/account'
@@ -1695,6 +1705,7 @@ export interface FileRouteTypes {
     | '/s/$slug'
     | '/sell/import'
     | '/seller/$id'
+    | '/services/inspection'
     | '/shop/$category'
     | '/shop/categories'
     | '/support/account'
@@ -1853,6 +1864,7 @@ export interface FileRouteTypes {
     | '/s/$slug'
     | '/sell/import'
     | '/seller/$id'
+    | '/services/inspection'
     | '/shop/$category'
     | '/shop/categories'
     | '/support_/account'
@@ -1960,6 +1972,7 @@ export interface RootRouteChildren {
   RidesSlugRoute: typeof RidesSlugRoute
   SSlugRoute: typeof SSlugRoute
   SellerIdRoute: typeof SellerIdRoute
+  ServicesInspectionRoute: typeof ServicesInspectionRoute
   ShopCategoryRoute: typeof ShopCategoryRoute
   ShopCategoriesRoute: typeof ShopCategoriesRoute
   SupportAccountRoute: typeof SupportAccountRoute
@@ -2339,6 +2352,13 @@ declare module '@tanstack/react-router' {
       path: '/shop/$category'
       fullPath: '/shop/$category'
       preLoaderRoute: typeof ShopCategoryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services/inspection': {
+      id: '/services/inspection'
+      path: '/services/inspection'
+      fullPath: '/services/inspection'
+      preLoaderRoute: typeof ServicesInspectionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/seller/$id': {
@@ -3367,6 +3387,7 @@ const rootRouteChildren: RootRouteChildren = {
   RidesSlugRoute: RidesSlugRoute,
   SSlugRoute: SSlugRoute,
   SellerIdRoute: SellerIdRoute,
+  ServicesInspectionRoute: ServicesInspectionRoute,
   ShopCategoryRoute: ShopCategoryRoute,
   ShopCategoriesRoute: ShopCategoriesRoute,
   SupportAccountRoute: SupportAccountRoute,

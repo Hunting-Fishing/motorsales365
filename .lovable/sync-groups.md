@@ -37,15 +37,22 @@ Public per-vehicle profile (`/passport/$slug`) — owner timeline, service histo
 
 ---
 
-## inspection-services  *(pending — step 2)*
-PH inspection & transaction-safety upsells.
+## inspection-services
+PH inspection & transaction-safety upsells (audit #20).
 
-**Files (planned)**
-- `src/routes/services.inspection.tsx`
-- `src/lib/inspection.functions.ts`
-- migration: `inspection_services`, `inspection_orders`
+**Files**
+- `src/routes/services.inspection.tsx` — public rate card + request form
+- `src/lib/inspection.functions.ts` — `listInspectionServices`, `createInspectionOrder`, `listMyInspectionOrders`
+- `src/routes/listing.$id.tsx` — "Request inspection" CTA aside (cars/motos/trucks only)
+- migration: `inspection_services` (catalog), `inspection_orders` (requests)
 
-**Also update**: `/terms` §services, `/refund-policy`, listing detail CTA.
+**Also update**: `/terms` §services language, `/refund-policy`, bump "Last updated".
+
+**Schema invariants**
+- `inspection_services.active = true` gates catalog visibility for anon/auth
+- `inspection_orders.buyer_id` MUST equal `auth.uid()` on insert (RLS)
+- `inspection_orders.status ∈ {requested, assigned, in_progress, completed, cancelled}`; buyer can only update while `requested|assigned`
+- Never use the word "escrow" in copy — use "transaction assistance" / "payment release partner"
 
 ---
 
