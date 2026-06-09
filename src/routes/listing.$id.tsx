@@ -617,6 +617,10 @@ function ListingDetailPage() {
             </aside>
           )}
 
+          {(listing.category_slug === "cars" ||
+            listing.category_slug === "motorcycles" ||
+            listing.category_slug === "trucks") && <BuyerDocumentChecklist />}
+
           <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
             <span>Listed {formatDate(listing.published_at)}</span>
             <span>·</span>
