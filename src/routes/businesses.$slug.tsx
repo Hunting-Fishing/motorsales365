@@ -549,7 +549,50 @@ function BusinessProfilePage() {
             </div>
           </div>
 
+          {/* CERTIFIED TRAINING — 365 Learn certificates earned by owner */}
+          {ownerCertificates.length > 0 && (
+            <Card className="p-5">
+              <div className="mb-3 flex items-center gap-2">
+                <Award className="h-5 w-5 text-primary" />
+                <h2 className="font-display text-lg font-semibold">Certified Training</h2>
+                <Badge variant="secondary" className="ml-1 text-[10px]">
+                  Verified by 365 Learn
+                </Badge>
+              </div>
+              <p className="mb-3 text-sm text-muted-foreground">
+                This business owner has earned the following certificates from 365 Learn courses.
+              </p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {ownerCertificates.map((c: any) => (
+                  <Link
+                    key={c.code}
+                    to="/c/$code"
+                    params={{ code: c.code }}
+                    className="flex items-start gap-3 rounded-lg border p-3 transition-colors hover:bg-accent"
+                  >
+                    <Award className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-semibold">
+                        {c.courses?.title ?? "Course certificate"}
+                      </div>
+                      <div className="mt-0.5 text-[11px] text-muted-foreground">
+                        {c.courses?.category ? `${c.courses.category} · ` : ""}
+                        Issued {new Date(c.issued_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+              <div className="mt-3 text-xs">
+                <Link to="/learn/mechanics" className="text-primary hover:underline">
+                  Browse all 365-trained mechanics →
+                </Link>
+              </div>
+            </Card>
+          )}
+
           {/* SERVICES */}
+
           {biz.show_services !== false && services.length > 0 && (
             <Card className="p-5">
               <div className="mb-3 flex items-center gap-2">
