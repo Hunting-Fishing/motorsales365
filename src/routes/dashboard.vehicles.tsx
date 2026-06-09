@@ -583,6 +583,12 @@ function VehicleDetailDialog({
               <PassportVerificationSection vehicleId={data.vehicle.id} />
             </div>
 
+            <div className="mt-2">
+              <PassportPremiumSection vehicleId={data.vehicle.id} />
+            </div>
+
+
+
 
 
             <div className="mt-2 rounded-xl border border-border bg-card p-4">
