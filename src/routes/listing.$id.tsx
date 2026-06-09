@@ -185,6 +185,12 @@ function ListingDetailPage() {
   const [sellerDealerPlan, setSellerDealerPlan] = useState<string | null>(null);
   const [sellerDealerPeriodEnd, setSellerDealerPeriodEnd] = useState<string | null>(null);
   const [sellerDealerCancelAtPeriodEnd, setSellerDealerCancelAtPeriodEnd] = useState<boolean>(false);
+  const { data: sellerRepStats } = useQuery({
+    queryKey: ["seller-rep-stats", listing?.user_id],
+    queryFn: () => getSellerReputationStats({ data: { sellerId: listing!.user_id } }),
+    enabled: !!listing?.user_id,
+    staleTime: 5 * 60 * 1000,
+  });
   const [loading, setLoading] = useState(true);
   const [activeIdx, setActiveIdx] = useState(0);
   const [favorited, setFavorited] = useState(false);
