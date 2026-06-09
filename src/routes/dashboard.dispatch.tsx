@@ -95,9 +95,14 @@ function DispatchDashboard() {
       )
       .subscribe();
     const tick = setInterval(() => setNow(Date.now()), 1000);
+    const poll = setInterval(() => {
+      void loadJobs();
+      void loadStatus();
+    }, 30000);
     return () => {
       void supabase.removeChannel(ch);
       clearInterval(tick);
+      clearInterval(poll);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);

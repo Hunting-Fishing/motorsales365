@@ -104,33 +104,53 @@ function DispatchHistory() {
   const [loadingData, setLoadingData] = useState(true);
   const [tab, setTab] = useState<(typeof TABS)[number]["key"]>("all");
 
+  const loadHistory = async () => {
+    if (!user) return;
+    setLoadingData(true);
+    const { data, error } = await (supabase as any)
+      .from("dispatch_job_events")
+      .select(
+        `id, request_id, event, created_at, metadata,
+         tow_requests:request_id (
+           id, vehicle_summary,
+           pickup_city, pickup_province, pickup_region, dropoff_city,
+           status, dispatch_status, created_at, picked_up_at, dropped_off_at, completed_at,
+           final_price_php, provider_id
+         )`,
+      )
+      .eq("provider_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (error) console.error("[history] load error:", error);
+    setEvents((data ?? []) as EventRow[]);
+    setLoadingData(false);
+  };
+
   useEffect(() => {
     if (!user) return;
-    let cancelled = false;
-    (async () => {
-      setLoadingData(true);
-      const { data, error } = await (supabase as any)
-        .from("dispatch_job_events")
-        .select(
-          `id, request_id, event, created_at, metadata,
-           tow_requests:request_id (
-             id, vehicle_summary,
-             pickup_city, pickup_province, pickup_region, dropoff_city,
-             status, dispatch_status, created_at, picked_up_at, dropped_off_at, completed_at,
-             final_price_php, provider_id
-           )`,
-        )
-        .eq("provider_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(200);
-      if (cancelled) return;
-      if (error) console.error("[history] load error:", error);
-      setEvents((data ?? []) as EventRow[]);
-      setLoadingData(false);
-    })();
+    void loadHistory();
+
+    const ch = supabase
+      .channel(`dispatch-history-${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "dispatch_job_events",
+          filter: `provider_id=eq.${user.id}`,
+        },
+        () => void loadHistory(),
+      )
+      .subscribe();
+
+    const poll = setInterval(() => void loadHistory(), 30000);
+
     return () => {
-      cancelled = true;
+      void supabase.removeChannel(ch);
+      clearInterval(poll);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   const stats = useMemo(() => {
