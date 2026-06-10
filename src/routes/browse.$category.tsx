@@ -428,6 +428,9 @@ function BrowsePage() {
         make: vMake || undefined,
         model: vModel || undefined,
         engine: vEngine || undefined,
+        ...(Object.fromEntries(
+          Object.entries(catFilters).filter(([, v]) => v !== undefined && v !== "" && v !== false),
+        ) as any),
       },
     });
   };
