@@ -49,6 +49,12 @@ function FavoritesPage() {
               photo_count: photos.length,
               has_video: videos.length > 0,
               seller_verified: r.profiles?.verification_status === "verified",
+              seller_phone_verified: !!r.profiles?.phone_verified_at,
+              passport_published: !!(r.vehicles?.is_public && r.vehicles?.passport_slug),
+              passport_documents_checked: !!r.vehicles?.vehicle_passport_verifications?.some(
+                (v: any) => v.status === "approved",
+              ),
+              attributes: r.attributes,
               status: r.status,
             } as ListingCardData;
           })
