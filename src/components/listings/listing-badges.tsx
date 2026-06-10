@@ -86,6 +86,9 @@ export function ListingBadges({
   );
 }
 
+const toNum = (v: unknown): number =>
+  typeof v === "string" ? parseFloat(v) || 0 : typeof v === "number" ? v : 0;
+
 /** Pick which of the three prices to show as the headline number. */
 export function pickHeadlinePrice(l: {
   price_php?: number | string | null;
