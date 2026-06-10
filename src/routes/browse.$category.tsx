@@ -383,6 +383,32 @@ function BrowsePage() {
     search.make,
     search.model,
     search.engine,
+    // Include the entire category-filter blob as a single JSON dep so any
+    // change re-runs the query.
+    JSON.stringify({
+      transmission: search.transmission, fuel: search.fuel, body_type: search.body_type,
+      mileage_min: search.mileage_min, mileage_max: search.mileage_max,
+      owner_status: search.owner_status, or_cr_status: search.or_cr_status,
+      flood_history: search.flood_history, accident_history: search.accident_history,
+      financing_available: search.financing_available, trade_accepted: search.trade_accepted,
+      verified_documents_only: search.verified_documents_only,
+      moto_type: search.moto_type, engine_cc_min: search.engine_cc_min,
+      engine_cc_max: search.engine_cc_max, plate_status: search.plate_status,
+      moto_condition: search.moto_condition, delivery_available: search.delivery_available,
+      equipment_type: search.equipment_type, brand: search.brand,
+      hours_min: search.hours_min, hours_max: search.hours_max,
+      weight_min: search.weight_min, weight_max: search.weight_max,
+      attachment_type: search.attachment_type, rental_or_sale: search.rental_or_sale,
+      with_operator: search.with_operator, inspection_available: search.inspection_available,
+      boat_type: search.boat_type, hull_material: search.hull_material,
+      boat_engine_type: search.boat_engine_type, length_min: search.length_min,
+      length_max: search.length_max, boat_registration_status: search.boat_registration_status,
+      boat_usage: search.boat_usage, trailer_included: search.trailer_included,
+      registration_no: search.registration_no, airworthiness: search.airworthiness,
+      maintenance_logs: search.maintenance_logs, engine_hours_min: search.engine_hours_min,
+      engine_hours_max: search.engine_hours_max, airport_code: search.airport_code,
+      aircraft_seller: search.aircraft_seller, inspection_required: search.inspection_required,
+    }),
   ]);
 
   const applyFilters = (e: React.FormEvent) => {
