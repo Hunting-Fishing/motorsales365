@@ -370,6 +370,7 @@ function BrowsePage() {
           passport_documents_checked: !!r.vehicles?.vehicle_passport_verifications?.some(
             (v: any) => v.status === "approved",
           ),
+          seller_user_id: r.user_id ?? null,
           seller_dealer_plan: dealers[r.user_id]?.planName ?? null,
           seller_dealer_period_end: dealers[r.user_id]?.currentPeriodEnd ?? null,
           seller_dealer_cancel_at_period_end: dealers[r.user_id]?.cancelAtPeriodEnd ?? false,
