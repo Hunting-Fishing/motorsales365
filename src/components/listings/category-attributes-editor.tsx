@@ -259,6 +259,7 @@ export function CategoryAttributesEditor({ category, value, onChange }: Props) {
         <Sel label="Rental or sale" field="rental_or_sale" opts={RENTAL_OR_SALE} value={value} onChange={onChange} />
         <Bool label="With operator" field="with_operator" value={value} onChange={onChange} />
         <Bool label="Inspection available" field="inspection_available" value={value} onChange={onChange} />
+        <TrustBlock value={value} onChange={onChange} includeInspection={false} />
       </div>
     );
   }
