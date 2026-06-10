@@ -34,6 +34,7 @@ export interface ListingCardData {
   has_video?: boolean;
   category_slug: string;
   seller_verified?: boolean;
+  seller_phone_verified?: boolean;
   seller_dealer_plan?: string | null;
   seller_dealer_period_end?: string | null;
   seller_dealer_cancel_at_period_end?: boolean | null;
@@ -41,6 +42,8 @@ export interface ListingCardData {
   attributes?: Record<string, any> | null;
   view_count?: number;
   like_count?: number;
+  passport_published?: boolean;
+  passport_documents_checked?: boolean;
 }
 
 const CATEGORY_META: Record<string, { label: string; Icon: typeof Droplets }> = {
