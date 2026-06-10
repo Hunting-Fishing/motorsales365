@@ -100,7 +100,15 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
   const showServices = VEHICLE_CATEGORIES.has(listing.category_slug);
   const trust = deriveTrustSignals(listing);
   return (
-    <div className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-elegant)]">
+    <div className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-elegant)]">
+      <div className="absolute right-2 top-2 z-10">
+        <ListingActionsMenu
+          listingId={listing.id}
+          sellerUserId={listing.seller_user_id ?? null}
+          sellerName={listing.seller_name ?? null}
+          variant="overlay"
+        />
+      </div>
       <Link to="/listing/$id" params={{ id: listing.id }} className="flex flex-1 flex-col">
         <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
           <ImageWithSkeleton
