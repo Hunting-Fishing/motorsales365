@@ -638,15 +638,68 @@ function EditListingPage() {
                 <Label>Title</Label>
                 <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
               </div>
-              <div>
+              <div className="sm:col-span-2">
                 <Label>Price (₱)</Label>
+                <div className="mt-1 flex flex-wrap items-center gap-2">
+                  <div className="inline-flex rounded-md border border-border bg-background p-0.5 text-xs">
+                    {(["asking", "monthly", "down_payment"] as const).map((k) => (
+                      <button
+                        key={k}
+                        type="button"
+                        onClick={() => setPriceKind(k)}
+                        className={
+                          "rounded px-2.5 py-1 transition " +
+                          (priceKind === k
+                            ? "bg-primary text-primary-foreground"
+                            : "text-muted-foreground hover:text-foreground")
+                        }
+                      >
+                        {k === "asking" ? "Asking" : k === "monthly" ? "Monthly" : "Down payment"}
+                      </button>
+                    ))}
+                  </div>
+                  <label className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <input
+                      type="checkbox"
+                      className="h-3.5 w-3.5 accent-primary"
+                      checked={negotiable}
+                      onChange={(e) => setNegotiable(e.target.checked)}
+                    />
+                    Negotiable
+                  </label>
+                </div>
                 <Input
                   type="number"
                   min="0"
+                  className="mt-2"
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                   required
                 />
+                <p className="mt-1 text-[11px] text-muted-foreground">
+                  Real asking price only. Placeholder prices like ₱1 or ₱2 are rejected.
+                </p>
+                {(category === "car" || category === "motorcycle" || category === "truck") && (
+                  <div className="mt-3">
+                    <Label className="text-xs">Registration</Label>
+                    <Select
+                      value={registrationStatus}
+                      onValueChange={(v) =>
+                        setRegistrationStatus(v as typeof registrationStatus)
+                      }
+                    >
+                      <SelectTrigger className="mt-1 h-9">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="registered">Registered (OR/CR current)</SelectItem>
+                        <SelectItem value="unregistered">Unregistered / expired</SelectItem>
+                        <SelectItem value="for_transfer">For transfer of ownership</SelectItem>
+                        <SelectItem value="unknown">Not specified</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
               <div>
                 <Label>Contact phone</Label>
