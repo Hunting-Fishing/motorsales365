@@ -71,6 +71,9 @@ function Index() {
   const [keyword, setKeyword] = useState("");
   const [featured, setFeatured] = useState<ListingCardData[]>([]);
   const [recent, setRecent] = useState<ListingCardData[]>([]);
+  const { ids: blockedIds } = useBlockedUserIds();
+  const visibleFeatured = featured.filter((l) => !l.seller_user_id || !blockedIds.has(l.seller_user_id));
+  const visibleRecent = recent.filter((l) => !l.seller_user_id || !blockedIds.has(l.seller_user_id));
 
   useEffect(() => {
     const load = async () => {
