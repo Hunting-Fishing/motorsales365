@@ -121,7 +121,6 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
             <Badge variant={listing.seller_type === "business" ? "default" : "secondary"}>
               {listing.seller_type === "business" ? "Business" : "Private"}
             </Badge>
-            {listing.seller_verified && <VerifiedBadge size="sm" showLabel />}
             {listing.seller_type === "business" && listing.seller_dealer_plan && (
               <DealerSubscriptionBadge
                 planName={listing.seller_dealer_plan}
