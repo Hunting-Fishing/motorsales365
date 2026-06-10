@@ -6510,14 +6510,20 @@ export type Database = {
       }
       tow_requests: {
         Row: {
+          can_brake: boolean | null
+          can_roll: boolean | null
+          can_steer: boolean | null
           completed_at: string | null
           completion_notes: string | null
           created_at: string
+          damage_photo_urls: string[]
           dispatch_expansions: number
           dispatch_status: string
           dispatch_window_ends_at: string | null
           dropoff_address: string | null
           dropoff_city: string | null
+          dropoff_lat: number | null
+          dropoff_lng: number | null
           dropoff_province: string | null
           dropoff_region: string | null
           dropped_off_at: string | null
@@ -6531,24 +6537,42 @@ export type Database = {
           picked_up_at: string | null
           pickup_address: string | null
           pickup_city: string | null
+          pickup_lat: number | null
+          pickup_lng: number | null
           pickup_province: string | null
           pickup_region: string | null
           provider_id: string | null
           requested_provider_id: string | null
           requester_id: string
+          ride_id: string | null
+          situation: string | null
           status: string
           updated_at: string
+          urgency: string
+          vehicle_drivetrain: string | null
+          vehicle_make: string | null
+          vehicle_model: string | null
+          vehicle_photo_url: string | null
           vehicle_summary: string
+          vehicle_transmission: string | null
+          vehicle_trim: string | null
+          vehicle_year: number | null
         }
         Insert: {
+          can_brake?: boolean | null
+          can_roll?: boolean | null
+          can_steer?: boolean | null
           completed_at?: string | null
           completion_notes?: string | null
           created_at?: string
+          damage_photo_urls?: string[]
           dispatch_expansions?: number
           dispatch_status?: string
           dispatch_window_ends_at?: string | null
           dropoff_address?: string | null
           dropoff_city?: string | null
+          dropoff_lat?: number | null
+          dropoff_lng?: number | null
           dropoff_province?: string | null
           dropoff_region?: string | null
           dropped_off_at?: string | null
@@ -6562,24 +6586,42 @@ export type Database = {
           picked_up_at?: string | null
           pickup_address?: string | null
           pickup_city?: string | null
+          pickup_lat?: number | null
+          pickup_lng?: number | null
           pickup_province?: string | null
           pickup_region?: string | null
           provider_id?: string | null
           requested_provider_id?: string | null
           requester_id: string
+          ride_id?: string | null
+          situation?: string | null
           status?: string
           updated_at?: string
+          urgency?: string
+          vehicle_drivetrain?: string | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_photo_url?: string | null
           vehicle_summary: string
+          vehicle_transmission?: string | null
+          vehicle_trim?: string | null
+          vehicle_year?: number | null
         }
         Update: {
+          can_brake?: boolean | null
+          can_roll?: boolean | null
+          can_steer?: boolean | null
           completed_at?: string | null
           completion_notes?: string | null
           created_at?: string
+          damage_photo_urls?: string[]
           dispatch_expansions?: number
           dispatch_status?: string
           dispatch_window_ends_at?: string | null
           dropoff_address?: string | null
           dropoff_city?: string | null
+          dropoff_lat?: number | null
+          dropoff_lng?: number | null
           dropoff_province?: string | null
           dropoff_region?: string | null
           dropped_off_at?: string | null
@@ -6593,16 +6635,36 @@ export type Database = {
           picked_up_at?: string | null
           pickup_address?: string | null
           pickup_city?: string | null
+          pickup_lat?: number | null
+          pickup_lng?: number | null
           pickup_province?: string | null
           pickup_region?: string | null
           provider_id?: string | null
           requested_provider_id?: string | null
           requester_id?: string
+          ride_id?: string | null
+          situation?: string | null
           status?: string
           updated_at?: string
+          urgency?: string
+          vehicle_drivetrain?: string | null
+          vehicle_make?: string | null
+          vehicle_model?: string | null
+          vehicle_photo_url?: string | null
           vehicle_summary?: string
+          vehicle_transmission?: string | null
+          vehicle_trim?: string | null
+          vehicle_year?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tow_requests_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "rides"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       training_partner_clicks: {
         Row: {
