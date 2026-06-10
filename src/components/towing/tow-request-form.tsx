@@ -69,7 +69,10 @@ const SITUATIONS = [
   { v: "accident", label: "Accident" },
   { v: "flat_tire", label: "Flat tire" },
   { v: "no_start", label: "Won't start" },
+  { v: "jump_start", label: "Boost needed" },
+  { v: "dead_battery", label: "Dead battery" },
   { v: "no_fuel", label: "Out of fuel" },
+  { v: "lockout", label: "Locked out" },
   { v: "winch", label: "Stuck / needs winch" },
   { v: "other", label: "Other" },
 ] as const;
@@ -125,6 +128,7 @@ export function TowRequestForm({
   const [contactPhone, setContactPhone] = useState("");
   const [preferredPayment, setPreferredPayment] = useState<string>("GCash");
   const [notes, setNotes] = useState("");
+  const [passengerCount, setPassengerCount] = useState<string>("0");
   const [submitting, setSubmitting] = useState(false);
 
   // Apply pin reverse-geocoded address to the address textbox when empty
@@ -278,6 +282,7 @@ export function TowRequestForm({
         can_steer: triToBool(canSteer),
         can_brake: triToBool(canBrake),
         needed_at: urgency === "scheduled" ? new Date(scheduledAt).toISOString() : null,
+        passenger_count: passengerCount === "" ? null : Math.max(0, Math.min(50, Number(passengerCount) || 0)),
         notes: noteBlob || null,
       });
       if (error) throw error;
@@ -382,6 +387,42 @@ export function TowRequestForm({
                 </button>
               );
             })}
+          </div>
+        </div>
+
+        <div>
+          <Label htmlFor="pax" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            How many people need a ride with the tow?
+          </Label>
+          <div className="mt-2 flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => setPassengerCount((c) => String(Math.max(0, (Number(c) || 0) - 1)))}
+              aria-label="Decrease passengers"
+            >
+              −
+            </Button>
+            <Input
+              id="pax"
+              inputMode="numeric"
+              value={passengerCount}
+              onChange={(e) => setPassengerCount(e.target.value.replace(/\D/g, "").slice(0, 2))}
+              className="w-20 text-center"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => setPassengerCount((c) => String(Math.min(50, (Number(c) || 0) + 1)))}
+              aria-label="Increase passengers"
+            >
+              +
+            </Button>
+            <span className="text-xs text-muted-foreground">
+              Includes the driver. Helps the operator pick the right truck cab.
+            </span>
           </div>
         </div>
       </section>
