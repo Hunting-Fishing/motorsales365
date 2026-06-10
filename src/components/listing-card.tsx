@@ -19,6 +19,7 @@ import placeholderCar from "@/assets/placeholder-car.webp";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ServiceStrip } from "@/components/service-strip";
 import { TrustBadges } from "@/components/listings/trust-badges";
+import { ListingActionsMenu } from "@/components/listings/listing-actions-menu";
 import { deriveTrustSignals } from "@/lib/trust-signals";
 
 export interface ListingCardData {
@@ -35,6 +36,8 @@ export interface ListingCardData {
   category_slug: string;
   seller_verified?: boolean;
   seller_phone_verified?: boolean;
+  seller_user_id?: string | null;
+  seller_name?: string | null;
   seller_dealer_plan?: string | null;
   seller_dealer_period_end?: string | null;
   seller_dealer_cancel_at_period_end?: boolean | null;
