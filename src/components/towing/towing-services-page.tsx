@@ -83,9 +83,6 @@ type ProviderRow = {
 };
 
 export function TowingServicesPage() {
-  const { user } = useAuth();
-  const navigate = useNavigate();
-
   // Provider filters
   const [activeService, setActiveService] = useState<string | null>(null);
   const [region, setRegion] = useState<string | null>(null);
@@ -102,17 +99,6 @@ export function TowingServicesPage() {
   const [providerSearch, setProviderSearch] = useState("");
   const [providerOptions, setProviderOptions] = useState<{ id: string; name: string; owner_id: string }[]>([]);
 
-  // Emergency request form
-  const [pickup, setPickup] = useState<Loc>(emptyLoc);
-  const [pickupAddress, setPickupAddress] = useState("");
-  const [dropoff, setDropoff] = useState<Loc>(emptyLoc);
-  const [dropoffAddress, setDropoffAddress] = useState("");
-  const [vehicleType, setVehicleType] = useState<string>("Car");
-  const [vehicleSummary, setVehicleSummary] = useState("");
-  const [contactPhone, setContactPhone] = useState("");
-  const [preferredPayment, setPreferredPayment] = useState<string>("GCash");
-  const [notes, setNotes] = useState("");
-  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
