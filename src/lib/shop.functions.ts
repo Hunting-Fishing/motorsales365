@@ -1166,10 +1166,16 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       warnings.push("Source page did not expose a price — please enter PHP price manually.");
     }
 
-    const category_id = fuzzyCategoryMatch(
-      String(marketplace?.category_hint ?? extracted?.category_hint ?? title ?? ""),
-      (cats ?? []) as any[],
-    );
+    const matchText = [
+      marketplace?.category_hint,
+      extracted?.category_hint,
+      title,
+      brand,
+      description,
+    ]
+      .filter(Boolean)
+      .join(" ");
+    const category_id = fuzzyCategoryMatch(matchText, (cats ?? []) as any[]);
 
     // Canonical URL hardening — prefer the marketplace's own URL if present.
     const canonical = pickStr(
