@@ -95,7 +95,7 @@ function ShopCategory() {
   });
   const products = data?.products ?? [];
 
-  const hasAnyFilter = !!(search.brand || activeVehicle);
+  const hasAnyFilter = !!(search.brand || activeVehicle || search.network);
 
   const onApplyFilters = (next: {
     categorySlug: string;
@@ -105,7 +105,8 @@ function ShopCategory() {
     if (next.vehicle) setGarageState(next.vehicle);
     else setGarageState(null);
     navigate({
-      search: () => ({
+      search: (prev: any) => ({
+        ...prev,
         brand: next.brand,
         make: next.vehicle?.make ?? "",
         model: next.vehicle?.model ?? "",
@@ -114,6 +115,11 @@ function ShopCategory() {
       }),
     });
   };
+
+  const setSort = (s: ShopSort) =>
+    navigate({ search: (prev: any) => ({ ...prev, sort: s }) });
+  const setNetwork = (n: ShopNetwork) =>
+    navigate({ search: (prev: any) => ({ ...prev, network: n }) });
 
   return (
     <SiteLayout>
