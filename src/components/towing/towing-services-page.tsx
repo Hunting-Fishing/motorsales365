@@ -291,14 +291,14 @@ export function TowingServicesPage() {
                 </h1>
                 <p className="max-w-2xl text-muted-foreground">
                   Find verified towing and vehicle-transport providers across the Philippines,
-                  or post an emergency tow request via the 365 Dispatch network.
+                  or request a tow via the 365 Dispatch network.
                 </p>
               </div>
             </div>
             <div className="flex flex-wrap gap-2">
               <Button asChild size="lg">
                 <a href="#emergency-tow">
-                  <Siren className="mr-2 h-4 w-4" /> Request emergency tow
+                  <Siren className="mr-2 h-4 w-4" /> Request a tow
                 </a>
               </Button>
               <Button asChild size="lg" variant="outline">
