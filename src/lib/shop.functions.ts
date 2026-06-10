@@ -221,6 +221,7 @@ export const listShopProducts = createServerFn({ method: "GET" })
         priceMin?: number;
         priceMax?: number;
         sort?: "featured" | "newest" | "price_asc" | "price_desc" | "popular";
+        network?: string;
       } = {},
     ) =>
       z
@@ -242,9 +243,10 @@ export const listShopProducts = createServerFn({ method: "GET" })
           priceMin: z.number().nonnegative().optional(),
           priceMax: z.number().nonnegative().optional(),
           sort: z.enum(["featured", "newest", "price_asc", "price_desc", "popular"]).optional(),
+          network: z.string().max(40).optional(),
         })
         .parse(input),
-  )
+    )
   .handler(async ({ data }) => {
     // Resolve a primary category + any extra sub-category slugs to ids
     const wantedSlugs = new Set<string>();
@@ -321,6 +323,26 @@ export const listShopProducts = createServerFn({ method: "GET" })
       allowedIds = new Set(matched.map((r: any) => r.product_id));
     }
 
+    // Marketplace/network filter: keep only products that have at least one
+    // active link from the selected affiliate network.
+    let networkAllowedIds: Set<string> | null = null;
+    if (data.network) {
+      const { data: net } = await supabaseAdmin
+        .from("affiliate_networks")
+        .select("id")
+        .eq("slug", data.network)
+        .eq("active", true)
+        .maybeSingle();
+      if (!net) return { products: [] };
+      const { data: linkRows } = await supabaseAdmin
+        .from("shop_product_links")
+        .select("product_id")
+        .eq("network_id", (net as any).id)
+        .limit(5000);
+      networkAllowedIds = new Set((linkRows ?? []).map((r: any) => r.product_id as string));
+      if (networkAllowedIds.size === 0) return { products: [] };
+    }
+
     let q = supabaseAdmin
       .from("shop_products")
       .select(
@@ -339,6 +361,9 @@ export const listShopProducts = createServerFn({ method: "GET" })
       const ids = Array.from(new Set((pcRows ?? []).map((r: any) => r.product_id as string)));
       if (ids.length === 0) return { products: [] };
       q = q.in("id", ids);
+    }
+    if (networkAllowedIds) {
+      q = q.in("id", Array.from(networkAllowedIds));
     }
     if (data.featured) q = q.eq("featured", true);
     if (data.dealsOnly) q = q.eq("is_deal", true);

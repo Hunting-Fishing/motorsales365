@@ -18,6 +18,7 @@ import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
 import { ShopMobileCtaBar } from "@/components/shop/shop-mobile-cta-bar";
 import { ShopBreadcrumbs } from "@/components/shop/shop-breadcrumbs";
 import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
+import { ShopSortBar, type ShopSort, type ShopNetwork } from "@/components/shop/shop-sort-bar";
 
 import { X } from "lucide-react";
 
@@ -27,6 +28,11 @@ const catSearch = z.object({
   year: fallback(z.number().optional(), undefined).default(undefined),
   engine: fallback(z.string(), "").default(""),
   brand: fallback(z.string(), "").default(""),
+  sort: fallback(
+    z.enum(["featured", "price_asc", "price_desc", "popular", "newest"]),
+    "featured",
+  ).default("featured"),
+  network: fallback(z.enum(["", "shopee", "lazada", "aliexpress"]), "").default(""),
 });
 
 export const Route = createFileRoute("/shop/$category")({
@@ -80,6 +86,8 @@ function ShopCategory() {
         }
       : {}),
     ...(search.brand ? { brand: search.brand } : {}),
+    ...(search.network ? { network: search.network } : {}),
+    sort: search.sort,
   };
   const { data } = useQuery({
     queryKey: ["shop-cat", category, filterArgs],
@@ -87,7 +95,7 @@ function ShopCategory() {
   });
   const products = data?.products ?? [];
 
-  const hasAnyFilter = !!(search.brand || activeVehicle);
+  const hasAnyFilter = !!(search.brand || activeVehicle || search.network);
 
   const onApplyFilters = (next: {
     categorySlug: string;
@@ -97,7 +105,8 @@ function ShopCategory() {
     if (next.vehicle) setGarageState(next.vehicle);
     else setGarageState(null);
     navigate({
-      search: () => ({
+      search: (prev: any) => ({
+        ...prev,
         brand: next.brand,
         make: next.vehicle?.make ?? "",
         model: next.vehicle?.model ?? "",
@@ -106,6 +115,11 @@ function ShopCategory() {
       }),
     });
   };
+
+  const setSort = (s: ShopSort) =>
+    navigate({ search: (prev: any) => ({ ...prev, sort: s }) });
+  const setNetwork = (n: ShopNetwork) =>
+    navigate({ search: (prev: any) => ({ ...prev, network: n }) });
 
   return (
     <SiteLayout>
@@ -171,6 +185,13 @@ function ShopCategory() {
         {cat?.description && <p className="text-muted-foreground">{cat.description}</p>}
 
         <AdCarousel placement="shop_top" />
+
+        <ShopSortBar
+          sort={search.sort}
+          network={search.network}
+          onSortChange={setSort}
+          onNetworkChange={setNetwork}
+        />
 
         {products.length === 0 ? (
           <p className="text-muted-foreground">

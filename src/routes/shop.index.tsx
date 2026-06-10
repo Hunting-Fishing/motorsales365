@@ -19,6 +19,7 @@ import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
 import { ShopFavoriteButton } from "@/components/shop/shop-favorite-button";
 import { ShopMobileCtaBar } from "@/components/shop/shop-mobile-cta-bar";
 import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
+import { ShopSortBar, type ShopSort, type ShopNetwork } from "@/components/shop/shop-sort-bar";
 
 import { useGarage, formatVehicle, type GarageVehicle } from "@/lib/garage";
 import { X } from "lucide-react";
@@ -31,6 +32,11 @@ const shopSearch = z.object({
   transmission: fallback(z.string(), "").default(""),
   brand: fallback(z.string(), "").default(""),
   category: fallback(z.string(), "").default(""),
+  sort: fallback(
+    z.enum(["featured", "price_asc", "price_desc", "popular", "newest"]),
+    "featured",
+  ).default("featured"),
+  network: fallback(z.enum(["", "shopee", "lazada", "aliexpress"]), "").default(""),
 });
 
 export const Route = createFileRoute("/shop/")({
@@ -97,14 +103,15 @@ function ShopIndex() {
       : {}),
     ...(search.brand ? { brand: search.brand } : {}),
     ...(search.category ? { categorySlug: search.category } : {}),
+    ...(search.network ? { network: search.network } : {}),
   };
   const { data: featData } = useQuery({
     queryKey: ["shop-featured", filterArgs],
     queryFn: () => listShopProducts({ data: { featured: true, limit: 12, ...filterArgs } }),
   });
   const { data: latestData } = useQuery({
-    queryKey: ["shop-latest", filterArgs],
-    queryFn: () => listShopProducts({ data: { limit: 24, ...filterArgs } }),
+    queryKey: ["shop-latest", filterArgs, search.sort],
+    queryFn: () => listShopProducts({ data: { limit: 24, sort: search.sort, ...filterArgs } }),
   });
   const { data: dealsData } = useQuery({
     queryKey: ["shop-deals", filterArgs],
@@ -155,7 +162,8 @@ function ShopIndex() {
     if (next.vehicle) setGarageState(next.vehicle);
     else setGarageState(null);
     navigate({
-      search: () => ({
+      search: (prev: any) => ({
+        ...prev,
         category: next.categorySlug,
         brand: next.brand,
         make: next.vehicle?.make ?? "",
@@ -167,7 +175,12 @@ function ShopIndex() {
     });
   };
 
-  const hasAnyFilter = !!(search.brand || search.category || activeVehicle);
+  const setSort = (s: ShopSort) =>
+    navigate({ search: (prev: any) => ({ ...prev, sort: s }) });
+  const setNetwork = (n: ShopNetwork) =>
+    navigate({ search: (prev: any) => ({ ...prev, network: n }) });
+
+  const hasAnyFilter = !!(search.brand || search.category || activeVehicle || search.network);
 
   return (
     <SiteLayout>
@@ -332,9 +345,18 @@ function ShopIndex() {
         )}
 
         <section>
-          <h2 className="mb-4 text-xl font-semibold">
-            {activeVehicle ? "Matching products" : "Latest products"}
-          </h2>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-xl font-semibold">
+              {activeVehicle ? "Matching products" : "Latest products"}
+            </h2>
+            <ShopSortBar
+              sort={search.sort}
+              network={search.network}
+              onSortChange={setSort}
+              onNetworkChange={setNetwork}
+              className="w-full sm:w-auto"
+            />
+          </div>
           {latest.length === 0 ? (
             <p className="text-muted-foreground">
               {hasAnyFilter
