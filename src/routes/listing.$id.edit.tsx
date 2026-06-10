@@ -137,6 +137,11 @@ function EditListingPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
+  const [priceKind, setPriceKind] = useState<"asking" | "monthly" | "down_payment">("asking");
+  const [negotiable, setNegotiable] = useState(false);
+  const [registrationStatus, setRegistrationStatus] = useState<
+    "registered" | "unregistered" | "for_transfer" | "unknown"
+  >("unknown");
   const [region, setRegion] = useState<string | null>(null);
   const [province, setProvince] = useState<string | null>(null);
   const [city, setCity] = useState<string | null>(null);
