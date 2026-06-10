@@ -1,16 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import {
-  Handshake,
-  CalendarClock,
-  Wallet,
   BadgeCheck,
   AlertTriangle,
   FileCheck2,
   FileX2,
   ArrowLeftRight,
 } from "lucide-react";
-import { formatPHP } from "@/lib/format";
 import { getSellerTier, type TierInput } from "@/lib/listing-tier";
 
 export type RegistrationStatus = "registered" | "unregistered" | "for_transfer" | "unknown";
