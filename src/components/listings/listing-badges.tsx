@@ -62,36 +62,7 @@ export function ListingBadges({
         </Badge>
       )}
 
-      {monthly > 0 && listing.headlineKind !== "monthly" && (
-        <Badge
-          variant="outline"
-          className="gap-1 border-purple-500/40 bg-purple-500/10 text-purple-600 dark:text-purple-300"
-        >
-          <CalendarClock className={iconSz} /> {formatPHP(monthly)}/mo
-        </Badge>
-      )}
-      {dp > 0 && listing.headlineKind !== "down_payment" && (
-        <Badge
-          variant="outline"
-          className="gap-1 border-orange-500/40 bg-orange-500/10 text-orange-600 dark:text-orange-300"
-        >
-          <Wallet className={iconSz} /> DP {formatPHP(dp)}
-        </Badge>
-      )}
-      {asking > 0 && listing.headlineKind && listing.headlineKind !== "asking" && (
-        <Badge variant="outline" className="gap-1">
-          Cash {formatPHP(asking)}
-        </Badge>
-      )}
-
-      {listing.negotiable && (
-        <Badge
-          variant="outline"
-          className="gap-1 border-blue-500/40 bg-blue-500/10 text-blue-600 dark:text-blue-300"
-        >
-          <Handshake className={iconSz} /> Negotiable
-        </Badge>
-      )}
+      {/* Pricing & negotiable pills moved to PricingWidget */}
 
       {reg === "registered" && (
         <Badge
