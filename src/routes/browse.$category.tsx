@@ -60,7 +60,7 @@ const searchSchema = z.object({
   transmission: optStr(),
   fuel: optStr(),
   body_type: optStr(),
-  drivetrain: optStr(),
+  drivetrain: z.enum(["fwd", "rwd", "awd", "4x4", "4x2"]).optional(),
   mileage_min: optNum(),
   mileage_max: optNum(),
   owner_status: optStr(),
