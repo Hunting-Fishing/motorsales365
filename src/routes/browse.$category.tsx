@@ -536,6 +536,7 @@ function BrowsePage() {
                 />
               </div>
             )}
+            <CategoryFilters category={category} value={catFilters} onChange={setCatFilters} />
             <LocationPicker
               asFilter
               stacked
