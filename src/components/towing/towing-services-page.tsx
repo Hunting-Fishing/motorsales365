@@ -245,69 +245,8 @@ export function TowingServicesPage() {
     };
   }, [providerSearch]);
 
-  const handleEmergencySubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) {
-      navigate({ to: "/login" });
-      return;
-    }
-    if (!vehicleSummary.trim() && !vehicleType) {
-      toast.error("Tell us what vehicle needs towing");
-      return;
-    }
-    if (!pickup.region || !dropoff.region) {
-      toast.error("Pickup and dropoff regions are required");
-      return;
-    }
-    setSubmitting(true);
-    try {
-      const summary = vehicleSummary.trim()
-        ? `${vehicleType} — ${vehicleSummary.trim()}`
-        : vehicleType;
-      const noteBlob = [
-        contactPhone ? `Contact: ${contactPhone}` : null,
-        preferredPayment ? `Preferred payment: ${preferredPayment}` : null,
-        notes.trim() || null,
-      ]
-        .filter(Boolean)
-        .join("\n");
 
-      const { error } = await (supabase as any).from("tow_requests").insert({
-        requester_id: user.id,
-        provider_id: null,
-        requested_provider_id: requestedProvider?.id ?? null,
-        listing_id: null,
-        pickup_region: pickup.region,
-        pickup_province: pickup.province,
-        pickup_city: pickup.city,
-        pickup_address: pickupAddress || null,
-        dropoff_region: dropoff.region,
-        dropoff_province: dropoff.province,
-        dropoff_city: dropoff.city,
-        dropoff_address: dropoffAddress || null,
-        vehicle_summary: summary,
-        needed_at: null,
-        notes: noteBlob || null,
-      });
-      if (error) throw error;
-      toast.success(
-        requestedProvider
-          ? `Request sent to ${requestedProvider.name}.`
-          : "Emergency tow request posted — nearby 365 Dispatch providers will respond within 5 minutes.",
-      );
-      setPickupAddress("");
-      setDropoffAddress("");
-      setVehicleSummary("");
-      setContactPhone("");
-      setNotes("");
-      setRequestedProvider(null);
-      setProviderSearch("");
-    } catch (err: any) {
-      toast.error(err.message ?? "Failed to submit request");
-    } finally {
-      setSubmitting(false);
-    }
-  };
+
 
   const promoted = useMemo(
     () =>
