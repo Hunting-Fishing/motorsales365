@@ -19,14 +19,23 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
+const searchSchema = z.object({
+  target_type: z.enum(["listing", "business", "seller", "other"]).optional(),
+  category: z.string().optional(),
+  listing_id: z.string().uuid().optional(),
+  target_url: z.string().optional(),
+  details: z.string().optional(),
+});
+
 export const Route = createFileRoute("/report")({
+  validateSearch: (search) => searchSchema.parse(search),
   head: () => ({
     meta: [
       { title: "Report a scam or suspicious listing — 365 MotorSales Philippines" },
       {
         name: "description",
         content:
-          "Report scams, fraudulent sellers, stolen vehicles, or suspicious businesses on 365 MotorSales. Attach screenshots or documents as evidence — our trust & safety team reviews every report.",
+          "Report scams, fraudulent sellers, stolen vehicles, fake documents, off-platform payments, duplicate listings, and price bait on 365 MotorSales. Our trust & safety team reviews every report.",
       },
     ],
   }),
@@ -43,8 +52,10 @@ const TARGET_TYPES = [
 const CATEGORIES = [
   "Scam / fraud attempt",
   "Stolen vehicle",
-  "Fake / cloned OR-CR",
+  "Fake / forged documents",
   "Off-platform payment pressure",
+  "Duplicate listing",
+  "Price bait / hidden fees",
   "Misleading photos or description",
   "Wrong category / spam",
   "Offensive or illegal content",
