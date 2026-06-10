@@ -33,6 +33,11 @@ import { TagPicker } from "@/components/tag-picker";
 import { CATEGORY_DEFAULT_GROUPS, SERVICE_CATEGORIES } from "@/data/service-tags";
 import { uploadWithRetry } from "@/lib/storage-upload";
 import { getUserPlanLimits, FREE_PLAN_LIMITS, type PlanLimits } from "@/lib/plan-limits";
+import {
+  CategoryAttributesEditor,
+  CATEGORY_ATTR_KEYS,
+} from "@/components/listings/category-attributes-editor";
+import { isAttrCategory } from "@/lib/category-attributes";
 import { PhoneInput } from "@/components/phone-input";
 import { parseE164, buildE164 } from "@/data/country-codes";
 import {
