@@ -78,7 +78,7 @@ export function PricingWidget({
 
   return (
     <div className={cn("flex flex-wrap items-center gap-1.5", className)}>
-      {asking > 0 &&
+      {asking !== null &&
         pill({
           kind: "asking",
           Icon: Banknote,
@@ -90,7 +90,7 @@ export function PricingWidget({
             soft: "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
           },
         })}
-      {monthly > 0 &&
+      {monthly !== null &&
         pill({
           kind: "monthly",
           Icon: CalendarClock,
@@ -101,7 +101,7 @@ export function PricingWidget({
             soft: "border-purple-500/40 bg-purple-500/10 text-purple-700 dark:text-purple-300",
           },
         })}
-      {dp > 0 &&
+      {dp !== null &&
         pill({
           kind: "down_payment",
           Icon: Wallet,
@@ -112,6 +112,7 @@ export function PricingWidget({
             soft: "border-orange-500/40 bg-orange-500/10 text-orange-700 dark:text-orange-300",
           },
         })}
+
       {listing.negotiable &&
         pill({
           kind: "negotiable",
