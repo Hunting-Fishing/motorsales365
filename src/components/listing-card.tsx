@@ -50,7 +50,8 @@ export interface ListingCardData {
   like_count?: number;
   passport_published?: boolean;
   passport_documents_checked?: boolean;
-  price_kind?: "asking" | "monthly" | "down_payment" | "starting_bid" | null;
+  monthly_php?: number | string | null;
+  down_payment_php?: number | string | null;
   negotiable?: boolean | null;
   price_hidden?: boolean | null;
   registration_status?: "registered" | "unregistered" | "for_transfer" | "unknown" | null;
