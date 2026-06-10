@@ -496,18 +496,27 @@ function ListingDetailPage() {
               </div>
             </div>
             <div className="flex flex-col items-end gap-2">
-              <ListingPrice
-                pricePhp={listing.price_php}
-                size="lg"
-                priceKind={listing.price_kind ?? "asking"}
-                negotiable={!!listing.negotiable}
-                priceHidden={!!listing.price_hidden}
-              />
+              {(() => {
+                const headline = pickHeadlinePrice(listing);
+                return (
+                  <ListingPrice
+                    pricePhp={headline.amount}
+                    size="lg"
+                    headlineKind={headline.kind === "hidden" ? "asking" : headline.kind}
+                    negotiable={!!listing.negotiable}
+                    priceHidden={!!listing.price_hidden || headline.kind === "hidden"}
+                  />
+                );
+              })()}
               <ListingBadges
                 listing={{
                   ...listing,
                   seller_dealer_plan: sellerDealerPlan,
                   seller_verified: !!(seller as any)?.verification_status,
+                  headlineKind:
+                    pickHeadlinePrice(listing).kind === "hidden"
+                      ? null
+                      : (pickHeadlinePrice(listing).kind as "asking" | "monthly" | "down_payment"),
                 }}
                 size="md"
               />
