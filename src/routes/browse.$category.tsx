@@ -202,7 +202,9 @@ function BrowsePage() {
     }
     return init;
   });
-  const [items, setItems] = useState<ListingCardData[]>([]);
+  const [allItems, setAllItems] = useState<ListingCardData[]>([]);
+  const { ids: blockedIds } = useBlockedUserIds();
+  const items = allItems.filter((l) => !l.seller_user_id || !blockedIds.has(l.seller_user_id));
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
