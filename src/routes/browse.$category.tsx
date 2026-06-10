@@ -388,7 +388,7 @@ function BrowsePage() {
     // Include the entire category-filter blob as a single JSON dep so any
     // change re-runs the query.
     JSON.stringify({
-      transmission: search.transmission, fuel: search.fuel, body_type: search.body_type,
+      transmission: search.transmission, fuel: search.fuel, body_type: search.body_type, drivetrain: search.drivetrain,
       mileage_min: search.mileage_min, mileage_max: search.mileage_max,
       owner_status: search.owner_status, or_cr_status: search.or_cr_status,
       flood_history: search.flood_history, accident_history: search.accident_history,
