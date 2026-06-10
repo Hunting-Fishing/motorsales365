@@ -468,6 +468,7 @@ function BrowsePage() {
         make: vMake || null,
         model: vModel || null,
         engine: vEngine || null,
+        ...catFilters,
       },
     });
     setSavingSearch(false);
