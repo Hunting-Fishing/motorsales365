@@ -552,31 +552,9 @@ export const adminUpsertProduct = createServerFn({ method: "POST" })
       productId = row.id;
     }
 
-    // Sync shop_product_categories: primary = category_id, plus its parent
-    // (so the product surfaces on both the subcategory and the parent
-    // category landing pages).
-    if (payload.category_id) {
-      const { data: catRow } = await supabase
-        .from("shop_categories")
-        .select("id, parent_id")
-        .eq("id", payload.category_id)
-        .maybeSingle();
-      const links: Array<{ product_id: string; category_id: string; is_primary: boolean }> = [
-        { product_id: productId, category_id: payload.category_id, is_primary: true },
-      ];
-      if (catRow?.parent_id) {
-        links.push({ product_id: productId, category_id: catRow.parent_id, is_primary: false });
-      }
-      // Clear stale primary, then upsert. Other curator-added cross-links stay.
-      await supabase
-        .from("shop_product_categories")
-        .delete()
-        .eq("product_id", productId)
-        .eq("is_primary", true);
-      await supabase
-        .from("shop_product_categories")
-        .upsert(links, { onConflict: "product_id,category_id" });
-    }
+    // Sync shop_product_categories so the product appears under both its
+    // subcategory and the parent department landing page.
+    await syncProductCategoryLinks(supabase as any, productId, payload.category_id ?? null);
     return { id: productId };
   });
 
