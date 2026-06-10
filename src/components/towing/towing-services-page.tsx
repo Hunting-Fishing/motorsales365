@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
+import { Link } from "@tanstack/react-router";
 import {
   Truck,
   Clock,
@@ -15,12 +14,10 @@ import {
   Network,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -32,6 +29,7 @@ import {
 } from "@/components/ui/select";
 import { LocationPicker } from "@/components/location-picker";
 import { FeaturedTowProviders } from "@/components/tow/featured-tow-providers";
+import { TowRequestForm } from "@/components/towing/tow-request-form";
 
 const SERVICE_CHIPS = [
   "Tow car",
