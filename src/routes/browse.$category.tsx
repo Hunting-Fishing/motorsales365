@@ -255,6 +255,8 @@ function BrowsePage() {
         eq("or_cr_status", search.or_cr_status);
         eq("flood_history", search.flood_history);
         eq("accident_history", search.accident_history);
+        eq("registered_owner", search.registered_owner);
+        isTrue("deed_chain_available", search.deed_chain_available);
         isTrue("financing_available", search.financing_available);
         isTrue("trade_accepted", search.trade_accepted);
         if (search.verified_documents_only) {
