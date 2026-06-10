@@ -181,7 +181,7 @@ function BrowsePage() {
   const [catFilters, setCatFilters] = useState<CategoryFilterValue>(() => {
     const init: CategoryFilterValue = {};
     const keys = [
-      "transmission","fuel","body_type","mileage_min","mileage_max","owner_status",
+      "transmission","fuel","body_type","drivetrain","mileage_min","mileage_max","owner_status",
       "or_cr_status","flood_history","accident_history","financing_available",
       "trade_accepted","verified_documents_only","moto_type","engine_cc_min",
       "engine_cc_max","plate_status","moto_condition","delivery_available",
