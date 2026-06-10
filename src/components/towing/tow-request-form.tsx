@@ -69,7 +69,10 @@ const SITUATIONS = [
   { v: "accident", label: "Accident" },
   { v: "flat_tire", label: "Flat tire" },
   { v: "no_start", label: "Won't start" },
+  { v: "jump_start", label: "Boost needed" },
+  { v: "dead_battery", label: "Dead battery" },
   { v: "no_fuel", label: "Out of fuel" },
+  { v: "lockout", label: "Locked out" },
   { v: "winch", label: "Stuck / needs winch" },
   { v: "other", label: "Other" },
 ] as const;
