@@ -1,77 +1,56 @@
-## Part 1 — Fix towing services page filters
+## Goal
+Make `/browse/$category` filters category-specific (Cars, Motorcycles, Boats, Airplanes, Heavy Equipment) and ensure the listing editor captures the matching fields so filters actually return results.
 
-Audit found three bugs that make the filters effectively non-functional:
+## Approach
+All extra fields already live in `listings.attributes` (jsonb). Browse filters use `attributes->>key ilike ...`. So this is mostly a frontend-only change: add per-category filter UI + edit-form fields, wire them through the search schema, and write/read the same attribute keys on both sides.
 
-1. **Province filter throws silently.** `listings.province` column does not exist (only `region` and `city`). `q.eq("province", province)` returns an error and zero rows whenever a province is picked.
-2. **Wrong data source.** Real tow providers live in the `businesses` table (`type_slug='towing'`), not `listings`. The grid currently queries `listings` with `category_slug='towing'` — which is essentially empty. So filters appear broken even when "matching" providers exist on the site.
-3. **24/7 flag lives on `provider_tow_rates`, not `listings.attributes`.** Toggling 24/7 filters on a field that providers never set.
+No DB migration needed (jsonb absorbs new keys). No business-logic changes outside the listing form and browse page.
 
-**Fixes:**
+## Filter spec by category (attribute keys)
 
-- Rewrite the grid query in `src/components/towing/towing-services-page.tsx` to source from `businesses` (joined with `provider_tow_rates` via `owner_id`) instead of `listings`:
-  - `region` / `province` / `city` → `businesses.region/province/city` (province exists there).
-  - `24/7` → join `provider_tow_rates.available_24_7 = true`.
-  - `Verified only` → `businesses.verification_status = 'verified'` (or `is_verified=true`, whichever the table actually has).
-  - `Accepted payments` → check `businesses.attributes->'payments'` (add this if missing) and **also** `attributes.payments` on each provider's owner profile for backward compat.
-  - `Service chips` → match against `businesses.attributes->'services'` (array). Keep the keyword-mapping fallback for legacy rows.
-- Replace `ListingCard` rendering with a new lightweight `TowProviderCard` (or reuse the card style from `FeaturedTowProviders`) so the grid renders business profiles, not vehicle listings.
-- Wire empty-state copy and "promoted" section to the new `subscription_tier` (`featured`/`premium`/new `dispatch_*` tiers from Part 2).
-- Verify by seeding 2–3 sample tow businesses (or use existing) and toggling every filter combination in the preview.
+**Cars** (`car`)
+- transmission (auto/manual/cvt/dct), fuel (gas/diesel/hybrid/ev/lpg), mileage_min / mileage_max, body_type (sedan/suv/hatch/pickup/van/coupe/mpv), registered_owner (1st/2nd/3rd+), or_cr_status (complete/lost/in_process), flood_history (yes/no/unknown), accident_history (yes/no/unknown), financing_available, trade_accepted, verified_documents_only
 
-## Part 2 — 365 Dispatch (Automated Dispatcher subscription)
+**Motorcycles** (`motorcycle`)
+- engine_cc_min/max, moto_type (scooter/underbone/big_bike/tricycle/dirt_bike), or_cr_status, plate_status (with/without/temporary), registered_owner, modified (stock/modified), delivery_available
 
-Three new monthly plans for towing providers to join the nationwide auto-dispatch network. Routing prefers Nearest → Best rating → Fastest historical ETA, with a 5-minute window where matched providers can see and accept the job before it broadens.
+**Heavy equipment** (`equipment`)
+- equipment_type (excavator/loader/bulldozer/crane/forklift/dump_truck/grader/compactor), hours_min/max, brand, operating_weight_min/max (tons), attachment_type, rental_or_sale (rental/sale/both), with_operator, inspection_available
 
-### Pricing tiers (subscription_plans rows, type='dispatcher')
+**Boats** (`boat`)
+- boat_type (banca/yacht/speedboat/sailboat/fishing/jetski), hull_material (fiberglass/aluminum/wood/steel/inflatable), engine_type (outboard/inboard/sail/electric), length_min/max (ft), registration_status (registered/unregistered/in_process), trailer_included, usage (commercial/fishing/recreation)
 
-| Plan | Price/mo | Coverage | Max active jobs | Priority |
-|---|---|---|---|---|
-| Dispatch Starter | ₱499 | Home region only | 3 | Standard |
-| Dispatch Pro | ₱1,499 | Multi-region (up to 4) | 10 | High |
-| Dispatch Fleet | ₱2,999 | Nationwide | Unlimited | Top |
+**Airplanes** (`airplane`) — higher-trust workflow
+- registration_no (text), airworthiness (current/expired/in_process), maintenance_logs (complete/partial/none), engine_hours_min/max, airport_code (text), broker_or_owner (broker/owner/dealer), inspection_required (yes/no)
+- Listing form shows a notice: aircraft listings require admin review before going live (already covered by existing pending → admin.listings flow).
 
-Direct-request jobs (user picks the provider by name in the form) bypass dispatch and go straight to that provider regardless of tier.
+## File changes
 
-### Database changes (one migration)
+1. **`src/routes/browse.$category.tsx`**
+   - Extend `searchSchema` with all keys above (all `.optional()`, coerce numerics).
+   - Build the query filters per-category in the existing supabase query block, using `attributes->>key` ilike for strings, `(attributes->>key)::int` range for numerics, and `attributes->>key = 'true'` for booleans.
+   - Replace the single `VehiclePicker` block with a `<CategoryFilters category={category} value={state} onChange={...} />` component that renders only the fields relevant to the current category. Keep keyword/location/price/sort shared.
+   - Update the Apply-filters navigate() call to include the new keys.
 
-- Add to `provider_tow_rates`: `dispatch_enabled boolean`, `dispatch_plan text`, `dispatch_regions text[]`, `dispatch_max_jobs int`, `avg_response_sec int`, `avg_rating numeric`.
-- Add to `tow_requests`: `dispatch_status text` (`open` | `matched` | `accepted` | `expired` | `direct`), `dispatch_window_ends_at timestamptz`, `requested_provider_id uuid` (for direct picks), `matched_provider_ids uuid[]`.
-- New table `dispatch_subscriptions` (user_id, plan, status, current_period_end, stripe_subscription_id, environment) — same shape as existing `business_subscriptions` so the Stripe webhook can populate it.
-- Insert three rows into `subscription_plans` with `stripe_lookup_key='dispatch_starter_monthly' | 'dispatch_pro_monthly' | 'dispatch_fleet_monthly'`.
-- Enable Realtime on `tow_requests` so dispatched providers see new jobs live.
-- Standard GRANT + RLS: providers read/update only their own dispatch row; tow_requests visible to requester, requested provider, and any provider in `matched_provider_ids`.
+2. **`src/components/browse/category-filters.tsx`** (new)
+   - One component, switch on `category`. Uses existing shadcn `Select`/`Input`/`Checkbox`. Pure controlled component, no data fetching.
+   - Co-locate option lists (transmissions, body types, equipment types, etc.) at the top of the file.
 
-### Auto-dispatch engine
+3. **`src/routes/listing.$id.edit.tsx`** and **`src/routes/sell.tsx`** (the creator flow)
+   - Add the same per-category field sets, gated by `category_slug`, writing to `attributes` with the keys above.
+   - Reuse the new option lists from `category-filters.tsx` so labels stay in sync.
+   - Aircraft section shows the trust notice and keeps `status='pending'` on submit (existing behavior).
 
-- **Trigger** `tg_dispatch_on_tow_request` (AFTER INSERT on `tow_requests`):
-  - If `requested_provider_id IS NOT NULL` → set `dispatch_status='direct'`, notify only that provider, exit.
-  - Otherwise compute eligible providers: `dispatch_enabled=true`, current `dispatch_subscriptions.status='active'`, pickup region in `dispatch_regions` (or 'nationwide'), under `dispatch_max_jobs`.
-  - Rank by tier priority → distance proxy (same city > same province > same region) → `avg_rating` DESC → `avg_response_sec` ASC.
-  - Take top 5, write into `matched_provider_ids`, set `dispatch_status='matched'`, `dispatch_window_ends_at = now() + 5 min`.
-- **pg_cron job** every minute: any `dispatch_status='matched'` past its window with no accept → re-rank and broaden (next 5, then nationwide), or mark `expired` after 3 expansions.
-- **Accept flow:** server fn `acceptDispatchedJob` — first provider to call wins; sets `provider_id`, `dispatch_status='accepted'`, status='assigned'; others see it close in realtime.
+4. **Listing detail (`src/routes/listing.$id.tsx`)**
+   - Add a small "Specs" block that renders any present attributes (label/value rows) so the new data is visible to buyers. No layout overhaul.
 
-### UI / surfaces
+## Out of scope
+- No schema migration; `attributes` jsonb already holds arbitrary keys.
+- No changes to towing/carwash/parts/drone/repair categories (already category-specific).
+- No verification workflow changes for aircraft beyond surfacing the existing pending-review notice.
+- No SEO copy rewrites beyond keeping current `head()`.
 
-- **`/dashboard/dispatch`** (new, under `_authenticated/`): live queue of matched jobs (realtime), Accept/Decline, in-progress jobs, completed history, current plan + active-jobs gauge. Email notification on match using existing email infra (no SMS for v1 — in-app + email is the simplest "professional" path).
-- **`/dispatch`** (new public landing): pitch page for "365 Dispatch — Nationwide Tow Network", plan comparison table, "Join the network" CTA → Stripe Checkout.
-- **Emergency form** (`towing-services-page.tsx`): add optional "Request a specific provider" combobox (searches `businesses` where `type_slug='towing'`) → populates `requested_provider_id`.
-- **Provider settings**: on `/dashboard/tow`, add a "365 Dispatch" card → toggle `dispatch_enabled`, pick covered regions (capped by plan), upgrade/manage subscription via Stripe Customer Portal.
-- **Sidebar nav**: add "365 Dispatch" link in `dashboard.tsx` (only shown when user is a tow provider or has dispatch subscription).
-
-### Stripe wiring
-
-- Reuse existing `createCheckoutSession` / webhook flow. Webhook recognizes the new `lookup_key`s and writes to `dispatch_subscriptions` (mirroring `business_subscriptions`).
-- Add `dispatch_*` lookup keys to the tier-mapping object used by the subscription gate.
-
-### Policy / compliance
-
-- Update `/terms` with a "365 Dispatch Network" section (subscription model, cancellation, provider obligations to respond within window, refund policy) and bump "Last updated".
-- Update `/privacy` if location data sharing semantics change (we forward pickup region/city to matched providers).
-
-### Out of scope (v1)
-
-- SMS push (in-app realtime + email only).
-- Live GPS tracking of providers (manual ETA only).
-- Bidding UI on dispatched jobs (existing `tow_bids` stays for non-dispatch requests).
-- Multi-provider fleet seats under one dispatch subscription (single-user for now; revisit with org/staff later).
+## Verification
+- Create one test listing per category with the new fields filled in, then open `/browse/<category>` and confirm each new filter narrows the result set correctly.
+- Check `/listing/:id` shows the new specs block.
+- Build passes (typecheck covers the extended zod schema and form state).
