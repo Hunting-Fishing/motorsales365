@@ -396,6 +396,7 @@ function BrowsePage() {
       mileage_min: search.mileage_min, mileage_max: search.mileage_max,
       owner_status: search.owner_status, or_cr_status: search.or_cr_status,
       flood_history: search.flood_history, accident_history: search.accident_history,
+      registered_owner: search.registered_owner, deed_chain_available: search.deed_chain_available,
       financing_available: search.financing_available, trade_accepted: search.trade_accepted,
       verified_documents_only: search.verified_documents_only,
       moto_type: search.moto_type, engine_cc_min: search.engine_cc_min,
