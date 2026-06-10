@@ -12,7 +12,7 @@ export function ListingPrice({
   pricePhp,
   className,
   size = "lg",
-  priceKind = "asking",
+  headlineKind = "asking",
   negotiable = false,
   priceHidden = false,
 }: {
@@ -20,7 +20,8 @@ export function ListingPrice({
   className?: string;
   /** lg = listing detail page, md = card, sm = inline */
   size?: "sm" | "md" | "lg";
-  priceKind?: "asking" | "monthly" | "down_payment" | "starting_bid";
+  /** Which of the three prices this headline represents (drives suffix/prefix). */
+  headlineKind?: "asking" | "monthly" | "down_payment";
   negotiable?: boolean;
   priceHidden?: boolean;
 }) {
@@ -32,22 +33,16 @@ export function ListingPrice({
     size === "lg" ? "text-3xl md:text-4xl" : size === "md" ? "text-xl" : "text-base";
   const secondarySize = size === "lg" ? "text-sm" : "text-xs";
 
-  const suffix =
-    priceKind === "monthly"
-      ? "/mo"
-      : priceKind === "down_payment"
-        ? " DP"
-        : priceKind === "starting_bid"
-          ? " start"
-          : "";
-
-  const prefix = priceKind === "down_payment" ? "DP " : priceKind === "starting_bid" ? "From " : "";
+  const suffix = headlineKind === "monthly" ? "/mo" : "";
+  const prefix = headlineKind === "down_payment" ? "DP " : "";
 
   return (
     <div className={cn("flex flex-col", className)}>
       <div className={cn("font-bold text-primary", primarySize)}>
         {priceHidden ? (
           <span>Message for price</span>
+        ) : amount <= 0 ? (
+          <span className="text-muted-foreground">No price set</span>
         ) : (
           <>
             {prefix}
