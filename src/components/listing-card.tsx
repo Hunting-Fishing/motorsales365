@@ -20,7 +20,7 @@ import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ServiceStrip } from "@/components/service-strip";
 import { TrustBadges } from "@/components/listings/trust-badges";
 import { ListingActionsMenu } from "@/components/listings/listing-actions-menu";
-import { ListingBadges } from "@/components/listings/listing-badges";
+import { ListingBadges, pickHeadlinePrice } from "@/components/listings/listing-badges";
 import { deriveTrustSignals } from "@/lib/trust-signals";
 import { getSellerTier } from "@/lib/listing-tier";
 import { cn } from "@/lib/utils";
