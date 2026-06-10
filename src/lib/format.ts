@@ -1,9 +1,11 @@
 export function formatPHP(value: number | string | null | undefined): string {
-  const num = typeof value === "string" ? parseFloat(value) : (value ?? 0);
-  if (Number.isNaN(num)) return "₱0";
+  const raw = typeof value === "string" ? parseFloat(value) : (value ?? 0);
+  if (Number.isNaN(raw)) return "₱0";
+  const num = Math.round(raw);
   return new Intl.NumberFormat("en-PH", {
     style: "currency",
     currency: "PHP",
+    currencyDisplay: "narrowSymbol",
     maximumFractionDigits: 0,
   }).format(num);
 }
