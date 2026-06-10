@@ -49,7 +49,7 @@ import {
   CategoryAttributesEditor,
   CATEGORY_ATTR_KEYS,
 } from "@/components/listings/category-attributes-editor";
-import { isAttrCategory } from "@/lib/category-attributes";
+import { isAttrCategory, isValidDrivetrain } from "@/lib/category-attributes";
 import { z } from "zod";
 
 const CATEGORY_LABEL_MAP: Record<string, string> = {
