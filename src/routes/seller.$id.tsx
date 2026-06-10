@@ -95,7 +95,7 @@ function SellerProfilePage() {
         supabase
           .from("listings")
           .select(
-            "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,listing_media(url,type)",
+            "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,listing_media(url,type),vehicles:vehicle_id(is_public,passport_slug,vehicle_passport_verifications(status))",
           )
           .eq("user_id", id)
           .in("status", ["active", "pending_sale"])
