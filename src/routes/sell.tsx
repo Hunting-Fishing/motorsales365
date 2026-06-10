@@ -611,7 +611,7 @@ function SellPage() {
     const textParsed = ListingTextSchema.safeParse({
       title,
       description,
-      price_php: Number(price),
+      price_php: Number(price) || 0,
       contact_phone: phone || null,
     });
     if (!textParsed.success) {
