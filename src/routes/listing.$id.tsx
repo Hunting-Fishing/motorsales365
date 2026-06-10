@@ -161,6 +161,10 @@ interface ListingDetail {
   title: string;
   description: string | null;
   price_php: number;
+  price_kind?: "asking" | "monthly" | "down_payment" | "starting_bid" | null;
+  negotiable?: boolean | null;
+  price_hidden?: boolean | null;
+  registration_status?: "registered" | "unregistered" | "for_transfer" | "unknown" | null;
   region: string | null;
   city: string | null;
   status: string;
