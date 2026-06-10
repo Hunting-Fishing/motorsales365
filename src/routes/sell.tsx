@@ -266,6 +266,7 @@ function SellPage() {
   const [engine, setEngine] = useState("");
   const [vehicleQuality, setVehicleQuality] = useState<VehicleQuality>({});
   const [vehicleQualityIssues, setVehicleQualityIssues] = useState<VehicleQualityIssue[]>([]);
+  const [categoryAttrs, setCategoryAttrs] = useState<Record<string, any>>({});
 
   // Towing service-specific fields
   const [towServiceType, setTowServiceType] = useState("");
