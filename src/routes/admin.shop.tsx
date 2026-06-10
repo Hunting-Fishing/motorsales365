@@ -63,6 +63,7 @@ import {
 import { detectNetworkSlug, cleanShopUrl, urlMatchesNetwork } from "@/lib/shop-url";
 import { getYearOptions, getMakesForYear, getModelsForYear } from "@/data/vehicles";
 import { getEnginesFor } from "@/data/vehicle-engines";
+import { CategoryKeywordEditor } from "@/components/admin/category-keyword-editor";
 
 export const Route = createFileRoute("/admin/shop")({
   component: AdminShop,
