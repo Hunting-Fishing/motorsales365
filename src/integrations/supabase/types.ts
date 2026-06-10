@@ -5649,6 +5649,38 @@ export type Database = {
           },
         ]
       }
+      shop_category_keywords: {
+        Row: {
+          category_id: string
+          created_at: string
+          created_by: string | null
+          id: string
+          keyword: string
+        }
+        Insert: {
+          category_id: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          keyword: string
+        }
+        Update: {
+          category_id?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          keyword?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_category_keywords_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "shop_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_click_events: {
         Row: {
           created_at: string
