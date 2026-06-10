@@ -151,6 +151,7 @@ function EditListingPage() {
   const [engine, setEngine] = useState("");
   const [vehicleQuality, setVehicleQuality] = useState<VehicleQuality>({});
   const [vehicleQualityIssues, setVehicleQualityIssues] = useState<VehicleQualityIssue[]>([]);
+  const [categoryAttrs, setCategoryAttrs] = useState<Record<string, any>>({});
 
   // Towing
   const [towServiceType, setTowServiceType] = useState("");
