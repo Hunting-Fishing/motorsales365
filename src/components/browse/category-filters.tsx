@@ -226,9 +226,11 @@ export function CategoryFilters({ category, value, onChange }: Props) {
         <Range label="Operating weight (tons)" minField="weight_min" maxField="weight_max" value={value} onChange={onChange} />
         <TextField label="Attachment type" field="attachment_type" placeholder="e.g. bucket, fork, hammer" value={value} onChange={onChange} />
         <Sel label="Rental or sale" field="rental_or_sale" opts={RENTAL_OR_SALE} value={value} onChange={onChange} />
+        <Sel label="Registered owner" field="registered_owner" opts={YES_NO_UNKNOWN} value={value} onChange={onChange} />
         <div className="space-y-2 pt-1">
           <Bool label="With operator" field="with_operator" value={value} onChange={onChange} />
           <Bool label="Inspection available" field="inspection_available" value={value} onChange={onChange} />
+          <Bool label="Deed chain available" field="deed_chain_available" value={value} onChange={onChange} />
         </div>
       </div>
     );
