@@ -1,56 +1,58 @@
 ## Goal
-Make `/browse/$category` filters category-specific (Cars, Motorcycles, Boats, Airplanes, Heavy Equipment) and ensure the listing editor captures the matching fields so filters actually return results.
 
-## Approach
-All extra fields already live in `listings.attributes` (jsonb). Browse filters use `attributes->>key ilike ...`. So this is mostly a frontend-only change: add per-category filter UI + edit-form fields, wire them through the search schema, and write/read the same attribute keys on both sides.
+Show a compact row of trust badges on every listing card (and the listing detail header) so buyers can scan a seller's credibility at a glance.
 
-No DB migration needed (jsonb absorbs new keys). No business-logic changes outside the listing form and browse page.
+## The 8 badges and their data source
 
-## Filter spec by category (attribute keys)
+| Badge | Source | Notes |
+|---|---|---|
+| Phone Verified | `profiles.phone_verified_at IS NOT NULL` | already captured |
+| ID Checked | `profiles.verification_status = 'verified'` | already shown as "VerifiedBadge"; re-label inside the trust strip |
+| OR/CR Submitted | `listings.attributes.or_cr_status IN ('complete','partial')` | seller-declared, field exists |
+| Documents Checked | `vehicle_passport_verifications.status = 'approved'` for the linked vehicle | admin-reviewed signal |
+| Registered Owner | `listings.attributes.registered_owner = 'yes'` | NEW attribute (yes / no / unknown) |
+| Deed Chain Available | `listings.attributes.deed_chain_available = true` | NEW boolean attribute |
+| Inspection Available | `listings.attributes.inspection_available = true` | already exists in editor |
+| 365 Passport | Vehicle linked to listing has a published passport page | derived from passport status + public flag |
 
-**Cars** (`car`)
-- transmission (auto/manual/cvt/dct), fuel (gas/diesel/hybrid/ev/lpg), mileage_min / mileage_max, body_type (sedan/suv/hatch/pickup/van/coupe/mpv), registered_owner (1st/2nd/3rd+), or_cr_status (complete/lost/in_process), flood_history (yes/no/unknown), accident_history (yes/no/unknown), financing_available, trade_accepted, verified_documents_only
+No badge renders when its condition is false — empty trust strip is fine and means "no claims yet".
 
-**Motorcycles** (`motorcycle`)
-- engine_cc_min/max, moto_type (scooter/underbone/big_bike/tricycle/dirt_bike), or_cr_status, plate_status (with/without/temporary), registered_owner, modified (stock/modified), delivery_available
+## Work breakdown
 
-**Heavy equipment** (`equipment`)
-- equipment_type (excavator/loader/bulldozer/crane/forklift/dump_truck/grader/compactor), hours_min/max, brand, operating_weight_min/max (tons), attachment_type, rental_or_sale (rental/sale/both), with_operator, inspection_available
+1. **Schema-light additions (no migration)**
+   - Add `registered_owner` (yes/no/unknown) and `deed_chain_available` (boolean) to `src/lib/category-attributes.ts`.
+   - Wire both into `src/components/listings/category-attributes-editor.tsx` for `car`, `motorcycle`, `truck`, `equipment`, `boat` blocks (skip airplane — handled by stricter workflow).
+   - Add matching filter controls in `src/components/browse/category-filters.tsx` and search-schema entries + query clauses in `src/routes/browse.$category.tsx`.
 
-**Boats** (`boat`)
-- boat_type (banca/yacht/speedboat/sailboat/fishing/jetski), hull_material (fiberglass/aluminum/wood/steel/inflatable), engine_type (outboard/inboard/sail/electric), length_min/max (ft), registration_status (registered/unregistered/in_process), trailer_included, usage (commercial/fishing/recreation)
+2. **TrustBadges component** — `src/components/listings/trust-badges.tsx`
+   - Accepts a typed `TrustSignals` object with the 8 booleans.
+   - Renders small pill badges with icons (Phone, IdCard, FileText, ShieldCheck, UserCheck, ScrollText, Eye, BadgeCheck) and Radix Tooltip explaining each.
+   - Two sizes: `sm` (card, max 4 visible + "+N" overflow) and `md` (detail header, all visible).
+   - Uses semantic tokens only; verified/admin-checked badges use `primary`, seller-declared use `secondary`.
 
-**Airplanes** (`airplane`) — higher-trust workflow
-- registration_no (text), airworthiness (current/expired/in_process), maintenance_logs (complete/partial/none), engine_hours_min/max, airport_code (text), broker_or_owner (broker/owner/dealer), inspection_required (yes/no)
-- Listing form shows a notice: aircraft listings require admin review before going live (already covered by existing pending → admin.listings flow).
+3. **ListingCard wiring** — `src/components/listing-card.tsx`
+   - Extend `ListingCardData` with `seller_phone_verified`, `passport_status`, `passport_published`.
+   - Remove the standalone `VerifiedBadge` from the top-image row and instead render `<TrustBadges signals={…} size="sm" />` below the title (above price), so the strip lives in the card body and doesn't fight the existing image-overlay badges.
 
-## File changes
+4. **Query updates**
+   - Update the listing select shapes in `src/routes/browse.$category.tsx`, `src/routes/index.tsx`, `src/routes/seller.$id.tsx`, `src/routes/dashboard.favorites.tsx`, and `src/routes/dashboard.likes.tsx` to pull `profiles.phone_verified_at` and join the latest `vehicle_passport_verifications` row through the listing→vehicle link.
+   - Add a small helper `deriveTrustSignals(listingRow)` in `src/lib/trust-signals.ts` so every caller maps once.
 
-1. **`src/routes/browse.$category.tsx`**
-   - Extend `searchSchema` with all keys above (all `.optional()`, coerce numerics).
-   - Build the query filters per-category in the existing supabase query block, using `attributes->>key` ilike for strings, `(attributes->>key)::int` range for numerics, and `attributes->>key = 'true'` for booleans.
-   - Replace the single `VehiclePicker` block with a `<CategoryFilters category={category} value={state} onChange={...} />` component that renders only the fields relevant to the current category. Keep keyword/location/price/sort shared.
-   - Update the Apply-filters navigate() call to include the new keys.
+5. **Listing detail page** — `src/routes/listing.$id.tsx`
+   - Render `<TrustBadges size="md" />` in the seller info block. Each badge tooltip links to a brief explanation; the "365 Passport" badge links to the vehicle's public passport page when available.
 
-2. **`src/components/browse/category-filters.tsx`** (new)
-   - One component, switch on `category`. Uses existing shadcn `Select`/`Input`/`Checkbox`. Pure controlled component, no data fetching.
-   - Co-locate option lists (transmissions, body types, equipment types, etc.) at the top of the file.
+6. **Docs / policy sync**
+   - Update `/terms` "Listings & data handling" section and bump "Last updated" to note that seller-declared trust flags (registered owner, deed chain, inspection available, OR/CR status) are seller representations, while ID Checked / Documents Checked / Passport are 365-verified.
 
-3. **`src/routes/listing.$id.edit.tsx`** and **`src/routes/sell.tsx`** (the creator flow)
-   - Add the same per-category field sets, gated by `category_slug`, writing to `attributes` with the keys above.
-   - Reuse the new option lists from `category-filters.tsx` so labels stay in sync.
-   - Aircraft section shows the trust notice and keeps `status='pending'` on submit (existing behavior).
+## Technical details
 
-4. **Listing detail (`src/routes/listing.$id.tsx`)**
-   - Add a small "Specs" block that renders any present attributes (label/value rows) so the new data is visible to buyers. No layout overhaul.
+- No new DB columns; `registered_owner` and `deed_chain_available` ride on the existing `listings.attributes` JSONB column.
+- Trust signal derivation is pure and unit-testable; no server fn needed.
+- Tooltip uses existing `@/components/ui/tooltip`. On touch devices Radix Tooltip falls back to long-press; that's acceptable.
+- Card height stays predictable: the strip is a single `flex-wrap` row with `gap-1`, max two visual lines.
+- Browse filter additions use the same JSONB pattern already in place (`attributes->>key` equality / boolean comparison).
 
 ## Out of scope
-- No schema migration; `attributes` jsonb already holds arbitrary keys.
-- No changes to towing/carwash/parts/drone/repair categories (already category-specific).
-- No verification workflow changes for aircraft beyond surfacing the existing pending-review notice.
-- No SEO copy rewrites beyond keeping current `head()`.
 
-## Verification
-- Create one test listing per category with the new fields filled in, then open `/browse/<category>` and confirm each new filter narrows the result set correctly.
-- Check `/listing/:id` shows the new specs block.
-- Build passes (typecheck covers the extended zod schema and form state).
+- No changes to verification submission workflow, KYC, or passport publishing pipeline — those already exist; this plan only surfaces their outcomes on cards.
+- Airplane listings remain on the higher-trust manual-review workflow and don't get the seller-declared "Registered Owner / Deed Chain" inputs.
