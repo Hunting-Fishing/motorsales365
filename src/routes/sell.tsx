@@ -638,6 +638,13 @@ function SellPage() {
         if (category === "car" || category === "motorcycle") {
           Object.assign(attributes, vehicleQualityToAttributes(vehicleQuality));
         }
+        if (isAttrCategory(category)) {
+          for (const k of CATEGORY_ATTR_KEYS[category] ?? []) {
+            const v = categoryAttrs[k];
+            if (v === undefined || v === null || v === "") continue;
+            attributes[k] = v;
+          }
+        }
         if (category === "towing") {
           if (towServiceType) attributes.service_type = towServiceType;
           if (towCapacity) attributes.vehicle_capacity = towCapacity;
