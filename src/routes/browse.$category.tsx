@@ -211,7 +211,7 @@ function BrowsePage() {
     const fetchListings = async () => {
       setLoading(true);
       const baseSelect =
-        "id,title,price_php,price_kind,negotiable,price_hidden,registration_status,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status,phone_verified_at),vehicles:vehicle_id(is_public,passport_slug,vehicle_passport_verifications(status))";
+        "id,title,price_php,monthly_php,down_payment_php,negotiable,price_hidden,registration_status,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status,phone_verified_at),vehicles:vehicle_id(is_public,passport_slug,vehicle_passport_verifications(status))";
       const buildBase = () => {
         let q = supabase
           .from("listings")
