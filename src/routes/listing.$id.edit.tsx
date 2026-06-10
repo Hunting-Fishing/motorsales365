@@ -232,8 +232,10 @@ function EditListingPage() {
     setTitle(l.title ?? "");
     setDescription(l.description ?? "");
     setPrice(String(l.price_php ?? ""));
-    setPriceKind(((l as any).price_kind as any) ?? "asking");
+    setMonthly((l as any).monthly_php != null ? String((l as any).monthly_php) : "");
+    setDownPayment((l as any).down_payment_php != null ? String((l as any).down_payment_php) : "");
     setNegotiable(!!(l as any).negotiable);
+    setPriceHidden(!!(l as any).price_hidden);
     setRegistrationStatus(((l as any).registration_status as any) ?? "unknown");
     setRegion(l.region ?? null);
     setProvince(l.province ?? null);
