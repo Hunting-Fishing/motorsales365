@@ -1020,6 +1020,20 @@ function EditListingPage() {
                 </div>
               </div>
             )}
+            {isAttrCategory(category) && (
+              <div className="mt-4 rounded-md border border-border/60 bg-background/40 p-4">
+                <h3 className="mb-3 font-display text-sm font-semibold">Buyer filters</h3>
+                <p className="mb-3 text-xs text-muted-foreground">
+                  These fields show up as filters on the {category} browse page. Fill them in so
+                  your listing gets matched.
+                </p>
+                <CategoryAttributesEditor
+                  category={category}
+                  value={categoryAttrs}
+                  onChange={setCategoryAttrs}
+                />
+              </div>
+            )}
           </section>
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
