@@ -21,6 +21,7 @@ import { ServiceStrip } from "@/components/service-strip";
 import { TrustBadges } from "@/components/listings/trust-badges";
 import { ListingActionsMenu } from "@/components/listings/listing-actions-menu";
 import { ListingBadges, pickHeadlinePrice } from "@/components/listings/listing-badges";
+import { PricingWidget } from "@/components/listings/pricing-widget";
 import { deriveTrustSignals } from "@/lib/trust-signals";
 import { getSellerTier } from "@/lib/listing-tier";
 import { cn } from "@/lib/utils";
@@ -186,6 +187,7 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
               />
             );
           })()}
+          <PricingWidget listing={listing} className="mt-2" />
           <ListingBadges
             listing={{
               ...listing,

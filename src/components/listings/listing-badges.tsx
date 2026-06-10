@@ -1,16 +1,12 @@
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import {
-  Handshake,
-  CalendarClock,
-  Wallet,
   BadgeCheck,
   AlertTriangle,
   FileCheck2,
   FileX2,
   ArrowLeftRight,
 } from "lucide-react";
-import { formatPHP } from "@/lib/format";
 import { getSellerTier, type TierInput } from "@/lib/listing-tier";
 
 export type RegistrationStatus = "registered" | "unregistered" | "for_transfer" | "unknown";
@@ -28,8 +24,6 @@ export interface ListingBadgeData extends TierInput {
   headlineKind?: "asking" | "monthly" | "down_payment" | null;
 }
 
-const toNum = (v: unknown): number =>
-  typeof v === "string" ? parseFloat(v) || 0 : typeof v === "number" ? v : 0;
 
 /**
  * Compact pill row used on listing cards and the detail page. Pills are
@@ -48,9 +42,6 @@ export function ListingBadges({
 }) {
   const tier = getSellerTier(listing);
   const reg: RegistrationStatus = listing.registration_status ?? "unknown";
-  const asking = toNum(listing.price_php);
-  const monthly = toNum(listing.monthly_php);
-  const dp = toNum(listing.down_payment_php);
   const iconSz = size === "md" ? "h-3.5 w-3.5" : "h-3 w-3";
 
   return (
@@ -62,36 +53,7 @@ export function ListingBadges({
         </Badge>
       )}
 
-      {monthly > 0 && listing.headlineKind !== "monthly" && (
-        <Badge
-          variant="outline"
-          className="gap-1 border-purple-500/40 bg-purple-500/10 text-purple-600 dark:text-purple-300"
-        >
-          <CalendarClock className={iconSz} /> {formatPHP(monthly)}/mo
-        </Badge>
-      )}
-      {dp > 0 && listing.headlineKind !== "down_payment" && (
-        <Badge
-          variant="outline"
-          className="gap-1 border-orange-500/40 bg-orange-500/10 text-orange-600 dark:text-orange-300"
-        >
-          <Wallet className={iconSz} /> DP {formatPHP(dp)}
-        </Badge>
-      )}
-      {asking > 0 && listing.headlineKind && listing.headlineKind !== "asking" && (
-        <Badge variant="outline" className="gap-1">
-          Cash {formatPHP(asking)}
-        </Badge>
-      )}
-
-      {listing.negotiable && (
-        <Badge
-          variant="outline"
-          className="gap-1 border-blue-500/40 bg-blue-500/10 text-blue-600 dark:text-blue-300"
-        >
-          <Handshake className={iconSz} /> Negotiable
-        </Badge>
-      )}
+      {/* Pricing & negotiable pills moved to PricingWidget */}
 
       {reg === "registered" && (
         <Badge
@@ -123,6 +85,9 @@ export function ListingBadges({
     </div>
   );
 }
+
+const toNum = (v: unknown): number =>
+  typeof v === "string" ? parseFloat(v) || 0 : typeof v === "number" ? v : 0;
 
 /** Pick which of the three prices to show as the headline number. */
 export function pickHeadlinePrice(l: {

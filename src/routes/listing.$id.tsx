@@ -60,6 +60,7 @@ import {
 import { formatPHP, formatDate } from "@/lib/format";
 import { ListingPrice } from "@/components/listing-price";
 import { ListingBadges, pickHeadlinePrice } from "@/components/listings/listing-badges";
+import { PricingWidget } from "@/components/listings/pricing-widget";
 import placeholderCar from "@/assets/placeholder-car.webp";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ListingQr } from "@/components/listing-qr";
@@ -509,6 +510,7 @@ function ListingDetailPage() {
                   />
                 );
               })()}
+              <PricingWidget listing={listing} size="md" />
               <ListingBadges
                 listing={{
                   ...listing,
