@@ -389,6 +389,42 @@ export function TowRequestForm({
             })}
           </div>
         </div>
+
+        <div>
+          <Label htmlFor="pax" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            How many people need a ride with the tow?
+          </Label>
+          <div className="mt-2 flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => setPassengerCount((c) => String(Math.max(0, (Number(c) || 0) - 1)))}
+              aria-label="Decrease passengers"
+            >
+              −
+            </Button>
+            <Input
+              id="pax"
+              inputMode="numeric"
+              value={passengerCount}
+              onChange={(e) => setPassengerCount(e.target.value.replace(/\D/g, "").slice(0, 2))}
+              className="w-20 text-center"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => setPassengerCount((c) => String(Math.min(50, (Number(c) || 0) + 1)))}
+              aria-label="Increase passengers"
+            >
+              +
+            </Button>
+            <span className="text-xs text-muted-foreground">
+              Includes the driver. Helps the operator pick the right truck cab.
+            </span>
+          </div>
+        </div>
       </section>
 
       {/* Vehicle */}
