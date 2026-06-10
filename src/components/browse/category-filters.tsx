@@ -247,8 +247,11 @@ export function CategoryFilters({ category, value, onChange }: Props) {
         <Range label="Length (ft)" minField="length_min" maxField="length_max" value={value} onChange={onChange} />
         <Sel label="Registration" field="boat_registration_status" opts={BOAT_REG_STATUS} value={value} onChange={onChange} />
         <Sel label="Usage" field="boat_usage" opts={BOAT_USAGE} value={value} onChange={onChange} />
+        <Sel label="Registered owner" field="registered_owner" opts={YES_NO_UNKNOWN} value={value} onChange={onChange} />
         <div className="space-y-2 pt-1">
           <Bool label="Trailer included" field="trailer_included" value={value} onChange={onChange} />
+          <Bool label="Deed chain available" field="deed_chain_available" value={value} onChange={onChange} />
+          <Bool label="Inspection available" field="inspection_available" value={value} onChange={onChange} />
         </div>
       </div>
     );
