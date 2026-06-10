@@ -1019,7 +1019,7 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     // Load categories for fuzzy mapping
     const { data: cats } = await supabaseAdmin
       .from("shop_categories")
-      .select("id, slug, name")
+      .select("id, slug, name, parent_id")
       .eq("active", true);
 
     // Try a per-network scraper (currently only lazada has a custom path).
