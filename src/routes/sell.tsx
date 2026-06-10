@@ -1342,6 +1342,18 @@ function SellPage() {
                 }
               />
             )}
+            {isAttrCategory(category) && (
+              <div className="rounded-md border border-border/60 bg-background/40 p-4">
+                <h3 className="mb-3 font-display text-sm font-semibold">
+                  {CATEGORY_LABEL_MAP[category] ?? "Details"} — buyers filter by these
+                </h3>
+                <CategoryAttributesEditor
+                  category={category}
+                  value={categoryAttrs}
+                  onChange={setCategoryAttrs}
+                />
+              </div>
+            )}
           </section>
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
