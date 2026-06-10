@@ -24,7 +24,7 @@ function FavoritesPage() {
     supabase
       .from("favorites")
       .select(
-        "listing_id, listings:listing_id(id,title,price_php,region,city,seller_type,boost_until,status,category_slug,user_id,view_count,listing_media(url,type),profiles:user_id(verification_status))",
+        "listing_id, listings:listing_id(id,title,price_php,region,city,seller_type,boost_until,status,category_slug,user_id,view_count,attributes,listing_media(url,type),profiles:user_id(verification_status,phone_verified_at),vehicles:vehicle_id(is_public,passport_slug,vehicle_passport_verifications(status)))",
       )
       .eq("user_id", user.id)
       .then(({ data, error }) => {
