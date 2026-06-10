@@ -35,6 +35,7 @@ import { VehiclePicker } from "@/components/vehicle-picker";
 import { CategoryFilters, type CategoryFilterValue } from "@/components/browse/category-filters";
 import { buildTitleSearchTerms } from "@/lib/vehicle-aliases";
 import { fuzzyFilter } from "@/lib/fuzzy";
+import { useBlockedUserIds } from "@/hooks/use-blocked-users";
 
 const optStr = () => z.string().optional();
 const optBool = () =>
