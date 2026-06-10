@@ -433,192 +433,63 @@ export function TowingServicesPage() {
         )}
       </div>
 
-      {/* Emergency tow form */}
+      {/* Request a tow */}
       <div id="emergency-tow" className="border-t border-border bg-secondary/30">
         <div className="container mx-auto px-4 py-12">
           <div className="mb-6 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-destructive text-destructive-foreground">
-              <Siren className="h-5 w-5" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <PhoneCall className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="font-display text-2xl font-bold">Emergency tow request</h2>
+              <h2 className="font-display text-2xl font-bold">Request a tow</h2>
               <p className="text-sm text-muted-foreground">
-                Posted to the 365 Dispatch network. Top matched providers see it for 5 minutes
-                before it broadens.
+                Tell us what's wrong, where you are, and what you're driving — nearby 365
+                Dispatch providers will respond.
               </p>
             </div>
           </div>
 
-          <form
-            onSubmit={handleEmergencySubmit}
-            className="grid gap-6 rounded-xl border border-border bg-card p-6 lg:grid-cols-2"
-          >
-            <section className="space-y-4">
-              <h3 className="font-display text-base font-semibold">Vehicle</h3>
-              <div>
-                <Label>Vehicle type</Label>
-                <Select value={vehicleType} onValueChange={setVehicleType}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {VEHICLE_TYPES.map((t) => (
-                      <SelectItem key={t} value={t}>{t}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="vs">Details (optional)</Label>
+          <TowRequestForm
+            requestedProviderId={requestedProvider?.id ?? null}
+            requestedProviderName={requestedProvider?.name ?? null}
+            onClearRequestedProvider={() => {
+              setRequestedProvider(null);
+              setProviderSearch("");
+            }}
+            providerSearchSlot={
+              <>
                 <Input
-                  id="vs"
-                  value={vehicleSummary}
-                  onChange={(e) => setVehicleSummary(e.target.value)}
-                  placeholder="e.g. 2018 Honda Civic, non-running"
+                  className="mt-2"
+                  placeholder="Type a tow company name…"
+                  value={providerSearch}
+                  onChange={(e) => setProviderSearch(e.target.value)}
                 />
-              </div>
-              <div>
-                <Label htmlFor="cp">Contact number</Label>
-                <Input
-                  id="cp"
-                  type="tel"
-                  required
-                  value={contactPhone}
-                  onChange={(e) => setContactPhone(e.target.value)}
-                  placeholder="09xx xxx xxxx"
-                />
-              </div>
-              <div>
-                <Label>Preferred payment</Label>
-                <Select value={preferredPayment} onValueChange={setPreferredPayment}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {PAYMENT_METHODS.map((p) => (
-                      <SelectItem key={p} value={p}>{p}</SelectItem>
+                {providerOptions.length > 0 && (
+                  <div className="mt-2 max-h-40 overflow-y-auto rounded-md border border-border bg-card">
+                    {providerOptions.map((opt) => (
+                      <button
+                        key={opt.id}
+                        type="button"
+                        className="block w-full px-3 py-2 text-left text-sm hover:bg-muted"
+                        onClick={() => {
+                          setRequestedProvider({ id: opt.owner_id, name: opt.name });
+                          setProviderOptions([]);
+                        }}
+                      >
+                        {opt.name}
+                      </button>
                     ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="rounded-lg border border-border bg-muted/40 p-3">
-                <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Request a specific provider (optional)
-                </Label>
-                {requestedProvider ? (
-                  <div className="mt-2 flex items-center justify-between rounded-md bg-card p-2">
-                    <span className="text-sm">
-                      <strong>{requestedProvider.name}</strong> will receive this request directly.
-                    </span>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => {
-                        setRequestedProvider(null);
-                        setProviderSearch("");
-                      }}
-                    >
-                      Clear
-                    </Button>
                   </div>
-                ) : (
-                  <>
-                    <Input
-                      className="mt-2"
-                      placeholder="Type a tow company name…"
-                      value={providerSearch}
-                      onChange={(e) => setProviderSearch(e.target.value)}
-                    />
-                    {providerOptions.length > 0 && (
-                      <div className="mt-2 max-h-40 overflow-y-auto rounded-md border border-border bg-card">
-                        {providerOptions.map((opt) => (
-                          <button
-                            key={opt.id}
-                            type="button"
-                            className="block w-full px-3 py-2 text-left text-sm hover:bg-muted"
-                            onClick={() => {
-                              setRequestedProvider({ id: opt.owner_id, name: opt.name });
-                              setProviderOptions([]);
-                            }}
-                          >
-                            {opt.name}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      Leave empty to let 365 Dispatch auto-match the best provider.
-                    </p>
-                  </>
                 )}
-              </div>
-            </section>
-
-            <section className="space-y-4">
-              <h3 className="font-display text-base font-semibold">Pickup</h3>
-              <LocationPicker
-                value={pickup}
-                onChange={(v) =>
-                  setPickup({
-                    region: v.region ?? null,
-                    province: v.province ?? null,
-                    city: v.city ?? null,
-                    barangay: v.barangay ?? null,
-                  })
-                }
-              />
-              <div>
-                <Label>Street / landmark</Label>
-                <Input
-                  value={pickupAddress}
-                  onChange={(e) => setPickupAddress(e.target.value)}
-                  placeholder="optional"
-                />
-              </div>
-
-              <h3 className="font-display text-base font-semibold">Dropoff</h3>
-              <LocationPicker
-                value={dropoff}
-                onChange={(v) =>
-                  setDropoff({
-                    region: v.region ?? null,
-                    province: v.province ?? null,
-                    city: v.city ?? null,
-                    barangay: v.barangay ?? null,
-                  })
-                }
-              />
-              <div>
-                <Label>Street / landmark</Label>
-                <Input
-                  value={dropoffAddress}
-                  onChange={(e) => setDropoffAddress(e.target.value)}
-                  placeholder="optional"
-                />
-              </div>
-            </section>
-
-            <section className="space-y-3 lg:col-span-2">
-              <Label htmlFor="nt">Notes for the driver</Label>
-              <Textarea
-                id="nt"
-                rows={3}
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Low-clearance vehicle, no keys, gate access, etc."
-              />
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="text-xs text-muted-foreground">
-                  Open requests are routed via the 365 Dispatch network. You'll see responses on
-                  your dashboard.
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Leave empty to let 365 Dispatch auto-match the best provider.
                 </p>
-                <Button type="submit" size="lg" disabled={submitting}>
-                  <PhoneCall className="mr-2 h-4 w-4" />
-                  {submitting ? "Submitting…" : "Post emergency tow request"}
-                </Button>
-              </div>
-            </section>
-          </form>
+              </>
+            }
+          />
         </div>
       </div>
+
 
       {/* CTAs */}
       <div className="border-t border-border">
