@@ -622,6 +622,11 @@ function SellPage() {
       setVehicleQualityIssues([]);
     }
 
+    if (category === "car" && !isValidDrivetrain(categoryAttrs.drivetrain)) {
+      toast.error("Please select a valid drivetrain (FWD, RWD, AWD, 4x4, or 4x2).");
+      return;
+    }
+
     setSubmitting(true);
     try {
       let lid = listingId;
