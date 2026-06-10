@@ -177,6 +177,27 @@ function BrowsePage() {
   const [vMake, setVMake] = useState(search.make ?? "");
   const [vModel, setVModel] = useState(search.model ?? "");
   const [vEngine, setVEngine] = useState(search.engine ?? "");
+  const [catFilters, setCatFilters] = useState<CategoryFilterValue>(() => {
+    const init: CategoryFilterValue = {};
+    const keys = [
+      "transmission","fuel","body_type","mileage_min","mileage_max","owner_status",
+      "or_cr_status","flood_history","accident_history","financing_available",
+      "trade_accepted","verified_documents_only","moto_type","engine_cc_min",
+      "engine_cc_max","plate_status","moto_condition","delivery_available",
+      "equipment_type","brand","hours_min","hours_max","weight_min","weight_max",
+      "attachment_type","rental_or_sale","with_operator","inspection_available",
+      "boat_type","hull_material","boat_engine_type","length_min","length_max",
+      "boat_registration_status","boat_usage","trailer_included","registration_no",
+      "airworthiness","maintenance_logs","engine_hours_min","engine_hours_max",
+      "airport_code","aircraft_seller","inspection_required",
+    ] as const;
+    for (const k of keys) {
+      const v = (search as any)[k];
+      if (v === undefined || v === null || v === "") continue;
+      init[k] = typeof v === "number" ? String(v) : v;
+    }
+    return init;
+  });
   const [items, setItems] = useState<ListingCardData[]>([]);
   const [loading, setLoading] = useState(true);
 
