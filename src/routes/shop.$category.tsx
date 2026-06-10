@@ -186,6 +186,13 @@ function ShopCategory() {
 
         <AdCarousel placement="shop_top" />
 
+        <ShopSortBar
+          sort={search.sort}
+          network={search.network}
+          onSortChange={setSort}
+          onNetworkChange={setNetwork}
+        />
+
         {products.length === 0 ? (
           <p className="text-muted-foreground">
             {hasAnyFilter
