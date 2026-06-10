@@ -290,6 +290,13 @@ function Index() {
                 {name}
               </Link>
             ))}
+            <Link
+              to="/wanted"
+              className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium transition hover:border-primary hover:text-primary"
+            >
+              <Megaphone className="h-4 w-4" />
+              Wanted
+            </Link>
           </div>
           <div className="mb-3 mt-5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Services & shops
