@@ -59,7 +59,7 @@ import {
 } from "@/components/ui/select";
 import { formatPHP, formatDate } from "@/lib/format";
 import { ListingPrice } from "@/components/listing-price";
-import { ListingBadges } from "@/components/listings/listing-badges";
+import { ListingBadges, pickHeadlinePrice } from "@/components/listings/listing-badges";
 import placeholderCar from "@/assets/placeholder-car.webp";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ListingQr } from "@/components/listing-qr";
@@ -162,7 +162,8 @@ interface ListingDetail {
   title: string;
   description: string | null;
   price_php: number;
-  price_kind?: "asking" | "monthly" | "down_payment" | "starting_bid" | null;
+  monthly_php?: number | string | null;
+  down_payment_php?: number | string | null;
   negotiable?: boolean | null;
   price_hidden?: boolean | null;
   registration_status?: "registered" | "unregistered" | "for_transfer" | "unknown" | null;
@@ -496,18 +497,27 @@ function ListingDetailPage() {
               </div>
             </div>
             <div className="flex flex-col items-end gap-2">
-              <ListingPrice
-                pricePhp={listing.price_php}
-                size="lg"
-                priceKind={listing.price_kind ?? "asking"}
-                negotiable={!!listing.negotiable}
-                priceHidden={!!listing.price_hidden}
-              />
+              {(() => {
+                const headline = pickHeadlinePrice(listing);
+                return (
+                  <ListingPrice
+                    pricePhp={headline.amount}
+                    size="lg"
+                    headlineKind={headline.kind === "hidden" ? "asking" : headline.kind}
+                    negotiable={!!listing.negotiable}
+                    priceHidden={!!listing.price_hidden || headline.kind === "hidden"}
+                  />
+                );
+              })()}
               <ListingBadges
                 listing={{
                   ...listing,
                   seller_dealer_plan: sellerDealerPlan,
                   seller_verified: !!(seller as any)?.verification_status,
+                  headlineKind:
+                    pickHeadlinePrice(listing).kind === "hidden"
+                      ? null
+                      : (pickHeadlinePrice(listing).kind as "asking" | "monthly" | "down_payment"),
                 }}
                 size="md"
               />

@@ -235,8 +235,10 @@ function SellPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [priceKind, setPriceKind] = useState<"asking" | "monthly" | "down_payment">("asking");
+  const [monthly, setMonthly] = useState("");
+  const [downPayment, setDownPayment] = useState("");
   const [negotiable, setNegotiable] = useState(false);
+  const [priceHidden, setPriceHidden] = useState(false);
   const [registrationStatus, setRegistrationStatus] = useState<
     "registered" | "unregistered" | "for_transfer" | "unknown"
   >("unknown");
@@ -609,7 +611,7 @@ function SellPage() {
     const textParsed = ListingTextSchema.safeParse({
       title,
       description,
-      price_php: Number(price),
+      price_php: Number(price) || 0,
       contact_phone: phone || null,
     });
     if (!textParsed.success) {
@@ -718,9 +720,11 @@ function SellPage() {
             category_slug: category,
             title: textParsed.data.title,
             description: textParsed.data.description,
-            price_php: textParsed.data.price_php,
-            price_kind: priceKind,
+            price_php: Number(price) || 0,
+            monthly_php: monthly ? Number(monthly) : null,
+            down_payment_php: downPayment ? Number(downPayment) : null,
             negotiable,
+            price_hidden: priceHidden,
             registration_status: registrationStatus,
             condition,
             region,
@@ -917,27 +921,56 @@ function SellPage() {
                   placeholder="2019 Toyota Vios 1.3 E AT"
                 />
               </div>
-              <div className="sm:col-span-2">
-                <Label htmlFor="price">Price (₱)</Label>
-                <div className="mt-1 flex flex-wrap items-center gap-2">
-                  <div className="inline-flex rounded-md border border-border bg-background p-0.5 text-xs">
-                    {(["asking", "monthly", "down_payment"] as const).map((k) => (
-                      <button
-                        key={k}
-                        type="button"
-                        onClick={() => setPriceKind(k)}
-                        className={
-                          "rounded px-2.5 py-1 transition " +
-                          (priceKind === k
-                            ? "bg-primary text-primary-foreground"
-                            : "text-muted-foreground hover:text-foreground")
-                        }
-                      >
-                        {k === "asking" ? "Asking" : k === "monthly" ? "Monthly" : "Down payment"}
-                      </button>
-                    ))}
+              <div className="sm:col-span-2 space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+                <div>
+                  <Label className="text-sm font-semibold">Pricing — fill any that apply</Label>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">
+                    Real numbers only. Placeholder prices (₱1, ₱2…) are rejected and lower your seller score.
+                  </p>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div>
+                    <Label htmlFor="price" className="text-xs">Asking price (₱)</Label>
+                    <Input
+                      id="price"
+                      type="number"
+                      min="0"
+                      className="mt-1"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      placeholder="e.g. 450000"
+                    />
+                    <p className="mt-0.5 text-[10px] text-muted-foreground">Full cash price</p>
                   </div>
-                  <label className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <div>
+                    <Label htmlFor="monthly" className="text-xs">Monthly payment (₱/mo)</Label>
+                    <Input
+                      id="monthly"
+                      type="number"
+                      min="0"
+                      className="mt-1"
+                      value={monthly}
+                      onChange={(e) => setMonthly(e.target.value)}
+                      placeholder="e.g. 12000"
+                    />
+                    <p className="mt-0.5 text-[10px] text-muted-foreground">Financing monthly</p>
+                  </div>
+                  <div>
+                    <Label htmlFor="dp" className="text-xs">Down payment (₱)</Label>
+                    <Input
+                      id="dp"
+                      type="number"
+                      min="0"
+                      className="mt-1"
+                      value={downPayment}
+                      onChange={(e) => setDownPayment(e.target.value)}
+                      placeholder="e.g. 80000"
+                    />
+                    <p className="mt-0.5 text-[10px] text-muted-foreground">Cash-out to start financing</p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-4 text-xs">
+                  <label className="inline-flex items-center gap-1.5">
                     <input
                       type="checkbox"
                       className="h-3.5 w-3.5 accent-primary"
@@ -946,29 +979,18 @@ function SellPage() {
                     />
                     Negotiable
                   </label>
+                  <label className="inline-flex items-center gap-1.5">
+                    <input
+                      type="checkbox"
+                      className="h-3.5 w-3.5 accent-primary"
+                      checked={priceHidden}
+                      onChange={(e) => setPriceHidden(e.target.checked)}
+                    />
+                    Hide price — buyers must message me
+                  </label>
                 </div>
-                <Input
-                  id="price"
-                  type="number"
-                  min="0"
-                  required
-                  className="mt-2"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder={
-                    priceKind === "monthly"
-                      ? "Monthly amount, e.g. 12000"
-                      : priceKind === "down_payment"
-                        ? "Down payment, e.g. 80000"
-                        : "Real asking price, e.g. 450000"
-                  }
-                />
-                <p className="mt-1 text-[11px] text-muted-foreground">
-                  Real asking price only. Placeholder prices like ₱1 or ₱2 will be rejected and
-                  lower your seller score.
-                </p>
                 {(category === "car" || category === "motorcycle" || category === "truck") && (
-                  <div className="mt-3">
+                  <div>
                     <Label className="text-xs">Registration</Label>
                     <Select
                       value={registrationStatus}

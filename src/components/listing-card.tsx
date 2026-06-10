@@ -20,7 +20,7 @@ import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ServiceStrip } from "@/components/service-strip";
 import { TrustBadges } from "@/components/listings/trust-badges";
 import { ListingActionsMenu } from "@/components/listings/listing-actions-menu";
-import { ListingBadges } from "@/components/listings/listing-badges";
+import { ListingBadges, pickHeadlinePrice } from "@/components/listings/listing-badges";
 import { deriveTrustSignals } from "@/lib/trust-signals";
 import { getSellerTier } from "@/lib/listing-tier";
 import { cn } from "@/lib/utils";
@@ -50,7 +50,8 @@ export interface ListingCardData {
   like_count?: number;
   passport_published?: boolean;
   passport_documents_checked?: boolean;
-  price_kind?: "asking" | "monthly" | "down_payment" | "starting_bid" | null;
+  monthly_php?: number | string | null;
+  down_payment_php?: number | string | null;
   negotiable?: boolean | null;
   price_hidden?: boolean | null;
   registration_status?: "registered" | "unregistered" | "for_transfer" | "unknown" | null;
@@ -172,15 +173,29 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
         <div className="flex flex-1 flex-col p-4">
           <h3 className="line-clamp-2 font-semibold leading-snug">{listing.title}</h3>
           {summary && <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{summary}</p>}
-          <ListingPrice
-            pricePhp={listing.price_php}
-            size="md"
+          {(() => {
+            const headline = pickHeadlinePrice(listing);
+            return (
+              <ListingPrice
+                pricePhp={headline.amount}
+                size="md"
+                className="mt-2"
+                headlineKind={headline.kind === "hidden" ? "asking" : headline.kind}
+                negotiable={!!listing.negotiable}
+                priceHidden={!!listing.price_hidden || headline.kind === "hidden"}
+              />
+            );
+          })()}
+          <ListingBadges
+            listing={{
+              ...listing,
+              headlineKind:
+                pickHeadlinePrice(listing).kind === "hidden"
+                  ? null
+                  : (pickHeadlinePrice(listing).kind as "asking" | "monthly" | "down_payment"),
+            }}
             className="mt-2"
-            priceKind={listing.price_kind ?? "asking"}
-            negotiable={!!listing.negotiable}
-            priceHidden={!!listing.price_hidden}
           />
-          <ListingBadges listing={listing} className="mt-2" />
           <TrustBadges signals={trust} size="sm" className="mt-2" />
           <div className="mt-auto flex items-center justify-between gap-2 pt-3 text-xs text-muted-foreground">
             <span className="flex min-w-0 items-center gap-1">

@@ -1,95 +1,100 @@
 ## Goal
 
-Stop the "₱2 placeholder" trick that's common on FB-style listings, and make every car card instantly tell buyers (1) what the price actually means and (2) who is selling it — using game-style rarity borders.
+Replace the single "Price + kind" control with three independent numeric fields plus a Negotiable toggle, so a listing can advertise any combination of:
+
+- **Asking price** (cash, full)
+- **Monthly amount** (installment / "all-in monthly")
+- **Down payment** (cash-out to start financing)
+
+Sellers can fill in one, two, or all three. Each field has its own minimum so junk values like ₱1 or ₱2 are rejected per field, not just on the headline price.
 
 ---
 
-## 1. Honest pricing (new fields on `listings`)
+## 1. Schema changes (`listings`)
 
-Add columns to `public.listings`:
+New columns alongside the existing `price_php`:
 
-- `price_kind` enum: `asking` | `monthly` | `down_payment` | `starting_bid` (default `asking`)
-- `negotiable` boolean (default false)
-- `price_hidden` boolean (default false) — for "Send a message for price"; requires a real reserve price still stored
-- `registration_status` enum: `registered` | `unregistered` | `for_transfer` | `unknown`
+- `monthly_php  numeric(14,2)` — nullable
+- `down_payment_php numeric(14,2)` — nullable
+- keep `negotiable boolean` (already added)
+- keep `price_hidden boolean` (already added)
+- **Deprecate** `price_kind`: keep the column for now but stop reading/writing it from the app. `price_php` always means the cash asking price going forward; monthly/DP live in their own columns. (Migration leaves old rows intact; a follow-up backfill can move historical `price_kind=monthly/down_payment` rows into the new columns.)
 
-Validation rules (client + server):
+Update the price-floor trigger:
 
-- For vehicle categories (car / motorcycle / truck / equipment), `price_php` must be ≥ a per-category floor (e.g. car ≥ ₱20,000, motorcycle ≥ ₱5,000, monthly/DP ≥ ₱1,000). Reject values like ₱1 / ₱2 / ₱123 with a clear inline error.
-- If `price_kind = monthly` or `down_payment`, the label MUST render with that suffix everywhere — no bare number.
-- Title cannot contain the real price in a way that contradicts `price_php` (regex sweep for "₱ … M / K") — soft warning, not block.
-
-User Score impact:
-
-- Each "abuse-priced" listing (flagged by rule or by reports) decrements the seller's existing reputation/score. Three strikes in 30 days → new listings auto-go to `pending_review` instead of `active`.
+- If `price_php > 0` and category is car/motorcycle/truck/equipment/boat/airplane → must meet category floor (₱20k cars/trucks/equipment, ₱5k motorcycles).
+- If `monthly_php` is set → must be ≥ ₱1,000.
+- If `down_payment_php` is set → must be ≥ ₱5,000.
+- At least one of `price_php`, `monthly_php`, `down_payment_php` must be > 0 when status is not `draft` (prevents "no price at all" listings unless `price_hidden = true`).
 
 ---
 
-## 2. Seller-tier rarity borders (game-style)
+## 2. Client validation
 
-Derive a single `seller_tier` from existing data (no new auth needed):
+Shared Zod schema in `src/lib/listing-pricing.ts` used by both `sell.tsx` and `listing.$id.edit.tsx`:
 
-| Tier | Border | Glow | Who |
-|---|---|---|---|
-| Unverified | thin grey | none | new account, no verification |
-| Private (verified) | white | subtle | ID-verified private seller |
-| Power seller | blue | soft blue | private seller with ≥ N sold / good score |
-| Business | green | green | business profile linked |
-| Dealership | gold | gold shimmer | verified dealership / org with active subscription |
-| Featured / Boosted | dual gold + orange ring | animated | active boost OR top plan |
-| Penalty | red dashed | none | score below threshold — warning to buyers |
-
-Implementation:
-
-- A `getSellerTier(listing)` helper in `src/lib/listing-tier.ts` returns `{ tier, borderClass, ringClass, label }` from `seller_type`, `organization_id`, verification flags, and reputation.
-- Add tier tokens to `src/styles.css` (`--tier-gold`, `--tier-gold-glow`, etc.) so colors live in the design system, not ad-hoc Tailwind.
-- `ListingCard` wraps its root in a `<div className={cn("rounded-xl p-[2px]", tier.borderClass)}>` for a true 2-color frame (outer ring + inner border) on premium tiers.
+- Each field optional; if present, must be a positive integer above its floor.
+- Cross-field rule: at least one field set OR `price_hidden` is true.
+- Friendly inline error per field (no generic "please check the form").
 
 ---
 
-## 3. Pricing & status widgets on the card face
+## 3. Form UI
 
-Small pill row pinned to the bottom-left of the photo (or top-right corner for the most important one):
+In the listing form's pricing section:
 
-- `Negotiable` (blue)
-- `Monthly ₱X,XXX/mo` (purple) — replaces the big price
-- `Down payment ₱X` (orange)
-- `Registered` (green check) / `Unregistered` (amber) / `For transfer` (grey)
-- `Private seller` / `Business` / `Dealership` (matches border color)
-- `Verified ID` (small shield)
+```
+Pricing  (fill any that apply)
 
-Pills are a single `<ListingBadges listing={l} />` component used by card, detail page, and search results so they stay consistent.
+[ Asking price (₱) ........... ]   helper: full cash price
+[ Monthly payment (₱/mo) ..... ]   helper: e.g. financing monthly
+[ Down payment (₱) ........... ]   helper: cash out to start financing
 
----
+[x] Negotiable
+[ ] Hide price — buyers must message me
 
-## 4. Listing form (`/sell` and `/listing/$id/edit`) updates
+Registration:  ( Registered | Unregistered | For transfer | Not specified )
+```
 
-- Price input grows a segmented control: **Asking / Monthly / Down payment** + a **Negotiable** checkbox.
-- Inline helper: "Real asking price only. Placeholder prices like ₱1 or ₱2 lower your seller score."
-- Registration status dropdown for vehicles.
-- "Hide price, ask buyers to message" toggle (still requires real `price_php` saved server-side).
+Inline helper text under the section:
+> Real numbers only. Placeholder prices (₱1, ₱2, etc.) are rejected and lower your seller score.
 
 ---
 
-## 5. Browse / filter
+## 4. Display
 
-Add filters: price kind (asking only / include monthly / include DP), negotiable, registration status, seller tier (private / business / dealership / verified only). Default browse hides `price_kind != asking` from the main price sort so cheap monthly amounts don't dominate the cheapest-first sort.
+Update `ListingPrice` + `ListingBadges` so a card / detail page can show all three when present:
+
+- **Headline price** = `price_php` when > 0; otherwise the monthly amount; otherwise DP; otherwise "Message for price".
+- **Pills** show what's NOT in the headline:
+  - "₱X,XXX/mo" pill if monthly set
+  - "DP ₱X,XXX" pill if down payment set
+  - "Negotiable" pill if toggled
+- Detail page shows a small "Financing options" block listing each available amount with its label.
+
+Filters on `/browse` get checkboxes: "Cash price", "Monthly", "Down payment" (default: all three on).
 
 ---
 
-## 6. Out of scope (separate follow-ups)
+## 5. Backend reads
 
-- New verification flows (we reuse existing verification + business/org data).
-- Animations beyond a simple CSS shimmer on gold tier.
-- Auctions UI — `starting_bid` enum value is reserved for later.
-- Terms/Privacy edits — none of this changes data collection or fees, so no policy sync needed.
+Extend the existing `select(...)` strings in `index.tsx`, `browse.$category.tsx`, `seller.$id.tsx`, `dashboard.favorites.tsx`, `dashboard.likes.tsx`, `listing.$id.tsx`, and the `ListingCardData` interface with the two new columns.
+
+---
+
+## 6. Out of scope
+
+- Auctions / `starting_bid` (still reserved on the deprecated enum).
+- Backfill of historical `price_kind` rows — handled later in a one-shot SQL.
+- New Stripe/payment logic.
+- No `/terms` or `/privacy` edits needed — this changes how price is collected and shown, not fees, payments, data collection, or processors.
 
 ---
 
 ## Technical notes
 
-- One migration: new enum types, new columns with safe defaults, plus a trigger that writes to `listing_price_history` when `price_php` or `price_kind` changes.
-- Server-side validation in `src/lib/listing-payment.functions.ts` (or wherever listing create/update lives) using a shared Zod schema also imported by the client form.
-- `getSellerTier` is pure and lives in `src/lib/listing-tier.ts`; covered by a small Vitest spec.
-- Tier border colors are added in `src/styles.css` under `@theme inline` so Tailwind classes like `ring-tier-gold` work.
-- No changes to `/terms` or `/privacy` (per project memory check: this only affects how price is displayed/validated, not fees, payments, or data handling).
+- Single migration: add columns, rewrite `listings_price_floor_check()` trigger.
+- Shared schema in `src/lib/listing-pricing.ts` (Zod + helper to compute "headline" amount + label).
+- `ListingBadges` gains `monthly_php` / `down_payment_php` inputs and renders pills only when values are present and not already the headline.
+- `ListingPrice` accepts an optional `headlineKind` so detail pages can force a layout, otherwise it derives from which fields are populated.
+- Form: remove the segmented Asking/Monthly/Down-payment selector in `sell.tsx` and `listing.$id.edit.tsx`; replace with the three labeled inputs and keep the Negotiable checkbox and Registration dropdown as-is.

@@ -3608,11 +3608,13 @@ export type Database = {
           contact_phone: string | null
           created_at: string
           description: string | null
+          down_payment_php: number | null
           expires_at: string | null
           export_available: boolean
           id: string
           lat: number | null
           lng: number | null
+          monthly_php: number | null
           negotiable: boolean
           organization_id: string | null
           plan: Database["public"]["Enums"]["listing_plan"]
@@ -3644,11 +3646,13 @@ export type Database = {
           contact_phone?: string | null
           created_at?: string
           description?: string | null
+          down_payment_php?: number | null
           expires_at?: string | null
           export_available?: boolean
           id?: string
           lat?: number | null
           lng?: number | null
+          monthly_php?: number | null
           negotiable?: boolean
           organization_id?: string | null
           plan?: Database["public"]["Enums"]["listing_plan"]
@@ -3680,11 +3684,13 @@ export type Database = {
           contact_phone?: string | null
           created_at?: string
           description?: string | null
+          down_payment_php?: number | null
           expires_at?: string | null
           export_available?: boolean
           id?: string
           lat?: number | null
           lng?: number | null
+          monthly_php?: number | null
           negotiable?: boolean
           organization_id?: string | null
           plan?: Database["public"]["Enums"]["listing_plan"]
