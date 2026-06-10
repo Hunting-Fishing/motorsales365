@@ -273,6 +273,7 @@ export function CategoryAttributesEditor({ category, value, onChange }: Props) {
         <Sel label="Registration status" field="boat_registration_status" opts={BOAT_REG_STATUS} value={value} onChange={onChange} />
         <Sel label="Usage" field="boat_usage" opts={BOAT_USAGE} value={value} onChange={onChange} />
         <Bool label="Trailer included" field="trailer_included" value={value} onChange={onChange} />
+        <TrustBlock value={value} onChange={onChange} />
       </div>
     );
   }
