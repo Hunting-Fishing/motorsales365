@@ -189,6 +189,35 @@ function Bool({
   );
 }
 
+function TrustBlock({
+  value,
+  onChange,
+  includeInspection = true,
+}: {
+  value: CategoryAttrsValue;
+  onChange: (next: CategoryAttrsValue) => void;
+  includeInspection?: boolean;
+}) {
+  return (
+    <div className="space-y-3 rounded-md border border-border/60 bg-background/40 p-3">
+      <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Trust & disclosure
+      </Label>
+      <Sel
+        label="Registered owner (your name on CR)"
+        field="registered_owner"
+        opts={YES_NO_UNKNOWN}
+        value={value}
+        onChange={onChange}
+      />
+      <Bool label="Deed of Sale chain available" field="deed_chain_available" value={value} onChange={onChange} />
+      {includeInspection && (
+        <Bool label="Allow pre-purchase inspection" field="inspection_available" value={value} onChange={onChange} />
+      )}
+    </div>
+  );
+}
+
 export function CategoryAttributesEditor({ category, value, onChange }: Props) {
   if (category === "car") {
     return (
