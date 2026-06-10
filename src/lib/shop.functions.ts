@@ -537,18 +537,47 @@ export const adminUpsertProduct = createServerFn({ method: "POST" })
     const slug = rest.slug || slugify(rest.title);
     if (!slug) throw new Error("A slug or title is required");
     const payload: any = { ...rest, slug, created_by: userId };
+    let productId: string;
     if (id) {
       const { error } = await supabase.from("shop_products").update(payload).eq("id", id);
       if (error) throw new Error(error.message);
-      return { id };
+      productId = id;
+    } else {
+      const { data: row, error } = await supabase
+        .from("shop_products")
+        .insert(payload)
+        .select("id")
+        .single();
+      if (error) throw new Error(error.message);
+      productId = row.id;
     }
-    const { data: row, error } = await supabase
-      .from("shop_products")
-      .insert(payload)
-      .select("id")
-      .single();
-    if (error) throw new Error(error.message);
-    return { id: row.id };
+
+    // Sync shop_product_categories: primary = category_id, plus its parent
+    // (so the product surfaces on both the subcategory and the parent
+    // category landing pages).
+    if (payload.category_id) {
+      const { data: catRow } = await supabase
+        .from("shop_categories")
+        .select("id, parent_id")
+        .eq("id", payload.category_id)
+        .maybeSingle();
+      const links: Array<{ product_id: string; category_id: string; is_primary: boolean }> = [
+        { product_id: productId, category_id: payload.category_id, is_primary: true },
+      ];
+      if (catRow?.parent_id) {
+        links.push({ product_id: productId, category_id: catRow.parent_id, is_primary: false });
+      }
+      // Clear stale primary, then upsert. Other curator-added cross-links stay.
+      await supabase
+        .from("shop_product_categories")
+        .delete()
+        .eq("product_id", productId)
+        .eq("is_primary", true);
+      await supabase
+        .from("shop_product_categories")
+        .upsert(links, { onConflict: "product_id,category_id" });
+    }
+    return { id: productId };
   });
 
 export const adminDeleteProduct = createServerFn({ method: "POST" })
