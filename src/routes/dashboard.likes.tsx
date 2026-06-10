@@ -19,7 +19,7 @@ function LikedPage() {
     supabase
       .from("listing_likes")
       .select(
-        "listing_id, listings:listing_id(id,title,price_php,region,city,seller_type,boost_until,status,category_slug,user_id,view_count,attributes,listing_media(url,type),profiles:user_id(verification_status,phone_verified_at),vehicles:vehicle_id(is_public,passport_slug,vehicle_passport_verifications(status)))",
+        "listing_id, listings:listing_id(id,title,price_php,price_kind,negotiable,price_hidden,registration_status,region,city,seller_type,boost_until,status,category_slug,user_id,view_count,attributes,listing_media(url,type),profiles:user_id(verification_status,phone_verified_at),vehicles:vehicle_id(is_public,passport_slug,vehicle_passport_verifications(status)))",
       )
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })

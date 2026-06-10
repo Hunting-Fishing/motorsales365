@@ -3613,12 +3613,16 @@ export type Database = {
           id: string
           lat: number | null
           lng: number | null
+          negotiable: boolean
           organization_id: string | null
           plan: Database["public"]["Enums"]["listing_plan"]
+          price_hidden: boolean
+          price_kind: Database["public"]["Enums"]["listing_price_kind"]
           price_php: number
           province: string | null
           published_at: string | null
           region: string | null
+          registration_status: Database["public"]["Enums"]["listing_registration_status"]
           seller_type: Database["public"]["Enums"]["seller_type"]
           source: string
           source_url: string | null
@@ -3645,12 +3649,16 @@ export type Database = {
           id?: string
           lat?: number | null
           lng?: number | null
+          negotiable?: boolean
           organization_id?: string | null
           plan?: Database["public"]["Enums"]["listing_plan"]
+          price_hidden?: boolean
+          price_kind?: Database["public"]["Enums"]["listing_price_kind"]
           price_php?: number
           province?: string | null
           published_at?: string | null
           region?: string | null
+          registration_status?: Database["public"]["Enums"]["listing_registration_status"]
           seller_type?: Database["public"]["Enums"]["seller_type"]
           source?: string
           source_url?: string | null
@@ -3677,12 +3685,16 @@ export type Database = {
           id?: string
           lat?: number | null
           lng?: number | null
+          negotiable?: boolean
           organization_id?: string | null
           plan?: Database["public"]["Enums"]["listing_plan"]
+          price_hidden?: boolean
+          price_kind?: Database["public"]["Enums"]["listing_price_kind"]
           price_php?: number
           province?: string | null
           published_at?: string | null
           region?: string | null
+          registration_status?: Database["public"]["Enums"]["listing_registration_status"]
           seller_type?: Database["public"]["Enums"]["seller_type"]
           source?: string
           source_url?: string | null
@@ -7703,6 +7715,12 @@ export type Database = {
         | "tow_request"
       lead_status: "new" | "in_progress" | "won" | "lost"
       listing_plan: "free" | "standard" | "upgraded"
+      listing_price_kind: "asking" | "monthly" | "down_payment" | "starting_bid"
+      listing_registration_status:
+        | "registered"
+        | "unregistered"
+        | "for_transfer"
+        | "unknown"
       listing_status:
         | "draft"
         | "pending_payment"
@@ -7998,6 +8016,13 @@ export const Constants = {
       ],
       lead_status: ["new", "in_progress", "won", "lost"],
       listing_plan: ["free", "standard", "upgraded"],
+      listing_price_kind: ["asking", "monthly", "down_payment", "starting_bid"],
+      listing_registration_status: [
+        "registered",
+        "unregistered",
+        "for_transfer",
+        "unknown",
+      ],
       listing_status: [
         "draft",
         "pending_payment",

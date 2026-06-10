@@ -20,7 +20,10 @@ import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ServiceStrip } from "@/components/service-strip";
 import { TrustBadges } from "@/components/listings/trust-badges";
 import { ListingActionsMenu } from "@/components/listings/listing-actions-menu";
+import { ListingBadges } from "@/components/listings/listing-badges";
 import { deriveTrustSignals } from "@/lib/trust-signals";
+import { getSellerTier } from "@/lib/listing-tier";
+import { cn } from "@/lib/utils";
 
 export interface ListingCardData {
   id: string;
@@ -47,6 +50,10 @@ export interface ListingCardData {
   like_count?: number;
   passport_published?: boolean;
   passport_documents_checked?: boolean;
+  price_kind?: "asking" | "monthly" | "down_payment" | "starting_bid" | null;
+  negotiable?: boolean | null;
+  price_hidden?: boolean | null;
+  registration_status?: "registered" | "unregistered" | "for_transfer" | "unknown" | null;
 }
 
 const CATEGORY_META: Record<string, { label: string; Icon: typeof Droplets }> = {
@@ -99,8 +106,15 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
   const summary = summarizeAttributes(listing.category_slug, listing.attributes);
   const showServices = VEHICLE_CATEGORIES.has(listing.category_slug);
   const trust = deriveTrustSignals(listing);
+  const tier = getSellerTier(listing);
   return (
-    <div className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-elegant)]">
+    <div
+      className={cn(
+        "group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-elegant)]",
+        tier.ringClass,
+        tier.glowClass,
+      )}
+    >
       <div className="absolute right-2 top-2 z-10">
         <ListingActionsMenu
           listingId={listing.id}
@@ -130,9 +144,6 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
                 {catMeta.label}
               </Badge>
             )}
-            <Badge variant={listing.seller_type === "business" ? "default" : "secondary"}>
-              {listing.seller_type === "business" ? "Business" : "Private"}
-            </Badge>
             {listing.seller_type === "business" && listing.seller_dealer_plan && (
               <DealerSubscriptionBadge
                 planName={listing.seller_dealer_plan}
@@ -161,7 +172,15 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
         <div className="flex flex-1 flex-col p-4">
           <h3 className="line-clamp-2 font-semibold leading-snug">{listing.title}</h3>
           {summary && <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{summary}</p>}
-          <ListingPrice pricePhp={listing.price_php} size="md" className="mt-2" />
+          <ListingPrice
+            pricePhp={listing.price_php}
+            size="md"
+            className="mt-2"
+            priceKind={listing.price_kind ?? "asking"}
+            negotiable={!!listing.negotiable}
+            priceHidden={!!listing.price_hidden}
+          />
+          <ListingBadges listing={listing} className="mt-2" />
           <TrustBadges signals={trust} size="sm" className="mt-2" />
           <div className="mt-auto flex items-center justify-between gap-2 pt-3 text-xs text-muted-foreground">
             <span className="flex min-w-0 items-center gap-1">

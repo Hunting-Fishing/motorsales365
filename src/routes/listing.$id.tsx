@@ -59,6 +59,7 @@ import {
 } from "@/components/ui/select";
 import { formatPHP, formatDate } from "@/lib/format";
 import { ListingPrice } from "@/components/listing-price";
+import { ListingBadges } from "@/components/listings/listing-badges";
 import placeholderCar from "@/assets/placeholder-car.webp";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ListingQr } from "@/components/listing-qr";
@@ -161,6 +162,10 @@ interface ListingDetail {
   title: string;
   description: string | null;
   price_php: number;
+  price_kind?: "asking" | "monthly" | "down_payment" | "starting_bid" | null;
+  negotiable?: boolean | null;
+  price_hidden?: boolean | null;
+  registration_status?: "registered" | "unregistered" | "for_transfer" | "unknown" | null;
   region: string | null;
   city: string | null;
   status: string;
@@ -490,7 +495,23 @@ function ListingDetailPage() {
                 {[listing.city, listing.region].filter(Boolean).join(", ") || "Philippines"}
               </div>
             </div>
-            <ListingPrice pricePhp={listing.price_php} size="lg" />
+            <div className="flex flex-col items-end gap-2">
+              <ListingPrice
+                pricePhp={listing.price_php}
+                size="lg"
+                priceKind={listing.price_kind ?? "asking"}
+                negotiable={!!listing.negotiable}
+                priceHidden={!!listing.price_hidden}
+              />
+              <ListingBadges
+                listing={{
+                  ...listing,
+                  seller_dealer_plan: sellerDealerPlan,
+                  seller_verified: !!(seller as any)?.verification_status,
+                }}
+                size="md"
+              />
+            </div>
           </div>
 
           {/* Engagement bar */}
