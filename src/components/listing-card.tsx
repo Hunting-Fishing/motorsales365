@@ -13,12 +13,13 @@ import {
   Heart,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { VerifiedBadge } from "@/components/verified-badge";
 import { DealerSubscriptionBadge } from "@/components/dealer-subscription-badge";
 import { ListingPrice } from "@/components/listing-price";
 import placeholderCar from "@/assets/placeholder-car.webp";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ServiceStrip } from "@/components/service-strip";
+import { TrustBadges } from "@/components/listings/trust-badges";
+import { deriveTrustSignals } from "@/lib/trust-signals";
 
 export interface ListingCardData {
   id: string;
