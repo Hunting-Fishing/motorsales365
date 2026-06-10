@@ -24,8 +24,6 @@ export interface ListingBadgeData extends TierInput {
   headlineKind?: "asking" | "monthly" | "down_payment" | null;
 }
 
-const toNum = (v: unknown): number =>
-  typeof v === "string" ? parseFloat(v) || 0 : typeof v === "number" ? v : 0;
 
 /**
  * Compact pill row used on listing cards and the detail page. Pills are
