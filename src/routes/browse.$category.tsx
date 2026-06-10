@@ -32,21 +32,79 @@ import {
 } from "@/components/ui/select";
 import { LocationPicker } from "@/components/location-picker";
 import { VehiclePicker } from "@/components/vehicle-picker";
+import { CategoryFilters, type CategoryFilterValue } from "@/components/browse/category-filters";
 import { buildTitleSearchTerms } from "@/lib/vehicle-aliases";
 import { fuzzyFilter } from "@/lib/fuzzy";
 
+const optStr = () => z.string().optional();
+const optBool = () =>
+  z
+    .union([z.literal("1"), z.literal("true"), z.boolean()])
+    .optional()
+    .transform((v) => (v === true || v === "1" || v === "true" ? true : undefined));
+const optNum = () => z.coerce.number().optional();
+
 const searchSchema = z.object({
-  q: z.string().optional(),
-  region: z.string().optional(),
-  province: z.string().optional(),
-  city: z.string().optional(),
-  min: z.coerce.number().optional(),
-  max: z.coerce.number().optional(),
+  q: optStr(),
+  region: optStr(),
+  province: optStr(),
+  city: optStr(),
+  min: optNum(),
+  max: optNum(),
   sort: z.enum(["recent", "price_asc", "price_desc"]).optional(),
-  year: z.coerce.number().optional(),
-  make: z.string().optional(),
-  model: z.string().optional(),
-  engine: z.string().optional(),
+  year: optNum(),
+  make: optStr(),
+  model: optStr(),
+  engine: optStr(),
+  // Car
+  transmission: optStr(),
+  fuel: optStr(),
+  body_type: optStr(),
+  mileage_min: optNum(),
+  mileage_max: optNum(),
+  owner_status: optStr(),
+  or_cr_status: optStr(),
+  flood_history: optStr(),
+  accident_history: optStr(),
+  financing_available: optBool(),
+  trade_accepted: optBool(),
+  verified_documents_only: optBool(),
+  // Motorcycle
+  moto_type: optStr(),
+  engine_cc_min: optNum(),
+  engine_cc_max: optNum(),
+  plate_status: optStr(),
+  moto_condition: optStr(),
+  delivery_available: optBool(),
+  // Equipment
+  equipment_type: optStr(),
+  brand: optStr(),
+  hours_min: optNum(),
+  hours_max: optNum(),
+  weight_min: optNum(),
+  weight_max: optNum(),
+  attachment_type: optStr(),
+  rental_or_sale: optStr(),
+  with_operator: optBool(),
+  inspection_available: optBool(),
+  // Boat
+  boat_type: optStr(),
+  hull_material: optStr(),
+  boat_engine_type: optStr(),
+  length_min: optNum(),
+  length_max: optNum(),
+  boat_registration_status: optStr(),
+  boat_usage: optStr(),
+  trailer_included: optBool(),
+  // Airplane
+  registration_no: optStr(),
+  airworthiness: optStr(),
+  maintenance_logs: optStr(),
+  engine_hours_min: optNum(),
+  engine_hours_max: optNum(),
+  airport_code: optStr(),
+  aircraft_seller: optStr(),
+  inspection_required: optBool(),
 });
 
 const CATEGORY_LABEL: Record<string, string> = {
@@ -119,6 +177,27 @@ function BrowsePage() {
   const [vMake, setVMake] = useState(search.make ?? "");
   const [vModel, setVModel] = useState(search.model ?? "");
   const [vEngine, setVEngine] = useState(search.engine ?? "");
+  const [catFilters, setCatFilters] = useState<CategoryFilterValue>(() => {
+    const init: CategoryFilterValue = {};
+    const keys = [
+      "transmission","fuel","body_type","mileage_min","mileage_max","owner_status",
+      "or_cr_status","flood_history","accident_history","financing_available",
+      "trade_accepted","verified_documents_only","moto_type","engine_cc_min",
+      "engine_cc_max","plate_status","moto_condition","delivery_available",
+      "equipment_type","brand","hours_min","hours_max","weight_min","weight_max",
+      "attachment_type","rental_or_sale","with_operator","inspection_available",
+      "boat_type","hull_material","boat_engine_type","length_min","length_max",
+      "boat_registration_status","boat_usage","trailer_included","registration_no",
+      "airworthiness","maintenance_logs","engine_hours_min","engine_hours_max",
+      "airport_code","aircraft_seller","inspection_required",
+    ] as const;
+    for (const k of keys) {
+      const v = (search as any)[k];
+      if (v === undefined || v === null || v === "") continue;
+      init[k] = typeof v === "number" ? String(v) : v;
+    }
+    return init;
+  });
   const [items, setItems] = useState<ListingCardData[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -144,6 +223,76 @@ function BrowsePage() {
         if (search.make) q = q.ilike("attributes->>make", search.make);
         if (search.model) q = q.ilike("attributes->>model", search.model);
         if (search.engine) q = q.ilike("attributes->>engine", search.engine);
+        // Category-specific filters — all live in listings.attributes.
+        const eq = (k: string, v?: string) => {
+          if (v) q = q.eq(`attributes->>${k}`, v);
+        };
+        const ilike = (k: string, v?: string) => {
+          if (v) q = q.ilike(`attributes->>${k}`, `%${v}%`);
+        };
+        const gte = (k: string, v?: number) => {
+          if (v != null && !Number.isNaN(v))
+            q = q.gte(`attributes->>${k}::numeric` as any, v);
+        };
+        const lte = (k: string, v?: number) => {
+          if (v != null && !Number.isNaN(v))
+            q = q.lte(`attributes->>${k}::numeric` as any, v);
+        };
+        const isTrue = (k: string, v?: boolean) => {
+          if (v) q = q.eq(`attributes->>${k}`, "true");
+        };
+        // Cars
+        eq("transmission", search.transmission);
+        eq("fuel", search.fuel);
+        eq("body_type", search.body_type);
+        gte("mileage_km", search.mileage_min);
+        lte("mileage_km", search.mileage_max);
+        eq("owner_status", search.owner_status);
+        eq("or_cr_status", search.or_cr_status);
+        eq("flood_history", search.flood_history);
+        eq("accident_history", search.accident_history);
+        isTrue("financing_available", search.financing_available);
+        isTrue("trade_accepted", search.trade_accepted);
+        if (search.verified_documents_only) {
+          q = q.eq("attributes->>or_cr_status", "complete");
+        }
+        // Motorcycles
+        eq("moto_type", search.moto_type);
+        gte("engine_cc", search.engine_cc_min);
+        lte("engine_cc", search.engine_cc_max);
+        eq("plate_status", search.plate_status);
+        eq("moto_condition", search.moto_condition);
+        isTrue("delivery_available", search.delivery_available);
+        // Equipment
+        eq("equipment_type", search.equipment_type);
+        ilike("brand", search.brand);
+        gte("hours", search.hours_min);
+        lte("hours", search.hours_max);
+        gte("operating_weight_tons", search.weight_min);
+        lte("operating_weight_tons", search.weight_max);
+        ilike("attachment_type", search.attachment_type);
+        eq("rental_or_sale", search.rental_or_sale);
+        isTrue("with_operator", search.with_operator);
+        isTrue("inspection_available", search.inspection_available);
+        // Boats
+        eq("boat_type", search.boat_type);
+        eq("hull_material", search.hull_material);
+        eq("boat_engine_type", search.boat_engine_type);
+        gte("length_ft", search.length_min);
+        lte("length_ft", search.length_max);
+        eq("boat_registration_status", search.boat_registration_status);
+        eq("boat_usage", search.boat_usage);
+        isTrue("trailer_included", search.trailer_included);
+        // Airplanes
+        ilike("registration_no", search.registration_no);
+        eq("airworthiness", search.airworthiness);
+        eq("maintenance_logs", search.maintenance_logs);
+        gte("engine_hours", search.engine_hours_min);
+        lte("engine_hours", search.engine_hours_max);
+        ilike("airport_code", search.airport_code);
+        eq("aircraft_seller", search.aircraft_seller);
+        isTrue("inspection_required", search.inspection_required);
+
         if (search.sort === "price_asc") q = q.order("price_php", { ascending: true });
         else if (search.sort === "price_desc") q = q.order("price_php", { ascending: false });
         else
@@ -234,6 +383,32 @@ function BrowsePage() {
     search.make,
     search.model,
     search.engine,
+    // Include the entire category-filter blob as a single JSON dep so any
+    // change re-runs the query.
+    JSON.stringify({
+      transmission: search.transmission, fuel: search.fuel, body_type: search.body_type,
+      mileage_min: search.mileage_min, mileage_max: search.mileage_max,
+      owner_status: search.owner_status, or_cr_status: search.or_cr_status,
+      flood_history: search.flood_history, accident_history: search.accident_history,
+      financing_available: search.financing_available, trade_accepted: search.trade_accepted,
+      verified_documents_only: search.verified_documents_only,
+      moto_type: search.moto_type, engine_cc_min: search.engine_cc_min,
+      engine_cc_max: search.engine_cc_max, plate_status: search.plate_status,
+      moto_condition: search.moto_condition, delivery_available: search.delivery_available,
+      equipment_type: search.equipment_type, brand: search.brand,
+      hours_min: search.hours_min, hours_max: search.hours_max,
+      weight_min: search.weight_min, weight_max: search.weight_max,
+      attachment_type: search.attachment_type, rental_or_sale: search.rental_or_sale,
+      with_operator: search.with_operator, inspection_available: search.inspection_available,
+      boat_type: search.boat_type, hull_material: search.hull_material,
+      boat_engine_type: search.boat_engine_type, length_min: search.length_min,
+      length_max: search.length_max, boat_registration_status: search.boat_registration_status,
+      boat_usage: search.boat_usage, trailer_included: search.trailer_included,
+      registration_no: search.registration_no, airworthiness: search.airworthiness,
+      maintenance_logs: search.maintenance_logs, engine_hours_min: search.engine_hours_min,
+      engine_hours_max: search.engine_hours_max, airport_code: search.airport_code,
+      aircraft_seller: search.aircraft_seller, inspection_required: search.inspection_required,
+    }),
   ]);
 
   const applyFilters = (e: React.FormEvent) => {
@@ -253,6 +428,9 @@ function BrowsePage() {
         make: vMake || undefined,
         model: vModel || undefined,
         engine: vEngine || undefined,
+        ...(Object.fromEntries(
+          Object.entries(catFilters).filter(([, v]) => v !== undefined && v !== "" && v !== false),
+        ) as any),
       },
     });
   };
@@ -290,6 +468,7 @@ function BrowsePage() {
         make: vMake || null,
         model: vModel || null,
         engine: vEngine || null,
+        ...catFilters,
       },
     });
     setSavingSearch(false);
@@ -357,6 +536,7 @@ function BrowsePage() {
                 />
               </div>
             )}
+            <CategoryFilters category={category} value={catFilters} onChange={setCatFilters} />
             <LocationPicker
               asFilter
               stacked

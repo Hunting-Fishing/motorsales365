@@ -33,6 +33,11 @@ import { TagPicker } from "@/components/tag-picker";
 import { CATEGORY_DEFAULT_GROUPS, SERVICE_CATEGORIES } from "@/data/service-tags";
 import { uploadWithRetry } from "@/lib/storage-upload";
 import { getUserPlanLimits, FREE_PLAN_LIMITS, type PlanLimits } from "@/lib/plan-limits";
+import {
+  CategoryAttributesEditor,
+  CATEGORY_ATTR_KEYS,
+} from "@/components/listings/category-attributes-editor";
+import { isAttrCategory } from "@/lib/category-attributes";
 import { PhoneInput } from "@/components/phone-input";
 import { parseE164, buildE164 } from "@/data/country-codes";
 import {
@@ -151,6 +156,7 @@ function EditListingPage() {
   const [engine, setEngine] = useState("");
   const [vehicleQuality, setVehicleQuality] = useState<VehicleQuality>({});
   const [vehicleQualityIssues, setVehicleQualityIssues] = useState<VehicleQualityIssue[]>([]);
+  const [categoryAttrs, setCategoryAttrs] = useState<Record<string, any>>({});
 
   // Towing
   const [towServiceType, setTowServiceType] = useState("");
@@ -241,6 +247,13 @@ function EditListingPage() {
     setFuel(a.fuel ?? "");
     setEngine(a.engine ?? "");
     setVehicleQuality(hydrateVehicleQuality(a));
+    if (isAttrCategory(l.category_slug)) {
+      const next: Record<string, any> = {};
+      for (const k of CATEGORY_ATTR_KEYS[l.category_slug] ?? []) {
+        if (a[k] !== undefined && a[k] !== null) next[k] = a[k];
+      }
+      setCategoryAttrs(next);
+    }
 
     setTowServiceType(a.service_type ?? "");
     setTowCapacity(a.vehicle_capacity ?? "");
@@ -344,6 +357,14 @@ function EditListingPage() {
     if (engine) attributes.engine = engine;
     if (category === "car" || category === "motorcycle") {
       Object.assign(attributes, vehicleQualityToAttributes(vehicleQuality));
+    }
+    if (isAttrCategory(category)) {
+      for (const k of CATEGORY_ATTR_KEYS[category] ?? []) delete attributes[k];
+      for (const k of CATEGORY_ATTR_KEYS[category] ?? []) {
+        const v = categoryAttrs[k];
+        if (v === undefined || v === null || v === "") continue;
+        attributes[k] = v;
+      }
     }
 
     if (category === "towing") {
@@ -997,6 +1018,20 @@ function EditListingPage() {
                   <Label>Year</Label>
                   <Input value={year} onChange={(e) => setYear(e.target.value)} />
                 </div>
+              </div>
+            )}
+            {isAttrCategory(category) && (
+              <div className="mt-4 rounded-md border border-border/60 bg-background/40 p-4">
+                <h3 className="mb-3 font-display text-sm font-semibold">Buyer filters</h3>
+                <p className="mb-3 text-xs text-muted-foreground">
+                  These fields show up as filters on the {category} browse page. Fill them in so
+                  your listing gets matched.
+                </p>
+                <CategoryAttributesEditor
+                  category={category}
+                  value={categoryAttrs}
+                  onChange={setCategoryAttrs}
+                />
               </div>
             )}
           </section>

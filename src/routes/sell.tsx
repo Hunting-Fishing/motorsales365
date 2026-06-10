@@ -45,7 +45,20 @@ import {
   type VehicleQualityIssue,
 } from "@/components/vehicle-quality-fields";
 import { VinScanDialog } from "@/components/vin-scan-dialog";
+import {
+  CategoryAttributesEditor,
+  CATEGORY_ATTR_KEYS,
+} from "@/components/listings/category-attributes-editor";
+import { isAttrCategory } from "@/lib/category-attributes";
 import { z } from "zod";
+
+const CATEGORY_LABEL_MAP: Record<string, string> = {
+  car: "Car",
+  motorcycle: "Motorcycle",
+  equipment: "Heavy equipment",
+  boat: "Boat",
+  airplane: "Aircraft",
+};
 
 const ListingTextSchema = z.object({
   title: z.string().trim().min(3, "Title must be at least 3 characters").max(120, "Title must be 120 characters or fewer"),
@@ -253,6 +266,7 @@ function SellPage() {
   const [engine, setEngine] = useState("");
   const [vehicleQuality, setVehicleQuality] = useState<VehicleQuality>({});
   const [vehicleQualityIssues, setVehicleQualityIssues] = useState<VehicleQualityIssue[]>([]);
+  const [categoryAttrs, setCategoryAttrs] = useState<Record<string, any>>({});
 
   // Towing service-specific fields
   const [towServiceType, setTowServiceType] = useState("");
@@ -623,6 +637,13 @@ function SellPage() {
         if (engine) attributes.engine = engine;
         if (category === "car" || category === "motorcycle") {
           Object.assign(attributes, vehicleQualityToAttributes(vehicleQuality));
+        }
+        if (isAttrCategory(category)) {
+          for (const k of CATEGORY_ATTR_KEYS[category] ?? []) {
+            const v = categoryAttrs[k];
+            if (v === undefined || v === null || v === "") continue;
+            attributes[k] = v;
+          }
         }
         if (category === "towing") {
           if (towServiceType) attributes.service_type = towServiceType;
@@ -1341,6 +1362,18 @@ function SellPage() {
                   />
                 }
               />
+            )}
+            {isAttrCategory(category) && (
+              <div className="rounded-md border border-border/60 bg-background/40 p-4">
+                <h3 className="mb-3 font-display text-sm font-semibold">
+                  {CATEGORY_LABEL_MAP[category] ?? "Details"} — buyers filter by these
+                </h3>
+                <CategoryAttributesEditor
+                  category={category}
+                  value={categoryAttrs}
+                  onChange={setCategoryAttrs}
+                />
+              </div>
             )}
           </section>
 
