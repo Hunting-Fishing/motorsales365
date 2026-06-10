@@ -510,6 +510,7 @@ function ListingDetailPage() {
                   />
                 );
               })()}
+              <PricingWidget listing={listing} size="md" />
               <ListingBadges
                 listing={{
                   ...listing,
