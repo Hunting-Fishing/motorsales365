@@ -857,71 +857,34 @@ function pickPricePhp(
   return null;
 }
 
-// Keyword dictionary mapping shop_categories.slug → trigger phrases found in
-// scraped product titles / descriptions / category hints. Subcategory matches
-// win over parent matches because they're more specific.
-const CATEGORY_KEYWORDS: Record<string, string[]> = {
-  diagnostics: ["obd2", "obd-ii", "obdii", "obd ii", "scan tool", "scanner", "ancel", "autel", "launch x431", "elm327", "code reader", "diagnostic tool"],
-  "car-washing": ["foam cannon", "snow foam", "pressure washer", "car shampoo", "car wash", "wash mitt"],
-  "waxes-coatings": ["car wax", "ceramic coat", "ceramic coating", "paint sealant", "sealant", "graphene coat"],
-  "polishing-compounds": ["polishing compound", "cutting compound", "buffing pad", "polisher"],
-  microfiber: ["microfiber", "micro fibre", "drying towel", "applicator pad"],
-  "wheel-tire-care": ["tire shine", "tire dressing", "wheel cleaner", "rim cleaner"],
-  "interior-care": ["interior cleaner", "leather conditioner", "dashboard polish", "fabric cleaner", "carpet cleaner"],
-  "jump-starters": ["jump starter", "jumpstarter", "jump pack", "booster pack"],
-  "tow-straps": ["tow strap", "recovery strap", "tow rope", "kinetic rope", "snatch strap"],
-  "first-aid": ["first aid", "first-aid"],
-  "fire-extinguishers": ["fire extinguisher"],
-  safety: ["warning triangle", "reflective triangle", "tire inflator", "portable air compressor", "emergency kit", "road kit", "safety vest"],
-  helmets: ["helmet", "full face", "half face", "modular helmet"],
-  "riding-gear": ["riding jacket", "riding pants", "rain gear", "rain suit", "motorcycle gloves", "riding gloves", "moto boots"],
-  "moto-luggage": ["tank bag", "saddle bag", "tail bag", "panniers"],
-  "chain-care": ["chain lube", "chain cleaner", "chain wax"],
-  "seat-covers": ["seat cover", "seat cushion"],
-  "floor-mats": ["floor mat", "car mat", "all-weather mat"],
-  "phone-mounts": ["phone mount", "phone holder", "car phone holder", "magsafe car"],
-  organizers: ["car organizer", "trunk organizer", "console organizer"],
-  accessories: ["sun shade", "sunshade", "windshield shade", "steering wheel cover", "armrest"],
-  dashcams: ["dash cam", "dashcam", "dvr car camera"],
-  "cameras-sensors": ["reverse camera", "backup camera", "parking sensor", "blind spot"],
-  "head-units": ["head unit", "car stereo", "android auto", "carplay head", "double din", "1din"],
-  speakers: ["car speaker", "subwoofer", "tweeter", "amplifier car audio"],
-  lighting: ["led headlight", "hid kit", "fog light", "h4 led", "h7 led", "h11 led"],
-  "hand-tools": ["socket set", "wrench set", "spanner", "ratchet set", "screwdriver set", "plier", "torque wrench", "multimeter"],
-  "power-tools": ["impact wrench", "cordless drill", "angle grinder", "rotary tool", "power drill"],
-  "jacks-stands": ["floor jack", "jack stand", "trolley jack", "scissor jack", "hydraulic jack"],
-  "workshop-equipment": ["engine hoist", "creeper", "tire changer", "wheel balancer"],
-  "battery-care": ["battery charger", "trickle charger", "smart charger", "battery maintainer", "battery tender"],
-  "garage-organizers": ["garage organizer", "tool chest", "tool cabinet", "tool cart"],
-  shelving: ["shelving", "garage shelf", "storage rack"],
-  "car-covers": ["car cover", "all weather cover"],
-  "truck-equipment": ["work light", "led work light", "ratchet strap", "tie down", "cargo strap", "grease gun", "truck bed", "winch"],
-  "off-road-lights": ["light bar", "off road light", "off-road light", "4x4 light"],
-  "recovery-boards": ["recovery board", "traction board", "sand board"],
-  "roof-racks": ["roof rack", "roof basket", "cross bar"],
-  snorkels: ["snorkel kit", "raised intake"],
-  "engine-oil": ["engine oil", "motor oil", "5w-30", "5w-40", "0w-20", "10w-40", "synthetic oil"],
-  atf: ["atf", "transmission fluid", "gear oil"],
-  "brake-fluid": ["brake fluid", "dot 3", "dot 4", "dot 5"],
-  coolant: ["coolant", "antifreeze", "radiator fluid"],
-  grease: ["grease cartridge", "lithium grease", "wd-40", "wd40", "penetrating oil"],
-  brakes: ["brake pad", "brake disc", "brake rotor", "brake shoe"],
-  filters: ["oil filter", "air filter", "cabin filter", "fuel filter"],
-  ignition: ["spark plug", "ignition coil", "iridium plug"],
-  "belts-hoses": ["timing belt", "serpentine belt", "radiator hose"],
-  cooling: ["radiator", "water pump", "thermostat"],
-  exhaust: ["exhaust pipe", "muffler", "catalytic converter"],
-  suspension: ["shock absorber", "strut", "control arm", "tie rod"],
-  tires: ["tyre", "all terrain tire", "215/", "225/", "235/", "265/"],
-  wheels: ["alloy wheel", "mag wheels"],
-  tpms: ["tpms", "valve stem", "tire pressure sensor"],
-  "ev-chargers": ["ev charger", "ev charging", "type 2 charger", "wallbox"],
-  "ev-adapters": ["ev adapter", "type 2 adapter", "chademo"],
-};
+// ---------- Category matcher (DB-backed) ----------
+// Trigger keywords live in `shop_category_keywords`; loadCategoryKeywordMap()
+// reads them once per scrape / re-categorize pass. Subcategory matches win
+// over parents because they're more specific.
+
+type CategoryRow = { id: string; name: string; slug: string; parent_id: string | null };
+
+async function loadCategoryKeywordMap(): Promise<{
+  cats: CategoryRow[];
+  keywordsById: Map<string, string[]>;
+}> {
+  const [{ data: cats }, { data: kws }] = await Promise.all([
+    supabaseAdmin.from("shop_categories").select("id, slug, name, parent_id").eq("active", true),
+    supabaseAdmin.from("shop_category_keywords").select("category_id, keyword"),
+  ]);
+  const keywordsById = new Map<string, string[]>();
+  for (const row of (kws ?? []) as any[]) {
+    const list = keywordsById.get(row.category_id) ?? [];
+    list.push(String(row.keyword).toLowerCase());
+    keywordsById.set(row.category_id, list);
+  }
+  return { cats: (cats ?? []) as CategoryRow[], keywordsById };
+}
 
 function fuzzyCategoryMatch(
   hint: string,
-  cats: Array<{ id: string; name: string; slug: string; parent_id?: string | null }>,
+  cats: CategoryRow[],
+  keywordsById: Map<string, string[]>,
 ): string | null {
   if (!hint) return null;
   const h = ` ${hint.toLowerCase().replace(/[^a-z0-9\/]+/g, " ")} `;
@@ -929,13 +892,17 @@ function fuzzyCategoryMatch(
   // 1) Keyword dictionary — subcategories win over parents.
   let best: { id: string; score: number; isChild: boolean } | null = null;
   for (const c of cats) {
-    const kws = CATEGORY_KEYWORDS[c.slug];
-    if (!kws) continue;
+    const kws = keywordsById.get(c.id);
+    if (!kws || kws.length === 0) continue;
     let score = 0;
     for (const kw of kws) if (h.includes(kw)) score += kw.length;
     if (score > 0) {
       const isChild = !!c.parent_id;
-      if (!best || (isChild && !best.isChild) || (isChild === best.isChild && score > best.score)) {
+      if (
+        !best ||
+        (isChild && !best.isChild) ||
+        (isChild === best.isChild && score > best.score)
+      ) {
         best = { id: c.id, score, isChild };
       }
     }
@@ -963,13 +930,53 @@ function fuzzyCategoryMatch(
     const score = tokens.filter((t) => ct.includes(t)).length;
     if (score > 0) {
       const isChild = !!c.parent_id;
-      if (!tBest || (isChild && !tBest.isChild) || (isChild === tBest.isChild && score > tBest.score)) {
+      if (
+        !tBest ||
+        (isChild && !tBest.isChild) ||
+        (isChild === tBest.isChild && score > tBest.score)
+      ) {
         tBest = { id: c.id, score, isChild };
       }
     }
   }
   return tBest?.id ?? null;
 }
+
+// Shared join-table sync — used by import, manual save, and bulk re-run.
+async function syncProductCategoryLinks(
+  client: typeof supabaseAdmin,
+  productId: string,
+  categoryId: string | null,
+  cats?: CategoryRow[],
+): Promise<void> {
+  if (!categoryId) return;
+  let parentId: string | null = null;
+  if (cats) {
+    parentId = cats.find((c) => c.id === categoryId)?.parent_id ?? null;
+  } else {
+    const { data: catRow } = await client
+      .from("shop_categories")
+      .select("parent_id")
+      .eq("id", categoryId)
+      .maybeSingle();
+    parentId = catRow?.parent_id ?? null;
+  }
+  const links: Array<{ product_id: string; category_id: string; is_primary: boolean }> = [
+    { product_id: productId, category_id: categoryId, is_primary: true },
+  ];
+  if (parentId) {
+    links.push({ product_id: productId, category_id: parentId, is_primary: false });
+  }
+  await client
+    .from("shop_product_categories")
+    .delete()
+    .eq("product_id", productId)
+    .eq("is_primary", true);
+  await client
+    .from("shop_product_categories")
+    .upsert(links, { onConflict: "product_id,category_id" });
+}
+
 
 
 const NETWORK_SLUGS = [
