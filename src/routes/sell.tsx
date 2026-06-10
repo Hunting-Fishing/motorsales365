@@ -49,7 +49,7 @@ import {
   CategoryAttributesEditor,
   CATEGORY_ATTR_KEYS,
 } from "@/components/listings/category-attributes-editor";
-import { isAttrCategory } from "@/lib/category-attributes";
+import { isAttrCategory, isValidDrivetrain } from "@/lib/category-attributes";
 import { z } from "zod";
 
 const CATEGORY_LABEL_MAP: Record<string, string> = {
@@ -620,6 +620,11 @@ function SellPage() {
         return;
       }
       setVehicleQualityIssues([]);
+    }
+
+    if (category === "car" && !isValidDrivetrain(categoryAttrs.drivetrain)) {
+      toast.error("Please select a valid drivetrain (FWD, RWD, AWD, 4x4, or 4x2).");
+      return;
     }
 
     setSubmitting(true);

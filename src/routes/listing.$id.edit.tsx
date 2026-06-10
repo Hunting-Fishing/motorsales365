@@ -37,7 +37,7 @@ import {
   CategoryAttributesEditor,
   CATEGORY_ATTR_KEYS,
 } from "@/components/listings/category-attributes-editor";
-import { isAttrCategory } from "@/lib/category-attributes";
+import { isAttrCategory, isValidDrivetrain } from "@/lib/category-attributes";
 import { PhoneInput } from "@/components/phone-input";
 import { parseE164, buildE164 } from "@/data/country-codes";
 import {
@@ -326,6 +326,10 @@ function EditListingPage() {
         return;
       }
       setVehicleQualityIssues([]);
+    }
+    if (category === "car" && !isValidDrivetrain(categoryAttrs.drivetrain)) {
+      toast.error("Please select a valid drivetrain (FWD, RWD, AWD, 4x4, or 4x2).");
+      return;
     }
     setSaving(true);
 
