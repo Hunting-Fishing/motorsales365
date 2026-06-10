@@ -137,8 +137,10 @@ function EditListingPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [priceKind, setPriceKind] = useState<"asking" | "monthly" | "down_payment">("asking");
+  const [monthly, setMonthly] = useState("");
+  const [downPayment, setDownPayment] = useState("");
   const [negotiable, setNegotiable] = useState(false);
+  const [priceHidden, setPriceHidden] = useState(false);
   const [registrationStatus, setRegistrationStatus] = useState<
     "registered" | "unregistered" | "for_transfer" | "unknown"
   >("unknown");
