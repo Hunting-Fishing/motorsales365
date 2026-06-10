@@ -246,6 +246,7 @@ function BrowsePage() {
         eq("transmission", search.transmission);
         eq("fuel", search.fuel);
         eq("body_type", search.body_type);
+        eq("drivetrain", search.drivetrain);
         gte("mileage_km", search.mileage_min);
         lte("mileage_km", search.mileage_max);
         eq("owner_status", search.owner_status);
