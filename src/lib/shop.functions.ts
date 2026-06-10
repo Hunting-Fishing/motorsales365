@@ -221,6 +221,7 @@ export const listShopProducts = createServerFn({ method: "GET" })
         priceMin?: number;
         priceMax?: number;
         sort?: "featured" | "newest" | "price_asc" | "price_desc" | "popular";
+        network?: string;
       } = {},
     ) =>
       z
@@ -242,9 +243,10 @@ export const listShopProducts = createServerFn({ method: "GET" })
           priceMin: z.number().nonnegative().optional(),
           priceMax: z.number().nonnegative().optional(),
           sort: z.enum(["featured", "newest", "price_asc", "price_desc", "popular"]).optional(),
+          network: z.string().max(40).optional(),
         })
         .parse(input),
-  )
+    )
   .handler(async ({ data }) => {
     // Resolve a primary category + any extra sub-category slugs to ids
     const wantedSlugs = new Set<string>();
