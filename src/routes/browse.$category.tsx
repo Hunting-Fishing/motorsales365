@@ -184,9 +184,9 @@ function BrowsePage() {
     const init: CategoryFilterValue = {};
     const keys = [
       "transmission","fuel","body_type","drivetrain","mileage_min","mileage_max","owner_status",
-      "or_cr_status","flood_history","accident_history","financing_available",
-      "trade_accepted","verified_documents_only","moto_type","engine_cc_min",
-      "engine_cc_max","plate_status","moto_condition","delivery_available",
+      "or_cr_status","flood_history","accident_history","registered_owner","deed_chain_available",
+      "financing_available","trade_accepted","verified_documents_only",
+      "moto_type","engine_cc_min","engine_cc_max","plate_status","moto_condition","delivery_available",
       "equipment_type","brand","hours_min","hours_max","weight_min","weight_max",
       "attachment_type","rental_or_sale","with_operator","inspection_available",
       "boat_type","hull_material","boat_engine_type","length_min","length_max",
