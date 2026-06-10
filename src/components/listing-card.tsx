@@ -187,7 +187,13 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
             );
           })()}
           <ListingBadges
-            listing={{ ...listing, headlineKind: pickHeadlinePrice(listing).kind === "hidden" ? null : pickHeadlinePrice(listing).kind }}
+            listing={{
+              ...listing,
+              headlineKind:
+                pickHeadlinePrice(listing).kind === "hidden"
+                  ? null
+                  : (pickHeadlinePrice(listing).kind as "asking" | "monthly" | "down_payment"),
+            }}
             className="mt-2"
           />
           <TrustBadges signals={trust} size="sm" className="mt-2" />
