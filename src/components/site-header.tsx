@@ -375,7 +375,22 @@ export function SiteHeader() {
                       </Link>
                     </SheetClose>
                   ))}
+                  <SheetClose asChild>
+                    <Link
+                      to={WANTED_LINK.to}
+                      className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                      activeProps={{ className: "bg-secondary text-foreground" }}
+                    >
+                      {WANTED_LINK.label}
+                    </Link>
+                  </SheetClose>
                 </div>
+
+                <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Marketplace
+                </p>
+                <div className="flex flex-col gap-0.5">
+                  <SheetClose asChild>
 
                 <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                   Marketplace
