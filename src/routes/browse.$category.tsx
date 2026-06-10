@@ -32,21 +32,79 @@ import {
 } from "@/components/ui/select";
 import { LocationPicker } from "@/components/location-picker";
 import { VehiclePicker } from "@/components/vehicle-picker";
+import { CategoryFilters, type CategoryFilterValue } from "@/components/browse/category-filters";
 import { buildTitleSearchTerms } from "@/lib/vehicle-aliases";
 import { fuzzyFilter } from "@/lib/fuzzy";
 
+const optStr = () => z.string().optional();
+const optBool = () =>
+  z
+    .union([z.literal("1"), z.literal("true"), z.boolean()])
+    .optional()
+    .transform((v) => (v === true || v === "1" || v === "true" ? true : undefined));
+const optNum = () => z.coerce.number().optional();
+
 const searchSchema = z.object({
-  q: z.string().optional(),
-  region: z.string().optional(),
-  province: z.string().optional(),
-  city: z.string().optional(),
-  min: z.coerce.number().optional(),
-  max: z.coerce.number().optional(),
+  q: optStr(),
+  region: optStr(),
+  province: optStr(),
+  city: optStr(),
+  min: optNum(),
+  max: optNum(),
   sort: z.enum(["recent", "price_asc", "price_desc"]).optional(),
-  year: z.coerce.number().optional(),
-  make: z.string().optional(),
-  model: z.string().optional(),
-  engine: z.string().optional(),
+  year: optNum(),
+  make: optStr(),
+  model: optStr(),
+  engine: optStr(),
+  // Car
+  transmission: optStr(),
+  fuel: optStr(),
+  body_type: optStr(),
+  mileage_min: optNum(),
+  mileage_max: optNum(),
+  owner_status: optStr(),
+  or_cr_status: optStr(),
+  flood_history: optStr(),
+  accident_history: optStr(),
+  financing_available: optBool(),
+  trade_accepted: optBool(),
+  verified_documents_only: optBool(),
+  // Motorcycle
+  moto_type: optStr(),
+  engine_cc_min: optNum(),
+  engine_cc_max: optNum(),
+  plate_status: optStr(),
+  moto_condition: optStr(),
+  delivery_available: optBool(),
+  // Equipment
+  equipment_type: optStr(),
+  brand: optStr(),
+  hours_min: optNum(),
+  hours_max: optNum(),
+  weight_min: optNum(),
+  weight_max: optNum(),
+  attachment_type: optStr(),
+  rental_or_sale: optStr(),
+  with_operator: optBool(),
+  inspection_available: optBool(),
+  // Boat
+  boat_type: optStr(),
+  hull_material: optStr(),
+  boat_engine_type: optStr(),
+  length_min: optNum(),
+  length_max: optNum(),
+  boat_registration_status: optStr(),
+  boat_usage: optStr(),
+  trailer_included: optBool(),
+  // Airplane
+  registration_no: optStr(),
+  airworthiness: optStr(),
+  maintenance_logs: optStr(),
+  engine_hours_min: optNum(),
+  engine_hours_max: optNum(),
+  airport_code: optStr(),
+  aircraft_seller: optStr(),
+  inspection_required: optBool(),
 });
 
 const CATEGORY_LABEL: Record<string, string> = {
