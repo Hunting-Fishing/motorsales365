@@ -362,6 +362,9 @@ export const listShopProducts = createServerFn({ method: "GET" })
       if (ids.length === 0) return { products: [] };
       q = q.in("id", ids);
     }
+    if (networkAllowedIds) {
+      q = q.in("id", Array.from(networkAllowedIds));
+    }
     if (data.featured) q = q.eq("featured", true);
     if (data.dealsOnly) q = q.eq("is_deal", true);
     if (data.search) q = q.ilike("title", `%${data.search}%`);
