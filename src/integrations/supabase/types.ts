@@ -6534,6 +6534,7 @@ export type Database = {
           matched_provider_ids: string[]
           needed_at: string | null
           notes: string | null
+          passenger_count: number | null
           picked_up_at: string | null
           pickup_address: string | null
           pickup_city: string | null
@@ -6583,6 +6584,7 @@ export type Database = {
           matched_provider_ids?: string[]
           needed_at?: string | null
           notes?: string | null
+          passenger_count?: number | null
           picked_up_at?: string | null
           pickup_address?: string | null
           pickup_city?: string | null
@@ -6632,6 +6634,7 @@ export type Database = {
           matched_provider_ids?: string[]
           needed_at?: string | null
           notes?: string | null
+          passenger_count?: number | null
           picked_up_at?: string | null
           pickup_address?: string | null
           pickup_city?: string | null
