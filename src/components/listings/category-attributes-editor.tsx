@@ -44,6 +44,9 @@ export const CATEGORY_ATTR_KEYS: Record<string, string[]> = {
     "accident_history",
     "financing_available",
     "trade_accepted",
+    "registered_owner",
+    "deed_chain_available",
+    "inspection_available",
   ],
   motorcycle: [
     "moto_type",
@@ -53,6 +56,9 @@ export const CATEGORY_ATTR_KEYS: Record<string, string[]> = {
     "owner_status",
     "moto_condition",
     "delivery_available",
+    "registered_owner",
+    "deed_chain_available",
+    "inspection_available",
   ],
   equipment: [
     "equipment_type",
@@ -63,6 +69,8 @@ export const CATEGORY_ATTR_KEYS: Record<string, string[]> = {
     "rental_or_sale",
     "with_operator",
     "inspection_available",
+    "registered_owner",
+    "deed_chain_available",
   ],
   boat: [
     "boat_type",
@@ -72,6 +80,9 @@ export const CATEGORY_ATTR_KEYS: Record<string, string[]> = {
     "boat_registration_status",
     "boat_usage",
     "trailer_included",
+    "registered_owner",
+    "deed_chain_available",
+    "inspection_available",
   ],
   airplane: [
     "registration_no",
