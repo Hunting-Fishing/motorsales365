@@ -1209,7 +1209,7 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     ]
       .filter(Boolean)
       .join(" ");
-    const category_id = fuzzyCategoryMatch(matchText, (cats ?? []) as any[]);
+    const category_id = fuzzyCategoryMatch(matchText, cats, keywordsById);
 
     // Canonical URL hardening — prefer the marketplace's own URL if present.
     const canonical = pickStr(
