@@ -24,6 +24,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useBlockedUserIds } from "@/hooks/use-blocked-users";
 import { getActiveDealerStatus } from "@/lib/seller-status.functions";
 import { SiteLayout } from "@/components/site-layout";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
