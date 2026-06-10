@@ -19,6 +19,7 @@ import placeholderCar from "@/assets/placeholder-car.webp";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ServiceStrip } from "@/components/service-strip";
 import { TrustBadges } from "@/components/listings/trust-badges";
+import { ListingActionsMenu } from "@/components/listings/listing-actions-menu";
 import { deriveTrustSignals } from "@/lib/trust-signals";
 
 export interface ListingCardData {
@@ -35,6 +36,8 @@ export interface ListingCardData {
   category_slug: string;
   seller_verified?: boolean;
   seller_phone_verified?: boolean;
+  seller_user_id?: string | null;
+  seller_name?: string | null;
   seller_dealer_plan?: string | null;
   seller_dealer_period_end?: string | null;
   seller_dealer_cancel_at_period_end?: boolean | null;
@@ -97,7 +100,15 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
   const showServices = VEHICLE_CATEGORIES.has(listing.category_slug);
   const trust = deriveTrustSignals(listing);
   return (
-    <div className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-elegant)]">
+    <div className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-elegant)]">
+      <div className="absolute right-2 top-2 z-10">
+        <ListingActionsMenu
+          listingId={listing.id}
+          sellerUserId={listing.seller_user_id ?? null}
+          sellerName={listing.seller_name ?? null}
+          variant="overlay"
+        />
+      </div>
       <Link to="/listing/$id" params={{ id: listing.id }} className="flex flex-1 flex-col">
         <div className="relative aspect-[4/3] overflow-hidden bg-secondary">
           <ImageWithSkeleton

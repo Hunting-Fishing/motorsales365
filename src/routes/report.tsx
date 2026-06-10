@@ -19,14 +19,23 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
+const searchSchema = z.object({
+  target_type: z.enum(["listing", "business", "seller", "other"]).optional(),
+  category: z.string().optional(),
+  listing_id: z.string().uuid().optional(),
+  target_url: z.string().optional(),
+  details: z.string().optional(),
+});
+
 export const Route = createFileRoute("/report")({
+  validateSearch: (search) => searchSchema.parse(search),
   head: () => ({
     meta: [
       { title: "Report a scam or suspicious listing — 365 MotorSales Philippines" },
       {
         name: "description",
         content:
-          "Report scams, fraudulent sellers, stolen vehicles, or suspicious businesses on 365 MotorSales. Attach screenshots or documents as evidence — our trust & safety team reviews every report.",
+          "Report scams, fraudulent sellers, stolen vehicles, fake documents, off-platform payments, duplicate listings, and price bait on 365 MotorSales. Our trust & safety team reviews every report.",
       },
     ],
   }),
@@ -43,8 +52,10 @@ const TARGET_TYPES = [
 const CATEGORIES = [
   "Scam / fraud attempt",
   "Stolen vehicle",
-  "Fake / cloned OR-CR",
+  "Fake / forged documents",
   "Off-platform payment pressure",
+  "Duplicate listing",
+  "Price bait / hidden fees",
   "Misleading photos or description",
   "Wrong category / spam",
   "Offensive or illegal content",
@@ -82,17 +93,22 @@ const schema = z.object({
 
 function ReportPage() {
   const { user } = useAuth();
-  const [targetType, setTargetType] =
-    useState<(typeof TARGET_TYPES)[number]["value"]>("listing");
-  const [category, setCategory] = useState(CATEGORIES[0]);
-  const [targetUrl, setTargetUrl] = useState("");
-  const [details, setDetails] = useState("");
+  const search = Route.useSearch();
+  const initialCategory =
+    search.category && CATEGORIES.includes(search.category) ? search.category : CATEGORIES[0];
+  const [targetType, setTargetType] = useState<(typeof TARGET_TYPES)[number]["value"]>(
+    search.target_type ?? "listing",
+  );
+  const [category, setCategory] = useState(initialCategory);
+  const [targetUrl, setTargetUrl] = useState(search.target_url ?? "");
+  const [details, setDetails] = useState(search.details ?? "");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<string | null>(null);
+  const listingId = search.listing_id;
 
   const handleFiles = (incoming: FileList | null) => {
     if (!incoming) return;
@@ -154,7 +170,7 @@ function ReportPage() {
         reporter_name: name || null,
         reporter_email: email || user?.email || null,
         reporter_phone: phone || null,
-        // listing_id stays null unless we can resolve from URL — moderators handle from URL field
+        listing_id: listingId ?? null,
       } as any);
       if (error) throw error;
 

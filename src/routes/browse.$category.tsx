@@ -35,6 +35,7 @@ import { VehiclePicker } from "@/components/vehicle-picker";
 import { CategoryFilters, type CategoryFilterValue } from "@/components/browse/category-filters";
 import { buildTitleSearchTerms } from "@/lib/vehicle-aliases";
 import { fuzzyFilter } from "@/lib/fuzzy";
+import { useBlockedUserIds } from "@/hooks/use-blocked-users";
 
 const optStr = () => z.string().optional();
 const optBool = () =>
@@ -201,7 +202,9 @@ function BrowsePage() {
     }
     return init;
   });
-  const [items, setItems] = useState<ListingCardData[]>([]);
+  const [allItems, setAllItems] = useState<ListingCardData[]>([]);
+  const { ids: blockedIds } = useBlockedUserIds();
+  const items = allItems.filter((l) => !l.seller_user_id || !blockedIds.has(l.seller_user_id));
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -370,6 +373,7 @@ function BrowsePage() {
           passport_documents_checked: !!r.vehicles?.vehicle_passport_verifications?.some(
             (v: any) => v.status === "approved",
           ),
+          seller_user_id: r.user_id ?? null,
           seller_dealer_plan: dealers[r.user_id]?.planName ?? null,
           seller_dealer_period_end: dealers[r.user_id]?.currentPeriodEnd ?? null,
           seller_dealer_cancel_at_period_end: dealers[r.user_id]?.cancelAtPeriodEnd ?? false,
@@ -377,7 +381,7 @@ function BrowsePage() {
           attributes: r.attributes,
         } as ListingCardData;
       });
-      setItems(mapped);
+      setAllItems(mapped);
       setLoading(false);
     };
     fetchListings();

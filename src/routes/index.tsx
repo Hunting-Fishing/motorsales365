@@ -24,6 +24,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useBlockedUserIds } from "@/hooks/use-blocked-users";
 import { getActiveDealerStatus } from "@/lib/seller-status.functions";
 import { SiteLayout } from "@/components/site-layout";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
@@ -70,6 +71,9 @@ function Index() {
   const [keyword, setKeyword] = useState("");
   const [featured, setFeatured] = useState<ListingCardData[]>([]);
   const [recent, setRecent] = useState<ListingCardData[]>([]);
+  const { ids: blockedIds } = useBlockedUserIds();
+  const visibleFeatured = featured.filter((l) => !l.seller_user_id || !blockedIds.has(l.seller_user_id));
+  const visibleRecent = recent.filter((l) => !l.seller_user_id || !blockedIds.has(l.seller_user_id));
 
   useEffect(() => {
     const load = async () => {
@@ -115,6 +119,7 @@ function Index() {
             passport_documents_checked: !!r.vehicles?.vehicle_passport_verifications?.some(
               (v: any) => v.status === "approved",
             ),
+            seller_user_id: r.user_id ?? null,
             seller_dealer_plan: dealers[r.user_id]?.planName ?? null,
             seller_dealer_period_end: dealers[r.user_id]?.currentPeriodEnd ?? null,
             seller_dealer_cancel_at_period_end: dealers[r.user_id]?.cancelAtPeriodEnd ?? false,
@@ -359,7 +364,7 @@ function Index() {
       <LiveActivityFeed />
 
       {/* Featured */}
-      {featured.length > 0 && (
+      {visibleFeatured.length > 0 && (
         <section className="container mx-auto px-4 py-12">
           <div className="mb-6 flex items-end justify-between">
             <div>
@@ -368,7 +373,7 @@ function Index() {
             </div>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {featured.map((l) => (
+            {visibleFeatured.map((l) => (
               <ListingCard key={l.id} listing={l} />
             ))}
           </div>
@@ -388,7 +393,7 @@ function Index() {
             </Link>
           </Button>
         </div>
-        {recent.length === 0 ? (
+        {visibleRecent.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
             No listings yet — be the first to{" "}
             <Link to="/sell" className="font-semibold text-primary underline">
@@ -398,7 +403,7 @@ function Index() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {recent.map((l) => (
+            {visibleRecent.map((l) => (
               <ListingCard key={l.id} listing={l} />
             ))}
           </div>
