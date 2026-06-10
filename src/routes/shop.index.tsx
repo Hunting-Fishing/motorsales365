@@ -103,14 +103,15 @@ function ShopIndex() {
       : {}),
     ...(search.brand ? { brand: search.brand } : {}),
     ...(search.category ? { categorySlug: search.category } : {}),
+    ...(search.network ? { network: search.network } : {}),
   };
   const { data: featData } = useQuery({
     queryKey: ["shop-featured", filterArgs],
     queryFn: () => listShopProducts({ data: { featured: true, limit: 12, ...filterArgs } }),
   });
   const { data: latestData } = useQuery({
-    queryKey: ["shop-latest", filterArgs],
-    queryFn: () => listShopProducts({ data: { limit: 24, ...filterArgs } }),
+    queryKey: ["shop-latest", filterArgs, search.sort],
+    queryFn: () => listShopProducts({ data: { limit: 24, sort: search.sort, ...filterArgs } }),
   });
   const { data: dealsData } = useQuery({
     queryKey: ["shop-deals", filterArgs],
