@@ -346,32 +346,35 @@ function FeatureMatrix() {
         </thead>
         <tbody>
           {FEATURE_GROUPS.map((g) => (
-            <>
-              <tr key={`g-${g.group}`} className="bg-muted/30">
-                <td
-                  colSpan={4}
-                  className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
-                >
-                  {g.group}
-                </td>
-              </tr>
-              {g.rows.map((r) => (
-                <tr key={`${g.group}-${r.label}`} className="border-t border-border">
-                  <td className="px-4 py-3 text-foreground">{r.label}</td>
-                  {r.values.map((v, i) => (
-                    <td
-                      key={i}
-                      className={`px-4 py-3 text-center ${i === 1 ? "bg-primary/5" : ""}`}
-                    >
-                      <CellView value={v} />
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </>
+            <FeatureGroupRows key={g.group} group={g} />
           ))}
         </tbody>
       </table>
     </div>
+  );
+}
+
+function FeatureGroupRows({ group: g }: { group: (typeof FEATURE_GROUPS)[number] }) {
+  return (
+    <>
+      <tr className="bg-muted/30">
+        <td
+          colSpan={4}
+          className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+        >
+          {g.group}
+        </td>
+      </tr>
+      {g.rows.map((r) => (
+        <tr key={r.label} className="border-t border-border">
+          <td className="px-4 py-3 text-foreground">{r.label}</td>
+          {r.values.map((v, i) => (
+            <td key={i} className={`px-4 py-3 text-center ${i === 1 ? "bg-primary/5" : ""}`}>
+              <CellView value={v} />
+            </td>
+          ))}
+        </tr>
+      ))}
+    </>
   );
 }
