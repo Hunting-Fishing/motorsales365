@@ -40,25 +40,8 @@ const SERVICE_CHIPS = [
   "Recovery/winch-out",
 ];
 
-const VEHICLE_TYPES = [
-  "Car",
-  "Motorcycle",
-  "SUV / Pickup",
-  "Van",
-  "Truck",
-  "Heavy equipment",
-  "Boat / Trailer",
-];
 
-const PAYMENT_METHODS = ["GCash", "Maya", "Cash", "Bank transfer"];
 
-type Loc = {
-  region: string | null;
-  province: string | null;
-  city: string | null;
-  barangay: string | null;
-};
-const emptyLoc: Loc = { region: null, province: null, city: null, barangay: null };
 
 type ProviderRow = {
   id: string;
