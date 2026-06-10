@@ -189,7 +189,24 @@ function DispatchLanding() {
           </Link>
           .
         </p>
+        <div className="mt-6">
+          <Button asChild variant="outline">
+            <a href="#compare">Compare all features</a>
+          </Button>
+        </div>
       </section>
+
+      <section id="compare" className="border-t border-border bg-background">
+        <div className="container mx-auto px-4 py-12">
+          <h2 className="font-display text-3xl font-bold">Compare every feature</h2>
+          <p className="mt-1 text-muted-foreground">
+            Every tier includes the basics. Upgrade when you outgrow the limits.
+          </p>
+
+          <FeatureMatrix />
+        </div>
+      </section>
+
 
       <section className="border-t border-border bg-secondary/30">
         <div className="container mx-auto px-4 py-12">
