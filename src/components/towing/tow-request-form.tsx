@@ -282,6 +282,7 @@ export function TowRequestForm({
         can_steer: triToBool(canSteer),
         can_brake: triToBool(canBrake),
         needed_at: urgency === "scheduled" ? new Date(scheduledAt).toISOString() : null,
+        passenger_count: passengerCount === "" ? null : Math.max(0, Math.min(50, Number(passengerCount) || 0)),
         notes: noteBlob || null,
       });
       if (error) throw error;
