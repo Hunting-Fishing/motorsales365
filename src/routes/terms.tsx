@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 9, 2026 (added manual PH payment methods: GCash, Maya, QR Ph, bank transfer, PayPal — with proof-of-payment review)";
+  const lastUpdated = "June 10, 2026 (repriced tow & trucking dispatch plans: Starter ₱49/mo, Pro ₱299/mo, Fleet ₱999/mo; annual billing offers 2 months free)";
 
   return (
     <SiteLayout>

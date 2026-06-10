@@ -1,72 +1,52 @@
-# Affiliate categorization — admin UI + consolidation
 
 ## Goal
-Make the keyword→subcategory mapping editable from the admin, re-categorize already-imported products on demand, and route every affiliate flow through a single matcher.
 
-## 1. Database
+Reposition 365MotorSales from a "directory listing" for tow companies into the **underdog dispatch software for every tow + trucking operator in the Philippines**. Drop the entry price to roughly **$1/mo (₱49)** and cap the top tier at roughly **$18/mo (₱999)** so a single completed job pays for a full year of software. Big roadside brands (AAP, Motolite Res-Q, Shell Go+, MPT DriveHub) keep their consumer subscriptions — we sit underneath them as the dispatch tool their subcontractors actually run on.
 
-New table `shop_category_keywords`:
-- `category_id uuid` → `shop_categories(id)` on delete cascade
-- `keyword text` (lowercased, trimmed, unique per category)
-- standard `id`, `created_at`, `created_by`
-- unique `(category_id, keyword)`
-- GRANTs: `authenticated` select; `service_role` all
-- RLS: public read (active categories), write gated by `can_manage_shop(auth.uid())`
+## New Pricing (towing + trucking)
 
-Seed migration inserts every entry from the current hardcoded `CATEGORY_KEYWORDS` map in `src/lib/shop.functions.ts`, resolved by category slug.
+| Tier | Monthly (PHP) | Yearly (PHP, 2 mo free) | Positioning |
+|---|---|---|---|
+| **Starter** (listed) | ₱49 (~$0.90) | ₱490 | Free directory listing + basic dispatch inbox. The "no excuse not to sign up" tier. |
+| **Pro** (featured) | ₱299 (~$5) | ₱2,990 | Priority placement, SMS/push job alerts, accept/decline, up to 5 drivers, lead routing. |
+| **Fleet** (premium) | ₱999 (~$18) | ₱9,990 | Unlimited drivers, live GPS, multi-branch, region tag, white-label customer link, API. |
 
-## 2. Server: single source of truth
+Trucking mirrors the same three tiers at the same prices.
 
-In `src/lib/shop.functions.ts`:
-- Delete the hardcoded `CATEGORY_KEYWORDS` constant.
-- New helper `loadCategoryKeywordMap()` → reads `shop_categories` + `shop_category_keywords` once, returns `{ cats, keywordsBySlug }`.
-- `fuzzyCategoryMatch` stays the same algorithm (subcategory-preferred, scored by keyword length, with name/slug + token fallback) but takes the loaded map.
-- `scrapeShopUrl` uses the new loader instead of the const.
+Old tiers (₱299 / ₱699 / ₱1,499 for towing; ₱399 / ₱899 / ₱1,799 for trucking) are retired but kept inactive for historical subscriptions.
 
-New server functions (all gated by `requireDomainRole("shop_manager", ...)`):
-- `adminListCategoryKeywords()` → returns categories grouped with their keywords + counts.
-- `adminAddCategoryKeyword({ category_id, keyword })`
-- `adminDeleteCategoryKeyword({ id })`
-- `adminBulkSetCategoryKeywords({ category_id, keywords: string[] })` (replace-all for textarea editor)
-- `adminRecategorizeProducts({ scope: "all" | "uncategorized" | "category", categoryId? })` →
-  - Loads keyword map, iterates `shop_products` in batches (id, title, brand, description, category_id).
-  - Computes new `category_id` from title+brand+description.
-  - Updates `shop_products.category_id` only when it actually changes; refreshes primary + parent rows in `shop_product_categories` using the same logic that already lives in `adminUpsertProduct` (extracted into a shared `syncProductCategoryLinks` helper so import + re-run + manual edit all behave identically).
-  - Returns `{ scanned, updated, unmatched }`.
+## Repositioning (copy + page structure)
 
-## 3. Admin UI
+- `/tow` and a new `/dispatch` landing reframe the pitch:
+  - Headline: **"Dispatch software for Philippine tow & trucking operators — from ₱49/month."**
+  - Subhead: "AAP, Motolite, Shell Go+ talk to drivers. We power the operators behind them."
+  - 3 value props: **Get jobs**, **Run the dispatch**, **Look professional**.
+  - Comparison block: 365MotorSales vs AAP membership vs in-house radios.
+- `/pricing` shows the new 3-tier card grid + a "1 completed job pays for the year" calculator.
+- Add a "Switch from radios / GC / spreadsheet" CTA section.
 
-New tab in `src/routes/admin.shop.tsx` → "Category mapping":
-- Left column: category tree (parents grouped, subcategories indented). Click a category to edit.
-- Right pane:
-  - Header with the category name + product count.
-  - Textarea ("one keyword per line") backed by `adminBulkSetCategoryKeywords`.
-  - Inline list of current keywords with delete buttons.
-  - "Add keyword" input + button.
-- Toolbar above the tab:
-  - "Re-categorize" dropdown: All products / Only uncategorized / Just this category.
-  - Runs `adminRecategorizeProducts`, shows toast with `scanned / updated / unmatched`.
-  - Confirm dialog before "All products".
+## Technical Changes
 
-## 4. Consolidation
+1. **Migration** `update_towing_trucking_pricing.sql`:
+   - `UPDATE business_plans` for the 12 existing towing + trucking rows: new `price_php`, `description`, and friendlier `tier` labels in `description` (Starter / Pro / Fleet) — keep enum `tier` values (`listed`/`featured`/`premium`) so existing FK + RLS keep working.
+   - Keep `stripe_lookup_key` slugs intact so Stripe prices auto-resync via lookup_key.
+2. **Stripe prices** — call `payments--create_price` for each of the 12 lookup keys at the new amounts (USD-cents equivalents). Old prices stay attached to legacy subscribers; new checkouts use the new amount via `lookup_key` rebind.
+3. **`src/routes/tow.tsx`** — rewrite hero, value props, comparison table, and pricing section to match repositioning.
+4. **`src/routes/pricing.tsx`** — surface the new towing/trucking tiers prominently with the "1 job = 1 year" framing.
+5. **`src/routes/dashboard.tow.tsx`** — add a "Starter is free-ish (₱49)" upsell banner for unsubscribed operators; nothing else changes.
+6. **No code change to checkout, webhooks, or `business_subscriptions`** — they already key off `business_plans.id` / `stripe_lookup_key`.
+7. **Memory** — add a `mem://policies/pricing-towing-trucking` rule so future repricing edits stay consistent with /terms + /pricing.
+8. **Terms + Privacy sync** — bump "Last updated" on `/terms` (fee/pricing change) and leave `/privacy` untouched (no data-handling change).
 
-Three callers now share the same code path:
-1. `scrapeShopUrl` (new product import).
-2. `adminUpsertProduct` (manual save).
-3. `adminRecategorizeProducts` (bulk re-run).
+## What we are NOT doing in this pass
 
-All call `syncProductCategoryLinks(productId, categoryId)` for the join-table write, and all match through the DB-backed keyword map. No hardcoded mapping remains in code.
+- No per-job lead fees (separate future build — flagged in earlier plan).
+- No white-label embed widget yet.
+- No driver-side mobile app — current PWA dashboard is enough at ₱49.
+- Not touching rental / financing / carwash / repair / parts plans.
 
-## Technical notes
+## Out-of-scope follow-ups (note only)
 
-- Matcher behaviour is unchanged — only the data source moves from const to table, so existing imports keep working without re-run.
-- Re-categorization batches in groups of 500 to stay within edge-function memory; uses `supabaseAdmin` inside the handler.
-- Keywords stored lowercase; UI normalizes on save.
-- Terms/Privacy do not need updates — this is internal tooling, no user-facing policy change.
-
-## Files
-
-- New migration: `shop_category_keywords` table, grants, RLS, seed.
-- Edit `src/lib/shop.functions.ts`: remove const, add loader + 5 new server fns + shared `syncProductCategoryLinks`.
-- Edit `src/routes/admin.shop.tsx`: add "Category mapping" tab + re-categorize toolbar.
-- New `src/components/admin/category-keyword-editor.tsx` (presentational).
+- Add `per_job_fee` column + optional ₱150/accepted-job billing for Starter tier.
+- "Powered by 365MotorSales" embed for insurers / dealerships.
+- SMS gateway cost pass-through once volume grows.
