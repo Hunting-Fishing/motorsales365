@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Check, Network, Siren, ShieldCheck, Truck, Zap } from "lucide-react";
+import { Check, Minus, Network, Siren, ShieldCheck, Truck, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -189,7 +189,24 @@ function DispatchLanding() {
           </Link>
           .
         </p>
+        <div className="mt-6">
+          <Button asChild variant="outline">
+            <a href="#compare">Compare all features</a>
+          </Button>
+        </div>
       </section>
+
+      <section id="compare" className="border-t border-border bg-background">
+        <div className="container mx-auto px-4 py-12">
+          <h2 className="font-display text-3xl font-bold">Compare every feature</h2>
+          <p className="mt-1 text-muted-foreground">
+            Every tier includes the basics. Upgrade when you outgrow the limits.
+          </p>
+
+          <FeatureMatrix />
+        </div>
+      </section>
+
 
       <section className="border-t border-border bg-secondary/30">
         <div className="container mx-auto px-4 py-12">
@@ -250,5 +267,114 @@ function DispatchLanding() {
         </div>
       </section>
     </main>
+  );
+}
+
+type Cell = boolean | string;
+const TIERS = ["Starter", "Pro", "Fleet"] as const;
+
+const FEATURE_GROUPS: { group: string; rows: { label: string; values: [Cell, Cell, Cell] }[] }[] = [
+  {
+    group: "Visibility & jobs",
+    rows: [
+      { label: "Public directory listing", values: [true, true, true] },
+      { label: "Priority placement in dispatch queue", values: [false, true, true] },
+      { label: "Verified provider badge", values: ["Basic", "Pro badge", "Fleet badge"] },
+      { label: "Job volume", values: ["Up to 20 / mo", "Unlimited", "Unlimited"] },
+      { label: "Service coverage", values: ["1 region", "Up to 3 regions", "Nationwide + multi-branch"] },
+    ],
+  },
+  {
+    group: "Dispatch tools",
+    rows: [
+      { label: "Dispatch inbox (web + PWA)", values: [true, true, true] },
+      { label: "Email + in-app alerts", values: [true, true, true] },
+      { label: "SMS + push job alerts", values: [false, true, true] },
+      { label: "Accept / decline + auto-route to nearest driver", values: [false, true, true] },
+      { label: "Driver seats", values: ["1 truck", "Up to 5 drivers", "Unlimited drivers"] },
+    ],
+  },
+  {
+    group: "Operations & brand",
+    rows: [
+      { label: "Live GPS truck tracking", values: [false, false, true] },
+      { label: "Multi-branch + role-based staff accounts", values: [false, false, true] },
+      { label: "White-label customer tracking link", values: [false, false, true] },
+      { label: "API access + webhooks", values: [false, false, true] },
+    ],
+  },
+  {
+    group: "Billing",
+    rows: [
+      { label: "Monthly price", values: ["₱49", "₱299", "₱999"] },
+      { label: "Cancel anytime", values: [true, true, true] },
+    ],
+  },
+];
+
+function CellView({ value }: { value: Cell }) {
+  if (value === true)
+    return <Check className="mx-auto h-5 w-5 text-emerald-600" aria-label="Included" />;
+  if (value === false)
+    return <Minus className="mx-auto h-4 w-4 text-muted-foreground/60" aria-label="Not included" />;
+  return <span className="text-sm">{value}</span>;
+}
+
+function FeatureMatrix() {
+  return (
+    <div className="mt-6 overflow-x-auto rounded-xl border border-border bg-card">
+      <table className="w-full min-w-[640px] border-collapse text-sm">
+        <thead>
+          <tr className="border-b border-border bg-secondary/40">
+            <th className="px-4 py-3 text-left font-display text-sm font-semibold">Feature</th>
+            {TIERS.map((t, i) => (
+              <th
+                key={t}
+                className={`px-4 py-3 text-center font-display text-sm font-semibold ${
+                  i === 1 ? "text-primary" : ""
+                }`}
+              >
+                {t}
+                {i === 1 && (
+                  <span className="ml-2 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] uppercase tracking-wide text-primary">
+                    Popular
+                  </span>
+                )}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {FEATURE_GROUPS.map((g) => (
+            <FeatureGroupRows key={g.group} group={g} />
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function FeatureGroupRows({ group: g }: { group: (typeof FEATURE_GROUPS)[number] }) {
+  return (
+    <>
+      <tr className="bg-muted/30">
+        <td
+          colSpan={4}
+          className="px-4 py-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
+        >
+          {g.group}
+        </td>
+      </tr>
+      {g.rows.map((r) => (
+        <tr key={r.label} className="border-t border-border">
+          <td className="px-4 py-3 text-foreground">{r.label}</td>
+          {r.values.map((v, i) => (
+            <td key={i} className={`px-4 py-3 text-center ${i === 1 ? "bg-primary/5" : ""}`}>
+              <CellView value={v} />
+            </td>
+          ))}
+        </tr>
+      ))}
+    </>
   );
 }
