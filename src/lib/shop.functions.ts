@@ -1585,3 +1585,155 @@ export const backfillMissingShopPrices = createServerFn({ method: "POST" })
     }
     return { scanned, filledPrice, stillMissing, errors: errors.slice(0, 20) };
   });
+
+// ============ Category-keyword admin ============
+
+export const adminListCategoryKeywords = createServerFn({ method: "GET" })
+  .middleware([requireDomainRole("shop_manager", "shop.adminListCategoryKeywords")])
+  .handler(async () => {
+    const [{ data: cats }, { data: kws }, { data: spc }] = await Promise.all([
+      supabaseAdmin
+        .from("shop_categories")
+        .select("id, slug, name, parent_id, department_slug")
+        .eq("active", true)
+        .order("name"),
+      supabaseAdmin
+        .from("shop_category_keywords")
+        .select("id, category_id, keyword")
+        .order("keyword"),
+      supabaseAdmin.from("shop_product_categories").select("category_id"),
+    ]);
+    const kwById = new Map<string, Array<{ id: string; keyword: string }>>();
+    for (const row of (kws ?? []) as any[]) {
+      const list = kwById.get(row.category_id) ?? [];
+      list.push({ id: row.id, keyword: row.keyword });
+      kwById.set(row.category_id, list);
+    }
+    const counts = new Map<string, number>();
+    for (const r of (spc ?? []) as any[]) {
+      counts.set(r.category_id, (counts.get(r.category_id) ?? 0) + 1);
+    }
+    return {
+      categories: (cats ?? []).map((c: any) => ({
+        ...c,
+        keywords: kwById.get(c.id) ?? [],
+        product_count: counts.get(c.id) ?? 0,
+      })),
+    };
+  });
+
+export const adminAddCategoryKeyword = createServerFn({ method: "POST" })
+  .middleware([requireDomainRole("shop_manager", "shop.adminAddCategoryKeyword")])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        category_id: z.string().uuid(),
+        keyword: z.string().min(1).max(120),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const kw = data.keyword.trim().toLowerCase();
+    if (!kw) throw new Error("Keyword required");
+    const { data: row, error } = await context.supabase
+      .from("shop_category_keywords")
+      .insert({ category_id: data.category_id, keyword: kw, created_by: context.userId })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    return { id: row.id };
+  });
+
+export const adminDeleteCategoryKeyword = createServerFn({ method: "POST" })
+  .middleware([requireDomainRole("shop_manager", "shop.adminDeleteCategoryKeyword")])
+  .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("shop_category_keywords")
+      .delete()
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminBulkSetCategoryKeywords = createServerFn({ method: "POST" })
+  .middleware([requireDomainRole("shop_manager", "shop.adminBulkSetCategoryKeywords")])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        category_id: z.string().uuid(),
+        keywords: z.array(z.string().min(1).max(120)).max(500),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const normalized = Array.from(
+      new Set(
+        data.keywords
+          .map((k) => k.trim().toLowerCase())
+          .filter((k) => k.length > 0 && k.length <= 120),
+      ),
+    );
+    const { error: dErr } = await context.supabase
+      .from("shop_category_keywords")
+      .delete()
+      .eq("category_id", data.category_id);
+    if (dErr) throw new Error(dErr.message);
+    if (normalized.length === 0) return { count: 0 };
+    const rows = normalized.map((kw) => ({
+      category_id: data.category_id,
+      keyword: kw,
+      created_by: context.userId,
+    }));
+    const { error: iErr } = await context.supabase
+      .from("shop_category_keywords")
+      .insert(rows);
+    if (iErr) throw new Error(iErr.message);
+    return { count: rows.length };
+  });
+
+export const adminRecategorizeProducts = createServerFn({ method: "POST" })
+  .middleware([requireDomainRole("shop_manager", "shop.adminRecategorizeProducts")])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        scope: z.enum(["all", "uncategorized", "category"]).default("all"),
+        categoryId: z.string().uuid().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { cats, keywordsById } = await loadCategoryKeywordMap();
+
+    let q = supabaseAdmin
+      .from("shop_products")
+      .select("id, title, brand, description, category_id");
+    if (data.scope === "uncategorized") q = q.is("category_id", null);
+    else if (data.scope === "category" && data.categoryId)
+      q = q.eq("category_id", data.categoryId);
+
+    const { data: products, error } = await q.limit(5000);
+    if (error) throw new Error(error.message);
+
+    let scanned = 0;
+    let updated = 0;
+    let unmatched = 0;
+    for (const p of (products ?? []) as any[]) {
+      scanned += 1;
+      const text = [p.title, p.brand, p.description].filter(Boolean).join(" ");
+      const newCat = fuzzyCategoryMatch(text, cats, keywordsById);
+      if (!newCat) {
+        unmatched += 1;
+        continue;
+      }
+      if (newCat === p.category_id) continue;
+      const { error: uErr } = await supabaseAdmin
+        .from("shop_products")
+        .update({ category_id: newCat })
+        .eq("id", p.id);
+      if (uErr) continue;
+      await syncProductCategoryLinks(supabaseAdmin, p.id, newCat, cats);
+      updated += 1;
+    }
+    return { scanned, updated, unmatched };
+  });
