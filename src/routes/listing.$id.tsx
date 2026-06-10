@@ -689,7 +689,15 @@ function ListingDetailPage() {
           )}
           <AdCarousel placement="listing_sidebar" />
           <div className="rounded-xl border border-border bg-card p-5">
-            <h3 className="font-display text-lg font-semibold">Seller</h3>
+            <div className="flex items-start justify-between gap-2">
+              <h3 className="font-display text-lg font-semibold">Seller</h3>
+              <ListingActionsMenu
+                listingId={listing.id}
+                sellerUserId={listing.user_id}
+                sellerName={seller?.business_name ?? seller?.full_name ?? null}
+                variant="inline"
+              />
+            </div>
             <div className="mt-2 flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary font-semibold">
                 {(seller?.business_name ?? seller?.full_name ?? "?").slice(0, 1).toUpperCase()}
