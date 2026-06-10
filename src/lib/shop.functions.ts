@@ -1052,11 +1052,9 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       networkId = net?.id ?? null;
     }
 
-    // Load categories for fuzzy mapping
-    const { data: cats } = await supabaseAdmin
-      .from("shop_categories")
-      .select("id, slug, name, parent_id")
-      .eq("active", true);
+    // Load categories + keyword map for fuzzy mapping
+    const { cats, keywordsById } = await loadCategoryKeywordMap();
+
 
     // Try a per-network scraper (currently only lazada has a custom path).
     // Anything else (or a failed custom path) falls through to Firecrawl.
