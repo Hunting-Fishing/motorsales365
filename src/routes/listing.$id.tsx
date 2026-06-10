@@ -494,7 +494,23 @@ function ListingDetailPage() {
                 {[listing.city, listing.region].filter(Boolean).join(", ") || "Philippines"}
               </div>
             </div>
-            <ListingPrice pricePhp={listing.price_php} size="lg" />
+            <div className="flex flex-col items-end gap-2">
+              <ListingPrice
+                pricePhp={listing.price_php}
+                size="lg"
+                priceKind={listing.price_kind ?? "asking"}
+                negotiable={!!listing.negotiable}
+                priceHidden={!!listing.price_hidden}
+              />
+              <ListingBadges
+                listing={{
+                  ...listing,
+                  seller_dealer_plan: sellerDealerPlan,
+                  seller_verified: !!(seller as any)?.verification_status,
+                }}
+                size="md"
+              />
+            </div>
           </div>
 
           {/* Engagement bar */}
