@@ -204,8 +204,11 @@ export function CategoryFilters({ category, value, onChange }: Props) {
         <Sel label="Plate status" field="plate_status" opts={PLATE_STATUS} value={value} onChange={onChange} />
         <Sel label="Owner status" field="owner_status" opts={OWNER_STATUS} value={value} onChange={onChange} />
         <Sel label="Condition" field="moto_condition" opts={MOTO_CONDITION} value={value} onChange={onChange} />
+        <Sel label="Registered owner" field="registered_owner" opts={YES_NO_UNKNOWN} value={value} onChange={onChange} />
         <div className="space-y-2 pt-1">
           <Bool label="Delivery available" field="delivery_available" value={value} onChange={onChange} />
+          <Bool label="Deed chain available" field="deed_chain_available" value={value} onChange={onChange} />
+          <Bool label="Inspection available" field="inspection_available" value={value} onChange={onChange} />
           <Bool label="Verified documents only" field="verified_documents_only" value={value} onChange={onChange} />
         </div>
       </div>
