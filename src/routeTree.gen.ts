@@ -99,6 +99,7 @@ import { Route as DashboardFavoritesRouteImport } from './routes/dashboard.favor
 import { Route as DashboardDispatchRouteImport } from './routes/dashboard.dispatch'
 import { Route as DashboardBusinessesRouteImport } from './routes/dashboard.businesses'
 import { Route as DashboardBoostsRouteImport } from './routes/dashboard.boosts'
+import { Route as DashboardBlockedRouteImport } from './routes/dashboard.blocked'
 import { Route as DashboardBillingRouteImport } from './routes/dashboard.billing'
 import { Route as DashboardAdsRouteImport } from './routes/dashboard.ads'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
@@ -632,6 +633,11 @@ const DashboardBoostsRoute = DashboardBoostsRouteImport.update({
   path: '/boosts',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardBlockedRoute = DashboardBlockedRouteImport.update({
+  id: '/blocked',
+  path: '/blocked',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardBillingRoute = DashboardBillingRouteImport.update({
   id: '/billing',
   path: '/billing',
@@ -1138,6 +1144,7 @@ export interface FileRoutesByFullPath {
   '/checkout/return': typeof CheckoutReturnRoute
   '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
+  '/dashboard/blocked': typeof DashboardBlockedRoute
   '/dashboard/boosts': typeof DashboardBoostsRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
   '/dashboard/dispatch': typeof DashboardDispatchRouteWithChildren
@@ -1310,6 +1317,7 @@ export interface FileRoutesByTo {
   '/checkout/return': typeof CheckoutReturnRoute
   '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
+  '/dashboard/blocked': typeof DashboardBlockedRoute
   '/dashboard/boosts': typeof DashboardBoostsRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
   '/dashboard/dispatch': typeof DashboardDispatchRouteWithChildren
@@ -1484,6 +1492,7 @@ export interface FileRoutesById {
   '/checkout/return': typeof CheckoutReturnRoute
   '/dashboard/ads': typeof DashboardAdsRoute
   '/dashboard/billing': typeof DashboardBillingRoute
+  '/dashboard/blocked': typeof DashboardBlockedRoute
   '/dashboard/boosts': typeof DashboardBoostsRoute
   '/dashboard/businesses': typeof DashboardBusinessesRoute
   '/dashboard/dispatch': typeof DashboardDispatchRouteWithChildren
@@ -1660,6 +1669,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/dashboard/ads'
     | '/dashboard/billing'
+    | '/dashboard/blocked'
     | '/dashboard/boosts'
     | '/dashboard/businesses'
     | '/dashboard/dispatch'
@@ -1832,6 +1842,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/dashboard/ads'
     | '/dashboard/billing'
+    | '/dashboard/blocked'
     | '/dashboard/boosts'
     | '/dashboard/businesses'
     | '/dashboard/dispatch'
@@ -2005,6 +2016,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/dashboard/ads'
     | '/dashboard/billing'
+    | '/dashboard/blocked'
     | '/dashboard/boosts'
     | '/dashboard/businesses'
     | '/dashboard/dispatch'
@@ -2835,6 +2847,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardBoostsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/blocked': {
+      id: '/dashboard/blocked'
+      path: '/blocked'
+      fullPath: '/dashboard/blocked'
+      preLoaderRoute: typeof DashboardBlockedRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/billing': {
       id: '/dashboard/billing'
       path: '/billing'
@@ -3520,6 +3539,7 @@ const DashboardTeamRouteWithChildren = DashboardTeamRoute._addFileChildren(
 interface DashboardRouteChildren {
   DashboardAdsRoute: typeof DashboardAdsRoute
   DashboardBillingRoute: typeof DashboardBillingRoute
+  DashboardBlockedRoute: typeof DashboardBlockedRoute
   DashboardBoostsRoute: typeof DashboardBoostsRoute
   DashboardBusinessesRoute: typeof DashboardBusinessesRoute
   DashboardDispatchRoute: typeof DashboardDispatchRouteWithChildren
@@ -3550,6 +3570,7 @@ interface DashboardRouteChildren {
 const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardAdsRoute: DashboardAdsRoute,
   DashboardBillingRoute: DashboardBillingRoute,
+  DashboardBlockedRoute: DashboardBlockedRoute,
   DashboardBoostsRoute: DashboardBoostsRoute,
   DashboardBusinessesRoute: DashboardBusinessesRoute,
   DashboardDispatchRoute: DashboardDispatchRouteWithChildren,

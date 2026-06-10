@@ -66,6 +66,7 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean }[] = [
   { to: "/dashboard/billing", label: "Billing", Icon: CreditCard },
   { to: "/dashboard/boosts", label: "Boost history", Icon: Rocket },
   { to: "/dashboard/wanted", label: "Wanted posts", Icon: MegaphoneIcon },
+  { to: "/dashboard/blocked", label: "Blocked users", Icon: Shield },
 ];
 
 function DashboardLayout() {
