@@ -381,7 +381,7 @@ function BrowsePage() {
           attributes: r.attributes,
         } as ListingCardData;
       });
-      setItems(mapped);
+      setAllItems(mapped);
       setLoading(false);
     };
     fetchListings();
