@@ -162,7 +162,8 @@ function ShopIndex() {
     if (next.vehicle) setGarageState(next.vehicle);
     else setGarageState(null);
     navigate({
-      search: () => ({
+      search: (prev: any) => ({
+        ...prev,
         category: next.categorySlug,
         brand: next.brand,
         make: next.vehicle?.make ?? "",
@@ -174,7 +175,12 @@ function ShopIndex() {
     });
   };
 
-  const hasAnyFilter = !!(search.brand || search.category || activeVehicle);
+  const setSort = (s: ShopSort) =>
+    navigate({ search: (prev: any) => ({ ...prev, sort: s }) });
+  const setNetwork = (n: ShopNetwork) =>
+    navigate({ search: (prev: any) => ({ ...prev, network: n }) });
+
+  const hasAnyFilter = !!(search.brand || search.category || activeVehicle || search.network);
 
   return (
     <SiteLayout>
