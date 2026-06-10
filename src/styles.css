@@ -44,6 +44,15 @@
   --color-sidebar-ring: var(--sidebar-ring);
   --font-display: "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
   --font-sans: "Inter", system-ui, sans-serif;
+
+  /* Seller-tier "rarity" border colors (game-inspired) */
+  --color-tier-unverified: oklch(0.72 0.01 250);
+  --color-tier-private: oklch(0.95 0.005 250);
+  --color-tier-power: oklch(0.62 0.18 250);
+  --color-tier-business: oklch(0.62 0.18 150);
+  --color-tier-dealer: oklch(0.78 0.16 85);
+  --color-tier-featured: oklch(0.72 0.2 50);
+  --color-tier-penalty: oklch(0.6 0.22 25);
 }
 
 :root {
