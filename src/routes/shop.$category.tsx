@@ -18,6 +18,7 @@ import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
 import { ShopMobileCtaBar } from "@/components/shop/shop-mobile-cta-bar";
 import { ShopBreadcrumbs } from "@/components/shop/shop-breadcrumbs";
 import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
+import { ShopSortBar, type ShopSort, type ShopNetwork } from "@/components/shop/shop-sort-bar";
 
 import { X } from "lucide-react";
 
@@ -27,6 +28,11 @@ const catSearch = z.object({
   year: fallback(z.number().optional(), undefined).default(undefined),
   engine: fallback(z.string(), "").default(""),
   brand: fallback(z.string(), "").default(""),
+  sort: fallback(
+    z.enum(["featured", "price_asc", "price_desc", "popular", "newest"]),
+    "featured",
+  ).default("featured"),
+  network: fallback(z.enum(["", "shopee", "lazada", "aliexpress"]), "").default(""),
 });
 
 export const Route = createFileRoute("/shop/$category")({
