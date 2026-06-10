@@ -59,7 +59,7 @@ import {
 } from "@/components/ui/select";
 import { formatPHP, formatDate } from "@/lib/format";
 import { ListingPrice } from "@/components/listing-price";
-import { ListingBadges } from "@/components/listings/listing-badges";
+import { ListingBadges, pickHeadlinePrice } from "@/components/listings/listing-badges";
 import placeholderCar from "@/assets/placeholder-car.webp";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ListingQr } from "@/components/listing-qr";
