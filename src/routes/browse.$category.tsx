@@ -223,6 +223,76 @@ function BrowsePage() {
         if (search.make) q = q.ilike("attributes->>make", search.make);
         if (search.model) q = q.ilike("attributes->>model", search.model);
         if (search.engine) q = q.ilike("attributes->>engine", search.engine);
+        // Category-specific filters — all live in listings.attributes.
+        const eq = (k: string, v?: string) => {
+          if (v) q = q.eq(`attributes->>${k}`, v);
+        };
+        const ilike = (k: string, v?: string) => {
+          if (v) q = q.ilike(`attributes->>${k}`, `%${v}%`);
+        };
+        const gte = (k: string, v?: number) => {
+          if (v != null && !Number.isNaN(v))
+            q = q.gte(`attributes->>${k}::numeric` as any, v);
+        };
+        const lte = (k: string, v?: number) => {
+          if (v != null && !Number.isNaN(v))
+            q = q.lte(`attributes->>${k}::numeric` as any, v);
+        };
+        const isTrue = (k: string, v?: boolean) => {
+          if (v) q = q.eq(`attributes->>${k}`, "true");
+        };
+        // Cars
+        eq("transmission", search.transmission);
+        eq("fuel", search.fuel);
+        eq("body_type", search.body_type);
+        gte("mileage_km", search.mileage_min);
+        lte("mileage_km", search.mileage_max);
+        eq("owner_status", search.owner_status);
+        eq("or_cr_status", search.or_cr_status);
+        eq("flood_history", search.flood_history);
+        eq("accident_history", search.accident_history);
+        isTrue("financing_available", search.financing_available);
+        isTrue("trade_accepted", search.trade_accepted);
+        if (search.verified_documents_only) {
+          q = q.eq("attributes->>or_cr_status", "complete");
+        }
+        // Motorcycles
+        eq("moto_type", search.moto_type);
+        gte("engine_cc", search.engine_cc_min);
+        lte("engine_cc", search.engine_cc_max);
+        eq("plate_status", search.plate_status);
+        eq("moto_condition", search.moto_condition);
+        isTrue("delivery_available", search.delivery_available);
+        // Equipment
+        eq("equipment_type", search.equipment_type);
+        ilike("brand", search.brand);
+        gte("hours", search.hours_min);
+        lte("hours", search.hours_max);
+        gte("operating_weight_tons", search.weight_min);
+        lte("operating_weight_tons", search.weight_max);
+        ilike("attachment_type", search.attachment_type);
+        eq("rental_or_sale", search.rental_or_sale);
+        isTrue("with_operator", search.with_operator);
+        isTrue("inspection_available", search.inspection_available);
+        // Boats
+        eq("boat_type", search.boat_type);
+        eq("hull_material", search.hull_material);
+        eq("boat_engine_type", search.boat_engine_type);
+        gte("length_ft", search.length_min);
+        lte("length_ft", search.length_max);
+        eq("boat_registration_status", search.boat_registration_status);
+        eq("boat_usage", search.boat_usage);
+        isTrue("trailer_included", search.trailer_included);
+        // Airplanes
+        ilike("registration_no", search.registration_no);
+        eq("airworthiness", search.airworthiness);
+        eq("maintenance_logs", search.maintenance_logs);
+        gte("engine_hours", search.engine_hours_min);
+        lte("engine_hours", search.engine_hours_max);
+        ilike("airport_code", search.airport_code);
+        eq("aircraft_seller", search.aircraft_seller);
+        isTrue("inspection_required", search.inspection_required);
+
         if (search.sort === "price_asc") q = q.order("price_php", { ascending: true });
         else if (search.sort === "price_desc") q = q.order("price_php", { ascending: false });
         else
