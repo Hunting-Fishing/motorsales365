@@ -37,6 +37,7 @@ import {
 export const CATEGORY_ATTR_KEYS: Record<string, string[]> = {
   car: [
     "body_type",
+    "drivetrain",
     "owner_status",
     "or_cr_status",
     "flood_history",
