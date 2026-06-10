@@ -19,6 +19,7 @@ import { ShopFilterDrawer } from "@/components/shop/shop-filter-drawer";
 import { ShopFavoriteButton } from "@/components/shop/shop-favorite-button";
 import { ShopMobileCtaBar } from "@/components/shop/shop-mobile-cta-bar";
 import { ShopifyStoreBanner } from "@/components/shop/shopify-store-banner";
+import { ShopSortBar, type ShopSort, type ShopNetwork } from "@/components/shop/shop-sort-bar";
 
 import { useGarage, formatVehicle, type GarageVehicle } from "@/lib/garage";
 import { X } from "lucide-react";
@@ -31,6 +32,11 @@ const shopSearch = z.object({
   transmission: fallback(z.string(), "").default(""),
   brand: fallback(z.string(), "").default(""),
   category: fallback(z.string(), "").default(""),
+  sort: fallback(
+    z.enum(["featured", "price_asc", "price_desc", "popular", "newest"]),
+    "featured",
+  ).default("featured"),
+  network: fallback(z.enum(["", "shopee", "lazada", "aliexpress"]), "").default(""),
 });
 
 export const Route = createFileRoute("/shop/")({
