@@ -86,6 +86,8 @@ function ShopCategory() {
         }
       : {}),
     ...(search.brand ? { brand: search.brand } : {}),
+    ...(search.network ? { network: search.network } : {}),
+    sort: search.sort,
   };
   const { data } = useQuery({
     queryKey: ["shop-cat", category, filterArgs],
