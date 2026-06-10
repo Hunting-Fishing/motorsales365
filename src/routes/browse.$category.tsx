@@ -67,6 +67,8 @@ const searchSchema = z.object({
   or_cr_status: optStr(),
   flood_history: optStr(),
   accident_history: optStr(),
+  registered_owner: optStr(),
+  deed_chain_available: optBool(),
   financing_available: optBool(),
   trade_accepted: optBool(),
   verified_documents_only: optBool(),
