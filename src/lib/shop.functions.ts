@@ -552,31 +552,9 @@ export const adminUpsertProduct = createServerFn({ method: "POST" })
       productId = row.id;
     }
 
-    // Sync shop_product_categories: primary = category_id, plus its parent
-    // (so the product surfaces on both the subcategory and the parent
-    // category landing pages).
-    if (payload.category_id) {
-      const { data: catRow } = await supabase
-        .from("shop_categories")
-        .select("id, parent_id")
-        .eq("id", payload.category_id)
-        .maybeSingle();
-      const links: Array<{ product_id: string; category_id: string; is_primary: boolean }> = [
-        { product_id: productId, category_id: payload.category_id, is_primary: true },
-      ];
-      if (catRow?.parent_id) {
-        links.push({ product_id: productId, category_id: catRow.parent_id, is_primary: false });
-      }
-      // Clear stale primary, then upsert. Other curator-added cross-links stay.
-      await supabase
-        .from("shop_product_categories")
-        .delete()
-        .eq("product_id", productId)
-        .eq("is_primary", true);
-      await supabase
-        .from("shop_product_categories")
-        .upsert(links, { onConflict: "product_id,category_id" });
-    }
+    // Sync shop_product_categories so the product appears under both its
+    // subcategory and the parent department landing page.
+    await syncProductCategoryLinks(supabase as any, productId, payload.category_id ?? null);
     return { id: productId };
   });
 
@@ -857,71 +835,34 @@ function pickPricePhp(
   return null;
 }
 
-// Keyword dictionary mapping shop_categories.slug → trigger phrases found in
-// scraped product titles / descriptions / category hints. Subcategory matches
-// win over parent matches because they're more specific.
-const CATEGORY_KEYWORDS: Record<string, string[]> = {
-  diagnostics: ["obd2", "obd-ii", "obdii", "obd ii", "scan tool", "scanner", "ancel", "autel", "launch x431", "elm327", "code reader", "diagnostic tool"],
-  "car-washing": ["foam cannon", "snow foam", "pressure washer", "car shampoo", "car wash", "wash mitt"],
-  "waxes-coatings": ["car wax", "ceramic coat", "ceramic coating", "paint sealant", "sealant", "graphene coat"],
-  "polishing-compounds": ["polishing compound", "cutting compound", "buffing pad", "polisher"],
-  microfiber: ["microfiber", "micro fibre", "drying towel", "applicator pad"],
-  "wheel-tire-care": ["tire shine", "tire dressing", "wheel cleaner", "rim cleaner"],
-  "interior-care": ["interior cleaner", "leather conditioner", "dashboard polish", "fabric cleaner", "carpet cleaner"],
-  "jump-starters": ["jump starter", "jumpstarter", "jump pack", "booster pack"],
-  "tow-straps": ["tow strap", "recovery strap", "tow rope", "kinetic rope", "snatch strap"],
-  "first-aid": ["first aid", "first-aid"],
-  "fire-extinguishers": ["fire extinguisher"],
-  safety: ["warning triangle", "reflective triangle", "tire inflator", "portable air compressor", "emergency kit", "road kit", "safety vest"],
-  helmets: ["helmet", "full face", "half face", "modular helmet"],
-  "riding-gear": ["riding jacket", "riding pants", "rain gear", "rain suit", "motorcycle gloves", "riding gloves", "moto boots"],
-  "moto-luggage": ["tank bag", "saddle bag", "tail bag", "panniers"],
-  "chain-care": ["chain lube", "chain cleaner", "chain wax"],
-  "seat-covers": ["seat cover", "seat cushion"],
-  "floor-mats": ["floor mat", "car mat", "all-weather mat"],
-  "phone-mounts": ["phone mount", "phone holder", "car phone holder", "magsafe car"],
-  organizers: ["car organizer", "trunk organizer", "console organizer"],
-  accessories: ["sun shade", "sunshade", "windshield shade", "steering wheel cover", "armrest"],
-  dashcams: ["dash cam", "dashcam", "dvr car camera"],
-  "cameras-sensors": ["reverse camera", "backup camera", "parking sensor", "blind spot"],
-  "head-units": ["head unit", "car stereo", "android auto", "carplay head", "double din", "1din"],
-  speakers: ["car speaker", "subwoofer", "tweeter", "amplifier car audio"],
-  lighting: ["led headlight", "hid kit", "fog light", "h4 led", "h7 led", "h11 led"],
-  "hand-tools": ["socket set", "wrench set", "spanner", "ratchet set", "screwdriver set", "plier", "torque wrench", "multimeter"],
-  "power-tools": ["impact wrench", "cordless drill", "angle grinder", "rotary tool", "power drill"],
-  "jacks-stands": ["floor jack", "jack stand", "trolley jack", "scissor jack", "hydraulic jack"],
-  "workshop-equipment": ["engine hoist", "creeper", "tire changer", "wheel balancer"],
-  "battery-care": ["battery charger", "trickle charger", "smart charger", "battery maintainer", "battery tender"],
-  "garage-organizers": ["garage organizer", "tool chest", "tool cabinet", "tool cart"],
-  shelving: ["shelving", "garage shelf", "storage rack"],
-  "car-covers": ["car cover", "all weather cover"],
-  "truck-equipment": ["work light", "led work light", "ratchet strap", "tie down", "cargo strap", "grease gun", "truck bed", "winch"],
-  "off-road-lights": ["light bar", "off road light", "off-road light", "4x4 light"],
-  "recovery-boards": ["recovery board", "traction board", "sand board"],
-  "roof-racks": ["roof rack", "roof basket", "cross bar"],
-  snorkels: ["snorkel kit", "raised intake"],
-  "engine-oil": ["engine oil", "motor oil", "5w-30", "5w-40", "0w-20", "10w-40", "synthetic oil"],
-  atf: ["atf", "transmission fluid", "gear oil"],
-  "brake-fluid": ["brake fluid", "dot 3", "dot 4", "dot 5"],
-  coolant: ["coolant", "antifreeze", "radiator fluid"],
-  grease: ["grease cartridge", "lithium grease", "wd-40", "wd40", "penetrating oil"],
-  brakes: ["brake pad", "brake disc", "brake rotor", "brake shoe"],
-  filters: ["oil filter", "air filter", "cabin filter", "fuel filter"],
-  ignition: ["spark plug", "ignition coil", "iridium plug"],
-  "belts-hoses": ["timing belt", "serpentine belt", "radiator hose"],
-  cooling: ["radiator", "water pump", "thermostat"],
-  exhaust: ["exhaust pipe", "muffler", "catalytic converter"],
-  suspension: ["shock absorber", "strut", "control arm", "tie rod"],
-  tires: ["tyre", "all terrain tire", "215/", "225/", "235/", "265/"],
-  wheels: ["alloy wheel", "mag wheels"],
-  tpms: ["tpms", "valve stem", "tire pressure sensor"],
-  "ev-chargers": ["ev charger", "ev charging", "type 2 charger", "wallbox"],
-  "ev-adapters": ["ev adapter", "type 2 adapter", "chademo"],
-};
+// ---------- Category matcher (DB-backed) ----------
+// Trigger keywords live in `shop_category_keywords`; loadCategoryKeywordMap()
+// reads them once per scrape / re-categorize pass. Subcategory matches win
+// over parents because they're more specific.
+
+type CategoryRow = { id: string; name: string; slug: string; parent_id: string | null };
+
+async function loadCategoryKeywordMap(): Promise<{
+  cats: CategoryRow[];
+  keywordsById: Map<string, string[]>;
+}> {
+  const [{ data: cats }, { data: kws }] = await Promise.all([
+    supabaseAdmin.from("shop_categories").select("id, slug, name, parent_id").eq("active", true),
+    supabaseAdmin.from("shop_category_keywords").select("category_id, keyword"),
+  ]);
+  const keywordsById = new Map<string, string[]>();
+  for (const row of (kws ?? []) as any[]) {
+    const list = keywordsById.get(row.category_id) ?? [];
+    list.push(String(row.keyword).toLowerCase());
+    keywordsById.set(row.category_id, list);
+  }
+  return { cats: (cats ?? []) as CategoryRow[], keywordsById };
+}
 
 function fuzzyCategoryMatch(
   hint: string,
-  cats: Array<{ id: string; name: string; slug: string; parent_id?: string | null }>,
+  cats: CategoryRow[],
+  keywordsById: Map<string, string[]>,
 ): string | null {
   if (!hint) return null;
   const h = ` ${hint.toLowerCase().replace(/[^a-z0-9\/]+/g, " ")} `;
@@ -929,13 +870,17 @@ function fuzzyCategoryMatch(
   // 1) Keyword dictionary — subcategories win over parents.
   let best: { id: string; score: number; isChild: boolean } | null = null;
   for (const c of cats) {
-    const kws = CATEGORY_KEYWORDS[c.slug];
-    if (!kws) continue;
+    const kws = keywordsById.get(c.id);
+    if (!kws || kws.length === 0) continue;
     let score = 0;
     for (const kw of kws) if (h.includes(kw)) score += kw.length;
     if (score > 0) {
       const isChild = !!c.parent_id;
-      if (!best || (isChild && !best.isChild) || (isChild === best.isChild && score > best.score)) {
+      if (
+        !best ||
+        (isChild && !best.isChild) ||
+        (isChild === best.isChild && score > best.score)
+      ) {
         best = { id: c.id, score, isChild };
       }
     }
@@ -963,13 +908,53 @@ function fuzzyCategoryMatch(
     const score = tokens.filter((t) => ct.includes(t)).length;
     if (score > 0) {
       const isChild = !!c.parent_id;
-      if (!tBest || (isChild && !tBest.isChild) || (isChild === tBest.isChild && score > tBest.score)) {
+      if (
+        !tBest ||
+        (isChild && !tBest.isChild) ||
+        (isChild === tBest.isChild && score > tBest.score)
+      ) {
         tBest = { id: c.id, score, isChild };
       }
     }
   }
   return tBest?.id ?? null;
 }
+
+// Shared join-table sync — used by import, manual save, and bulk re-run.
+async function syncProductCategoryLinks(
+  client: typeof supabaseAdmin,
+  productId: string,
+  categoryId: string | null,
+  cats?: CategoryRow[],
+): Promise<void> {
+  if (!categoryId) return;
+  let parentId: string | null = null;
+  if (cats) {
+    parentId = cats.find((c) => c.id === categoryId)?.parent_id ?? null;
+  } else {
+    const { data: catRow } = await client
+      .from("shop_categories")
+      .select("parent_id")
+      .eq("id", categoryId)
+      .maybeSingle();
+    parentId = catRow?.parent_id ?? null;
+  }
+  const links: Array<{ product_id: string; category_id: string; is_primary: boolean }> = [
+    { product_id: productId, category_id: categoryId, is_primary: true },
+  ];
+  if (parentId) {
+    links.push({ product_id: productId, category_id: parentId, is_primary: false });
+  }
+  await client
+    .from("shop_product_categories")
+    .delete()
+    .eq("product_id", productId)
+    .eq("is_primary", true);
+  await client
+    .from("shop_product_categories")
+    .upsert(links, { onConflict: "product_id,category_id" });
+}
+
 
 
 const NETWORK_SLUGS = [
@@ -1045,11 +1030,9 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
       networkId = net?.id ?? null;
     }
 
-    // Load categories for fuzzy mapping
-    const { data: cats } = await supabaseAdmin
-      .from("shop_categories")
-      .select("id, slug, name, parent_id")
-      .eq("active", true);
+    // Load categories + keyword map for fuzzy mapping
+    const { cats, keywordsById } = await loadCategoryKeywordMap();
+
 
     // Try a per-network scraper (currently only lazada has a custom path).
     // Anything else (or a failed custom path) falls through to Firecrawl.
@@ -1204,7 +1187,7 @@ export const scrapeShopUrl = createServerFn({ method: "POST" })
     ]
       .filter(Boolean)
       .join(" ");
-    const category_id = fuzzyCategoryMatch(matchText, (cats ?? []) as any[]);
+    const category_id = fuzzyCategoryMatch(matchText, cats, keywordsById);
 
     // Canonical URL hardening — prefer the marketplace's own URL if present.
     const canonical = pickStr(
@@ -1601,4 +1584,156 @@ export const backfillMissingShopPrices = createServerFn({ method: "POST" })
       }
     }
     return { scanned, filledPrice, stillMissing, errors: errors.slice(0, 20) };
+  });
+
+// ============ Category-keyword admin ============
+
+export const adminListCategoryKeywords = createServerFn({ method: "GET" })
+  .middleware([requireDomainRole("shop_manager", "shop.adminListCategoryKeywords")])
+  .handler(async () => {
+    const [{ data: cats }, { data: kws }, { data: spc }] = await Promise.all([
+      supabaseAdmin
+        .from("shop_categories")
+        .select("id, slug, name, parent_id, department_slug")
+        .eq("active", true)
+        .order("name"),
+      supabaseAdmin
+        .from("shop_category_keywords")
+        .select("id, category_id, keyword")
+        .order("keyword"),
+      supabaseAdmin.from("shop_product_categories").select("category_id"),
+    ]);
+    const kwById = new Map<string, Array<{ id: string; keyword: string }>>();
+    for (const row of (kws ?? []) as any[]) {
+      const list = kwById.get(row.category_id) ?? [];
+      list.push({ id: row.id, keyword: row.keyword });
+      kwById.set(row.category_id, list);
+    }
+    const counts = new Map<string, number>();
+    for (const r of (spc ?? []) as any[]) {
+      counts.set(r.category_id, (counts.get(r.category_id) ?? 0) + 1);
+    }
+    return {
+      categories: (cats ?? []).map((c: any) => ({
+        ...c,
+        keywords: kwById.get(c.id) ?? [],
+        product_count: counts.get(c.id) ?? 0,
+      })),
+    };
+  });
+
+export const adminAddCategoryKeyword = createServerFn({ method: "POST" })
+  .middleware([requireDomainRole("shop_manager", "shop.adminAddCategoryKeyword")])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        category_id: z.string().uuid(),
+        keyword: z.string().min(1).max(120),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const kw = data.keyword.trim().toLowerCase();
+    if (!kw) throw new Error("Keyword required");
+    const { data: row, error } = await context.supabase
+      .from("shop_category_keywords")
+      .insert({ category_id: data.category_id, keyword: kw, created_by: context.userId })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    return { id: row.id };
+  });
+
+export const adminDeleteCategoryKeyword = createServerFn({ method: "POST" })
+  .middleware([requireDomainRole("shop_manager", "shop.adminDeleteCategoryKeyword")])
+  .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("shop_category_keywords")
+      .delete()
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminBulkSetCategoryKeywords = createServerFn({ method: "POST" })
+  .middleware([requireDomainRole("shop_manager", "shop.adminBulkSetCategoryKeywords")])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        category_id: z.string().uuid(),
+        keywords: z.array(z.string().min(1).max(120)).max(500),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const normalized = Array.from(
+      new Set(
+        data.keywords
+          .map((k) => k.trim().toLowerCase())
+          .filter((k) => k.length > 0 && k.length <= 120),
+      ),
+    );
+    const { error: dErr } = await context.supabase
+      .from("shop_category_keywords")
+      .delete()
+      .eq("category_id", data.category_id);
+    if (dErr) throw new Error(dErr.message);
+    if (normalized.length === 0) return { count: 0 };
+    const rows = normalized.map((kw) => ({
+      category_id: data.category_id,
+      keyword: kw,
+      created_by: context.userId,
+    }));
+    const { error: iErr } = await context.supabase
+      .from("shop_category_keywords")
+      .insert(rows);
+    if (iErr) throw new Error(iErr.message);
+    return { count: rows.length };
+  });
+
+export const adminRecategorizeProducts = createServerFn({ method: "POST" })
+  .middleware([requireDomainRole("shop_manager", "shop.adminRecategorizeProducts")])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        scope: z.enum(["all", "uncategorized", "category"]).default("all"),
+        categoryId: z.string().uuid().optional(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const { cats, keywordsById } = await loadCategoryKeywordMap();
+
+    let q = supabaseAdmin
+      .from("shop_products")
+      .select("id, title, brand, description, category_id");
+    if (data.scope === "uncategorized") q = q.is("category_id", null);
+    else if (data.scope === "category" && data.categoryId)
+      q = q.eq("category_id", data.categoryId);
+
+    const { data: products, error } = await q.limit(5000);
+    if (error) throw new Error(error.message);
+
+    let scanned = 0;
+    let updated = 0;
+    let unmatched = 0;
+    for (const p of (products ?? []) as any[]) {
+      scanned += 1;
+      const text = [p.title, p.brand, p.description].filter(Boolean).join(" ");
+      const newCat = fuzzyCategoryMatch(text, cats, keywordsById);
+      if (!newCat) {
+        unmatched += 1;
+        continue;
+      }
+      if (newCat === p.category_id) continue;
+      const { error: uErr } = await supabaseAdmin
+        .from("shop_products")
+        .update({ category_id: newCat })
+        .eq("id", p.id);
+      if (uErr) continue;
+      await syncProductCategoryLinks(supabaseAdmin, p.id, newCat, cats);
+      updated += 1;
+    }
+    return { scanned, updated, unmatched };
   });

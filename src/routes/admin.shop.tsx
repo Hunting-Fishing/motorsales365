@@ -63,6 +63,7 @@ import {
 import { detectNetworkSlug, cleanShopUrl, urlMatchesNetwork } from "@/lib/shop-url";
 import { getYearOptions, getMakesForYear, getModelsForYear } from "@/data/vehicles";
 import { getEnginesFor } from "@/data/vehicle-engines";
+import { CategoryKeywordEditor } from "@/components/admin/category-keyword-editor";
 
 export const Route = createFileRoute("/admin/shop")({
   component: AdminShop,
@@ -81,6 +82,9 @@ function AdminShop() {
         <TabsList className="w-full justify-start overflow-x-auto sm:w-auto">
           <TabsTrigger value="products">Products</TabsTrigger>
           <TabsTrigger value="networks">Networks</TabsTrigger>
+          <TabsTrigger value="keywords" className="whitespace-nowrap">
+            Category mapping
+          </TabsTrigger>
           <TabsTrigger value="directory" className="whitespace-nowrap">
             Sign-up directory
           </TabsTrigger>
@@ -90,6 +94,9 @@ function AdminShop() {
         </TabsContent>
         <TabsContent value="networks" className="mt-4">
           <NetworksTab />
+        </TabsContent>
+        <TabsContent value="keywords" className="mt-4">
+          <CategoryKeywordEditor />
         </TabsContent>
         <TabsContent value="directory" className="mt-4">
           <DirectoryTab />
