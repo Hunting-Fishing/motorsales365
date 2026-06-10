@@ -12,22 +12,28 @@ export interface PricingWidgetInput {
   price_hidden?: boolean | null;
 }
 
-const toNum = (v: unknown): number =>
-  typeof v === "string" ? parseFloat(v) || 0 : typeof v === "number" ? v : 0;
+const toNum = (v: unknown): number | null => {
+  if (v === null || v === undefined || v === "") return null;
+  const n = typeof v === "string" ? parseFloat(v) : typeof v === "number" ? v : NaN;
+  return Number.isFinite(n) && n > 0 ? n : null;
+};
 
-function pickHeadline(asking: number, monthly: number, dp: number): Kind | null {
-  if (asking > 0) return "asking";
-  if (monthly > 0) return "monthly";
-  if (dp > 0) return "down_payment";
+function pickHeadline(
+  asking: number | null,
+  monthly: number | null,
+  dp: number | null,
+): Kind | null {
+  if (asking) return "asking";
+  if (monthly) return "monthly";
+  if (dp) return "down_payment";
   return null;
 }
 
 /**
- * On-card pricing widget. Renders a pill for EVERY price field the seller
- * filled in (Asking, Monthly, Down payment) plus a Negotiable pill. The pill
- * matching the headline price gets a stronger, filled treatment so the
- * primary number stays obvious while buyers can see all financing options
- * at a glance.
+ * On-card pricing widget. Renders a pill ONLY for price fields the seller
+ * actually set to a positive amount (Asking, Monthly, Down payment) plus a
+ * Negotiable pill. Null, undefined, empty, zero, and non-finite values are
+ * treated as unset and never produce a pill.
  */
 export function PricingWidget({
   listing,
@@ -43,8 +49,9 @@ export function PricingWidget({
   const dp = toNum(listing.down_payment_php);
   const headline = listing.price_hidden ? null : pickHeadline(asking, monthly, dp);
 
-  const hasAny = asking > 0 || monthly > 0 || dp > 0 || !!listing.negotiable;
+  const hasAny = !!(asking || monthly || dp || listing.negotiable);
   if (!hasAny && !listing.price_hidden) return null;
+
 
   const iconSz = size === "md" ? "h-3.5 w-3.5" : "h-3 w-3";
   const padding = size === "md" ? "px-2.5 py-1 text-xs" : "px-2 py-0.5 text-[11px]";
@@ -71,7 +78,7 @@ export function PricingWidget({
 
   return (
     <div className={cn("flex flex-wrap items-center gap-1.5", className)}>
-      {asking > 0 &&
+      {asking !== null &&
         pill({
           kind: "asking",
           Icon: Banknote,
@@ -83,7 +90,7 @@ export function PricingWidget({
             soft: "border-emerald-500/40 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
           },
         })}
-      {monthly > 0 &&
+      {monthly !== null &&
         pill({
           kind: "monthly",
           Icon: CalendarClock,
@@ -94,7 +101,7 @@ export function PricingWidget({
             soft: "border-purple-500/40 bg-purple-500/10 text-purple-700 dark:text-purple-300",
           },
         })}
-      {dp > 0 &&
+      {dp !== null &&
         pill({
           kind: "down_payment",
           Icon: Wallet,
@@ -105,6 +112,7 @@ export function PricingWidget({
             soft: "border-orange-500/40 bg-orange-500/10 text-orange-700 dark:text-orange-300",
           },
         })}
+
       {listing.negotiable &&
         pill({
           kind: "negotiable",
