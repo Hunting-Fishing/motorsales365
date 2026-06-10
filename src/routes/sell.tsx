@@ -45,7 +45,20 @@ import {
   type VehicleQualityIssue,
 } from "@/components/vehicle-quality-fields";
 import { VinScanDialog } from "@/components/vin-scan-dialog";
+import {
+  CategoryAttributesEditor,
+  CATEGORY_ATTR_KEYS,
+} from "@/components/listings/category-attributes-editor";
+import { isAttrCategory } from "@/lib/category-attributes";
 import { z } from "zod";
+
+const CATEGORY_LABEL_MAP: Record<string, string> = {
+  car: "Car",
+  motorcycle: "Motorcycle",
+  equipment: "Heavy equipment",
+  boat: "Boat",
+  airplane: "Aircraft",
+};
 
 const ListingTextSchema = z.object({
   title: z.string().trim().min(3, "Title must be at least 3 characters").max(120, "Title must be 120 characters or fewer"),
