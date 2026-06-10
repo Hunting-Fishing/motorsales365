@@ -63,6 +63,7 @@ import placeholderCar from "@/assets/placeholder-car.webp";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ListingQr } from "@/components/listing-qr";
 import { siteUrl } from "@/lib/site-config";
+import { ListingActionsMenu } from "@/components/listings/listing-actions-menu";
 
 const REPORT_REASONS = [
   "Suspected scam or fraud",
