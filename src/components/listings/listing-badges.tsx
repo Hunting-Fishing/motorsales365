@@ -44,9 +44,6 @@ export function ListingBadges({
 }) {
   const tier = getSellerTier(listing);
   const reg: RegistrationStatus = listing.registration_status ?? "unknown";
-  const asking = toNum(listing.price_php);
-  const monthly = toNum(listing.monthly_php);
-  const dp = toNum(listing.down_payment_php);
   const iconSz = size === "md" ? "h-3.5 w-3.5" : "h-3 w-3";
 
   return (
