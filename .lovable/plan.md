@@ -1,66 +1,72 @@
-## Summary
-Make Report visible on every listing card and seller profile via a kebab (⋮) menu with quick-report categories. Add a Block seller feature backed by a new `user_blocks` table that hides the blocker's view of that seller's listings, cards, and messages.
+# Affiliate categorization — admin UI + consolidation
 
-## Backend
+## Goal
+Make the keyword→subcategory mapping editable from the admin, re-categorize already-imported products on demand, and route every affiliate flow through a single matcher.
 
-**New migration — `user_blocks`**
-```sql
-CREATE TABLE public.user_blocks (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  blocker_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  blocked_user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  reason text,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  UNIQUE (blocker_id, blocked_user_id),
-  CHECK (blocker_id <> blocked_user_id)
-);
-GRANT SELECT, INSERT, DELETE ON public.user_blocks TO authenticated;
-GRANT ALL ON public.user_blocks TO service_role;
-ALTER TABLE public.user_blocks ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users manage their own blocks" ON public.user_blocks
-  FOR ALL USING (auth.uid() = blocker_id) WITH CHECK (auth.uid() = blocker_id);
-```
-No DB-side filtering of listings — the app filters client-side using a small `useBlockedUserIds()` hook so existing public queries don't need RLS changes.
+## 1. Database
 
-## Report prefill
+New table `shop_category_keywords`:
+- `category_id uuid` → `shop_categories(id)` on delete cascade
+- `keyword text` (lowercased, trimmed, unique per category)
+- standard `id`, `created_at`, `created_by`
+- unique `(category_id, keyword)`
+- GRANTs: `authenticated` select; `service_role` all
+- RLS: public read (active categories), write gated by `can_manage_shop(auth.uid())`
 
-Extend `src/routes/report.tsx` with `validateSearch` accepting `target_type`, `category`, `listing_id`, `target_url`, `details`. Add the 6 new categories to the `CATEGORIES` array:
-- "Fake / forged documents"
-- "Stolen vehicle"
-- "Off-platform / scam payment"
-- "Duplicate listing"
-- "Price bait / hidden fees"
-- (existing ones kept; "Fake / cloned OR-CR" renamed to "Fake / forged documents" for consistency)
+Seed migration inserts every entry from the current hardcoded `CATEGORY_KEYWORDS` map in `src/lib/shop.functions.ts`, resolved by category slug.
 
-Form initializes from the URL params; when `listing_id` is present, also send it on insert.
+## 2. Server: single source of truth
 
-## New shared component — `src/components/listings/listing-actions-menu.tsx`
-A dropdown (kebab) with:
-- Report listing (general → `/report?target_type=listing&listing_id=...`)
-- Report fake documents
-- Report stolen vehicle
-- Report scam payment
-- Report duplicate listing
-- Report price bait
-- Block seller (signed-in only; opens confirm dialog, inserts into `user_blocks`, toast + invalidate)
+In `src/lib/shop.functions.ts`:
+- Delete the hardcoded `CATEGORY_KEYWORDS` constant.
+- New helper `loadCategoryKeywordMap()` → reads `shop_categories` + `shop_category_keywords` once, returns `{ cats, keywordsBySlug }`.
+- `fuzzyCategoryMatch` stays the same algorithm (subcategory-preferred, scored by keyword length, with name/slug + token fallback) but takes the loaded map.
+- `scrapeShopUrl` uses the new loader instead of the const.
 
-Each report item links to `/report` with prefilled `category` and `listing_id`/`target_url`. Built on existing `DropdownMenu` shadcn primitive.
+New server functions (all gated by `requireDomainRole("shop_manager", ...)`):
+- `adminListCategoryKeywords()` → returns categories grouped with their keywords + counts.
+- `adminAddCategoryKeyword({ category_id, keyword })`
+- `adminDeleteCategoryKeyword({ id })`
+- `adminBulkSetCategoryKeywords({ category_id, keywords: string[] })` (replace-all for textarea editor)
+- `adminRecategorizeProducts({ scope: "all" | "uncategorized" | "category", categoryId? })` →
+  - Loads keyword map, iterates `shop_products` in batches (id, title, brand, description, category_id).
+  - Computes new `category_id` from title+brand+description.
+  - Updates `shop_products.category_id` only when it actually changes; refreshes primary + parent rows in `shop_product_categories` using the same logic that already lives in `adminUpsertProduct` (extracted into a shared `syncProductCategoryLinks` helper so import + re-run + manual edit all behave identically).
+  - Returns `{ scanned, updated, unmatched }`.
 
-## New hook — `src/hooks/use-blocked-users.ts`
-Returns `Set<string>` of blocked seller IDs for the current user via TanStack Query (key `['user-blocks', userId]`). Used to filter cards and to expose `block(userId)` / `unblock(userId)` mutations.
+## 3. Admin UI
 
-## UI integration
+New tab in `src/routes/admin.shop.tsx` → "Category mapping":
+- Left column: category tree (parents grouped, subcategories indented). Click a category to edit.
+- Right pane:
+  - Header with the category name + product count.
+  - Textarea ("one keyword per line") backed by `adminBulkSetCategoryKeywords`.
+  - Inline list of current keywords with delete buttons.
+  - "Add keyword" input + button.
+- Toolbar above the tab:
+  - "Re-categorize" dropdown: All products / Only uncategorized / Just this category.
+  - Runs `adminRecategorizeProducts`, shows toast with `scanned / updated / unmatched`.
+  - Confirm dialog before "All products".
 
-- `src/components/listing-card.tsx`: render `<ListingActionsMenu listingId seller_id />` absolutely positioned top-right of the image (alongside existing favorite button). Clicking does not navigate.
-- `src/routes/listing.$id.tsx`: add the same menu to the seller-info block on the detail page.
-- `src/routes/seller.$id.tsx`: add a "Report seller" + "Block seller" dropdown in the profile header.
-- Filter blocked sellers out of `featured`/`recent` on `index.tsx`, `browse.$category.tsx`, `dashboard.favorites.tsx`, `dashboard.likes.tsx`, `seller.$id.tsx` (no-op for self).
-- `src/routes/dashboard.tsx` (or sidebar): add a "Blocked users" link to a new `src/routes/dashboard.blocked.tsx` page that lists blocks with an Unblock button.
+## 4. Consolidation
 
-## Out of scope
-- Hiding blocked users' messages in conversations (separate pass; threads stay readable so existing chats aren't orphaned).
-- Auto-suppressing blocked sellers from search results server-side.
-- Notifying blocked users (intentionally silent).
+Three callers now share the same code path:
+1. `scrapeShopUrl` (new product import).
+2. `adminUpsertProduct` (manual save).
+3. `adminRecategorizeProducts` (bulk re-run).
 
-## Terms sync
-Add a short "Blocking and reporting" paragraph to `/terms` describing what Block does (hides their listings from your view; does not notify them) and the available report categories. Bump "Last updated".
+All call `syncProductCategoryLinks(productId, categoryId)` for the join-table write, and all match through the DB-backed keyword map. No hardcoded mapping remains in code.
+
+## Technical notes
+
+- Matcher behaviour is unchanged — only the data source moves from const to table, so existing imports keep working without re-run.
+- Re-categorization batches in groups of 500 to stay within edge-function memory; uses `supabaseAdmin` inside the handler.
+- Keywords stored lowercase; UI normalizes on save.
+- Terms/Privacy do not need updates — this is internal tooling, no user-facing policy change.
+
+## Files
+
+- New migration: `shop_category_keywords` table, grants, RLS, seed.
+- Edit `src/lib/shop.functions.ts`: remove const, add loader + 5 new server fns + shared `syncProductCategoryLinks`.
+- Edit `src/routes/admin.shop.tsx`: add "Category mapping" tab + re-categorize toolbar.
+- New `src/components/admin/category-keyword-editor.tsx` (presentational).
