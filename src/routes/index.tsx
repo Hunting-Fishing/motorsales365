@@ -364,7 +364,7 @@ function Index() {
       <LiveActivityFeed />
 
       {/* Featured */}
-      {featured.length > 0 && (
+      {visibleFeatured.length > 0 && (
         <section className="container mx-auto px-4 py-12">
           <div className="mb-6 flex items-end justify-between">
             <div>
@@ -373,7 +373,7 @@ function Index() {
             </div>
           </div>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {featured.map((l) => (
+            {visibleFeatured.map((l) => (
               <ListingCard key={l.id} listing={l} />
             ))}
           </div>
@@ -393,7 +393,7 @@ function Index() {
             </Link>
           </Button>
         </div>
-        {recent.length === 0 ? (
+        {visibleRecent.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
             No listings yet — be the first to{" "}
             <Link to="/sell" className="font-semibold text-primary underline">
@@ -403,7 +403,7 @@ function Index() {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {recent.map((l) => (
+            {visibleRecent.map((l) => (
               <ListingCard key={l.id} listing={l} />
             ))}
           </div>
