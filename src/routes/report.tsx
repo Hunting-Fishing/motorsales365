@@ -93,17 +93,22 @@ const schema = z.object({
 
 function ReportPage() {
   const { user } = useAuth();
-  const [targetType, setTargetType] =
-    useState<(typeof TARGET_TYPES)[number]["value"]>("listing");
-  const [category, setCategory] = useState(CATEGORIES[0]);
-  const [targetUrl, setTargetUrl] = useState("");
-  const [details, setDetails] = useState("");
+  const search = Route.useSearch();
+  const initialCategory =
+    search.category && CATEGORIES.includes(search.category) ? search.category : CATEGORIES[0];
+  const [targetType, setTargetType] = useState<(typeof TARGET_TYPES)[number]["value"]>(
+    search.target_type ?? "listing",
+  );
+  const [category, setCategory] = useState(initialCategory);
+  const [targetUrl, setTargetUrl] = useState(search.target_url ?? "");
+  const [details, setDetails] = useState(search.details ?? "");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState<string | null>(null);
+  const listingId = search.listing_id;
 
   const handleFiles = (incoming: FileList | null) => {
     if (!incoming) return;
