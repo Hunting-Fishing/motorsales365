@@ -44,6 +44,9 @@ export const CATEGORY_ATTR_KEYS: Record<string, string[]> = {
     "accident_history",
     "financing_available",
     "trade_accepted",
+    "registered_owner",
+    "deed_chain_available",
+    "inspection_available",
   ],
   motorcycle: [
     "moto_type",
@@ -53,6 +56,9 @@ export const CATEGORY_ATTR_KEYS: Record<string, string[]> = {
     "owner_status",
     "moto_condition",
     "delivery_available",
+    "registered_owner",
+    "deed_chain_available",
+    "inspection_available",
   ],
   equipment: [
     "equipment_type",
@@ -63,6 +69,8 @@ export const CATEGORY_ATTR_KEYS: Record<string, string[]> = {
     "rental_or_sale",
     "with_operator",
     "inspection_available",
+    "registered_owner",
+    "deed_chain_available",
   ],
   boat: [
     "boat_type",
@@ -72,6 +80,9 @@ export const CATEGORY_ATTR_KEYS: Record<string, string[]> = {
     "boat_registration_status",
     "boat_usage",
     "trailer_included",
+    "registered_owner",
+    "deed_chain_available",
+    "inspection_available",
   ],
   airplane: [
     "registration_no",
@@ -178,6 +189,35 @@ function Bool({
   );
 }
 
+function TrustBlock({
+  value,
+  onChange,
+  includeInspection = true,
+}: {
+  value: CategoryAttrsValue;
+  onChange: (next: CategoryAttrsValue) => void;
+  includeInspection?: boolean;
+}) {
+  return (
+    <div className="space-y-3 rounded-md border border-border/60 bg-background/40 p-3">
+      <Label className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        Trust & disclosure
+      </Label>
+      <Sel
+        label="Registered owner (your name on CR)"
+        field="registered_owner"
+        opts={YES_NO_UNKNOWN}
+        value={value}
+        onChange={onChange}
+      />
+      <Bool label="Deed of Sale chain available" field="deed_chain_available" value={value} onChange={onChange} />
+      {includeInspection && (
+        <Bool label="Allow pre-purchase inspection" field="inspection_available" value={value} onChange={onChange} />
+      )}
+    </div>
+  );
+}
+
 export function CategoryAttributesEditor({ category, value, onChange }: Props) {
   if (category === "car") {
     return (
@@ -190,6 +230,7 @@ export function CategoryAttributesEditor({ category, value, onChange }: Props) {
         <Sel label="Accident history" field="accident_history" opts={YES_NO_UNKNOWN} value={value} onChange={onChange} />
         <Bool label="Financing available" field="financing_available" value={value} onChange={onChange} />
         <Bool label="Trade-in accepted" field="trade_accepted" value={value} onChange={onChange} />
+        <TrustBlock value={value} onChange={onChange} />
       </div>
     );
   }
@@ -203,6 +244,7 @@ export function CategoryAttributesEditor({ category, value, onChange }: Props) {
         <Sel label="Owner status" field="owner_status" opts={OWNER_STATUS} value={value} onChange={onChange} />
         <Sel label="Condition" field="moto_condition" opts={MOTO_CONDITION} value={value} onChange={onChange} />
         <Bool label="Delivery available" field="delivery_available" value={value} onChange={onChange} />
+        <TrustBlock value={value} onChange={onChange} />
       </div>
     );
   }
@@ -217,6 +259,7 @@ export function CategoryAttributesEditor({ category, value, onChange }: Props) {
         <Sel label="Rental or sale" field="rental_or_sale" opts={RENTAL_OR_SALE} value={value} onChange={onChange} />
         <Bool label="With operator" field="with_operator" value={value} onChange={onChange} />
         <Bool label="Inspection available" field="inspection_available" value={value} onChange={onChange} />
+        <TrustBlock value={value} onChange={onChange} includeInspection={false} />
       </div>
     );
   }
@@ -230,6 +273,7 @@ export function CategoryAttributesEditor({ category, value, onChange }: Props) {
         <Sel label="Registration status" field="boat_registration_status" opts={BOAT_REG_STATUS} value={value} onChange={onChange} />
         <Sel label="Usage" field="boat_usage" opts={BOAT_USAGE} value={value} onChange={onChange} />
         <Bool label="Trailer included" field="trailer_included" value={value} onChange={onChange} />
+        <TrustBlock value={value} onChange={onChange} />
       </div>
     );
   }

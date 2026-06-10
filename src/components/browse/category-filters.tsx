@@ -181,9 +181,12 @@ export function CategoryFilters({ category, value, onChange }: Props) {
         <Sel label="OR/CR" field="or_cr_status" opts={OR_CR_STATUS} value={value} onChange={onChange} />
         <Sel label="Flood history" field="flood_history" opts={YES_NO_UNKNOWN} value={value} onChange={onChange} />
         <Sel label="Accident history" field="accident_history" opts={YES_NO_UNKNOWN} value={value} onChange={onChange} />
+        <Sel label="Registered owner" field="registered_owner" opts={YES_NO_UNKNOWN} value={value} onChange={onChange} />
         <div className="space-y-2 pt-1">
           <Bool label="Financing available" field="financing_available" value={value} onChange={onChange} />
           <Bool label="Trade accepted" field="trade_accepted" value={value} onChange={onChange} />
+          <Bool label="Deed chain available" field="deed_chain_available" value={value} onChange={onChange} />
+          <Bool label="Inspection available" field="inspection_available" value={value} onChange={onChange} />
           <Bool label="Verified documents only" field="verified_documents_only" value={value} onChange={onChange} />
         </div>
       </div>
@@ -201,8 +204,11 @@ export function CategoryFilters({ category, value, onChange }: Props) {
         <Sel label="Plate status" field="plate_status" opts={PLATE_STATUS} value={value} onChange={onChange} />
         <Sel label="Owner status" field="owner_status" opts={OWNER_STATUS} value={value} onChange={onChange} />
         <Sel label="Condition" field="moto_condition" opts={MOTO_CONDITION} value={value} onChange={onChange} />
+        <Sel label="Registered owner" field="registered_owner" opts={YES_NO_UNKNOWN} value={value} onChange={onChange} />
         <div className="space-y-2 pt-1">
           <Bool label="Delivery available" field="delivery_available" value={value} onChange={onChange} />
+          <Bool label="Deed chain available" field="deed_chain_available" value={value} onChange={onChange} />
+          <Bool label="Inspection available" field="inspection_available" value={value} onChange={onChange} />
           <Bool label="Verified documents only" field="verified_documents_only" value={value} onChange={onChange} />
         </div>
       </div>
@@ -220,9 +226,11 @@ export function CategoryFilters({ category, value, onChange }: Props) {
         <Range label="Operating weight (tons)" minField="weight_min" maxField="weight_max" value={value} onChange={onChange} />
         <TextField label="Attachment type" field="attachment_type" placeholder="e.g. bucket, fork, hammer" value={value} onChange={onChange} />
         <Sel label="Rental or sale" field="rental_or_sale" opts={RENTAL_OR_SALE} value={value} onChange={onChange} />
+        <Sel label="Registered owner" field="registered_owner" opts={YES_NO_UNKNOWN} value={value} onChange={onChange} />
         <div className="space-y-2 pt-1">
           <Bool label="With operator" field="with_operator" value={value} onChange={onChange} />
           <Bool label="Inspection available" field="inspection_available" value={value} onChange={onChange} />
+          <Bool label="Deed chain available" field="deed_chain_available" value={value} onChange={onChange} />
         </div>
       </div>
     );
@@ -239,8 +247,11 @@ export function CategoryFilters({ category, value, onChange }: Props) {
         <Range label="Length (ft)" minField="length_min" maxField="length_max" value={value} onChange={onChange} />
         <Sel label="Registration" field="boat_registration_status" opts={BOAT_REG_STATUS} value={value} onChange={onChange} />
         <Sel label="Usage" field="boat_usage" opts={BOAT_USAGE} value={value} onChange={onChange} />
+        <Sel label="Registered owner" field="registered_owner" opts={YES_NO_UNKNOWN} value={value} onChange={onChange} />
         <div className="space-y-2 pt-1">
           <Bool label="Trailer included" field="trailer_included" value={value} onChange={onChange} />
+          <Bool label="Deed chain available" field="deed_chain_available" value={value} onChange={onChange} />
+          <Bool label="Inspection available" field="inspection_available" value={value} onChange={onChange} />
         </div>
       </div>
     );

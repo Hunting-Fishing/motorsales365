@@ -67,6 +67,8 @@ const searchSchema = z.object({
   or_cr_status: optStr(),
   flood_history: optStr(),
   accident_history: optStr(),
+  registered_owner: optStr(),
+  deed_chain_available: optBool(),
   financing_available: optBool(),
   trade_accepted: optBool(),
   verified_documents_only: optBool(),
@@ -182,9 +184,9 @@ function BrowsePage() {
     const init: CategoryFilterValue = {};
     const keys = [
       "transmission","fuel","body_type","drivetrain","mileage_min","mileage_max","owner_status",
-      "or_cr_status","flood_history","accident_history","financing_available",
-      "trade_accepted","verified_documents_only","moto_type","engine_cc_min",
-      "engine_cc_max","plate_status","moto_condition","delivery_available",
+      "or_cr_status","flood_history","accident_history","registered_owner","deed_chain_available",
+      "financing_available","trade_accepted","verified_documents_only",
+      "moto_type","engine_cc_min","engine_cc_max","plate_status","moto_condition","delivery_available",
       "equipment_type","brand","hours_min","hours_max","weight_min","weight_max",
       "attachment_type","rental_or_sale","with_operator","inspection_available",
       "boat_type","hull_material","boat_engine_type","length_min","length_max",
@@ -206,7 +208,7 @@ function BrowsePage() {
     const fetchListings = async () => {
       setLoading(true);
       const baseSelect =
-        "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status)";
+        "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status,phone_verified_at),vehicles:vehicle_id(is_public,passport_slug,vehicle_passport_verifications(status))";
       const buildBase = () => {
         let q = supabase
           .from("listings")
@@ -253,6 +255,8 @@ function BrowsePage() {
         eq("or_cr_status", search.or_cr_status);
         eq("flood_history", search.flood_history);
         eq("accident_history", search.accident_history);
+        eq("registered_owner", search.registered_owner);
+        isTrue("deed_chain_available", search.deed_chain_available);
         isTrue("financing_available", search.financing_available);
         isTrue("trade_accepted", search.trade_accepted);
         if (search.verified_documents_only) {
@@ -361,6 +365,11 @@ function BrowsePage() {
           photo_count: photos.length,
           has_video: videos.length > 0,
           seller_verified: r.profiles?.verification_status === "verified",
+          seller_phone_verified: !!r.profiles?.phone_verified_at,
+          passport_published: !!(r.vehicles?.is_public && r.vehicles?.passport_slug),
+          passport_documents_checked: !!r.vehicles?.vehicle_passport_verifications?.some(
+            (v: any) => v.status === "approved",
+          ),
           seller_dealer_plan: dealers[r.user_id]?.planName ?? null,
           seller_dealer_period_end: dealers[r.user_id]?.currentPeriodEnd ?? null,
           seller_dealer_cancel_at_period_end: dealers[r.user_id]?.cancelAtPeriodEnd ?? false,
@@ -392,6 +401,7 @@ function BrowsePage() {
       mileage_min: search.mileage_min, mileage_max: search.mileage_max,
       owner_status: search.owner_status, or_cr_status: search.or_cr_status,
       flood_history: search.flood_history, accident_history: search.accident_history,
+      registered_owner: search.registered_owner, deed_chain_available: search.deed_chain_available,
       financing_available: search.financing_available, trade_accepted: search.trade_accepted,
       verified_documents_only: search.verified_documents_only,
       moto_type: search.moto_type, engine_cc_min: search.engine_cc_min,

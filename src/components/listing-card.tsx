@@ -13,12 +13,13 @@ import {
   Heart,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { VerifiedBadge } from "@/components/verified-badge";
 import { DealerSubscriptionBadge } from "@/components/dealer-subscription-badge";
 import { ListingPrice } from "@/components/listing-price";
 import placeholderCar from "@/assets/placeholder-car.webp";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ServiceStrip } from "@/components/service-strip";
+import { TrustBadges } from "@/components/listings/trust-badges";
+import { deriveTrustSignals } from "@/lib/trust-signals";
 
 export interface ListingCardData {
   id: string;
@@ -33,6 +34,7 @@ export interface ListingCardData {
   has_video?: boolean;
   category_slug: string;
   seller_verified?: boolean;
+  seller_phone_verified?: boolean;
   seller_dealer_plan?: string | null;
   seller_dealer_period_end?: string | null;
   seller_dealer_cancel_at_period_end?: boolean | null;
@@ -40,6 +42,8 @@ export interface ListingCardData {
   attributes?: Record<string, any> | null;
   view_count?: number;
   like_count?: number;
+  passport_published?: boolean;
+  passport_documents_checked?: boolean;
 }
 
 const CATEGORY_META: Record<string, { label: string; Icon: typeof Droplets }> = {
@@ -91,6 +95,7 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
   const catMeta = CATEGORY_META[listing.category_slug];
   const summary = summarizeAttributes(listing.category_slug, listing.attributes);
   const showServices = VEHICLE_CATEGORIES.has(listing.category_slug);
+  const trust = deriveTrustSignals(listing);
   return (
     <div className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-elegant)]">
       <Link to="/listing/$id" params={{ id: listing.id }} className="flex flex-1 flex-col">
@@ -117,7 +122,6 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
             <Badge variant={listing.seller_type === "business" ? "default" : "secondary"}>
               {listing.seller_type === "business" ? "Business" : "Private"}
             </Badge>
-            {listing.seller_verified && <VerifiedBadge size="sm" showLabel />}
             {listing.seller_type === "business" && listing.seller_dealer_plan && (
               <DealerSubscriptionBadge
                 planName={listing.seller_dealer_plan}
@@ -147,6 +151,7 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
           <h3 className="line-clamp-2 font-semibold leading-snug">{listing.title}</h3>
           {summary && <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{summary}</p>}
           <ListingPrice pricePhp={listing.price_php} size="md" className="mt-2" />
+          <TrustBadges signals={trust} size="sm" className="mt-2" />
           <div className="mt-auto flex items-center justify-between gap-2 pt-3 text-xs text-muted-foreground">
             <span className="flex min-w-0 items-center gap-1">
               <MapPin className="h-3 w-3" />

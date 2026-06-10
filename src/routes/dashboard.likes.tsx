@@ -19,7 +19,7 @@ function LikedPage() {
     supabase
       .from("listing_likes")
       .select(
-        "listing_id, listings:listing_id(id,title,price_php,region,city,seller_type,boost_until,status,category_slug,user_id,view_count,listing_media(url,type),profiles:user_id(verification_status))",
+        "listing_id, listings:listing_id(id,title,price_php,region,city,seller_type,boost_until,status,category_slug,user_id,view_count,attributes,listing_media(url,type),profiles:user_id(verification_status,phone_verified_at),vehicles:vehicle_id(is_public,passport_slug,vehicle_passport_verifications(status)))",
       )
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })
@@ -43,6 +43,12 @@ function LikedPage() {
               photo_count: photos.length,
               has_video: videos.length > 0,
               seller_verified: r.profiles?.verification_status === "verified",
+              seller_phone_verified: !!r.profiles?.phone_verified_at,
+              passport_published: !!(r.vehicles?.is_public && r.vehicles?.passport_slug),
+              passport_documents_checked: !!r.vehicles?.vehicle_passport_verifications?.some(
+                (v: any) => v.status === "approved",
+              ),
+              attributes: r.attributes,
               status: r.status,
               view_count: r.view_count ?? 0,
             } as ListingCardData;

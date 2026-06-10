@@ -95,7 +95,7 @@ function SellerProfilePage() {
         supabase
           .from("listings")
           .select(
-            "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,listing_media(url,type)",
+            "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,listing_media(url,type),vehicles:vehicle_id(is_public,passport_slug,vehicle_passport_verifications(status))",
           )
           .eq("user_id", id)
           .in("status", ["active", "pending_sale"])
@@ -130,6 +130,12 @@ function SellerProfilePage() {
             photo_count: photos.length,
             has_video: videos.length > 0,
             seller_verified: verified,
+            seller_phone_verified: !!(p as any)?.phone_verified_at,
+            passport_published: !!(l.vehicles?.is_public && l.vehicles?.passport_slug),
+            passport_documents_checked: !!l.vehicles?.vehicle_passport_verifications?.some(
+              (v: any) => v.status === "approved",
+            ),
+            attributes: l.attributes,
             status: l.status,
           };
         }),
