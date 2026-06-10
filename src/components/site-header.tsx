@@ -41,6 +41,7 @@ const NAV = [
 
 const BUSINESSES_LINK = { to: "/businesses", label: "Businesses" } as const;
 const RIDES_LINK = { to: "/rides", label: "Rides" } as const;
+const WANTED_LINK = { to: "/wanted", label: "Wanted" } as const;
 
 const SELLER_VIEW_OPTIONS: { value: SellerType; label: string }[] = [
   { value: "private", label: "Private seller" },
