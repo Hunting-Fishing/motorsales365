@@ -20,7 +20,10 @@ import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ServiceStrip } from "@/components/service-strip";
 import { TrustBadges } from "@/components/listings/trust-badges";
 import { ListingActionsMenu } from "@/components/listings/listing-actions-menu";
+import { ListingBadges } from "@/components/listings/listing-badges";
 import { deriveTrustSignals } from "@/lib/trust-signals";
+import { getSellerTier } from "@/lib/listing-tier";
+import { cn } from "@/lib/utils";
 
 export interface ListingCardData {
   id: string;
@@ -47,6 +50,10 @@ export interface ListingCardData {
   like_count?: number;
   passport_published?: boolean;
   passport_documents_checked?: boolean;
+  price_kind?: "asking" | "monthly" | "down_payment" | "starting_bid" | null;
+  negotiable?: boolean | null;
+  price_hidden?: boolean | null;
+  registration_status?: "registered" | "unregistered" | "for_transfer" | "unknown" | null;
 }
 
 const CATEGORY_META: Record<string, { label: string; Icon: typeof Droplets }> = {
