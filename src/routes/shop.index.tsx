@@ -345,9 +345,18 @@ function ShopIndex() {
         )}
 
         <section>
-          <h2 className="mb-4 text-xl font-semibold">
-            {activeVehicle ? "Matching products" : "Latest products"}
-          </h2>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="text-xl font-semibold">
+              {activeVehicle ? "Matching products" : "Latest products"}
+            </h2>
+            <ShopSortBar
+              sort={search.sort}
+              network={search.network}
+              onSortChange={setSort}
+              onNetworkChange={setNetwork}
+              className="w-full sm:w-auto"
+            />
+          </div>
           {latest.length === 0 ? (
             <p className="text-muted-foreground">
               {hasAnyFilter
