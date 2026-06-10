@@ -128,6 +128,7 @@ export function TowRequestForm({
   const [contactPhone, setContactPhone] = useState("");
   const [preferredPayment, setPreferredPayment] = useState<string>("GCash");
   const [notes, setNotes] = useState("");
+  const [passengerCount, setPassengerCount] = useState<string>("0");
   const [submitting, setSubmitting] = useState(false);
 
   // Apply pin reverse-geocoded address to the address textbox when empty
