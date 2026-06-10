@@ -391,12 +391,6 @@ export function SiteHeader() {
                 </p>
                 <div className="flex flex-col gap-0.5">
                   <SheetClose asChild>
-
-                <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  Marketplace
-                </p>
-                <div className="flex flex-col gap-0.5">
-                  <SheetClose asChild>
                     <Link
                       to={BUSINESSES_LINK.to}
                       className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
