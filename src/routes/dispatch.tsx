@@ -132,6 +132,41 @@ function DispatchLanding() {
         </div>
       </section>
 
+      <section className="container mx-auto px-4 py-8">
+        <div className="rounded-xl border border-border bg-card p-6 md:p-8">
+          <h3 className="font-display text-xl font-semibold">What changes as you grow</h3>
+          <ul className="mt-4 grid gap-3 text-sm text-muted-foreground md:grid-cols-2">
+            <li className="flex items-start gap-2">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span>
+                <strong className="text-foreground">Starter</strong> gets you listed and gives you a basic inbox —
+                enough to start receiving jobs.
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span>
+                <strong className="text-foreground">Pro</strong> adds priority placement, SMS alerts, and auto-routing
+                to 5 drivers.
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span>
+                <strong className="text-foreground">Fleet</strong> unlocks GPS tracking, multi-branch, white-label
+                links, and API access.
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span>
+                All tiers are cancel-anytime and keep 100% of what you charge the customer.
+              </span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
       <section id="plans" className="container mx-auto px-4 py-12">
         <h2 className="font-display text-3xl font-bold">Underdog pricing.</h2>
         <p className="mt-1 text-muted-foreground">
