@@ -187,6 +187,7 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
               />
             );
           })()}
+          <PricingWidget listing={listing} className="mt-2" />
           <ListingBadges
             listing={{
               ...listing,
