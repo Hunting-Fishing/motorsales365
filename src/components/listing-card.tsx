@@ -151,6 +151,7 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
           <h3 className="line-clamp-2 font-semibold leading-snug">{listing.title}</h3>
           {summary && <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{summary}</p>}
           <ListingPrice pricePhp={listing.price_php} size="md" className="mt-2" />
+          <TrustBadges signals={trust} size="sm" className="mt-2" />
           <div className="mt-auto flex items-center justify-between gap-2 pt-3 text-xs text-muted-foreground">
             <span className="flex min-w-0 items-center gap-1">
               <MapPin className="h-3 w-3" />
