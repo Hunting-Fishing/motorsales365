@@ -95,6 +95,7 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
   const catMeta = CATEGORY_META[listing.category_slug];
   const summary = summarizeAttributes(listing.category_slug, listing.attributes);
   const showServices = VEHICLE_CATEGORIES.has(listing.category_slug);
+  const trust = deriveTrustSignals(listing);
   return (
     <div className="group flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-elegant)]">
       <Link to="/listing/$id" params={{ id: listing.id }} className="flex flex-1 flex-col">
