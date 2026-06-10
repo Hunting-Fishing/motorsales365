@@ -170,7 +170,7 @@ function ReportPage() {
         reporter_name: name || null,
         reporter_email: email || user?.email || null,
         reporter_phone: phone || null,
-        // listing_id stays null unless we can resolve from URL — moderators handle from URL field
+        listing_id: listingId ?? null,
       } as any);
       if (error) throw error;
 
