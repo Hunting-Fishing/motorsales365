@@ -60,6 +60,7 @@ const searchSchema = z.object({
   transmission: optStr(),
   fuel: optStr(),
   body_type: optStr(),
+  drivetrain: optStr(),
   mileage_min: optNum(),
   mileage_max: optNum(),
   owner_status: optStr(),
@@ -180,7 +181,7 @@ function BrowsePage() {
   const [catFilters, setCatFilters] = useState<CategoryFilterValue>(() => {
     const init: CategoryFilterValue = {};
     const keys = [
-      "transmission","fuel","body_type","mileage_min","mileage_max","owner_status",
+      "transmission","fuel","body_type","drivetrain","mileage_min","mileage_max","owner_status",
       "or_cr_status","flood_history","accident_history","financing_available",
       "trade_accepted","verified_documents_only","moto_type","engine_cc_min",
       "engine_cc_max","plate_status","moto_condition","delivery_available",
@@ -245,6 +246,7 @@ function BrowsePage() {
         eq("transmission", search.transmission);
         eq("fuel", search.fuel);
         eq("body_type", search.body_type);
+        eq("drivetrain", search.drivetrain);
         gte("mileage_km", search.mileage_min);
         lte("mileage_km", search.mileage_max);
         eq("owner_status", search.owner_status);
@@ -386,7 +388,7 @@ function BrowsePage() {
     // Include the entire category-filter blob as a single JSON dep so any
     // change re-runs the query.
     JSON.stringify({
-      transmission: search.transmission, fuel: search.fuel, body_type: search.body_type,
+      transmission: search.transmission, fuel: search.fuel, body_type: search.body_type, drivetrain: search.drivetrain,
       mileage_min: search.mileage_min, mileage_max: search.mileage_max,
       owner_status: search.owner_status, or_cr_status: search.or_cr_status,
       flood_history: search.flood_history, accident_history: search.accident_history,

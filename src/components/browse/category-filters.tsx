@@ -12,6 +12,7 @@ import {
   TRANSMISSIONS,
   FUEL_TYPES,
   BODY_TYPES,
+  DRIVETRAINS,
   OWNER_STATUS,
   OR_CR_STATUS,
   YES_NO_UNKNOWN,
@@ -174,6 +175,7 @@ export function CategoryFilters({ category, value, onChange }: Props) {
         <Sel label="Transmission" field="transmission" opts={TRANSMISSIONS} value={value} onChange={onChange} />
         <Sel label="Fuel" field="fuel" opts={FUEL_TYPES} value={value} onChange={onChange} />
         <Sel label="Body type" field="body_type" opts={BODY_TYPES} value={value} onChange={onChange} />
+        <Sel label="Drivetrain" field="drivetrain" opts={DRIVETRAINS} value={value} onChange={onChange} />
         <Range label="Mileage (km)" minField="mileage_min" maxField="mileage_max" value={value} onChange={onChange} />
         <Sel label="Owner status" field="owner_status" opts={OWNER_STATUS} value={value} onChange={onChange} />
         <Sel label="OR/CR" field="or_cr_status" opts={OR_CR_STATUS} value={value} onChange={onChange} />

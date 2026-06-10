@@ -12,6 +12,7 @@ import {
   TRANSMISSIONS,
   FUEL_TYPES,
   BODY_TYPES,
+  DRIVETRAINS,
   OWNER_STATUS,
   OR_CR_STATUS,
   YES_NO_UNKNOWN,
@@ -36,6 +37,7 @@ import {
 export const CATEGORY_ATTR_KEYS: Record<string, string[]> = {
   car: [
     "body_type",
+    "drivetrain",
     "owner_status",
     "or_cr_status",
     "flood_history",
@@ -181,6 +183,7 @@ export function CategoryAttributesEditor({ category, value, onChange }: Props) {
     return (
       <div className="space-y-3">
         <Sel label="Body type" field="body_type" opts={BODY_TYPES} value={value} onChange={onChange} />
+        <Sel label="Drivetrain" field="drivetrain" opts={DRIVETRAINS} value={value} onChange={onChange} />
         <Sel label="Owner status" field="owner_status" opts={OWNER_STATUS} value={value} onChange={onChange} />
         <Sel label="OR / CR status" field="or_cr_status" opts={OR_CR_STATUS} value={value} onChange={onChange} />
         <Sel label="Flood history" field="flood_history" opts={YES_NO_UNKNOWN} value={value} onChange={onChange} />
