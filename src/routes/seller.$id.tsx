@@ -206,6 +206,13 @@ function SellerProfilePage() {
                     </span>
                   </span>
                 )}
+                <ListingActionsMenu
+                  sellerUserId={id}
+                  sellerName={displayName ?? null}
+                  targetType="seller"
+                  variant="inline"
+                  className="ml-auto"
+                />
               </div>
               <SellerReputationBadges
                 className="mt-2"
