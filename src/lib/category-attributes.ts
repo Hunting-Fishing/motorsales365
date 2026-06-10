@@ -45,6 +45,13 @@ export const DRIVETRAINS: Opt[] = [
   { value: "4x2", label: "4x2 / 2WD" },
 ];
 
+export const DRIVETRAIN_VALUES = DRIVETRAINS.map((o) => o.value);
+
+export function isValidDrivetrain(v: string | undefined | null): boolean {
+  if (!v) return true; // empty is allowed (optional field)
+  return DRIVETRAIN_VALUES.includes(v);
+}
+
 export const OR_CR_STATUS: Opt[] = [
   { value: "complete", label: "Complete OR/CR" },
   { value: "lost", label: "Lost / for re-issuance" },
