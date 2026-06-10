@@ -242,6 +242,13 @@ function EditListingPage() {
     setFuel(a.fuel ?? "");
     setEngine(a.engine ?? "");
     setVehicleQuality(hydrateVehicleQuality(a));
+    if (isAttrCategory(l.category_slug)) {
+      const next: Record<string, any> = {};
+      for (const k of CATEGORY_ATTR_KEYS[l.category_slug] ?? []) {
+        if (a[k] !== undefined && a[k] !== null) next[k] = a[k];
+      }
+      setCategoryAttrs(next);
+    }
 
     setTowServiceType(a.service_type ?? "");
     setTowCapacity(a.vehicle_capacity ?? "");
