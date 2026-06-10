@@ -644,27 +644,50 @@ function EditListingPage() {
                 <Label>Title</Label>
                 <Input value={title} onChange={(e) => setTitle(e.target.value)} required />
               </div>
-              <div className="sm:col-span-2">
-                <Label>Price (₱)</Label>
-                <div className="mt-1 flex flex-wrap items-center gap-2">
-                  <div className="inline-flex rounded-md border border-border bg-background p-0.5 text-xs">
-                    {(["asking", "monthly", "down_payment"] as const).map((k) => (
-                      <button
-                        key={k}
-                        type="button"
-                        onClick={() => setPriceKind(k)}
-                        className={
-                          "rounded px-2.5 py-1 transition " +
-                          (priceKind === k
-                            ? "bg-primary text-primary-foreground"
-                            : "text-muted-foreground hover:text-foreground")
-                        }
-                      >
-                        {k === "asking" ? "Asking" : k === "monthly" ? "Monthly" : "Down payment"}
-                      </button>
-                    ))}
+              <div className="sm:col-span-2 space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+                <div>
+                  <Label className="text-sm font-semibold">Pricing — fill any that apply</Label>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">
+                    Real numbers only. Placeholder prices (₱1, ₱2…) are rejected.
+                  </p>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div>
+                    <Label className="text-xs">Asking price (₱)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      className="mt-1"
+                      value={price}
+                      onChange={(e) => setPrice(e.target.value)}
+                      placeholder="e.g. 450000"
+                    />
                   </div>
-                  <label className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <div>
+                    <Label className="text-xs">Monthly (₱/mo)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      className="mt-1"
+                      value={monthly}
+                      onChange={(e) => setMonthly(e.target.value)}
+                      placeholder="e.g. 12000"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Down payment (₱)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      className="mt-1"
+                      value={downPayment}
+                      onChange={(e) => setDownPayment(e.target.value)}
+                      placeholder="e.g. 80000"
+                    />
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-4 text-xs">
+                  <label className="inline-flex items-center gap-1.5">
                     <input
                       type="checkbox"
                       className="h-3.5 w-3.5 accent-primary"
@@ -673,26 +696,22 @@ function EditListingPage() {
                     />
                     Negotiable
                   </label>
+                  <label className="inline-flex items-center gap-1.5">
+                    <input
+                      type="checkbox"
+                      className="h-3.5 w-3.5 accent-primary"
+                      checked={priceHidden}
+                      onChange={(e) => setPriceHidden(e.target.checked)}
+                    />
+                    Hide price — buyers must message me
+                  </label>
                 </div>
-                <Input
-                  type="number"
-                  min="0"
-                  className="mt-2"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  required
-                />
-                <p className="mt-1 text-[11px] text-muted-foreground">
-                  Real asking price only. Placeholder prices like ₱1 or ₱2 are rejected.
-                </p>
                 {(category === "car" || category === "motorcycle" || category === "truck") && (
-                  <div className="mt-3">
+                  <div>
                     <Label className="text-xs">Registration</Label>
                     <Select
                       value={registrationStatus}
-                      onValueChange={(v) =>
-                        setRegistrationStatus(v as typeof registrationStatus)
-                      }
+                      onValueChange={(v) => setRegistrationStatus(v as typeof registrationStatus)}
                     >
                       <SelectTrigger className="mt-1 h-9">
                         <SelectValue />
