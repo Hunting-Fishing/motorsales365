@@ -76,7 +76,7 @@ function Index() {
       const { data: boostedRows } = await supabase
         .from("listings")
         .select(
-          "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status)",
+          "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status,phone_verified_at),vehicles:vehicle_id(is_public,passport_slug,vehicle_passport_verifications(status))",
         )
         .in("status", ["active", "pending_sale"])
         .gt("boost_until", new Date().toISOString())
@@ -86,7 +86,7 @@ function Index() {
       const { data: recentRows } = await supabase
         .from("listings")
         .select(
-          "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status)",
+          "id,title,price_php,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status,phone_verified_at),vehicles:vehicle_id(is_public,passport_slug,vehicle_passport_verifications(status))",
         )
         .in("status", ["active", "pending_sale"])
         .order("published_at", { ascending: false, nullsFirst: false })
