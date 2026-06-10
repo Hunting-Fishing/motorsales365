@@ -37,6 +37,14 @@ export const OWNER_STATUS: Opt[] = [
   { value: "3rd_plus", label: "3rd owner or more" },
 ];
 
+export const DRIVETRAINS: Opt[] = [
+  { value: "fwd", label: "FWD (front-wheel drive)" },
+  { value: "rwd", label: "RWD (rear-wheel drive)" },
+  { value: "awd", label: "AWD (all-wheel drive)" },
+  { value: "4x4", label: "4x4 / 4WD" },
+  { value: "4x2", label: "4x2 / 2WD" },
+];
+
 export const OR_CR_STATUS: Opt[] = [
   { value: "complete", label: "Complete OR/CR" },
   { value: "lost", label: "Lost / for re-issuance" },
