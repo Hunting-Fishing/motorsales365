@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/collapsible";
 import { waMeUrl } from "@/lib/whatsapp";
 import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
-import { ServiceStrip } from "@/components/service-strip";
+
 import { AffiliatePartsSection } from "@/components/affiliate-parts-section";
 import { NeededPartsRail } from "@/components/listing/needed-parts-rail";
 import { GalleryLightbox } from "@/components/listing/gallery-lightbox";
@@ -85,6 +85,42 @@ const REPORT_REASONS = [
   "Prohibited item",
   "Other",
 ];
+
+function SectionCard({
+  title,
+  meta,
+  defaultOpen,
+  className,
+  children,
+}: {
+  title: React.ReactNode;
+  meta?: React.ReactNode;
+  defaultOpen?: boolean;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  const isDesktop =
+    typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches;
+  const open = defaultOpen ?? isDesktop;
+  return (
+    <Collapsible
+      defaultOpen={open}
+      className={`mt-6 rounded-xl border border-border bg-card p-5 ${className ?? ""}`}
+    >
+      <CollapsibleTrigger className="group flex w-full items-center justify-between gap-3 text-left">
+        <h2 className="font-display text-lg font-semibold">{title}</h2>
+        <div className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
+          {meta}
+          <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]:rotate-180" />
+        </div>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
+        <div className="mt-3">{children}</div>
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
 
 export const Route = createFileRoute("/listing/$id")({
   loader: async ({ params }) => {
@@ -609,15 +645,12 @@ function ListingDetailPage() {
           </div>
 
 
-          {/* Above-the-fold service CTA strip — revenue: lead-gen for finance/insurance/inspection partners */}
-          {listing.category_slug !== "towing" && listing.category_slug !== "services" && (
-            <ServiceStrip listingId={listing.id} vehicleSummary={listing.title} />
-          )}
-
           {/* Service tags */}
           {Array.isArray(listing.attributes?.tags) && listing.attributes.tags.length > 0 && (
-            <div className="mt-6 rounded-xl border border-border bg-card p-5">
-              <h2 className="mb-3 font-display text-lg font-semibold">Services & offerings</h2>
+            <SectionCard
+              title="Services & offerings"
+              meta={<span>{listing.attributes.tags.length}</span>}
+            >
               <div className="flex flex-wrap gap-1.5">
                 {(listing.attributes.tags as string[]).map((t) => (
                   <Badge key={t} variant="secondary" className="text-xs">
@@ -625,7 +658,7 @@ function ListingDetailPage() {
                   </Badge>
                 ))}
               </div>
-            </div>
+            </SectionCard>
           )}
 
           {/* Specs */}
@@ -635,59 +668,48 @@ function ListingDetailPage() {
             );
             if (specEntries.length === 0) return null;
             return (
-              <Collapsible
-                defaultOpen={
-                  typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches
+              <SectionCard
+                title="Specifications"
+                meta={
+                  <span>
+                    {specEntries.length} {specEntries.length === 1 ? "spec" : "specs"}
+                  </span>
                 }
-                className="mt-6 rounded-xl border border-border bg-card p-5"
               >
-                <CollapsibleTrigger className="group flex w-full items-center justify-between gap-3">
-                  <h2 className="font-display text-lg font-semibold">Specifications</h2>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span>
-                      {specEntries.length} {specEntries.length === 1 ? "spec" : "specs"}
-                    </span>
-                    <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]:rotate-180" />
-                  </div>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
-                  <dl className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    {specEntries.map(([k, v]) => (
-                      <div
-                        key={k}
-                        className="flex justify-between gap-3 border-b border-border/60 pb-2 text-sm"
-                      >
-                        <dt className="capitalize text-muted-foreground">
-                          {k.replace(/_/g, " ")}
-                        </dt>
-                        <dd className="font-medium text-right">
-                          {Array.isArray(v)
-                            ? v.join(", ")
-                            : typeof v === "boolean"
-                              ? v
-                                ? "Yes"
-                                : "No"
-                              : String(v)}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-                </CollapsibleContent>
-              </Collapsible>
+                <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {specEntries.map(([k, v]) => (
+                    <div
+                      key={k}
+                      className="flex justify-between gap-3 border-b border-border/60 pb-2 text-sm"
+                    >
+                      <dt className="capitalize text-muted-foreground">
+                        {k.replace(/_/g, " ")}
+                      </dt>
+                      <dd className="font-medium text-right">
+                        {Array.isArray(v)
+                          ? v.join(", ")
+                          : typeof v === "boolean"
+                            ? v
+                              ? "Yes"
+                              : "No"
+                            : String(v)}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </SectionCard>
             );
           })()}
 
-
-
           {/* Description */}
-          <div className="mt-6 rounded-xl border border-border bg-card p-5">
-            <h2 className="mb-3 font-display text-lg font-semibold">Description</h2>
+          <SectionCard title="Description">
             <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
               {listing.description || "No description provided."}
             </p>
-          </div>
+          </SectionCard>
 
-          {/* In-house parts — buyer can request quote for items the seller flagged */}
+          {/* In-house parts — buyer can request quote for items the seller flagged.
+              Component renders its own card with internal collapse. */}
           {(listing.category_slug === "cars" ||
             listing.category_slug === "motorcycles" ||
             listing.category_slug === "car" ||
@@ -708,6 +730,8 @@ function ListingDetailPage() {
           {(listing.category_slug === "cars" ||
             listing.category_slug === "motorcycles" ||
             listing.category_slug === "trucks") && <BuyerDocumentChecklist />}
+
+
 
           <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
             <span>Listed {formatDate(listing.published_at)}</span>
@@ -892,86 +916,106 @@ function ListingDetailPage() {
             </button>
           </div>
 
-          {/* Services around this vehicle — revenue: lead-gen for finance/insurance/OR-CR partners */}
-          <div className="rounded-xl border border-border bg-card p-5">
-            <h3 className="font-display text-lg font-semibold">Services for this vehicle</h3>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Free quotes from partner providers — financing, insurance, OR/CR, title transfer, and
-              a 365-vetted pre-purchase inspection from ₱99. No commitment.
-            </p>
-            <div className="mt-3 grid gap-2 sm:grid-cols-2">
-              <ServiceInquiryDialog
-                inquiryType="financing"
-                listingId={listing.id}
-                vehicleSummary={listing.title}
-              >
-                <Button variant="outline" className="w-full justify-start">
-                  <Banknote className="mr-2 h-4 w-4" /> Get financing
-                </Button>
-              </ServiceInquiryDialog>
-              <ServiceInquiryDialog
-                inquiryType="insurance"
-                listingId={listing.id}
-                vehicleSummary={listing.title}
-              >
-                <Button variant="outline" className="w-full justify-start">
-                  <Shield className="mr-2 h-4 w-4" /> Get insurance quote
-                </Button>
-              </ServiceInquiryDialog>
-              <ServiceInquiryDialog
-                inquiryType="or_cr"
-                listingId={listing.id}
-                vehicleSummary={listing.title}
-              >
-                <Button variant="outline" className="w-full justify-start">
-                  <FileText className="mr-2 h-4 w-4" /> OR/CR renewal help
-                </Button>
-              </ServiceInquiryDialog>
-              <ServiceInquiryDialog
-                inquiryType="title_transfer"
-                listingId={listing.id}
-                vehicleSummary={listing.title}
-              >
-                <Button variant="outline" className="w-full justify-start">
-                  <ClipboardCheck className="mr-2 h-4 w-4" /> Title transfer help
-                </Button>
-              </ServiceInquiryDialog>
-              <ServiceInquiryDialog
-                inquiryType="inspection"
-                listingId={listing.id}
-                vehicleSummary={listing.title}
-              >
-                <Button variant="outline" className="w-full justify-start sm:col-span-2">
-                  <Wrench className="mr-2 h-4 w-4" /> Request a pre-purchase inspection
-                </Button>
-              </ServiceInquiryDialog>
-            </div>
-          </div>
+          {/* Services around this vehicle — merged from former ServiceStrip.
+              Revenue: lead-gen for finance/insurance/OR-CR partners. */}
+          <Collapsible
+            defaultOpen
+            className="rounded-xl border border-border bg-card p-5"
+          >
+            <CollapsibleTrigger className="group flex w-full items-start justify-between gap-3 text-left">
+              <div className="min-w-0">
+                <h3 className="font-display text-lg font-semibold">
+                  Need inspection or insurance for this car?
+                </h3>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Free quotes from vetted PH partners — financing, insurance, OR/CR, title
+                  transfer, and a 365-vetted pre-purchase inspection from ₱99. One form, no
+                  commitment.
+                </p>
+              </div>
+              <ChevronDown className="mt-1 h-4 w-4 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <ServiceInquiryDialog
+                  inquiryType="inspection"
+                  listingId={listing.id}
+                  vehicleSummary={listing.title}
+                >
+                  <Button variant="outline" className="w-full justify-start sm:col-span-2">
+                    <Wrench className="mr-2 h-4 w-4" /> Request a pre-purchase inspection
+                  </Button>
+                </ServiceInquiryDialog>
+                <ServiceInquiryDialog
+                  inquiryType="insurance"
+                  listingId={listing.id}
+                  vehicleSummary={listing.title}
+                >
+                  <Button variant="outline" className="w-full justify-start">
+                    <Shield className="mr-2 h-4 w-4" /> Get insurance quote
+                  </Button>
+                </ServiceInquiryDialog>
+                <ServiceInquiryDialog
+                  inquiryType="financing"
+                  listingId={listing.id}
+                  vehicleSummary={listing.title}
+                >
+                  <Button variant="outline" className="w-full justify-start">
+                    <Banknote className="mr-2 h-4 w-4" /> Get financing
+                  </Button>
+                </ServiceInquiryDialog>
+                <ServiceInquiryDialog
+                  inquiryType="or_cr"
+                  listingId={listing.id}
+                  vehicleSummary={listing.title}
+                >
+                  <Button variant="outline" className="w-full justify-start">
+                    <FileText className="mr-2 h-4 w-4" /> OR/CR renewal help
+                  </Button>
+                </ServiceInquiryDialog>
+                <ServiceInquiryDialog
+                  inquiryType="title_transfer"
+                  listingId={listing.id}
+                  vehicleSummary={listing.title}
+                >
+                  <Button variant="outline" className="w-full justify-start">
+                    <ClipboardCheck className="mr-2 h-4 w-4" /> Title transfer help
+                  </Button>
+                </ServiceInquiryDialog>
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
 
           <AdCarousel placement="listing_sidebar" />
 
           {listing.allow_messages && (
-            <div className="rounded-xl border border-border bg-card p-5">
-              <h3 className="flex items-center gap-2 font-display text-lg font-semibold">
-                <MessageSquare className="h-4 w-4" /> Send a message
-              </h3>
-              <Textarea
-                ref={messageRef}
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                placeholder="Hi, is this still available?"
-                className="mt-3"
-                rows={4}
-              />
-              <Button
-                onClick={sendMessage}
-                disabled={sending || !message.trim()}
-                className="mt-2 w-full"
-              >
-                {sending ? "Sending…" : "Send message"}
-              </Button>
-            </div>
+            <Collapsible defaultOpen className="rounded-xl border border-border bg-card p-5">
+              <CollapsibleTrigger className="group flex w-full items-center justify-between gap-3 text-left">
+                <h3 className="flex items-center gap-2 font-display text-lg font-semibold">
+                  <MessageSquare className="h-4 w-4" /> Send a message
+                </h3>
+                <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <Textarea
+                  ref={messageRef}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  placeholder="Hi, is this still available?"
+                  className="mt-3"
+                  rows={4}
+                />
+                <Button
+                  onClick={sendMessage}
+                  disabled={sending || !message.trim()}
+                  className="mt-2 w-full"
+                >
+                  {sending ? "Sending…" : "Send message"}
+                </Button>
+              </CollapsibleContent>
+            </Collapsible>
           )}
+
         </aside>
       </div>
       <MobileActionBar
