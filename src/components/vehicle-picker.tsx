@@ -32,6 +32,8 @@ type Props = {
   engine?: string;
   /** When true, stack Year/Make/Model vertically (use for narrow sidebars). */
   stacked?: boolean;
+  /** Optional listings-per-year counts, rendered beside each year option. */
+  yearCounts?: Record<string, number>;
   onChange: (next: { year: string; make: string; model: string; engine?: string }) => void;
 };
 
