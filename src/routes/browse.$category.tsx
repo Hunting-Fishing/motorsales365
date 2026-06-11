@@ -34,7 +34,20 @@ import {
 } from "@/components/ui/select";
 import { LocationPicker } from "@/components/location-picker";
 import { VehiclePicker } from "@/components/vehicle-picker";
-import { CategoryFilters, type CategoryFilterValue } from "@/components/browse/category-filters";
+import {
+  CategoryFilters,
+  categoryHasDetails,
+  categoryHasExtras,
+  type CategoryFilterValue,
+} from "@/components/browse/category-filters";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 import { buildTitleSearchTerms } from "@/lib/vehicle-aliases";
 import { fuzzyFilter } from "@/lib/fuzzy";
 import { useBlockedUserIds } from "@/hooks/use-blocked-users";
