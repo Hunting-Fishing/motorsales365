@@ -129,8 +129,21 @@ const CATEGORY_LABEL: Record<string, string> = {
   other: "Other Transport",
 };
 
+function filtersFromSearch(
+  category: string,
+  search: z.infer<typeof searchSchema>,
+): BrowseFiltersInput {
+  return { category, ...search } as BrowseFiltersInput;
+}
+
 export const Route = createFileRoute("/browse/$category")({
   validateSearch: searchSchema,
+  loaderDeps: ({ search }) => search,
+  loader: async ({ params, deps }) => {
+    if (params.category === "towing") return { items: [], userIds: [] as string[] };
+    return await getBrowseListings({ data: filtersFromSearch(params.category, deps) });
+  },
+  staleTime: 30_000,
   head: ({ params }) => {
     const label = CATEGORY_LABEL[params.category] ?? "Listings";
     const url = `https://www.365motorsales.com/browse/${params.category}`;
