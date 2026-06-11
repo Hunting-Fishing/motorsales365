@@ -19,7 +19,13 @@ import {
   Wrench,
   MessageCircle,
   ShieldCheck,
+  ChevronDown,
 } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { waMeUrl } from "@/lib/whatsapp";
 import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
 import { ServiceStrip } from "@/components/service-strip";
