@@ -767,15 +767,7 @@ function ListingDetailPage() {
         </div>
 
         {/* Sidebar */}
-        <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
-          {listing.category_slug !== "services" && listing.category_slug !== "towing" && (
-            <QuoteRequestCta
-              listingId={listing.id}
-              region={listing.region ?? undefined}
-              budgetPhp={listing.price_php ?? undefined}
-            />
-          )}
-          <AdCarousel placement="listing_sidebar" />
+        <aside className="space-y-4 pb-20 lg:sticky lg:top-20 lg:self-start lg:pb-0">
           <div className="rounded-xl border border-border bg-card p-5">
             <div className="flex items-start justify-between gap-2">
               <h3 className="font-display text-lg font-semibold">Seller</h3>
