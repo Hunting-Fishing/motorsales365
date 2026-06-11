@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { RouteErrorBoundary, RouteNotFoundBoundary } from "@/components/route-boundaries";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   MapPin,
   Heart,
@@ -9,6 +9,7 @@ import {
   Phone,
   MessageSquare,
   ChevronLeft,
+  ChevronRight,
   Truck,
   Eye,
   Bookmark,
@@ -18,8 +19,9 @@ import {
   ClipboardCheck,
   Wrench,
   MessageCircle,
-  ShieldCheck,
   ChevronDown,
+  Play,
+  Expand,
 } from "lucide-react";
 import {
   Collapsible,
@@ -31,7 +33,8 @@ import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
 import { ServiceStrip } from "@/components/service-strip";
 import { AffiliatePartsSection } from "@/components/affiliate-parts-section";
 import { NeededPartsRail } from "@/components/listing/needed-parts-rail";
-import { QuoteRequestCta } from "@/components/quote-request-cta";
+import { GalleryLightbox } from "@/components/listing/gallery-lightbox";
+import { MobileActionBar } from "@/components/listing/mobile-action-bar";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
