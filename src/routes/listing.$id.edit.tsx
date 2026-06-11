@@ -38,6 +38,7 @@ import {
   CATEGORY_ATTR_KEYS,
 } from "@/components/listings/category-attributes-editor";
 import { isAttrCategory, isValidDrivetrain } from "@/lib/category-attributes";
+import { NeededPartsEditor } from "@/components/listings/needed-parts-editor";
 import { PhoneInput } from "@/components/phone-input";
 import { parseE164, buildE164 } from "@/data/country-codes";
 import {
@@ -164,6 +165,10 @@ function EditListingPage() {
   const [vehicleQuality, setVehicleQuality] = useState<VehicleQuality>({});
   const [vehicleQualityIssues, setVehicleQualityIssues] = useState<VehicleQualityIssue[]>([]);
   const [categoryAttrs, setCategoryAttrs] = useState<Record<string, any>>({});
+  const [neededParts, setNeededParts] = useState<
+    { key: string; label: string; category: string; qty?: number }[]
+  >([]);
+  const [tireSizeConfirmed, setTireSizeConfirmed] = useState("");
 
   // Towing
   const [towServiceType, setTowServiceType] = useState("");
@@ -259,6 +264,8 @@ function EditListingPage() {
     setFuel(a.fuel ?? "");
     setEngine(a.engine ?? "");
     setVehicleQuality(hydrateVehicleQuality(a));
+    setNeededParts(Array.isArray(a.needed_parts) ? a.needed_parts : []);
+    setTireSizeConfirmed(a.tire_size_confirmed ?? "");
     if (isAttrCategory(l.category_slug)) {
       const next: Record<string, any> = {};
       for (const k of CATEGORY_ATTR_KEYS[l.category_slug] ?? []) {
@@ -373,6 +380,8 @@ function EditListingPage() {
     if (engine) attributes.engine = engine;
     if (category === "car" || category === "motorcycle") {
       Object.assign(attributes, vehicleQualityToAttributes(vehicleQuality));
+      attributes.needed_parts = neededParts.length ? neededParts : undefined;
+      attributes.tire_size_confirmed = tireSizeConfirmed.trim() || undefined;
     }
     if (isAttrCategory(category)) {
       for (const k of CATEGORY_ATTR_KEYS[category] ?? []) delete attributes[k];
@@ -1124,6 +1133,26 @@ function EditListingPage() {
                   category={category}
                   value={categoryAttrs}
                   onChange={setCategoryAttrs}
+                />
+              </div>
+            )}
+            {(category === "car" || category === "motorcycle") && (
+              <div className="mt-4 rounded-md border border-border/60 bg-background/40 p-4">
+                <h3 className="mb-1 font-display text-sm font-semibold">
+                  Parts needed / known issues (optional)
+                </h3>
+                <p className="mb-3 text-xs text-muted-foreground">
+                  Flag anything this car needs (brakes, tires, battery, etc.). Buyers will see
+                  these on the listing and can request a parts quote from us.
+                </p>
+                <NeededPartsEditor
+                  value={neededParts}
+                  onChange={setNeededParts}
+                  tireSize={tireSizeConfirmed}
+                  onTireSizeChange={setTireSizeConfirmed}
+                  make={make}
+                  model={model}
+                  year={year ? Number(year) : undefined}
                 />
               </div>
             )}

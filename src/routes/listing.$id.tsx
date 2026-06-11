@@ -24,6 +24,7 @@ import { waMeUrl } from "@/lib/whatsapp";
 import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
 import { ServiceStrip } from "@/components/service-strip";
 import { AffiliatePartsSection } from "@/components/affiliate-parts-section";
+import { NeededPartsRail } from "@/components/listing/needed-parts-rail";
 import { QuoteRequestCta } from "@/components/quote-request-cta";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -603,6 +604,14 @@ function ListingDetailPage() {
               {listing.description || "No description provided."}
             </p>
           </div>
+
+          {/* In-house parts — buyer can request quote for items the seller flagged */}
+          {(listing.category_slug === "cars" ||
+            listing.category_slug === "motorcycles" ||
+            listing.category_slug === "car" ||
+            listing.category_slug === "motorcycle") && (
+            <NeededPartsRail listingId={listing.id} />
+          )}
 
           {/* Affiliate parts — revenue: commission on partner shop checkouts */}
           {listing.category_slug !== "towing" && listing.category_slug !== "services" && (

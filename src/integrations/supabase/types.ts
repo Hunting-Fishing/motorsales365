@@ -3990,6 +3990,126 @@ export type Database = {
         }
         Relationships: []
       }
+      part_quote_requests: {
+        Row: {
+          contact_email: string | null
+          contact_name: string
+          contact_phone: string | null
+          created_at: string
+          delivery_method: string
+          id: string
+          internal_notes: string | null
+          items: Json
+          listing_id: string | null
+          notes: string | null
+          requester_user_id: string | null
+          ride_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          contact_email?: string | null
+          contact_name: string
+          contact_phone?: string | null
+          created_at?: string
+          delivery_method?: string
+          id?: string
+          internal_notes?: string | null
+          items?: Json
+          listing_id?: string | null
+          notes?: string | null
+          requester_user_id?: string | null
+          ride_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          contact_email?: string | null
+          contact_name?: string
+          contact_phone?: string | null
+          created_at?: string
+          delivery_method?: string
+          id?: string
+          internal_notes?: string | null
+          items?: Json
+          listing_id?: string | null
+          notes?: string | null
+          requester_user_id?: string | null
+          ride_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "part_quote_requests_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "part_quote_requests_ride_id_fkey"
+            columns: ["ride_id"]
+            isOneToOne: false
+            referencedRelation: "rides"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      parts_catalog: {
+        Row: {
+          active: boolean
+          base_price_php: number | null
+          category: string
+          compatible_makes: string[]
+          compatible_models: string[]
+          created_at: string
+          description: string | null
+          id: string
+          photo_url: string | null
+          slug: string
+          sort_order: number
+          title: string
+          updated_at: string
+          year_max: number | null
+          year_min: number | null
+        }
+        Insert: {
+          active?: boolean
+          base_price_php?: number | null
+          category: string
+          compatible_makes?: string[]
+          compatible_models?: string[]
+          created_at?: string
+          description?: string | null
+          id?: string
+          photo_url?: string | null
+          slug: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+          year_max?: number | null
+          year_min?: number | null
+        }
+        Update: {
+          active?: boolean
+          base_price_php?: number | null
+          category?: string
+          compatible_makes?: string[]
+          compatible_models?: string[]
+          created_at?: string
+          description?: string | null
+          id?: string
+          photo_url?: string | null
+          slug?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+          year_max?: number | null
+          year_min?: number | null
+        }
+        Relationships: []
+      }
       passport_premium_products: {
         Row: {
           active: boolean
@@ -7073,6 +7193,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      vehicle_tire_specs: {
+        Row: {
+          created_at: string
+          front_size: string | null
+          id: string
+          make: string
+          model: string
+          notes: string | null
+          rear_size: string | null
+          updated_at: string
+          year_max: number | null
+          year_min: number | null
+        }
+        Insert: {
+          created_at?: string
+          front_size?: string | null
+          id?: string
+          make: string
+          model: string
+          notes?: string | null
+          rear_size?: string | null
+          updated_at?: string
+          year_max?: number | null
+          year_min?: number | null
+        }
+        Update: {
+          created_at?: string
+          front_size?: string | null
+          id?: string
+          make?: string
+          model?: string
+          notes?: string | null
+          rear_size?: string | null
+          updated_at?: string
+          year_max?: number | null
+          year_min?: number | null
+        }
+        Relationships: []
       }
       vehicles: {
         Row: {

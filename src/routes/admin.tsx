@@ -114,6 +114,13 @@ const NAV: {
     info: "Manage affiliate products, networks (Shopee/Lazada/AliExpress) and click analytics.",
   },
   {
+    to: "/admin/parts",
+    label: "Parts Fulfillment",
+    Icon: Store,
+    roles: ["admin"],
+    info: "In-house parts: catalog, vehicle tire specs, buyer quote requests, and setup checklist (suppliers, logistics, payments).",
+  },
+  {
     to: "/admin/education",
     label: "Education",
     Icon: GraduationCap,

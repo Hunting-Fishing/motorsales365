@@ -126,6 +126,7 @@ import { Route as AdminPromotionsRouteImport } from './routes/admin.promotions'
 import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
+import { Route as AdminPartsRouteImport } from './routes/admin.parts'
 import { Route as AdminLocationCorrectionsRouteImport } from './routes/admin.location-corrections'
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
 import { Route as AdminLeadOffersRouteImport } from './routes/admin.lead-offers'
@@ -768,6 +769,11 @@ const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
   path: '/payments',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPartsRoute = AdminPartsRouteImport.update({
+  id: '/parts',
+  path: '/parts',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminLocationCorrectionsRoute =
   AdminLocationCorrectionsRouteImport.update({
     id: '/location-corrections',
@@ -1118,6 +1124,7 @@ export interface FileRoutesByFullPath {
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
+  '/admin/parts': typeof AdminPartsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
@@ -1291,6 +1298,7 @@ export interface FileRoutesByTo {
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
+  '/admin/parts': typeof AdminPartsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
@@ -1466,6 +1474,7 @@ export interface FileRoutesById {
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
   '/admin/location-corrections': typeof AdminLocationCorrectionsRoute
+  '/admin/parts': typeof AdminPartsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
@@ -1643,6 +1652,7 @@ export interface FileRouteTypes {
     | '/admin/lead-offers'
     | '/admin/listings'
     | '/admin/location-corrections'
+    | '/admin/parts'
     | '/admin/payments'
     | '/admin/performance'
     | '/admin/pricing'
@@ -1816,6 +1826,7 @@ export interface FileRouteTypes {
     | '/admin/lead-offers'
     | '/admin/listings'
     | '/admin/location-corrections'
+    | '/admin/parts'
     | '/admin/payments'
     | '/admin/performance'
     | '/admin/pricing'
@@ -1990,6 +2001,7 @@ export interface FileRouteTypes {
     | '/admin/lead-offers'
     | '/admin/listings'
     | '/admin/location-corrections'
+    | '/admin/parts'
     | '/admin/payments'
     | '/admin/performance'
     | '/admin/pricing'
@@ -3036,6 +3048,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPaymentsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/parts': {
+      id: '/admin/parts'
+      path: '/parts'
+      fullPath: '/admin/parts'
+      preLoaderRoute: typeof AdminPartsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/location-corrections': {
       id: '/admin/location-corrections'
       path: '/location-corrections'
@@ -3448,6 +3467,7 @@ interface AdminRouteChildren {
   AdminLeadOffersRoute: typeof AdminLeadOffersRoute
   AdminListingsRoute: typeof AdminListingsRoute
   AdminLocationCorrectionsRoute: typeof AdminLocationCorrectionsRoute
+  AdminPartsRoute: typeof AdminPartsRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
   AdminPricingRoute: typeof AdminPricingRoute
@@ -3484,6 +3504,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminLeadOffersRoute: AdminLeadOffersRoute,
   AdminListingsRoute: AdminListingsRoute,
   AdminLocationCorrectionsRoute: AdminLocationCorrectionsRoute,
+  AdminPartsRoute: AdminPartsRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
   AdminPricingRoute: AdminPricingRoute,
