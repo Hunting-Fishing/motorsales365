@@ -708,36 +708,29 @@ function ListingDetailPage() {
             </p>
           </SectionCard>
 
-          {/* In-house parts — buyer can request quote for items the seller flagged */}
+          {/* In-house parts — buyer can request quote for items the seller flagged.
+              Component renders its own card with internal collapse. */}
           {(listing.category_slug === "cars" ||
             listing.category_slug === "motorcycles" ||
             listing.category_slug === "car" ||
             listing.category_slug === "motorcycle") && (
-            <SectionCard title="Parts needed for this vehicle">
-              <NeededPartsRail listingId={listing.id} embedded />
-            </SectionCard>
+            <NeededPartsRail listingId={listing.id} />
           )}
 
           {/* Affiliate parts — revenue: commission on partner shop checkouts */}
           {listing.category_slug !== "towing" && listing.category_slug !== "services" && (
-            <SectionCard title="Recommended parts & accessories" defaultOpen={false}>
-              <AffiliatePartsSection
-                make={listing.attributes?.make ?? null}
-                model={listing.attributes?.model ?? null}
-                year={listing.attributes?.year ? Number(listing.attributes.year) : null}
-                listingId={listing.id}
-                embedded
-              />
-            </SectionCard>
+            <AffiliatePartsSection
+              make={listing.attributes?.make ?? null}
+              model={listing.attributes?.model ?? null}
+              year={listing.attributes?.year ? Number(listing.attributes.year) : null}
+              listingId={listing.id}
+            />
           )}
 
           {(listing.category_slug === "cars" ||
             listing.category_slug === "motorcycles" ||
-            listing.category_slug === "trucks") && (
-            <SectionCard title="Buyer document checklist" defaultOpen={false}>
-              <BuyerDocumentChecklist embedded />
-            </SectionCard>
-          )}
+            listing.category_slug === "trucks") && <BuyerDocumentChecklist />}
+
 
 
           <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
