@@ -1,113 +1,70 @@
-## What we're building
+# Plan: Collapsible specs + standardize on the enhanced tow form
 
-Three connected pieces:
+Two small, focused changes on the listing page and the `/tow` route.
 
-1. **Seller side** — when posting/editing a vehicle listing, sellers tag what parts are needed (e.g. front pads, rear rotors, all 4 tires, battery) plus confirm/override factory tire size.
-2. **Buyer side** — on the listing page, a new **"Get these parts from us"** section appears beside the existing "Parts & accessories" rail. It shows the seller-flagged parts matched to in-house catalog items with a **"Request quote / Reserve"** button (no real checkout yet).
-3. **Admin side** — a new **Admin → Parts Fulfillment** tab that centralizes everything we need to operationalize this: catalog management, vehicle-fitment data, incoming quote requests, plus a checklist of accounts/integrations to sign up for (suppliers, tire data, payments, shipping). Future-ready for My Rides "order parts" entry point.
+## 1. Make Specifications collapsible on the listing page
 
-Out of scope this round: live checkout, real inventory/stock, shipping rates, paid tire-size API. We'll add cart/Stripe once fulfillment is set up — the data model below is designed so checkout slots in later without rework.
+File: `src/routes/listing.$id.tsx` (the `Specifications` block around lines 575–598)
 
----
+- Wrap the spec list in a `<Collapsible>` (from `@/components/ui/collapsible`, already used elsewhere).
+- Header row: the existing `Specifications` title + a chevron button on the right showing item count (e.g. `12 specs`).
+- Default state: **collapsed on mobile, expanded on desktop ≥ md** (so power users on a laptop still see everything at a glance, mobile users get a tidier page).
+- Smooth chevron rotation; keep the rounded card chrome unchanged.
+- No data or sorting changes — same key/value rows.
 
-## Buyer experience (listing page)
+## 2. Standardize `/tow` on the enhanced TowRequestForm
 
-A new card sits above the existing affiliate "Parts & accessories" rail when the seller has flagged needed parts:
+The site has two tow request flows today:
+
+- `/tow` (file `src/routes/tow.tsx`) — old, simpler form. This is what every "Request a tow" CTA links to (listing page, footer, etc.).
+- `TowingServicesPage` mounted at `/browse/towing` — already uses the enhanced `TowRequestForm` from `src/components/towing/tow-request-form.tsx` (urgency, situation, drivetrain, can-roll/steer/brake, map pin, photos, ride picker, payment method).
+
+### Rewrite `src/routes/tow.tsx` so it renders `TowRequestForm`
+
+- Keep the route, head meta, and `?listing=…` / `?provider=…` search schema.
+- Replace the inline form (location pickers, plain textareas, submit handler) with a layout that mirrors the `#emergency-tow` block of `TowingServicesPage`:
+  - Page header ("Request a tow" + supporting copy).
+  - `FeaturedTowProviders` rail above the form (already on `/tow` today — keep it).
+  - `<TowRequestForm requestedProviderId={…} requestedProviderName={…} onClearRequestedProvider={…} providerSearchSlot={…} />`.
+- Hydrate `requestedProvider` from `?provider=…` by querying `businesses` for `id, name` (same query the services page uses) so the CTA from a tow provider's listing pre-selects them.
+- For `?listing=…`, extend `TowRequestForm` props with an optional `seedListingId?: string | null` and, when provided, fetch the listing once and pre-fill `vehicleType / vYear / vMake / vModel / vTrim` from `listings.attributes` (and rideId stays empty — this is a marketplace vehicle, not the user's ride). Show a small "Towing the vehicle from this listing" chip with a remove (×) button at the top of the vehicle section.
+- Delete the now-unused state, helpers, and submit handler in `tow.tsx` — the enhanced form owns submission.
+
+### Tighten the listing-page CTAs
+
+File: `src/routes/listing.$id.tsx` (around lines 831 and 838)
+
+- Both `Link to="/tow"` CTAs stay, but the labels/intent get distinguished:
+  - When the listing **is a tow provider** (`category_slug === "towing"`): single CTA → `/tow?provider={listing.id}` ("Request a tow from this provider").
+  - When the listing **is a vehicle for sale/transport** (cars, motorcycles, trucks, heavy equipment): CTA → `/tow?listing={listing.id}` ("Request a tow for this vehicle").
+- No other call sites change (footer "Request a tow" still goes to bare `/tow`).
+
+## 3. Polish & consistency
+
+- Sitemap, `llms.txt`, footer, and Terms references to `/tow` stay valid — same URL, upgraded form.
+- No DB or pricing changes, so no `/terms` or `/refund-policy` update needed.
+
+## Technical notes
 
 ```text
-🛠  Parts needed for this car — buy from us
-The seller listed these as needed. Request a quote and we'll
-prepare the parts for pickup or delivery.
+src/routes/listing.$id.tsx
+  └─ Specifications block → <Collapsible defaultOpen={mdUp}>
+  └─ Tow CTAs → branch on category_slug, pass listing vs provider param
 
-[ Front brake pads ]   Toyota OEM-equiv pads — from ₱2,400   [ Request quote ]
-[ Front rotors ]       Vented rotor pair (fits 2018 Vios)    [ Request quote ]
-[ All 4 tires 185/60R15 ]  3 matching options                [ See options ]
+src/routes/tow.tsx (rewritten thin shell)
+  └─ Loads requestedProvider from ?provider
+  └─ <TowRequestForm seedListingId={search.listing ?? null} ...requestedProvider />
 
-         [ Request quote for all flagged parts ]
+src/components/towing/tow-request-form.tsx
+  └─ New optional prop `seedListingId`
+  └─ useEffect: on mount, if seedListingId, fetch listing + prefill vehicle fields
+  └─ Small dismissible chip showing "From listing: <title>"
 ```
 
-Clicking "Request quote" opens a small dialog (name, phone, preferred contact, pickup vs delivery, notes) → creates a `part_quote_request` row. Confirmation toast + email to admin. No payment.
+No new dependencies. Existing `Collapsible`, `LocationPicker`, `TowMapPin`, `RidePicker`, and `FeaturedTowProviders` are reused.
 
-If the seller did NOT flag anything, the card doesn't render — the existing affiliate rail stays as-is.
+## Out of scope
 
----
-
-## Seller experience (post listing form)
-
-A new collapsible section in the listing editor: **"Parts needed / known issues"** (only shown for car & motorcycle categories).
-
-- Tag picker pre-seeded with common items grouped by system: Brakes (pads, rotors, calipers, lines), Tires, Suspension (shocks, struts, bushings), Engine (oil change, timing belt, plugs, battery), Electrical, Body, Fluids.
-- Free-text "Add custom item" for anything not in the list.
-- Tire size field auto-fills from a small internal lookup table (`vehicle_tire_specs`) keyed on year/make/model — seller can confirm or override. Override wins.
-- All optional. Empty = nothing shown on listing page.
-
-We reuse the existing `tag-picker` component and the established `attributes` JSONB pattern on `listings`.
-
----
-
-## Admin → Parts Fulfillment tab
-
-New top-level admin tab (or merged into the existing admin shell, whichever fits the current layout) with four sub-sections:
-
-1. **Catalog** — CRUD over `parts_catalog` (in-house SKUs with title, category, base price, photo, compatible makes/models, stock note).
-2. **Quote requests** — inbox view of `part_quote_requests` with status (new → quoted → won/lost), buyer contact, linked listing, internal notes.
-3. **Vehicle tire specs** — manage the `vehicle_tire_specs` seed table.
-4. **Setup checklist** — static page documenting every external account/integration we'll eventually need, with status (todo / in progress / connected). First-pass list:
-   - Parts supplier accounts (local distributors, OEM)
-   - Tire wholesalers (Yokohama PH, GT Radial, etc.)
-   - Tire-fitment data source (start internal, optionally Tecdoc / TireSize.com later)
-   - Payments — already on Stripe via Lovable; flag when to switch this flow to embedded checkout
-   - Shipping/logistics (LBC, J&T, Lalamove for delivery)
-   - Accounting/invoicing
-   - Returns & warranty policy doc
-
-This tab is the single place ops can see "what's still missing to ship a part."
-
----
-
-## Data model (technical)
-
-New tables (all in `public`, with GRANTs + RLS as per project rules):
-
-- `parts_catalog` — in-house SKU list. Columns: `id`, `slug`, `title`, `description`, `category` (brakes/tires/suspension/…), `base_price_php`, `photo_url`, `compatible_makes` (text[]), `compatible_models` (text[]), `year_min`, `year_max`, `active`, `sort_order`, timestamps. Public read (active only), admin write.
-- `vehicle_tire_specs` — `id`, `make`, `model`, `year_min`, `year_max`, `front_size`, `rear_size`, `notes`. Public read, admin write. Seeded with a starter set; expand over time.
-- `part_quote_requests` — `id`, `listing_id` (nullable, also supports My Rides later via `ride_id` nullable), `requester_user_id` (nullable for guests), `contact_name`, `contact_phone`, `contact_email`, `delivery_method` (pickup/delivery), `notes`, `items` (jsonb: array of {kind: 'catalog'|'custom', catalog_id?, label, qty}), `status` (new/quoted/accepted/rejected/cancelled), `internal_notes`, timestamps. Requester can read their own; admins read all; inserts allowed for auth + guest (rate-limited by IP/email at the server-fn level).
-
-Listing-side: add `attributes.needed_parts` (array of `{ key, label, qty? }`) and `attributes.tire_size_confirmed` (string) to the existing `listings.attributes` JSONB — no schema change required.
-
-### Server functions (`createServerFn`)
-
-- `getNeededPartsForListing({ listingId })` → reads listing attributes + joins matching `parts_catalog` rows → returns the merged list rendered by the buyer card.
-- `getTireSpec({ make, model, year })` → looks up `vehicle_tire_specs`, used by the seller form to pre-fill.
-- `createPartQuoteRequest({ listingId?, rideId?, items, contact, ... })` — public (no auth required), Zod validated, rate-limited; inserts and notifies admin via existing email pipeline.
-- `listPartQuoteRequests`, `updatePartQuoteRequest` — admin-only (role check via `has_role`).
-- CRUD for `parts_catalog` and `vehicle_tire_specs` — admin-only.
-
-### Files (high level)
-
-- `src/components/listing/needed-parts-rail.tsx` — the new buyer-side card.
-- `src/components/listings/needed-parts-editor.tsx` — seller-side tag picker + tire size confirm.
-- `src/components/part-quote-dialog.tsx` — quote request dialog (shared between listing page and future My Rides).
-- `src/lib/parts-fulfillment.functions.ts` — all the server fns above.
-- `src/routes/admin.parts.tsx` (+ children for catalog / quotes / tire-specs / setup) — admin tab.
-- `src/data/parts-catalog-seed.ts` + migration seed for `vehicle_tire_specs`.
-
-### Reuse / no rebuild
-
-- The existing `affiliate-parts-section.tsx` stays untouched and continues to render below the new "from us" rail — they serve different intents (affiliate = browse, in-house = act on this car).
-- Reuses `tag-picker`, `image-with-skeleton`, `formatPHP`, existing admin layout, existing email pipeline, existing `has_role` security pattern.
-
----
-
-## Rollout
-
-1. Migrations + seed data.
-2. Seller form section (behind `needed_parts` feature flag if you want to soft-launch).
-3. Buyer-side rail + quote dialog.
-4. Admin Parts Fulfillment tab (catalog, quotes inbox, tire specs, setup checklist).
-5. Wire "Order parts" entry from My Rides into the same dialog (no new backend work — just pass `rideId`).
-6. Later: swap "Request quote" for embedded Stripe checkout once supplier + shipping are set up.
-
-### Policy sync
-
-Selling parts directly = new commerce surface. We'll update `/terms` (add parts sales, quote process, refund/returns reference) and `/refund-policy` (parts returns/warranty) with the rollout, and bump "Last updated".
+- Redesigning the enhanced form itself.
+- Changing dispatch routing/pricing/payments.
+- Touching `dashboard.tow.tsx` (the operator-side inbox).
