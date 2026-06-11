@@ -283,6 +283,7 @@ export function VehiclePicker({ category, year, make, model, engine, stacked, ye
             searchPlaceholder="Search year…"
             emptyText="No years"
             addLabel="Use year"
+            optionCounts={yearCounts}
             onSelect={(v) => onChange({ year: v, make, model, engine })}
           />
         </div>
