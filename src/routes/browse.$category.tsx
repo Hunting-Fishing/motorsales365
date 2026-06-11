@@ -426,101 +426,146 @@ function BrowsePage() {
         </div>
       </div>
 
-      <div className="container mx-auto grid gap-6 px-4 py-8 lg:grid-cols-[280px_1fr]">
-        {/* Filters */}
-        <aside className="space-y-5 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-card)] lg:sticky lg:top-20 lg:self-start">
-          <h2 className="font-display text-lg font-semibold">Filters</h2>
-          <form onSubmit={applyFilters} className="space-y-4">
-            <div>
-              <Label htmlFor="kw">Keyword</Label>
-              <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="kw"
-                  value={keyword}
-                  onChange={(e) => setKeyword(e.target.value)}
-                  placeholder="Make, model…"
-                  className="pl-8"
-                />
-              </div>
+      <div className="container mx-auto grid gap-6 px-4 py-6 md:grid-cols-[260px_1fr] md:py-8">
+        {/* Filters — desktop sidebar */}
+        <aside className="hidden md:block">
+          <div className="space-y-4 rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-card)] md:sticky md:top-20">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-base font-semibold">Filters</h2>
+              {activeCount > 0 && (
+                <button
+                  type="button"
+                  onClick={clearAll}
+                  className="text-xs text-muted-foreground hover:text-foreground"
+                >
+                  Clear all
+                </button>
+              )}
             </div>
-            {(category === "car" || category === "motorcycle") && (
-              <div className="rounded-md border border-border/60 bg-background/60 p-3">
-                <Label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Vehicle
-                </Label>
-                <VehiclePicker
-                  category={category as "car" | "motorcycle"}
-                  year={vYear}
-                  make={vMake}
-                  model={vModel}
-                  engine={vEngine}
-                  onChange={(v) => {
-                    setVYear(v.year);
-                    setVMake(v.make);
-                    setVModel(v.model);
-                    setVEngine(v.engine ?? "");
-                  }}
-                />
-              </div>
-            )}
-            <CategoryFilters category={category} value={catFilters} onChange={setCatFilters} />
-            <LocationPicker
-              asFilter
-              stacked
-              showBarangay={false}
-              value={{ region, province, city }}
-              onChange={(v) => {
-                setRegion(v.region ?? null);
-                setProvince(v.province ?? null);
-                setCity(v.city ?? null);
-              }}
+            <FiltersForm
+              category={category}
+              keyword={keyword}
+              setKeyword={setKeyword}
+              vYear={vYear}
+              vMake={vMake}
+              vModel={vModel}
+              vEngine={vEngine}
+              setVYear={setVYear}
+              setVMake={setVMake}
+              setVModel={setVModel}
+              setVEngine={setVEngine}
+              region={region}
+              province={province}
+              city={city}
+              setRegion={setRegion}
+              setProvince={setProvince}
+              setCity={setCity}
+              minPrice={minPrice}
+              maxPrice={maxPrice}
+              setMinPrice={setMinPrice}
+              setMaxPrice={setMaxPrice}
+              sort={sort}
+              setSort={setSort as any}
+              catFilters={catFilters}
+              setCatFilters={setCatFilters}
+              onSubmit={applyFilters}
+              onSave={openSaveDialog}
             />
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label>Min ₱</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  value={minPrice}
-                  onChange={(e) => setMinPrice(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label>Max ₱</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  value={maxPrice}
-                  onChange={(e) => setMaxPrice(e.target.value)}
-                />
-              </div>
-            </div>
-            <div>
-              <Label>Sort</Label>
-              <Select value={sort} onValueChange={(v: any) => setSort(v)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="recent">Most recent</SelectItem>
-                  <SelectItem value="price_asc">Price (low to high)</SelectItem>
-                  <SelectItem value="price_desc">Price (high to low)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Button type="submit" className="w-full">
-              Apply filters
-            </Button>
-            <Button type="button" variant="outline" className="w-full" onClick={openSaveDialog}>
-              <BookmarkPlus className="mr-2 h-4 w-4" />
-              Save search
-            </Button>
-          </form>
+          </div>
         </aside>
 
         {/* Results */}
-        <div>
+        <div className="min-w-0">
+          {/* Mobile filter trigger + active chips */}
+          <div className="mb-4 flex flex-wrap items-center gap-2 md:mb-3">
+            <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2 md:hidden">
+                  <SlidersHorizontal className="h-4 w-4" />
+                  Filters
+                  {activeCount > 0 && (
+                    <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+                      {activeCount}
+                    </Badge>
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="h-[92vh] overflow-y-auto p-4 sm:max-w-lg sm:mx-auto">
+                <SheetHeader className="text-left">
+                  <SheetTitle>Filters</SheetTitle>
+                </SheetHeader>
+                <div className="mt-3">
+                  <FiltersForm
+                    category={category}
+                    keyword={keyword}
+                    setKeyword={setKeyword}
+                    vYear={vYear}
+                    vMake={vMake}
+                    vModel={vModel}
+                    vEngine={vEngine}
+                    setVYear={setVYear}
+                    setVMake={setVMake}
+                    setVModel={setVModel}
+                    setVEngine={setVEngine}
+                    region={region}
+                    province={province}
+                    city={city}
+                    setRegion={setRegion}
+                    setProvince={setProvince}
+                    setCity={setCity}
+                    minPrice={minPrice}
+                    maxPrice={maxPrice}
+                    setMinPrice={setMinPrice}
+                    setMaxPrice={setMaxPrice}
+                    sort={sort}
+                    setSort={setSort as any}
+                    catFilters={catFilters}
+                    setCatFilters={setCatFilters}
+                    onSubmit={applyFilters}
+                    onSave={openSaveDialog}
+                  />
+                </div>
+              </SheetContent>
+            </Sheet>
+            {chips.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5">
+                {chips.map((c) => (
+                  <Badge
+                    key={c.key}
+                    variant="secondary"
+                    className="gap-1 pl-2 pr-1 py-0.5 text-xs font-normal"
+                  >
+                    <span className="max-w-[180px] truncate">{c.label}</span>
+                    <button
+                      type="button"
+                      aria-label={`Remove ${c.key}`}
+                      onClick={() => {
+                        c.clear();
+                        setTimeout(() => applyFilters(), 0);
+                      }}
+                      className="inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-muted-foreground/20"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+                {chips.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      clearAll();
+                      setTimeout(() => applyFilters(), 0);
+                    }}
+                    className="ml-1 text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    Clear all
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+
           <SponsoredCategorySlot categorySlug={category} className="mb-6" />
           <AdCarousel placement="browse_top" className="mb-6" />
           {(() => {
