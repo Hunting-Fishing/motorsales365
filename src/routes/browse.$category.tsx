@@ -139,8 +139,8 @@ function filtersFromSearch(
 export const Route = createFileRoute("/browse/$category")({
   validateSearch: searchSchema,
   loaderDeps: ({ search }) => search,
-  loader: async ({ params, deps }) => {
-    if (params.category === "towing") return { items: [], userIds: [] as string[] };
+  loader: async ({ params, deps }): Promise<{ items: ListingCardData[]; userIds: string[] }> => {
+    if (params.category === "towing") return { items: [], userIds: [] };
     return await getBrowseListings({ data: filtersFromSearch(params.category, deps) });
   },
   staleTime: 30_000,
