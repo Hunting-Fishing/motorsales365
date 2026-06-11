@@ -645,15 +645,12 @@ function ListingDetailPage() {
           </div>
 
 
-          {/* Above-the-fold service CTA strip — revenue: lead-gen for finance/insurance/inspection partners */}
-          {listing.category_slug !== "towing" && listing.category_slug !== "services" && (
-            <ServiceStrip listingId={listing.id} vehicleSummary={listing.title} />
-          )}
-
           {/* Service tags */}
           {Array.isArray(listing.attributes?.tags) && listing.attributes.tags.length > 0 && (
-            <div className="mt-6 rounded-xl border border-border bg-card p-5">
-              <h2 className="mb-3 font-display text-lg font-semibold">Services & offerings</h2>
+            <SectionCard
+              title="Services & offerings"
+              meta={<span>{listing.attributes.tags.length}</span>}
+            >
               <div className="flex flex-wrap gap-1.5">
                 {(listing.attributes.tags as string[]).map((t) => (
                   <Badge key={t} variant="secondary" className="text-xs">
@@ -661,7 +658,7 @@ function ListingDetailPage() {
                   </Badge>
                 ))}
               </div>
-            </div>
+            </SectionCard>
           )}
 
           {/* Specs */}
@@ -671,79 +668,77 @@ function ListingDetailPage() {
             );
             if (specEntries.length === 0) return null;
             return (
-              <Collapsible
-                defaultOpen={
-                  typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches
+              <SectionCard
+                title="Specifications"
+                meta={
+                  <span>
+                    {specEntries.length} {specEntries.length === 1 ? "spec" : "specs"}
+                  </span>
                 }
-                className="mt-6 rounded-xl border border-border bg-card p-5"
               >
-                <CollapsibleTrigger className="group flex w-full items-center justify-between gap-3">
-                  <h2 className="font-display text-lg font-semibold">Specifications</h2>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <span>
-                      {specEntries.length} {specEntries.length === 1 ? "spec" : "specs"}
-                    </span>
-                    <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]:rotate-180" />
-                  </div>
-                </CollapsibleTrigger>
-                <CollapsibleContent className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
-                  <dl className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    {specEntries.map(([k, v]) => (
-                      <div
-                        key={k}
-                        className="flex justify-between gap-3 border-b border-border/60 pb-2 text-sm"
-                      >
-                        <dt className="capitalize text-muted-foreground">
-                          {k.replace(/_/g, " ")}
-                        </dt>
-                        <dd className="font-medium text-right">
-                          {Array.isArray(v)
-                            ? v.join(", ")
-                            : typeof v === "boolean"
-                              ? v
-                                ? "Yes"
-                                : "No"
-                              : String(v)}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-                </CollapsibleContent>
-              </Collapsible>
+                <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {specEntries.map(([k, v]) => (
+                    <div
+                      key={k}
+                      className="flex justify-between gap-3 border-b border-border/60 pb-2 text-sm"
+                    >
+                      <dt className="capitalize text-muted-foreground">
+                        {k.replace(/_/g, " ")}
+                      </dt>
+                      <dd className="font-medium text-right">
+                        {Array.isArray(v)
+                          ? v.join(", ")
+                          : typeof v === "boolean"
+                            ? v
+                              ? "Yes"
+                              : "No"
+                            : String(v)}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              </SectionCard>
             );
           })()}
 
-
-
           {/* Description */}
-          <div className="mt-6 rounded-xl border border-border bg-card p-5">
-            <h2 className="mb-3 font-display text-lg font-semibold">Description</h2>
+          <SectionCard title="Description">
             <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
               {listing.description || "No description provided."}
             </p>
-          </div>
+          </SectionCard>
 
           {/* In-house parts — buyer can request quote for items the seller flagged */}
           {(listing.category_slug === "cars" ||
             listing.category_slug === "motorcycles" ||
             listing.category_slug === "car" ||
             listing.category_slug === "motorcycle") && (
-            <NeededPartsRail listingId={listing.id} />
+            <SectionCard title="Parts needed for this vehicle">
+              <NeededPartsRail listingId={listing.id} embedded />
+            </SectionCard>
           )}
 
           {/* Affiliate parts — revenue: commission on partner shop checkouts */}
           {listing.category_slug !== "towing" && listing.category_slug !== "services" && (
-            <AffiliatePartsSection
-              make={listing.attributes?.make ?? null}
-              model={listing.attributes?.model ?? null}
-              year={listing.attributes?.year ? Number(listing.attributes.year) : null}
-              listingId={listing.id}
-            />
+            <SectionCard title="Recommended parts & accessories" defaultOpen={false}>
+              <AffiliatePartsSection
+                make={listing.attributes?.make ?? null}
+                model={listing.attributes?.model ?? null}
+                year={listing.attributes?.year ? Number(listing.attributes.year) : null}
+                listingId={listing.id}
+                embedded
+              />
+            </SectionCard>
           )}
 
           {(listing.category_slug === "cars" ||
             listing.category_slug === "motorcycles" ||
-            listing.category_slug === "trucks") && <BuyerDocumentChecklist />}
+            listing.category_slug === "trucks") && (
+            <SectionCard title="Buyer document checklist" defaultOpen={false}>
+              <BuyerDocumentChecklist embedded />
+            </SectionCard>
+          )}
+
 
           <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
             <span>Listed {formatDate(listing.published_at)}</span>
