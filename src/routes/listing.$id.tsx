@@ -849,12 +849,18 @@ function ListingDetailPage() {
                   </Button>
                 </a>
               )}
-              <Button variant="outline" className="w-full" onClick={toggleFavorite}>
-                <Heart
-                  className={`mr-2 h-4 w-4 ${favorited ? "fill-destructive text-destructive" : ""}`}
-                />
-                {favorited ? "Saved" : "Save listing"}
-              </Button>
+              {listing.allow_messages && (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    messageRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+                    messageRef.current?.focus();
+                  }}
+                >
+                  <MessageSquare className="mr-2 h-4 w-4" /> Message seller
+                </Button>
+              )}
               <ListingQr
                 listingId={listing.id}
                 title={listing.title}
@@ -878,13 +884,20 @@ function ListingDetailPage() {
                 </Button>
               )}
             </div>
+            <button
+              onClick={() => setReportOpen(true)}
+              className="mt-3 inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-destructive"
+            >
+              <Flag className="h-3 w-3" /> Report this listing
+            </button>
           </div>
 
           {/* Services around this vehicle — revenue: lead-gen for finance/insurance/OR-CR partners */}
           <div className="rounded-xl border border-border bg-card p-5">
             <h3 className="font-display text-lg font-semibold">Services for this vehicle</h3>
             <p className="mt-1 text-xs text-muted-foreground">
-              Free quotes from partner providers. No commitment.
+              Free quotes from partner providers — financing, insurance, OR/CR, title transfer, and
+              a 365-vetted pre-purchase inspection from ₱99. No commitment.
             </p>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
               <ServiceInquiryDialog
@@ -935,12 +948,15 @@ function ListingDetailPage() {
             </div>
           </div>
 
+          <AdCarousel placement="listing_sidebar" />
+
           {listing.allow_messages && (
             <div className="rounded-xl border border-border bg-card p-5">
               <h3 className="flex items-center gap-2 font-display text-lg font-semibold">
                 <MessageSquare className="h-4 w-4" /> Send a message
               </h3>
               <Textarea
+                ref={messageRef}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Hi, is this still available?"
@@ -958,6 +974,15 @@ function ListingDetailPage() {
           )}
         </aside>
       </div>
+      <MobileActionBar
+        phone={listing.contact_phone}
+        whatsappMessage={`Hi! I'm interested in your listing "${listing.title}" on 365 Motor Sales: ${siteUrl(typeof window !== "undefined" ? window.location.pathname : "/")}`}
+        allowMessages={listing.allow_messages}
+        onMessageClick={() => {
+          messageRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+          messageRef.current?.focus();
+        }}
+      />
     </SiteLayout>
   );
 }
