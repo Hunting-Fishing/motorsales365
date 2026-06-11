@@ -431,12 +431,44 @@ function ListingDetailPage() {
         <div>
           {/* Gallery */}
           <div className="overflow-hidden rounded-xl border border-border bg-card">
-            <div className="aspect-[16/10] bg-secondary">
-              <ImageWithSkeleton
-                src={cover?.url || placeholderCar}
-                alt={cover ? listing.title : "Vehicle photo coming soon"}
-                eager
-              />
+            <div className="relative aspect-[16/10] bg-secondary">
+              <button
+                type="button"
+                onClick={() => photos.length > 0 && setLightboxOpen(true)}
+                className="block h-full w-full"
+                aria-label="Open photo"
+              >
+                <ImageWithSkeleton
+                  src={cover?.url || placeholderCar}
+                  alt={cover ? listing.title : "Vehicle photo coming soon"}
+                  eager
+                />
+              </button>
+              {photos.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setActiveIdx((i) => (i - 1 + photos.length) % photos.length)}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 text-white opacity-0 transition-opacity hover:bg-black/70 group-hover:opacity-100 md:opacity-100"
+                    aria-label="Previous photo"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveIdx((i) => (i + 1) % photos.length)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 text-white hover:bg-black/70"
+                    aria-label="Next photo"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </>
+              )}
+              {photos.length > 0 && (
+                <div className="pointer-events-none absolute bottom-2 right-2 flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-medium text-white">
+                  <Expand className="h-3 w-3" /> {activeIdx + 1} / {photos.length}
+                </div>
+              )}
             </div>
             {(photos.length > 1 || videos.length > 0) && (
               <div className="flex gap-2 overflow-x-auto p-3">
@@ -449,17 +481,34 @@ function ListingDetailPage() {
                     <ImageWithSkeleton src={p.url} alt={`${listing.title} photo ${i + 1}`} />
                   </button>
                 ))}
-                {videos.map((v) => (
-                  <video
+                {videos.map((v, vi) => (
+                  <button
                     key={v.id}
-                    src={v.url}
-                    controls
-                    className="h-16 w-24 shrink-0 rounded-md border border-border bg-black object-cover"
-                  />
+                    type="button"
+                    onClick={() => {
+                      setActiveIdx(photos.length + vi);
+                      setLightboxOpen(true);
+                    }}
+                    className="relative h-16 w-24 shrink-0 overflow-hidden rounded-md border border-border bg-black"
+                    aria-label="Play video"
+                  >
+                    <video src={v.url} className="h-full w-full object-cover" muted />
+                    <span className="absolute inset-0 flex items-center justify-center bg-black/40">
+                      <Play className="h-5 w-5 fill-white text-white" />
+                    </span>
+                  </button>
                 ))}
               </div>
             )}
           </div>
+          <GalleryLightbox
+            open={lightboxOpen}
+            onOpenChange={setLightboxOpen}
+            items={[...photos, ...videos]}
+            index={activeIdx}
+            onIndexChange={setActiveIdx}
+            title={listing.title}
+          />
 
           {listing.status === "pending_sale" && (
             <div className="mt-6 flex items-start gap-3 rounded-xl border border-warning/40 bg-warning/10 p-4">
