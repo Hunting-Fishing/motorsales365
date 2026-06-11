@@ -754,6 +754,7 @@ function FiltersForm(p: FiltersFormProps) {
             <AccordionContent className="pt-1">
               <VehiclePicker
                 category={p.category as "car" | "motorcycle"}
+                stacked
                 year={p.vYear}
                 make={p.vMake}
                 model={p.vModel}
