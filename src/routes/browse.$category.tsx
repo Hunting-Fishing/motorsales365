@@ -269,8 +269,10 @@ function BrowsePage() {
   const loading = false;
 
 
-  const applyFilters = (e: React.FormEvent) => {
-    e.preventDefault();
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  const applyFilters = (e?: React.FormEvent) => {
+    e?.preventDefault();
     navigate({
       to: "/browse/$category",
       params: { category },
@@ -291,7 +293,75 @@ function BrowsePage() {
         ) as any),
       },
     });
+    setFiltersOpen(false);
   };
+
+  // Active filter chips (excluding sort/keyword which have own visible inputs on desktop).
+  type Chip = { key: string; label: string; clear: () => void };
+  const chips: Chip[] = [];
+  if (keyword) chips.push({ key: "q", label: `“${keyword}”`, clear: () => setKeyword("") });
+  if (vYear || vMake || vModel || vEngine) {
+    const label = [vYear, vMake, vModel, vEngine].filter(Boolean).join(" ");
+    chips.push({
+      key: "vehicle",
+      label,
+      clear: () => {
+        setVYear("");
+        setVMake("");
+        setVModel("");
+        setVEngine("");
+      },
+    });
+  }
+  if (region || province || city) {
+    chips.push({
+      key: "loc",
+      label: [city, province, region].filter(Boolean).join(", "),
+      clear: () => {
+        setRegion(null);
+        setProvince(null);
+        setCity(null);
+      },
+    });
+  }
+  if (minPrice || maxPrice) {
+    chips.push({
+      key: "price",
+      label: `₱${minPrice || "0"}–${maxPrice || "∞"}`,
+      clear: () => {
+        setMinPrice("");
+        setMaxPrice("");
+      },
+    });
+  }
+  for (const [k, v] of Object.entries(catFilters)) {
+    if (v === undefined || v === "" || v === false) continue;
+    chips.push({
+      key: k,
+      label: `${k.replace(/_/g, " ")}: ${v === true ? "yes" : v}`,
+      clear: () => {
+        const next = { ...catFilters };
+        delete next[k];
+        setCatFilters(next);
+      },
+    });
+  }
+  const activeCount = chips.length;
+
+  const clearAll = () => {
+    setKeyword("");
+    setRegion(null);
+    setProvince(null);
+    setCity(null);
+    setMinPrice("");
+    setMaxPrice("");
+    setVYear("");
+    setVMake("");
+    setVModel("");
+    setVEngine("");
+    setCatFilters({});
+  };
+
 
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [saveName, setSaveName] = useState("");
