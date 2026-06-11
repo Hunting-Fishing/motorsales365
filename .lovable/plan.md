@@ -1,41 +1,47 @@
-## Goal
-Seed 10 published marketplace listings of iconic rally/JDM cars (no trademark logos), each with a watermarked hero photo, so the marketplace looks alive during sales-rep demos.
+## Why it's slow today
 
-## The 10 cars
-1. 1986 Toyota Corolla AE86 Levin — coupe, RWD
-2. 1991 Nissan Skyline GT-R R32
-3. 1992 Nissan Silvia S13
-4. 1990 Nissan Fairlady Z (Z32)
-5. 1994 Nissan 180SX
-6. 1985 Toyota Celica GT-Four ST165 (Rally)
-7. 1995 Mitsubishi Lancer Evolution III
-8. 2002 Subaru Impreza WRX STI (GD)
-9. 1993 Mazda RX-7 FD3S
-10. 1994 Toyota Supra Mk4 (A80)
+`src/routes/browse.$category.tsx` fetches everything client-side in a `useEffect` after hydration. The waterfall on each visit is roughly:
 
-All marked with a translucent diagonal **"DEMO — 365 MotorSales"** watermark across the hero image. No real-brand badges/logos in the prompts — generic rally liveries only.
+1. HTML loads with **no listings** (empty shell).
+2. React hydrates, then fires a Supabase query with a wide embed (`listing_media`, `profiles`, `vehicles`, `vehicle_passport_verifications`) — one round trip.
+3. A second await calls the `getActiveDealerStatus` server function — another round trip.
+4. Only then are cards rendered.
 
-## Ownership & visibility
-- Owner: existing admin profile `365 MotorSales` (`a3999f39-3641-4e16-a11b-f2b6563b8a8f`).
-- `status = 'published'`, `published_at = now()`, `source = 'demo_seed'` (lets us delete them later in one query).
-- `category_slug = 'car'`, `seller_type = 'private'`, spread across a few PH cities (Manila, Cebu, Davao, Quezon City, Cavite).
-- Realistic PHP `price_php`, a couple `negotiable = true`, none price-hidden.
+The DB itself isn't the bottleneck (only ~22 rows; slowest query in pg_stat_statements is unrelated email/cron work), so the fix is on the **request pattern**, not Postgres sizing.
 
-## Image generation
-- Generate 10 hero JPGs at 1280×960 via imagegen `fast` tier, each prompt: tasteful 3/4 exterior shot of the generic car on tarmac, no badges/text, "with a large translucent diagonal watermark reading 'DEMO — 365 MotorSales' across the image".
-- Save to `/tmp/demo-seed/*.jpg`, upload each via `lovable-assets` CLI, write `.asset.json` pointers under `src/assets/demo-listings/`.
-- Use the resulting CDN URLs in `listing_media.url` (one photo per listing, `sort_order = 0`, `type = 'image'`).
+## Plan
 
-## DB writes
-One `INSERT` into `listings` (10 rows) + one `INSERT` into `listing_media` (10 rows) via the insert tool. No schema changes. No new tables, policies, or migrations.
+### 1. Move the fetch into a TanStack Start server function + route loader (SSR)
+- New `src/lib/browse-listings.functions.ts` exporting `getBrowseListings = createServerFn({ method: "GET" })` that takes `{ category, filters }`, validates with the existing Zod schema, and runs the Supabase query using `supabaseAdmin` (loaded inside the handler).
+- Security: handler returns **only a safe projection** (the same columns the card needs) and re-applies the same `status IN ('active','pending_sale')` + `category_slug` filter — never returns full rows. Public-read semantics match today's RLS-allowed shape, so no policy widening.
+- Route gets `loader: ({ context, params, deps }) => context.queryClient.ensureQueryData(browseQueryOptions(...))` plus `loaderDeps` returning the filter subset. Component switches to `useSuspenseQuery` so the first paint already has data (SSR-rendered HTML).
 
-## Cleanup hook
-Because every row has `source = 'demo_seed'`, the whole set can be removed later with:
+### 2. Parallelize dealer status
+Inside the server-fn handler, run `Promise.all([listingsQuery, getActiveDealerStatusInternal(userIds?)])`. Today they're serial. For SSR we don't yet have `userIds`, so dealer status moves to a second `useQuery` (non-blocking) that overlays the dealer badge once it returns — listings show immediately.
+
+### 3. Trim the embedded select
+Replace the deep PostgREST embed with two flat queries inside the server fn (listings, then a single `profiles` + `vehicles` lookup keyed by the returned IDs). This avoids the join planner overhead per request and makes the response payload smaller.
+
+### 4. Add one composite index
 ```sql
-DELETE FROM listings WHERE source = 'demo_seed';
+CREATE INDEX IF NOT EXISTS idx_listings_browse
+  ON public.listings (category_slug, status, boost_until DESC NULLS LAST, published_at DESC NULLS LAST);
 ```
+Plain `CREATE INDEX` in a migration (not `CONCURRENTLY`). Helps future growth even though current row count is small.
 
-## Out of scope
-- No watermark on titles (visual watermark only, per your pick).
-- No edits to listing-card / detail / search components.
-- No seeded ride-garage, business, or tow data.
+### 5. Quick wins in the component
+- Remove the `JSON.stringify(...)` dep array (it allocates each render) in favor of `loaderDeps`.
+- Keep the existing fuzzy-fallback path, but only run it when the first result is small AND a keyword is present (already does); move it into the server fn so it's one round trip total.
+
+## Security notes
+- No RLS policy changes. The server fn runs under service role but only returns a hard-coded allowlist of public columns already visible to anonymous browsing today.
+- No new `anon` grants. No secret leakage — `supabaseAdmin` is `await import`-ed inside the handler.
+- Auth-gated routes are unaffected; this route is public by design.
+
+## Expected result
+First contentful listings render with the SSR HTML (no post-hydration spinner). Subsequent filter changes hit the warmed query cache and one DB round trip instead of two serial ones.
+
+## Files touched
+- new: `src/lib/browse-listings.functions.ts`
+- edit: `src/routes/browse.$category.tsx` (loader + `useSuspenseQuery`, drop client `useEffect` fetch)
+- new migration: composite index above
