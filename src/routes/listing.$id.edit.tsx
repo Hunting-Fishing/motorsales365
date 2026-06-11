@@ -164,6 +164,10 @@ function EditListingPage() {
   const [vehicleQuality, setVehicleQuality] = useState<VehicleQuality>({});
   const [vehicleQualityIssues, setVehicleQualityIssues] = useState<VehicleQualityIssue[]>([]);
   const [categoryAttrs, setCategoryAttrs] = useState<Record<string, any>>({});
+  const [neededParts, setNeededParts] = useState<
+    { key: string; label: string; category: string; qty?: number }[]
+  >([]);
+  const [tireSizeConfirmed, setTireSizeConfirmed] = useState("");
 
   // Towing
   const [towServiceType, setTowServiceType] = useState("");
@@ -259,6 +263,8 @@ function EditListingPage() {
     setFuel(a.fuel ?? "");
     setEngine(a.engine ?? "");
     setVehicleQuality(hydrateVehicleQuality(a));
+    setNeededParts(Array.isArray(a.needed_parts) ? a.needed_parts : []);
+    setTireSizeConfirmed(a.tire_size_confirmed ?? "");
     if (isAttrCategory(l.category_slug)) {
       const next: Record<string, any> = {};
       for (const k of CATEGORY_ATTR_KEYS[l.category_slug] ?? []) {
