@@ -143,6 +143,54 @@ export function TowRequestForm({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dropoffPin.address]);
 
+  // Seed vehicle + pickup from a marketplace listing when launched from "Need this towed?"
+  const [seededListing, setSeededListing] = useState<{ id: string; title: string } | null>(null);
+  useEffect(() => {
+    if (!seedListingId) {
+      setSeededListing(null);
+      return;
+    }
+    let cancelled = false;
+    supabase
+      .from("listings")
+      .select("id,title,attributes,region,province,city,barangay,category_slug")
+      .eq("id", seedListingId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (cancelled || !data) return;
+        setSeededListing({ id: data.id, title: data.title });
+        const a = (data.attributes ?? {}) as any;
+        if (a.year) setVYear((s) => s || String(a.year));
+        if (a.make) setVMake((s) => s || String(a.make));
+        if (a.model) setVModel((s) => s || String(a.model));
+        if (a.trim) setVTrim((s) => s || String(a.trim));
+        if (a.transmission) {
+          const t = TRANSMISSIONS.find(
+            (x) => x.toLowerCase() === String(a.transmission).toLowerCase(),
+          );
+          if (t) setTransmission(t);
+        }
+        if (data.category_slug === "motorcycle" || data.category_slug === "motorcycles") {
+          setVehicleType("Motorcycle");
+        }
+        setPickup((p) =>
+          p.region
+            ? p
+            : {
+                region: data.region ?? null,
+                province: data.province ?? null,
+                city: data.city ?? null,
+                barangay: data.barangay ?? null,
+              },
+        );
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [seedListingId]);
+
+
+
   function applyRide(r: RideOption | null) {
     setRideId(r?.id ?? null);
     if (!r) return;
