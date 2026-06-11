@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import ogBrowse from "@/assets/og/browse.jpg";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Search, BookmarkPlus, Rocket } from "lucide-react";
+import { Search, BookmarkPlus, Rocket, SlidersHorizontal, X } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
@@ -34,7 +34,20 @@ import {
 } from "@/components/ui/select";
 import { LocationPicker } from "@/components/location-picker";
 import { VehiclePicker } from "@/components/vehicle-picker";
-import { CategoryFilters, type CategoryFilterValue } from "@/components/browse/category-filters";
+import {
+  CategoryFilters,
+  categoryHasDetails,
+  categoryHasExtras,
+  type CategoryFilterValue,
+} from "@/components/browse/category-filters";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 import { buildTitleSearchTerms } from "@/lib/vehicle-aliases";
 import { fuzzyFilter } from "@/lib/fuzzy";
 import { useBlockedUserIds } from "@/hooks/use-blocked-users";
@@ -256,8 +269,10 @@ function BrowsePage() {
   const loading = false;
 
 
-  const applyFilters = (e: React.FormEvent) => {
-    e.preventDefault();
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  const applyFilters = (e?: React.FormEvent) => {
+    e?.preventDefault();
     navigate({
       to: "/browse/$category",
       params: { category },
@@ -278,7 +293,75 @@ function BrowsePage() {
         ) as any),
       },
     });
+    setFiltersOpen(false);
   };
+
+  // Active filter chips (excluding sort/keyword which have own visible inputs on desktop).
+  type Chip = { key: string; label: string; clear: () => void };
+  const chips: Chip[] = [];
+  if (keyword) chips.push({ key: "q", label: `“${keyword}”`, clear: () => setKeyword("") });
+  if (vYear || vMake || vModel || vEngine) {
+    const label = [vYear, vMake, vModel, vEngine].filter(Boolean).join(" ");
+    chips.push({
+      key: "vehicle",
+      label,
+      clear: () => {
+        setVYear("");
+        setVMake("");
+        setVModel("");
+        setVEngine("");
+      },
+    });
+  }
+  if (region || province || city) {
+    chips.push({
+      key: "loc",
+      label: [city, province, region].filter(Boolean).join(", "),
+      clear: () => {
+        setRegion(null);
+        setProvince(null);
+        setCity(null);
+      },
+    });
+  }
+  if (minPrice || maxPrice) {
+    chips.push({
+      key: "price",
+      label: `₱${minPrice || "0"}–${maxPrice || "∞"}`,
+      clear: () => {
+        setMinPrice("");
+        setMaxPrice("");
+      },
+    });
+  }
+  for (const [k, v] of Object.entries(catFilters)) {
+    if (v === undefined || v === "" || v === false) continue;
+    chips.push({
+      key: k,
+      label: `${k.replace(/_/g, " ")}: ${v === true ? "yes" : v}`,
+      clear: () => {
+        const next = { ...catFilters };
+        delete next[k];
+        setCatFilters(next);
+      },
+    });
+  }
+  const activeCount = chips.length;
+
+  const clearAll = () => {
+    setKeyword("");
+    setRegion(null);
+    setProvince(null);
+    setCity(null);
+    setMinPrice("");
+    setMaxPrice("");
+    setVYear("");
+    setVMake("");
+    setVModel("");
+    setVEngine("");
+    setCatFilters({});
+  };
+
 
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [saveName, setSaveName] = useState("");
@@ -343,101 +426,146 @@ function BrowsePage() {
         </div>
       </div>
 
-      <div className="container mx-auto grid gap-6 px-4 py-8 lg:grid-cols-[280px_1fr]">
-        {/* Filters */}
-        <aside className="space-y-5 rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-card)] lg:sticky lg:top-20 lg:self-start">
-          <h2 className="font-display text-lg font-semibold">Filters</h2>
-          <form onSubmit={applyFilters} className="space-y-4">
-            <div>
-              <Label htmlFor="kw">Keyword</Label>
-              <div className="relative">
-                <Search className="absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  id="kw"
-                  value={keyword}
-                  onChange={(e) => setKeyword(e.target.value)}
-                  placeholder="Make, model…"
-                  className="pl-8"
-                />
-              </div>
+      <div className="container mx-auto grid gap-6 px-4 py-6 md:grid-cols-[260px_1fr] md:py-8">
+        {/* Filters — desktop sidebar */}
+        <aside className="hidden md:block">
+          <div className="space-y-4 rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-card)] md:sticky md:top-20">
+            <div className="flex items-center justify-between">
+              <h2 className="font-display text-base font-semibold">Filters</h2>
+              {activeCount > 0 && (
+                <button
+                  type="button"
+                  onClick={clearAll}
+                  className="text-xs text-muted-foreground hover:text-foreground"
+                >
+                  Clear all
+                </button>
+              )}
             </div>
-            {(category === "car" || category === "motorcycle") && (
-              <div className="rounded-md border border-border/60 bg-background/60 p-3">
-                <Label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                  Vehicle
-                </Label>
-                <VehiclePicker
-                  category={category as "car" | "motorcycle"}
-                  year={vYear}
-                  make={vMake}
-                  model={vModel}
-                  engine={vEngine}
-                  onChange={(v) => {
-                    setVYear(v.year);
-                    setVMake(v.make);
-                    setVModel(v.model);
-                    setVEngine(v.engine ?? "");
-                  }}
-                />
-              </div>
-            )}
-            <CategoryFilters category={category} value={catFilters} onChange={setCatFilters} />
-            <LocationPicker
-              asFilter
-              stacked
-              showBarangay={false}
-              value={{ region, province, city }}
-              onChange={(v) => {
-                setRegion(v.region ?? null);
-                setProvince(v.province ?? null);
-                setCity(v.city ?? null);
-              }}
+            <FiltersForm
+              category={category}
+              keyword={keyword}
+              setKeyword={setKeyword}
+              vYear={vYear}
+              vMake={vMake}
+              vModel={vModel}
+              vEngine={vEngine}
+              setVYear={setVYear}
+              setVMake={setVMake}
+              setVModel={setVModel}
+              setVEngine={setVEngine}
+              region={region}
+              province={province}
+              city={city}
+              setRegion={setRegion}
+              setProvince={setProvince}
+              setCity={setCity}
+              minPrice={minPrice}
+              maxPrice={maxPrice}
+              setMinPrice={setMinPrice}
+              setMaxPrice={setMaxPrice}
+              sort={sort}
+              setSort={setSort as any}
+              catFilters={catFilters}
+              setCatFilters={setCatFilters}
+              onSubmit={applyFilters}
+              onSave={openSaveDialog}
             />
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <Label>Min ₱</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  value={minPrice}
-                  onChange={(e) => setMinPrice(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label>Max ₱</Label>
-                <Input
-                  type="number"
-                  min="0"
-                  value={maxPrice}
-                  onChange={(e) => setMaxPrice(e.target.value)}
-                />
-              </div>
-            </div>
-            <div>
-              <Label>Sort</Label>
-              <Select value={sort} onValueChange={(v: any) => setSort(v)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="recent">Most recent</SelectItem>
-                  <SelectItem value="price_asc">Price (low to high)</SelectItem>
-                  <SelectItem value="price_desc">Price (high to low)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <Button type="submit" className="w-full">
-              Apply filters
-            </Button>
-            <Button type="button" variant="outline" className="w-full" onClick={openSaveDialog}>
-              <BookmarkPlus className="mr-2 h-4 w-4" />
-              Save search
-            </Button>
-          </form>
+          </div>
         </aside>
 
         {/* Results */}
-        <div>
+        <div className="min-w-0">
+          {/* Mobile filter trigger + active chips */}
+          <div className="mb-4 flex flex-wrap items-center gap-2 md:mb-3">
+            <Sheet open={filtersOpen} onOpenChange={setFiltersOpen}>
+              <SheetTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2 md:hidden">
+                  <SlidersHorizontal className="h-4 w-4" />
+                  Filters
+                  {activeCount > 0 && (
+                    <Badge variant="secondary" className="ml-1 h-5 px-1.5 text-xs">
+                      {activeCount}
+                    </Badge>
+                  )}
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="h-[92vh] overflow-y-auto p-4 sm:max-w-lg sm:mx-auto">
+                <SheetHeader className="text-left">
+                  <SheetTitle>Filters</SheetTitle>
+                </SheetHeader>
+                <div className="mt-3">
+                  <FiltersForm
+                    category={category}
+                    keyword={keyword}
+                    setKeyword={setKeyword}
+                    vYear={vYear}
+                    vMake={vMake}
+                    vModel={vModel}
+                    vEngine={vEngine}
+                    setVYear={setVYear}
+                    setVMake={setVMake}
+                    setVModel={setVModel}
+                    setVEngine={setVEngine}
+                    region={region}
+                    province={province}
+                    city={city}
+                    setRegion={setRegion}
+                    setProvince={setProvince}
+                    setCity={setCity}
+                    minPrice={minPrice}
+                    maxPrice={maxPrice}
+                    setMinPrice={setMinPrice}
+                    setMaxPrice={setMaxPrice}
+                    sort={sort}
+                    setSort={setSort as any}
+                    catFilters={catFilters}
+                    setCatFilters={setCatFilters}
+                    onSubmit={applyFilters}
+                    onSave={openSaveDialog}
+                  />
+                </div>
+              </SheetContent>
+            </Sheet>
+            {chips.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5">
+                {chips.map((c) => (
+                  <Badge
+                    key={c.key}
+                    variant="secondary"
+                    className="gap-1 pl-2 pr-1 py-0.5 text-xs font-normal"
+                  >
+                    <span className="max-w-[180px] truncate">{c.label}</span>
+                    <button
+                      type="button"
+                      aria-label={`Remove ${c.key}`}
+                      onClick={() => {
+                        c.clear();
+                        setTimeout(() => applyFilters(), 0);
+                      }}
+                      className="inline-flex h-4 w-4 items-center justify-center rounded-full hover:bg-muted-foreground/20"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </Badge>
+                ))}
+                {chips.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      clearAll();
+                      setTimeout(() => applyFilters(), 0);
+                    }}
+                    className="ml-1 text-xs text-muted-foreground hover:text-foreground"
+                  >
+                    Clear all
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+
           <SponsoredCategorySlot categorySlug={category} className="mb-6" />
           <AdCarousel placement="browse_top" className="mb-6" />
           {(() => {
@@ -524,5 +652,185 @@ function BrowsePage() {
         </DialogContent>
       </Dialog>
     </SiteLayout>
+  );
+}
+
+interface FiltersFormProps {
+  category: string;
+  keyword: string;
+  setKeyword: (v: string) => void;
+  vYear: string;
+  vMake: string;
+  vModel: string;
+  vEngine: string;
+  setVYear: (v: string) => void;
+  setVMake: (v: string) => void;
+  setVModel: (v: string) => void;
+  setVEngine: (v: string) => void;
+  region: string | null;
+  province: string | null;
+  city: string | null;
+  setRegion: (v: string | null) => void;
+  setProvince: (v: string | null) => void;
+  setCity: (v: string | null) => void;
+  minPrice: string;
+  maxPrice: string;
+  setMinPrice: (v: string) => void;
+  setMaxPrice: (v: string) => void;
+  sort: "recent" | "price_asc" | "price_desc";
+  setSort: (v: "recent" | "price_asc" | "price_desc") => void;
+  catFilters: CategoryFilterValue;
+  setCatFilters: (v: CategoryFilterValue) => void;
+  onSubmit: (e?: React.FormEvent) => void;
+  onSave: () => void;
+}
+
+function FiltersForm(p: FiltersFormProps) {
+  const showVehicle = p.category === "car" || p.category === "motorcycle";
+  const hasDetails = categoryHasDetails(p.category);
+  const hasExtras = categoryHasExtras(p.category);
+
+  return (
+    <form onSubmit={p.onSubmit} className="space-y-3">
+      {/* Always-visible quick filters */}
+      <div className="space-y-3">
+        <div>
+          <Label htmlFor="kw" className="text-xs">
+            Keyword
+          </Label>
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="kw"
+              value={p.keyword}
+              onChange={(e) => p.setKeyword(e.target.value)}
+              placeholder="Make, model…"
+              className="h-9 pl-8"
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <Label className="text-xs">Min ₱</Label>
+            <Input
+              type="number"
+              min="0"
+              value={p.minPrice}
+              onChange={(e) => p.setMinPrice(e.target.value)}
+              className="h-9"
+            />
+          </div>
+          <div>
+            <Label className="text-xs">Max ₱</Label>
+            <Input
+              type="number"
+              min="0"
+              value={p.maxPrice}
+              onChange={(e) => p.setMaxPrice(e.target.value)}
+              className="h-9"
+            />
+          </div>
+        </div>
+        <div>
+          <Label className="text-xs">Sort</Label>
+          <Select value={p.sort} onValueChange={(v: any) => p.setSort(v)}>
+            <SelectTrigger className="h-9">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="recent">Most recent</SelectItem>
+              <SelectItem value="price_asc">Price (low to high)</SelectItem>
+              <SelectItem value="price_desc">Price (high to low)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Collapsible deep filters */}
+      <Accordion type="multiple" className="w-full">
+        {showVehicle && (
+          <AccordionItem value="vehicle">
+            <AccordionTrigger className="py-2 text-sm">Vehicle</AccordionTrigger>
+            <AccordionContent className="pt-1">
+              <VehiclePicker
+                category={p.category as "car" | "motorcycle"}
+                year={p.vYear}
+                make={p.vMake}
+                model={p.vModel}
+                engine={p.vEngine}
+                onChange={(v) => {
+                  p.setVYear(v.year);
+                  p.setVMake(v.make);
+                  p.setVModel(v.model);
+                  p.setVEngine(v.engine ?? "");
+                }}
+              />
+            </AccordionContent>
+          </AccordionItem>
+        )}
+        <AccordionItem value="location">
+          <AccordionTrigger className="py-2 text-sm">Location</AccordionTrigger>
+          <AccordionContent className="pt-1">
+            <LocationPicker
+              asFilter
+              stacked
+              showBarangay={false}
+              value={{ region: p.region, province: p.province, city: p.city }}
+              onChange={(v) => {
+                p.setRegion(v.region ?? null);
+                p.setProvince(v.province ?? null);
+                p.setCity(v.city ?? null);
+              }}
+            />
+          </AccordionContent>
+        </AccordionItem>
+        {hasDetails && (
+          <AccordionItem value="details">
+            <AccordionTrigger className="py-2 text-sm">
+              {p.category === "car"
+                ? "Car details"
+                : p.category === "motorcycle"
+                  ? "Motorcycle details"
+                  : p.category === "equipment"
+                    ? "Equipment details"
+                    : p.category === "boat"
+                      ? "Boat details"
+                      : "Aircraft details"}
+            </AccordionTrigger>
+            <AccordionContent className="pt-1">
+              <CategoryFilters
+                category={p.category}
+                value={p.catFilters}
+                onChange={p.setCatFilters}
+                section="details"
+              />
+            </AccordionContent>
+          </AccordionItem>
+        )}
+        {hasExtras && (
+          <AccordionItem value="extras">
+            <AccordionTrigger className="py-2 text-sm">Documents & extras</AccordionTrigger>
+            <AccordionContent className="pt-1">
+              <CategoryFilters
+                category={p.category}
+                value={p.catFilters}
+                onChange={p.setCatFilters}
+                section="extras"
+              />
+            </AccordionContent>
+          </AccordionItem>
+        )}
+      </Accordion>
+
+      <div className="space-y-2 pt-1">
+        <Button type="submit" className="w-full">
+          Apply filters
+        </Button>
+        <Button type="button" variant="outline" className="w-full" onClick={p.onSave}>
+          <BookmarkPlus className="mr-2 h-4 w-4" />
+          Save search
+        </Button>
+      </div>
+    </form>
   );
 }
