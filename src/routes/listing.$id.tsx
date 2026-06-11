@@ -533,15 +533,6 @@ function ListingDetailPage() {
                 <Badge variant={listing.seller_type === "business" ? "default" : "secondary"}>
                   {listing.seller_type === "business" ? "Business seller" : "Private seller"}
                 </Badge>
-                {listing.seller_type === "business" && sellerDealerPlan && (
-                  <DealerSubscriptionBadge
-                    planName={sellerDealerPlan}
-                    currentPeriodEnd={sellerDealerPeriodEnd}
-                    cancelAtPeriodEnd={sellerDealerCancelAtPeriodEnd}
-                    size="md"
-                    showRenewal
-                  />
-                )}
                 {seller?.verification_status === "verified" && (
                   <VerifiedBadge size="md" showLabel />
                 )}
