@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus, X } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Info, Plus, X } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { NEEDED_PARTS_GROUPS, NEEDED_PARTS_INDEX } from "@/data/needed-parts-catalog";
 import { getTireSpec } from "@/lib/parts-fulfillment.functions";
@@ -19,7 +19,19 @@ interface Props {
   make?: string;
   model?: string;
   year?: number;
+  engine?: string;
 }
+
+// Accepts metric (185/60R15, 225/45ZR17), light truck (LT265/70R17), and flotation (31x10.5R15).
+const TIRE_SIZE_RE =
+  /^(LT|P)?\d{2,3}(\/\d{2,3}|x\d{1,2}(\.\d)?)[ZR]?R?\d{2}(\s?\d{2,3}[A-Z])?$/i;
+
+type LookupState =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "none" }
+  | { status: "uncertain"; candidates: any[]; match: any | null }
+  | { status: "matched"; match: any };
 
 export function NeededPartsEditor({
   value,
@@ -29,24 +41,47 @@ export function NeededPartsEditor({
   make,
   model,
   year,
+  engine,
 }: Props) {
   const [custom, setCustom] = useState("");
-  const [suggested, setSuggested] = useState<string | null>(null);
-  const lookup = useServerFn(getTireSpec);
+  const [touched, setTouched] = useState(false);
+  const [lookup, setLookup] = useState<LookupState>({ status: "idle" });
+  const fetchSpec = useServerFn(getTireSpec);
 
   useEffect(() => {
-    if (!make || !model) return;
+    if (!make || !model) {
+      setLookup({ status: "idle" });
+      return;
+    }
     let cancelled = false;
-    lookup({ data: { make, model, year } })
+    setLookup({ status: "loading" });
+    fetchSpec({ data: { make, model, year, engine } })
       .then((r: any) => {
-        if (cancelled) return;
-        setSuggested(r?.front_size ?? null);
+        if (cancelled || !r) return;
+        if (r.status === "matched") setLookup({ status: "matched", match: r.match });
+        else if (r.status === "uncertain")
+          setLookup({ status: "uncertain", candidates: r.candidates ?? [], match: r.match });
+        else setLookup({ status: "none" });
       })
-      .catch(() => {});
+      .catch(() => {
+        if (!cancelled) setLookup({ status: "none" });
+      });
     return () => {
       cancelled = true;
     };
-  }, [make, model, year, lookup]);
+  }, [make, model, year, engine, fetchSpec]);
+
+  const trimmed = tireSize.trim();
+  const formatOk = trimmed === "" || TIRE_SIZE_RE.test(trimmed);
+  const matchedFront =
+    lookup.status === "matched" ? (lookup.match?.front_size as string | null) : null;
+  const matchedRear =
+    lookup.status === "matched" ? (lookup.match?.rear_size as string | null) : null;
+  const expectedSet = new Set(
+    [matchedFront, matchedRear].filter((s): s is string => !!s).map((s) => s.toUpperCase()),
+  );
+  const mismatchesFactory =
+    lookup.status === "matched" && trimmed !== "" && !expectedSet.has(trimmed.toUpperCase());
 
   const toggle = (key: string) => {
     const opt = NEEDED_PARTS_INDEX[key];
@@ -71,27 +106,105 @@ export function NeededPartsEditor({
     <div className="space-y-5">
       <div>
         <label className="mb-1 block text-xs font-medium">Tire size (factory or installed)</label>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <input
             value={tireSize}
             onChange={(e) => onTireSizeChange(e.target.value)}
+            onBlur={() => setTouched(true)}
             placeholder="e.g. 185/60R15"
-            className="w-40 rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+            className={`w-44 rounded-md border bg-background px-2 py-1.5 text-sm ${
+              touched && !formatOk ? "border-destructive" : "border-border"
+            }`}
           />
-          {suggested && suggested !== tireSize && (
-            <button
-              type="button"
-              onClick={() => onTireSizeChange(suggested)}
-              className="text-xs font-medium text-primary hover:underline"
-            >
-              Use suggested: {suggested}
-            </button>
+          {lookup.status === "loading" && (
+            <span className="text-xs text-muted-foreground">Looking up factory size…</span>
+          )}
+          {lookup.status === "matched" && (
+            <div className="flex flex-wrap items-center gap-1.5">
+              {matchedFront && matchedFront.toUpperCase() !== trimmed.toUpperCase() && (
+                <button
+                  type="button"
+                  onClick={() => onTireSizeChange(matchedFront)}
+                  className="text-xs font-medium text-primary hover:underline"
+                >
+                  Use front: {matchedFront}
+                </button>
+              )}
+              {matchedRear && matchedRear !== matchedFront && (
+                <button
+                  type="button"
+                  onClick={() => onTireSizeChange(matchedRear)}
+                  className="text-xs font-medium text-primary hover:underline"
+                >
+                  Use rear: {matchedRear}
+                </button>
+              )}
+            </div>
+          )}
+          {lookup.status === "uncertain" && lookup.candidates.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5">
+              {Array.from(
+                new Set(
+                  lookup.candidates
+                    .flatMap((c: any) => [c.front_size, c.rear_size])
+                    .filter(Boolean),
+                ),
+              ).map((s) => (
+                <button
+                  key={s as string}
+                  type="button"
+                  onClick={() => onTireSizeChange(s as string)}
+                  className="rounded-full border border-border px-2 py-0.5 text-xs hover:border-primary/40"
+                >
+                  {s as string}
+                </button>
+              ))}
+            </div>
           )}
         </div>
-        <p className="mt-1 text-[11px] text-muted-foreground">
-          Buyers see this to get a tire quote. Override if your car has a non-stock size.
-        </p>
+
+        {touched && !formatOk && (
+          <p className="mt-1 flex items-center gap-1 text-[11px] text-destructive">
+            <AlertTriangle className="h-3 w-3" /> Use a standard format like 185/60R15 or
+            225/45ZR17.
+          </p>
+        )}
+        {formatOk && lookup.status === "matched" && trimmed !== "" && !mismatchesFactory && (
+          <p className="mt-1 flex items-center gap-1 text-[11px] text-emerald-600">
+            <CheckCircle2 className="h-3 w-3" /> Matches factory spec for {make} {model}
+            {year ? ` (${year})` : ""}.
+          </p>
+        )}
+        {mismatchesFactory && (
+          <p className="mt-1 flex items-center gap-1 text-[11px] text-amber-600">
+            <AlertTriangle className="h-3 w-3" /> Doesn't match the factory size
+            {matchedFront
+              ? ` (${matchedFront}${matchedRear && matchedRear !== matchedFront ? ` / ${matchedRear}` : ""})`
+              : ""}
+            . Keep it if your car runs a non-stock size.
+          </p>
+        )}
+        {lookup.status === "uncertain" && (
+          <p className="mt-1 flex items-center gap-1 text-[11px] text-amber-600">
+            <AlertTriangle className="h-3 w-3" /> We couldn't confirm the factory size for this
+            year/trim. Please confirm the size on your tire sidewall.
+          </p>
+        )}
+        {lookup.status === "none" && make && model && (
+          <p className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
+            <Info className="h-3 w-3" /> No factory spec on file for {make} {model}. Enter the
+            size printed on the tire sidewall.
+          </p>
+        )}
+        {lookup.status === "idle" && (
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            Buyers use this to get a tire quote. Add make, model, and year above to auto-suggest
+            the factory size.
+          </p>
+        )}
       </div>
+
+
 
       {value.length > 0 && (
         <div className="rounded-lg border border-border bg-secondary/40 p-3">

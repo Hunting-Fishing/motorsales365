@@ -54,14 +54,21 @@ export const getNeededPartsForListing = createServerFn({ method: "POST" })
     return { needed, tireSize, suggested };
   });
 
-/** Look up factory tire spec for a given vehicle (best match by year range). */
+/**
+ * Look up factory tire spec for a given vehicle.
+ * Returns a status so the UI can show validation/confirmation prompts when uncertain.
+ *  - matched:   exactly one spec matches make+model (+year if given)
+ *  - uncertain: model found but year is out of any known range, or multiple specs match
+ *  - none:      no spec on file for this make/model
+ */
 export const getTireSpec = createServerFn({ method: "POST" })
-  .inputValidator((d: { make: string; model: string; year?: number }) =>
+  .inputValidator((d: { make: string; model: string; year?: number; engine?: string }) =>
     z
       .object({
         make: z.string().min(1).max(100),
         model: z.string().min(1).max(100),
         year: z.number().int().min(1900).max(2100).optional(),
+        engine: z.string().max(120).optional(),
       })
       .parse(d),
   )
@@ -72,15 +79,26 @@ export const getTireSpec = createServerFn({ method: "POST" })
       .select("*")
       .ilike("make", data.make)
       .ilike("model", data.model);
-    if (!rows?.length) return null;
+    if (!rows?.length) {
+      return { status: "none" as const, match: null, candidates: [] };
+    }
     const y = data.year ?? null;
-    const match =
-      rows.find(
-        (r: any) =>
-          y != null && (!r.year_min || y >= r.year_min) && (!r.year_max || y <= r.year_max),
-      ) ?? rows[0];
-    return match;
+    const inRange = (r: any) =>
+      y != null && (!r.year_min || y >= r.year_min) && (!r.year_max || y <= r.year_max);
+    const yearMatches = y != null ? rows.filter(inRange) : rows;
+
+    if (y != null && yearMatches.length === 0) {
+      // Model known but no spec covers this year — flag as uncertain.
+      return { status: "uncertain" as const, match: null, candidates: rows };
+    }
+    if (yearMatches.length === 1) {
+      return { status: "matched" as const, match: yearMatches[0], candidates: yearMatches };
+    }
+    // Multiple overlapping rows (e.g. trim/engine variants) — let user pick.
+    return { status: "uncertain" as const, match: yearMatches[0], candidates: yearMatches };
   });
+
+
 
 /** Anyone can submit a quote request. Server enforces shape + light rate limit. */
 export const createPartQuoteRequest = createServerFn({ method: "POST" })
