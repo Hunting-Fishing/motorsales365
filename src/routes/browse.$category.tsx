@@ -217,7 +217,8 @@ function BrowsePage() {
     }
     return init;
   });
-  const { items: loaderItems, userIds } = Route.useLoaderData();
+  const loaderData = Route.useLoaderData() as { items: ListingCardData[]; userIds: string[] };
+  const { items: loaderItems, userIds } = loaderData;
   const { ids: blockedIds } = useBlockedUserIds();
 
   // Overlay dealer/business badge once it loads — doesn't block first paint.
