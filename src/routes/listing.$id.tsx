@@ -86,6 +86,42 @@ const REPORT_REASONS = [
   "Other",
 ];
 
+function SectionCard({
+  title,
+  meta,
+  defaultOpen,
+  className,
+  children,
+}: {
+  title: React.ReactNode;
+  meta?: React.ReactNode;
+  defaultOpen?: boolean;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  const isDesktop =
+    typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches;
+  const open = defaultOpen ?? isDesktop;
+  return (
+    <Collapsible
+      defaultOpen={open}
+      className={`mt-6 rounded-xl border border-border bg-card p-5 ${className ?? ""}`}
+    >
+      <CollapsibleTrigger className="group flex w-full items-center justify-between gap-3 text-left">
+        <h2 className="font-display text-lg font-semibold">{title}</h2>
+        <div className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
+          {meta}
+          <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]:rotate-180" />
+        </div>
+      </CollapsibleTrigger>
+      <CollapsibleContent className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
+        <div className="mt-3">{children}</div>
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
+
 export const Route = createFileRoute("/listing/$id")({
   loader: async ({ params }) => {
     try {
