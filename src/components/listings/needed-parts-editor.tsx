@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus, X } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Info, Plus, X } from "lucide-react";
 import { useServerFn } from "@tanstack/react-start";
 import { NEEDED_PARTS_GROUPS, NEEDED_PARTS_INDEX } from "@/data/needed-parts-catalog";
 import { getTireSpec } from "@/lib/parts-fulfillment.functions";
@@ -19,7 +19,19 @@ interface Props {
   make?: string;
   model?: string;
   year?: number;
+  engine?: string;
 }
+
+// Accepts metric (185/60R15, 225/45ZR17), light truck (LT265/70R17), and flotation (31x10.5R15).
+const TIRE_SIZE_RE =
+  /^(LT|P)?\d{2,3}(\/\d{2,3}|x\d{1,2}(\.\d)?)[ZR]?R?\d{2}(\s?\d{2,3}[A-Z])?$/i;
+
+type LookupState =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "none" }
+  | { status: "uncertain"; candidates: any[]; match: any | null }
+  | { status: "matched"; match: any };
 
 export function NeededPartsEditor({
   value,
@@ -29,24 +41,47 @@ export function NeededPartsEditor({
   make,
   model,
   year,
+  engine,
 }: Props) {
   const [custom, setCustom] = useState("");
-  const [suggested, setSuggested] = useState<string | null>(null);
-  const lookup = useServerFn(getTireSpec);
+  const [touched, setTouched] = useState(false);
+  const [lookup, setLookup] = useState<LookupState>({ status: "idle" });
+  const fetchSpec = useServerFn(getTireSpec);
 
   useEffect(() => {
-    if (!make || !model) return;
+    if (!make || !model) {
+      setLookup({ status: "idle" });
+      return;
+    }
     let cancelled = false;
-    lookup({ data: { make, model, year } })
+    setLookup({ status: "loading" });
+    fetchSpec({ data: { make, model, year, engine } })
       .then((r: any) => {
-        if (cancelled) return;
-        setSuggested(r?.front_size ?? null);
+        if (cancelled || !r) return;
+        if (r.status === "matched") setLookup({ status: "matched", match: r.match });
+        else if (r.status === "uncertain")
+          setLookup({ status: "uncertain", candidates: r.candidates ?? [], match: r.match });
+        else setLookup({ status: "none" });
       })
-      .catch(() => {});
+      .catch(() => {
+        if (!cancelled) setLookup({ status: "none" });
+      });
     return () => {
       cancelled = true;
     };
-  }, [make, model, year, lookup]);
+  }, [make, model, year, engine, fetchSpec]);
+
+  const trimmed = tireSize.trim();
+  const formatOk = trimmed === "" || TIRE_SIZE_RE.test(trimmed);
+  const matchedFront =
+    lookup.status === "matched" ? (lookup.match?.front_size as string | null) : null;
+  const matchedRear =
+    lookup.status === "matched" ? (lookup.match?.rear_size as string | null) : null;
+  const expectedSet = new Set(
+    [matchedFront, matchedRear].filter((s): s is string => !!s).map((s) => s.toUpperCase()),
+  );
+  const mismatchesFactory =
+    lookup.status === "matched" && trimmed !== "" && !expectedSet.has(trimmed.toUpperCase());
 
   const toggle = (key: string) => {
     const opt = NEEDED_PARTS_INDEX[key];
