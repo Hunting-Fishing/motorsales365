@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { RouteErrorBoundary, RouteNotFoundBoundary } from "@/components/route-boundaries";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   MapPin,
   Heart,
@@ -9,6 +9,7 @@ import {
   Phone,
   MessageSquare,
   ChevronLeft,
+  ChevronRight,
   Truck,
   Eye,
   Bookmark,
@@ -18,8 +19,9 @@ import {
   ClipboardCheck,
   Wrench,
   MessageCircle,
-  ShieldCheck,
   ChevronDown,
+  Play,
+  Expand,
 } from "lucide-react";
 import {
   Collapsible,
@@ -31,7 +33,8 @@ import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
 import { ServiceStrip } from "@/components/service-strip";
 import { AffiliatePartsSection } from "@/components/affiliate-parts-section";
 import { NeededPartsRail } from "@/components/listing/needed-parts-rail";
-import { QuoteRequestCta } from "@/components/quote-request-cta";
+import { GalleryLightbox } from "@/components/listing/gallery-lightbox";
+import { MobileActionBar } from "@/components/listing/mobile-action-bar";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -218,6 +221,8 @@ function ListingDetailPage() {
   const [reportReason, setReportReason] = useState(REPORT_REASONS[0]);
   const [reportDetails, setReportDetails] = useState("");
   const [submittingReport, setSubmittingReport] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const messageRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -426,12 +431,44 @@ function ListingDetailPage() {
         <div>
           {/* Gallery */}
           <div className="overflow-hidden rounded-xl border border-border bg-card">
-            <div className="aspect-[16/10] bg-secondary">
-              <ImageWithSkeleton
-                src={cover?.url || placeholderCar}
-                alt={cover ? listing.title : "Vehicle photo coming soon"}
-                eager
-              />
+            <div className="relative aspect-[16/10] bg-secondary">
+              <button
+                type="button"
+                onClick={() => photos.length > 0 && setLightboxOpen(true)}
+                className="block h-full w-full"
+                aria-label="Open photo"
+              >
+                <ImageWithSkeleton
+                  src={cover?.url || placeholderCar}
+                  alt={cover ? listing.title : "Vehicle photo coming soon"}
+                  eager
+                />
+              </button>
+              {photos.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setActiveIdx((i) => (i - 1 + photos.length) % photos.length)}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 text-white opacity-0 transition-opacity hover:bg-black/70 group-hover:opacity-100 md:opacity-100"
+                    aria-label="Previous photo"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveIdx((i) => (i + 1) % photos.length)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-black/50 p-1.5 text-white hover:bg-black/70"
+                    aria-label="Next photo"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </button>
+                </>
+              )}
+              {photos.length > 0 && (
+                <div className="pointer-events-none absolute bottom-2 right-2 flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-medium text-white">
+                  <Expand className="h-3 w-3" /> {activeIdx + 1} / {photos.length}
+                </div>
+              )}
             </div>
             {(photos.length > 1 || videos.length > 0) && (
               <div className="flex gap-2 overflow-x-auto p-3">
@@ -444,17 +481,34 @@ function ListingDetailPage() {
                     <ImageWithSkeleton src={p.url} alt={`${listing.title} photo ${i + 1}`} />
                   </button>
                 ))}
-                {videos.map((v) => (
-                  <video
+                {videos.map((v, vi) => (
+                  <button
                     key={v.id}
-                    src={v.url}
-                    controls
-                    className="h-16 w-24 shrink-0 rounded-md border border-border bg-black object-cover"
-                  />
+                    type="button"
+                    onClick={() => {
+                      setActiveIdx(photos.length + vi);
+                      setLightboxOpen(true);
+                    }}
+                    className="relative h-16 w-24 shrink-0 overflow-hidden rounded-md border border-border bg-black"
+                    aria-label="Play video"
+                  >
+                    <video src={v.url} className="h-full w-full object-cover" muted />
+                    <span className="absolute inset-0 flex items-center justify-center bg-black/40">
+                      <Play className="h-5 w-5 fill-white text-white" />
+                    </span>
+                  </button>
                 ))}
               </div>
             )}
           </div>
+          <GalleryLightbox
+            open={lightboxOpen}
+            onOpenChange={setLightboxOpen}
+            items={[...photos, ...videos]}
+            index={activeIdx}
+            onIndexChange={setActiveIdx}
+            title={listing.title}
+          />
 
           {listing.status === "pending_sale" && (
             <div className="mt-6 flex items-start gap-3 rounded-xl border border-warning/40 bg-warning/10 p-4">
@@ -479,15 +533,6 @@ function ListingDetailPage() {
                 <Badge variant={listing.seller_type === "business" ? "default" : "secondary"}>
                   {listing.seller_type === "business" ? "Business seller" : "Private seller"}
                 </Badge>
-                {listing.seller_type === "business" && sellerDealerPlan && (
-                  <DealerSubscriptionBadge
-                    planName={sellerDealerPlan}
-                    currentPeriodEnd={sellerDealerPeriodEnd}
-                    cancelAtPeriodEnd={sellerDealerCancelAtPeriodEnd}
-                    size="md"
-                    showRenewal
-                  />
-                )}
                 {seller?.verification_status === "verified" && (
                   <VerifiedBadge size="md" showLabel />
                 )}
@@ -534,29 +579,35 @@ function ListingDetailPage() {
           </div>
 
           {/* Engagement bar */}
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-sm text-muted-foreground">
-              <Eye className="h-4 w-4" /> {(listing.view_count ?? 0).toLocaleString()} views
+          <div className="mt-4 flex flex-nowrap items-center gap-2 overflow-x-auto sm:flex-wrap">
+            <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-sm text-muted-foreground">
+              <Eye className="h-4 w-4" />
+              <span className="hidden sm:inline">{(listing.view_count ?? 0).toLocaleString()} views</span>
+              <span className="sm:hidden">{(listing.view_count ?? 0).toLocaleString()}</span>
             </span>
             <Button
               variant={liked ? "default" : "outline"}
               size="sm"
               onClick={toggleLike}
-              className="rounded-full"
+              className="shrink-0 rounded-full"
             >
-              <Heart className={`mr-1.5 h-4 w-4 ${liked ? "fill-current" : ""}`} />
-              {likeCount.toLocaleString()} {likeCount === 1 ? "Like" : "Likes"}
+              <Heart className={`h-4 w-4 ${liked ? "fill-current" : ""} sm:mr-1.5`} />
+              <span className="hidden sm:inline">
+                {likeCount.toLocaleString()} {likeCount === 1 ? "Like" : "Likes"}
+              </span>
+              <span className="ml-1 sm:hidden">{likeCount.toLocaleString()}</span>
             </Button>
             <Button
               variant={favorited ? "default" : "outline"}
               size="sm"
               onClick={toggleFavorite}
-              className="rounded-full"
+              className="shrink-0 rounded-full"
             >
-              <Bookmark className={`mr-1.5 h-4 w-4 ${favorited ? "fill-current" : ""}`} />
-              {favorited ? "Saved" : "Save"}
+              <Bookmark className={`h-4 w-4 ${favorited ? "fill-current" : ""} sm:mr-1.5`} />
+              <span className="hidden sm:inline">{favorited ? "Saved" : "Save"}</span>
             </Button>
           </div>
+
 
           {/* Above-the-fold service CTA strip — revenue: lead-gen for finance/insurance/inspection partners */}
           {listing.category_slug !== "towing" && listing.category_slug !== "services" && (
@@ -654,43 +705,6 @@ function ListingDetailPage() {
             />
           )}
 
-          {/* Buyer-safety upsell — links to /services/inspection (audit #20) */}
-          {(listing.category_slug === "cars" ||
-            listing.category_slug === "motorcycles" ||
-            listing.category_slug === "trucks") && (
-            <aside className="mt-6 rounded-xl border border-border bg-card p-5">
-              <div className="flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                  <ShieldCheck className="h-5 w-5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-display text-base font-semibold">
-                    Before you pay — buyer safety add-ons
-                  </h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Optional OR/CR review, seller ID verification, or a pre-purchase mechanic
-                    inspection through a 365-vetted partner. Pricing from ₱99.
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <Link
-                      to="/services/inspection"
-                      search={{ listing: listing.id } as any}
-                      className="inline-flex items-center justify-center rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground hover:opacity-90"
-                    >
-                      Request inspection
-                    </Link>
-                    <Link
-                      to="/services/inspection"
-                      className="inline-flex items-center justify-center rounded-md border border-border px-3 py-1.5 text-xs font-medium hover:bg-muted"
-                    >
-                      See the rate card
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </aside>
-          )}
-
           {(listing.category_slug === "cars" ||
             listing.category_slug === "motorcycles" ||
             listing.category_slug === "trucks") && <BuyerDocumentChecklist />}
@@ -698,7 +712,7 @@ function ListingDetailPage() {
           <div className="mt-4 flex flex-wrap gap-3 text-xs text-muted-foreground">
             <span>Listed {formatDate(listing.published_at)}</span>
             <span>·</span>
-            <span>{listing.view_count} views</span>
+            <span>{(listing.view_count ?? 0).toLocaleString()} views</span>
             <span>·</span>
             <Dialog open={reportOpen} onOpenChange={setReportOpen}>
               <DialogTrigger asChild>
@@ -753,15 +767,7 @@ function ListingDetailPage() {
         </div>
 
         {/* Sidebar */}
-        <aside className="space-y-4 lg:sticky lg:top-20 lg:self-start">
-          {listing.category_slug !== "services" && listing.category_slug !== "towing" && (
-            <QuoteRequestCta
-              listingId={listing.id}
-              region={listing.region ?? undefined}
-              budgetPhp={listing.price_php ?? undefined}
-            />
-          )}
-          <AdCarousel placement="listing_sidebar" />
+        <aside className="space-y-4 pb-20 lg:sticky lg:top-20 lg:self-start lg:pb-0">
           <div className="rounded-xl border border-border bg-card p-5">
             <div className="flex items-start justify-between gap-2">
               <h3 className="font-display text-lg font-semibold">Seller</h3>
@@ -843,12 +849,18 @@ function ListingDetailPage() {
                   </Button>
                 </a>
               )}
-              <Button variant="outline" className="w-full" onClick={toggleFavorite}>
-                <Heart
-                  className={`mr-2 h-4 w-4 ${favorited ? "fill-destructive text-destructive" : ""}`}
-                />
-                {favorited ? "Saved" : "Save listing"}
-              </Button>
+              {listing.allow_messages && (
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => {
+                    messageRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+                    messageRef.current?.focus();
+                  }}
+                >
+                  <MessageSquare className="mr-2 h-4 w-4" /> Message seller
+                </Button>
+              )}
               <ListingQr
                 listingId={listing.id}
                 title={listing.title}
@@ -872,13 +884,20 @@ function ListingDetailPage() {
                 </Button>
               )}
             </div>
+            <button
+              onClick={() => setReportOpen(true)}
+              className="mt-3 inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-destructive"
+            >
+              <Flag className="h-3 w-3" /> Report this listing
+            </button>
           </div>
 
           {/* Services around this vehicle — revenue: lead-gen for finance/insurance/OR-CR partners */}
           <div className="rounded-xl border border-border bg-card p-5">
             <h3 className="font-display text-lg font-semibold">Services for this vehicle</h3>
             <p className="mt-1 text-xs text-muted-foreground">
-              Free quotes from partner providers. No commitment.
+              Free quotes from partner providers — financing, insurance, OR/CR, title transfer, and
+              a 365-vetted pre-purchase inspection from ₱99. No commitment.
             </p>
             <div className="mt-3 grid gap-2 sm:grid-cols-2">
               <ServiceInquiryDialog
@@ -929,12 +948,15 @@ function ListingDetailPage() {
             </div>
           </div>
 
+          <AdCarousel placement="listing_sidebar" />
+
           {listing.allow_messages && (
             <div className="rounded-xl border border-border bg-card p-5">
               <h3 className="flex items-center gap-2 font-display text-lg font-semibold">
                 <MessageSquare className="h-4 w-4" /> Send a message
               </h3>
               <Textarea
+                ref={messageRef}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Hi, is this still available?"
@@ -952,6 +974,15 @@ function ListingDetailPage() {
           )}
         </aside>
       </div>
+      <MobileActionBar
+        phone={listing.contact_phone}
+        whatsappMessage={`Hi! I'm interested in your listing "${listing.title}" on 365 Motor Sales: ${siteUrl(typeof window !== "undefined" ? window.location.pathname : "/")}`}
+        allowMessages={listing.allow_messages}
+        onMessageClick={() => {
+          messageRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+          messageRef.current?.focus();
+        }}
+      />
     </SiteLayout>
   );
 }
