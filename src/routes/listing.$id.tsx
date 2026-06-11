@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/collapsible";
 import { waMeUrl } from "@/lib/whatsapp";
 import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
-import { ServiceStrip } from "@/components/service-strip";
+
 import { AffiliatePartsSection } from "@/components/affiliate-parts-section";
 import { NeededPartsRail } from "@/components/listing/needed-parts-rail";
 import { GalleryLightbox } from "@/components/listing/gallery-lightbox";
