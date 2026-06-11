@@ -217,230 +217,43 @@ function BrowsePage() {
     }
     return init;
   });
-  const [allItems, setAllItems] = useState<ListingCardData[]>([]);
+  const { items: loaderItems, userIds } = Route.useLoaderData();
   const { ids: blockedIds } = useBlockedUserIds();
-  const items = allItems.filter((l) => !l.seller_user_id || !blockedIds.has(l.seller_user_id));
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchListings = async () => {
-      setLoading(true);
-      const baseSelect =
-        "id,title,price_php,monthly_php,down_payment_php,negotiable,price_hidden,registration_status,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,listing_media(url,type),profiles:user_id(verification_status,phone_verified_at),vehicles:vehicle_id(is_public,passport_slug,vehicle_passport_verifications(status))";
-      const buildBase = () => {
-        let q = supabase
-          .from("listings")
-          .select(baseSelect)
-          .in("status", ["active", "pending_sale"])
-          .eq("category_slug", category);
-        if (search.region && search.region !== "all") q = q.eq("region", search.region);
-        if (search.province) q = q.eq("province", search.province);
-        if (search.city) q = q.eq("city", search.city);
-        if (search.min) q = q.gte("price_php", search.min);
-        if (search.max) q = q.lte("price_php", search.max);
-        // Vehicle attributes are stored as JSON. Match the seller-entered
-        // string casing-insensitively when possible.
-        if (search.year) q = q.eq("attributes->>year", String(search.year));
-        if (search.make) q = q.ilike("attributes->>make", search.make);
-        if (search.model) q = q.ilike("attributes->>model", search.model);
-        if (search.engine) q = q.ilike("attributes->>engine", search.engine);
-        // Category-specific filters — all live in listings.attributes.
-        const eq = (k: string, v?: string) => {
-          if (v) q = q.eq(`attributes->>${k}`, v);
-        };
-        const ilike = (k: string, v?: string) => {
-          if (v) q = q.ilike(`attributes->>${k}`, `%${v}%`);
-        };
-        const gte = (k: string, v?: number) => {
-          if (v != null && !Number.isNaN(v))
-            q = q.gte(`attributes->>${k}::numeric` as any, v);
-        };
-        const lte = (k: string, v?: number) => {
-          if (v != null && !Number.isNaN(v))
-            q = q.lte(`attributes->>${k}::numeric` as any, v);
-        };
-        const isTrue = (k: string, v?: boolean) => {
-          if (v) q = q.eq(`attributes->>${k}`, "true");
-        };
-        // Cars
-        eq("transmission", search.transmission);
-        eq("fuel", search.fuel);
-        eq("body_type", search.body_type);
-        eq("drivetrain", search.drivetrain);
-        gte("mileage_km", search.mileage_min);
-        lte("mileage_km", search.mileage_max);
-        eq("owner_status", search.owner_status);
-        eq("or_cr_status", search.or_cr_status);
-        eq("flood_history", search.flood_history);
-        eq("accident_history", search.accident_history);
-        eq("registered_owner", search.registered_owner);
-        isTrue("deed_chain_available", search.deed_chain_available);
-        isTrue("financing_available", search.financing_available);
-        isTrue("trade_accepted", search.trade_accepted);
-        if (search.verified_documents_only) {
-          q = q.eq("attributes->>or_cr_status", "complete");
-        }
-        // Motorcycles
-        eq("moto_type", search.moto_type);
-        gte("engine_cc", search.engine_cc_min);
-        lte("engine_cc", search.engine_cc_max);
-        eq("plate_status", search.plate_status);
-        eq("moto_condition", search.moto_condition);
-        isTrue("delivery_available", search.delivery_available);
-        // Equipment
-        eq("equipment_type", search.equipment_type);
-        ilike("brand", search.brand);
-        gte("hours", search.hours_min);
-        lte("hours", search.hours_max);
-        gte("operating_weight_tons", search.weight_min);
-        lte("operating_weight_tons", search.weight_max);
-        ilike("attachment_type", search.attachment_type);
-        eq("rental_or_sale", search.rental_or_sale);
-        isTrue("with_operator", search.with_operator);
-        isTrue("inspection_available", search.inspection_available);
-        // Boats
-        eq("boat_type", search.boat_type);
-        eq("hull_material", search.hull_material);
-        eq("boat_engine_type", search.boat_engine_type);
-        gte("length_ft", search.length_min);
-        lte("length_ft", search.length_max);
-        eq("boat_registration_status", search.boat_registration_status);
-        eq("boat_usage", search.boat_usage);
-        isTrue("trailer_included", search.trailer_included);
-        // Airplanes
-        ilike("registration_no", search.registration_no);
-        eq("airworthiness", search.airworthiness);
-        eq("maintenance_logs", search.maintenance_logs);
-        gte("engine_hours", search.engine_hours_min);
-        lte("engine_hours", search.engine_hours_max);
-        ilike("airport_code", search.airport_code);
-        eq("aircraft_seller", search.aircraft_seller);
-        isTrue("inspection_required", search.inspection_required);
-
-        if (search.sort === "price_asc") q = q.order("price_php", { ascending: true });
-        else if (search.sort === "price_desc") q = q.order("price_php", { ascending: false });
-        else
-          q = q
-            .order("boost_until", { ascending: false, nullsFirst: false })
-            .order("published_at", { ascending: false, nullsFirst: false });
-        return q;
-      };
-
-      // Build alias/fuzzy alternates for the keyword (handles "VW", "Toyta", etc.)
-      const terms = search.q ? buildTitleSearchTerms(search.q, 6) : [];
-      const escape = (s: string) => s.replace(/[%,()]/g, " ").trim();
-
-      let q = buildBase();
-      if (search.q && terms.length > 0) {
-        const orExpr = terms.map((t) => `title.ilike.%${escape(t)}%`).join(",");
-        q = q.or(orExpr);
+  // Overlay dealer/business badge once it loads — doesn't block first paint.
+  const dealersQuery = useQuery({
+    queryKey: ["browse-dealers", userIds],
+    enabled: userIds.length > 0,
+    staleTime: 60_000,
+    queryFn: async () => {
+      try {
+        const res = await getActiveDealerStatus({ data: { userIds } });
+        return res.dealers;
+      } catch {
+        return {} as Record<string, { planName: string; currentPeriodEnd: string | null; cancelAtPeriodEnd: boolean; status: string }>;
       }
+    },
+  });
+  const dealers = dealersQuery.data ?? {};
 
-      let { data } = await q.limit(60);
+  const items = useMemo(
+    () =>
+      loaderItems
+        .filter((l) => !l.seller_user_id || !blockedIds.has(l.seller_user_id))
+        .map((l) => {
+          const uid = l.seller_user_id;
+          if (!uid || !dealers[uid]) return l;
+          return {
+            ...l,
+            seller_dealer_plan: dealers[uid].planName,
+            seller_dealer_period_end: dealers[uid].currentPeriodEnd,
+            seller_dealer_cancel_at_period_end: dealers[uid].cancelAtPeriodEnd,
+          } as ListingCardData;
+        }),
+    [loaderItems, blockedIds, dealers],
+  );
+  const loading = false;
 
-      // Fallback: if very few hits and a keyword was provided, fetch a wider
-      // pool and apply fuzzy matching client-side to catch typos/variants.
-      if (search.q && (!data || data.length < 6)) {
-        const fb = await buildBase().limit(200);
-        if (fb.data) {
-          const fuzz = fuzzyFilter(fb.data as any[], search.q, (r) => r.title ?? "");
-          const seen = new Set((data ?? []).map((r: any) => r.id));
-          for (const r of fuzz) {
-            if (!seen.has((r as any).id)) {
-              (data ??= []).push(r as any);
-              if (data.length >= 60) break;
-            }
-          }
-        }
-      }
-
-      const userIds = Array.from(
-        new Set((data ?? []).map((r: any) => r.user_id).filter(Boolean)),
-      );
-      let dealers: Record<string, { planName: string; currentPeriodEnd: string | null; cancelAtPeriodEnd: boolean; status: string }> = {};
-      if (userIds.length > 0) {
-        try {
-          const res = await getActiveDealerStatus({ data: { userIds } });
-          dealers = res.dealers;
-        } catch {
-          /* ignore */
-        }
-      }
-      const mapped = (data ?? []).map((r: any) => {
-        const photos = (r.listing_media ?? []).filter((m: any) => m.type === "photo");
-        const videos = (r.listing_media ?? []).filter((m: any) => m.type === "video");
-        return {
-          id: r.id,
-          title: r.title,
-          price_php: Number(r.price_php),
-          region: r.region,
-          city: r.city,
-          seller_type: r.seller_type,
-          boost_until: r.boost_until,
-          category_slug: r.category_slug,
-          view_count: r.view_count ?? 0,
-          cover_url: photos[0]?.url ?? null,
-          photo_count: photos.length,
-          has_video: videos.length > 0,
-          seller_verified: r.profiles?.verification_status === "verified",
-          seller_phone_verified: !!r.profiles?.phone_verified_at,
-          passport_published: !!(r.vehicles?.is_public && r.vehicles?.passport_slug),
-          passport_documents_checked: !!r.vehicles?.vehicle_passport_verifications?.some(
-            (v: any) => v.status === "approved",
-          ),
-          seller_user_id: r.user_id ?? null,
-          seller_dealer_plan: dealers[r.user_id]?.planName ?? null,
-          seller_dealer_period_end: dealers[r.user_id]?.currentPeriodEnd ?? null,
-          seller_dealer_cancel_at_period_end: dealers[r.user_id]?.cancelAtPeriodEnd ?? false,
-          status: r.status,
-          attributes: r.attributes,
-        } as ListingCardData;
-      });
-      setAllItems(mapped);
-      setLoading(false);
-    };
-    fetchListings();
-  }, [
-    category,
-    search.q,
-    search.region,
-    search.province,
-    search.city,
-    search.min,
-    search.max,
-    search.sort,
-    search.year,
-    search.make,
-    search.model,
-    search.engine,
-    // Include the entire category-filter blob as a single JSON dep so any
-    // change re-runs the query.
-    JSON.stringify({
-      transmission: search.transmission, fuel: search.fuel, body_type: search.body_type, drivetrain: search.drivetrain,
-      mileage_min: search.mileage_min, mileage_max: search.mileage_max,
-      owner_status: search.owner_status, or_cr_status: search.or_cr_status,
-      flood_history: search.flood_history, accident_history: search.accident_history,
-      registered_owner: search.registered_owner, deed_chain_available: search.deed_chain_available,
-      financing_available: search.financing_available, trade_accepted: search.trade_accepted,
-      verified_documents_only: search.verified_documents_only,
-      moto_type: search.moto_type, engine_cc_min: search.engine_cc_min,
-      engine_cc_max: search.engine_cc_max, plate_status: search.plate_status,
-      moto_condition: search.moto_condition, delivery_available: search.delivery_available,
-      equipment_type: search.equipment_type, brand: search.brand,
-      hours_min: search.hours_min, hours_max: search.hours_max,
-      weight_min: search.weight_min, weight_max: search.weight_max,
-      attachment_type: search.attachment_type, rental_or_sale: search.rental_or_sale,
-      with_operator: search.with_operator, inspection_available: search.inspection_available,
-      boat_type: search.boat_type, hull_material: search.hull_material,
-      boat_engine_type: search.boat_engine_type, length_min: search.length_min,
-      length_max: search.length_max, boat_registration_status: search.boat_registration_status,
-      boat_usage: search.boat_usage, trailer_included: search.trailer_included,
-      registration_no: search.registration_no, airworthiness: search.airworthiness,
-      maintenance_logs: search.maintenance_logs, engine_hours_min: search.engine_hours_min,
-      engine_hours_max: search.engine_hours_max, airport_code: search.airport_code,
-      aircraft_seller: search.aircraft_seller, inspection_required: search.inspection_required,
-    }),
-  ]);
 
   const applyFilters = (e: React.FormEvent) => {
     e.preventDefault();
