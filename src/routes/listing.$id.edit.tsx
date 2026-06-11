@@ -1153,6 +1153,7 @@ function EditListingPage() {
                   make={make}
                   model={model}
                   year={year ? Number(year) : undefined}
+                  engine={engine || undefined}
                 />
               </div>
             )}
