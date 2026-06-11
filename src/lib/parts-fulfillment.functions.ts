@@ -1,0 +1,284 @@
+import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+const ItemSchema = z.object({
+  kind: z.enum(["catalog", "custom"]),
+  catalog_id: z.string().uuid().optional().nullable(),
+  label: z.string().min(1).max(200),
+  qty: z.number().int().min(1).max(99).optional().nullable(),
+});
+
+/** Read listing.attributes.needed_parts + join in any matched catalog rows. */
+export const getNeededPartsForListing = createServerFn({ method: "POST" })
+  .inputValidator((d: { listingId: string }) =>
+    z.object({ listingId: z.string().uuid() }).parse(d),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: listing } = await supabaseAdmin
+      .from("listings")
+      .select("id,attributes,category_slug")
+      .eq("id", data.listingId)
+      .maybeSingle();
+    if (!listing) return { needed: [], tireSize: null, suggested: [] };
+
+    const attrs = (listing.attributes ?? {}) as any;
+    const needed = Array.isArray(attrs.needed_parts) ? attrs.needed_parts : [];
+    const tireSize: string | null = attrs.tire_size_confirmed ?? null;
+    const make: string | null = attrs.make ?? null;
+
+    // Build a suggested catalog set: match by category keys present in needed[], plus tires if tireSize is set.
+    const wantedCats = new Set<string>();
+    for (const n of needed) {
+      if (typeof n?.category === "string") wantedCats.add(n.category);
+    }
+    if (tireSize) wantedCats.add("tires");
+
+    let suggested: any[] = [];
+    if (wantedCats.size > 0) {
+      const { data: cat } = await supabaseAdmin
+        .from("parts_catalog")
+        .select("id,slug,title,description,category,base_price_php,photo_url,compatible_makes")
+        .eq("active", true)
+        .in("category", Array.from(wantedCats))
+        .order("sort_order", { ascending: true })
+        .limit(24);
+      suggested = (cat ?? []).filter((row: any) => {
+        if (!row.compatible_makes?.length || !make) return true;
+        return row.compatible_makes.some(
+          (m: string) => m.toLowerCase() === String(make).toLowerCase(),
+        );
+      });
+    }
+    return { needed, tireSize, suggested };
+  });
+
+/** Look up factory tire spec for a given vehicle (best match by year range). */
+export const getTireSpec = createServerFn({ method: "POST" })
+  .inputValidator((d: { make: string; model: string; year?: number }) =>
+    z
+      .object({
+        make: z.string().min(1).max(100),
+        model: z.string().min(1).max(100),
+        year: z.number().int().min(1900).max(2100).optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows } = await supabaseAdmin
+      .from("vehicle_tire_specs")
+      .select("*")
+      .ilike("make", data.make)
+      .ilike("model", data.model);
+    if (!rows?.length) return null;
+    const y = data.year ?? null;
+    const match =
+      rows.find(
+        (r: any) =>
+          y != null && (!r.year_min || y >= r.year_min) && (!r.year_max || y <= r.year_max),
+      ) ?? rows[0];
+    return match;
+  });
+
+/** Anyone can submit a quote request. Server enforces shape + light rate limit. */
+export const createPartQuoteRequest = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        listingId: z.string().uuid().optional().nullable(),
+        rideId: z.string().uuid().optional().nullable(),
+        contact_name: z.string().trim().min(1).max(120),
+        contact_phone: z.string().trim().max(40).optional().nullable(),
+        contact_email: z.string().trim().email().max(255).optional().nullable(),
+        delivery_method: z.enum(["pickup", "delivery"]).default("pickup"),
+        notes: z.string().trim().max(2000).optional().nullable(),
+        items: z.array(ItemSchema).min(1).max(40),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Light rate limit: cap to 5 requests per email per hour.
+    if (data.contact_email) {
+      const since = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+      const { count } = await supabaseAdmin
+        .from("part_quote_requests")
+        .select("id", { count: "exact", head: true })
+        .eq("contact_email", data.contact_email)
+        .gte("created_at", since);
+      if ((count ?? 0) >= 5) {
+        throw new Error("Too many recent quote requests. Please try again later.");
+      }
+    }
+    const { data: row, error } = await supabaseAdmin
+      .from("part_quote_requests")
+      .insert({
+        listing_id: data.listingId ?? null,
+        ride_id: data.rideId ?? null,
+        contact_name: data.contact_name,
+        contact_phone: data.contact_phone ?? null,
+        contact_email: data.contact_email ?? null,
+        delivery_method: data.delivery_method,
+        notes: data.notes ?? null,
+        items: data.items,
+      })
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+    return { id: row.id };
+  });
+
+// ---------- Admin ----------
+
+async function requireAdmin(context: any) {
+  const { data, error } = await context.supabase.rpc("has_role", {
+    _user_id: context.userId,
+    _role: "admin",
+  });
+  if (error || !data) throw new Error("Forbidden");
+}
+
+export const adminListQuoteRequests = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { status?: string } | undefined) =>
+    z.object({ status: z.string().optional() }).parse(d ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    let q = supabaseAdmin
+      .from("part_quote_requests")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (data.status && data.status !== "all") q = q.eq("status", data.status);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+export const adminUpdateQuoteRequest = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        status: z.enum(["new", "quoted", "accepted", "rejected", "cancelled"]).optional(),
+        internal_notes: z.string().max(4000).optional().nullable(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const patch: any = {};
+    if (data.status) patch.status = data.status;
+    if (data.internal_notes !== undefined) patch.internal_notes = data.internal_notes;
+    const { error } = await supabaseAdmin
+      .from("part_quote_requests")
+      .update(patch)
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminListCatalog = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("parts_catalog")
+      .select("*")
+      .order("sort_order", { ascending: true })
+      .order("title", { ascending: true });
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+const CatalogSchema = z.object({
+  id: z.string().uuid().optional(),
+  slug: z.string().trim().min(1).max(120),
+  title: z.string().trim().min(1).max(200),
+  description: z.string().max(2000).optional().nullable(),
+  category: z.string().trim().min(1).max(60),
+  base_price_php: z.number().nullable().optional(),
+  photo_url: z.string().url().nullable().optional(),
+  compatible_makes: z.array(z.string()).default([]),
+  compatible_models: z.array(z.string()).default([]),
+  year_min: z.number().int().nullable().optional(),
+  year_max: z.number().int().nullable().optional(),
+  active: z.boolean().default(true),
+  sort_order: z.number().int().default(0),
+});
+
+export const adminUpsertCatalog = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => CatalogSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("parts_catalog").upsert(data as any);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminDeleteCatalog = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("parts_catalog").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminListTireSpecs = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await requireAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("vehicle_tire_specs")
+      .select("*")
+      .order("make")
+      .order("model");
+    if (error) throw new Error(error.message);
+    return data ?? [];
+  });
+
+const TireSpecSchema = z.object({
+  id: z.string().uuid().optional(),
+  make: z.string().trim().min(1).max(100),
+  model: z.string().trim().min(1).max(100),
+  year_min: z.number().int().nullable().optional(),
+  year_max: z.number().int().nullable().optional(),
+  front_size: z.string().trim().max(40).nullable().optional(),
+  rear_size: z.string().trim().max(40).nullable().optional(),
+  notes: z.string().max(500).nullable().optional(),
+});
+
+export const adminUpsertTireSpec = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => TireSpecSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("vehicle_tire_specs").upsert(data as any);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminDeleteTireSpec = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { id: string }) => z.object({ id: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.from("vehicle_tire_specs").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
