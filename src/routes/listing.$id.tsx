@@ -719,12 +719,14 @@ function ListingDetailPage() {
 
           {/* Affiliate parts — revenue: commission on partner shop checkouts */}
           {listing.category_slug !== "towing" && listing.category_slug !== "services" && (
-            <AffiliatePartsSection
-              make={listing.attributes?.make ?? null}
-              model={listing.attributes?.model ?? null}
-              year={listing.attributes?.year ? Number(listing.attributes.year) : null}
-              listingId={listing.id}
-            />
+            <SectionCard title="Parts & accessories for this car">
+              <AffiliatePartsSection
+                make={listing.attributes?.make ?? null}
+                model={listing.attributes?.model ?? null}
+                year={listing.attributes?.year ? Number(listing.attributes.year) : null}
+                listingId={listing.id}
+              />
+            </SectionCard>
           )}
 
           {(listing.category_slug === "cars" ||
