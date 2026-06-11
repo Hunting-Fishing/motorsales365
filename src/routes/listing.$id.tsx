@@ -221,6 +221,8 @@ function ListingDetailPage() {
   const [reportReason, setReportReason] = useState(REPORT_REASONS[0]);
   const [reportDetails, setReportDetails] = useState("");
   const [submittingReport, setSubmittingReport] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const messageRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     const load = async () => {
