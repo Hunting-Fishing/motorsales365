@@ -1135,6 +1135,26 @@ function EditListingPage() {
                 />
               </div>
             )}
+            {(category === "car" || category === "motorcycle") && (
+              <div className="mt-4 rounded-md border border-border/60 bg-background/40 p-4">
+                <h3 className="mb-1 font-display text-sm font-semibold">
+                  Parts needed / known issues (optional)
+                </h3>
+                <p className="mb-3 text-xs text-muted-foreground">
+                  Flag anything this car needs (brakes, tires, battery, etc.). Buyers will see
+                  these on the listing and can request a parts quote from us.
+                </p>
+                <NeededPartsEditor
+                  value={neededParts}
+                  onChange={setNeededParts}
+                  tireSize={tireSizeConfirmed}
+                  onTireSizeChange={setTireSizeConfirmed}
+                  make={make}
+                  model={model}
+                  year={year ? Number(year) : undefined}
+                />
+              </div>
+            )}
           </section>
 
           <section className="space-y-4 rounded-xl border border-border bg-card p-6">
