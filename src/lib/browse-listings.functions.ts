@@ -208,9 +208,38 @@ export const getBrowseListings = createServerFn({ method: "POST" })
       }
     }
 
-    const items: ListingCardData[] = (data ?? []).map((r: any) => {
+    const rows = (data ?? []) as any[];
+    const userIdsAll = Array.from(new Set(rows.map((r) => r.user_id).filter(Boolean))) as string[];
+    const vehicleIdsAll = Array.from(
+      new Set(rows.map((r) => r.vehicle_id).filter(Boolean)),
+    ) as string[];
+
+    const [profilesRes, vehiclesRes] = await Promise.all([
+      userIdsAll.length
+        ? supabaseAdmin
+            .from("profiles")
+            .select("id,verification_status,phone_verified_at")
+            .in("id", userIdsAll)
+        : Promise.resolve({ data: [] as any[] }),
+      vehicleIdsAll.length
+        ? supabaseAdmin
+            .from("vehicles")
+            .select("id,is_public,passport_slug,vehicle_passport_verifications(status)")
+            .in("id", vehicleIdsAll)
+        : Promise.resolve({ data: [] as any[] }),
+    ]);
+    const profilesMap = new Map<string, any>(
+      ((profilesRes as any).data ?? []).map((p: any) => [p.id, p]),
+    );
+    const vehiclesMap = new Map<string, any>(
+      ((vehiclesRes as any).data ?? []).map((v: any) => [v.id, v]),
+    );
+
+    const items: ListingCardData[] = rows.map((r) => {
       const photos = (r.listing_media ?? []).filter((m: any) => m.type === "photo");
       const videos = (r.listing_media ?? []).filter((m: any) => m.type === "video");
+      const profile = r.user_id ? profilesMap.get(r.user_id) : null;
+      const vehicle = r.vehicle_id ? vehiclesMap.get(r.vehicle_id) : null;
       return {
         id: r.id,
         title: r.title,
@@ -224,10 +253,10 @@ export const getBrowseListings = createServerFn({ method: "POST" })
         cover_url: photos[0]?.url ?? null,
         photo_count: photos.length,
         has_video: videos.length > 0,
-        seller_verified: r.profiles?.verification_status === "verified",
-        seller_phone_verified: !!r.profiles?.phone_verified_at,
-        passport_published: !!(r.vehicles?.is_public && r.vehicles?.passport_slug),
-        passport_documents_checked: !!r.vehicles?.vehicle_passport_verifications?.some(
+        seller_verified: profile?.verification_status === "verified",
+        seller_phone_verified: !!profile?.phone_verified_at,
+        passport_published: !!(vehicle?.is_public && vehicle?.passport_slug),
+        passport_documents_checked: !!vehicle?.vehicle_passport_verifications?.some(
           (v: any) => v.status === "approved",
         ),
         seller_user_id: r.user_id ?? null,
@@ -239,9 +268,5 @@ export const getBrowseListings = createServerFn({ method: "POST" })
       } as ListingCardData;
     });
 
-    const userIds = Array.from(
-      new Set((data ?? []).map((r: any) => r.user_id).filter(Boolean)),
-    ) as string[];
-
-    return { items, userIds };
+    return { items, userIds: userIdsAll };
   });
