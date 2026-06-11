@@ -1,11 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import ogBrowse from "@/assets/og/browse.jpg";
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Search, BookmarkPlus, Rocket } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { getActiveDealerStatus } from "@/lib/seller-status.functions";
+import { getBrowseListings, type BrowseFiltersInput } from "@/lib/browse-listings.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { TowingServicesPage } from "@/components/towing/towing-services-page";
