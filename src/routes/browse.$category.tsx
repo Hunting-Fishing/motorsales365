@@ -541,6 +541,7 @@ function BrowsePage() {
                     setCatFilters={setCatFilters}
                     onSubmit={applyFilters}
                     onSave={openSaveDialog}
+                    yearCounts={yearCounts}
                   />
                 </div>
               </SheetContent>
