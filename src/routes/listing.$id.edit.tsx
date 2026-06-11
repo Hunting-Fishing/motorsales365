@@ -379,6 +379,8 @@ function EditListingPage() {
     if (engine) attributes.engine = engine;
     if (category === "car" || category === "motorcycle") {
       Object.assign(attributes, vehicleQualityToAttributes(vehicleQuality));
+      attributes.needed_parts = neededParts.length ? neededParts : undefined;
+      attributes.tire_size_confirmed = tireSizeConfirmed.trim() || undefined;
     }
     if (isAttrCategory(category)) {
       for (const k of CATEGORY_ATTR_KEYS[category] ?? []) delete attributes[k];
