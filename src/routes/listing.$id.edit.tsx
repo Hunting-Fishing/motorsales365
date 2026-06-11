@@ -38,6 +38,7 @@ import {
   CATEGORY_ATTR_KEYS,
 } from "@/components/listings/category-attributes-editor";
 import { isAttrCategory, isValidDrivetrain } from "@/lib/category-attributes";
+import { NeededPartsEditor } from "@/components/listings/needed-parts-editor";
 import { PhoneInput } from "@/components/phone-input";
 import { parseE164, buildE164 } from "@/data/country-codes";
 import {
