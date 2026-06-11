@@ -8,6 +8,7 @@ import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { getActiveDealerStatus } from "@/lib/seller-status.functions";
 import { getBrowseListings, type BrowseFiltersInput } from "@/lib/browse-listings.functions";
+import { getYearCountsForCategory } from "@/lib/year-counts.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { TowingServicesPage } from "@/components/towing/towing-services-page";
@@ -249,6 +250,22 @@ function BrowsePage() {
     },
   });
   const dealers = dealersQuery.data ?? {};
+
+  // Per-year listing counts for the year dropdown — refetches when region changes.
+  const showVehiclePicker = category === "car" || category === "motorcycle";
+  const yearCountsQuery = useQuery({
+    queryKey: ["browse-year-counts", category, region],
+    enabled: showVehiclePicker,
+    staleTime: 5 * 60_000,
+    queryFn: async () => {
+      try {
+        return await getYearCountsForCategory({ data: { category, region } });
+      } catch {
+        return {} as Record<string, number>;
+      }
+    },
+  });
+  const yearCounts = yearCountsQuery.data ?? {};
 
   const items = useMemo(
     () =>
@@ -683,6 +700,7 @@ interface FiltersFormProps {
   setCatFilters: (v: CategoryFilterValue) => void;
   onSubmit: (e?: React.FormEvent) => void;
   onSave: () => void;
+  yearCounts?: Record<string, number>;
 }
 
 function FiltersForm(p: FiltersFormProps) {
