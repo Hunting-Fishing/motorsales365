@@ -84,6 +84,7 @@ type Props = {
   requestedProviderName?: string | null;
   onClearRequestedProvider?: () => void;
   providerSearchSlot?: React.ReactNode;
+  seedListingId?: string | null;
 };
 
 export function TowRequestForm({
@@ -91,6 +92,7 @@ export function TowRequestForm({
   requestedProviderName,
   onClearRequestedProvider,
   providerSearchSlot,
+  seedListingId,
 }: Props) {
   const { user } = useAuth();
   const navigate = useNavigate();
