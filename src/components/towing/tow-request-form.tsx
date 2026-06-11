@@ -358,6 +358,25 @@ export function TowRequestForm({
       onSubmit={handleSubmit}
       className="grid gap-6 rounded-xl border border-border bg-card p-6 lg:grid-cols-2"
     >
+      {seededListing && (
+        <div className="lg:col-span-2 flex items-center justify-between gap-3 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
+          <div className="flex items-center gap-2">
+            <Wrench className="h-4 w-4 text-primary" />
+            <span>
+              Towing the vehicle from listing:{" "}
+              <span className="font-medium">{seededListing.title}</span>
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSeededListing(null)}
+            className="text-xs text-muted-foreground hover:text-foreground"
+            aria-label="Clear linked listing"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
       {/* Urgency + situation */}
       <section className="space-y-4 lg:col-span-2">
         <div>
