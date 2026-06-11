@@ -578,30 +578,55 @@ function ListingDetailPage() {
           )}
 
           {/* Specs */}
-          {Object.keys(listing.attributes ?? {}).filter((k) => k !== "tags").length > 0 && (
-            <div className="mt-6 rounded-xl border border-border bg-card p-5">
-              <h2 className="mb-3 font-display text-lg font-semibold">Specifications</h2>
-              <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                {Object.entries(listing.attributes)
-                  .filter(([k]) => k !== "tags")
-                  .map(([k, v]) => (
-                    <div
-                      key={k}
-                      className="flex justify-between gap-3 border-b border-border/60 pb-2 text-sm"
-                    >
-                      <dt className="capitalize text-muted-foreground">{k.replace(/_/g, " ")}</dt>
-                      <dd className="font-medium text-right">
-                        {Array.isArray(v)
-                          ? v.join(", ")
-                          : typeof v === "boolean"
-                            ? v ? "Yes" : "No"
-                            : String(v)}
-                      </dd>
-                    </div>
-                  ))}
-              </dl>
-            </div>
-          )}
+          {(() => {
+            const specEntries = Object.entries(listing.attributes ?? {}).filter(
+              ([k]) => k !== "tags",
+            );
+            if (specEntries.length === 0) return null;
+            return (
+              <Collapsible
+                defaultOpen={
+                  typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches
+                }
+                className="mt-6 rounded-xl border border-border bg-card p-5"
+              >
+                <CollapsibleTrigger className="group flex w-full items-center justify-between gap-3">
+                  <h2 className="font-display text-lg font-semibold">Specifications</h2>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <span>
+                      {specEntries.length} {specEntries.length === 1 ? "spec" : "specs"}
+                    </span>
+                    <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]:rotate-180" />
+                  </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
+                  <dl className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    {specEntries.map(([k, v]) => (
+                      <div
+                        key={k}
+                        className="flex justify-between gap-3 border-b border-border/60 pb-2 text-sm"
+                      >
+                        <dt className="capitalize text-muted-foreground">
+                          {k.replace(/_/g, " ")}
+                        </dt>
+                        <dd className="font-medium text-right">
+                          {Array.isArray(v)
+                            ? v.join(", ")
+                            : typeof v === "boolean"
+                              ? v
+                                ? "Yes"
+                                : "No"
+                              : String(v)}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </CollapsibleContent>
+              </Collapsible>
+            );
+          })()}
+
+
 
           {/* Description */}
           <div className="mt-6 rounded-xl border border-border bg-card p-5">
