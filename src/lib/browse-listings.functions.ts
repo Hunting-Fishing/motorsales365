@@ -93,7 +93,7 @@ export const getBrowseListings = createServerFn({ method: "POST" })
     const category = search.category;
 
     const baseSelect =
-      "id,title,price_php,monthly_php,down_payment_php,negotiable,price_hidden,registration_status,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,published_at,listing_media(url,type),profiles:user_id(verification_status,phone_verified_at),vehicles:vehicle_id(is_public,passport_slug,vehicle_passport_verifications(status))";
+      "id,title,price_php,monthly_php,down_payment_php,negotiable,price_hidden,registration_status,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,vehicle_id,published_at,listing_media(url,type)";
 
     const buildBase = () => {
       let q = supabaseAdmin
