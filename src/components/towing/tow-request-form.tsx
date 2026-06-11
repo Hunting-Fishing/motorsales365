@@ -303,7 +303,7 @@ export function TowRequestForm({
         requester_id: user.id,
         provider_id: null,
         requested_provider_id: requestedProviderId ?? null,
-        listing_id: null,
+        listing_id: seededListing?.id ?? null,
         urgency,
         situation,
         ride_id: rideId,
