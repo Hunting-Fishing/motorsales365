@@ -4633,11 +4633,11 @@ export function getMakesForYear(category: VehicleCategory, year: number | undefi
   });
 }
 
-/** Year-dropdown options (newest first, down to 1980). */
+/** Year-dropdown options (newest first, down to 1920 for vintage/classic). */
 export function getYearOptions(): number[] {
   const current = new Date().getFullYear();
   const next = current + 1;
   const years: number[] = [];
-  for (let y = next; y >= 1980; y--) years.push(y);
+  for (let y = next; y >= 1920; y--) years.push(y);
   return years;
 }

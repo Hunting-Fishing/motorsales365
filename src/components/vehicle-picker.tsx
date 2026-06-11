@@ -32,6 +32,8 @@ type Props = {
   engine?: string;
   /** When true, stack Year/Make/Model vertically (use for narrow sidebars). */
   stacked?: boolean;
+  /** Optional listings-per-year counts, rendered beside each year option. */
+  yearCounts?: Record<string, number>;
   onChange: (next: { year: string; make: string; model: string; engine?: string }) => void;
 };
 
@@ -46,6 +48,7 @@ function Combo({
   allowCustom = true,
   addLabel,
   getKeywords,
+  optionCounts,
 }: {
   value: string;
   options: string[];
@@ -57,6 +60,7 @@ function Combo({
   allowCustom?: boolean;
   addLabel: string;
   getKeywords?: (option: string) => string[];
+  optionCounts?: Record<string, number>;
 }) {
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState("");
@@ -128,19 +132,27 @@ function Combo({
               )}
             </CommandEmpty>
             <CommandGroup>
-              {options.map((opt) => (
-                <CommandItem
-                  key={opt}
-                  value={opt}
-                  keywords={getKeywords?.(opt)}
-                  onSelect={() => commit(opt)}
-                >
-                  <Check
-                    className={cn("mr-2 h-4 w-4", value === opt ? "opacity-100" : "opacity-0")}
-                  />
-                  {opt}
-                </CommandItem>
-              ))}
+              {options.map((opt) => {
+                const count = optionCounts?.[opt];
+                return (
+                  <CommandItem
+                    key={opt}
+                    value={opt}
+                    keywords={getKeywords?.(opt)}
+                    onSelect={() => commit(opt)}
+                  >
+                    <Check
+                      className={cn("mr-2 h-4 w-4", value === opt ? "opacity-100" : "opacity-0")}
+                    />
+                    <span className="flex-1">{opt}</span>
+                    {typeof count === "number" && count > 0 && (
+                      <span className="ml-2 tabular-nums text-xs text-muted-foreground">
+                        ({count.toLocaleString()})
+                      </span>
+                    )}
+                  </CommandItem>
+                );
+              })}
             </CommandGroup>
           </CommandList>
         </Command>
@@ -149,7 +161,7 @@ function Combo({
   );
 }
 
-export function VehiclePicker({ category, year, make, model, engine, stacked, onChange }: Props) {
+export function VehiclePicker({ category, year, make, model, engine, stacked, yearCounts, onChange }: Props) {
   // "Other" mode = three free-text inputs (escape hatch).
   const [otherMode, setOtherMode] = React.useState(false);
   const [engineCustom, setEngineCustom] = React.useState(false);
@@ -271,6 +283,7 @@ export function VehiclePicker({ category, year, make, model, engine, stacked, on
             searchPlaceholder="Search year…"
             emptyText="No years"
             addLabel="Use year"
+            optionCounts={yearCounts}
             onSelect={(v) => onChange({ year: v, make, model, engine })}
           />
         </div>
