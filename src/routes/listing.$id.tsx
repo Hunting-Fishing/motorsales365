@@ -579,29 +579,35 @@ function ListingDetailPage() {
           </div>
 
           {/* Engagement bar */}
-          <div className="mt-4 flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-sm text-muted-foreground">
-              <Eye className="h-4 w-4" /> {(listing.view_count ?? 0).toLocaleString()} views
+          <div className="mt-4 flex flex-nowrap items-center gap-2 overflow-x-auto sm:flex-wrap">
+            <span className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1.5 text-sm text-muted-foreground">
+              <Eye className="h-4 w-4" />
+              <span className="hidden sm:inline">{(listing.view_count ?? 0).toLocaleString()} views</span>
+              <span className="sm:hidden">{(listing.view_count ?? 0).toLocaleString()}</span>
             </span>
             <Button
               variant={liked ? "default" : "outline"}
               size="sm"
               onClick={toggleLike}
-              className="rounded-full"
+              className="shrink-0 rounded-full"
             >
-              <Heart className={`mr-1.5 h-4 w-4 ${liked ? "fill-current" : ""}`} />
-              {likeCount.toLocaleString()} {likeCount === 1 ? "Like" : "Likes"}
+              <Heart className={`h-4 w-4 ${liked ? "fill-current" : ""} sm:mr-1.5`} />
+              <span className="hidden sm:inline">
+                {likeCount.toLocaleString()} {likeCount === 1 ? "Like" : "Likes"}
+              </span>
+              <span className="ml-1 sm:hidden">{likeCount.toLocaleString()}</span>
             </Button>
             <Button
               variant={favorited ? "default" : "outline"}
               size="sm"
               onClick={toggleFavorite}
-              className="rounded-full"
+              className="shrink-0 rounded-full"
             >
-              <Bookmark className={`mr-1.5 h-4 w-4 ${favorited ? "fill-current" : ""}`} />
-              {favorited ? "Saved" : "Save"}
+              <Bookmark className={`h-4 w-4 ${favorited ? "fill-current" : ""} sm:mr-1.5`} />
+              <span className="hidden sm:inline">{favorited ? "Saved" : "Save"}</span>
             </Button>
           </div>
+
 
           {/* Above-the-fold service CTA strip — revenue: lead-gen for finance/insurance/inspection partners */}
           {listing.category_slug !== "towing" && listing.category_slug !== "services" && (
