@@ -1,70 +1,86 @@
-# Plan: Collapsible specs + standardize on the enhanced tow form
+## Car Listing Page — Audit & Cleanup Plan
 
-Two small, focused changes on the listing page and the `/tow` route.
+Scope: `src/routes/listing.$id.tsx` (the public car ad detail page). The editor (`listing.$id.edit.tsx`) is out of scope for this pass.
 
-## 1. Make Specifications collapsible on the listing page
+### What the audit found
 
-File: `src/routes/listing.$id.tsx` (the `Specifications` block around lines 575–598)
+Going section-by-section, these are real duplicates or UX issues. Nothing unique gets removed — only the second/third copy of the same control collapses into the first.
 
-- Wrap the spec list in a `<Collapsible>` (from `@/components/ui/collapsible`, already used elsewhere).
-- Header row: the existing `Specifications` title + a chevron button on the right showing item count (e.g. `12 specs`).
-- Default state: **collapsed on mobile, expanded on desktop ≥ md** (so power users on a laptop still see everything at a glance, mobile users get a tidier page).
-- Smooth chevron rotation; keep the rounded card chrome unchanged.
-- No data or sorting changes — same key/value rows.
+**1. Service CTAs appear up to 3× each.** Insurance, financing, inspection, OR/CR, and title transfer all show up in:
+  - `ServiceStrip` (above-the-fold strip, line 562)
+  - `QuoteRequestCta` sidebar card (insurance + financing again, line 758)
+  - "Buyer safety add-ons" aside (inspection again, line 661)
+  - "Services for this vehicle" sidebar grid (all 5 again, line 877)
 
-## 2. Standardize `/tow` on the enhanced TowRequestForm
+  Result: insurance = 3 entry points, inspection = 3, financing = 2, OR/CR = 2, title transfer = 2.
 
-The site has two tow request flows today:
+**2. View count shown twice.** Engagement bar (line 539) and footer meta row (line 701).
 
-- `/tow` (file `src/routes/tow.tsx`) — old, simpler form. This is what every "Request a tow" CTA links to (listing page, footer, etc.).
-- `TowingServicesPage` mounted at `/browse/towing` — already uses the enhanced `TowRequestForm` from `src/components/towing/tow-request-form.tsx` (urgency, situation, drivetrain, can-roll/steer/brake, map pin, photos, ride picker, payment method).
+**3. "Save listing" shown 3×.** Engagement bar pill (line 551), sidebar action button (line 846), and the favorite toggle in the engagement bar — same action, three buttons.
 
-### Rewrite `src/routes/tow.tsx` so it renders `TowRequestForm`
+**4. Dealer subscription badge shown twice.** Title block (line 482) and seller card (line 794).
 
-- Keep the route, head meta, and `?listing=…` / `?provider=…` search schema.
-- Replace the inline form (location pickers, plain textareas, submit handler) with a layout that mirrors the `#emergency-tow` block of `TowingServicesPage`:
-  - Page header ("Request a tow" + supporting copy).
-  - `FeaturedTowProviders` rail above the form (already on `/tow` today — keep it).
-  - `<TowRequestForm requestedProviderId={…} requestedProviderName={…} onClearRequestedProvider={…} providerSearchSlot={…} />`.
-- Hydrate `requestedProvider` from `?provider=…` by querying `businesses` for `id, name` (same query the services page uses) so the CTA from a tow provider's listing pre-selects them.
-- For `?listing=…`, extend `TowRequestForm` props with an optional `seedListingId?: string | null` and, when provided, fetch the listing once and pre-fill `vehicleType / vYear / vMake / vModel / vTrim` from `listings.attributes` (and rideId stays empty — this is a marketplace vehicle, not the user's ride). Show a small "Towing the vehicle from this listing" chip with a remove (×) button at the top of the vehicle section.
-- Delete the now-unused state, helpers, and submit handler in `tow.tsx` — the enhanced form owns submission.
+**5. Specifications header.** Already collapsible; fine — but the empty `{/* */}` gap (lines 628–630) and the gap before Description add visual noise on mobile.
 
-### Tighten the listing-page CTAs
+**6. Sidebar density.** The right rail stacks: QuoteRequestCta → Ad → Seller card (with 5+ buttons) → Services grid (5 buttons) → Message box. On a 1015px viewport it's a wall of buttons.
 
-File: `src/routes/listing.$id.tsx` (around lines 831 and 838)
+**7. Gallery.** Single active thumbnail, no swipe/keyboard nav, no counter ("3 / 12"), no fullscreen/lightbox. Videos render as 96×64 inline `<video controls>` — awkward.
 
-- Both `Link to="/tow"` CTAs stay, but the labels/intent get distinguished:
-  - When the listing **is a tow provider** (`category_slug === "towing"`): single CTA → `/tow?provider={listing.id}` ("Request a tow from this provider").
-  - When the listing **is a vehicle for sale/transport** (cars, motorcycles, trucks, heavy equipment): CTA → `/tow?listing={listing.id}` ("Request a tow for this vehicle").
-- No other call sites change (footer "Request a tow" still goes to bare `/tow`).
+**8. Pricing block visually competes.** Headline price, `PricingWidget`, and `ListingBadges` all stack right of the title with no hierarchy — three "price-ish" components in a row.
 
-## 3. Polish & consistency
+**9. Report link buried in a 4-item meta row** with bullet separators; doesn't read as actionable.
 
-- Sitemap, `llms.txt`, footer, and Terms references to `/tow` stay valid — same URL, upgraded form.
-- No DB or pricing changes, so no `/terms` or `/refund-policy` update needed.
+**10. Mobile layout.** Engagement bar wraps to 3 lines; sticky sidebar collapses below content and the user has to scroll past everything to reach Call/WhatsApp.
 
-## Technical notes
+### Proposed changes (UI/UX only, no business-logic changes)
 
-```text
-src/routes/listing.$id.tsx
-  └─ Specifications block → <Collapsible defaultOpen={mdUp}>
-  └─ Tow CTAs → branch on category_slug, pass listing vs provider param
+**A. Consolidate service CTAs into ONE sidebar card**
+- Keep `ServiceStrip` above the fold (it's the highest-converting entry).
+- Sidebar "Services for this vehicle" card stays as the canonical detailed list (all 5 services in one grid).
+- Remove `QuoteRequestCta` from the sidebar (its insurance + financing are already in both the strip and the services card). The component file stays — other pages may use it.
+- Remove the standalone "Before you pay — buyer safety add-ons" aside; fold its copy ("Optional OR/CR review, seller ID verification, pre-purchase mechanic inspection — from ₱99") as a one-line subhead under the "Services for this vehicle" card so the value prop is preserved.
+- Net: each service has exactly one above-the-fold entry (strip) and one detailed entry (sidebar card). Zero functionality lost.
 
-src/routes/tow.tsx (rewritten thin shell)
-  └─ Loads requestedProvider from ?provider
-  └─ <TowRequestForm seedListingId={search.listing ?? null} ...requestedProvider />
+**B. Dedupe engagement controls**
+- Engagement bar keeps: Views, Likes, Save (single source of truth for Save).
+- Remove the duplicate "Save listing" button from the sidebar action stack — Call / WhatsApp / QR / Tow stay.
+- Remove the duplicate "views" line in the footer meta row (keep "Listed <date>" and Report).
 
-src/components/towing/tow-request-form.tsx
-  └─ New optional prop `seedListingId`
-  └─ useEffect: on mount, if seedListingId, fetch listing + prefill vehicle fields
-  └─ Small dismissible chip showing "From listing: <title>"
-```
+**C. Dedupe dealer badge**
+- Show `DealerSubscriptionBadge` only in the seller sidebar card (where it's contextual).
+- Title block keeps the seller-type badge + Verified + Featured boost — but drops the dealer plan chip.
 
-No new dependencies. Existing `Collapsible`, `LocationPicker`, `TowMapPin`, `RidePicker`, and `FeaturedTowProviders` are reused.
+**D. Pricing block hierarchy**
+- Group price + monthly/down (`PricingWidget`) into a single right-aligned block with the headline on top, financing terms underneath, and badges (`ListingBadges`) below that with smaller text — clear primary/secondary/tertiary tiering.
 
-## Out of scope
+**E. Sidebar order & sticky behavior**
+- New stack: Seller card (with Call / WhatsApp / Message-trigger / QR / Tow) → Services for this vehicle → Ad carousel → (Message inline form moved into a collapsible inside seller card, since Call/WhatsApp are the primary paths and the textarea takes vertical space).
+- Sticky behavior unchanged; the smaller stack means Call/WhatsApp stay above the fold on a 1080-tall viewport.
 
-- Redesigning the enhanced form itself.
-- Changing dispatch routing/pricing/payments.
-- Touching `dashboard.tow.tsx` (the operator-side inbox).
+**F. Gallery polish**
+- Add prev/next arrows + photo counter "3 / 12" overlay.
+- Click cover → lightbox (`Dialog` with full-size image, swipe + arrow-key nav). Videos open in the same lightbox.
+- Thumbnails stay; videos get a play-icon poster instead of an inline `<video controls>` chip.
+
+**G. Report visibility**
+- Move "Report listing" out of the bullet-separated meta row into a small ghost button at the bottom of the seller card (next to the existing `ListingActionsMenu`). Footer meta row becomes "Listed <date> · <view count> views".
+
+**H. Mobile**
+- Engagement bar: icon-only on `<sm` (Views icon + count, Heart, Bookmark) to keep it one line.
+- Add a sticky bottom action bar on mobile only: [Call] [WhatsApp] [Message] — mirrors the sidebar so mobile users don't have to scroll.
+
+### Out of scope
+- `listing.$id.edit.tsx` (seller-side editor, recently revised)
+- Backend/RPC changes, pricing/policy changes
+- Tow form, Specifications data shape, NeededPartsRail, AffiliatePartsSection, BuyerDocumentChecklist — all stay as-is
+- `QuoteRequestCta` component itself (only removed from this one page)
+
+### Files touched
+
+- `src/routes/listing.$id.tsx` — all the above edits
+- new: `src/components/listing/gallery-lightbox.tsx` — lightbox dialog
+- new: `src/components/listing/mobile-action-bar.tsx` — sticky bottom bar (mobile only)
+
+### Risk
+
+Low. No data model, no server functions, no policy changes. Removed elements are all duplicates of controls that exist elsewhere on the same page. If any removal turns out to be wrong, it's a one-line revert.
