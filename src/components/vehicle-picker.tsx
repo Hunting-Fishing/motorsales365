@@ -30,6 +30,8 @@ type Props = {
   make: string;
   model: string;
   engine?: string;
+  /** When true, stack Year/Make/Model vertically (use for narrow sidebars). */
+  stacked?: boolean;
   onChange: (next: { year: string; make: string; model: string; engine?: string }) => void;
 };
 
@@ -147,7 +149,7 @@ function Combo({
   );
 }
 
-export function VehiclePicker({ category, year, make, model, engine, onChange }: Props) {
+export function VehiclePicker({ category, year, make, model, engine, stacked, onChange }: Props) {
   // "Other" mode = three free-text inputs (escape hatch).
   const [otherMode, setOtherMode] = React.useState(false);
   const [engineCustom, setEngineCustom] = React.useState(false);
@@ -247,7 +249,7 @@ export function VehiclePicker({ category, year, make, model, engine, onChange }:
 
   return (
     <div className="space-y-3">
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className={cn("grid gap-3", stacked ? "grid-cols-1" : "sm:grid-cols-3")}>
         {/* Year */}
         <div className="space-y-1">
           <div className="flex items-center justify-between">
