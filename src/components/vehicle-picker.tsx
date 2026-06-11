@@ -161,7 +161,7 @@ function Combo({
   );
 }
 
-export function VehiclePicker({ category, year, make, model, engine, stacked, onChange }: Props) {
+export function VehiclePicker({ category, year, make, model, engine, stacked, yearCounts, onChange }: Props) {
   // "Other" mode = three free-text inputs (escape hatch).
   const [otherMode, setOtherMode] = React.useState(false);
   const [engineCustom, setEngineCustom] = React.useState(false);
