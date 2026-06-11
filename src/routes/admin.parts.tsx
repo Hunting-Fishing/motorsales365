@@ -280,7 +280,7 @@ function CatalogTab() {
                   ...draft,
                   compatible_makes: v
                     .split(",")
-                    .map((s) => s.trim())
+                    .map((s: string) => s.trim())
                     .filter(Boolean),
                 })
               }
