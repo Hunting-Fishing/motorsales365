@@ -654,3 +654,183 @@ function BrowsePage() {
     </SiteLayout>
   );
 }
+
+interface FiltersFormProps {
+  category: string;
+  keyword: string;
+  setKeyword: (v: string) => void;
+  vYear: string;
+  vMake: string;
+  vModel: string;
+  vEngine: string;
+  setVYear: (v: string) => void;
+  setVMake: (v: string) => void;
+  setVModel: (v: string) => void;
+  setVEngine: (v: string) => void;
+  region: string | null;
+  province: string | null;
+  city: string | null;
+  setRegion: (v: string | null) => void;
+  setProvince: (v: string | null) => void;
+  setCity: (v: string | null) => void;
+  minPrice: string;
+  maxPrice: string;
+  setMinPrice: (v: string) => void;
+  setMaxPrice: (v: string) => void;
+  sort: "recent" | "price_asc" | "price_desc";
+  setSort: (v: "recent" | "price_asc" | "price_desc") => void;
+  catFilters: CategoryFilterValue;
+  setCatFilters: (v: CategoryFilterValue) => void;
+  onSubmit: (e?: React.FormEvent) => void;
+  onSave: () => void;
+}
+
+function FiltersForm(p: FiltersFormProps) {
+  const showVehicle = p.category === "car" || p.category === "motorcycle";
+  const hasDetails = categoryHasDetails(p.category);
+  const hasExtras = categoryHasExtras(p.category);
+
+  return (
+    <form onSubmit={p.onSubmit} className="space-y-3">
+      {/* Always-visible quick filters */}
+      <div className="space-y-3">
+        <div>
+          <Label htmlFor="kw" className="text-xs">
+            Keyword
+          </Label>
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              id="kw"
+              value={p.keyword}
+              onChange={(e) => p.setKeyword(e.target.value)}
+              placeholder="Make, model…"
+              className="h-9 pl-8"
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          <div>
+            <Label className="text-xs">Min ₱</Label>
+            <Input
+              type="number"
+              min="0"
+              value={p.minPrice}
+              onChange={(e) => p.setMinPrice(e.target.value)}
+              className="h-9"
+            />
+          </div>
+          <div>
+            <Label className="text-xs">Max ₱</Label>
+            <Input
+              type="number"
+              min="0"
+              value={p.maxPrice}
+              onChange={(e) => p.setMaxPrice(e.target.value)}
+              className="h-9"
+            />
+          </div>
+        </div>
+        <div>
+          <Label className="text-xs">Sort</Label>
+          <Select value={p.sort} onValueChange={(v: any) => p.setSort(v)}>
+            <SelectTrigger className="h-9">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="recent">Most recent</SelectItem>
+              <SelectItem value="price_asc">Price (low to high)</SelectItem>
+              <SelectItem value="price_desc">Price (high to low)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Collapsible deep filters */}
+      <Accordion type="multiple" className="w-full">
+        {showVehicle && (
+          <AccordionItem value="vehicle">
+            <AccordionTrigger className="py-2 text-sm">Vehicle</AccordionTrigger>
+            <AccordionContent className="pt-1">
+              <VehiclePicker
+                category={p.category as "car" | "motorcycle"}
+                year={p.vYear}
+                make={p.vMake}
+                model={p.vModel}
+                engine={p.vEngine}
+                onChange={(v) => {
+                  p.setVYear(v.year);
+                  p.setVMake(v.make);
+                  p.setVModel(v.model);
+                  p.setVEngine(v.engine ?? "");
+                }}
+              />
+            </AccordionContent>
+          </AccordionItem>
+        )}
+        <AccordionItem value="location">
+          <AccordionTrigger className="py-2 text-sm">Location</AccordionTrigger>
+          <AccordionContent className="pt-1">
+            <LocationPicker
+              asFilter
+              stacked
+              showBarangay={false}
+              value={{ region: p.region, province: p.province, city: p.city }}
+              onChange={(v) => {
+                p.setRegion(v.region ?? null);
+                p.setProvince(v.province ?? null);
+                p.setCity(v.city ?? null);
+              }}
+            />
+          </AccordionContent>
+        </AccordionItem>
+        {hasDetails && (
+          <AccordionItem value="details">
+            <AccordionTrigger className="py-2 text-sm">
+              {p.category === "car"
+                ? "Car details"
+                : p.category === "motorcycle"
+                  ? "Motorcycle details"
+                  : p.category === "equipment"
+                    ? "Equipment details"
+                    : p.category === "boat"
+                      ? "Boat details"
+                      : "Aircraft details"}
+            </AccordionTrigger>
+            <AccordionContent className="pt-1">
+              <CategoryFilters
+                category={p.category}
+                value={p.catFilters}
+                onChange={p.setCatFilters}
+                section="details"
+              />
+            </AccordionContent>
+          </AccordionItem>
+        )}
+        {hasExtras && (
+          <AccordionItem value="extras">
+            <AccordionTrigger className="py-2 text-sm">Documents & extras</AccordionTrigger>
+            <AccordionContent className="pt-1">
+              <CategoryFilters
+                category={p.category}
+                value={p.catFilters}
+                onChange={p.setCatFilters}
+                section="extras"
+              />
+            </AccordionContent>
+          </AccordionItem>
+        )}
+      </Accordion>
+
+      <div className="space-y-2 pt-1">
+        <Button type="submit" className="w-full">
+          Apply filters
+        </Button>
+        <Button type="button" variant="outline" className="w-full" onClick={p.onSave}>
+          <BookmarkPlus className="mr-2 h-4 w-4" />
+          Save search
+        </Button>
+      </div>
+    </form>
+  );
+}
