@@ -1,8 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { ExternalLink, ShoppingBag } from "lucide-react";
-import { getPartsForVehicle, trackPartClick } from "@/lib/parts.functions";
-import { formatPHP } from "@/lib/format";
+import logoSrc from "@/assets/logo-small.webp";
+import { Badge } from "@/components/ui/badge";
 
 interface Props {
   make?: string | null;
@@ -12,94 +9,50 @@ interface Props {
   vehicleId?: string;
 }
 
+const PLACEHOLDER_ITEMS = [
+  "Brake pads",
+  "Tires",
+  "Oil filter",
+  "Battery",
+  "Shocks",
+  "Spark plugs",
+];
+
 /**
- * Curated affiliate parts catalog matched to the listing's make/model.
- * Revenue: affiliate-link commissions. Click-through is tracked server-side.
+ * Affiliate parts — currently a compact "Coming Soon" teaser.
+ * Real partner catalog will be enabled once supplier agreements are in place.
  */
-export function AffiliatePartsSection({ make, model, year, listingId, vehicleId }: Props) {
-  const fetchParts = useServerFn(getPartsForVehicle);
-  const trackClick = useServerFn(trackPartClick);
-  const { data: parts, isLoading } = useQuery({
-    queryKey: ["affiliate-parts", make ?? "any", model ?? "any", year ?? "any"],
-    queryFn: () =>
-      fetchParts({
-        data: {
-          make: make ?? undefined,
-          model: model ?? undefined,
-          year: year ?? undefined,
-          limit: 6,
-        },
-      }),
-    staleTime: 5 * 60_000,
-  });
-
-  if (!isLoading && (!parts || parts.length === 0)) return null;
-
-  function onClick(partId: string) {
-    // Fire-and-forget; do not block the navigation.
-    trackClick({ data: { partId, listingId, vehicleId } }).catch(() => {});
-  }
-
+export function AffiliatePartsSection(_props: Props) {
   return (
-    <div className="mt-6 rounded-xl border border-border bg-card p-5">
+    <div className="relative">
       <div className="flex items-center gap-2">
-        <ShoppingBag className="h-4 w-4 text-primary" />
-        <h2 className="font-display text-lg font-semibold">Parts & accessories for this car</h2>
+        <Badge variant="secondary" className="text-[10px]">
+          Coming Soon
+        </Badge>
       </div>
-      <p className="mt-1 text-xs text-muted-foreground">
-        Curated picks from partner shops. Prices and stock vary by retailer.
+      <p className="mt-2 text-xs text-muted-foreground">
+        Curated parts &amp; accessories from partner shops will appear here once supplier onboarding is complete.
       </p>
 
-      {isLoading ? (
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-32 animate-pulse rounded-lg border border-border bg-muted/30"
+      <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">
+        {PLACEHOLDER_ITEMS.map((label) => (
+          <div
+            key={label}
+            className="flex flex-col items-center gap-1 rounded-lg border border-border bg-muted/30 p-2 text-center opacity-60"
+          >
+            <img
+              src={logoSrc}
+              alt="365 MotorSales"
+              className="h-8 w-8 object-contain"
+              loading="lazy"
             />
-          ))}
-        </div>
-      ) : (
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {(parts ?? []).map((p: any) => (
-            <a
-              key={p.id}
-              href={p.target_url}
-              target="_blank"
-              rel="nofollow sponsored noreferrer"
-              onClick={() => onClick(p.id)}
-              className="group flex flex-col rounded-lg border border-border bg-background p-3 transition-colors hover:border-primary"
-            >
-              {p.image_url ? (
-                <div className="mb-2 aspect-[4/3] w-full overflow-hidden rounded-md bg-muted">
-                  <img
-                    src={p.image_url}
-                    alt={p.title}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
-              ) : (
-                <div className="mb-2 flex aspect-[4/3] w-full items-center justify-center rounded-md bg-muted">
-                  <ShoppingBag className="h-6 w-6 text-muted-foreground/40" />
-                </div>
-              )}
-              <p className="line-clamp-2 text-sm font-medium group-hover:text-primary">{p.title}</p>
-              <div className="mt-1 flex items-center justify-between text-xs">
-                <span className="font-semibold text-foreground">
-                  {p.price_php ? formatPHP(Number(p.price_php)) : "View price"}
-                </span>
-                <span className="inline-flex items-center gap-0.5 text-muted-foreground group-hover:text-primary">
-                  Shop <ExternalLink className="h-3 w-3" />
-                </span>
-              </div>
-            </a>
-          ))}
-        </div>
-      )}
-      <p className="mt-3 text-[10px] text-muted-foreground">
-        Some links are affiliate links — 365 MotorSales may earn a commission, at no extra cost to
-        you.
+            <span className="text-[10px] leading-tight text-muted-foreground">{label}</span>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-2 text-[10px] text-muted-foreground">
+        Affiliate links — 365 MotorSales may earn a commission at no extra cost to you.
       </p>
     </div>
   );
