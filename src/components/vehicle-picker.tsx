@@ -46,6 +46,7 @@ function Combo({
   allowCustom = true,
   addLabel,
   getKeywords,
+  optionCounts,
 }: {
   value: string;
   options: string[];
@@ -57,6 +58,7 @@ function Combo({
   allowCustom?: boolean;
   addLabel: string;
   getKeywords?: (option: string) => string[];
+  optionCounts?: Record<string, number>;
 }) {
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState("");
@@ -128,19 +130,27 @@ function Combo({
               )}
             </CommandEmpty>
             <CommandGroup>
-              {options.map((opt) => (
-                <CommandItem
-                  key={opt}
-                  value={opt}
-                  keywords={getKeywords?.(opt)}
-                  onSelect={() => commit(opt)}
-                >
-                  <Check
-                    className={cn("mr-2 h-4 w-4", value === opt ? "opacity-100" : "opacity-0")}
-                  />
-                  {opt}
-                </CommandItem>
-              ))}
+              {options.map((opt) => {
+                const count = optionCounts?.[opt];
+                return (
+                  <CommandItem
+                    key={opt}
+                    value={opt}
+                    keywords={getKeywords?.(opt)}
+                    onSelect={() => commit(opt)}
+                  >
+                    <Check
+                      className={cn("mr-2 h-4 w-4", value === opt ? "opacity-100" : "opacity-0")}
+                    />
+                    <span className="flex-1">{opt}</span>
+                    {typeof count === "number" && count > 0 && (
+                      <span className="ml-2 tabular-nums text-xs text-muted-foreground">
+                        ({count.toLocaleString()})
+                      </span>
+                    )}
+                  </CommandItem>
+                );
+              })}
             </CommandGroup>
           </CommandList>
         </Command>
