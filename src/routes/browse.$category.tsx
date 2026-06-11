@@ -775,6 +775,7 @@ function FiltersForm(p: FiltersFormProps) {
               <VehiclePicker
                 category={p.category as "car" | "motorcycle"}
                 stacked
+                yearCounts={p.yearCounts}
                 year={p.vYear}
                 make={p.vMake}
                 model={p.vModel}
