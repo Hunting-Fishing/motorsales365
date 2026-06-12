@@ -119,6 +119,8 @@ export function ListingCard({
   const showServices = VEHICLE_CATEGORIES.has(listing.category_slug);
   const trust = deriveTrustSignals(listing);
   const tier = getSellerTier(listing);
+  const { data: reportSummary } = useListingReportSummary(listing.id);
+  const openReports = reportSummary?.open_count ?? 0;
   return (
     <div
       className={cn(
