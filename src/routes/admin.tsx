@@ -35,6 +35,11 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { AdminNotificationBell } from "@/components/admin/admin-notification-bell";
+import {
+  useAdminPendingCounts,
+  pendingCountForRoute,
+} from "@/hooks/use-admin-pending-counts";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
