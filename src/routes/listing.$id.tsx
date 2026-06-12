@@ -35,6 +35,7 @@ import { AffiliatePartsSection } from "@/components/affiliate-parts-section";
 import { NeededPartsRail } from "@/components/listing/needed-parts-rail";
 import { GalleryLightbox } from "@/components/listing/gallery-lightbox";
 import { MobileActionBar } from "@/components/listing/mobile-action-bar";
+import { ListingReportsSection } from "@/components/listing/listing-reports-section";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
