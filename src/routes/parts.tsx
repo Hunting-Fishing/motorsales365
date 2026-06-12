@@ -125,9 +125,11 @@ function PartsHub() {
         <div className="mt-8 rounded-xl border border-border bg-card p-5 text-sm text-muted-foreground">
           <p>
             <span className="font-semibold text-foreground">How it works:</span> Use the wizard
-            to narrow by your vehicle, system (engine, brakes, body, etc.) and exact parts.
-            We match listings whose seller marked compatibility — or whose donor vehicle
-            matches yours. Found nothing? Post a wanted ad and salvage yards reach out.
+            to narrow by vehicle, system, and exact parts. Results are ranked by fitment
+            quality (exact year+make+model first), and you can filter by OEM vs aftermarket
+            or search by OEM part number. We also show OEM-equivalent catalog references with
+            typical retail prices so you can compare. Found nothing? Post a wanted ad and
+            salvage yards reach out.
           </p>
           <p className="mt-2 text-xs">
             Part names follow the Car-Part.com industry standard used by salvage yards worldwide.

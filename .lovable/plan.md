@@ -1,60 +1,53 @@
 ## Goal
-Bring the `/parts` wizard's taxonomy up to industry standard by adopting the **complete Car-Part.com part-name list** (the de-facto standard used by every salvage yard in North America and widely mirrored in Asia), and clean up the miscategorizations (fuel injector currently sits under "Cooling & Fuel" instead of a Fuel system).
 
-## Source
-Pulled live from https://www.car-part.com/advsearch.htm — the `userPart` dropdown contains **~295 canonical part names** (A/C Assembly … Wiring Harness/Misc. Electric). This is the same list yards use for inventory tagging, so listings will line up with how sellers think.
+After buyers pick a vehicle + system + part in the Parts Wizard, also:
+1. Surface **matching catalog entries** (parts_catalog) as quick-reference cards (typical price, photo, OEM-equivalent name) above the listings.
+2. **Rank listings** by fitment quality (exact year+make+model > make+model > make-only > attribute-only) instead of treating them all equally.
+3. Let buyers **filter by OEM vs Aftermarket** and search by **OEM part number** so they can find a specific Toyota 90919-01247 etc.
 
-## Scope
+No DB schema changes — `listing_fitment`, `listings.attributes.oem_or_aftermarket`, and `attributes.part_number` are already captured at sell-time.
 
-### 1. Rewrite `src/data/needed-parts-catalog.ts`
-- Keep the existing types (`NeededPartOption`, `NeededPartGroup`) and exported names (`NEEDED_PARTS_GROUPS`, `NEEDED_PARTS_INDEX`, `USED_PARTS_GROUPS`) — no consumer changes.
-- Replace the 10 current groups with **15 systems**, each populated from the Car-Part.com list:
+## Changes
 
-  1. **Engine** — Engine, Engine Block, Cylinder Head, Camshaft, Crankshaft, Timing Cover, Valve Cover, Oil Pan, Harmonic Balancer, Flywheel/Flex Plate, Intake/Exhaust Manifold, Turbocharger/Supercharger, Intercooler, Vacuum Pump, etc.
-  2. **Fuel System** — Fuel Pump, Fuel Tank, Fuel Injector Pump, Fuel Distributor, Carburetor, Throttle Body. *(fixes the "fuel injector under cooling" bug)*
-  3. **Cooling** — Radiator, Radiator Core Support, Cooling Fan (Rad & Con), Fan Blade, Fan Clutch, Water Pump, Heater Core, Oil Cooler, Auto Trans Cooler, A/C Condensor.
-  4. **A/C & Heater** — A/C Assembly, Compressor, Evaporator, Hose, Heater Assy/Motor, Heater/AC Control, Blower Motor.
-  5. **Transmission & Drivetrain** — Transmission, Transfer Case, Torque Converter, Bellhousing, OD Unit, Trans Pan, Trans Computer, Clutch Master/Slave, Drive Shaft F/R, Differential, Carrier, Ring & Pinion, Axle Assy/Shaft/Housing, Hub, Lockout Hub.
-  6. **Brakes** — Caliper, Rotor F/R, Master Cylinder, Power Brake Booster, ABS Computer, ABS Pump, Brake Lines.
-  7. **Suspension & Steering** — Control Arms (F/R, U/L), Strut, Knee, Knuckle, Spindle, Coil Spring, Leaf Spring F/R, Shock Absorber, Stabilizer Bar, Steering Rack/Box, Steering Column, Power Steering Pump/Assy, Rear Suspension/Trailing/Locating Arms.
-  8. **Wheels & Tires** — Wheel, Tire, Hub Cap/Wheel Cover.
-  9. **Body — Exterior Panels** — Hood, Hood Hinge, Fender, Fender Ext, Inner Panel, Quarter Panel/Ext/Repair, Roof, Roof Panel, Cowl, Cab, Cab Clip, Rocker Moulding, Header Panel, Rear Body Panel, Rear Finish Panel, Frame, Frame Sections, Front End/Nose, Rear Clip, Pillar.
-  10. **Bumpers & Trim** — Bumper Assy F/R, Reinforcement F/R, Bumper Guard, Bumper Shock, Spoiler F/R, Valence, Grille, Mouldings, Running Boards, Pickup Bed (all variants), Bed Liner.
-  11. **Doors** — Front/Rear Door, Hinges, Handles, Mirrors, Mouldings, Regulators, Switches, Window/Vent Motors, Glass.
-  12. **Glass** — Windshield, Back Glass, Quarter Window, Special Glass, Sun Roof/T-Top, Sun Roof Motor.
-  13. **Tailgate/Trunk & Convertible** — Tailgate/Trunklid, Trunk Hinge, Rear Gate Motor, Conv Top Boot/Lift/Motor.
-  14. **Lighting** — Headlight Assy, Headlight Door/Motor/Wiper, Tail Light, Backup Light, Fog/Park Lamps F/R, Marker Lights, License Lamp, Third Brake Light.
-  15. **Electrical & Electronics** — Alternator, Starter, Generator, Voltage Regulator, Distributor, Ignition Switch/Module, Coil/Igniter, Engine Computer, Chassis/Cruise/Trans Computer, Body computers, Wiring Harness, Antenna, Radio/CD, Speedometer, Instrument Cluster, Window Motor, Door Motor, Wiper Motor F/R, Washer Motor/Reservoir, Wiper Linkage, Air Bag (+ Clockspring, Module, Sensor), Power Window Switch, Column Switch, Seat Belt Motor, Cruise Servo.
-  16. **Interior** — Seat (Front/Rear/3rd), Seat Track, Seat Belt, Dash Panel, Interior Panels, Steering Wheel.
-  17. **Fluids & Maintenance** (kept, all `serviceOnly: true`) — oil change, coolant flush, trans/diff fluid, alignment, balancing, brake fluid flush, timing belt service.
+### 1. `src/lib/parts-search.functions.ts` — smarter `searchUsedParts`
 
-- Every Car-Part.com `option` becomes one `NeededPartOption` with:
-  - `key`: snake-case slug derived from the label (stable; used in `attributes.part_keys`).
-  - `label`: Car-Part.com display name, lightly cleaned (fix typos like "Condensor"→"Condenser", "Instument"→"Instrument", strip trailing "(See Also …)" hints into a comment — keep label searchable).
-  - `category`: maps to the existing `parts_catalog.category` taxonomy (engine, drivetrain, brakes, suspension, body, electrical, cooling, fuel, interior, tires, wheels, glass, lighting, hvac, fluids). **Add `fuel`, `hvac`, `glass`, `lighting` if missing — they're already referenced loosely.**
-  - `serviceOnly`: only on the Fluids & Maintenance group.
+- Accept new inputs: `oemPreference: "any" | "oem" | "aftermarket"`, `partNumber: string | null`.
+- When a vehicle is provided, fetch `listing_fitment` rows including `year_min/year_max` (not just listing_id). Compute per-listing **match score**:
+  - 3 = make+model+year in range
+  - 2 = make+model match
+  - 1 = make-only OR attribute fallback (`attributes.make/model`)
+  - 0 = no vehicle match (excluded when vehicle provided)
+- After the existing part_keys/systems filter, apply OEM filter against `attributes.oem_or_aftermarket` and substring-match `attributes.part_number` (case-insensitive) when provided.
+- Sort: boosted first, then `matchScore` desc, then created_at desc. Return `match_score` on each listing.
+- Add a sibling server fn `suggestCatalogParts({ partKeys, systems, make, model, year })` that queries `parts_catalog` where `category` ∈ selected systems OR `slug/title` fuzzy-matches selected part labels, filtered by `compatible_makes` / `compatible_models` / year range when provided. Returns top ~6.
 
-- De-duplicate Car-Part's redundant entries (e.g. "Front Bumper Assembly" vs "Bumper Assy (Front)", "Engine Cylinder Head" vs "Cylinder Head (Engine)"). Keep one canonical option per physical part; ~295 raw entries collapse to ~210 unique options.
+### 2. `src/components/parts/parts-wizard.tsx` — wizard UX
 
-### 2. No changes to wizard UI or DB
-- `src/components/parts/parts-wizard.tsx` already iterates `USED_PARTS_GROUPS` and renders chips per `items[]`. New taxonomy renders automatically.
-- `src/lib/parts-search.functions.ts` filters by `attributes.part_keys` (string array) — existing listings keep working; new keys just become matchable as sellers re-tag.
-- No migration needed. Optional follow-up (not in this plan): a small one-time SQL to remap any listings still tagged with old keys (e.g. `fuel_injectors` → `fuel_injector_pump`).
+- Step 3 (parts): add a small **OEM / Aftermarket / Any** segmented control and an optional **OEM part #** input.
+- On submit, call both `searchUsedParts` and `suggestCatalogParts` in parallel; store both results.
+- Step 4 (results):
+  - New "Catalog suggestions" strip on top (cards from `parts_catalog`) with a "Typical price" badge and a "Find sellers" button that scrolls to the listings below — only shown when suggestions exist.
+  - Each listing card gets a small **match badge** ("Exact fit • 2018 Civic" / "Fits Civic" / "Make match" / "Attribute match") driven by `match_score`.
+  - When no listings match but catalog suggestions exist, encourage "Post a wanted ad for this exact part" (existing CTA, prefilled with catalog slug).
 
-### 3. Add a credit line
-- In `src/routes/parts.tsx` info strip, add: *"Part names follow the Car-Part.com industry standard."* — short, non-promotional, sets expectation for sellers familiar with US yard taxonomy.
+### 3. `src/components/listing-card.tsx` — optional badge slot
+
+- Accept an optional `badge?: { label: string; tone: "exact"|"good"|"loose" }` prop and render it in the card header. No visual change when omitted.
+
+### 4. `src/routes/parts.tsx` — copy tweak
+
+- Update the "How it works" strip to mention catalog suggestions + OEM filtering.
 
 ## Out of scope
-- Importing live inventory from Car-Part.com (their data is licensed; we'd need a partnership).
-- Per-make/model fitment auto-population.
-- Changing seller `/sell` part picker (it uses the same catalog and will update automatically).
-- Touching the `parts_catalog` table or `affiliate-parts-section.tsx`.
 
-## Files
-- Rewrite: `src/data/needed-parts-catalog.ts`
-- Tiny edit: `src/routes/parts.tsx` (credit line)
+- No new tables, migrations, or RLS changes.
+- Sell flow stays as-is (OEM/part number already collected).
+- No live OEM-number database import — uses what sellers entered.
+- Affiliate parts section unchanged.
 
 ## Validation
-- Visual: open `/parts`, confirm 15 system tiles, confirm "Fuel Pump", "Fuel Injector Pump", "Fuel Tank" appear under **Fuel System** (not Cooling).
-- Build: typecheck passes (no consumer signature changes).
-- Spot-check `/sell` used-part form still shows the System dropdown with new groups.
+
+- Wizard with `2018 Honda Civic → Brakes → Front brake pads` shows: catalog card for "Front brake pads (OEM-equiv)" + listings sorted with exact-year fits first.
+- Toggling **OEM only** hides listings tagged Aftermarket.
+- Typing a part number narrows listings to ones whose `attributes.part_number` contains that string.
+- Typecheck passes; no DB migration required.

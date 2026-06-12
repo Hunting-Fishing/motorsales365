@@ -102,7 +102,15 @@ function summarizeAttributes(slug: string, attrs?: Record<string, any> | null): 
   return null;
 }
 
-export function ListingCard({ listing }: { listing: ListingCardData }) {
+export type ListingCardBadge = { label: string; tone: "exact" | "good" | "loose" };
+
+export function ListingCard({
+  listing,
+  matchBadge,
+}: {
+  listing: ListingCardData;
+  matchBadge?: ListingCardBadge | null;
+}) {
   const boosted = listing.boost_until && new Date(listing.boost_until) > new Date();
   const catMeta = CATEGORY_META[listing.category_slug];
   const summary = summarizeAttributes(listing.category_slug, listing.attributes);
@@ -138,6 +146,17 @@ export function ListingCard({ listing }: { listing: ListingCardData }) {
               <Badge className="bg-accent text-accent-foreground">
                 <Star className="mr-1 h-3 w-3" />
                 Featured
+              </Badge>
+            )}
+            {matchBadge && (
+              <Badge
+                className={cn(
+                  matchBadge.tone === "exact" && "bg-emerald-600 text-white",
+                  matchBadge.tone === "good" && "bg-primary text-primary-foreground",
+                  matchBadge.tone === "loose" && "bg-muted text-foreground",
+                )}
+              >
+                {matchBadge.label}
               </Badge>
             )}
             {catMeta && (
