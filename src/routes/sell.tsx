@@ -50,6 +50,12 @@ import {
   CATEGORY_ATTR_KEYS,
 } from "@/components/listings/category-attributes-editor";
 import { isAttrCategory, isValidDrivetrain } from "@/lib/category-attributes";
+import {
+  FitmentEditor,
+  normalizeFitmentRows,
+  type FitmentRow,
+} from "@/components/parts/fitment-editor";
+import { NEEDED_PARTS_GROUPS } from "@/data/needed-parts-catalog";
 import { z } from "zod";
 
 const CATEGORY_LABEL_MAP: Record<string, string> = {
@@ -107,6 +113,11 @@ const SELL_SEO: Record<string, { title: string; description: string }> = {
     title: "Sell auto parts & accessories — 365 MotorSales Philippines",
     description:
       "List OEM and aftermarket vehicle parts, tires, wheels, and accessories for Filipino buyers.",
+  },
+  used_part: {
+    title: "Sell used auto parts — 365 MotorSales Philippines",
+    description:
+      "List used engines, transmissions, body panels, and salvage parts. Tag vehicle fitment so buyers can find your part.",
   },
   drone: {
     title: "List drone services & sales — 365 MotorSales Philippines",
@@ -175,7 +186,8 @@ const CATEGORIES = [
   { slug: "equipment", name: "Heavy Equipment" },
   { slug: "towing", name: "Towing & Transport Services" },
   { slug: "carwash", name: "Car Wash" },
-  { slug: "parts", name: "Parts & Accessories" },
+  { slug: "parts", name: "Parts & Accessories (Shop)" },
+  { slug: "used_part", name: "Used Part (peer-to-peer)" },
   { slug: "drone", name: "Drones & Aerial" },
   { slug: "repair", name: "Repair Shop" },
   { slug: "bodyshop", name: "Body Shop" },
@@ -305,6 +317,16 @@ function SellPage() {
   const [droneServices, setDroneServices] = useState<string[]>([]);
   const [droneLicensed, setDroneLicensed] = useState(false);
   const [droneCoverage, setDroneCoverage] = useState("");
+
+  // Used part (peer-to-peer) fields
+  const [usedPartSystem, setUsedPartSystem] = useState("");
+  const [usedPartName, setUsedPartName] = useState("");
+  const [usedPartCondition, setUsedPartCondition] = useState("");
+  const [usedPartOemAfter, setUsedPartOemAfter] = useState("");
+  const [usedPartNumber, setUsedPartNumber] = useState("");
+  const [usedPartWarrantyDays, setUsedPartWarrantyDays] = useState("");
+  const [fitmentRows, setFitmentRows] = useState<FitmentRow[]>([]);
+
 
   // Service business fields (repair, bodyshop, salvage, also reused by carwash/parts)
   const [serviceTags, setServiceTags] = useState<string[]>([]);
@@ -696,6 +718,14 @@ function SellPage() {
               .map((s) => s.trim())
               .filter(Boolean);
         }
+        if (category === "used_part") {
+          if (usedPartSystem) attributes.system = usedPartSystem;
+          if (usedPartName) attributes.part_name = usedPartName;
+          if (usedPartCondition) attributes.part_condition = usedPartCondition;
+          if (usedPartOemAfter) attributes.oem_or_aftermarket = usedPartOemAfter;
+          if (usedPartNumber) attributes.part_number = usedPartNumber;
+          if (usedPartWarrantyDays) attributes.warranty_days = Number(usedPartWarrantyDays);
+        }
         // Unified service tags (works for any service category, including parts/carwash)
         if (serviceTags.length) attributes.tags = serviceTags;
         if (
@@ -745,6 +775,23 @@ function SellPage() {
         if (error || !listing) throw error;
         lid = listing.id;
         setListingId(lid);
+
+        if (category === "used_part") {
+          const { ok: fitRows, error: fitErr } = normalizeFitmentRows(fitmentRows);
+          if (fitErr) {
+            toast.error(fitErr);
+            setSubmitting(false);
+            return;
+          }
+          if (fitRows.length) {
+            const { error: fErr } = await supabase
+              .from("listing_fitment")
+              .insert(fitRows.map((r) => ({ ...r, listing_id: lid! })));
+            if (fErr) {
+              toast.error(`Saved listing, but fitment failed: ${fErr.message}`);
+            }
+          }
+        }
       }
 
       // Upload photos that are not already done. Run sequentially to keep the
@@ -1203,6 +1250,84 @@ function SellPage() {
                     value={partStock}
                     onChange={(e) => setPartStock(e.target.value)}
                   />
+                </div>
+              </div>
+            ) : category === "used_part" ? (
+              <div className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <Label>Vehicle system *</Label>
+                    <Select value={usedPartSystem} onValueChange={setUsedPartSystem}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select system" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {NEEDED_PARTS_GROUPS.map((g) => (
+                          <SelectItem key={g.key} value={g.key}>
+                            {g.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Part name *</Label>
+                    <Input
+                      value={usedPartName}
+                      onChange={(e) => setUsedPartName(e.target.value)}
+                      placeholder="e.g. Alternator, Front bumper"
+                    />
+                  </div>
+                  <div>
+                    <Label>Condition</Label>
+                    <Select value={usedPartCondition} onValueChange={setUsedPartCondition}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="nos">New old stock (NOS)</SelectItem>
+                        <SelectItem value="used_excellent">Used — excellent</SelectItem>
+                        <SelectItem value="used_good">Used — good</SelectItem>
+                        <SelectItem value="used_fair">Used — fair</SelectItem>
+                        <SelectItem value="for_parts">For parts / not working</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>OEM or Aftermarket</Label>
+                    <Select value={usedPartOemAfter} onValueChange={setUsedPartOemAfter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="OEM">OEM</SelectItem>
+                        <SelectItem value="Aftermarket">Aftermarket</SelectItem>
+                        <SelectItem value="Surplus">Surplus / JDM</SelectItem>
+                        <SelectItem value="Unknown">Unknown</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Part number (optional)</Label>
+                    <Input
+                      value={usedPartNumber}
+                      onChange={(e) => setUsedPartNumber(e.target.value)}
+                      placeholder="OEM or aftermarket part #"
+                    />
+                  </div>
+                  <div>
+                    <Label>Warranty (days, optional)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={usedPartWarrantyDays}
+                      onChange={(e) => setUsedPartWarrantyDays(e.target.value)}
+                      placeholder="e.g. 7"
+                    />
+                  </div>
+                </div>
+                <div className="rounded-lg border border-border bg-muted/20 p-3">
+                  <FitmentEditor value={fitmentRows} onChange={setFitmentRows} />
                 </div>
               </div>
             ) : category === "drone" ? (
