@@ -74,6 +74,37 @@ function AdminReports() {
     load();
   };
 
+  const publishSummary = async (id: string) => {
+    const text = (drafts[id] ?? "").trim();
+    if (!text) {
+      toast.error("Enter a public summary first.");
+      return;
+    }
+    const { error } = await supabase
+      .from("reports")
+      .update({ public_summary: text, made_public_at: new Date().toISOString(), made_public_by: user?.id ?? null })
+      .eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Public summary published — visitors can now see it on the listing.");
+    load();
+  };
+
+  const unpublishSummary = async (id: string) => {
+    const { error } = await supabase
+      .from("reports")
+      .update({ public_summary: null, made_public_at: null, made_public_by: null })
+      .eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Public summary removed.");
+    load();
+  };
+
   return (
     <div>
       <AdminGroupTabs title="Activity" tabs={ACTIVITY_TABS} />
