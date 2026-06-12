@@ -919,6 +919,10 @@ function ListingDetailPage() {
             </button>
           </div>
 
+          <ListingReportsSection listingId={listing.id} />
+
+
+
           {/* Services around this vehicle — merged from former ServiceStrip.
               Revenue: lead-gen for finance/insurance/OR-CR partners. */}
           <Collapsible
