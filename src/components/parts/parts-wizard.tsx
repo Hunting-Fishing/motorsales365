@@ -3,19 +3,31 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { ChevronLeft, ChevronRight, Search, Loader2, Wrench } from "lucide-react";
+import { ChevronLeft, ChevronRight, Search, Loader2, Wrench, Package } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { USED_PARTS_GROUPS } from "@/data/needed-parts-catalog";
 import { CAR_MAKES, getYearOptions, getMakes } from "@/data/vehicles";
-import { searchUsedParts } from "@/lib/parts-search.functions";
-import { ListingCard, type ListingCardData } from "@/components/listing-card";
+import { searchUsedParts, suggestCatalogParts } from "@/lib/parts-search.functions";
+import { ListingCard, type ListingCardData, type ListingCardBadge } from "@/components/listing-card";
 
 type Step = 1 | 2 | 3 | 4;
+type OemPref = "any" | "oem" | "aftermarket";
+
+type Suggestion = {
+  id: string;
+  slug: string;
+  title: string;
+  description: string | null;
+  category: string;
+  base_price_php: number | null;
+  photo_url: string | null;
+};
 
 export function PartsWizard() {
   const navigate = useNavigate();
   const runSearch = useServerFn(searchUsedParts);
+  const runSuggest = useServerFn(suggestCatalogParts);
 
   const [step, setStep] = useState<Step>(1);
   const [year, setYear] = useState<string>("");
@@ -23,8 +35,11 @@ export function PartsWizard() {
   const [model, setModel] = useState<string>("");
   const [systems, setSystems] = useState<string[]>([]);
   const [partKeys, setPartKeys] = useState<string[]>([]);
+  const [oemPref, setOemPref] = useState<OemPref>("any");
+  const [partNumber, setPartNumber] = useState("");
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<ListingCardData[] | null>(null);
+  const [results, setResults] = useState<(ListingCardData & { match_score?: number })[] | null>(null);
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
 
   const years = useMemo(() => getYearOptions(), []);
   const carMakes = useMemo(() => CAR_MAKES.map((m) => m.make), []);
@@ -35,29 +50,34 @@ export function PartsWizard() {
   }, [make]);
 
   const visibleGroups = useMemo(() => USED_PARTS_GROUPS, []);
-  const selectedGroupItems = useMemo(() => {
-    if (systems.length === 0) return visibleGroups.flatMap((g) => g.items);
-    return visibleGroups.filter((g) => systems.includes(g.key)).flatMap((g) => g.items);
-  }, [systems, visibleGroups]);
 
   function toggle(arr: string[], v: string): string[] {
     return arr.includes(v) ? arr.filter((x) => x !== v) : [...arr, v];
   }
 
+  const partLabels = useMemo(() => {
+    const all = visibleGroups.flatMap((g) => g.items);
+    return all.filter((it) => partKeys.includes(it.key)).map((it) => it.label);
+  }, [partKeys, visibleGroups]);
+
   async function submit() {
     setLoading(true);
     try {
-      const r = await runSearch({
-        data: {
-          make: make || null,
-          model: model || null,
-          year: year ? Number(year) : null,
-          systems,
-          partKeys,
-          limit: 60,
-        },
-      });
-      setResults(r.listings as ListingCardData[]);
+      const payload = {
+        make: make || null,
+        model: model || null,
+        year: year ? Number(year) : null,
+        systems,
+        partKeys,
+      };
+      const [searchRes, suggestRes] = await Promise.all([
+        runSearch({
+          data: { ...payload, oemPreference: oemPref, partNumber: partNumber || null, limit: 60 },
+        }),
+        runSuggest({ data: { ...payload, partLabels, limit: 6 } }),
+      ]);
+      setResults(searchRes.listings as (ListingCardData & { match_score?: number })[]);
+      setSuggestions(suggestRes.suggestions as Suggestion[]);
       setStep(4);
     } finally {
       setLoading(false);
@@ -67,8 +87,21 @@ export function PartsWizard() {
   function startOver() {
     setStep(1);
     setResults(null);
+    setSuggestions([]);
     setPartKeys([]);
     setSystems([]);
+    setPartNumber("");
+    setOemPref("any");
+  }
+
+  function badgeFor(score: number | undefined): ListingCardBadge | null {
+    if (!make || !score) return null;
+    if (score >= 3) {
+      const vehicle = [year, make, model].filter(Boolean).join(" ");
+      return { label: `Exact fit${vehicle ? " • " + vehicle : ""}`, tone: "exact" };
+    }
+    if (score === 2) return { label: `Fits ${model || make}`, tone: "good" };
+    return { label: `${make} match`, tone: "loose" };
   }
 
   return (
@@ -198,15 +231,50 @@ export function PartsWizard() {
         </div>
       )}
 
-      {/* Step 3 — specific parts */}
+      {/* Step 3 — specific parts + OEM/part# */}
       {step === 3 && (
         <div className="space-y-4">
           <div>
             <h2 className="font-display text-xl font-semibold">Which part(s)?</h2>
             <p className="text-sm text-muted-foreground">
-              Pick as many as you need. Skip to search by system only.
+              Pick as many as you need. Add OEM number for exact matches.
             </p>
           </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                OEM / Aftermarket
+              </p>
+              <div className="inline-flex rounded-md border border-border bg-background p-0.5">
+                {(["any", "oem", "aftermarket"] as OemPref[]).map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => setOemPref(v)}
+                    className={`rounded px-3 py-1.5 text-xs font-medium capitalize transition ${
+                      oemPref === v
+                        ? "bg-primary text-primary-foreground"
+                        : "text-muted-foreground hover:bg-secondary"
+                    }`}
+                  >
+                    {v}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                OEM part # (optional)
+              </p>
+              <Input
+                value={partNumber}
+                onChange={(e) => setPartNumber(e.target.value)}
+                placeholder="e.g. 90919-01247"
+              />
+            </div>
+          </div>
+
           <div className="max-h-96 overflow-y-auto rounded-lg border border-border bg-background/40 p-3">
             {visibleGroups
               .filter((g) => systems.length === 0 || systems.includes(g.key))
@@ -258,7 +326,7 @@ export function PartsWizard() {
 
       {/* Step 4 — results */}
       {step === 4 && results && (
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 className="font-display text-xl font-semibold">
@@ -267,6 +335,8 @@ export function PartsWizard() {
               <p className="text-sm text-muted-foreground">
                 {[year, make, model].filter(Boolean).join(" ") || "Any vehicle"}
                 {partKeys.length > 0 ? ` • ${partKeys.length} part(s)` : ""}
+                {oemPref !== "any" ? ` • ${oemPref.toUpperCase()}` : ""}
+                {partNumber ? ` • #${partNumber}` : ""}
               </p>
             </div>
             <div className="flex gap-2">
@@ -285,6 +355,8 @@ export function PartsWizard() {
                           model,
                           systems,
                           partKeys,
+                          partNumber,
+                          oemPref,
                         }),
                       } as any,
                     })
@@ -296,10 +368,55 @@ export function PartsWizard() {
             </div>
           </div>
 
+          {/* Catalog suggestions */}
+          {suggestions.length > 0 && (
+            <section className="space-y-2 rounded-xl border border-border bg-background/40 p-4">
+              <div className="flex items-center gap-2">
+                <Package className="h-4 w-4 text-primary" />
+                <h3 className="font-display text-sm font-semibold">Catalog reference</h3>
+                <span className="text-xs text-muted-foreground">
+                  OEM-equivalent picks — typical retail
+                </span>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {suggestions.map((s) => (
+                  <div
+                    key={s.id}
+                    className="flex gap-3 rounded-lg border border-border bg-card p-3"
+                  >
+                    {s.photo_url ? (
+                      <img
+                        src={s.photo_url}
+                        alt={s.title}
+                        loading="lazy"
+                        className="h-16 w-16 shrink-0 rounded-md object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-md bg-secondary">
+                        <Wrench className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="line-clamp-2 text-sm font-medium">{s.title}</p>
+                      {s.base_price_php != null && (
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          Typical ~ ₱{Math.round(s.base_price_php).toLocaleString()}
+                        </p>
+                      )}
+                      <p className="mt-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">
+                        {s.category}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
           {results.length === 0 ? (
             <div className="rounded-lg border border-dashed border-border bg-background/50 p-8 text-center">
               <Wrench className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
-              <p className="text-sm font-medium">No parts listed yet that match.</p>
+              <p className="text-sm font-medium">No listings yet that match.</p>
               <p className="mx-auto mt-1 max-w-md text-xs text-muted-foreground">
                 Try removing filters, browse all parts below, or post a wanted ad and let
                 salvage yards & sellers come to you.
@@ -318,7 +435,11 @@ export function PartsWizard() {
           ) : (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {results.map((l) => (
-                <ListingCard key={l.id} listing={l} />
+                <ListingCard
+                  key={l.id}
+                  listing={l}
+                  matchBadge={badgeFor(l.match_score)}
+                />
               ))}
             </div>
           )}
