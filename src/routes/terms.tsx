@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 10, 2026 (repriced tow & trucking dispatch plans: Starter ₱49/mo, Pro ₱299/mo, Fleet ₱999/mo; annual billing offers 2 months free)";
+  const lastUpdated = "June 12, 2026 (added Used Parts marketplace addendum — peer-to-peer used and salvage auto parts, seller condition disclosure required, no platform warranty)";
 
   return (
     <SiteLayout>
@@ -574,6 +574,52 @@ function TermsPage() {
             notice be in writing under RA 8792.
           </li>
         </ul>
+
+        <h2 className="mt-6 text-xl font-semibold">20a. Used parts marketplace addendum</h2>
+        <p className="mt-2 text-muted-foreground">
+          The "Used Parts" section (<Link className="text-primary underline" to="/parts">/parts</Link>)
+          is a peer-to-peer listing service for used and salvage automotive parts (engines,
+          transmissions, body panels, electronics, interior, wheels and similar). The following
+          rules apply in addition to the general listing rules in these Terms:
+        </p>
+        <ul className="mt-2 list-disc pl-6 text-muted-foreground">
+          <li>
+            <strong>Seller disclosure.</strong> Sellers must accurately disclose the part's
+            condition (new takeoff, used good, used fair, for rebuild, or core), the donor
+            vehicle (year/make/model) where applicable, and any known damage, missing
+            components, or required core return.
+          </li>
+          <li>
+            <strong>Compatibility / fitment.</strong> Buyers are responsible for confirming a
+            part fits their specific vehicle (VIN, trim, engine variant). Fitment data provided
+            by sellers is informational and not guaranteed by 365 MotorSales.
+          </li>
+          <li>
+            <strong>No platform warranty.</strong> Used parts are sold by the listing seller,
+            not by 365 MotorSales. Any warranty, return window, or core-return policy is set by
+            the seller in the listing. The Platform provides no warranty (express or implied)
+            on used parts.
+          </li>
+          <li>
+            <strong>Prohibited items.</strong> Airbags must be uninstalled, undeployed, and may
+            not be sold for installation by non-certified persons. Catalytic converters, ECUs
+            tied to specific VINs, and any part requiring proof of lawful provenance must
+            include source documentation. Stolen parts are strictly forbidden and will be
+            reported under RA 6539 (Anti-Carnapping) and RA 10883 (New Anti-Carnapping Act).
+          </li>
+          <li>
+            <strong>Quote / messaging only.</strong> Parts transactions are arranged directly
+            between buyer and seller (in-app messaging, phone, or in-person at the seller's
+            yard or shop). The Platform does not currently process payments for used parts and
+            does not hold funds in escrow for this category.
+          </li>
+          <li>
+            <strong>Vehicles for parts.</strong> A complete vehicle listed for parts-out is
+            still a vehicle listing; sellers must mark it as "for parts only" so buyers
+            understand the condition and registration status.
+          </li>
+        </ul>
+
 
         <h2 className="mt-6 text-xl font-semibold">21. Contact</h2>
         <p className="mt-2 text-muted-foreground">

@@ -51,6 +51,7 @@ const VEHICLE_CATEGORIES = [
   { slug: "airplane", name: "Airplanes", Icon: Plane },
   { slug: "equipment", name: "Equipment", Icon: Construction },
   { slug: "drone", name: "Drones", Icon: Send },
+  { slug: "parts", name: "Parts", Icon: Wrench },
   { slug: "other", name: "Other", Icon: Caravan },
 ] as const;
 
@@ -59,7 +60,6 @@ const SERVICE_CATEGORIES = [
   { slug: "repair", name: "Repair Shop", Icon: WrenchIcon },
   { slug: "bodyshop", name: "Body Shop", Icon: SprayCan },
   { slug: "carwash", name: "Car Wash", Icon: Droplets },
-  { slug: "parts", name: "Parts & Accessories", Icon: Wrench },
   { slug: "salvage", name: "Auto Salvage", Icon: Recycle },
 ] as const;
 
@@ -284,17 +284,28 @@ function Index() {
             Shop by category
           </div>
           <div className="flex flex-wrap gap-2">
-            {VEHICLE_CATEGORIES.map(({ slug, name, Icon }) => (
-              <Link
-                key={slug}
-                to="/browse/$category"
-                params={{ category: slug }}
-                className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium transition hover:border-primary hover:text-primary"
-              >
-                <Icon className="h-4 w-4" />
-                {name}
-              </Link>
-            ))}
+            {VEHICLE_CATEGORIES.map(({ slug, name, Icon }) =>
+              slug === "parts" ? (
+                <Link
+                  key={slug}
+                  to="/parts"
+                  className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium transition hover:border-primary hover:text-primary"
+                >
+                  <Icon className="h-4 w-4" />
+                  {name}
+                </Link>
+              ) : (
+                <Link
+                  key={slug}
+                  to="/browse/$category"
+                  params={{ category: slug }}
+                  className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium transition hover:border-primary hover:text-primary"
+                >
+                  <Icon className="h-4 w-4" />
+                  {name}
+                </Link>
+              ),
+            )}
             <Link
               to="/wanted"
               className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium transition hover:border-primary hover:text-primary"
