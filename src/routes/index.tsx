@@ -51,6 +51,7 @@ const VEHICLE_CATEGORIES = [
   { slug: "airplane", name: "Airplanes", Icon: Plane },
   { slug: "equipment", name: "Equipment", Icon: Construction },
   { slug: "drone", name: "Drones", Icon: Send },
+  { slug: "parts", name: "Parts", Icon: Wrench },
   { slug: "other", name: "Other", Icon: Caravan },
 ] as const;
 
@@ -59,7 +60,6 @@ const SERVICE_CATEGORIES = [
   { slug: "repair", name: "Repair Shop", Icon: WrenchIcon },
   { slug: "bodyshop", name: "Body Shop", Icon: SprayCan },
   { slug: "carwash", name: "Car Wash", Icon: Droplets },
-  { slug: "parts", name: "Parts & Accessories", Icon: Wrench },
   { slug: "salvage", name: "Auto Salvage", Icon: Recycle },
 ] as const;
 
