@@ -83,8 +83,33 @@ export const searchUsedParts = createServerFn({ method: "POST" })
       return keyHit && sysHit;
     });
 
-    return { listings: filtered };
+    return { listings: filtered.map(mapListing) };
   });
+
+function mapListing(r: any) {
+  const media = Array.isArray(r.listing_media) ? r.listing_media : [];
+  const photos = media.filter((m: any) => m.type === "photo");
+  const videos = media.filter((m: any) => m.type === "video");
+  return {
+    id: r.id,
+    title: r.title,
+    price_php: Number(r.price_php ?? 0),
+    region: r.region ?? null,
+    city: r.city ?? null,
+    seller_type: r.seller_type ?? "private",
+    boost_until: r.boost_until ?? null,
+    category_slug: r.category_slug,
+    view_count: r.view_count ?? 0,
+    cover_url: photos[0]?.url ?? null,
+    photo_count: photos.length,
+    has_video: videos.length > 0,
+    seller_user_id: r.user_id ?? null,
+    status: r.status,
+    attributes: r.attributes,
+    negotiable: r.negotiable ?? null,
+    price_hidden: r.price_hidden ?? null,
+  };
+}
 
 /** Browse parts hub default feed (no vehicle filter). */
 export const browseUsedParts = createServerFn({ method: "POST" })
