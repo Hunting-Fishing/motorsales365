@@ -1252,6 +1252,84 @@ function SellPage() {
                   />
                 </div>
               </div>
+            ) : category === "used_part" ? (
+              <div className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <Label>Vehicle system *</Label>
+                    <Select value={usedPartSystem} onValueChange={setUsedPartSystem}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select system" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {NEEDED_PARTS_GROUPS.map((g) => (
+                          <SelectItem key={g.key} value={g.key}>
+                            {g.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Part name *</Label>
+                    <Input
+                      value={usedPartName}
+                      onChange={(e) => setUsedPartName(e.target.value)}
+                      placeholder="e.g. Alternator, Front bumper"
+                    />
+                  </div>
+                  <div>
+                    <Label>Condition</Label>
+                    <Select value={usedPartCondition} onValueChange={setUsedPartCondition}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="nos">New old stock (NOS)</SelectItem>
+                        <SelectItem value="used_excellent">Used — excellent</SelectItem>
+                        <SelectItem value="used_good">Used — good</SelectItem>
+                        <SelectItem value="used_fair">Used — fair</SelectItem>
+                        <SelectItem value="for_parts">For parts / not working</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>OEM or Aftermarket</Label>
+                    <Select value={usedPartOemAfter} onValueChange={setUsedPartOemAfter}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="OEM">OEM</SelectItem>
+                        <SelectItem value="Aftermarket">Aftermarket</SelectItem>
+                        <SelectItem value="Surplus">Surplus / JDM</SelectItem>
+                        <SelectItem value="Unknown">Unknown</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label>Part number (optional)</Label>
+                    <Input
+                      value={usedPartNumber}
+                      onChange={(e) => setUsedPartNumber(e.target.value)}
+                      placeholder="OEM or aftermarket part #"
+                    />
+                  </div>
+                  <div>
+                    <Label>Warranty (days, optional)</Label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={usedPartWarrantyDays}
+                      onChange={(e) => setUsedPartWarrantyDays(e.target.value)}
+                      placeholder="e.g. 7"
+                    />
+                  </div>
+                </div>
+                <div className="rounded-lg border border-border bg-muted/20 p-3">
+                  <FitmentEditor value={fitmentRows} onChange={setFitmentRows} />
+                </div>
+              </div>
             ) : category === "drone" ? (
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
