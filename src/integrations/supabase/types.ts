@@ -4952,6 +4952,9 @@ export type Database = {
           evidence_urls: string[]
           id: string
           listing_id: string | null
+          made_public_at: string | null
+          made_public_by: string | null
+          public_summary: string | null
           reason: string
           reporter_email: string | null
           reporter_id: string | null
@@ -4969,6 +4972,9 @@ export type Database = {
           evidence_urls?: string[]
           id?: string
           listing_id?: string | null
+          made_public_at?: string | null
+          made_public_by?: string | null
+          public_summary?: string | null
           reason: string
           reporter_email?: string | null
           reporter_id?: string | null
@@ -4986,6 +4992,9 @@ export type Database = {
           evidence_urls?: string[]
           id?: string
           listing_id?: string | null
+          made_public_at?: string | null
+          made_public_by?: string | null
+          public_summary?: string | null
           reason?: string
           reporter_email?: string | null
           reporter_id?: string | null
@@ -7714,6 +7723,7 @@ export type Database = {
     }
     Functions: {
       accept_org_invite: { Args: { _token: string }; Returns: Json }
+      admin_pending_counts: { Args: never; Returns: Json }
       apply_referral_redemption: {
         Args: {
           _base_amount: number
@@ -7776,6 +7786,20 @@ export type Database = {
           rep_user_id: string
           title: string
         }[]
+      }
+      get_listing_report_summaries: {
+        Args: { _listing_ids: string[] }
+        Returns: {
+          has_public_notes: boolean
+          listing_id: string
+          open_count: number
+          resolved_count: number
+          total: number
+        }[]
+      }
+      get_listing_report_summary: {
+        Args: { _listing_id: string }
+        Returns: Json
       }
       get_public_passport_verification: {
         Args: { _slug: string }
