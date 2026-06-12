@@ -318,6 +318,16 @@ function SellPage() {
   const [droneLicensed, setDroneLicensed] = useState(false);
   const [droneCoverage, setDroneCoverage] = useState("");
 
+  // Used part (peer-to-peer) fields
+  const [usedPartSystem, setUsedPartSystem] = useState("");
+  const [usedPartName, setUsedPartName] = useState("");
+  const [usedPartCondition, setUsedPartCondition] = useState("");
+  const [usedPartOemAfter, setUsedPartOemAfter] = useState("");
+  const [usedPartNumber, setUsedPartNumber] = useState("");
+  const [usedPartWarrantyDays, setUsedPartWarrantyDays] = useState("");
+  const [fitmentRows, setFitmentRows] = useState<FitmentRow[]>([]);
+
+
   // Service business fields (repair, bodyshop, salvage, also reused by carwash/parts)
   const [serviceTags, setServiceTags] = useState<string[]>([]);
   const [serviceHours, setServiceHours] = useState("");
