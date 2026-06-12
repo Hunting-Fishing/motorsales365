@@ -3,12 +3,14 @@ import { AdminGroupTabs, ACTIVITY_TABS } from "@/components/admin/admin-group-ta
 import { confirm } from "@/components/ui/confirm-dialog";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Trash2, ShieldOff, CheckCircle2 } from "lucide-react";
+import { Trash2, ShieldOff, CheckCircle2, Megaphone, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import { formatDate } from "@/lib/format";
 import { RouteError, RouteNotFound } from "@/components/route-boundaries";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/admin/reports")({
   component: AdminReports,
