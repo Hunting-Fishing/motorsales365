@@ -183,6 +183,41 @@ function AdminReports() {
                   </div>
                 )}
               </div>
+
+              {/* Public summary controls — what visitors will see on the listing page */}
+              <div className="mt-4 rounded-md border border-dashed border-border bg-background/60 p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-xs font-semibold">
+                    <Megaphone className="h-3.5 w-3.5" />
+                    Public summary
+                    {r.public_summary && (
+                      <Badge variant="secondary" className="ml-1">
+                        Published {r.made_public_at ? `· ${formatDate(r.made_public_at)}` : ""}
+                      </Badge>
+                    )}
+                  </div>
+                  {r.public_summary && (
+                    <Button size="sm" variant="ghost" onClick={() => unpublishSummary(r.id)}>
+                      <EyeOff className="mr-1 h-3.5 w-3.5" />
+                      Unpublish
+                    </Button>
+                  )}
+                </div>
+                <Textarea
+                  value={drafts[r.id] ?? r.public_summary ?? ""}
+                  onChange={(e) => setDrafts((d) => ({ ...d, [r.id]: e.target.value }))}
+                  placeholder="Short, neutral summary visible to all visitors. Do not include reporter names or unverified claims."
+                  className="mt-2 min-h-20 text-sm"
+                />
+                <div className="mt-2 flex items-center justify-between gap-2">
+                  <p className="text-[11px] text-muted-foreground">
+                    Reporter identity and raw details are never shown publicly — only this summary.
+                  </p>
+                  <Button size="sm" onClick={() => publishSummary(r.id)}>
+                    {r.public_summary ? "Update summary" : "Publish public summary"}
+                  </Button>
+                </div>
+              </div>
             </div>
           ))}
         </div>
