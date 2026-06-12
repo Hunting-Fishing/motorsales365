@@ -7895,6 +7895,7 @@ export type Database = {
       }
       rotate_internal_webhook_key: { Args: { _name: string }; Returns: boolean }
       self_serve_change_plan: { Args: { _plan_id: string }; Returns: Json }
+      seller_account_active: { Args: { _user_id: string }; Returns: boolean }
       suggest_business_tag: {
         Args: { _category: string; _label: string; _type_slug: string }
         Returns: string
