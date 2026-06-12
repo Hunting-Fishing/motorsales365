@@ -1,45 +1,60 @@
 ## Goal
-Let sellers list a used part on `/sell` and tag which vehicles it fits, so the `/parts` wizard can match it.
+Bring the `/parts` wizard's taxonomy up to industry standard by adopting the **complete Car-Part.com part-name list** (the de-facto standard used by every salvage yard in North America and widely mirrored in Asia), and clean up the miscategorizations (fuel injector currently sits under "Cooling & Fuel" instead of a Fuel system).
+
+## Source
+Pulled live from https://www.car-part.com/advsearch.htm — the `userPart` dropdown contains **~295 canonical part names** (A/C Assembly … Wiring Harness/Misc. Electric). This is the same list yards use for inventory tagging, so listings will line up with how sellers think.
 
 ## Scope
 
-### 1. Add `used_part` category
-- Add `used_part` (label: "Used Part", icon: Wrench) to the `CATEGORIES` list used by `/sell` so it appears in the category dropdown.
-- Update `category-attributes.ts` to register a `used_part` attribute group:
-  - `system` (select — from `NEEDED_PARTS_GROUPS` keys: Engine, Drivetrain, Brakes, …)
-  - `part_type` (text — e.g. "Alternator")
-  - `condition` (select: New-old-stock / Used-excellent / Used-good / Used-fair / For parts)
-  - `oem_aftermarket` (select: OEM / Aftermarket / Unknown)
-  - `part_number` (text, optional)
-  - `warranty_days` (number, optional)
-- Migration: add `'used_part'` to the listing category type/enum and grant the same RLS as other categories. (Standalone migration; everything else ships after it lands.)
+### 1. Rewrite `src/data/needed-parts-catalog.ts`
+- Keep the existing types (`NeededPartOption`, `NeededPartGroup`) and exported names (`NEEDED_PARTS_GROUPS`, `NEEDED_PARTS_INDEX`, `USED_PARTS_GROUPS`) — no consumer changes.
+- Replace the 10 current groups with **15 systems**, each populated from the Car-Part.com list:
 
-### 2. New `FitmentEditor` component
-- `src/components/parts/fitment-editor.tsx`
-- Manages an array of rows `{ make, model, year_min, year_max, trim? }`.
-- Uses existing make/model pickers if present; otherwise text + numeric year fields.
-- "Add fitment" button, per-row remove, validation (year_min ≤ year_max, make required).
-- Pure controlled component — value + onChange — no Supabase calls.
+  1. **Engine** — Engine, Engine Block, Cylinder Head, Camshaft, Crankshaft, Timing Cover, Valve Cover, Oil Pan, Harmonic Balancer, Flywheel/Flex Plate, Intake/Exhaust Manifold, Turbocharger/Supercharger, Intercooler, Vacuum Pump, etc.
+  2. **Fuel System** — Fuel Pump, Fuel Tank, Fuel Injector Pump, Fuel Distributor, Carburetor, Throttle Body. *(fixes the "fuel injector under cooling" bug)*
+  3. **Cooling** — Radiator, Radiator Core Support, Cooling Fan (Rad & Con), Fan Blade, Fan Clutch, Water Pump, Heater Core, Oil Cooler, Auto Trans Cooler, A/C Condensor.
+  4. **A/C & Heater** — A/C Assembly, Compressor, Evaporator, Hose, Heater Assy/Motor, Heater/AC Control, Blower Motor.
+  5. **Transmission & Drivetrain** — Transmission, Transfer Case, Torque Converter, Bellhousing, OD Unit, Trans Pan, Trans Computer, Clutch Master/Slave, Drive Shaft F/R, Differential, Carrier, Ring & Pinion, Axle Assy/Shaft/Housing, Hub, Lockout Hub.
+  6. **Brakes** — Caliper, Rotor F/R, Master Cylinder, Power Brake Booster, ABS Computer, ABS Pump, Brake Lines.
+  7. **Suspension & Steering** — Control Arms (F/R, U/L), Strut, Knee, Knuckle, Spindle, Coil Spring, Leaf Spring F/R, Shock Absorber, Stabilizer Bar, Steering Rack/Box, Steering Column, Power Steering Pump/Assy, Rear Suspension/Trailing/Locating Arms.
+  8. **Wheels & Tires** — Wheel, Tire, Hub Cap/Wheel Cover.
+  9. **Body — Exterior Panels** — Hood, Hood Hinge, Fender, Fender Ext, Inner Panel, Quarter Panel/Ext/Repair, Roof, Roof Panel, Cowl, Cab, Cab Clip, Rocker Moulding, Header Panel, Rear Body Panel, Rear Finish Panel, Frame, Frame Sections, Front End/Nose, Rear Clip, Pillar.
+  10. **Bumpers & Trim** — Bumper Assy F/R, Reinforcement F/R, Bumper Guard, Bumper Shock, Spoiler F/R, Valence, Grille, Mouldings, Running Boards, Pickup Bed (all variants), Bed Liner.
+  11. **Doors** — Front/Rear Door, Hinges, Handles, Mirrors, Mouldings, Regulators, Switches, Window/Vent Motors, Glass.
+  12. **Glass** — Windshield, Back Glass, Quarter Window, Special Glass, Sun Roof/T-Top, Sun Roof Motor.
+  13. **Tailgate/Trunk & Convertible** — Tailgate/Trunklid, Trunk Hinge, Rear Gate Motor, Conv Top Boot/Lift/Motor.
+  14. **Lighting** — Headlight Assy, Headlight Door/Motor/Wiper, Tail Light, Backup Light, Fog/Park Lamps F/R, Marker Lights, License Lamp, Third Brake Light.
+  15. **Electrical & Electronics** — Alternator, Starter, Generator, Voltage Regulator, Distributor, Ignition Switch/Module, Coil/Igniter, Engine Computer, Chassis/Cruise/Trans Computer, Body computers, Wiring Harness, Antenna, Radio/CD, Speedometer, Instrument Cluster, Window Motor, Door Motor, Wiper Motor F/R, Washer Motor/Reservoir, Wiper Linkage, Air Bag (+ Clockspring, Module, Sensor), Power Window Switch, Column Switch, Seat Belt Motor, Cruise Servo.
+  16. **Interior** — Seat (Front/Rear/3rd), Seat Track, Seat Belt, Dash Panel, Interior Panels, Steering Wheel.
+  17. **Fluids & Maintenance** (kept, all `serviceOnly: true`) — oil change, coolant flush, trans/diff fluid, alignment, balancing, brake fluid flush, timing belt service.
 
-### 3. Wire it into `/sell`
-- Render the editor only when `category === 'used_part'`, after the category attributes block (around line 1460 region).
-- On submit, after the listing is inserted and we have `listing_id`, insert the fitment rows into `public.listing_fitment` (bulk insert). Mirror the pattern used for `listing_media`.
-- On edit (`listing.$id.edit.tsx`), load existing fitment rows for the listing and pass to the editor; on save, diff/replace (simplest: delete-all + insert).
+- Every Car-Part.com `option` becomes one `NeededPartOption` with:
+  - `key`: snake-case slug derived from the label (stable; used in `attributes.part_keys`).
+  - `label`: Car-Part.com display name, lightly cleaned (fix typos like "Condensor"→"Condenser", "Instument"→"Instrument", strip trailing "(See Also …)" hints into a comment — keep label searchable).
+  - `category`: maps to the existing `parts_catalog.category` taxonomy (engine, drivetrain, brakes, suspension, body, electrical, cooling, fuel, interior, tires, wheels, glass, lighting, hvac, fluids). **Add `fuel`, `hvac`, `glass`, `lighting` if missing — they're already referenced loosely.**
+  - `serviceOnly`: only on the Fluids & Maintenance group.
 
-### 4. Hook the wizard to real data
-- `parts-search.functions.ts` already joins listings + fitment. Verify the query filters by `category = 'used_part' OR vehicle_for_parts = true` and by system attribute. Patch if needed once data exists.
+- De-duplicate Car-Part's redundant entries (e.g. "Front Bumper Assembly" vs "Bumper Assy (Front)", "Engine Cylinder Head" vs "Cylinder Head (Engine)"). Keep one canonical option per physical part; ~295 raw entries collapse to ~210 unique options.
+
+### 2. No changes to wizard UI or DB
+- `src/components/parts/parts-wizard.tsx` already iterates `USED_PARTS_GROUPS` and renders chips per `items[]`. New taxonomy renders automatically.
+- `src/lib/parts-search.functions.ts` filters by `attributes.part_keys` (string array) — existing listings keep working; new keys just become matchable as sellers re-tag.
+- No migration needed. Optional follow-up (not in this plan): a small one-time SQL to remap any listings still tagged with old keys (e.g. `fuel_injectors` → `fuel_injector_pump`).
+
+### 3. Add a credit line
+- In `src/routes/parts.tsx` info strip, add: *"Part names follow the Car-Part.com industry standard."* — short, non-promotional, sets expectation for sellers familiar with US yard taxonomy.
 
 ## Out of scope
-- `vehicle_for_parts` flag on regular vehicle listings (defer — separate request).
-- Live inventory feeds, scraping, Tecdoc.
-- Changes to `/parts` wizard UI.
-- Touching `affiliate-parts-section.tsx`.
+- Importing live inventory from Car-Part.com (their data is licensed; we'd need a partnership).
+- Per-make/model fitment auto-population.
+- Changing seller `/sell` part picker (it uses the same catalog and will update automatically).
+- Touching the `parts_catalog` table or `affiliate-parts-section.tsx`.
 
 ## Files
-- Migration: add `used_part` to category enum.
-- New: `src/components/parts/fitment-editor.tsx`.
-- Edit: `src/lib/categories.ts` (or wherever `CATEGORIES` lives), `src/lib/category-attributes.ts`, `src/routes/sell.tsx`, `src/routes/listing.$id.edit.tsx`, `src/lib/parts-search.functions.ts` (verify only).
+- Rewrite: `src/data/needed-parts-catalog.ts`
+- Tiny edit: `src/routes/parts.tsx` (credit line)
 
-## Order of operations
-1. Migration (enum value) — awaits approval.
-2. After approval: category metadata + FitmentEditor + sell/edit wiring in one pass.
+## Validation
+- Visual: open `/parts`, confirm 15 system tiles, confirm "Fuel Pump", "Fuel Injector Pump", "Fuel Tank" appear under **Fuel System** (not Cooling).
+- Build: typecheck passes (no consumer signature changes).
+- Spot-check `/sell` used-part form still shows the System dropdown with new groups.
