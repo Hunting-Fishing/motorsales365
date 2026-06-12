@@ -25,14 +25,16 @@ export const Route = createFileRoute("/admin/reports")({
 });
 
 function AdminReports() {
+  const { user } = useAuth();
   const [reports, setReports] = useState<any[]>([]);
   const [filter, setFilter] = useState<"open" | "resolved" | "all">("open");
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
 
   const load = async () => {
     let q = supabase
       .from("reports")
       .select(
-        "id,reason,details,status,created_at,reporter_id,listing_id,listings:listing_id(title,status,user_id)",
+        "id,reason,category,details,status,created_at,reporter_id,listing_id,public_summary,made_public_at,listings:listing_id(title,status,user_id)",
       )
       .order("created_at", { ascending: false });
     if (filter !== "all") q = q.eq("status", filter);
