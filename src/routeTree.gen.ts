@@ -26,6 +26,7 @@ import { Route as RefundPolicyRouteImport } from './routes/refund-policy'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PaymentsRouteImport } from './routes/payments'
+import { Route as PartsRouteImport } from './routes/parts'
 import { Route as PartnerTrainingRouteImport } from './routes/partner-training'
 import { Route as MyQrRouteImport } from './routes/my-qr'
 import { Route as MapRouteImport } from './routes/map'
@@ -267,6 +268,11 @@ const PricingRoute = PricingRouteImport.update({
 const PaymentsRoute = PaymentsRouteImport.update({
   id: '/payments',
   path: '/payments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PartsRoute = PartsRouteImport.update({
+  id: '/parts',
+  path: '/parts',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PartnerTrainingRoute = PartnerTrainingRouteImport.update({
@@ -1091,6 +1097,7 @@ export interface FileRoutesByFullPath {
   '/map': typeof MapRoute
   '/my-qr': typeof MyQrRoute
   '/partner-training': typeof PartnerTrainingRoute
+  '/parts': typeof PartsRoute
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -1265,6 +1272,7 @@ export interface FileRoutesByTo {
   '/map': typeof MapRoute
   '/my-qr': typeof MyQrRoute
   '/partner-training': typeof PartnerTrainingRoute
+  '/parts': typeof PartsRoute
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -1441,6 +1449,7 @@ export interface FileRoutesById {
   '/map': typeof MapRoute
   '/my-qr': typeof MyQrRoute
   '/partner-training': typeof PartnerTrainingRoute
+  '/parts': typeof PartsRoute
   '/payments': typeof PaymentsRouteWithChildren
   '/pricing': typeof PricingRoute
   '/privacy': typeof PrivacyRoute
@@ -1619,6 +1628,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/my-qr'
     | '/partner-training'
+    | '/parts'
     | '/payments'
     | '/pricing'
     | '/privacy'
@@ -1793,6 +1803,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/my-qr'
     | '/partner-training'
+    | '/parts'
     | '/payments'
     | '/pricing'
     | '/privacy'
@@ -1968,6 +1979,7 @@ export interface FileRouteTypes {
     | '/map'
     | '/my-qr'
     | '/partner-training'
+    | '/parts'
     | '/payments'
     | '/pricing'
     | '/privacy'
@@ -2145,6 +2157,7 @@ export interface RootRouteChildren {
   MapRoute: typeof MapRoute
   MyQrRoute: typeof MyQrRoute
   PartnerTrainingRoute: typeof PartnerTrainingRoute
+  PartsRoute: typeof PartsRoute
   PaymentsRoute: typeof PaymentsRouteWithChildren
   PricingRoute: typeof PricingRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -2346,6 +2359,13 @@ declare module '@tanstack/react-router' {
       path: '/payments'
       fullPath: '/payments'
       preLoaderRoute: typeof PaymentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/parts': {
+      id: '/parts'
+      path: '/parts'
+      fullPath: '/parts'
+      preLoaderRoute: typeof PartsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/partner-training': {
@@ -3722,6 +3742,7 @@ const rootRouteChildren: RootRouteChildren = {
   MapRoute: MapRoute,
   MyQrRoute: MyQrRoute,
   PartnerTrainingRoute: PartnerTrainingRoute,
+  PartsRoute: PartsRoute,
   PaymentsRoute: PaymentsRouteWithChildren,
   PricingRoute: PricingRoute,
   PrivacyRoute: PrivacyRoute,
