@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 12, 2026 (added Used Parts marketplace addendum — peer-to-peer used and salvage auto parts, seller condition disclosure required, no platform warranty)";
+  const lastUpdated = "June 12, 2026 (added public report transparency — listing pages now display report counts and admin-reviewed summaries; reporter identities are never published)";
 
   return (
     <SiteLayout>

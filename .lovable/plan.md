@@ -1,53 +1,38 @@
 ## Goal
-The banner image at the top of every page (`src/assets/banner.webp`, rendered by `SiteLayout`) shows 8 category tiles — **Cars, Motorcycles, Trucks, Heavy Equipment, Parts, Tires, Repair Shops, Related Businesses** — but those tiles are baked into the image. The whole banner is currently a single `<a href="/">` so clicking any tile just reloads the home page.
+Surface reports publicly (counts + admin-curated summaries) to add user-side transparency, mark listing cards when reports exist, and give the admin panel proper unread-count notifications across every moderation queue (including a global bell).
 
-We'll overlay invisible, percentage-positioned `<Link>` hotspots on each tile so they route correctly.
+## 1. Database
 
-## Routes per tile
-| Tile | Destination |
-|---|---|
-| CARS | `/browse/car` |
-| MOTORCYCLES | `/browse/motorcycle` |
-| TRUCKS | `/browse/truck` |
-| HEAVY EQUIPMENT | `/browse/equipment` |
-| PARTS | `/parts` |
-| TIRES | `/browse/tires` |
-| REPAIR SHOPS | `/browse/repair` |
-| RELATED BUSINESSES | `/businesses` |
+New migration:
+- `reports`: add `public_summary text`, `made_public_at timestamptz`, `made_public_by uuid`. Add index on `(listing_id, status)`.
+- Public RPC `get_listing_report_summary(listing_id uuid)` → `SECURITY DEFINER`, returns `{ open_count, resolved_count, total, categories: jsonb, public_notes: [{category, summary, made_public_at}] }`. Granted to `anon, authenticated`. Only rows with `public_summary IS NOT NULL` contribute to `public_notes`; counts come from all rows. No reporter identity, no raw `details`, ever.
+- New view/RPC `admin_pending_counts()` → `SECURITY DEFINER`, gated by `can_support(auth.uid())`, returns one row of unread counts per area (reports_open, verifications_pending, claims_pending, payments_pending, inquiries_open, location_corrections_pending, type_suggestions_pending, ad_campaigns_pending, ops_alerts_unack, support_tickets_open, discover_queue_pending, lead_offers_pending).
 
-(Per your answer, `Tires` and `Repair Shops` use `/browse/$category`. The `/browse/$category` route accepts any slug, so empty categories still render properly with the existing "no results" state.)
+No new tables — counts come from existing tables, so no GRANT issues beyond the RPCs.
 
-## Implementation
+## 2. Public-facing UI
 
-Edit only `src/components/site-layout.tsx`:
+- `ListingReportBadge` component on `ListingCard` (top-left near image, distinct from the existing `ListingActionsMenu`): small ⚠️ icon + count when `open_count > 0`. Tooltip: "N user report(s) on this listing — tap for details". Tap opens the listing page anchored to the new section.
+- `ListingReportsSection` on `/listing/$id` page, placed under price/description and above "Report this listing" CTA. Shows:
+  - Total counts (open / resolved) with category breakdown chips.
+  - Admin-curated public summaries (one card per public note: category, summary text, date). Empty state: "No admin-reviewed concerns yet."
+  - Plain-English disclaimer: counts include unverified user reports; only admin-reviewed notes shown in detail.
+- Card data fetched via batch RPC `get_listing_report_summaries(ids uuid[])` so feeds stay efficient — added alongside the per-listing RPC.
 
-1. Remove the outer `<a href="/">` wrapper around the banner.
-2. Replace with a `relative` wrapper:
-   - `<img>` keeps its current responsive sizing.
-   - 8 absolutely-positioned `<Link>` elements, each sized as a percentage of the banner's width/height so hotspots stay aligned on mobile and desktop.
-   - Each hotspot gets `aria-label`, `title`, transparent background, focus ring for a11y, and subtle hover highlight (`hover:bg-white/10`).
-3. Add a small "Home" link area on the logo region (left side of banner) so users don't lose the click-banner-to-go-home behavior.
+## 3. Admin notifications
 
-### Hotspot coordinates (normalized %, measured from the banner)
-Tile strip sits at roughly `top: 76.6%` to `89%`. Approximate x ranges:
+- `useAdminPendingCounts()` hook polls `admin_pending_counts()` every 60s (and on focus). Cached via TanStack Query.
+- Sidebar items in `admin.tsx` (group tabs) get a red pill badge with the count for their area.
+- New `AdminNotificationBell` in the admin header: dropdown listing every area with `count > 0`, each as a link. Total badge on the bell icon.
+- New admin tool on `admin.reports.tsx` per report: textarea + "Publish public summary" / "Unpublish" buttons writing `public_summary`, `made_public_at`, `made_public_by`. Logged via `logAdminAudit`.
 
-```text
-CARS              left  9.3%  width  9.2%
-MOTORCYCLES       left 18.8%  width  9.2%
-TRUCKS            left 28.3%  width  9.5%
-HEAVY EQUIPMENT   left 38.1%  width  9.5%
-PARTS             left 47.8%  width  9.3%
-TIRES             left 57.4%  width  9.5%
-REPAIR SHOPS     left 67.1%  width  9.6%
-RELATED BUSINESS  left 76.9%  width 16.2%
-```
+## 4. Policy pages
 
-Logo "Home" hotspot: `left 24% top 8% width 28% height 60%` (covers the 365 MOTOR SALES logo half).
+- `/terms`: add short clause that listing pages display report counts and admin-reviewed summaries; reporter identity is never published. Bump "Last updated".
+- `/privacy`: note that reporter identity and free-text details remain private; only admin-curated summaries are public. Bump "Last updated".
 
-## Out of scope
-- No DB or route changes (`/browse/$category` already accepts arbitrary slugs).
-- No changes to the home page hero CTAs or category chip strip — those already route correctly.
-- No new `/tires` or `/repair-shops` landing pages.
+## Technical details
 
-## Validation
-Open `/`, hover each tile — cursor changes, focus ring visible on tab. Click each tile and confirm the URL becomes `/browse/car`, `/browse/motorcycle`, `/browse/truck`, `/browse/equipment`, `/parts`, `/browse/tires`, `/browse/repair`, `/businesses` respectively. Resize to mobile width and re-verify hotspots stay aligned over the tiles.
+- Files to add: `supabase/migrations/<ts>_public_report_summaries_and_admin_counts.sql`, `src/lib/reports.functions.ts` (wrappers for the two RPCs — public is unauthenticated `createServerFn` calling `supabaseAdmin` server-side projection, admin counts uses `requireSupabaseAuth`), `src/components/listings/listing-report-badge.tsx`, `src/components/listing/listing-reports-section.tsx`, `src/components/admin/admin-notification-bell.tsx`, `src/hooks/use-admin-pending-counts.ts`.
+- Files to edit: `src/components/listing-card.tsx` (badge), `src/routes/listing.$id.tsx` (section), `src/routes/admin.tsx` (bell + sidebar badges), `src/routes/admin.reports.tsx` (publish summary controls), `src/components/admin/admin-group-tabs.tsx` (accept count slot), `src/routes/terms.tsx`, `src/routes/privacy.tsx`.
+- Memory rule for terms/privacy sync already covers the policy bumps.

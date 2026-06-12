@@ -35,6 +35,7 @@ import { AffiliatePartsSection } from "@/components/affiliate-parts-section";
 import { NeededPartsRail } from "@/components/listing/needed-parts-rail";
 import { GalleryLightbox } from "@/components/listing/gallery-lightbox";
 import { MobileActionBar } from "@/components/listing/mobile-action-bar";
+import { ListingReportsSection } from "@/components/listing/listing-reports-section";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
@@ -917,6 +918,10 @@ function ListingDetailPage() {
               <Flag className="h-3 w-3" /> Report this listing
             </button>
           </div>
+
+          <ListingReportsSection listingId={listing.id} />
+
+
 
           {/* Services around this vehicle — merged from former ServiceStrip.
               Revenue: lead-gen for finance/insurance/OR-CR partners. */}

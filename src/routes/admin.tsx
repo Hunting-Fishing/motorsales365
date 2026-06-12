@@ -35,6 +35,11 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { AdminNotificationBell } from "@/components/admin/admin-notification-bell";
+import {
+  useAdminPendingCounts,
+  pendingCountForRoute,
+} from "@/hooks/use-admin-pending-counts";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
@@ -343,51 +348,67 @@ function AdminLayout() {
       ? myRoles[0][0].toUpperCase() + myRoles[0].slice(1)
       : "Staff";
 
+  const { data: pendingCounts } = useAdminPendingCounts(hasAccess);
+
   return (
     <SiteLayout>
       <TooltipProvider delayDuration={200}>
         <div className="container mx-auto grid gap-4 px-3 py-4 sm:gap-6 sm:px-4 sm:py-8 lg:grid-cols-[240px_1fr]">
-          {/* Mobile: section selector */}
+          {/* Mobile: section selector + bell */}
           <div className="lg:hidden">
-            <div className="mb-1 px-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              {label} console
+            <div className="mb-1 flex items-center justify-between gap-2 px-1">
+              <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                {label} console
+              </div>
+              <AdminNotificationBell enabled={hasAccess} />
             </div>
             <AdminMobileSelect items={visibleNav} />
           </div>
 
           {/* Desktop: sidebar */}
           <aside className="hidden rounded-xl border border-border bg-card p-2 lg:sticky lg:top-20 lg:block lg:self-start">
-            <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-              {label}
+            <div className="flex items-center justify-between gap-2 px-3 py-2">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                {label}
+              </span>
+              <AdminNotificationBell enabled={hasAccess} />
             </div>
             <nav className="flex flex-col gap-1">
-              {visibleNav.map(({ to, label, Icon, exact, info }) => (
-                <div key={to} className="group flex shrink-0 items-center gap-1">
-                  <Link
-                    to={to}
-                    activeOptions={{ exact: !!exact }}
-                    activeProps={{ className: "bg-primary text-primary-foreground" }}
-                    className="flex flex-1 shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary"
-                  >
-                    <Icon className="h-4 w-4" />
-                    {label}
-                  </Link>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        aria-label={`About ${label}`}
-                        className="rounded-md p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
-                      >
-                        <Info className="h-3.5 w-3.5" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" className="max-w-xs">
-                      {info}
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              ))}
+              {visibleNav.map(({ to, label, Icon, exact, info }) => {
+                const count = pendingCountForRoute(to, pendingCounts);
+                return (
+                  <div key={to} className="group flex shrink-0 items-center gap-1">
+                    <Link
+                      to={to}
+                      activeOptions={{ exact: !!exact }}
+                      activeProps={{ className: "bg-primary text-primary-foreground" }}
+                      className="flex flex-1 shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary"
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span className="flex-1">{label}</span>
+                      {count > 0 && (
+                        <span className="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-semibold leading-none text-destructive-foreground">
+                          {count > 99 ? "99+" : count}
+                        </span>
+                      )}
+                    </Link>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <button
+                          type="button"
+                          aria-label={`About ${label}`}
+                          className="rounded-md p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                        >
+                          <Info className="h-3.5 w-3.5" />
+                        </button>
+                      </TooltipTrigger>
+                      <TooltipContent side="right" className="max-w-xs">
+                        {info}
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
+                );
+              })}
             </nav>
           </aside>
           <div className="min-w-0">

@@ -3,12 +3,14 @@ import { AdminGroupTabs, ACTIVITY_TABS } from "@/components/admin/admin-group-ta
 import { confirm } from "@/components/ui/confirm-dialog";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Trash2, ShieldOff, CheckCircle2 } from "lucide-react";
+import { Trash2, ShieldOff, CheckCircle2, Megaphone, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Textarea } from "@/components/ui/textarea";
 import { formatDate } from "@/lib/format";
 import { RouteError, RouteNotFound } from "@/components/route-boundaries";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/admin/reports")({
   component: AdminReports,
@@ -23,14 +25,16 @@ export const Route = createFileRoute("/admin/reports")({
 });
 
 function AdminReports() {
+  const { user } = useAuth();
   const [reports, setReports] = useState<any[]>([]);
   const [filter, setFilter] = useState<"open" | "resolved" | "all">("open");
+  const [drafts, setDrafts] = useState<Record<string, string>>({});
 
   const load = async () => {
     let q = supabase
       .from("reports")
       .select(
-        "id,reason,details,status,created_at,reporter_id,listing_id,listings:listing_id(title,status,user_id)",
+        "id,reason,category,details,status,created_at,reporter_id,listing_id,public_summary,made_public_at,listings:listing_id(title,status,user_id)",
       )
       .order("created_at", { ascending: false });
     if (filter !== "all") q = q.eq("status", filter);
@@ -67,6 +71,37 @@ function AdminReports() {
     await supabase.from("listings").delete().eq("id", listingId);
     await supabase.from("reports").update({ status: "resolved" }).eq("id", reportId);
     toast.success("Listing deleted");
+    load();
+  };
+
+  const publishSummary = async (id: string) => {
+    const text = (drafts[id] ?? "").trim();
+    if (!text) {
+      toast.error("Enter a public summary first.");
+      return;
+    }
+    const { error } = await supabase
+      .from("reports")
+      .update({ public_summary: text, made_public_at: new Date().toISOString(), made_public_by: user?.id ?? null })
+      .eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Public summary published — visitors can now see it on the listing.");
+    load();
+  };
+
+  const unpublishSummary = async (id: string) => {
+    const { error } = await supabase
+      .from("reports")
+      .update({ public_summary: null, made_public_at: null, made_public_by: null })
+      .eq("id", id);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Public summary removed.");
     load();
   };
 
@@ -147,6 +182,41 @@ function AdminReports() {
                     </Button>
                   </div>
                 )}
+              </div>
+
+              {/* Public summary controls — what visitors will see on the listing page */}
+              <div className="mt-4 rounded-md border border-dashed border-border bg-background/60 p-3">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-xs font-semibold">
+                    <Megaphone className="h-3.5 w-3.5" />
+                    Public summary
+                    {r.public_summary && (
+                      <Badge variant="secondary" className="ml-1">
+                        Published {r.made_public_at ? `· ${formatDate(r.made_public_at)}` : ""}
+                      </Badge>
+                    )}
+                  </div>
+                  {r.public_summary && (
+                    <Button size="sm" variant="ghost" onClick={() => unpublishSummary(r.id)}>
+                      <EyeOff className="mr-1 h-3.5 w-3.5" />
+                      Unpublish
+                    </Button>
+                  )}
+                </div>
+                <Textarea
+                  value={drafts[r.id] ?? r.public_summary ?? ""}
+                  onChange={(e) => setDrafts((d) => ({ ...d, [r.id]: e.target.value }))}
+                  placeholder="Short, neutral summary visible to all visitors. Do not include reporter names or unverified claims."
+                  className="mt-2 min-h-20 text-sm"
+                />
+                <div className="mt-2 flex items-center justify-between gap-2">
+                  <p className="text-[11px] text-muted-foreground">
+                    Reporter identity and raw details are never shown publicly — only this summary.
+                  </p>
+                  <Button size="sm" onClick={() => publishSummary(r.id)}>
+                    {r.public_summary ? "Update summary" : "Publish public summary"}
+                  </Button>
+                </div>
               </div>
             </div>
           ))}

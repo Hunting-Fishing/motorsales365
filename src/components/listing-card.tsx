@@ -21,7 +21,9 @@ import { ServiceStrip } from "@/components/service-strip";
 import { TrustBadges } from "@/components/listings/trust-badges";
 import { ListingActionsMenu } from "@/components/listings/listing-actions-menu";
 import { ListingBadges, pickHeadlinePrice } from "@/components/listings/listing-badges";
+import { ListingReportBadge } from "@/components/listings/listing-report-badge";
 import { PricingWidget } from "@/components/listings/pricing-widget";
+import { useListingReportSummary } from "@/hooks/use-listing-report-summary";
 import { deriveTrustSignals } from "@/lib/trust-signals";
 import { getSellerTier } from "@/lib/listing-tier";
 import { cn } from "@/lib/utils";
@@ -117,6 +119,8 @@ export function ListingCard({
   const showServices = VEHICLE_CATEGORIES.has(listing.category_slug);
   const trust = deriveTrustSignals(listing);
   const tier = getSellerTier(listing);
+  const { data: reportSummary } = useListingReportSummary(listing.id);
+  const openReports = reportSummary?.open_count ?? 0;
   return (
     <div
       className={cn(
@@ -142,6 +146,9 @@ export function ListingCard({
             loading="lazy"
           />
           <div className="absolute left-2 top-2 flex flex-wrap gap-1">
+            {openReports > 0 && (
+              <ListingReportBadge listingId={listing.id} openCount={openReports} />
+            )}
             {boosted && (
               <Badge className="bg-accent text-accent-foreground">
                 <Star className="mr-1 h-3 w-3" />
