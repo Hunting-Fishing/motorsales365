@@ -114,6 +114,11 @@ const SELL_SEO: Record<string, { title: string; description: string }> = {
     description:
       "List OEM and aftermarket vehicle parts, tires, wheels, and accessories for Filipino buyers.",
   },
+  used_part: {
+    title: "Sell used auto parts — 365 MotorSales Philippines",
+    description:
+      "List used engines, transmissions, body panels, and salvage parts. Tag vehicle fitment so buyers can find your part.",
+  },
   drone: {
     title: "List drone services & sales — 365 MotorSales Philippines",
     description:
