@@ -1,53 +1,53 @@
 ## Goal
+The banner image at the top of every page (`src/assets/banner.webp`, rendered by `SiteLayout`) shows 8 category tiles — **Cars, Motorcycles, Trucks, Heavy Equipment, Parts, Tires, Repair Shops, Related Businesses** — but those tiles are baked into the image. The whole banner is currently a single `<a href="/">` so clicking any tile just reloads the home page.
 
-After buyers pick a vehicle + system + part in the Parts Wizard, also:
-1. Surface **matching catalog entries** (parts_catalog) as quick-reference cards (typical price, photo, OEM-equivalent name) above the listings.
-2. **Rank listings** by fitment quality (exact year+make+model > make+model > make-only > attribute-only) instead of treating them all equally.
-3. Let buyers **filter by OEM vs Aftermarket** and search by **OEM part number** so they can find a specific Toyota 90919-01247 etc.
+We'll overlay invisible, percentage-positioned `<Link>` hotspots on each tile so they route correctly.
 
-No DB schema changes — `listing_fitment`, `listings.attributes.oem_or_aftermarket`, and `attributes.part_number` are already captured at sell-time.
+## Routes per tile
+| Tile | Destination |
+|---|---|
+| CARS | `/browse/car` |
+| MOTORCYCLES | `/browse/motorcycle` |
+| TRUCKS | `/browse/truck` |
+| HEAVY EQUIPMENT | `/browse/equipment` |
+| PARTS | `/parts` |
+| TIRES | `/browse/tires` |
+| REPAIR SHOPS | `/browse/repair` |
+| RELATED BUSINESSES | `/businesses` |
 
-## Changes
+(Per your answer, `Tires` and `Repair Shops` use `/browse/$category`. The `/browse/$category` route accepts any slug, so empty categories still render properly with the existing "no results" state.)
 
-### 1. `src/lib/parts-search.functions.ts` — smarter `searchUsedParts`
+## Implementation
 
-- Accept new inputs: `oemPreference: "any" | "oem" | "aftermarket"`, `partNumber: string | null`.
-- When a vehicle is provided, fetch `listing_fitment` rows including `year_min/year_max` (not just listing_id). Compute per-listing **match score**:
-  - 3 = make+model+year in range
-  - 2 = make+model match
-  - 1 = make-only OR attribute fallback (`attributes.make/model`)
-  - 0 = no vehicle match (excluded when vehicle provided)
-- After the existing part_keys/systems filter, apply OEM filter against `attributes.oem_or_aftermarket` and substring-match `attributes.part_number` (case-insensitive) when provided.
-- Sort: boosted first, then `matchScore` desc, then created_at desc. Return `match_score` on each listing.
-- Add a sibling server fn `suggestCatalogParts({ partKeys, systems, make, model, year })` that queries `parts_catalog` where `category` ∈ selected systems OR `slug/title` fuzzy-matches selected part labels, filtered by `compatible_makes` / `compatible_models` / year range when provided. Returns top ~6.
+Edit only `src/components/site-layout.tsx`:
 
-### 2. `src/components/parts/parts-wizard.tsx` — wizard UX
+1. Remove the outer `<a href="/">` wrapper around the banner.
+2. Replace with a `relative` wrapper:
+   - `<img>` keeps its current responsive sizing.
+   - 8 absolutely-positioned `<Link>` elements, each sized as a percentage of the banner's width/height so hotspots stay aligned on mobile and desktop.
+   - Each hotspot gets `aria-label`, `title`, transparent background, focus ring for a11y, and subtle hover highlight (`hover:bg-white/10`).
+3. Add a small "Home" link area on the logo region (left side of banner) so users don't lose the click-banner-to-go-home behavior.
 
-- Step 3 (parts): add a small **OEM / Aftermarket / Any** segmented control and an optional **OEM part #** input.
-- On submit, call both `searchUsedParts` and `suggestCatalogParts` in parallel; store both results.
-- Step 4 (results):
-  - New "Catalog suggestions" strip on top (cards from `parts_catalog`) with a "Typical price" badge and a "Find sellers" button that scrolls to the listings below — only shown when suggestions exist.
-  - Each listing card gets a small **match badge** ("Exact fit • 2018 Civic" / "Fits Civic" / "Make match" / "Attribute match") driven by `match_score`.
-  - When no listings match but catalog suggestions exist, encourage "Post a wanted ad for this exact part" (existing CTA, prefilled with catalog slug).
+### Hotspot coordinates (normalized %, measured from the banner)
+Tile strip sits at roughly `top: 76.6%` to `89%`. Approximate x ranges:
 
-### 3. `src/components/listing-card.tsx` — optional badge slot
+```text
+CARS              left  9.3%  width  9.2%
+MOTORCYCLES       left 18.8%  width  9.2%
+TRUCKS            left 28.3%  width  9.5%
+HEAVY EQUIPMENT   left 38.1%  width  9.5%
+PARTS             left 47.8%  width  9.3%
+TIRES             left 57.4%  width  9.5%
+REPAIR SHOPS     left 67.1%  width  9.6%
+RELATED BUSINESS  left 76.9%  width 16.2%
+```
 
-- Accept an optional `badge?: { label: string; tone: "exact"|"good"|"loose" }` prop and render it in the card header. No visual change when omitted.
-
-### 4. `src/routes/parts.tsx` — copy tweak
-
-- Update the "How it works" strip to mention catalog suggestions + OEM filtering.
+Logo "Home" hotspot: `left 24% top 8% width 28% height 60%` (covers the 365 MOTOR SALES logo half).
 
 ## Out of scope
-
-- No new tables, migrations, or RLS changes.
-- Sell flow stays as-is (OEM/part number already collected).
-- No live OEM-number database import — uses what sellers entered.
-- Affiliate parts section unchanged.
+- No DB or route changes (`/browse/$category` already accepts arbitrary slugs).
+- No changes to the home page hero CTAs or category chip strip — those already route correctly.
+- No new `/tires` or `/repair-shops` landing pages.
 
 ## Validation
-
-- Wizard with `2018 Honda Civic → Brakes → Front brake pads` shows: catalog card for "Front brake pads (OEM-equiv)" + listings sorted with exact-year fits first.
-- Toggling **OEM only** hides listings tagged Aftermarket.
-- Typing a part number narrows listings to ones whose `attributes.part_number` contains that string.
-- Typecheck passes; no DB migration required.
+Open `/`, hover each tile — cursor changes, focus ring visible on tab. Click each tile and confirm the URL becomes `/browse/car`, `/browse/motorcycle`, `/browse/truck`, `/browse/equipment`, `/parts`, `/browse/tires`, `/browse/repair`, `/businesses` respectively. Resize to mobile width and re-verify hotspots stay aligned over the tiles.
