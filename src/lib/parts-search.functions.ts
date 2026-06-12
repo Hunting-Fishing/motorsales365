@@ -130,5 +130,5 @@ export const browseUsedParts = createServerFn({ method: "POST" })
       .order("created_at", { ascending: false })
       .limit(data.limit);
     if (error) throw error;
-    return { listings: listings ?? [] };
+    return { listings: (listings ?? []).map(mapListing) };
   });
