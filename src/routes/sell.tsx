@@ -775,6 +775,23 @@ function SellPage() {
         if (error || !listing) throw error;
         lid = listing.id;
         setListingId(lid);
+
+        if (category === "used_part") {
+          const { ok: fitRows, error: fitErr } = normalizeFitmentRows(fitmentRows);
+          if (fitErr) {
+            toast.error(fitErr);
+            setSubmitting(false);
+            return;
+          }
+          if (fitRows.length) {
+            const { error: fErr } = await supabase
+              .from("listing_fitment")
+              .insert(fitRows.map((r) => ({ ...r, listing_id: lid })));
+            if (fErr) {
+              toast.error(`Saved listing, but fitment failed: ${fErr.message}`);
+            }
+          }
+        }
       }
 
       // Upload photos that are not already done. Run sequentially to keep the
