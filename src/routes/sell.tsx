@@ -50,6 +50,12 @@ import {
   CATEGORY_ATTR_KEYS,
 } from "@/components/listings/category-attributes-editor";
 import { isAttrCategory, isValidDrivetrain } from "@/lib/category-attributes";
+import {
+  FitmentEditor,
+  normalizeFitmentRows,
+  type FitmentRow,
+} from "@/components/parts/fitment-editor";
+import { NEEDED_PARTS_GROUPS } from "@/data/needed-parts-catalog";
 import { z } from "zod";
 
 const CATEGORY_LABEL_MAP: Record<string, string> = {
