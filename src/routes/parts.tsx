@@ -129,6 +129,9 @@ function PartsHub() {
             We match listings whose seller marked compatibility — or whose donor vehicle
             matches yours. Found nothing? Post a wanted ad and salvage yards reach out.
           </p>
+          <p className="mt-2 text-xs">
+            Part names follow the Car-Part.com industry standard used by salvage yards worldwide.
+          </p>
         </div>
       </div>
     </SiteLayout>
