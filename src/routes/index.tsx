@@ -284,17 +284,28 @@ function Index() {
             Shop by category
           </div>
           <div className="flex flex-wrap gap-2">
-            {VEHICLE_CATEGORIES.map(({ slug, name, Icon }) => (
-              <Link
-                key={slug}
-                to="/browse/$category"
-                params={{ category: slug }}
-                className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium transition hover:border-primary hover:text-primary"
-              >
-                <Icon className="h-4 w-4" />
-                {name}
-              </Link>
-            ))}
+            {VEHICLE_CATEGORIES.map(({ slug, name, Icon }) =>
+              slug === "parts" ? (
+                <Link
+                  key={slug}
+                  to="/parts"
+                  className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium transition hover:border-primary hover:text-primary"
+                >
+                  <Icon className="h-4 w-4" />
+                  {name}
+                </Link>
+              ) : (
+                <Link
+                  key={slug}
+                  to="/browse/$category"
+                  params={{ category: slug }}
+                  className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium transition hover:border-primary hover:text-primary"
+                >
+                  <Icon className="h-4 w-4" />
+                  {name}
+                </Link>
+              ),
+            )}
             <Link
               to="/wanted"
               className="flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium transition hover:border-primary hover:text-primary"
