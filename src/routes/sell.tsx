@@ -718,6 +718,14 @@ function SellPage() {
               .map((s) => s.trim())
               .filter(Boolean);
         }
+        if (category === "used_part") {
+          if (usedPartSystem) attributes.system = usedPartSystem;
+          if (usedPartName) attributes.part_name = usedPartName;
+          if (usedPartCondition) attributes.part_condition = usedPartCondition;
+          if (usedPartOemAfter) attributes.oem_or_aftermarket = usedPartOemAfter;
+          if (usedPartNumber) attributes.part_number = usedPartNumber;
+          if (usedPartWarrantyDays) attributes.warranty_days = Number(usedPartWarrantyDays);
+        }
         // Unified service tags (works for any service category, including parts/carwash)
         if (serviceTags.length) attributes.tags = serviceTags;
         if (
