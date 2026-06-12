@@ -146,6 +146,9 @@ export function ListingCard({
             loading="lazy"
           />
           <div className="absolute left-2 top-2 flex flex-wrap gap-1">
+            {openReports > 0 && (
+              <ListingReportBadge listingId={listing.id} openCount={openReports} />
+            )}
             {boosted && (
               <Badge className="bg-accent text-accent-foreground">
                 <Star className="mr-1 h-3 w-3" />
