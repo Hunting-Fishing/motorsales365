@@ -3481,6 +3481,47 @@ export type Database = {
         }
         Relationships: []
       }
+      listing_fitment: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          make: string
+          model: string
+          trim: string | null
+          year_max: number | null
+          year_min: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          make: string
+          model: string
+          trim?: string | null
+          year_max?: number | null
+          year_min?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          make?: string
+          model?: string
+          trim?: string | null
+          year_max?: number | null
+          year_min?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_fitment_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listing_likes: {
         Row: {
           created_at: string
