@@ -786,7 +786,7 @@ function SellPage() {
           if (fitRows.length) {
             const { error: fErr } = await supabase
               .from("listing_fitment")
-              .insert(fitRows.map((r) => ({ ...r, listing_id: lid })));
+              .insert(fitRows.map((r) => ({ ...r, listing_id: lid! })));
             if (fErr) {
               toast.error(`Saved listing, but fitment failed: ${fErr.message}`);
             }
