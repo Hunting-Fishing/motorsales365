@@ -23,7 +23,13 @@ import { ListingActionsMenu } from "@/components/listings/listing-actions-menu";
 import { ListingBadges, pickHeadlinePrice } from "@/components/listings/listing-badges";
 import { ListingReportBadge } from "@/components/listings/listing-report-badge";
 import { PricingWidget } from "@/components/listings/pricing-widget";
+import { NewBadge } from "@/components/listings/new-badge";
+import { RenewedBadge } from "@/components/listings/renewed-badge";
+import { PromoBadge, type ListingPromo } from "@/components/listings/promo-badge";
+import { PriceTrendBadge, type PriceTrend } from "@/components/listings/price-trend-badge";
 import { useListingReportSummary } from "@/hooks/use-listing-report-summary";
+import { useListingPriceTrend } from "@/hooks/use-listing-price-trend";
+import { useListingPromo } from "@/hooks/use-listing-promo";
 import { deriveTrustSignals } from "@/lib/trust-signals";
 import { getSellerTier } from "@/lib/listing-tier";
 import { cn } from "@/lib/utils";
@@ -58,6 +64,10 @@ export interface ListingCardData {
   negotiable?: boolean | null;
   price_hidden?: boolean | null;
   registration_status?: "registered" | "unregistered" | "for_transfer" | "unknown" | null;
+  published_at?: string | null;
+  updated_at?: string | null;
+  price_trend?: PriceTrend | null;
+  promotion?: ListingPromo | null;
 }
 
 const CATEGORY_META: Record<string, { label: string; Icon: typeof Droplets }> = {
