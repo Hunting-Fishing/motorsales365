@@ -45,6 +45,7 @@ import { Route as AffiliateDisclosureRouteImport } from './routes/affiliate-disc
 import { Route as AdvertiseRouteImport } from './routes/advertise'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WantedIndexRouteImport } from './routes/wanted.index'
 import { Route as WantedPartsIndexRouteImport } from './routes/wanted-parts.index'
@@ -135,10 +136,10 @@ import { Route as AdminLeadOffersRouteImport } from './routes/admin.lead-offers'
 import { Route as AdminInquiriesRouteImport } from './routes/admin.inquiries'
 import { Route as AdminFeatureFlagsRouteImport } from './routes/admin.feature-flags'
 import { Route as AdminEducationRouteImport } from './routes/admin.education'
+import { Route as AdminDispatchRouteImport } from './routes/admin.dispatch'
 import { Route as AdminDiscoverBusinessesRouteImport } from './routes/admin.discover-businesses'
 import { Route as AdminCurrenciesRouteImport } from './routes/admin.currencies'
 import { Route as AdminClaimsRouteImport } from './routes/admin.claims'
-import { Route as AdminDispatchRouteImport } from './routes/admin.dispatch'
 import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
@@ -367,6 +368,10 @@ const AdminRoute = AdminRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -820,6 +825,11 @@ const AdminEducationRoute = AdminEducationRouteImport.update({
   path: '/education',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminDispatchRoute = AdminDispatchRouteImport.update({
+  id: '/dispatch',
+  path: '/dispatch',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminDiscoverBusinessesRoute = AdminDiscoverBusinessesRouteImport.update({
   id: '/discover-businesses',
   path: '/discover-businesses',
@@ -833,11 +843,6 @@ const AdminCurrenciesRoute = AdminCurrenciesRouteImport.update({
 const AdminClaimsRoute = AdminClaimsRouteImport.update({
   id: '/claims',
   path: '/claims',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminDispatchRoute = AdminDispatchRouteImport.update({
-  id: '/dispatch',
-  path: '/dispatch',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminBusinessesRoute = AdminBusinessesRouteImport.update({
@@ -979,9 +984,9 @@ const AdminRedemptionsStaffIdRoute = AdminRedemptionsStaffIdRouteImport.update({
 } as any)
 const AuthenticatedDashboardPartsWantedRoute =
   AuthenticatedDashboardPartsWantedRouteImport.update({
-    id: '/_authenticated/dashboard/parts-wanted',
+    id: '/dashboard/parts-wanted',
     path: '/dashboard/parts-wanted',
-    getParentRoute: () => rootRouteImport,
+    getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
@@ -1149,9 +1154,9 @@ export interface FileRoutesByFullPath {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/claims': typeof AdminClaimsRoute
-  '/admin/dispatch': typeof AdminDispatchRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/discover-businesses': typeof AdminDiscoverBusinessesRoute
+  '/admin/dispatch': typeof AdminDispatchRoute
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
@@ -1328,9 +1333,9 @@ export interface FileRoutesByTo {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/claims': typeof AdminClaimsRoute
-  '/admin/dispatch': typeof AdminDispatchRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/discover-businesses': typeof AdminDiscoverBusinessesRoute
+  '/admin/dispatch': typeof AdminDispatchRoute
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
@@ -1465,6 +1470,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/admin': typeof AdminRouteWithChildren
   '/advertise': typeof AdvertiseRoute
@@ -1509,9 +1515,9 @@ export interface FileRoutesById {
   '/admin/audit': typeof AdminAuditRoute
   '/admin/businesses': typeof AdminBusinessesRoute
   '/admin/claims': typeof AdminClaimsRoute
-  '/admin/dispatch': typeof AdminDispatchRoute
   '/admin/currencies': typeof AdminCurrenciesRoute
   '/admin/discover-businesses': typeof AdminDiscoverBusinessesRoute
+  '/admin/dispatch': typeof AdminDispatchRoute
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
@@ -1694,6 +1700,7 @@ export interface FileRouteTypes {
     | '/admin/claims'
     | '/admin/currencies'
     | '/admin/discover-businesses'
+    | '/admin/dispatch'
     | '/admin/education'
     | '/admin/feature-flags'
     | '/admin/inquiries'
@@ -1872,6 +1879,7 @@ export interface FileRouteTypes {
     | '/admin/claims'
     | '/admin/currencies'
     | '/admin/discover-businesses'
+    | '/admin/dispatch'
     | '/admin/education'
     | '/admin/feature-flags'
     | '/admin/inquiries'
@@ -2005,6 +2013,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/_authenticated'
     | '/about'
     | '/admin'
     | '/advertise'
@@ -2051,6 +2060,7 @@ export interface FileRouteTypes {
     | '/admin/claims'
     | '/admin/currencies'
     | '/admin/discover-businesses'
+    | '/admin/dispatch'
     | '/admin/education'
     | '/admin/feature-flags'
     | '/admin/inquiries'
@@ -2186,6 +2196,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   AdminRoute: typeof AdminRouteWithChildren
   AdvertiseRoute: typeof AdvertiseRoute
@@ -2262,7 +2273,6 @@ export interface RootRouteChildren {
   ShopIndexRoute: typeof ShopIndexRoute
   WantedPartsIndexRoute: typeof WantedPartsIndexRoute
   WantedIndexRoute: typeof WantedIndexRoute
-  AuthenticatedDashboardPartsWantedRoute: typeof AuthenticatedDashboardPartsWantedRoute
   ApiAdminCreateUserRoute: typeof ApiAdminCreateUserRoute
   ApiPublicGeoSearchRoute: typeof ApiPublicGeoSearchRoute
   ApiPublicGeocodeRoute: typeof ApiPublicGeocodeRoute
@@ -2543,6 +2553,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -3175,6 +3192,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEducationRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/dispatch': {
+      id: '/admin/dispatch'
+      path: '/dispatch'
+      fullPath: '/admin/dispatch'
+      preLoaderRoute: typeof AdminDispatchRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/discover-businesses': {
       id: '/admin/discover-businesses'
       path: '/discover-businesses'
@@ -3194,13 +3218,6 @@ declare module '@tanstack/react-router' {
       path: '/claims'
       fullPath: '/admin/claims'
       preLoaderRoute: typeof AdminClaimsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/dispatch': {
-      id: '/admin/dispatch'
-      path: '/dispatch'
-      fullPath: '/admin/dispatch'
-      preLoaderRoute: typeof AdminDispatchRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/businesses': {
@@ -3397,7 +3414,7 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/parts-wanted'
       fullPath: '/dashboard/parts-wanted'
       preLoaderRoute: typeof AuthenticatedDashboardPartsWantedRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
@@ -3549,6 +3566,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDashboardPartsWantedRoute: typeof AuthenticatedDashboardPartsWantedRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDashboardPartsWantedRoute:
+    AuthenticatedDashboardPartsWantedRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
 interface AdminRouteChildren {
   AdminAccountsRoute: typeof AdminAccountsRoute
   AdminAdCampaignsRoute: typeof AdminAdCampaignsRoute
@@ -3558,9 +3587,9 @@ interface AdminRouteChildren {
   AdminAuditRoute: typeof AdminAuditRoute
   AdminBusinessesRoute: typeof AdminBusinessesRoute
   AdminClaimsRoute: typeof AdminClaimsRoute
-  AdminDispatchRoute: typeof AdminDispatchRoute
   AdminCurrenciesRoute: typeof AdminCurrenciesRoute
   AdminDiscoverBusinessesRoute: typeof AdminDiscoverBusinessesRoute
+  AdminDispatchRoute: typeof AdminDispatchRoute
   AdminEducationRoute: typeof AdminEducationRoute
   AdminFeatureFlagsRoute: typeof AdminFeatureFlagsRoute
   AdminInquiriesRoute: typeof AdminInquiriesRoute
@@ -3595,9 +3624,9 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminAuditRoute: AdminAuditRoute,
   AdminBusinessesRoute: AdminBusinessesRoute,
   AdminClaimsRoute: AdminClaimsRoute,
-  AdminDispatchRoute: AdminDispatchRoute,
   AdminCurrenciesRoute: AdminCurrenciesRoute,
   AdminDiscoverBusinessesRoute: AdminDiscoverBusinessesRoute,
+  AdminDispatchRoute: AdminDispatchRoute,
   AdminEducationRoute: AdminEducationRoute,
   AdminFeatureFlagsRoute: AdminFeatureFlagsRoute,
   AdminInquiriesRoute: AdminInquiriesRoute,
@@ -3803,6 +3832,7 @@ const RCodeRouteWithChildren = RCodeRoute._addFileChildren(RCodeRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   AdminRoute: AdminRouteWithChildren,
   AdvertiseRoute: AdvertiseRoute,
@@ -3879,8 +3909,6 @@ const rootRouteChildren: RootRouteChildren = {
   ShopIndexRoute: ShopIndexRoute,
   WantedPartsIndexRoute: WantedPartsIndexRoute,
   WantedIndexRoute: WantedIndexRoute,
-  AuthenticatedDashboardPartsWantedRoute:
-    AuthenticatedDashboardPartsWantedRoute,
   ApiAdminCreateUserRoute: ApiAdminCreateUserRoute,
   ApiPublicGeoSearchRoute: ApiPublicGeoSearchRoute,
   ApiPublicGeocodeRoute: ApiPublicGeocodeRoute,
@@ -3911,13 +3939,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
