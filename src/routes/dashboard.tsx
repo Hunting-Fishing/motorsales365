@@ -22,6 +22,7 @@ import {
   Share2,
   Megaphone,
   Rocket,
+  Wrench,
   Megaphone as MegaphoneIcon,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
