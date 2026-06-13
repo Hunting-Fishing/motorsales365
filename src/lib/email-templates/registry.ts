@@ -35,6 +35,7 @@ import { template as verificationApproved } from "./verification-approved";
 import { template as verificationRejected } from "./verification-rejected";
 import { template as bookingStatusChanged } from "./booking-status-changed";
 import { template as opsAlertsDigest } from "./ops-alerts-digest";
+import { template as partsWantedMatch } from "./parts-wanted-match";
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   "signup-welcome": signupWelcome,
@@ -63,4 +64,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "verification-rejected": verificationRejected,
   "booking-status-changed": bookingStatusChanged,
   "ops-alerts-digest": opsAlertsDigest,
+  "parts-wanted-match": partsWantedMatch,
 };
