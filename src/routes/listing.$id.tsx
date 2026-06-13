@@ -590,15 +590,19 @@ function ListingDetailPage() {
               {(() => {
                 const headline = pickHeadlinePrice(listing);
                 return (
-                  <ListingPrice
-                    pricePhp={headline.amount}
-                    size="lg"
-                    headlineKind={headline.kind === "hidden" ? "asking" : headline.kind}
-                    negotiable={!!listing.negotiable}
-                    priceHidden={!!listing.price_hidden || headline.kind === "hidden"}
-                  />
+                  <div className="flex flex-wrap items-center justify-end gap-2">
+                    <ListingPrice
+                      pricePhp={headline.amount}
+                      size="lg"
+                      headlineKind={headline.kind === "hidden" ? "asking" : headline.kind}
+                      negotiable={!!listing.negotiable}
+                      priceHidden={!!listing.price_hidden || headline.kind === "hidden"}
+                    />
+                    <PriceTrendBadge trend={priceTrendDetail ?? null} size="md" />
+                  </div>
                 );
               })()}
+              <PromoBadge promo={listingPromoDetail ?? null} />
               <PricingWidget listing={listing} size="md" />
               <ListingBadges
                 listing={{
@@ -612,6 +616,7 @@ function ListingDetailPage() {
                 }}
                 size="md"
               />
+              <PriceHistoryDisclosure listingId={listing.id} />
             </div>
           </div>
 
