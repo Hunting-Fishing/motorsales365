@@ -77,6 +77,11 @@ import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ListingQr } from "@/components/listing-qr";
 import { siteUrl } from "@/lib/site-config";
 import { ListingActionsMenu } from "@/components/listings/listing-actions-menu";
+import { PriceTrendBadge } from "@/components/listings/price-trend-badge";
+import { PromoBadge } from "@/components/listings/promo-badge";
+import { PriceHistoryDisclosure } from "@/components/listing/price-history-disclosure";
+import { useListingPriceTrend } from "@/hooks/use-listing-price-trend";
+import { useListingPromo } from "@/hooks/use-listing-promo";
 
 const REPORT_REASONS = [
   "Suspected scam or fraud",
