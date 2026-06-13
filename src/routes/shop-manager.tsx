@@ -50,8 +50,6 @@ function ShopManagerPage() {
     openCheckout({
       priceId,
       quantity: 1,
-      customerEmail: user.email,
-      userId: user.id,
       returnUrl: `${window.location.origin}/shop-manager?checkout=success&session_id={CHECKOUT_SESSION_ID}`,
     });
   };
