@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/use-auth";
 import { useShopManagerAccess } from "@/hooks/use-shop-manager-access";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
+import { createPortalSession } from "@/utils/payments.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
+import { toast } from "sonner";
 
 const TITLE = "Shop Manager — 365 Motor Sales";
 const DESCRIPTION =
