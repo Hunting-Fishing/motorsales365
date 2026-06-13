@@ -85,9 +85,19 @@ function RefundPage() {
           stacking two terms.
         </p>
 
-        <p className="mt-6 text-xs text-muted-foreground">
-          Last updated: June 9, 2026 (added Vehicle Passport Premium section)
+        <h2 className="mt-6 text-xl font-semibold">Shop Manager add-on</h2>
+        <p className="mt-2 text-muted-foreground">
+          Shop Manager (₱799/mo Solo, ₱1,999/mo Pro) is a monthly subscription delivered through
+          our partner platform All Business 365. Cancel anytime from your dashboard — cancellation
+          stops the next renewal but the current month is <strong>not pro-rated</strong>. If
+          activation fails due to a platform error we will either restore access or refund the
+          most recent month in full.
         </p>
+
+        <p className="mt-6 text-xs text-muted-foreground">
+          Last updated: June 13, 2026 (added Shop Manager subscription add-on)
+        </p>
+
 
 
         <h2 className="mt-6 text-xl font-semibold">How to request</h2>
