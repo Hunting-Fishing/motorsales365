@@ -61,6 +61,7 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean }[] = [
   { to: "/dashboard/businesses", label: "My businesses", Icon: Store },
   { to: "/dashboard/ads", label: "Ad campaigns", Icon: Megaphone },
   { to: "/dashboard/sponsorships", label: "Sponsorships", Icon: Megaphone },
+  { to: "/shop-manager", label: "Shop Manager", Icon: Wrench },
   { to: "/dashboard/profile", label: "Profile", Icon: UserIcon },
   { to: "/my-qr", label: "My QR code", Icon: QrCode },
   { to: "/dashboard/verification", label: "Verification", Icon: ShieldCheck },
