@@ -225,14 +225,16 @@ export function ListingCard({
           {(() => {
             const headline = pickHeadlinePrice(listing);
             return (
-              <ListingPrice
-                pricePhp={headline.amount}
-                size="md"
-                className="mt-2"
-                headlineKind={headline.kind === "hidden" ? "asking" : headline.kind}
-                negotiable={!!listing.negotiable}
-                priceHidden={!!listing.price_hidden || headline.kind === "hidden"}
-              />
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <ListingPrice
+                  pricePhp={headline.amount}
+                  size="md"
+                  headlineKind={headline.kind === "hidden" ? "asking" : headline.kind}
+                  negotiable={!!listing.negotiable}
+                  priceHidden={!!listing.price_hidden || headline.kind === "hidden"}
+                />
+                <PriceTrendBadge trend={effectiveTrend} />
+              </div>
             );
           })()}
           <PricingWidget listing={listing} className="mt-2" />
