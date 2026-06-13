@@ -1,126 +1,95 @@
+# Shop Manager portal — Phase 1
 
-## Goal
+## Reality check before we start
 
-Let users post structured "Parts wanted" and "Parting-out vehicle wanted" requests tied to a specific vehicle (make/model/year/engine code). When a matching listing is published, auto-notify the requester. Also surface these wants on their profile.
+The source project **All Business 365** is huge: ~200 pages, 100+ component folders, 663 migrations, and 20+ verticals (automotive, marine, septic, fuel, welding, etc.). It also lives on its **own Supabase** (`oudkbrnvommbvtuispla`) — two Lovable projects cannot share one Supabase, so "same database" isn't on the table.
 
-Example: user wants "engine for 1991 Pajero" → system resolves to make=Mitsubishi, model=Pajero, year=1991, engine=4D56T (from `vehicle-engines.ts`). When a listing in `parts` category with fitment Mitsubishi/Pajero covering 1991 (and matching `4D56T` in attributes/title/description) gets published, the user gets notified.
+Phase 1 therefore ships a **portal**: this site sells the subscription, writes an entitlement row into the All Business 365 DB, and SSOs the user into the existing deployment (`mainrepairsoftware.lovable.app`). Phases 2+ port the automotive module's tables and screens into this codebase, behind the same subscription gate, so over time users stop being redirected.
 
-## What we build
+## Phase 1 deliverable (this turn)
 
-### 1. DB migration
+### 1. Pricing + landing
+- New public route `/shop-manager` — value prop, screenshots, plan cards.
+- New Stripe product **Shop Manager** with prices `shop_manager_solo_monthly` and `shop_manager_pro_monthly` (created via the payments tool; amounts/currency confirmed with you before creation).
+- Reuses the existing embedded checkout flow (`StripeEmbeddedCheckout`) — no new payment plumbing.
 
-**`parts_wanted`** — replaces ad-hoc `wanted_posts` for parts/parting-out (keeps `wanted_posts` for other categories).
-- `user_id`, `kind` enum (`part` | `parting_out`), `title`, `notes`
-- Vehicle fitment: `make`, `model`, `year`, `engine_code` (nullable), `trim` (nullable), `vehicle_category`
-- Part: `part_category` (brakes/engine/body/...), `part_keywords text[]`, `condition_pref` (any/used/new/oem/aftermarket)
-- Budget: `budget_max_php`, `region`, `city`
-- Alerts: `alert_frequency` ('off'|'instant'|'daily'), `last_alerted_at`, `status` ('open'|'closed'|'expired'), `expires_at` (90d default)
-- RLS: owner manages; open rows publicly viewable (anonymized — like wanted_posts).
-- GRANTs to authenticated + service_role + anon SELECT (open only).
+### 2. Subscription record + gate (this DB)
+- New table `public.shop_manager_subscriptions` (user_id, tier, status, current_period_end, stripe_subscription_id, external_account_id, sso_provisioned_at). RLS: user reads own row; service_role full.
+- Hook `useShopManagerAccess()` → reads the row, exposes `{ active, tier }`.
+- Stripe webhook handler (in our existing webhook route) upserts the row on `checkout.session.completed` / `invoice.paid` / `customer.subscription.deleted`.
 
-**`parts_wanted_matches`** — one row per (wanted, listing) match.
-- `wanted_id`, `listing_id`, `score numeric`, `matched_at`, `notified_at`, `dismissed_at`
-- Unique on (wanted_id, listing_id). Owner-only read via wanted ownership.
+### 3. Provisioning into the All Business 365 DB
+- New secrets (added via secrets tool, you paste the values):
+  - `SHOP_MANAGER_SUPABASE_URL` = `https://oudkbrnvommbvtuispla.supabase.co`
+  - `SHOP_MANAGER_SUPABASE_SERVICE_ROLE_KEY` (you'll generate this in the other project)
+  - `SHOP_MANAGER_SSO_SECRET` (random 32-byte hex — used to sign the SSO handoff)
+- Server fn `provisionShopManagerAccount` (called from the webhook after a successful subscription):
+  - Creates / looks up an `auth.users` row in the All Business 365 DB by the buyer's email (via Auth Admin API on that project).
+  - Inserts/updates a row in a new table on **that** DB: `external_entitlements (user_id, source='365motorsales', tier, expires_at, signature)`. Migration for that one row lives in the All Business 365 project (separate task; I'll ship the SQL file ready to paste).
+  - Stamps `external_account_id` and `sso_provisioned_at` back on our local row.
 
-**Match function** `match_listing_to_parts_wanted(listing_id)` (SECURITY DEFINER, plpgsql):
-- Triggered on listing status → 'published' in category `part`.
-- Joins listing + listing_fitment + attributes JSON.
-- For each open `parts_wanted` row:
-  - +3 if fitment make/model matches
-  - +2 if year falls in fitment year_min..year_max
-  - +2 if `engine_code` appears in listing title/desc/attributes.engine_code
-  - +1 per part_keyword found in title/desc
-  - Region match +1
-  - Threshold ≥4 → insert into `parts_wanted_matches`.
+### 4. SSO handoff
+- Server route `/api/public/shop-manager/sso` (POST, requires our auth):
+  - Verifies the caller has an active `shop_manager_subscriptions` row.
+  - Mints a short-lived (60s) HMAC-signed JWT with `{ email, tier, exp, nonce }` using `SHOP_MANAGER_SSO_SECRET`.
+  - Returns `{ redirect_url }` = `https://mainrepairsoftware.lovable.app/sso/365motorsales?token=…`.
+- Client side: an "Open Shop Manager" button on `/shop-manager` and on the dashboard sidebar calls that fn and `window.location.href`s into it.
+- On the All Business 365 side (separate, documented in `docs/shop-manager-sso.md`): a `/sso/365motorsales` route verifies the HMAC + nonce, then signs the user in via Auth Admin's `generateLink` magic-link flow. I'll include that as a ready-to-paste handler in the doc — not modifying that project from here.
 
-**Trigger**: `AFTER UPDATE OF status ON listings` when NEW.status='published' AND category_slug='parts' → call match function.
+### 5. Dashboard surface
+- New card in `/dashboard` sidebar: "Shop Manager" with status pill (Active / Inactive). Links to `/shop-manager` if inactive, opens SSO if active.
+- "Subscriptions" tab on dashboard already exists — add Shop Manager line with manage/cancel link.
 
-**Backfill**: on insert into `parts_wanted`, also scan last 60 days of published parts listings.
-
-### 2. Server functions (`src/lib/parts-wanted.functions.ts`)
-
-- `createPartsWanted` — auth, validates with zod, resolves engine code via lookup helper, inserts row, kicks off backfill scan.
-- `updatePartsWanted`, `closePartsWanted`, `deletePartsWanted`
-- `listMyPartsWanted` — owner list with match counts
-- `listMyMatches({ wantedId? })` — joins listing summary
-- `dismissMatch({ matchId })`
-- `listPublicPartsWanted` — for community board (anonymized)
-
-### 3. Vehicle resolver helper (`src/lib/vehicle-resolver.ts`)
-
-Pure TS helper that takes free-text (e.g. "91 pajero engine") and returns best (make, model, year, engine_code) using `vehicles.ts` + `vehicle-engines.ts` fuzzy match (`src/lib/fuzzy.ts` already exists). Used by the form's "smart parse" button and by background re-resolution.
-
-### 4. UI
-
-**New routes**
-- `src/routes/wanted-parts.index.tsx` — public board: filters (make/model/year/part category/region). Replaces `parts` tab inside `wanted.index.tsx` (cross-link).
-- `src/routes/wanted-parts.new.tsx` — structured form (vehicle picker via existing `vehicle-picker.tsx` + engine select pulled from `VEHICLE_ENGINES`, part category, keywords, condition, budget, region, alert freq).
-- `src/routes/_authenticated/dashboard.parts-wanted.tsx` — owner dashboard: list of wants + match inbox with listing thumbnails, "View listing" / "Dismiss" / "Close request".
-
-**Components**
-- `src/components/parts-wanted/vehicle-engine-picker.tsx` — make/model/year/engine cascading select, prefills from free text.
-- `src/components/parts-wanted/match-card.tsx` — listing preview + score badge.
-- `src/components/parts-wanted/wanted-badge.tsx` — small badge on listing detail "X buyers wanted this part" (read from RPC).
-
-**Profile integration**
-- Add "Parts I'm looking for" section to `src/routes/profile.$id.tsx` (owner sees full list; public sees public-safe summary).
-- Add "Parting out wanted" section similarly.
-- Surface a count chip on the user's passport/profile header.
-
-**Header/nav**
-- Add `/wanted-parts` link under existing Wanted nav entry.
-- Dashboard sidebar gets "Parts Wanted (n new matches)" pill using `useAdminPendingCounts`-style polling.
-
-### 5. Notifications
-
-- **Instant**: server fn `notifyPartsWantedMatches` enqueues email via existing `enqueue_email` RPC using new template `parts-wanted-match.tsx` (subject: "We found a match: {part} for {year} {make} {model}"). Also creates an in-app row via existing notification path used by reports/inquiries.
-- **Daily digest**: pg_cron job (added to existing cron infra via `supabase--insert`) calls `/api/public/hooks/parts-wanted-digest` at 08:00 PHT → batches unsent matches grouped by user → one email + marks `notified_at`.
-- Frequency respects `alert_frequency` on the row; "instant" gated to authenticated users (no extra plan requirement — this is core ops, unlike saved_search instant which is Premium).
-
-### 6. Admin
-
-- `src/routes/admin.parts-wanted.tsx` — moderation list, ability to close abusive requests, view match stats. Feed admin pending counts RPC with new bucket `parts_wanted_flagged`.
-
-### 7. Policy + Terms
-
-- Update `/terms` and `/privacy`: structured vehicle/part wants are stored and used to send match alerts; users can disable per-request; emails respect suppression list. Bump "Last updated".
+### 6. Compliance copy
+- Bump `/terms` (adds Shop Manager subscription + third-party data handoff clause).
+- Bump `/privacy` (discloses that email + display name are forwarded to All Business 365 on activation).
+- Bump `/refund-policy` (Shop Manager is monthly, cancel anytime, no proration).
 
 ## Technical details
 
-- All match writes go through `supabaseAdmin` inside server fns / triggers — no client write to `parts_wanted_matches`.
-- Year-match handles open-ended fitment (`year_min` only, `year_max` only).
-- Engine code matching is case-insensitive and tolerant (`4D56T` ≈ `4d56-t`).
-- Re-resolve engine code on `parts_wanted` update via DB trigger calling an immutable helper that reads engine catalog from a small lookup table seeded from `vehicle-engines.ts` (one-time seed migration) so SQL can match without app round-trip.
-- Email send goes through existing pgmq `transactional_emails` queue.
-- No edge functions; cron hits TanStack `/api/public/hooks/parts-wanted-digest` with `apikey` header.
+### New files
+- `src/routes/shop-manager.tsx` — public landing + pricing + checkout trigger.
+- `src/routes/_authenticated/shop-manager-gate.tsx` — post-purchase success → "Open Shop Manager" CTA.
+- `src/routes/api/public/shop-manager/sso.ts` — TanStack server route (TOKEN MINTING; requires our cookie/JWT, not public despite path).
+- `src/lib/shop-manager.functions.ts` — `getShopManagerAccess`, `provisionShopManagerAccount`, `requestShopManagerSsoUrl`.
+- `src/lib/shop-manager-sso.server.ts` — HMAC sign helper (server-only).
+- `src/hooks/use-shop-manager-access.ts`.
+- `src/components/shop-manager/plan-card.tsx`, `open-shop-manager-button.tsx`.
+- `docs/shop-manager-sso.md` — partner-side integration steps (SQL + receiver handler to paste into All Business 365).
 
-## Files
+### Edited files
+- `src/routes/_authenticated/dashboard.tsx` (or current dashboard route) — add Shop Manager card.
+- Stripe webhook handler (whichever file currently handles `checkout.session.completed`) — branch on the Shop Manager product to call `provisionShopManagerAccount`.
+- `src/components/site-header.tsx` — add "Shop Manager" nav entry.
+- `src/routes/terms.tsx`, `src/routes/privacy.tsx`, `src/routes/refund-policy.tsx` — policy updates + bump "Last updated".
 
-**Migrations** (1 file):
-- `parts_wanted`, `parts_wanted_matches`, `vehicle_engine_lookup` (seeded), match function, listing trigger, RLS, GRANTs.
+### Migration (this project only)
+```sql
+CREATE TABLE public.shop_manager_subscriptions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  tier text NOT NULL CHECK (tier IN ('solo','pro')),
+  status text NOT NULL DEFAULT 'inactive',
+  stripe_subscription_id text UNIQUE,
+  external_account_id text,
+  sso_provisioned_at timestamptz,
+  current_period_end timestamptz,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+GRANT SELECT ON public.shop_manager_subscriptions TO authenticated;
+GRANT ALL    ON public.shop_manager_subscriptions TO service_role;
+ALTER TABLE public.shop_manager_subscriptions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "own row read" ON public.shop_manager_subscriptions
+  FOR SELECT TO authenticated USING (user_id = auth.uid());
+```
 
-**New code:**
-- `src/lib/parts-wanted.functions.ts`
-- `src/lib/vehicle-resolver.ts`
-- `src/lib/email-templates/parts-wanted-match.tsx`
-- `src/routes/wanted-parts.index.tsx`
-- `src/routes/wanted-parts.new.tsx`
-- `src/routes/_authenticated/dashboard.parts-wanted.tsx`
-- `src/routes/admin.parts-wanted.tsx`
-- `src/routes/api/public/hooks/parts-wanted-digest.ts`
-- `src/components/parts-wanted/{vehicle-engine-picker,match-card,wanted-badge}.tsx`
-- `src/hooks/use-parts-wanted-matches.ts`
+### Phases 2+ (NOT this turn — preview only)
+- Phase 2: port `automotive/` pages + `work_orders`, `repair_plans`, `vehicle_inspections`, `parts_tracking`, `customers` schemas into this DB. Mount at `/shop-manager/*` behind the same gate. Subscription flips from "redirect SSO" to "local app".
+- Phase 3: connect Shop Manager work orders ↔ this site's `listings`, `parts_wanted`, `service_inquiries`, `businesses` (already in place).
+- Phase 4: migrate existing All Business 365 customer data via export → import script; retire SSO redirect.
 
-**Edited:**
-- `src/routes/profile.$id.tsx` — add wants sections.
-- `src/routes/wanted.index.tsx` — cross-link to parts board.
-- `src/routes/listing.$id.tsx` — show "X buyers want this" badge.
-- `src/routes/admin.tsx` — nav pill.
-- `src/routes/terms.tsx`, `src/routes/privacy.tsx` — disclosure update.
-- `src/components/site-header.tsx` — Wanted submenu adds Parts link.
-
-## Out of scope (ask before adding)
-
-- SMS / push notifications (email + in-app only)
-- Seller-side "Reach buyers waiting for this part" paid boost
-- Automated DMs to sellers on behalf of wanters
+## Open questions before I build
+1. **Prices**: what should `shop_manager_solo_monthly` and `shop_manager_pro_monthly` cost (PHP and/or USD)? Feature split between tiers?
+2. You'll need to (a) generate a service-role key in the All Business 365 project and (b) paste a tiny SQL migration + an SSO receiver route there. Confirm you can do that, or I'll script-export both files for you to drop in.
+3. Should Phase 1 require a verified Business on this site, or is any signed-in user allowed to subscribe?

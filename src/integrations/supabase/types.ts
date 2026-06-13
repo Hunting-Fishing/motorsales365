@@ -6204,6 +6204,45 @@ export type Database = {
         }
         Relationships: []
       }
+      shop_manager_provisioning: {
+        Row: {
+          created_at: string
+          external_account_id: string | null
+          external_user_email: string | null
+          id: string
+          last_error: string | null
+          last_sso_at: string | null
+          sso_provisioned_at: string | null
+          tier: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          external_account_id?: string | null
+          external_user_email?: string | null
+          id?: string
+          last_error?: string | null
+          last_sso_at?: string | null
+          sso_provisioned_at?: string | null
+          tier?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          external_account_id?: string | null
+          external_user_email?: string | null
+          id?: string
+          last_error?: string | null
+          last_sso_at?: string | null
+          sso_provisioned_at?: string | null
+          tier?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       shop_price_history: {
         Row: {
           captured_at: string
