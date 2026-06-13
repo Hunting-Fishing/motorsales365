@@ -3583,6 +3583,7 @@ export type Database = {
           changed_at: string
           delta_pct: number
           delta_php: number
+          field: string
           id: string
           listing_id: string
           new_price_php: number
@@ -3592,6 +3593,7 @@ export type Database = {
           changed_at?: string
           delta_pct: number
           delta_php: number
+          field?: string
           id?: string
           listing_id: string
           new_price_php: number
@@ -3601,6 +3603,7 @@ export type Database = {
           changed_at?: string
           delta_pct?: number
           delta_php?: number
+          field?: string
           id?: string
           listing_id?: string
           new_price_php?: number
@@ -3609,6 +3612,53 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "listing_price_history_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      listing_promotions: {
+        Row: {
+          amount_off_php: number | null
+          created_at: string
+          created_by: string | null
+          ends_at: string
+          id: string
+          label: string
+          listing_id: string
+          percent_off: number | null
+          starts_at: string
+          updated_at: string
+        }
+        Insert: {
+          amount_off_php?: number | null
+          created_at?: string
+          created_by?: string | null
+          ends_at: string
+          id?: string
+          label: string
+          listing_id: string
+          percent_off?: number | null
+          starts_at?: string
+          updated_at?: string
+        }
+        Update: {
+          amount_off_php?: number | null
+          created_at?: string
+          created_by?: string | null
+          ends_at?: string
+          id?: string
+          label?: string
+          listing_id?: string
+          percent_off?: number | null
+          starts_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "listing_promotions_listing_id_fkey"
             columns: ["listing_id"]
             isOneToOne: false
             referencedRelation: "listings"
@@ -7785,6 +7835,41 @@ export type Database = {
           public_phone: string
           rep_user_id: string
           title: string
+        }[]
+      }
+      get_listing_price_history: {
+        Args: { _listing_id: string }
+        Returns: {
+          changed_at: string
+          delta_pct: number
+          delta_php: number
+          direction: string
+          field: string
+          new_price_php: number
+          old_price_php: number
+        }[]
+      }
+      get_listing_price_trend: {
+        Args: { _listing_id: string }
+        Returns: {
+          changed_at: string
+          delta_pct: number
+          delta_php: number
+          direction: string
+          field: string
+          new_price_php: number
+          old_price_php: number
+        }[]
+      }
+      get_listing_price_trends: {
+        Args: { _listing_ids: string[] }
+        Returns: {
+          changed_at: string
+          delta_pct: number
+          delta_php: number
+          direction: string
+          field: string
+          listing_id: string
         }[]
       }
       get_listing_report_summaries: {

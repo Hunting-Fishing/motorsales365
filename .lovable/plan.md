@@ -1,38 +1,93 @@
-## Goal
-Surface reports publicly (counts + admin-curated summaries) to add user-side transparency, mark listing cards when reports exist, and give the admin panel proper unread-count notifications across every moderation queue (including a global bell).
 
-## 1. Database
+## Audit findings
 
-New migration:
-- `reports`: add `public_summary text`, `made_public_at timestamptz`, `made_public_by uuid`. Add index on `(listing_id, status)`.
-- Public RPC `get_listing_report_summary(listing_id uuid)` → `SECURITY DEFINER`, returns `{ open_count, resolved_count, total, categories: jsonb, public_notes: [{category, summary, made_public_at}] }`. Granted to `anon, authenticated`. Only rows with `public_summary IS NOT NULL` contribute to `public_notes`; counts come from all rows. No reporter identity, no raw `details`, ever.
-- New view/RPC `admin_pending_counts()` → `SECURITY DEFINER`, gated by `can_support(auth.uid())`, returns one row of unread counts per area (reports_open, verifications_pending, claims_pending, payments_pending, inquiries_open, location_corrections_pending, type_suggestions_pending, ad_campaigns_pending, ops_alerts_unack, support_tickets_open, discover_queue_pending, lead_offers_pending).
+I walked the listing pipeline (DB → `browse-listings.functions.ts` → `ListingCard` + `PricingWidget` + `ListingBadges`) against each signal you listed. Here's what's already wired and what's missing:
 
-No new tables — counts come from existing tables, so no GRANT issues beyond the RPCs.
+| Signal | Status today | Gap |
+|---|---|---|
+| **Boost (Featured)** | ✅ `boost_until` shown as "Featured" badge; browse sorts boosted first | Card never shows *how long* the boost lasts; expired boosts silently drop |
+| **Renew** | ⚠️ Boost dialog says "Renew + Boost"; `dashboard.boosts` shows renewal state | Card has no "Just renewed" signal; no surfacing of `expires_at` proximity for owners |
+| **Promotions** | ⚠️ `promotions` table = checkout promo codes only (admin) | No listing-level promo (e.g. "10% off this week") on cards/detail |
+| **New listings** | ❌ `published_at` selected but unused on card | No "New" badge for listings published in last 48h |
+| **Price changes ↑/↓** | ⚠️ `listing_price_history` table + trigger exist (0 rows so far). Trigger only watches `price_php` — ignores `monthly_php` and `down_payment_php` | No UI anywhere. No arrow/color on card or detail page |
+| **Private vs Dealer** | ⚠️ Tier system + `DealerSubscriptionBadge` exist, but **browse query hard-codes `seller_dealer_plan: null`** — so dealer badge never shows on browse cards (only on seller/detail pages) | Browse never joins dealer subscription → all dealers look "private/verified" in browse |
 
-## 2. Public-facing UI
+## Plan
 
-- `ListingReportBadge` component on `ListingCard` (top-left near image, distinct from the existing `ListingActionsMenu`): small ⚠️ icon + count when `open_count > 0`. Tooltip: "N user report(s) on this listing — tap for details". Tap opens the listing page anchored to the new section.
-- `ListingReportsSection` on `/listing/$id` page, placed under price/description and above "Report this listing" CTA. Shows:
-  - Total counts (open / resolved) with category breakdown chips.
-  - Admin-curated public summaries (one card per public note: category, summary text, date). Empty state: "No admin-reviewed concerns yet."
-  - Plain-English disclaimer: counts include unverified user reports; only admin-reviewed notes shown in detail.
-- Card data fetched via batch RPC `get_listing_report_summaries(ids uuid[])` so feeds stay efficient — added alongside the per-listing RPC.
+### 1. Database (1 migration)
 
-## 3. Admin notifications
+- Extend `tg_listing_price_history` to also log changes to `monthly_php` and `down_payment_php` (new nullable columns `kind text`, `field text` on `listing_price_history`; default `'asking'` for legacy rows).
+- Add index `idx_listing_price_history_listing_recent` on `(listing_id, changed_at desc)` (already exists — confirm).
+- Add `listing_promotions` table (optional, per-listing promo): `listing_id`, `label`, `percent_off` *or* `amount_off_php`, `starts_at`, `ends_at`, `created_by`. RLS: owners/staff write, public read when active + listing visible. Includes GRANTs for `anon`/`authenticated`/`service_role`.
+- Add helper RPC `get_listing_price_trend(_listing_id uuid)` → returns most recent `{ delta_php, delta_pct, direction, changed_at, field }` within last 30 days (SECURITY DEFINER, gated by listing visibility).
 
-- `useAdminPendingCounts()` hook polls `admin_pending_counts()` every 60s (and on focus). Cached via TanStack Query.
-- Sidebar items in `admin.tsx` (group tabs) get a red pill badge with the count for their area.
-- New `AdminNotificationBell` in the admin header: dropdown listing every area with `count > 0`, each as a link. Total badge on the bell icon.
-- New admin tool on `admin.reports.tsx` per report: textarea + "Publish public summary" / "Unpublish" buttons writing `public_summary`, `made_public_at`, `made_public_by`. Logged via `logAdminAudit`.
+### 2. Browse query (`src/lib/browse-listings.functions.ts`)
 
-## 4. Policy pages
+- Join `subscriptions` (active business plan) into the seller profile fetch so cards can show the real dealer plan + period end instead of the hard-coded `null`.
+- Select `published_at` into the mapped `ListingCardData` (currently dropped).
+- Batch-fetch latest price trend + active listing promo for the page's listing ids (one RPC each, keyed by id) and attach to each card row.
 
-- `/terms`: add short clause that listing pages display report counts and admin-reviewed summaries; reporter identity is never published. Bump "Last updated".
-- `/privacy`: note that reporter identity and free-text details remain private; only admin-curated summaries are public. Bump "Last updated".
+### 3. `ListingCardData` shape (`src/components/listing-card.tsx`)
 
-## Technical details
+Add optional fields:
+- `published_at?: string | null`
+- `price_trend?: { direction: "up" | "down"; delta_pct: number; field: "asking" | "monthly" | "down_payment"; changed_at: string } | null`
+- `promotion?: { label: string; percent_off?: number; amount_off_php?: number; ends_at: string } | null`
+- `boost_until` already present — also derive `boost_days_left`.
 
-- Files to add: `supabase/migrations/<ts>_public_report_summaries_and_admin_counts.sql`, `src/lib/reports.functions.ts` (wrappers for the two RPCs — public is unauthenticated `createServerFn` calling `supabaseAdmin` server-side projection, admin counts uses `requireSupabaseAuth`), `src/components/listings/listing-report-badge.tsx`, `src/components/listing/listing-reports-section.tsx`, `src/components/admin/admin-notification-bell.tsx`, `src/hooks/use-admin-pending-counts.ts`.
-- Files to edit: `src/components/listing-card.tsx` (badge), `src/routes/listing.$id.tsx` (section), `src/routes/admin.tsx` (bell + sidebar badges), `src/routes/admin.reports.tsx` (publish summary controls), `src/components/admin/admin-group-tabs.tsx` (accept count slot), `src/routes/terms.tsx`, `src/routes/privacy.tsx`.
-- Memory rule for terms/privacy sync already covers the policy bumps.
+### 4. New badge components (`src/components/listings/`)
+
+- `NewBadge.tsx` — green "NEW" pill when `published_at` is within 48h (and not boosted, to avoid double-decoration).
+- `PriceTrendBadge.tsx` — arrow + percent:
+  - **Down** = green (`ArrowDown`, `bg-emerald-500/15 text-emerald-700`) — "↓ 8% price drop"
+  - **Up** = red (`ArrowUp`, `bg-rose-500/15 text-rose-700`) — "↑ 5%"
+  - Renders inside `PricingWidget` next to the headline pill so it sits on the price it actually changed.
+- `PromoBadge.tsx` — accent pill "10% OFF · ends Sat" with countdown if <72h.
+- `RenewedBadge.tsx` — subtle "Renewed" pill when boost was created within last 24h AND listing `expires_at` was bumped (detected via `listing_boosts.created_at` vs `listings.updated_at`).
+
+### 5. Card rendering order (top-left overlay stack)
+
+```text
+[NEW] [FEATURED] [RENEWED] [PROMO] [PENDING SALE] [CATEGORY] [DEALER PLAN]
+```
+
+Rules:
+- `NEW` suppressed when `FEATURED` is showing (avoid stacking promo-on-promo).
+- `RENEWED` suppressed when `NEW` is showing.
+- Dealer plan badge stays bottom of the stack (already does).
+- Private sellers: keep current `ListingBadges` tier pill ("Verified seller" / "Unverified") — no dealer badge.
+
+### 6. Detail page (`src/routes/listing.$id.tsx`)
+
+- Add a compact "Price history" disclosure under the price block: last 3 changes with date, old → new, ↑/↓ pct, color-coded.
+- Show promo banner above price when active.
+- Show "Boosted until {date}" line for the owner only.
+
+### 7. Owner dashboard (`src/routes/dashboard.index.tsx`)
+
+- On each owner listing row: small badges mirroring public ones (NEW / FEATURED / PROMO / price ↑↓) so sellers see what buyers see.
+
+### 8. Admin
+
+- `admin.listings.tsx`: column for "Last price change" with arrow + pct.
+- `admin.promotions.tsx`: new tab "Listing promos" to create/end per-listing promotions.
+
+### 9. Policy pages
+
+- `/terms`: add a clause that price-change history is publicly visible for active listings.
+- `/privacy`: no change (no new PII).
+- Bump "Last updated" on `/terms`.
+
+## Out of scope (not touching this turn)
+
+- Email/notification dispatch for price drops to favoriters (worth doing later, separate ask).
+- Saved-search alerts wiring for new promos (already partially exists).
+- Boost auto-renew subscriptions (already covered by `boost_products.recurring`).
+
+## Files
+
+**New:** migration, `src/components/listings/new-badge.tsx`, `price-trend-badge.tsx`, `promo-badge.tsx`, `renewed-badge.tsx`, `src/hooks/use-listing-price-trend.ts`, `src/hooks/use-listing-promo.ts`.
+
+**Edited:** `browse-listings.functions.ts`, `listing-card.tsx`, `pricing-widget.tsx`, `listing.$id.tsx`, `dashboard.index.tsx`, `admin.listings.tsx`, `admin.promotions.tsx`, `terms.tsx`.
+
+Approve and I'll implement in one pass.

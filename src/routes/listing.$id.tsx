@@ -77,6 +77,11 @@ import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ListingQr } from "@/components/listing-qr";
 import { siteUrl } from "@/lib/site-config";
 import { ListingActionsMenu } from "@/components/listings/listing-actions-menu";
+import { PriceTrendBadge } from "@/components/listings/price-trend-badge";
+import { PromoBadge } from "@/components/listings/promo-badge";
+import { PriceHistoryDisclosure } from "@/components/listing/price-history-disclosure";
+import { useListingPriceTrend } from "@/hooks/use-listing-price-trend";
+import { useListingPromo } from "@/hooks/use-listing-promo";
 
 const REPORT_REASONS = [
   "Suspected scam or fraud",
@@ -247,6 +252,8 @@ function ListingDetailPage() {
     enabled: !!listing?.user_id,
     staleTime: 5 * 60 * 1000,
   });
+  const { data: priceTrendDetail } = useListingPriceTrend(listing?.id);
+  const { data: listingPromoDetail } = useListingPromo(listing?.id);
   const [loading, setLoading] = useState(true);
   const [activeIdx, setActiveIdx] = useState(0);
   const [favorited, setFavorited] = useState(false);
@@ -590,15 +597,19 @@ function ListingDetailPage() {
               {(() => {
                 const headline = pickHeadlinePrice(listing);
                 return (
-                  <ListingPrice
-                    pricePhp={headline.amount}
-                    size="lg"
-                    headlineKind={headline.kind === "hidden" ? "asking" : headline.kind}
-                    negotiable={!!listing.negotiable}
-                    priceHidden={!!listing.price_hidden || headline.kind === "hidden"}
-                  />
+                  <div className="flex flex-wrap items-center justify-end gap-2">
+                    <ListingPrice
+                      pricePhp={headline.amount}
+                      size="lg"
+                      headlineKind={headline.kind === "hidden" ? "asking" : headline.kind}
+                      negotiable={!!listing.negotiable}
+                      priceHidden={!!listing.price_hidden || headline.kind === "hidden"}
+                    />
+                    <PriceTrendBadge trend={priceTrendDetail ?? null} size="md" />
+                  </div>
                 );
               })()}
+              <PromoBadge promo={listingPromoDetail ?? null} />
               <PricingWidget listing={listing} size="md" />
               <ListingBadges
                 listing={{
@@ -612,6 +623,7 @@ function ListingDetailPage() {
                 }}
                 size="md"
               />
+              <PriceHistoryDisclosure listingId={listing.id} />
             </div>
           </div>
 

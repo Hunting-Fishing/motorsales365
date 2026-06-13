@@ -93,7 +93,7 @@ export const getBrowseListings = createServerFn({ method: "POST" })
     const category = search.category;
 
     const baseSelect =
-      "id,title,price_php,monthly_php,down_payment_php,negotiable,price_hidden,registration_status,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,vehicle_id,published_at,listing_media(url,type)";
+      "id,title,price_php,monthly_php,down_payment_php,negotiable,price_hidden,registration_status,region,city,seller_type,boost_until,status,category_slug,view_count,attributes,user_id,vehicle_id,published_at,updated_at,listing_media(url,type)";
 
     const buildBase = () => {
       let q = supabaseAdmin
@@ -214,7 +214,9 @@ export const getBrowseListings = createServerFn({ method: "POST" })
       new Set(rows.map((r) => r.vehicle_id).filter(Boolean)),
     ) as string[];
 
-    const [profilesRes, vehiclesRes] = await Promise.all([
+    const listingIds = rows.map((r) => r.id);
+
+    const [profilesRes, vehiclesRes, subsRes, trendsRes, promosRes] = await Promise.all([
       userIdsAll.length
         ? supabaseAdmin
             .from("profiles")
@@ -227,23 +229,64 @@ export const getBrowseListings = createServerFn({ method: "POST" })
             .select("id,is_public,passport_slug,vehicle_passport_verifications(status)")
             .in("id", vehicleIdsAll)
         : Promise.resolve({ data: [] as any[] }),
+      userIdsAll.length
+        ? supabaseAdmin
+            .from("subscriptions")
+            .select(
+              "user_id,status,current_period_end,cancel_at_period_end,plan:subscription_plans(name)",
+            )
+            .in("user_id", userIdsAll)
+            .in("status", ["active", "trialing", "past_due"])
+        : Promise.resolve({ data: [] as any[] }),
+      listingIds.length
+        ? (supabaseAdmin as any).rpc("get_listing_price_trends", {
+            _listing_ids: listingIds,
+          })
+        : Promise.resolve({ data: [] as any[] }),
+      listingIds.length
+        ? supabaseAdmin
+            .from("listing_promotions")
+            .select("listing_id,label,percent_off,amount_off_php,ends_at,starts_at")
+            .in("listing_id", listingIds)
+            .gt("ends_at", new Date().toISOString())
+            .lte("starts_at", new Date().toISOString())
+        : Promise.resolve({ data: [] as any[] }),
     ]);
+
     const profilesMap = new Map<string, any>(
       ((profilesRes as any).data ?? []).map((p: any) => [p.id, p]),
     );
     const vehiclesMap = new Map<string, any>(
       ((vehiclesRes as any).data ?? []).map((v: any) => [v.id, v]),
     );
+    const subsMap = new Map<string, any>();
+    for (const s of (subsRes as any).data ?? []) {
+      if (!subsMap.has(s.user_id)) subsMap.set(s.user_id, s);
+    }
+    const trendsMap = new Map<string, any>();
+    for (const t of (trendsRes as any).data ?? []) trendsMap.set(t.listing_id, t);
+    const promosMap = new Map<string, any>();
+    for (const p of (promosRes as any).data ?? []) {
+      if (!promosMap.has(p.listing_id)) promosMap.set(p.listing_id, p);
+    }
 
     const items: ListingCardData[] = rows.map((r) => {
       const photos = (r.listing_media ?? []).filter((m: any) => m.type === "photo");
       const videos = (r.listing_media ?? []).filter((m: any) => m.type === "video");
       const profile = r.user_id ? profilesMap.get(r.user_id) : null;
       const vehicle = r.vehicle_id ? vehiclesMap.get(r.vehicle_id) : null;
+      const sub = r.user_id ? subsMap.get(r.user_id) : null;
+      const trend = trendsMap.get(r.id);
+      const promo = promosMap.get(r.id);
       return {
         id: r.id,
         title: r.title,
         price_php: Number(r.price_php),
+        monthly_php: r.monthly_php,
+        down_payment_php: r.down_payment_php,
+        negotiable: r.negotiable,
+        price_hidden: r.price_hidden,
+        registration_status: r.registration_status,
         region: r.region,
         city: r.city,
         seller_type: r.seller_type,
@@ -260,11 +303,29 @@ export const getBrowseListings = createServerFn({ method: "POST" })
           (v: any) => v.status === "approved",
         ),
         seller_user_id: r.user_id ?? null,
-        seller_dealer_plan: null,
-        seller_dealer_period_end: null,
-        seller_dealer_cancel_at_period_end: false,
+        seller_dealer_plan: sub?.plan?.name ?? null,
+        seller_dealer_period_end: sub?.current_period_end ?? null,
+        seller_dealer_cancel_at_period_end: !!sub?.cancel_at_period_end,
         status: r.status,
         attributes: r.attributes,
+        published_at: r.published_at,
+        updated_at: r.updated_at,
+        price_trend: trend
+          ? {
+              direction: trend.direction,
+              delta_pct: trend.delta_pct,
+              field: trend.field,
+              changed_at: trend.changed_at,
+            }
+          : null,
+        promotion: promo
+          ? {
+              label: promo.label,
+              percent_off: promo.percent_off,
+              amount_off_php: promo.amount_off_php,
+              ends_at: promo.ends_at,
+            }
+          : null,
       } as ListingCardData;
     });
 

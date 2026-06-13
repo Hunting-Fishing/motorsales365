@@ -35,6 +35,7 @@ import {
   listIssuedDiscounts,
   setDiscountActive,
 } from "@/lib/promotions.functions";
+import { ListingPromosPanel } from "@/components/admin/listing-promos-panel";
 import { formatDate } from "@/lib/format";
 
 export const Route = createFileRoute("/admin/promotions")({
@@ -67,11 +68,19 @@ function AdminPromotions() {
       <Tabs defaultValue={canCreatePromotions ? "promos" : "discounts"}>
         <TabsList>
           {canCreatePromotions && <TabsTrigger value="promos">Promo codes</TabsTrigger>}
+          {canCreatePromotions && (
+            <TabsTrigger value="listing-promos">Listing promos</TabsTrigger>
+          )}
           {canIssueDiscounts && <TabsTrigger value="discounts">Customer discounts</TabsTrigger>}
         </TabsList>
         {canCreatePromotions && (
           <TabsContent value="promos" className="pt-4">
             <PromoCodesPanel />
+          </TabsContent>
+        )}
+        {canCreatePromotions && (
+          <TabsContent value="listing-promos" className="pt-4">
+            <ListingPromosPanel />
           </TabsContent>
         )}
         {canIssueDiscounts && (
