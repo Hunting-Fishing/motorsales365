@@ -42,6 +42,7 @@ const NAV = [
 const BUSINESSES_LINK = { to: "/businesses", label: "Businesses" } as const;
 const RIDES_LINK = { to: "/rides", label: "Rides" } as const;
 const WANTED_LINK = { to: "/wanted", label: "Wanted" } as const;
+const PARTS_WANTED_LINK = { to: "/wanted-parts", label: "Parts wanted" } as const;
 
 const SELLER_VIEW_OPTIONS: { value: SellerType; label: string }[] = [
   { value: "private", label: "Private seller" },
@@ -113,6 +114,13 @@ export function SiteHeader() {
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               {WANTED_LINK.label}
+            </Link>
+            <Link
+              to={PARTS_WANTED_LINK.to}
+              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              activeProps={{ className: "bg-secondary text-foreground" }}
+            >
+              {PARTS_WANTED_LINK.label}
             </Link>
             <Link
               to={BUSINESSES_LINK.to}

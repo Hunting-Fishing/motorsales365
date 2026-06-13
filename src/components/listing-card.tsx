@@ -23,7 +23,13 @@ import { ListingActionsMenu } from "@/components/listings/listing-actions-menu";
 import { ListingBadges, pickHeadlinePrice } from "@/components/listings/listing-badges";
 import { ListingReportBadge } from "@/components/listings/listing-report-badge";
 import { PricingWidget } from "@/components/listings/pricing-widget";
+import { NewBadge } from "@/components/listings/new-badge";
+import { RenewedBadge } from "@/components/listings/renewed-badge";
+import { PromoBadge, type ListingPromo } from "@/components/listings/promo-badge";
+import { PriceTrendBadge, type PriceTrend } from "@/components/listings/price-trend-badge";
 import { useListingReportSummary } from "@/hooks/use-listing-report-summary";
+import { useListingPriceTrend } from "@/hooks/use-listing-price-trend";
+import { useListingPromo } from "@/hooks/use-listing-promo";
 import { deriveTrustSignals } from "@/lib/trust-signals";
 import { getSellerTier } from "@/lib/listing-tier";
 import { cn } from "@/lib/utils";
@@ -58,6 +64,10 @@ export interface ListingCardData {
   negotiable?: boolean | null;
   price_hidden?: boolean | null;
   registration_status?: "registered" | "unregistered" | "for_transfer" | "unknown" | null;
+  published_at?: string | null;
+  updated_at?: string | null;
+  price_trend?: PriceTrend | null;
+  promotion?: ListingPromo | null;
 }
 
 const CATEGORY_META: Record<string, { label: string; Icon: typeof Droplets }> = {
@@ -120,7 +130,11 @@ export function ListingCard({
   const trust = deriveTrustSignals(listing);
   const tier = getSellerTier(listing);
   const { data: reportSummary } = useListingReportSummary(listing.id);
+  const { data: priceTrend } = useListingPriceTrend(listing.id);
+  const { data: promo } = useListingPromo(listing.id);
   const openReports = reportSummary?.open_count ?? 0;
+  const effectivePromo = listing.promotion ?? promo ?? null;
+  const effectiveTrend = listing.price_trend ?? priceTrend ?? null;
   return (
     <div
       className={cn(
@@ -155,6 +169,14 @@ export function ListingCard({
                 Featured
               </Badge>
             )}
+            {!boosted && <NewBadge publishedAt={listing.published_at} />}
+            {!boosted && (
+              <RenewedBadge
+                updatedAt={listing.updated_at}
+                publishedAt={listing.published_at}
+              />
+            )}
+            <PromoBadge promo={effectivePromo} />
             {matchBadge && (
               <Badge
                 className={cn(
@@ -203,14 +225,16 @@ export function ListingCard({
           {(() => {
             const headline = pickHeadlinePrice(listing);
             return (
-              <ListingPrice
-                pricePhp={headline.amount}
-                size="md"
-                className="mt-2"
-                headlineKind={headline.kind === "hidden" ? "asking" : headline.kind}
-                negotiable={!!listing.negotiable}
-                priceHidden={!!listing.price_hidden || headline.kind === "hidden"}
-              />
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <ListingPrice
+                  pricePhp={headline.amount}
+                  size="md"
+                  headlineKind={headline.kind === "hidden" ? "asking" : headline.kind}
+                  negotiable={!!listing.negotiable}
+                  priceHidden={!!listing.price_hidden || headline.kind === "hidden"}
+                />
+                <PriceTrendBadge trend={effectiveTrend} />
+              </div>
             );
           })()}
           <PricingWidget listing={listing} className="mt-2" />
