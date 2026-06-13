@@ -89,14 +89,37 @@ function ShopManagerPage() {
               </Button>
             </div>
             {isActive && (
-              <p className="mt-3 text-sm text-muted-foreground">
-                You're on the <strong className="capitalize">{currentTier}</strong> plan.
-                Renewal:{" "}
-                {access.data?.currentPeriodEnd
-                  ? new Date(access.data.currentPeriodEnd).toLocaleDateString()
-                  : "—"}
-                .
-              </p>
+              <div className="mt-3 space-y-2 text-sm text-muted-foreground">
+                <p>
+                  You're on the <strong className="capitalize">{currentTier}</strong> plan.
+                  {access.data?.cancelAtPeriodEnd ? " Access ends " : " Renews "}
+                  {access.data?.currentPeriodEnd
+                    ? new Date(access.data.currentPeriodEnd).toLocaleDateString()
+                    : "—"}
+                  .
+                </p>
+                <Button
+                  variant="link"
+                  size="sm"
+                  className="h-auto px-0"
+                  onClick={async () => {
+                    try {
+                      const res = await createPortalSession({
+                        data: {
+                          environment: getStripeEnvironment(),
+                          returnUrl: `${window.location.origin}/shop-manager`,
+                        },
+                      });
+                      if ("error" in res) throw new Error(res.error);
+                      window.open(res.url, "_blank");
+                    } catch (e) {
+                      toast.error(e instanceof Error ? e.message : "Could not open billing");
+                    }
+                  }}
+                >
+                  Manage billing →
+                </Button>
+              </div>
             )}
           </div>
           <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
