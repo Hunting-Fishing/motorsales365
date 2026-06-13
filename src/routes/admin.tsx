@@ -22,6 +22,7 @@ import {
   GraduationCap,
   AlertTriangle,
   MapPin,
+  Truck,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
@@ -85,17 +86,17 @@ const NAV: {
   },
   {
     to: "/admin/advertising",
-    label: "Advertising",
-    Icon: Megaphone,
+    label: "Ad Inquiries",
+    Icon: Inbox,
     roles: ["admin", "advertising", "sales"],
-    info: "Ad inquiries, placements and advertiser CRM. Senior/manager sales tiers get full access; junior is read-only.",
+    info: "Inbound advertiser inquiries, leads and advertiser CRM. Senior/manager sales tiers get full access; junior is read-only. See also Ad Campaigns for managing what's actually running.",
   },
   {
     to: "/admin/ad-campaigns",
     label: "Ad Campaigns",
     Icon: Megaphone,
     roles: ["admin", "advertising"],
-    info: "Create, schedule and manage sponsored ad placements (home carousel, browse banners, category sponsors).",
+    info: "Create, schedule and manage sponsored ad placements (home carousel, browse banners, category sponsors). See also Ad Inquiries for the advertiser sales pipeline.",
   },
   {
     to: "/admin/lead-offers",
@@ -124,6 +125,13 @@ const NAV: {
     Icon: Store,
     roles: ["admin"],
     info: "In-house parts: catalog, vehicle tire specs, buyer quote requests, and setup checklist (suppliers, logistics, payments).",
+  },
+  {
+    to: "/admin/dispatch",
+    label: "365 Dispatch",
+    Icon: Truck,
+    roles: ["admin", "support"],
+    info: "Dispatch subscriptions (renewals/cancellations), the live tow-job queue with stuck-job alerts and a manual expand trigger, and provider performance.",
   },
   {
     to: "/admin/education",

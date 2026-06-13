@@ -3,6 +3,10 @@ import Stripe from "stripe";
 import { createStripeClient, getWebhookSecret, type StripeEnv } from "@/lib/stripe.server";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { alertOps } from "@/lib/alerting.server";
+import {
+  recordPaymentForInvoice,
+  resolveInvoiceSubscriptionTarget,
+} from "@/lib/payments-recording.server";
 
 function parseEnv(url: URL): StripeEnv {
   const v = url.searchParams.get("env");
@@ -235,52 +239,33 @@ async function upsertBusinessSubscription(env: StripeEnv, sub: Stripe.Subscripti
 }
 
 async function recordPaymentFromInvoice(env: StripeEnv, invoice: Stripe.Invoice) {
+  void env;
   // Only record paid invoices
   if (invoice.status !== "paid") return;
   const subId = (invoice as any).subscription;
   const customerId = typeof invoice.customer === "string" ? invoice.customer : invoice.customer?.id;
   if (!subId || !customerId) return;
 
-  // Find the user via the subscription row
-  const { data: subRow } = await supabaseAdmin
-    .from("subscriptions")
-    .select("user_id")
-    .eq("stripe_subscription_id", typeof subId === "string" ? subId : subId.id)
-    .maybeSingle();
+  const stripeSubscriptionId = typeof subId === "string" ? subId : subId.id;
 
-  const userId = (subRow as any)?.user_id;
-  if (!userId) return;
+  // Renewal invoices can belong to a general subscription, a business
+  // directory subscription, or a dispatch (towing provider) subscription —
+  // each lives in its own table. Check all three before giving up.
+  const target = await resolveInvoiceSubscriptionTarget(stripeSubscriptionId);
+  if (!target) {
+    console.error(
+      "[webhook] Could not resolve subscription for invoice",
+      invoice.id,
+      stripeSubscriptionId,
+    );
+    void alertOps("payments.invoice.subscription_not_found", {
+      invoiceId: invoice.id,
+      stripeSubscriptionId,
+    });
+    return;
+  }
 
-  // Idempotency: skip if a payment row already exists for this invoice
-  const reference = `stripe_invoice:${invoice.id}`;
-  const { data: existing } = await supabaseAdmin
-    .from("payments")
-    .select("id")
-    .eq("reference", reference)
-    .maybeSingle();
-  if (existing) return;
-
-  const line = invoice.lines.data[0] as any;
-  const periodStart = line?.period?.start;
-  const periodEnd = line?.period?.end;
-  const amount = invoice.amount_paid / 100;
-
-  await supabaseAdmin.from("payments").insert({
-    user_id: userId,
-    kind: "subscription" as any,
-    status: "paid" as any,
-    amount_php: amount,
-    gross_amount_php: invoice.subtotal / 100,
-    method: "stripe",
-    reference,
-    paid_at: invoice.status_transitions?.paid_at
-      ? new Date(invoice.status_transitions.paid_at * 1000).toISOString()
-      : new Date().toISOString(),
-    period_start: periodStart ? new Date(periodStart * 1000).toISOString() : null,
-    period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
-    credit_calculated_at: new Date().toISOString(),
-    notes: invoice.hosted_invoice_url ?? null,
-  } as any);
+  await recordPaymentForInvoice({ ...target, invoice });
 }
 
 async function activateBoostFromSession(env: StripeEnv, session: Stripe.Checkout.Session) {
@@ -403,7 +388,7 @@ async function activatePassportPremiumFromSession(env: StripeEnv, session: Strip
   const newUntil = new Date(base.getTime() + days * 24 * 60 * 60 * 1000);
 
   const reference = `stripe_session:${session.id}`;
-  const { data: payRow } = await supabaseAdmin
+  const { data: payRow, error: payError } = await supabaseAdmin
     .from("payments")
     .insert({
       user_id: userId,
@@ -416,6 +401,17 @@ async function activatePassportPremiumFromSession(env: StripeEnv, session: Strip
     } as any)
     .select("id")
     .maybeSingle();
+
+  if (payError) {
+    console.error("[webhook] passport_premium payments insert failed", payError, session.id);
+    void alertOps("payments.passport_premium.insert_failed", {
+      sessionId: session.id,
+      userId,
+      vehicleId,
+      productSlug,
+      error: payError.message,
+    });
+  }
 
   await supabaseAdmin.from("passport_premium_purchases").insert({
     vehicle_id: vehicleId,

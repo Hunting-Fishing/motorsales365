@@ -1,15 +1,39 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPHP } from "@/lib/format";
-import { BarChart3, MapPin, Users, Tag, CreditCard, TrendingUp, Smartphone } from "lucide-react";
+import {
+  BarChart3,
+  MapPin,
+  Users,
+  Tag,
+  CreditCard,
+  TrendingUp,
+  Smartphone,
+  PieChart,
+} from "lucide-react";
 import { DeviceHeatmap, type HeatPoint } from "@/components/admin/device-heatmap";
+import { adminBackfillSubscriptionPayments } from "@/lib/admin-revenue-backfill.functions";
 
 export const Route = createFileRoute("/admin/analytics")({
   component: AdminAnalytics,
 });
 
 type Bucket = { key: string; count: number; extra?: string };
+
+// Display labels for payment_kind values. Keep in sync with the
+// public.payment_kind Postgres enum (see supabase/migrations).
+const PAYMENT_KIND_LABELS: Record<string, string> = {
+  listing: "Listing fees",
+  upgrade: "Listing upgrades",
+  boost: "Boosts",
+  subscription: "Subscriptions",
+  course: "Courses",
+  passport_premium: "Vehicle Passport Premium",
+  business_subscription: "Business directory subscriptions",
+  dispatch_subscription: "Dispatch / towing subscriptions",
+};
 
 function Card({ title, icon: Icon, children }: { title: string; icon: any; children: any }) {
   return (
@@ -54,6 +78,44 @@ function BarList({
           </div>
         );
       })}
+    </div>
+  );
+}
+
+function BackfillButton() {
+  const run = useServerFn(adminBackfillSubscriptionPayments);
+  const [status, setStatus] = useState<"idle" | "running" | "done" | "error">("idle");
+  const [summary, setSummary] = useState<string | null>(null);
+
+  async function handleClick() {
+    setStatus("running");
+    setSummary(null);
+    try {
+      const res = await run();
+      const inserted = res.results.reduce((s, r) => s + r.paymentsInserted, 0);
+      const checked = res.results.reduce((s, r) => s + r.invoicesChecked, 0);
+      const errors = res.results.flatMap((r) => r.errors);
+      setSummary(
+        `Checked ${checked} invoice(s) across business & dispatch subscriptions — recorded ${inserted} new payment(s).` +
+          (errors.length ? ` ${errors.length} error(s) — see ops alerts.` : ""),
+      );
+      setStatus(errors.length ? "error" : "done");
+    } catch (e: any) {
+      setSummary(e?.message || "Backfill failed.");
+      setStatus("error");
+    }
+  }
+
+  return (
+    <div className="mt-3 border-t border-border pt-3">
+      <button
+        onClick={handleClick}
+        disabled={status === "running"}
+        className="rounded-full border border-border bg-card px-3 py-1 text-xs font-medium text-muted-foreground transition hover:text-foreground disabled:opacity-50"
+      >
+        {status === "running" ? "Backfilling…" : "Backfill subscription payments from Stripe"}
+      </button>
+      {summary && <div className="mt-2 text-xs text-muted-foreground">{summary}</div>}
     </div>
   );
 }
@@ -177,6 +239,19 @@ function AdminAnalytics() {
     .filter((p) => p.status === "paid")
     .reduce((s, p) => s + Number(p.amount_php || 0), 0);
 
+  // Revenue by product (payment_kind)
+  const byPaymentKind = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const p of payments) {
+      if (p.status !== "paid") continue;
+      const k = PAYMENT_KIND_LABELS[p.kind as string] || (p.kind as string) || "Unknown";
+      m.set(k, (m.get(k) || 0) + Number(p.amount_php || 0));
+    }
+    return [...m.entries()]
+      .map(([key, count]) => ({ key, count }))
+      .sort((a, b) => b.count - a.count);
+  }, [payments]);
+
   // Listings by category
   const byCategory = useMemo(
     () => tally(listings, (l) => catMap[l.category_slug] || l.category_slug),
@@ -285,6 +360,11 @@ function AdminAnalytics() {
           </div>
         ))}
       </div>
+
+      <Card title="Revenue by product" icon={PieChart}>
+        <BarList items={byPaymentKind} total={totalRevenue} valueLabel={formatPHP} />
+        <BackfillButton />
+      </Card>
 
       <Card title="Device locations heatmap — Philippines" icon={Smartphone}>
         <div className="mb-3 flex flex-wrap items-center gap-3">

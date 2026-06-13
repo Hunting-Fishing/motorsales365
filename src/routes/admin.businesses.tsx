@@ -12,6 +12,7 @@ import {
   Pencil,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { formatDate } from "@/lib/format";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -47,21 +48,52 @@ type Row = {
   rating_avg: number;
   rating_count: number;
   owner_id: string | null;
+  subscription_tier: "free" | "listed" | "featured" | "premium" | null;
+  featured_until: string | null;
+  cancel_at_period_end?: boolean;
 };
+
+function subscriptionBadge(b: Row) {
+  const tier = b.subscription_tier;
+  if (!tier || tier === "free") {
+    return (
+      <Badge variant="outline" className="text-muted-foreground">
+        Free
+      </Badge>
+    );
+  }
+  const styles: Record<string, string> = {
+    listed: "bg-slate-600",
+    featured: "bg-primary",
+    premium: "bg-amber-500 text-amber-950",
+  };
+  const tierLabel = tier.charAt(0).toUpperCase() + tier.slice(1);
+  if (!b.featured_until) {
+    return <Badge className={styles[tier] ?? ""}>{tierLabel}</Badge>;
+  }
+  const dateLabel = formatDate(b.featured_until);
+  const suffix = b.cancel_at_period_end ? `cancels ${dateLabel}` : `renews ${dateLabel}`;
+  return (
+    <Badge className={styles[tier] ?? ""}>
+      {tierLabel} · {suffix}
+    </Badge>
+  );
+}
 
 function AdminBusinessesPage() {
   const [tab, setTab] = useState("pending");
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const [tierFilter, setTierFilter] = useState<"all" | "free" | "paid">("all");
   const [transferTarget, setTransferTarget] = useState<Row | null>(null);
 
-  const load = async (status: string, q?: string) => {
+  const load = async (status: string, q?: string, tier?: "all" | "free" | "paid") => {
     setLoading(true);
     let query = (supabase as any)
       .from("businesses")
       .select(
-        "id,slug,name,type_slug,status,city,region,featured,created_at,rating_avg,rating_count,owner_id",
+        "id,slug,name,type_slug,status,city,region,featured,created_at,rating_avg,rating_count,owner_id,subscription_tier,featured_until",
       )
       .order("created_at", { ascending: false })
       .limit(200);
@@ -73,13 +105,38 @@ function AdminBusinessesPage() {
       );
     }
     const { data } = await query;
-    setRows(data ?? []);
+    let result: Row[] = data ?? [];
+
+    // Tier filter (client-side — avoids stacking a second .or() on top of the search filter)
+    const effectiveTier = tier ?? tierFilter;
+    if (effectiveTier === "free") {
+      result = result.filter((b) => !b.subscription_tier || b.subscription_tier === "free");
+    } else if (effectiveTier === "paid") {
+      result = result.filter((b) => b.subscription_tier && b.subscription_tier !== "free");
+    }
+
+    // Pull cancel_at_period_end for paying businesses so badges can show "renews" vs "cancels"
+    const paidIds = result
+      .filter((b) => b.subscription_tier && b.subscription_tier !== "free")
+      .map((b) => b.id);
+    if (paidIds.length) {
+      const { data: subs } = await (supabase as any)
+        .from("business_subscriptions")
+        .select("business_id,cancel_at_period_end")
+        .in("business_id", paidIds);
+      const cancelMap = new Map<string, boolean>(
+        (subs ?? []).map((s: any) => [s.business_id, !!s.cancel_at_period_end]),
+      );
+      result = result.map((b) => ({ ...b, cancel_at_period_end: cancelMap.get(b.id) }));
+    }
+
+    setRows(result);
     setLoading(false);
   };
 
   useEffect(() => {
-    if (tab !== "import") load(tab, search); /* eslint-disable-next-line */
-  }, [tab]);
+    if (tab !== "import") load(tab, search, tierFilter); /* eslint-disable-next-line */
+  }, [tab, tierFilter]);
 
   const moderate = async (id: string, patch: Partial<Row>) => {
     const { error } = await (supabase as any).from("businesses").update(patch).eq("id", id);
@@ -114,13 +171,23 @@ function AdminBusinessesPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") load(tab, search);
+                  if (e.key === "Enter") load(tab, search, tierFilter);
                 }}
               />
-              <Button onClick={() => load(tab, search)} variant="outline">
+              <Button onClick={() => load(tab, search, tierFilter)} variant="outline">
                 <Search className="mr-1 h-4 w-4" />
                 Search
               </Button>
+              <Select value={tierFilter} onValueChange={(v) => setTierFilter(v as "all" | "free" | "paid")}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All tiers</SelectItem>
+                  <SelectItem value="free">Free</SelectItem>
+                  <SelectItem value="paid">Paid (any)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             {loading ? (
               <Card className="p-6 text-sm text-muted-foreground">Loading…</Card>
@@ -147,6 +214,7 @@ function AdminBusinessesPage() {
                         </Link>
                         {b.featured && <Badge>Featured</Badge>}
                         <Badge variant="outline">{b.status}</Badge>
+                        {subscriptionBadge(b)}
                       </div>
                       <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                         <span>Type:</span>
