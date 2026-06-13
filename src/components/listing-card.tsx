@@ -130,7 +130,11 @@ export function ListingCard({
   const trust = deriveTrustSignals(listing);
   const tier = getSellerTier(listing);
   const { data: reportSummary } = useListingReportSummary(listing.id);
+  const { data: priceTrend } = useListingPriceTrend(listing.id);
+  const { data: promo } = useListingPromo(listing.id);
   const openReports = reportSummary?.open_count ?? 0;
+  const effectivePromo = listing.promotion ?? promo ?? null;
+  const effectiveTrend = listing.price_trend ?? priceTrend ?? null;
   return (
     <div
       className={cn(
@@ -165,6 +169,14 @@ export function ListingCard({
                 Featured
               </Badge>
             )}
+            {!boosted && <NewBadge publishedAt={listing.published_at} />}
+            {!boosted && (
+              <RenewedBadge
+                updatedAt={listing.updated_at}
+                publishedAt={listing.published_at}
+              />
+            )}
+            <PromoBadge promo={effectivePromo} />
             {matchBadge && (
               <Badge
                 className={cn(
