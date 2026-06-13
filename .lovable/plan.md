@@ -1,93 +1,126 @@
 
-## Audit findings
+## Goal
 
-I walked the listing pipeline (DB → `browse-listings.functions.ts` → `ListingCard` + `PricingWidget` + `ListingBadges`) against each signal you listed. Here's what's already wired and what's missing:
+Let users post structured "Parts wanted" and "Parting-out vehicle wanted" requests tied to a specific vehicle (make/model/year/engine code). When a matching listing is published, auto-notify the requester. Also surface these wants on their profile.
 
-| Signal | Status today | Gap |
-|---|---|---|
-| **Boost (Featured)** | ✅ `boost_until` shown as "Featured" badge; browse sorts boosted first | Card never shows *how long* the boost lasts; expired boosts silently drop |
-| **Renew** | ⚠️ Boost dialog says "Renew + Boost"; `dashboard.boosts` shows renewal state | Card has no "Just renewed" signal; no surfacing of `expires_at` proximity for owners |
-| **Promotions** | ⚠️ `promotions` table = checkout promo codes only (admin) | No listing-level promo (e.g. "10% off this week") on cards/detail |
-| **New listings** | ❌ `published_at` selected but unused on card | No "New" badge for listings published in last 48h |
-| **Price changes ↑/↓** | ⚠️ `listing_price_history` table + trigger exist (0 rows so far). Trigger only watches `price_php` — ignores `monthly_php` and `down_payment_php` | No UI anywhere. No arrow/color on card or detail page |
-| **Private vs Dealer** | ⚠️ Tier system + `DealerSubscriptionBadge` exist, but **browse query hard-codes `seller_dealer_plan: null`** — so dealer badge never shows on browse cards (only on seller/detail pages) | Browse never joins dealer subscription → all dealers look "private/verified" in browse |
+Example: user wants "engine for 1991 Pajero" → system resolves to make=Mitsubishi, model=Pajero, year=1991, engine=4D56T (from `vehicle-engines.ts`). When a listing in `parts` category with fitment Mitsubishi/Pajero covering 1991 (and matching `4D56T` in attributes/title/description) gets published, the user gets notified.
 
-## Plan
+## What we build
 
-### 1. Database (1 migration)
+### 1. DB migration
 
-- Extend `tg_listing_price_history` to also log changes to `monthly_php` and `down_payment_php` (new nullable columns `kind text`, `field text` on `listing_price_history`; default `'asking'` for legacy rows).
-- Add index `idx_listing_price_history_listing_recent` on `(listing_id, changed_at desc)` (already exists — confirm).
-- Add `listing_promotions` table (optional, per-listing promo): `listing_id`, `label`, `percent_off` *or* `amount_off_php`, `starts_at`, `ends_at`, `created_by`. RLS: owners/staff write, public read when active + listing visible. Includes GRANTs for `anon`/`authenticated`/`service_role`.
-- Add helper RPC `get_listing_price_trend(_listing_id uuid)` → returns most recent `{ delta_php, delta_pct, direction, changed_at, field }` within last 30 days (SECURITY DEFINER, gated by listing visibility).
+**`parts_wanted`** — replaces ad-hoc `wanted_posts` for parts/parting-out (keeps `wanted_posts` for other categories).
+- `user_id`, `kind` enum (`part` | `parting_out`), `title`, `notes`
+- Vehicle fitment: `make`, `model`, `year`, `engine_code` (nullable), `trim` (nullable), `vehicle_category`
+- Part: `part_category` (brakes/engine/body/...), `part_keywords text[]`, `condition_pref` (any/used/new/oem/aftermarket)
+- Budget: `budget_max_php`, `region`, `city`
+- Alerts: `alert_frequency` ('off'|'instant'|'daily'), `last_alerted_at`, `status` ('open'|'closed'|'expired'), `expires_at` (90d default)
+- RLS: owner manages; open rows publicly viewable (anonymized — like wanted_posts).
+- GRANTs to authenticated + service_role + anon SELECT (open only).
 
-### 2. Browse query (`src/lib/browse-listings.functions.ts`)
+**`parts_wanted_matches`** — one row per (wanted, listing) match.
+- `wanted_id`, `listing_id`, `score numeric`, `matched_at`, `notified_at`, `dismissed_at`
+- Unique on (wanted_id, listing_id). Owner-only read via wanted ownership.
 
-- Join `subscriptions` (active business plan) into the seller profile fetch so cards can show the real dealer plan + period end instead of the hard-coded `null`.
-- Select `published_at` into the mapped `ListingCardData` (currently dropped).
-- Batch-fetch latest price trend + active listing promo for the page's listing ids (one RPC each, keyed by id) and attach to each card row.
+**Match function** `match_listing_to_parts_wanted(listing_id)` (SECURITY DEFINER, plpgsql):
+- Triggered on listing status → 'published' in category `part`.
+- Joins listing + listing_fitment + attributes JSON.
+- For each open `parts_wanted` row:
+  - +3 if fitment make/model matches
+  - +2 if year falls in fitment year_min..year_max
+  - +2 if `engine_code` appears in listing title/desc/attributes.engine_code
+  - +1 per part_keyword found in title/desc
+  - Region match +1
+  - Threshold ≥4 → insert into `parts_wanted_matches`.
 
-### 3. `ListingCardData` shape (`src/components/listing-card.tsx`)
+**Trigger**: `AFTER UPDATE OF status ON listings` when NEW.status='published' AND category_slug='parts' → call match function.
 
-Add optional fields:
-- `published_at?: string | null`
-- `price_trend?: { direction: "up" | "down"; delta_pct: number; field: "asking" | "monthly" | "down_payment"; changed_at: string } | null`
-- `promotion?: { label: string; percent_off?: number; amount_off_php?: number; ends_at: string } | null`
-- `boost_until` already present — also derive `boost_days_left`.
+**Backfill**: on insert into `parts_wanted`, also scan last 60 days of published parts listings.
 
-### 4. New badge components (`src/components/listings/`)
+### 2. Server functions (`src/lib/parts-wanted.functions.ts`)
 
-- `NewBadge.tsx` — green "NEW" pill when `published_at` is within 48h (and not boosted, to avoid double-decoration).
-- `PriceTrendBadge.tsx` — arrow + percent:
-  - **Down** = green (`ArrowDown`, `bg-emerald-500/15 text-emerald-700`) — "↓ 8% price drop"
-  - **Up** = red (`ArrowUp`, `bg-rose-500/15 text-rose-700`) — "↑ 5%"
-  - Renders inside `PricingWidget` next to the headline pill so it sits on the price it actually changed.
-- `PromoBadge.tsx` — accent pill "10% OFF · ends Sat" with countdown if <72h.
-- `RenewedBadge.tsx` — subtle "Renewed" pill when boost was created within last 24h AND listing `expires_at` was bumped (detected via `listing_boosts.created_at` vs `listings.updated_at`).
+- `createPartsWanted` — auth, validates with zod, resolves engine code via lookup helper, inserts row, kicks off backfill scan.
+- `updatePartsWanted`, `closePartsWanted`, `deletePartsWanted`
+- `listMyPartsWanted` — owner list with match counts
+- `listMyMatches({ wantedId? })` — joins listing summary
+- `dismissMatch({ matchId })`
+- `listPublicPartsWanted` — for community board (anonymized)
 
-### 5. Card rendering order (top-left overlay stack)
+### 3. Vehicle resolver helper (`src/lib/vehicle-resolver.ts`)
 
-```text
-[NEW] [FEATURED] [RENEWED] [PROMO] [PENDING SALE] [CATEGORY] [DEALER PLAN]
-```
+Pure TS helper that takes free-text (e.g. "91 pajero engine") and returns best (make, model, year, engine_code) using `vehicles.ts` + `vehicle-engines.ts` fuzzy match (`src/lib/fuzzy.ts` already exists). Used by the form's "smart parse" button and by background re-resolution.
 
-Rules:
-- `NEW` suppressed when `FEATURED` is showing (avoid stacking promo-on-promo).
-- `RENEWED` suppressed when `NEW` is showing.
-- Dealer plan badge stays bottom of the stack (already does).
-- Private sellers: keep current `ListingBadges` tier pill ("Verified seller" / "Unverified") — no dealer badge.
+### 4. UI
 
-### 6. Detail page (`src/routes/listing.$id.tsx`)
+**New routes**
+- `src/routes/wanted-parts.index.tsx` — public board: filters (make/model/year/part category/region). Replaces `parts` tab inside `wanted.index.tsx` (cross-link).
+- `src/routes/wanted-parts.new.tsx` — structured form (vehicle picker via existing `vehicle-picker.tsx` + engine select pulled from `VEHICLE_ENGINES`, part category, keywords, condition, budget, region, alert freq).
+- `src/routes/_authenticated/dashboard.parts-wanted.tsx` — owner dashboard: list of wants + match inbox with listing thumbnails, "View listing" / "Dismiss" / "Close request".
 
-- Add a compact "Price history" disclosure under the price block: last 3 changes with date, old → new, ↑/↓ pct, color-coded.
-- Show promo banner above price when active.
-- Show "Boosted until {date}" line for the owner only.
+**Components**
+- `src/components/parts-wanted/vehicle-engine-picker.tsx` — make/model/year/engine cascading select, prefills from free text.
+- `src/components/parts-wanted/match-card.tsx` — listing preview + score badge.
+- `src/components/parts-wanted/wanted-badge.tsx` — small badge on listing detail "X buyers wanted this part" (read from RPC).
 
-### 7. Owner dashboard (`src/routes/dashboard.index.tsx`)
+**Profile integration**
+- Add "Parts I'm looking for" section to `src/routes/profile.$id.tsx` (owner sees full list; public sees public-safe summary).
+- Add "Parting out wanted" section similarly.
+- Surface a count chip on the user's passport/profile header.
 
-- On each owner listing row: small badges mirroring public ones (NEW / FEATURED / PROMO / price ↑↓) so sellers see what buyers see.
+**Header/nav**
+- Add `/wanted-parts` link under existing Wanted nav entry.
+- Dashboard sidebar gets "Parts Wanted (n new matches)" pill using `useAdminPendingCounts`-style polling.
 
-### 8. Admin
+### 5. Notifications
 
-- `admin.listings.tsx`: column for "Last price change" with arrow + pct.
-- `admin.promotions.tsx`: new tab "Listing promos" to create/end per-listing promotions.
+- **Instant**: server fn `notifyPartsWantedMatches` enqueues email via existing `enqueue_email` RPC using new template `parts-wanted-match.tsx` (subject: "We found a match: {part} for {year} {make} {model}"). Also creates an in-app row via existing notification path used by reports/inquiries.
+- **Daily digest**: pg_cron job (added to existing cron infra via `supabase--insert`) calls `/api/public/hooks/parts-wanted-digest` at 08:00 PHT → batches unsent matches grouped by user → one email + marks `notified_at`.
+- Frequency respects `alert_frequency` on the row; "instant" gated to authenticated users (no extra plan requirement — this is core ops, unlike saved_search instant which is Premium).
 
-### 9. Policy pages
+### 6. Admin
 
-- `/terms`: add a clause that price-change history is publicly visible for active listings.
-- `/privacy`: no change (no new PII).
-- Bump "Last updated" on `/terms`.
+- `src/routes/admin.parts-wanted.tsx` — moderation list, ability to close abusive requests, view match stats. Feed admin pending counts RPC with new bucket `parts_wanted_flagged`.
 
-## Out of scope (not touching this turn)
+### 7. Policy + Terms
 
-- Email/notification dispatch for price drops to favoriters (worth doing later, separate ask).
-- Saved-search alerts wiring for new promos (already partially exists).
-- Boost auto-renew subscriptions (already covered by `boost_products.recurring`).
+- Update `/terms` and `/privacy`: structured vehicle/part wants are stored and used to send match alerts; users can disable per-request; emails respect suppression list. Bump "Last updated".
+
+## Technical details
+
+- All match writes go through `supabaseAdmin` inside server fns / triggers — no client write to `parts_wanted_matches`.
+- Year-match handles open-ended fitment (`year_min` only, `year_max` only).
+- Engine code matching is case-insensitive and tolerant (`4D56T` ≈ `4d56-t`).
+- Re-resolve engine code on `parts_wanted` update via DB trigger calling an immutable helper that reads engine catalog from a small lookup table seeded from `vehicle-engines.ts` (one-time seed migration) so SQL can match without app round-trip.
+- Email send goes through existing pgmq `transactional_emails` queue.
+- No edge functions; cron hits TanStack `/api/public/hooks/parts-wanted-digest` with `apikey` header.
 
 ## Files
 
-**New:** migration, `src/components/listings/new-badge.tsx`, `price-trend-badge.tsx`, `promo-badge.tsx`, `renewed-badge.tsx`, `src/hooks/use-listing-price-trend.ts`, `src/hooks/use-listing-promo.ts`.
+**Migrations** (1 file):
+- `parts_wanted`, `parts_wanted_matches`, `vehicle_engine_lookup` (seeded), match function, listing trigger, RLS, GRANTs.
 
-**Edited:** `browse-listings.functions.ts`, `listing-card.tsx`, `pricing-widget.tsx`, `listing.$id.tsx`, `dashboard.index.tsx`, `admin.listings.tsx`, `admin.promotions.tsx`, `terms.tsx`.
+**New code:**
+- `src/lib/parts-wanted.functions.ts`
+- `src/lib/vehicle-resolver.ts`
+- `src/lib/email-templates/parts-wanted-match.tsx`
+- `src/routes/wanted-parts.index.tsx`
+- `src/routes/wanted-parts.new.tsx`
+- `src/routes/_authenticated/dashboard.parts-wanted.tsx`
+- `src/routes/admin.parts-wanted.tsx`
+- `src/routes/api/public/hooks/parts-wanted-digest.ts`
+- `src/components/parts-wanted/{vehicle-engine-picker,match-card,wanted-badge}.tsx`
+- `src/hooks/use-parts-wanted-matches.ts`
 
-Approve and I'll implement in one pass.
+**Edited:**
+- `src/routes/profile.$id.tsx` — add wants sections.
+- `src/routes/wanted.index.tsx` — cross-link to parts board.
+- `src/routes/listing.$id.tsx` — show "X buyers want this" badge.
+- `src/routes/admin.tsx` — nav pill.
+- `src/routes/terms.tsx`, `src/routes/privacy.tsx` — disclosure update.
+- `src/components/site-header.tsx` — Wanted submenu adds Parts link.
+
+## Out of scope (ask before adding)
+
+- SMS / push notifications (email + in-app only)
+- Seller-side "Reach buyers waiting for this part" paid boost
+- Automated DMs to sellers on behalf of wanters
