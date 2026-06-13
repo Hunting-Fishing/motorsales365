@@ -99,16 +99,29 @@ export function buildShopManagerRedirect(token: string, returnPath?: string): st
  */
 export async function ensurePartnerAuthUser(email: string): Promise<string> {
   const partner = partnerSupabase();
-  // Look up by email via the Auth Admin API (paginated, but email filter is supported)
-  // @ts-expect-error filter is accepted by gotrue 2.x service role API
-  const { data: list, error: listErr } = await partner.auth.admin.listUsers({
-    page: 1,
-    perPage: 1,
-    filter: `email.eq.${email.toLowerCase()}`,
-  });
-  if (listErr) throw new Error(`Partner listUsers failed: ${listErr.message}`);
-  const existing = list?.users?.[0];
-  if (existing) return existing.id;
+  const normalized = email.toLowerCase();
+  // gotrue-js does not expose an email filter on listUsers; getUserByEmail is the
+  // documented lookup. Cast through `any` because the helper landed in newer
+  // versions and may not be present in the installed type defs.
+  const adminAny = (partner.auth as any).admin;
+  let existingId: string | null = null;
+  if (typeof adminAny.getUserByEmail === "function") {
+    const { data, error } = await adminAny.getUserByEmail(normalized);
+    if (error && error.status !== 404) {
+      throw new Error(`Partner getUserByEmail failed: ${error.message}`);
+    }
+    existingId = data?.user?.id ?? null;
+  } else {
+    // Fallback: scan first page (small partner tenant) and match locally.
+    const { data: list, error: listErr } = await partner.auth.admin.listUsers({
+      page: 1,
+      perPage: 200,
+    });
+    if (listErr) throw new Error(`Partner listUsers failed: ${listErr.message}`);
+    existingId =
+      list?.users?.find((u: any) => u.email?.toLowerCase() === normalized)?.id ?? null;
+  }
+  if (existingId) return existingId;
 
   const { data: created, error: createErr } = await partner.auth.admin.createUser({
     email,
