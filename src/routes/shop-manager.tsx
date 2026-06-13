@@ -104,14 +104,13 @@ function ShopManagerPage() {
                   className="h-auto px-0"
                   onClick={async () => {
                     try {
-                      const res = await createPortalSession({
+                      const url = await createPortalSession({
                         data: {
                           environment: getStripeEnvironment(),
                           returnUrl: `${window.location.origin}/shop-manager`,
                         },
                       });
-                      if ("error" in res) throw new Error(res.error);
-                      window.open(res.url, "_blank");
+                      window.open(url, "_blank");
                     } catch (e) {
                       toast.error(e instanceof Error ? e.message : "Could not open billing");
                     }
