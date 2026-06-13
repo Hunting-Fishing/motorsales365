@@ -116,6 +116,13 @@ export function SiteHeader() {
               {WANTED_LINK.label}
             </Link>
             <Link
+              to={PARTS_WANTED_LINK.to}
+              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              activeProps={{ className: "bg-secondary text-foreground" }}
+            >
+              {PARTS_WANTED_LINK.label}
+            </Link>
+            <Link
               to={BUSINESSES_LINK.to}
               className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               activeProps={{ className: "bg-secondary text-foreground" }}
