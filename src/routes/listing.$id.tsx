@@ -252,6 +252,8 @@ function ListingDetailPage() {
     enabled: !!listing?.user_id,
     staleTime: 5 * 60 * 1000,
   });
+  const { data: priceTrendDetail } = useListingPriceTrend(listing?.id);
+  const { data: listingPromoDetail } = useListingPromo(listing?.id);
   const [loading, setLoading] = useState(true);
   const [activeIdx, setActiveIdx] = useState(0);
   const [favorited, setFavorited] = useState(false);
