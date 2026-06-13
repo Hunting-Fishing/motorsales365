@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 13, 2026 (added listing transparency — price-change history (up/down with %) and per-listing promotional discounts are now publicly visible on active listings; 'New' and 'Renewed' badges are derived from listing publish/update timestamps)";
+  const lastUpdated = "June 13, 2026 (added Parts Wanted requests: structured buyer requests tied to a vehicle and engine code; the platform auto-matches new listings and notifies requesters by email/in-app per their selected frequency. Vehicle/part details are visible on the public parts-wanted board; requester identity stays private until they message a seller.)";
 
   return (
     <SiteLayout>

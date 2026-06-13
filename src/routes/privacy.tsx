@@ -22,7 +22,7 @@ export const Route = createFileRoute("/privacy")({
 });
 
 function PrivacyPage() {
-  const lastUpdated = "June 12, 2026 (clarified that reporter identity and raw report details remain private; only admin-curated summaries are public)";
+  const lastUpdated = "June 13, 2026 (added Parts Wanted requests: vehicle make/model/year, engine code, keywords, region and alert frequency are stored to power match notifications; requester identity is not shown publicly; users can close or delete any request at any time, and emails respect the suppression list.)";
 
   return (
     <SiteLayout>
