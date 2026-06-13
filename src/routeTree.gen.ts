@@ -18,6 +18,7 @@ import { Route as SupportRouteImport } from './routes/support'
 import { Route as StartSellingRouteImport } from './routes/start-selling'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as ShopManagerRouteImport } from './routes/shop-manager'
 import { Route as SellRouteImport } from './routes/sell'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -233,6 +234,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ShopManagerRoute = ShopManagerRouteImport.update({
+  id: '/shop-manager',
+  path: '/shop-manager',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SellRoute = SellRouteImport.update({
@@ -1137,6 +1143,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sell': typeof SellRouteWithChildren
+  '/shop-manager': typeof ShopManagerRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/start-selling': typeof StartSellingRoute
@@ -1316,6 +1323,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sell': typeof SellRouteWithChildren
+  '/shop-manager': typeof ShopManagerRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/start-selling': typeof StartSellingRoute
@@ -1498,6 +1506,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sell': typeof SellRouteWithChildren
+  '/shop-manager': typeof ShopManagerRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/start-selling': typeof StartSellingRoute
@@ -1681,6 +1690,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/robots.txt'
     | '/sell'
+    | '/shop-manager'
     | '/signup'
     | '/sitemap.xml'
     | '/start-selling'
@@ -1860,6 +1870,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/robots.txt'
     | '/sell'
+    | '/shop-manager'
     | '/signup'
     | '/sitemap.xml'
     | '/start-selling'
@@ -2041,6 +2052,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/robots.txt'
     | '/sell'
+    | '/shop-manager'
     | '/signup'
     | '/sitemap.xml'
     | '/start-selling'
@@ -2224,6 +2236,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SellRoute: typeof SellRouteWithChildren
+  ShopManagerRoute: typeof ShopManagerRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StartSellingRoute: typeof StartSellingRoute
@@ -2364,6 +2377,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/shop-manager': {
+      id: '/shop-manager'
+      path: '/shop-manager'
+      fullPath: '/shop-manager'
+      preLoaderRoute: typeof ShopManagerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sell': {
@@ -3860,6 +3880,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SellRoute: SellRouteWithChildren,
+  ShopManagerRoute: ShopManagerRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StartSellingRoute: StartSellingRoute,
@@ -3939,13 +3960,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

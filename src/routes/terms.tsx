@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 13, 2026 (added Parts Wanted requests: structured buyer requests tied to a vehicle and engine code; the platform auto-matches new listings and notifies requesters by email/in-app per their selected frequency. Vehicle/part details are visible on the public parts-wanted board; requester identity stays private until they message a seller.)";
+  const lastUpdated = "June 13, 2026 (added Shop Manager subscription add-on, ₱799/mo Solo or ₱1,999/mo Pro, delivered through our partner platform All Business 365; on activation we forward your account email and display name to provision a workspace and sign you in via SSO; cancel anytime from your dashboard, monthly billing is not pro-rated.)";
 
   return (
     <SiteLayout>

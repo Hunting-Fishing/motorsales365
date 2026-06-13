@@ -22,7 +22,7 @@ export const Route = createFileRoute("/privacy")({
 });
 
 function PrivacyPage() {
-  const lastUpdated = "June 13, 2026 (added Parts Wanted requests: vehicle make/model/year, engine code, keywords, region and alert frequency are stored to power match notifications; requester identity is not shown publicly; users can close or delete any request at any time, and emails respect the suppression list.)";
+  const lastUpdated = "June 13, 2026 (added Shop Manager add-on: on subscription we forward your account email and display name to our partner platform All Business 365 to create your shop workspace and sign you in via SSO; that platform becomes a separate Personal Information Controller for the data you enter there.)";
 
   return (
     <SiteLayout>
