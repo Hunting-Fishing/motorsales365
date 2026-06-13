@@ -124,7 +124,7 @@ export async function ensurePartnerAuthUser(email: string): Promise<string> {
   if (existingId) return existingId;
 
   const { data: created, error: createErr } = await partner.auth.admin.createUser({
-    email,
+    email: normalized,
     email_confirm: true,
     user_metadata: { source: "365motorsales" },
   });
