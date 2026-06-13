@@ -4201,6 +4201,129 @@ export type Database = {
         }
         Relationships: []
       }
+      parts_wanted: {
+        Row: {
+          alert_frequency: string
+          budget_max_php: number | null
+          city: string | null
+          condition_pref: string
+          created_at: string
+          engine_code: string | null
+          expires_at: string
+          id: string
+          kind: Database["public"]["Enums"]["parts_wanted_kind"]
+          last_alerted_at: string | null
+          make: string
+          model: string
+          notes: string | null
+          part_category: string | null
+          part_keywords: string[]
+          region: string | null
+          status: Database["public"]["Enums"]["parts_wanted_status"]
+          title: string
+          trim: string | null
+          updated_at: string
+          user_id: string
+          vehicle_category: string | null
+          year: number | null
+        }
+        Insert: {
+          alert_frequency?: string
+          budget_max_php?: number | null
+          city?: string | null
+          condition_pref?: string
+          created_at?: string
+          engine_code?: string | null
+          expires_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["parts_wanted_kind"]
+          last_alerted_at?: string | null
+          make: string
+          model: string
+          notes?: string | null
+          part_category?: string | null
+          part_keywords?: string[]
+          region?: string | null
+          status?: Database["public"]["Enums"]["parts_wanted_status"]
+          title: string
+          trim?: string | null
+          updated_at?: string
+          user_id: string
+          vehicle_category?: string | null
+          year?: number | null
+        }
+        Update: {
+          alert_frequency?: string
+          budget_max_php?: number | null
+          city?: string | null
+          condition_pref?: string
+          created_at?: string
+          engine_code?: string | null
+          expires_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["parts_wanted_kind"]
+          last_alerted_at?: string | null
+          make?: string
+          model?: string
+          notes?: string | null
+          part_category?: string | null
+          part_keywords?: string[]
+          region?: string | null
+          status?: Database["public"]["Enums"]["parts_wanted_status"]
+          title?: string
+          trim?: string | null
+          updated_at?: string
+          user_id?: string
+          vehicle_category?: string | null
+          year?: number | null
+        }
+        Relationships: []
+      }
+      parts_wanted_matches: {
+        Row: {
+          dismissed_at: string | null
+          id: string
+          listing_id: string
+          matched_at: string
+          notified_at: string | null
+          score: number
+          wanted_id: string
+        }
+        Insert: {
+          dismissed_at?: string | null
+          id?: string
+          listing_id: string
+          matched_at?: string
+          notified_at?: string | null
+          score?: number
+          wanted_id: string
+        }
+        Update: {
+          dismissed_at?: string | null
+          id?: string
+          listing_id?: string
+          matched_at?: string
+          notified_at?: string | null
+          score?: number
+          wanted_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parts_wanted_matches_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parts_wanted_matches_wanted_id_fkey"
+            columns: ["wanted_id"]
+            isOneToOne: false
+            referencedRelation: "parts_wanted"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       passport_premium_products: {
         Row: {
           active: boolean
@@ -7789,6 +7912,7 @@ export type Database = {
         Args: { _auto: boolean; _claim_id: string }
         Returns: undefined
       }
+      backfill_parts_wanted: { Args: { p_wanted_id: string }; Returns: number }
       can_manage_ads: { Args: { _user_id: string }; Returns: boolean }
       can_manage_org: {
         Args: { _org_id: string; _user_id: string }
@@ -7886,6 +8010,10 @@ export type Database = {
         Args: { _listing_id: string }
         Returns: Json
       }
+      get_listing_wanted_count: {
+        Args: { p_listing_id: string }
+        Returns: number
+      }
       get_public_passport_verification: {
         Args: { _slug: string }
         Returns: {
@@ -7946,6 +8074,10 @@ export type Database = {
           vehicle_model: string
           vehicle_year: number
         }[]
+      }
+      match_listing_to_parts_wanted: {
+        Args: { p_listing_id: string }
+        Returns: number
       }
       move_to_dlq: {
         Args: {
@@ -8113,6 +8245,8 @@ export type Database = {
       media_type: "photo" | "video"
       org_role: "owner" | "admin" | "member"
       partner_tier: "featured" | "standard"
+      parts_wanted_kind: "part" | "parting_out"
+      parts_wanted_status: "open" | "closed" | "expired"
       passport_verification_status:
         | "pending"
         | "more_info"
@@ -8416,6 +8550,8 @@ export const Constants = {
       media_type: ["photo", "video"],
       org_role: ["owner", "admin", "member"],
       partner_tier: ["featured", "standard"],
+      parts_wanted_kind: ["part", "parting_out"],
+      parts_wanted_status: ["open", "closed", "expired"],
       passport_verification_status: [
         "pending",
         "more_info",

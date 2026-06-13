@@ -47,6 +47,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WantedIndexRouteImport } from './routes/wanted.index'
+import { Route as WantedPartsIndexRouteImport } from './routes/wanted-parts.index'
 import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as RidesIndexRouteImport } from './routes/rides.index'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
@@ -55,6 +56,7 @@ import { Route as BusinessesIndexRouteImport } from './routes/businesses.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as WantedNewRouteImport } from './routes/wanted.new'
 import { Route as WantedIdRouteImport } from './routes/wanted.$id'
+import { Route as WantedPartsNewRouteImport } from './routes/wanted-parts.new'
 import { Route as SupportSellingRouteImport } from './routes/support_.selling'
 import { Route as SupportBuyingRouteImport } from './routes/support_.buying'
 import { Route as SupportBusinessRouteImport } from './routes/support_.business'
@@ -164,6 +166,7 @@ import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocod
 import { Route as ApiPublicGeoSearchRouteImport } from './routes/api/public/geo-search'
 import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
 import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions_.$staffId'
+import { Route as AuthenticatedDashboardPartsWantedRouteImport } from './routes/_authenticated/dashboard.parts-wanted'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -179,6 +182,7 @@ import { Route as ApiSellerStaffDeactivateRouteImport } from './routes/api/selle
 import { Route as ApiSellerStaffCreateRouteImport } from './routes/api/seller/staff/create'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksRefreshLazadaRouteImport } from './routes/api/public/hooks/refresh-lazada'
+import { Route as ApiPublicHooksPartsWantedDigestRouteImport } from './routes/api/public/hooks/parts-wanted-digest'
 import { Route as ApiPublicHooksOpsAlertsDigestRouteImport } from './routes/api/public/hooks/ops-alerts-digest'
 import { Route as ApiPublicHooksDispatchExpandRouteImport } from './routes/api/public/hooks/dispatch-expand'
 import { Route as ApiPublicHooksDiscoverSyncRouteImport } from './routes/api/public/hooks/discover-sync'
@@ -375,6 +379,11 @@ const WantedIndexRoute = WantedIndexRouteImport.update({
   path: '/wanted/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WantedPartsIndexRoute = WantedPartsIndexRouteImport.update({
+  id: '/wanted-parts/',
+  path: '/wanted-parts/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ShopIndexRoute = ShopIndexRouteImport.update({
   id: '/shop/',
   path: '/shop/',
@@ -413,6 +422,11 @@ const WantedNewRoute = WantedNewRouteImport.update({
 const WantedIdRoute = WantedIdRouteImport.update({
   id: '/wanted/$id',
   path: '/wanted/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WantedPartsNewRoute = WantedPartsNewRouteImport.update({
+  id: '/wanted-parts/new',
+  path: '/wanted-parts/new',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SupportSellingRoute = SupportSellingRouteImport.update({
@@ -963,6 +977,12 @@ const AdminRedemptionsStaffIdRoute = AdminRedemptionsStaffIdRouteImport.update({
   path: '/redemptions/$staffId',
   getParentRoute: () => AdminRoute,
 } as any)
+const AuthenticatedDashboardPartsWantedRoute =
+  AuthenticatedDashboardPartsWantedRouteImport.update({
+    id: '/_authenticated/dashboard/parts-wanted',
+    path: '/dashboard/parts-wanted',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -1045,6 +1065,12 @@ const ApiPublicHooksRefreshLazadaRoute =
   ApiPublicHooksRefreshLazadaRouteImport.update({
     id: '/api/public/hooks/refresh-lazada',
     path: '/api/public/hooks/refresh-lazada',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksPartsWantedDigestRoute =
+  ApiPublicHooksPartsWantedDigestRouteImport.update({
+    id: '/api/public/hooks/parts-wanted-digest',
+    path: '/api/public/hooks/parts-wanted-digest',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicHooksOpsAlertsDigestRoute =
@@ -1204,6 +1230,7 @@ export interface FileRoutesByFullPath {
   '/support/business': typeof SupportBusinessRoute
   '/support/buying': typeof SupportBuyingRoute
   '/support/selling': typeof SupportSellingRoute
+  '/wanted-parts/new': typeof WantedPartsNewRoute
   '/wanted/$id': typeof WantedIdRoute
   '/wanted/new': typeof WantedNewRoute
   '/admin/': typeof AdminIndexRoute
@@ -1212,7 +1239,9 @@ export interface FileRoutesByFullPath {
   '/learn/': typeof LearnIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop/': typeof ShopIndexRoute
+  '/wanted-parts/': typeof WantedPartsIndexRoute
   '/wanted/': typeof WantedIndexRoute
+  '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1237,6 +1266,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
   '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
+  '/api/public/hooks/parts-wanted-digest': typeof ApiPublicHooksPartsWantedDigestRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
@@ -1378,6 +1408,7 @@ export interface FileRoutesByTo {
   '/support/business': typeof SupportBusinessRoute
   '/support/buying': typeof SupportBuyingRoute
   '/support/selling': typeof SupportSellingRoute
+  '/wanted-parts/new': typeof WantedPartsNewRoute
   '/wanted/$id': typeof WantedIdRoute
   '/wanted/new': typeof WantedNewRoute
   '/admin': typeof AdminIndexRoute
@@ -1386,7 +1417,9 @@ export interface FileRoutesByTo {
   '/learn': typeof LearnIndexRoute
   '/rides': typeof RidesIndexRoute
   '/shop': typeof ShopIndexRoute
+  '/wanted-parts': typeof WantedPartsIndexRoute
   '/wanted': typeof WantedIndexRoute
+  '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1411,6 +1444,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
   '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
+  '/api/public/hooks/parts-wanted-digest': typeof ApiPublicHooksPartsWantedDigestRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
@@ -1556,6 +1590,7 @@ export interface FileRoutesById {
   '/support_/business': typeof SupportBusinessRoute
   '/support_/buying': typeof SupportBuyingRoute
   '/support_/selling': typeof SupportSellingRoute
+  '/wanted-parts/new': typeof WantedPartsNewRoute
   '/wanted/$id': typeof WantedIdRoute
   '/wanted/new': typeof WantedNewRoute
   '/admin/': typeof AdminIndexRoute
@@ -1564,7 +1599,9 @@ export interface FileRoutesById {
   '/learn/': typeof LearnIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop/': typeof ShopIndexRoute
+  '/wanted-parts/': typeof WantedPartsIndexRoute
   '/wanted/': typeof WantedIndexRoute
+  '/_authenticated/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1589,6 +1626,7 @@ export interface FileRoutesById {
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
   '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
+  '/api/public/hooks/parts-wanted-digest': typeof ApiPublicHooksPartsWantedDigestRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
@@ -1735,6 +1773,7 @@ export interface FileRouteTypes {
     | '/support/business'
     | '/support/buying'
     | '/support/selling'
+    | '/wanted-parts/new'
     | '/wanted/$id'
     | '/wanted/new'
     | '/admin/'
@@ -1743,7 +1782,9 @@ export interface FileRouteTypes {
     | '/learn/'
     | '/rides/'
     | '/shop/'
+    | '/wanted-parts/'
     | '/wanted/'
+    | '/dashboard/parts-wanted'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -1768,6 +1809,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/discover-sync'
     | '/api/public/hooks/dispatch-expand'
     | '/api/public/hooks/ops-alerts-digest'
+    | '/api/public/hooks/parts-wanted-digest'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
     | '/api/seller/staff/create'
@@ -1909,6 +1951,7 @@ export interface FileRouteTypes {
     | '/support/business'
     | '/support/buying'
     | '/support/selling'
+    | '/wanted-parts/new'
     | '/wanted/$id'
     | '/wanted/new'
     | '/admin'
@@ -1917,7 +1960,9 @@ export interface FileRouteTypes {
     | '/learn'
     | '/rides'
     | '/shop'
+    | '/wanted-parts'
     | '/wanted'
+    | '/dashboard/parts-wanted'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -1942,6 +1987,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/discover-sync'
     | '/api/public/hooks/dispatch-expand'
     | '/api/public/hooks/ops-alerts-digest'
+    | '/api/public/hooks/parts-wanted-digest'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
     | '/api/seller/staff/create'
@@ -2086,6 +2132,7 @@ export interface FileRouteTypes {
     | '/support_/business'
     | '/support_/buying'
     | '/support_/selling'
+    | '/wanted-parts/new'
     | '/wanted/$id'
     | '/wanted/new'
     | '/admin/'
@@ -2094,7 +2141,9 @@ export interface FileRouteTypes {
     | '/learn/'
     | '/rides/'
     | '/shop/'
+    | '/wanted-parts/'
     | '/wanted/'
+    | '/_authenticated/dashboard/parts-wanted'
     | '/admin/redemptions_/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2119,6 +2168,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/discover-sync'
     | '/api/public/hooks/dispatch-expand'
     | '/api/public/hooks/ops-alerts-digest'
+    | '/api/public/hooks/parts-wanted-digest'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
     | '/api/seller/staff/create'
@@ -2206,13 +2256,16 @@ export interface RootRouteChildren {
   SupportBusinessRoute: typeof SupportBusinessRoute
   SupportBuyingRoute: typeof SupportBuyingRoute
   SupportSellingRoute: typeof SupportSellingRoute
+  WantedPartsNewRoute: typeof WantedPartsNewRoute
   WantedIdRoute: typeof WantedIdRoute
   WantedNewRoute: typeof WantedNewRoute
   BusinessesIndexRoute: typeof BusinessesIndexRoute
   LearnIndexRoute: typeof LearnIndexRoute
   RidesIndexRoute: typeof RidesIndexRoute
   ShopIndexRoute: typeof ShopIndexRoute
+  WantedPartsIndexRoute: typeof WantedPartsIndexRoute
   WantedIndexRoute: typeof WantedIndexRoute
+  AuthenticatedDashboardPartsWantedRoute: typeof AuthenticatedDashboardPartsWantedRoute
   ApiAdminCreateUserRoute: typeof ApiAdminCreateUserRoute
   ApiPublicGeoSearchRoute: typeof ApiPublicGeoSearchRoute
   ApiPublicGeocodeRoute: typeof ApiPublicGeocodeRoute
@@ -2226,6 +2279,7 @@ export interface RootRouteChildren {
   ApiPublicHooksDiscoverSyncRoute: typeof ApiPublicHooksDiscoverSyncRoute
   ApiPublicHooksDispatchExpandRoute: typeof ApiPublicHooksDispatchExpandRoute
   ApiPublicHooksOpsAlertsDigestRoute: typeof ApiPublicHooksOpsAlertsDigestRoute
+  ApiPublicHooksPartsWantedDigestRoute: typeof ApiPublicHooksPartsWantedDigestRoute
   ApiPublicHooksRefreshLazadaRoute: typeof ApiPublicHooksRefreshLazadaRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiSellerStaffCreateRoute: typeof ApiSellerStaffCreateRoute
@@ -2508,6 +2562,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WantedIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/wanted-parts/': {
+      id: '/wanted-parts/'
+      path: '/wanted-parts'
+      fullPath: '/wanted-parts/'
+      preLoaderRoute: typeof WantedPartsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/shop/': {
       id: '/shop/'
       path: '/shop'
@@ -2562,6 +2623,13 @@ declare module '@tanstack/react-router' {
       path: '/wanted/$id'
       fullPath: '/wanted/$id'
       preLoaderRoute: typeof WantedIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/wanted-parts/new': {
+      id: '/wanted-parts/new'
+      path: '/wanted-parts/new'
+      fullPath: '/wanted-parts/new'
+      preLoaderRoute: typeof WantedPartsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/support_/selling': {
@@ -3327,6 +3395,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRedemptionsStaffIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_authenticated/dashboard/parts-wanted': {
+      id: '/_authenticated/dashboard/parts-wanted'
+      path: '/dashboard/parts-wanted'
+      fullPath: '/dashboard/parts-wanted'
+      preLoaderRoute: typeof AuthenticatedDashboardPartsWantedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -3430,6 +3505,13 @@ declare module '@tanstack/react-router' {
       path: '/api/public/hooks/refresh-lazada'
       fullPath: '/api/public/hooks/refresh-lazada'
       preLoaderRoute: typeof ApiPublicHooksRefreshLazadaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/parts-wanted-digest': {
+      id: '/api/public/hooks/parts-wanted-digest'
+      path: '/api/public/hooks/parts-wanted-digest'
+      fullPath: '/api/public/hooks/parts-wanted-digest'
+      preLoaderRoute: typeof ApiPublicHooksPartsWantedDigestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/hooks/ops-alerts-digest': {
@@ -3791,13 +3873,17 @@ const rootRouteChildren: RootRouteChildren = {
   SupportBusinessRoute: SupportBusinessRoute,
   SupportBuyingRoute: SupportBuyingRoute,
   SupportSellingRoute: SupportSellingRoute,
+  WantedPartsNewRoute: WantedPartsNewRoute,
   WantedIdRoute: WantedIdRoute,
   WantedNewRoute: WantedNewRoute,
   BusinessesIndexRoute: BusinessesIndexRoute,
   LearnIndexRoute: LearnIndexRoute,
   RidesIndexRoute: RidesIndexRoute,
   ShopIndexRoute: ShopIndexRoute,
+  WantedPartsIndexRoute: WantedPartsIndexRoute,
   WantedIndexRoute: WantedIndexRoute,
+  AuthenticatedDashboardPartsWantedRoute:
+    AuthenticatedDashboardPartsWantedRoute,
   ApiAdminCreateUserRoute: ApiAdminCreateUserRoute,
   ApiPublicGeoSearchRoute: ApiPublicGeoSearchRoute,
   ApiPublicGeocodeRoute: ApiPublicGeocodeRoute,
@@ -3811,6 +3897,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksDiscoverSyncRoute: ApiPublicHooksDiscoverSyncRoute,
   ApiPublicHooksDispatchExpandRoute: ApiPublicHooksDispatchExpandRoute,
   ApiPublicHooksOpsAlertsDigestRoute: ApiPublicHooksOpsAlertsDigestRoute,
+  ApiPublicHooksPartsWantedDigestRoute: ApiPublicHooksPartsWantedDigestRoute,
   ApiPublicHooksRefreshLazadaRoute: ApiPublicHooksRefreshLazadaRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiSellerStaffCreateRoute: ApiSellerStaffCreateRoute,
