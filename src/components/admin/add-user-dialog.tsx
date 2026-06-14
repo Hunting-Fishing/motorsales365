@@ -406,6 +406,7 @@ export function AddUserDialog({
             {submitting ? "Creating…" : "Create user"}
           </Button>
         </DialogFooter>
+        </TooltipProvider>
       </DialogContent>
     </Dialog>
   );
