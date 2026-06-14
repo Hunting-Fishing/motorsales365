@@ -184,6 +184,16 @@ export function EmailRoutingPanel() {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <Button size="sm" variant="outline" asChild>
+            <a
+              href="https://dash.cloudflare.com/?to=/:account/365motorsales.com/email/routing/routes"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <ExternalLink className="mr-1 h-4 w-4" />
+              Cloudflare Routing
+            </a>
+          </Button>
           <Button size="sm" variant="outline" onClick={load} disabled={loading}>
             <RefreshCw className={`mr-1 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
             Refresh
@@ -192,6 +202,16 @@ export function EmailRoutingPanel() {
             <Plus className="mr-1 h-4 w-4" />
             Add route
           </Button>
+        </div>
+      </div>
+
+      <div className="mb-3 flex gap-2 rounded-md bg-muted/50 p-2.5 text-xs text-muted-foreground">
+        <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
+        <div>
+          This is a local <strong>registry</strong> of who-mails-where. Real inbound routing for
+          <code className="mx-1">@365motorsales.com</code> lives in Cloudflare — editing rows
+          here does <strong>not</strong> redirect mail. Use the{" "}
+          <strong>Cloudflare Routing</strong> button to manage the actual rules.
         </div>
       </div>
 
