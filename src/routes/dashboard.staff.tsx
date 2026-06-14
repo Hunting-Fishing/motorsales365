@@ -214,6 +214,7 @@ function AddStaffDialog({
             <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
         </div>
+        <div className="pt-2"><FormFeedbackLink formId="staff-create" /></div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={submitting}>Cancel</Button>
           <Button onClick={submit} disabled={submitting || username.trim().length < 2 || password.length < 8}>
