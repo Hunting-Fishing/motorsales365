@@ -322,6 +322,9 @@ export function PartsWizard() {
               )}
             </Button>
           </div>
+          <div className="flex justify-end pt-1">
+            <FormFeedbackLink formId="parts-wizard" />
+          </div>
         </div>
       )}
 
