@@ -1,35 +1,56 @@
 ## Goal
 
-Replace the single "Full name" field on the admin Add User dialog with two fields — **First name** and **Last name** — wherever the dialog is used (365 Staff and the general admin Users page). No changes to the two-account model: Billy gets two unrelated accounts under two different emails (e.g. `billy.b@365motorsales.com` for staff, his personal email for personal use), and he signs out / signs in to switch.
+Make the **Create Employee** dialog on `/admin/staff-365` self-explanatory by adding small info `(?)` icons (tooltips) and one inline help banner that answer the recurring questions:
 
-## Confirmation-email behavior (no change needed)
+- Will a confirmation email be sent? (No.)
+- How does the employee log in? (Email + the shown temp password.)
+- Will the new `@365motorsales.com` address receive mail automatically? (No — Cloudflare routing rule is required first.)
+- What's the temp password for / how is it shared?
+- What do the roles mean?
 
-The admin Create User route (`src/routes/api/admin/create-user.tsx`) already calls `auth.admin.createUser` with `email_confirm: true`, so creating `billy.b@365motorsales.com` will **not** send a confirmation email — the account is pre-verified and ready to sign in with the temporary password.
+No backend changes. Pure UX clarity on a form that's currently silent about all of this.
 
 ## Changes
 
-### 1. `src/components/admin/add-user-dialog.tsx`
-- Replace `fullName` state with `firstName` and `lastName` state.
-- Replace the single "Full name *" input with two side-by-side inputs: **First name *** and **Last name *** (grid `grid-cols-2 gap-3`).
-- Validation: require both first and last to be non-empty.
-- On submit, send `full_name: \`${firstName.trim()} ${lastName.trim()}\`` to `/api/admin/create-user` so the backend, profile row, and `user_metadata.full_name` keep working unchanged.
-- Reset both fields in `reset()`.
+### `src/components/admin/add-user-dialog.tsx`
 
-### 2. No backend changes
-The API route and profile schema continue to store `full_name`. First/Last is purely a UI concern for now.
+1. **Add a Tooltip helper** at the top of the file: small `<InfoTip>` component wrapping shadcn `Tooltip` + a `lucide-react` `Info` icon (h-3.5 w-3.5, muted-foreground). Used inline next to field labels.
 
-### 3. No other call sites need updating
-`AddUserDialog` is used by `src/routes/admin.staff-365.tsx` and the general admin users page; both consume it as a black box with `onCreated` only, so the split is transparent to them.
+2. **Dialog description (top of dialog)** — replace the generic line with a 2-line summary:
+   - "Creates a fully-active account. The employee can sign in immediately — no confirmation email is sent."
+   - "Outbound mail from the app uses **notify.365motorsales.com**. Inbound mail to this address needs a Cloudflare routing rule (see Email Routing tab)."
+   - Render the second line in a small `bg-muted/40 rounded-md p-2 text-xs` callout with an `Info` icon, only when `enforceDomain` is set (staff context).
 
-## Out of scope (per your choice "C")
+3. **Per-field info icons** (add `<InfoTip>` next to these labels):
+   - **Email** — "Used both for sign-in and as the From-recipient address on app emails. For `@365motorsales.com` addresses, make sure a Cloudflare routing rule exists, otherwise the employee can't receive any mail (including password resets)."
+   - **First name / Last name** — "Shown across the admin UI and used in email greetings."
+   - **Temporary password** — "One-time password. Share it through a secure channel (Signal, password manager, in person). The employee should change it at first sign-in."
+   - **Roles** — "Adds extra capabilities on top of the base `user` role. `admin` = full access; `moderator` = listings/users moderation; `support` = tickets; `sales` = leads; `advertising` = ad inquiries."
 
-- No `linked_user_id` or account-switcher UI.
-- No "act as personal seller" mode on the staff account.
-- Billy will just have two separate accounts; to swap he signs out and signs in with the other email.
+4. **Staff-domain reminder** (existing "Email must end with @365motorsales.com" text) — keep, but upgrade to include an inline link:
+   - "Don't forget to add a Cloudflare Email Routing rule for this address (and a row in the **Email Routing** tab) before sharing it." The "Email Routing" words link to `/admin/staff-365?tab=routing` (`Link` from `@tanstack/react-router`).
+
+5. **Success toast** (after `Create user`) — append: "Add a Cloudflare routing rule for this address so they can receive mail." (Only when `enforceDomain` is set.)
+
+### `src/routes/admin.staff-365.tsx`
+
+- Read the `tab` search param on mount and pass it as `defaultValue` / controlled `value` to `<Tabs>` so the deep-link from the dialog lands on the Email Routing tab. Minimal change: use `useSearch({ strict: false })` + a small `useState` synced with it.
+
+### Tooltip dependency
+
+`@/components/ui/tooltip` already exists (shadcn). No new deps. Wrap the dialog content in a `<TooltipProvider>` if not already provided higher up.
+
+## Out of scope
+
+- No changes to actual Cloudflare routing — that stays in the Cloudflare dashboard.
+- No webmail/inbox UI inside the app.
+- No changes to `/api/admin/create-user` or the email infra.
+- No changes to the general (non-staff) `AddUserDialog` consumers beyond the same tooltips (they get the same `InfoTip` icons; the routing callout only shows when `enforceDomain` is set, so non-staff usage is unaffected visually).
 
 ## Acceptance
 
-- Opening "Create Employee" on `/admin/staff-365` shows First name and Last name side by side instead of one Full name field.
-- Submitting with "Billy" + "Bailey" creates the user with `full_name = "Billy Bailey"` in `profiles` and in auth metadata.
-- Creating `billy.b@365motorsales.com` produces no confirmation email and the account can sign in immediately with the shown temp password.
-- The general admin Add User dialog (non-staff) shows the same split.
+- Opening Create Employee shows an Info callout explaining outbound vs inbound mail.
+- Each labeled field has a `(?)` icon that reveals a tooltip with the explanations above.
+- The `@365motorsales.com` reminder includes a clickable link that opens the Email Routing tab.
+- The success toast reminds the admin to add the Cloudflare rule.
+- No backend/API changes; existing create flow still works.
