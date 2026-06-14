@@ -327,6 +327,7 @@ function ProfilePage() {
             </p>
           </div>
         )}
+        <FormFeedbackLink formId="profile-edit" className="mt-2" />
         <Button onClick={save} disabled={saving}>
           {saving ? "Saving…" : "Save profile"}
         </Button>
