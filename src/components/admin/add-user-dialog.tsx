@@ -83,7 +83,8 @@ export function AddUserDialog({
   };
 
   const submit = async () => {
-    if (!email || !fullName || !password) {
+    const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+    if (!email || !firstName.trim() || !lastName.trim() || !password) {
       toast.error("Fill all required fields");
       return;
     }
@@ -102,7 +103,7 @@ export function AddUserDialog({
 
       const body: any = {
         email: email.trim().toLowerCase(),
-        full_name: fullName.trim(),
+        full_name: fullName,
         password,
         account_type: accountType,
         roles: accountType === "staff" ? roles : [],
