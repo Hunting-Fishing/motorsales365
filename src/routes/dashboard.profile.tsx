@@ -360,6 +360,7 @@ function ProfilePage() {
               onChange={(e) => setNewEmail(e.target.value)}
             />
           </div>
+          <FormFeedbackLink formId="profile-email-change" />
           <Button type="submit" variant="secondary" disabled={emailSubmitting}>
             {emailSubmitting ? "Sending…" : "Send confirmation links"}
           </Button>
