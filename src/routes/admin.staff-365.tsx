@@ -115,7 +115,7 @@ function Staff365Page() {
         </p>
       </div>
 
-      <Tabs defaultValue={useSearch({ from: "/admin/staff-365" }).tab}>
+      <Tabs defaultValue={initialTab}>
         <TabsList>
           <TabsTrigger value="staff">Staff</TabsTrigger>
           <TabsTrigger value="routing">Email Routing</TabsTrigger>
