@@ -144,6 +144,7 @@ function QuoteDialog({
             />
           </div>
         </div>
+        <div className="pt-1"><FormFeedbackLink formId="quote-request" /></div>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)}>Cancel</Button>
           <Button onClick={submit} disabled={submitting}>
