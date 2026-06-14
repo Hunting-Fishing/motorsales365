@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useSearch } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Copy, Eye, Power, RefreshCw, ShieldOff } from "lucide-react";
@@ -26,11 +26,15 @@ const SUPER_ADMIN_EMAIL = "jordilwbailey@gmail.com";
 const STAFF_DOMAIN = "@365motorsales.com";
 
 export const Route = createFileRoute("/admin/staff-365")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    tab: s.tab === "routing" ? ("routing" as const) : ("staff" as const),
+  }),
   component: Staff365Page,
 });
 
 function Staff365Page() {
   const { user, loading: authLoading } = useAuth();
+  const { tab: initialTab } = useSearch({ from: "/admin/staff-365" });
   const isSuperAdmin = (user?.email ?? "").toLowerCase() === SUPER_ADMIN_EMAIL;
   const fetchStaff = useServerFn(listStaff365);
   const toggleDisabled = useServerFn(setStaff365Disabled);
@@ -111,7 +115,7 @@ function Staff365Page() {
         </p>
       </div>
 
-      <Tabs defaultValue="staff">
+      <Tabs defaultValue={initialTab}>
         <TabsList>
           <TabsTrigger value="staff">Staff</TabsTrigger>
           <TabsTrigger value="routing">Email Routing</TabsTrigger>

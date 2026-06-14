@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
-import { Copy, RefreshCw, UserPlus } from "lucide-react";
+import { Copy, Info, RefreshCw, UserPlus } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,10 +22,45 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 
 type StaffRole = "admin" | "moderator" | "support" | "sales" | "advertising";
 const STAFF_ROLES: StaffRole[] = ["admin", "moderator", "support", "sales", "advertising"];
+
+function InfoTip({ children }: { children: ReactNode }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-label="More info"
+          className="inline-flex items-center text-muted-foreground hover:text-foreground"
+        >
+          <Info className="h-3.5 w-3.5" aria-hidden="true" />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent className="max-w-xs text-xs leading-relaxed">
+        {children}
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+function LabelWithTip({ children, tip }: { children: ReactNode; tip: ReactNode }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <Label>{children}</Label>
+      <InfoTip>{tip}</InfoTip>
+    </div>
+  );
+}
 
 function generatePassword(len = 16) {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%";
@@ -127,6 +163,9 @@ export function AddUserDialog({
         return;
       }
       toast.success(`User created. Temp password: ${password}`, { duration: 12000 });
+      if (enforceDomain) {
+        toast.message("Don't forget to add a Cloudflare Email Routing rule for this address so they can receive mail.", { duration: 14000 });
+      }
       onCreated?.();
       setOpen(false);
       reset();
@@ -150,17 +189,40 @@ export function AddUserDialog({
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg">
+        <TooltipProvider delayDuration={150}>
         <DialogHeader>
           <DialogTitle>Add a new user</DialogTitle>
           <DialogDescription>
-            Creates a fully-active account in the database with the chosen roles. They can sign in
-            immediately with the temporary password.
+            Creates a fully-active account. The employee can sign in immediately —
+            no confirmation email is sent.
           </DialogDescription>
         </DialogHeader>
 
+        {enforceDomain && (
+          <div className="flex gap-2 rounded-md bg-muted/50 p-2.5 text-xs text-muted-foreground">
+            <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
+            <div>
+              Outbound mail from the app sends via <strong>notify.365motorsales.com</strong>.
+              Inbound mail to a new <strong>{enforceDomain}</strong> address needs a Cloudflare
+              routing rule — otherwise even the password-reset email can't be delivered.
+            </div>
+          </div>
+        )}
+
         <div className="space-y-3">
           <div className="grid gap-2">
-            <Label>Email *</Label>
+            <LabelWithTip
+              tip={
+                <>
+                  Used for sign-in and as the recipient address for app-generated emails
+                  (password reset, notifications). For <code>@365motorsales.com</code>
+                  addresses, ensure a Cloudflare Email Routing rule exists so mail
+                  actually reaches a real inbox.
+                </>
+              }
+            >
+              Email *
+            </LabelWithTip>
             <Input
               type="email"
               value={email}
@@ -170,7 +232,9 @@ export function AddUserDialog({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-2">
-              <Label>First name *</Label>
+              <LabelWithTip tip="Shown across the admin UI and used in email greetings.">
+                First name *
+              </LabelWithTip>
               <Input
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
@@ -178,7 +242,9 @@ export function AddUserDialog({
               />
             </div>
             <div className="grid gap-2">
-              <Label>Last name *</Label>
+              <LabelWithTip tip="Shown across the admin UI and used in email greetings.">
+                Last name *
+              </LabelWithTip>
               <Input
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
@@ -187,7 +253,11 @@ export function AddUserDialog({
             </div>
           </div>
           <div className="grid gap-2">
-            <Label>Temporary password *</Label>
+            <LabelWithTip
+              tip="One-time password. Share through a secure channel (Signal, password manager, in person). The employee should change it at first sign-in."
+            >
+              Temporary password *
+            </LabelWithTip>
             <div className="flex gap-2">
               <Input
                 value={password}
@@ -229,13 +299,34 @@ export function AddUserDialog({
           )}
           {enforceDomain && (
             <p className="text-xs text-muted-foreground">
-              Email must end with <strong>{enforceDomain}</strong>.
+              Email must end with <strong>{enforceDomain}</strong>. Add a matching rule in the{" "}
+              <Link
+                to="/admin/staff-365"
+                search={{ tab: "routing" } as any}
+                className="font-medium text-primary underline-offset-2 hover:underline"
+              >
+                Email Routing
+              </Link>{" "}
+              tab and in Cloudflare before sharing.
             </p>
           )}
 
+
           {accountType === "staff" ? (
             <div className="grid gap-2">
-              <Label>Roles (in addition to base user)</Label>
+              <LabelWithTip
+                tip={
+                  <ul className="ml-3 list-disc space-y-0.5">
+                    <li><strong>admin</strong> — full access to everything.</li>
+                    <li><strong>moderator</strong> — listings &amp; users moderation.</li>
+                    <li><strong>support</strong> — handle support tickets.</li>
+                    <li><strong>sales</strong> — leads &amp; sales pipeline.</li>
+                    <li><strong>advertising</strong> — ad inquiries.</li>
+                  </ul>
+                }
+              >
+                Roles (in addition to base user)
+              </LabelWithTip>
               <div className="flex flex-wrap gap-1.5">
                 {STAFF_ROLES.map((r) => {
                   const on = roles.includes(r);
@@ -315,6 +406,7 @@ export function AddUserDialog({
             {submitting ? "Creating…" : "Create user"}
           </Button>
         </DialogFooter>
+        </TooltipProvider>
       </DialogContent>
     </Dialog>
   );
