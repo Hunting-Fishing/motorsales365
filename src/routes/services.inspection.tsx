@@ -402,6 +402,7 @@ function InspectionPage() {
               </p>
             )}
 
+            <FormFeedbackLink formId="inspection-request" className="mb-1" />
             <Button type="submit" size="lg" className="w-full" disabled={submitting}>
               {submitting ? "Submitting…" : user ? "Submit request" : "Sign in & submit"}
             </Button>
