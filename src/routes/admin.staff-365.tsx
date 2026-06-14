@@ -26,6 +26,9 @@ const SUPER_ADMIN_EMAIL = "jordilwbailey@gmail.com";
 const STAFF_DOMAIN = "@365motorsales.com";
 
 export const Route = createFileRoute("/admin/staff-365")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    tab: s.tab === "routing" ? ("routing" as const) : ("staff" as const),
+  }),
   component: Staff365Page,
 });
 
