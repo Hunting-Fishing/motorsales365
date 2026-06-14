@@ -836,6 +836,7 @@ function TowProviderDashboard() {
               />
             </div>
           </div>
+          <div className="pt-2"><FormFeedbackLink formId="tow-bid" /></div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setBidTarget(null)} disabled={bidSubmitting}>
               Cancel
