@@ -2918,6 +2918,45 @@ export type Database = {
         }
         Relationships: []
       }
+      form_feedback: {
+        Row: {
+          contact_email: string | null
+          created_at: string
+          form_id: string
+          id: string
+          message: string
+          page_path: string | null
+          status: string
+          suggestion_type: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          contact_email?: string | null
+          created_at?: string
+          form_id: string
+          id?: string
+          message: string
+          page_path?: string | null
+          status?: string
+          suggestion_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          contact_email?: string | null
+          created_at?: string
+          form_id?: string
+          id?: string
+          message?: string
+          page_path?: string | null
+          status?: string
+          suggestion_type?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       inspection_orders: {
         Row: {
           buyer_id: string

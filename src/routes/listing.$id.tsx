@@ -36,6 +36,7 @@ import { NeededPartsRail } from "@/components/listing/needed-parts-rail";
 import { GalleryLightbox } from "@/components/listing/gallery-lightbox";
 import { MobileActionBar } from "@/components/listing/mobile-action-bar";
 import { ListingReportsSection } from "@/components/listing/listing-reports-section";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { ListingWantedBadge } from "@/components/parts-wanted/wanted-badge";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -792,6 +793,9 @@ function ListingDetailPage() {
                       placeholder="Tell us more…"
                     />
                   </div>
+                </div>
+                <div className="mt-3 border-t border-border pt-3">
+                  <FormFeedbackLink formId="report-listing" />
                 </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setReportOpen(false)}>
