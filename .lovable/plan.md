@@ -1,34 +1,47 @@
-## Goal
+# Admin Reports — full upgrade
 
-Add a **"Open Cloudflare Email Routing"** button to the Email Routing panel header on `/admin/staff-365?tab=routing` so admins can jump straight to the actual routing config (the source of truth for inbound mail) without hunting through Cloudflare.
+## Why this is needed
 
-Also add a one-paragraph info banner clarifying that this in-app panel is a **registry** of what's configured in Cloudflare — editing rows here does not change real routing.
+The report form already captures category, target type, target URL, evidence files, and reporter contact — but `admin.reports.tsx` only renders `reason` and `details`, so the admin sees almost nothing. That's why "the reported ad did not tell the admin what the problem was."
 
-## Changes
+We'll also add reporter counters and a fraud-signal panel (duplicate photos, duplicate posts, repeat sellers, repeat reporters, scam keywords).
 
-### `src/components/admin/email-routing-panel.tsx`
+## Schema (already approved & applied)
 
-1. **Header strip** (above the existing filter row): a small info callout —
-   - Icon: `Info` from `lucide-react`.
-   - Text: "This is a local registry of who-mails-where. Real inbound routing for `@365motorsales.com` lives in Cloudflare — changes here do not redirect mail. Use the button to manage the actual rules."
-   - Styling: `flex gap-2 rounded-md bg-muted/50 p-2.5 text-xs text-muted-foreground`.
+- `reports`: add `resolution` ('accepted'|'dismissed'), `resolved_by`, `resolved_at`, `signals jsonb`
+- `listing_media`: add `phash`, `file_sha256` (nullable; future-fill)
+- Indexes on the new columns
 
-2. **"Open Cloudflare Email Routing" button**, placed inline with the existing Refresh / Add buttons in the panel header:
-   - shadcn `Button` size `sm`, variant `outline`.
-   - Icon: `ExternalLink` (lucide).
-   - Wraps an `<a>` with `href="https://dash.cloudflare.com/?to=/:account/365motorsales.com/email/routing/routes"` (Cloudflare resolves `:account` after login), `target="_blank"`, `rel="noopener noreferrer"`.
-   - Label: "Cloudflare Routing".
+## Admin Reports page — what each card will show
 
-3. Existing "Add route" / "Refresh" buttons are untouched.
+1. **Header row** — status, target type, category badge, created date
+2. **Target** — link to listing (existing) OR `target_url` for business/seller/other reports
+3. **Reporter** — name / email / phone if provided, or "Signed-in user" link with profile, or "Anonymous"
+4. **Counters chip on reporter** — Total · Open · Resolved · Accepted · Dismissed (click → filter list by this reporter)
+5. **Details** — the full free-text from the reporter (already there but unstyled)
+6. **Evidence gallery** — thumbnails (images) + download links (PDFs), fetched via short-lived signed URLs from the private `report-evidence` bucket
+7. **Signals panel** (lazy-loaded per card on expand):
+   - Duplicate photos: other listings sharing image sha or storage path
+   - Duplicate posts: same title from a different seller in last 90 days
+   - Seller prior reports: total + accepted count
+   - Reporter history: total / accepted / dismissed (abuse detection)
+   - Scam keyword hits: Western Union, crypto, off-platform contact, deposit pressure, gift cards, overseas/shipping
+8. **Actions** — Hide listing / Delete / Resolve as Accepted / Resolve as Dismissed / Publish public summary (existing)
 
-### Out of scope
+`Accepted` and `Dismissed` are stored on `reports.resolution` going forward; old resolved rows show as "Resolved" without a sub-label.
 
-- No API call into Cloudflare (would require an API token + secret + edge function — separate decision).
-- No webmail / inbox UI inside the app.
-- No changes to `email_routes` schema or data.
+## New / changed files
 
-## Acceptance
+- `src/lib/admin-reports.functions.ts` *(new)* — `getReportSignals`, `getReporterCounts`, `setReportResolution`, `getReportEvidenceUrls` (all gated by `requireDomainRole("moderator", ...)`)
+- `src/components/admin/report-card.tsx` *(new)* — the rebuilt card UI
+- `src/components/admin/report-signals.tsx` *(new)* — collapsible signals strip
+- `src/routes/admin.reports.tsx` — switch list rendering to the new card; add `?reporter=<id>` filter
+- `src/routes/report.tsx` — no change (it already captures everything)
 
-- Visiting `/admin/staff-365?tab=routing` shows an info callout explaining the registry-vs-Cloudflare distinction.
-- A "Cloudflare Routing" button in the header opens `dash.cloudflare.com/.../email/routing/routes` in a new tab.
-- All existing routing-panel functionality (filter, search, add, edit, delete) still works.
+## Out of scope (called out, not built)
+
+- Real perceptual-hash backfill of historical images (worker job) — exact-hash dedupe ships now, pHash column is ready for later
+- Auto-suspend sellers above N accepted reports — leave manual
+- "Smart" image similarity (CLIP / vector search) — future enhancement
+
+Approve to switch into build mode and ship.
