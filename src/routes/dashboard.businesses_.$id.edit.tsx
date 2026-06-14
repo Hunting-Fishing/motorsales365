@@ -1695,7 +1695,8 @@ function LocationTab({ biz, onSaved }: { biz: any; onSaved: () => void }) {
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <FormFeedbackLink formId="business-edit-location" />
         <Button onClick={handleSave} disabled={saving}>
           {saving ? "Saving…" : "Save location"}
         </Button>
