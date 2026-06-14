@@ -168,13 +168,23 @@ export function AddUserDialog({
               placeholder="user@example.com"
             />
           </div>
-          <div className="grid gap-2">
-            <Label>Full name *</Label>
-            <Input
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Jane Doe"
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="grid gap-2">
+              <Label>First name *</Label>
+              <Input
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="Billy"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label>Last name *</Label>
+              <Input
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Bailey"
+              />
+            </div>
           </div>
           <div className="grid gap-2">
             <Label>Temporary password *</Label>
