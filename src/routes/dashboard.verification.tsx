@@ -391,9 +391,12 @@ function VerificationPage() {
         </div>
 
         {canEdit && (
-          <Button onClick={submit} disabled={submitting}>
-            {submitting ? "Submitting…" : request ? "Resubmit application" : "Submit for review"}
-          </Button>
+          <>
+            <FormFeedbackLink formId="seller-verification" />
+            <Button onClick={submit} disabled={submitting}>
+              {submitting ? "Submitting…" : request ? "Resubmit application" : "Submit for review"}
+            </Button>
+          </>
         )}
       </div>
     </div>
