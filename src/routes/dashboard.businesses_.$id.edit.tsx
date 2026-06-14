@@ -527,7 +527,8 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
       })}
 
 
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <FormFeedbackLink formId="business-edit-tags" />
         <Button onClick={save} disabled={saving}>
           {saving ? "Saving…" : "Save tags"}
         </Button>
