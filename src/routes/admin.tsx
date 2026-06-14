@@ -315,6 +315,8 @@ function AdminLayout() {
     };
   }, [user, isAdmin, is365Staff]);
 
+  const { data: pendingCounts } = useAdminPendingCounts(hasAccess);
+
   useEffect(() => {
     if (loading) return;
     if (!user) navigate({ to: "/login" });
@@ -356,7 +358,7 @@ function AdminLayout() {
       ? myRoles[0][0].toUpperCase() + myRoles[0].slice(1)
       : "Staff";
 
-  const { data: pendingCounts } = useAdminPendingCounts(hasAccess);
+
 
   return (
     <SiteLayout>
