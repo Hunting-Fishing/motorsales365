@@ -319,6 +319,7 @@ export function ClaimStatusSection({ businessId }: { businessId: string }) {
               />
             </div>
           </div>
+          <div className="pt-2"><FormFeedbackLink formId="business-claim-resubmit" /></div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditOpen(false)} disabled={busy}>
               Cancel
