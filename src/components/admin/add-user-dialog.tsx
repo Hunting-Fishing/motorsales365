@@ -189,17 +189,40 @@ export function AddUserDialog({
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-lg">
+        <TooltipProvider delayDuration={150}>
         <DialogHeader>
           <DialogTitle>Add a new user</DialogTitle>
           <DialogDescription>
-            Creates a fully-active account in the database with the chosen roles. They can sign in
-            immediately with the temporary password.
+            Creates a fully-active account. The employee can sign in immediately —
+            no confirmation email is sent.
           </DialogDescription>
         </DialogHeader>
 
+        {enforceDomain && (
+          <div className="flex gap-2 rounded-md bg-muted/50 p-2.5 text-xs text-muted-foreground">
+            <Info className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" aria-hidden="true" />
+            <div>
+              Outbound mail from the app sends via <strong>notify.365motorsales.com</strong>.
+              Inbound mail to a new <strong>{enforceDomain}</strong> address needs a Cloudflare
+              routing rule — otherwise even the password-reset email can't be delivered.
+            </div>
+          </div>
+        )}
+
         <div className="space-y-3">
           <div className="grid gap-2">
-            <Label>Email *</Label>
+            <LabelWithTip
+              tip={
+                <>
+                  Used for sign-in and as the recipient address for app-generated emails
+                  (password reset, notifications). For <code>@365motorsales.com</code>
+                  addresses, ensure a Cloudflare Email Routing rule exists so mail
+                  actually reaches a real inbox.
+                </>
+              }
+            >
+              Email *
+            </LabelWithTip>
             <Input
               type="email"
               value={email}
@@ -209,7 +232,9 @@ export function AddUserDialog({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-2">
-              <Label>First name *</Label>
+              <LabelWithTip tip="Shown across the admin UI and used in email greetings.">
+                First name *
+              </LabelWithTip>
               <Input
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
@@ -217,7 +242,9 @@ export function AddUserDialog({
               />
             </div>
             <div className="grid gap-2">
-              <Label>Last name *</Label>
+              <LabelWithTip tip="Shown across the admin UI and used in email greetings.">
+                Last name *
+              </LabelWithTip>
               <Input
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
@@ -226,7 +253,11 @@ export function AddUserDialog({
             </div>
           </div>
           <div className="grid gap-2">
-            <Label>Temporary password *</Label>
+            <LabelWithTip
+              tip="One-time password. Share through a secure channel (Signal, password manager, in person). The employee should change it at first sign-in."
+            >
+              Temporary password *
+            </LabelWithTip>
             <div className="flex gap-2">
               <Input
                 value={password}
@@ -268,9 +299,18 @@ export function AddUserDialog({
           )}
           {enforceDomain && (
             <p className="text-xs text-muted-foreground">
-              Email must end with <strong>{enforceDomain}</strong>.
+              Email must end with <strong>{enforceDomain}</strong>. Add a matching rule in the{" "}
+              <Link
+                to="/admin/staff-365"
+                search={{ tab: "routing" } as any}
+                className="font-medium text-primary underline-offset-2 hover:underline"
+              >
+                Email Routing
+              </Link>{" "}
+              tab and in Cloudflare before sharing.
             </p>
           )}
+
 
           {accountType === "staff" ? (
             <div className="grid gap-2">
