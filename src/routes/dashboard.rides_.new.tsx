@@ -100,6 +100,7 @@ function NewRidePage() {
           placeholder="e.g. Type R, Sport, GR"
         />
       </div>
+      <FormFeedbackLink formId="ride-create" />
       <div className="flex justify-end gap-2">
         <Button type="submit" disabled={busy}>
           {busy ? "Creating…" : "Create ride"}
