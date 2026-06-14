@@ -44,11 +44,13 @@ export function createStripeClient(env: StripeEnv): Stripe {
 
 const ALLOWED_RETURN_ORIGINS = new Set<string>([
   "https://www.365motorsales.com",
-  "https://www.365motorsales.com",
+  "https://365motorsales.com",
   "https://motorsales365.lovable.app",
   "https://id-preview--0738c881-614d-4885-8d75-1b7c90e0835e.lovable.app",
   "https://project--0738c881-614d-4885-8d75-1b7c90e0835e.lovable.app",
   "https://project--0738c881-614d-4885-8d75-1b7c90e0835e-dev.lovable.app",
+  "https://localhost:8080",
+  "http://localhost:8080",
 ]);
 
 /**
