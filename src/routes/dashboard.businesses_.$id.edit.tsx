@@ -1878,6 +1878,7 @@ function VanitySlugField({
           </Button>
         )}
       </div>
+      <FormFeedbackLink formId="business-edit-vanity" className="pt-1" />
       <p className="text-[11px] text-muted-foreground">
         Canonical permalink: <span className="font-mono">/businesses/{currentSlug}</span> (old links
         keep working).
