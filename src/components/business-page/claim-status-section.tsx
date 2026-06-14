@@ -23,6 +23,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -318,6 +319,7 @@ export function ClaimStatusSection({ businessId }: { businessId: string }) {
               />
             </div>
           </div>
+          <div className="pt-2"><FormFeedbackLink formId="business-claim-resubmit" /></div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditOpen(false)} disabled={busy}>
               Cancel

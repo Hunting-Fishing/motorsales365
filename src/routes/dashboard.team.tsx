@@ -15,6 +15,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { Building2, Users, Inbox, BarChart3, Plus } from "lucide-react";
 import { toast } from "sonner";
 
@@ -155,6 +156,7 @@ function CreateOrgDialog({
             if (e.key === "Enter") submit();
           }}
         />
+        <div className="pt-2"><FormFeedbackLink formId="team-create" /></div>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={creating}>
             Cancel

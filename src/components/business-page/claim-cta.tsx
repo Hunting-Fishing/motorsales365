@@ -13,6 +13,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -127,6 +128,7 @@ export function ClaimCta({
                     />
                   </div>
                 </div>
+                <div className="pt-2"><FormFeedbackLink formId="business-claim" /></div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setOpen(false)} disabled={busy}>
                     Cancel

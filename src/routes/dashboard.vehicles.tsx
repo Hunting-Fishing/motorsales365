@@ -46,6 +46,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import {
   Select,
   SelectContent,
@@ -413,6 +414,7 @@ function VehicleDialog({
               onCheckedChange={(v) => setForm((f) => ({ ...f, isPublic: v }))}
             />
           </div>
+          <div className="pt-2"><FormFeedbackLink formId="vehicle-edit" /></div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel

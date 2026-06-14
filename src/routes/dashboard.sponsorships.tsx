@@ -23,6 +23,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { useAuth } from "@/hooks/use-auth";
 import { InquiryTimeline, type AuditEntry } from "@/components/sponsorship/inquiry-timeline";
 import { supabase } from "@/integrations/supabase/client";
@@ -395,6 +396,7 @@ function SponsorshipsPage() {
               </div>
             </div>
           )}
+          <div className="pt-2"><FormFeedbackLink formId="sponsorship-submit" /></div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditing(null)} disabled={saving}>
               Cancel

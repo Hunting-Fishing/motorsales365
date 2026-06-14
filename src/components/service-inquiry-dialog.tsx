@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -202,6 +203,7 @@ export function ServiceInquiryDialog({ inquiryType, listingId, vehicleSummary, c
               onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
             />
           </div>
+          <div className="pt-1"><FormFeedbackLink formId="service-inquiry" /></div>
           <DialogFooter className="gap-2 sm:gap-2">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel

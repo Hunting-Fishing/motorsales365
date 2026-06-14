@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { X } from "lucide-react";
 import { createPartQuoteRequest } from "@/lib/parts-fulfillment.functions";
 import { useAuth } from "@/hooks/use-auth";
+import { FormFeedbackLink } from "@/components/form-feedback";
 
 export type QuoteItem = {
   kind: "catalog" | "custom";
@@ -155,6 +156,7 @@ export function PartQuoteDialog({
           <p className="text-[11px] text-muted-foreground">
             No payment now — we'll send a quote with parts options and pricing first.
           </p>
+          <div className="pt-1"><FormFeedbackLink formId="part-quote-request" /></div>
           <div className="flex justify-end gap-2 pt-1">
             <button
               type="button"
