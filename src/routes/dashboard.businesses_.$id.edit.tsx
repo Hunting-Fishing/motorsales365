@@ -864,7 +864,8 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <FormFeedbackLink formId="business-edit-profile" />
         <Button onClick={handleSave} disabled={saving}>
           {saving ? "Saving…" : "Save changes"}
         </Button>
