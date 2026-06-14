@@ -128,6 +128,7 @@ export function ClaimCta({
                     />
                   </div>
                 </div>
+                <div className="pt-2"><FormFeedbackLink formId="business-claim" /></div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setOpen(false)} disabled={busy}>
                     Cancel
