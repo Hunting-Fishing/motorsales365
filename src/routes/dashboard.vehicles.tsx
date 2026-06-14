@@ -705,6 +705,7 @@ function VehicleDetailDialog({
                       />
                     </div>
                   )}
+                  <FormFeedbackLink formId="vehicle-service-record" />
                   <div className="flex justify-end">
                     <Button type="submit" disabled={saving}>
                       {saving ? "Saving…" : "Save record"}
