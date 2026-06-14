@@ -15,6 +15,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { Building2, Users, Inbox, BarChart3, Plus } from "lucide-react";
 import { toast } from "sonner";
 
