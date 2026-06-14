@@ -17,6 +17,7 @@ import {
   updateInquiryStatus,
 } from "@/lib/business-pages.functions";
 import { setVanitySlug } from "@/lib/business-mini-site.functions";
+import { FormFeedbackLink } from "@/components/form-feedback";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
