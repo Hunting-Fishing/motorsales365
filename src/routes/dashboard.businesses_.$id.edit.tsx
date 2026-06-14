@@ -1780,7 +1780,8 @@ function HoursTab({ biz, onSaved }: { biz: any; onSaved: () => void }) {
         </div>
       )}
 
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <FormFeedbackLink formId="business-edit-hours" />
         <Button onClick={save} disabled={saving}>
           {saving ? "Saving…" : "Save hours"}
         </Button>
