@@ -251,6 +251,7 @@ function ImportPage() {
                 "Import listing"
               )}
             </Button>
+            <FormFeedbackLink formId="sell-import-url" />
             <p className="text-xs text-muted-foreground">
               Limit: 10 imports per day. Only your own listings — we verify Facebook profile
               ownership.
