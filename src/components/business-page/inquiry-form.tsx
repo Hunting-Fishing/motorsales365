@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { submitBusinessInquiry } from "@/lib/business-pages.functions";
 import { Button } from "@/components/ui/button";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
