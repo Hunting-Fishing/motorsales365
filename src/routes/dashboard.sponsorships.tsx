@@ -23,6 +23,7 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { useAuth } from "@/hooks/use-auth";
 import { InquiryTimeline, type AuditEntry } from "@/components/sponsorship/inquiry-timeline";
 import { supabase } from "@/integrations/supabase/client";
