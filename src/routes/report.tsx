@@ -394,6 +394,7 @@ function ReportPage() {
                     </div>
                   </div>
 
+                  <FormFeedbackLink formId="report-listing-page" className="mb-2" />
                   <Button type="submit" disabled={submitting} className="w-full sm:w-auto">
                     {submitting ? "Submitting…" : "Submit report"}
                   </Button>
