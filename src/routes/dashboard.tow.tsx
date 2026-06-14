@@ -771,6 +771,7 @@ function TowProviderDashboard() {
             onChange={(e) => setDeclineReason(e.target.value)}
             placeholder="e.g. Out of coverage area, vehicle too heavy for my flatbed, fully booked that day…"
           />
+          <div className="pt-2"><FormFeedbackLink formId="tow-decline" /></div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setDeclineTarget(null)} disabled={declining}>
               Cancel
