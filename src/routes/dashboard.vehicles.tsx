@@ -414,6 +414,7 @@ function VehicleDialog({
               onCheckedChange={(v) => setForm((f) => ({ ...f, isPublic: v }))}
             />
           </div>
+          <div className="pt-2"><FormFeedbackLink formId="vehicle-edit" /></div>
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
