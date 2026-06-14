@@ -350,6 +350,7 @@ export function PassportVerificationSection({ vehicleId }: { vehicleId: string }
               This submission is {existing?.status}. Contact support to make changes.
             </p>
           ) : (
+            <FormFeedbackLink formId="passport-verification" className="mb-2" />
             <div className="flex justify-end">
               <Button type="submit" disabled={saving || uploading}>
                 {saving ? (
