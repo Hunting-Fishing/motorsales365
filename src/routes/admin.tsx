@@ -315,6 +315,8 @@ function AdminLayout() {
     };
   }, [user, isAdmin, is365Staff]);
 
+  const { data: pendingCounts } = useAdminPendingCounts(hasAccess);
+
   useEffect(() => {
     if (loading) return;
     if (!user) navigate({ to: "/login" });
