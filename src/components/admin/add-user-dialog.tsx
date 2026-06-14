@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { toast } from "sonner";
-import { Copy, RefreshCw, UserPlus } from "lucide-react";
+import { Copy, Info, RefreshCw, UserPlus } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,10 +22,45 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 
 type StaffRole = "admin" | "moderator" | "support" | "sales" | "advertising";
 const STAFF_ROLES: StaffRole[] = ["admin", "moderator", "support", "sales", "advertising"];
+
+function InfoTip({ children }: { children: ReactNode }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <button
+          type="button"
+          tabIndex={-1}
+          aria-label="More info"
+          className="inline-flex items-center text-muted-foreground hover:text-foreground"
+        >
+          <Info className="h-3.5 w-3.5" aria-hidden="true" />
+        </button>
+      </TooltipTrigger>
+      <TooltipContent className="max-w-xs text-xs leading-relaxed">
+        {children}
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+function LabelWithTip({ children, tip }: { children: ReactNode; tip: ReactNode }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <Label>{children}</Label>
+      <InfoTip>{tip}</InfoTip>
+    </div>
+  );
+}
 
 function generatePassword(len = 16) {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%";
