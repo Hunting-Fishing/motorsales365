@@ -234,6 +234,7 @@ function NewPartsWantedPage() {
           </select>
         </div>
 
+        <FormFeedbackLink formId="wanted-parts-new" className="mb-1" />
         <button
           type="submit"
           disabled={submitting}
