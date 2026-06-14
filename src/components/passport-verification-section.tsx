@@ -350,20 +350,22 @@ export function PassportVerificationSection({ vehicleId }: { vehicleId: string }
               This submission is {existing?.status}. Contact support to make changes.
             </p>
           ) : (
-            <FormFeedbackLink formId="passport-verification" className="mb-2" />
-            <div className="flex justify-end">
-              <Button type="submit" disabled={saving || uploading}>
-                {saving ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting…
-                  </>
-                ) : existing ? (
-                  "Update & resubmit"
-                ) : (
-                  "Submit for verification"
-                )}
-              </Button>
-            </div>
+            <>
+              <FormFeedbackLink formId="passport-verification" className="mb-2" />
+              <div className="flex justify-end">
+                <Button type="submit" disabled={saving || uploading}>
+                  {saving ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting…
+                    </>
+                  ) : existing ? (
+                    "Update & resubmit"
+                  ) : (
+                    "Submit for verification"
+                  )}
+                </Button>
+              </div>
+            </>
           )}
         </form>
       )}
