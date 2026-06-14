@@ -156,6 +156,7 @@ export function PartQuoteDialog({
           <p className="text-[11px] text-muted-foreground">
             No payment now — we'll send a quote with parts options and pricing first.
           </p>
+          <div className="pt-1"><FormFeedbackLink formId="part-quote-request" /></div>
           <div className="flex justify-end gap-2 pt-1">
             <button
               type="button"
