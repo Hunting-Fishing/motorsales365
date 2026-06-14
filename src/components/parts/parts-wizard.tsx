@@ -10,6 +10,7 @@ import { USED_PARTS_GROUPS } from "@/data/needed-parts-catalog";
 import { CAR_MAKES, getYearOptions, getMakes } from "@/data/vehicles";
 import { searchUsedParts, suggestCatalogParts } from "@/lib/parts-search.functions";
 import { ListingCard, type ListingCardData, type ListingCardBadge } from "@/components/listing-card";
+import { FormFeedbackLink } from "@/components/form-feedback";
 
 type Step = 1 | 2 | 3 | 4;
 type OemPref = "any" | "oem" | "aftermarket";
