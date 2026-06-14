@@ -259,6 +259,7 @@ function AdvertiserPortalPage() {
               </div>
             </div>
           )}
+          <div className="pt-2"><FormFeedbackLink formId="ad-campaign-submit" /></div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
             <Button onClick={save}>{editing?.id ? "Resubmit" : "Submit for review"}</Button>
