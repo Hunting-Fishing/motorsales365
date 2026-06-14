@@ -5,6 +5,7 @@ import { SiteLayout } from "@/components/site-layout";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { submitBusiness } from "@/lib/businesses.functions";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
