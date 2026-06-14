@@ -1217,6 +1217,7 @@ function RatesForm({
           placeholder="e.g. Flatbed available, surcharges for after-hours, accepts GCash…"
         />
       </div>
+      <FormFeedbackLink formId="tow-rates-edit" />
       <Button type="submit" disabled={saving}>
         {saving ? "Saving…" : "Save rates"}
       </Button>
