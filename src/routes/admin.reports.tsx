@@ -73,9 +73,9 @@ function AdminReports() {
   }, [load]);
 
   const setFilter = (f: "open" | "resolved" | "all") =>
-    navigate({ search: (s) => ({ ...s, filter: f }) });
+    navigate({ search: (s: any) => ({ ...s, filter: f }) });
   const setReporter = (id: string | null) =>
-    navigate({ search: (s) => ({ ...s, reporter: id ?? undefined }) });
+    navigate({ search: (s: any) => ({ ...s, reporter: id ?? undefined }) });
 
   return (
     <div>
