@@ -784,6 +784,7 @@ export function TowRequestForm({
             </span>
           </div>
         )}
+        <FormFeedbackLink formId="tow-request" className="mb-1" />
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-xs text-muted-foreground">
             Open requests are routed via the 365 Dispatch network. You'll see responses on your
