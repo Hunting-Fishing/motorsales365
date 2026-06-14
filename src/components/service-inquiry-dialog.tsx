@@ -203,6 +203,7 @@ export function ServiceInquiryDialog({ inquiryType, listingId, vehicleSummary, c
               onChange={(e) => setForm((f) => ({ ...f, message: e.target.value }))}
             />
           </div>
+          <div className="pt-1"><FormFeedbackLink formId="service-inquiry" /></div>
           <DialogFooter className="gap-2 sm:gap-2">
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
               Cancel
