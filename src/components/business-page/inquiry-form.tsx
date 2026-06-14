@@ -99,6 +99,7 @@ export function InquiryForm({
         rows={4}
         required
       />
+      <FormFeedbackLink formId="business-inquiry" />
       <Button type="submit" disabled={sending} className="w-full sm:w-auto">
         <Send className="mr-2 h-4 w-4" />
         {sending ? "Sending…" : "Send inquiry"}
