@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import { SiteLayout } from "@/components/site-layout";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -401,6 +402,7 @@ function InspectionPage() {
               </p>
             )}
 
+            <FormFeedbackLink formId="inspection-request" className="mb-1" />
             <Button type="submit" size="lg" className="w-full" disabled={submitting}>
               {submitting ? "Submitting…" : user ? "Submit request" : "Sign in & submit"}
             </Button>

@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { VehiclePicker } from "@/components/vehicle-picker";
@@ -99,6 +100,7 @@ function NewRidePage() {
           placeholder="e.g. Type R, Sport, GR"
         />
       </div>
+      <FormFeedbackLink formId="ride-create" />
       <div className="flex justify-end gap-2">
         <Button type="submit" disabled={busy}>
           {busy ? "Creating…" : "Create ride"}

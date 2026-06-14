@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { submitBusinessInquiry } from "@/lib/business-pages.functions";
 import { Button } from "@/components/ui/button";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
@@ -98,6 +99,7 @@ export function InquiryForm({
         rows={4}
         required
       />
+      <FormFeedbackLink formId="business-inquiry" />
       <Button type="submit" disabled={sending} className="w-full sm:w-auto">
         <Send className="mr-2 h-4 w-4" />
         {sending ? "Sending…" : "Send inquiry"}

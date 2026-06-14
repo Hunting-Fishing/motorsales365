@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
@@ -225,6 +226,7 @@ function WantedDetail() {
                   placeholder="Phone, Viber, Messenger, or listing link"
                 />
               </div>
+              <FormFeedbackLink formId="wanted-respond" className="mb-1" />
               <div className="flex justify-end">
                 <Button type="submit" disabled={submitting}>
                   {submitting ? "Sending…" : user ? "Send response" : "Sign in to respond"}

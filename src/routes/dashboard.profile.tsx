@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -326,6 +327,7 @@ function ProfilePage() {
             </p>
           </div>
         )}
+        <FormFeedbackLink formId="profile-edit" className="mt-2" />
         <Button onClick={save} disabled={saving}>
           {saving ? "Saving…" : "Save profile"}
         </Button>
@@ -358,6 +360,7 @@ function ProfilePage() {
               onChange={(e) => setNewEmail(e.target.value)}
             />
           </div>
+          <FormFeedbackLink formId="profile-email-change" />
           <Button type="submit" variant="secondary" disabled={emailSubmitting}>
             {emailSubmitting ? "Sending…" : "Send confirmation links"}
           </Button>

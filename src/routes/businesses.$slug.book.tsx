@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { SiteLayout } from "@/components/site-layout";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -321,6 +322,7 @@ function BookingPage() {
                     />
                   </div>
                 </div>
+                <FormFeedbackLink formId="business-booking" className="mt-3" />
                 <div className="mt-4 flex items-center justify-between text-sm">
                   <div className="text-muted-foreground">
                     {item.title} · {new Date(selectedSlot).toLocaleString()}

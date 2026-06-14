@@ -4,6 +4,7 @@ import { z } from "zod";
 import { AlertTriangle, Shield, Upload, X, CheckCircle2 } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -393,6 +394,7 @@ function ReportPage() {
                     </div>
                   </div>
 
+                  <FormFeedbackLink formId="report-listing-page" className="mb-2" />
                   <Button type="submit" disabled={submitting} className="w-full sm:w-auto">
                     {submitting ? "Submitting…" : "Submit report"}
                   </Button>

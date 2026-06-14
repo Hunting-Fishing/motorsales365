@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -1334,6 +1335,7 @@ function EditListingPage() {
             )}
           </section>
 
+          <div className="flex justify-between gap-2"><FormFeedbackLink formId="edit-listing" /></div>
           <div className="flex justify-end gap-2">
             <Button asChild type="button" variant="outline">
               <Link to="/dashboard">Cancel</Link>

@@ -12,6 +12,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { ShieldCheck, Upload, X, Loader2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -349,19 +350,22 @@ export function PassportVerificationSection({ vehicleId }: { vehicleId: string }
               This submission is {existing?.status}. Contact support to make changes.
             </p>
           ) : (
-            <div className="flex justify-end">
-              <Button type="submit" disabled={saving || uploading}>
-                {saving ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting…
-                  </>
-                ) : existing ? (
-                  "Update & resubmit"
-                ) : (
-                  "Submit for verification"
-                )}
-              </Button>
-            </div>
+            <>
+              <FormFeedbackLink formId="passport-verification" className="mb-2" />
+              <div className="flex justify-end">
+                <Button type="submit" disabled={saving || uploading}>
+                  {saving ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Submitting…
+                    </>
+                  ) : existing ? (
+                    "Update & resubmit"
+                  ) : (
+                    "Submit for verification"
+                  )}
+                </Button>
+              </div>
+            </>
           )}
         </form>
       )}

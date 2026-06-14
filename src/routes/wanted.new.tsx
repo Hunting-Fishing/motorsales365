@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -266,6 +267,7 @@ function NewWantedPage() {
             .
           </div>
 
+          <FormFeedbackLink formId="wanted-new" className="mb-1" />
           <div className="flex justify-end gap-2">
             <Button type="button" variant="ghost" asChild>
               <Link to="/wanted">Cancel</Link>
