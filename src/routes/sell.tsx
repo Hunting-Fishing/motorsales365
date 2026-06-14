@@ -1982,6 +1982,7 @@ function SellPage() {
                 Listing publishes after payment is confirmed.
               </div>
             </div>
+            <div className="mb-1"><FormFeedbackLink formId="post-listing" /></div>
             <div className="flex flex-col-reverse gap-2 sm:flex-row">
               <Button asChild type="button" variant="outline" className="w-full sm:w-auto">
                 <Link to="/dashboard">Cancel</Link>
