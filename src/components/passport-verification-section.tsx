@@ -12,6 +12,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { ShieldCheck, Upload, X, Loader2, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
