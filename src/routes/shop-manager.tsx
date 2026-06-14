@@ -10,6 +10,7 @@ import { useShopManagerAccess } from "@/hooks/use-shop-manager-access";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 import { createPortalSession } from "@/utils/payments.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
+import { ShopManagerSecretsDiagnosticCard } from "@/components/shop-manager/secrets-diagnostic-card";
 import { toast } from "sonner";
 
 const TITLE = "Shop Manager — 365 Motor Sales";
@@ -31,7 +32,7 @@ export const Route = createFileRoute("/shop-manager")({
 });
 
 function ShopManagerPage() {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const navigate = useNavigate();
   const access = useShopManagerAccess();
   const { openCheckout, checkoutElement, closeCheckout, isOpen } = useStripeCheckout();
@@ -242,6 +243,8 @@ function ShopManagerPage() {
             .
           </p>
         </section>
+
+        {isAdmin && <ShopManagerSecretsDiagnosticCard />}
 
         {/* Embedded checkout */}
         {isOpen && (

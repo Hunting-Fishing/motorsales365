@@ -1,95 +1,46 @@
-# Shop Manager portal — Phase 1
+# Verify Shop Manager secrets
 
-## Reality check before we start
+You're unsure whether the 3 secrets were entered correctly. Instead of asking you to re-enter them blindly, I'll add a small **admin-only diagnostic** that tests each one and tells you in plain English what's wrong (if anything).
 
-The source project **All Business 365** is huge: ~200 pages, 100+ component folders, 663 migrations, and 20+ verticals (automotive, marine, septic, fuel, welding, etc.). It also lives on its **own Supabase** (`oudkbrnvommbvtuispla`) — two Lovable projects cannot share one Supabase, so "same database" isn't on the table.
+## What the check does
 
-Phase 1 therefore ships a **portal**: this site sells the subscription, writes an entitlement row into the All Business 365 DB, and SSOs the user into the existing deployment (`mainrepairsoftware.lovable.app`). Phases 2+ port the automotive module's tables and screens into this codebase, behind the same subscription gate, so over time users stop being redirected.
+For each secret, it runs a safe, read-only test:
 
-## Phase 1 deliverable (this turn)
+| Secret | Test | Pass = | Fail tells us |
+|---|---|---|---|
+| `SHOP_MANAGER_SUPABASE_URL` | Is it a valid `https://*.supabase.co` URL? | Format is correct | You pasted a key or random string instead of a URL |
+| `SHOP_MANAGER_SUPABASE_SERVICE_ROLE_KEY` | Decode the JWT and check the `role` claim | Claim says `service_role` | You pasted the **anon/publishable** key (claim would say `anon`) or it isn't a JWT at all |
+| `SHOP_MANAGER_SSO_SECRET` | Length + entropy check, and confirm it is NOT identical to the service role key or URL | It's a distinct random string | You reused one of the other two values |
 
-### 1. Pricing + landing
-- New public route `/shop-manager` — value prop, screenshots, plan cards.
-- New Stripe product **Shop Manager** with prices `shop_manager_solo_monthly` and `shop_manager_pro_monthly` (created via the payments tool; amounts/currency confirmed with you before creation).
-- Reuses the existing embedded checkout flow (`StripeEmbeddedCheckout`) — no new payment plumbing.
+Then it does **one live call** to the partner backend: `auth.admin.listUsers({ perPage: 1 })`. If the URL + service role key are a matching valid pair, this returns `200 OK` with a user count. If not, the partner returns `401/403` and we surface the exact message.
 
-### 2. Subscription record + gate (this DB)
-- New table `public.shop_manager_subscriptions` (user_id, tier, status, current_period_end, stripe_subscription_id, external_account_id, sso_provisioned_at). RLS: user reads own row; service_role full.
-- Hook `useShopManagerAccess()` → reads the row, exposes `{ active, tier }`.
-- Stripe webhook handler (in our existing webhook route) upserts the row on `checkout.session.completed` / `invoice.paid` / `customer.subscription.deleted`.
+No data is created, no users are touched.
 
-### 3. Provisioning into the All Business 365 DB
-- New secrets (added via secrets tool, you paste the values):
-  - `SHOP_MANAGER_SUPABASE_URL` = `https://oudkbrnvommbvtuispla.supabase.co`
-  - `SHOP_MANAGER_SUPABASE_SERVICE_ROLE_KEY` (you'll generate this in the other project)
-  - `SHOP_MANAGER_SSO_SECRET` (random 32-byte hex — used to sign the SSO handoff)
-- Server fn `provisionShopManagerAccount` (called from the webhook after a successful subscription):
-  - Creates / looks up an `auth.users` row in the All Business 365 DB by the buyer's email (via Auth Admin API on that project).
-  - Inserts/updates a row in a new table on **that** DB: `external_entitlements (user_id, source='365motorsales', tier, expires_at, signature)`. Migration for that one row lives in the All Business 365 project (separate task; I'll ship the SQL file ready to paste).
-  - Stamps `external_account_id` and `sso_provisioned_at` back on our local row.
+## Where it lives
 
-### 4. SSO handoff
-- Server route `/api/public/shop-manager/sso` (POST, requires our auth):
-  - Verifies the caller has an active `shop_manager_subscriptions` row.
-  - Mints a short-lived (60s) HMAC-signed JWT with `{ email, tier, exp, nonce }` using `SHOP_MANAGER_SSO_SECRET`.
-  - Returns `{ redirect_url }` = `https://mainrepairsoftware.lovable.app/sso/365motorsales?token=…`.
-- Client side: an "Open Shop Manager" button on `/shop-manager` and on the dashboard sidebar calls that fn and `window.location.href`s into it.
-- On the All Business 365 side (separate, documented in `docs/shop-manager-sso.md`): a `/sso/365motorsales` route verifies the HMAC + nonce, then signs the user in via Auth Admin's `generateLink` magic-link flow. I'll include that as a ready-to-paste handler in the doc — not modifying that project from here.
+- New server fn `diagnoseShopManagerSecrets` in `src/lib/shop-manager.functions.ts` — gated to **admins only** (`has_role(auth.uid(), 'admin')`).
+- New "Diagnostics" card on `/shop-manager` that only renders for admins, with a **"Run check"** button and a clear pass/fail readout per secret + the live partner ping result.
 
-### 5. Dashboard surface
-- New card in `/dashboard` sidebar: "Shop Manager" with status pill (Active / Inactive). Links to `/shop-manager` if inactive, opens SSO if active.
-- "Subscriptions" tab on dashboard already exists — add Shop Manager line with manage/cancel link.
+## What you'll see after running it
 
-### 6. Compliance copy
-- Bump `/terms` (adds Shop Manager subscription + third-party data handoff clause).
-- Bump `/privacy` (discloses that email + display name are forwarded to All Business 365 on activation).
-- Bump `/refund-policy` (Shop Manager is monthly, cancel anytime, no proration).
+A simple table like:
 
-## Technical details
-
-### New files
-- `src/routes/shop-manager.tsx` — public landing + pricing + checkout trigger.
-- `src/routes/_authenticated/shop-manager-gate.tsx` — post-purchase success → "Open Shop Manager" CTA.
-- `src/routes/api/public/shop-manager/sso.ts` — TanStack server route (TOKEN MINTING; requires our cookie/JWT, not public despite path).
-- `src/lib/shop-manager.functions.ts` — `getShopManagerAccess`, `provisionShopManagerAccount`, `requestShopManagerSsoUrl`.
-- `src/lib/shop-manager-sso.server.ts` — HMAC sign helper (server-only).
-- `src/hooks/use-shop-manager-access.ts`.
-- `src/components/shop-manager/plan-card.tsx`, `open-shop-manager-button.tsx`.
-- `docs/shop-manager-sso.md` — partner-side integration steps (SQL + receiver handler to paste into All Business 365).
-
-### Edited files
-- `src/routes/_authenticated/dashboard.tsx` (or current dashboard route) — add Shop Manager card.
-- Stripe webhook handler (whichever file currently handles `checkout.session.completed`) — branch on the Shop Manager product to call `provisionShopManagerAccount`.
-- `src/components/site-header.tsx` — add "Shop Manager" nav entry.
-- `src/routes/terms.tsx`, `src/routes/privacy.tsx`, `src/routes/refund-policy.tsx` — policy updates + bump "Last updated".
-
-### Migration (this project only)
-```sql
-CREATE TABLE public.shop_manager_subscriptions (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  tier text NOT NULL CHECK (tier IN ('solo','pro')),
-  status text NOT NULL DEFAULT 'inactive',
-  stripe_subscription_id text UNIQUE,
-  external_account_id text,
-  sso_provisioned_at timestamptz,
-  current_period_end timestamptz,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now()
-);
-GRANT SELECT ON public.shop_manager_subscriptions TO authenticated;
-GRANT ALL    ON public.shop_manager_subscriptions TO service_role;
-ALTER TABLE public.shop_manager_subscriptions ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "own row read" ON public.shop_manager_subscriptions
-  FOR SELECT TO authenticated USING (user_id = auth.uid());
+```
+SHOP_MANAGER_SUPABASE_URL              ✅ Valid Supabase URL
+SHOP_MANAGER_SUPABASE_SERVICE_ROLE_KEY ❌ This is an ANON key, not a service role key
+SHOP_MANAGER_SSO_SECRET                ⚠️  Same value as service role key — must be different
+Partner connection                     ❌ 401 Invalid API key
 ```
 
-### Phases 2+ (NOT this turn — preview only)
-- Phase 2: port `automotive/` pages + `work_orders`, `repair_plans`, `vehicle_inspections`, `parts_tracking`, `customers` schemas into this DB. Mount at `/shop-manager/*` behind the same gate. Subscription flips from "redirect SSO" to "local app".
-- Phase 3: connect Shop Manager work orders ↔ this site's `listings`, `parts_wanted`, `service_inquiries`, `businesses` (already in place).
-- Phase 4: migrate existing All Business 365 customer data via export → import script; retire SSO redirect.
+…so you know exactly which one(s) to re-enter, and which are fine.
 
-## Open questions before I build
-1. **Prices**: what should `shop_manager_solo_monthly` and `shop_manager_pro_monthly` cost (PHP and/or USD)? Feature split between tiers?
-2. You'll need to (a) generate a service-role key in the All Business 365 project and (b) paste a tiny SQL migration + an SSO receiver route there. Confirm you can do that, or I'll script-export both files for you to drop in.
-3. Should Phase 1 require a verified Business on this site, or is any signed-in user allowed to subscribe?
+## After the diagnostic
+
+- If all 3 pass → we move on to drafting the partner-side receiver route.
+- If any fail → I'll open `secrets--update_secret` for **only** the wrong one(s), with a short note on what to paste.
+
+## Technical notes
+
+- JWT role check decodes the payload's middle segment only (no signature verification needed — we're just reading the `role` claim the partner project signs into its own keys).
+- The listUsers ping uses `perPage: 1` and discards results; it's the cheapest valid admin call.
+- Error messages from the partner are returned verbatim so you can see exactly what's wrong.

@@ -187,3 +187,180 @@ export const requestShopManagerSsoUrl = createServerFn({ method: "POST" })
     const url = sso.buildShopManagerRedirect(token, data.returnPath);
     return { url };
   });
+
+// ---------- Admin diagnostic: verify the 3 Shop Manager secrets ----------
+
+export type ShopManagerSecretCheck = {
+  name: string;
+  ok: boolean;
+  level: "ok" | "warn" | "error";
+  message: string;
+};
+
+export type ShopManagerDiagnosticResult = {
+  checks: ShopManagerSecretCheck[];
+  partnerPing: { ok: boolean; status: number | null; message: string };
+};
+
+function decodeJwtPayload(token: string): any | null {
+  try {
+    const parts = token.split(".");
+    if (parts.length !== 3) return null;
+    const pad = (s: string) => s + "=".repeat((4 - (s.length % 4)) % 4);
+    const json = atob(pad(parts[1].replace(/-/g, "+").replace(/_/g, "/")));
+    return JSON.parse(json);
+  } catch {
+    return null;
+  }
+}
+
+export const diagnoseShopManagerSecrets = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<ShopManagerDiagnosticResult> => {
+    // Admin gate
+    const { data: isAdmin, error: roleErr } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
+    if (roleErr || !isAdmin) throw new Error("Forbidden");
+
+    const url = process.env.SHOP_MANAGER_SUPABASE_URL ?? "";
+    const key = process.env.SHOP_MANAGER_SUPABASE_SERVICE_ROLE_KEY ?? "";
+    const sso = process.env.SHOP_MANAGER_SSO_SECRET ?? "";
+    const checks: ShopManagerSecretCheck[] = [];
+
+    // 1) URL check
+    if (!url) {
+      checks.push({
+        name: "SHOP_MANAGER_SUPABASE_URL",
+        ok: false,
+        level: "error",
+        message: "Not set.",
+      });
+    } else if (!/^https:\/\/[a-z0-9-]+\.supabase\.co\/?$/i.test(url)) {
+      checks.push({
+        name: "SHOP_MANAGER_SUPABASE_URL",
+        ok: false,
+        level: "error",
+        message: `Doesn't look like a Supabase URL. Got: "${url.slice(0, 40)}${url.length > 40 ? "…" : ""}". Expected https://xxxxx.supabase.co`,
+      });
+    } else {
+      checks.push({
+        name: "SHOP_MANAGER_SUPABASE_URL",
+        ok: true,
+        level: "ok",
+        message: `Valid Supabase URL (${url}).`,
+      });
+    }
+
+    // 2) Service role key check
+    const keyPayload = decodeJwtPayload(key);
+    if (!key) {
+      checks.push({
+        name: "SHOP_MANAGER_SUPABASE_SERVICE_ROLE_KEY",
+        ok: false,
+        level: "error",
+        message: "Not set.",
+      });
+    } else if (!keyPayload) {
+      checks.push({
+        name: "SHOP_MANAGER_SUPABASE_SERVICE_ROLE_KEY",
+        ok: false,
+        level: "error",
+        message: "Not a valid JWT. Paste the service_role key from the All Business 365 project.",
+      });
+    } else if (keyPayload.role !== "service_role") {
+      checks.push({
+        name: "SHOP_MANAGER_SUPABASE_SERVICE_ROLE_KEY",
+        ok: false,
+        level: "error",
+        message: `This is a "${keyPayload.role}" key, not service_role. Paste the SERVICE ROLE key (Project Settings → API → service_role).`,
+      });
+    } else {
+      checks.push({
+        name: "SHOP_MANAGER_SUPABASE_SERVICE_ROLE_KEY",
+        ok: true,
+        level: "ok",
+        message: `Valid service_role JWT (project ref: ${keyPayload.ref ?? "?"}).`,
+      });
+    }
+
+    // 3) SSO secret check
+    if (!sso) {
+      checks.push({
+        name: "SHOP_MANAGER_SSO_SECRET",
+        ok: false,
+        level: "error",
+        message: "Not set. Invent a random string (32+ chars) and use the same value on the partner side as MOTORSALES_SSO_SECRET.",
+      });
+    } else if (sso === key || sso === url) {
+      checks.push({
+        name: "SHOP_MANAGER_SSO_SECRET",
+        ok: false,
+        level: "error",
+        message: "Same value as another secret. Must be a distinct random string.",
+      });
+    } else if (sso.length < 24) {
+      checks.push({
+        name: "SHOP_MANAGER_SSO_SECRET",
+        ok: false,
+        level: "warn",
+        message: `Too short (${sso.length} chars). Use 32+ random characters.`,
+      });
+    } else if (decodeJwtPayload(sso)) {
+      checks.push({
+        name: "SHOP_MANAGER_SSO_SECRET",
+        ok: false,
+        level: "warn",
+        message: "Looks like a JWT. This should be a random shared password you invent, not a Supabase key.",
+      });
+    } else {
+      checks.push({
+        name: "SHOP_MANAGER_SSO_SECRET",
+        ok: true,
+        level: "ok",
+        message: `Looks good (${sso.length} chars, distinct).`,
+      });
+    }
+
+    // 4) Live partner ping — only if URL + key look usable
+    const urlOk = checks[0].ok;
+    const keyOk = checks[1].ok;
+    let partnerPing: ShopManagerDiagnosticResult["partnerPing"];
+    if (!urlOk || !keyOk) {
+      partnerPing = {
+        ok: false,
+        status: null,
+        message: "Skipped — fix URL/service role key first.",
+      };
+    } else {
+      try {
+        const { createClient } = await import("@supabase/supabase-js");
+        const partner = createClient(url, key, {
+          auth: { persistSession: false, autoRefreshToken: false },
+        });
+        const { data, error } = await partner.auth.admin.listUsers({ page: 1, perPage: 1 });
+        if (error) {
+          partnerPing = {
+            ok: false,
+            status: (error as any).status ?? null,
+            message: `Partner rejected the call: ${error.message}`,
+          };
+        } else {
+          partnerPing = {
+            ok: true,
+            status: 200,
+            message: `Connected. Partner project has ${data?.users?.length ?? 0}+ users on page 1.`,
+          };
+        }
+      } catch (e) {
+        partnerPing = {
+          ok: false,
+          status: null,
+          message: e instanceof Error ? e.message : String(e),
+        };
+      }
+    }
+
+    return { checks, partnerPing };
+  });
