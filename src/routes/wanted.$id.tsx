@@ -226,6 +226,7 @@ function WantedDetail() {
                   placeholder="Phone, Viber, Messenger, or listing link"
                 />
               </div>
+              <FormFeedbackLink formId="wanted-respond" className="mb-1" />
               <div className="flex justify-end">
                 <Button type="submit" disabled={submitting}>
                   {submitting ? "Sending…" : user ? "Send response" : "Sign in to respond"}
