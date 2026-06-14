@@ -314,7 +314,19 @@ export function AddUserDialog({
 
           {accountType === "staff" ? (
             <div className="grid gap-2">
-              <Label>Roles (in addition to base user)</Label>
+              <LabelWithTip
+                tip={
+                  <ul className="ml-3 list-disc space-y-0.5">
+                    <li><strong>admin</strong> — full access to everything.</li>
+                    <li><strong>moderator</strong> — listings &amp; users moderation.</li>
+                    <li><strong>support</strong> — handle support tickets.</li>
+                    <li><strong>sales</strong> — leads &amp; sales pipeline.</li>
+                    <li><strong>advertising</strong> — ad inquiries.</li>
+                  </ul>
+                }
+              >
+                Roles (in addition to base user)
+              </LabelWithTip>
               <div className="flex flex-wrap gap-1.5">
                 {STAFF_ROLES.map((r) => {
                   const on = roles.includes(r);
