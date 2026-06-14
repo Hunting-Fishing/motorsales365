@@ -439,6 +439,14 @@ export function SiteHeader() {
                   </SheetClose>
                   <SheetClose asChild>
                     <Link
+                      to="/shop-manager"
+                      className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                    >
+                      Shop Manager
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link
                       to="/learn"
                       className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
                     >
