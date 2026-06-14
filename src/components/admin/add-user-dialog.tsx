@@ -163,6 +163,9 @@ export function AddUserDialog({
         return;
       }
       toast.success(`User created. Temp password: ${password}`, { duration: 12000 });
+      if (enforceDomain) {
+        toast.message("Don't forget to add a Cloudflare Email Routing rule for this address so they can receive mail.", { duration: 14000 });
+      }
       onCreated?.();
       setOpen(false);
       reset();
