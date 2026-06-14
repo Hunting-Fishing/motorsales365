@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { X } from "lucide-react";
 import { createPartQuoteRequest } from "@/lib/parts-fulfillment.functions";
 import { useAuth } from "@/hooks/use-auth";
+import { FormFeedbackLink } from "@/components/form-feedback";
 
 export type QuoteItem = {
   kind: "catalog" | "custom";
