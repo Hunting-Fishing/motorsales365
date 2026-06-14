@@ -23,6 +23,7 @@ import {
   checkFbVerification,
   finalizeFbImport,
 } from "@/lib/facebook-import.functions";
+import { FormFeedbackLink } from "@/components/form-feedback";
 
 export const Route = createFileRoute("/sell/import")({
   head: () => ({
@@ -250,6 +251,7 @@ function ImportPage() {
                 "Import listing"
               )}
             </Button>
+            <FormFeedbackLink formId="sell-import-url" />
             <p className="text-xs text-muted-foreground">
               Limit: 10 imports per day. Only your own listings — we verify Facebook profile
               ownership.
@@ -479,20 +481,23 @@ function ImportPage() {
               )}
             </section>
 
-            <div className="flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => setStep("url")}>
-                Start over
-              </Button>
-              <Button type="submit" disabled={busy} size="lg">
-                {busy ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Creating draft…
-                  </>
-                ) : (
-                  "Create draft listing"
-                )}
-              </Button>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <FormFeedbackLink formId="sell-import-finalize" />
+              <div className="flex gap-2">
+                <Button type="button" variant="outline" onClick={() => setStep("url")}>
+                  Start over
+                </Button>
+                <Button type="submit" disabled={busy} size="lg">
+                  {busy ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating draft…
+                    </>
+                  ) : (
+                    "Create draft listing"
+                  )}
+                </Button>
+              </div>
             </div>
           </form>
         )}

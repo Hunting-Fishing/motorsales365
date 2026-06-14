@@ -5,6 +5,7 @@ import { SiteLayout } from "@/components/site-layout";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { submitBusiness } from "@/lib/businesses.functions";
+import { FormFeedbackLink } from "@/components/form-feedback";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -794,7 +795,8 @@ function SubmitBusinessPage() {
             <WeekHoursEditor value={hours} onChange={setHours} />
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <FormFeedbackLink formId="business-submit" />
             <Button onClick={submit} disabled={submitting}>
               {submitting ? "Submitting…" : "Submit for review"}
             </Button>

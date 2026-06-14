@@ -17,6 +17,7 @@ import {
   updateInquiryStatus,
 } from "@/lib/business-pages.functions";
 import { setVanitySlug } from "@/lib/business-mini-site.functions";
+import { FormFeedbackLink } from "@/components/form-feedback";
 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -526,7 +527,8 @@ function TagsTab({ businessId, typeSlug }: { businessId: string; typeSlug: strin
       })}
 
 
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <FormFeedbackLink formId="business-edit-tags" />
         <Button onClick={save} disabled={saving}>
           {saving ? "Saving…" : "Save tags"}
         </Button>
@@ -862,7 +864,8 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <FormFeedbackLink formId="business-edit-profile" />
         <Button onClick={handleSave} disabled={saving}>
           {saving ? "Saving…" : "Save changes"}
         </Button>
@@ -1692,7 +1695,8 @@ function LocationTab({ biz, onSaved }: { biz: any; onSaved: () => void }) {
         </div>
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <FormFeedbackLink formId="business-edit-location" />
         <Button onClick={handleSave} disabled={saving}>
           {saving ? "Saving…" : "Save location"}
         </Button>
@@ -1776,7 +1780,8 @@ function HoursTab({ biz, onSaved }: { biz: any; onSaved: () => void }) {
         </div>
       )}
 
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <FormFeedbackLink formId="business-edit-hours" />
         <Button onClick={save} disabled={saving}>
           {saving ? "Saving…" : "Save hours"}
         </Button>
@@ -1873,6 +1878,7 @@ function VanitySlugField({
           </Button>
         )}
       </div>
+      <FormFeedbackLink formId="business-edit-vanity" className="pt-1" />
       <p className="text-[11px] text-muted-foreground">
         Canonical permalink: <span className="font-mono">/businesses/{currentSlug}</span> (old links
         keep working).
