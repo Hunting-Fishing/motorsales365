@@ -242,6 +242,7 @@ export function SupportTicketForm({
         </div>
       </div>
 
+      <FormFeedbackLink formId="support-ticket" />
       <Button type="submit" disabled={submitting} size="lg" className="w-full sm:w-auto">
         {submitting ? (
           <>
