@@ -95,37 +95,49 @@ export const requestShopManagerSsoUrl = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const sso = await import("./shop-manager-sso.server");
 
-    // 1) Verify the caller actually has access (re-run the same query as getShopManagerAccess
-    //    but only the bits we need to mint a token).
-    const { data: plans } = await supabaseAdmin
-      .from("subscription_plans")
-      .select("id, stripe_lookup_key")
-      .in("stripe_lookup_key", SHOP_MANAGER_LOOKUP_KEYS as unknown as string[]);
-    const planIds = (plans ?? []).map((p: any) => p.id);
-    if (planIds.length === 0) throw new Error("Shop Manager plans not configured");
+    // Admins bypass the subscription check and SSO in as "pro".
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
 
-    const { data: sub } = await supabaseAdmin
-      .from("subscriptions")
-      .select(
-        "status, current_period_end, plan_id, subscription_plans:plan_id ( stripe_lookup_key )",
-      )
-      .eq("user_id", context.userId)
-      .in("plan_id", planIds)
-      .in("status", ["active", "trialing", "past_due"])
-      .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+    let tier: "solo" | "pro" | null = null;
 
-    if (!sub) throw new Error("No active Shop Manager subscription");
-    const periodEnd = (sub as any).current_period_end as string | null;
-    if (periodEnd && new Date(periodEnd).getTime() < Date.now()) {
-      throw new Error("Shop Manager subscription has expired");
+    if (!isAdmin) {
+      // 1) Verify the caller actually has access (re-run the same query as getShopManagerAccess
+      //    but only the bits we need to mint a token).
+      const { data: plans } = await supabaseAdmin
+        .from("subscription_plans")
+        .select("id, stripe_lookup_key")
+        .in("stripe_lookup_key", SHOP_MANAGER_LOOKUP_KEYS as unknown as string[]);
+      const planIds = (plans ?? []).map((p: any) => p.id);
+      if (planIds.length === 0) throw new Error("Shop Manager plans not configured");
+
+      const { data: sub } = await supabaseAdmin
+        .from("subscriptions")
+        .select(
+          "status, current_period_end, plan_id, subscription_plans:plan_id ( stripe_lookup_key )",
+        )
+        .eq("user_id", context.userId)
+        .in("plan_id", planIds)
+        .in("status", ["active", "trialing", "past_due"])
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (!sub) throw new Error("No active Shop Manager subscription");
+      const periodEnd = (sub as any).current_period_end as string | null;
+      if (periodEnd && new Date(periodEnd).getTime() < Date.now()) {
+        throw new Error("Shop Manager subscription has expired");
+      }
+
+      tier = tierFromLookupKey(
+        (sub as any).subscription_plans?.stripe_lookup_key as ShopManagerLookupKey,
+      );
+      if (!tier) throw new Error("Unknown Shop Manager tier");
+    } else {
+      tier = "pro";
     }
-
-    const tier = tierFromLookupKey(
-      (sub as any).subscription_plans?.stripe_lookup_key as ShopManagerLookupKey,
-    );
-    if (!tier) throw new Error("Unknown Shop Manager tier");
 
     // 2) Resolve buyer email + name from our profile / auth.
     const { data: { user: authUser } = { user: null } } = await supabaseAdmin.auth.admin.getUserById(

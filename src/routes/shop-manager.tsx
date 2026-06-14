@@ -78,8 +78,11 @@ function ShopManagerPage() {
               invoicing, and reminders — in one place, built for Philippine automotive shops.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              {isActive ? (
-                <OpenShopManagerButton size="lg" />
+              {isActive || isAdmin ? (
+                <OpenShopManagerButton
+                  size="lg"
+                  label={isAdmin && !isActive ? "Open Shop Manager (admin)" : "Open Shop Manager"}
+                />
               ) : (
                 <Button size="lg" onClick={() => selectPlan("shop_manager_solo_monthly")}>
                   Start Solo — ₱799/mo
