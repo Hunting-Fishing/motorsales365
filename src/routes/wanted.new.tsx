@@ -267,6 +267,7 @@ function NewWantedPage() {
             .
           </div>
 
+          <FormFeedbackLink formId="wanted-new" className="mb-1" />
           <div className="flex justify-end gap-2">
             <Button type="button" variant="ghost" asChild>
               <Link to="/wanted">Cancel</Link>
