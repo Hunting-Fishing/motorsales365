@@ -322,6 +322,7 @@ function BookingPage() {
                     />
                   </div>
                 </div>
+                <FormFeedbackLink formId="business-booking" className="mt-3" />
                 <div className="mt-4 flex items-center justify-between text-sm">
                   <div className="text-muted-foreground">
                     {item.title} · {new Date(selectedSlot).toLocaleString()}
