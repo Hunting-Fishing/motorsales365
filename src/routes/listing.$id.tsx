@@ -794,6 +794,9 @@ function ListingDetailPage() {
                     />
                   </div>
                 </div>
+                <div className="mt-3 border-t border-border pt-3">
+                  <FormFeedbackLink formId="report-listing" />
+                </div>
                 <DialogFooter>
                   <Button variant="outline" onClick={() => setReportOpen(false)}>
                     Cancel
