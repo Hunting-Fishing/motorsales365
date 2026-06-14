@@ -34,6 +34,7 @@ export const Route = createFileRoute("/admin/staff-365")({
 
 function Staff365Page() {
   const { user, loading: authLoading } = useAuth();
+  const { tab: initialTab } = useSearch({ from: "/admin/staff-365" });
   const isSuperAdmin = (user?.email ?? "").toLowerCase() === SUPER_ADMIN_EMAIL;
   const fetchStaff = useServerFn(listStaff365);
   const toggleDisabled = useServerFn(setStaff365Disabled);
