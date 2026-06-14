@@ -795,7 +795,8 @@ function SubmitBusinessPage() {
             <WeekHoursEditor value={hours} onChange={setHours} />
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <FormFeedbackLink formId="business-submit" />
             <Button onClick={submit} disabled={submitting}>
               {submitting ? "Submitting…" : "Submit for review"}
             </Button>
