@@ -47,7 +47,8 @@ export function AddUserDialog({
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState(() => generatePassword());
   const [accountType, setAccountType] = useState<"staff" | "business">(lockStaff ? "staff" : "staff");
   const [roles, setRoles] = useState<StaffRole[]>(["support"]);
@@ -58,7 +59,8 @@ export function AddUserDialog({
 
   const reset = () => {
     setEmail("");
-    setFullName("");
+    setFirstName("");
+    setLastName("");
     setPassword(generatePassword());
     setAccountType("staff");
     setRoles(["support"]);
@@ -81,7 +83,8 @@ export function AddUserDialog({
   };
 
   const submit = async () => {
-    if (!email || !fullName || !password) {
+    const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
+    if (!email || !firstName.trim() || !lastName.trim() || !password) {
       toast.error("Fill all required fields");
       return;
     }
@@ -100,7 +103,7 @@ export function AddUserDialog({
 
       const body: any = {
         email: email.trim().toLowerCase(),
-        full_name: fullName.trim(),
+        full_name: fullName,
         password,
         account_type: accountType,
         roles: accountType === "staff" ? roles : [],
@@ -165,13 +168,23 @@ export function AddUserDialog({
               placeholder="user@example.com"
             />
           </div>
-          <div className="grid gap-2">
-            <Label>Full name *</Label>
-            <Input
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              placeholder="Jane Doe"
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="grid gap-2">
+              <Label>First name *</Label>
+              <Input
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="Billy"
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label>Last name *</Label>
+              <Input
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                placeholder="Bailey"
+              />
+            </div>
           </div>
           <div className="grid gap-2">
             <Label>Temporary password *</Label>
