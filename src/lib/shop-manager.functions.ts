@@ -224,9 +224,9 @@ export const diagnoseShopManagerSecrets = createServerFn({ method: "POST" })
     });
     if (roleErr || !isAdmin) throw new Error("Forbidden");
 
-    const url = process.env.SHOP_MANAGER_SUPABASE_URL ?? "";
-    const key = process.env.SHOP_MANAGER_SUPABASE_SERVICE_ROLE_KEY ?? "";
-    const sso = process.env.SHOP_MANAGER_SSO_SECRET ?? "";
+    const url = (process.env.SHOP_MANAGER_SUPABASE_URL ?? "").trim().replace(/\/+$/, "");
+    const key = (process.env.SHOP_MANAGER_SUPABASE_SERVICE_ROLE_KEY ?? "").trim();
+    const sso = (process.env.SHOP_MANAGER_SSO_SECRET ?? "").trim();
     const checks: ShopManagerSecretCheck[] = [];
 
     // 1) URL check
