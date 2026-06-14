@@ -127,6 +127,7 @@ export function SuggestLocationDialog({
             </div>
           </div>
         </div>
+        <div className="px-1 pt-1"><FormFeedbackLink formId="business-suggest-location" /></div>
         <DialogFooter>
           <Button variant="ghost" onClick={() => setOpen(false)} disabled={submitting}>
             Cancel
