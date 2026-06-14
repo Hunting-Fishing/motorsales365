@@ -396,6 +396,7 @@ function SponsorshipsPage() {
               </div>
             </div>
           )}
+          <div className="pt-2"><FormFeedbackLink formId="sponsorship-submit" /></div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditing(null)} disabled={saving}>
               Cancel
