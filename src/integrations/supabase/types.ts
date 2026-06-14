@@ -3543,8 +3543,10 @@ export type Database = {
       listing_media: {
         Row: {
           created_at: string
+          file_sha256: string | null
           id: string
           listing_id: string
+          phash: string | null
           sort_order: number
           storage_path: string | null
           type: Database["public"]["Enums"]["media_type"]
@@ -3552,8 +3554,10 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          file_sha256?: string | null
           id?: string
           listing_id: string
+          phash?: string | null
           sort_order?: number
           storage_path?: string | null
           type: Database["public"]["Enums"]["media_type"]
@@ -3561,8 +3565,10 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          file_sha256?: string | null
           id?: string
           listing_id?: string
+          phash?: string | null
           sort_order?: number
           storage_path?: string | null
           type?: Database["public"]["Enums"]["media_type"]
@@ -5133,6 +5139,10 @@ export type Database = {
           reporter_id: string | null
           reporter_name: string | null
           reporter_phone: string | null
+          resolution: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          signals: Json
           status: string
           target_type: string
           target_url: string | null
@@ -5153,6 +5163,10 @@ export type Database = {
           reporter_id?: string | null
           reporter_name?: string | null
           reporter_phone?: string | null
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          signals?: Json
           status?: string
           target_type?: string
           target_url?: string | null
@@ -5173,6 +5187,10 @@ export type Database = {
           reporter_id?: string | null
           reporter_name?: string | null
           reporter_phone?: string | null
+          resolution?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          signals?: Json
           status?: string
           target_type?: string
           target_url?: string | null
