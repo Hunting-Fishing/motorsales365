@@ -358,7 +358,7 @@ function AdminLayout() {
       ? myRoles[0][0].toUpperCase() + myRoles[0].slice(1)
       : "Staff";
 
-  const { data: pendingCounts } = useAdminPendingCounts(hasAccess);
+
 
   return (
     <SiteLayout>
