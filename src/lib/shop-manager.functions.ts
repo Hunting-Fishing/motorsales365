@@ -253,7 +253,8 @@ export const diagnoseShopManagerSecrets = createServerFn({ method: "POST" })
       });
     }
 
-    // 2) Service role key check
+    // 2) Service role key check — accept either new sb_secret_* format or legacy JWT
+    const isNewSecretFormat = /^sb_secret_[A-Za-z0-9_-]{20,}$/.test(key);
     const keyPayload = decodeJwtPayload(key);
     if (!key) {
       checks.push({
@@ -262,12 +263,19 @@ export const diagnoseShopManagerSecrets = createServerFn({ method: "POST" })
         level: "error",
         message: "Not set.",
       });
+    } else if (isNewSecretFormat) {
+      checks.push({
+        name: "SHOP_MANAGER_SUPABASE_SERVICE_ROLE_KEY",
+        ok: true,
+        level: "ok",
+        message: "Valid new-format secret key (sb_secret_…). Live partner ping will confirm it's the service_role key.",
+      });
     } else if (!keyPayload) {
       checks.push({
         name: "SHOP_MANAGER_SUPABASE_SERVICE_ROLE_KEY",
         ok: false,
         level: "error",
-        message: "Not a valid JWT. Paste the service_role key from the All Business 365 project.",
+        message: "Not a valid service role key. Expected sb_secret_… (new format) or a JWT (legacy).",
       });
     } else if (keyPayload.role !== "service_role") {
       checks.push({
@@ -284,6 +292,7 @@ export const diagnoseShopManagerSecrets = createServerFn({ method: "POST" })
         message: `Valid service_role JWT (project ref: ${keyPayload.ref ?? "?"}).`,
       });
     }
+
 
     // 3) SSO secret check
     if (!sso) {
