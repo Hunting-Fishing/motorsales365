@@ -47,7 +47,8 @@ export function AddUserDialog({
   const [open, setOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [email, setEmail] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [password, setPassword] = useState(() => generatePassword());
   const [accountType, setAccountType] = useState<"staff" | "business">(lockStaff ? "staff" : "staff");
   const [roles, setRoles] = useState<StaffRole[]>(["support"]);
@@ -58,7 +59,8 @@ export function AddUserDialog({
 
   const reset = () => {
     setEmail("");
-    setFullName("");
+    setFirstName("");
+    setLastName("");
     setPassword(generatePassword());
     setAccountType("staff");
     setRoles(["support"]);
