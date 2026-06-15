@@ -306,7 +306,7 @@ function DispatchLanding() {
 }
 
 type Cell = boolean | string;
-const TIERS = ["Starter", "Pro", "Fleet"] as const;
+const TIERS = ["Solo", "Team", "Unlimited"] as const;
 
 const FEATURE_GROUPS: { group: string; rows: { label: string; values: [Cell, Cell, Cell] }[] }[] = [
   {
@@ -314,8 +314,8 @@ const FEATURE_GROUPS: { group: string; rows: { label: string; values: [Cell, Cel
     rows: [
       { label: "Public directory listing", values: [true, true, true] },
       { label: "Priority placement in dispatch queue", values: [false, true, true] },
-      { label: "Verified provider badge", values: ["Basic", "Pro badge", "Fleet badge"] },
-      { label: "Job volume", values: ["Up to 20 / mo", "Unlimited", "Unlimited"] },
+      { label: "Verified provider badge", values: ["Basic", "Team badge", "Unlimited badge"] },
+      { label: "Active jobs at once", values: ["Up to 3", "Up to 10", "Unlimited"] },
       { label: "Service coverage", values: ["1 region", "Up to 3 regions", "Nationwide + multi-branch"] },
     ],
   },
@@ -326,7 +326,7 @@ const FEATURE_GROUPS: { group: string; rows: { label: string; values: [Cell, Cel
       { label: "Email + in-app alerts", values: [true, true, true] },
       { label: "SMS + push job alerts", values: [false, true, true] },
       { label: "Accept / decline + auto-route to nearest driver", values: [false, true, true] },
-      { label: "Driver seats", values: ["1 truck", "Up to 5 drivers", "Unlimited drivers"] },
+      { label: "Driver seats", values: ["1 driver", "Up to 5 drivers", "Unlimited drivers"] },
     ],
   },
   {
@@ -341,7 +341,7 @@ const FEATURE_GROUPS: { group: string; rows: { label: string; values: [Cell, Cel
   {
     group: "Billing",
     rows: [
-      { label: "Monthly price", values: ["₱49", "₱299", "₱999"] },
+      { label: "Monthly price", values: ["₱250", "₱500", "₱1,000"] },
       { label: "Cancel anytime", values: [true, true, true] },
     ],
   },
