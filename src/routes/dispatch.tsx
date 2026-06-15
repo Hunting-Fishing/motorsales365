@@ -75,6 +75,7 @@ const PLANS = [
 ];
 
 function DispatchLanding() {
+  const { user } = useAuth();
   return (
     <main>
       <section className="border-b border-border bg-gradient-to-br from-primary/10 via-secondary/30 to-background">
@@ -94,11 +95,13 @@ function DispatchLanding() {
                 <Network className="mr-2 h-4 w-4" /> See plans
               </a>
             </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link to="/dashboard/tow">
-                <Truck className="mr-2 h-4 w-4" /> Provider dashboard
-              </Link>
-            </Button>
+            {user && (
+              <Button asChild size="lg" variant="outline">
+                <Link to="/dashboard/dispatch">
+                  <Truck className="mr-2 h-4 w-4" /> My provider dashboard
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </section>
