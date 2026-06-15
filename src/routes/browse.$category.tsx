@@ -553,6 +553,7 @@ function BrowsePage() {
                     setCatFilters={setCatFilters}
                     onSubmit={applyFilters}
                     onSave={openSaveDialog}
+                    onReset={resetAll}
                     yearCounts={yearCounts}
                   />
                 </div>
