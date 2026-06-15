@@ -67,7 +67,7 @@ function VerifyEmailPage() {
       type: "signup",
       email,
       options: {
-        emailRedirectTo: `${siteOrigin()}/verify-email${intent ? `?intent=${intent}` : ""}`,
+        emailRedirectTo: `${siteOrigin()}/verify-email${intent || redirect ? "?" : ""}${intent ? `intent=${intent}` : ""}${intent && redirect ? "&" : ""}${redirect ? `redirect=${encodeURIComponent(redirect)}` : ""}`,
       },
     });
     setResending(false);
