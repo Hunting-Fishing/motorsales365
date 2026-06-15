@@ -16,6 +16,7 @@ import { VerifiedBadge } from "@/components/verified-badge";
 import { formatDate } from "@/lib/format";
 import { AddUserDialog } from "@/components/admin/add-user-dialog";
 import { EditProfileDialog } from "@/components/admin/edit-profile-dialog";
+import { Staff365Badge } from "@/components/admin/staff-365-badge";
 import { ResetPasswordDialog } from "@/components/admin/reset-password-dialog";
 import { logAdminAudit } from "@/lib/admin-audit";
 import { useAuth } from "@/hooks/use-auth";
