@@ -208,10 +208,31 @@ export function ReportCard({
             size="sm"
             variant="ghost"
             className="h-8"
-            onClick={() => setHistoryOpen((v) => !v)}
+            onClick={toggleExpanded}
+            aria-expanded={expanded}
+            aria-controls={`report-${report.id}-body`}
           >
-            <History className="mr-1 h-4 w-4" /> History
+            {expanded ? (
+              <>
+                <ChevronUp className="mr-1 h-4 w-4" /> Collapse
+              </>
+            ) : (
+              <>
+                <ChevronDown className="mr-1 h-4 w-4" /> View details
+              </>
+            )}
           </Button>
+          {expanded && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-8"
+              onClick={() => setHistoryOpen((v) => !v)}
+            >
+              <History className="mr-1 h-4 w-4" /> History
+            </Button>
+          )}
+
           {report.status !== "resolved" ? (
             <>
               <div className="flex items-center gap-0.5">
