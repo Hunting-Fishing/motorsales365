@@ -731,8 +731,21 @@ function FiltersForm(p: FiltersFormProps) {
               value={p.keyword}
               onChange={(e) => p.setKeyword(e.target.value)}
               placeholder="Make, model…"
-              className="h-9 pl-8"
+              className="h-9 pl-8 pr-8"
             />
+            {p.keyword && (
+              <button
+                type="button"
+                onClick={() => {
+                  p.setKeyword("");
+                  setTimeout(() => p.onSubmit(), 0);
+                }}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-full hover:bg-muted-foreground/20 p-0.5"
+                aria-label="Clear search"
+              >
+                <X className="h-3.5 w-3.5 text-muted-foreground" />
+              </button>
+            )}
           </div>
         </div>
         <div className="grid grid-cols-2 gap-2">
