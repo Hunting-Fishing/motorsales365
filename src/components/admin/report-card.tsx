@@ -467,6 +467,19 @@ export function ReportCard({
           </div>
         </section>
       </div>
+
+      {dialog && (
+        <ReportActionDialog
+          open={!!dialog}
+          onOpenChange={(o) => !o && setDialog(null)}
+          reportId={report.id}
+          action={dialog.action}
+          listingId={report.listing_id}
+          listingTitle={report.listings?.title ?? null}
+          reversesActionId={dialog.reversesActionId ?? null}
+          onDone={refresh}
+        />
+      )}
     </article>
   );
 }
