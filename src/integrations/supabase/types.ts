@@ -4828,6 +4828,7 @@ export type Database = {
           is_staff_account: boolean
           last_name: string | null
           login_username: string | null
+          member_number: number | null
           parent_org_id: string | null
           phone: string | null
           phone_e164: string | null
@@ -4878,6 +4879,7 @@ export type Database = {
           is_staff_account?: boolean
           last_name?: string | null
           login_username?: string | null
+          member_number?: number | null
           parent_org_id?: string | null
           phone?: string | null
           phone_e164?: string | null
@@ -4928,6 +4930,7 @@ export type Database = {
           is_staff_account?: boolean
           last_name?: string | null
           login_username?: string | null
+          member_number?: number | null
           parent_org_id?: string | null
           phone?: string | null
           phone_e164?: string | null

@@ -50,12 +50,35 @@ function AdminReports() {
     if (filter !== "all") q = q.eq("status", filter);
     if (reporterFilter) q = q.eq("reporter_id", reporterFilter);
     const { data } = await q;
-    const rows = (data ?? []) as unknown as ReportRow[];
-    setReports(rows);
+    let rows = (data ?? []) as unknown as ReportRow[];
 
     const reporterIds = Array.from(
       new Set(rows.map((r) => r.reporter_id).filter((x): x is string => !!x)),
     );
+
+    if (reporterIds.length) {
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("id, member_number, full_name, first_name, last_name, business_name")
+        .in("id", reporterIds);
+      const byId = new Map((profs ?? []).map((p: any) => [p.id, p]));
+      rows = rows.map((r) => {
+        const p = r.reporter_id ? byId.get(r.reporter_id) : null;
+        return p
+          ? {
+              ...r,
+              reporter_member_number: p.member_number ?? null,
+              reporter_full_name:
+                p.full_name ||
+                [p.first_name, p.last_name].filter(Boolean).join(" ") ||
+                null,
+              reporter_business_name: p.business_name ?? null,
+            }
+          : r;
+      });
+    }
+    setReports(rows);
+
     if (reporterIds.length) {
       try {
         const res = await countsFn({ data: { reporterIds } });
