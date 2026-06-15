@@ -254,7 +254,7 @@ function DispatchLanding() {
             to the customer, paid per dispatch, and has no software of their own. That's
             where we fit: every independent and subcontracted tow + trucking operator in
             the Philippines needs a way to take jobs, dispatch a driver, and look
-            legitimate. ₱49/month gets you on the map. ₱999/month replaces a ₱150,000
+            legitimate. ₱250/month gets you on the map. ₱1,000/month replaces a ₱150,000
             fleet-management suite.
           </p>
           <div className="mt-6 grid gap-4 md:grid-cols-3">
