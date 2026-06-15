@@ -40,7 +40,7 @@ export const getMyTier = createServerFn({ method: "GET" })
     const { data: profile } = await context.supabase
       .from("profiles")
       .select("created_at")
-      .eq("user_id", context.userId)
+      .eq("id", context.userId)
       .maybeSingle();
 
     const allTiers = (tiers ?? []) as MemberTier[];

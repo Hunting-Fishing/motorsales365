@@ -1,7 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { requireDomainRole } from "@/integrations/supabase/admin-middleware";
+import { requireDomainRole, requireAdminRoleAudited } from "@/integrations/supabase/admin-middleware";
 
 export type TrustScoreEvent = {
   id: string;
