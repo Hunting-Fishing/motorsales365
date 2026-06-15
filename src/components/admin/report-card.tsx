@@ -275,28 +275,30 @@ export function ReportCard({
             </div>
             <div className="flex items-start gap-3">
               <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
-                {reporterName.slice(0, 1).toUpperCase()}
+                {displayName.slice(0, 1).toUpperCase()}
               </div>
               <div className="min-w-0 flex-1 space-y-0.5">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="truncate text-sm font-semibold text-foreground">
-                    {reporterName}
+                    {displayName}
                   </span>
+                  {memberLabel && (
+                    <Badge variant="secondary" className="text-[10px] font-mono">
+                      {memberLabel}
+                    </Badge>
+                  )}
                   {isAnonymous && (
                     <Badge variant="outline" className="text-[10px]">
                       anonymous
                     </Badge>
                   )}
                 </div>
-                {reporterSubtitle && (
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <Mail className="h-3 w-3" />
-                    <a href={`mailto:${reporterSubtitle}`} className="truncate hover:underline">
-                      {reporterSubtitle}
-                    </a>
+                {report.reporter_business_name && (
+                  <div className="truncate text-xs font-medium text-muted-foreground">
+                    {report.reporter_business_name}
                   </div>
                 )}
-                {!reporterSubtitle && report.reporter_email && (
+                {report.reporter_email && (
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Mail className="h-3 w-3" />
                     <a href={`mailto:${report.reporter_email}`} className="truncate hover:underline">
@@ -308,11 +310,6 @@ export function ReportCard({
                   <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <Phone className="h-3 w-3" />
                     {report.reporter_phone}
-                  </div>
-                )}
-                {report.reporter_id && (
-                  <div className="font-mono text-[10px] text-muted-foreground/70">
-                    ID: {report.reporter_id.slice(0, 8)}…
                   </div>
                 )}
               </div>
