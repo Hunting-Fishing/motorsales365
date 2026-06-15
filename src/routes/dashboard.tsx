@@ -26,6 +26,7 @@ import {
   Megaphone as MegaphoneIcon,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import { useDispatchProvider } from "@/hooks/use-dispatch-provider";
 import { SiteLayout } from "@/components/site-layout";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -45,7 +46,7 @@ export const Route = createFileRoute("/dashboard")({
   }),
 });
 
-const NAV: { to: string; label: string; Icon: any; exact?: boolean }[] = [
+const BASE_NAV: { to: string; label: string; Icon: any; exact?: boolean }[] = [
   { to: "/dashboard", label: "My listings", Icon: LayoutGrid, exact: true },
   { to: "/dashboard/rides", label: "My rides", Icon: Car },
   { to: "/dashboard/vehicles", label: "Vehicle passport", Icon: ShieldCheck },
@@ -55,9 +56,6 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean }[] = [
   { to: "/dashboard/likes", label: "Liked", Icon: Heart },
   { to: "/dashboard/searches", label: "Saved searches", Icon: Search },
   { to: "/dashboard/messages", label: "Messages", Icon: MessageSquare },
-  { to: "/dashboard/tow", label: "Tow requests", Icon: Truck },
-  { to: "/dashboard/dispatch", label: "365 Dispatch", Icon: Truck },
-  { to: "/dashboard/dispatch/history", label: "Job history", Icon: Truck },
   { to: "/dashboard/businesses", label: "My businesses", Icon: Store },
   { to: "/dashboard/ads", label: "Ad campaigns", Icon: Megaphone },
   { to: "/dashboard/sponsorships", label: "Sponsorships", Icon: Megaphone },
@@ -69,6 +67,15 @@ const NAV: { to: string; label: string; Icon: any; exact?: boolean }[] = [
   { to: "/dashboard/boosts", label: "Boost history", Icon: Rocket },
   { to: "/dashboard/wanted", label: "Wanted posts", Icon: MegaphoneIcon },
   { to: "/dashboard/blocked", label: "Blocked users", Icon: Shield },
+];
+
+// Tow & Dispatch links only appear once the user has joined the Dispatch
+// network (provider_tow_rates row). Otherwise non-providers see blank
+// "Tow requests" / "365 Dispatch" pages.
+const DISPATCH_NAV: { to: string; label: string; Icon: any }[] = [
+  { to: "/dashboard/tow", label: "Tow requests", Icon: Truck },
+  { to: "/dashboard/dispatch", label: "365 Dispatch", Icon: Truck },
+  { to: "/dashboard/dispatch/history", label: "Job history", Icon: Truck },
 ];
 
 function DashboardLayout() {
