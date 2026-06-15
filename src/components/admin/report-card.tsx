@@ -2,8 +2,6 @@ import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
-  Trash2,
-  ShieldOff,
   CheckCircle2,
   XCircle,
   Megaphone,
@@ -14,17 +12,22 @@ import {
   Mail,
   Phone,
   Filter,
+  History,
+  Undo2,
+  RotateCcw,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { confirm } from "@/components/ui/confirm-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDate } from "@/lib/format";
 import { ReportSignals } from "./report-signals";
 import { PostingUserPanel } from "./posting-user-panel";
-import { getReportEvidenceUrls, setReportResolution } from "@/lib/admin-reports.functions";
+import { getReportEvidenceUrls } from "@/lib/admin-reports.functions";
+import { ReportActionDialog, type ActionKind } from "./report-action-dialog";
+import { ReportActionInfo } from "./report-action-info";
+import { ReportHistory } from "./report-history";
 
 type ReporterCounts = {
   total: number;
