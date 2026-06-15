@@ -118,6 +118,16 @@ function DispatchJoin() {
 
   const validPrice = priceId && VALID_PRICES.has(priceId);
 
+  if (loading || (!loading && !user)) {
+    return (
+      <SiteLayout>
+        <div className="container mx-auto max-w-xl px-4 py-16 text-center text-sm text-muted-foreground">
+          Loading…
+        </div>
+      </SiteLayout>
+    );
+  }
+
   if (!validPrice) {
     return (
       <SiteLayout>
