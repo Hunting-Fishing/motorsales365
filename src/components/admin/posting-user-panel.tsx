@@ -257,6 +257,10 @@ export function PostingUserPanel({ userId }: { userId: string }) {
         </div>
       )}
 
+      {open && <AccountTeamStrip userId={userId} />}
+
+
+
       <UserDossierDialog
         open={dossierOpen}
         onOpenChange={setDossierOpen}
