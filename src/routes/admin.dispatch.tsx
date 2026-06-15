@@ -27,9 +27,13 @@ export const Route = createFileRoute("/admin/dispatch")({
 });
 
 const PLAN_LABELS: Record<string, { label: string; color: string }> = {
-  dispatch_starter: { label: "Starter", color: "bg-secondary" },
-  dispatch_pro: { label: "Pro", color: "bg-primary text-primary-foreground" },
-  dispatch_fleet: { label: "Fleet", color: "bg-amber-500 text-white" },
+  dispatch_solo: { label: "Solo", color: "bg-secondary" },
+  dispatch_team: { label: "Team", color: "bg-primary text-primary-foreground" },
+  dispatch_unlimited: { label: "Unlimited", color: "bg-amber-500 text-white" },
+  // legacy
+  dispatch_starter: { label: "Starter (legacy)", color: "bg-secondary" },
+  dispatch_pro: { label: "Pro (legacy)", color: "bg-primary text-primary-foreground" },
+  dispatch_fleet: { label: "Fleet (legacy)", color: "bg-amber-500 text-white" },
 };
 
 const SUB_STATUS_STYLES: Record<string, string> = {
