@@ -5,6 +5,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { adminUpdateUserProfile } from "@/lib/admin-profile.functions";
 import { logAdminAudit, type AdminAuditEntry } from "@/lib/admin-audit";
+import { Staff365Badge } from "@/components/admin/staff-365-badge";
 import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -56,9 +57,11 @@ type EditableUser = {
 export function EditProfileDialog({
   user,
   onSaved,
+  is365Staff = false,
 }: {
   user: EditableUser;
   onSaved?: () => void;
+  is365Staff?: boolean;
 }) {
   const updateProfile = useServerFn(adminUpdateUserProfile);
   const [open, setOpen] = useState(false);
@@ -248,7 +251,10 @@ export function EditProfileDialog({
       </DialogTrigger>
       <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit user profile</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            Edit user profile
+            {is365Staff && <Staff365Badge size="sm" />}
+          </DialogTitle>
           <DialogDescription>
             {user.full_name ?? "(no name)"} — change identity, address, business, email, avatar,
             roles, and verification.

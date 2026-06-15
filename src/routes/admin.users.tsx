@@ -16,6 +16,7 @@ import { VerifiedBadge } from "@/components/verified-badge";
 import { formatDate } from "@/lib/format";
 import { AddUserDialog } from "@/components/admin/add-user-dialog";
 import { EditProfileDialog } from "@/components/admin/edit-profile-dialog";
+import { Staff365Badge } from "@/components/admin/staff-365-badge";
 import { ResetPasswordDialog } from "@/components/admin/reset-password-dialog";
 import { logAdminAudit } from "@/lib/admin-audit";
 import { useAuth } from "@/hooks/use-auth";
@@ -398,6 +399,7 @@ function AdminUsers() {
                 <div className="flex items-center gap-1.5 font-medium">
                   {u.full_name ?? "(no name)"}
                   {isVerified && <VerifiedBadge size="sm" />}
+                  {staffIds.has(u.id) && <Staff365Badge size="xs" className="ml-1" />}
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {u.seller_type} · joined {formatDate(u.created_at)}
@@ -438,7 +440,7 @@ function AdminUsers() {
                     {magicLoadingId === u.id ? "…" : "Sign-in link"}
                   </Button>
                 )}
-                <EditProfileDialog user={u} onSaved={load} />
+                <EditProfileDialog user={u} onSaved={load} is365Staff={staffIds.has(u.id)} />
                 {isSuperAdmin && <ResetPasswordDialog user={u} />}
                 {isVerified ? (
                   <Button
