@@ -73,8 +73,11 @@ export function UserDossierDialog({
         </DialogHeader>
 
         <Tabs value={tab} onValueChange={setTab}>
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="team">
+              <Users className="mr-1 h-3.5 w-3.5" /> Team
+            </TabsTrigger>
             <TabsTrigger value="reports">
               <FileWarning className="mr-1 h-3.5 w-3.5" /> Reports
             </TabsTrigger>
@@ -91,6 +94,9 @@ export function UserDossierDialog({
 
           <TabsContent value="overview" className="mt-4 space-y-4">
             <OverviewTab identity={identity} stats={stats} score={score} />
+          </TabsContent>
+          <TabsContent value="team" className="mt-4">
+            {open && <AccountTeamStrip userId={userId} />}
           </TabsContent>
           <TabsContent value="reports" className="mt-4">
             {open && <ReportsTab userId={userId} />}
