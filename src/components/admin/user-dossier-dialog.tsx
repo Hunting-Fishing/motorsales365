@@ -26,10 +26,12 @@ import {
   listUserListings,
   listUserCommunications,
   listUserBilling,
+  listAccountTeammates,
   type DossierIdentity,
   type DossierStats,
   type DossierScore,
 } from "@/lib/admin-user-dossier.functions";
+import { AccountTeamStrip } from "./account-team-strip";
 
 const php = (n: number | string | null | undefined) =>
   "₱" + Math.round(Number(n ?? 0)).toLocaleString("en-PH", { maximumFractionDigits: 0 });
