@@ -17,8 +17,11 @@ export const Route = createFileRoute("/api/public/hooks/quarterly-bonuses")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const auth = await verifyInternalCronToken(request);
-        if (!auth.ok) return new Response("Unauthorized", { status: 401 });
+        const authed = await verifyInternalCronToken({
+          jobName: "quarterly_bonuses",
+          tokenHeader: request.headers.get("x-cron-token"),
+        });
+        if (!authed) return new Response("Unauthorized", { status: 401 });
 
         const now = new Date();
         const periodStart = new Date(now.getFullYear(), Math.floor(now.getMonth() / 3) * 3 - 3, 1);
