@@ -11,7 +11,7 @@ import { getBrowseListings, type BrowseFiltersInput } from "@/lib/browse-listing
 import { getYearCountsForCategory } from "@/lib/year-counts.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
-import { TowingServicesPage } from "@/components/towing/towing-services-page";
+
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
 import { AdCarousel } from "@/components/ads/ad-carousel";
 import { SponsoredCategorySlot } from "@/components/ads/sponsored-category-slot";
