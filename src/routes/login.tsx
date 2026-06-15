@@ -68,7 +68,7 @@ function LoginPage() {
 
   useEffect(() => {
     if (!loading && user) {
-      goToDashboard();
+      goToPostLogin();
     }
     return () => {
       if (redirectTimerRef.current) window.clearTimeout(redirectTimerRef.current);
@@ -109,7 +109,7 @@ function LoginPage() {
       }
       await refreshSession(data.session);
       toast.success("Welcome back!");
-      goToDashboard();
+      goToPostLogin();
     } finally {
       inFlightRef.current = false;
       setSubmitting(false);
@@ -130,7 +130,7 @@ function LoginPage() {
         return;
       }
       if (result.redirected) return;
-      goToDashboard();
+      goToPostLogin();
     } finally {
       inFlightRef.current = false;
       setGoogleSubmitting(false);
