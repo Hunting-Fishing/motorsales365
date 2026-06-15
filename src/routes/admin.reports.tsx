@@ -37,9 +37,11 @@ function AdminReports() {
   const search = Route.useSearch();
   const filter = search.filter ?? "open";
   const reporterFilter = search.reporter ?? null;
+  const expandedId = search.expanded ?? null;
   const [reports, setReports] = useState<ReportRow[]>([]);
   const [counts, setCounts] = useState<Record<string, any>>({});
   const countsFn = useServerFn(getReporterCounts);
+
 
   const load = useCallback(async () => {
     let q = supabase
