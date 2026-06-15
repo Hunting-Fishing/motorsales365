@@ -71,24 +71,39 @@ export function ReportCard({
   currentUserId,
   onChanged,
   onFilterReporter,
+  expanded: expandedProp,
+  defaultExpanded = true,
+  onToggleExpanded,
 }: {
   report: ReportRow;
   reporterCounts?: ReporterCounts;
   currentUserId: string | null;
   onChanged: () => void;
   onFilterReporter: (reporterId: string) => void;
+  expanded?: boolean;
+  defaultExpanded?: boolean;
+  onToggleExpanded?: (next: boolean) => void;
 }) {
   const [draft, setDraft] = useState(report.public_summary ?? "");
   const evidenceFn = useServerFn(getReportEvidenceUrls);
   const [evidence, setEvidence] = useState<{ path: string; url: string | null }[]>([]);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyKey, setHistoryKey] = useState(0);
+  const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
+  const expanded = expandedProp ?? internalExpanded;
+  const toggleExpanded = () => {
+    const next = !expanded;
+    if (onToggleExpanded) onToggleExpanded(next);
+    else setInternalExpanded(next);
+  };
+  const articleRef = useRef<HTMLElement>(null);
   const [dialog, setDialog] = useState<{
     action: ActionKind;
     reversesActionId?: string | null;
   } | null>(null);
 
   useEffect(() => {
+    if (!expanded) return;
     const paths = report.evidence_urls ?? [];
     if (paths.length === 0) return;
     let cancelled = false;
@@ -100,7 +115,8 @@ export function ReportCard({
     return () => {
       cancelled = true;
     };
-  }, [report.id]);
+  }, [report.id, expanded]);
+
 
   const refresh = () => {
     setHistoryKey((k) => k + 1);
