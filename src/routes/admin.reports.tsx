@@ -14,7 +14,9 @@ import { getReporterCounts } from "@/lib/admin-reports.functions";
 const searchSchema = z.object({
   filter: z.enum(["open", "resolved", "all"]).optional(),
   reporter: z.string().uuid().optional(),
+  expanded: z.string().uuid().optional(),
 });
+
 
 export const Route = createFileRoute("/admin/reports")({
   validateSearch: (s) => searchSchema.parse(s ?? {}),
@@ -35,9 +37,11 @@ function AdminReports() {
   const search = Route.useSearch();
   const filter = search.filter ?? "open";
   const reporterFilter = search.reporter ?? null;
+  const expandedId = search.expanded ?? null;
   const [reports, setReports] = useState<ReportRow[]>([]);
   const [counts, setCounts] = useState<Record<string, any>>({});
   const countsFn = useServerFn(getReporterCounts);
+
 
   const load = useCallback(async () => {
     let q = supabase
@@ -95,10 +99,27 @@ function AdminReports() {
     load();
   }, [load]);
 
+  // Scroll the expanded card into view after reports load
+  useEffect(() => {
+    if (!expandedId || reports.length === 0) return;
+    const el = document.getElementById(`report-${expandedId}`);
+    if (el) {
+      requestAnimationFrame(() =>
+        el.scrollIntoView({ block: "start", behavior: "smooth" }),
+      );
+    }
+  }, [expandedId, reports]);
+
   const setFilter = (f: "open" | "resolved" | "all") =>
-    navigate({ search: (s: any) => ({ ...s, filter: f }) });
+    navigate({ search: (s: any) => ({ ...s, filter: f, expanded: undefined }) });
   const setReporter = (id: string | null) =>
     navigate({ search: (s: any) => ({ ...s, reporter: id ?? undefined }) });
+  const setExpanded = (id: string | null) =>
+    navigate({
+      search: (s: any) => ({ ...s, expanded: id ?? undefined }),
+      replace: true,
+    });
+
 
   return (
     <div>
@@ -140,16 +161,23 @@ function AdminReports() {
         </div>
       ) : (
         <div className="space-y-3">
-          {reports.map((r) => (
-            <ReportCard
-              key={r.id}
-              report={r}
-              reporterCounts={r.reporter_id ? counts[r.reporter_id] : undefined}
-              currentUserId={user?.id ?? null}
-              onChanged={load}
-              onFilterReporter={(id) => setReporter(id)}
-            />
-          ))}
+          {reports.map((r) => {
+            const isExpanded =
+              expandedId === r.id || (filter === "open" && expandedId === null);
+            return (
+              <ReportCard
+                key={r.id}
+                report={r}
+                reporterCounts={r.reporter_id ? counts[r.reporter_id] : undefined}
+                currentUserId={user?.id ?? null}
+                onChanged={load}
+                onFilterReporter={(id) => setReporter(id)}
+                expanded={isExpanded}
+                onToggleExpanded={(next) => setExpanded(next ? r.id : null)}
+              />
+            );
+          })}
+
         </div>
       )}
     </div>

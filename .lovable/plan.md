@@ -1,77 +1,61 @@
-# Phase C-2 Rollout — User-Facing Pages & Admin Wiring
+## 1. Collapsed report cards on the resolved/all list
 
-Foundation (DB + server fns + TierBadge) is already in place. This plan wires them into the UI and ships the remaining cron + policy work.
+Right now `ReportCard` always renders the full panel (reason, evidence, listing details, action history, dispute panel). On `/admin/reports?filter=resolved` this makes the list a wall of text.
 
-## 1. Disputes (poster-facing)
+Change `ReportCard` to support a **collapsed posting-style summary** and an **expanded full view**:
 
-- `src/routes/_authenticated/disputes.$reportId.tsx` — dispute form for the poster of a reported listing
-  - Loads via `getReportForDispute({ reportId })`
-  - Textarea (min 30 chars) + up to 5 evidence images uploaded to existing `report-evidence` bucket under `disputes/{reportId}/{uuid}`
-  - Countdown showing days remaining in 14-day window
-  - Calls `fileDispute`, then redirects to `account.disputes`
-  - Shows existing dispute state if already filed (read-only)
-- `src/routes/_authenticated/account.disputes.tsx` — user's dispute history list via `listMyDisputes`
-- Add "Dispute this decision" link in any place a poster sees a resolved report against them (notification email + account area)
-- `src/components/admin/dispute-panel.tsx` — embedded in `ReportCard` when `report_disputes` row exists
-  - Shows dispute reason, evidence thumbnails, filed-at
-  - Uphold / Overturn buttons → `resolveDispute({ disputeId, decision, response })` (response required, ≥10 chars)
-  - Overturn calls `resolve_report_dispute` RPC which already reverses prior action and refunds score
+- Add an `expanded` prop (controlled by parent) plus an internal default.
+- Collapsed row shows, in a single clickable card (like a listing row):
+  - Status pill (resolved/open) + report category/reason short label
+  - Listing thumbnail + title (or target type/url when no listing)
+  - Reporter chip (member #, name) and report date
+  - Final action taken (from latest `report_actions` row) + resolver
+  - Chevron / "View details" affordance
+- Expanded view = current full content (reason, evidence carousel, posting user panel, history, dispute panel, action buttons).
+- Collapsed is the default for `filter !== "open"`; open reports stay expanded by default so moderators can still triage quickly.
 
-## 2. Trust Score Transparency
+### Scroll restoration
 
-- `src/routes/_authenticated/account.trust-score.tsx`
-  - Current score + `TierBadge` + progress bar to next tier
-  - Paginated event timeline (delta, reason_code, note, created_at) via `getMyTrustScore`
-  - Link to `/help/trust-score`
-- `src/routes/help.trust-score.tsx` — public SEO page explaining: range 0–1000, baseline 500, what raises/lowers score, dispute mechanism, tier thresholds, rewards overview
-- Surface live trust score + `TierBadge` on `PostingUserPanel` (admin dossier) using `getUserTrustScore`
+In `admin.reports.tsx`:
+- Track the expanded report id in the URL via `search.expanded` (uuid, optional) using the existing `validateSearch` schema. This makes the state shareable and survives reloads.
+- When a card is expanded, scroll its container into view smoothly; when collapsed, do nothing (the card stays in place so the user is already at "the exact spot").
+- Add `id={`report-${r.id}`}` to each card wrapper and on mount/route-change, if `search.expanded` is set, call `scrollIntoView({ block: "start" })` after the list loads.
+- Back/forward navigation already restores `search.expanded`, so returning from a deep action keeps the same card open and in view.
 
-## 3. Rewards Wallet & Tier Display
+## 2. Notifications when a reported user is someone's 365 client
 
-- `src/routes/_authenticated/account.rewards.tsx`
-  - Lists `member_rewards` rows with claim buttons (calls `claimReward`)
-  - Shows current `boost_credits` balance
-  - Explains tier perks
-- `src/routes/admin.rewards.tsx` — admin grant interface using `adminGrantReward`
-- Add `TierBadge` next to user display name in:
-  - `PostingUserPanel` dossier header
-  - `account-team-strip.tsx` per-member row
-  - Public listing detail seller card (read tier from `profiles.tier_id`)
+Trigger: a new row in `public.reports` whose `target_type = 'listing'` (or `'user'`) maps to a `target_user_id`. Recipients:
 
-## 4. Scheduled Jobs
+1. The **assigned 365 sales rep** for that user (lookup via `sales_rep_assignments` where `subject_type='user'` and `subject_id = target_user_id` and `active = true`).
+2. **All main admins** (everyone in `user_roles` with role `admin`).
 
-Three TanStack server routes under `src/routes/api/public/hooks/`, each authenticated via `apikey` header:
+Implementation:
 
-- `recompute-tiers.ts` — nightly at 03:00 UTC. Recomputes `profiles.tier_id` for active users (signed in within 90d) by calling `compute_user_tier(user_id)`.
-- `quarterly-bonuses.ts` — 1st of Jan/Apr/Jul/Oct at 09:00 UTC. For each active account with **zero accepted reports in the period**, insert a `member_rewards` row sized by tier (Common: 1 boost credit, → Legendary: 10) via `grant_member_reward`.
-- `annual-bonuses.ts` — Jan 1 at 10:00 UTC. Larger annual bonus + "Outstanding Member" featured-badge for top 10 Legendary scores (admin reviews/approves spotlight selection in admin rewards page).
+- New migration adds a Postgres trigger `tg_notify_report_created` on `public.reports AFTER INSERT`:
+  - Resolve `target_user_id` (from `listings.user_id` when `target_type='listing'`, or `reports.target_user_id` directly).
+  - Look up the active assigned rep.
+  - Insert one `ops_alerts` row of kind `report_filed` with `severity='warning'`, `payload` = `{ report_id, target_user_id, reporter_id, category, assigned_rep_id }` so it surfaces in the existing admin alerts UI (already used elsewhere — see `admin.alerts.tsx`).
+  - For the assigned rep (if any), insert a row into a new lightweight `staff_inbox_notifications` table — or reuse the existing `sales_rep_followups` table by inserting a `kind='client_reported'` row referencing the report so it shows up on the rep's dashboard.
+- Email path: when the rep has an email on file, enqueue a transactional email `client-reported-notice` via the existing `sendTransactionalEmail` helper. Template: short notice with reporter category, link to `/staff/clients/{userId}` and `/admin/reports?expanded={reportId}` (admins only). Admins get the same email through their existing ops digest — no per-event admin email to avoid noise.
+- In-app: extend `admin-notification-bell.tsx` to show the new `ops_alerts` kind; add a small badge on the rep's staff dashboard linking to the client and the report.
 
-pg_cron schedules registered via `supabase--insert` (not migration) since they contain the project URL.
+### Technical notes
 
-## 5. Policy Sync
+- Trigger uses `SECURITY DEFINER` with `set search_path = public` and only reads/writes tables it owns; no auth.uid() inside.
+- Email send is fire-and-forget from a server function called by the same RPC that creates the report (or from a `pg_net` call inside the trigger if already wired — fallback: have `report-actions.functions.ts`/the report-create server fn enqueue after insert so we don't add `pg_net`).
+- Skip notification when reporter == target (self-reports) or when target has no assigned rep (still notify admins via ops_alerts).
 
-- `src/routes/terms.tsx` — add section "Trust Score, Disputes & Member Rewards" covering: score range, how actions affect it, 14-day dispute window, reward/boost credits are non-cashable, tier downgrade rules
-- `src/routes/privacy.tsx` — note that moderation actions, dispute submissions, and evidence uploads are retained for the account lifetime + 2 years
-- Bump "Last updated" on both
+## Out of scope
 
-## Answered Defaults (from prior questions)
+- Redesigning the open-reports moderation flow.
+- Changing dispute/rewards logic.
+- SMS or push notifications.
 
-- Dispute evidence → reuse `report-evidence` bucket under `disputes/` prefix
-- Boost wallet → use new `boost_credits` table (already created)
-- `profiles.tier_id` → already added; recomputed nightly + on score event trigger
-- Ship order → Disputes → Trust score pages → Tier badges + rewards → Cron → Terms/Privacy
+## Files touched
 
-## Out of Scope (v1)
-
-- Public leaderboard
-- Referral score boosts
-- Paid tier upgrades
-- Translations (English only)
-- Mobile push for dispute notifications (email only via existing transactional templates)
-
-## Technical Notes
-
-- All new `_authenticated` routes safe to use `loader` with the existing server fns (foundation already uses `requireSupabaseAuth`)
-- Help/terms/privacy are public — must not call protected fns in loaders
-- Tier downgrade: immediate on score drop (handled by `compute_user_tier` trigger), display cache refreshed by nightly cron
-- "Outstanding Member" annual: auto-shortlist top 10 by score, admin manual final pick (hybrid of the two options)
+- `src/components/admin/report-card.tsx` — collapsed/expanded modes, `expanded` prop.
+- `src/routes/admin.reports.tsx` — `expanded` search param, scroll-into-view, default-collapsed when filter ≠ open.
+- `src/components/admin/admin-notification-bell.tsx` — surface `report_filed` alerts.
+- New `src/lib/email-templates/client-reported-notice.tsx` + registry entry.
+- New migration: trigger + (optional) `staff_inbox_notifications` or `sales_rep_followups` insert.
+- `src/lib/report-*.functions.ts` — after successful report insert, fan out rep email.

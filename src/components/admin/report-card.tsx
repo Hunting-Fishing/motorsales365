@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import {
@@ -15,7 +15,10 @@ import {
   History,
   Undo2,
   RotateCcw,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
+
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -68,24 +71,39 @@ export function ReportCard({
   currentUserId,
   onChanged,
   onFilterReporter,
+  expanded: expandedProp,
+  defaultExpanded = true,
+  onToggleExpanded,
 }: {
   report: ReportRow;
   reporterCounts?: ReporterCounts;
   currentUserId: string | null;
   onChanged: () => void;
   onFilterReporter: (reporterId: string) => void;
+  expanded?: boolean;
+  defaultExpanded?: boolean;
+  onToggleExpanded?: (next: boolean) => void;
 }) {
   const [draft, setDraft] = useState(report.public_summary ?? "");
   const evidenceFn = useServerFn(getReportEvidenceUrls);
   const [evidence, setEvidence] = useState<{ path: string; url: string | null }[]>([]);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyKey, setHistoryKey] = useState(0);
+  const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
+  const expanded = expandedProp ?? internalExpanded;
+  const toggleExpanded = () => {
+    const next = !expanded;
+    if (onToggleExpanded) onToggleExpanded(next);
+    else setInternalExpanded(next);
+  };
+  const articleRef = useRef<HTMLElement>(null);
   const [dialog, setDialog] = useState<{
     action: ActionKind;
     reversesActionId?: string | null;
   } | null>(null);
 
   useEffect(() => {
+    if (!expanded) return;
     const paths = report.evidence_urls ?? [];
     if (paths.length === 0) return;
     let cancelled = false;
@@ -97,7 +115,8 @@ export function ReportCard({
     return () => {
       cancelled = true;
     };
-  }, [report.id]);
+  }, [report.id, expanded]);
+
 
   const refresh = () => {
     setHistoryKey((k) => k + 1);
@@ -152,7 +171,12 @@ export function ReportCard({
       : "border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300";
 
   return (
-    <article className="overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md">
+    <article
+      ref={articleRef}
+      id={`report-${report.id}`}
+      className="overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md"
+    >
+
       {/* ── Header bar ───────────────────────────────────────── */}
       <header className="flex flex-wrap items-start justify-between gap-3 border-b border-border bg-muted/30 px-5 py-3">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
@@ -184,10 +208,31 @@ export function ReportCard({
             size="sm"
             variant="ghost"
             className="h-8"
-            onClick={() => setHistoryOpen((v) => !v)}
+            onClick={toggleExpanded}
+            aria-expanded={expanded}
+            aria-controls={`report-${report.id}-body`}
           >
-            <History className="mr-1 h-4 w-4" /> History
+            {expanded ? (
+              <>
+                <ChevronUp className="mr-1 h-4 w-4" /> Collapse
+              </>
+            ) : (
+              <>
+                <ChevronDown className="mr-1 h-4 w-4" /> View details
+              </>
+            )}
           </Button>
+          {expanded && (
+            <Button
+              size="sm"
+              variant="ghost"
+              className="h-8"
+              onClick={() => setHistoryOpen((v) => !v)}
+            >
+              <History className="mr-1 h-4 w-4" /> History
+            </Button>
+          )}
+
           {report.status !== "resolved" ? (
             <>
               <div className="flex items-center gap-0.5">
@@ -248,7 +293,45 @@ export function ReportCard({
         </div>
       </header>
 
-      {historyOpen && (
+      {!expanded && (
+        <button
+          type="button"
+          onClick={toggleExpanded}
+          className="flex w-full items-start gap-3 px-5 py-3 text-left transition-colors hover:bg-muted/30"
+        >
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              {report.listing_id ? (
+                <span className="truncate text-sm font-semibold text-foreground">
+                  {report.listings?.title ?? "Listing"}
+                </span>
+              ) : report.target_url ? (
+                <span className="truncate text-sm font-semibold text-foreground">
+                  {report.target_url}
+                </span>
+              ) : (
+                <span className="truncate text-sm font-semibold italic text-muted-foreground">
+                  No target link
+                </span>
+              )}
+            </div>
+            <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
+              {report.reason}
+            </p>
+            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
+              <span>By {displayName}</span>
+              {memberLabel && <span className="font-mono">{memberLabel}</span>}
+              {report.resolution && (
+                <span className="capitalize">→ {report.resolution}</span>
+              )}
+            </div>
+          </div>
+          <ChevronDown className="mt-1 h-4 w-4 shrink-0 text-muted-foreground" />
+        </button>
+      )}
+
+      {expanded && historyOpen && (
+
         <div className="border-b border-border bg-background/40 p-5">
           <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             Action history
@@ -263,7 +346,9 @@ export function ReportCard({
         </div>
       )}
 
-      <div className="space-y-5 p-5">
+      {expanded && (
+      <div id={`report-${report.id}-body`} className="space-y-5 p-5">
+
         {/* ── Target + Reason ─────────────────────────────────── */}
         <section>
           <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -471,6 +556,9 @@ export function ReportCard({
           </div>
         </section>
       </div>
+      )}
+
+
 
       {dialog && (
         <ReportActionDialog
