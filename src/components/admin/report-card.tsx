@@ -62,8 +62,14 @@ export type ReportRow = {
   public_summary: string | null;
   made_public_at: string | null;
   resolution: string | null;
-  listings?: { title: string | null; status: string | null; user_id: string | null } | null;
+  listings?: {
+    title: string | null;
+    status: string | null;
+    user_id: string | null;
+    listing_media?: { url: string | null; sort_order: number | null }[] | null;
+  } | null;
 };
+
 
 export function ReportCard({
   report,
