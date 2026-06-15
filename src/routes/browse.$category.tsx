@@ -708,6 +708,7 @@ interface FiltersFormProps {
   setCatFilters: (v: CategoryFilterValue) => void;
   onSubmit: (e?: React.FormEvent) => void;
   onSave: () => void;
+  onReset?: () => void;
   yearCounts?: Record<string, number>;
 }
 
