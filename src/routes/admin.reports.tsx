@@ -99,10 +99,27 @@ function AdminReports() {
     load();
   }, [load]);
 
+  // Scroll the expanded card into view after reports load
+  useEffect(() => {
+    if (!expandedId || reports.length === 0) return;
+    const el = document.getElementById(`report-${expandedId}`);
+    if (el) {
+      requestAnimationFrame(() =>
+        el.scrollIntoView({ block: "start", behavior: "smooth" }),
+      );
+    }
+  }, [expandedId, reports]);
+
   const setFilter = (f: "open" | "resolved" | "all") =>
-    navigate({ search: (s: any) => ({ ...s, filter: f }) });
+    navigate({ search: (s: any) => ({ ...s, filter: f, expanded: undefined }) });
   const setReporter = (id: string | null) =>
     navigate({ search: (s: any) => ({ ...s, reporter: id ?? undefined }) });
+  const setExpanded = (id: string | null) =>
+    navigate({
+      search: (s: any) => ({ ...s, expanded: id ?? undefined }),
+      replace: true,
+    });
+
 
   return (
     <div>
