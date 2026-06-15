@@ -170,8 +170,8 @@ function DispatchLanding() {
       <section id="plans" className="container mx-auto px-4 py-12">
         <h2 className="font-display text-3xl font-bold">Underdog pricing.</h2>
         <p className="mt-1 text-muted-foreground">
-          One tow job in Metro Manila averages ₱2,500–₱5,000. Our top tier costs ₱999/mo —
-          a single completed job covers a full year of Pro.
+          One tow job in Metro Manila averages ₱2,500–₱5,000. Our top tier costs ₱1,000/mo —
+          a single completed job covers a full year of Unlimited.
         </p>
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           {PLANS.map((p) => (
