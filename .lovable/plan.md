@@ -1,148 +1,65 @@
-# Phase C — Fair Moderation + Member Rewards
+# Phase C-2 — Disputes, Trust-Score UX, Rewards, Cron, Policy sync
 
-Goal: make every moderation action explicit, reversible, and explainable; let posters dispute decisions; turn the trust score into a transparent, two-way system; and reward consistently good members with quarterly free boosts and annual tier bonuses (common → legendary).
+Builds on the Phase C foundation (ledger tables, `apply_report_action`, revamped card UI) that's already live. Five tracks, each independently shippable.
 
----
+## 1. Poster-facing disputes
 
-## 1. Safer report actions (UI/UX)
+- `src/lib/disputes.functions.ts`
+  - `fileDispute({ reportId, message, evidenceUrls[] })` — RLS-enforced; one open dispute per report per user; 14-day window.
+  - `getMyDispute({ reportId })` — for the poster.
+  - `listOpenDisputes()` — admin/moderator list for the queue.
+  - `resolveDispute({ disputeId, decision: 'uphold'|'overturn', response })` — admin only; on overturn calls `apply_report_action(action='reverse', reverses_action_id=<original accept row>)`, sets `score_refund`, restores listing if it was hidden.
+- `src/routes/_authenticated/disputes.$reportId.tsx` — poster view. Shows report reason, public summary, current decision, trust-score change, dispute form (textarea + up to 5 image uploads to `report-evidence` bucket), countdown to deadline, status once filed.
+- `src/routes/_authenticated/account.disputes.tsx` — list of all the user's disputes (open / upheld / overturned).
+- Admin side:
+  - `src/components/admin/dispute-panel.tsx` mounted inside `ReportCard` when a dispute exists, showing message + evidence + Uphold/Overturn buttons (each opens a confirmation with required response note).
+  - New filter chip "Disputed" on `/admin/reports`.
+- Email: extend resolution path so when `notify_poster=true` on accept, an email with a "Dispute this decision" deep link is sent (reuse `src/lib/email/send.ts`; new template `dispute-invite.tsx`). On dispute resolution, send `dispute-upheld.tsx` / `dispute-overturned.tsx`.
 
-In `src/components/admin/report-card.tsx` rebuild the action row:
+## 2. Trust-score transparency
 
-- **Color-coded buttons** (semantic tokens, not raw colors):
-  - Accept (confirms violation) — `destructive` outline, red accent
-  - Dismiss (no violation) — `secondary`, muted
-  - Hide listing — `warning` (amber) outline
-  - Delete listing — solid `destructive`, requires typed confirmation
-  - Publish summary — `default` primary
-  - Reverse decision — `outline` with undo icon (only when resolved)
-- **No auto-action on Accept.** Today, "Accept" silently chains effects; change to: Accept only marks the report as a confirmed violation. Hiding/deleting the listing become explicit follow-up steps inside the confirmation dialog (checkboxes: "Also hide listing", "Also notify poster", "Issue strike").
-- **Info icons (ⓘ)** beside every button → Popover explaining:
-  - what the action does
-  - effect on listing
-  - effect on poster's trust score (+/− points)
-  - whether the poster can dispute it
-  - whether/how it can be reversed
-- **Confirmation dialog** for every state-changing action (`ConfirmActionDialog` new component): shows action summary, score delta preview, required moderator note (min 10 chars), and an optional "send message to poster" textarea. Delete-listing requires typing the listing title.
-- **Status chips** at the top of the card use color: open=amber, accepted=red, dismissed=slate, reversed=blue, disputed=purple.
+- `src/lib/trust-score.functions.ts`
+  - `getTrustScoreBreakdown({ userId? })` — returns current score, baseline, sum of deltas, list of events (paginated), grouped totals by reason_code.
+  - Admin-only `adjustTrustScore({ userId, delta, reason })` — writes a `manual_admin_adjustment` event; required note.
+- `src/routes/_authenticated/account.trust-score.tsx` — user-facing breakdown: big score number, tier badge, progress bar to next tier, timeline of events with reason codes, link to the explainer.
+- `src/routes/help.trust-score.tsx` — public SEO page: how the score works, all reason codes with point values, how to dispute, link to posting etiquette.
+- Surface score chip on `PostingUserPanel` (already shows trust_score — switch to live `get_trust_score()` value) and link to user's trust-score page.
 
-## 2. Report action history + reversal
+## 3. Member tiers + rewards
 
-New table `report_actions` (append-only ledger):
+- `src/lib/tiers.functions.ts`
+  - `getMyTier()` / `getUserTier({ userId })` — returns tier id, score, tenure days, distance to next tier.
+- `src/lib/rewards.functions.ts`
+  - `listMyRewards()` / `claimReward({ id })` (sets `status='claimed'`, claimed_at; if `kind='boost_credit'` writes a row into a new wallet table — see below).
+  - Admin: `listAllRewards()`, `grantReward({ userId, kind, amount, note })`, `revokeReward({ id, reason })`.
+- New table `boost_credits` (wallet) — simple ledger of granted/consumed credits with a `source` ('reward'|'purchase'|'manual'); existing boost flow checks this wallet first before charging. Migration in same call.
+- `src/components/tier-badge.tsx` — small chip used on profile, shop page, listing cards. Color mapped from `member_tiers.color`.
+- `src/routes/_authenticated/account.rewards.tsx` — current tier, progress, claimable + history.
+- `src/routes/admin.rewards.tsx` — distribution queue, manual grants, audit log.
 
-```text
-id, report_id, actor_id, action, prev_status, new_status,
-score_delta, note, listing_effect (none|hidden|deleted|restored),
-notified_poster bool, created_at, reversed_by_action_id
-```
+## 4. Scheduled distributions (pg_cron + server routes)
 
-- Every Accept / Dismiss / Hide / Delete / Publish / Unpublish / Reverse / Dispute-resolve writes one row.
-- **Reverse decision** action: only admins; opens dialog explaining what will be undone (status flips back to open, score delta inverted, hidden listing un-hidden, deleted listing cannot be auto-restored — flagged for manual restore). Writes a new row with `reversed_by_action_id` pointing at the original.
-- New "History" tab in `ReportCard` showing a timeline (icon, actor, action, note, score delta) using existing audit styling.
+- `src/routes/api/public/hooks/recompute-tiers.ts` (nightly) — for each user, derives tier from `get_trust_score()` + `created_at`, stores on `profiles.tier_id` (new column). Used only for display caching — authoritative tier is always recomputed.
+- `src/routes/api/public/hooks/quarterly-bonuses.ts` (1st of Jan/Apr/Jul/Oct) — for active accounts (≥1 listing this quarter, no accepted reports), inserts `member_rewards` rows of `kind='boost_credit'` with `amount=tier.quarterly_boost_credits`, `period='qN-YYYY'`. Idempotent by `(user_id, period, kind)`.
+- `src/routes/api/public/hooks/annual-bonuses.ts` (Jan 1) — issues annual boost credits + featured badge by highest tier reached. Surfaces top-10 Legendary list for admin manual spotlight pick.
+- pg_cron entries via `supabase--insert` after routes ship, using `apikey` header.
 
-## 3. User disputes
+## 5. Policy sync (Core memory rule)
 
-New table `report_disputes`:
-
-```text
-id, report_id, user_id (poster), message, evidence_urls[],
-status (open|upheld|overturned), admin_response, resolved_by,
-resolved_at, score_refund, created_at
-```
-
-- New public route `src/routes/_authenticated/disputes.$reportId.tsx`: poster sees the report reason, public summary, current decision, and a form to file a dispute (one per report). They can attach up to 5 evidence images.
-- Notify poster: when a report resolves against them, send an in-app notification + email with a "Dispute this decision" link (14-day window).
-- Admin side: new tab in `/admin/reports` filter ("Disputed"), and a Dispute panel inside `ReportCard` showing the poster's message + evidence. Admin actions:
-  - **Uphold** — dispute denied, no score change.
-  - **Overturn** — auto-reverses the original decision, refunds the score delta plus a +5 "wrongly reported" bonus, un-hides listing if applicable.
-- All dispute actions write to `report_actions`.
-
-## 4. Transparent, fair trust score (v2)
-
-Replace the ad-hoc formula in `admin-user-dossier.functions.ts` with a documented, two-way ledger.
-
-New table `trust_score_events`:
-
-```text
-id, user_id, delta, reason_code, reason_label, source_type
-(report|dispute|review|verification|listing|bonus|tier|manual),
-source_id, actor_id, created_at
-```
-
-Score is now `500 + sum(delta)` clamped to `0..1000`, **not** recalculated from scratch — every change is auditable.
-
-Reason codes (negative):
-- `report_accepted` −25
-- `listing_hidden` −10
-- `listing_deleted` −40
-- `repeat_offense_30d` −15 (stacking)
-- `low_rating` −5 per ≤2★ review
-
-Reason codes (positive):
-- `dispute_overturned` +original_delta +5
-- `verified_identity` +50
-- `verified_business` +75
-- `5★_review` +3
-- `completed_sale` +2
-- `quarterly_clean_streak` +25 (no accepted reports in 90 days)
-- `tier_bonus` variable (see §5)
-- `manual_admin_adjustment` (admin-only, requires note)
-
-User-facing `/account/trust-score` page (and a public `/help/trust-score`) explains every reason code, current score, history timeline, and current tier. Score breakdown also appears in the admin dossier and in dispute forms so users see exactly which event lost them points.
-
-## 5. Member reward tiers (common → legendary)
-
-New tables `member_tiers` (config) and `member_rewards` (issued).
-
-Tiers (based on trust score + tenure, recomputed nightly):
-
-| Tier       | Min score | Min tenure | Color    |
-|------------|-----------|------------|----------|
-| Common     | 0         | 0          | slate    |
-| Uncommon   | 550       | 30 d       | green    |
-| Rare       | 650       | 90 d       | blue     |
-| Epic       | 750       | 180 d      | purple   |
-| Legendary  | 875       | 365 d      | amber/gold |
-
-**Quarterly bonuses (every 3 months, pg_cron):**
-- Active accounts (≥1 listing or ≥1 sale in quarter) with no accepted reports get free boost credits scaled by tier: Common 1 · Uncommon 2 · Rare 4 · Epic 7 · Legendary 12.
-- Credits drop into existing `listing_boosts` flow as `source = 'tier_bonus'`.
-- In-app notification + email.
-
-**Annual bonuses (Jan 1, pg_cron):**
-- Highest-tier reached during the year unlocks:
-  - Legendary → free 12-month "featured seller" badge + 30 boost credits + custom shop banner slot
-  - Epic → 6-month badge + 15 boost credits
-  - Rare → 3-month badge + 8 boost credits
-  - Uncommon → 4 boost credits
-- "Outstanding member of the year" — top 10 by score within Legendary tier get a manual review queue surfaced to admins for a hand-picked spotlight feature.
-
-UI:
-- Tier badge on profile, shop page, listing cards (small chip).
-- New `/account/rewards` page: current tier, progress bar to next tier, claimable rewards, history.
-- Admin `/admin/rewards` page: see upcoming distributions, manually grant/revoke, audit log.
-
-## 6. Cross-cutting
-
-- Sync rule: §1–§5 touch fees/boosts/score → update `/terms` "Last updated" and add a "Trust score & rewards" section; update `/privacy` for new score-event logging; add `/help/trust-score` and `/help/rewards`. Per `mem://policies/terms-sync` and `mem://policies/privacy-sync`.
-- Link from posting-etiquette page to `/help/trust-score`.
-- All admin actions still gated by `has_role(...,'admin'|'moderator')`. Reversal limited to `admin`. Manual score adjustments limited to `admin` and always logged.
-
----
-
-## Technical sketch (for the implementer)
-
-- **Migrations**: `report_actions`, `report_disputes`, `trust_score_events`, `member_tiers` (seed 5 rows), `member_rewards`. All with GRANTs (`authenticated` for own rows via RLS, `service_role` full). Trigger on `reports` resolution → writes default `trust_score_events` + `report_actions` rows via SECURITY DEFINER function `public.apply_report_resolution(report_id, action, actor, note, opts)`.
-- **Server fns** (`src/lib/`): `report-actions.functions.ts` (apply/reverse), `disputes.functions.ts` (file/list/resolve), `trust-score.functions.ts` (read events, breakdown), `rewards.functions.ts` (list, claim, admin grant), `tiers.functions.ts` (current tier, progress).
-- **Cron**: `src/routes/api/public/hooks/quarterly-bonuses.ts` + `annual-bonuses.ts` + nightly `recompute-tiers.ts`, all wired through pg_cron with `apikey` header.
-- **Components**: `ConfirmActionDialog`, `ActionInfoPopover`, `ReportHistoryTimeline`, `DisputePanel`, `TrustScoreBreakdown`, `TierBadge`, `RewardsCard`.
-- **Hook**: `useTrustScore(userId)` and `useMemberTier(userId)` with React Query.
+- `src/routes/terms.tsx` — append "Trust score & rewards" section explaining score formula, dispute window, tier benefits (free boosts, badges). Bump "Last updated".
+- `src/routes/privacy.tsx` — note that moderation actions and dispute history are logged per-user. Bump "Last updated".
+- Link to `/help/trust-score` from `/help/posting-etiquette` and from the report-resolution email.
 
 ## Open questions
 
-1. **Score range** — OK with `0..1000` starting at 500, or prefer keeping current `0..100`? (1000 gives finer granularity for tier thresholds.)
-2. **Dispute window** — 14 days from resolution OK, or shorter/longer?
-3. **Tier downgrade** — should a user drop tiers immediately when score falls, or only at quarterly recompute? (Recommend quarterly to avoid yo-yo.)
-4. **Annual "Outstanding Member"** spotlight — fully manual admin pick from the Legendary shortlist, or auto-top-3 by score?
-5. **Boost credit accounting** — reuse existing `listing_boosts` table with a `source` column, or new `boost_credits` wallet table?
+1. **Dispute evidence storage** — reuse existing `report-evidence` bucket (admin reads via signed URL), or stand up a separate `dispute-evidence` bucket? Reusing is simpler.
+2. **Boost credit wallet** — confirm OK to add a new `boost_credits` ledger table (cleaner audit) rather than overload `listing_boosts` with a `source` column.
+3. **Tier `tier_id` cache on profiles** — OK to add a `profiles.tier_id text` column for fast badge display, recomputed nightly? Authoritative tier still derived from score on read.
+4. **Order to ship** — recommend: (1) Disputes UX, (2) Trust-score pages, (3) Tier badges + rewards UI, (4) Cron jobs, (5) Terms/Privacy. Want a different order, or ship all five in one big batch?
 
-Out of scope here: paid tier purchases, referral-based score boosts, public leaderboard.
+## Out of scope
+
+- Public leaderboard.
+- Referral score boosts.
+- Paid tier upgrades (real money buys a tier).
+- Translating help pages (English-only v1).
