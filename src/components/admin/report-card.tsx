@@ -148,11 +148,15 @@ export function ReportCard({
     onChanged();
   };
 
-  const reporterName =
+  const displayName =
+    report.reporter_full_name ||
     report.reporter_name ||
     (report.reporter_email ? report.reporter_email.split("@")[0] : null) ||
-    (report.reporter_id ? `User ${report.reporter_id.slice(0, 8)}` : "Anonymous");
-  const reporterSubtitle = report.reporter_name && report.reporter_email ? report.reporter_email : null;
+    (report.reporter_id ? "Registered user" : "Anonymous");
+  const memberLabel =
+    report.reporter_member_number != null
+      ? `User #${report.reporter_member_number.toLocaleString()}`
+      : null;
   const isAnonymous = !report.reporter_id;
 
   return (
