@@ -23,6 +23,7 @@ import { confirm } from "@/components/ui/confirm-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { formatDate } from "@/lib/format";
 import { ReportSignals } from "./report-signals";
+import { PostingUserPanel } from "./posting-user-panel";
 import { getReportEvidenceUrls, setReportResolution } from "@/lib/admin-reports.functions";
 
 type ReporterCounts = {
