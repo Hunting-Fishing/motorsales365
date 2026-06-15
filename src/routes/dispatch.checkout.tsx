@@ -8,9 +8,9 @@ import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
 import { useAuth } from "@/hooks/use-auth";
 
 const VALID_PRICES = new Set([
-  "dispatch_starter_monthly",
-  "dispatch_pro_monthly",
-  "dispatch_fleet_monthly",
+  "dispatch_solo_monthly",
+  "dispatch_team_monthly",
+  "dispatch_unlimited_monthly",
 ]);
 
 export const Route = createFileRoute("/dispatch/checkout")({
