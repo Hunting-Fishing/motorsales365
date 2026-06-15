@@ -11,7 +11,17 @@ import { Label } from "@/components/ui/label";
 import { SiteLayout } from "@/components/site-layout";
 import { siteOrigin } from "@/lib/site-config";
 
+function safeInternalPath(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  // Only allow same-origin relative paths (must start with single "/")
+  if (!value.startsWith("/") || value.startsWith("//")) return undefined;
+  return value;
+}
+
 export const Route = createFileRoute("/login")({
+  validateSearch: (search: Record<string, unknown>): { redirect?: string } => ({
+    redirect: safeInternalPath(search.redirect),
+  }),
   component: LoginPage,
 });
 
