@@ -18,6 +18,8 @@ import {
 import { formatDate } from "@/lib/format";
 import { InquiryTimeline } from "@/components/sponsorship/inquiry-timeline";
 import { SECTIONS, FORMATS, sectionLabel, formatLabel } from "@/components/advertise/placements";
+import { ContactRequestButton } from "@/components/admin/contact-request-button";
+import { useStaffScope } from "@/hooks/use-staff-scope";
 
 export const Route = createFileRoute("/admin/advertising")({
   component: AdminAdvertising,
@@ -37,6 +39,7 @@ const STATUS_TONE: Record<Status, string> = {
 
 function AdminAdvertising() {
   const { user, canManageAds } = useAuth();
+  const { scope } = useStaffScope();
   const hasAccess = canManageAds;
   const [inquiries, setInquiries] = useState<any[]>([]);
   const [filter, setFilter] = useState<Status | "all">("new");
@@ -350,6 +353,16 @@ function AdminAdvertising() {
                   >
                     {active.assigned_to === user?.id ? "Assigned to you" : "Assign to me"}
                   </Button>
+                  {active.assigned_to &&
+                    active.assigned_to !== user?.id &&
+                    scope &&
+                    !scope.canSeeAll && (
+                      <ContactRequestButton
+                        ownerId={active.assigned_to}
+                        ownerLabel="the assigned staff member"
+                        adInquiryId={active.id}
+                      />
+                    )}
                   {active.status !== "won" && active.status !== "lost" && (
                     <>
                       <Button
