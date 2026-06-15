@@ -461,6 +461,57 @@ export type Database = {
           },
         ]
       }
+      boost_credits: {
+        Row: {
+          actor_id: string | null
+          amount: number
+          created_at: string
+          id: string
+          listing_boost_id: string | null
+          note: string | null
+          reward_id: string | null
+          source: string
+          user_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          amount: number
+          created_at?: string
+          id?: string
+          listing_boost_id?: string | null
+          note?: string | null
+          reward_id?: string | null
+          source: string
+          user_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          amount?: number
+          created_at?: string
+          id?: string
+          listing_boost_id?: string | null
+          note?: string | null
+          reward_id?: string | null
+          source?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "boost_credits_listing_boost_id_fkey"
+            columns: ["listing_boost_id"]
+            isOneToOne: false
+            referencedRelation: "listing_boosts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "boost_credits_reward_id_fkey"
+            columns: ["reward_id"]
+            isOneToOne: false
+            referencedRelation: "member_rewards"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       boost_products: {
         Row: {
           active: boolean
@@ -4935,6 +4986,8 @@ export type Database = {
           signup_province: string | null
           signup_region: string | null
           street_address: string | null
+          tier_id: string | null
+          tier_recomputed_at: string | null
           updated_at: string
           verification_status: Database["public"]["Enums"]["verification_status"]
           verified_at: string | null
@@ -4986,6 +5039,8 @@ export type Database = {
           signup_province?: string | null
           signup_region?: string | null
           street_address?: string | null
+          tier_id?: string | null
+          tier_recomputed_at?: string | null
           updated_at?: string
           verification_status?: Database["public"]["Enums"]["verification_status"]
           verified_at?: string | null
@@ -5037,6 +5092,8 @@ export type Database = {
           signup_province?: string | null
           signup_region?: string | null
           street_address?: string | null
+          tier_id?: string | null
+          tier_recomputed_at?: string | null
           updated_at?: string
           verification_status?: Database["public"]["Enums"]["verification_status"]
           verified_at?: string | null
@@ -5048,6 +5105,13 @@ export type Database = {
             columns: ["parent_org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_tier_id_fkey"
+            columns: ["tier_id"]
+            isOneToOne: false
+            referencedRelation: "member_tiers"
             referencedColumns: ["id"]
           },
         ]
@@ -8369,6 +8433,7 @@ export type Database = {
       can_moderate: { Args: { _user_id: string }; Returns: boolean }
       can_support: { Args: { _user_id: string }; Returns: boolean }
       cleanup_unverified_users: { Args: never; Returns: number }
+      compute_user_tier: { Args: { _user_id: string }; Returns: string }
       current_plan_tier: { Args: { _user_id: string }; Returns: string }
       delete_email: {
         Args: { message_id: number; queue_name: string }
@@ -8408,6 +8473,7 @@ export type Database = {
           title: string
         }[]
       }
+      get_boost_credit_balance: { Args: { _user_id: string }; Returns: number }
       get_listing_price_history: {
         Args: { _listing_id: string }
         Returns: {
@@ -8475,6 +8541,18 @@ export type Database = {
         }[]
       }
       get_trust_score: { Args: { _user_id: string }; Returns: number }
+      grant_member_reward: {
+        Args: {
+          _amount: number
+          _expires_at?: string
+          _kind: string
+          _note: string
+          _period: string
+          _tier_id: string
+          _user_id: string
+        }
+        Returns: string
+      }
       has_active_client_access: {
         Args: { _client: string; _owner: string; _requester: string }
         Returns: boolean
@@ -8583,6 +8661,10 @@ export type Database = {
         Returns: Json
       }
       resolve_login_to_email: { Args: { _input: string }; Returns: string }
+      resolve_report_dispute: {
+        Args: { _decision: string; _dispute_id: string; _response: string }
+        Returns: string
+      }
       rotate_internal_cron_token: {
         Args: { _job_name: string }
         Returns: boolean
