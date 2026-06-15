@@ -286,7 +286,7 @@ function SignupPage() {
     }
     // Edge case: confirmations disabled, session is live immediately.
     toast.success("Account created!");
-    navigate({ to: POST_SIGNUP_ROUTE[intent] });
+    goAfterSignup(POST_SIGNUP_ROUTE[intent]);
   };
 
   const handleGoogle = async () => {
