@@ -85,6 +85,7 @@ import { Route as HelpPayWithGcashRouteImport } from './routes/help.pay-with-gca
 import { Route as GoProductIdRouteImport } from './routes/go.$productId'
 import { Route as ExportTrustRouteImport } from './routes/export.trust'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
+import { Route as DispatchJoinRouteImport } from './routes/dispatch.join'
 import { Route as DispatchCheckoutRouteImport } from './routes/dispatch.checkout'
 import { Route as DashboardWantedRouteImport } from './routes/dashboard.wanted'
 import { Route as DashboardVerificationRouteImport } from './routes/dashboard.verification'
@@ -580,6 +581,11 @@ const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DispatchJoinRoute = DispatchJoinRouteImport.update({
+  id: '/join',
+  path: '/join',
+  getParentRoute: () => DispatchRoute,
 } as any)
 const DispatchCheckoutRoute = DispatchCheckoutRouteImport.update({
   id: '/checkout',
@@ -1293,6 +1299,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/dashboard/wanted': typeof DashboardWantedRoute
   '/dispatch/checkout': typeof DispatchCheckoutRoute
+  '/dispatch/join': typeof DispatchJoinRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/go/$productId': typeof GoProductIdRoute
@@ -1483,6 +1490,7 @@ export interface FileRoutesByTo {
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/dashboard/wanted': typeof DashboardWantedRoute
   '/dispatch/checkout': typeof DispatchCheckoutRoute
+  '/dispatch/join': typeof DispatchJoinRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/go/$productId': typeof GoProductIdRoute
@@ -1678,6 +1686,7 @@ export interface FileRoutesById {
   '/dashboard/verification': typeof DashboardVerificationRoute
   '/dashboard/wanted': typeof DashboardWantedRoute
   '/dispatch/checkout': typeof DispatchCheckoutRoute
+  '/dispatch/join': typeof DispatchJoinRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/export/trust': typeof ExportTrustRoute
   '/go/$productId': typeof GoProductIdRoute
@@ -1873,6 +1882,7 @@ export interface FileRouteTypes {
     | '/dashboard/verification'
     | '/dashboard/wanted'
     | '/dispatch/checkout'
+    | '/dispatch/join'
     | '/email/unsubscribe'
     | '/export/trust'
     | '/go/$productId'
@@ -2063,6 +2073,7 @@ export interface FileRouteTypes {
     | '/dashboard/verification'
     | '/dashboard/wanted'
     | '/dispatch/checkout'
+    | '/dispatch/join'
     | '/email/unsubscribe'
     | '/export/trust'
     | '/go/$productId'
@@ -2257,6 +2268,7 @@ export interface FileRouteTypes {
     | '/dashboard/verification'
     | '/dashboard/wanted'
     | '/dispatch/checkout'
+    | '/dispatch/join'
     | '/email/unsubscribe'
     | '/export/trust'
     | '/go/$productId'
@@ -2992,6 +3004,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/dispatch/join': {
+      id: '/dispatch/join'
+      path: '/join'
+      fullPath: '/dispatch/join'
+      preLoaderRoute: typeof DispatchJoinRouteImport
+      parentRoute: typeof DispatchRoute
     }
     '/dispatch/checkout': {
       id: '/dispatch/checkout'
@@ -4008,10 +4027,12 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 
 interface DispatchRouteChildren {
   DispatchCheckoutRoute: typeof DispatchCheckoutRoute
+  DispatchJoinRoute: typeof DispatchJoinRoute
 }
 
 const DispatchRouteChildren: DispatchRouteChildren = {
   DispatchCheckoutRoute: DispatchCheckoutRoute,
+  DispatchJoinRoute: DispatchJoinRoute,
 }
 
 const DispatchRouteWithChildren = DispatchRoute._addFileChildren(
