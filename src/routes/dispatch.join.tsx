@@ -104,7 +104,11 @@ function DispatchJoin() {
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate({ to: "/login", search: { redirect: `/dispatch/join?priceId=${priceId ?? ""}` } as any });
+      const redirect = `/dispatch/join?priceId=${encodeURIComponent(priceId ?? "")}`;
+      navigate({
+        to: "/signup",
+        search: { type: "service_provider", redirect } as any,
+      });
     }
   }, [loading, user, navigate, priceId]);
 
