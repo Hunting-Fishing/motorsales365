@@ -6589,6 +6589,95 @@ export type Database = {
         }
         Relationships: []
       }
+      staff_client_contact_audit: {
+        Row: {
+          action: Database["public"]["Enums"]["staff_contact_audit_action"]
+          actor_id: string | null
+          created_at: string
+          id: string
+          metadata: Json
+          note: string | null
+          request_id: string
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["staff_contact_audit_action"]
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          note?: string | null
+          request_id: string
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["staff_contact_audit_action"]
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json
+          note?: string | null
+          request_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "staff_client_contact_audit_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "staff_client_contact_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      staff_client_contact_requests: {
+        Row: {
+          ad_inquiry_id: string | null
+          client_profile_id: string | null
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          decision_note: string | null
+          expires_at: string | null
+          id: string
+          lead_id: string | null
+          owner_id: string
+          reason: string
+          requester_id: string
+          status: Database["public"]["Enums"]["staff_contact_request_status"]
+          updated_at: string
+        }
+        Insert: {
+          ad_inquiry_id?: string | null
+          client_profile_id?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          expires_at?: string | null
+          id?: string
+          lead_id?: string | null
+          owner_id: string
+          reason: string
+          requester_id: string
+          status?: Database["public"]["Enums"]["staff_contact_request_status"]
+          updated_at?: string
+        }
+        Update: {
+          ad_inquiry_id?: string | null
+          client_profile_id?: string | null
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          decision_note?: string | null
+          expires_at?: string | null
+          id?: string
+          lead_id?: string | null
+          owner_id?: string
+          reason?: string
+          requester_id?: string
+          status?: Database["public"]["Enums"]["staff_contact_request_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       staff_promotions: {
         Row: {
           active: boolean
@@ -8123,6 +8212,10 @@ export type Database = {
           status: Database["public"]["Enums"]["passport_verification_status"]
         }[]
       }
+      has_active_client_access: {
+        Args: { _client: string; _owner: string; _requester: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -8138,6 +8231,7 @@ export type Database = {
         Args: { _listing_id: string; _viewer_id?: string }
         Returns: undefined
       }
+      is_365_staff: { Args: { _user_id: string }; Returns: boolean }
       is_business_account: { Args: { _user_id: string }; Returns: boolean }
       is_business_editor: {
         Args: { _business_id: string; _user_id: string }
@@ -8405,6 +8499,19 @@ export type Database = {
         | "insurance"
         | "accident_repair"
         | "other"
+      staff_contact_audit_action:
+        | "created"
+        | "approved"
+        | "denied"
+        | "revoked"
+        | "expired"
+        | "accessed"
+      staff_contact_request_status:
+        | "pending"
+        | "approved"
+        | "denied"
+        | "expired"
+        | "revoked"
       verification_request_status:
         | "pending"
         | "approved"
@@ -8715,6 +8822,21 @@ export const Constants = {
         "insurance",
         "accident_repair",
         "other",
+      ],
+      staff_contact_audit_action: [
+        "created",
+        "approved",
+        "denied",
+        "revoked",
+        "expired",
+        "accessed",
+      ],
+      staff_contact_request_status: [
+        "pending",
+        "approved",
+        "denied",
+        "expired",
+        "revoked",
       ],
       verification_request_status: [
         "pending",
