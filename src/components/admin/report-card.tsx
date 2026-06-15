@@ -62,8 +62,14 @@ export type ReportRow = {
   public_summary: string | null;
   made_public_at: string | null;
   resolution: string | null;
-  listings?: { title: string | null; status: string | null; user_id: string | null } | null;
+  listings?: {
+    title: string | null;
+    status: string | null;
+    user_id: string | null;
+    listing_media?: { url: string | null; sort_order: number | null }[] | null;
+  } | null;
 };
+
 
 export function ReportCard({
   report,
@@ -293,42 +299,64 @@ export function ReportCard({
         </div>
       </header>
 
-      {!expanded && (
-        <button
-          type="button"
-          onClick={toggleExpanded}
-          className="flex w-full items-start gap-3 px-5 py-3 text-left transition-colors hover:bg-muted/30"
-        >
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              {report.listing_id ? (
-                <span className="truncate text-sm font-semibold text-foreground">
-                  {report.listings?.title ?? "Listing"}
-                </span>
-              ) : report.target_url ? (
-                <span className="truncate text-sm font-semibold text-foreground">
-                  {report.target_url}
-                </span>
+      {!expanded && (() => {
+        const media = report.listings?.listing_media ?? [];
+        const sorted = [...media].sort(
+          (a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0),
+        );
+        const thumb = sorted.find((m) => m.url)?.url ?? null;
+        return (
+          <button
+            type="button"
+            onClick={toggleExpanded}
+            className="flex w-full items-start gap-3 px-5 py-3 text-left transition-colors hover:bg-muted/30"
+          >
+            <div className="h-14 w-14 shrink-0 overflow-hidden rounded-md border border-border bg-muted">
+              {thumb ? (
+                <img
+                  src={thumb}
+                  alt=""
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                />
               ) : (
-                <span className="truncate text-sm font-semibold italic text-muted-foreground">
-                  No target link
-                </span>
+                <div className="grid h-full w-full place-items-center text-muted-foreground">
+                  <FileText className="h-5 w-5" />
+                </div>
               )}
             </div>
-            <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
-              {report.reason}
-            </p>
-            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
-              <span>By {displayName}</span>
-              {memberLabel && <span className="font-mono">{memberLabel}</span>}
-              {report.resolution && (
-                <span className="capitalize">→ {report.resolution}</span>
-              )}
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2">
+                {report.listing_id ? (
+                  <span className="truncate text-sm font-semibold text-foreground">
+                    {report.listings?.title ?? "Listing"}
+                  </span>
+                ) : report.target_url ? (
+                  <span className="truncate text-sm font-semibold text-foreground">
+                    {report.target_url}
+                  </span>
+                ) : (
+                  <span className="truncate text-sm font-semibold italic text-muted-foreground">
+                    No target link
+                  </span>
+                )}
+              </div>
+              <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
+                {report.reason}
+              </p>
+              <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
+                <span>By {displayName}</span>
+                {memberLabel && <span className="font-mono">{memberLabel}</span>}
+                {report.resolution && (
+                  <span className="capitalize">→ {report.resolution}</span>
+                )}
+              </div>
             </div>
-          </div>
-          <ChevronDown className="mt-1 h-4 w-4 shrink-0 text-muted-foreground" />
-        </button>
-      )}
+            <ChevronDown className="mt-1 h-4 w-4 shrink-0 text-muted-foreground" />
+          </button>
+        );
+      })()}
+
 
       {expanded && historyOpen && (
 

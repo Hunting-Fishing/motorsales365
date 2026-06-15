@@ -47,8 +47,9 @@ function AdminReports() {
     let q = supabase
       .from("reports")
       .select(
-        "id, reason, category, details, status, created_at, reporter_id, reporter_name, reporter_email, reporter_phone, listing_id, target_type, target_url, evidence_urls, public_summary, made_public_at, resolution, listings:listing_id(title, status, user_id)",
+        "id, reason, category, details, status, created_at, reporter_id, reporter_name, reporter_email, reporter_phone, listing_id, target_type, target_url, evidence_urls, public_summary, made_public_at, resolution, listings:listing_id(title, status, user_id, listing_media(url, sort_order))",
       )
+
       .order("created_at", { ascending: false })
       .limit(200);
     if (filter !== "all") q = q.eq("status", filter);
