@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/use-auth";
 
-export const Route = createFileRoute("/dispatch")({
+export const Route = createFileRoute("/dispatch/")({
   head: () => ({
     meta: [
       { title: "365 Dispatch — PH Tow & Trucking Dispatch Software from ₱250/mo" },

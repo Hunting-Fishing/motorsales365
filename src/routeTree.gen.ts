@@ -53,6 +53,7 @@ import { Route as WantedPartsIndexRouteImport } from './routes/wanted-parts.inde
 import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as RidesIndexRouteImport } from './routes/rides.index'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
+import { Route as DispatchIndexRouteImport } from './routes/dispatch.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as BusinessesIndexRouteImport } from './routes/businesses.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
@@ -421,6 +422,11 @@ const LearnIndexRoute = LearnIndexRouteImport.update({
   id: '/learn/',
   path: '/learn/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const DispatchIndexRoute = DispatchIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DispatchRoute,
 } as any)
 const DashboardIndexRoute = DashboardIndexRouteImport.update({
   id: '/',
@@ -1332,6 +1338,7 @@ export interface FileRoutesByFullPath {
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/dispatch/': typeof DispatchIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop/': typeof ShopIndexRoute
@@ -1396,7 +1403,6 @@ export interface FileRoutesByTo {
   '/bundles': typeof BundlesRoute
   '/company': typeof CompanyRoute
   '/contact': typeof ContactRoute
-  '/dispatch': typeof DispatchRouteWithChildren
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
   '/guidelines': typeof GuidelinesRoute
@@ -1523,6 +1529,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AdminIndexRoute
   '/businesses': typeof BusinessesIndexRoute
   '/dashboard': typeof DashboardIndexRoute
+  '/dispatch': typeof DispatchIndexRoute
   '/learn': typeof LearnIndexRoute
   '/rides': typeof RidesIndexRoute
   '/shop': typeof ShopIndexRoute
@@ -1719,6 +1726,7 @@ export interface FileRoutesById {
   '/admin/': typeof AdminIndexRoute
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
+  '/dispatch/': typeof DispatchIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop/': typeof ShopIndexRoute
@@ -1915,6 +1923,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
+    | '/dispatch/'
     | '/learn/'
     | '/rides/'
     | '/shop/'
@@ -1979,7 +1988,6 @@ export interface FileRouteTypes {
     | '/bundles'
     | '/company'
     | '/contact'
-    | '/dispatch'
     | '/export'
     | '/forgot-password'
     | '/guidelines'
@@ -2106,6 +2114,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/businesses'
     | '/dashboard'
+    | '/dispatch'
     | '/learn'
     | '/rides'
     | '/shop'
@@ -2301,6 +2310,7 @@ export interface FileRouteTypes {
     | '/admin/'
     | '/businesses/'
     | '/dashboard/'
+    | '/dispatch/'
     | '/learn/'
     | '/rides/'
     | '/shop/'
@@ -2780,6 +2790,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/learn/'
       preLoaderRoute: typeof LearnIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/dispatch/': {
+      id: '/dispatch/'
+      path: '/'
+      fullPath: '/dispatch/'
+      preLoaderRoute: typeof DispatchIndexRouteImport
+      parentRoute: typeof DispatchRoute
     }
     '/dashboard/': {
       id: '/dashboard/'
@@ -4028,11 +4045,13 @@ const DashboardRouteWithChildren = DashboardRoute._addFileChildren(
 interface DispatchRouteChildren {
   DispatchCheckoutRoute: typeof DispatchCheckoutRoute
   DispatchJoinRoute: typeof DispatchJoinRoute
+  DispatchIndexRoute: typeof DispatchIndexRoute
 }
 
 const DispatchRouteChildren: DispatchRouteChildren = {
   DispatchCheckoutRoute: DispatchCheckoutRoute,
   DispatchJoinRoute: DispatchJoinRoute,
+  DispatchIndexRoute: DispatchIndexRoute,
 }
 
 const DispatchRouteWithChildren = DispatchRoute._addFileChildren(
