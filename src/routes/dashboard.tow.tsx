@@ -17,6 +17,9 @@ import {
 import { formatPHP } from "@/lib/format";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import { useDispatchProvider } from "@/hooks/use-dispatch-provider";
+import { Link } from "@tanstack/react-router";
+import { Network } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -105,6 +108,7 @@ type ProviderRates = {
 
 function TowProviderDashboard() {
   const { user } = useAuth();
+  const dispatchProvider = useDispatchProvider();
   const [isProvider, setIsProvider] = useState<boolean | null>(null);
   const [requests, setRequests] = useState<TowRequest[]>([]);
   const [bids, setBids] = useState<TowBid[]>([]);
