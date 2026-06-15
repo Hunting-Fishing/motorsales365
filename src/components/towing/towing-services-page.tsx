@@ -471,6 +471,7 @@ export function TowingServicesPage({
           </div>
 
           <TowRequestForm
+            seedListingId={seedListingId}
             requestedProviderId={requestedProvider?.id ?? null}
             requestedProviderName={requestedProvider?.name ?? null}
             onClearRequestedProvider={() => {
