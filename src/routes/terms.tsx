@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 13, 2026 (added Shop Manager subscription add-on, ₱799/mo Solo or ₱1,999/mo Pro, delivered through our partner platform All Business 365; on activation we forward your account email and display name to provision a workspace and sign you in via SSO; cancel anytime from your dashboard, monthly billing is not pro-rated.)";
+  const lastUpdated = "June 15, 2026 (added Trust Score, Disputes & Member Rewards section: 0–1000 score scale with 500 baseline, accepted-report penalty schedule, 14-day dispute window, quarterly/annual boost credit bonuses by tier, and clarification that reward credits are non-transferable and have no cash value.)";
 
   return (
     <SiteLayout>
@@ -426,6 +426,33 @@ function TermsPage() {
           National Privacy Commission (for data-privacy matters), or the BSP Consumer Assistance
           Mechanism (for payment-related matters), as appropriate.
         </p>
+
+        <h2 className="mt-6 text-xl font-semibold">14a. Trust Score, Disputes &amp; Member Rewards</h2>
+        <p className="mt-2 text-muted-foreground">
+          Every account carries a trust score from <strong>0 to 1000</strong>, starting at{" "}
+          <strong>500</strong>. The score is adjusted when reports against your listings are
+          accepted or dismissed by our moderation team, when verifications are completed, or when
+          buyer disputes are resolved. The full schedule is published at{" "}
+          <Link className="text-primary underline" to="/help/trust-score">/help/trust-score</Link>.
+          Indicative penalties: accepted report −25 pts (additional −10 hide / −30 delete), repeat
+          offenses within 30 days carry a 2× multiplier.
+        </p>
+        <p className="mt-2 text-muted-foreground">
+          You may file <strong>one dispute per report</strong> within <strong>14 days</strong> of
+          resolution at <Link className="text-primary underline" to="/account/disputes">My
+          disputes</Link>. We review disputes within five (5) business days. If overturned, the
+          listing is restored and any trust-score penalty is fully refunded. Disputes do not extend
+          statutory rights you may have under Philippine consumer-protection law.
+        </p>
+        <p className="mt-2 text-muted-foreground">
+          Members in tiers Uncommon and above receive quarterly boost credits (1st of Jan/Apr/Jul/Oct)
+          and Legendary members receive a larger annual bonus, provided the account had zero
+          accepted reports in the period. Boost credits and badges are <strong>non-transferable,
+          have no cash value, cannot be refunded, sold, or assigned</strong>, and may be revoked if
+          the account is suspended for a Terms violation. Tier may be downgraded immediately when
+          the score falls below the tier threshold.
+        </p>
+
 
         <h2 className="mt-6 text-xl font-semibold">15a. 365 Learn (education portal)</h2>
         <p className="mt-2 text-muted-foreground">

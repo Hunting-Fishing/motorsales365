@@ -1,65 +1,77 @@
-# Phase C-2 — Disputes, Trust-Score UX, Rewards, Cron, Policy sync
+# Phase C-2 Rollout — User-Facing Pages & Admin Wiring
 
-Builds on the Phase C foundation (ledger tables, `apply_report_action`, revamped card UI) that's already live. Five tracks, each independently shippable.
+Foundation (DB + server fns + TierBadge) is already in place. This plan wires them into the UI and ships the remaining cron + policy work.
 
-## 1. Poster-facing disputes
+## 1. Disputes (poster-facing)
 
-- `src/lib/disputes.functions.ts`
-  - `fileDispute({ reportId, message, evidenceUrls[] })` — RLS-enforced; one open dispute per report per user; 14-day window.
-  - `getMyDispute({ reportId })` — for the poster.
-  - `listOpenDisputes()` — admin/moderator list for the queue.
-  - `resolveDispute({ disputeId, decision: 'uphold'|'overturn', response })` — admin only; on overturn calls `apply_report_action(action='reverse', reverses_action_id=<original accept row>)`, sets `score_refund`, restores listing if it was hidden.
-- `src/routes/_authenticated/disputes.$reportId.tsx` — poster view. Shows report reason, public summary, current decision, trust-score change, dispute form (textarea + up to 5 image uploads to `report-evidence` bucket), countdown to deadline, status once filed.
-- `src/routes/_authenticated/account.disputes.tsx` — list of all the user's disputes (open / upheld / overturned).
-- Admin side:
-  - `src/components/admin/dispute-panel.tsx` mounted inside `ReportCard` when a dispute exists, showing message + evidence + Uphold/Overturn buttons (each opens a confirmation with required response note).
-  - New filter chip "Disputed" on `/admin/reports`.
-- Email: extend resolution path so when `notify_poster=true` on accept, an email with a "Dispute this decision" deep link is sent (reuse `src/lib/email/send.ts`; new template `dispute-invite.tsx`). On dispute resolution, send `dispute-upheld.tsx` / `dispute-overturned.tsx`.
+- `src/routes/_authenticated/disputes.$reportId.tsx` — dispute form for the poster of a reported listing
+  - Loads via `getReportForDispute({ reportId })`
+  - Textarea (min 30 chars) + up to 5 evidence images uploaded to existing `report-evidence` bucket under `disputes/{reportId}/{uuid}`
+  - Countdown showing days remaining in 14-day window
+  - Calls `fileDispute`, then redirects to `account.disputes`
+  - Shows existing dispute state if already filed (read-only)
+- `src/routes/_authenticated/account.disputes.tsx` — user's dispute history list via `listMyDisputes`
+- Add "Dispute this decision" link in any place a poster sees a resolved report against them (notification email + account area)
+- `src/components/admin/dispute-panel.tsx` — embedded in `ReportCard` when `report_disputes` row exists
+  - Shows dispute reason, evidence thumbnails, filed-at
+  - Uphold / Overturn buttons → `resolveDispute({ disputeId, decision, response })` (response required, ≥10 chars)
+  - Overturn calls `resolve_report_dispute` RPC which already reverses prior action and refunds score
 
-## 2. Trust-score transparency
+## 2. Trust Score Transparency
 
-- `src/lib/trust-score.functions.ts`
-  - `getTrustScoreBreakdown({ userId? })` — returns current score, baseline, sum of deltas, list of events (paginated), grouped totals by reason_code.
-  - Admin-only `adjustTrustScore({ userId, delta, reason })` — writes a `manual_admin_adjustment` event; required note.
-- `src/routes/_authenticated/account.trust-score.tsx` — user-facing breakdown: big score number, tier badge, progress bar to next tier, timeline of events with reason codes, link to the explainer.
-- `src/routes/help.trust-score.tsx` — public SEO page: how the score works, all reason codes with point values, how to dispute, link to posting etiquette.
-- Surface score chip on `PostingUserPanel` (already shows trust_score — switch to live `get_trust_score()` value) and link to user's trust-score page.
+- `src/routes/_authenticated/account.trust-score.tsx`
+  - Current score + `TierBadge` + progress bar to next tier
+  - Paginated event timeline (delta, reason_code, note, created_at) via `getMyTrustScore`
+  - Link to `/help/trust-score`
+- `src/routes/help.trust-score.tsx` — public SEO page explaining: range 0–1000, baseline 500, what raises/lowers score, dispute mechanism, tier thresholds, rewards overview
+- Surface live trust score + `TierBadge` on `PostingUserPanel` (admin dossier) using `getUserTrustScore`
 
-## 3. Member tiers + rewards
+## 3. Rewards Wallet & Tier Display
 
-- `src/lib/tiers.functions.ts`
-  - `getMyTier()` / `getUserTier({ userId })` — returns tier id, score, tenure days, distance to next tier.
-- `src/lib/rewards.functions.ts`
-  - `listMyRewards()` / `claimReward({ id })` (sets `status='claimed'`, claimed_at; if `kind='boost_credit'` writes a row into a new wallet table — see below).
-  - Admin: `listAllRewards()`, `grantReward({ userId, kind, amount, note })`, `revokeReward({ id, reason })`.
-- New table `boost_credits` (wallet) — simple ledger of granted/consumed credits with a `source` ('reward'|'purchase'|'manual'); existing boost flow checks this wallet first before charging. Migration in same call.
-- `src/components/tier-badge.tsx` — small chip used on profile, shop page, listing cards. Color mapped from `member_tiers.color`.
-- `src/routes/_authenticated/account.rewards.tsx` — current tier, progress, claimable + history.
-- `src/routes/admin.rewards.tsx` — distribution queue, manual grants, audit log.
+- `src/routes/_authenticated/account.rewards.tsx`
+  - Lists `member_rewards` rows with claim buttons (calls `claimReward`)
+  - Shows current `boost_credits` balance
+  - Explains tier perks
+- `src/routes/admin.rewards.tsx` — admin grant interface using `adminGrantReward`
+- Add `TierBadge` next to user display name in:
+  - `PostingUserPanel` dossier header
+  - `account-team-strip.tsx` per-member row
+  - Public listing detail seller card (read tier from `profiles.tier_id`)
 
-## 4. Scheduled distributions (pg_cron + server routes)
+## 4. Scheduled Jobs
 
-- `src/routes/api/public/hooks/recompute-tiers.ts` (nightly) — for each user, derives tier from `get_trust_score()` + `created_at`, stores on `profiles.tier_id` (new column). Used only for display caching — authoritative tier is always recomputed.
-- `src/routes/api/public/hooks/quarterly-bonuses.ts` (1st of Jan/Apr/Jul/Oct) — for active accounts (≥1 listing this quarter, no accepted reports), inserts `member_rewards` rows of `kind='boost_credit'` with `amount=tier.quarterly_boost_credits`, `period='qN-YYYY'`. Idempotent by `(user_id, period, kind)`.
-- `src/routes/api/public/hooks/annual-bonuses.ts` (Jan 1) — issues annual boost credits + featured badge by highest tier reached. Surfaces top-10 Legendary list for admin manual spotlight pick.
-- pg_cron entries via `supabase--insert` after routes ship, using `apikey` header.
+Three TanStack server routes under `src/routes/api/public/hooks/`, each authenticated via `apikey` header:
 
-## 5. Policy sync (Core memory rule)
+- `recompute-tiers.ts` — nightly at 03:00 UTC. Recomputes `profiles.tier_id` for active users (signed in within 90d) by calling `compute_user_tier(user_id)`.
+- `quarterly-bonuses.ts` — 1st of Jan/Apr/Jul/Oct at 09:00 UTC. For each active account with **zero accepted reports in the period**, insert a `member_rewards` row sized by tier (Common: 1 boost credit, → Legendary: 10) via `grant_member_reward`.
+- `annual-bonuses.ts` — Jan 1 at 10:00 UTC. Larger annual bonus + "Outstanding Member" featured-badge for top 10 Legendary scores (admin reviews/approves spotlight selection in admin rewards page).
 
-- `src/routes/terms.tsx` — append "Trust score & rewards" section explaining score formula, dispute window, tier benefits (free boosts, badges). Bump "Last updated".
-- `src/routes/privacy.tsx` — note that moderation actions and dispute history are logged per-user. Bump "Last updated".
-- Link to `/help/trust-score` from `/help/posting-etiquette` and from the report-resolution email.
+pg_cron schedules registered via `supabase--insert` (not migration) since they contain the project URL.
 
-## Open questions
+## 5. Policy Sync
 
-1. **Dispute evidence storage** — reuse existing `report-evidence` bucket (admin reads via signed URL), or stand up a separate `dispute-evidence` bucket? Reusing is simpler.
-2. **Boost credit wallet** — confirm OK to add a new `boost_credits` ledger table (cleaner audit) rather than overload `listing_boosts` with a `source` column.
-3. **Tier `tier_id` cache on profiles** — OK to add a `profiles.tier_id text` column for fast badge display, recomputed nightly? Authoritative tier still derived from score on read.
-4. **Order to ship** — recommend: (1) Disputes UX, (2) Trust-score pages, (3) Tier badges + rewards UI, (4) Cron jobs, (5) Terms/Privacy. Want a different order, or ship all five in one big batch?
+- `src/routes/terms.tsx` — add section "Trust Score, Disputes & Member Rewards" covering: score range, how actions affect it, 14-day dispute window, reward/boost credits are non-cashable, tier downgrade rules
+- `src/routes/privacy.tsx` — note that moderation actions, dispute submissions, and evidence uploads are retained for the account lifetime + 2 years
+- Bump "Last updated" on both
 
-## Out of scope
+## Answered Defaults (from prior questions)
 
-- Public leaderboard.
-- Referral score boosts.
-- Paid tier upgrades (real money buys a tier).
-- Translating help pages (English-only v1).
+- Dispute evidence → reuse `report-evidence` bucket under `disputes/` prefix
+- Boost wallet → use new `boost_credits` table (already created)
+- `profiles.tier_id` → already added; recomputed nightly + on score event trigger
+- Ship order → Disputes → Trust score pages → Tier badges + rewards → Cron → Terms/Privacy
+
+## Out of Scope (v1)
+
+- Public leaderboard
+- Referral score boosts
+- Paid tier upgrades
+- Translations (English only)
+- Mobile push for dispute notifications (email only via existing transactional templates)
+
+## Technical Notes
+
+- All new `_authenticated` routes safe to use `loader` with the existing server fns (foundation already uses `requireSupabaseAuth`)
+- Help/terms/privacy are public — must not call protected fns in loaders
+- Tier downgrade: immediate on score drop (handled by `compute_user_tier` trigger), display cache refreshed by nightly cron
+- "Outstanding Member" annual: auto-shortlist top 10 by score, admin manual final pick (hybrid of the two options)

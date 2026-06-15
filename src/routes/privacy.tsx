@@ -22,7 +22,7 @@ export const Route = createFileRoute("/privacy")({
 });
 
 function PrivacyPage() {
-  const lastUpdated = "June 13, 2026 (added Shop Manager add-on: on subscription we forward your account email and display name to our partner platform All Business 365 to create your shop workspace and sign you in via SSO; that platform becomes a separate Personal Information Controller for the data you enter there.)";
+  const lastUpdated = "June 15, 2026 (clarified retention of trust-score events, dispute submissions, and dispute evidence files: kept for the lifetime of the account plus 2 years to support audit trails and possible re-opening; dispute evidence is uploaded to our Lovable Cloud storage and accessible only to the uploader and our moderation team.)";
 
   return (
     <SiteLayout>
@@ -47,6 +47,19 @@ function PrivacyPage() {
           provide, and disclose them to that business so they can fulfil the appointment. The
           business is a separate Personal Information Controller for the booking. We retain booking
           records for service history, dispute resolution, and tax compliance.
+        </p>
+
+        <p className="mt-3 text-muted-foreground">
+          <strong>Trust-score &amp; disputes.</strong> We record every moderation action against
+          your listings (accept, dismiss, hide, restore, reverse) and every change to your trust
+          score, with the reason and a timestamp. When you file a dispute we collect your written
+          explanation and any evidence files you upload. This data is retained for the lifetime of
+          your account plus two (2) years, is visible to our moderation team and to you (via{" "}
+          <Link className="text-primary underline" to="/account/disputes">My disputes</Link> and{" "}
+          <Link className="text-primary underline" to="/account/trust-score">My trust score</Link>),
+          and is not shared with other users or third parties except where required by lawful
+          authority. See <Link className="text-primary underline" to="/help/trust-score">/help/trust-score</Link>{" "}
+          for how the score works.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold">1. Who we are (Data Controller)</h2>

@@ -79,6 +79,7 @@ import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as LearnMechanicsRouteImport } from './routes/learn.mechanics'
 import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
 import { Route as InvitesTokenRouteImport } from './routes/invites.$token'
+import { Route as HelpTrustScoreRouteImport } from './routes/help.trust-score'
 import { Route as HelpPostingEtiquetteRouteImport } from './routes/help.posting-etiquette'
 import { Route as HelpPayWithGcashRouteImport } from './routes/help.pay-with-gcash'
 import { Route as GoProductIdRouteImport } from './routes/go.$productId'
@@ -124,6 +125,7 @@ import { Route as AdminStaff365RouteImport } from './routes/admin.staff-365'
 import { Route as AdminShopRouteImport } from './routes/admin.shop'
 import { Route as AdminSandboxRouteImport } from './routes/admin.sandbox'
 import { Route as AdminSalesRepsRouteImport } from './routes/admin.sales-reps'
+import { Route as AdminRewardsRouteImport } from './routes/admin.rewards'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminReferralsRouteImport } from './routes/admin.referrals'
 import { Route as AdminRedemptionsRouteImport } from './routes/admin.redemptions'
@@ -169,8 +171,12 @@ import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocod
 import { Route as ApiPublicGeoSearchRouteImport } from './routes/api/public/geo-search'
 import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
 import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions_.$staffId'
+import { Route as AuthenticatedDisputeReportIdRouteImport } from './routes/_authenticated/dispute.$reportId'
 import { Route as AuthenticatedDashboardStaffRequestsRouteImport } from './routes/_authenticated/dashboard.staff-requests'
 import { Route as AuthenticatedDashboardPartsWantedRouteImport } from './routes/_authenticated/dashboard.parts-wanted'
+import { Route as AuthenticatedAccountTrustScoreRouteImport } from './routes/_authenticated/account.trust-score'
+import { Route as AuthenticatedAccountRewardsRouteImport } from './routes/_authenticated/account.rewards'
+import { Route as AuthenticatedAccountDisputesRouteImport } from './routes/_authenticated/account.disputes'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -186,10 +192,13 @@ import { Route as ApiSellerStaffDeactivateRouteImport } from './routes/api/selle
 import { Route as ApiSellerStaffCreateRouteImport } from './routes/api/seller/staff/create'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksRefreshLazadaRouteImport } from './routes/api/public/hooks/refresh-lazada'
+import { Route as ApiPublicHooksRecomputeTiersRouteImport } from './routes/api/public/hooks/recompute-tiers'
+import { Route as ApiPublicHooksQuarterlyBonusesRouteImport } from './routes/api/public/hooks/quarterly-bonuses'
 import { Route as ApiPublicHooksPartsWantedDigestRouteImport } from './routes/api/public/hooks/parts-wanted-digest'
 import { Route as ApiPublicHooksOpsAlertsDigestRouteImport } from './routes/api/public/hooks/ops-alerts-digest'
 import { Route as ApiPublicHooksDispatchExpandRouteImport } from './routes/api/public/hooks/dispatch-expand'
 import { Route as ApiPublicHooksDiscoverSyncRouteImport } from './routes/api/public/hooks/discover-sync'
+import { Route as ApiPublicHooksAnnualBonusesRouteImport } from './routes/api/public/hooks/annual-bonuses'
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
 import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
 
@@ -542,6 +551,11 @@ const InvitesTokenRoute = InvitesTokenRouteImport.update({
   path: '/invites/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HelpTrustScoreRoute = HelpTrustScoreRouteImport.update({
+  id: '/help/trust-score',
+  path: '/help/trust-score',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HelpPostingEtiquetteRoute = HelpPostingEtiquetteRouteImport.update({
   id: '/help/posting-etiquette',
   path: '/help/posting-etiquette',
@@ -765,6 +779,11 @@ const AdminSandboxRoute = AdminSandboxRouteImport.update({
 const AdminSalesRepsRoute = AdminSalesRepsRouteImport.update({
   id: '/sales-reps',
   path: '/sales-reps',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRewardsRoute = AdminRewardsRouteImport.update({
+  id: '/rewards',
+  path: '/rewards',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminReportsRoute = AdminReportsRouteImport.update({
@@ -995,6 +1014,12 @@ const AdminRedemptionsStaffIdRoute = AdminRedemptionsStaffIdRouteImport.update({
   path: '/redemptions/$staffId',
   getParentRoute: () => AdminRoute,
 } as any)
+const AuthenticatedDisputeReportIdRoute =
+  AuthenticatedDisputeReportIdRouteImport.update({
+    id: '/dispute/$reportId',
+    path: '/dispute/$reportId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardStaffRequestsRoute =
   AuthenticatedDashboardStaffRequestsRouteImport.update({
     id: '/dashboard/staff-requests',
@@ -1005,6 +1030,24 @@ const AuthenticatedDashboardPartsWantedRoute =
   AuthenticatedDashboardPartsWantedRouteImport.update({
     id: '/dashboard/parts-wanted',
     path: '/dashboard/parts-wanted',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAccountTrustScoreRoute =
+  AuthenticatedAccountTrustScoreRouteImport.update({
+    id: '/account/trust-score',
+    path: '/account/trust-score',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAccountRewardsRoute =
+  AuthenticatedAccountRewardsRouteImport.update({
+    id: '/account/rewards',
+    path: '/account/rewards',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAccountDisputesRoute =
+  AuthenticatedAccountDisputesRouteImport.update({
+    id: '/account/disputes',
+    path: '/account/disputes',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const LovableEmailTransactionalSendRoute =
@@ -1091,6 +1134,18 @@ const ApiPublicHooksRefreshLazadaRoute =
     path: '/api/public/hooks/refresh-lazada',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksRecomputeTiersRoute =
+  ApiPublicHooksRecomputeTiersRouteImport.update({
+    id: '/api/public/hooks/recompute-tiers',
+    path: '/api/public/hooks/recompute-tiers',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksQuarterlyBonusesRoute =
+  ApiPublicHooksQuarterlyBonusesRouteImport.update({
+    id: '/api/public/hooks/quarterly-bonuses',
+    path: '/api/public/hooks/quarterly-bonuses',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksPartsWantedDigestRoute =
   ApiPublicHooksPartsWantedDigestRouteImport.update({
     id: '/api/public/hooks/parts-wanted-digest',
@@ -1113,6 +1168,12 @@ const ApiPublicHooksDiscoverSyncRoute =
   ApiPublicHooksDiscoverSyncRouteImport.update({
     id: '/api/public/hooks/discover-sync',
     path: '/api/public/hooks/discover-sync',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicHooksAnnualBonusesRoute =
+  ApiPublicHooksAnnualBonusesRouteImport.update({
+    id: '/api/public/hooks/annual-bonuses',
+    path: '/api/public/hooks/annual-bonuses',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ApiPublicFxRefreshRoute = ApiPublicFxRefreshRouteImport.update({
@@ -1191,6 +1252,7 @@ export interface FileRoutesByFullPath {
   '/admin/redemptions': typeof AdminRedemptionsRoute
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/rewards': typeof AdminRewardsRoute
   '/admin/sales-reps': typeof AdminSalesRepsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
   '/admin/shop': typeof AdminShopRoute
@@ -1236,6 +1298,7 @@ export interface FileRoutesByFullPath {
   '/go/$productId': typeof GoProductIdRoute
   '/help/pay-with-gcash': typeof HelpPayWithGcashRoute
   '/help/posting-etiquette': typeof HelpPostingEtiquetteRoute
+  '/help/trust-score': typeof HelpTrustScoreRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
   '/learn/mechanics': typeof LearnMechanicsRoute
@@ -1267,8 +1330,12 @@ export interface FileRoutesByFullPath {
   '/shop/': typeof ShopIndexRoute
   '/wanted-parts/': typeof WantedPartsIndexRoute
   '/wanted/': typeof WantedIndexRoute
+  '/account/disputes': typeof AuthenticatedAccountDisputesRoute
+  '/account/rewards': typeof AuthenticatedAccountRewardsRoute
+  '/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
+  '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1290,10 +1357,13 @@ export interface FileRoutesByFullPath {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
+  '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
   '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/parts-wanted-digest': typeof ApiPublicHooksPartsWantedDigestRoute
+  '/api/public/hooks/quarterly-bonuses': typeof ApiPublicHooksQuarterlyBonusesRoute
+  '/api/public/hooks/recompute-tiers': typeof ApiPublicHooksRecomputeTiersRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
@@ -1373,6 +1443,7 @@ export interface FileRoutesByTo {
   '/admin/redemptions': typeof AdminRedemptionsRoute
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/rewards': typeof AdminRewardsRoute
   '/admin/sales-reps': typeof AdminSalesRepsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
   '/admin/shop': typeof AdminShopRoute
@@ -1417,6 +1488,7 @@ export interface FileRoutesByTo {
   '/go/$productId': typeof GoProductIdRoute
   '/help/pay-with-gcash': typeof HelpPayWithGcashRoute
   '/help/posting-etiquette': typeof HelpPostingEtiquetteRoute
+  '/help/trust-score': typeof HelpTrustScoreRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
   '/learn/mechanics': typeof LearnMechanicsRoute
@@ -1448,8 +1520,12 @@ export interface FileRoutesByTo {
   '/shop': typeof ShopIndexRoute
   '/wanted-parts': typeof WantedPartsIndexRoute
   '/wanted': typeof WantedIndexRoute
+  '/account/disputes': typeof AuthenticatedAccountDisputesRoute
+  '/account/rewards': typeof AuthenticatedAccountRewardsRoute
+  '/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
+  '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1471,10 +1547,13 @@ export interface FileRoutesByTo {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/dashboard/team': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
+  '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
   '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/parts-wanted-digest': typeof ApiPublicHooksPartsWantedDigestRoute
+  '/api/public/hooks/quarterly-bonuses': typeof ApiPublicHooksQuarterlyBonusesRoute
+  '/api/public/hooks/recompute-tiers': typeof ApiPublicHooksRecomputeTiersRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
@@ -1558,6 +1637,7 @@ export interface FileRoutesById {
   '/admin/redemptions': typeof AdminRedemptionsRoute
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/rewards': typeof AdminRewardsRoute
   '/admin/sales-reps': typeof AdminSalesRepsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
   '/admin/shop': typeof AdminShopRoute
@@ -1603,6 +1683,7 @@ export interface FileRoutesById {
   '/go/$productId': typeof GoProductIdRoute
   '/help/pay-with-gcash': typeof HelpPayWithGcashRoute
   '/help/posting-etiquette': typeof HelpPostingEtiquetteRoute
+  '/help/trust-score': typeof HelpTrustScoreRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
   '/learn/mechanics': typeof LearnMechanicsRoute
@@ -1634,8 +1715,12 @@ export interface FileRoutesById {
   '/shop/': typeof ShopIndexRoute
   '/wanted-parts/': typeof WantedPartsIndexRoute
   '/wanted/': typeof WantedIndexRoute
+  '/_authenticated/account/disputes': typeof AuthenticatedAccountDisputesRoute
+  '/_authenticated/account/rewards': typeof AuthenticatedAccountRewardsRoute
+  '/_authenticated/account/trust-score': typeof AuthenticatedAccountTrustScoreRoute
   '/_authenticated/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/_authenticated/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
+  '/_authenticated/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1657,10 +1742,13 @@ export interface FileRoutesById {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
+  '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
   '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/parts-wanted-digest': typeof ApiPublicHooksPartsWantedDigestRoute
+  '/api/public/hooks/quarterly-bonuses': typeof ApiPublicHooksQuarterlyBonusesRoute
+  '/api/public/hooks/recompute-tiers': typeof ApiPublicHooksRecomputeTiersRoute
   '/api/public/hooks/refresh-lazada': typeof ApiPublicHooksRefreshLazadaRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
@@ -1744,6 +1832,7 @@ export interface FileRouteTypes {
     | '/admin/redemptions'
     | '/admin/referrals'
     | '/admin/reports'
+    | '/admin/rewards'
     | '/admin/sales-reps'
     | '/admin/sandbox'
     | '/admin/shop'
@@ -1789,6 +1878,7 @@ export interface FileRouteTypes {
     | '/go/$productId'
     | '/help/pay-with-gcash'
     | '/help/posting-etiquette'
+    | '/help/trust-score'
     | '/invites/$token'
     | '/learn/$slug'
     | '/learn/mechanics'
@@ -1820,8 +1910,12 @@ export interface FileRouteTypes {
     | '/shop/'
     | '/wanted-parts/'
     | '/wanted/'
+    | '/account/disputes'
+    | '/account/rewards'
+    | '/account/trust-score'
     | '/dashboard/parts-wanted'
     | '/dashboard/staff-requests'
+    | '/dispute/$reportId'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -1843,10 +1937,13 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/dashboard/team/'
     | '/api/public/fx/refresh'
+    | '/api/public/hooks/annual-bonuses'
     | '/api/public/hooks/discover-sync'
     | '/api/public/hooks/dispatch-expand'
     | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/parts-wanted-digest'
+    | '/api/public/hooks/quarterly-bonuses'
+    | '/api/public/hooks/recompute-tiers'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
     | '/api/seller/staff/create'
@@ -1926,6 +2023,7 @@ export interface FileRouteTypes {
     | '/admin/redemptions'
     | '/admin/referrals'
     | '/admin/reports'
+    | '/admin/rewards'
     | '/admin/sales-reps'
     | '/admin/sandbox'
     | '/admin/shop'
@@ -1970,6 +2068,7 @@ export interface FileRouteTypes {
     | '/go/$productId'
     | '/help/pay-with-gcash'
     | '/help/posting-etiquette'
+    | '/help/trust-score'
     | '/invites/$token'
     | '/learn/$slug'
     | '/learn/mechanics'
@@ -2001,8 +2100,12 @@ export interface FileRouteTypes {
     | '/shop'
     | '/wanted-parts'
     | '/wanted'
+    | '/account/disputes'
+    | '/account/rewards'
+    | '/account/trust-score'
     | '/dashboard/parts-wanted'
     | '/dashboard/staff-requests'
+    | '/dispute/$reportId'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2024,10 +2127,13 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/dashboard/team'
     | '/api/public/fx/refresh'
+    | '/api/public/hooks/annual-bonuses'
     | '/api/public/hooks/discover-sync'
     | '/api/public/hooks/dispatch-expand'
     | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/parts-wanted-digest'
+    | '/api/public/hooks/quarterly-bonuses'
+    | '/api/public/hooks/recompute-tiers'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
     | '/api/seller/staff/create'
@@ -2110,6 +2216,7 @@ export interface FileRouteTypes {
     | '/admin/redemptions'
     | '/admin/referrals'
     | '/admin/reports'
+    | '/admin/rewards'
     | '/admin/sales-reps'
     | '/admin/sandbox'
     | '/admin/shop'
@@ -2155,6 +2262,7 @@ export interface FileRouteTypes {
     | '/go/$productId'
     | '/help/pay-with-gcash'
     | '/help/posting-etiquette'
+    | '/help/trust-score'
     | '/invites/$token'
     | '/learn/$slug'
     | '/learn/mechanics'
@@ -2186,8 +2294,12 @@ export interface FileRouteTypes {
     | '/shop/'
     | '/wanted-parts/'
     | '/wanted/'
+    | '/_authenticated/account/disputes'
+    | '/_authenticated/account/rewards'
+    | '/_authenticated/account/trust-score'
     | '/_authenticated/dashboard/parts-wanted'
     | '/_authenticated/dashboard/staff-requests'
+    | '/_authenticated/dispute/$reportId'
     | '/admin/redemptions_/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2209,10 +2321,13 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/dashboard/team/'
     | '/api/public/fx/refresh'
+    | '/api/public/hooks/annual-bonuses'
     | '/api/public/hooks/discover-sync'
     | '/api/public/hooks/dispatch-expand'
     | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/parts-wanted-digest'
+    | '/api/public/hooks/quarterly-bonuses'
+    | '/api/public/hooks/recompute-tiers'
     | '/api/public/hooks/refresh-lazada'
     | '/api/public/payments/webhook'
     | '/api/seller/staff/create'
@@ -2284,6 +2399,7 @@ export interface RootRouteChildren {
   GoProductIdRoute: typeof GoProductIdRoute
   HelpPayWithGcashRoute: typeof HelpPayWithGcashRoute
   HelpPostingEtiquetteRoute: typeof HelpPostingEtiquetteRoute
+  HelpTrustScoreRoute: typeof HelpTrustScoreRoute
   InvitesTokenRoute: typeof InvitesTokenRoute
   LearnSlugRoute: typeof LearnSlugRoute
   LearnMechanicsRoute: typeof LearnMechanicsRoute
@@ -2322,10 +2438,13 @@ export interface RootRouteChildren {
   ShopDepartmentSlugRoute: typeof ShopDepartmentSlugRoute
   ShopPSlugRoute: typeof ShopPSlugRoute
   ApiPublicFxRefreshRoute: typeof ApiPublicFxRefreshRoute
+  ApiPublicHooksAnnualBonusesRoute: typeof ApiPublicHooksAnnualBonusesRoute
   ApiPublicHooksDiscoverSyncRoute: typeof ApiPublicHooksDiscoverSyncRoute
   ApiPublicHooksDispatchExpandRoute: typeof ApiPublicHooksDispatchExpandRoute
   ApiPublicHooksOpsAlertsDigestRoute: typeof ApiPublicHooksOpsAlertsDigestRoute
   ApiPublicHooksPartsWantedDigestRoute: typeof ApiPublicHooksPartsWantedDigestRoute
+  ApiPublicHooksQuarterlyBonusesRoute: typeof ApiPublicHooksQuarterlyBonusesRoute
+  ApiPublicHooksRecomputeTiersRoute: typeof ApiPublicHooksRecomputeTiersRoute
   ApiPublicHooksRefreshLazadaRoute: typeof ApiPublicHooksRefreshLazadaRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   ApiSellerStaffCreateRoute: typeof ApiSellerStaffCreateRoute
@@ -2832,6 +2951,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvitesTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/help/trust-score': {
+      id: '/help/trust-score'
+      path: '/help/trust-score'
+      fullPath: '/help/trust-score'
+      preLoaderRoute: typeof HelpTrustScoreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/help/posting-etiquette': {
       id: '/help/posting-etiquette'
       path: '/help/posting-etiquette'
@@ -3145,6 +3271,13 @@ declare module '@tanstack/react-router' {
       path: '/sales-reps'
       fullPath: '/admin/sales-reps'
       preLoaderRoute: typeof AdminSalesRepsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/rewards': {
+      id: '/admin/rewards'
+      path: '/rewards'
+      fullPath: '/admin/rewards'
+      preLoaderRoute: typeof AdminRewardsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/reports': {
@@ -3462,6 +3595,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRedemptionsStaffIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_authenticated/dispute/$reportId': {
+      id: '/_authenticated/dispute/$reportId'
+      path: '/dispute/$reportId'
+      fullPath: '/dispute/$reportId'
+      preLoaderRoute: typeof AuthenticatedDisputeReportIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/staff-requests': {
       id: '/_authenticated/dashboard/staff-requests'
       path: '/dashboard/staff-requests'
@@ -3474,6 +3614,27 @@ declare module '@tanstack/react-router' {
       path: '/dashboard/parts-wanted'
       fullPath: '/dashboard/parts-wanted'
       preLoaderRoute: typeof AuthenticatedDashboardPartsWantedRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/account/trust-score': {
+      id: '/_authenticated/account/trust-score'
+      path: '/account/trust-score'
+      fullPath: '/account/trust-score'
+      preLoaderRoute: typeof AuthenticatedAccountTrustScoreRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/account/rewards': {
+      id: '/_authenticated/account/rewards'
+      path: '/account/rewards'
+      fullPath: '/account/rewards'
+      preLoaderRoute: typeof AuthenticatedAccountRewardsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/account/disputes': {
+      id: '/_authenticated/account/disputes'
+      path: '/account/disputes'
+      fullPath: '/account/disputes'
+      preLoaderRoute: typeof AuthenticatedAccountDisputesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/lovable/email/transactional/send': {
@@ -3581,6 +3742,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksRefreshLazadaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/recompute-tiers': {
+      id: '/api/public/hooks/recompute-tiers'
+      path: '/api/public/hooks/recompute-tiers'
+      fullPath: '/api/public/hooks/recompute-tiers'
+      preLoaderRoute: typeof ApiPublicHooksRecomputeTiersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/quarterly-bonuses': {
+      id: '/api/public/hooks/quarterly-bonuses'
+      path: '/api/public/hooks/quarterly-bonuses'
+      fullPath: '/api/public/hooks/quarterly-bonuses'
+      preLoaderRoute: typeof ApiPublicHooksQuarterlyBonusesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/parts-wanted-digest': {
       id: '/api/public/hooks/parts-wanted-digest'
       path: '/api/public/hooks/parts-wanted-digest'
@@ -3609,6 +3784,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksDiscoverSyncRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/annual-bonuses': {
+      id: '/api/public/hooks/annual-bonuses'
+      path: '/api/public/hooks/annual-bonuses'
+      fullPath: '/api/public/hooks/annual-bonuses'
+      preLoaderRoute: typeof ApiPublicHooksAnnualBonusesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/fx/refresh': {
       id: '/api/public/fx/refresh'
       path: '/api/public/fx/refresh'
@@ -3627,15 +3809,23 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAccountDisputesRoute: typeof AuthenticatedAccountDisputesRoute
+  AuthenticatedAccountRewardsRoute: typeof AuthenticatedAccountRewardsRoute
+  AuthenticatedAccountTrustScoreRoute: typeof AuthenticatedAccountTrustScoreRoute
   AuthenticatedDashboardPartsWantedRoute: typeof AuthenticatedDashboardPartsWantedRoute
   AuthenticatedDashboardStaffRequestsRoute: typeof AuthenticatedDashboardStaffRequestsRoute
+  AuthenticatedDisputeReportIdRoute: typeof AuthenticatedDisputeReportIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAccountDisputesRoute: AuthenticatedAccountDisputesRoute,
+  AuthenticatedAccountRewardsRoute: AuthenticatedAccountRewardsRoute,
+  AuthenticatedAccountTrustScoreRoute: AuthenticatedAccountTrustScoreRoute,
   AuthenticatedDashboardPartsWantedRoute:
     AuthenticatedDashboardPartsWantedRoute,
   AuthenticatedDashboardStaffRequestsRoute:
     AuthenticatedDashboardStaffRequestsRoute,
+  AuthenticatedDisputeReportIdRoute: AuthenticatedDisputeReportIdRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -3667,6 +3857,7 @@ interface AdminRouteChildren {
   AdminRedemptionsRoute: typeof AdminRedemptionsRoute
   AdminReferralsRoute: typeof AdminReferralsRoute
   AdminReportsRoute: typeof AdminReportsRoute
+  AdminRewardsRoute: typeof AdminRewardsRoute
   AdminSalesRepsRoute: typeof AdminSalesRepsRoute
   AdminSandboxRoute: typeof AdminSandboxRoute
   AdminShopRoute: typeof AdminShopRoute
@@ -3704,6 +3895,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminRedemptionsRoute: AdminRedemptionsRoute,
   AdminReferralsRoute: AdminReferralsRoute,
   AdminReportsRoute: AdminReportsRoute,
+  AdminRewardsRoute: AdminRewardsRoute,
   AdminSalesRepsRoute: AdminSalesRepsRoute,
   AdminSandboxRoute: AdminSandboxRoute,
   AdminShopRoute: AdminShopRoute,
@@ -3946,6 +4138,7 @@ const rootRouteChildren: RootRouteChildren = {
   GoProductIdRoute: GoProductIdRoute,
   HelpPayWithGcashRoute: HelpPayWithGcashRoute,
   HelpPostingEtiquetteRoute: HelpPostingEtiquetteRoute,
+  HelpTrustScoreRoute: HelpTrustScoreRoute,
   InvitesTokenRoute: InvitesTokenRoute,
   LearnSlugRoute: LearnSlugRoute,
   LearnMechanicsRoute: LearnMechanicsRoute,
@@ -3984,10 +4177,13 @@ const rootRouteChildren: RootRouteChildren = {
   ShopDepartmentSlugRoute: ShopDepartmentSlugRoute,
   ShopPSlugRoute: ShopPSlugRoute,
   ApiPublicFxRefreshRoute: ApiPublicFxRefreshRoute,
+  ApiPublicHooksAnnualBonusesRoute: ApiPublicHooksAnnualBonusesRoute,
   ApiPublicHooksDiscoverSyncRoute: ApiPublicHooksDiscoverSyncRoute,
   ApiPublicHooksDispatchExpandRoute: ApiPublicHooksDispatchExpandRoute,
   ApiPublicHooksOpsAlertsDigestRoute: ApiPublicHooksOpsAlertsDigestRoute,
   ApiPublicHooksPartsWantedDigestRoute: ApiPublicHooksPartsWantedDigestRoute,
+  ApiPublicHooksQuarterlyBonusesRoute: ApiPublicHooksQuarterlyBonusesRoute,
+  ApiPublicHooksRecomputeTiersRoute: ApiPublicHooksRecomputeTiersRoute,
   ApiPublicHooksRefreshLazadaRoute: ApiPublicHooksRefreshLazadaRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   ApiSellerStaffCreateRoute: ApiSellerStaffCreateRoute,

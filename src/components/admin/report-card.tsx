@@ -28,6 +28,7 @@ import { getReportEvidenceUrls } from "@/lib/admin-reports.functions";
 import { ReportActionDialog, type ActionKind } from "./report-action-dialog";
 import { ReportActionInfo } from "./report-action-info";
 import { ReportHistory } from "./report-history";
+import { DisputePanel } from "./dispute-panel";
 
 type ReporterCounts = {
   total: number;
@@ -306,6 +307,9 @@ export function ReportCard({
 
         {/* ── Posting user dossier ───────────────────────────── */}
         {report.listings?.user_id && <PostingUserPanel userId={report.listings.user_id} />}
+
+        {/* ── Dispute (if filed by poster) ─────────────────────── */}
+        <DisputePanel reportId={report.id} onResolved={refresh} />
 
 
 
