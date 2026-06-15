@@ -14,7 +14,9 @@ import { getReporterCounts } from "@/lib/admin-reports.functions";
 const searchSchema = z.object({
   filter: z.enum(["open", "resolved", "all"]).optional(),
   reporter: z.string().uuid().optional(),
+  expanded: z.string().uuid().optional(),
 });
+
 
 export const Route = createFileRoute("/admin/reports")({
   validateSearch: (s) => searchSchema.parse(s ?? {}),
