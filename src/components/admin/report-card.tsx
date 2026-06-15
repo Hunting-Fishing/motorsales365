@@ -75,9 +75,14 @@ export function ReportCard({
   onFilterReporter: (reporterId: string) => void;
 }) {
   const [draft, setDraft] = useState(report.public_summary ?? "");
-  const resolveFn = useServerFn(setReportResolution);
   const evidenceFn = useServerFn(getReportEvidenceUrls);
   const [evidence, setEvidence] = useState<{ path: string; url: string | null }[]>([]);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [historyKey, setHistoryKey] = useState(0);
+  const [dialog, setDialog] = useState<{
+    action: ActionKind;
+    reversesActionId?: string | null;
+  } | null>(null);
 
   useEffect(() => {
     const paths = report.evidence_urls ?? [];
@@ -93,33 +98,8 @@ export function ReportCard({
     };
   }, [report.id]);
 
-  const resolve = async (resolution: "accepted" | "dismissed") => {
-    await resolveFn({ data: { id: report.id, resolution } });
-    if (resolution === "accepted") toast.success("Resolved as accepted");
-    else toast.success("Dismissed");
-    onChanged();
-  };
-
-  const hideListing = async () => {
-    if (!report.listing_id) return;
-    await supabase.from("listings").update({ status: "hidden" }).eq("id", report.listing_id);
-    await resolveFn({ data: { id: report.id, resolution: "accepted" } });
-    toast.success("Listing hidden");
-    onChanged();
-  };
-
-  const removeListing = async () => {
-    if (!report.listing_id) return;
-    if (
-      !(await confirm({
-        title: "Permanently delete this listing? This cannot be undone.",
-        destructive: true,
-      }))
-    )
-      return;
-    await supabase.from("listings").delete().eq("id", report.listing_id);
-    await resolveFn({ data: { id: report.id, resolution: "accepted" } });
-    toast.success("Listing deleted");
+  const refresh = () => {
+    setHistoryKey((k) => k + 1);
     onChanged();
   };
 
