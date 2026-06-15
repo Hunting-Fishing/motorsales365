@@ -192,11 +192,17 @@ function BrowsePage() {
 
   if (category === "towing") {
     return (
-      <SiteLayout>
-        <TowingServicesPage />
-      </SiteLayout>
+      <Navigate
+        to="/tow"
+        replace
+        search={{
+          listing: (search as any).listing,
+          provider: (search as any).provider,
+        }}
+      />
     );
   }
+
 
 
   const [keyword, setKeyword] = useState(search.q ?? "");
