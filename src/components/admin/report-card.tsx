@@ -171,7 +171,12 @@ export function ReportCard({
       : "border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300";
 
   return (
-    <article className="overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md">
+    <article
+      ref={articleRef}
+      id={`report-${report.id}`}
+      className="overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md"
+    >
+
       {/* ── Header bar ───────────────────────────────────────── */}
       <header className="flex flex-wrap items-start justify-between gap-3 border-b border-border bg-muted/30 px-5 py-3">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
