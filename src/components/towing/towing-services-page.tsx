@@ -65,7 +65,15 @@ type ProviderRow = {
   services: string[];
 };
 
-export function TowingServicesPage() {
+export type TowingServicesPageProps = {
+  seedListingId?: string | null;
+  requestedProviderId?: string | null;
+};
+
+export function TowingServicesPage({
+  seedListingId = null,
+  requestedProviderId = null,
+}: TowingServicesPageProps = {}) {
   // Provider filters
   const [activeService, setActiveService] = useState<string | null>(null);
   const [region, setRegion] = useState<string | null>(null);
@@ -81,6 +89,36 @@ export function TowingServicesPage() {
   const [requestedProvider, setRequestedProvider] = useState<{ id: string; name: string } | null>(null);
   const [providerSearch, setProviderSearch] = useState("");
   const [providerOptions, setProviderOptions] = useState<{ id: string; name: string; owner_id: string }[]>([]);
+
+  // Hydrate requestedProvider from ?provider= (business id or listing id)
+  useEffect(() => {
+    if (!requestedProviderId) return;
+    let cancelled = false;
+    (async () => {
+      const { data: biz } = await (supabase as any)
+        .from("businesses")
+        .select("id,name,owner_id")
+        .eq("id", requestedProviderId)
+        .maybeSingle();
+      if (cancelled) return;
+      if (biz) {
+        setRequestedProvider({ id: biz.owner_id ?? biz.id, name: biz.name });
+        return;
+      }
+      const { data: listing } = await (supabase as any)
+        .from("listings")
+        .select("title,user_id")
+        .eq("id", requestedProviderId)
+        .maybeSingle();
+      if (cancelled || !listing) return;
+      setRequestedProvider({ id: listing.user_id, name: listing.title });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [requestedProviderId]);
+
+
 
 
   useEffect(() => {
