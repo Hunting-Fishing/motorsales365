@@ -220,13 +220,8 @@ function DispatchLanding() {
           Annual billing (2 months free) is available under{" "}
           <Link to="/pricing" className="underline">
             /pricing
-          </Link>{" "}
-          for tow and trucking operators. Subscribing requires an active provider profile —
-          set yours up under{" "}
-          <Link to="/dashboard/tow" className="underline">
-            Provider dashboard
           </Link>
-          .
+          . Pick a plan above to create your provider profile and subscribe.
         </p>
         <div className="mt-6">
           <Button asChild variant="outline">
