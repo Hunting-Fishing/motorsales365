@@ -293,7 +293,45 @@ export function ReportCard({
         </div>
       </header>
 
-      {historyOpen && (
+      {!expanded && (
+        <button
+          type="button"
+          onClick={toggleExpanded}
+          className="flex w-full items-start gap-3 px-5 py-3 text-left transition-colors hover:bg-muted/30"
+        >
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              {report.listing_id ? (
+                <span className="truncate text-sm font-semibold text-foreground">
+                  {report.listings?.title ?? "Listing"}
+                </span>
+              ) : report.target_url ? (
+                <span className="truncate text-sm font-semibold text-foreground">
+                  {report.target_url}
+                </span>
+              ) : (
+                <span className="truncate text-sm font-semibold italic text-muted-foreground">
+                  No target link
+                </span>
+              )}
+            </div>
+            <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">
+              {report.reason}
+            </p>
+            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
+              <span>By {displayName}</span>
+              {memberLabel && <span className="font-mono">{memberLabel}</span>}
+              {report.resolution && (
+                <span className="capitalize">→ {report.resolution}</span>
+              )}
+            </div>
+          </div>
+          <ChevronDown className="mt-1 h-4 w-4 shrink-0 text-muted-foreground" />
+        </button>
+      )}
+
+      {expanded && historyOpen && (
+
         <div className="border-b border-border bg-background/40 p-5">
           <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             Action history
