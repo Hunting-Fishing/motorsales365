@@ -150,7 +150,78 @@ function DispatchDashboard() {
       : 0;
 
   if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
-  if (!user) return null;
+  if (!user) {
+    if (typeof window !== "undefined") {
+      window.location.replace("/signup?type=service_provider&redirect=%2Fdashboard%2Fdispatch");
+    }
+    return null;
+  }
+
+  // No provider profile yet → push to sign-up flow.
+  if (status && !(status as any).hasProfile) {
+    return (
+      <div className="space-y-4 p-6">
+        <h1 className="font-display text-2xl font-bold">365 Dispatch</h1>
+        <Card className="space-y-3 p-6 text-sm">
+          <p className="font-medium">You haven't joined the Dispatch network yet.</p>
+          <p className="text-muted-foreground">
+            Create your tow company profile and pick a plan to start receiving auto-matched jobs.
+          </p>
+          <div>
+            <Button asChild>
+              <Link to="/dispatch" hash="plans">
+                <Network className="mr-2 h-4 w-4" /> Choose a plan
+              </Link>
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
+  // Profile exists but no active subscription → CTA to subscribe.
+  if (status && (status as any).hasProfile && !plan) {
+    return (
+      <div className="space-y-4 p-6">
+        <header className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <h1 className="font-display text-2xl font-bold">365 Dispatch</h1>
+            <p className="text-sm text-muted-foreground">
+              Your provider profile is saved. Subscribe to activate dispatch.
+            </p>
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/dashboard/dispatch/history">Job history</Link>
+          </Button>
+        </header>
+        <Card className="border-amber-400/40 bg-amber-50/40 p-4 text-sm dark:bg-amber-950/20">
+          You need an active Dispatch subscription to receive new jobs. Past jobs stay in your
+          history.{" "}
+          <Link to="/dispatch" hash="plans" className="underline">
+            View plans
+          </Link>
+          .
+        </Card>
+        <Card className="relative overflow-hidden p-4">
+          <div className="pointer-events-none select-none blur-sm">
+            <div className="mb-3 flex items-center gap-2">
+              <Truck className="h-4 w-4" />
+              <h2 className="font-semibold">Live queue</h2>
+              <Badge variant="secondary">--</Badge>
+            </div>
+            <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">
+              New jobs are hidden while your subscription is inactive.
+            </div>
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Button asChild size="lg">
+              <Link to="/dispatch" hash="plans">Subscribe to unlock the live queue</Link>
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 p-4 md:p-6">
@@ -177,15 +248,6 @@ function DispatchDashboard() {
         </div>
       </header>
 
-      {!plan && (
-        <Card className="border-amber-400/40 bg-amber-50/40 p-4 text-sm dark:bg-amber-950/20">
-          You need an active Dispatch subscription to receive auto-matched jobs.{" "}
-          <Link to="/dispatch" hash="plans" className="underline">
-            View plans
-          </Link>
-          .
-        </Card>
-      )}
 
       {/* Settings */}
       <Card className="p-4">
