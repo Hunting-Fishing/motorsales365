@@ -56,9 +56,11 @@ type EditableUser = {
 export function EditProfileDialog({
   user,
   onSaved,
+  is365Staff = false,
 }: {
   user: EditableUser;
   onSaved?: () => void;
+  is365Staff?: boolean;
 }) {
   const updateProfile = useServerFn(adminUpdateUserProfile);
   const [open, setOpen] = useState(false);
