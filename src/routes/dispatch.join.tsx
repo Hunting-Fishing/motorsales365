@@ -103,22 +103,13 @@ function DispatchJoin() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (!loading && !user) {
-      const redirect = `/dispatch/join?priceId=${encodeURIComponent(priceId ?? "")}`;
-      navigate({
-        to: "/signup",
-        search: { type: "service_provider", redirect } as any,
-      });
-    }
-  }, [loading, user, navigate, priceId]);
-
-  useEffect(() => {
     if (user?.email && !email) setEmail(user.email);
   }, [user, email]);
 
   const validPrice = priceId && VALID_PRICES.has(priceId);
+  const redirectBack = `/dispatch/join?priceId=${encodeURIComponent(priceId ?? "")}`;
 
-  if (loading || (!loading && !user)) {
+  if (loading) {
     return (
       <SiteLayout>
         <div className="container mx-auto max-w-xl px-4 py-16 text-center text-sm text-muted-foreground">
@@ -139,6 +130,58 @@ function DispatchJoin() {
           <Button asChild className="mt-6">
             <Link to="/dispatch" hash="plans">View plans</Link>
           </Button>
+        </section>
+      </SiteLayout>
+    );
+  }
+
+  if (!user) {
+    const planGate = PLAN_DETAILS[priceId!];
+    return (
+      <SiteLayout>
+        <section className="container mx-auto max-w-xl px-4 py-12">
+          <Button asChild variant="ghost" size="sm" className="mb-4">
+            <Link to="/dispatch" hash="plans">
+              <ArrowLeft className="mr-1 h-4 w-4" /> Back to plans
+            </Link>
+          </Button>
+          <Card className="space-y-5 p-6">
+            <div>
+              <div className="text-xs font-semibold uppercase tracking-wide text-primary">
+                Step 1 of 3 · Create your account
+              </div>
+              <h1 className="mt-2 font-display text-2xl font-bold">
+                Sign up to join 365 Dispatch
+              </h1>
+              <p className="mt-2 text-sm text-muted-foreground">
+                You're subscribing to the <strong>{planGate.name}</strong> plan ({planGate.price}).
+                Create a tow-company account or sign in to continue. After payment,
+                your provider dashboard unlocks.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Button asChild size="lg" className="flex-1">
+                <Link
+                  to="/signup"
+                  search={{ type: "service_provider", redirect: redirectBack } as any}
+                >
+                  Create tow company account
+                </Link>
+              </Button>
+              <Button asChild size="lg" variant="outline" className="flex-1">
+                <Link to="/login" search={{ redirect: redirectBack }}>
+                  I already have an account
+                </Link>
+              </Button>
+            </div>
+            <div className="flex items-start gap-2 rounded-md bg-muted/50 p-3 text-xs text-muted-foreground">
+              <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span>
+                Your profile stays <strong>pending</strong> until subscription payment
+                completes. Cancel anytime.
+              </span>
+            </div>
+          </Card>
         </section>
       </SiteLayout>
     );
