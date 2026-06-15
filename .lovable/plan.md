@@ -1,79 +1,148 @@
-# Phase B — Account-Team Visibility + Posting Etiquette Guide
+# Phase C — Fair Moderation + Member Rewards
 
-Two scoped additions. No schema changes.
+Goal: make every moderation action explicit, reversible, and explainable; let posters dispute decisions; turn the trust score into a transparent, two-way system; and reward consistently good members with quarterly free boosts and annual tier bonuses (common → legendary).
 
-## 1. Show all users on a multi-user account (in Report dossier)
+---
 
-Problem: A business account (organization) can have multiple members. The current Posting User panel only shows the single user tied to the reported listing. If one teammate is the bad actor, staff need to see the rest of the team and their behavior at a glance.
+## 1. Safer report actions (UI/UX)
 
-### Data we already have
-- `organizations` (the account)
-- `organization_members` (org_id, user_id, role, joined_at)
-- `profiles` (member_number, names, business_name, account_status, created_at)
-- `listings`, `reports` — let us count per-member activity
+In `src/components/admin/report-card.tsx` rebuild the action row:
 
-### Changes
+- **Color-coded buttons** (semantic tokens, not raw colors):
+  - Accept (confirms violation) — `destructive` outline, red accent
+  - Dismiss (no violation) — `secondary`, muted
+  - Hide listing — `warning` (amber) outline
+  - Delete listing — solid `destructive`, requires typed confirmation
+  - Publish summary — `default` primary
+  - Reverse decision — `outline` with undo icon (only when resolved)
+- **No auto-action on Accept.** Today, "Accept" silently chains effects; change to: Accept only marks the report as a confirmed violation. Hiding/deleting the listing become explicit follow-up steps inside the confirmation dialog (checkboxes: "Also hide listing", "Also notify poster", "Issue strike").
+- **Info icons (ⓘ)** beside every button → Popover explaining:
+  - what the action does
+  - effect on listing
+  - effect on poster's trust score (+/− points)
+  - whether the poster can dispute it
+  - whether/how it can be reversed
+- **Confirmation dialog** for every state-changing action (`ConfirmActionDialog` new component): shows action summary, score delta preview, required moderator note (min 10 chars), and an optional "send message to poster" textarea. Delete-listing requires typing the listing title.
+- **Status chips** at the top of the card use color: open=amber, accepted=red, dismissed=slate, reversed=blue, disputed=purple.
 
-**`src/lib/admin-user-dossier.functions.ts`** (edit)
-- Extend `getUserAdminDossier` to also resolve the user's `parent_org_id` (or any `organization_members` row).
-- Add `listAccountTeammates({ userId })` server function (admin/moderator only) returning, for every member of the same org:
-  - `user_id`, `member_number`, `display_name`, `role` (owner/admin/member), `joined_at`, `account_status`
-  - mini-stats: `listings_active`, `reports_against`, `reports_taken_down`, `trust_score` (reuse the same scoring formula)
-  - `is_focus` flag for the user the current report is about
+## 2. Report action history + reversal
 
-**`src/components/admin/posting-user-panel.tsx`** (edit)
-- If the user belongs to an org with 2+ members, render an "Account team" strip below the trust-score tiles:
-  - Org name + kind badge + total members count
-  - Horizontal list of teammate chips: avatar, `User #`, name, role pill, trust-score dot (red/amber/green), reports-against count
-  - The focus user is highlighted; other chips are clickable → open the existing `UserDossierDialog` for that teammate
-- Collapsed by default when >6 teammates ("Show all 12 teammates").
+New table `report_actions` (append-only ledger):
 
-**`src/components/admin/user-dossier-dialog.tsx`** (edit)
-- Add a "Team" tab (visible only when org exists) with the full teammate table: User #, name, role, joined, listings, reports against, taken-down, last activity, trust score, action → open their dossier.
+```text
+id, report_id, actor_id, action, prev_status, new_status,
+score_delta, note, listing_effect (none|hidden|deleted|restored),
+notified_poster bool, created_at, reversed_by_action_id
+```
 
-No new tables, no migrations.
+- Every Accept / Dismiss / Hide / Delete / Publish / Unpublish / Reverse / Dispute-resolve writes one row.
+- **Reverse decision** action: only admins; opens dialog explaining what will be undone (status flips back to open, score delta inverted, hidden listing un-hidden, deleted listing cannot be auto-restored — flagged for manual restore). Writes a new row with `reversed_by_action_id` pointing at the original.
+- New "History" tab in `ReportCard` showing a timeline (icon, actor, action, note, score delta) using existing audit styling.
 
-## 2. Posting Etiquette guide page
+## 3. User disputes
 
-New public help page at `/help/posting-etiquette` that staff can link to from warnings, report-resolution emails, and rejection notices.
+New table `report_disputes`:
 
-**`src/routes/help.posting-etiquette.tsx`** (new)
-- Standard SiteLayout, proper SEO head (title, description, og:image — reuse share-kit cover).
-- Single H1: "Posting Etiquette & Listing Guidelines".
-- Sections:
-  1. Why this matters (trust, buyer safety, account standing)
-  2. Required info per listing type (vehicle / part / service / business) — checklists
-  3. Photos — do/don't with example screenshot pairs (good vs bad)
-  4. Pricing honesty — no bait pricing, no hidden fees
-  5. Title & description — keyword stuffing, ALL CAPS, emoji spam
-  6. Prohibited items (link to `/terms` section)
-  7. Communication standards — response time, no off-platform redirects
-  8. Reports & strikes — how reports work, what triggers takedown, appeal path
-  9. Account standing & trust score — what raises/lowers it
-  10. Multi-user accounts — owner is responsible for teammate conduct
+```text
+id, report_id, user_id (poster), message, evidence_urls[],
+status (open|upheld|overturned), admin_response, resolved_by,
+resolved_at, score_refund, created_at
+```
 
-**`src/components/help/etiquette-do-dont.tsx`** (new) — small reusable two-column "Do / Don't" card with check/x icons and optional image.
+- New public route `src/routes/_authenticated/disputes.$reportId.tsx`: poster sees the report reason, public summary, current decision, and a form to file a dispute (one per report). They can attach up to 5 evidence images.
+- Notify poster: when a report resolves against them, send an in-app notification + email with a "Dispute this decision" link (14-day window).
+- Admin side: new tab in `/admin/reports` filter ("Disputed"), and a Dispute panel inside `ReportCard` showing the poster's message + evidence. Admin actions:
+  - **Uphold** — dispute denied, no score change.
+  - **Overturn** — auto-reverses the original decision, refunds the score delta plus a +5 "wrongly reported" bonus, un-hides listing if applicable.
+- All dispute actions write to `report_actions`.
 
-**Screenshots** — placeholders sourced from existing assets where possible; for the good/bad photo examples I'll generate 4–6 illustrative images (good listing photo, blurry photo, watermarked photo, screenshot-of-screenshot, good title example, bad title example). Stored under `src/assets/etiquette/`.
+## 4. Transparent, fair trust score (v2)
 
-**Linking**
-- Add a "Posting guidelines" link in `src/components/site-footer.tsx` under the Help column.
-- Surface a small "Review posting guidelines" link inside `ReportCard` resolution actions and in the listing-rejection notice copy.
+Replace the ad-hoc formula in `admin-user-dossier.functions.ts` with a documented, two-way ledger.
 
-No backend, no schema.
+New table `trust_score_events`:
 
-## Technical notes
+```text
+id, user_id, delta, reason_code, reason_label, source_type
+(report|dispute|review|verification|listing|bonus|tier|manual),
+source_id, actor_id, created_at
+```
 
-- All new admin queries gated by `has_role(auth.uid(),'admin'|'moderator')` (consistent with existing dossier loaders).
-- Trust-score reuse: extract the formula in `admin-user-dossier.functions.ts` into a shared `computeTrustScore(stats)` helper so teammate chips and the focus panel agree.
-- The etiquette page is fully static (no loader) so prerender is safe; metadata set via route `head()`.
+Score is now `500 + sum(delta)` clamped to `0..1000`, **not** recalculated from scratch — every change is auditable.
 
-## Out of scope (ask before doing)
-- Editing/suspending individual teammates from the report panel (write actions).
-- Auto-issuing warnings or strikes.
-- Translating the etiquette page (English only for v1).
+Reason codes (negative):
+- `report_accepted` −25
+- `listing_hidden` −10
+- `listing_deleted` −40
+- `repeat_offense_30d` −15 (stacking)
+- `low_rating` −5 per ≤2★ review
 
-## Questions before I build
-1. **Teammate chip click** — open their dossier in a nested dialog (stack on top of current), or replace the current dossier in place with a "back" button?
-2. **Etiquette screenshots** — OK for me to generate illustrative images, or do you want to supply real screenshots from the live site after the page scaffolds?
-3. **Strikes system** — out of scope here, but should I queue a Phase C plan for a real strike/warning ledger (3 strikes → suspend, etc.)?
+Reason codes (positive):
+- `dispute_overturned` +original_delta +5
+- `verified_identity` +50
+- `verified_business` +75
+- `5★_review` +3
+- `completed_sale` +2
+- `quarterly_clean_streak` +25 (no accepted reports in 90 days)
+- `tier_bonus` variable (see §5)
+- `manual_admin_adjustment` (admin-only, requires note)
+
+User-facing `/account/trust-score` page (and a public `/help/trust-score`) explains every reason code, current score, history timeline, and current tier. Score breakdown also appears in the admin dossier and in dispute forms so users see exactly which event lost them points.
+
+## 5. Member reward tiers (common → legendary)
+
+New tables `member_tiers` (config) and `member_rewards` (issued).
+
+Tiers (based on trust score + tenure, recomputed nightly):
+
+| Tier       | Min score | Min tenure | Color    |
+|------------|-----------|------------|----------|
+| Common     | 0         | 0          | slate    |
+| Uncommon   | 550       | 30 d       | green    |
+| Rare       | 650       | 90 d       | blue     |
+| Epic       | 750       | 180 d      | purple   |
+| Legendary  | 875       | 365 d      | amber/gold |
+
+**Quarterly bonuses (every 3 months, pg_cron):**
+- Active accounts (≥1 listing or ≥1 sale in quarter) with no accepted reports get free boost credits scaled by tier: Common 1 · Uncommon 2 · Rare 4 · Epic 7 · Legendary 12.
+- Credits drop into existing `listing_boosts` flow as `source = 'tier_bonus'`.
+- In-app notification + email.
+
+**Annual bonuses (Jan 1, pg_cron):**
+- Highest-tier reached during the year unlocks:
+  - Legendary → free 12-month "featured seller" badge + 30 boost credits + custom shop banner slot
+  - Epic → 6-month badge + 15 boost credits
+  - Rare → 3-month badge + 8 boost credits
+  - Uncommon → 4 boost credits
+- "Outstanding member of the year" — top 10 by score within Legendary tier get a manual review queue surfaced to admins for a hand-picked spotlight feature.
+
+UI:
+- Tier badge on profile, shop page, listing cards (small chip).
+- New `/account/rewards` page: current tier, progress bar to next tier, claimable rewards, history.
+- Admin `/admin/rewards` page: see upcoming distributions, manually grant/revoke, audit log.
+
+## 6. Cross-cutting
+
+- Sync rule: §1–§5 touch fees/boosts/score → update `/terms` "Last updated" and add a "Trust score & rewards" section; update `/privacy` for new score-event logging; add `/help/trust-score` and `/help/rewards`. Per `mem://policies/terms-sync` and `mem://policies/privacy-sync`.
+- Link from posting-etiquette page to `/help/trust-score`.
+- All admin actions still gated by `has_role(...,'admin'|'moderator')`. Reversal limited to `admin`. Manual score adjustments limited to `admin` and always logged.
+
+---
+
+## Technical sketch (for the implementer)
+
+- **Migrations**: `report_actions`, `report_disputes`, `trust_score_events`, `member_tiers` (seed 5 rows), `member_rewards`. All with GRANTs (`authenticated` for own rows via RLS, `service_role` full). Trigger on `reports` resolution → writes default `trust_score_events` + `report_actions` rows via SECURITY DEFINER function `public.apply_report_resolution(report_id, action, actor, note, opts)`.
+- **Server fns** (`src/lib/`): `report-actions.functions.ts` (apply/reverse), `disputes.functions.ts` (file/list/resolve), `trust-score.functions.ts` (read events, breakdown), `rewards.functions.ts` (list, claim, admin grant), `tiers.functions.ts` (current tier, progress).
+- **Cron**: `src/routes/api/public/hooks/quarterly-bonuses.ts` + `annual-bonuses.ts` + nightly `recompute-tiers.ts`, all wired through pg_cron with `apikey` header.
+- **Components**: `ConfirmActionDialog`, `ActionInfoPopover`, `ReportHistoryTimeline`, `DisputePanel`, `TrustScoreBreakdown`, `TierBadge`, `RewardsCard`.
+- **Hook**: `useTrustScore(userId)` and `useMemberTier(userId)` with React Query.
+
+## Open questions
+
+1. **Score range** — OK with `0..1000` starting at 500, or prefer keeping current `0..100`? (1000 gives finer granularity for tier thresholds.)
+2. **Dispute window** — 14 days from resolution OK, or shorter/longer?
+3. **Tier downgrade** — should a user drop tiers immediately when score falls, or only at quarterly recompute? (Recommend quarterly to avoid yo-yo.)
+4. **Annual "Outstanding Member"** spotlight — fully manual admin pick from the Legendary shortlist, or auto-top-3 by score?
+5. **Boost credit accounting** — reuse existing `listing_boosts` table with a `source` column, or new `boost_credits` wallet table?
+
+Out of scope here: paid tier purchases, referral-based score boosts, public leaderboard.

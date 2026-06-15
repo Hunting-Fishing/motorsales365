@@ -3871,6 +3871,98 @@ export type Database = {
           },
         ]
       }
+      member_rewards: {
+        Row: {
+          amount: number
+          claimed_at: string | null
+          created_at: string
+          expires_at: string | null
+          granted_by: string | null
+          id: string
+          kind: string
+          note: string | null
+          period: string | null
+          status: string
+          tier_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          claimed_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          granted_by?: string | null
+          id?: string
+          kind: string
+          note?: string | null
+          period?: string | null
+          status?: string
+          tier_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          claimed_at?: string | null
+          created_at?: string
+          expires_at?: string | null
+          granted_by?: string | null
+          id?: string
+          kind?: string
+          note?: string | null
+          period?: string | null
+          status?: string
+          tier_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_rewards_tier_id_fkey"
+            columns: ["tier_id"]
+            isOneToOne: false
+            referencedRelation: "member_tiers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      member_tiers: {
+        Row: {
+          annual_badge_months: number
+          annual_boost_credits: number
+          color: string
+          created_at: string
+          id: string
+          min_score: number
+          min_tenure_days: number
+          name: string
+          quarterly_boost_credits: number
+          rank: number
+        }
+        Insert: {
+          annual_badge_months?: number
+          annual_boost_credits?: number
+          color: string
+          created_at?: string
+          id: string
+          min_score: number
+          min_tenure_days: number
+          name: string
+          quarterly_boost_credits?: number
+          rank: number
+        }
+        Update: {
+          annual_badge_months?: number
+          annual_boost_credits?: number
+          color?: string
+          created_at?: string
+          id?: string
+          min_score?: number
+          min_tenure_days?: number
+          name?: string
+          quarterly_boost_credits?: number
+          rank?: number
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           body: string
@@ -5163,6 +5255,125 @@ export type Database = {
           visitor_id?: string
         }
         Relationships: []
+      }
+      report_actions: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          id: string
+          listing_effect: string
+          new_resolution: string | null
+          new_status: string | null
+          note: string | null
+          notified_poster: boolean
+          prev_resolution: string | null
+          prev_status: string | null
+          report_id: string
+          reversed_by_action_id: string | null
+          score_delta: number
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          listing_effect?: string
+          new_resolution?: string | null
+          new_status?: string | null
+          note?: string | null
+          notified_poster?: boolean
+          prev_resolution?: string | null
+          prev_status?: string | null
+          report_id: string
+          reversed_by_action_id?: string | null
+          score_delta?: number
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          id?: string
+          listing_effect?: string
+          new_resolution?: string | null
+          new_status?: string | null
+          note?: string | null
+          notified_poster?: boolean
+          prev_resolution?: string | null
+          prev_status?: string | null
+          report_id?: string
+          reversed_by_action_id?: string | null
+          score_delta?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_actions_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_actions_reversed_by_action_id_fkey"
+            columns: ["reversed_by_action_id"]
+            isOneToOne: false
+            referencedRelation: "report_actions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      report_disputes: {
+        Row: {
+          admin_response: string | null
+          created_at: string
+          evidence_urls: string[]
+          id: string
+          message: string
+          report_id: string
+          resolved_at: string | null
+          resolved_by: string | null
+          score_refund: number
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_response?: string | null
+          created_at?: string
+          evidence_urls?: string[]
+          id?: string
+          message: string
+          report_id: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          score_refund?: number
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_response?: string | null
+          created_at?: string
+          evidence_urls?: string[]
+          id?: string
+          message?: string
+          report_id?: string
+          resolved_at?: string | null
+          resolved_by?: string | null
+          score_refund?: number
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_disputes_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: false
+            referencedRelation: "reports"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reports: {
         Row: {
@@ -7280,6 +7491,42 @@ export type Database = {
         }
         Relationships: []
       }
+      trust_score_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          delta: number
+          id: string
+          reason_code: string
+          reason_label: string
+          source_id: string | null
+          source_type: string
+          user_id: string
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          delta: number
+          id?: string
+          reason_code: string
+          reason_label: string
+          source_id?: string | null
+          source_type: string
+          user_id: string
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          delta?: number
+          id?: string
+          reason_code?: string
+          reason_label?: string
+          source_id?: string | null
+          source_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_blocks: {
         Row: {
           blocked_user_id: string
@@ -8096,6 +8343,18 @@ export type Database = {
         }
         Returns: Json
       }
+      apply_report_action: {
+        Args: {
+          _action: string
+          _delete_listing?: boolean
+          _hide_listing?: boolean
+          _note?: string
+          _notify_poster?: boolean
+          _report_id: string
+          _reverses_action_id?: string
+        }
+        Returns: string
+      }
       approve_business_claim: {
         Args: { _auto: boolean; _claim_id: string }
         Returns: undefined
@@ -8215,6 +8474,7 @@ export type Database = {
           status: Database["public"]["Enums"]["passport_verification_status"]
         }[]
       }
+      get_trust_score: { Args: { _user_id: string }; Returns: number }
       has_active_client_access: {
         Args: { _client: string; _owner: string; _requester: string }
         Returns: boolean
