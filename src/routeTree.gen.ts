@@ -79,6 +79,7 @@ import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as LearnMechanicsRouteImport } from './routes/learn.mechanics'
 import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
 import { Route as InvitesTokenRouteImport } from './routes/invites.$token'
+import { Route as HelpPostingEtiquetteRouteImport } from './routes/help.posting-etiquette'
 import { Route as HelpPayWithGcashRouteImport } from './routes/help.pay-with-gcash'
 import { Route as GoProductIdRouteImport } from './routes/go.$productId'
 import { Route as ExportTrustRouteImport } from './routes/export.trust'
@@ -539,6 +540,11 @@ const LearnSlugRoute = LearnSlugRouteImport.update({
 const InvitesTokenRoute = InvitesTokenRouteImport.update({
   id: '/invites/$token',
   path: '/invites/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelpPostingEtiquetteRoute = HelpPostingEtiquetteRouteImport.update({
+  id: '/help/posting-etiquette',
+  path: '/help/posting-etiquette',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HelpPayWithGcashRoute = HelpPayWithGcashRouteImport.update({
@@ -1229,6 +1235,7 @@ export interface FileRoutesByFullPath {
   '/export/trust': typeof ExportTrustRoute
   '/go/$productId': typeof GoProductIdRoute
   '/help/pay-with-gcash': typeof HelpPayWithGcashRoute
+  '/help/posting-etiquette': typeof HelpPostingEtiquetteRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
   '/learn/mechanics': typeof LearnMechanicsRoute
@@ -1409,6 +1416,7 @@ export interface FileRoutesByTo {
   '/export/trust': typeof ExportTrustRoute
   '/go/$productId': typeof GoProductIdRoute
   '/help/pay-with-gcash': typeof HelpPayWithGcashRoute
+  '/help/posting-etiquette': typeof HelpPostingEtiquetteRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
   '/learn/mechanics': typeof LearnMechanicsRoute
@@ -1594,6 +1602,7 @@ export interface FileRoutesById {
   '/export/trust': typeof ExportTrustRoute
   '/go/$productId': typeof GoProductIdRoute
   '/help/pay-with-gcash': typeof HelpPayWithGcashRoute
+  '/help/posting-etiquette': typeof HelpPostingEtiquetteRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
   '/learn/mechanics': typeof LearnMechanicsRoute
@@ -1779,6 +1788,7 @@ export interface FileRouteTypes {
     | '/export/trust'
     | '/go/$productId'
     | '/help/pay-with-gcash'
+    | '/help/posting-etiquette'
     | '/invites/$token'
     | '/learn/$slug'
     | '/learn/mechanics'
@@ -1959,6 +1969,7 @@ export interface FileRouteTypes {
     | '/export/trust'
     | '/go/$productId'
     | '/help/pay-with-gcash'
+    | '/help/posting-etiquette'
     | '/invites/$token'
     | '/learn/$slug'
     | '/learn/mechanics'
@@ -2143,6 +2154,7 @@ export interface FileRouteTypes {
     | '/export/trust'
     | '/go/$productId'
     | '/help/pay-with-gcash'
+    | '/help/posting-etiquette'
     | '/invites/$token'
     | '/learn/$slug'
     | '/learn/mechanics'
@@ -2271,6 +2283,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   GoProductIdRoute: typeof GoProductIdRoute
   HelpPayWithGcashRoute: typeof HelpPayWithGcashRoute
+  HelpPostingEtiquetteRoute: typeof HelpPostingEtiquetteRoute
   InvitesTokenRoute: typeof InvitesTokenRoute
   LearnSlugRoute: typeof LearnSlugRoute
   LearnMechanicsRoute: typeof LearnMechanicsRoute
@@ -2817,6 +2830,13 @@ declare module '@tanstack/react-router' {
       path: '/invites/$token'
       fullPath: '/invites/$token'
       preLoaderRoute: typeof InvitesTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/help/posting-etiquette': {
+      id: '/help/posting-etiquette'
+      path: '/help/posting-etiquette'
+      fullPath: '/help/posting-etiquette'
+      preLoaderRoute: typeof HelpPostingEtiquetteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/help/pay-with-gcash': {
@@ -3925,6 +3945,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   GoProductIdRoute: GoProductIdRoute,
   HelpPayWithGcashRoute: HelpPayWithGcashRoute,
+  HelpPostingEtiquetteRoute: HelpPostingEtiquetteRoute,
   InvitesTokenRoute: InvitesTokenRoute,
   LearnSlugRoute: LearnSlugRoute,
   LearnMechanicsRoute: LearnMechanicsRoute,

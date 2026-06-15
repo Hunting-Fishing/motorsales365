@@ -63,6 +63,7 @@ export function SiteFooter() {
       links: [
         { to: "/start-selling", label: "How selling works" },
         { to: "/sell", label: "Post a listing" },
+        { to: "/help/posting-etiquette", label: "Posting etiquette & guidelines" },
         { to: "/wanted", label: "Wanted board (buyer requests)" },
         { to: "/pricing", label: "Pricing & plans" },
         { to: "/payments", label: "Payment methods" },

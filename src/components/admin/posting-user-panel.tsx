@@ -27,6 +27,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatDate } from "@/lib/format";
 import { getUserAdminDossier } from "@/lib/admin-user-dossier.functions";
 import { UserDossierDialog } from "./user-dossier-dialog";
+import { AccountTeamStrip } from "./account-team-strip";
 
 function StatTile({
   icon: Icon,
@@ -255,6 +256,10 @@ export function PostingUserPanel({ userId }: { userId: string }) {
           />
         </div>
       )}
+
+      {open && <AccountTeamStrip userId={userId} />}
+
+
 
       <UserDossierDialog
         open={dossierOpen}

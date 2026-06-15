@@ -381,3 +381,226 @@ export const listUserBilling = createServerFn({ method: "POST" })
       boosts: boosts ?? [],
     };
   });
+
+// ────────────────────────── Account team (org members) ──────────────────────────
+
+export type TeammateRow = {
+  user_id: string;
+  member_number: number | null;
+  display_name: string;
+  avatar_url: string | null;
+  email: string | null;
+  role: string; // org_role
+  joined_at: string;
+  account_status: string | null;
+  verification_status: string | null;
+  listings_active: number;
+  reports_against: number;
+  reports_taken_down: number;
+  trust_score: number;
+  trust_band: "low" | "mid" | "high";
+  is_focus: boolean;
+};
+
+export type AccountTeamResult = {
+  organization: {
+    id: string;
+    name: string;
+    slug: string | null;
+    kind: string | null;
+    status: string | null;
+    verification_status: string | null;
+  } | null;
+  teammates: TeammateRow[];
+};
+
+function scoreFromCounts(p: {
+  reports_taken_down: number;
+  reports_open: number;
+  verified: boolean;
+  rating_avg: number | null;
+  revenue: number;
+  founding: boolean;
+}) {
+  let score = 100;
+  score -= Math.min(30, p.reports_taken_down * 8);
+  score -= Math.min(15, p.reports_open * 3);
+  score += p.verified ? 15 : 0;
+  score += Math.min(10, Math.round((p.rating_avg ?? 0) * 2));
+  score += Math.min(10, Math.round(Math.log10(p.revenue + 1) * 2));
+  score += p.founding ? 5 : 0;
+  score = Math.max(0, Math.min(100, score));
+  const band: "low" | "mid" | "high" = score < 40 ? "low" : score < 70 ? "mid" : "high";
+  return { score, band };
+}
+
+export const listAccountTeammates = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { userId: string }) => d)
+  .handler(async ({ data, context }): Promise<AccountTeamResult> => {
+    await requireMod(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const focusId = data.userId;
+
+    // Resolve org via profile.parent_org_id OR organization_members membership
+    const { data: focusProf } = await supabaseAdmin
+      .from("profiles")
+      .select("parent_org_id")
+      .eq("id", focusId)
+      .maybeSingle();
+
+    let orgId: string | null = (focusProf as any)?.parent_org_id ?? null;
+    if (!orgId) {
+      const { data: m } = await supabaseAdmin
+        .from("organization_members")
+        .select("organization_id")
+        .eq("user_id", focusId)
+        .limit(1)
+        .maybeSingle();
+      orgId = (m as any)?.organization_id ?? null;
+    }
+    if (!orgId) return { organization: null, teammates: [] };
+
+    const { data: org } = await supabaseAdmin
+      .from("organizations")
+      .select("id, name, slug, kind, status, verification_status")
+      .eq("id", orgId)
+      .maybeSingle();
+
+    const { data: members } = await supabaseAdmin
+      .from("organization_members")
+      .select("user_id, role, joined_at")
+      .eq("organization_id", orgId);
+
+    const memberIds = (members ?? []).map((m: any) => m.user_id);
+    // Also include the focus user even if not yet in organization_members
+    if (!memberIds.includes(focusId)) memberIds.push(focusId);
+    if (!memberIds.length) return { organization: org as any, teammates: [] };
+
+    const [{ data: profs }, { data: listings }] = await Promise.all([
+      supabaseAdmin
+        .from("profiles")
+        .select(
+          "id, member_number, full_name, first_name, last_name, business_name, avatar_url, account_status, verification_status, verified_at, is_founding_member",
+        )
+        .in("id", memberIds),
+      supabaseAdmin
+        .from("listings")
+        .select("id, user_id, status")
+        .in("user_id", memberIds),
+    ]);
+
+    const listingsByUser = new Map<string, { id: string; status: string }[]>();
+    for (const l of listings ?? []) {
+      const arr = listingsByUser.get((l as any).user_id) ?? [];
+      arr.push({ id: (l as any).id, status: (l as any).status });
+      listingsByUser.set((l as any).user_id, arr);
+    }
+    const allListingIds = (listings ?? []).map((l: any) => l.id);
+    const reportsByListing = new Map<string, { status: string; resolution: string | null }[]>();
+    if (allListingIds.length) {
+      const { data: rep } = await supabaseAdmin
+        .from("reports")
+        .select("listing_id, status, resolution")
+        .in("listing_id", allListingIds);
+      for (const r of rep ?? []) {
+        const k = (r as any).listing_id as string;
+        const arr = reportsByListing.get(k) ?? [];
+        arr.push({ status: (r as any).status, resolution: (r as any).resolution });
+        reportsByListing.set(k, arr);
+      }
+    }
+
+    // Revenue (lifetime PHP, paid) per user
+    const { data: pays } = await supabaseAdmin
+      .from("payments")
+      .select("user_id, amount_php, status")
+      .in("user_id", memberIds)
+      .eq("status", "paid");
+    const revByUser = new Map<string, number>();
+    for (const p of pays ?? []) {
+      const k = (p as any).user_id as string;
+      revByUser.set(k, (revByUser.get(k) ?? 0) + Number((p as any).amount_php ?? 0));
+    }
+    // Ratings
+    const { data: reviews } = await supabaseAdmin
+      .from("seller_reviews")
+      .select("seller_id, rating")
+      .in("seller_id", memberIds)
+      .eq("status", "published");
+    const ratingAgg = new Map<string, { sum: number; n: number }>();
+    for (const r of reviews ?? []) {
+      const k = (r as any).seller_id as string;
+      const cur = ratingAgg.get(k) ?? { sum: 0, n: 0 };
+      cur.sum += Number((r as any).rating ?? 0);
+      cur.n += 1;
+      ratingAgg.set(k, cur);
+    }
+
+    const memberRoleMap = new Map<string, { role: string; joined_at: string }>();
+    for (const m of members ?? []) {
+      memberRoleMap.set((m as any).user_id, {
+        role: (m as any).role ?? "member",
+        joined_at: (m as any).joined_at,
+      });
+    }
+
+    const teammates: TeammateRow[] = (profs ?? []).map((p: any) => {
+      const userLs = listingsByUser.get(p.id) ?? [];
+      const listings_active = userLs.filter((l) => l.status === "active").length;
+      let reports_against = 0;
+      let reports_taken_down = 0;
+      let reports_open = 0;
+      for (const l of userLs) {
+        const rs = reportsByListing.get(l.id) ?? [];
+        reports_against += rs.length;
+        for (const r of rs) {
+          if (r.status !== "resolved") reports_open++;
+          else if (r.resolution === "accepted") reports_taken_down++;
+        }
+      }
+      const agg = ratingAgg.get(p.id);
+      const rating_avg = agg && agg.n ? agg.sum / agg.n : null;
+      const { score, band } = scoreFromCounts({
+        reports_taken_down,
+        reports_open,
+        verified: p.verification_status === "verified" || !!p.verified_at,
+        rating_avg,
+        revenue: revByUser.get(p.id) ?? 0,
+        founding: !!p.is_founding_member,
+      });
+      const roleRow = memberRoleMap.get(p.id);
+      const display_name =
+        p.full_name ||
+        [p.first_name, p.last_name].filter(Boolean).join(" ") ||
+        p.business_name ||
+        "Unnamed user";
+      return {
+        user_id: p.id,
+        member_number: p.member_number ?? null,
+        display_name,
+        avatar_url: p.avatar_url ?? null,
+        email: null,
+        role: roleRow?.role ?? (p.id === focusId ? "(focus)" : "member"),
+        joined_at: roleRow?.joined_at ?? "",
+        account_status: p.account_status ?? null,
+        verification_status: p.verification_status ?? null,
+        listings_active,
+        reports_against,
+        reports_taken_down,
+        trust_score: score,
+        trust_band: band,
+        is_focus: p.id === focusId,
+      };
+    });
+
+    // Sort: focus first, then by reports_taken_down desc, then reports_against desc
+    teammates.sort((a, b) => {
+      if (a.is_focus !== b.is_focus) return a.is_focus ? -1 : 1;
+      if (b.reports_taken_down !== a.reports_taken_down)
+        return b.reports_taken_down - a.reports_taken_down;
+      return b.reports_against - a.reports_against;
+    });
+
+    return { organization: org as any, teammates };
+  });
