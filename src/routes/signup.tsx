@@ -307,7 +307,7 @@ function SignupPage() {
       return;
     }
     if (result.redirected) return;
-    navigate({ to: POST_SIGNUP_ROUTE[intent] });
+    goAfterSignup(POST_SIGNUP_ROUTE[intent]);
   };
 
   return (
