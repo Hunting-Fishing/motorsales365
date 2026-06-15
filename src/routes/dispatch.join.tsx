@@ -208,16 +208,14 @@ function DispatchJoin() {
                 <Label htmlFor="phone">Mobile (PH) *</Label>
                 <Input id="phone" required inputMode="tel" value={phone}
                   onChange={(e) => setPhone(e.target.value)} placeholder="09171234567" />
+                <p className="mt-1 text-xs text-muted-foreground">Format: 09XXXXXXXXX or +639XXXXXXXXX</p>
               </div>
               <div>
                 <Label htmlFor="email">Contact email</Label>
                 <Input id="email" type="email" value={email}
                   onChange={(e) => setEmail(e.target.value)} placeholder="ops@example.com" />
               </div>
-              <div>
-                <Label htmlFor="logo">Logo URL (optional)</Label>
-                <Input id="logo" value={""} disabled placeholder="Upload from dashboard after signup" />
-              </div>
+
             </div>
           </Card>
 
