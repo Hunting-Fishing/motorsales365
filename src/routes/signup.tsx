@@ -26,13 +26,22 @@ import { PhoneInput } from "@/components/phone-input";
 import { buildE164 } from "@/data/country-codes";
 import { siteOrigin } from "@/lib/site-config";
 
-type SignupSearch = { type?: SignupIntent };
+type SignupSearch = { type?: SignupIntent; redirect?: string };
+
+function safeInternalPath(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  if (!value.startsWith("/") || value.startsWith("//")) return undefined;
+  return value;
+}
 
 export const Route = createFileRoute("/signup")({
   validateSearch: (search: Record<string, unknown>): SignupSearch => {
     const t = search.type;
     const valid = SIGNUP_TYPES.map((s) => s.id) as string[];
-    return { type: typeof t === "string" && valid.includes(t) ? (t as SignupIntent) : undefined };
+    return {
+      type: typeof t === "string" && valid.includes(t) ? (t as SignupIntent) : undefined,
+      redirect: safeInternalPath(search.redirect),
+    };
   },
   component: SignupPage,
 });
@@ -175,9 +184,19 @@ function SignupPage() {
     if (c) setRefCode(c);
   }, []);
 
+  const goAfterSignup = (fallback: string) => {
+    const dest = search.redirect || fallback;
+    if (dest.startsWith("/") && !dest.startsWith("//")) {
+      window.location.assign(dest);
+    } else {
+      navigate({ to: fallback as any });
+    }
+  };
+
   useEffect(() => {
-    if (!loading && user) navigate({ to: "/dashboard" });
-  }, [user, loading, navigate]);
+    if (!loading && user) goAfterSignup("/dashboard");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, loading]);
 
   // Reset business_kind when switching intent
   useEffect(() => {
@@ -267,7 +286,7 @@ function SignupPage() {
     }
     // Edge case: confirmations disabled, session is live immediately.
     toast.success("Account created!");
-    navigate({ to: POST_SIGNUP_ROUTE[intent] });
+    goAfterSignup(POST_SIGNUP_ROUTE[intent]);
   };
 
   const handleGoogle = async () => {
@@ -288,7 +307,7 @@ function SignupPage() {
       return;
     }
     if (result.redirected) return;
-    navigate({ to: POST_SIGNUP_ROUTE[intent] });
+    goAfterSignup(POST_SIGNUP_ROUTE[intent]);
   };
 
   return (

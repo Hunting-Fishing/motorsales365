@@ -3,6 +3,7 @@ import { Check, Minus, Network, Siren, ShieldCheck, Truck, Zap } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/dispatch")({
   head: () => ({
@@ -74,6 +75,7 @@ const PLANS = [
 ];
 
 function DispatchLanding() {
+  const { user } = useAuth();
   return (
     <main>
       <section className="border-b border-border bg-gradient-to-br from-primary/10 via-secondary/30 to-background">
@@ -93,11 +95,13 @@ function DispatchLanding() {
                 <Network className="mr-2 h-4 w-4" /> See plans
               </a>
             </Button>
-            <Button asChild size="lg" variant="outline">
-              <Link to="/dashboard/tow">
-                <Truck className="mr-2 h-4 w-4" /> Provider dashboard
-              </Link>
-            </Button>
+            {user && (
+              <Button asChild size="lg" variant="outline">
+                <Link to="/dashboard/dispatch">
+                  <Truck className="mr-2 h-4 w-4" /> My provider dashboard
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </section>
@@ -216,13 +220,8 @@ function DispatchLanding() {
           Annual billing (2 months free) is available under{" "}
           <Link to="/pricing" className="underline">
             /pricing
-          </Link>{" "}
-          for tow and trucking operators. Subscribing requires an active provider profile —
-          set yours up under{" "}
-          <Link to="/dashboard/tow" className="underline">
-            Provider dashboard
           </Link>
-          .
+          . Pick a plan above to create your provider profile and subscribe.
         </p>
         <div className="mt-6">
           <Button asChild variant="outline">

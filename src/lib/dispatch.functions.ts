@@ -95,11 +95,12 @@ export const getMyDispatchStatus = createServerFn({ method: "GET" })
       .maybeSingle();
     const { data: rates } = await supabase
       .from("provider_tow_rates")
-      .select("dispatch_enabled, dispatch_regions")
+      .select("dispatch_enabled, dispatch_regions, notes, updated_at")
       .eq("user_id", userId)
       .maybeSingle();
     return {
       subscription: sub ?? null,
+      hasProfile: rates !== null,
       enabled: (rates as any)?.dispatch_enabled ?? false,
       regions: ((rates as any)?.dispatch_regions ?? []) as string[],
     };

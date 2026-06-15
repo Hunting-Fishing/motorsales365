@@ -11,7 +11,17 @@ import { Label } from "@/components/ui/label";
 import { SiteLayout } from "@/components/site-layout";
 import { siteOrigin } from "@/lib/site-config";
 
+function safeInternalPath(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  // Only allow same-origin relative paths (must start with single "/")
+  if (!value.startsWith("/") || value.startsWith("//")) return undefined;
+  return value;
+}
+
 export const Route = createFileRoute("/login")({
+  validateSearch: (search: Record<string, unknown>): { redirect?: string } => ({
+    redirect: safeInternalPath(search.redirect),
+  }),
   component: LoginPage,
 });
 
@@ -19,6 +29,8 @@ function LoginPage() {
   const { user, loading, refreshSession } = useAuth();
   const navigate = useNavigate();
   const router = useRouter();
+  const { redirect: redirectTo } = Route.useSearch();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -34,14 +46,20 @@ function LoginPage() {
   // a session and are about to redirect.
   const authBusy = submitting || googleSubmitting || loading || !!user;
 
-  const goToDashboard = () => {
+  const goToPostLogin = () => {
+    const dest = redirectTo || "/dashboard";
     if (redirectTimerRef.current) window.clearTimeout(redirectTimerRef.current);
     redirectTimerRef.current = window.setTimeout(() => {
-      window.location.replace("/dashboard");
+      window.location.replace(dest);
     }, 1200);
-    void navigate({ to: "/dashboard", replace: true }).finally(() => {
-      if (redirectTimerRef.current) window.clearTimeout(redirectTimerRef.current);
-    });
+    // For non-typed redirect strings, fall back to a direct location change.
+    if (dest === "/dashboard") {
+      void navigate({ to: "/dashboard", replace: true }).finally(() => {
+        if (redirectTimerRef.current) window.clearTimeout(redirectTimerRef.current);
+      });
+    } else {
+      window.location.replace(dest);
+    }
   };
 
   useEffect(() => {
@@ -50,7 +68,7 @@ function LoginPage() {
 
   useEffect(() => {
     if (!loading && user) {
-      goToDashboard();
+      goToPostLogin();
     }
     return () => {
       if (redirectTimerRef.current) window.clearTimeout(redirectTimerRef.current);
@@ -91,7 +109,7 @@ function LoginPage() {
       }
       await refreshSession(data.session);
       toast.success("Welcome back!");
-      goToDashboard();
+      goToPostLogin();
     } finally {
       inFlightRef.current = false;
       setSubmitting(false);
@@ -112,7 +130,7 @@ function LoginPage() {
         return;
       }
       if (result.redirected) return;
-      goToDashboard();
+      goToPostLogin();
     } finally {
       inFlightRef.current = false;
       setGoogleSubmitting(false);

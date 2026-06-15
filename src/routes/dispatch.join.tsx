@@ -104,7 +104,11 @@ function DispatchJoin() {
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate({ to: "/login", search: { redirect: `/dispatch/join?priceId=${priceId ?? ""}` } as any });
+      const redirect = `/dispatch/join?priceId=${encodeURIComponent(priceId ?? "")}`;
+      navigate({
+        to: "/signup",
+        search: { type: "service_provider", redirect } as any,
+      });
     }
   }, [loading, user, navigate, priceId]);
 
@@ -113,6 +117,16 @@ function DispatchJoin() {
   }, [user, email]);
 
   const validPrice = priceId && VALID_PRICES.has(priceId);
+
+  if (loading || (!loading && !user)) {
+    return (
+      <SiteLayout>
+        <div className="container mx-auto max-w-xl px-4 py-16 text-center text-sm text-muted-foreground">
+          Loading…
+        </div>
+      </SiteLayout>
+    );
+  }
 
   if (!validPrice) {
     return (
