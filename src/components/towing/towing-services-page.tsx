@@ -12,7 +12,10 @@ import {
   Star,
   Crown,
   Network,
+  ChevronDown,
+  Search,
 } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
