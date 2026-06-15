@@ -507,7 +507,44 @@ function TowProviderDashboard() {
     }
   };
 
-  if (loading) return <div className="p-12 text-center text-muted-foreground">Loading…</div>;
+  if (loading || dispatchProvider.loading)
+    return <div className="p-12 text-center text-muted-foreground">Loading…</div>;
+
+  // Tow company tools are only for registered Dispatch providers.
+  if (!dispatchProvider.hasProfile) {
+    return (
+      <div className="mx-auto max-w-2xl space-y-4 p-6">
+        <header className="flex items-start gap-3">
+          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <Truck className="h-6 w-6" />
+          </div>
+          <div>
+            <h1 className="font-display text-2xl font-bold md:text-3xl">Tow requests</h1>
+            <p className="text-sm text-muted-foreground">
+              This area is for registered tow companies on the 365 Dispatch network.
+            </p>
+          </div>
+        </header>
+        <div className="rounded-xl border border-border bg-card p-6 text-sm">
+          <p className="font-medium">You haven't joined the Dispatch network yet.</p>
+          <p className="mt-1 text-muted-foreground">
+            Create your tow company profile and pick a plan to start receiving and bidding on jobs in your area.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Button asChild>
+              <Link to="/dispatch" hash="plans">
+                <Network className="mr-2 h-4 w-4" /> Choose a Dispatch plan
+              </Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link to="/tow">Need a tow yourself?</Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
 
   return (
     <div className="space-y-6">
