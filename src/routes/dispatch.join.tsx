@@ -163,26 +163,32 @@ function DispatchJoin() {
     }
   }
 
+  const plan = PLAN_DETAILS[priceId!];
+
   return (
     <SiteLayout>
-      <section className="container mx-auto max-w-3xl px-4 py-8">
+      <section className="container mx-auto max-w-5xl px-4 py-8">
         <Button asChild variant="ghost" size="sm" className="mb-4">
           <Link to="/dispatch" hash="plans">
             <ArrowLeft className="mr-1 h-4 w-4" /> Back to plans
           </Link>
         </Button>
         <div className="mb-6">
-          <div className="text-xs font-semibold uppercase tracking-wide text-primary">
-            Step 1 of 2 · Provider profile
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-primary">
+            <span className="rounded-full bg-primary/10 px-2 py-0.5">Step 1 of 2</span>
+            <span className="text-muted-foreground">Provider profile → Subscribe</span>
           </div>
-          <h1 className="mt-1 font-display text-2xl font-bold sm:text-3xl">
+          <h1 className="mt-2 font-display text-2xl font-bold sm:text-3xl">
             Join the 365 Dispatch network
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Selected plan: <strong className="text-foreground">{PLAN_LABEL[priceId!]}</strong>.
-            Tell us about your operation so we can route jobs to you. You'll subscribe on the next step.
+            Tell us about your operation so we can route the right jobs to you. You'll subscribe on the next step.
           </p>
         </div>
+
+        <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+          <div>
+
 
         <form onSubmit={onSubmit} className="space-y-6">
           <Card className="space-y-4 p-5">
