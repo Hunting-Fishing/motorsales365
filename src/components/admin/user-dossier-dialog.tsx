@@ -9,6 +9,7 @@ import {
   Wallet,
   ExternalLink,
   CheckCircle2,
+  Users,
 } from "lucide-react";
 import {
   Dialog,
