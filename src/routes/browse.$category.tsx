@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import ogBrowse from "@/assets/og/browse.jpg";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
