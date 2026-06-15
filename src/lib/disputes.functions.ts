@@ -138,7 +138,7 @@ export const getDisputeForReport = createServerFn({ method: "GET" })
   });
 
 export const resolveDispute = createServerFn({ method: "POST" })
-  .middleware([requireDomainRole("admin", "disputes.resolve")])
+  .middleware([requireAdminRoleAudited("disputes.resolve")])
   .inputValidator(
     (input: { disputeId: string; decision: "uphold" | "overturn"; response: string }) =>
       z

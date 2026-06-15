@@ -54,7 +54,7 @@ export const claimReward = createServerFn({ method: "POST" })
   });
 
 export const adminGrantReward = createServerFn({ method: "POST" })
-  .middleware([requireDomainRole("admin", "rewards.grant")])
+  .middleware([requireAdminRoleAudited("rewards.grant")])
   .inputValidator(
     (input: {
       userId: string;
@@ -92,7 +92,7 @@ export const adminGrantReward = createServerFn({ method: "POST" })
   });
 
 export const adminListRewards = createServerFn({ method: "GET" })
-  .middleware([requireDomainRole("admin", "rewards.list")])
+  .middleware([requireAdminRoleAudited("rewards.list")])
   .handler(async ({ context }) => {
     const { data } = await context.supabase
       .from("member_rewards")

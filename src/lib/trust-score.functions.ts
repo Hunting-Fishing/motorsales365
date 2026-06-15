@@ -53,7 +53,7 @@ export const getUserTrustScore = createServerFn({ method: "GET" })
   });
 
 export const adjustTrustScore = createServerFn({ method: "POST" })
-  .middleware([requireDomainRole("admin", "trustScore.adjust")])
+  .middleware([requireAdminRoleAudited("trustScore.adjust")])
   .inputValidator((input: { userId: string; delta: number; reason: string }) =>
     z
       .object({
