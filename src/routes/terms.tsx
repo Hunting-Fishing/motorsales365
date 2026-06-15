@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 15, 2026 (added Trust Score, Disputes & Member Rewards section: 0–1000 score scale with 500 baseline, accepted-report penalty schedule, 14-day dispute window, quarterly/annual boost credit bonuses by tier, and clarification that reward credits are non-transferable and have no cash value.)";
+  const lastUpdated = "June 15, 2026 (re-priced 365 Dispatch tiers: Solo ₱250/mo 1 driver, Team ₱500/mo up to 5 drivers, Unlimited ₱1,000/mo unlimited drivers; legacy Starter/Pro/Fleet plans grandfathered.)";
 
   return (
     <SiteLayout>
