@@ -140,7 +140,14 @@ function DispatchDashboard() {
 
   const plan = status?.subscription?.plan_slug ?? null;
   const planMeta = plan ? PLAN_LABELS[plan] : null;
-  const maxRegions = plan === "dispatch_fleet" ? 99 : plan === "dispatch_pro" ? 4 : plan === "dispatch_starter" ? 1 : 0;
+  const maxRegions =
+    plan === "dispatch_unlimited" || plan === "dispatch_fleet"
+      ? 99
+      : plan === "dispatch_team" || plan === "dispatch_pro"
+      ? 3
+      : plan === "dispatch_solo" || plan === "dispatch_starter"
+      ? 1
+      : 0;
 
   if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
   if (!user) return null;
