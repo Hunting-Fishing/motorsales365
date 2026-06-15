@@ -162,7 +162,7 @@ function DashboardLayout() {
         {/* Desktop: sidebar */}
         <aside className="hidden min-w-0 max-w-full overflow-hidden rounded-xl border border-border bg-card p-2 lg:sticky lg:top-20 lg:block lg:self-start">
           <nav className="flex flex-col gap-1">
-            {nav.map(({ to, label, Icon, exact }) => (
+            {nav.map(({ to, label, Icon, exact }: any) => (
               <Link
                 key={to}
                 to={to}
