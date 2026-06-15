@@ -139,22 +139,22 @@ function DispatchLanding() {
             <li className="flex items-start gap-2">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <span>
-                <strong className="text-foreground">Starter</strong> gets you listed and gives you a basic inbox —
-                enough to start receiving jobs.
+                <strong className="text-foreground">Solo</strong> gets you listed and gives you a basic inbox
+                for 1 driver — enough to start receiving jobs.
               </span>
             </li>
             <li className="flex items-start gap-2">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <span>
-                <strong className="text-foreground">Pro</strong> adds priority placement, SMS alerts, and auto-routing
-                to 5 drivers.
+                <strong className="text-foreground">Team</strong> adds priority placement, SMS alerts, and auto-routing
+                across up to 5 drivers.
               </span>
             </li>
             <li className="flex items-start gap-2">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <span>
-                <strong className="text-foreground">Fleet</strong> unlocks GPS tracking, multi-branch, white-label
-                links, and API access.
+                <strong className="text-foreground">Unlimited</strong> unlocks unlimited drivers, GPS tracking,
+                multi-branch, white-label links, and API access.
               </span>
             </li>
             <li className="flex items-start gap-2">
