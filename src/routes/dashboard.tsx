@@ -83,6 +83,7 @@ function DashboardLayout() {
   const navigate = useNavigate();
   const [hasReferral, setHasReferral] = useState(false);
   const [hasOrg, setHasOrg] = useState(false);
+  const { hasProfile: isDispatchProvider } = useDispatchProvider();
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
@@ -113,7 +114,6 @@ function DashboardLayout() {
       </SiteLayout>
     );
 
-  const { hasProfile: isDispatchProvider } = useDispatchProvider();
 
   const nav = [
     ...BASE_NAV,

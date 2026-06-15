@@ -8,12 +8,19 @@ import { Button } from "@/components/ui/button";
 import { SiteLayout } from "@/components/site-layout";
 import { siteOrigin } from "@/lib/site-config";
 
-type Search = { email?: string; intent?: string };
+type Search = { email?: string; intent?: string; redirect?: string };
+
+function safeInternalPath(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  if (!value.startsWith("/") || value.startsWith("//")) return undefined;
+  return value;
+}
 
 export const Route = createFileRoute("/verify-email")({
   validateSearch: (s: Record<string, unknown>): Search => ({
     email: typeof s.email === "string" ? s.email : undefined,
     intent: typeof s.intent === "string" ? s.intent : undefined,
+    redirect: safeInternalPath(s.redirect),
   }),
   component: VerifyEmailPage,
 });
@@ -25,7 +32,7 @@ const POST_ROUTE: Record<string, string> = {
 };
 
 function VerifyEmailPage() {
-  const { email, intent } = useSearch({ from: "/verify-email" });
+  const { email, intent, redirect } = useSearch({ from: "/verify-email" });
   const { user } = useAuth();
   const navigate = useNavigate();
   const [cooldown, setCooldown] = useState(0);
@@ -34,11 +41,15 @@ function VerifyEmailPage() {
   // Auto-forward when the user becomes verified (link clicked / session arrives)
   useEffect(() => {
     if (user?.email_confirmed_at) {
-      const dest = (intent && POST_ROUTE[intent]) || "/dashboard";
+      const dest = redirect || (intent && POST_ROUTE[intent]) || "/dashboard";
       toast.success("Email verified — welcome aboard!");
-      navigate({ to: dest });
+      if (redirect) {
+        window.location.assign(dest);
+      } else {
+        navigate({ to: dest });
+      }
     }
-  }, [user, intent, navigate]);
+  }, [user, intent, redirect, navigate]);
 
   useEffect(() => {
     if (cooldown <= 0) return;
@@ -56,7 +67,7 @@ function VerifyEmailPage() {
       type: "signup",
       email,
       options: {
-        emailRedirectTo: `${siteOrigin()}/verify-email${intent ? `?intent=${intent}` : ""}`,
+        emailRedirectTo: `${siteOrigin()}/verify-email${intent || redirect ? "?" : ""}${intent ? `intent=${intent}` : ""}${intent && redirect ? "&" : ""}${redirect ? `redirect=${encodeURIComponent(redirect)}` : ""}`,
       },
     });
     setResending(false);
@@ -111,7 +122,7 @@ function VerifyEmailPage() {
             <Link to="/signup" className="hover:underline">
               Wrong email? Start over
             </Link>
-            <Link to="/login" className="hover:underline">
+            <Link to="/login" search={redirect ? { redirect } : {}} className="hover:underline">
               Already verified? Sign in
             </Link>
           </div>

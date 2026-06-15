@@ -76,6 +76,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         await stripe.customers.update(customerId, { name: profile.full_name });
       }
 
+      const isDispatch = data.priceId.startsWith("dispatch_");
       const session = await stripe.checkout.sessions.create({
         line_items: [{ price: stripePrice.id, quantity: data.quantity || 1 }],
         mode: isRecurring ? "subscription" : "payment",
@@ -83,9 +84,20 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
         return_url: data.returnUrl,
         customer: customerId,
         managed_payments: { enabled: true },
-        metadata: { userId, lookup_key: data.priceId, managed_payments: "true" },
+        metadata: {
+          userId,
+          lookup_key: data.priceId,
+          managed_payments: "true",
+          ...(isDispatch && { kind: "dispatch" }),
+        },
         ...(isRecurring && {
-          subscription_data: { metadata: { userId, lookup_key: data.priceId } },
+          subscription_data: {
+            metadata: {
+              userId,
+              lookup_key: data.priceId,
+              ...(isDispatch && { kind: "dispatch" }),
+            },
+          },
         }),
       } as Stripe.Checkout.SessionCreateParams);
 

@@ -267,7 +267,7 @@ function SignupPage() {
           referral_code: refCode || undefined,
           signup_intent: intent,
         },
-        emailRedirectTo: `${siteOrigin()}/verify-email?intent=${intent}`,
+        emailRedirectTo: `${siteOrigin()}/verify-email?intent=${intent}${search.redirect ? `&redirect=${encodeURIComponent(search.redirect)}` : ""}`,
       },
     });
     setSubmitting(false);
