@@ -141,7 +141,7 @@ export const getUserAdminDossier = createServerFn({ method: "POST" })
       .from("payments")
       .select("amount_php, paid_at, status")
       .eq("user_id", uid)
-      .eq("status", "succeeded");
+      .eq("status", "paid");
     const revenue_lifetime_php = (pays ?? []).reduce(
       (s, p: any) => s + Number(p.amount_php ?? 0),
       0,
