@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { Crosshair, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { PlacesAutocomplete } from "./places-autocomplete";
 
@@ -60,31 +67,24 @@ export function MapFilterBar({
 
   return (
     <div className="space-y-3">
-      {/* Type chips — swipeable strip on mobile, wraps on sm+ */}
-      <div className="-mx-3 flex gap-2 overflow-x-auto px-3 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-0 sm:flex-wrap sm:px-0 sm:overflow-visible">
-        <button
-          type="button"
-          aria-pressed={selectedType === null}
-          onClick={() => onSelectType(null)}
-          className={`${chipBase} ${selectedType === null ? chipActive : chipIdle}`}
+      {/* Type filter + search + locate — compact single row on sm+ */}
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(180px,220px)_1fr_auto] sm:items-center">
+        <Select
+          value={selectedType ?? "__all"}
+          onValueChange={(v) => onSelectType(v === "__all" ? null : v)}
         >
-          All types
-        </button>
-        {types.map((t) => (
-          <button
-            key={t.slug}
-            type="button"
-            aria-pressed={selectedType === t.slug}
-            onClick={() => onSelectType(selectedType === t.slug ? null : t.slug)}
-            className={`${chipBase} ${selectedType === t.slug ? chipActive : chipIdle}`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Search + locate — stacked full-width on mobile, inline on sm+ */}
-      <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:items-center">
+          <SelectTrigger className="h-11 sm:h-9">
+            <SelectValue placeholder="All types" />
+          </SelectTrigger>
+          <SelectContent className="max-h-80">
+            <SelectItem value="__all">All types</SelectItem>
+            {types.map((t) => (
+              <SelectItem key={t.slug} value={t.slug}>
+                {t.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <PlacesAutocomplete
           value={search}
           onChange={setSearch}
@@ -103,6 +103,7 @@ export function MapFilterBar({
           {locating ? "Locating…" : "Use my location"}
         </Button>
       </div>
+
 
       {center && (
         <div className="rounded-lg border border-border bg-secondary/40 p-3 text-xs">
