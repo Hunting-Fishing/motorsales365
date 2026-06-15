@@ -226,9 +226,9 @@ function DispatchDashboard() {
               );
             })}
           </div>
-          {plan === "dispatch_fleet" && (
+          {(plan === "dispatch_unlimited" || plan === "dispatch_fleet") && (
             <p className="mt-2 text-xs text-muted-foreground">
-              Fleet plan covers nationwide automatically — region selection is optional.
+              Unlimited plan covers nationwide automatically — region selection is optional.
             </p>
           )}
         </div>
