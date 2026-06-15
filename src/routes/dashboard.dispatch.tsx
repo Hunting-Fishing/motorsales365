@@ -43,9 +43,13 @@ type DispatchedJob = {
 };
 
 const PLAN_LABELS: Record<string, { label: string; color: string }> = {
-  dispatch_starter: { label: "Starter (₱499/mo)", color: "bg-secondary" },
-  dispatch_pro: { label: "Pro (₱1,499/mo)", color: "bg-primary text-primary-foreground" },
-  dispatch_fleet: { label: "Fleet (₱2,999/mo)", color: "bg-amber-500 text-white" },
+  dispatch_solo: { label: "Solo (₱250/mo)", color: "bg-secondary" },
+  dispatch_team: { label: "Team (₱500/mo)", color: "bg-primary text-primary-foreground" },
+  dispatch_unlimited: { label: "Unlimited (₱1,000/mo)", color: "bg-amber-500 text-white" },
+  // legacy
+  dispatch_starter: { label: "Starter (legacy)", color: "bg-secondary" },
+  dispatch_pro: { label: "Pro (legacy)", color: "bg-primary text-primary-foreground" },
+  dispatch_fleet: { label: "Fleet (legacy)", color: "bg-amber-500 text-white" },
 };
 
 function DispatchDashboard() {
