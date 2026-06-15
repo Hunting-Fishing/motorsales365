@@ -143,15 +143,19 @@ export function ReportCard({
       : null;
   const isAnonymous = !report.reporter_id;
 
+  const statusTone =
+    report.status === "resolved"
+      ? report.resolution === "accepted"
+        ? "border-destructive/40 bg-destructive/10 text-destructive"
+        : "border-border bg-muted text-muted-foreground"
+      : "border-amber-500/40 bg-amber-500/15 text-amber-700 dark:text-amber-300";
+
   return (
     <article className="overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md">
       {/* ── Header bar ───────────────────────────────────────── */}
       <header className="flex flex-wrap items-start justify-between gap-3 border-b border-border bg-muted/30 px-5 py-3">
         <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <Badge
-            variant={report.status === "resolved" ? "secondary" : "destructive"}
-            className="uppercase tracking-wide"
-          >
+          <Badge className={`border uppercase tracking-wide ${statusTone}`}>
             {report.status}
             {report.resolution ? ` · ${report.resolution}` : ""}
           </Badge>
@@ -174,27 +178,89 @@ export function ReportCard({
           </span>
         </div>
 
-        {report.status !== "resolved" && (
-          <div className="flex flex-wrap gap-2">
-            {report.listing_id && (
-              <>
-                <Button size="sm" variant="outline" onClick={hideListing}>
-                  <ShieldOff className="mr-1 h-4 w-4" /> Hide
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-8"
+            onClick={() => setHistoryOpen((v) => !v)}
+          >
+            <History className="mr-1 h-4 w-4" /> History
+          </Button>
+          {report.status !== "resolved" ? (
+            <>
+              <div className="flex items-center gap-0.5">
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => setDialog({ action: "accept" })}
+                >
+                  <CheckCircle2 className="mr-1 h-4 w-4" /> Accept
                 </Button>
-                <Button size="sm" variant="outline" onClick={removeListing}>
-                  <Trash2 className="mr-1 h-4 w-4" /> Delete
+                <ReportActionInfo
+                  title="Accept report"
+                  effect="Marks the report as a confirmed violation. You can optionally hide or delete the listing in the next step."
+                  scoreEffect="−25 pts to the poster (additional −10 hide / −30 delete)."
+                  reversible={true}
+                  disputable={true}
+                />
+              </div>
+              <div className="flex items-center gap-0.5">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => setDialog({ action: "dismiss" })}
+                >
+                  <XCircle className="mr-1 h-4 w-4" /> Dismiss
                 </Button>
-              </>
-            )}
-            <Button size="sm" variant="default" onClick={() => resolve("accepted")}>
-              <CheckCircle2 className="mr-1 h-4 w-4" /> Accept
-            </Button>
-            <Button size="sm" variant="ghost" onClick={() => resolve("dismissed")}>
-              <XCircle className="mr-1 h-4 w-4" /> Dismiss
-            </Button>
-          </div>
-        )}
+                <ReportActionInfo
+                  title="Dismiss report"
+                  effect="Marks the report as not a violation. The listing is unchanged."
+                  scoreEffect="No change to poster's trust score."
+                  reversible={true}
+                  disputable={false}
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              {report.listings?.status === "hidden" && (
+                <div className="flex items-center gap-0.5">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setDialog({ action: "restore_listing" })}
+                  >
+                    <RotateCcw className="mr-1 h-4 w-4" /> Restore listing
+                  </Button>
+                  <ReportActionInfo
+                    title="Restore listing"
+                    effect="Sets the listing back to active status."
+                    scoreEffect="+10 pts to poster."
+                    reversible={true}
+                    disputable={false}
+                  />
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </header>
+
+      {historyOpen && (
+        <div className="border-b border-border bg-background/40 p-5">
+          <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Action history
+          </div>
+          <ReportHistory
+            reportId={report.id}
+            refreshKey={historyKey}
+            onReverse={(actionId) =>
+              setDialog({ action: "reverse", reversesActionId: actionId })
+            }
+          />
+        </div>
+      )}
 
       <div className="space-y-5 p-5">
         {/* ── Target + Reason ─────────────────────────────────── */}
