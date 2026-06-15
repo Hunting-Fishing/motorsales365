@@ -184,9 +184,19 @@ function SignupPage() {
     if (c) setRefCode(c);
   }, []);
 
+  const goAfterSignup = (fallback: string) => {
+    const dest = search.redirect || fallback;
+    if (dest.startsWith("/") && !dest.startsWith("//")) {
+      window.location.assign(dest);
+    } else {
+      navigate({ to: fallback as any });
+    }
+  };
+
   useEffect(() => {
-    if (!loading && user) navigate({ to: "/dashboard" });
-  }, [user, loading, navigate]);
+    if (!loading && user) goAfterSignup("/dashboard");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, loading]);
 
   // Reset business_kind when switching intent
   useEffect(() => {
