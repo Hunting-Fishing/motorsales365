@@ -31,8 +31,6 @@ function LoginPage() {
   const router = useRouter();
   const { redirect: redirectTo } = Route.useSearch();
 
-
-  const { redirect: redirectTo } = Route.useSearch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
