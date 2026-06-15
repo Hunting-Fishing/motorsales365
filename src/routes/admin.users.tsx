@@ -440,7 +440,7 @@ function AdminUsers() {
                     {magicLoadingId === u.id ? "…" : "Sign-in link"}
                   </Button>
                 )}
-                <EditProfileDialog user={u} onSaved={load} />
+                <EditProfileDialog user={u} onSaved={load} is365Staff={staffIds.has(u.id)} />
                 {isSuperAdmin && <ResetPasswordDialog user={u} />}
                 {isVerified ? (
                   <Button
