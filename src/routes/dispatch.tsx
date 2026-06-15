@@ -205,8 +205,8 @@ function DispatchLanding() {
                 ))}
               </ul>
               <Button asChild className="mt-6 w-full" size="lg">
-                <Link to="/dispatch/checkout" search={{ priceId: p.slug }}>
-                  Subscribe
+                <Link to="/dispatch/join" search={{ priceId: p.slug }}>
+                  Join &amp; subscribe
                 </Link>
               </Button>
             </Card>
