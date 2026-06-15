@@ -44,7 +44,7 @@ export function SiteFooter() {
         { to: "/browse/$category", params: { category: "boat" }, label: "Boats" },
         { to: "/browse/$category", params: { category: "airplane" }, label: "Airplanes" },
         { to: "/browse/$category", params: { category: "equipment" }, label: "Equipment" },
-        { to: "/browse/$category", params: { category: "towing" }, label: "Towing & Transport Services" },
+        { to: "/tow", label: "Towing & Transport Services" },
       ],
     },
     {

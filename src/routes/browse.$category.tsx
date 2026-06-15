@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
 import ogBrowse from "@/assets/og/browse.jpg";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -11,7 +11,7 @@ import { getBrowseListings, type BrowseFiltersInput } from "@/lib/browse-listing
 import { getYearCountsForCategory } from "@/lib/year-counts.functions";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
-import { TowingServicesPage } from "@/components/towing/towing-services-page";
+
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
 import { AdCarousel } from "@/components/ads/ad-carousel";
 import { SponsoredCategorySlot } from "@/components/ads/sponsored-category-slot";
@@ -192,11 +192,17 @@ function BrowsePage() {
 
   if (category === "towing") {
     return (
-      <SiteLayout>
-        <TowingServicesPage />
-      </SiteLayout>
+      <Navigate
+        to="/tow"
+        replace
+        search={{
+          listing: (search as any).listing,
+          provider: (search as any).provider,
+        }}
+      />
     );
   }
+
 
 
   const [keyword, setKeyword] = useState(search.q ?? "");
