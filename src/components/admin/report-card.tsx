@@ -255,6 +255,11 @@ export function ReportCard({
           </div>
         </section>
 
+        {/* ── Posting user dossier ───────────────────────────── */}
+        {report.listings?.user_id && <PostingUserPanel userId={report.listings.user_id} />}
+
+
+
         {/* ── Reporter + Evidence ─────────────────────────────── */}
         <section className="grid gap-3 md:grid-cols-2">
           <div className="rounded-lg border border-border bg-background/40 p-4">
