@@ -30,7 +30,7 @@ export type StaffContactAuditRow = {
   actor_id: string | null;
   action: "created" | "approved" | "denied" | "revoked" | "expired" | "accessed";
   note: string | null;
-  metadata: Record<string, unknown>;
+  metadata: Record<string, any>;
   created_at: string;
 };
 
