@@ -269,7 +269,7 @@ function DispatchLanding() {
               },
               {
                 t: "365 Dispatch",
-                b: "Built in PH for PH operators. ₱49 to start. GCash, Maya, card, bank.",
+                b: "Built in PH for PH operators. ₱250 to start. GCash, Maya, card, bank.",
               },
             ].map((c) => (
               <Card key={c.t} className="p-4">
