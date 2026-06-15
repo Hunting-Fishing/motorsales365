@@ -80,3 +80,13 @@ export function validateReturnUrl(
   }
   return url;
 }
+
+export function getStripeErrorMessage(error: unknown): string {
+  if (error && typeof error === "object") {
+    const e = error as { message?: string; raw?: { message?: string; code?: string }; code?: string };
+    const msg = e.raw?.message ?? e.message;
+    const code = e.raw?.code ?? e.code;
+    if (msg) return code ? `${msg} (${code})` : msg;
+  }
+  return "Stripe request failed";
+}

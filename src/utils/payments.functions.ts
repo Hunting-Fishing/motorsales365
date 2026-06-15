@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import type Stripe from "stripe";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireAdminRoleAudited } from "@/integrations/supabase/admin-middleware";
-import { type StripeEnv, createStripeClient, validateReturnUrl } from "@/lib/stripe.server";
+import { type StripeEnv, createStripeClient, getStripeErrorMessage, validateReturnUrl } from "@/lib/stripe.server";
 
 async function resolveOrCreateCustomer(
   stripe: ReturnType<typeof createStripeClient>,
@@ -52,43 +52,48 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
       return data;
     },
   )
-  .handler(async ({ data, context }) => {
-    const { supabase, userId, claims } = context;
-    const stripe = createStripeClient(data.environment);
+  .handler(async ({ data, context }): Promise<{ clientSecret: string } | { error: string }> => {
+    try {
+      const { supabase, userId, claims } = context;
+      const stripe = createStripeClient(data.environment);
 
-    const prices = await stripe.prices.list({ lookup_keys: [data.priceId] });
-    if (!prices.data.length) throw new Error("Price not found");
-    const stripePrice = prices.data[0];
-    const isRecurring = stripePrice.type === "recurring";
+      const prices = await stripe.prices.list({ lookup_keys: [data.priceId] });
+      if (!prices.data.length) {
+        return { error: `Price not configured for "${data.priceId}". Contact support.` };
+      }
+      const stripePrice = prices.data[0];
+      const isRecurring = stripePrice.type === "recurring";
 
-    const email = (claims as { email?: string } | null)?.email;
-    const customerId = await resolveOrCreateCustomer(stripe, { email, userId });
+      const email = (claims as { email?: string } | null)?.email;
+      const customerId = await resolveOrCreateCustomer(stripe, { email, userId });
 
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("full_name")
-      .eq("id", userId)
-      .maybeSingle();
-    if (profile?.full_name) {
-      await stripe.customers.update(customerId, { name: profile.full_name });
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", userId)
+        .maybeSingle();
+      if (profile?.full_name) {
+        await stripe.customers.update(customerId, { name: profile.full_name });
+      }
+
+      const session = await stripe.checkout.sessions.create({
+        line_items: [{ price: stripePrice.id, quantity: data.quantity || 1 }],
+        mode: isRecurring ? "subscription" : "payment",
+        ui_mode: "embedded_page",
+        return_url: data.returnUrl,
+        customer: customerId,
+        managed_payments: { enabled: true },
+        metadata: { userId, lookup_key: data.priceId, managed_payments: "true" },
+        ...(isRecurring && {
+          subscription_data: { metadata: { userId, lookup_key: data.priceId } },
+        }),
+      } as Stripe.Checkout.SessionCreateParams);
+
+      return { clientSecret: session.client_secret ?? "" };
+    } catch (error) {
+      console.error("createCheckoutSession failed:", error);
+      return { error: getStripeErrorMessage(error) };
     }
-
-    const session = await stripe.checkout.sessions.create({
-      line_items: [{ price: stripePrice.id, quantity: data.quantity || 1 }],
-      mode: isRecurring ? "subscription" : "payment",
-      ui_mode: "embedded_page",
-      return_url: data.returnUrl,
-      customer: customerId,
-      // Stripe handles end-to-end tax/fraud/disputes globally on this session.
-      // `managed_payments` is newer than the installed SDK typings — safe to cast.
-      managed_payments: { enabled: true },
-      metadata: { userId, lookup_key: data.priceId, managed_payments: "true" },
-      ...(isRecurring && {
-        subscription_data: { metadata: { userId, lookup_key: data.priceId } },
-      }),
-    } as Stripe.Checkout.SessionCreateParams);
-
-    return session.client_secret;
   });
 
 /**

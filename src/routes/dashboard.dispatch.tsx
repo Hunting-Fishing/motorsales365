@@ -43,9 +43,13 @@ type DispatchedJob = {
 };
 
 const PLAN_LABELS: Record<string, { label: string; color: string }> = {
-  dispatch_starter: { label: "Starter (₱499/mo)", color: "bg-secondary" },
-  dispatch_pro: { label: "Pro (₱1,499/mo)", color: "bg-primary text-primary-foreground" },
-  dispatch_fleet: { label: "Fleet (₱2,999/mo)", color: "bg-amber-500 text-white" },
+  dispatch_solo: { label: "Solo (₱250/mo)", color: "bg-secondary" },
+  dispatch_team: { label: "Team (₱500/mo)", color: "bg-primary text-primary-foreground" },
+  dispatch_unlimited: { label: "Unlimited (₱1,000/mo)", color: "bg-amber-500 text-white" },
+  // legacy
+  dispatch_starter: { label: "Starter (legacy)", color: "bg-secondary" },
+  dispatch_pro: { label: "Pro (legacy)", color: "bg-primary text-primary-foreground" },
+  dispatch_fleet: { label: "Fleet (legacy)", color: "bg-amber-500 text-white" },
 };
 
 function DispatchDashboard() {
@@ -136,7 +140,14 @@ function DispatchDashboard() {
 
   const plan = status?.subscription?.plan_slug ?? null;
   const planMeta = plan ? PLAN_LABELS[plan] : null;
-  const maxRegions = plan === "dispatch_fleet" ? 99 : plan === "dispatch_pro" ? 4 : plan === "dispatch_starter" ? 1 : 0;
+  const maxRegions =
+    plan === "dispatch_unlimited" || plan === "dispatch_fleet"
+      ? 99
+      : plan === "dispatch_team" || plan === "dispatch_pro"
+      ? 3
+      : plan === "dispatch_solo" || plan === "dispatch_starter"
+      ? 1
+      : 0;
 
   if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
   if (!user) return null;
@@ -215,9 +226,9 @@ function DispatchDashboard() {
               );
             })}
           </div>
-          {plan === "dispatch_fleet" && (
+          {(plan === "dispatch_unlimited" || plan === "dispatch_fleet") && (
             <p className="mt-2 text-xs text-muted-foreground">
-              Fleet plan covers nationwide automatically — region selection is optional.
+              Unlimited plan covers nationwide automatically — region selection is optional.
             </p>
           )}
         </div>

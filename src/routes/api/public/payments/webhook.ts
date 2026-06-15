@@ -110,7 +110,7 @@ async function upsertDispatchSubscription(
   const item = sub.items.data[0];
   const lookup = dispatchLookup ?? item?.price?.lookup_key ?? null;
   // Strip "_monthly" suffix for plan_slug stored in dispatch_subscriptions
-  const planSlug = lookup ? lookup.replace(/_monthly$/, "") : "dispatch_starter";
+  const planSlug = lookup ? lookup.replace(/_monthly$/, "") : "dispatch_solo";
   const periodEnd = (item as any)?.current_period_end ?? (sub as any).current_period_end;
   const status = sub.status === "trialing" ? "active" : sub.status;
   const isActive = status === "active";

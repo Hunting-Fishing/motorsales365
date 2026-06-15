@@ -7,17 +7,17 @@ import { Badge } from "@/components/ui/badge";
 export const Route = createFileRoute("/dispatch")({
   head: () => ({
     meta: [
-      { title: "365 Dispatch — PH Tow & Trucking Dispatch Software from ₱49/mo" },
+      { title: "365 Dispatch — PH Tow & Trucking Dispatch Software from ₱250/mo" },
       {
         name: "description",
         content:
-          "The underdog dispatch software for Philippine tow and trucking operators. Get jobs, run your dispatch, look professional — from ₱49/month. One completed job pays for a year.",
+          "The underdog dispatch software for Philippine tow and trucking operators. Solo ₱250 (1 driver), Team ₱500 (5 drivers), Unlimited drivers ₱1,000 per month. No per-job commissions.",
       },
       { property: "og:title", content: "365 Dispatch — PH Tow & Trucking Dispatch Software" },
       {
         property: "og:description",
         content:
-          "Dispatch software for every PH tow and trucking operator. Starter ₱49, Pro ₱299, Fleet ₱999 per month. No per-job commissions.",
+          "Dispatch software for every PH tow and trucking operator. Solo ₱250, Team ₱500, Unlimited ₱1,000 per month.",
       },
     ],
   }),
@@ -26,48 +26,48 @@ export const Route = createFileRoute("/dispatch")({
 
 const PLANS = [
   {
-    slug: "dispatch_starter_monthly",
-    name: "Starter",
-    price: 49,
-    tagline: "No excuse not to sign up",
-    coverage: "1 region · 1 truck",
-    jobs: "Up to 20 jobs / month",
+    slug: "dispatch_solo_monthly",
+    name: "Solo",
+    price: 250,
+    tagline: "Owner-operator starter",
+    coverage: "1 service region",
+    jobs: "1 driver seat",
     perks: [
       "Free directory listing",
-      "Basic dispatch inbox (web + PWA)",
-      "Email + in-app alerts",
+      "Dispatch inbox (web + PWA)",
+      "Email + in-app job alerts",
       "Cancel anytime",
     ],
     tone: "border-border",
   },
   {
-    slug: "dispatch_pro_monthly",
-    name: "Pro",
-    price: 299,
-    tagline: "1 job pays for the year",
-    coverage: "Up to 3 regions · 5 drivers",
-    jobs: "Unlimited jobs",
+    slug: "dispatch_team_monthly",
+    name: "Team",
+    price: 500,
+    tagline: "Most popular for small shops",
+    coverage: "Up to 3 service regions",
+    jobs: "Up to 5 drivers",
     perks: [
       "Priority placement in dispatch queue",
       "SMS + push job alerts",
       "Accept / decline + auto-route to nearest driver",
-      "Pro badge on your public profile",
+      "Team badge on your public profile",
     ],
     tone: "border-primary ring-2 ring-primary/20",
     highlight: "Most popular",
   },
   {
-    slug: "dispatch_fleet_monthly",
-    name: "Fleet",
-    price: 999,
-    tagline: "Run your whole operation",
+    slug: "dispatch_unlimited_monthly",
+    name: "Unlimited",
+    price: 1000,
+    tagline: "Run your whole fleet",
     coverage: "Nationwide · multi-branch",
-    jobs: "Unlimited jobs + drivers",
+    jobs: "Unlimited drivers",
     perks: [
       "Live GPS truck tracking",
       "Multi-branch + role-based staff accounts",
       "White-label tracking link for your customer",
-      "API access + Zapier-style webhooks",
+      "API access + webhooks",
     ],
     tone: "border-amber-400/60",
   },
@@ -80,12 +80,12 @@ function DispatchLanding() {
         <div className="container mx-auto px-4 py-16">
           <Badge className="mb-4 bg-primary text-primary-foreground">365 Dispatch</Badge>
           <h1 className="font-display text-4xl font-bold tracking-tight md:text-5xl">
-            Dispatch software for PH tow &amp; trucking operators — from ₱49/month.
+            Dispatch software for PH tow &amp; trucking operators — from ₱250/month.
           </h1>
           <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
             AAP, Motolite Res-Q, Shell Go+, and MPT DriveHub talk to drivers. We power the
-            tow and trucking operators behind them. One completed job pays for a full year
-            of software — no per-job commissions, no radios, no group chats.
+            tow and trucking operators behind them. Pay per driver seat, no per-job
+            commissions, no radios, no group chats.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Button asChild size="lg">
@@ -139,22 +139,22 @@ function DispatchLanding() {
             <li className="flex items-start gap-2">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <span>
-                <strong className="text-foreground">Starter</strong> gets you listed and gives you a basic inbox —
-                enough to start receiving jobs.
+                <strong className="text-foreground">Solo</strong> gets you listed and gives you a basic inbox
+                for 1 driver — enough to start receiving jobs.
               </span>
             </li>
             <li className="flex items-start gap-2">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <span>
-                <strong className="text-foreground">Pro</strong> adds priority placement, SMS alerts, and auto-routing
-                to 5 drivers.
+                <strong className="text-foreground">Team</strong> adds priority placement, SMS alerts, and auto-routing
+                across up to 5 drivers.
               </span>
             </li>
             <li className="flex items-start gap-2">
               <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
               <span>
-                <strong className="text-foreground">Fleet</strong> unlocks GPS tracking, multi-branch, white-label
-                links, and API access.
+                <strong className="text-foreground">Unlimited</strong> unlocks unlimited drivers, GPS tracking,
+                multi-branch, white-label links, and API access.
               </span>
             </li>
             <li className="flex items-start gap-2">
@@ -170,8 +170,8 @@ function DispatchLanding() {
       <section id="plans" className="container mx-auto px-4 py-12">
         <h2 className="font-display text-3xl font-bold">Underdog pricing.</h2>
         <p className="mt-1 text-muted-foreground">
-          One tow job in Metro Manila averages ₱2,500–₱5,000. Our top tier costs ₱999/mo —
-          a single completed job covers a full year of Pro.
+          One tow job in Metro Manila averages ₱2,500–₱5,000. Our top tier costs ₱1,000/mo —
+          a single completed job covers a full year of Unlimited.
         </p>
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           {PLANS.map((p) => (
@@ -205,8 +205,8 @@ function DispatchLanding() {
                 ))}
               </ul>
               <Button asChild className="mt-6 w-full" size="lg">
-                <Link to="/dispatch/checkout" search={{ priceId: p.slug }}>
-                  Subscribe
+                <Link to="/dispatch/join" search={{ priceId: p.slug }}>
+                  Join &amp; subscribe
                 </Link>
               </Button>
             </Card>
@@ -254,7 +254,7 @@ function DispatchLanding() {
             to the customer, paid per dispatch, and has no software of their own. That's
             where we fit: every independent and subcontracted tow + trucking operator in
             the Philippines needs a way to take jobs, dispatch a driver, and look
-            legitimate. ₱49/month gets you on the map. ₱999/month replaces a ₱150,000
+            legitimate. ₱250/month gets you on the map. ₱1,000/month replaces a ₱150,000
             fleet-management suite.
           </p>
           <div className="mt-6 grid gap-4 md:grid-cols-3">
@@ -269,7 +269,7 @@ function DispatchLanding() {
               },
               {
                 t: "365 Dispatch",
-                b: "Built in PH for PH operators. ₱49 to start. GCash, Maya, card, bank.",
+                b: "Built in PH for PH operators. ₱250 to start. GCash, Maya, card, bank.",
               },
             ].map((c) => (
               <Card key={c.t} className="p-4">
@@ -306,7 +306,7 @@ function DispatchLanding() {
 }
 
 type Cell = boolean | string;
-const TIERS = ["Starter", "Pro", "Fleet"] as const;
+const TIERS = ["Solo", "Team", "Unlimited"] as const;
 
 const FEATURE_GROUPS: { group: string; rows: { label: string; values: [Cell, Cell, Cell] }[] }[] = [
   {
@@ -314,8 +314,8 @@ const FEATURE_GROUPS: { group: string; rows: { label: string; values: [Cell, Cel
     rows: [
       { label: "Public directory listing", values: [true, true, true] },
       { label: "Priority placement in dispatch queue", values: [false, true, true] },
-      { label: "Verified provider badge", values: ["Basic", "Pro badge", "Fleet badge"] },
-      { label: "Job volume", values: ["Up to 20 / mo", "Unlimited", "Unlimited"] },
+      { label: "Verified provider badge", values: ["Basic", "Team badge", "Unlimited badge"] },
+      { label: "Active jobs at once", values: ["Up to 3", "Up to 10", "Unlimited"] },
       { label: "Service coverage", values: ["1 region", "Up to 3 regions", "Nationwide + multi-branch"] },
     ],
   },
@@ -326,7 +326,7 @@ const FEATURE_GROUPS: { group: string; rows: { label: string; values: [Cell, Cel
       { label: "Email + in-app alerts", values: [true, true, true] },
       { label: "SMS + push job alerts", values: [false, true, true] },
       { label: "Accept / decline + auto-route to nearest driver", values: [false, true, true] },
-      { label: "Driver seats", values: ["1 truck", "Up to 5 drivers", "Unlimited drivers"] },
+      { label: "Driver seats", values: ["1 driver", "Up to 5 drivers", "Unlimited drivers"] },
     ],
   },
   {
@@ -341,7 +341,7 @@ const FEATURE_GROUPS: { group: string; rows: { label: string; values: [Cell, Cel
   {
     group: "Billing",
     rows: [
-      { label: "Monthly price", values: ["₱49", "₱299", "₱999"] },
+      { label: "Monthly price", values: ["₱250", "₱500", "₱1,000"] },
       { label: "Cancel anytime", values: [true, true, true] },
     ],
   },
