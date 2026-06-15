@@ -44,6 +44,9 @@ export type ReportRow = {
   reporter_name: string | null;
   reporter_email: string | null;
   reporter_phone: string | null;
+  reporter_member_number?: number | null;
+  reporter_full_name?: string | null;
+  reporter_business_name?: string | null;
   listing_id: string | null;
   target_type: string;
   target_url: string | null;
