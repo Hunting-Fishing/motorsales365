@@ -161,16 +161,23 @@ function AdminReports() {
         </div>
       ) : (
         <div className="space-y-3">
-          {reports.map((r) => (
-            <ReportCard
-              key={r.id}
-              report={r}
-              reporterCounts={r.reporter_id ? counts[r.reporter_id] : undefined}
-              currentUserId={user?.id ?? null}
-              onChanged={load}
-              onFilterReporter={(id) => setReporter(id)}
-            />
-          ))}
+          {reports.map((r) => {
+            const isExpanded =
+              expandedId === r.id || (filter === "open" && expandedId === null);
+            return (
+              <ReportCard
+                key={r.id}
+                report={r}
+                reporterCounts={r.reporter_id ? counts[r.reporter_id] : undefined}
+                currentUserId={user?.id ?? null}
+                onChanged={load}
+                onFilterReporter={(id) => setReporter(id)}
+                expanded={isExpanded}
+                onToggleExpanded={(next) => setExpanded(next ? r.id : null)}
+              />
+            );
+          })}
+
         </div>
       )}
     </div>
