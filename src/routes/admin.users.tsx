@@ -399,6 +399,7 @@ function AdminUsers() {
                 <div className="flex items-center gap-1.5 font-medium">
                   {u.full_name ?? "(no name)"}
                   {isVerified && <VerifiedBadge size="sm" />}
+                  {staffIds.has(u.id) && <Staff365Badge size="xs" className="ml-1" />}
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {u.seller_type} · joined {formatDate(u.created_at)}
