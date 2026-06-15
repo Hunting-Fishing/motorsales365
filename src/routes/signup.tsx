@@ -26,13 +26,22 @@ import { PhoneInput } from "@/components/phone-input";
 import { buildE164 } from "@/data/country-codes";
 import { siteOrigin } from "@/lib/site-config";
 
-type SignupSearch = { type?: SignupIntent };
+type SignupSearch = { type?: SignupIntent; redirect?: string };
+
+function safeInternalPath(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  if (!value.startsWith("/") || value.startsWith("//")) return undefined;
+  return value;
+}
 
 export const Route = createFileRoute("/signup")({
   validateSearch: (search: Record<string, unknown>): SignupSearch => {
     const t = search.type;
     const valid = SIGNUP_TYPES.map((s) => s.id) as string[];
-    return { type: typeof t === "string" && valid.includes(t) ? (t as SignupIntent) : undefined };
+    return {
+      type: typeof t === "string" && valid.includes(t) ? (t as SignupIntent) : undefined,
+      redirect: safeInternalPath(search.redirect),
+    };
   },
   component: SignupPage,
 });
