@@ -345,7 +345,42 @@ function DispatchJoin() {
             </Button>
           </div>
         </form>
+          </div>
+
+          <aside className="lg:sticky lg:top-20 lg:self-start">
+            <Card className="space-y-4 p-5">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Selected plan
+                </div>
+                <div className="mt-1 flex items-baseline justify-between gap-2">
+                  <div className="font-display text-xl font-bold">{plan.name}</div>
+                  <div className="text-sm font-semibold text-primary">{plan.price}</div>
+                </div>
+                <div className="text-xs text-muted-foreground">{plan.drivers}</div>
+              </div>
+              <ul className="space-y-2 text-sm">
+                {plan.perks.map((perk) => (
+                  <li key={perk} className="flex items-start gap-2">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <span>{perk}</span>
+                  </li>
+                ))}
+              </ul>
+              <Button asChild variant="outline" size="sm" className="w-full">
+                <Link to="/dispatch" hash="plans">Change plan</Link>
+              </Button>
+              <div className="flex items-start gap-2 rounded-md bg-muted/50 p-3 text-xs text-muted-foreground">
+                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span>
+                  Your profile is saved as <strong>pending</strong> and dispatch only activates after a successful payment. Cancel anytime from your dashboard.
+                </span>
+              </div>
+            </Card>
+          </aside>
+        </div>
       </section>
     </SiteLayout>
   );
 }
+
