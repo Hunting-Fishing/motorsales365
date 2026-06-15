@@ -28,6 +28,8 @@ import { formatDate } from "@/lib/format";
 import { getUserAdminDossier } from "@/lib/admin-user-dossier.functions";
 import { UserDossierDialog } from "./user-dossier-dialog";
 import { AccountTeamStrip } from "./account-team-strip";
+import { TierBadge } from "@/components/tier-badge";
+import { getUserTier } from "@/lib/tiers.functions";
 
 function StatTile({
   icon: Icon,
@@ -68,11 +70,17 @@ export function PostingUserPanel({ userId }: { userId: string }) {
   const [open, setOpen] = useState(true);
   const [dossierOpen, setDossierOpen] = useState(false);
   const fetchFn = useServerFn(getUserAdminDossier);
+  const tierFn = useServerFn(getUserTier);
 
   const { data, isLoading } = useQuery({
     queryKey: ["admin-user-dossier", userId],
     queryFn: () => fetchFn({ data: { userId } }),
     staleTime: 60_000,
+  });
+  const { data: tierData } = useQuery({
+    queryKey: ["user-tier", userId],
+    queryFn: () => tierFn({ data: { userId } }),
+    staleTime: 5 * 60_000,
   });
 
   if (isLoading) {
