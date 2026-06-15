@@ -131,6 +131,7 @@ export function PostingUserPanel({ userId }: { userId: string }) {
           </div>
           <div className="mt-0.5 flex flex-wrap items-center gap-2">
             <span className="truncate text-base font-bold text-foreground">{displayName}</span>
+            {tierData?.tierId && <TierBadge tierId={tierData.tierId} size="xs" />}
             {memberBadge && (
               <Badge variant="secondary" className="font-mono text-[10px]">
                 {memberBadge}
