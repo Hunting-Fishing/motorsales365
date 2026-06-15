@@ -9,12 +9,61 @@ export const Route = createFileRoute("/admin/sandbox")({
   component: SandboxPage,
 });
 
-const ALL_ROLES: AppRole[] = ["admin", "sales", "moderator", "support", "advertising", "user"];
+const ALL_ROLES: AppRole[] = [
+  "admin",
+  "moderator",
+  "support",
+  "advertising",
+  "sales",
+  "sales_junior",
+  "sales_senior",
+  "sales_manager",
+  "user",
+];
 const SELLER_TYPES: { value: SellerType; label: string }[] = [
   { value: "private", label: "Private seller" },
   { value: "dealer", label: "Dealer" },
   { value: "repair_shop", label: "Repair shop" },
   { value: "insurance", label: "Insurance" },
+];
+
+const STAFF_PERSONAS: { key: string; label: string; roles: AppRole[]; description: string }[] = [
+  {
+    key: "advertising",
+    label: "Advertising staff",
+    roles: ["advertising"],
+    description: "365 advertising rep — handles ad inquiries & placements.",
+  },
+  {
+    key: "sales_junior",
+    label: "Sales (Junior)",
+    roles: ["sales_junior"],
+    description: "Entry-level sales rep — limited tools.",
+  },
+  {
+    key: "sales_senior",
+    label: "Sales (Senior)",
+    roles: ["sales_senior"],
+    description: "Senior sales rep — can manage ads & promotions.",
+  },
+  {
+    key: "sales_manager",
+    label: "Sales (Manager)",
+    roles: ["sales_manager"],
+    description: "Sales manager — full sales tools incl. discounts.",
+  },
+  {
+    key: "support",
+    label: "Support staff",
+    roles: ["support"],
+    description: "Customer support — ticket handling.",
+  },
+  {
+    key: "moderator",
+    label: "Moderator",
+    roles: ["moderator"],
+    description: "Content moderation — sees all listings & reports.",
+  },
 ];
 
 function SandboxPage() {
