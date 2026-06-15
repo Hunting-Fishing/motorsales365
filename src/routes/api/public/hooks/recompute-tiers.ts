@@ -8,8 +8,11 @@ export const Route = createFileRoute("/api/public/hooks/recompute-tiers")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const auth = await verifyInternalCronToken(request);
-        if (!auth.ok) return new Response("Unauthorized", { status: 401 });
+        const authed = await verifyInternalCronToken({
+          jobName: "recompute_tiers",
+          tokenHeader: request.headers.get("x-cron-token"),
+        });
+        if (!authed) return new Response("Unauthorized", { status: 401 });
 
         const cutoff = new Date(Date.now() - 90 * 86400_000).toISOString();
         const { data: users } = await supabaseAdmin
