@@ -7,17 +7,17 @@ import { Badge } from "@/components/ui/badge";
 export const Route = createFileRoute("/dispatch")({
   head: () => ({
     meta: [
-      { title: "365 Dispatch — PH Tow & Trucking Dispatch Software from ₱49/mo" },
+      { title: "365 Dispatch — PH Tow & Trucking Dispatch Software from ₱250/mo" },
       {
         name: "description",
         content:
-          "The underdog dispatch software for Philippine tow and trucking operators. Get jobs, run your dispatch, look professional — from ₱49/month. One completed job pays for a year.",
+          "The underdog dispatch software for Philippine tow and trucking operators. Solo ₱250 (1 driver), Team ₱500 (5 drivers), Unlimited drivers ₱1,000 per month. No per-job commissions.",
       },
       { property: "og:title", content: "365 Dispatch — PH Tow & Trucking Dispatch Software" },
       {
         property: "og:description",
         content:
-          "Dispatch software for every PH tow and trucking operator. Starter ₱49, Pro ₱299, Fleet ₱999 per month. No per-job commissions.",
+          "Dispatch software for every PH tow and trucking operator. Solo ₱250, Team ₱500, Unlimited ₱1,000 per month.",
       },
     ],
   }),
