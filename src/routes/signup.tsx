@@ -272,7 +272,23 @@ function SignupPage() {
     });
     setSubmitting(false);
     if (error) {
-      toast.error(error.message);
+      const msg = error.message || "";
+      if (/already|registered|exists|in use/i.test(msg)) {
+        toast.error("That email is already registered. Try signing in instead.");
+      } else {
+        toast.error(msg);
+      }
+      return;
+    }
+    // Supabase returns a user with empty identities[] when the email is already
+    // registered (to avoid leaking account existence). Treat as "already in use".
+    const identities = (data.user as { identities?: unknown[] } | null)?.identities;
+    if (data.user && Array.isArray(identities) && identities.length === 0) {
+      toast.error("That email is already registered. Please sign in instead.");
+      navigate({
+        to: "/login",
+        search: { redirect: search.redirect } as any,
+      });
       return;
     }
     // If email confirmation is required, no session is returned — send to pending screen.
