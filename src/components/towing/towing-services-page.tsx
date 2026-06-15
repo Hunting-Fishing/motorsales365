@@ -491,6 +491,10 @@ export function TowingServicesPage({
           </div>
         )}
       </div>
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
+
 
       {/* Request a tow */}
       <div id="emergency-tow" className="border-t border-border bg-secondary/30">
