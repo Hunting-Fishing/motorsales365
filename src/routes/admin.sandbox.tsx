@@ -9,12 +9,61 @@ export const Route = createFileRoute("/admin/sandbox")({
   component: SandboxPage,
 });
 
-const ALL_ROLES: AppRole[] = ["admin", "sales", "moderator", "support", "advertising", "user"];
+const ALL_ROLES: AppRole[] = [
+  "admin",
+  "moderator",
+  "support",
+  "advertising",
+  "sales",
+  "sales_junior",
+  "sales_senior",
+  "sales_manager",
+  "user",
+];
 const SELLER_TYPES: { value: SellerType; label: string }[] = [
   { value: "private", label: "Private seller" },
   { value: "dealer", label: "Dealer" },
   { value: "repair_shop", label: "Repair shop" },
   { value: "insurance", label: "Insurance" },
+];
+
+const STAFF_PERSONAS: { key: string; label: string; roles: AppRole[]; description: string }[] = [
+  {
+    key: "advertising",
+    label: "Advertising staff",
+    roles: ["advertising"],
+    description: "365 advertising rep — handles ad inquiries & placements.",
+  },
+  {
+    key: "sales_junior",
+    label: "Sales (Junior)",
+    roles: ["sales_junior"],
+    description: "Entry-level sales rep — limited tools.",
+  },
+  {
+    key: "sales_senior",
+    label: "Sales (Senior)",
+    roles: ["sales_senior"],
+    description: "Senior sales rep — can manage ads & promotions.",
+  },
+  {
+    key: "sales_manager",
+    label: "Sales (Manager)",
+    roles: ["sales_manager"],
+    description: "Sales manager — full sales tools incl. discounts.",
+  },
+  {
+    key: "support",
+    label: "Support staff",
+    roles: ["support"],
+    description: "Customer support — ticket handling.",
+  },
+  {
+    key: "moderator",
+    label: "Moderator",
+    roles: ["moderator"],
+    description: "Content moderation — sees all listings & reports.",
+  },
 ];
 
 function SandboxPage() {
@@ -50,6 +99,63 @@ function SandboxPage() {
           Nothing here changes the database or grants real privileges.
         </p>
       </div>
+
+      <section className="rounded-xl border border-primary/30 bg-primary/5 p-5">
+        <div className="mb-3">
+          <h2 className="text-lg font-semibold">View as 365 staff persona</h2>
+          <p className="text-xs text-muted-foreground">
+            One-click switch to view the app exactly as a given 365 staff role would see it. This
+            replaces your simulated roles — admin tools you'd lose access to will disappear from the
+            sidebar until you reset.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          {STAFF_PERSONAS.map((p) => {
+            const active =
+              !!simulatedRoles &&
+              simulatedRoles.length === p.roles.length &&
+              p.roles.every((r) => simulatedRoles.includes(r));
+            return (
+              <button
+                key={p.key}
+                onClick={() => {
+                  setSimulatedRoles(p.roles);
+                  toast.success(`Now viewing as ${p.label}`);
+                }}
+                disabled={!realIsAdmin}
+                className={`rounded-lg border p-3 text-left transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                  active
+                    ? "border-primary bg-primary/10"
+                    : "border-border bg-background hover:border-primary/50"
+                }`}
+              >
+                <div className="text-sm font-semibold">
+                  {active ? "✓ " : ""}
+                  {p.label}
+                </div>
+                <div className="mt-1 text-xs text-muted-foreground">{p.description}</div>
+              </button>
+            );
+          })}
+        </div>
+        {simulatedRoles && (
+          <div className="mt-3 flex items-center justify-between rounded-md border border-amber-500/40 bg-amber-500/10 p-3 text-xs text-amber-700">
+            <span>
+              Currently simulating: <strong>{simulatedRoles.join(", ") || "(none)"}</strong>
+            </span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => {
+                setSimulatedRoles(null);
+                toast.success("Restored real roles");
+              }}
+            >
+              Exit persona
+            </Button>
+          </div>
+        )}
+      </section>
 
       <section className="rounded-xl border border-border bg-card p-5">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
