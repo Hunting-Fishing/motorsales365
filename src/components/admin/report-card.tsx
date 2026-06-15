@@ -346,7 +346,9 @@ export function ReportCard({
         </div>
       )}
 
-      <div className="space-y-5 p-5">
+      {expanded && (
+      <div id={`report-${report.id}-body`} className="space-y-5 p-5">
+
         {/* ── Target + Reason ─────────────────────────────────── */}
         <section>
           <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
