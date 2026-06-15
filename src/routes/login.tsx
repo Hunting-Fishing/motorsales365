@@ -44,14 +44,36 @@ function LoginPage() {
   // a session and are about to redirect.
   const authBusy = submitting || googleSubmitting || loading || !!user;
 
-  const goToDashboard = () => {
+  const { redirect: redirectTo } = Route.useSearch();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [googleSubmitting, setGoogleSubmitting] = useState(false);
+  // Single-flight lock: survives re-renders and guarantees only one in-flight
+  // auth request at a time, even if React batches state updates.
+  const inFlightRef = useRef(false);
+  const redirectTimerRef = useRef<number | null>(null);
+
+  // Disable all auth actions while: a request is in flight, the auth hook is
+  // still initializing (header shows the loading spinner), or we already have
+  // a session and are about to redirect.
+  const authBusy = submitting || googleSubmitting || loading || !!user;
+
+  const goToPostLogin = () => {
+    const dest = redirectTo || "/dashboard";
     if (redirectTimerRef.current) window.clearTimeout(redirectTimerRef.current);
     redirectTimerRef.current = window.setTimeout(() => {
-      window.location.replace("/dashboard");
+      window.location.replace(dest);
     }, 1200);
-    void navigate({ to: "/dashboard", replace: true }).finally(() => {
-      if (redirectTimerRef.current) window.clearTimeout(redirectTimerRef.current);
-    });
+    // For non-typed redirect strings, fall back to a direct location change.
+    if (dest === "/dashboard") {
+      void navigate({ to: "/dashboard", replace: true }).finally(() => {
+        if (redirectTimerRef.current) window.clearTimeout(redirectTimerRef.current);
+      });
+    } else {
+      window.location.replace(dest);
+    }
   };
 
   useEffect(() => {
