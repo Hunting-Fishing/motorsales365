@@ -3,6 +3,7 @@ import { Check, Minus, Network, Siren, ShieldCheck, Truck, Zap } from "lucide-re
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useAuth } from "@/hooks/use-auth";
 
 export const Route = createFileRoute("/dispatch")({
   head: () => ({
