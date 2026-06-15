@@ -80,12 +80,12 @@ function DispatchLanding() {
         <div className="container mx-auto px-4 py-16">
           <Badge className="mb-4 bg-primary text-primary-foreground">365 Dispatch</Badge>
           <h1 className="font-display text-4xl font-bold tracking-tight md:text-5xl">
-            Dispatch software for PH tow &amp; trucking operators — from ₱49/month.
+            Dispatch software for PH tow &amp; trucking operators — from ₱250/month.
           </h1>
           <p className="mt-3 max-w-2xl text-lg text-muted-foreground">
             AAP, Motolite Res-Q, Shell Go+, and MPT DriveHub talk to drivers. We power the
-            tow and trucking operators behind them. One completed job pays for a full year
-            of software — no per-job commissions, no radios, no group chats.
+            tow and trucking operators behind them. Pay per driver seat, no per-job
+            commissions, no radios, no group chats.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Button asChild size="lg">
