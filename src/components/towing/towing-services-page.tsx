@@ -12,7 +12,10 @@ import {
   Star,
   Crown,
   Network,
+  ChevronDown,
+  Search,
 } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -84,6 +87,7 @@ export function TowingServicesPage({
   const [payment, setPayment] = useState<string>("any");
   const [providers, setProviders] = useState<ProviderRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [browseOpen, setBrowseOpen] = useState(false);
 
   // Direct-provider request (bypasses auto-dispatch)
   const [requestedProvider, setRequestedProvider] = useState<{ id: string; name: string } | null>(null);
@@ -338,8 +342,42 @@ export function TowingServicesPage({
       </div>
 
       <div className="container mx-auto px-4 pt-8">
-        <FeaturedTowProviders region={region} />
-      </div>
+        <Collapsible open={browseOpen} onOpenChange={setBrowseOpen}>
+          <CollapsibleTrigger
+            className="group flex w-full items-center justify-between gap-4 rounded-xl border border-border bg-card px-5 py-4 text-left shadow-[var(--shadow-card)] transition hover:border-primary/40"
+            aria-label={browseOpen ? "Hide tow company browser" : "Show tow company browser"}
+          >
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-secondary text-foreground">
+                <Search className="h-5 w-5" />
+              </div>
+              <div className="min-w-0">
+                <div className="truncate font-display text-base font-bold sm:text-lg">
+                  Browse verified towing companies
+                </div>
+                <p className="line-clamp-2 text-xs text-muted-foreground sm:text-sm">
+                  Search and filter PH tow providers by service, location, payment, and 24/7
+                  availability — view their profile, ratings, and contact details.
+                </p>
+              </div>
+            </div>
+            <div className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
+              <span className="hidden sm:inline">
+                {loading ? "…" : `${providers.length} provider${providers.length === 1 ? "" : "s"}`}
+              </span>
+              <span className="rounded-full border border-border px-2 py-0.5 text-[11px] font-medium">
+                {browseOpen ? "Hide" : "Show"}
+              </span>
+              <ChevronDown
+                className={`h-4 w-4 transition-transform ${browseOpen ? "rotate-180" : ""}`}
+              />
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="overflow-hidden data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down">
+            <div className="pt-6">
+              <FeaturedTowProviders region={region} />
+            </div>
+
 
       {/* Filters */}
       <div className="container mx-auto px-4 pt-8">
@@ -453,6 +491,10 @@ export function TowingServicesPage({
           </div>
         )}
       </div>
+          </CollapsibleContent>
+        </Collapsible>
+      </div>
+
 
       {/* Request a tow */}
       <div id="emergency-tow" className="border-t border-border bg-secondary/30">
