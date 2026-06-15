@@ -53,6 +53,15 @@ const ALLOWED_RETURN_ORIGINS = new Set<string>([
   "http://localhost:8080",
 ]);
 
+// Allow any Lovable preview/sandbox subdomain (e.g. *.lovableproject.com,
+// *.lovable.app, *.sandbox.lovable.dev) so in-editor previews work without
+// hardcoding every per-session host.
+const ALLOWED_RETURN_HOST_SUFFIXES = [
+  ".lovableproject.com",
+  ".lovable.app",
+  ".sandbox.lovable.dev",
+];
+
 /**
  * Validate a client-supplied `returnUrl` against an allowlist of trusted
  * origins so an attacker can't redirect a user back to an external phishing
@@ -75,7 +84,11 @@ export function validateReturnUrl(
   } catch {
     throw new Error("Invalid returnUrl");
   }
-  if (!ALLOWED_RETURN_ORIGINS.has(parsed.origin)) {
+  const isHttps = parsed.protocol === "https:";
+  const hostAllowed =
+    isHttps &&
+    ALLOWED_RETURN_HOST_SUFFIXES.some((suffix) => parsed.hostname.endsWith(suffix));
+  if (!ALLOWED_RETURN_ORIGINS.has(parsed.origin) && !hostAllowed) {
     throw new Error("returnUrl origin is not allowed");
   }
   return url;
