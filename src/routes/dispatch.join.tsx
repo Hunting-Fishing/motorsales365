@@ -22,11 +22,27 @@ const VALID_PRICES = new Set([
   "dispatch_unlimited_monthly",
 ]);
 
-const PLAN_LABEL: Record<string, string> = {
-  dispatch_solo_monthly: "Solo · ₱250/mo",
-  dispatch_team_monthly: "Team · ₱500/mo",
-  dispatch_unlimited_monthly: "Unlimited · ₱1,000/mo",
+const PLAN_DETAILS: Record<string, { name: string; price: string; drivers: string; perks: string[] }> = {
+  dispatch_solo_monthly: {
+    name: "Solo",
+    price: "₱250 / month",
+    drivers: "1 driver",
+    perks: ["Live job alerts in your region", "Accept or pass on each request", "Cancel anytime"],
+  },
+  dispatch_team_monthly: {
+    name: "Team",
+    price: "₱500 / month",
+    drivers: "Up to 5 drivers",
+    perks: ["Dispatch to multiple drivers", "Job history & reporting", "Priority in matched regions"],
+  },
+  dispatch_unlimited_monthly: {
+    name: "Unlimited",
+    price: "₱1,000 / month",
+    drivers: "Unlimited drivers",
+    perks: ["Nationwide coverage", "All regions included", "Top-priority dispatch"],
+  },
 };
+
 
 const SERVICES = [
   { id: "tow_car", label: "Car towing" },
