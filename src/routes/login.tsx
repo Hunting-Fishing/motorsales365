@@ -29,20 +29,8 @@ function LoginPage() {
   const { user, loading, refreshSession } = useAuth();
   const navigate = useNavigate();
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [googleSubmitting, setGoogleSubmitting] = useState(false);
-  // Single-flight lock: survives re-renders and guarantees only one in-flight
-  // auth request at a time, even if React batches state updates.
-  const inFlightRef = useRef(false);
-  const redirectTimerRef = useRef<number | null>(null);
+  const { redirect: redirectTo } = Route.useSearch();
 
-  // Disable all auth actions while: a request is in flight, the auth hook is
-  // still initializing (header shows the loading spinner), or we already have
-  // a session and are about to redirect.
-  const authBusy = submitting || googleSubmitting || loading || !!user;
 
   const { redirect: redirectTo } = Route.useSearch();
   const [email, setEmail] = useState("");
