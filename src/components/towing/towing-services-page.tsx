@@ -87,6 +87,7 @@ export function TowingServicesPage({
   const [payment, setPayment] = useState<string>("any");
   const [providers, setProviders] = useState<ProviderRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [browseOpen, setBrowseOpen] = useState(false);
 
   // Direct-provider request (bypasses auto-dispatch)
   const [requestedProvider, setRequestedProvider] = useState<{ id: string; name: string } | null>(null);
