@@ -556,6 +556,9 @@ export function ReportCard({
           </div>
         </section>
       </div>
+      )}
+
+
 
       {dialog && (
         <ReportActionDialog
