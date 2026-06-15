@@ -113,8 +113,11 @@ function DashboardLayout() {
       </SiteLayout>
     );
 
+  const { hasProfile: isDispatchProvider } = useDispatchProvider();
+
   const nav = [
-    ...NAV,
+    ...BASE_NAV,
+    ...(isDispatchProvider ? DISPATCH_NAV : []),
     ...(hasOrg ? [{ to: "/dashboard/team", label: "Team", Icon: Users }] : []),
     ...(hasOrg ? [{ to: "/dashboard/staff", label: "Staff & Access", Icon: Users }] : []),
 
