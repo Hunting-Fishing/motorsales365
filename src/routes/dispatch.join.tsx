@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -13,6 +13,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
 import { joinDispatchNetwork } from "@/lib/dispatch.functions";
 import { PH_REGIONS } from "@/lib/format";
+
 import { toast } from "sonner";
 
 const VALID_PRICES = new Set([
@@ -21,11 +22,27 @@ const VALID_PRICES = new Set([
   "dispatch_unlimited_monthly",
 ]);
 
-const PLAN_LABEL: Record<string, string> = {
-  dispatch_solo_monthly: "Solo · ₱250/mo",
-  dispatch_team_monthly: "Team · ₱500/mo",
-  dispatch_unlimited_monthly: "Unlimited · ₱1,000/mo",
+const PLAN_DETAILS: Record<string, { name: string; price: string; drivers: string; perks: string[] }> = {
+  dispatch_solo_monthly: {
+    name: "Solo",
+    price: "₱250 / month",
+    drivers: "1 driver",
+    perks: ["Live job alerts in your region", "Accept or pass on each request", "Cancel anytime"],
+  },
+  dispatch_team_monthly: {
+    name: "Team",
+    price: "₱500 / month",
+    drivers: "Up to 5 drivers",
+    perks: ["Dispatch to multiple drivers", "Job history & reporting", "Priority in matched regions"],
+  },
+  dispatch_unlimited_monthly: {
+    name: "Unlimited",
+    price: "₱1,000 / month",
+    drivers: "Unlimited drivers",
+    perks: ["Nationwide coverage", "All regions included", "Top-priority dispatch"],
+  },
 };
+
 
 const SERVICES = [
   { id: "tow_car", label: "Car towing" },
@@ -146,26 +163,32 @@ function DispatchJoin() {
     }
   }
 
+  const plan = PLAN_DETAILS[priceId!];
+
   return (
     <SiteLayout>
-      <section className="container mx-auto max-w-3xl px-4 py-8">
+      <section className="container mx-auto max-w-5xl px-4 py-8">
         <Button asChild variant="ghost" size="sm" className="mb-4">
           <Link to="/dispatch" hash="plans">
             <ArrowLeft className="mr-1 h-4 w-4" /> Back to plans
           </Link>
         </Button>
         <div className="mb-6">
-          <div className="text-xs font-semibold uppercase tracking-wide text-primary">
-            Step 1 of 2 · Provider profile
+          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-primary">
+            <span className="rounded-full bg-primary/10 px-2 py-0.5">Step 1 of 2</span>
+            <span className="text-muted-foreground">Provider profile → Subscribe</span>
           </div>
-          <h1 className="mt-1 font-display text-2xl font-bold sm:text-3xl">
+          <h1 className="mt-2 font-display text-2xl font-bold sm:text-3xl">
             Join the 365 Dispatch network
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Selected plan: <strong className="text-foreground">{PLAN_LABEL[priceId!]}</strong>.
-            Tell us about your operation so we can route jobs to you. You'll subscribe on the next step.
+            Tell us about your operation so we can route the right jobs to you. You'll subscribe on the next step.
           </p>
         </div>
+
+        <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
+          <div>
+
 
         <form onSubmit={onSubmit} className="space-y-6">
           <Card className="space-y-4 p-5">
@@ -185,16 +208,14 @@ function DispatchJoin() {
                 <Label htmlFor="phone">Mobile (PH) *</Label>
                 <Input id="phone" required inputMode="tel" value={phone}
                   onChange={(e) => setPhone(e.target.value)} placeholder="09171234567" />
+                <p className="mt-1 text-xs text-muted-foreground">Format: 09XXXXXXXXX or +639XXXXXXXXX</p>
               </div>
               <div>
                 <Label htmlFor="email">Contact email</Label>
                 <Input id="email" type="email" value={email}
                   onChange={(e) => setEmail(e.target.value)} placeholder="ops@example.com" />
               </div>
-              <div>
-                <Label htmlFor="logo">Logo URL (optional)</Label>
-                <Input id="logo" value={""} disabled placeholder="Upload from dashboard after signup" />
-              </div>
+
             </div>
           </Card>
 
@@ -322,7 +343,42 @@ function DispatchJoin() {
             </Button>
           </div>
         </form>
+          </div>
+
+          <aside className="lg:sticky lg:top-20 lg:self-start">
+            <Card className="space-y-4 p-5">
+              <div>
+                <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Selected plan
+                </div>
+                <div className="mt-1 flex items-baseline justify-between gap-2">
+                  <div className="font-display text-xl font-bold">{plan.name}</div>
+                  <div className="text-sm font-semibold text-primary">{plan.price}</div>
+                </div>
+                <div className="text-xs text-muted-foreground">{plan.drivers}</div>
+              </div>
+              <ul className="space-y-2 text-sm">
+                {plan.perks.map((perk) => (
+                  <li key={perk} className="flex items-start gap-2">
+                    <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                    <span>{perk}</span>
+                  </li>
+                ))}
+              </ul>
+              <Button asChild variant="outline" size="sm" className="w-full">
+                <Link to="/dispatch" hash="plans">Change plan</Link>
+              </Button>
+              <div className="flex items-start gap-2 rounded-md bg-muted/50 p-3 text-xs text-muted-foreground">
+                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                <span>
+                  Your profile is saved as <strong>pending</strong> and dispatch only activates after a successful payment. Cancel anytime from your dashboard.
+                </span>
+              </div>
+            </Card>
+          </aside>
+        </div>
       </section>
     </SiteLayout>
   );
 }
+
