@@ -385,6 +385,11 @@ function BrowsePage() {
     setCatFilters({});
   };
 
+  const resetAll = () => {
+    clearAll();
+    setTimeout(() => applyFilters(), 0);
+  };
+
 
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [saveName, setSaveName] = useState("");
