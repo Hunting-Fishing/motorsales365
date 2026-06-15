@@ -122,7 +122,7 @@ function VerifyEmailPage() {
             <Link to="/signup" className="hover:underline">
               Wrong email? Start over
             </Link>
-            <Link to="/login" className="hover:underline">
+            <Link to="/login" search={redirect ? { redirect } : {}} className="hover:underline">
               Already verified? Sign in
             </Link>
           </div>
