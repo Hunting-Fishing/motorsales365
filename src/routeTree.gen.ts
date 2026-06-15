@@ -168,6 +168,7 @@ import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocod
 import { Route as ApiPublicGeoSearchRouteImport } from './routes/api/public/geo-search'
 import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
 import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions_.$staffId'
+import { Route as AuthenticatedDashboardStaffRequestsRouteImport } from './routes/_authenticated/dashboard.staff-requests'
 import { Route as AuthenticatedDashboardPartsWantedRouteImport } from './routes/_authenticated/dashboard.parts-wanted'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -988,6 +989,12 @@ const AdminRedemptionsStaffIdRoute = AdminRedemptionsStaffIdRouteImport.update({
   path: '/redemptions/$staffId',
   getParentRoute: () => AdminRoute,
 } as any)
+const AuthenticatedDashboardStaffRequestsRoute =
+  AuthenticatedDashboardStaffRequestsRouteImport.update({
+    id: '/dashboard/staff-requests',
+    path: '/dashboard/staff-requests',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardPartsWantedRoute =
   AuthenticatedDashboardPartsWantedRouteImport.update({
     id: '/dashboard/parts-wanted',
@@ -1254,6 +1261,7 @@ export interface FileRoutesByFullPath {
   '/wanted-parts/': typeof WantedPartsIndexRoute
   '/wanted/': typeof WantedIndexRoute
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
+  '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1433,6 +1441,7 @@ export interface FileRoutesByTo {
   '/wanted-parts': typeof WantedPartsIndexRoute
   '/wanted': typeof WantedIndexRoute
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
+  '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1617,6 +1626,7 @@ export interface FileRoutesById {
   '/wanted-parts/': typeof WantedPartsIndexRoute
   '/wanted/': typeof WantedIndexRoute
   '/_authenticated/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
+  '/_authenticated/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1801,6 +1811,7 @@ export interface FileRouteTypes {
     | '/wanted-parts/'
     | '/wanted/'
     | '/dashboard/parts-wanted'
+    | '/dashboard/staff-requests'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -1980,6 +1991,7 @@ export interface FileRouteTypes {
     | '/wanted-parts'
     | '/wanted'
     | '/dashboard/parts-wanted'
+    | '/dashboard/staff-requests'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2163,6 +2175,7 @@ export interface FileRouteTypes {
     | '/wanted-parts/'
     | '/wanted/'
     | '/_authenticated/dashboard/parts-wanted'
+    | '/_authenticated/dashboard/staff-requests'
     | '/admin/redemptions_/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -3429,6 +3442,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRedemptionsStaffIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_authenticated/dashboard/staff-requests': {
+      id: '/_authenticated/dashboard/staff-requests'
+      path: '/dashboard/staff-requests'
+      fullPath: '/dashboard/staff-requests'
+      preLoaderRoute: typeof AuthenticatedDashboardStaffRequestsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard/parts-wanted': {
       id: '/_authenticated/dashboard/parts-wanted'
       path: '/dashboard/parts-wanted'
@@ -3588,11 +3608,14 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardPartsWantedRoute: typeof AuthenticatedDashboardPartsWantedRoute
+  AuthenticatedDashboardStaffRequestsRoute: typeof AuthenticatedDashboardStaffRequestsRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardPartsWantedRoute:
     AuthenticatedDashboardPartsWantedRoute,
+  AuthenticatedDashboardStaffRequestsRoute:
+    AuthenticatedDashboardStaffRequestsRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
