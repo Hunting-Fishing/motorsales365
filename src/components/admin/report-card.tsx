@@ -145,67 +145,44 @@ export function ReportCard({
     onChanged();
   };
 
-  const reporterLabel =
+  const reporterName =
     report.reporter_name ||
-    report.reporter_email ||
-    (report.reporter_id ? "Signed-in user" : "Anonymous");
+    (report.reporter_email ? report.reporter_email.split("@")[0] : null) ||
+    (report.reporter_id ? `User ${report.reporter_id.slice(0, 8)}` : "Anonymous");
+  const reporterSubtitle = report.reporter_name && report.reporter_email ? report.reporter_email : null;
+  const isAnonymous = !report.reporter_id;
 
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
-      {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge variant={report.status === "resolved" ? "secondary" : "destructive"}>
-              {report.status}
-              {report.resolution ? ` · ${report.resolution}` : ""}
+    <article className="overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow hover:shadow-md">
+      {/* ── Header bar ───────────────────────────────────────── */}
+      <header className="flex flex-wrap items-start justify-between gap-3 border-b border-border bg-muted/30 px-5 py-3">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <Badge
+            variant={report.status === "resolved" ? "secondary" : "destructive"}
+            className="uppercase tracking-wide"
+          >
+            {report.status}
+            {report.resolution ? ` · ${report.resolution}` : ""}
+          </Badge>
+          <Badge variant="outline" className="capitalize">
+            {report.target_type}
+          </Badge>
+          {report.category && (
+            <Badge className="border border-amber-500/30 bg-amber-500/15 text-amber-700 hover:bg-amber-500/15 dark:text-amber-300">
+              {report.category}
             </Badge>
-            <Badge variant="outline" className="capitalize">
-              {report.target_type}
-            </Badge>
-            {report.category && (
-              <Badge className="bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 hover:bg-amber-500/15">
-                {report.category}
-              </Badge>
-            )}
-            {report.listings?.status && (
-              <Badge variant="outline">listing: {report.listings.status}</Badge>
-            )}
-            <span className="text-xs text-muted-foreground">{formatDate(report.created_at)}</span>
-          </div>
-
-          {/* Target */}
-          {report.listing_id ? (
-            <Link
-              to="/listing/$id"
-              params={{ id: report.listing_id }}
-              className="mt-1 block font-medium hover:text-primary"
-            >
-              {report.listings?.title ?? "Listing"}
-            </Link>
-          ) : report.target_url ? (
-            <a
-              href={report.target_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-1 inline-flex items-center gap-1 break-all font-medium hover:text-primary"
-            >
-              {report.target_url}
-              <ExternalLink className="h-3 w-3" />
-            </a>
-          ) : (
-            <p className="mt-1 text-sm text-muted-foreground">No target link provided</p>
           )}
-
-          {/* Details */}
-          {report.details && (
-            <p className="mt-2 whitespace-pre-wrap rounded border border-border bg-background/40 p-3 text-sm">
-              {report.details}
-            </p>
+          {report.listings?.status && (
+            <Badge variant="outline">listing: {report.listings.status}</Badge>
           )}
+          <span className="text-xs text-muted-foreground">
+            Reported {formatDate(report.created_at)}
+          </span>
+          <span className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
+            #{report.id.slice(0, 8)}
+          </span>
         </div>
 
-        {/* Actions */}
         {report.status !== "resolved" && (
           <div className="flex flex-wrap gap-2">
             {report.listing_id && (
@@ -226,136 +203,211 @@ export function ReportCard({
             </Button>
           </div>
         )}
-      </div>
+      </header>
 
-      {/* Reporter */}
-      <div className="mt-4 grid gap-3 md:grid-cols-2">
-        <div className="rounded-md border border-border bg-background/40 p-3 text-xs">
-          <div className="mb-2 flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 font-semibold">
-              <User className="h-3.5 w-3.5" />
-              Reporter
+      <div className="space-y-5 p-5">
+        {/* ── Target + Reason ─────────────────────────────────── */}
+        <section>
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Reported {report.target_type}
+          </div>
+          {report.listing_id ? (
+            <Link
+              to="/listing/$id"
+              params={{ id: report.listing_id }}
+              className="mt-1 inline-flex items-center gap-1.5 text-lg font-semibold text-foreground hover:text-primary"
+            >
+              {report.listings?.title ?? "Listing"}
+              <ExternalLink className="h-4 w-4 opacity-60" />
+            </Link>
+          ) : report.target_url ? (
+            <a
+              href={report.target_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-1 inline-flex items-center gap-1.5 break-all text-base font-semibold hover:text-primary"
+            >
+              {report.target_url}
+              <ExternalLink className="h-4 w-4 opacity-60" />
+            </a>
+          ) : (
+            <p className="mt-1 text-sm italic text-muted-foreground">No target link provided</p>
+          )}
+
+          <div className="mt-4 rounded-lg border-l-4 border-destructive/60 bg-destructive/5 px-4 py-3">
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-destructive">
+              Reason for report
             </div>
-            {report.reporter_id && (
-              <Button
-                size="sm"
-                variant="ghost"
-                className="h-6 px-2 text-[11px]"
-                onClick={() => onFilterReporter(report.reporter_id!)}
-              >
-                <Filter className="mr-1 h-3 w-3" /> Filter by reporter
-              </Button>
+            <p className="mt-1 text-sm font-medium text-foreground">{report.reason}</p>
+            {report.details && (
+              <p className="mt-2 whitespace-pre-wrap border-t border-destructive/15 pt-2 text-sm text-muted-foreground">
+                {report.details}
+              </p>
             )}
           </div>
-          <div className="space-y-1">
-            <div className="font-medium">{reporterLabel}</div>
-            {report.reporter_email && (
-              <div className="flex items-center gap-1 text-muted-foreground">
-                <Mail className="h-3 w-3" />
-                <a href={`mailto:${report.reporter_email}`} className="hover:underline">
-                  {report.reporter_email}
-                </a>
+        </section>
+
+        {/* ── Reporter + Evidence ─────────────────────────────── */}
+        <section className="grid gap-3 md:grid-cols-2">
+          <div className="rounded-lg border border-border bg-background/40 p-4">
+            <div className="mb-3 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                <User className="h-3.5 w-3.5" />
+                Reporter
               </div>
-            )}
-            {report.reporter_phone && (
-              <div className="flex items-center gap-1 text-muted-foreground">
-                <Phone className="h-3 w-3" />
-                {report.reporter_phone}
+              {report.reporter_id && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="h-6 px-2 text-[11px]"
+                  onClick={() => onFilterReporter(report.reporter_id!)}
+                >
+                  <Filter className="mr-1 h-3 w-3" /> Filter
+                </Button>
+              )}
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+                {reporterName.slice(0, 1).toUpperCase()}
               </div>
-            )}
+              <div className="min-w-0 flex-1 space-y-0.5">
+                <div className="flex items-center gap-2">
+                  <span className="truncate text-sm font-semibold text-foreground">
+                    {reporterName}
+                  </span>
+                  {isAnonymous && (
+                    <Badge variant="outline" className="text-[10px]">
+                      anonymous
+                    </Badge>
+                  )}
+                </div>
+                {reporterSubtitle && (
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Mail className="h-3 w-3" />
+                    <a href={`mailto:${reporterSubtitle}`} className="truncate hover:underline">
+                      {reporterSubtitle}
+                    </a>
+                  </div>
+                )}
+                {!reporterSubtitle && report.reporter_email && (
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Mail className="h-3 w-3" />
+                    <a href={`mailto:${report.reporter_email}`} className="truncate hover:underline">
+                      {report.reporter_email}
+                    </a>
+                  </div>
+                )}
+                {report.reporter_phone && (
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <Phone className="h-3 w-3" />
+                    {report.reporter_phone}
+                  </div>
+                )}
+                {report.reporter_id && (
+                  <div className="font-mono text-[10px] text-muted-foreground/70">
+                    ID: {report.reporter_id.slice(0, 8)}…
+                  </div>
+                )}
+              </div>
+            </div>
             {reporterCounts && (
-              <div className="mt-2 flex flex-wrap gap-1">
-                <Badge variant="secondary">Total {reporterCounts.total}</Badge>
-                <Badge variant="outline">Open {reporterCounts.open}</Badge>
-                <Badge variant="outline">Resolved {reporterCounts.resolved}</Badge>
-                <Badge className="bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/15">
+              <div className="mt-3 flex flex-wrap gap-1 border-t border-border pt-3">
+                <Badge variant="secondary" className="text-[10px]">
+                  Total {reporterCounts.total}
+                </Badge>
+                <Badge variant="outline" className="text-[10px]">
+                  Open {reporterCounts.open}
+                </Badge>
+                <Badge variant="outline" className="text-[10px]">
+                  Resolved {reporterCounts.resolved}
+                </Badge>
+                <Badge className="border border-emerald-500/30 bg-emerald-500/15 text-[10px] text-emerald-700 hover:bg-emerald-500/15 dark:text-emerald-300">
                   Accepted {reporterCounts.accepted}
                 </Badge>
-                <Badge className="bg-muted-foreground/10 border border-border">
+                <Badge className="border border-border bg-muted-foreground/10 text-[10px]">
                   Dismissed {reporterCounts.dismissed}
                 </Badge>
               </div>
             )}
           </div>
-        </div>
 
-        {/* Evidence */}
-        <div className="rounded-md border border-border bg-background/40 p-3 text-xs">
-          <div className="mb-2 flex items-center gap-2 font-semibold">
-            <FileText className="h-3.5 w-3.5" />
-            Evidence ({(report.evidence_urls ?? []).length})
-          </div>
-          {(report.evidence_urls ?? []).length === 0 ? (
-            <p className="text-muted-foreground">None attached.</p>
-          ) : (
-            <div className="flex flex-wrap gap-2">
-              {evidence.map((e) =>
-                e.url ? (
-                  /\.(png|jpe?g|webp|gif|heic)$/i.test(e.path) ? (
-                    <a
-                      key={e.path}
-                      href={e.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block h-16 w-16 overflow-hidden rounded border border-border"
-                    >
-                      <img src={e.url} alt="" className="h-full w-full object-cover" />
-                    </a>
-                  ) : (
-                    <a
-                      key={e.path}
-                      href={e.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 rounded border border-border bg-card px-2 py-1 hover:bg-secondary"
-                    >
-                      <FileText className="h-3 w-3" />
-                      {e.path.split("/").pop()}
-                    </a>
-                  )
-                ) : null,
-              )}
+          <div className="rounded-lg border border-border bg-background/40 p-4">
+            <div className="mb-3 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <FileText className="h-3.5 w-3.5" />
+              Evidence ({(report.evidence_urls ?? []).length})
             </div>
-          )}
-        </div>
-      </div>
-
-      {/* Signals */}
-      <ReportSignals reportId={report.id} />
-
-      {/* Public summary */}
-      <div className="mt-4 rounded-md border border-dashed border-border bg-background/40 p-3">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-xs font-semibold">
-            <Megaphone className="h-3.5 w-3.5" />
-            Public summary
-            {report.public_summary && (
-              <Badge variant="secondary" className="ml-1">
-                Published {report.made_public_at ? `· ${formatDate(report.made_public_at)}` : ""}
-              </Badge>
+            {(report.evidence_urls ?? []).length === 0 ? (
+              <p className="text-xs italic text-muted-foreground">None attached.</p>
+            ) : (
+              <div className="flex flex-wrap gap-2">
+                {evidence.map((e) =>
+                  e.url ? (
+                    /\.(png|jpe?g|webp|gif|heic)$/i.test(e.path) ? (
+                      <a
+                        key={e.path}
+                        href={e.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block h-16 w-16 overflow-hidden rounded border border-border"
+                      >
+                        <img src={e.url} alt="" className="h-full w-full object-cover" />
+                      </a>
+                    ) : (
+                      <a
+                        key={e.path}
+                        href={e.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 rounded border border-border bg-card px-2 py-1 text-xs hover:bg-secondary"
+                      >
+                        <FileText className="h-3 w-3" />
+                        {e.path.split("/").pop()}
+                      </a>
+                    )
+                  ) : null,
+                )}
+              </div>
             )}
           </div>
-          {report.public_summary && (
-            <Button size="sm" variant="ghost" onClick={unpublishSummary}>
-              <EyeOff className="mr-1 h-3.5 w-3.5" /> Unpublish
+        </section>
+
+        {/* Signals */}
+        <ReportSignals reportId={report.id} />
+
+        {/* ── Public summary ──────────────────────────────────── */}
+        <section className="rounded-lg border border-dashed border-border bg-background/40 p-4">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              <Megaphone className="h-3.5 w-3.5" />
+              Public summary
+              {report.public_summary && (
+                <Badge variant="secondary" className="ml-1 normal-case tracking-normal">
+                  Published{report.made_public_at ? ` · ${formatDate(report.made_public_at)}` : ""}
+                </Badge>
+              )}
+            </div>
+            {report.public_summary && (
+              <Button size="sm" variant="ghost" onClick={unpublishSummary}>
+                <EyeOff className="mr-1 h-3.5 w-3.5" /> Unpublish
+              </Button>
+            )}
+          </div>
+          <Textarea
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder="Short, neutral summary visible to all visitors. Don't include reporter names or unverified claims."
+            className="mt-2 min-h-20 text-sm"
+          />
+          <div className="mt-2 flex items-center justify-between gap-2">
+            <p className="text-[11px] text-muted-foreground">
+              Reporter identity and raw details are never shown publicly — only this summary.
+            </p>
+            <Button size="sm" onClick={publishSummary}>
+              {report.public_summary ? "Update summary" : "Publish public summary"}
             </Button>
-          )}
-        </div>
-        <Textarea
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          placeholder="Short, neutral summary visible to all visitors. Don't include reporter names or unverified claims."
-          className="mt-2 min-h-20 text-sm"
-        />
-        <div className="mt-2 flex items-center justify-between gap-2">
-          <p className="text-[11px] text-muted-foreground">
-            Reporter identity and raw details are never shown publicly — only this summary.
-          </p>
-          <Button size="sm" onClick={publishSummary}>
-            {report.public_summary ? "Update summary" : "Publish public summary"}
-          </Button>
-        </div>
+          </div>
+        </section>
       </div>
-    </div>
+    </article>
   );
 }
