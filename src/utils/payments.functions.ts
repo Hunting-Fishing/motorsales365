@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import type Stripe from "stripe";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireAdminRoleAudited } from "@/integrations/supabase/admin-middleware";
-import { type StripeEnv, createStripeClient, validateReturnUrl } from "@/lib/stripe.server";
+import { type StripeEnv, createStripeClient, getStripeErrorMessage, validateReturnUrl } from "@/lib/stripe.server";
 
 async function resolveOrCreateCustomer(
   stripe: ReturnType<typeof createStripeClient>,
