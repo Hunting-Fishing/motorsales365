@@ -21,6 +21,7 @@ interface Item {
   description: string;
   done: boolean;
   tabValue: string;
+  anchor?: string;
 }
 
 function buildItems(d: ChecklistInput): Item[] {
