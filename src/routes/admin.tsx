@@ -216,6 +216,7 @@ const NAV: {
     Icon: Sparkles,
     roles: ["admin"],
     info: "Approve user-submitted services into the shared catalog.",
+  },
   {
     to: "/admin/verifications",
     label: "Verifications",
