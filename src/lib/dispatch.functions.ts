@@ -106,6 +106,73 @@ export const getMyDispatchStatus = createServerFn({ method: "GET" })
     };
   });
 
+export const getDispatchJoinPrefill = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const [{ data: profile }, { data: business }, { data: rates }] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select(
+          "full_name, first_name, last_name, phone, phone_e164, business_name, business_logo_url, business_region, business_city, business_province, signup_region, signup_city, signup_province",
+        )
+        .eq("id", userId)
+        .maybeSingle(),
+      supabase
+        .from("businesses")
+        .select("id, name, phone, email, region, city, logo_url, description")
+        .eq("owner_id", userId)
+        .eq("type_slug", "towing")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+      supabase
+        .from("provider_tow_rates")
+        .select("flat_base_php, per_km_php, available_24_7, dispatch_regions, notes")
+        .eq("user_id", userId)
+        .maybeSingle(),
+    ]);
+    const { data: authUser } = await supabase.auth.getUser();
+    const email = authUser.user?.email ?? null;
+
+    let parsedNotes: any = null;
+    const rawNotes = (rates as any)?.notes;
+    if (typeof rawNotes === "string") {
+      try {
+        parsedNotes = JSON.parse(rawNotes);
+      } catch {
+        parsedNotes = { freeText: rawNotes };
+      }
+    }
+
+    const p = (profile as any) ?? {};
+    const b = (business as any) ?? {};
+    const r = (rates as any) ?? {};
+
+    return {
+      email,
+      companyName: b.name ?? p.business_name ?? "",
+      operatorName:
+        p.full_name ??
+        [p.first_name, p.last_name].filter(Boolean).join(" ").trim() ??
+        "",
+      phone: b.phone ?? p.phone_e164 ?? p.phone ?? "",
+      contactEmail: b.email ?? email ?? "",
+      logoUrl: b.logo_url ?? p.business_logo_url ?? "",
+      region: b.region ?? p.business_region ?? p.signup_region ?? "",
+      city: b.city ?? p.business_city ?? p.signup_city ?? "",
+      regions: Array.isArray(r.dispatch_regions) ? (r.dispatch_regions as string[]) : [],
+      notes: parsedNotes?.freeText ?? b.description ?? "",
+      operatorNameSaved: parsedNotes?.operatorName ?? null,
+      driverCount: parsedNotes?.driverCount ?? null,
+      services: Array.isArray(parsedNotes?.services) ? parsedNotes.services : [],
+      payments: Array.isArray(parsedNotes?.payments) ? parsedNotes.payments : [],
+      flatBasePhp: r.flat_base_php ?? null,
+      perKmPhp: r.per_km_php ?? null,
+      available24_7: Boolean(r.available_24_7),
+    };
+  });
+
 const SERVICE_OPTIONS = [
   "tow_car",
   "tow_motorcycle",
