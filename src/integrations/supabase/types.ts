@@ -1866,11 +1866,13 @@ export type Database = {
         Row: {
           active: boolean
           business_id: string
+          catalog_id: string | null
           catalog_key: string | null
           category: string | null
           created_at: string
           description: string | null
           id: string
+          pending_suggestion_id: string | null
           photo_url: string | null
           price_label: string | null
           price_php: number | null
@@ -1883,11 +1885,13 @@ export type Database = {
         Insert: {
           active?: boolean
           business_id: string
+          catalog_id?: string | null
           catalog_key?: string | null
           category?: string | null
           created_at?: string
           description?: string | null
           id?: string
+          pending_suggestion_id?: string | null
           photo_url?: string | null
           price_label?: string | null
           price_php?: number | null
@@ -1900,11 +1904,13 @@ export type Database = {
         Update: {
           active?: boolean
           business_id?: string
+          catalog_id?: string | null
           catalog_key?: string | null
           category?: string | null
           created_at?: string
           description?: string | null
           id?: string
+          pending_suggestion_id?: string | null
           photo_url?: string | null
           price_label?: string | null
           price_php?: number | null
@@ -1920,6 +1926,20 @@ export type Database = {
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_services_catalog_id_fkey"
+            columns: ["catalog_id"]
+            isOneToOne: false
+            referencedRelation: "service_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_services_pending_suggestion_id_fkey"
+            columns: ["pending_suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "service_catalog_suggestions"
             referencedColumns: ["id"]
           },
         ]
@@ -6526,6 +6546,129 @@ export type Database = {
             columns: ["seller_id"]
             isOneToOne: false
             referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      service_catalog: {
+        Row: {
+          active: boolean
+          business_type_slug: string
+          created_at: string
+          default_unit: string | null
+          description: string | null
+          id: string
+          key: string
+          sort_order: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          business_type_slug: string
+          created_at?: string
+          default_unit?: string | null
+          description?: string | null
+          id?: string
+          key: string
+          sort_order?: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          business_type_slug?: string
+          created_at?: string
+          default_unit?: string | null
+          description?: string | null
+          id?: string
+          key?: string
+          sort_order?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_catalog_business_type_slug_fkey"
+            columns: ["business_type_slug"]
+            isOneToOne: false
+            referencedRelation: "business_types"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      service_catalog_suggestions: {
+        Row: {
+          admin_note: string | null
+          business_type_slug: string
+          created_at: string
+          decided_at: string | null
+          decided_by: string | null
+          id: string
+          merged_into_catalog_id: string | null
+          proposed_description: string | null
+          proposed_title: string
+          proposed_unit: string | null
+          sample_price_php: number | null
+          status: string
+          submitter_business_id: string | null
+          submitter_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          admin_note?: string | null
+          business_type_slug: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          merged_into_catalog_id?: string | null
+          proposed_description?: string | null
+          proposed_title: string
+          proposed_unit?: string | null
+          sample_price_php?: number | null
+          status?: string
+          submitter_business_id?: string | null
+          submitter_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          admin_note?: string | null
+          business_type_slug?: string
+          created_at?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          id?: string
+          merged_into_catalog_id?: string | null
+          proposed_description?: string | null
+          proposed_title?: string
+          proposed_unit?: string | null
+          sample_price_php?: number | null
+          status?: string
+          submitter_business_id?: string | null
+          submitter_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_catalog_suggestions_business_type_slug_fkey"
+            columns: ["business_type_slug"]
+            isOneToOne: false
+            referencedRelation: "business_types"
+            referencedColumns: ["slug"]
+          },
+          {
+            foreignKeyName: "service_catalog_suggestions_merged_into_catalog_id_fkey"
+            columns: ["merged_into_catalog_id"]
+            isOneToOne: false
+            referencedRelation: "service_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_catalog_suggestions_submitter_business_id_fkey"
+            columns: ["submitter_business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
             referencedColumns: ["id"]
           },
         ]

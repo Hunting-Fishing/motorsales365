@@ -211,6 +211,13 @@ const NAV: {
     info: "Review user-submitted new business types: approve, merge, or reject.",
   },
   {
+    to: "/admin/service-suggestions",
+    label: "Service suggestions",
+    Icon: Sparkles,
+    roles: ["admin"],
+    info: "Approve user-submitted services into the shared catalog.",
+  },
+  {
     to: "/admin/verifications",
     label: "Verifications",
     Icon: ShieldCheck,
