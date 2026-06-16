@@ -176,13 +176,13 @@ export const listServiceSuggestionAudit = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
 
     const actorIds = Array.from(new Set((rows ?? []).map((r: any) => r.actor_id).filter(Boolean)));
-    let actors: Record<string, { id: string; full_name: string | null; email: string | null }> = {};
+    let actors: Record<string, { id: string; full_name: string | null }> = {};
     if (actorIds.length) {
       const { data: profs } = await supabaseAdmin
         .from("profiles")
-        .select("id, full_name, email")
+        .select("id, full_name")
         .in("id", actorIds);
-      for (const p of profs ?? []) actors[p.id] = p as any;
+      for (const p of (profs ?? []) as any[]) actors[p.id] = p;
     }
     return (rows ?? []).map((r: any) => ({ ...r, actor: actors[r.actor_id] ?? null }));
   });
