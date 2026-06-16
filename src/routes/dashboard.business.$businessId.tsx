@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { getWorkspaceBusiness } from "@/lib/business-workspace.functions";
+import { getBusinessPlanUsage } from "@/lib/business-plan-usage.functions";
 import { WorkspaceSidebar } from "@/components/business-workspace/sidebar";
 import { WorkspaceNotificationsProvider } from "@/components/business-workspace/notifications-provider";
 import { WorkspaceNotificationBell } from "@/components/business-workspace/notification-bell";
