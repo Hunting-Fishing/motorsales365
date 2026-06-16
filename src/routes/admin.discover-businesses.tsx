@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,7 @@ import {
   searchFbPagesForAdmin,
   geocodeForImport,
   importDiscoveredBusinesses,
+  searchWebsiteSignupsForAdmin,
   type FbCandidate,
 } from "@/lib/business-discover.functions";
 import { AutoSyncTab } from "@/components/admin/auto-sync-tab";
@@ -63,6 +64,26 @@ type Row = {
   city: string | null;
   geoConfidence: "high" | "low" | "none";
   alreadyImported: boolean;
+};
+
+type WebsiteSignupRow = {
+  id: string;
+  name: string;
+  slug: string;
+  vanity_slug: string | null;
+  status: string;
+  type_slug: string | null;
+  phone: string | null;
+  email: string | null;
+  website: string | null;
+  city: string | null;
+  region: string | null;
+  created_at: string;
+  owner_id: string | null;
+  source: string | null;
+  logo_url: string | null;
+  cover_url: string | null;
+  description: string | null;
 };
 
 const FB_CATEGORY_TO_TYPE: { match: RegExp; slug: string }[] = [
@@ -169,11 +190,15 @@ function DiscoverPage() {
       <Tabs defaultValue="auto" className="w-full">
         <TabsList>
           <TabsTrigger value="auto">Auto-sync (Google)</TabsTrigger>
+          <TabsTrigger value="website">Signed up on 365</TabsTrigger>
           <TabsTrigger value="google">Google Places</TabsTrigger>
           <TabsTrigger value="facebook">Facebook Pages</TabsTrigger>
         </TabsList>
         <TabsContent value="auto" className="mt-4">
           <AutoSyncTab />
+        </TabsContent>
+        <TabsContent value="website" className="mt-4">
+          <WebsiteSignupsTab />
         </TabsContent>
         <TabsContent value="google" className="mt-4">
           <GoogleTab onAdd={addRow} />
