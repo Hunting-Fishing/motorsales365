@@ -14,8 +14,10 @@ export const Route = createFileRoute("/reset-password")({
 
 function ResetPasswordPage() {
   const [mode, setMode] = useState<"request" | "set">("request");
+  const [linkError, setLinkError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -24,22 +26,47 @@ function ResetPasswordPage() {
     const url = new URL(window.location.href);
     const hash = window.location.hash || "";
     const code = url.searchParams.get("code");
+    const tokenHash = url.searchParams.get("token_hash");
+    const type = url.searchParams.get("type");
     const errorDesc =
       url.searchParams.get("error_description") ||
       hash.match(/error_description=([^&]+)/)?.[1];
 
     if (errorDesc) {
-      toast.error(decodeURIComponent(errorDesc).replace(/\+/g, " "));
+      const msg = decodeURIComponent(errorDesc).replace(/\+/g, " ");
+      toast.error(msg);
+      setLinkError(msg);
     }
 
-    // PKCE flow: ?code=... → exchange for a session, then show set-password form
-    if (code) {
+    // Preferred flow: ?token_hash=...&type=recovery — works from any device.
+    if (tokenHash && type === "recovery") {
+      supabase.auth
+        .verifyOtp({ token_hash: tokenHash, type: "recovery" })
+        .then(({ error }) => {
+          if (error) {
+            toast.error(error.message);
+            setLinkError(
+              "This password reset link is invalid, expired, or already used. Request a new one below.",
+            );
+            return;
+          }
+          setMode("set");
+          setLinkError(null);
+          window.history.replaceState({}, "", "/reset-password");
+        });
+    }
+    // PKCE fallback: ?code=... → exchange for a session (same-browser only)
+    else if (code) {
       supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
         if (error) {
           toast.error(error.message);
+          setLinkError(
+            "This password reset link can't be completed in this browser. Open the link in the same browser you requested it from, or request a new link below.",
+          );
           return;
         }
         setMode("set");
+        setLinkError(null);
         window.history.replaceState({}, "", "/reset-password");
       });
     }
@@ -67,10 +94,19 @@ function ResetPasswordPage() {
       return;
     }
     toast.success("Check your email for the reset link.");
+    setLinkError(null);
   };
 
   const handleSet = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match.");
+      return;
+    }
     setSubmitting(true);
     const { error } = await supabase.auth.updateUser({ password });
     setSubmitting(false);
@@ -93,6 +129,12 @@ function ResetPasswordPage() {
             ? "We'll email you a reset link."
             : "Choose a new password for your account."}
         </p>
+
+        {linkError && mode === "request" && (
+          <div className="mt-6 rounded-md border border-destructive/40 bg-destructive/10 p-4 text-sm text-destructive">
+            {linkError}
+          </div>
+        )}
 
         {mode === "request" ? (
           <form onSubmit={handleRequest} className="mt-8 space-y-4">
@@ -118,10 +160,26 @@ function ResetPasswordPage() {
                 id="pw"
                 type="password"
                 required
-                minLength={6}
+                minLength={8}
+                autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+            </div>
+            <div>
+              <Label htmlFor="pw2">Confirm new password</Label>
+              <Input
+                id="pw2"
+                type="password"
+                required
+                minLength={8}
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              {confirmPassword && password !== confirmPassword && (
+                <p className="mt-1 text-xs text-destructive">Passwords do not match.</p>
+              )}
             </div>
             <Button type="submit" disabled={submitting} className="w-full">
               {submitting ? "Saving…" : "Update password"}
