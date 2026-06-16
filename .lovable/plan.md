@@ -1,66 +1,72 @@
-# Business workspace access + plan management
+# Plan limit enforcement + auto-upgrade
 
-Right now a business owner has no obvious way back into their workspace, and there is no surface showing what plan they're on, how much of it they've used, or what happens when they hit the cap. This plan adds the entry points, a billing/usage hub, plan-rule enforcement, and optional auto-upgrade.
+Make the billing dashboard's caps real: block create paths that exceed plan limits, auto-bump the subscription when the user has opted in, and disable "+ Add" buttons in the UI when at cap.
 
-## 1. Quick-access entry points
+## 1. Shared limit helper
 
-Add a "My businesses" group everywhere the user lands:
+New `src/lib/business-plan-enforcement.server.ts` (server-only):
 
-- **Account dropdown** (`src/components/site-header.tsx`, both desktop popover ~L255 and mobile sheet ~L493): new section above "My listings" that lists each business the user owns/manages with a colored kind badge (Tow, Shop, etc.) and links straight to `/dashboard/business/$businessId`. Single business → one row; multiple → scrollable list; zero → "Register a business" CTA.
-- **Welcome strip** (the "Welcome: 365 Tow Company …" line in the header): make the business name itself a link to that business's workspace, plus a small "Workspace ▾" pill that opens the same module list (Overview, Dispatch, Fleet, Staff, Inventory, Billing).
-- **Dashboard home** (`src/routes/dashboard.index.tsx`): promote the existing business cards to a top-of-page rail with prominent "Open workspace" + "Billing & plan" buttons.
-- **Mobile tab bar** (`src/components/mobile-tab-bar.tsx`): when the signed-in user owns ≥1 business, swap one tab for a "Workspace" tab that deep-links to their primary (or last-opened) business.
+- `PlanLimitError` class (typed: `{ limitKey, current, cap, tier, businessId }`).
+- `assertWithinLimit(businessId, limitKey, increment = 1)`:
+  - Loads current `business_subscriptions` row + `business_plans.limits` for the business.
+  - Counts current usage for `limitKey` (reuses the same count queries already in `getBusinessPlanUsage`).
+  - Throws `PlanLimitError` when `current + increment > cap` (treats `null`/missing cap as unlimited).
+- `tryAutoUpgrade(businessId, limitKey)`:
+  - Reads `business_subscriptions.auto_upgrade`.
+  - Finds the next-higher `business_plans` row (by `sort_order` / price) whose `limits[limitKey]` accommodates the new usage.
+  - Updates `business_subscriptions.plan_id` + writes a `business_plan_change_log` entry (reason `auto_upgrade`, triggered_by `system`).
+  - Returns `{ upgraded: true, newTier }` or `{ upgraded: false, reason }`.
+- `enforceLimit(businessId, limitKey, increment?)`: wraps assert → on `PlanLimitError`, if auto-upgrade enabled, run `tryAutoUpgrade` and re-assert; otherwise rethrow.
 
-## 2. Plan, usage & billing hub
+Stripe proration is out of scope for this step (existing subscription rows are local-only); the change log + plan swap is enough to unlock the action. A follow-up can wire Stripe `subscriptions.update` when billing goes live.
 
-New route `dashboard.business.$businessId.billing.tsx` and matching sidebar module "Billing & plan" (added to every kind in `src/lib/business-workspace/modules.ts`). Contents:
+## 2. Wire enforcement into create paths
 
-- **Current plan card** — tier name, price, interval, status badge (Active / Past due / Cancelling), and a big "X days remaining" countdown derived from `current_period_end`. "Renews on …" / "Ends on …" copy depending on `cancel_at_period_end`.
-- **Usage meters** — one progress bar per limit defined for the plan (see §3): Active listings, Staff seats, Trucks/assets, Inventory SKUs, Tow jobs this month, Storage MB. Each bar turns amber at 80% and red at 100% with a "Manage" deep-link to the relevant module.
-- **Plan comparison strip** — current tier highlighted; "Upgrade" / "Downgrade" buttons open the existing `BusinessPlanDialog` prefilled with the right `typeSlug`. Downgrades that would exceed a lower tier's caps show a warning listing what must be reduced first.
-- **Auto-upgrade toggle** — see §4.
-- **Billing actions** — "Manage payment method / invoices" (Stripe customer portal via existing helper) and "Cancel plan".
+Add `await enforceLimit(...)` at the top of each handler, before the insert:
 
-Also surface a compact "Plan: Listed · 12 days left · 78% staff used" chip in the workspace top bar (`dashboard.business.$businessId.tsx`) that links to the billing page, and a red banner across all workspace pages when status is `past_due` or usage is at 100%.
+- `src/lib/business-staff.functions.ts` → `addBusinessStaffByEmail` → `enforceLimit(businessId, "staff")`.
+- `src/lib/business-assets.functions.ts` → `upsertBusinessAsset` → only on insert (no `id` provided) → `enforceLimit(businessId, "assets")`.
+- `src/lib/business-inventory.functions.ts` → `upsertBusinessInventoryItem` → insert-only → `enforceLimit(businessId, "inventory_skus")`.
+- `src/lib/business-workspace.functions.ts` (or wherever listings/tow jobs are created from the workspace) → `enforceLimit(businessId, "listings")` / `"tow_jobs_month"`.
 
-## 3. Plan rules & limit enforcement
+Each handler catches `PlanLimitError` and returns `{ error: "plan_limit", limitKey, current, cap, tier }` so the client can show a tailored toast linking to `/billing`.
 
-Plans currently have no machine-readable limits. Add them:
+## 3. Change log table
 
-- Migration: extend `business_plans` with a `limits jsonb` column (e.g. `{ "staff": 3, "assets": 5, "listings": 25, "tow_jobs_month": 100, "inventory_skus": 200, "storage_mb": 500 }`) and `features jsonb` (e.g. `{ "dispatch": true, "analytics": false }`). Seed sensible defaults per existing tier (free / listed / featured / premium).
-- New server fn `getBusinessPlanUsage(businessId)` in `src/lib/business-subscriptions.functions.ts` that returns `{ plan, limits, usage: { staff, assets, listings, tow_jobs_month, … }, daysRemaining, status }` by counting from `business_staff`, `business_assets`, `business_inventory_items`, `listings`, `tow_requests` (with `created_at >= date_trunc('month', now())`).
-- Enforce caps server-side in the create-paths that already exist: `addBusinessStaff`, `createBusinessAsset`, `createInventoryItem`, listing create, dispatch acceptance. Each throws a typed `PlanLimitError` with `{ resource, limit, current, upgradeTo }` so the UI can show "You've hit the 3-staff limit on Listed. Upgrade to Featured for 10."
-- Client helper `usePlanGuard(businessId)` to gate "+ Add" buttons (disabled + tooltip) before the server call.
+New migration adds `public.business_plan_change_log`:
 
-## 4. Auto-upgrade
+- `business_id`, `from_plan_id`, `to_plan_id`, `reason` (`auto_upgrade` | `manual` | `downgrade` | `cancel`), `triggered_by` (`user` | `system`), `metadata jsonb`, timestamps.
+- RLS: business owner + staff with `manage_billing` can SELECT; only `service_role` can INSERT (writes happen server-side).
+- GRANT SELECT to authenticated, ALL to service_role.
 
-- Per-business setting stored on `business_subscriptions.metadata.auto_upgrade` (`true` | `false`, default `false`) with a toggle in the Billing hub.
-- When a `PlanLimitError` fires and auto-upgrade is on, the server fn instead: looks up the next tier with capacity for that resource, calls Stripe to swap the subscription item (proration on), updates `business_subscriptions`, logs a `business_plan_change` audit row, emails the owner, and retries the original op once. If swap fails, falls back to throwing the limit error.
-- A scheduled check (reuse the existing pg_cron / webhook pattern under `/api/public/`) runs nightly; if any usage > 100% for ≥24h and auto-upgrade is on, upgrades; otherwise sends a "You're over your plan limits" warning email.
+Surfaced on the billing page as a "Plan history" list below usage meters.
 
-## 5. Renewal & status visibility
+## 4. Client-side guard
 
-- `getBusinessPlanUsage` returns `daysRemaining = ceil((current_period_end - now) / day)`; surface in the billing hub, the workspace chip, and the account dropdown row ("12d left").
-- 7/3/1-day-before-renewal email reminder (reuse the existing transactional email infra; new template `business-plan-renewal-reminder.tsx`).
-- `past_due` triggers an in-app banner + email; after 7 days the account is auto-downgraded to free with a final notice.
+New `src/hooks/use-plan-guard.ts`:
 
-## Technical notes
+- Wraps `getBusinessPlanUsage` query and exposes `{ atLimit, remaining, cap, tier, autoUpgrade }` per `limitKey`.
+- Returns a `<LimitTooltip limitKey>` helper that renders a disabled state with "You've reached your {tier} plan's {limit} cap — upgrade to add more" linking to billing.
 
-- New migration adds `business_plans.limits jsonb`, `business_plans.features jsonb`, `business_subscriptions.metadata.auto_upgrade` (just a metadata key, no schema change), and a small `business_plan_change_log` table (business_id, from_tier, to_tier, reason, actor_user_id, created_at) with RLS scoped via `is_business_member` + `service_role`.
-- New server fns in `src/lib/business-subscriptions.functions.ts`: `getBusinessPlanUsage`, `setAutoUpgrade`, `requestPlanChange`, `openBillingPortal` (wraps existing Stripe portal helper for businesses).
-- New module entry in `src/lib/business-workspace/modules.ts`: `"billing"` icon `CreditCard`, available to every kind.
-- Pricing dialog reused; no Stripe product changes — limits live in our DB, not in Stripe.
-- Out of scope: usage-based metered billing, multi-business consolidated invoicing, team-member-level seat billing UI (caps only).
+Apply to "+ Add staff", "+ Add asset", "+ Add inventory item", "+ New listing" buttons in the workspace routes. Buttons stay enabled when `autoUpgrade` is on (the server will handle the bump), but show a small "Auto-upgrade will apply" hint.
 
-## Files touched (estimate)
+## 5. Billing page additions
 
-- `src/components/site-header.tsx` (account menu sections)
-- `src/components/mobile-tab-bar.tsx`
-- `src/routes/dashboard.index.tsx`
-- `src/routes/dashboard.business.$businessId.tsx` (top-bar plan chip + banner)
-- `src/routes/dashboard.business.$businessId.billing.tsx` (new)
-- `src/lib/business-workspace/modules.ts`
-- `src/lib/business-subscriptions.functions.ts`
-- `src/lib/business-staff.functions.ts`, `business-assets.functions.ts`, `business-inventory.functions.ts` (limit checks)
-- `src/lib/email-templates/business-plan-renewal-reminder.tsx` (new)
-- One migration for plan `limits`/`features` + change-log table + seed.
+Edit `src/routes/dashboard.business.$businessId.billing.tsx`:
+
+- Add "Plan history" card listing the 10 most recent change-log rows (from → to, reason, when).
+- When `usage[k] >= limits[k]` and `autoUpgrade` is off, highlight the meter red and show inline "Upgrade now" button next to the matching tier.
+
+## 6. Technical notes
+
+- All counts already exist in `getBusinessPlanUsage`; extract them into a shared `countBusinessUsage(supabase, businessId)` helper in `business-plan-usage.server.ts` so both `getBusinessPlanUsage` and `assertWithinLimit` use one source of truth.
+- `tow_jobs_month` resets on `current_period_start` of the subscription — use that as the lower bound for the count.
+- Auto-upgrade must be idempotent: if two parallel creates trip the cap, both call `tryAutoUpgrade`; serialize via `select … for update` on `business_subscriptions` inside a transaction (single RPC).
+- No Stripe API calls in this step. When Stripe is wired later, `tryAutoUpgrade` will additionally call `stripe.subscriptions.update` with proration; the local plan swap stays the source of truth for gating.
+
+## Files
+
+- **New**: `src/lib/business-plan-enforcement.server.ts`, `src/lib/business-plan-usage.server.ts` (extracted helper), `src/hooks/use-plan-guard.ts`, `src/components/business-workspace/limit-tooltip.tsx`, `supabase/migrations/<ts>_plan_change_log.sql`.
+- **Edited**: `src/lib/business-staff.functions.ts`, `src/lib/business-assets.functions.ts`, `src/lib/business-inventory.functions.ts`, `src/lib/business-plan-usage.functions.ts`, `src/routes/dashboard.business.$businessId.billing.tsx`, `src/routes/dashboard.business.$businessId.staff.tsx`, `src/routes/dashboard.business.$businessId.fleet.tsx`, `src/routes/dashboard.business.$businessId.inventory.tsx`.
+
+Approve to build.
