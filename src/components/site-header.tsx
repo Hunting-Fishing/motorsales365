@@ -257,7 +257,41 @@ export function SiteHeader() {
                   <span className="hidden sm:inline">Account</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent align="end" className="w-64">
+                {myBusinesses.length > 0 && (
+                  <>
+                    <div className="px-2 pb-1 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      My businesses
+                    </div>
+                    {myBusinesses.map((b) => (
+                      <div key={b.id} className="px-1 pb-1">
+                        <div className="flex items-center gap-1">
+                          <DropdownMenuItem asChild className="flex-1">
+                            <Link
+                              to="/dashboard/business/$businessId"
+                              params={{ businessId: b.id }}
+                              className="flex items-center gap-2"
+                            >
+                              <Building2 className="h-4 w-4 text-primary" />
+                              <span className="truncate">{b.name}</span>
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild className="px-2">
+                            <Link
+                              to="/dashboard/business/$businessId/billing"
+                              params={{ businessId: b.id }}
+                              aria-label="Billing & plan"
+                              title="Billing & plan"
+                            >
+                              <CreditCard className="h-4 w-4" />
+                            </Link>
+                          </DropdownMenuItem>
+                        </div>
+                      </div>
+                    ))}
+                    <DropdownMenuSeparator />
+                  </>
+                )}
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard">My listings</Link>
                 </DropdownMenuItem>
