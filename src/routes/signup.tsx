@@ -184,6 +184,49 @@ function SignupPage() {
     if (c) setRefCode(c);
   }, []);
 
+  // Restore previously entered form data when the user comes back from verify-email
+  // (e.g. wrong email). Stashed values take precedence over URL defaults.
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem("signup.pending");
+      if (!raw) return;
+      const p = JSON.parse(raw);
+      if (p.intent) setIntent(p.intent);
+      if (p.first_name !== undefined) setFirstName(p.first_name);
+      if (p.last_name !== undefined) setLastName(p.last_name);
+      if (p.email !== undefined) setEmail(p.email);
+      if (p.phone_iso !== undefined) setPhoneIso(p.phone_iso);
+      if (p.phone_national !== undefined) setPhoneNational(p.phone_national);
+      if (p.business_name !== undefined) setBusinessName(p.business_name);
+      if (p.business_address !== undefined) setBusinessAddress(p.business_address);
+      if (p.business_kind !== undefined) setBusinessKind(p.business_kind);
+      if (p.street_address !== undefined) setStreetAddress(p.street_address);
+      if (p.postal_code !== undefined) setPostalCode(p.postal_code);
+      if (p.business_postal_code !== undefined) setBusinessPostalCode(p.business_postal_code);
+      if (p.region !== undefined || p.province !== undefined || p.city !== undefined) {
+        setLocation({
+          region: p.region ?? null,
+          province: p.province ?? null,
+          city: p.city ?? null,
+          barangay: null,
+        });
+      }
+      if (typeof p.agreed === "boolean") setAgreed(p.agreed);
+      if (p.ref_code !== undefined) setRefCode(p.ref_code);
+      window.localStorage.removeItem("signup.pending");
+      // Focus and select email so the user can immediately change it
+      setTimeout(() => {
+        const el = document.getElementById("email") as HTMLInputElement | null;
+        if (el) {
+          el.focus();
+          el.select();
+        }
+      }, 0);
+    } catch {
+      // ignore parse errors
+    }
+  }, []);
+
   const goAfterSignup = (fallback: string) => {
     const dest = search.redirect || fallback;
     if (dest.startsWith("/") && !dest.startsWith("//")) {
@@ -210,7 +253,10 @@ function SignupPage() {
         full_name: fullName || undefined,
         first_name: firstName.trim() || undefined,
         last_name: lastName.trim() || undefined,
+        email: email.trim() || undefined,
         phone: phoneE164 || undefined,
+        phone_iso: phoneIso || undefined,
+        phone_national: phoneNational.trim() || undefined,
         business_name: isBusinessLike ? businessName.trim() || undefined : undefined,
         business_address: isBusinessLike ? businessAddress.trim() || undefined : undefined,
         business_kind: isBusinessLike ? businessKind || undefined : undefined,
@@ -221,6 +267,8 @@ function SignupPage() {
         province: location.province ?? undefined,
         city: location.city ?? undefined,
         is_business: isBusinessLike,
+        agreed,
+        ref_code: refCode.trim() || undefined,
       };
       window.localStorage.setItem("signup.pending", JSON.stringify(payload));
     } catch {

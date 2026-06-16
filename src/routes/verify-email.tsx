@@ -119,9 +119,19 @@ function VerifyEmailPage() {
                 : "Resend verification email"}
           </Button>
           <div className="flex items-center justify-between text-sm text-muted-foreground">
-            <Link to="/signup" className="hover:underline">
-              Wrong email? Start over
-            </Link>
+          <Link
+            to="/signup"
+            search={
+              intent
+                ? { type: intent, ...(redirect ? { redirect } : {}) }
+                : redirect
+                  ? { redirect }
+                  : {}
+            }
+            className="hover:underline"
+          >
+            Wrong email? Start over
+          </Link>
             <Link to="/login" search={redirect ? { redirect } : {}} className="hover:underline">
               Already verified? Sign in
             </Link>
