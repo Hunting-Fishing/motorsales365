@@ -208,14 +208,24 @@ function SubmitBusinessPage() {
   }, [user?.id, prefilled]);
 
   useEffect(() => {
-    setTypes(
-      BUSINESS_KIND_OPTIONS.map((o) => ({ slug: o.value, label: o.label })),
-    );
+    // Seed from the static list immediately so the dropdown isn't empty during
+    // network roundtrip, then replace with the live `business_types` rows
+    // (admin can add/rename without a deploy).
+    setTypes(BUSINESS_KIND_OPTIONS.map((o) => ({ slug: o.value, label: o.label })));
     (async () => {
-      const { data: t2 } = await (supabase as any)
-        .from("business_tags")
-        .select("slug,label,type_slug,category,sort_order,is_popular")
-        .order("sort_order");
+      const [{ data: typesRows }, { data: t2 }] = await Promise.all([
+        (supabase as any)
+          .from("business_types")
+          .select("slug,label,sort_order")
+          .order("sort_order", { ascending: true }),
+        (supabase as any)
+          .from("business_tags")
+          .select("slug,label,type_slug,category,sort_order,is_popular")
+          .order("sort_order"),
+      ]);
+      if (Array.isArray(typesRows) && typesRows.length > 0) {
+        setTypes(typesRows.map((r: any) => ({ slug: r.slug, label: r.label })));
+      }
       setTags(t2 ?? []);
     })();
   }, []);

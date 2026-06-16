@@ -1,5 +1,13 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { confirm } from "@/components/ui/confirm-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { discountForOrdinal } from "@/lib/multi-business-discount";
 import { useEffect, useState } from "react";
 import {
   Store as StoreIcon,
@@ -352,10 +360,60 @@ function MyBusinessesPage() {
   const archivedCount = rows.filter((r) => r.status === "archived").length;
   const visibleRows = showArchived ? rows : rows.filter((r) => r.status !== "archived");
 
+  const navigate = useNavigate();
+  const activeBusinesses = rows
+    .filter((r) => r.status === "active" || r.status === "pending")
+    .sort((a, b) => a.name.localeCompare(b.name));
+
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between gap-2">
-        <h1 className="font-display text-2xl font-bold">My businesses</h1>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="font-display text-2xl font-bold">My businesses</h1>
+          {activeBusinesses.length > 1 && (
+            <Select
+              onValueChange={(id) => {
+                const target = activeBusinesses.find((b) => b.id === id);
+                if (!target) return;
+                toast.info(`Opening ${target.name} workspace…`);
+                navigate({
+                  to: "/dashboard/business/$businessId",
+                  params: { businessId: id },
+                });
+              }}
+            >
+              <SelectTrigger className="h-9 w-[220px]">
+                <SelectValue placeholder="Switch to business…" />
+              </SelectTrigger>
+              <SelectContent>
+                {activeBusinesses.map((b) => {
+                  const ord = rows
+                    .filter((r) => r.status === "active" || r.status === "pending")
+                    .sort(
+                      (a, c) =>
+                        // matches server ordering: created_at asc, but rows are loaded
+                        // created_at desc — recompute using stable id-name pair
+                        a.name.localeCompare(c.name),
+                    )
+                    .findIndex((r) => r.id === b.id);
+                  const d = discountForOrdinal(ord);
+                  return (
+                    <SelectItem key={b.id} value={b.id}>
+                      <span className="inline-flex items-center gap-2">
+                        <span>{b.name}</span>
+                        {d.percentOff > 0 && (
+                          <Badge variant="secondary" className="text-[10px]">
+                            {d.percentOff}% off
+                          </Badge>
+                        )}
+                      </span>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          )}
+        </div>
         <div className="flex items-center gap-2">
           {archivedCount > 0 && (
             <Button
@@ -375,6 +433,21 @@ function MyBusinessesPage() {
           </Button>
         </div>
       </div>
+
+      {activeBusinesses.length >= 2 && (
+        <Card className="border-primary/30 bg-primary/5 p-3 text-sm">
+          <div className="flex items-start gap-2">
+            <Sparkles className="mt-0.5 h-4 w-4 text-primary" />
+            <div>
+              <div className="font-medium">Multi-business discount unlocked</div>
+              <div className="text-xs text-muted-foreground">
+                You own {activeBusinesses.length} businesses — 2nd gets 10% off, 3rd 15%, 4th and
+                beyond 20% off their plan. Open a business and choose "Change plan" to apply.
+              </div>
+            </div>
+          </div>
+        </Card>
+      )}
       {loading ? (
         <div className="space-y-2">
           {Array.from({ length: 3 }).map((_, i) => (
