@@ -744,7 +744,7 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
       <div className="space-y-3 rounded-lg border border-border p-3">
         <div className="text-sm font-medium">Contact details</div>
         <div className="grid gap-3 sm:grid-cols-2">
-          <div>
+          <div id="onboard-phone">
             <Label>Phone</Label>
             <Input
               type="tel"
