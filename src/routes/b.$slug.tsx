@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
+import { resolveBusinessMiniSiteSlug } from "@/lib/business-pages.functions";
 
 /**
  * Short vanity URL: /b/<vanity>.
@@ -9,50 +9,13 @@ import { supabase } from "@/integrations/supabase/client";
  */
 export const Route = createFileRoute("/b/$slug")({
   beforeLoad: async ({ params }) => {
-    const lookup = params.slug.toLowerCase();
-
-    // 1. vanity_slug
-    let { data: biz } = await (supabase as any)
-      .from("businesses")
-      .select("slug,status")
-      .eq("vanity_slug", lookup)
-      .maybeSingle();
-
-    // 2. canonical slug (rare — someone shared a /b/ link with the long slug)
-    if (!biz) {
-      const r = await (supabase as any)
-        .from("businesses")
-        .select("slug,status")
-        .eq("slug", lookup)
-        .maybeSingle();
-      biz = r.data;
-    }
-
-    // 3. history (renamed slug or vanity)
-    if (!biz) {
-      const { data: hist } = await (supabase as any)
-        .from("business_slug_history")
-        .select("business_id")
-        .ilike("old_slug", lookup)
-        .limit(1)
-        .maybeSingle();
-      if (hist) {
-        const r = await (supabase as any)
-          .from("businesses")
-          .select("slug,status")
-          .eq("id", (hist as any).business_id)
-          .maybeSingle();
-        biz = r.data;
-      }
-    }
-
-    const HIDDEN_STATUSES = new Set(["archived", "hidden", "removed", "banned"]);
-    if (!biz || HIDDEN_STATUSES.has(String((biz as any).status))) {
+    const { business } = await resolveBusinessMiniSiteSlug({ data: { slug: params.slug } });
+    if (!business) {
       // Truly suppressed (archived/hidden/etc.) → don't expose via direct link.
       // Pending businesses ARE exposed — they are the owner's mini-site.
       throw redirect({ to: "/businesses" });
     }
-    throw redirect({ to: "/businesses/$slug", params: { slug: (biz as any).slug } });
+    throw redirect({ to: "/businesses/$slug", params: { slug: business.slug } });
   },
   component: () => null,
 });
