@@ -64,9 +64,9 @@ export const Route = createFileRoute("/businesses/$slug")({
     try {
       const { data } = await (supabase as any)
         .from("businesses")
-        .select("name,description,tagline,city,region,logo_url,cover_url")
+        .select("name,description,tagline,city,region,logo_url,cover_url,status")
         .eq("slug", params.slug)
-        .eq("status", "active")
+        .not("status", "in", "(archived,hidden,removed,banned)")
         .maybeSingle();
       return { seo: data ?? null };
     } catch {
