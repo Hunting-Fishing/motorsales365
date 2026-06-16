@@ -373,6 +373,119 @@ function ReviewRow({
   );
 }
 
+function fmtDate(t: string | null | undefined) {
+  if (!t) return "—";
+  return new Date(t).toLocaleString();
+}
+
+function WebsiteSignupsTab() {
+  const search = useServerFn(searchWebsiteSignupsForAdmin);
+  const [query, setQuery] = useState("");
+  const [status, setStatus] = useState("all");
+  const [busy, setBusy] = useState(false);
+  const [rows, setRows] = useState<WebsiteSignupRow[]>([]);
+
+  async function runSearch() {
+    setBusy(true);
+    try {
+      const res = await search({ data: { query, status } });
+      setRows(res.rows as WebsiteSignupRow[]);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Search failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  useEffect(() => {
+    runSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <Card className="space-y-4 p-4">
+      <div className="flex flex-wrap items-end gap-3">
+        <div className="min-w-[260px] flex-1">
+          <Label>Search signed-up businesses</Label>
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") runSearch();
+            }}
+            placeholder="Business name, slug, phone, email, city…"
+          />
+        </div>
+        <div>
+          <Label>Status</Label>
+          <Select value={status} onValueChange={setStatus}>
+            <SelectTrigger className="w-[170px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Any status</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="hidden">Hidden</SelectItem>
+              <SelectItem value="archived">Archived</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <Button onClick={runSearch} disabled={busy}>
+          {busy ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCw className="mr-2 h-4 w-4" />}
+          Search
+        </Button>
+      </div>
+
+      <div className="space-y-2">
+        {rows.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No signed-up businesses match this search.</p>
+        ) : (
+          rows.map((r) => (
+            <div key={r.id} className="flex flex-wrap items-start gap-3 rounded border bg-background p-3">
+              {r.logo_url ? (
+                <img src={r.logo_url} alt={`${r.name} logo`} className="h-14 w-14 rounded object-cover" />
+              ) : (
+                <div className="h-14 w-14 rounded bg-muted" />
+              )}
+              <div className="min-w-[240px] flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="font-medium">{r.name}</span>
+                  <Badge variant={r.status === "active" ? "default" : "secondary"}>{r.status}</Badge>
+                  {r.type_slug && <Badge variant="outline">{r.type_slug}</Badge>}
+                  <Badge variant="outline">365 signup</Badge>
+                </div>
+                <div className="mt-1 text-xs text-muted-foreground">
+                  /b/{r.vanity_slug || r.slug} · /businesses/{r.slug} · signed up {fmtDate(r.created_at)}
+                </div>
+                <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
+                  {[r.city, r.region].filter(Boolean).join(", ") && <span>{[r.city, r.region].filter(Boolean).join(", ")}</span>}
+                  {r.phone && <span>{r.phone}</span>}
+                  {r.email && <span>{r.email}</span>}
+                  {r.website && <span>{r.website}</span>}
+                </div>
+                {r.description && <p className="mt-2 line-clamp-2 text-xs text-muted-foreground">{r.description}</p>}
+              </div>
+              <div className="flex gap-2">
+                <Button asChild size="sm" variant="outline">
+                  <Link to="/admin/businesses/$id" params={{ id: r.id }}>
+                    Admin
+                  </Link>
+                </Button>
+                <Button asChild size="sm" variant="outline">
+                  <Link to="/b/$slug" params={{ slug: r.vanity_slug || r.slug }}>
+                    Mini-site
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </Card>
+  );
+}
+
 function GoogleTab({ onAdd }: { onAdd: (r: Row) => void }) {
   const search = useServerFn(searchGooglePlaces);
   const [placeType, setPlaceType] = useState(AVAILABLE_PLACE_TYPES[0]);
