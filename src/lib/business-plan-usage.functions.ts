@@ -211,3 +211,29 @@ export const setBusinessAutoUpgrade = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+/** Recent plan change log entries for a business. */
+export const listBusinessPlanHistory = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { businessId: string }) => {
+    if (!/^[0-9a-f-]{36}$/i.test(d.businessId)) throw new Error("Invalid businessId");
+    return d;
+  })
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const { data: isMember } = await supabase.rpc("is_business_member", {
+      _user: userId,
+      _business: data.businessId,
+    });
+    if (!isMember) throw new Error("Forbidden");
+
+    const { data: rows, error } = await supabase
+      .from("business_plan_change_log")
+      .select("id, from_tier, to_tier, reason, triggered_by, created_at, metadata")
+      .eq("business_id", data.businessId)
+      .order("created_at", { ascending: false })
+      .limit(10);
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+

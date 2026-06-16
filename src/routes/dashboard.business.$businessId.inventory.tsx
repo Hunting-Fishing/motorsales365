@@ -90,7 +90,7 @@ function InventoryPage() {
   async function handleSave() {
     setSaving(true);
     try {
-      await upsertFn({
+      const res: any = await upsertFn({
         data: {
           id: editing?.id,
           businessId,
@@ -104,9 +104,12 @@ function InventoryPage() {
           location: form.location || null,
         },
       });
+      const { handlePlanLimitResult } = await import("@/lib/plan-limit-toast");
+      if (handlePlanLimitResult(res, { businessId })) return;
       toast.success("Saved");
       setOpen(false);
       qc.invalidateQueries({ queryKey: ["business-inventory", businessId] });
+
     } catch (e: any) {
       toast.error(e?.message || "Failed");
     } finally {

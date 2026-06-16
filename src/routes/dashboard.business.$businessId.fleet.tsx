@@ -110,7 +110,7 @@ function FleetPage() {
   async function handleSave() {
     setSaving(true);
     try {
-      await upsertFn({
+      const res: any = await upsertFn({
         data: {
           id: editing?.id,
           businessId,
@@ -123,9 +123,12 @@ function FleetPage() {
           notes: form.notes || null,
         },
       });
+      const { handlePlanLimitResult } = await import("@/lib/plan-limit-toast");
+      if (handlePlanLimitResult(res, { businessId })) return;
       toast.success(editing ? "Asset updated" : "Asset added");
       setOpen(false);
       qc.invalidateQueries({ queryKey: ["business-assets", businessId] });
+
     } catch (e: any) {
       toast.error(e?.message || "Failed");
     } finally {

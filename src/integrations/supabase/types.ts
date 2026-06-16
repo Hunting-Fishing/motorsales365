@@ -1600,6 +1600,70 @@ export type Database = {
           },
         ]
       }
+      business_plan_change_log: {
+        Row: {
+          actor_user_id: string | null
+          business_id: string
+          created_at: string
+          from_plan_id: string | null
+          from_tier: string | null
+          id: string
+          metadata: Json
+          reason: string
+          to_plan_id: string | null
+          to_tier: string | null
+          triggered_by: string
+        }
+        Insert: {
+          actor_user_id?: string | null
+          business_id: string
+          created_at?: string
+          from_plan_id?: string | null
+          from_tier?: string | null
+          id?: string
+          metadata?: Json
+          reason: string
+          to_plan_id?: string | null
+          to_tier?: string | null
+          triggered_by: string
+        }
+        Update: {
+          actor_user_id?: string | null
+          business_id?: string
+          created_at?: string
+          from_plan_id?: string | null
+          from_tier?: string | null
+          id?: string
+          metadata?: Json
+          reason?: string
+          to_plan_id?: string | null
+          to_tier?: string | null
+          triggered_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_plan_change_log_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_plan_change_log_from_plan_id_fkey"
+            columns: ["from_plan_id"]
+            isOneToOne: false
+            referencedRelation: "business_plans"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_plan_change_log_to_plan_id_fkey"
+            columns: ["to_plan_id"]
+            isOneToOne: false
+            referencedRelation: "business_plans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_plans: {
         Row: {
           active: boolean

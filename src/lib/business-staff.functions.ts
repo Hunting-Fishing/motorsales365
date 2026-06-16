@@ -68,6 +68,22 @@ export const addBusinessStaffByEmail = createServerFn({ method: "POST" })
     const { supabase, userId } = context;
     await assertManager(supabase, userId, data.businessId);
 
+    // Enforce plan staff cap (with auto-upgrade if enabled)
+    try {
+      const { enforceLimit, planLimitErrorPayload, PlanLimitError } = await import(
+        "@/lib/business-plan-enforcement.server"
+      );
+      try {
+        await enforceLimit(supabase as any, data.businessId, "staff", userId);
+      } catch (e) {
+        if (e instanceof PlanLimitError) return planLimitErrorPayload(e)!;
+        throw e;
+      }
+    } catch (e: any) {
+      if (e?.code === "plan_limit") return e;
+      throw e;
+    }
+
     // Privileged: look up user by email via admin client.
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: list, error: listErr } = await (supabaseAdmin as any).auth.admin.listUsers({
@@ -99,6 +115,7 @@ export const addBusinessStaffByEmail = createServerFn({ method: "POST" })
     if (error) throw error;
     return { ok: true };
   });
+
 
 export const updateBusinessStaff = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

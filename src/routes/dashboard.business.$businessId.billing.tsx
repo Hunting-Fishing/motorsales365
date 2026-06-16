@@ -5,9 +5,11 @@ import { useState } from "react";
 import {
   getBusinessPlanUsage,
   setBusinessAutoUpgrade,
+  listBusinessPlanHistory,
   type PlanLimits,
   type PlanUsage,
 } from "@/lib/business-plan-usage.functions";
+
 import { getWorkspaceBusiness } from "@/lib/business-workspace.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -50,6 +52,7 @@ function BillingPage() {
   const qc = useQueryClient();
   const loadUsage = useServerFn(getBusinessPlanUsage);
   const loadBiz = useServerFn(getWorkspaceBusiness);
+  const loadHistory = useServerFn(listBusinessPlanHistory);
   const setAuto = useServerFn(setBusinessAutoUpgrade);
   const [planOpen, setPlanOpen] = useState(false);
 
@@ -61,6 +64,11 @@ function BillingPage() {
     queryKey: ["business-plan-usage", businessId],
     queryFn: () => loadUsage({ data: { businessId } }),
   });
+  const historyQ = useQuery({
+    queryKey: ["business-plan-history", businessId],
+    queryFn: () => loadHistory({ data: { businessId } }),
+  });
+
 
   const autoMut = useMutation({
     mutationFn: (enabled: boolean) => setAuto({ data: { businessId, enabled } }),
@@ -247,6 +255,41 @@ function BillingPage() {
           )}
         </CardContent>
       </Card>
+
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Plan history</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {historyQ.isLoading ? (
+            <Skeleton className="h-16 w-full" />
+          ) : !historyQ.data?.length ? (
+            <p className="text-sm text-muted-foreground">No plan changes yet.</p>
+          ) : (
+            <ul className="divide-y text-sm">
+              {historyQ.data.map((h: any) => (
+                <li key={h.id} className="flex items-center justify-between py-2">
+                  <div>
+                    <span className="capitalize font-medium">{h.from_tier || "—"}</span>
+                    <span className="mx-2 text-muted-foreground">→</span>
+                    <span className="capitalize font-medium">{h.to_tier || "—"}</span>
+                    <Badge variant="outline" className="ml-2 capitalize">
+                      {String(h.reason).replace("_", " ")}
+                    </Badge>
+                    {h.triggered_by === "system" && (
+                      <Badge variant="secondary" className="ml-1">auto</Badge>
+                    )}
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(h.created_at).toLocaleString()}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
 
       {business && typeSlug && (
         <BusinessPlanDialog
