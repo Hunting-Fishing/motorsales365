@@ -213,7 +213,7 @@ function SubmitBusinessPage() {
     // (admin can add/rename without a deploy).
     setTypes(BUSINESS_KIND_OPTIONS.map((o) => ({ slug: o.value, label: o.label })));
     (async () => {
-      const [{ data: typesRows }, { data: t2 }] = await Promise.all([
+      const [typesRes, tagsRes] = await Promise.all([
         (supabase as any)
           .from("business_types")
           .select("slug,label,sort_order")
@@ -223,10 +223,52 @@ function SubmitBusinessPage() {
           .select("slug,label,type_slug,category,sort_order,is_popular")
           .order("sort_order"),
       ]);
+
+      const typesRows = typesRes?.data;
+      const typesError = typesRes?.error;
+      const tagsRows = tagsRes?.data;
+      const tagsError = tagsRes?.error;
+
       if (Array.isArray(typesRows) && typesRows.length > 0) {
         setTypes(typesRows.map((r: any) => ({ slug: r.slug, label: r.label })));
+      } else {
+        // DB unreachable or table empty — keep static fallback already seeded
+        // and notify admins so the catalog gap gets fixed.
+        toast.warning("Business categories list is using a fallback. Admins have been notified.");
+        try {
+          const { reportClientLoadFailure } = await import("@/lib/ops-alert.functions");
+          await reportClientLoadFailure({
+            data: {
+              event: typesError ? "business_types.load_failed" : "business_types.empty",
+              details: {
+                route: "/businesses/submit",
+                error: typesError?.message ?? null,
+                rowCount: Array.isArray(typesRows) ? typesRows.length : null,
+              },
+            },
+          });
+        } catch {
+          // Swallow — alerting must never break the form.
+        }
       }
-      setTags(t2 ?? []);
+
+      setTags(tagsRows ?? []);
+      if ((!Array.isArray(tagsRows) || tagsRows.length === 0) && tagsError) {
+        try {
+          const { reportClientLoadFailure } = await import("@/lib/ops-alert.functions");
+          await reportClientLoadFailure({
+            data: {
+              event: "business_tags.load_failed",
+              details: {
+                route: "/businesses/submit",
+                error: tagsError?.message ?? null,
+              },
+            },
+          });
+        } catch {
+          // Swallow.
+        }
+      }
     })();
   }, []);
 
