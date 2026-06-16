@@ -38,6 +38,7 @@ type Suggestion = {
   status: "pending" | "approved" | "rejected" | "merged";
   admin_note: string | null;
   created_at: string;
+  business?: { id: string; name: string; slug: string } | null;
 };
 
 function ServiceSuggestionsAdmin() {
@@ -76,6 +77,7 @@ function ServiceSuggestionsAdmin() {
     setTitle(row.proposed_title);
     setDesc(row.proposed_description ?? "");
     setUnit(row.proposed_unit ?? "");
+    setNote("");
   };
   const openReject = (row: Suggestion) => {
     setAction({ kind: "reject", row });
@@ -93,6 +95,7 @@ function ServiceSuggestionsAdmin() {
             title: title.trim(),
             description: desc.trim() || null,
             unit: unit.trim() || null,
+            adminNote: note.trim() || null,
           },
         });
         toast.success("Approved and added to catalog");
@@ -162,7 +165,7 @@ function ServiceSuggestionsAdmin() {
                     <Badge variant="outline" className="text-xs">{s.business_type_slug}</Badge>
                     {s.proposed_unit && <Badge variant="secondary" className="text-xs">/{s.proposed_unit}</Badge>}
                     {s.sample_price_php != null && (
-                      <Badge variant="outline" className="text-xs">sample ₱{s.sample_price_php}</Badge>
+                      <Badge variant="outline" className="text-xs">fee ₱{s.sample_price_php}</Badge>
                     )}
                     <Badge className="text-xs capitalize">{s.status}</Badge>
                   </div>
@@ -170,7 +173,20 @@ function ServiceSuggestionsAdmin() {
                     <p className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">{s.proposed_description}</p>
                   )}
                   <div className="mt-2 text-xs text-muted-foreground">
-                    Submitted {new Date(s.created_at).toLocaleString()}
+                    Provider:{" "}
+                    {s.business ? (
+                      <a
+                        href={`/businesses/${s.business.slug}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        {s.business.name}
+                      </a>
+                    ) : (
+                      <span>— (no business linked)</span>
+                    )}
+                    {" · "}Submitted {new Date(s.created_at).toLocaleString()}
                   </div>
                   {s.admin_note && (
                     <div className="mt-2 rounded-md bg-muted/50 p-2 text-xs">
@@ -218,6 +234,15 @@ function ServiceSuggestionsAdmin() {
                   <div>
                     <Label>Description</Label>
                     <Textarea value={desc} onChange={(e) => setDesc(e.target.value)} rows={3} />
+                  </div>
+                  <div>
+                    <Label>Admin note (optional)</Label>
+                    <Textarea
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                      rows={2}
+                      placeholder="Visible internally; useful for context on the decision."
+                    />
                   </div>
                 </div>
               ) : (

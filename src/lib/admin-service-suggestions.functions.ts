@@ -21,7 +21,7 @@ export const listServiceSuggestions = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     let q = supabaseAdmin
       .from("service_catalog_suggestions")
-      .select("*")
+      .select("*, business:submitter_business_id ( id, name, slug )")
       .order("created_at", { ascending: false })
       .limit(200);
     if (data.status) q = q.eq("status", data.status);
@@ -38,6 +38,7 @@ export const approveServiceSuggestion = createServerFn({ method: "POST" })
     description?: string | null;
     unit?: string | null;
     mergeIntoCatalogId?: string | null;
+    adminNote?: string | null;
   }) =>
     z
       .object({
@@ -46,6 +47,7 @@ export const approveServiceSuggestion = createServerFn({ method: "POST" })
         description: z.string().trim().max(500).nullish(),
         unit: z.string().trim().max(20).nullish(),
         mergeIntoCatalogId: z.string().uuid().nullish(),
+        adminNote: z.string().trim().max(500).nullish(),
       })
       .parse(d),
   )
@@ -91,6 +93,7 @@ export const approveServiceSuggestion = createServerFn({ method: "POST" })
       .update({
         status: data.mergeIntoCatalogId ? "merged" : "approved",
         merged_into_catalog_id: catalogId,
+        admin_note: data.adminNote ?? null,
         decided_by: context.userId,
         decided_at: new Date().toISOString(),
       })
