@@ -150,6 +150,18 @@ function SignupPage() {
         label: "Password",
         message: "Password must be at least 8 characters.",
       });
+    if (!confirmPassword)
+      list.push({
+        field: "confirm-password",
+        label: "Confirm password",
+        message: "Re-enter your password.",
+      });
+    else if (confirmPassword !== password)
+      list.push({
+        field: "confirm-password",
+        label: "Confirm password",
+        message: "Passwords do not match.",
+      });
     if (!agreed)
       list.push({
         field: "terms",
