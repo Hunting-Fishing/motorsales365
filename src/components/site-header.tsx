@@ -111,6 +111,15 @@ export function SiteHeader() {
               ) : (
                 <span className="font-medium text-foreground">{profileName}</span>
               )}
+              {businessSetup.needed && (
+                <Link
+                  to="/businesses/submit"
+                  className="ml-2 inline-flex items-center gap-1 rounded-full border border-amber-500/60 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-700 hover:bg-amber-500/20 dark:text-amber-300"
+                  title="Finish setting up your business"
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-amber-500" /> Setup pending
+                </Link>
+              )}
             </span>
           )}
 
