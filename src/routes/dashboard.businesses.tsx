@@ -256,6 +256,23 @@ function MyBusinessesPage() {
   const [loading, setLoading] = useState(true);
   const [planTarget, setPlanTarget] = useState<Row | null>(null);
   const [showArchived, setShowArchived] = useState(false);
+  const [profile, setProfile] = useState<{
+    seller_type: string | null;
+    business_name: string | null;
+    business_kind: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await (supabase as any)
+        .from("profiles")
+        .select("seller_type, business_name, business_kind")
+        .eq("id", user.id)
+        .maybeSingle();
+      setProfile(data ?? null);
+    })();
+  }, [user]);
 
   const setStatus = async (b: Row, nextStatus: "active" | "archived") => {
     const prevStatus = b.status;
@@ -365,10 +382,52 @@ function MyBusinessesPage() {
           ))}
         </div>
       ) : visibleRows.length === 0 ? (
-        <Card className="p-6 text-center text-sm text-muted-foreground">
-          <StoreIcon className="mx-auto mb-2 h-6 w-6 opacity-60" />
-          {rows.length === 0 ? "You haven't listed any business yet." : "No businesses to show."}
-        </Card>
+        rows.length === 0 && profile?.seller_type === "business" ? (
+          (() => {
+            const kindLabel = profile.business_kind
+              ? profile.business_kind
+                  .split(/[-_\s]+/)
+                  .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+                  .join(" ")
+              : null;
+            return (
+              <Card className="border-amber-500/50 bg-amber-500/5 p-6">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300">
+                    <StoreIcon className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h2 className="font-display text-lg font-bold">
+                      Finish setting up
+                      {profile.business_name ? ` ${profile.business_name}` : " your business"}
+                    </h2>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      You signed up as a{kindLabel ? ` ${kindLabel.toLowerCase()}` : ""} business.
+                      Add a few details to publish your business page and unlock your workspace,
+                      billing, staff, and plan.
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <Button asChild size="sm">
+                        <Link to="/businesses/submit">
+                          <Plus className="mr-1 h-4 w-4" />
+                          Continue setup
+                        </Link>
+                      </Button>
+                      <Button asChild size="sm" variant="outline">
+                        <Link to="/dashboard/profile">Switch account type</Link>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            );
+          })()
+        ) : (
+          <Card className="p-6 text-center text-sm text-muted-foreground">
+            <StoreIcon className="mx-auto mb-2 h-6 w-6 opacity-60" />
+            {rows.length === 0 ? "You haven't listed any business yet." : "No businesses to show."}
+          </Card>
+        )
       ) : (
         <div className="space-y-2">
           {visibleRows.map((b) => {

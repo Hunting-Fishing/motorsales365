@@ -76,7 +76,7 @@ export function SiteHeader() {
     navigate({ to: "/" });
   };
 
-  const myBusinesses = useMyBusinesses(user?.id);
+  const { list: myBusinesses, setup: businessSetup } = useMyBusinesses(user?.id);
 
 
   return (
@@ -110,6 +110,15 @@ export function SiteHeader() {
                 </Link>
               ) : (
                 <span className="font-medium text-foreground">{profileName}</span>
+              )}
+              {businessSetup.needed && (
+                <Link
+                  to="/businesses/submit"
+                  className="ml-2 inline-flex items-center gap-1 rounded-full border border-amber-500/60 bg-amber-500/10 px-2 py-0.5 text-[10px] font-semibold text-amber-700 hover:bg-amber-500/20 dark:text-amber-300"
+                  title="Finish setting up your business"
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-amber-500" /> Setup pending
+                </Link>
               )}
             </span>
           )}
@@ -269,7 +278,7 @@ export function SiteHeader() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64">
-                {myBusinesses.length > 0 && (
+                {(myBusinesses.length > 0 || businessSetup.needed) && (
                   <>
                     <div className="px-2 pb-1 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                       My businesses
@@ -300,6 +309,32 @@ export function SiteHeader() {
                         </div>
                       </div>
                     ))}
+                    {businessSetup.needed && (
+                      <div className="px-1 pb-1">
+                        <DropdownMenuItem asChild>
+                          <Link
+                            to="/businesses/submit"
+                            className="flex items-start gap-2 rounded-md border border-amber-500/50 bg-amber-500/10 px-2 py-2 text-amber-800 hover:bg-amber-500/20 dark:text-amber-200"
+                          >
+                            <Plus className="mt-0.5 h-4 w-4 shrink-0" />
+                            <div className="min-w-0">
+                              <div className="text-sm font-semibold">
+                                Finish setting up your
+                                {businessSetup.kindLabel
+                                  ? ` ${businessSetup.kindLabel.toLowerCase()}`
+                                  : ""}{" "}
+                                business
+                              </div>
+                              <div className="truncate text-[11px] opacity-80">
+                                {businessSetup.name
+                                  ? `Continue with ${businessSetup.name}`
+                                  : "Add details to publish your page"}
+                              </div>
+                            </div>
+                          </Link>
+                        </DropdownMenuItem>
+                      </div>
+                    )}
                     <DropdownMenuSeparator />
                   </>
                 )}
@@ -533,7 +568,7 @@ export function SiteHeader() {
 
                 {user && (
                   <>
-                    {myBusinesses.length > 0 && (
+                    {(myBusinesses.length > 0 || businessSetup.needed) && (
                       <>
                         <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                           My businesses
@@ -563,6 +598,25 @@ export function SiteHeader() {
                               </SheetClose>
                             </div>
                           ))}
+                          {businessSetup.needed && (
+                            <div className="px-3">
+                              <SheetClose asChild>
+                                <Link
+                                  to="/businesses/submit"
+                                  className="flex items-start gap-2 rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-3 text-sm font-medium text-amber-800 hover:bg-amber-500/20 dark:text-amber-200"
+                                >
+                                  <Plus className="mt-0.5 h-4 w-4 shrink-0" />
+                                  <span className="min-w-0">
+                                    Finish setting up your
+                                    {businessSetup.kindLabel
+                                      ? ` ${businessSetup.kindLabel.toLowerCase()}`
+                                      : ""}{" "}
+                                    business
+                                  </span>
+                                </Link>
+                              </SheetClose>
+                            </div>
+                          )}
                         </div>
                       </>
                     )}
@@ -709,29 +763,68 @@ export function SiteHeader() {
 }
 
 type MyBiz = { id: string; name: string; type_slug: string | null };
+type BusinessSetup = {
+  needed: boolean;
+  kind: string | null;
+  kindLabel: string | null;
+  name: string | null;
+};
 
-function useMyBusinesses(userId?: string) {
+function kindToLabel(k: string | null): string | null {
+  if (!k) return null;
+  return k
+    .split(/[-_\s]+/)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+function useMyBusinesses(userId?: string): { list: MyBiz[]; setup: BusinessSetup } {
   const [list, setList] = useState<MyBiz[]>([]);
+  const [setup, setSetup] = useState<BusinessSetup>({
+    needed: false,
+    kind: null,
+    kindLabel: null,
+    name: null,
+  });
   useEffect(() => {
     if (!userId) {
       setList([]);
+      setSetup({ needed: false, kind: null, kindLabel: null, name: null });
       return;
     }
     let cancelled = false;
-    supabase
-      .from("businesses")
-      .select("id,name,type_slug,status")
-      .eq("owner_id", userId)
-      .in("status", ["active", "pending", "hidden"])
-      .order("created_at", { ascending: false })
-      .limit(6)
-      .then(({ data }) => {
-        if (!cancelled) setList((data ?? []) as MyBiz[]);
+    (async () => {
+      const [{ data: biz }, { data: prof }] = await Promise.all([
+        supabase
+          .from("businesses")
+          .select("id,name,type_slug,status")
+          .eq("owner_id", userId)
+          .in("status", ["active", "pending", "hidden"])
+          .order("created_at", { ascending: false })
+          .limit(6),
+        (supabase as any)
+          .from("profiles")
+          .select("seller_type, business_kind, business_name")
+          .eq("id", userId)
+          .maybeSingle(),
+      ]);
+      if (cancelled) return;
+      const rows = (biz ?? []) as MyBiz[];
+      setList(rows);
+      const sellerType = (prof as any)?.seller_type as string | undefined;
+      const kind = ((prof as any)?.business_kind as string | null) ?? null;
+      const bname = ((prof as any)?.business_name as string | null) ?? null;
+      setSetup({
+        needed: sellerType === "business" && rows.length === 0,
+        kind,
+        kindLabel: kindToLabel(kind),
+        name: bname,
       });
+    })();
     return () => {
       cancelled = true;
     };
   }, [userId]);
-  return list;
+  return { list, setup };
 }
 

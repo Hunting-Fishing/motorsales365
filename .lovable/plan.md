@@ -1,72 +1,45 @@
-# Plan limit enforcement + auto-upgrade
+# Finish "set up your business" for incomplete business signups
 
-Make the billing dashboard's caps real: block create paths that exceed plan limits, auto-bump the subscription when the user has opted in, and disable "+ Add" buttons in the UI when at cap.
+## What's actually happening
 
-## 1. Shared limit helper
+Your account signed up as **seller_type = "business"**, **business_kind = "towing"**, **business_name = "365 TOWING TEST"** — but there is **no row in the `businesses` table** for you yet. Every "My businesses" surface (sidebar, account dropdown, My businesses page, workspace links) is gated on actual `businesses` rows, so they all correctly show empty. Nothing is broken — the gap is that the app never *invites* you to finish creating the business record after signup, so it looks like a bug.
 
-New `src/lib/business-plan-enforcement.server.ts` (server-only):
+The header welcome strip pulls the name from `profiles.business_name`, which is why "Welcome: 365 Tow Company 365 Towing" still shows even though no business exists.
 
-- `PlanLimitError` class (typed: `{ limitKey, current, cap, tier, businessId }`).
-- `assertWithinLimit(businessId, limitKey, increment = 1)`:
-  - Loads current `business_subscriptions` row + `business_plans.limits` for the business.
-  - Counts current usage for `limitKey` (reuses the same count queries already in `getBusinessPlanUsage`).
-  - Throws `PlanLimitError` when `current + increment > cap` (treats `null`/missing cap as unlimited).
-- `tryAutoUpgrade(businessId, limitKey)`:
-  - Reads `business_subscriptions.auto_upgrade`.
-  - Finds the next-higher `business_plans` row (by `sort_order` / price) whose `limits[limitKey]` accommodates the new usage.
-  - Updates `business_subscriptions.plan_id` + writes a `business_plan_change_log` entry (reason `auto_upgrade`, triggered_by `system`).
-  - Returns `{ upgraded: true, newTier }` or `{ upgraded: false, reason }`.
-- `enforceLimit(businessId, limitKey, increment?)`: wraps assert → on `PlanLimitError`, if auto-upgrade enabled, run `tryAutoUpgrade` and re-assert; otherwise rethrow.
+## Fix: detect the incomplete state and surface a guided CTA
 
-Stripe proration is out of scope for this step (existing subscription rows are local-only); the change log + plan swap is enough to unlock the action. A follow-up can wire Stripe `subscriptions.update` when billing goes live.
+A user is "incomplete-business" when:
+`profile.seller_type === "business"` AND no row exists in `businesses` where `owner_id = user.id`.
 
-## 2. Wire enforcement into create paths
+When that's true, every place that currently hides "My businesses" instead shows a single bright CTA: **"Finish setting up your towing business"** (kind comes from `profile.business_kind`) that deep-links to `/businesses/submit?type=<kind>&name=<business_name>` with the signup info pre-filled.
 
-Add `await enforceLimit(...)` at the top of each handler, before the insert:
+### 1. Account dropdown (`src/components/site-header.tsx`)
+- Keep the "My businesses" section header always visible for `seller_type=business`.
+- If `myBusinesses.length === 0`, render a single highlighted item: **"Finish setting up your <kind> business"** → `/businesses/submit?type=<kind>&name=<encoded business_name>`.
+- Same change in the mobile sheet block (line ~539).
 
-- `src/lib/business-staff.functions.ts` → `addBusinessStaffByEmail` → `enforceLimit(businessId, "staff")`.
-- `src/lib/business-assets.functions.ts` → `upsertBusinessAsset` → only on insert (no `id` provided) → `enforceLimit(businessId, "assets")`.
-- `src/lib/business-inventory.functions.ts` → `upsertBusinessInventoryItem` → insert-only → `enforceLimit(businessId, "inventory_skus")`.
-- `src/lib/business-workspace.functions.ts` (or wherever listings/tow jobs are created from the workspace) → `enforceLimit(businessId, "listings")` / `"tow_jobs_month"`.
+### 2. Dashboard sidebar / nav (left rail in the second screenshot)
+- Find the "My businesses" entry. When the user is incomplete-business, add a small amber dot/badge ("Set up") next to the label, and on hover/click route to the same submit URL with prefill.
 
-Each handler catches `PlanLimitError` and returns `{ error: "plan_limit", limitKey, current, cap, tier }` so the client can show a tailored toast linking to `/billing`.
+### 3. My businesses page (`src/routes/dashboard.businesses.tsx`)
+- Replace the generic empty state ("You haven't listed any business yet.") with a tailored card when `seller_type=business`:
+  - Title: **"Finish setting up <business_name>"**
+  - Sub: "You signed up as a towing business. Add a few details to publish your page and unlock your workspace."
+  - Primary button: **Continue setup** → `/businesses/submit?type=towing&name=…&kind=…`
+  - Secondary: **Switch account type** → `/dashboard/profile`
+- Keep the existing empty state as a fallback for non-business sellers.
 
-## 3. Change log table
+### 4. Prefill `/businesses/submit`
+- Read `type`, `name`, `kind` from URL search params and seed the corresponding form fields on mount. Falls back to current defaults when params are absent. No behavior change for users who land there without params.
 
-New migration adds `public.business_plan_change_log`:
-
-- `business_id`, `from_plan_id`, `to_plan_id`, `reason` (`auto_upgrade` | `manual` | `downgrade` | `cancel`), `triggered_by` (`user` | `system`), `metadata jsonb`, timestamps.
-- RLS: business owner + staff with `manage_billing` can SELECT; only `service_role` can INSERT (writes happen server-side).
-- GRANT SELECT to authenticated, ALL to service_role.
-
-Surfaced on the billing page as a "Plan history" list below usage meters.
-
-## 4. Client-side guard
-
-New `src/hooks/use-plan-guard.ts`:
-
-- Wraps `getBusinessPlanUsage` query and exposes `{ atLimit, remaining, cap, tier, autoUpgrade }` per `limitKey`.
-- Returns a `<LimitTooltip limitKey>` helper that renders a disabled state with "You've reached your {tier} plan's {limit} cap — upgrade to add more" linking to billing.
-
-Apply to "+ Add staff", "+ Add asset", "+ Add inventory item", "+ New listing" buttons in the workspace routes. Buttons stay enabled when `autoUpgrade` is on (the server will handle the bump), but show a small "Auto-upgrade will apply" hint.
-
-## 5. Billing page additions
-
-Edit `src/routes/dashboard.business.$businessId.billing.tsx`:
-
-- Add "Plan history" card listing the 10 most recent change-log rows (from → to, reason, when).
-- When `usage[k] >= limits[k]` and `autoUpgrade` is off, highlight the meter red and show inline "Upgrade now" button next to the matching tier.
-
-## 6. Technical notes
-
-- All counts already exist in `getBusinessPlanUsage`; extract them into a shared `countBusinessUsage(supabase, businessId)` helper in `business-plan-usage.server.ts` so both `getBusinessPlanUsage` and `assertWithinLimit` use one source of truth.
-- `tow_jobs_month` resets on `current_period_start` of the subscription — use that as the lower bound for the count.
-- Auto-upgrade must be idempotent: if two parallel creates trip the cap, both call `tryAutoUpgrade`; serialize via `select … for update` on `business_subscriptions` inside a transaction (single RPC).
-- No Stripe API calls in this step. When Stripe is wired later, `tryAutoUpgrade` will additionally call `stripe.subscriptions.update` with proration; the local plan swap stays the source of truth for gating.
+### 5. Welcome strip honesty (small polish)
+- In `site-header.tsx`, when incomplete-business, append a small ✱ chip next to the welcome name: **"Setup pending"** → links to the submit page. Makes it obvious why "My businesses" appears empty while the welcome still uses the business name.
 
 ## Files
+- **Edited**: `src/components/site-header.tsx`, `src/routes/dashboard.businesses.tsx`, `src/routes/businesses.submit.tsx` (or wherever the submit form lives — will confirm during build), and the dashboard sidebar (likely `src/components/dashboard-sidebar.tsx`).
+- **No schema changes**, no new server functions — pure UX wiring on top of fields that already exist (`profiles.seller_type`, `business_kind`, `business_name`).
 
-- **New**: `src/lib/business-plan-enforcement.server.ts`, `src/lib/business-plan-usage.server.ts` (extracted helper), `src/hooks/use-plan-guard.ts`, `src/components/business-workspace/limit-tooltip.tsx`, `supabase/migrations/<ts>_plan_change_log.sql`.
-- **Edited**: `src/lib/business-staff.functions.ts`, `src/lib/business-assets.functions.ts`, `src/lib/business-inventory.functions.ts`, `src/lib/business-plan-usage.functions.ts`, `src/routes/dashboard.business.$businessId.billing.tsx`, `src/routes/dashboard.business.$businessId.staff.tsx`, `src/routes/dashboard.business.$businessId.fleet.tsx`, `src/routes/dashboard.business.$businessId.inventory.tsx`.
+## Note on the existing record
+The row you see in the welcome strip is just `profiles.business_name`. There is genuinely no business yet to "link" to — completing the submit form is what creates it. Once submitted (and `status` becomes `active` or even `pending`), every quick link in the dropdown/sidebar/workspace lights up automatically; no extra wiring needed.
 
 Approve to build.
