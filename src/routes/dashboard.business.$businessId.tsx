@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { getWorkspaceBusiness } from "@/lib/business-workspace.functions";
 import { WorkspaceSidebar } from "@/components/business-workspace/sidebar";
+import { WorkspaceNotificationsProvider } from "@/components/business-workspace/notifications-provider";
+import { WorkspaceNotificationBell } from "@/components/business-workspace/notification-bell";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 
@@ -63,18 +65,27 @@ function WorkspaceLayout() {
   const { business, role } = q.data;
 
   return (
-    <div className="container mx-auto p-2 md:p-4">
-      <div className="flex flex-col md:flex-row gap-4">
-        <WorkspaceSidebar
-          businessId={business.id}
-          businessName={business.name}
-          businessKind={business.type_slug}
-          role={role as any}
-        />
-        <main className="flex-1 min-w-0">
-          <Outlet />
-        </main>
+    <WorkspaceNotificationsProvider businessId={business.id}>
+      <div className="container mx-auto p-2 md:p-4">
+        <div className="flex items-center justify-between mb-3 px-1">
+          <div className="text-sm text-muted-foreground truncate">
+            <span className="font-medium text-foreground">{business.name}</span> workspace
+          </div>
+          <WorkspaceNotificationBell />
+        </div>
+        <div className="flex flex-col md:flex-row gap-4">
+          <WorkspaceSidebar
+            businessId={business.id}
+            businessName={business.name}
+            businessKind={business.type_slug}
+            role={role as any}
+          />
+          <main className="flex-1 min-w-0">
+            <Outlet />
+          </main>
+        </div>
       </div>
-    </div>
+    </WorkspaceNotificationsProvider>
   );
 }
+
