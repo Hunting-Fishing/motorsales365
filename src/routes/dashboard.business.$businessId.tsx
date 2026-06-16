@@ -31,6 +31,13 @@ function WorkspaceLayout() {
     queryFn: () => load({ data: { businessId } }),
   });
 
+  const loadUsage = useServerFn(getBusinessPlanUsage);
+  const usageQ = useQuery({
+    queryKey: ["business-plan-usage", businessId],
+    enabled: !!q.data?.business?.id,
+    queryFn: () => loadUsage({ data: { businessId } }),
+  });
+
   if (loading || (user && q.isLoading)) {
     return (
       <div className="container mx-auto p-4">
