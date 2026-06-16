@@ -22,6 +22,47 @@ const lenientUrl = (max = 500) =>
       }
     });
 
+const HIDDEN_BUSINESS_STATUSES = ["archived", "hidden", "removed", "banned"] as const;
+
+export const resolveBusinessMiniSiteSlug = createServerFn({ method: "GET" })
+  .inputValidator((input: { slug: string }) =>
+    z.object({ slug: z.string().min(1).max(200) }).parse(input),
+  )
+  .handler(async ({ data }) => {
+    const lookup = data.slug.trim().toLowerCase();
+
+    const select = "id,slug,vanity_slug,status";
+    const { data: initial, error } = await supabaseAdmin
+      .from("businesses")
+      .select(select)
+      .or(`slug.eq.${lookup},vanity_slug.eq.${lookup}`)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+
+    let biz = initial;
+    if (!biz) {
+      const { data: hist } = await supabaseAdmin
+        .from("business_slug_history")
+        .select("business_id")
+        .ilike("old_slug", lookup)
+        .limit(1)
+        .maybeSingle();
+      if (hist) {
+        const { data: historical } = await supabaseAdmin
+          .from("businesses")
+          .select(select)
+          .eq("id", (hist as any).business_id)
+          .maybeSingle();
+        biz = historical ?? null;
+      }
+    }
+
+    if (!biz || HIDDEN_BUSINESS_STATUSES.includes(String((biz as any).status) as any)) {
+      return { business: null };
+    }
+    return { business: biz as { id: string; slug: string; vanity_slug: string | null; status: string } };
+  });
+
 
 // ============== PUBLIC ==============
 
@@ -60,7 +101,9 @@ export const getBusinessPage = createServerFn({ method: "GET" })
         biz = b2 ?? null;
       }
     }
-    if (!biz) return { business: null };
+    if (!biz || HIDDEN_BUSINESS_STATUSES.includes(String((biz as any).status) as any)) {
+      return { business: null };
+    }
 
     const [
       { data: typeRow },
