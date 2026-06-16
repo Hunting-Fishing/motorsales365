@@ -93,6 +93,7 @@ export const Route = createFileRoute("/businesses/$slug")({
       `${b.name}${loc ? ` in ${loc}` : ""} — automotive business on 365 MotorSales Philippines.`
     ).slice(0, 155);
     const img = b.cover_url ?? b.logo_url ?? null;
+    const isPending = b.status === "pending";
     return {
       meta: [
         { title },
@@ -110,6 +111,7 @@ export const Route = createFileRoute("/businesses/$slug")({
         { name: "twitter:card", content: "summary_large_image" },
         { name: "twitter:title", content: title },
         { name: "twitter:description", content: desc },
+        ...(isPending ? [{ name: "robots", content: "noindex,follow" }] : []),
       ],
       links: [{ rel: "canonical", href: url }],
       scripts: [
