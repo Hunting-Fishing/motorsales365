@@ -204,7 +204,7 @@ export function WorkspaceNotificationsProvider({
           "inquiry",
           `New inquiry from ${row.name ?? "customer"}`,
           (row.message ?? "").slice(0, 120),
-          () => navigate({ to: "/dashboard/business/$businessId" as any, params: { businessId } }),
+          () => navigate({ to: `/dashboard/business/${businessId}` as any }),
         );
         qc.invalidateQueries({ queryKey });
       },
@@ -221,7 +221,7 @@ export function WorkspaceNotificationsProvider({
           "booking",
           `New booking from ${row.customer_name ?? "customer"}`,
           `Starts ${new Date(row.starts_at).toLocaleString()}`,
-          () => navigate({ to: "/dashboard/business/$businessId" as any, params: { businessId } }),
+          () => navigate({ to: `/dashboard/business/${businessId}` as any }),
         );
         qc.invalidateQueries({ queryKey });
       },
