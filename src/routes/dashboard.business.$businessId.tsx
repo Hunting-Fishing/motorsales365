@@ -72,14 +72,34 @@ function WorkspaceLayout() {
 
   const { business, role } = q.data;
 
+  const usage = usageQ.data;
+  const tone =
+    usage?.status === "past_due"
+      ? "border-destructive/40 bg-destructive/10 text-destructive"
+      : "border-primary/30 bg-primary/5 text-foreground";
+
   return (
     <WorkspaceNotificationsProvider businessId={business.id}>
       <div className="container mx-auto p-2 md:p-4">
-        <div className="flex items-center justify-between mb-3 px-1">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-3 px-1">
           <div className="text-sm text-muted-foreground truncate">
             <span className="font-medium text-foreground">{business.name}</span> workspace
           </div>
-          <WorkspaceNotificationBell />
+          <div className="flex items-center gap-2">
+            {usage && (
+              <Link
+                to="/dashboard/business/$businessId/billing"
+                params={{ businessId: business.id }}
+                className={`hidden sm:flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium hover:opacity-90 ${tone}`}
+              >
+                <span className="capitalize">Plan: {usage.tier}</span>
+                {usage.daysRemaining != null && (
+                  <span className="opacity-80">· {usage.daysRemaining}d left</span>
+                )}
+              </Link>
+            )}
+            <WorkspaceNotificationBell />
+          </div>
         </div>
         <div className="flex flex-col md:flex-row gap-4">
           <WorkspaceSidebar
