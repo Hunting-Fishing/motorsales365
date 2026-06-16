@@ -80,6 +80,19 @@ export const createBusinessSubscriptionCheckout = createServerFn({ method: "POST
     if (!plan || !(plan as any).active) throw new Error("Plan not available");
     const lookupKey = (plan as any).stripe_lookup_key as string;
 
+    // Compute the multi-business discount this business is eligible for
+    // (ordered by created_at; 2nd=10%, 3rd=15%, 4th+=20% off).
+    const { data: ownedRows } = await supabase
+      .from("businesses")
+      .select("id, created_at")
+      .eq("owner_id", userId)
+      .in("status", ["active", "pending"])
+      .order("created_at", { ascending: true });
+    const ownedList = ownedRows ?? [];
+    const ordinal = ownedList.findIndex((r: any) => r.id === data.businessId);
+    const { discountForOrdinal } = await import("@/lib/multi-business-discount");
+    const discount = discountForOrdinal(ordinal < 0 ? ownedList.length : ordinal);
+
     const stripe = createStripeClient(data.environment);
     const prices = await stripe.prices.list({ lookup_keys: [lookupKey], limit: 1 });
     if (!prices.data.length) throw new Error("Stripe price not found");
@@ -90,6 +103,26 @@ export const createBusinessSubscriptionCheckout = createServerFn({ method: "POST
 
     const productName = `${(plan as any).description ?? data.planSlug} — ${(biz as any).name}`;
 
+    // Create an on-the-fly Stripe coupon for the multi-business discount so
+    // it shows on the checkout, on Stripe invoices and on subscription
+    // renewals (forever — duration=forever). `managed_payments` is
+    // compatible with `discounts`.
+    let discountStripeArg: any = undefined;
+    if (discount.percentOff > 0) {
+      const coupon = await stripe.coupons.create({
+        percent_off: discount.percentOff,
+        duration: "forever",
+        name: `${discount.percentOff}% off — additional business #${discount.ordinal + 1}`,
+        metadata: {
+          kind: "multi_business",
+          userId,
+          businessId: data.businessId,
+          ordinal: String(discount.ordinal),
+        },
+      });
+      discountStripeArg = [{ coupon: coupon.id }];
+    }
+
     const session = await stripe.checkout.sessions.create({
       line_items: [{ price: stripePrice.id, quantity: 1 }],
       mode: "subscription",
@@ -99,6 +132,7 @@ export const createBusinessSubscriptionCheckout = createServerFn({ method: "POST
       // End-to-end tax/fraud/disputes handled by Stripe. Conflicts with
       // customer_update, so that's omitted.
       managed_payments: { enabled: true },
+      ...(discountStripeArg ? { discounts: discountStripeArg } : {}),
       metadata: {
         userId,
         kind: "business",
@@ -106,6 +140,8 @@ export const createBusinessSubscriptionCheckout = createServerFn({ method: "POST
         planSlug: data.planSlug,
         lookup_key: lookupKey,
         managed_payments: "true",
+        multi_business_percent_off: String(discount.percentOff),
+        multi_business_ordinal: String(discount.ordinal),
       },
       subscription_data: {
         description: productName,
@@ -115,6 +151,7 @@ export const createBusinessSubscriptionCheckout = createServerFn({ method: "POST
           businessId: data.businessId,
           planSlug: data.planSlug,
           lookup_key: lookupKey,
+          multi_business_percent_off: String(discount.percentOff),
         },
       },
     } as any);
