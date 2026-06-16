@@ -180,6 +180,8 @@ function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
             bookableItems: (data as any).bookableItems ?? [],
             availability: (data as any).availability ?? [],
           }}
+          userId={user.id}
+          onSaved={() => refetch()}
           onJumpTab={(v, anchor) => {
             if (validTabs.includes(v)) setActiveTab(v);
             if (anchor) {
