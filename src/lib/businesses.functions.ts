@@ -3,6 +3,25 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { hasStructuredOpenDay } from "@/lib/business-hours";
 
+// Lenient URL: accept bare domain, normalize to https://, allow null/empty.
+const lenientUrl = (max = 500) =>
+  z
+    .string()
+    .max(max)
+    .nullable()
+    .optional()
+    .transform((v) => {
+      if (v == null) return v;
+      const t = v.trim();
+      if (!t) return null;
+      const withScheme = /^https?:\/\//i.test(t) ? t : `https://${t}`;
+      try {
+        return new URL(withScheme).toString();
+      } catch {
+        throw new Error(`Invalid URL: ${v}`);
+      }
+    });
+
 function slugify(s: string): string {
   return s
     .toLowerCase()
@@ -12,6 +31,7 @@ function slugify(s: string): string {
     .replace(/^-+|-+$/g, "")
     .slice(0, 60);
 }
+
 
 /**
  * Submit a new business listing. Validates input, generates a unique slug
@@ -27,11 +47,11 @@ export const submitBusiness = createServerFn({ method: "POST" })
         name: z.string().trim().min(2).max(120),
         type_slug: z.string().min(1).max(60),
         description: z.string().max(2000).nullable().optional(),
-        logo_url: z.string().url().nullable().optional(),
+        logo_url: lenientUrl(2048),
         phone: z.string().max(40).nullable().optional(),
         email: z.string().email().max(200).nullable().optional(),
-        website: z.string().url().max(500).nullable().optional(),
-        messenger_url: z.string().url().max(500).nullable().optional(),
+        website: lenientUrl(500),
+        messenger_url: lenientUrl(500),
         street_address: z.string().max(300).nullable().optional(),
         region: z.string().max(120).nullable().optional(),
         province: z.string().max(120).nullable().optional(),

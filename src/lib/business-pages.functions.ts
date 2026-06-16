@@ -3,6 +3,26 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
+// Lenient URL: accept bare domain, normalize to https://, allow null/empty.
+const lenientUrl = (max = 500) =>
+  z
+    .string()
+    .max(max)
+    .nullable()
+    .optional()
+    .transform((v) => {
+      if (v == null) return v;
+      const t = v.trim();
+      if (!t) return null;
+      const withScheme = /^https?:\/\//i.test(t) ? t : `https://${t}`;
+      try {
+        return new URL(withScheme).toString();
+      } catch {
+        throw new Error(`Invalid URL: ${v}`);
+      }
+    });
+
+
 // ============== PUBLIC ==============
 
 /**
@@ -350,8 +370,8 @@ export const updateBusinessPageSettings = createServerFn({ method: "POST" })
         description: z.string().max(4000).nullable().optional(),
         phone: z.string().max(40).nullable().optional(),
         email: z.string().email().max(200).nullable().optional(),
-        website: z.string().url().max(500).nullable().optional(),
-        messenger_url: z.string().url().max(500).nullable().optional(),
+        website: lenientUrl(500),
+        messenger_url: lenientUrl(500),
         brands_carried: z.string().max(2000).nullable().optional(),
         theme_color: z
           .string()
@@ -364,9 +384,9 @@ export const updateBusinessPageSettings = createServerFn({ method: "POST" })
         show_gallery: z.boolean().optional(),
         show_contact: z.boolean().optional(),
         cta_primary: z.enum(["inquiry", "call", "messenger"]).optional(),
-        logo_url: z.string().url().nullable().optional(),
-        cover_url: z.string().url().nullable().optional(),
-        featured_video_url: z.string().url().max(500).nullable().optional(),
+        logo_url: lenientUrl(2048),
+        cover_url: lenientUrl(2048),
+        featured_video_url: lenientUrl(500),
         featured_video_provider: z.enum(["youtube", "vimeo", "facebook"]).nullable().optional(),
         // Location fields (editable post-submission)
         street_address: z.string().max(300).nullable().optional(),
