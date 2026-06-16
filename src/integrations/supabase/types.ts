@@ -9100,6 +9100,11 @@ export type Database = {
         }[]
       }
       get_trust_score: { Args: { _user_id: string }; Returns: number }
+      get_wanted_post_contact: { Args: { _post_id: string }; Returns: string }
+      get_wanted_response_contact: {
+        Args: { _response_id: string }
+        Returns: string
+      }
       grant_member_reward: {
         Args: {
           _amount: number
