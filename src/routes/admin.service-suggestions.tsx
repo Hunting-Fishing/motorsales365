@@ -77,6 +77,7 @@ function ServiceSuggestionsAdmin() {
     setTitle(row.proposed_title);
     setDesc(row.proposed_description ?? "");
     setUnit(row.proposed_unit ?? "");
+    setNote("");
   };
   const openReject = (row: Suggestion) => {
     setAction({ kind: "reject", row });
