@@ -218,6 +218,13 @@ const NAV: {
     info: "Approve user-submitted services into the shared catalog.",
   },
   {
+    to: "/admin/service-suggestion-audit",
+    label: "Service audit log",
+    Icon: Sparkles,
+    roles: ["admin"],
+    info: "History of approve/reject/merge decisions on custom service suggestions.",
+  },
+  {
     to: "/admin/verifications",
     label: "Verifications",
     Icon: ShieldCheck,
