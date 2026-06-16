@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import {
   Menu,
   Plus,
@@ -16,10 +17,13 @@ import {
   Users,
   BarChart3,
   Inbox,
+  Building2,
+  CreditCard,
 } from "lucide-react";
 import { useAuth, type SellerType } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/brand-logo";
+import { supabase } from "@/integrations/supabase/client";
 
 import {
   DropdownMenu,
