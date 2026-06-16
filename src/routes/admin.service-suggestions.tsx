@@ -235,6 +235,15 @@ function ServiceSuggestionsAdmin() {
                     <Label>Description</Label>
                     <Textarea value={desc} onChange={(e) => setDesc(e.target.value)} rows={3} />
                   </div>
+                  <div>
+                    <Label>Admin note (optional)</Label>
+                    <Textarea
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                      rows={2}
+                      placeholder="Visible internally; useful for context on the decision."
+                    />
+                  </div>
                 </div>
               ) : (
                 <div>
