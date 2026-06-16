@@ -629,3 +629,31 @@ export function SiteHeader() {
     </header>
   );
 }
+
+type MyBiz = { id: string; name: string; type_slug: string | null };
+
+function useMyBusinesses(userId?: string) {
+  const [list, setList] = useState<MyBiz[]>([]);
+  useEffect(() => {
+    if (!userId) {
+      setList([]);
+      return;
+    }
+    let cancelled = false;
+    supabase
+      .from("businesses")
+      .select("id,name,type_slug,status")
+      .eq("owner_id", userId)
+      .in("status", ["active", "pending", "hidden"])
+      .order("created_at", { ascending: false })
+      .limit(6)
+      .then(({ data }) => {
+        if (!cancelled) setList((data ?? []) as MyBiz[]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+  return list;
+}
+
