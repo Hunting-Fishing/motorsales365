@@ -568,7 +568,7 @@ export function SiteHeader() {
 
                 {user && (
                   <>
-                    {myBusinesses.length > 0 && (
+                    {(myBusinesses.length > 0 || businessSetup.needed) && (
                       <>
                         <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                           My businesses
@@ -598,6 +598,25 @@ export function SiteHeader() {
                               </SheetClose>
                             </div>
                           ))}
+                          {businessSetup.needed && (
+                            <div className="px-3">
+                              <SheetClose asChild>
+                                <Link
+                                  to="/businesses/submit"
+                                  className="flex items-start gap-2 rounded-md border border-amber-500/50 bg-amber-500/10 px-3 py-3 text-sm font-medium text-amber-800 hover:bg-amber-500/20 dark:text-amber-200"
+                                >
+                                  <Plus className="mt-0.5 h-4 w-4 shrink-0" />
+                                  <span className="min-w-0">
+                                    Finish setting up your
+                                    {businessSetup.kindLabel
+                                      ? ` ${businessSetup.kindLabel.toLowerCase()}`
+                                      : ""}{" "}
+                                    business
+                                  </span>
+                                </Link>
+                              </SheetClose>
+                            </div>
+                          )}
                         </div>
                       </>
                     )}
