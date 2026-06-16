@@ -3,6 +3,26 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
+// Lenient URL: accept bare domain, normalize to https://, allow null/empty.
+const lenientUrl = (max = 500) =>
+  z
+    .string()
+    .max(max)
+    .nullable()
+    .optional()
+    .transform((v) => {
+      if (v == null) return v;
+      const t = v.trim();
+      if (!t) return null;
+      const withScheme = /^https?:\/\//i.test(t) ? t : `https://${t}`;
+      try {
+        return new URL(withScheme).toString();
+      } catch {
+        throw new Error(`Invalid URL: ${v}`);
+      }
+    });
+
+
 // ============== PUBLIC ==============
 
 /**
