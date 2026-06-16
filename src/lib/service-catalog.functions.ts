@@ -90,7 +90,7 @@ export const getServicePriceStats = createServerFn({ method: "GET" })
       )
       .eq("catalog_id", data.catalogId)
       .eq("active", true)
-      .eq("businesses.status", "published");
+      .eq("businesses.status", "active");
     if (data.excludeBusinessId) q = q.neq("business_id", data.excludeBusinessId);
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
