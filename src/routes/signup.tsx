@@ -210,7 +210,10 @@ function SignupPage() {
         full_name: fullName || undefined,
         first_name: firstName.trim() || undefined,
         last_name: lastName.trim() || undefined,
+        email: email.trim() || undefined,
         phone: phoneE164 || undefined,
+        phone_iso: phoneIso || undefined,
+        phone_national: phoneNational.trim() || undefined,
         business_name: isBusinessLike ? businessName.trim() || undefined : undefined,
         business_address: isBusinessLike ? businessAddress.trim() || undefined : undefined,
         business_kind: isBusinessLike ? businessKind || undefined : undefined,
@@ -221,6 +224,8 @@ function SignupPage() {
         province: location.province ?? undefined,
         city: location.city ?? undefined,
         is_business: isBusinessLike,
+        agreed,
+        ref_code: refCode.trim() || undefined,
       };
       window.localStorage.setItem("signup.pending", JSON.stringify(payload));
     } catch {
