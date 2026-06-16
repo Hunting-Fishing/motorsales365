@@ -108,6 +108,35 @@ export const searchFbPagesForAdmin = createServerFn({ method: "POST" })
     };
   });
 
+export const searchWebsiteSignupsForAdmin = createServerFn({ method: "POST" })
+  .middleware([requireAdminRoleAudited("businesses.discover.searchWebsiteSignups")])
+  .inputValidator((d: unknown) =>
+    z
+      .object({ query: z.string().max(160).optional(), status: z.string().max(40).optional() })
+      .parse(d),
+  )
+  .handler(async ({ data }) => {
+    const q = (data.query ?? "").trim().replace(/[%,()]/g, " ").replace(/\s+/g, " ");
+    let query = supabaseAdmin
+      .from("businesses")
+      .select(
+        "id,name,slug,vanity_slug,status,type_slug,phone,email,website,city,region,created_at,updated_at,owner_id,source,logo_url,cover_url,description",
+      )
+      .not("owner_id", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (data.status && data.status !== "all") query = query.eq("status", data.status as any);
+    if (q.length >= 2) {
+      const pattern = `%${q}%`;
+      query = query.or(
+        `name.ilike.${pattern},slug.ilike.${pattern},vanity_slug.ilike.${pattern},phone.ilike.${pattern},email.ilike.${pattern},city.ilike.${pattern}`,
+      );
+    }
+    const { data: rows, error } = await query;
+    if (error) throw new Error(error.message);
+    return { rows: rows ?? [] };
+  });
+
 const ImportInput = z.object({
   rows: z
     .array(
