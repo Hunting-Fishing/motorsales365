@@ -72,6 +72,7 @@ function SignupPage() {
   const [phoneIso, setPhoneIso] = useState("PH");
   const [phoneNational, setPhoneNational] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [businessName, setBusinessName] = useState("");
   const [businessAddress, setBusinessAddress] = useState("");
