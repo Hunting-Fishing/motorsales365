@@ -438,6 +438,7 @@ function SubmitBusinessPage() {
   };
 
   const submitFn = useServerFn(submitBusiness);
+  const saveServicesFn = useServerFn(saveBusinessServices);
 
   const submit = async () => {
     if (!user) return;
