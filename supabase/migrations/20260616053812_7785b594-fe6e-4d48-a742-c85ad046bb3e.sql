@@ -1,0 +1,1 @@
+ALTER TABLE public.businesses DROP CONSTRAINT IF EXISTS businesses_source_external_id_key;
