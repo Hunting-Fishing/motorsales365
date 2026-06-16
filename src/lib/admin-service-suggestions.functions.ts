@@ -166,7 +166,7 @@ export const listServiceSuggestionAudit = createServerFn({ method: "GET" })
     let q = supabaseAdmin
       .from("service_suggestion_audit_log")
       .select(
-        "id, suggestion_id, actor_id, action, catalog_id, note, created_at, suggestion:suggestion_id ( proposed_title, business_type_slug ), actor:actor_id ( id, full_name, email )",
+        "id, suggestion_id, actor_id, action, catalog_id, note, created_at, suggestion:suggestion_id ( proposed_title, business_type_slug )",
       )
       .order("created_at", { ascending: false })
       .limit(data.limit ?? 200);
@@ -174,5 +174,15 @@ export const listServiceSuggestionAudit = createServerFn({ method: "GET" })
 
     const { data: rows, error } = await q;
     if (error) throw new Error(error.message);
-    return rows ?? [];
+
+    const actorIds = Array.from(new Set((rows ?? []).map((r: any) => r.actor_id).filter(Boolean)));
+    let actors: Record<string, { id: string; full_name: string | null; email: string | null }> = {};
+    if (actorIds.length) {
+      const { data: profs } = await supabaseAdmin
+        .from("profiles")
+        .select("id, full_name, email")
+        .in("id", actorIds);
+      for (const p of profs ?? []) actors[p.id] = p as any;
+    }
+    return (rows ?? []).map((r: any) => ({ ...r, actor: actors[r.actor_id] ?? null }));
   });
