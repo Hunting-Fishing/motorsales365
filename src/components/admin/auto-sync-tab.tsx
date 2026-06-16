@@ -83,6 +83,7 @@ export function AutoSyncTab() {
   const [selected, setSelected] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(false);
   const [running, setRunning] = useState(false);
+  const [queueQuery, setQueueQuery] = useState("");
 
   const [newQuery, setNewQuery] = useState("");
   const [newCity, setNewCity] = useState("");
@@ -158,6 +159,14 @@ export function AutoSyncTab() {
   }
 
   const selectedIds = Object.entries(selected).filter(([, v]) => v).map(([k]) => k);
+  const normalizedQueueQuery = queueQuery.trim().toLowerCase();
+  const filteredQueue = normalizedQueueQuery
+    ? queue.filter((r) =>
+        [r.name, r.address, r.phone, r.website, r.city, r.region, r.our_type]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(normalizedQueueQuery)),
+      )
+    : queue;
 
   async function importSelected() {
     if (!selectedIds.length) return;
@@ -257,7 +266,9 @@ export function AutoSyncTab() {
       <Card className="p-4">
         <div className="mb-3 flex items-center justify-between">
           <div>
-            <h3 className="font-semibold">Pending queue ({queue.length})</h3>
+            <h3 className="font-semibold">
+              Pending queue ({filteredQueue.length}{filteredQueue.length !== queue.length ? `/${queue.length}` : ""})
+            </h3>
             <p className="text-xs text-muted-foreground">
               New businesses discovered by the sync, plus updates detected on already-imported ones.
             </p>
@@ -276,11 +287,22 @@ export function AutoSyncTab() {
           </div>
         </div>
 
+        <div className="mb-3 max-w-xl">
+          <Label className="text-xs">Search pending queue</Label>
+          <Input
+            value={queueQuery}
+            onChange={(e) => setQueueQuery(e.target.value)}
+            placeholder="Business name, address, phone, website, city…"
+          />
+        </div>
+
         {queue.length === 0 ? (
           <p className="text-sm text-muted-foreground">Nothing pending. The hourly sync will refill this list.</p>
+        ) : filteredQueue.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No pending queue items match this search.</p>
         ) : (
           <div className="space-y-2">
-            {queue.map((r) => {
+            {filteredQueue.map((r) => {
               const importable = !!r.our_type && r.lat != null && r.lng != null;
               return (
                 <div key={r.id} className="flex items-start gap-3 rounded border p-3">

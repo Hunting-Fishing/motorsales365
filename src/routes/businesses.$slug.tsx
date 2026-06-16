@@ -62,13 +62,22 @@ import {
 export const Route = createFileRoute("/businesses/$slug")({
   loader: async ({ params }) => {
     try {
-      const { data } = await (supabase as any)
-        .from("businesses")
-        .select("name,description,tagline,city,region,logo_url,cover_url,status")
-        .eq("slug", params.slug)
-        .not("status", "in", "(archived,hidden,removed,banned)")
-        .maybeSingle();
-      return { seo: data ?? null };
+      const page = await getBusinessPage({ data: { slug: params.slug } });
+      const b: any = page.business;
+      return b
+        ? {
+            seo: {
+              name: b.name,
+              description: b.description,
+              tagline: b.tagline,
+              city: b.city,
+              region: b.region,
+              logo_url: b.logo_url,
+              cover_url: b.cover_url,
+              status: b.status,
+            },
+          }
+        : { seo: null };
     } catch {
       return { seo: null };
     }
