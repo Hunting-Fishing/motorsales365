@@ -5,6 +5,8 @@ import { SiteLayout } from "@/components/site-layout";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { submitBusiness } from "@/lib/businesses.functions";
+import { saveBusinessServices } from "@/lib/business-services-save.functions";
+import { ServicesTable, type DraftService } from "@/components/business/services-table";
 import { FormFeedbackLink } from "@/components/form-feedback";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -113,7 +115,7 @@ function SubmitBusinessPage() {
   const [lng, setLng] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [brandsCarried, setBrandsCarried] = useState("");
-  const [priceLabel, setPriceLabel] = useState("");
+  const [services, setServices] = useState<DraftService[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [logoUploading, setLogoUploading] = useState(false);
@@ -773,20 +775,8 @@ function SubmitBusinessPage() {
             />
           </div>
 
-          <div>
-            <Label>
-              Price / rate label{" "}
-              <span className="text-xs font-normal text-muted-foreground">
-                (optional, shown on map and profile)
-              </span>
-            </Label>
-            <Input
-              value={priceLabel}
-              onChange={(e) => setPriceLabel(e.target.value)}
-              maxLength={40}
-              placeholder="e.g. ₱65/L, From ₱500, Free estimate"
-            />
-          </div>
+          <ServicesTable typeSlug={typeSlug} value={services} onChange={setServices} />
+
 
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
