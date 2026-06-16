@@ -26,6 +26,14 @@ import {
   DialogFooter,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Search, Upload, X, Image as ImageIcon } from "lucide-react";
 import { LocationDrilldown, type LocationValue } from "@/components/businesses/location-drilldown";
 import { LocationPicker } from "@/components/businesses/location-picker";
@@ -589,55 +597,29 @@ function SubmitBusinessPage() {
           <div>
             <div className="mb-1 flex items-center justify-between gap-2">
               <Label>Business type *</Label>
-              <Dialog open={suggestOpen} onOpenChange={setSuggestOpen}>
-                <DialogTrigger asChild>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
                   <Button type="button" variant="outline" size="sm">
                     + Add
                   </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>Suggest a new business type</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-3">
-                    <p className="text-sm text-muted-foreground">
-                      Don't see your type? Suggest it below. Our admin team will review and either
-                      add it to the list or merge it with an existing type.
-                    </p>
-                    <div>
-                      <Label>Type name *</Label>
-                      <Input
-                        value={suggestLabel}
-                        onChange={(e) => setSuggestLabel(e.target.value)}
-                        maxLength={80}
-                        placeholder="e.g. Tire shop, Window tinting, Truck rental"
-                      />
-                    </div>
-                    <div>
-                      <Label>Notes (optional)</Label>
-                      <Textarea
-                        value={suggestNotes}
-                        onChange={(e) => setSuggestNotes(e.target.value)}
-                        maxLength={500}
-                        rows={3}
-                        placeholder="Briefly describe what businesses this type covers."
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button type="button" variant="ghost" onClick={() => setSuggestOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button
-                      type="button"
-                      onClick={submitTypeSuggestion}
-                      disabled={suggestSubmitting}
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="max-h-80 w-64 overflow-y-auto">
+                  <DropdownMenuLabel>Choose business type</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {types.map((t) => (
+                    <DropdownMenuItem
+                      key={t.slug}
+                      onSelect={() => {
+                        setTypeSlug(t.slug);
+                        setSelectedTags([]);
+                      }}
                     >
-                      {suggestSubmitting ? "Sending…" : "Send to admin"}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+                      {t.label}
+                      {typeSlug === t.slug ? " ✓" : ""}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             <Select
               value={typeSlug}
