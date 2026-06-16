@@ -151,7 +151,7 @@ export function OnboardingChecklist({
           <li key={it.key}>
             <button
               type="button"
-              onClick={() => !it.done && onJumpTab(it.tabValue)}
+              onClick={() => onJumpTab(it.tabValue, it.anchor)}
               className={cn(
                 "flex w-full items-center gap-3 rounded-md border border-transparent p-2 text-left transition-colors",
                 it.done ? "opacity-60" : "hover:border-border hover:bg-muted/40",
