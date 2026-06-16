@@ -133,7 +133,7 @@ export const getBusinessPlanUsage = createServerFn({ method: "POST" })
         ? supabase
             .from("listings")
             .select("id", { count: "exact", head: true })
-            .eq("seller_id", providerId)
+            .eq("user_id", providerId)
             .eq("status", "active")
         : Promise.resolve({ count: 0 } as any),
       providerId
