@@ -6735,6 +6735,51 @@ export type Database = {
           },
         ]
       }
+      service_suggestion_audit_log: {
+        Row: {
+          action: string
+          actor_id: string
+          catalog_id: string | null
+          created_at: string
+          id: string
+          note: string | null
+          suggestion_id: string
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          catalog_id?: string | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          suggestion_id: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          catalog_id?: string | null
+          created_at?: string
+          id?: string
+          note?: string | null
+          suggestion_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_suggestion_audit_log_catalog_id_fkey"
+            columns: ["catalog_id"]
+            isOneToOne: false
+            referencedRelation: "service_catalog"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "service_suggestion_audit_log_suggestion_id_fkey"
+            columns: ["suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "service_catalog_suggestions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       share_kit_layouts: {
         Row: {
           cx: number
