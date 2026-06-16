@@ -46,8 +46,10 @@ export const Route = createFileRoute("/b/$slug")({
       }
     }
 
-    if (!biz || (biz as any).status !== "active") {
-      // Archived, hidden, pending or unknown → don't expose via direct link.
+    const HIDDEN_STATUSES = new Set(["archived", "hidden", "removed", "banned"]);
+    if (!biz || HIDDEN_STATUSES.has(String((biz as any).status))) {
+      // Truly suppressed (archived/hidden/etc.) → don't expose via direct link.
+      // Pending businesses ARE exposed — they are the owner's mini-site.
       throw redirect({ to: "/businesses" });
     }
     throw redirect({ to: "/businesses/$slug", params: { slug: (biz as any).slug } });
