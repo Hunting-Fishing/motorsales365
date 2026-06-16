@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useAuth } from "@/hooks/use-auth";
 import { useServerFn } from "@tanstack/react-start";
-import { joinDispatchNetwork } from "@/lib/dispatch.functions";
+import { joinDispatchNetwork, getDispatchJoinPrefill } from "@/lib/dispatch.functions";
 import { PH_REGIONS } from "@/lib/format";
 
 import { toast } from "sonner";
