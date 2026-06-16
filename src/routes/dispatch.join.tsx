@@ -106,6 +106,34 @@ function DispatchJoin() {
     if (user?.email && !email) setEmail(user.email);
   }, [user, email]);
 
+  const loadPrefill = useServerFn(getDispatchJoinPrefill);
+  const [prefilled, setPrefilled] = useState(false);
+  useEffect(() => {
+    if (!user || prefilled) return;
+    setPrefilled(true);
+    loadPrefill()
+      .then((p: any) => {
+        if (!p) return;
+        setCompanyName((cur) => cur || p.companyName || "");
+        setOperatorName((cur) => cur || p.operatorNameSaved || p.operatorName || "");
+        setPhone((cur) => cur || p.phone || "");
+        setEmail((cur) => cur || p.contactEmail || p.email || "");
+        setRegion((cur) => cur || p.region || "");
+        setCity((cur) => cur || p.city || "");
+        if (Array.isArray(p.regions) && p.regions.length) {
+          setExtraRegions((cur) => (cur.length ? cur : p.regions.filter((r: string) => r !== (p.region || ""))));
+        }
+        if (Array.isArray(p.services) && p.services.length) setServices((cur) => (cur.length ? cur : p.services));
+        if (Array.isArray(p.payments) && p.payments.length) setPayments(p.payments);
+        if (p.driverCount) setDriverCount(p.driverCount);
+        if (p.available24_7) setAvailable24_7(true);
+        if (p.flatBasePhp != null) setFlatBase(String(p.flatBasePhp));
+        if (p.perKmPhp != null) setPerKm(String(p.perKmPhp));
+        if (p.notes) setNotes((cur) => cur || p.notes);
+      })
+      .catch(() => {});
+  }, [user, prefilled, loadPrefill]);
+
   const validPrice = priceId && VALID_PRICES.has(priceId);
   const redirectBack = `/dispatch/join?priceId=${encodeURIComponent(priceId ?? "")}`;
 
