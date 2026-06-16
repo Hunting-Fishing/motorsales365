@@ -216,7 +216,7 @@ export function ServicesTable({
                   setSuggestOpen(true);
                 }}
               >
-                <Plus className="mr-1 h-4 w-4" /> Suggest new service…
+                <Plus className="mr-1 h-4 w-4" /> Add custom service…
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -310,7 +310,7 @@ export function ServicesTable({
       <Dialog open={suggestOpen} onOpenChange={setSuggestOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Suggest a new service</DialogTitle>
+            <DialogTitle>Add a custom service</DialogTitle>
           </DialogHeader>
           <div className="grid gap-3">
             <div>
