@@ -522,6 +522,39 @@ export function SiteHeader() {
 
                 {user && (
                   <>
+                    {myBusinesses.length > 0 && (
+                      <>
+                        <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                          My businesses
+                        </p>
+                        <div className="flex flex-col gap-0.5">
+                          {myBusinesses.map((b) => (
+                            <div key={b.id} className="flex items-center gap-1 px-3">
+                              <SheetClose asChild>
+                                <Link
+                                  to="/dashboard/business/$businessId"
+                                  params={{ businessId: b.id }}
+                                  className="flex-1 flex items-center gap-2 rounded-md py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <Building2 className="h-4 w-4 text-primary" />
+                                  <span className="truncate">{b.name}</span>
+                                </Link>
+                              </SheetClose>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/dashboard/business/$businessId/billing"
+                                  params={{ businessId: b.id }}
+                                  aria-label="Billing & plan"
+                                  className="rounded-md p-2 hover:bg-secondary"
+                                >
+                                  <CreditCard className="h-4 w-4" />
+                                </Link>
+                              </SheetClose>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
                     <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                       Account
                     </p>
