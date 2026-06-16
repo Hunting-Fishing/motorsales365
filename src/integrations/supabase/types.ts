@@ -614,6 +614,119 @@ export type Database = {
           },
         ]
       }
+      business_asset_maintenance: {
+        Row: {
+          asset_id: string
+          business_id: string
+          cost: number | null
+          created_at: string
+          created_by: string | null
+          id: string
+          next_due_date: string | null
+          next_due_km: number | null
+          odometer_km: number | null
+          service_date: string
+          work_done: string
+        }
+        Insert: {
+          asset_id: string
+          business_id: string
+          cost?: number | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          next_due_date?: string | null
+          next_due_km?: number | null
+          odometer_km?: number | null
+          service_date?: string
+          work_done: string
+        }
+        Update: {
+          asset_id?: string
+          business_id?: string
+          cost?: number | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          next_due_date?: string | null
+          next_due_km?: number | null
+          odometer_km?: number | null
+          service_date?: string
+          work_done?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_asset_maintenance_asset_id_fkey"
+            columns: ["asset_id"]
+            isOneToOne: false
+            referencedRelation: "business_assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_asset_maintenance_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_assets: {
+        Row: {
+          assigned_driver_id: string | null
+          business_id: string
+          capacity_kg: number | null
+          created_at: string
+          id: string
+          kind: Database["public"]["Enums"]["business_asset_kind"]
+          name: string
+          notes: string | null
+          photos: Json
+          plate: string | null
+          status: Database["public"]["Enums"]["business_asset_status"]
+          updated_at: string
+          vin: string | null
+        }
+        Insert: {
+          assigned_driver_id?: string | null
+          business_id: string
+          capacity_kg?: number | null
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["business_asset_kind"]
+          name: string
+          notes?: string | null
+          photos?: Json
+          plate?: string | null
+          status?: Database["public"]["Enums"]["business_asset_status"]
+          updated_at?: string
+          vin?: string | null
+        }
+        Update: {
+          assigned_driver_id?: string | null
+          business_id?: string
+          capacity_kg?: number | null
+          created_at?: string
+          id?: string
+          kind?: Database["public"]["Enums"]["business_asset_kind"]
+          name?: string
+          notes?: string | null
+          photos?: Json
+          plate?: string | null
+          status?: Database["public"]["Enums"]["business_asset_status"]
+          updated_at?: string
+          vin?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_assets_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_availability: {
         Row: {
           business_id: string
@@ -1280,6 +1393,113 @@ export type Database = {
           },
         ]
       }
+      business_inventory_items: {
+        Row: {
+          active: boolean
+          business_id: string
+          category: string | null
+          cost: number | null
+          created_at: string
+          id: string
+          location: string | null
+          name: string
+          notes: string | null
+          qty_on_hand: number
+          reorder_at: number | null
+          sku: string | null
+          unit: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          business_id: string
+          category?: string | null
+          cost?: number | null
+          created_at?: string
+          id?: string
+          location?: string | null
+          name: string
+          notes?: string | null
+          qty_on_hand?: number
+          reorder_at?: number | null
+          sku?: string | null
+          unit?: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          business_id?: string
+          category?: string | null
+          cost?: number | null
+          created_at?: string
+          id?: string
+          location?: string | null
+          name?: string
+          notes?: string | null
+          qty_on_hand?: number
+          reorder_at?: number | null
+          sku?: string | null
+          unit?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_inventory_items_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_inventory_movements: {
+        Row: {
+          actor_id: string | null
+          business_id: string
+          created_at: string
+          delta: number
+          id: string
+          item_id: string
+          reason: string | null
+          tow_request_id: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          business_id: string
+          created_at?: string
+          delta: number
+          id?: string
+          item_id: string
+          reason?: string | null
+          tow_request_id?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          business_id?: string
+          created_at?: string
+          delta?: number
+          id?: string
+          item_id?: string
+          reason?: string | null
+          tow_request_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_inventory_movements_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "business_inventory_movements_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "business_inventory_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_location_corrections: {
         Row: {
           business_id: string
@@ -1659,6 +1879,56 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "business_slug_history_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      business_staff: {
+        Row: {
+          active: boolean
+          business_id: string
+          created_at: string
+          duties: string[]
+          id: string
+          invited_by: string | null
+          on_shift: boolean
+          role: Database["public"]["Enums"]["business_staff_role"]
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          business_id: string
+          created_at?: string
+          duties?: string[]
+          id?: string
+          invited_by?: string | null
+          on_shift?: boolean
+          role?: Database["public"]["Enums"]["business_staff_role"]
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          business_id?: string
+          created_at?: string
+          duties?: string[]
+          id?: string
+          invited_by?: string | null
+          on_shift?: boolean
+          role?: Database["public"]["Enums"]["business_staff_role"]
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_staff_business_id_fkey"
             columns: ["business_id"]
             isOneToOne: false
             referencedRelation: "businesses"
@@ -7316,6 +7586,9 @@ export type Database = {
       }
       tow_requests: {
         Row: {
+          assigned_asset_id: string | null
+          assigned_at: string | null
+          assigned_driver_id: string | null
           can_brake: boolean | null
           can_roll: boolean | null
           can_steer: boolean | null
@@ -7326,6 +7599,7 @@ export type Database = {
           dispatch_expansions: number
           dispatch_status: string
           dispatch_window_ends_at: string | null
+          driver_notes: string | null
           dropoff_address: string | null
           dropoff_city: string | null
           dropoff_lat: number | null
@@ -7333,6 +7607,7 @@ export type Database = {
           dropoff_province: string | null
           dropoff_region: string | null
           dropped_off_at: string | null
+          en_route_at: string | null
           eta_minutes: number | null
           final_price_php: number | null
           id: string
@@ -7340,6 +7615,7 @@ export type Database = {
           matched_provider_ids: string[]
           needed_at: string | null
           notes: string | null
+          on_scene_at: string | null
           passenger_count: number | null
           picked_up_at: string | null
           pickup_address: string | null
@@ -7354,6 +7630,7 @@ export type Database = {
           ride_id: string | null
           situation: string | null
           status: string
+          towing_at: string | null
           updated_at: string
           urgency: string
           vehicle_drivetrain: string | null
@@ -7366,6 +7643,9 @@ export type Database = {
           vehicle_year: number | null
         }
         Insert: {
+          assigned_asset_id?: string | null
+          assigned_at?: string | null
+          assigned_driver_id?: string | null
           can_brake?: boolean | null
           can_roll?: boolean | null
           can_steer?: boolean | null
@@ -7376,6 +7656,7 @@ export type Database = {
           dispatch_expansions?: number
           dispatch_status?: string
           dispatch_window_ends_at?: string | null
+          driver_notes?: string | null
           dropoff_address?: string | null
           dropoff_city?: string | null
           dropoff_lat?: number | null
@@ -7383,6 +7664,7 @@ export type Database = {
           dropoff_province?: string | null
           dropoff_region?: string | null
           dropped_off_at?: string | null
+          en_route_at?: string | null
           eta_minutes?: number | null
           final_price_php?: number | null
           id?: string
@@ -7390,6 +7672,7 @@ export type Database = {
           matched_provider_ids?: string[]
           needed_at?: string | null
           notes?: string | null
+          on_scene_at?: string | null
           passenger_count?: number | null
           picked_up_at?: string | null
           pickup_address?: string | null
@@ -7404,6 +7687,7 @@ export type Database = {
           ride_id?: string | null
           situation?: string | null
           status?: string
+          towing_at?: string | null
           updated_at?: string
           urgency?: string
           vehicle_drivetrain?: string | null
@@ -7416,6 +7700,9 @@ export type Database = {
           vehicle_year?: number | null
         }
         Update: {
+          assigned_asset_id?: string | null
+          assigned_at?: string | null
+          assigned_driver_id?: string | null
           can_brake?: boolean | null
           can_roll?: boolean | null
           can_steer?: boolean | null
@@ -7426,6 +7713,7 @@ export type Database = {
           dispatch_expansions?: number
           dispatch_status?: string
           dispatch_window_ends_at?: string | null
+          driver_notes?: string | null
           dropoff_address?: string | null
           dropoff_city?: string | null
           dropoff_lat?: number | null
@@ -7433,6 +7721,7 @@ export type Database = {
           dropoff_province?: string | null
           dropoff_region?: string | null
           dropped_off_at?: string | null
+          en_route_at?: string | null
           eta_minutes?: number | null
           final_price_php?: number | null
           id?: string
@@ -7440,6 +7729,7 @@ export type Database = {
           matched_provider_ids?: string[]
           needed_at?: string | null
           notes?: string | null
+          on_scene_at?: string | null
           passenger_count?: number | null
           picked_up_at?: string | null
           pickup_address?: string | null
@@ -7454,6 +7744,7 @@ export type Database = {
           ride_id?: string | null
           situation?: string | null
           status?: string
+          towing_at?: string | null
           updated_at?: string
           urgency?: string
           vehicle_drivetrain?: string | null
@@ -7466,6 +7757,13 @@ export type Database = {
           vehicle_year?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "tow_requests_assigned_asset_id_fkey"
+            columns: ["assigned_asset_id"]
+            isOneToOne: false
+            referencedRelation: "business_assets"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tow_requests_ride_id_fkey"
             columns: ["ride_id"]
@@ -8557,6 +8855,14 @@ export type Database = {
         Args: { _client: string; _owner: string; _requester: string }
         Returns: boolean
       }
+      has_business_role: {
+        Args: {
+          _business: string
+          _role: Database["public"]["Enums"]["business_staff_role"]
+          _user: string
+        }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -8576,6 +8882,14 @@ export type Database = {
       is_business_account: { Args: { _user_id: string }; Returns: boolean }
       is_business_editor: {
         Args: { _business_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_business_member: {
+        Args: { _business: string; _user: string }
+        Returns: boolean
+      }
+      is_business_owner: {
+        Args: { _business: string; _user: string }
         Returns: boolean
       }
       is_org_member: {
@@ -8717,6 +9031,19 @@ export type Database = {
         | "sales_junior"
         | "sales_senior"
         | "sales_manager"
+      business_asset_kind:
+        | "tow_truck"
+        | "flatbed"
+        | "wrecker"
+        | "service_van"
+        | "trailer"
+        | "equipment"
+        | "other"
+      business_asset_status:
+        | "active"
+        | "maintenance"
+        | "out_of_service"
+        | "retired"
       business_kind:
         | "repair_shop"
         | "insurance"
@@ -8742,6 +9069,13 @@ export type Database = {
         | "transport"
         | "motorcycle_shop"
         | "used_dealership"
+      business_staff_role:
+        | "owner"
+        | "manager"
+        | "dispatcher"
+        | "driver"
+        | "mechanic"
+        | "clerk"
       business_status: "pending" | "active" | "rejected" | "hidden"
       business_tier: "free" | "listed" | "featured" | "premium"
       course_level: "beginner" | "intermediate" | "advanced"
@@ -9030,6 +9364,21 @@ export const Constants = {
         "sales_senior",
         "sales_manager",
       ],
+      business_asset_kind: [
+        "tow_truck",
+        "flatbed",
+        "wrecker",
+        "service_van",
+        "trailer",
+        "equipment",
+        "other",
+      ],
+      business_asset_status: [
+        "active",
+        "maintenance",
+        "out_of_service",
+        "retired",
+      ],
       business_kind: [
         "repair_shop",
         "insurance",
@@ -9055,6 +9404,14 @@ export const Constants = {
         "transport",
         "motorcycle_shop",
         "used_dealership",
+      ],
+      business_staff_role: [
+        "owner",
+        "manager",
+        "dispatcher",
+        "driver",
+        "mechanic",
+        "clerk",
       ],
       business_status: ["pending", "active", "rejected", "hidden"],
       business_tier: ["free", "listed", "featured", "premium"],

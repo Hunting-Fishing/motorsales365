@@ -248,6 +248,10 @@ function MyListings() {
         </Button>
       </div>
 
+      <BusinessWorkspaceBanner userId={user?.id} />
+
+
+
       {(() => {
         const now = Date.now();
         const unboosted = listings.filter(
@@ -519,6 +523,50 @@ function ListingStats({ stats }: { stats?: Stats }) {
           <span>—</span>
         )}
       </span>
+    </div>
+  );
+}
+
+function BusinessWorkspaceBanner({ userId }: { userId?: string }) {
+  const [bizList, setBizList] = useState<any[]>([]);
+  useEffect(() => {
+    if (!userId) return;
+    supabase
+      .from("businesses")
+      .select("id,name,type_slug,status")
+      .eq("owner_id", userId)
+      .in("status", ["active", "pending", "hidden"])
+      .limit(5)
+      .then(({ data }) => setBizList(data ?? []));
+  }, [userId]);
+  if (!bizList.length) return null;
+  return (
+    <div className="mb-4 space-y-2">
+      {bizList.map((b) => {
+        const isTow = b.type_slug === "towing";
+        return (
+          <div
+            key={b.id}
+            className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4"
+          >
+            <div>
+              <div className="font-semibold">
+                {isTow ? "🚛 Tow & roadside workspace" : "🏢 Business workspace"} — {b.name}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                {isTow
+                  ? "Dispatch, fleet, drivers, and inventory built for tow companies."
+                  : "Manage your team, inventory, and operations."}
+              </p>
+            </div>
+            <Button asChild>
+              <Link to="/dashboard/business/$businessId" params={{ businessId: b.id }}>
+                Open workspace
+              </Link>
+            </Button>
+          </div>
+        );
+      })}
     </div>
   );
 }
