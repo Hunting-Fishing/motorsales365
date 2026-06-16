@@ -73,13 +73,16 @@ export const submitBusiness = createServerFn({ method: "POST" })
       throw new Error("Please set at least one open day in your business hours.");
     }
 
-    // 1) Unique-slug loop (max 50 attempts) — pre-checks `businesses.slug`.
+    // 1) Unique-slug loop (max 50 attempts) — checks `businesses.slug` across
+    // ALL owners, not just rows the caller can see under RLS, so pending
+    // listings owned by other users still count as taken.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const base = slugify(data.name) || "business";
     let slug = base;
     let found = false;
     for (let i = 0; i < 50; i++) {
       const candidate = i === 0 ? base : `${base}-${i + 1}`;
-      const { data: existing, error: chkErr } = await supabase
+      const { data: existing, error: chkErr } = await supabaseAdmin
         .from("businesses")
         .select("id")
         .eq("slug", candidate)
@@ -92,30 +95,39 @@ export const submitBusiness = createServerFn({ method: "POST" })
       }
     }
     if (!found) {
-      // Fall back to a random suffix.
       slug = `${base}-${Math.random().toString(36).slice(2, 7)}`;
     }
 
     const { tag_slugs, ...biz } = data;
 
     // 2) Insert business (RLS scopes owner_id to auth.uid()).
-    const { data: row, error: insErr } = await supabase
-      .from("businesses")
-      .insert({
-        owner_id: userId,
-        slug,
-        status: "pending",
-        ...biz,
-      } as any)
-      .select("id, slug")
-      .single();
-    if (insErr) {
-      // Friendly message for slug race condition.
+    // Retry once with a random suffix if we still race on the unique index.
+    let row: any = null;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const { data: r, error: insErr } = await supabase
+        .from("businesses")
+        .insert({
+          owner_id: userId,
+          slug,
+          status: "pending",
+          ...biz,
+        } as any)
+        .select("id, slug")
+        .single();
+      if (!insErr) {
+        row = r;
+        break;
+      }
       if (insErr.code === "23505" || /duplicate key/i.test(insErr.message)) {
+        if (attempt === 0) {
+          slug = `${base}-${Math.random().toString(36).slice(2, 7)}`;
+          continue;
+        }
         throw new Error("That URL was just taken — please try again.");
       }
       throw new Error(insErr.message);
     }
+    if (!row) throw new Error("Failed to create business — please try again.");
 
     // 3) Tag links (best-effort; non-fatal).
     if (tag_slugs && tag_slugs.length > 0) {
