@@ -1,0 +1,1 @@
+DROP INDEX IF EXISTS public.businesses_source_external_id_key;
