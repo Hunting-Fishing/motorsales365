@@ -7,8 +7,10 @@ import { getBusinessPlanUsage } from "@/lib/business-plan-usage.functions";
 import { WorkspaceSidebar } from "@/components/business-workspace/sidebar";
 import { WorkspaceNotificationsProvider } from "@/components/business-workspace/notifications-provider";
 import { WorkspaceNotificationBell } from "@/components/business-workspace/notification-bell";
+import { WorkspacePlanWarnings } from "@/components/business-workspace/plan-warnings";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+
 
 export const Route = createFileRoute("/dashboard/business/$businessId")({
   component: WorkspaceLayout,
@@ -109,9 +111,11 @@ function WorkspaceLayout() {
             role={role as any}
           />
           <main className="flex-1 min-w-0">
+            <WorkspacePlanWarnings businessId={business.id} usage={usage} />
             <Outlet />
           </main>
         </div>
+
       </div>
     </WorkspaceNotificationsProvider>
   );
