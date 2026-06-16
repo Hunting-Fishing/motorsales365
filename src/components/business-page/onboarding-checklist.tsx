@@ -111,7 +111,7 @@ export function OnboardingChecklist({
   onJumpTab,
 }: {
   data: ChecklistInput;
-  onJumpTab: (tabValue: string) => void;
+  onJumpTab: (tabValue: string, anchor?: string) => void;
 }) {
   const items = buildItems(data);
   const done = items.filter((i) => i.done).length;
