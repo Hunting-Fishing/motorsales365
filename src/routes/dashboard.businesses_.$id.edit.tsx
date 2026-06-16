@@ -730,7 +730,7 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
           className="h-11 text-base"
         />
       </div>
-      <div>
+      <div id="onboard-description">
         <Label>About / description</Label>
         <Textarea
           value={description}
