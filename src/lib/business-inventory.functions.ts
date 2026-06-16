@@ -53,6 +53,19 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertManager(supabase, userId, data.businessId);
+
+    if (!data.id) {
+      const { enforceLimit, planLimitErrorPayload, PlanLimitError } = await import(
+        "@/lib/business-plan-enforcement.server"
+      );
+      try {
+        await enforceLimit(supabase as any, data.businessId, "inventory_skus", userId);
+      } catch (e) {
+        if (e instanceof PlanLimitError) return planLimitErrorPayload(e)! as any;
+        throw e;
+      }
+    }
+
     const payload = {
       id: data.id,
       business_id: data.businessId,
@@ -74,6 +87,7 @@ export const upsertBusinessInventoryItem = createServerFn({ method: "POST" })
     if (error) throw error;
     return row;
   });
+
 
 export const adjustBusinessInventory = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
