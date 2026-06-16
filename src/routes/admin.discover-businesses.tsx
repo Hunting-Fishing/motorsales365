@@ -468,9 +468,7 @@ function WebsiteSignupsTab() {
               </div>
               <div className="flex gap-2">
                 <Button asChild size="sm" variant="outline">
-                  <Link to="/admin/businesses/$id" params={{ id: r.id }}>
-                    Admin
-                  </Link>
+                  <Link to="/admin/businesses">Moderation</Link>
                 </Button>
                 <Button asChild size="sm" variant="outline">
                   <Link to="/b/$slug" params={{ slug: r.vanity_slug || r.slug }}>
