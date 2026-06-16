@@ -76,6 +76,9 @@ export function SiteHeader() {
     navigate({ to: "/" });
   };
 
+  const myBusinesses = useMyBusinesses(user?.id);
+
+
   return (
     <header className="w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="container mx-auto flex h-14 items-center justify-between gap-2 px-3 sm:h-16 sm:gap-4 sm:px-4">
