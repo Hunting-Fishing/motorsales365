@@ -111,12 +111,24 @@ export const Route = createFileRoute("/lovable/email/auth/webhook")({
           return Response.json({ error: `Unknown email type: ${emailType}` }, { status: 400 });
         }
 
-        // Build template props from payload.data (HookData structure)
+        // Build template props from payload.data (HookData structure).
+        // For recovery (password reset), use the token_hash flow so the link
+        // works from any device/email client — PKCE requires a code_verifier
+        // stored in the originating browser's localStorage, which breaks when
+        // the email is opened elsewhere or pre-fetched by mail scanners.
+        const tokenHash = payload.data.token_hash;
+        const recoveryUrl =
+          emailType === "recovery" && tokenHash
+            ? `https://${ROOT_DOMAIN}/reset-password?token_hash=${encodeURIComponent(
+                tokenHash,
+              )}&type=recovery`
+            : payload.data.url;
+
         const templateProps = {
           siteName: SITE_NAME,
           siteUrl: `https://${ROOT_DOMAIN}`,
           recipient: payload.data.email,
-          confirmationUrl: payload.data.url,
+          confirmationUrl: recoveryUrl,
           token: payload.data.token,
           email: payload.data.email,
           oldEmail: payload.data.old_email,
