@@ -163,7 +163,7 @@ function ServiceSuggestionsAdmin() {
                     <Badge variant="outline" className="text-xs">{s.business_type_slug}</Badge>
                     {s.proposed_unit && <Badge variant="secondary" className="text-xs">/{s.proposed_unit}</Badge>}
                     {s.sample_price_php != null && (
-                      <Badge variant="outline" className="text-xs">sample ₱{s.sample_price_php}</Badge>
+                      <Badge variant="outline" className="text-xs">fee ₱{s.sample_price_php}</Badge>
                     )}
                     <Badge className="text-xs capitalize">{s.status}</Badge>
                   </div>
@@ -171,7 +171,20 @@ function ServiceSuggestionsAdmin() {
                     <p className="mt-2 whitespace-pre-wrap text-sm text-muted-foreground">{s.proposed_description}</p>
                   )}
                   <div className="mt-2 text-xs text-muted-foreground">
-                    Submitted {new Date(s.created_at).toLocaleString()}
+                    Provider:{" "}
+                    {s.business ? (
+                      <a
+                        href={`/businesses/${s.business.slug}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-primary hover:underline"
+                      >
+                        {s.business.name}
+                      </a>
+                    ) : (
+                      <span>— (no business linked)</span>
+                    )}
+                    {" · "}Submitted {new Date(s.created_at).toLocaleString()}
                   </div>
                   {s.admin_note && (
                     <div className="mt-2 rounded-md bg-muted/50 p-2 text-xs">
