@@ -241,10 +241,10 @@ function SignupPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, loading]);
 
-  // Reset business_kind when switching intent
-  useEffect(() => {
-    setBusinessKind("");
-  }, [intent]);
+  // Note: form fields are preserved when the user changes account type so
+  // they don't have to start over. business_kind only renders for
+  // business-like intents (gated by isBusinessLike) and all current options
+  // are valid across business and service_provider, so no reset is needed.
 
   const stashPendingProfile = () => {
     try {
