@@ -94,6 +94,7 @@ function ServiceSuggestionsAdmin() {
             title: title.trim(),
             description: desc.trim() || null,
             unit: unit.trim() || null,
+            adminNote: note.trim() || null,
           },
         });
         toast.success("Approved and added to catalog");
