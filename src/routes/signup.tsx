@@ -690,6 +690,41 @@ function SignupPage() {
             )}
           </div>
 
+          <div id="field-confirm-password">
+            <Label htmlFor="confirm-password">
+              Confirm password <span className="text-destructive">*</span>
+            </Label>
+            <div className="relative">
+              <Input
+                id="confirm-password"
+                type={showPassword ? "text" : "password"}
+                required
+                minLength={8}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                onBlur={() => markTouched("confirm-password")}
+                autoComplete="new-password"
+                aria-invalid={!!errorFor("confirm-password")}
+                className={cn("pr-10", invalidCls("confirm-password"))}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {errorFor("confirm-password") ? (
+              <p className="mt-1 text-xs text-destructive">{errorFor("confirm-password")}</p>
+            ) : (
+              <p className="mt-1 text-xs text-muted-foreground">
+                Re-enter your password to confirm.
+              </p>
+            )}
+          </div>
+
           <div
             id="field-terms"
             className={cn(
