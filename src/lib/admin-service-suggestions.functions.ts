@@ -137,5 +137,42 @@ export const rejectServiceSuggestion = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .eq("status", "pending");
     if (error) throw new Error(error.message);
+
+    await supabaseAdmin.from("service_suggestion_audit_log").insert({
+      suggestion_id: data.id,
+      actor_id: context.userId,
+      action: "rejected",
+      catalog_id: null,
+      note: data.note ?? null,
+    });
+
     return { ok: true };
+  });
+
+export const listServiceSuggestionAudit = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { suggestionId?: string; limit?: number }) =>
+    z
+      .object({
+        suggestionId: z.string().uuid().optional(),
+        limit: z.number().int().min(1).max(500).optional(),
+      })
+      .parse(d ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    await assertAdmin(context.supabase, context.userId);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    let q = supabaseAdmin
+      .from("service_suggestion_audit_log")
+      .select(
+        "id, suggestion_id, actor_id, action, catalog_id, note, created_at, suggestion:suggestion_id ( proposed_title, business_type_slug ), actor:actor_id ( id, full_name, email )",
+      )
+      .order("created_at", { ascending: false })
+      .limit(data.limit ?? 200);
+    if (data.suggestionId) q = q.eq("suggestion_id", data.suggestionId);
+
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+    return rows ?? [];
   });
