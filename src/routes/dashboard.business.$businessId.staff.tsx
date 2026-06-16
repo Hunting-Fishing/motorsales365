@@ -87,7 +87,9 @@ function StaffPage() {
   async function handleInvite() {
     setSubmitting(true);
     try {
-      await addFn({ data: { businessId, email, role, title, duties } });
+      const res: any = await addFn({ data: { businessId, email, role, title, duties } });
+      const { handlePlanLimitResult } = await import("@/lib/plan-limit-toast");
+      if (handlePlanLimitResult(res, { businessId })) return;
       toast.success("Employee added");
       setOpen(false);
       setEmail("");
@@ -98,6 +100,7 @@ function StaffPage() {
       toast.error(e?.message || "Failed to add employee");
     } finally {
       setSubmitting(false);
+
     }
   }
 
