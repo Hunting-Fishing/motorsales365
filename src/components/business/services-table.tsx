@@ -216,7 +216,7 @@ export function ServicesTable({
                   setSuggestOpen(true);
                 }}
               >
-                <Plus className="mr-1 h-4 w-4" /> Suggest new service…
+                <Plus className="mr-1 h-4 w-4" /> Add custom service…
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -310,8 +310,12 @@ export function ServicesTable({
       <Dialog open={suggestOpen} onOpenChange={setSuggestOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Suggest a new service</DialogTitle>
+            <DialogTitle>Add a custom service</DialogTitle>
           </DialogHeader>
+          <p className="text-xs text-muted-foreground">
+            Your service is added to your list right away. It goes to admin review and, once
+            approved, becomes available in the +Add menu for all businesses of this type.
+          </p>
           <div className="grid gap-3">
             <div>
               <Label>Service name</Label>
@@ -324,21 +328,21 @@ export function ServicesTable({
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
+                <Label>Your fee (₱)</Label>
+                <Input
+                  inputMode="decimal"
+                  value={sPrice}
+                  onChange={(e) => setSPrice(e.target.value)}
+                  placeholder="e.g. 125"
+                />
+              </div>
+              <div>
                 <Label>Unit</Label>
                 <Input
                   value={sUnit}
                   onChange={(e) => setSUnit(e.target.value)}
                   placeholder="service / km / L"
                   maxLength={20}
-                />
-              </div>
-              <div>
-                <Label>Your price (₱)</Label>
-                <Input
-                  inputMode="decimal"
-                  value={sPrice}
-                  onChange={(e) => setSPrice(e.target.value)}
-                  placeholder="optional"
                 />
               </div>
             </div>
