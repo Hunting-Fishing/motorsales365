@@ -182,6 +182,7 @@ function SignupPage() {
     businessName,
     businessKind,
     password,
+    confirmPassword,
     agreed,
   ]);
 
