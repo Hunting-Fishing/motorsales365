@@ -109,7 +109,7 @@ export const MODULES: Record<WorkspaceModuleId, WorkspaceModule> = {
   },
 };
 
-const COMMON_END: WorkspaceModuleId[] = ["settings"];
+const COMMON_END: WorkspaceModuleId[] = ["billing", "settings"];
 
 /** Map a business_kind (businesses.type_slug) to its ordered sidebar modules.
  *  Only modules with implemented routes are listed; more will appear as they ship. */

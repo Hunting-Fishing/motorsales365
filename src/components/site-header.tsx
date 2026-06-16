@@ -1,4 +1,5 @@
 import { Link, useNavigate } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import {
   Menu,
   Plus,
@@ -16,10 +17,13 @@ import {
   Users,
   BarChart3,
   Inbox,
+  Building2,
+  CreditCard,
 } from "lucide-react";
 import { useAuth, type SellerType } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/brand-logo";
+import { supabase } from "@/integrations/supabase/client";
 
 import {
   DropdownMenu,
@@ -72,6 +76,9 @@ export function SiteHeader() {
     navigate({ to: "/" });
   };
 
+  const myBusinesses = useMyBusinesses(user?.id);
+
+
   return (
     <header className="w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
       <div className="container mx-auto flex h-14 items-center justify-between gap-2 px-3 sm:h-16 sm:gap-4 sm:px-4">
@@ -92,7 +99,18 @@ export function SiteHeader() {
 
           {user && profileName && (
             <span className="hidden text-sm text-muted-foreground sm:inline">
-              Welcome: <span className="font-medium text-foreground">{profileName}</span>
+              Welcome:{" "}
+              {myBusinesses[0] ? (
+                <Link
+                  to="/dashboard/business/$businessId"
+                  params={{ businessId: myBusinesses[0].id }}
+                  className="font-medium text-foreground hover:underline"
+                >
+                  {profileName}
+                </Link>
+              ) : (
+                <span className="font-medium text-foreground">{profileName}</span>
+              )}
             </span>
           )}
 
@@ -250,7 +268,41 @@ export function SiteHeader() {
                   <span className="hidden sm:inline">Account</span>
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuContent align="end" className="w-64">
+                {myBusinesses.length > 0 && (
+                  <>
+                    <div className="px-2 pb-1 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      My businesses
+                    </div>
+                    {myBusinesses.map((b) => (
+                      <div key={b.id} className="px-1 pb-1">
+                        <div className="flex items-center gap-1">
+                          <DropdownMenuItem asChild className="flex-1">
+                            <Link
+                              to="/dashboard/business/$businessId"
+                              params={{ businessId: b.id }}
+                              className="flex items-center gap-2"
+                            >
+                              <Building2 className="h-4 w-4 text-primary" />
+                              <span className="truncate">{b.name}</span>
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild className="px-2">
+                            <Link
+                              to="/dashboard/business/$businessId/billing"
+                              params={{ businessId: b.id }}
+                              aria-label="Billing & plan"
+                              title="Billing & plan"
+                            >
+                              <CreditCard className="h-4 w-4" />
+                            </Link>
+                          </DropdownMenuItem>
+                        </div>
+                      </div>
+                    ))}
+                    <DropdownMenuSeparator />
+                  </>
+                )}
                 <DropdownMenuItem asChild>
                   <Link to="/dashboard">My listings</Link>
                 </DropdownMenuItem>
@@ -481,6 +533,39 @@ export function SiteHeader() {
 
                 {user && (
                   <>
+                    {myBusinesses.length > 0 && (
+                      <>
+                        <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                          My businesses
+                        </p>
+                        <div className="flex flex-col gap-0.5">
+                          {myBusinesses.map((b) => (
+                            <div key={b.id} className="flex items-center gap-1 px-3">
+                              <SheetClose asChild>
+                                <Link
+                                  to="/dashboard/business/$businessId"
+                                  params={{ businessId: b.id }}
+                                  className="flex-1 flex items-center gap-2 rounded-md py-3 text-sm font-medium hover:bg-secondary"
+                                >
+                                  <Building2 className="h-4 w-4 text-primary" />
+                                  <span className="truncate">{b.name}</span>
+                                </Link>
+                              </SheetClose>
+                              <SheetClose asChild>
+                                <Link
+                                  to="/dashboard/business/$businessId/billing"
+                                  params={{ businessId: b.id }}
+                                  aria-label="Billing & plan"
+                                  className="rounded-md p-2 hover:bg-secondary"
+                                >
+                                  <CreditCard className="h-4 w-4" />
+                                </Link>
+                              </SheetClose>
+                            </div>
+                          ))}
+                        </div>
+                      </>
+                    )}
                     <p className="px-3 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                       Account
                     </p>
@@ -622,3 +707,31 @@ export function SiteHeader() {
     </header>
   );
 }
+
+type MyBiz = { id: string; name: string; type_slug: string | null };
+
+function useMyBusinesses(userId?: string) {
+  const [list, setList] = useState<MyBiz[]>([]);
+  useEffect(() => {
+    if (!userId) {
+      setList([]);
+      return;
+    }
+    let cancelled = false;
+    supabase
+      .from("businesses")
+      .select("id,name,type_slug,status")
+      .eq("owner_id", userId)
+      .in("status", ["active", "pending", "hidden"])
+      .order("created_at", { ascending: false })
+      .limit(6)
+      .then(({ data }) => {
+        if (!cancelled) setList((data ?? []) as MyBiz[]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+  return list;
+}
+
