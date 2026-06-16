@@ -256,6 +256,41 @@ function BillingPage() {
         </CardContent>
       </Card>
 
+      <Card>
+        <CardHeader className="pb-2">
+          <CardTitle className="text-base">Plan history</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {historyQ.isLoading ? (
+            <Skeleton className="h-16 w-full" />
+          ) : !historyQ.data?.length ? (
+            <p className="text-sm text-muted-foreground">No plan changes yet.</p>
+          ) : (
+            <ul className="divide-y text-sm">
+              {historyQ.data.map((h: any) => (
+                <li key={h.id} className="flex items-center justify-between py-2">
+                  <div>
+                    <span className="capitalize font-medium">{h.from_tier || "—"}</span>
+                    <span className="mx-2 text-muted-foreground">→</span>
+                    <span className="capitalize font-medium">{h.to_tier || "—"}</span>
+                    <Badge variant="outline" className="ml-2 capitalize">
+                      {String(h.reason).replace("_", " ")}
+                    </Badge>
+                    {h.triggered_by === "system" && (
+                      <Badge variant="secondary" className="ml-1">auto</Badge>
+                    )}
+                  </div>
+                  <span className="text-xs text-muted-foreground">
+                    {new Date(h.created_at).toLocaleString()}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+
       {business && typeSlug && (
         <BusinessPlanDialog
           open={planOpen}
