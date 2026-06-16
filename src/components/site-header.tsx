@@ -99,7 +99,18 @@ export function SiteHeader() {
 
           {user && profileName && (
             <span className="hidden text-sm text-muted-foreground sm:inline">
-              Welcome: <span className="font-medium text-foreground">{profileName}</span>
+              Welcome:{" "}
+              {myBusinesses[0] ? (
+                <Link
+                  to="/dashboard/business/$businessId"
+                  params={{ businessId: myBusinesses[0].id }}
+                  className="font-medium text-foreground hover:underline"
+                >
+                  {profileName}
+                </Link>
+              ) : (
+                <span className="font-medium text-foreground">{profileName}</span>
+              )}
             </span>
           )}
 
