@@ -691,19 +691,23 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
 
   return (
     <Card className="space-y-4 p-4 md:p-5">
-      <ImageField
-        label="Logo"
-        url={logoUrl}
-        onUpload={(f) => onUpload(f, "logo")}
-        onClear={() => setLogoUrl(null)}
-        square
-      />
-      <ImageField
-        label="Cover photo"
-        url={coverUrl}
-        onUpload={(f) => onUpload(f, "cover")}
-        onClear={() => setCoverUrl(null)}
-      />
+      <div id="onboard-logo">
+        <ImageField
+          label="Logo"
+          url={logoUrl}
+          onUpload={(f) => onUpload(f, "logo")}
+          onClear={() => setLogoUrl(null)}
+          square
+        />
+      </div>
+      <div id="onboard-cover">
+        <ImageField
+          label="Cover photo"
+          url={coverUrl}
+          onUpload={(f) => onUpload(f, "cover")}
+          onClear={() => setCoverUrl(null)}
+        />
+      </div>
 
       <div>
         <Label>Business name</Label>
