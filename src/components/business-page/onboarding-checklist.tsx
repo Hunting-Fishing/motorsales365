@@ -406,8 +406,10 @@ function DescriptionInline({ biz, onDone }: { biz: any; onDone: () => void }) {
         placeholder="Tell customers what makes you different — services, brands, story."
       />
       <div className="flex items-center justify-between gap-2">
-        <span className={cn("text-xs", len < 50 ? "text-muted-foreground" : "text-emerald-600")}>
-          {len}/50 characters
+        <span className={cn("text-xs", len < 50 ? "text-amber-600" : "text-emerald-600")}>
+          {len < 50
+            ? `Need ${50 - len} more character${50 - len === 1 ? "" : "s"} (min 50)`
+            : `${len} characters ✓`}
         </span>
         <Button size="sm" type="button" onClick={submit} disabled={busy || len < 50}>
           {busy ? "Saving…" : "Save"}
