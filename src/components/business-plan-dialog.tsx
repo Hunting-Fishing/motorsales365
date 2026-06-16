@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { listBusinessPlansForType } from "@/lib/business-subscriptions.functions";
+import { getMultiBusinessDiscount } from "@/lib/multi-business-discount.functions";
+import { applyDiscount } from "@/lib/multi-business-discount";
 import { toast } from "sonner";
 
 type Plan = {
@@ -75,16 +77,23 @@ export function BusinessPlanDialog({
   const [loading, setLoading] = useState(true);
   const [interval, setInterval] = useState<"month" | "year">("month");
   const [busySlug, setBusySlug] = useState<string | null>(null);
+  const [discount, setDiscount] = useState<{ percentOff: number; label: string | null; ordinal: number; totalBusinesses: number } | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!open) return;
     setLoading(true);
-    listBusinessPlansForType({ data: { typeSlug } })
-      .then((r) => setPlans((r.plans ?? []) as Plan[]))
+    Promise.all([
+      listBusinessPlansForType({ data: { typeSlug } }),
+      getMultiBusinessDiscount({ data: { businessId } }).catch(() => null),
+    ])
+      .then(([planRes, discRes]) => {
+        setPlans((planRes.plans ?? []) as Plan[]);
+        if (discRes) setDiscount(discRes as any);
+      })
       .catch((e) => toast.error(e?.message ?? "Failed to load plans"))
       .finally(() => setLoading(false));
-  }, [open, typeSlug]);
+  }, [open, typeSlug, businessId]);
 
   const tiers = useMemo(() => {
     const map: Record<string, Plan | undefined> = {};
@@ -115,6 +124,21 @@ export function BusinessPlanDialog({
             Choose a plan to get more visibility and leads for your business directory listing.
           </DialogDescription>
         </DialogHeader>
+
+        {discount && discount.percentOff > 0 && (
+          <div className="mb-2 flex items-center gap-2 rounded-lg border border-primary/40 bg-primary/5 px-3 py-2 text-sm">
+            <Sparkles className="h-4 w-4 text-primary" />
+            <div>
+              <div className="font-medium text-primary">
+                {discount.percentOff}% multi-business discount applied
+              </div>
+              <div className="text-xs text-muted-foreground">
+                This is business #{discount.ordinal + 1} on your account — the discount applies to
+                every renewal of this plan.
+              </div>
+            </div>
+          </div>
+        )}
 
         <Tabs value={interval} onValueChange={(v) => setInterval(v as "month" | "year")}>
           <TabsList className="mb-4">
@@ -162,12 +186,28 @@ export function BusinessPlanDialog({
                           {isCurrent && <Badge variant="secondary">Current</Badge>}
                         </div>
                         <div className="mb-2">
-                          <span className="font-display text-2xl font-extrabold">
-                            ₱{Number(plan.price_php).toLocaleString()}
-                          </span>
-                          <span className="text-sm text-muted-foreground">
-                            /{plan.interval === "month" ? "mo" : "yr"}
-                          </span>
+                          {discount && discount.percentOff > 0 ? (
+                            <>
+                              <span className="font-display text-2xl font-extrabold">
+                                ₱{applyDiscount(Number(plan.price_php), discount.percentOff).toLocaleString()}
+                              </span>
+                              <span className="text-sm text-muted-foreground">
+                                /{plan.interval === "month" ? "mo" : "yr"}
+                              </span>
+                              <span className="ml-2 text-xs text-muted-foreground line-through">
+                                ₱{Number(plan.price_php).toLocaleString()}
+                              </span>
+                            </>
+                          ) : (
+                            <>
+                              <span className="font-display text-2xl font-extrabold">
+                                ₱{Number(plan.price_php).toLocaleString()}
+                              </span>
+                              <span className="text-sm text-muted-foreground">
+                                /{plan.interval === "month" ? "mo" : "yr"}
+                              </span>
+                            </>
+                          )}
                         </div>
                         <p className="mb-3 text-xs text-muted-foreground">{copy.blurb}</p>
                         <ul className="mb-4 space-y-1 text-xs">
