@@ -1046,7 +1046,7 @@ const TAG_GROUP_MAP: { label: string; cats: string[] }[] = [
   { label: "Brands", cats: ["station_brand", "brand"] },
   { label: "Tires & wheels", cats: ["tires", "wheels"] },
   {
-    label: "Services",
+    label: "SERVICES",
     cats: [
       "station_services",
       "service",
@@ -1074,7 +1074,7 @@ const TAG_GROUP_MAP: { label: string; cats: string[] }[] = [
     ],
   },
   {
-    label: "Products on sale",
+    label: "OUR EQUIPMENT",
     cats: [
       "station_products",
       "parts",
@@ -1091,10 +1091,10 @@ const TAG_GROUP_MAP: { label: string; cats: string[] }[] = [
   { label: "Payment accepted", cats: ["station_payment", "payment", "financing"] },
   { label: "Languages", cats: ["language"] },
   {
-    label: "Coverage",
+    label: "AREA COVERAGE",
     cats: ["vehicle_scope", "coverage", "buyback", "channel", "logistics", "condition", "trust"],
   },
-  { label: "Hours", cats: ["hours", "operations"] },
+  { label: "HOURS OF OPERATION", cats: ["hours", "operations"] },
 ];
 
 function renderGroups(tags: TagItem[]): { label: string; items: TagItem[] }[] {

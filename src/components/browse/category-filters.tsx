@@ -243,7 +243,7 @@ export function CategoryFilters({ category, value, onChange, section = "all" }: 
           <DetailsGrid>
             <Sel label="Equipment type" field="equipment_type" opts={EQUIPMENT_TYPES} value={value} onChange={onChange} />
             <TextField label="Brand" field="brand" placeholder="e.g. Caterpillar" value={value} onChange={onChange} />
-            <Range label="Hours used" minField="hours_min" maxField="hours_max" value={value} onChange={onChange} />
+            <Range label="VEHICLE CAPACITY RATING" minField="hours_min" maxField="hours_max" value={value} onChange={onChange} />
             <Range label="Operating weight (tons)" minField="weight_min" maxField="weight_max" value={value} onChange={onChange} />
             <TextField label="Attachment type" field="attachment_type" placeholder="bucket, fork…" value={value} onChange={onChange} />
             <Sel label="Rental or sale" field="rental_or_sale" opts={RENTAL_OR_SALE} value={value} onChange={onChange} />

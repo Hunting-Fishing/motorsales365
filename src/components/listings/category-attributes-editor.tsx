@@ -253,7 +253,7 @@ export function CategoryAttributesEditor({ category, value, onChange }: Props) {
       <div className="space-y-3">
         <Sel label="Equipment type" field="equipment_type" opts={EQUIPMENT_TYPES} value={value} onChange={onChange} />
         <Text label="Brand" field="brand" placeholder="e.g. Caterpillar" value={value} onChange={onChange} />
-        <Text label="Hours used" field="hours" type="number" placeholder="e.g. 1200" value={value} onChange={onChange} />
+        <Text label="VEHICLE CAPACITY RATING" field="hours" type="number" placeholder="e.g. 1200" value={value} onChange={onChange} />
         <Text label="Operating weight (tons)" field="operating_weight_tons" type="number" placeholder="e.g. 12" value={value} onChange={onChange} />
         <Text label="Attachment type" field="attachment_type" placeholder="e.g. bucket, fork, hammer" value={value} onChange={onChange} />
         <Sel label="Rental or sale" field="rental_or_sale" opts={RENTAL_OR_SALE} value={value} onChange={onChange} />

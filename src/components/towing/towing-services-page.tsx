@@ -416,7 +416,7 @@ export function TowingServicesPage({
           <div className="mt-4 grid gap-4 md:grid-cols-[minmax(260px,1fr)_minmax(180px,220px)_auto]">
             <div>
               <Label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                <MapPin className="mr-1 inline h-3 w-3" /> Province coverage
+                <MapPin className="mr-1 inline h-3 w-3" /> AREA COVERAGE
               </Label>
               <LocationPicker
                 asFilter
