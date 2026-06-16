@@ -121,7 +121,13 @@ function VerifyEmailPage() {
           <div className="flex items-center justify-between text-sm text-muted-foreground">
           <Link
             to="/signup"
-            search={{ type: intent, redirect: redirect || undefined }}
+            search={
+              intent
+                ? { type: intent, ...(redirect ? { redirect } : {}) }
+                : redirect
+                  ? { redirect }
+                  : {}
+            }
             className="hover:underline"
           >
             Wrong email? Start over
