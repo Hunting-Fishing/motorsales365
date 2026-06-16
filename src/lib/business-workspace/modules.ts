@@ -109,15 +109,16 @@ export const MODULES: Record<WorkspaceModuleId, WorkspaceModule> = {
   },
 };
 
-const COMMON_END: WorkspaceModuleId[] = ["analytics", "billing", "settings"];
+const COMMON_END: WorkspaceModuleId[] = ["settings"];
 
-/** Map a business_kind (businesses.type_slug) to its ordered sidebar modules. */
+/** Map a business_kind (businesses.type_slug) to its ordered sidebar modules.
+ *  Only modules with implemented routes are listed; more will appear as they ship. */
 export function modulesForKind(kind: string | null | undefined): WorkspaceModule[] {
   const k = (kind || "other").toLowerCase();
   let ids: WorkspaceModuleId[];
   switch (k) {
     case "towing":
-      ids = ["overview", "dispatch", "fleet", "staff", "inventory", "rates", ...COMMON_END];
+      ids = ["overview", "dispatch", "fleet", "staff", "inventory", ...COMMON_END];
       break;
     case "repair_shop":
     case "body_paint":
@@ -126,20 +127,20 @@ export function modulesForKind(kind: string | null | undefined): WorkspaceModule
     case "carwash":
     case "audio_tint":
     case "inspection":
-      ids = ["overview", "bookings", "staff", "inventory", "listings", ...COMMON_END];
+      ids = ["overview", "staff", "inventory", ...COMMON_END];
       break;
     case "parts_accessories":
     case "accessories":
-      ids = ["overview", "inventory", "listings", "staff", ...COMMON_END];
+      ids = ["overview", "inventory", "staff", ...COMMON_END];
       break;
     case "dealership":
     case "used_dealership":
     case "motorcycle_shop":
     case "rental":
-      ids = ["overview", "listings", "fleet", "staff", ...COMMON_END];
+      ids = ["overview", "fleet", "staff", ...COMMON_END];
       break;
     default:
-      ids = ["overview", "listings", "staff", ...COMMON_END];
+      ids = ["overview", "staff", ...COMMON_END];
   }
   return ids.map((id) => MODULES[id]);
 }
