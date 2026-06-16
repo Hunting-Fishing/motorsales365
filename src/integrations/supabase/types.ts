@@ -1606,8 +1606,10 @@ export type Database = {
           business_kind: Database["public"]["Enums"]["business_kind"]
           created_at: string
           description: string | null
+          features: Json
           id: string
           interval: string
+          limits: Json
           price_php: number
           slug: string
           sort_order: number
@@ -1621,8 +1623,10 @@ export type Database = {
           business_kind: Database["public"]["Enums"]["business_kind"]
           created_at?: string
           description?: string | null
+          features?: Json
           id?: string
           interval: string
+          limits?: Json
           price_php: number
           slug: string
           sort_order?: number
@@ -1636,8 +1640,10 @@ export type Database = {
           business_kind?: Database["public"]["Enums"]["business_kind"]
           created_at?: string
           description?: string | null
+          features?: Json
           id?: string
           interval?: string
+          limits?: Json
           price_php?: number
           slug?: string
           sort_order?: number
@@ -1938,6 +1944,7 @@ export type Database = {
       }
       business_subscriptions: {
         Row: {
+          auto_upgrade: boolean
           business_id: string
           cancel_at_period_end: boolean
           created_at: string
@@ -1956,6 +1963,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          auto_upgrade?: boolean
           business_id: string
           cancel_at_period_end?: boolean
           created_at?: string
@@ -1974,6 +1982,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          auto_upgrade?: boolean
           business_id?: string
           cancel_at_period_end?: boolean
           created_at?: string
