@@ -535,7 +535,7 @@ function BusinessWorkspaceBanner({ userId }: { userId?: string }) {
       .from("businesses")
       .select("id,name,type_slug,status")
       .eq("owner_id", userId)
-      .neq("status", "archived")
+      .in("status", ["active", "pending", "hidden"])
       .limit(5)
       .then(({ data }) => setBizList(data ?? []));
   }, [userId]);
