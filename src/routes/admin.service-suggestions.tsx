@@ -38,6 +38,7 @@ type Suggestion = {
   status: "pending" | "approved" | "rejected" | "merged";
   admin_note: string | null;
   created_at: string;
+  business?: { id: string; name: string; slug: string } | null;
 };
 
 function ServiceSuggestionsAdmin() {
