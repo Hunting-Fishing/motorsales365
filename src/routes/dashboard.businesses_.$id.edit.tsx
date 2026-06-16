@@ -801,11 +801,13 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
         </div>
       </div>
 
-      <VanitySlugField
-        businessId={biz.id}
-        currentVanity={biz.vanity_slug ?? null}
-        currentSlug={biz.slug}
-      />
+      <div id="onboard-vanity">
+        <VanitySlugField
+          businessId={biz.id}
+          currentVanity={biz.vanity_slug ?? null}
+          currentSlug={biz.slug}
+        />
+      </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
