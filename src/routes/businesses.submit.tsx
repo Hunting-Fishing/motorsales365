@@ -153,6 +153,60 @@ function SubmitBusinessPage() {
     if (!loading && !user) navigate({ to: "/login" });
   }, [user, loading, navigate]);
 
+  // One-shot prefill from the user's profile (collected at signup).
+  // Only fills fields that are currently empty so user edits are never overwritten.
+  const [prefilled, setPrefilled] = useState(false);
+  useEffect(() => {
+    if (!user?.id || prefilled) return;
+    let cancelled = false;
+    (async () => {
+      const { data: p } = await (supabase as any)
+        .from("profiles")
+        .select(
+          "business_name, business_kind, business_address, business_city, business_region, business_province, business_postal_code, phone, phone_e164, street_address, postal_code, signup_city, signup_region, signup_province",
+        )
+        .eq("id", user.id)
+        .maybeSingle();
+      if (cancelled) return;
+      setPrefilled(true);
+      if (!p) return;
+      setName((cur) => cur || p.business_name || "");
+      setTypeSlug((cur) => {
+        if (cur) return cur;
+        const kind = p.business_kind as string | null;
+        if (kind && BUSINESS_KIND_OPTIONS.some((o) => o.value === kind)) return kind;
+        return "";
+      });
+      setStreetAddress((cur) => cur || p.business_address || p.street_address || "");
+      setPostalCode((cur) => cur || p.business_postal_code || p.postal_code || "");
+      setLoc((cur) =>
+        cur.city
+          ? cur
+          : {
+              region: p.business_region ?? p.signup_region ?? null,
+              province: p.business_province ?? p.signup_province ?? null,
+              city: p.business_city ?? p.signup_city ?? null,
+              barangay: null,
+            },
+      );
+      const e164: string | null = p.phone_e164 || p.phone || null;
+      if (e164) {
+        setPhoneNational((cur) => {
+          if (cur) return cur;
+          if (e164.startsWith("+63")) {
+            setPhoneIso("PH");
+            return e164.slice(3);
+          }
+          return cur;
+        });
+      }
+      setEmail((cur) => cur || user.email || "");
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id, prefilled]);
+
   useEffect(() => {
     setTypes(
       BUSINESS_KIND_OPTIONS.map((o) => ({ slug: o.value, label: o.label })),
