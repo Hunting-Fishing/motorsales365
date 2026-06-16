@@ -196,6 +196,7 @@ import { Route as DashboardBusinessBusinessIdSettingsRouteImport } from './route
 import { Route as DashboardBusinessBusinessIdInventoryRouteImport } from './routes/dashboard.business.$businessId.inventory'
 import { Route as DashboardBusinessBusinessIdFleetRouteImport } from './routes/dashboard.business.$businessId.fleet'
 import { Route as DashboardBusinessBusinessIdDispatchRouteImport } from './routes/dashboard.business.$businessId.dispatch'
+import { Route as DashboardBusinessBusinessIdBillingRouteImport } from './routes/dashboard.business.$businessId.billing'
 import { Route as ApiSellerStaffResetPasswordRouteImport } from './routes/api/seller/staff/reset-password'
 import { Route as ApiSellerStaffDeactivateRouteImport } from './routes/api/seller/staff/deactivate'
 import { Route as ApiSellerStaffCreateRouteImport } from './routes/api/seller/staff/create'
@@ -1166,6 +1167,12 @@ const DashboardBusinessBusinessIdDispatchRoute =
     path: '/dispatch',
     getParentRoute: () => DashboardBusinessBusinessIdRoute,
   } as any)
+const DashboardBusinessBusinessIdBillingRoute =
+  DashboardBusinessBusinessIdBillingRouteImport.update({
+    id: '/billing',
+    path: '/billing',
+    getParentRoute: () => DashboardBusinessBusinessIdRoute,
+  } as any)
 const ApiSellerStaffResetPasswordRoute =
   ApiSellerStaffResetPasswordRouteImport.update({
     id: '/api/seller/staff/reset-password',
@@ -1433,6 +1440,7 @@ export interface FileRoutesByFullPath {
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
   '/api/seller/staff/deactivate': typeof ApiSellerStaffDeactivateRoute
   '/api/seller/staff/reset-password': typeof ApiSellerStaffResetPasswordRoute
+  '/dashboard/business/$businessId/billing': typeof DashboardBusinessBusinessIdBillingRoute
   '/dashboard/business/$businessId/dispatch': typeof DashboardBusinessBusinessIdDispatchRoute
   '/dashboard/business/$businessId/fleet': typeof DashboardBusinessBusinessIdFleetRoute
   '/dashboard/business/$businessId/inventory': typeof DashboardBusinessBusinessIdInventoryRoute
@@ -1630,6 +1638,7 @@ export interface FileRoutesByTo {
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
   '/api/seller/staff/deactivate': typeof ApiSellerStaffDeactivateRoute
   '/api/seller/staff/reset-password': typeof ApiSellerStaffResetPasswordRoute
+  '/dashboard/business/$businessId/billing': typeof DashboardBusinessBusinessIdBillingRoute
   '/dashboard/business/$businessId/dispatch': typeof DashboardBusinessBusinessIdDispatchRoute
   '/dashboard/business/$businessId/fleet': typeof DashboardBusinessBusinessIdFleetRoute
   '/dashboard/business/$businessId/inventory': typeof DashboardBusinessBusinessIdInventoryRoute
@@ -1834,6 +1843,7 @@ export interface FileRoutesById {
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
   '/api/seller/staff/deactivate': typeof ApiSellerStaffDeactivateRoute
   '/api/seller/staff/reset-password': typeof ApiSellerStaffResetPasswordRoute
+  '/dashboard/business/$businessId/billing': typeof DashboardBusinessBusinessIdBillingRoute
   '/dashboard/business/$businessId/dispatch': typeof DashboardBusinessBusinessIdDispatchRoute
   '/dashboard/business/$businessId/fleet': typeof DashboardBusinessBusinessIdFleetRoute
   '/dashboard/business/$businessId/inventory': typeof DashboardBusinessBusinessIdInventoryRoute
@@ -2038,6 +2048,7 @@ export interface FileRouteTypes {
     | '/api/seller/staff/create'
     | '/api/seller/staff/deactivate'
     | '/api/seller/staff/reset-password'
+    | '/dashboard/business/$businessId/billing'
     | '/dashboard/business/$businessId/dispatch'
     | '/dashboard/business/$businessId/fleet'
     | '/dashboard/business/$businessId/inventory'
@@ -2235,6 +2246,7 @@ export interface FileRouteTypes {
     | '/api/seller/staff/create'
     | '/api/seller/staff/deactivate'
     | '/api/seller/staff/reset-password'
+    | '/dashboard/business/$businessId/billing'
     | '/dashboard/business/$businessId/dispatch'
     | '/dashboard/business/$businessId/fleet'
     | '/dashboard/business/$businessId/inventory'
@@ -2438,6 +2450,7 @@ export interface FileRouteTypes {
     | '/api/seller/staff/create'
     | '/api/seller/staff/deactivate'
     | '/api/seller/staff/reset-password'
+    | '/dashboard/business/$businessId/billing'
     | '/dashboard/business/$businessId/dispatch'
     | '/dashboard/business/$businessId/fleet'
     | '/dashboard/business/$businessId/inventory'
@@ -3881,6 +3894,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardBusinessBusinessIdDispatchRouteImport
       parentRoute: typeof DashboardBusinessBusinessIdRoute
     }
+    '/dashboard/business/$businessId/billing': {
+      id: '/dashboard/business/$businessId/billing'
+      path: '/billing'
+      fullPath: '/dashboard/business/$businessId/billing'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdBillingRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
     '/api/seller/staff/reset-password': {
       id: '/api/seller/staff/reset-password'
       path: '/api/seller/staff/reset-password'
@@ -4115,6 +4135,7 @@ const DashboardTeamRouteWithChildren = DashboardTeamRoute._addFileChildren(
 )
 
 interface DashboardBusinessBusinessIdRouteChildren {
+  DashboardBusinessBusinessIdBillingRoute: typeof DashboardBusinessBusinessIdBillingRoute
   DashboardBusinessBusinessIdDispatchRoute: typeof DashboardBusinessBusinessIdDispatchRoute
   DashboardBusinessBusinessIdFleetRoute: typeof DashboardBusinessBusinessIdFleetRoute
   DashboardBusinessBusinessIdInventoryRoute: typeof DashboardBusinessBusinessIdInventoryRoute
@@ -4125,6 +4146,8 @@ interface DashboardBusinessBusinessIdRouteChildren {
 
 const DashboardBusinessBusinessIdRouteChildren: DashboardBusinessBusinessIdRouteChildren =
   {
+    DashboardBusinessBusinessIdBillingRoute:
+      DashboardBusinessBusinessIdBillingRoute,
     DashboardBusinessBusinessIdDispatchRoute:
       DashboardBusinessBusinessIdDispatchRoute,
     DashboardBusinessBusinessIdFleetRoute:

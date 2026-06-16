@@ -198,13 +198,12 @@ function BillingPage() {
                     >
                       {used} / {limit}
                       {moduleLink && (
-                        <Link
-                          to={`/dashboard/business/$businessId/${moduleLink}` as any}
-                          params={{ businessId }}
+                        <a
+                          href={`/dashboard/business/${businessId}/${moduleLink}`}
                           className="ml-2 text-xs underline"
                         >
                           Manage
-                        </Link>
+                        </a>
                       )}
                     </span>
                   </div>
