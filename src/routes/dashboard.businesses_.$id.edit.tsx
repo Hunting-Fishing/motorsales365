@@ -180,8 +180,18 @@ function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
             bookableItems: (data as any).bookableItems ?? [],
             availability: (data as any).availability ?? [],
           }}
-          onJumpTab={(v) => {
+          onJumpTab={(v, anchor) => {
             if (validTabs.includes(v)) setActiveTab(v);
+            if (anchor) {
+              setTimeout(() => {
+                const el = document.getElementById(anchor);
+                if (el) {
+                  el.scrollIntoView({ behavior: "smooth", block: "center" });
+                  el.classList.add("ring-2", "ring-primary", "ring-offset-2", "rounded-md");
+                  setTimeout(() => el.classList.remove("ring-2", "ring-primary", "ring-offset-2", "rounded-md"), 2000);
+                }
+              }, 120);
+            }
           }}
         />
       </div>
@@ -681,19 +691,23 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
 
   return (
     <Card className="space-y-4 p-4 md:p-5">
-      <ImageField
-        label="Logo"
-        url={logoUrl}
-        onUpload={(f) => onUpload(f, "logo")}
-        onClear={() => setLogoUrl(null)}
-        square
-      />
-      <ImageField
-        label="Cover photo"
-        url={coverUrl}
-        onUpload={(f) => onUpload(f, "cover")}
-        onClear={() => setCoverUrl(null)}
-      />
+      <div id="onboard-logo">
+        <ImageField
+          label="Logo"
+          url={logoUrl}
+          onUpload={(f) => onUpload(f, "logo")}
+          onClear={() => setLogoUrl(null)}
+          square
+        />
+      </div>
+      <div id="onboard-cover">
+        <ImageField
+          label="Cover photo"
+          url={coverUrl}
+          onUpload={(f) => onUpload(f, "cover")}
+          onClear={() => setCoverUrl(null)}
+        />
+      </div>
 
       <div>
         <Label>Business name</Label>
@@ -716,7 +730,7 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
           className="h-11 text-base"
         />
       </div>
-      <div>
+      <div id="onboard-description">
         <Label>About / description</Label>
         <Textarea
           value={description}
@@ -730,7 +744,7 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
       <div className="space-y-3 rounded-lg border border-border p-3">
         <div className="text-sm font-medium">Contact details</div>
         <div className="grid gap-3 sm:grid-cols-2">
-          <div>
+          <div id="onboard-phone">
             <Label>Phone</Label>
             <Input
               type="tel"
@@ -787,11 +801,13 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
         </div>
       </div>
 
-      <VanitySlugField
-        businessId={biz.id}
-        currentVanity={biz.vanity_slug ?? null}
-        currentSlug={biz.slug}
-      />
+      <div id="onboard-vanity">
+        <VanitySlugField
+          businessId={biz.id}
+          currentVanity={biz.vanity_slug ?? null}
+          currentSlug={biz.slug}
+        />
+      </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <div>

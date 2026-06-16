@@ -21,6 +21,7 @@ interface Item {
   description: string;
   done: boolean;
   tabValue: string;
+  anchor?: string;
 }
 
 function buildItems(d: ChecklistInput): Item[] {
@@ -32,6 +33,7 @@ function buildItems(d: ChecklistInput): Item[] {
       description: "Your brand mark — shown across the directory and your mini-site.",
       done: !!b.logo_url,
       tabValue: "profile",
+      anchor: "onboard-logo",
     },
     {
       key: "cover",
@@ -39,6 +41,7 @@ function buildItems(d: ChecklistInput): Item[] {
       description: "Big hero image (or a 1080p video) — first thing visitors see.",
       done: !!b.cover_url || !!b.featured_video_url,
       tabValue: "profile",
+      anchor: "onboard-cover",
     },
     {
       key: "description",
@@ -46,6 +49,7 @@ function buildItems(d: ChecklistInput): Item[] {
       description: "At least 50 characters about what you do, the brands you carry, your story.",
       done: typeof b.description === "string" && b.description.trim().length >= 50,
       tabValue: "profile",
+      anchor: "onboard-description",
     },
     {
       key: "hours",
@@ -60,6 +64,7 @@ function buildItems(d: ChecklistInput): Item[] {
       description: "So customers can call or message directly.",
       done: !!b.phone,
       tabValue: "profile",
+      anchor: "onboard-phone",
     },
     {
       key: "services",
@@ -96,6 +101,7 @@ function buildItems(d: ChecklistInput): Item[] {
       description: "Pick a clean address like /b/yourshop — easier to share, more professional.",
       done: !!b.vanity_slug,
       tabValue: "profile",
+      anchor: "onboard-vanity",
     },
   ];
 }
@@ -105,7 +111,7 @@ export function OnboardingChecklist({
   onJumpTab,
 }: {
   data: ChecklistInput;
-  onJumpTab: (tabValue: string) => void;
+  onJumpTab: (tabValue: string, anchor?: string) => void;
 }) {
   const items = buildItems(data);
   const done = items.filter((i) => i.done).length;
@@ -145,7 +151,7 @@ export function OnboardingChecklist({
           <li key={it.key}>
             <button
               type="button"
-              onClick={() => !it.done && onJumpTab(it.tabValue)}
+              onClick={() => onJumpTab(it.tabValue, it.anchor)}
               className={cn(
                 "flex w-full items-center gap-3 rounded-md border border-transparent p-2 text-left transition-colors",
                 it.done ? "opacity-60" : "hover:border-border hover:bg-muted/40",
