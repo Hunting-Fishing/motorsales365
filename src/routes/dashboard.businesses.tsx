@@ -427,6 +427,11 @@ function MyBusinessesPage() {
                     {b.rating_count} review{b.rating_count === 1 ? "" : "s"}
                   </span>
                   <Button size="sm" asChild>
+                    <Link to="/dashboard/business/$businessId" params={{ businessId: b.id }}>
+                      Open workspace
+                    </Link>
+                  </Button>
+                  <Button size="sm" variant="outline" asChild>
                     <Link to="/dashboard/businesses/$id/edit" params={{ id: b.id }}>
                       <LayoutTemplate className="mr-1 h-3.5 w-3.5" />
                       Manage page
