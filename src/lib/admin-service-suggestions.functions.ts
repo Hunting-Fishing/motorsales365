@@ -21,7 +21,7 @@ export const listServiceSuggestions = createServerFn({ method: "GET" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     let q = supabaseAdmin
       .from("service_catalog_suggestions")
-      .select("*, business:submitter_business_id ( id, name, slug ), submitter:submitter_id ( id, email, full_name )")
+      .select("*, business:submitter_business_id ( id, name, slug )")
       .order("created_at", { ascending: false })
       .limit(200);
     if (data.status) q = q.eq("status", data.status);
