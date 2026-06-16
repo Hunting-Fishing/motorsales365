@@ -256,6 +256,23 @@ function MyBusinessesPage() {
   const [loading, setLoading] = useState(true);
   const [planTarget, setPlanTarget] = useState<Row | null>(null);
   const [showArchived, setShowArchived] = useState(false);
+  const [profile, setProfile] = useState<{
+    seller_type: string | null;
+    business_name: string | null;
+    business_kind: string | null;
+  } | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await (supabase as any)
+        .from("profiles")
+        .select("seller_type, business_name, business_kind")
+        .eq("id", user.id)
+        .maybeSingle();
+      setProfile(data ?? null);
+    })();
+  }, [user]);
 
   const setStatus = async (b: Row, nextStatus: "active" | "archived") => {
     const prevStatus = b.status;
