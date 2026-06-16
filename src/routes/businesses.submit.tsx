@@ -468,13 +468,21 @@ function SubmitBusinessPage() {
           barangay: loc.barangay,
           postal_code: postalCode.trim() || null,
           brands_carried: brandsCarried.trim() || null,
-          price_label: priceLabel.trim() || null,
+          price_label: null,
           lat: lat ? Number(lat) : null,
           lng: lng ? Number(lng) : null,
           tag_slugs: selectedTags,
           hours: { tz: TZ, primary: hours },
         },
       });
+      // Persist services if any were added
+      if (services.length > 0 && result?.id) {
+        try {
+          await saveServicesFn({ data: { businessId: result.id, services } });
+        } catch (e: any) {
+          toast.warning(`Business created, but services failed to save: ${e?.message ?? "unknown error"}`);
+        }
+      }
       setSubmitting(false);
       toast.success(`Submitted! Your business URL: /businesses/${result.slug}`);
       navigate({ to: "/dashboard/businesses" });
