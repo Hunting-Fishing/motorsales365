@@ -1,34 +1,27 @@
-The answer is: **it should show sign up/sign in when the person is not signed in**, but the current failure is mainly a routing problem.
+## Goals
 
-Right now `/dispatch/join?...` and likely `/dispatch/checkout?...` are matching under the `/dispatch` parent route, but the `/dispatch` route renders the landing page instead of rendering its child route. That is why picking Solo, Team, or Unlimited appears to bring you back to the same page.
+1. Stop wiping the signup form when the user changes account type (e.g. switching to/from Tow & Recovery).
+2. Require a confirm-password field that must match before submission.
 
-Plan:
+## Changes (all in `src/routes/signup.tsx`)
 
-1. **Fix the `/dispatch` route structure**
-   - Convert `src/routes/dispatch.tsx` into a proper parent/layout route that renders child pages with `<Outlet />`.
-   - Move the current Dispatch pricing/landing content into a new `/dispatch` index route.
-   - This will allow `/dispatch/join` and `/dispatch/checkout` to actually display their own pages.
+### 1. Don't wipe state on intent change
 
-2. **Make the unsigned-user path obvious**
-   - Ensure `/dispatch/join?priceId=...` shows a clear tow-company signup gate when no user is signed in:
-     - “Create tow company account”
-     - “I already have an account”
-   - Preserve the selected plan through signup/login so they return to the same tow onboarding step.
+- Remove the `useEffect` that resets `businessKind` whenever `intent` changes (lines 244–247).
+- Instead, only clear `businessKind` when the new intent's `BUSINESS_KIND_OPTIONS` list does not contain the currently-selected kind (i.e. the previous value is invalid for the new category). Personal/customer intents stay as-is — `isBusinessLike` already gates whether the field is rendered/submitted, so the stored value is harmless when hidden and is preserved if the user toggles back.
+- All other fields (name, email, phone, address, location, password, agreed, ref code) are already independent of intent and will naturally persist across the switch.
 
-3. **Make the signed-in path complete**
-   - If signed in, `/dispatch/join` should show the tow company/provider profile form.
-   - After submitting that form, send the user to `/dispatch/checkout?priceId=...`.
-   - The checkout page should show the embedded payment form for the selected Solo, Team, or Unlimited plan.
+### 2. Confirm password field
 
-4. **Preserve redirects through auth**
-   - Verify email/password signup, login, and Google auth continue to carry the selected Dispatch plan back into the tow signup flow.
-   - Fix any remaining generic redirects that send service providers to the normal business flow instead of Dispatch onboarding.
+- Add state: `const [confirmPassword, setConfirmPassword] = useState("")` and include it in the `stashPendingProfile` restore/save round-trip so it survives the verify-email round-trip too.
+- Render a new `<Input id="confirm-password" type={showPassword ? "text" : "password"} autoComplete="new-password">` directly below the existing password field, with the same show/hide toggle behavior (single toggle controls both).
+- Validation in the existing `Issue[]` builder:
+  - If `confirmPassword` is empty → `{ field: "confirm-password", label: "Confirm password", message: "Re-enter your password." }`.
+  - Else if `confirmPassword !== password` → `{ field: "confirm-password", message: "Passwords do not match." }`.
+- Add `confirm-password` to the touched-field tracking and `errorFor` / `invalidCls` wiring so the inline error appears on blur and on submit, matching the pattern already used for `password`.
+- Include `confirmPassword` in the dependency array of the validation `useMemo` so the error clears live as the user types.
 
-5. **Keep provider dashboard gated**
-   - Tow/Dispatch dashboard links remain hidden until the user has created a tow provider profile.
-   - Dispatch tools remain locked until the subscription is active.
+### 3. No other behavioral changes
 
-6. **Validate the flow**
-   - Test unauthenticated plan click: `/dispatch` → plan → `/dispatch/join` signup gate.
-   - Test signed-in profile path: join form → checkout page.
-   - Confirm `/dispatch/checkout` no longer shows the landing page.
+- Submit flow, server call, redirect, and "already registered" handling are unchanged.
+- No backend / server-fn changes.

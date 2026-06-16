@@ -72,6 +72,7 @@ function SignupPage() {
   const [phoneIso, setPhoneIso] = useState("PH");
   const [phoneNational, setPhoneNational] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [businessName, setBusinessName] = useState("");
   const [businessAddress, setBusinessAddress] = useState("");
@@ -149,6 +150,18 @@ function SignupPage() {
         label: "Password",
         message: "Password must be at least 8 characters.",
       });
+    if (!confirmPassword)
+      list.push({
+        field: "confirm-password",
+        label: "Confirm password",
+        message: "Re-enter your password.",
+      });
+    else if (confirmPassword !== password)
+      list.push({
+        field: "confirm-password",
+        label: "Confirm password",
+        message: "Passwords do not match.",
+      });
     if (!agreed)
       list.push({
         field: "terms",
@@ -169,6 +182,7 @@ function SignupPage() {
     businessName,
     businessKind,
     password,
+    confirmPassword,
     agreed,
   ]);
 
@@ -241,10 +255,10 @@ function SignupPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, loading]);
 
-  // Reset business_kind when switching intent
-  useEffect(() => {
-    setBusinessKind("");
-  }, [intent]);
+  // Note: form fields are preserved when the user changes account type so
+  // they don't have to start over. business_kind only renders for
+  // business-like intents (gated by isBusinessLike) and all current options
+  // are valid across business and service_provider, so no reset is needed.
 
   const stashPendingProfile = () => {
     try {
@@ -672,6 +686,41 @@ function SignupPage() {
             ) : (
               <p className="mt-1 text-xs text-muted-foreground">
                 At least 8 characters. Use a mix of letters and numbers.
+              </p>
+            )}
+          </div>
+
+          <div id="field-confirm-password">
+            <Label htmlFor="confirm-password">
+              Confirm password <span className="text-destructive">*</span>
+            </Label>
+            <div className="relative">
+              <Input
+                id="confirm-password"
+                type={showPassword ? "text" : "password"}
+                required
+                minLength={8}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                onBlur={() => markTouched("confirm-password")}
+                autoComplete="new-password"
+                aria-invalid={!!errorFor("confirm-password")}
+                className={cn("pr-10", invalidCls("confirm-password"))}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+            {errorFor("confirm-password") ? (
+              <p className="mt-1 text-xs text-destructive">{errorFor("confirm-password")}</p>
+            ) : (
+              <p className="mt-1 text-xs text-muted-foreground">
+                Re-enter your password to confirm.
               </p>
             )}
           </div>
