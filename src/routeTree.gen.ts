@@ -125,6 +125,7 @@ import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTypeSuggestionsRouteImport } from './routes/admin.type-suggestions'
 import { Route as AdminStaff365RouteImport } from './routes/admin.staff-365'
 import { Route as AdminShopRouteImport } from './routes/admin.shop'
+import { Route as AdminServiceSuggestionsRouteImport } from './routes/admin.service-suggestions'
 import { Route as AdminSandboxRouteImport } from './routes/admin.sandbox'
 import { Route as AdminSalesRepsRouteImport } from './routes/admin.sales-reps'
 import { Route as AdminRewardsRouteImport } from './routes/admin.rewards'
@@ -791,6 +792,11 @@ const AdminShopRoute = AdminShopRouteImport.update({
   path: '/shop',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminServiceSuggestionsRoute = AdminServiceSuggestionsRouteImport.update({
+  id: '/service-suggestions',
+  path: '/service-suggestions',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminSandboxRoute = AdminSandboxRouteImport.update({
   id: '/sandbox',
   path: '/sandbox',
@@ -1323,6 +1329,7 @@ export interface FileRoutesByFullPath {
   '/admin/rewards': typeof AdminRewardsRoute
   '/admin/sales-reps': typeof AdminSalesRepsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
+  '/admin/service-suggestions': typeof AdminServiceSuggestionsRoute
   '/admin/shop': typeof AdminShopRoute
   '/admin/staff-365': typeof AdminStaff365Route
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
@@ -1523,6 +1530,7 @@ export interface FileRoutesByTo {
   '/admin/rewards': typeof AdminRewardsRoute
   '/admin/sales-reps': typeof AdminSalesRepsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
+  '/admin/service-suggestions': typeof AdminServiceSuggestionsRoute
   '/admin/shop': typeof AdminShopRoute
   '/admin/staff-365': typeof AdminStaff365Route
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
@@ -1726,6 +1734,7 @@ export interface FileRoutesById {
   '/admin/rewards': typeof AdminRewardsRoute
   '/admin/sales-reps': typeof AdminSalesRepsRoute
   '/admin/sandbox': typeof AdminSandboxRoute
+  '/admin/service-suggestions': typeof AdminServiceSuggestionsRoute
   '/admin/shop': typeof AdminShopRoute
   '/admin/staff-365': typeof AdminStaff365Route
   '/admin/type-suggestions': typeof AdminTypeSuggestionsRoute
@@ -1931,6 +1940,7 @@ export interface FileRouteTypes {
     | '/admin/rewards'
     | '/admin/sales-reps'
     | '/admin/sandbox'
+    | '/admin/service-suggestions'
     | '/admin/shop'
     | '/admin/staff-365'
     | '/admin/type-suggestions'
@@ -2131,6 +2141,7 @@ export interface FileRouteTypes {
     | '/admin/rewards'
     | '/admin/sales-reps'
     | '/admin/sandbox'
+    | '/admin/service-suggestions'
     | '/admin/shop'
     | '/admin/staff-365'
     | '/admin/type-suggestions'
@@ -2333,6 +2344,7 @@ export interface FileRouteTypes {
     | '/admin/rewards'
     | '/admin/sales-reps'
     | '/admin/sandbox'
+    | '/admin/service-suggestions'
     | '/admin/shop'
     | '/admin/staff-365'
     | '/admin/type-suggestions'
@@ -3397,6 +3409,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminShopRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/service-suggestions': {
+      id: '/admin/service-suggestions'
+      path: '/service-suggestions'
+      fullPath: '/admin/service-suggestions'
+      preLoaderRoute: typeof AdminServiceSuggestionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/sandbox': {
       id: '/admin/sandbox'
       path: '/sandbox'
@@ -4054,6 +4073,7 @@ interface AdminRouteChildren {
   AdminRewardsRoute: typeof AdminRewardsRoute
   AdminSalesRepsRoute: typeof AdminSalesRepsRoute
   AdminSandboxRoute: typeof AdminSandboxRoute
+  AdminServiceSuggestionsRoute: typeof AdminServiceSuggestionsRoute
   AdminShopRoute: typeof AdminShopRoute
   AdminStaff365Route: typeof AdminStaff365Route
   AdminTypeSuggestionsRoute: typeof AdminTypeSuggestionsRoute
@@ -4092,6 +4112,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminRewardsRoute: AdminRewardsRoute,
   AdminSalesRepsRoute: AdminSalesRepsRoute,
   AdminSandboxRoute: AdminSandboxRoute,
+  AdminServiceSuggestionsRoute: AdminServiceSuggestionsRoute,
   AdminShopRoute: AdminShopRoute,
   AdminStaff365Route: AdminStaff365Route,
   AdminTypeSuggestionsRoute: AdminTypeSuggestionsRoute,
