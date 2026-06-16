@@ -166,6 +166,7 @@ import { Route as DashboardTeamMembersRouteImport } from './routes/dashboard.tea
 import { Route as DashboardTeamLeadsRouteImport } from './routes/dashboard.team.leads'
 import { Route as DashboardRidesNewRouteImport } from './routes/dashboard.rides_.new'
 import { Route as DashboardDispatchHistoryRouteImport } from './routes/dashboard.dispatch.history'
+import { Route as DashboardBusinessBusinessIdRouteImport } from './routes/dashboard.business.$businessId'
 import { Route as BusinessesSlugBookRouteImport } from './routes/businesses.$slug.book'
 import { Route as ApiPublicReverseGeocodeRouteImport } from './routes/api/public/reverse-geocode'
 import { Route as ApiPublicPaymentEventsRouteImport } from './routes/api/public/payment-events'
@@ -179,6 +180,7 @@ import { Route as AuthenticatedDashboardPartsWantedRouteImport } from './routes/
 import { Route as AuthenticatedAccountTrustScoreRouteImport } from './routes/_authenticated/account.trust-score'
 import { Route as AuthenticatedAccountRewardsRouteImport } from './routes/_authenticated/account.rewards'
 import { Route as AuthenticatedAccountDisputesRouteImport } from './routes/_authenticated/account.disputes'
+import { Route as DashboardBusinessBusinessIdIndexRouteImport } from './routes/dashboard.business.$businessId.index'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -991,6 +993,12 @@ const DashboardDispatchHistoryRoute =
     path: '/history',
     getParentRoute: () => DashboardDispatchRoute,
   } as any)
+const DashboardBusinessBusinessIdRoute =
+  DashboardBusinessBusinessIdRouteImport.update({
+    id: '/business/$businessId',
+    path: '/business/$businessId',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const BusinessesSlugBookRoute = BusinessesSlugBookRouteImport.update({
   id: '/book',
   path: '/book',
@@ -1061,6 +1069,12 @@ const AuthenticatedAccountDisputesRoute =
     id: '/account/disputes',
     path: '/account/disputes',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const DashboardBusinessBusinessIdIndexRoute =
+  DashboardBusinessBusinessIdIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => DashboardBusinessBusinessIdRoute,
   } as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
@@ -1357,6 +1371,7 @@ export interface FileRoutesByFullPath {
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/api/public/reverse-geocode': typeof ApiPublicReverseGeocodeRoute
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
+  '/dashboard/business/$businessId': typeof DashboardBusinessBusinessIdRouteWithChildren
   '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
   '/dashboard/rides/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
@@ -1393,6 +1408,7 @@ export interface FileRoutesByFullPath {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/dashboard/business/$businessId/': typeof DashboardBusinessBusinessIdIndexRoute
   '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
 }
 export interface FileRoutesByTo {
@@ -1584,6 +1600,7 @@ export interface FileRoutesByTo {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/dashboard/business/$businessId': typeof DashboardBusinessBusinessIdIndexRoute
   '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
 }
 export interface FileRoutesById {
@@ -1745,6 +1762,7 @@ export interface FileRoutesById {
   '/api/public/payment-events': typeof ApiPublicPaymentEventsRoute
   '/api/public/reverse-geocode': typeof ApiPublicReverseGeocodeRoute
   '/businesses/$slug/book': typeof BusinessesSlugBookRoute
+  '/dashboard/business/$businessId': typeof DashboardBusinessBusinessIdRouteWithChildren
   '/dashboard/dispatch/history': typeof DashboardDispatchHistoryRoute
   '/dashboard/rides_/new': typeof DashboardRidesNewRoute
   '/dashboard/team/leads': typeof DashboardTeamLeadsRoute
@@ -1781,6 +1799,7 @@ export interface FileRoutesById {
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
   '/lovable/email/transactional/preview': typeof LovableEmailTransactionalPreviewRoute
   '/lovable/email/transactional/send': typeof LovableEmailTransactionalSendRoute
+  '/dashboard/business/$businessId/': typeof DashboardBusinessBusinessIdIndexRoute
   '/api/public/training-partners/$id/click': typeof ApiPublicTrainingPartnersIdClickRoute
 }
 export interface FileRouteTypes {
@@ -1942,6 +1961,7 @@ export interface FileRouteTypes {
     | '/api/public/payment-events'
     | '/api/public/reverse-geocode'
     | '/businesses/$slug/book'
+    | '/dashboard/business/$businessId'
     | '/dashboard/dispatch/history'
     | '/dashboard/rides/new'
     | '/dashboard/team/leads'
@@ -1978,6 +1998,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/dashboard/business/$businessId/'
     | '/api/public/training-partners/$id/click'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -2169,6 +2190,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/dashboard/business/$businessId'
     | '/api/public/training-partners/$id/click'
   id:
     | '__root__'
@@ -2329,6 +2351,7 @@ export interface FileRouteTypes {
     | '/api/public/payment-events'
     | '/api/public/reverse-geocode'
     | '/businesses/$slug/book'
+    | '/dashboard/business/$businessId'
     | '/dashboard/dispatch/history'
     | '/dashboard/rides_/new'
     | '/dashboard/team/leads'
@@ -2365,6 +2388,7 @@ export interface FileRouteTypes {
     | '/lovable/email/queue/process'
     | '/lovable/email/transactional/preview'
     | '/lovable/email/transactional/send'
+    | '/dashboard/business/$businessId/'
     | '/api/public/training-partners/$id/click'
   fileRoutesById: FileRoutesById
 }
@@ -3582,6 +3606,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardDispatchHistoryRouteImport
       parentRoute: typeof DashboardDispatchRoute
     }
+    '/dashboard/business/$businessId': {
+      id: '/dashboard/business/$businessId'
+      path: '/business/$businessId'
+      fullPath: '/dashboard/business/$businessId'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/businesses/$slug/book': {
       id: '/businesses/$slug/book'
       path: '/book'
@@ -3672,6 +3703,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/account/disputes'
       preLoaderRoute: typeof AuthenticatedAccountDisputesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/dashboard/business/$businessId/': {
+      id: '/dashboard/business/$businessId/'
+      path: '/'
+      fullPath: '/dashboard/business/$businessId/'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdIndexRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
     }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
@@ -3976,6 +4014,21 @@ const DashboardTeamRouteWithChildren = DashboardTeamRoute._addFileChildren(
   DashboardTeamRouteChildren,
 )
 
+interface DashboardBusinessBusinessIdRouteChildren {
+  DashboardBusinessBusinessIdIndexRoute: typeof DashboardBusinessBusinessIdIndexRoute
+}
+
+const DashboardBusinessBusinessIdRouteChildren: DashboardBusinessBusinessIdRouteChildren =
+  {
+    DashboardBusinessBusinessIdIndexRoute:
+      DashboardBusinessBusinessIdIndexRoute,
+  }
+
+const DashboardBusinessBusinessIdRouteWithChildren =
+  DashboardBusinessBusinessIdRoute._addFileChildren(
+    DashboardBusinessBusinessIdRouteChildren,
+  )
+
 interface DashboardRouteChildren {
   DashboardAdsRoute: typeof DashboardAdsRoute
   DashboardBillingRoute: typeof DashboardBillingRoute
@@ -4001,6 +4054,7 @@ interface DashboardRouteChildren {
   DashboardVerificationRoute: typeof DashboardVerificationRoute
   DashboardWantedRoute: typeof DashboardWantedRoute
   DashboardIndexRoute: typeof DashboardIndexRoute
+  DashboardBusinessBusinessIdRoute: typeof DashboardBusinessBusinessIdRouteWithChildren
   DashboardRidesNewRoute: typeof DashboardRidesNewRoute
   DashboardBusinessesIdAnalyticsRoute: typeof DashboardBusinessesIdAnalyticsRoute
   DashboardBusinessesIdEditRoute: typeof DashboardBusinessesIdEditRoute
@@ -4032,6 +4086,8 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardVerificationRoute: DashboardVerificationRoute,
   DashboardWantedRoute: DashboardWantedRoute,
   DashboardIndexRoute: DashboardIndexRoute,
+  DashboardBusinessBusinessIdRoute:
+    DashboardBusinessBusinessIdRouteWithChildren,
   DashboardRidesNewRoute: DashboardRidesNewRoute,
   DashboardBusinessesIdAnalyticsRoute: DashboardBusinessesIdAnalyticsRoute,
   DashboardBusinessesIdEditRoute: DashboardBusinessesIdEditRoute,
