@@ -180,8 +180,18 @@ function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
             bookableItems: (data as any).bookableItems ?? [],
             availability: (data as any).availability ?? [],
           }}
-          onJumpTab={(v) => {
+          onJumpTab={(v, anchor) => {
             if (validTabs.includes(v)) setActiveTab(v);
+            if (anchor) {
+              setTimeout(() => {
+                const el = document.getElementById(anchor);
+                if (el) {
+                  el.scrollIntoView({ behavior: "smooth", block: "center" });
+                  el.classList.add("ring-2", "ring-primary", "ring-offset-2", "rounded-md");
+                  setTimeout(() => el.classList.remove("ring-2", "ring-primary", "ring-offset-2", "rounded-md"), 2000);
+                }
+              }, 120);
+            }
           }}
         />
       </div>
