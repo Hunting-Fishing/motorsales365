@@ -5,9 +5,11 @@ import { useState } from "react";
 import {
   getBusinessPlanUsage,
   setBusinessAutoUpgrade,
+  listBusinessPlanHistory,
   type PlanLimits,
   type PlanUsage,
 } from "@/lib/business-plan-usage.functions";
+
 import { getWorkspaceBusiness } from "@/lib/business-workspace.functions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -50,6 +52,7 @@ function BillingPage() {
   const qc = useQueryClient();
   const loadUsage = useServerFn(getBusinessPlanUsage);
   const loadBiz = useServerFn(getWorkspaceBusiness);
+  const loadHistory = useServerFn(listBusinessPlanHistory);
   const setAuto = useServerFn(setBusinessAutoUpgrade);
   const [planOpen, setPlanOpen] = useState(false);
 
@@ -61,6 +64,11 @@ function BillingPage() {
     queryKey: ["business-plan-usage", businessId],
     queryFn: () => loadUsage({ data: { businessId } }),
   });
+  const historyQ = useQuery({
+    queryKey: ["business-plan-history", businessId],
+    queryFn: () => loadHistory({ data: { businessId } }),
+  });
+
 
   const autoMut = useMutation({
     mutationFn: (enabled: boolean) => setAuto({ data: { businessId, enabled } }),
