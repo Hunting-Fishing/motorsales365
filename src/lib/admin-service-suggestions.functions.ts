@@ -88,10 +88,12 @@ export const approveServiceSuggestion = createServerFn({ method: "POST" })
       catalogId = ins!.id;
     }
 
+    const action = data.mergeIntoCatalogId ? "merged" : "approved";
+
     await supabaseAdmin
       .from("service_catalog_suggestions")
       .update({
-        status: data.mergeIntoCatalogId ? "merged" : "approved",
+        status: action,
         merged_into_catalog_id: catalogId,
         admin_note: data.adminNote ?? null,
         decided_by: context.userId,
@@ -104,6 +106,14 @@ export const approveServiceSuggestion = createServerFn({ method: "POST" })
       .from("business_services")
       .update({ catalog_id: catalogId, pending_suggestion_id: null })
       .eq("pending_suggestion_id", data.id);
+
+    await supabaseAdmin.from("service_suggestion_audit_log").insert({
+      suggestion_id: data.id,
+      actor_id: context.userId,
+      action,
+      catalog_id: catalogId,
+      note: data.adminNote ?? null,
+    });
 
     return { catalogId };
   });
