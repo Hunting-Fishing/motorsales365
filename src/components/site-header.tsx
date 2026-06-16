@@ -278,7 +278,7 @@ export function SiteHeader() {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-64">
-                {myBusinesses.length > 0 && (
+                {(myBusinesses.length > 0 || businessSetup.needed) && (
                   <>
                     <div className="px-2 pb-1 pt-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                       My businesses
@@ -309,6 +309,32 @@ export function SiteHeader() {
                         </div>
                       </div>
                     ))}
+                    {businessSetup.needed && (
+                      <div className="px-1 pb-1">
+                        <DropdownMenuItem asChild>
+                          <Link
+                            to="/businesses/submit"
+                            className="flex items-start gap-2 rounded-md border border-amber-500/50 bg-amber-500/10 px-2 py-2 text-amber-800 hover:bg-amber-500/20 dark:text-amber-200"
+                          >
+                            <Plus className="mt-0.5 h-4 w-4 shrink-0" />
+                            <div className="min-w-0">
+                              <div className="text-sm font-semibold">
+                                Finish setting up your
+                                {businessSetup.kindLabel
+                                  ? ` ${businessSetup.kindLabel.toLowerCase()}`
+                                  : ""}{" "}
+                                business
+                              </div>
+                              <div className="truncate text-[11px] opacity-80">
+                                {businessSetup.name
+                                  ? `Continue with ${businessSetup.name}`
+                                  : "Add details to publish your page"}
+                              </div>
+                            </div>
+                          </Link>
+                        </DropdownMenuItem>
+                      </div>
+                    )}
                     <DropdownMenuSeparator />
                   </>
                 )}
