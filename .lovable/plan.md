@@ -1,45 +1,56 @@
-# Finish "set up your business" for incomplete business signups
+# Overhaul `business_tags` — fill the gaps the directory exposes
 
-## What's actually happening
+## Why this is needed
+- `Hours` is missing **Walk-ins welcome** (it currently lives miscategorized under `service_mode`), plus Early mornings, Late nights, Holidays open, etc.
+- `Towing › Equipment` only has 4 chips. Tow industry needs ~20+: light/medium/heavy/super-heavy wreckers, flatbed/rollback, integrated, rotator, wheel-lift, underlift, dolly/skates, car carrier, lowboy, container/box hauler, motorcycle cradle, off-road/4x4 recovery, winch capacity tiers, air-cushion/snatch blocks, etc.
+- 11 of the 23 business kinds have **zero tags today**: `motorcycle_shop, rental, battery_shop, accessories, audio_tint, inspection, driving_school, lto_services, financing, transport, corporate` — they show an empty Tags dialog.
+- Several kinds with tags are thin (carwash, salvage, insurance, body_paint).
 
-Your account signed up as **seller_type = "business"**, **business_kind = "towing"**, **business_name = "365 TOWING TEST"** — but there is **no row in the `businesses` table** for you yet. Every "My businesses" surface (sidebar, account dropdown, My businesses page, workspace links) is gated on actual `businesses` rows, so they all correctly show empty. Nothing is broken — the gap is that the app never *invites* you to finish creating the business record after signup, so it looks like a bug.
+## What the migration does
+One SQL migration inserts/updates rows in `public.business_tags` (admin-managed table, public read). No schema change, no app code change.
 
-The header welcome strip pulls the name from `profiles.business_name`, which is why "Welcome: 365 Tow Company 365 Towing" still shows even though no business exists.
+### Global tags (type_slug = NULL — shown to every business)
+- **Hours** (expanded): keep Open 24/7, Open Sundays, By appointment. Add **Walk-ins welcome**, **Open holidays**, **Open public holidays**, **Early mornings (before 7am)**, **Late nights (after 9pm)**, **Open lunch**, **Same-day service**, **Emergency after-hours**. Move `walk-in` chip from `service_mode` → `hours` (re-slug or update category).
+- **Service mode**: add Drive-thru, On-site, Drop-off, Loaner vehicle, Free pickup within zone, Nationwide shipping.
+- **Trust / credentials**: add DTI-registered, BIR-registered, SEC-registered, BPLS / Mayor's permit, Senior/PWD discount, Veteran-owned, OFW-friendly, Cash-on-arrival deposit only, Insured operator, Bonded.
+- **Payment**: add PayMaya QR, Bayad Center, 7-Eleven CLiQQ, Coins.ph, USDT/Crypto, Cheque, PO / Net-30 (corporate), Fleet account.
+- **Language**: add Cebuano, Hiligaynon, Ilocano, Bikol, Waray, Kapampangan, Pangasinense, Chavacano, Tausug, Korean, Japanese, Chinese (Mandarin).
 
-## Fix: detect the incomplete state and surface a guided CTA
+### Towing (`type_slug = 'towing'`) — the headliner
+Replace the current 13 chips with a richer set across these categories:
+- **Equipment**: Flatbed / rollback, Wheel-lift, Underlift, Integrated wrecker, Light-duty wrecker, Medium-duty wrecker, Heavy-duty wrecker, Super-heavy wrecker, Rotator, Lowboy trailer, Car carrier (2-car), Container hauler, Box truck, Motorcycle cradle, Motorcycle trailer, ATV/UTV recovery sled, Wheel skates / dollies, Air cushion recovery, Snatch blocks, Self-loader.
+- **Capacity (GVWR)**: Up to 3.5T, 3.5–7.5T, 7.5–18T, 18–35T, 35T+, 50T+ rotator.
+- **Service**: 24/7 dispatch, Long-distance / interprovincial, Accident recovery, Winch-out, Off-road recovery, Ditch recovery, Water recovery, Repo / impound, Illegal-parking removal, Auction / lot transport, Dealer transport, Fleet recovery, Heavy-equipment transport, Boat / jet-ski transport, Container drayage, Motorcycle transport, EV-certified transport, Luxury / exotic transport, Classic-car transport, Race-car transport.
+- **Roadside**: Jumpstart, Lockout, Fuel delivery, Roadside tire change, Battery swap, Mobile tire repair, Mobile mechanic call-out, Coolant top-up, Air refill, On-scene minor repair.
+- **Coverage**: Within city, Provincial, Regional, Nationwide, NLEX/SLEX, SCTEX/TPLEX, CALAX, NAIAX/Skyway, Subic/Clark corridor, Mountain routes (Kennon/Marcos Hwy).
+- **Insurance partners** (optional, popular only): BPI/MS, Standard, Malayan, Pioneer, FPG, Etiqa, Charter Ping An, AON, Direct PMS billing.
+- **Specialty**: EV-trained crew, Hybrid-trained crew, Diesel rescue, LPG/CNG-safe handling, Hazmat-aware, Tow + storage yard, Police/LTO accredited, Insurance accredited.
 
-A user is "incomplete-business" when:
-`profile.seller_type === "business"` AND no row exists in `businesses` where `owner_id = user.id`.
+### Other empty / thin kinds — seed tag sets
+For each kind below, add a focused 8–20-tag starter set across `equipment / service / vehicle_scope / specialty / trust` as appropriate. Examples:
+- **motorcycle_shop**: bike types served (scooter, big bike, underbone, electric, off-road), services (tune-up, valve adjust, chain, suspension, ECU flash, dyno), brands (Honda, Yamaha, Suzuki, Kawasaki, KTM, BMW, Ducati), gear (helmet, riding gear).
+- **rental**: vehicle types (sedan, SUV, AUV, van, pickup, motorcycle, luxury, exotic), terms (hourly, daily, weekly, monthly, long-term, with driver, self-drive), services (airport delivery, chauffeur, wedding car, film/TV rental, corporate).
+- **battery_shop**: chemistries (Lead-acid, AGM, Gel, LiFePO4), services (Free install, Battery test, Mobile install, Trade-in), brands (Motolite, Amaron, Yuasa, Bosch, Varta).
+- **accessories / audio_tint**: tint shades, audio brands, dashcam, lighting, alarms, remote-start, smart keys.
+- **inspection**: PMVIC, smoke emission, OBD-II diagnostics, dyno, brake test, headlight aim.
+- **driving_school**: manual, automatic, motorcycle, defensive driving, TESDA NC II, LTO TDC, foreign-license conversion, in-English instruction.
+- **lto_services**: renewal, transfer, plates, conduction sticker, OR/CR replacement, change color, change body type, fixer-free.
+- **financing**: bank loan, in-house, lease-to-own, BPI Auto, Security Bank, BDO, EastWest, Maybank, downpayment-free, no-show-money.
+- **transport**: 4-wheel, 6-wheel, 10-wheel, container, refrigerated, hauling, last-mile, intercity, NCR delivery, nationwide.
+- **corporate**: fleet management, GPS tracking, telematics, driver supply, maintenance contracts, fuel cards.
+- **carwash** (expand): ceramic coating, paint correction, PPF, leather treatment, engine bay, headlight restoration, motorcycle wash, truck/bus wash.
+- **salvage** (expand): cash for clunkers, parts buyback, hauling, certified scrap, LTO deregistration, copper/aluminum/iron, fleet retirement.
+- **insurance** (expand): TPL only, comprehensive, CTPL, AOG (acts of god), Bodily injury, Property damage, Excess waiver, Tow-included, 24/7 claims, In-house adjuster.
+- **body_paint** (expand): PDR (paintless dent repair), full repaint, color match, ceramic coat, headlamp restore, plastic repair, frame straightening, classic-car restoration, motorcycle paint, custom airbrush, wrap removal.
 
-When that's true, every place that currently hides "My businesses" instead shows a single bright CTA: **"Finish setting up your towing business"** (kind comes from `profile.business_kind`) that deep-links to `/businesses/submit?type=<kind>&name=<business_name>` with the signup info pre-filled.
-
-### 1. Account dropdown (`src/components/site-header.tsx`)
-- Keep the "My businesses" section header always visible for `seller_type=business`.
-- If `myBusinesses.length === 0`, render a single highlighted item: **"Finish setting up your <kind> business"** → `/businesses/submit?type=<kind>&name=<encoded business_name>`.
-- Same change in the mobile sheet block (line ~539).
-
-### 2. Dashboard sidebar / nav (left rail in the second screenshot)
-- Find the "My businesses" entry. When the user is incomplete-business, add a small amber dot/badge ("Set up") next to the label, and on hover/click route to the same submit URL with prefill.
-
-### 3. My businesses page (`src/routes/dashboard.businesses.tsx`)
-- Replace the generic empty state ("You haven't listed any business yet.") with a tailored card when `seller_type=business`:
-  - Title: **"Finish setting up <business_name>"**
-  - Sub: "You signed up as a towing business. Add a few details to publish your page and unlock your workspace."
-  - Primary button: **Continue setup** → `/businesses/submit?type=towing&name=…&kind=…`
-  - Secondary: **Switch account type** → `/dashboard/profile`
-- Keep the existing empty state as a fallback for non-business sellers.
-
-### 4. Prefill `/businesses/submit`
-- Read `type`, `name`, `kind` from URL search params and seed the corresponding form fields on mount. Falls back to current defaults when params are absent. No behavior change for users who land there without params.
-
-### 5. Welcome strip honesty (small polish)
-- In `site-header.tsx`, when incomplete-business, append a small ✱ chip next to the welcome name: **"Setup pending"** → links to the submit page. Makes it obvious why "My businesses" appears empty while the welcome still uses the business name.
+## Technical notes
+- One idempotent migration using `INSERT ... ON CONFLICT (slug) DO UPDATE SET label, category, type_slug, sort_order, is_popular, description`. Slugs use kebab-case prefixed by kind when needed (`tow-rotator`, `moto-scooter`) so global vs scoped tags don't collide.
+- `walk-in` row: update category from `service_mode` → `hours` (keep slug for back-compat with any existing `business_tag_links`).
+- `is_popular = true` only on the ~3 highest-intent tags per category so the "Top" view stays clean.
+- `sort_order` increments by 10 within each (type_slug, category) for easy future inserts.
+- Total new/updated rows: ~280–320. Pure data — no RLS, types, or component changes.
 
 ## Files
-- **Edited**: `src/components/site-header.tsx`, `src/routes/dashboard.businesses.tsx`, `src/routes/businesses.submit.tsx` (or wherever the submit form lives — will confirm during build), and the dashboard sidebar (likely `src/components/dashboard-sidebar.tsx`).
-- **No schema changes**, no new server functions — pure UX wiring on top of fields that already exist (`profiles.seller_type`, `business_kind`, `business_name`).
+- New: `supabase/migrations/<ts>_expand_business_tags.sql`
 
-## Note on the existing record
-The row you see in the welcome strip is just `profiles.business_name`. There is genuinely no business yet to "link" to — completing the submit form is what creates it. Once submitted (and `status` becomes `active` or even `pending`), every quick link in the dropdown/sidebar/workspace lights up automatically; no extra wiring needed.
-
-Approve to build.
+After it lands, the existing `BusinessTagsDialog` will render the richer set automatically (it already groups by category and respects `is_popular`).
