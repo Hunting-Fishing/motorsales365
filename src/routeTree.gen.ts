@@ -191,6 +191,11 @@ import { Route as DashboardTeamLeadsIdRouteImport } from './routes/dashboard.tea
 import { Route as DashboardRidesIdEditRouteImport } from './routes/dashboard.rides_.$id.edit'
 import { Route as DashboardBusinessesIdEditRouteImport } from './routes/dashboard.businesses_.$id.edit'
 import { Route as DashboardBusinessesIdAnalyticsRouteImport } from './routes/dashboard.businesses_.$id.analytics'
+import { Route as DashboardBusinessBusinessIdStaffRouteImport } from './routes/dashboard.business.$businessId.staff'
+import { Route as DashboardBusinessBusinessIdSettingsRouteImport } from './routes/dashboard.business.$businessId.settings'
+import { Route as DashboardBusinessBusinessIdInventoryRouteImport } from './routes/dashboard.business.$businessId.inventory'
+import { Route as DashboardBusinessBusinessIdFleetRouteImport } from './routes/dashboard.business.$businessId.fleet'
+import { Route as DashboardBusinessBusinessIdDispatchRouteImport } from './routes/dashboard.business.$businessId.dispatch'
 import { Route as ApiSellerStaffResetPasswordRouteImport } from './routes/api/seller/staff/reset-password'
 import { Route as ApiSellerStaffDeactivateRouteImport } from './routes/api/seller/staff/deactivate'
 import { Route as ApiSellerStaffCreateRouteImport } from './routes/api/seller/staff/create'
@@ -1131,6 +1136,36 @@ const DashboardBusinessesIdAnalyticsRoute =
     path: '/businesses/$id/analytics',
     getParentRoute: () => DashboardRoute,
   } as any)
+const DashboardBusinessBusinessIdStaffRoute =
+  DashboardBusinessBusinessIdStaffRouteImport.update({
+    id: '/staff',
+    path: '/staff',
+    getParentRoute: () => DashboardBusinessBusinessIdRoute,
+  } as any)
+const DashboardBusinessBusinessIdSettingsRoute =
+  DashboardBusinessBusinessIdSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => DashboardBusinessBusinessIdRoute,
+  } as any)
+const DashboardBusinessBusinessIdInventoryRoute =
+  DashboardBusinessBusinessIdInventoryRouteImport.update({
+    id: '/inventory',
+    path: '/inventory',
+    getParentRoute: () => DashboardBusinessBusinessIdRoute,
+  } as any)
+const DashboardBusinessBusinessIdFleetRoute =
+  DashboardBusinessBusinessIdFleetRouteImport.update({
+    id: '/fleet',
+    path: '/fleet',
+    getParentRoute: () => DashboardBusinessBusinessIdRoute,
+  } as any)
+const DashboardBusinessBusinessIdDispatchRoute =
+  DashboardBusinessBusinessIdDispatchRouteImport.update({
+    id: '/dispatch',
+    path: '/dispatch',
+    getParentRoute: () => DashboardBusinessBusinessIdRoute,
+  } as any)
 const ApiSellerStaffResetPasswordRoute =
   ApiSellerStaffResetPasswordRouteImport.update({
     id: '/api/seller/staff/reset-password',
@@ -1398,6 +1433,11 @@ export interface FileRoutesByFullPath {
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
   '/api/seller/staff/deactivate': typeof ApiSellerStaffDeactivateRoute
   '/api/seller/staff/reset-password': typeof ApiSellerStaffResetPasswordRoute
+  '/dashboard/business/$businessId/dispatch': typeof DashboardBusinessBusinessIdDispatchRoute
+  '/dashboard/business/$businessId/fleet': typeof DashboardBusinessBusinessIdFleetRoute
+  '/dashboard/business/$businessId/inventory': typeof DashboardBusinessBusinessIdInventoryRoute
+  '/dashboard/business/$businessId/settings': typeof DashboardBusinessBusinessIdSettingsRoute
+  '/dashboard/business/$businessId/staff': typeof DashboardBusinessBusinessIdStaffRoute
   '/dashboard/businesses/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
   '/dashboard/businesses/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
@@ -1590,6 +1630,11 @@ export interface FileRoutesByTo {
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
   '/api/seller/staff/deactivate': typeof ApiSellerStaffDeactivateRoute
   '/api/seller/staff/reset-password': typeof ApiSellerStaffResetPasswordRoute
+  '/dashboard/business/$businessId/dispatch': typeof DashboardBusinessBusinessIdDispatchRoute
+  '/dashboard/business/$businessId/fleet': typeof DashboardBusinessBusinessIdFleetRoute
+  '/dashboard/business/$businessId/inventory': typeof DashboardBusinessBusinessIdInventoryRoute
+  '/dashboard/business/$businessId/settings': typeof DashboardBusinessBusinessIdSettingsRoute
+  '/dashboard/business/$businessId/staff': typeof DashboardBusinessBusinessIdStaffRoute
   '/dashboard/businesses/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
   '/dashboard/businesses/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides/$id/edit': typeof DashboardRidesIdEditRoute
@@ -1789,6 +1834,11 @@ export interface FileRoutesById {
   '/api/seller/staff/create': typeof ApiSellerStaffCreateRoute
   '/api/seller/staff/deactivate': typeof ApiSellerStaffDeactivateRoute
   '/api/seller/staff/reset-password': typeof ApiSellerStaffResetPasswordRoute
+  '/dashboard/business/$businessId/dispatch': typeof DashboardBusinessBusinessIdDispatchRoute
+  '/dashboard/business/$businessId/fleet': typeof DashboardBusinessBusinessIdFleetRoute
+  '/dashboard/business/$businessId/inventory': typeof DashboardBusinessBusinessIdInventoryRoute
+  '/dashboard/business/$businessId/settings': typeof DashboardBusinessBusinessIdSettingsRoute
+  '/dashboard/business/$businessId/staff': typeof DashboardBusinessBusinessIdStaffRoute
   '/dashboard/businesses_/$id/analytics': typeof DashboardBusinessesIdAnalyticsRoute
   '/dashboard/businesses_/$id/edit': typeof DashboardBusinessesIdEditRoute
   '/dashboard/rides_/$id/edit': typeof DashboardRidesIdEditRoute
@@ -1988,6 +2038,11 @@ export interface FileRouteTypes {
     | '/api/seller/staff/create'
     | '/api/seller/staff/deactivate'
     | '/api/seller/staff/reset-password'
+    | '/dashboard/business/$businessId/dispatch'
+    | '/dashboard/business/$businessId/fleet'
+    | '/dashboard/business/$businessId/inventory'
+    | '/dashboard/business/$businessId/settings'
+    | '/dashboard/business/$businessId/staff'
     | '/dashboard/businesses/$id/analytics'
     | '/dashboard/businesses/$id/edit'
     | '/dashboard/rides/$id/edit'
@@ -2180,6 +2235,11 @@ export interface FileRouteTypes {
     | '/api/seller/staff/create'
     | '/api/seller/staff/deactivate'
     | '/api/seller/staff/reset-password'
+    | '/dashboard/business/$businessId/dispatch'
+    | '/dashboard/business/$businessId/fleet'
+    | '/dashboard/business/$businessId/inventory'
+    | '/dashboard/business/$businessId/settings'
+    | '/dashboard/business/$businessId/staff'
     | '/dashboard/businesses/$id/analytics'
     | '/dashboard/businesses/$id/edit'
     | '/dashboard/rides/$id/edit'
@@ -2378,6 +2438,11 @@ export interface FileRouteTypes {
     | '/api/seller/staff/create'
     | '/api/seller/staff/deactivate'
     | '/api/seller/staff/reset-password'
+    | '/dashboard/business/$businessId/dispatch'
+    | '/dashboard/business/$businessId/fleet'
+    | '/dashboard/business/$businessId/inventory'
+    | '/dashboard/business/$businessId/settings'
+    | '/dashboard/business/$businessId/staff'
     | '/dashboard/businesses_/$id/analytics'
     | '/dashboard/businesses_/$id/edit'
     | '/dashboard/rides_/$id/edit'
@@ -3781,6 +3846,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardBusinessesIdAnalyticsRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/business/$businessId/staff': {
+      id: '/dashboard/business/$businessId/staff'
+      path: '/staff'
+      fullPath: '/dashboard/business/$businessId/staff'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdStaffRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
+    '/dashboard/business/$businessId/settings': {
+      id: '/dashboard/business/$businessId/settings'
+      path: '/settings'
+      fullPath: '/dashboard/business/$businessId/settings'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdSettingsRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
+    '/dashboard/business/$businessId/inventory': {
+      id: '/dashboard/business/$businessId/inventory'
+      path: '/inventory'
+      fullPath: '/dashboard/business/$businessId/inventory'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdInventoryRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
+    '/dashboard/business/$businessId/fleet': {
+      id: '/dashboard/business/$businessId/fleet'
+      path: '/fleet'
+      fullPath: '/dashboard/business/$businessId/fleet'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdFleetRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
+    '/dashboard/business/$businessId/dispatch': {
+      id: '/dashboard/business/$businessId/dispatch'
+      path: '/dispatch'
+      fullPath: '/dashboard/business/$businessId/dispatch'
+      preLoaderRoute: typeof DashboardBusinessBusinessIdDispatchRouteImport
+      parentRoute: typeof DashboardBusinessBusinessIdRoute
+    }
     '/api/seller/staff/reset-password': {
       id: '/api/seller/staff/reset-password'
       path: '/api/seller/staff/reset-password'
@@ -4015,11 +4115,26 @@ const DashboardTeamRouteWithChildren = DashboardTeamRoute._addFileChildren(
 )
 
 interface DashboardBusinessBusinessIdRouteChildren {
+  DashboardBusinessBusinessIdDispatchRoute: typeof DashboardBusinessBusinessIdDispatchRoute
+  DashboardBusinessBusinessIdFleetRoute: typeof DashboardBusinessBusinessIdFleetRoute
+  DashboardBusinessBusinessIdInventoryRoute: typeof DashboardBusinessBusinessIdInventoryRoute
+  DashboardBusinessBusinessIdSettingsRoute: typeof DashboardBusinessBusinessIdSettingsRoute
+  DashboardBusinessBusinessIdStaffRoute: typeof DashboardBusinessBusinessIdStaffRoute
   DashboardBusinessBusinessIdIndexRoute: typeof DashboardBusinessBusinessIdIndexRoute
 }
 
 const DashboardBusinessBusinessIdRouteChildren: DashboardBusinessBusinessIdRouteChildren =
   {
+    DashboardBusinessBusinessIdDispatchRoute:
+      DashboardBusinessBusinessIdDispatchRoute,
+    DashboardBusinessBusinessIdFleetRoute:
+      DashboardBusinessBusinessIdFleetRoute,
+    DashboardBusinessBusinessIdInventoryRoute:
+      DashboardBusinessBusinessIdInventoryRoute,
+    DashboardBusinessBusinessIdSettingsRoute:
+      DashboardBusinessBusinessIdSettingsRoute,
+    DashboardBusinessBusinessIdStaffRoute:
+      DashboardBusinessBusinessIdStaffRoute,
     DashboardBusinessBusinessIdIndexRoute:
       DashboardBusinessBusinessIdIndexRoute,
   }
