@@ -76,7 +76,7 @@ export function SiteHeader() {
     navigate({ to: "/" });
   };
 
-  const myBusinesses = useMyBusinesses(user?.id);
+  const { list: myBusinesses, setup: businessSetup } = useMyBusinesses(user?.id);
 
 
   return (
@@ -709,29 +709,68 @@ export function SiteHeader() {
 }
 
 type MyBiz = { id: string; name: string; type_slug: string | null };
+type BusinessSetup = {
+  needed: boolean;
+  kind: string | null;
+  kindLabel: string | null;
+  name: string | null;
+};
 
-function useMyBusinesses(userId?: string) {
+function kindToLabel(k: string | null): string | null {
+  if (!k) return null;
+  return k
+    .split(/[-_\s]+/)
+    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(" ");
+}
+
+function useMyBusinesses(userId?: string): { list: MyBiz[]; setup: BusinessSetup } {
   const [list, setList] = useState<MyBiz[]>([]);
+  const [setup, setSetup] = useState<BusinessSetup>({
+    needed: false,
+    kind: null,
+    kindLabel: null,
+    name: null,
+  });
   useEffect(() => {
     if (!userId) {
       setList([]);
+      setSetup({ needed: false, kind: null, kindLabel: null, name: null });
       return;
     }
     let cancelled = false;
-    supabase
-      .from("businesses")
-      .select("id,name,type_slug,status")
-      .eq("owner_id", userId)
-      .in("status", ["active", "pending", "hidden"])
-      .order("created_at", { ascending: false })
-      .limit(6)
-      .then(({ data }) => {
-        if (!cancelled) setList((data ?? []) as MyBiz[]);
+    (async () => {
+      const [{ data: biz }, { data: prof }] = await Promise.all([
+        supabase
+          .from("businesses")
+          .select("id,name,type_slug,status")
+          .eq("owner_id", userId)
+          .in("status", ["active", "pending", "hidden"])
+          .order("created_at", { ascending: false })
+          .limit(6),
+        (supabase as any)
+          .from("profiles")
+          .select("seller_type, business_kind, business_name")
+          .eq("id", userId)
+          .maybeSingle(),
+      ]);
+      if (cancelled) return;
+      const rows = (biz ?? []) as MyBiz[];
+      setList(rows);
+      const sellerType = (prof as any)?.seller_type as string | undefined;
+      const kind = ((prof as any)?.business_kind as string | null) ?? null;
+      const bname = ((prof as any)?.business_name as string | null) ?? null;
+      setSetup({
+        needed: sellerType === "business" && rows.length === 0,
+        kind,
+        kindLabel: kindToLabel(kind),
+        name: bname,
       });
+    })();
     return () => {
       cancelled = true;
     };
   }, [userId]);
-  return list;
+  return { list, setup };
 }
 
