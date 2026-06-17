@@ -35,7 +35,8 @@ type Photo = {
 
 async function uploadGalleryPhoto(userId: string, businessId: string, file: File): Promise<string> {
   const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const path = `${userId}/${businessId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  // Path must start with businessId — the storage RLS policy checks foldername[1] against businesses.id
+  const path = `${businessId}/${userId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
   const { publicUrl } = await uploadWithRetry({
     bucket: "business-gallery",
     path,
