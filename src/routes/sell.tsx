@@ -1675,7 +1675,8 @@ function SellPage() {
             </RadioGroup>
           </section>
 
-          <section className="space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4">
+          <section data-tab="plan" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "plan" ? "" : "hidden"}`}>
+
             <h2 className="font-display text-base font-semibold">Plan</h2>
             <RadioGroup
               value={plan}
