@@ -208,6 +208,7 @@ export function BookingsTab({
   businessId,
   businessSlug,
   businessName,
+  businessKind,
   businessHours,
   items,
   availability,
@@ -218,6 +219,7 @@ export function BookingsTab({
   businessId: string;
   businessSlug?: string | null;
   businessName?: string;
+  businessKind?: string | null;
   businessHours: unknown;
   items: Item[];
   availability: Avail[];
