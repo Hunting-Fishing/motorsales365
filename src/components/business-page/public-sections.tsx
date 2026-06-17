@@ -133,14 +133,31 @@ export function PublicGallerySection({
                 key={p.id}
                 type="button"
                 onClick={() => setLightboxIdx(i)}
-                className="aspect-square overflow-hidden rounded-md border border-border"
+                className="relative aspect-square overflow-hidden rounded-md border border-border bg-muted"
               >
-                <img
-                  src={p.url}
-                  alt={p.caption ?? ""}
-                  className="h-full w-full object-cover"
-                  loading="lazy"
-                />
+                {isVideoUrl(p.url) ? (
+                  <>
+                    <video
+                      src={p.url}
+                      className="h-full w-full object-cover"
+                      muted
+                      playsInline
+                      preload="metadata"
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                      <div className="rounded-full bg-white/90 p-2 text-black">
+                        <Play className="h-4 w-4 fill-current" />
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <img
+                    src={p.url}
+                    alt={p.caption ?? ""}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                )}
               </button>
             ))}
           </div>
