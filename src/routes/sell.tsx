@@ -245,12 +245,12 @@ function SellPage() {
   const { payment: paymentStatus, listingId: pendingListingId } = Route.useSearch();
 
   const [category, setCategory] = useState("car");
-  const [activeTab, setActiveTab] = useState<"basics" | "details" | "location" | "plan" | "media">("basics");
+  const [activeTab, setActiveTab] = useState<"details" | "location" | "plan" | "media">("details");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
-  const [monthly, setMonthly] = useState("");
-  const [downPayment, setDownPayment] = useState("");
+  const [myRides, setMyRides] = useState<Array<{ id: string; name: string | null; year: number | null; make: string | null; model: string | null }>>([]);
+  const [sourceRideId, setSourceRideId] = useState<string | null>(null);
   const [negotiable, setNegotiable] = useState(false);
   const [priceHidden, setPriceHidden] = useState(false);
   const [registrationStatus, setRegistrationStatus] = useState<
