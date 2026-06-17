@@ -434,14 +434,12 @@ function ServiceRow({
   };
 
   const unmatchedSuggestions = tagSuggestions.filter((t) => !row.tags.includes(t));
-  const inlineSuggestions = unmatchedSuggestions.slice(0, 5);
-  const moreSuggestions = unmatchedSuggestions.slice(5);
 
   return (
     <div className="px-3 py-3">
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-[minmax(0,1.4fr)_88px_88px_140px_minmax(0,1fr)_150px_72px_88px_36px] md:items-start md:gap-2">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-[minmax(0,1.6fr)_96px_96px_140px_160px_80px_minmax(0,1fr)_36px] lg:items-start lg:gap-2">
         <Field label="Service">
-          <div className="col-span-2 md:col-span-1">
+          <div className="col-span-2 lg:col-span-1">
             <div className="font-medium leading-tight">{row.title}</div>
             {row.description && (
               <div className="line-clamp-2 text-xs text-muted-foreground">
@@ -459,7 +457,7 @@ function ServiceRow({
         <Field label="From ₱">
           <Input
             inputMode="decimal"
-            className="w-full md:w-[88px]"
+            className="w-full"
             value={row.price_php ?? ""}
             placeholder="200"
             onChange={(e) => onPatch({ price_php: parseMoney(e.target.value) })}
@@ -469,7 +467,7 @@ function ServiceRow({
         <Field label="To ₱ (optional)">
           <Input
             inputMode="decimal"
-            className="w-full md:w-[88px]"
+            className="w-full"
             value={row.max_price_php ?? ""}
             placeholder="optional"
             onChange={(e) => onPatch({ max_price_php: parseMoney(e.target.value) })}
@@ -481,7 +479,7 @@ function ServiceRow({
             value={row.unit ?? ""}
             onValueChange={(v) => onPatch({ unit: v || null })}
           >
-            <SelectTrigger className="w-full md:w-[140px]">
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="unit" />
             </SelectTrigger>
             <SelectContent>
@@ -494,17 +492,6 @@ function ServiceRow({
           </Select>
         </Field>
 
-        <Field label="Note">
-          <Textarea
-            className="col-span-2 min-h-[60px] w-full resize-y text-sm md:col-span-1"
-            value={row.notes ?? ""}
-            placeholder="e.g. includes fuel at pump, excludes parts, weekends extra"
-            maxLength={500}
-            rows={2}
-            onChange={(e) => onPatch({ notes: e.target.value || null })}
-          />
-        </Field>
-
         <Field label="Coverage">
           <Select
             value={row.region_scope ?? ""}
@@ -512,7 +499,7 @@ function ServiceRow({
               onPatch({ region_scope: (v || null) as RegionScope | null })
             }
           >
-            <SelectTrigger className="w-full md:w-[150px]">
+            <SelectTrigger className="w-full">
               <SelectValue placeholder="Select coverage…" />
             </SelectTrigger>
             <SelectContent>
@@ -528,7 +515,7 @@ function ServiceRow({
         <Field label="ETA (min)">
           <Input
             inputMode="numeric"
-            className="w-full md:w-[72px]"
+            className="w-full"
             value={row.eta_minutes ?? ""}
             placeholder="—"
             onChange={(e) =>
@@ -552,7 +539,7 @@ function ServiceRow({
           </div>
         </Field>
 
-        <div className="col-span-2 flex justify-end md:col-span-1 md:justify-center">
+        <div className="col-span-2 flex justify-end lg:col-span-1 lg:justify-center">
           <Button
             size="sm"
             variant="ghost"
@@ -565,6 +552,20 @@ function ServiceRow({
         </div>
       </div>
 
+      {/* Notes — full-width row */}
+      <div className="mt-3">
+        <Label className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+          Note
+        </Label>
+        <Textarea
+          className="mt-1 min-h-[64px] w-full resize-y text-sm"
+          value={row.notes ?? ""}
+          placeholder="e.g. includes fuel at pump, excludes parts, weekends extra"
+          maxLength={500}
+          rows={2}
+          onChange={(e) => onPatch({ notes: e.target.value || null })}
+        />
+      </div>
 
       {/* Tags + radius + 24/7 row */}
       <div className="mt-3 flex flex-wrap items-start gap-x-4 gap-y-2 rounded-md bg-muted/30 p-2">
@@ -590,62 +591,14 @@ function ServiceRow({
                 </button>
               </Badge>
             ))}
-            <Input
-              value={tagDraft}
-              onChange={(e) => setTagDraft(e.target.value)}
-              onKeyDown={onTagKey}
-              onBlur={() => tagDraft && addTag(tagDraft)}
-              placeholder="+ tag"
-              className="h-7 w-24 text-xs"
+            <TagPicker
+              suggestions={unmatchedSuggestions}
+              draft={tagDraft}
+              setDraft={setTagDraft}
+              onAdd={addTag}
+              onKey={onTagKey}
             />
           </div>
-          {inlineSuggestions.length > 0 && (
-            <div className="flex flex-wrap items-center gap-1">
-              <span className="text-[10px] uppercase text-muted-foreground">
-                Suggested:
-              </span>
-              {inlineSuggestions.map((t) => (
-                <button
-                  key={t}
-                  type="button"
-                  onClick={() => addTag(t)}
-                  className="rounded-full border border-dashed border-border bg-background px-2 py-0.5 text-[11px] text-muted-foreground hover:border-solid hover:bg-accent hover:text-foreground"
-                >
-                  + {t}
-                </button>
-              ))}
-              {moreSuggestions.length > 0 && (
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <button
-                      type="button"
-                      className="rounded-full border border-border bg-background px-2 py-0.5 text-[11px] text-muted-foreground hover:bg-accent"
-                    >
-                      +{moreSuggestions.length} more
-                    </button>
-                  </PopoverTrigger>
-                  <PopoverContent
-                    align="start"
-                    className="w-64 p-2"
-                    onOpenAutoFocus={(e) => e.preventDefault()}
-                  >
-                    <div className="flex flex-wrap gap-1">
-                      {moreSuggestions.map((t) => (
-                        <button
-                          key={t}
-                          type="button"
-                          onClick={() => addTag(t)}
-                          className="rounded-full border border-border bg-background px-2 py-0.5 text-[11px] hover:bg-accent"
-                        >
-                          + {t}
-                        </button>
-                      ))}
-                    </div>
-                  </PopoverContent>
-                </Popover>
-              )}
-            </div>
-          )}
         </div>
 
         <label
@@ -677,6 +630,86 @@ function ServiceRow({
           <span>24/7</span>
         </label>
       </div>
+    </div>
+  );
+}
+
+function TagPicker({
+  suggestions,
+  draft,
+  setDraft,
+  onAdd,
+  onKey,
+}: {
+  suggestions: string[];
+  draft: string;
+  setDraft: (v: string) => void;
+  onAdd: (raw: string) => void;
+  onKey: (e: KeyboardEvent<HTMLInputElement>) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return suggestions;
+    return suggestions.filter((t) => t.toLowerCase().includes(q));
+  }, [suggestions, query]);
+
+  return (
+    <div className="flex items-center gap-1">
+      <Input
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={onKey}
+        onBlur={() => draft && onAdd(draft)}
+        placeholder="+ custom tag"
+        className="h-7 w-28 text-xs"
+      />
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <button
+            type="button"
+            className="rounded-full border border-dashed border-border bg-background px-2 py-0.5 text-[11px] text-muted-foreground hover:border-solid hover:bg-accent hover:text-foreground"
+          >
+            + Tag
+          </button>
+        </PopoverTrigger>
+        <PopoverContent
+          align="start"
+          className="w-72 p-2"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search tags…"
+            className="mb-2 h-8 text-xs"
+          />
+          {filtered.length === 0 ? (
+            <p className="px-1 py-2 text-xs text-muted-foreground">
+              No matching tags. Type in the field on the left and press Enter to add your own.
+            </p>
+          ) : (
+            <div className="max-h-56 overflow-y-auto">
+              <div className="flex flex-wrap gap-1">
+                {filtered.map((t) => (
+                  <button
+                    key={t}
+                    type="button"
+                    onClick={() => {
+                      onAdd(t);
+                      setQuery("");
+                    }}
+                    className="rounded-full border border-border bg-background px-2 py-0.5 text-[11px] hover:bg-accent"
+                  >
+                    + {t}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </PopoverContent>
+      </Popover>
     </div>
   );
 }
