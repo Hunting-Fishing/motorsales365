@@ -17,6 +17,8 @@ import {
   updateGalleryPhoto,
 } from "@/lib/business-mini-site.functions";
 import { uploadWithRetry } from "@/lib/storage-upload";
+import { isVideoUrl } from "@/lib/media-kind";
+import { Progress } from "@/components/ui/progress";
 
 type Album = {
   id: string;
@@ -33,7 +35,15 @@ type Photo = {
   sort_order: number;
 };
 
-async function uploadGalleryPhoto(userId: string, businessId: string, file: File): Promise<string> {
+const MAX_IMAGE_BYTES = 15 * 1024 * 1024; // 15 MB
+const MAX_VIDEO_BYTES = 100 * 1024 * 1024; // 100 MB
+
+async function uploadGalleryFile(
+  userId: string,
+  businessId: string,
+  file: File,
+  onProgress: (percent: number) => void,
+): Promise<string> {
   const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
   // Path must start with businessId — the storage RLS policy checks foldername[1] against businesses.id
   const path = `${businessId}/${userId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
@@ -42,6 +52,7 @@ async function uploadGalleryPhoto(userId: string, businessId: string, file: File
     path,
     file,
     contentType: file.type,
+    onProgress: (e) => onProgress(e.percent),
   });
   return publicUrl;
 }
