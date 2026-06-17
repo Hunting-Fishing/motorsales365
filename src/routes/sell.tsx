@@ -890,7 +890,7 @@ function SellPage() {
           </p>
 
           <div className="mt-6 space-y-4 rounded-xl border border-border bg-card p-5 sm:p-6">
-            <h2 className="font-display text-base font-semibold">How selling works</h2>
+            <h2 className="text-sm font-semibold">How selling works</h2>
             <ol className="ml-5 list-decimal space-y-1 text-sm text-muted-foreground">
               <li>Create a free account (or sign in).</li>
               <li>Add up to 12 photos and 1 walkaround video (free plan).</li>
@@ -1127,10 +1127,10 @@ function SellPage() {
 
 
           {SERVICE_CATEGORIES.has(category) && (
-            <section data-tab="details" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "details" ? "" : "hidden"}`}>
+            <section data-tab="details" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "details" ? "" : "hidden"}`}>
 
               <div>
-                <h2 className="font-display text-base font-semibold">What do you offer?</h2>
+                <h2 className="text-sm font-semibold">What do you offer?</h2>
                 <p className="text-xs text-muted-foreground">
                   Pick everything that applies — buyers filter by these tags.
                 </p>
@@ -1143,11 +1143,11 @@ function SellPage() {
             </section>
           )}
 
-          <section data-tab="details" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "details" ? "" : "hidden"}`}>
+          <section data-tab="details" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "details" ? "" : "hidden"}`}>
 
-            <h2 className="font-display text-base font-semibold">Details</h2>
+            <h2 className="text-sm font-semibold">Details</h2>
             {category === "repair" || category === "bodyshop" || category === "salvage" ? (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 <div className="sm:col-span-2">
                   <Label>Operating hours</Label>
                   <Input
@@ -1182,7 +1182,7 @@ function SellPage() {
                 </label>
               </div>
             ) : category === "carwash" ? (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 <div className="sm:col-span-2">
                   <Label>Services offered</Label>
                   <div className="mt-2 flex flex-wrap gap-2">
@@ -1253,7 +1253,7 @@ function SellPage() {
                 </label>
               </div>
             ) : category === "parts" ? (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
                   <Label>Part type</Label>
                   <Select value={partType} onValueChange={setPartType}>
@@ -1310,7 +1310,7 @@ function SellPage() {
               </div>
             ) : category === "used_part" ? (
               <div className="space-y-4">
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                   <div>
                     <Label>Vehicle system *</Label>
                     <Select value={usedPartSystem} onValueChange={setUsedPartSystem}>
@@ -1387,7 +1387,7 @@ function SellPage() {
                 </div>
               </div>
             ) : category === "drone" ? (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
                   <Label>Business type</Label>
                   <Select value={droneBizType} onValueChange={setDroneBizType}>
@@ -1451,7 +1451,7 @@ function SellPage() {
                 </label>
               </div>
             ) : category === "towing" ? (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
                   <Label>Service type</Label>
                   <Select value={towServiceType} onValueChange={setTowServiceType}>
@@ -1595,7 +1595,7 @@ function SellPage() {
                 />
               </div>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
                   <Label>Make / Brand</Label>
                   <Input value={make} onChange={(e) => setMake(e.target.value)} />
@@ -1610,7 +1610,7 @@ function SellPage() {
                 </div>
               </div>
             )}
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {(category === "car" || category === "motorcycle") && (
                 <>
                   <div>
@@ -1677,9 +1677,9 @@ function SellPage() {
             )}
           </section>
 
-          <section data-tab="location" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "location" ? "" : "hidden"}`}>
+          <section data-tab="location" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "location" ? "" : "hidden"}`}>
 
-            <h2 className="font-display text-base font-semibold">Location</h2>
+            <h2 className="text-sm font-semibold">Location</h2>
             <p className="text-xs text-muted-foreground">
               Based on the official PSA Philippine Standard Geographic Code.
             </p>
@@ -1694,9 +1694,9 @@ function SellPage() {
             />
           </section>
 
-          <section data-tab="location" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "location" ? "" : "hidden"}`}>
+          <section data-tab="location" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "location" ? "" : "hidden"}`}>
 
-            <h2 className="font-display text-base font-semibold">Seller type</h2>
+            <h2 className="text-sm font-semibold">Seller type</h2>
             <RadioGroup
               value={sellerType}
               onValueChange={(v: any) => setSellerType(v)}
@@ -1735,9 +1735,9 @@ function SellPage() {
           </section>
 
 
-          <section data-tab="plan" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "plan" ? "" : "hidden"}`}>
+          <section data-tab="plan" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "plan" ? "" : "hidden"}`}>
 
-            <h2 className="font-display text-base font-semibold">Plan</h2>
+            <h2 className="text-sm font-semibold">Plan</h2>
             <RadioGroup
               value={plan}
               onValueChange={(v: any) => setPlan(v)}
@@ -1774,9 +1774,9 @@ function SellPage() {
             </RadioGroup>
           </section>
 
-          <section data-tab="plan" className={`space-y-2 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "plan" ? "" : "hidden"}`}>
+          <section data-tab="plan" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "plan" ? "" : "hidden"}`}>
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-base font-semibold">Add a boost (optional)</h2>
+              <h2 className="text-sm font-semibold">Add a boost (optional)</h2>
               {selectedBoost && (
                 <button
                   type="button"
@@ -1819,8 +1819,8 @@ function SellPage() {
           </section>
 
 
-          <section data-tab="media" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "media" ? "" : "hidden"}`}>
-            <h2 className="font-display text-base font-semibold">Photos & video</h2>
+          <section data-tab="media" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "media" ? "" : "hidden"}`}>
+            <h2 className="text-sm font-semibold">Photos & video</h2>
             {(() => {
               const tierCaps: Record<
                 "free" | "standard" | "upgraded",
