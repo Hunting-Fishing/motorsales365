@@ -347,13 +347,24 @@ export function GalleryTab({
                   return (
                     <div
                       key={p.id}
-                      className="group relative aspect-square overflow-hidden rounded-md border border-border"
+                      className="group relative aspect-square overflow-hidden rounded-md border border-border bg-muted"
                     >
-                      <img
-                        src={p.url}
-                        alt={p.caption ?? ""}
-                        className="h-full w-full object-cover"
-                      />
+                      {isVideoUrl(p.url) ? (
+                        <video
+                          src={p.url}
+                          className="h-full w-full object-cover"
+                          muted
+                          playsInline
+                          preload="metadata"
+                          controls
+                        />
+                      ) : (
+                        <img
+                          src={p.url}
+                          alt={p.caption ?? ""}
+                          className="h-full w-full object-cover"
+                        />
+                      )}
                       {isCover && (
                         <div
                           className="absolute left-1 top-1 rounded-full bg-primary/90 p-1 text-primary-foreground"
