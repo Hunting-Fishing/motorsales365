@@ -38,13 +38,16 @@ export function CatalogPicker({
   onPick,
   onCustom,
   typeSlug,
+  businessId,
 }: {
   existingKeys: Set<string>;
   onPick: (item: CatalogItem) => void;
   onCustom: () => void;
-  /** Business type slug. Only "fuel_station" gets the fuel catalog;
-   * everything else gets an "Add custom item" panel. */
+  /** Business type slug. "fuel_station" uses the bundled in-code catalog;
+   * everything else loads the DB-backed catalog for that type. */
   typeSlug?: string | null;
+  /** Used when submitting a "suggest a new item" request. */
+  businessId?: string | null;
 }) {
   const useFuelCatalog = typeSlug === "fuel_station";
   const [q, setQ] = useState("");
@@ -65,23 +68,17 @@ export function CatalogPicker({
     return hits.slice(0, 40);
   }, [q, useFuelCatalog]);
 
-  // Non-fuel businesses: simple custom-only panel (no curated catalog yet).
+  // Non-fuel: DB-backed catalog tailored to this business type, with a
+  // "suggest a new item" flow that notifies admins.
   if (!useFuelCatalog) {
     return (
-      <Card className="overflow-hidden border-primary/30">
-        <div className="border-b border-border bg-muted/40 p-3">
-          <div className="flex items-center justify-between gap-2">
-            <h3 className="text-sm font-semibold">Add a service or product</h3>
-            <Button size="sm" variant="default" onClick={onCustom}>
-              <Plus className="mr-1 h-4 w-4" /> Add custom item
-            </Button>
-          </div>
-        </div>
-        <div className="p-4 text-sm text-muted-foreground">
-          Describe each service or product you offer (title, price, optional photo and description).
-          A curated catalog for this business type is coming soon — for now, add items manually.
-        </div>
-      </Card>
+      <DbCatalogPicker
+        typeSlug={typeSlug ?? null}
+        businessId={businessId ?? null}
+        existingKeys={existingKeys}
+        onPick={onPick}
+        onCustom={onCustom}
+      />
     );
   }
 
