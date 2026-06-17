@@ -15,6 +15,13 @@ import {
   Play,
 } from "lucide-react";
 import { isVideoUrl } from "@/lib/media-kind";
+import { formatE164 } from "@/data/country-codes";
+
+const PHONE_KINDS_SET = new Set(["phone", "whatsapp", "viber"]);
+function displayChannel(kind: string, value: string): string {
+  return PHONE_KINDS_SET.has(kind) ? formatE164(value) : value;
+}
+
 
 type Album = {
   id: string;
@@ -327,7 +334,7 @@ export function PublicContactSection({
                   {KIND_LABELS[c.kind] ?? c.kind}
                   {c.label ? ` · ${c.label}` : ""}
                 </div>
-                <div className="truncate text-sm font-medium">{c.value}</div>
+                <div className="truncate text-sm font-medium">{displayChannel(c.kind, c.value)}</div>
               </div>
             </div>
           );

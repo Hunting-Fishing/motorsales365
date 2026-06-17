@@ -86,11 +86,59 @@ export function buildE164(iso: string, national: string): string | null {
   return `${c.dial}${digits}`;
 }
 
-// Light formatter: groups national digits in 3-3-4 blocks for readability.
-export function formatNational(national: string): string {
+// Country-aware formatter: groups national digits with dashes so PH
+// `9694343430` displays as `969-434-3430`. Falls back to 3-3-rest for unknown
+// ISO codes. Pass only national digits (no dial code).
+export function formatNational(national: string, iso?: string): string {
   const d = national.replace(/\D/g, "");
-  if (d.length <= 3) return d;
-  if (d.length <= 6) return `${d.slice(0, 3)} ${d.slice(3)}`;
-  if (d.length <= 10) return `${d.slice(0, 3)} ${d.slice(3, 6)} ${d.slice(6)}`;
-  return `${d.slice(0, 3)} ${d.slice(3, 6)} ${d.slice(6, 10)} ${d.slice(10)}`;
+  if (!d) return "";
+  const code = (iso ?? "").toUpperCase();
+  const groupings: Record<string, number[]> = {
+    PH: [3, 3, 4],
+    US: [3, 3, 4],
+    CA: [3, 3, 4],
+    AU: [3, 3, 3],
+    NZ: [2, 3, 4],
+    GB: [4, 6],
+    SG: [4, 4],
+    MY: [2, 3, 4],
+    ID: [3, 4, 4],
+    TH: [2, 3, 4],
+    VN: [3, 3, 3],
+    JP: [2, 4, 4],
+    KR: [2, 4, 4],
+    CN: [3, 4, 4],
+    HK: [4, 4],
+    TW: [3, 3, 3],
+    IN: [5, 5],
+    AE: [2, 3, 4],
+    SA: [2, 3, 4],
+    DE: [4, 3, 4],
+    FR: [1, 2, 2, 2, 2],
+    ES: [3, 3, 3],
+    IT: [3, 3, 4],
+    NL: [2, 4, 4],
+    BR: [2, 4, 4],
+    MX: [3, 3, 4],
+  };
+  const pattern = groupings[code] ?? [3, 3, 4];
+  const parts: string[] = [];
+  let i = 0;
+  for (const size of pattern) {
+    if (i >= d.length) break;
+    parts.push(d.slice(i, i + size));
+    i += size;
+  }
+  if (i < d.length) parts.push(d.slice(i));
+  return parts.filter(Boolean).join("-");
 }
+
+/** Format a stored E.164 phone (`+639694343430`) for display, e.g. `+63 969-434-3430`. */
+export function formatE164(value: string | null | undefined): string {
+  if (!value) return "";
+  const { iso, national } = parseE164(value);
+  const country = COUNTRY_CODES.find((c) => c.iso === iso);
+  const formatted = formatNational(national, iso);
+  return country ? `${country.dial} ${formatted}` : value;
+}
+

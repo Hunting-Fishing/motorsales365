@@ -547,7 +547,7 @@ function formatChannelValue(kind: string, value: string): string {
   if (PHONE_KINDS.has(kind)) {
     const parsed = parseE164(value);
     const country = COUNTRY_CODES.find((c) => c.iso === parsed.iso);
-    if (country) return `${country.flag} ${country.dial} ${formatNational(parsed.national)}`;
+    if (country) return `${country.flag} ${country.dial} ${formatNational(parsed.national, parsed.iso)}`;
   }
   return value;
 }
@@ -561,9 +561,10 @@ function PhoneField({
   iso: string;
   national: string;
   onIsoChange: (v: string) => void;
-  onNationalChange: (v: string) => void;
+  onNationalChange: (digits: string) => void;
 }) {
   const country = COUNTRY_CODES.find((c) => c.iso === iso) ?? COUNTRY_CODES[0];
+  const display = formatNational(national, iso);
   return (
     <div className="flex gap-2">
       <Select value={iso} onValueChange={onIsoChange}>
@@ -590,15 +591,16 @@ function PhoneField({
       <Input
         type="tel"
         inputMode="tel"
-        value={national}
-        onChange={(e) => onNationalChange(e.target.value.replace(/[^\d ]/g, ""))}
-        placeholder="969 606 3830"
+        value={display}
+        onChange={(e) => onNationalChange(e.target.value.replace(/\D/g, ""))}
+        placeholder="969-434-3430"
         className="h-11 flex-1"
-        maxLength={20}
+        maxLength={24}
       />
     </div>
   );
 }
+
 
 export function ContactChannelsTab({
   businessId,
@@ -638,7 +640,7 @@ export function ContactChannelsTab({
     if (PHONE_KINDS.has(c.kind)) {
       const p = parseE164(c.value);
       setIso(p.iso);
-      setNational(formatNational(p.national));
+      setNational(p.national);
       setValue("");
     } else {
       setValue(c.value);
@@ -646,6 +648,7 @@ export function ContactChannelsTab({
       setNational("");
     }
   };
+
 
   const save = async () => {
     let finalValue = value.trim();

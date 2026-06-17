@@ -17,6 +17,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { getBusinessPage } from "@/lib/business-pages.functions";
 import { getBookingConfig, createBooking } from "@/lib/business-bookings.functions";
 import { computeSlots } from "@/lib/business-bookings-slots";
+import { COUNTRY_CODES, parseE164, buildE164, formatNational } from "@/data/country-codes";
+
 
 export const Route = createFileRoute("/businesses/$slug/book")({
   head: ({ params }) => ({
@@ -66,7 +68,10 @@ function BookingPage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [name, setName] = useState((user as any)?.user_metadata?.full_name ?? "");
-  const [phone, setPhone] = useState("");
+  const [phoneIso, setPhoneIso] = useState<string>("PH");
+  const [phoneNational, setPhoneNational] = useState<string>("");
+  const phone = buildE164(phoneIso, phoneNational) ?? "";
+
   const [email, setEmail] = useState((user as any)?.email ?? "");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -293,14 +298,31 @@ function BookingPage() {
                   </div>
                   <div>
                     <Label htmlFor="b-phone">Phone</Label>
-                    <Input
-                      id="b-phone"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      maxLength={40}
-                      placeholder="+63…"
-                    />
+                    <div className="flex gap-2">
+                      <select
+                        aria-label="Country code"
+                        value={phoneIso}
+                        onChange={(e) => setPhoneIso(e.target.value)}
+                        className="h-10 rounded-md border border-input bg-background px-2 text-sm"
+                      >
+                        {COUNTRY_CODES.map((c) => (
+                          <option key={c.iso} value={c.iso}>
+                            {c.flag} {c.dial}
+                          </option>
+                        ))}
+                      </select>
+                      <Input
+                        id="b-phone"
+                        type="tel"
+                        inputMode="tel"
+                        value={formatNational(phoneNational, phoneIso)}
+                        onChange={(e) => setPhoneNational(e.target.value.replace(/\D/g, ""))}
+                        maxLength={24}
+                        placeholder="969-434-3430"
+                      />
+                    </div>
                   </div>
+
                   <div className="sm:col-span-2">
                     <Label htmlFor="b-email">Email</Label>
                     <Input

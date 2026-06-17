@@ -102,10 +102,12 @@ export const createBooking = createServerFn({ method: "POST" })
         customerPhone: z.string().max(40).optional().nullable(),
         customerEmail: z.string().email().max(200).optional().nullable(),
         userId: z.string().uuid().optional().nullable(),
+        assignedUserId: z.string().uuid().optional().nullable(),
         notes: z.string().max(1000).optional().nullable(),
       })
       .parse(input),
   )
+
   .handler(async ({ data }) => {
     // Load item to derive duration + approval
     const { data: item, error: itemErr } = await supabaseAdmin
@@ -152,11 +154,13 @@ export const createBooking = createServerFn({ method: "POST" })
         customer_phone: data.customerPhone?.trim() || null,
         customer_email: data.customerEmail?.trim() || null,
         user_id: data.userId ?? null,
+        assigned_user_id: data.assignedUserId ?? null,
         starts_at: start.toISOString(),
         ends_at: end.toISOString(),
         status,
         notes: data.notes?.trim() || null,
       } as any)
+
       .select("id, status, starts_at, ends_at")
       .single();
     if (error) throw new Error(error.message);
@@ -455,4 +459,99 @@ export const updateBookingStatus = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-// Slot computation lives in ./business-bookings-slots (client-safe).
+/* ---------- OWNER: assign booking to staff member ---------- */
+
+export const assignBooking = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) =>
+    z
+      .object({
+        businessId: z.string().uuid(),
+        id: z.string().uuid(),
+        assignedUserId: z.string().uuid().nullable(),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertEditor(supabase, userId, data.businessId);
+    // If assigning, verify the user is the owner or active staff.
+    if (data.assignedUserId) {
+      const { data: biz } = await supabase
+        .from("businesses")
+        .select("owner_id")
+        .eq("id", data.businessId)
+        .maybeSingle();
+      const isOwner = (biz as any)?.owner_id === data.assignedUserId;
+      if (!isOwner) {
+        const { data: staff } = await supabase
+          .from("business_staff")
+          .select("id")
+          .eq("business_id", data.businessId)
+          .eq("user_id", data.assignedUserId)
+          .eq("active", true)
+          .maybeSingle();
+        if (!staff) throw new Error("That user is not approved staff for this business");
+      }
+    }
+    const { error } = await supabase
+      .from("business_bookings")
+      .update({ assigned_user_id: data.assignedUserId } as any)
+      .eq("id", data.id)
+      .eq("business_id", data.businessId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/* ---------- OWNER: list of people a booking can be assigned to ---------- */
+
+export const listBookingAssignees = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((input) => z.object({ businessId: z.string().uuid() }).parse(input))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    await assertEditor(supabase, userId, data.businessId);
+    const { data: biz } = await supabase
+      .from("businesses")
+      .select("owner_id")
+      .eq("id", data.businessId)
+      .maybeSingle();
+    const { data: staff } = await supabase
+      .from("business_staff")
+      .select("user_id, role, title")
+      .eq("business_id", data.businessId)
+      .eq("active", true);
+
+    const ids = new Set<string>();
+    if ((biz as any)?.owner_id) ids.add((biz as any).owner_id);
+    for (const s of (staff as any[]) ?? []) if (s.user_id) ids.add(s.user_id);
+    if (ids.size === 0) return { assignees: [] };
+
+    const { data: profiles } = await supabase
+      .from("profiles")
+      .select("user_id, full_name, email, avatar_url")
+      .in("user_id", Array.from(ids));
+
+    const profileMap = new Map((profiles as any[] | null)?.map((p) => [p.user_id, p]) ?? []);
+    const ownerId = (biz as any)?.owner_id ?? null;
+    const list = Array.from(ids).map((uid) => {
+      const p = profileMap.get(uid);
+      const staffRow = (staff as any[] | undefined)?.find((s) => s.user_id === uid);
+      return {
+        user_id: uid,
+        full_name: p?.full_name ?? p?.email ?? "Unnamed user",
+        email: p?.email ?? null,
+        avatar_url: p?.avatar_url ?? null,
+        role: uid === ownerId ? "owner" : (staffRow?.role ?? "staff"),
+        title: staffRow?.title ?? null,
+      };
+    });
+    // Owner first, then alphabetical
+    list.sort((a, b) => {
+      if (a.role === "owner") return -1;
+      if (b.role === "owner") return 1;
+      return a.full_name.localeCompare(b.full_name);
+    });
+    return { assignees: list };
+  });
+

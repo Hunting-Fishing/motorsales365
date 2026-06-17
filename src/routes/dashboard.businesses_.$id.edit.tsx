@@ -277,6 +277,7 @@ function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
         <TabsContent value="bookings">
           <BookingsTab
             businessId={biz.id}
+            businessHours={(biz as any).hours ?? null}
             items={(data as any).bookableItems ?? []}
             availability={(data as any).availability ?? []}
             exceptions={(data as any).exceptions ?? []}
@@ -284,6 +285,7 @@ function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
             onChange={refetch}
           />
         </TabsContent>
+
         <TabsContent value="inquiries">
           <InquiriesTab businessId={biz.id} inquiries={data.inquiries} onChange={refetch} />
         </TabsContent>
