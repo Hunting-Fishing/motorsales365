@@ -8,14 +8,13 @@ import { useAuth } from "@/hooks/use-auth";
 import {
   getMyBusinessPage,
   updateBusinessPageSettings,
-  upsertBusinessService,
-  deleteBusinessService,
   upsertBusinessProduct,
   deleteBusinessProduct,
   createBusinessPost,
   deleteBusinessPost,
   updateInquiryStatus,
 } from "@/lib/business-pages.functions";
+import { saveBusinessServices } from "@/lib/business-services-save.functions";
 import { setVanitySlug } from "@/lib/business-mini-site.functions";
 import { FormFeedbackLink } from "@/components/form-feedback";
 
@@ -44,8 +43,6 @@ import {
   Upload,
   ExternalLink,
   Image as ImageIcon,
-  X,
-  Pencil,
 } from "lucide-react";
 import { WeekHoursEditor } from "@/components/business/hours-editor";
 import {
@@ -55,15 +52,7 @@ import {
   type StructuredHours,
   type WeekSchedule,
 } from "@/lib/business-hours";
-import {
-  CatalogPicker,
-  PricingFields,
-  blankService,
-  fromCatalogItem,
-  
-  type ServiceFormValue,
-} from "@/components/business/service-catalog-picker";
-import { CATEGORY_LABEL, UNIT_OPTIONS } from "@/data/fuel-station-catalog";
+import { ServicesTable, type DraftService } from "@/components/business/services-table";
 import { GalleryTab, ContactChannelsTab } from "@/components/business-page/gallery-contact-tabs";
 import { LocationPicker } from "@/components/businesses/location-picker";
 import { BookingsTab } from "@/components/business-page/bookings-tab";
