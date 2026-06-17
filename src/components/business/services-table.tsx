@@ -373,6 +373,17 @@ export function ServicesTable({
   );
 }
 
+function Field({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="flex flex-col gap-1 md:contents">
+      <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground md:hidden">
+        {label}
+      </span>
+      {children}
+    </div>
+  );
+}
+
 function ServiceRow({
   row,
   businessId,
