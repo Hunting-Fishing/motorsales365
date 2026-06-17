@@ -83,6 +83,9 @@ export function GalleryTab({
   const [editTitle, setEditTitle] = useState("");
   const [editDesc, setEditDesc] = useState("");
   const [uploadingFor, setUploadingFor] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<
+    { name: string; percent: number; size: number; kind: "image" | "video" }[]
+  >([]);
   const [captionFor, setCaptionFor] = useState<string | null>(null);
   const [captionDraft, setCaptionDraft] = useState("");
 
