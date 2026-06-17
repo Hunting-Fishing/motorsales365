@@ -1641,7 +1641,21 @@ function SellPage() {
                 </div>
               </label>
             </RadioGroup>
+            <div className="pt-2">
+              <Label htmlFor="phone">Contact phone (optional)</Label>
+              <PhoneInput
+                id="phone"
+                iso={phoneIso}
+                national={phoneNational}
+                onChange={({ iso, national }) => {
+                  setPhoneIso(iso);
+                  setPhoneNational(national);
+                  setPhone(buildE164(iso, national) ?? "");
+                }}
+              />
+            </div>
           </section>
+
 
           <section data-tab="plan" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "plan" ? "" : "hidden"}`}>
 
