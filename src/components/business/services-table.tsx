@@ -427,18 +427,9 @@ function ServiceRow({
   const inlineSuggestions = unmatchedSuggestions.slice(0, 5);
   const moreSuggestions = unmatchedSuggestions.slice(5);
 
-  const Field = ({ label, children }: { label: string; children: ReactNode }) => (
-    <div className="flex flex-col gap-1 md:contents">
-      <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground md:hidden">
-        {label}
-      </span>
-      {children}
-    </div>
-  );
-
   return (
     <div className="px-3 py-3">
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-[minmax(0,1.4fr)_88px_88px_140px_minmax(0,1fr)_150px_72px_88px_36px] md:items-center md:gap-2">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-[minmax(0,1.4fr)_88px_88px_140px_minmax(0,1fr)_150px_72px_88px_36px] md:items-start md:gap-2">
         <Field label="Service">
           <div className="col-span-2 md:col-span-1">
             <div className="font-medium leading-tight">{row.title}</div>
@@ -494,11 +485,12 @@ function ServiceRow({
         </Field>
 
         <Field label="Note">
-          <Input
-            className="col-span-2 w-full md:col-span-1"
+          <Textarea
+            className="col-span-2 min-h-[60px] w-full resize-y text-sm md:col-span-1"
             value={row.notes ?? ""}
-            placeholder='"+ fuel at pump"'
-            maxLength={120}
+            placeholder="e.g. includes fuel at pump, excludes parts, weekends extra"
+            maxLength={500}
+            rows={2}
             onChange={(e) => onPatch({ notes: e.target.value || null })}
           />
         </Field>
@@ -511,7 +503,7 @@ function ServiceRow({
             }
           >
             <SelectTrigger className="w-full md:w-[150px]">
-              <SelectValue placeholder="—" />
+              <SelectValue placeholder="Select coverage…" />
             </SelectTrigger>
             <SelectContent>
               {REGION_SCOPE_OPTIONS.map((r) => (
@@ -535,12 +527,17 @@ function ServiceRow({
           />
         </Field>
 
-        <Field label="Market">
-          <div>
+        <Field label="Market avg">
+          <div className="text-xs">
             {row.catalog_id ? (
               <MarketStats catalogId={row.catalog_id} excludeBusinessId={businessId} />
             ) : (
-              <span className="text-xs text-muted-foreground">—</span>
+              <span
+                className="text-muted-foreground"
+                title="Market comparison appears once this custom service is approved by admin."
+              >
+                Pending approval
+              </span>
             )}
           </div>
         </Field>
@@ -557,6 +554,7 @@ function ServiceRow({
           </Button>
         </div>
       </div>
+
 
       {/* Tags + radius + 24/7 row */}
       <div className="mt-3 flex flex-wrap items-start gap-x-4 gap-y-2 rounded-md bg-muted/30 p-2">
