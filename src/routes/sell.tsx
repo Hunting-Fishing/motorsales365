@@ -1013,7 +1013,33 @@ function SellPage() {
           <section data-tab="details" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "details" ? "" : "hidden"}`}>
 
 
-            <h2 className="font-display text-base font-semibold">Category & basics</h2>
+            <h2 className="font-display text-base font-semibold">Details</h2>
+            {myRides.length > 0 && (
+              <div className="rounded-lg border border-primary/30 bg-primary/5 p-2.5">
+                <Label className="text-xs font-semibold">Pull from your Rides</Label>
+                <p className="mt-0.5 text-[11px] text-muted-foreground">
+                  Prefills vehicle details and adds a link back to your Rides page for more photos.
+                </p>
+                <Select
+                  value={sourceRideId ?? ""}
+                  onValueChange={(v) => { if (v) prefillFromRide(v); }}
+                >
+                  <SelectTrigger className="mt-1.5 h-9">
+                    <SelectValue placeholder="Choose one of your rides…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {myRides.map((r) => {
+                      const label = [r.year, r.make, r.model].filter(Boolean).join(" ");
+                      return (
+                        <SelectItem key={r.id} value={r.id}>
+                          {r.name ? `${r.name}${label ? ` — ${label}` : ""}` : label || "Untitled ride"}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label>Category</Label>
