@@ -1990,7 +1990,7 @@ function SellPage() {
             <div className="mb-1"><FormFeedbackLink formId="post-listing" /></div>
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
               {(() => {
-                const order = ["basics", "details", "location", "plan", "media"] as const;
+                const order = ["details", "location", "plan", "media"] as const;
                 const i = order.indexOf(activeTab);
                 return (
                   <>
