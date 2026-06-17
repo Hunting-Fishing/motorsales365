@@ -284,12 +284,11 @@ export function ServicesTable({
         </div>
       ) : (
         <div className="divide-y divide-border">
-          <div className="hidden md:grid md:grid-cols-[minmax(0,1.4fr)_88px_88px_140px_minmax(0,1fr)_150px_72px_88px_36px] gap-2 bg-muted/30 px-3 py-2 text-[11px] uppercase tracking-wide text-muted-foreground">
+          <div className="hidden lg:grid lg:grid-cols-[minmax(0,1.6fr)_96px_96px_140px_160px_80px_minmax(0,1fr)_36px] gap-2 bg-muted/30 px-3 py-2 text-[11px] uppercase tracking-wide text-muted-foreground">
             <div>Service</div>
             <div>From ₱</div>
             <div>To ₱</div>
             <div>Unit</div>
-            <div>Note</div>
             <div>Coverage</div>
             <div>ETA m</div>
             <div>Market</div>
