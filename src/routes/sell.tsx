@@ -1739,37 +1739,38 @@ function SellPage() {
             <RadioGroup
               value={plan}
               onValueChange={(v: any) => setPlan(v)}
-              className="grid gap-3 sm:grid-cols-3"
+              className="grid gap-2 sm:grid-cols-3"
             >
-              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 hover:bg-secondary/50">
-                <RadioGroupItem value="free" className="mt-1" />
+              <label className="flex cursor-pointer items-start gap-2 rounded-lg border border-border p-2.5 hover:bg-secondary/50">
+                <RadioGroupItem value="free" className="mt-0.5" />
                 <div>
-                  <div className="font-medium">Free — ₱0</div>
-                  <div className="text-xs text-muted-foreground">
-                    Up to 12 photos, 1 video. 5 active listings.
+                  <div className="text-sm font-medium">Free — ₱0</div>
+                  <div className="text-[11px] text-muted-foreground">
+                    12 photos, 1 video · 5 active
                   </div>
                 </div>
               </label>
-              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 hover:bg-secondary/50">
-                <RadioGroupItem value="standard" className="mt-1" />
+              <label className="flex cursor-pointer items-start gap-2 rounded-lg border border-border p-2.5 hover:bg-secondary/50">
+                <RadioGroupItem value="standard" className="mt-0.5" />
                 <div>
-                  <div className="font-medium">
+                  <div className="text-sm font-medium">
                     Standard — {formatPHP(pricing.listing_fee_php ?? 20)}
                   </div>
-                  <div className="text-xs text-muted-foreground">Up to 20 photos, 3 videos</div>
+                  <div className="text-[11px] text-muted-foreground">20 photos, 3 videos</div>
                 </div>
               </label>
-              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 hover:bg-secondary/50">
-                <RadioGroupItem value="upgraded" className="mt-1" />
+              <label className="flex cursor-pointer items-start gap-2 rounded-lg border border-border p-2.5 hover:bg-secondary/50">
+                <RadioGroupItem value="upgraded" className="mt-0.5" />
                 <div>
-                  <div className="font-medium">
+                  <div className="text-sm font-medium">
                     Upgraded —{" "}
                     {formatPHP((pricing.listing_fee_php ?? 20) + (pricing.upgrade_fee_php ?? 100))}
                   </div>
-                  <div className="text-xs text-muted-foreground">Up to 20 photos, 3 videos</div>
+                  <div className="text-[11px] text-muted-foreground">20 photos, 3 videos</div>
                 </div>
               </label>
             </RadioGroup>
+
           </section>
 
           <section data-tab="plan" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "plan" ? "" : "hidden"}`}>
