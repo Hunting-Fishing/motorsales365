@@ -1559,7 +1559,44 @@ function SellPage() {
                 </div>
               </div>
             ) : category === "car" || category === "motorcycle" ? (
-              <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <div className="sm:col-span-2">
+                    <Label>VIN / chassis</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Optional"
+                        value={vehicleQuality.vin_chassis ?? ""}
+                        maxLength={17}
+                        onChange={(e) =>
+                          setVehicleQuality((prev) => ({
+                            ...prev,
+                            vin_chassis: e.target.value.toUpperCase().replace(/\s+/g, ""),
+                          }))
+                        }
+                      />
+                      <VinScanDialog
+                        onResult={(r) => {
+                          setVehicleQuality((prev) => ({ ...prev, vin_chassis: r.vin }));
+                          if (r.year) setYear(r.year);
+                          if (r.make) setMake(r.make);
+                          if (r.model) setModel(r.model);
+                          if (r.fuel) setFuel(r.fuel);
+                          if (r.transmission) setTransmission(r.transmission);
+                        }}
+                      />
+                    </div>
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">
+                      11–17 letters and numbers, no I/O/Q. Shown only when a buyer requests verification.
+                    </p>
+                    {vehicleQualityIssues.find((i) => i.field === "vin_chassis") && (
+                      <p className="mt-0.5 text-[11px] text-destructive flex items-center gap-1">
+                        <AlertCircle className="h-3 w-3" />
+                        {vehicleQualityIssues.find((i) => i.field === "vin_chassis")?.message}
+                      </p>
+                    )}
+                  </div>
+                </div>
                 <VehiclePicker
                   category={category as "car" | "motorcycle"}
                   year={year}
@@ -1641,18 +1678,6 @@ function SellPage() {
                 value={vehicleQuality}
                 onChange={setVehicleQuality}
                 issues={vehicleQualityIssues}
-                vinScanSlot={
-                  <VinScanDialog
-                    onResult={(r) => {
-                      setVehicleQuality((prev) => ({ ...prev, vin_chassis: r.vin }));
-                      if (r.year) setYear(r.year);
-                      if (r.make) setMake(r.make);
-                      if (r.model) setModel(r.model);
-                      if (r.fuel) setFuel(r.fuel);
-                      if (r.transmission) setTransmission(r.transmission);
-                    }}
-                  />
-                }
               />
             )}
             {isAttrCategory(category) && (
