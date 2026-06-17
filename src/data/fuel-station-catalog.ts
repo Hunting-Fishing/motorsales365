@@ -269,20 +269,58 @@ export const CATEGORY_LABEL: Record<string, string> = Object.fromEntries(
 );
 
 export const UNIT_OPTIONS: { value: string; label: string }[] = [
-  { value: "L", label: "per Liter (₱/L)" },
-  { value: "kWh", label: "per kWh (₱/kWh)" },
-  { value: "item", label: "per item" },
+  // Services / labor
   { value: "service", label: "per service" },
-  { value: "kg", label: "per kilo" },
-  { value: "tank", label: "per tank" },
-  { value: "pack", label: "per pack" },
+  { value: "job", label: "per job" },
+  { value: "visit", label: "per visit" },
+  { value: "session", label: "per session" },
+  { value: "appointment", label: "per appointment" },
+  { value: "hr", label: "per hour" },
+  { value: "min", label: "per minute" },
+  { value: "day", label: "per day" },
+  { value: "week", label: "per week" },
+  { value: "month", label: "per month" },
+  { value: "year", label: "per year" },
+  // Distance / transport
+  { value: "km", label: "per kilometer (₱/km)" },
+  { value: "trip", label: "per trip" },
+  { value: "delivery", label: "per delivery" },
+  { value: "passenger", label: "per passenger" },
+  // Quantity
+  { value: "item", label: "per item" },
   { value: "pc", label: "per piece" },
+  { value: "pair", label: "per pair" },
+  { value: "set", label: "per set" },
+  { value: "pack", label: "per pack" },
+  { value: "box", label: "per box" },
   { value: "bag", label: "per bag" },
-  { value: "cup", label: "per cup" },
-  { value: "sachet", label: "per sachet" },
   { value: "tray", label: "per tray" },
+  { value: "sachet", label: "per sachet" },
   { value: "stick", label: "per stick" },
+  { value: "bottle", label: "per bottle" },
+  { value: "can", label: "per can" },
+  { value: "cup", label: "per cup" },
+  { value: "plate", label: "per plate" },
   { value: "load", label: "per load" },
+  // Vehicle / unit
+  { value: "vehicle", label: "per vehicle" },
+  { value: "wheel", label: "per wheel" },
+  { value: "tire", label: "per tire" },
+  { value: "axle", label: "per axle" },
+  { value: "seat", label: "per seat" },
+  { value: "room", label: "per room" },
+  { value: "sqm", label: "per square meter (₱/sqm)" },
+  // Weight / volume
+  { value: "kg", label: "per kilo (₱/kg)" },
+  { value: "g", label: "per gram" },
+  { value: "lb", label: "per pound" },
+  { value: "L", label: "per liter (₱/L)" },
+  { value: "mL", label: "per milliliter" },
+  { value: "gal", label: "per gallon" },
+  { value: "tank", label: "per tank" },
+  { value: "drum", label: "per drum" },
+  // Energy
+  { value: "kWh", label: "per kWh (₱/kWh)" },
 ];
 
 export function findCatalogItem(key: string | null | undefined): CatalogItem | null {
