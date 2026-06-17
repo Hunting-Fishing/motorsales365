@@ -532,12 +532,25 @@ function BusinessProfilePage() {
               <p className="whitespace-pre-wrap text-sm text-muted-foreground">
                 {biz.description || "No description provided."}
               </p>
-              {biz.brands_carried && (
+              {(brandsList.length > 0 || biz.brands_carried) && (
                 <div className="mt-3">
                   <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     Brands carried
                   </div>
-                  <div className="mt-1 text-sm">{biz.brands_carried}</div>
+                  {brandsList.length > 0 ? (
+                    <div className="mt-1.5 flex flex-wrap gap-1.5">
+                      {brandsList.map((b, i) => (
+                        <span
+                          key={`${b.name}-${i}`}
+                          className="rounded-full border border-border bg-secondary px-2.5 py-0.5 text-xs"
+                        >
+                          {b.name}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mt-1 text-sm">{biz.brands_carried}</div>
+                  )}
                 </div>
               )}
               {biz.hours && (
