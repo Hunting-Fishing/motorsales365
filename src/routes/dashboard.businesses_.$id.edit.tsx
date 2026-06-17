@@ -279,6 +279,7 @@ function EditBusinessPageInner({ biz, data, user, refetch, navigate }: any) {
             businessId={biz.id}
             businessSlug={(biz as any).slug ?? null}
             businessName={biz.name}
+            businessKind={(biz as any).type_slug ?? (biz as any).kind ?? null}
             businessHours={(biz as any).hours ?? null}
             items={(data as any).bookableItems ?? []}
             availability={(data as any).availability ?? []}
