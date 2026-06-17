@@ -150,7 +150,7 @@ export function GalleryTab({
       const limit = isVideo ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES;
       if (f.size > limit) {
         toast.error(
-          `${f.name} is too large (max ${isVideo ? "100 MB" : "15 MB"})`,
+          `${f.name} is too large (max ${isVideo ? "50 MB" : "15 MB"})`,
         );
         return;
       }
