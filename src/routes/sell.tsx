@@ -929,7 +929,38 @@ function SellPage() {
         </div>
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-3">
-          <section className="space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4">
+          {(() => {
+            const TABS = [
+              { key: "basics", label: "Basics" },
+              { key: "details", label: "Details" },
+              { key: "location", label: "Location & Seller" },
+              { key: "plan", label: "Plan & Boost" },
+              { key: "media", label: "Photos" },
+            ] as const;
+            const idx = TABS.findIndex((t) => t.key === activeTab);
+            return (
+              <div className="sticky top-14 z-20 -mx-3 sm:mx-0 bg-background/95 backdrop-blur border-b border-border sm:rounded-xl sm:border sm:bg-card">
+                <div className="flex overflow-x-auto no-scrollbar px-1 py-1 gap-1">
+                  {TABS.map((t, i) => (
+                    <button
+                      key={t.key}
+                      type="button"
+                      onClick={() => setActiveTab(t.key)}
+                      className={`whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                        activeTab === t.key
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:bg-secondary"
+                      }`}
+                    >
+                      <span className="mr-1 opacity-60">{i + 1}.</span>{t.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+          <section data-tab="basics" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "basics" ? "" : "hidden"}`}>
+
             <h2 className="font-display text-base font-semibold">Category & basics</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
