@@ -1000,41 +1000,38 @@ function SellPage() {
 
             );
           })()}
-          <section data-tab="details" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "details" ? "" : "hidden"}`}>
-
-
-            <h2 className="font-display text-base font-semibold">Details</h2>
-            {myRides.length > 0 && (
-              <div className="rounded-lg border border-primary/30 bg-primary/5 p-2.5">
-                <Label className="text-xs font-semibold">Pull from your Rides</Label>
-                <p className="mt-0.5 text-[11px] text-muted-foreground">
-                  Prefills vehicle details and adds a link back to your Rides page for more photos.
-                </p>
-                <Select
-                  value={sourceRideId ?? ""}
-                  onValueChange={(v) => { if (v) prefillFromRide(v); }}
-                >
-                  <SelectTrigger className="mt-1.5 h-9">
-                    <SelectValue placeholder="Choose one of your rides…" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {myRides.map((r) => {
-                      const label = [r.year, r.make, r.model].filter(Boolean).join(" ");
-                      return (
-                        <SelectItem key={r.id} value={r.id}>
-                          {r.name ? `${r.name}${label ? ` — ${label}` : ""}` : label || "Untitled ride"}
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-            <div className="grid gap-4 sm:grid-cols-2">
+          <section data-tab="details" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "details" ? "" : "hidden"}`}>
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="text-sm font-semibold">Basics</h2>
+              {myRides.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <span className="hidden sm:inline text-[11px] text-muted-foreground">Pull from Rides:</span>
+                  <Select
+                    value={sourceRideId ?? ""}
+                    onValueChange={(v) => { if (v) prefillFromRide(v); }}
+                  >
+                    <SelectTrigger className="h-8 w-[200px] text-xs">
+                      <SelectValue placeholder="Choose a ride…" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {myRides.map((r) => {
+                        const label = [r.year, r.make, r.model].filter(Boolean).join(" ");
+                        return (
+                          <SelectItem key={r.id} value={r.id}>
+                            {r.name ? `${r.name}${label ? ` — ${label}` : ""}` : label || "Untitled ride"}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
               <div>
-                <Label>Category</Label>
+                <Label className="text-xs">Category</Label>
                 <Select value={category} onValueChange={setCategory}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-9 text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -1047,9 +1044,9 @@ function SellPage() {
                 </Select>
               </div>
               <div>
-                <Label>Condition</Label>
+                <Label className="text-xs">Condition</Label>
                 <Select value={condition} onValueChange={setCondition}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-9 text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -1059,78 +1056,74 @@ function SellPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="sm:col-span-2">
-                <Label htmlFor="title">Title</Label>
+              {(category === "car" || category === "motorcycle" || category === "truck") ? (
+                <div>
+                  <Label className="text-xs">Registration</Label>
+                  <Select
+                    value={registrationStatus}
+                    onValueChange={(v) => setRegistrationStatus(v as typeof registrationStatus)}
+                  >
+                    <SelectTrigger className="h-9 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="registered">Registered</SelectItem>
+                      <SelectItem value="unregistered">Unregistered</SelectItem>
+                      <SelectItem value="for_transfer">For transfer</SelectItem>
+                      <SelectItem value="unknown">Not specified</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : null}
+              <div>
+                <Label htmlFor="price" className="text-xs">Asking price (₱)</Label>
                 <Input
-                  id="title"
-                  required
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="2019 Toyota Vios 1.3 E AT"
+                  id="price"
+                  type="number"
+                  min="0"
+                  className="h-9 text-sm"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="e.g. 450000"
                 />
               </div>
-              <div className="sm:col-span-2 space-y-3 rounded-lg border border-border bg-muted/30 p-3">
-                <div>
-                  <Label className="text-sm font-semibold">Pricing — fill any that apply</Label>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">
-                    Real numbers only. Placeholder prices (₱1, ₱2…) are rejected and lower your seller score.
-                  </p>
-                </div>
-                <div>
-                  <Label htmlFor="price" className="text-xs">Asking price (₱)</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    min="0"
-                    className="mt-1"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    placeholder="e.g. 450000"
-                  />
-                  <p className="mt-0.5 text-[10px] text-muted-foreground">Full cash price</p>
-                </div>
-                <div className="flex flex-wrap items-center gap-4 text-xs">
-                  <label className="inline-flex items-center gap-1.5">
-                    <input
-                      type="checkbox"
-                      className="h-3.5 w-3.5 accent-primary"
-                      checked={negotiable}
-                      onChange={(e) => setNegotiable(e.target.checked)}
-                    />
-                    Negotiable
-                  </label>
-                  <label className="inline-flex items-center gap-1.5">
-                    <input
-                      type="checkbox"
-                      className="h-3.5 w-3.5 accent-primary"
-                      checked={priceHidden}
-                      onChange={(e) => setPriceHidden(e.target.checked)}
-                    />
-                    Hide price — buyers must message me
-                  </label>
-                </div>
-                {(category === "car" || category === "motorcycle" || category === "truck") && (
-                  <div>
-                    <Label className="text-xs">Registration</Label>
-                    <Select
-                      value={registrationStatus}
-                      onValueChange={(v) => setRegistrationStatus(v as typeof registrationStatus)}
-                    >
-                      <SelectTrigger className="mt-1 h-9">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="registered">Registered (OR/CR current)</SelectItem>
-                        <SelectItem value="unregistered">Unregistered / expired</SelectItem>
-                        <SelectItem value="for_transfer">For transfer of ownership</SelectItem>
-                        <SelectItem value="unknown">Not specified</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-              </div>
+            </div>
+            <div>
+              <Label htmlFor="title" className="text-xs">Title</Label>
+              <Input
+                id="title"
+                required
+                className="h-9 text-sm"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="2019 Toyota Vios 1.3 E AT"
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-4 text-xs">
+              <label className="inline-flex items-center gap-1.5">
+                <input
+                  type="checkbox"
+                  className="h-3.5 w-3.5 accent-primary"
+                  checked={negotiable}
+                  onChange={(e) => setNegotiable(e.target.checked)}
+                />
+                Negotiable
+              </label>
+              <label className="inline-flex items-center gap-1.5">
+                <input
+                  type="checkbox"
+                  className="h-3.5 w-3.5 accent-primary"
+                  checked={priceHidden}
+                  onChange={(e) => setPriceHidden(e.target.checked)}
+                />
+                Hide price — buyers must message me
+              </label>
+              <span className="text-[11px] text-muted-foreground">
+                Real prices only — placeholders (₱1, ₱2…) lower your seller score.
+              </span>
             </div>
           </section>
+
 
 
           {SERVICE_CATEGORIES.has(category) && (
