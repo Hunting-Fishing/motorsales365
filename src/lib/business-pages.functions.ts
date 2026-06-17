@@ -174,6 +174,11 @@ export const getBusinessPage = createServerFn({ method: "GET" })
         .eq("business_id", (biz as any).id)
         .eq("active", true)
         .order("sort_order"),
+      supabaseAdmin
+        .from("business_brands")
+        .select("id, name, slug, sort_order")
+        .eq("business_id", (biz as any).id)
+        .order("sort_order"),
     ]);
 
     let tagLabels: string[] = [];
