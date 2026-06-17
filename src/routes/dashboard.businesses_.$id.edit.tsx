@@ -60,7 +60,7 @@ import {
   PricingFields,
   blankService,
   fromCatalogItem,
-  formatServicePrice as _formatServicePrice,
+  
   type ServiceFormValue,
 } from "@/components/business/service-catalog-picker";
 import { CATEGORY_LABEL, UNIT_OPTIONS } from "@/data/fuel-station-catalog";
