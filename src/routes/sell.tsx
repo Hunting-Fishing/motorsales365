@@ -753,8 +753,6 @@ function SellPage() {
             title: textParsed.data.title,
             description: textParsed.data.description,
             price_php: Number(price) || 0,
-            monthly_php: monthly ? Number(monthly) : null,
-            down_payment_php: downPayment ? Number(downPayment) : null,
             negotiable,
             price_hidden: priceHidden,
             registration_status: registrationStatus,
