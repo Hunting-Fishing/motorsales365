@@ -1,33 +1,65 @@
 ## Problem
 
-`https://www.365motorsales.com/b/365towingtestaccount` redirects to `/businesses` because the business row has `status = 'pending'`. Both `/b/$slug` (vanity redirector) and `/businesses/$slug` (detail page) hard-gate on `status = 'active'`, so any business that hasn't been admin-approved is invisible — even to the owner who is sharing their own URL.
+Right now, clicking a catalog item (e.g. "Flatbed Tow") opens the full `ServiceEditor` form (photo upload, title, description, pricing block, custom price label, public toggle). That is too much for Filipino business owners who aren't tech-savvy, and the resulting data is inconsistent across businesses so buyers can't easily compare prices.
 
-Today: 68 pending vs 36 active. Most owner-facing mini-sites are dark.
+The previous design was a simple spreadsheet-style menu: one row per service with just `Service | Price | (optional region/note)`. We want that back as the default flow, and standardize it across every business type so buyers see the same shape everywhere.
 
-## Fix
+## Goal
 
-Treat the mini-site (`/b/<vanity>` → `/businesses/<slug>`) as a real, public page as soon as the owner submits. `pending` means "awaiting admin verification," not "hidden." Only `archived` / `hidden` (and any future explicit suppression status) should 404 / redirect.
+A simple, standardized "restaurant menu" style editor:
+- Pick from the catalog → row appears immediately in the list (no modal/form).
+- Each row is a single line: **Service name | Price (₱) | Unit | (optional) Note** with a delete button.
+- One save action commits any edits. No photo upload, no description, no "active" switch by default — that lives behind an optional "More" toggle for power users.
+- Identical UX for every business type (tow, repair, carwash, tires, fuel, etc.), so listings stay comparable.
 
-### Changes
+## Scope
 
-1. **`src/routes/b.$slug.tsx`** — replace the `status !== 'active'` gate with a deny-list (`['archived','hidden']`). Pending businesses resolve normally and redirect to their canonical `/businesses/<slug>`.
+Frontend only. Database schema, server functions, and the catalog data stay as-is. We're changing the editor presentation, not the saved fields.
 
-2. **`src/routes/businesses.$slug.tsx`** (loader, ~line 69) — change `.eq("status", "active")` to `.not("status", "in", "(archived,hidden)")` so the page renders for pending businesses.
+## Changes
 
-3. **Pending banner on the public page** — when `status === 'pending'`, render a small non-blocking notice at the top of the business page: "This business is awaiting verification by 365 Motor Sales." Keeps trust signals honest without breaking the share link.
+### 1. `src/components/business/service-catalog-picker.tsx`
+- Keep `CatalogPicker` exactly as-is (search + suggest + custom + grouped rows). It's working.
+- Add a new exported `ServiceMenuRow` component: an inline row with
+  - Service title (read-only, from catalog)
+  - `₱ price` input (numeric, the only thing most owners need to fill)
+  - Unit dropdown (defaults to the catalog item's `default_unit`, dropdown shows `UNIT_OPTIONS`)
+  - Short "Note" input (maps to existing `price_label` or `description` — pick `price_label` so it shows on the public page next to the price, e.g. "Metro Manila only")
+  - Trash icon to delete
+  - A small "More" disclosure that reveals: photo, long description, promo price, hidden toggle (keeps power-user fields available without cluttering the default view).
+- `PricingFields` stays for the "More" panel but the default row uses a compact inline version.
 
-4. **Listings stay gated** — `/businesses` index and search/discover stay `status = 'active'` only. Pending businesses are reachable by direct link (what owners share) but don't appear in the public directory until approved. No change needed there beyond confirming current behavior.
+### 2. `src/routes/dashboard.businesses_.$id.edit.tsx` (services section, ~lines 970–1100)
+- When the user picks a catalog item, **do not** open `ServiceEditor`. Instead, immediately call `upsertBusinessService` with `{ title, catalog_key, category, unit: default_unit }` and refresh — the row joins the menu list.
+- Replace the current `Card` per-service block with `ServiceMenuRow` rows grouped by category (same grouping we already have).
+- Each row autosaves on blur of the price/unit/note inputs (debounced) via `upsertBusinessService`. Buyers always see fresh prices, and owners never hit a "Save" wall.
+- Keep "Custom item" → that one still opens the full `ServiceEditor` (custom items need a title field).
+- Keep delete confirmation.
 
-5. **SEO** — for `status = 'pending'`, set `<meta name="robots" content="noindex">` in the route's `head()` so unverified pages don't get indexed; flip to indexable automatically once activated.
+### 3. Public page (`src/routes/businesses.$slug.tsx`)
+- No structural change. The existing `formatServicePrice` already renders `₱price/unit` and respects `price_label`. Standardized rows in the editor will naturally produce standardized output.
 
-### Out of scope
+## Technical notes (for the dev reading this)
 
-- Auto-activating on submit (keeps admin moderation intact).
-- Owner-only preview mode (not needed once pending is publicly viewable).
-- Changes to `/dashboard` or admin approval flow.
+- Autosave: wrap each row in a small `useDebouncedCallback` (200–400ms) around `upsertBusinessService`. On error, toast + revert local state.
+- Type changes: none. `ServiceFormValue` already has `price_php`, `unit`, `price_label`.
+- Sort order: preserve `sort_order` on insert (use `services.length` like today).
+- A11y: each input gets an associated `<Label className="sr-only">` because the column header is shown once at the top of the table.
 
-### Verification
+## Out of scope
 
-- Visit `/b/365towingtestaccount` → 200, renders the business page with a "Awaiting verification" banner.
-- `/businesses` directory still shows only the 36 active businesses.
-- Archive a test business → `/b/<vanity>` and `/businesses/<slug>` both redirect to `/businesses`.
+- Catalog data, suggestions flow, admin review — all unchanged.
+- Products tab — unchanged (this only touches Services).
+- Schema/migrations — none.
+
+## Visual sketch
+
+```text
+Towing                                                    [+ Add from catalog]
+────────────────────────────────────────────────────────────────────────────
+ Service                  Price (₱)   Unit       Note                    ⋯
+ Flatbed Tow              [  2500  ]  [per trip] [Metro Manila only ]   🗑  ▸More
+ Wheel-lift Tow           [  1800  ]  [per trip] [                  ]   🗑  ▸More
+ Roadside Jumpstart       [   500  ]  [per job ] [                  ]   🗑  ▸More
+                                                            [+ Custom item]
+```
