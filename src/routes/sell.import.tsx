@@ -219,9 +219,47 @@ function ImportPage() {
           </Link>
         </Button>
         <h1 className="font-display text-2xl sm:text-3xl font-bold">Import from Facebook Marketplace</h1>
-        <p className="text-muted-foreground">
+        <p className="text-sm sm:text-base text-muted-foreground">
           Paste a Facebook Marketplace listing URL. We'll extract the details and verify it's yours.
         </p>
+
+        {(() => {
+          const STEPS = [
+            { key: "url", label: "Paste URL" },
+            { key: "verify", label: "Verify" },
+            { key: "preview", label: "Review" },
+          ] as const;
+          const idx = Math.max(0, STEPS.findIndex((s) => s.key === step));
+          const pct = step === "done" ? 100 : ((idx + 1) / STEPS.length) * 100;
+          return (
+            <div className="mt-4 sticky top-14 z-20 -mx-3 sm:mx-0 bg-background/95 backdrop-blur border-b border-border sm:rounded-xl sm:border sm:bg-card">
+              <div className="flex overflow-x-auto no-scrollbar px-1 py-1 gap-1">
+                {STEPS.map((s, i) => (
+                  <div
+                    key={s.key}
+                    className={`whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-medium ${
+                      step === s.key
+                        ? "bg-primary text-primary-foreground"
+                        : i < idx
+                          ? "text-foreground"
+                          : "text-muted-foreground"
+                    }`}
+                  >
+                    <span className="mr-1 opacity-60">{i < idx ? "✓" : `${i + 1}.`}</span>{s.label}
+                  </div>
+                ))}
+              </div>
+              <div className="px-2 pb-2">
+                <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1">
+                  <span>Step {Math.min(idx + 1, STEPS.length)} of {STEPS.length} — {STEPS[idx]?.label}</span>
+                  <span>{Math.round(pct)}%</span>
+                </div>
+                <Progress value={pct} className="h-1.5" />
+              </div>
+            </div>
+          );
+        })()}
+
 
         {step === "url" && (
           <form
