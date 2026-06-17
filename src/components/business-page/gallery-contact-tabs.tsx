@@ -17,6 +17,8 @@ import {
   updateGalleryPhoto,
 } from "@/lib/business-mini-site.functions";
 import { uploadWithRetry } from "@/lib/storage-upload";
+import { isVideoUrl } from "@/lib/media-kind";
+import { Progress } from "@/components/ui/progress";
 
 type Album = {
   id: string;
@@ -33,7 +35,15 @@ type Photo = {
   sort_order: number;
 };
 
-async function uploadGalleryPhoto(userId: string, businessId: string, file: File): Promise<string> {
+const MAX_IMAGE_BYTES = 15 * 1024 * 1024; // 15 MB
+const MAX_VIDEO_BYTES = 50 * 1024 * 1024; // 50 MB (Supabase default bucket limit)
+
+async function uploadGalleryFile(
+  userId: string,
+  businessId: string,
+  file: File,
+  onProgress: (percent: number) => void,
+): Promise<string> {
   const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
   // Path must start with businessId — the storage RLS policy checks foldername[1] against businesses.id
   const path = `${businessId}/${userId}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
@@ -42,6 +52,7 @@ async function uploadGalleryPhoto(userId: string, businessId: string, file: File
     path,
     file,
     contentType: file.type,
+    onProgress: (e) => onProgress(e.percent),
   });
   return publicUrl;
 }
@@ -72,6 +83,9 @@ export function GalleryTab({
   const [editTitle, setEditTitle] = useState("");
   const [editDesc, setEditDesc] = useState("");
   const [uploadingFor, setUploadingFor] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<
+    { name: string; percent: number; size: number; kind: "image" | "video" }[]
+  >([]);
   const [captionFor, setCaptionFor] = useState<string | null>(null);
   const [captionDraft, setCaptionDraft] = useState("");
 
@@ -123,20 +137,53 @@ export function GalleryTab({
 
   const onFiles = async (albumId: string, files: FileList | null) => {
     if (!files || files.length === 0) return;
+    const arr = Array.from(files);
+
+    // Validate sizes and types up front
+    for (const f of arr) {
+      const isVideo = f.type.startsWith("video/");
+      const isImage = f.type.startsWith("image/");
+      if (!isImage && !isVideo) {
+        toast.error(`${f.name}: only images and videos are allowed`);
+        return;
+      }
+      const limit = isVideo ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES;
+      if (f.size > limit) {
+        toast.error(
+          `${f.name} is too large (max ${isVideo ? "50 MB" : "15 MB"})`,
+        );
+        return;
+      }
+    }
+
     setUploadingFor(albumId);
+    setUploadProgress(
+      arr.map((f) => ({
+        name: f.name,
+        percent: 0,
+        size: f.size,
+        kind: f.type.startsWith("video/") ? "video" : "image",
+      })),
+    );
     try {
       const urls: { url: string }[] = [];
-      for (const f of Array.from(files)) {
-        const url = await uploadGalleryPhoto(userId, businessId, f);
+      for (let i = 0; i < arr.length; i++) {
+        const f = arr[i];
+        const url = await uploadGalleryFile(userId, businessId, f, (percent) => {
+          setUploadProgress((prev) =>
+            prev.map((p, idx) => (idx === i ? { ...p, percent } : p)),
+          );
+        });
         urls.push({ url });
       }
       await addPhotos({ data: { businessId, albumId, photos: urls } });
-      toast.success(`Uploaded ${urls.length} photo${urls.length === 1 ? "" : "s"}`);
+      toast.success(`Uploaded ${urls.length} file${urls.length === 1 ? "" : "s"}`);
       onChange();
     } catch (e: any) {
       toast.error(e?.message ?? "Upload failed");
     } finally {
       setUploadingFor(null);
+      setUploadProgress([]);
     }
   };
 
@@ -300,13 +347,24 @@ export function GalleryTab({
                   return (
                     <div
                       key={p.id}
-                      className="group relative aspect-square overflow-hidden rounded-md border border-border"
+                      className="group relative aspect-square overflow-hidden rounded-md border border-border bg-muted"
                     >
-                      <img
-                        src={p.url}
-                        alt={p.caption ?? ""}
-                        className="h-full w-full object-cover"
-                      />
+                      {isVideoUrl(p.url) ? (
+                        <video
+                          src={p.url}
+                          className="h-full w-full object-cover"
+                          muted
+                          playsInline
+                          preload="metadata"
+                          controls
+                        />
+                      ) : (
+                        <img
+                          src={p.url}
+                          alt={p.caption ?? ""}
+                          className="h-full w-full object-cover"
+                        />
+                      )}
                       {isCover && (
                         <div
                           className="absolute left-1 top-1 rounded-full bg-primary/90 p-1 text-primary-foreground"
@@ -384,19 +442,41 @@ export function GalleryTab({
                     </div>
                   );
                 })}
-                <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-md border border-dashed border-border bg-muted/30 text-xs text-muted-foreground hover:bg-muted/60">
+                <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-md border border-dashed border-border bg-muted/30 p-2 text-center text-xs text-muted-foreground hover:bg-muted/60">
                   <Upload className="h-4 w-4" />
-                  {uploadingFor === a.id ? "Uploading…" : "Add"}
+                  {uploadingFor === a.id ? "Uploading…" : "Add photo or video"}
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/*,video/*"
                     multiple
                     className="hidden"
                     disabled={uploadingFor === a.id}
-                    onChange={(e) => onFiles(a.id, e.target.files)}
+                    onChange={(e) => {
+                      onFiles(a.id, e.target.files);
+                      e.target.value = "";
+                    }}
                   />
                 </label>
               </div>
+
+              {uploadingFor === a.id && uploadProgress.length > 0 && (
+                <div className="space-y-2 rounded-md border border-border bg-muted/40 p-2">
+                  {uploadProgress.map((p, i) => (
+                    <div key={i} className="space-y-1">
+                      <div className="flex items-center justify-between gap-2 text-xs">
+                        <span className="truncate text-muted-foreground">
+                          {p.kind === "video" ? "🎬 " : "🖼️ "}
+                          {p.name}
+                        </span>
+                        <span className="tabular-nums text-muted-foreground">
+                          {p.percent}%
+                        </span>
+                      </div>
+                      <Progress value={p.percent} className="h-1.5" />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           );
         })}
