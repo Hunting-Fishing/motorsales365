@@ -68,7 +68,10 @@ function BookingPage() {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [name, setName] = useState((user as any)?.user_metadata?.full_name ?? "");
-  const [phone, setPhone] = useState("");
+  const [phoneIso, setPhoneIso] = useState<string>("PH");
+  const [phoneNational, setPhoneNational] = useState<string>("");
+  const phone = buildE164(phoneIso, phoneNational) ?? "";
+
   const [email, setEmail] = useState((user as any)?.email ?? "");
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
