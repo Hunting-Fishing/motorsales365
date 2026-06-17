@@ -196,7 +196,7 @@ const emptyItem = {
   title: "",
   description: "",
   duration_min: 30,
-  buffer_min: 0,
+  buffer_min: 10,
   price_php: null as number | null,
   max_concurrent: 1,
   require_approval: true,
@@ -260,196 +260,296 @@ function BookableItemsSection({
     }
   }
 
+  async function toggleActive(it: Item) {
+    try {
+      await upsert({
+        data: {
+          businessId,
+          id: it.id,
+          title: it.title,
+          description: it.description ?? null,
+          duration_min: it.duration_min,
+          buffer_min: it.buffer_min ?? 0,
+          price_php: it.price_php ?? null,
+          max_concurrent: it.max_concurrent ?? 1,
+          require_approval: !!it.require_approval,
+          lead_time_hours: it.lead_time_hours ?? 2,
+          horizon_days: it.horizon_days ?? 30,
+          active: !it.active,
+        },
+      });
+      onChange();
+    } catch (e: any) {
+      toast.error(e?.message);
+    }
+  }
+
+  function startFromCatalog(title: string) {
+    setDraft({ ...emptyItem, title });
+  }
+
   return (
-    <Card className="p-5">
-      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="font-display text-lg font-semibold">Bookable services</h2>
+    <Card className="px-4 py-4">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h2 className="font-display text-base font-semibold">Bookable services</h2>
           <p className="text-xs text-muted-foreground">
-            Each service customers can book — set the duration, price, and whether you approve
-            requests manually.
+            Pick from the catalog or add your own. Click a row to edit details.
           </p>
         </div>
-        {!draft && (
+        <div className="flex items-center gap-2">
+          <Select onValueChange={(v) => v && startFromCatalog(v)}>
+            <SelectTrigger className="h-8 w-[210px] text-xs">
+              <SelectValue placeholder="+ Select from catalog" />
+            </SelectTrigger>
+            <SelectContent>
+              {TAG_GROUPS.filter((g) =>
+                (BOOKABLE_CATALOG_GROUPS as readonly string[]).includes(g.key),
+              ).map((g) => (
+                <SelectGroup key={g.key}>
+                  <SelectLabel>{g.label}</SelectLabel>
+                  {g.tags.map((t) => (
+                    <SelectItem key={t} value={t}>
+                      {t}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              ))}
+            </SelectContent>
+          </Select>
           <Button size="sm" onClick={() => setDraft({ ...emptyItem })}>
-            <Plus className="mr-1 h-4 w-4" /> Add service
+            <Plus className="mr-1 h-4 w-4" /> Add manually
           </Button>
-        )}
+        </div>
       </div>
 
-      {draft && (
-        <div className="mb-4 space-y-4 rounded-lg border border-primary/30 bg-primary/[0.02] p-4">
-          <div>
-            <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Basics
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <Label>Service title *</Label>
-                <Input
-                  value={draft.title}
-                  onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-                  maxLength={120}
-                  placeholder="e.g. Tow request, Vehicle inspection"
-                />
-                <FieldHelp>What customers will see on the booking page.</FieldHelp>
-              </div>
-              <div>
-                <Label>Price (PHP, optional)</Label>
-                <Input
-                  type="number"
-                  value={draft.price_php ?? ""}
-                  onChange={(e) =>
-                    setDraft({
-                      ...draft,
-                      price_php: e.target.value === "" ? null : Number(e.target.value),
-                    })
-                  }
-                  placeholder="Leave blank if quote-on-request"
-                />
-                <FieldHelp>Shown as a guide price — leave blank for "Inquire for pricing".</FieldHelp>
-              </div>
-              <div className="sm:col-span-2">
-                <Label>Description</Label>
-                <Textarea
-                  value={draft.description ?? ""}
-                  onChange={(e) => setDraft({ ...draft, description: e.target.value })}
-                  rows={2}
-                  maxLength={1000}
-                  placeholder="What's included, what to bring, etc."
-                />
-              </div>
-            </div>
-          </div>
+      <TableScroll minWidth="640px">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[34%]">Service</TableHead>
+              <TableHead>Duration</TableHead>
+              <TableHead>Buffer</TableHead>
+              <TableHead>Lead</TableHead>
+              <TableHead>Max/slot</TableHead>
+              <TableHead>Price</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {items.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="py-8 text-center text-sm text-muted-foreground">
+                  No bookable services yet — use the buttons above to add one.
+                </TableCell>
+              </TableRow>
+            ) : (
+              items.map((it) => (
+                <TableRow
+                  key={it.id}
+                  className="cursor-pointer"
+                  onClick={() => setDraft(it)}
+                >
+                  <TableCell className="font-medium">
+                    <div className="truncate">{it.title}</div>
+                    {it.description && (
+                      <div className="truncate text-[11px] text-muted-foreground">
+                        {it.description}
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-xs">{it.duration_min}m</TableCell>
+                  <TableCell className="text-xs">{it.buffer_min ?? 0}m</TableCell>
+                  <TableCell className="text-xs">{it.lead_time_hours ?? 0}h</TableCell>
+                  <TableCell className="text-xs">{it.max_concurrent ?? 1}</TableCell>
+                  <TableCell className="text-xs">
+                    {it.price_php != null ? `₱${it.price_php.toLocaleString()}` : "—"}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={it.active ? "default" : "secondary"} className="text-[10px]">
+                      {it.active ? "Active" : "Inactive"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex justify-end gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setDraft(it)}
+                        aria-label="Edit"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => toggleActive(it)}
+                        aria-label={it.active ? "Disable" : "Enable"}
+                        title={it.active ? "Disable" : "Enable"}
+                      >
+                        <CheckCircle2
+                          className={cn(
+                            "h-4 w-4",
+                            it.active ? "text-emerald-500" : "text-muted-foreground",
+                          )}
+                        />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => del(it.id)}
+                        aria-label="Delete"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </TableScroll>
 
-          <div>
-            <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Scheduling rules
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
+      <Dialog open={!!draft} onOpenChange={(o) => !o && setDraft(null)}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{draft?.id ? "Edit service" : "New bookable service"}</DialogTitle>
+          </DialogHeader>
+          {draft && (
+            <div className="space-y-5">
               <div>
-                <Label>Duration (minutes)</Label>
-                <Input
-                  type="number"
-                  min={5}
-                  value={draft.duration_min}
-                  onChange={(e) => setDraft({ ...draft, duration_min: Number(e.target.value) })}
-                />
-                <FieldHelp>How long one appointment takes.</FieldHelp>
-              </div>
-              <div>
-                <Label>Buffer between bookings (min)</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={draft.buffer_min}
-                  onChange={(e) => setDraft({ ...draft, buffer_min: Number(e.target.value) })}
-                />
-                <FieldHelp>Cleanup / travel time added after each booking.</FieldHelp>
-              </div>
-              <div>
-                <Label>Max concurrent</Label>
-                <Input
-                  type="number"
-                  min={1}
-                  value={draft.max_concurrent}
-                  onChange={(e) => setDraft({ ...draft, max_concurrent: Number(e.target.value) })}
-                />
-                <FieldHelp>How many customers you can serve at once (bays, trucks, staff).</FieldHelp>
-              </div>
-              <div>
-                <Label>Lead time (hours)</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={draft.lead_time_hours}
-                  onChange={(e) => setDraft({ ...draft, lead_time_hours: Number(e.target.value) })}
-                />
-                <FieldHelp>Minimum notice before a booking can start.</FieldHelp>
-              </div>
-              <div>
-                <Label>Booking horizon (days)</Label>
-                <Input
-                  type="number"
-                  min={1}
-                  value={draft.horizon_days}
-                  onChange={(e) => setDraft({ ...draft, horizon_days: Number(e.target.value) })}
-                />
-                <FieldHelp>How far in advance customers can book.</FieldHelp>
-              </div>
-              <div className="flex items-center justify-between rounded-md border border-border bg-background px-3 py-2">
-                <div>
-                  <Label className="m-0">Require approval</Label>
-                  <p className="text-[11px] text-muted-foreground">
-                    {draft.require_approval
-                      ? "You'll confirm each booking before it's final."
-                      : "Bookings auto-confirm — slot is held immediately."}
-                  </p>
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Basics
                 </div>
-                <Switch
-                  checked={!!draft.require_approval}
-                  onCheckedChange={(v) => setDraft({ ...draft, require_approval: v })}
-                />
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="sm:col-span-2">
+                    <Label>Service title *</Label>
+                    <Input
+                      value={draft.title}
+                      onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                      maxLength={120}
+                      placeholder="e.g. Oil change, Tow request, Vehicle inspection"
+                    />
+                    <FieldHelp>What customers will see on the booking page.</FieldHelp>
+                  </div>
+                  <div>
+                    <Label>Price (PHP, optional)</Label>
+                    <Input
+                      type="number"
+                      value={draft.price_php ?? ""}
+                      onChange={(e) =>
+                        setDraft({
+                          ...draft,
+                          price_php: e.target.value === "" ? null : Number(e.target.value),
+                        })
+                      }
+                      placeholder="Leave blank for quote-on-request"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between rounded-md border border-border bg-background px-3 py-2">
+                    <Label className="m-0">Active</Label>
+                    <Switch
+                      checked={draft.active !== false}
+                      onCheckedChange={(v) => setDraft({ ...draft, active: v })}
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <Label>Description</Label>
+                    <Textarea
+                      value={draft.description ?? ""}
+                      onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+                      rows={2}
+                      maxLength={1000}
+                      placeholder="What's included, what to bring, etc."
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Scheduling rules
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <Label>Duration (minutes)</Label>
+                    <Input
+                      type="number"
+                      min={5}
+                      value={draft.duration_min}
+                      onChange={(e) => setDraft({ ...draft, duration_min: Number(e.target.value) })}
+                    />
+                  </div>
+                  <div>
+                    <Label>Buffer between bookings (min)</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={draft.buffer_min}
+                      onChange={(e) => setDraft({ ...draft, buffer_min: Number(e.target.value) })}
+                    />
+                  </div>
+                  <div>
+                    <Label>Max concurrent</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      value={draft.max_concurrent}
+                      onChange={(e) =>
+                        setDraft({ ...draft, max_concurrent: Number(e.target.value) })
+                      }
+                    />
+                    <FieldHelp>How many customers you can serve at once.</FieldHelp>
+                  </div>
+                  <div>
+                    <Label>Lead time (hours)</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={draft.lead_time_hours}
+                      onChange={(e) =>
+                        setDraft({ ...draft, lead_time_hours: Number(e.target.value) })
+                      }
+                    />
+                    <FieldHelp>Minimum notice before a booking can start.</FieldHelp>
+                  </div>
+                  <div>
+                    <Label>Booking horizon (days)</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      value={draft.horizon_days}
+                      onChange={(e) =>
+                        setDraft({ ...draft, horizon_days: Number(e.target.value) })
+                      }
+                    />
+                  </div>
+                  <div className="flex items-center justify-between rounded-md border border-border bg-background px-3 py-2">
+                    <div>
+                      <Label className="m-0">Require approval</Label>
+                      <p className="text-[11px] text-muted-foreground">
+                        {draft.require_approval ? "Manual confirm" : "Auto-confirms"}
+                      </p>
+                    </div>
+                    <Switch
+                      checked={!!draft.require_approval}
+                      onCheckedChange={(v) => setDraft({ ...draft, require_approval: v })}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="flex justify-end gap-2 border-t border-border pt-3">
+          )}
+          <DialogFooter>
             <Button variant="outline" onClick={() => setDraft(null)}>
               Cancel
             </Button>
-            <Button onClick={save}>{draft.id ? "Update service" : "Create service"}</Button>
-          </div>
-        </div>
-      )}
-
-      {items.length === 0 && !draft && (
-        <div className="rounded-lg border border-dashed border-border p-6 text-center">
-          <CalendarDays className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
-          <p className="text-sm font-medium">No bookable services yet</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Add your first service so customers can book online.
-          </p>
-        </div>
-      )}
-
-      <div className="grid gap-2 sm:grid-cols-2">
-        {items.map((it) => (
-          <div
-            key={it.id}
-            className="flex items-start justify-between gap-2 rounded-lg border border-border p-3 transition-colors hover:border-primary/40"
-          >
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="font-medium">{it.title}</span>
-                {!it.active && <Badge variant="secondary">inactive</Badge>}
-                {it.require_approval ? (
-                  <Badge variant="outline" className="text-[10px]">manual approval</Badge>
-                ) : (
-                  <Badge variant="outline" className="text-[10px]">auto-confirms</Badge>
-                )}
-              </div>
-              <div className="mt-1 flex flex-wrap gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
-                <span><Clock className="mr-0.5 inline h-3 w-3" />{it.duration_min} min</span>
-                {it.price_php != null && <span>· ₱{it.price_php.toLocaleString()}</span>}
-                {it.max_concurrent > 1 && <span>· up to {it.max_concurrent} at once</span>}
-                <span>· {it.lead_time_hours}h notice</span>
-              </div>
-              {it.description && (
-                <p className="mt-1.5 line-clamp-2 text-xs text-muted-foreground">{it.description}</p>
-              )}
-            </div>
-            <div className="flex shrink-0 gap-1">
-              <Button size="sm" variant="ghost" onClick={() => setDraft(it)} aria-label="Edit">
-                <Pencil className="h-4 w-4" />
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => del(it.id)} aria-label="Delete">
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
+            <Button onClick={save}>{draft?.id ? "Update service" : "Create service"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
