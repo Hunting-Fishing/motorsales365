@@ -449,7 +449,7 @@ function SellPage() {
       const { data: rides } = await (supabase as any)
         .from("rides")
         .select("id,name,year,make,model")
-        .eq("owner_id", user.id)
+        .eq("user_id", user.id)
         .order("updated_at", { ascending: false })
         .limit(20);
       if (rides) setMyRides(rides);
