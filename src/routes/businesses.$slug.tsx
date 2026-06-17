@@ -248,11 +248,13 @@ function BusinessProfilePage() {
   };
 
   const messengerHref = biz.messenger_url || null;
+  const facebookHref = (biz as any).facebook_url || null;
   const telHref = biz.phone ? `tel:${biz.phone}` : null;
   const whatsappHref = waMeUrl(
-    biz.phone,
+    (biz as any).whatsapp_number || biz.phone,
     `Hi ${biz.name}, I found you on 365 Motor Sales and would like to ask about your services.`,
   );
+  const brandsList: { name: string }[] = ((data as any)?.brands ?? []) as { name: string }[];
 
   return (
     <SiteLayout>
