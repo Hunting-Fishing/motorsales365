@@ -137,20 +137,53 @@ export function GalleryTab({
 
   const onFiles = async (albumId: string, files: FileList | null) => {
     if (!files || files.length === 0) return;
+    const arr = Array.from(files);
+
+    // Validate sizes and types up front
+    for (const f of arr) {
+      const isVideo = f.type.startsWith("video/");
+      const isImage = f.type.startsWith("image/");
+      if (!isImage && !isVideo) {
+        toast.error(`${f.name}: only images and videos are allowed`);
+        return;
+      }
+      const limit = isVideo ? MAX_VIDEO_BYTES : MAX_IMAGE_BYTES;
+      if (f.size > limit) {
+        toast.error(
+          `${f.name} is too large (max ${isVideo ? "100 MB" : "15 MB"})`,
+        );
+        return;
+      }
+    }
+
     setUploadingFor(albumId);
+    setUploadProgress(
+      arr.map((f) => ({
+        name: f.name,
+        percent: 0,
+        size: f.size,
+        kind: f.type.startsWith("video/") ? "video" : "image",
+      })),
+    );
     try {
       const urls: { url: string }[] = [];
-      for (const f of Array.from(files)) {
-        const url = await uploadGalleryPhoto(userId, businessId, f);
+      for (let i = 0; i < arr.length; i++) {
+        const f = arr[i];
+        const url = await uploadGalleryFile(userId, businessId, f, (percent) => {
+          setUploadProgress((prev) =>
+            prev.map((p, idx) => (idx === i ? { ...p, percent } : p)),
+          );
+        });
         urls.push({ url });
       }
       await addPhotos({ data: { businessId, albumId, photos: urls } });
-      toast.success(`Uploaded ${urls.length} photo${urls.length === 1 ? "" : "s"}`);
+      toast.success(`Uploaded ${urls.length} file${urls.length === 1 ? "" : "s"}`);
       onChange();
     } catch (e: any) {
       toast.error(e?.message ?? "Upload failed");
     } finally {
       setUploadingFor(null);
+      setUploadProgress([]);
     }
   };
 
