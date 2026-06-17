@@ -958,7 +958,13 @@ function ServicesTab({
     description: s.description ?? null,
     unit: s.unit ?? null,
     price_php: s.price_php ?? null,
+    max_price_php: s.max_price_php ?? null,
     notes: s.price_label ?? null,
+    region_scope: s.region_scope ?? null,
+    service_radius_km: s.service_radius_km ?? null,
+    eta_minutes: s.eta_minutes ?? null,
+    tags: Array.isArray(s.tags) ? s.tags : [],
+    available_24_7: !!s.available_24_7,
   }));
 
   const [draft, setDraft] = useState<DraftService[]>(initial);
