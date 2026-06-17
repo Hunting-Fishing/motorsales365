@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { confirm } from "@/components/ui/confirm-dialog";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -18,7 +19,19 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Trash2, Plus, CalendarDays, List, RefreshCcw, UserRound } from "lucide-react";
+import {
+  Trash2,
+  Plus,
+  CalendarDays,
+  List,
+  RefreshCcw,
+  UserRound,
+  ExternalLink,
+  Clock,
+  CheckCircle2,
+  Sparkles,
+  Pencil,
+} from "lucide-react";
 import {
   upsertBookableItem,
   deleteBookableItem,
@@ -29,7 +42,13 @@ import {
   assignBooking,
   listBookingAssignees,
 } from "@/lib/business-bookings.functions";
-import { isStructuredHours, DAY_KEYS, type StructuredHours } from "@/lib/business-hours";
+import {
+  isStructuredHours,
+  DAY_KEYS,
+  DAY_LABELS,
+  formatRange,
+  type StructuredHours,
+} from "@/lib/business-hours";
 import { formatE164 } from "@/data/country-codes";
 import { cn } from "@/lib/utils";
 
@@ -49,6 +68,8 @@ type Assignee = {
 
 export function BookingsTab({
   businessId,
+  businessSlug,
+  businessName,
   businessHours,
   items,
   availability,
@@ -57,6 +78,8 @@ export function BookingsTab({
   onChange,
 }: {
   businessId: string;
+  businessSlug?: string | null;
+  businessName?: string;
   businessHours: unknown;
   items: Item[];
   availability: Avail[];
@@ -71,8 +94,79 @@ export function BookingsTab({
   });
   const assignees: Assignee[] = (assigneeData as any)?.assignees ?? [];
 
+  const pending = bookings.filter((b: any) => b.status === "pending").length;
+  const confirmed = bookings.filter((b: any) => b.status === "confirmed").length;
+  const hasItems = items.length > 0;
+
   return (
     <div className="space-y-6">
+      {/* Overview / How it works */}
+      <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background p-5">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div className="max-w-2xl">
+            <div className="mb-1 flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <h2 className="font-display text-lg font-semibold">Online bookings</h2>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Let customers book appointments directly from your 365 MotorSales business page.
+              Bookings respect your <strong>Hours</strong> tab — change open hours there and they
+              flow through automatically.
+            </p>
+            <ol className="mt-3 grid gap-1.5 text-xs text-muted-foreground sm:grid-cols-2">
+              <li className="flex gap-2">
+                <span className="font-semibold text-primary">1.</span> Add a bookable service below
+                (e.g. <em>Tow request</em>, <em>Free estimate</em>).
+              </li>
+              <li className="flex gap-2">
+                <span className="font-semibold text-primary">2.</span> Confirm your booking hours
+                match your Hours tab.
+              </li>
+              <li className="flex gap-2">
+                <span className="font-semibold text-primary">3.</span> Customers pick a date &amp;
+                time on your public page.
+              </li>
+              <li className="flex gap-2">
+                <span className="font-semibold text-primary">4.</span> You approve here and assign
+                to a staff member.
+              </li>
+            </ol>
+          </div>
+          <div className="flex flex-col items-stretch gap-2 sm:items-end">
+            <div className="flex gap-2 text-xs">
+              <Badge variant="secondary" className="px-2 py-1">
+                {hasItems ? `${items.length} service${items.length === 1 ? "" : "s"}` : "No services yet"}
+              </Badge>
+              <Badge variant={pending ? "destructive" : "outline"} className="px-2 py-1">
+                {pending} pending
+              </Badge>
+              <Badge variant="outline" className="px-2 py-1">
+                {confirmed} confirmed
+              </Badge>
+            </div>
+            {businessSlug && hasItems && (
+              <Link
+                to="/businesses/$slug/book"
+                params={{ slug: businessSlug }}
+                target="_blank"
+                rel="noopener"
+              >
+                <Button size="sm" variant="outline" className="w-full sm:w-auto">
+                  <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
+                  Preview public booking page
+                </Button>
+              </Link>
+            )}
+            {businessSlug && (
+              <div className="text-[11px] text-muted-foreground sm:text-right">
+                Public link:{" "}
+                <code className="rounded bg-muted px-1 py-0.5">/businesses/{businessSlug}/book</code>
+              </div>
+            )}
+          </div>
+        </div>
+      </Card>
+
       <BookableItemsSection businessId={businessId} items={items} onChange={onChange} />
       <WeeklyHoursSection
         businessId={businessId}
@@ -83,6 +177,7 @@ export function BookingsTab({
       <ExceptionsSection businessId={businessId} exceptions={exceptions} onChange={onChange} />
       <BookingsInboxSection
         businessId={businessId}
+        businessName={businessName}
         bookings={bookings}
         assignees={assignees}
         onChange={onChange}
@@ -106,6 +201,10 @@ const emptyItem = {
   active: true,
 };
 
+function FieldHelp({ children }: { children: React.ReactNode }) {
+  return <p className="mt-1 text-[11px] text-muted-foreground">{children}</p>;
+}
+
 function BookableItemsSection({
   businessId,
   items,
@@ -120,7 +219,7 @@ function BookableItemsSection({
   const [draft, setDraft] = useState<any | null>(null);
 
   async function save() {
-    if (!draft.title?.trim()) return toast.error("Title required");
+    if (!draft.title?.trim()) return toast.error("Title is required");
     try {
       await upsert({
         data: {
@@ -139,7 +238,7 @@ function BookableItemsSection({
           active: draft.active !== false,
         },
       });
-      toast.success("Saved");
+      toast.success("Service saved");
       setDraft(null);
       onChange();
     } catch (e: any) {
@@ -148,7 +247,7 @@ function BookableItemsSection({
   }
 
   async function del(id: string) {
-    if (!(await confirm({ title: "Delete this bookable item?", destructive: true }))) return;
+    if (!(await confirm({ title: "Delete this bookable service?", destructive: true }))) return;
     try {
       await remove({ data: { businessId, id } });
       onChange();
@@ -159,134 +258,188 @@ function BookableItemsSection({
 
   return (
     <Card className="p-5">
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div>
           <h2 className="font-display text-lg font-semibold">Bookable services</h2>
-          <p className="text-xs text-muted-foreground">What customers can book online.</p>
+          <p className="text-xs text-muted-foreground">
+            Each service customers can book — set the duration, price, and whether you approve
+            requests manually.
+          </p>
         </div>
         {!draft && (
           <Button size="sm" onClick={() => setDraft({ ...emptyItem })}>
-            <Plus className="mr-1 h-4 w-4" /> Add
+            <Plus className="mr-1 h-4 w-4" /> Add service
           </Button>
         )}
       </div>
 
       {draft && (
-        <div className="mb-4 space-y-3 rounded-lg border border-border p-4">
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div>
-              <Label>Title</Label>
-              <Input
-                value={draft.title}
-                onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-                maxLength={120}
-              />
-            </div>
-            <div>
-              <Label>Price (PHP, optional)</Label>
-              <Input
-                type="number"
-                value={draft.price_php ?? ""}
-                onChange={(e) =>
-                  setDraft({
-                    ...draft,
-                    price_php: e.target.value === "" ? null : Number(e.target.value),
-                  })
-                }
-              />
-            </div>
-            <div>
-              <Label>Duration (min)</Label>
-              <Input
-                type="number"
-                value={draft.duration_min}
-                onChange={(e) => setDraft({ ...draft, duration_min: Number(e.target.value) })}
-              />
-            </div>
-            <div>
-              <Label>Buffer between bookings (min)</Label>
-              <Input
-                type="number"
-                value={draft.buffer_min}
-                onChange={(e) => setDraft({ ...draft, buffer_min: Number(e.target.value) })}
-              />
-            </div>
-            <div>
-              <Label>Max concurrent</Label>
-              <Input
-                type="number"
-                value={draft.max_concurrent}
-                onChange={(e) => setDraft({ ...draft, max_concurrent: Number(e.target.value) })}
-              />
-            </div>
-            <div>
-              <Label>Lead time (hours)</Label>
-              <Input
-                type="number"
-                value={draft.lead_time_hours}
-                onChange={(e) => setDraft({ ...draft, lead_time_hours: Number(e.target.value) })}
-              />
-            </div>
-            <div>
-              <Label>Booking horizon (days)</Label>
-              <Input
-                type="number"
-                value={draft.horizon_days}
-                onChange={(e) => setDraft({ ...draft, horizon_days: Number(e.target.value) })}
-              />
-            </div>
-            <div className="flex items-center justify-between rounded-md border border-border px-3 py-2">
-              <Label className="m-0">Require approval</Label>
-              <Switch
-                checked={!!draft.require_approval}
-                onCheckedChange={(v) => setDraft({ ...draft, require_approval: v })}
-              />
-            </div>
-          </div>
+        <div className="mb-4 space-y-4 rounded-lg border border-primary/30 bg-primary/[0.02] p-4">
           <div>
-            <Label>Description</Label>
-            <Textarea
-              value={draft.description ?? ""}
-              onChange={(e) => setDraft({ ...draft, description: e.target.value })}
-              rows={2}
-              maxLength={1000}
-            />
+            <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Basics
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <Label>Service title *</Label>
+                <Input
+                  value={draft.title}
+                  onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                  maxLength={120}
+                  placeholder="e.g. Tow request, Vehicle inspection"
+                />
+                <FieldHelp>What customers will see on the booking page.</FieldHelp>
+              </div>
+              <div>
+                <Label>Price (PHP, optional)</Label>
+                <Input
+                  type="number"
+                  value={draft.price_php ?? ""}
+                  onChange={(e) =>
+                    setDraft({
+                      ...draft,
+                      price_php: e.target.value === "" ? null : Number(e.target.value),
+                    })
+                  }
+                  placeholder="Leave blank if quote-on-request"
+                />
+                <FieldHelp>Shown as a guide price — leave blank for "Inquire for pricing".</FieldHelp>
+              </div>
+              <div className="sm:col-span-2">
+                <Label>Description</Label>
+                <Textarea
+                  value={draft.description ?? ""}
+                  onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+                  rows={2}
+                  maxLength={1000}
+                  placeholder="What's included, what to bring, etc."
+                />
+              </div>
+            </div>
           </div>
-          <div className="flex justify-end gap-2">
+
+          <div>
+            <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Scheduling rules
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div>
+                <Label>Duration (minutes)</Label>
+                <Input
+                  type="number"
+                  min={5}
+                  value={draft.duration_min}
+                  onChange={(e) => setDraft({ ...draft, duration_min: Number(e.target.value) })}
+                />
+                <FieldHelp>How long one appointment takes.</FieldHelp>
+              </div>
+              <div>
+                <Label>Buffer between bookings (min)</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={draft.buffer_min}
+                  onChange={(e) => setDraft({ ...draft, buffer_min: Number(e.target.value) })}
+                />
+                <FieldHelp>Cleanup / travel time added after each booking.</FieldHelp>
+              </div>
+              <div>
+                <Label>Max concurrent</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  value={draft.max_concurrent}
+                  onChange={(e) => setDraft({ ...draft, max_concurrent: Number(e.target.value) })}
+                />
+                <FieldHelp>How many customers you can serve at once (bays, trucks, staff).</FieldHelp>
+              </div>
+              <div>
+                <Label>Lead time (hours)</Label>
+                <Input
+                  type="number"
+                  min={0}
+                  value={draft.lead_time_hours}
+                  onChange={(e) => setDraft({ ...draft, lead_time_hours: Number(e.target.value) })}
+                />
+                <FieldHelp>Minimum notice before a booking can start.</FieldHelp>
+              </div>
+              <div>
+                <Label>Booking horizon (days)</Label>
+                <Input
+                  type="number"
+                  min={1}
+                  value={draft.horizon_days}
+                  onChange={(e) => setDraft({ ...draft, horizon_days: Number(e.target.value) })}
+                />
+                <FieldHelp>How far in advance customers can book.</FieldHelp>
+              </div>
+              <div className="flex items-center justify-between rounded-md border border-border bg-background px-3 py-2">
+                <div>
+                  <Label className="m-0">Require approval</Label>
+                  <p className="text-[11px] text-muted-foreground">
+                    {draft.require_approval
+                      ? "You'll confirm each booking before it's final."
+                      : "Bookings auto-confirm — slot is held immediately."}
+                  </p>
+                </div>
+                <Switch
+                  checked={!!draft.require_approval}
+                  onCheckedChange={(v) => setDraft({ ...draft, require_approval: v })}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 border-t border-border pt-3">
             <Button variant="outline" onClick={() => setDraft(null)}>
               Cancel
             </Button>
-            <Button onClick={save}>Save</Button>
+            <Button onClick={save}>{draft.id ? "Update service" : "Create service"}</Button>
           </div>
         </div>
       )}
 
       {items.length === 0 && !draft && (
-        <p className="text-sm text-muted-foreground">No bookable services yet.</p>
+        <div className="rounded-lg border border-dashed border-border p-6 text-center">
+          <CalendarDays className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
+          <p className="text-sm font-medium">No bookable services yet</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Add your first service so customers can book online.
+          </p>
+        </div>
       )}
 
-      <div className="space-y-2">
+      <div className="grid gap-2 sm:grid-cols-2">
         {items.map((it) => (
           <div
             key={it.id}
-            className="flex items-center justify-between rounded-md border border-border px-3 py-2"
+            className="flex items-start justify-between gap-2 rounded-lg border border-border p-3 transition-colors hover:border-primary/40"
           >
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-1.5">
                 <span className="font-medium">{it.title}</span>
                 {!it.active && <Badge variant="secondary">inactive</Badge>}
-                {it.require_approval && <Badge variant="outline">approval</Badge>}
+                {it.require_approval ? (
+                  <Badge variant="outline" className="text-[10px]">manual approval</Badge>
+                ) : (
+                  <Badge variant="outline" className="text-[10px]">auto-confirms</Badge>
+                )}
               </div>
-              <div className="text-xs text-muted-foreground">
-                {it.duration_min}m{it.price_php != null && <> · ₱{it.price_php}</>}
-                {it.max_concurrent > 1 && <> · ×{it.max_concurrent}</>}
+              <div className="mt-1 flex flex-wrap gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
+                <span><Clock className="mr-0.5 inline h-3 w-3" />{it.duration_min} min</span>
+                {it.price_php != null && <span>· ₱{it.price_php.toLocaleString()}</span>}
+                {it.max_concurrent > 1 && <span>· up to {it.max_concurrent} at once</span>}
+                <span>· {it.lead_time_hours}h notice</span>
               </div>
+              {it.description && (
+                <p className="mt-1.5 line-clamp-2 text-xs text-muted-foreground">{it.description}</p>
+              )}
             </div>
-            <div className="flex gap-1">
-              <Button size="sm" variant="outline" onClick={() => setDraft(it)}>
-                Edit
+            <div className="flex shrink-0 gap-1">
+              <Button size="sm" variant="ghost" onClick={() => setDraft(it)} aria-label="Edit">
+                <Pencil className="h-4 w-4" />
               </Button>
-              <Button size="sm" variant="ghost" onClick={() => del(it.id)}>
+              <Button size="sm" variant="ghost" onClick={() => del(it.id)} aria-label="Delete">
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
@@ -309,11 +462,6 @@ const DAY_KEY_TO_WEEKDAY: Record<string, number> = {
   sat: 6,
 };
 
-/**
- * Convert the structured business hours (from the Hours tab) into the row
- * shape used by `business_availability`. `24h` becomes a single 00:00–23:59
- * window; `closed` days produce no rows. `open` days emit one row per range.
- */
 function hoursToAvailabilityRows(hours: unknown): Avail[] {
   if (!isStructuredHours(hours)) return [];
   const week = (hours as StructuredHours).primary;
@@ -347,6 +495,13 @@ function rowsEqual(a: Avail[], b: Avail[]): boolean {
   return norm(a) === norm(b);
 }
 
+function fmt12(t: string) {
+  const [h, m] = t.split(":").map(Number);
+  const ap = h >= 12 ? "PM" : "AM";
+  const hh = ((h + 11) % 12) + 1;
+  return `${hh}:${String(m || 0).padStart(2, "0")} ${ap}`;
+}
+
 function WeeklyHoursSection({
   businessId,
   businessHours,
@@ -363,16 +518,12 @@ function WeeklyHoursSection({
   const businessRows = useMemo(() => hoursToAvailabilityRows(businessHours), [businessHours]);
   const hasBusinessHours = businessRows.length > 0;
 
-  // "Synced" means availability matches the business open hours, or is empty
-  // while business hours exist (first-time setup).
   const initiallySynced =
     hasBusinessHours &&
     (availability.length === 0 || rowsEqual(availability, businessRows));
 
   const [useBusinessHours, setUseBusinessHours] = useState<boolean>(initiallySynced);
-  const [rows, setRows] = useState<Avail[]>(
-    initiallySynced ? businessRows : availability,
-  );
+  const [rows, setRows] = useState<Avail[]>(initiallySynced ? businessRows : availability);
   const [saving, setSaving] = useState(false);
 
   const effectiveRows = useBusinessHours ? businessRows : rows;
@@ -401,11 +552,26 @@ function WeeklyHoursSection({
 
   return (
     <Card className="p-5">
-      <div className="mb-1 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="font-display text-lg font-semibold">Booking hours</h2>
+      <div className="mb-1 flex flex-wrap items-start justify-between gap-2">
+        <div>
+          <h2 className="font-display text-lg font-semibold">Booking hours</h2>
+          <p className="text-xs text-muted-foreground">
+            {useBusinessHours
+              ? "Live-synced from your Hours tab. Edit there to update both."
+              : !hasBusinessHours
+                ? "Set your weekly open windows for online bookings."
+                : "Custom booking hours — independent of your shop open hours."}
+          </p>
+        </div>
         {hasBusinessHours && (
-          <div className="flex items-center gap-2">
-            <Label htmlFor="use-business-hours" className="m-0 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2 rounded-md border border-border bg-muted/40 px-3 py-1.5">
+            <CheckCircle2
+              className={cn(
+                "h-4 w-4",
+                useBusinessHours ? "text-green-600" : "text-muted-foreground",
+              )}
+            />
+            <Label htmlFor="use-business-hours" className="m-0 cursor-pointer text-xs">
               Use my business open hours
             </Label>
             <Switch
@@ -413,24 +579,43 @@ function WeeklyHoursSection({
               checked={useBusinessHours}
               onCheckedChange={(v) => {
                 setUseBusinessHours(v);
-                if (!v) setRows(businessRows); // seed custom editor from current hours
+                if (!v) setRows(businessRows);
               }}
             />
           </div>
         )}
       </div>
-      <p className="mb-4 text-xs text-muted-foreground">
-        {useBusinessHours
-          ? "Synced from your Hours tab — change them there and they apply here automatically."
-          : !hasBusinessHours
-          ? "Set your weekly open windows for online bookings. (Tip: set your Hours tab to auto-sync.)"
-          : "Custom booking hours — independent of your shop open hours."}
-      </p>
 
       {!hasBusinessHours && (
-        <div className="mb-3 rounded-md border border-dashed border-border bg-muted/40 p-3 text-xs text-muted-foreground">
+        <div className="mb-3 mt-3 rounded-md border border-dashed border-border bg-muted/40 p-3 text-xs text-muted-foreground">
           You haven't set business open hours yet. Set them in the <strong>Hours</strong> tab to
-          enable one-click sync.
+          enable one-click sync between your shop hours and booking availability.
+        </div>
+      )}
+
+      {/* Compact summary from Hours tab */}
+      {hasBusinessHours && isStructuredHours(businessHours) && (
+        <div className="mb-4 mt-3 rounded-md border border-border bg-muted/30 p-3">
+          <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+            From your Hours tab
+          </div>
+          <div className="grid gap-1 text-xs sm:grid-cols-2">
+            {DAY_KEYS.map((k) => {
+              const d = (businessHours as StructuredHours).primary[k];
+              const label =
+                !d || d.mode === "closed"
+                  ? "Closed"
+                  : d.mode === "24h"
+                    ? "24 hours"
+                    : (d.ranges ?? []).map((r) => formatRange(r)).join(", ") || "Closed";
+              return (
+                <div key={k} className="flex justify-between gap-2">
+                  <span className="font-medium">{DAY_LABELS[k]}</span>
+                  <span className="text-muted-foreground">{label}</span>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 
@@ -442,17 +627,23 @@ function WeeklyHoursSection({
         </div>
       )}
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         {WEEKDAYS.map((name, idx) => {
           const dayRows = effectiveRows
             .map((r, i) => ({ r, i }))
             .filter((x) => x.r.weekday === idx);
           return (
-            <div key={idx} className="rounded-md border border-border p-3">
+            <div
+              key={idx}
+              className={cn(
+                "rounded-md border p-3 transition-colors",
+                dayRows.length === 0 ? "border-border bg-muted/20" : "border-border",
+              )}
+            >
               <div className="mb-2 flex items-center justify-between">
                 <div className="font-medium">{name}</div>
                 {!useBusinessHours && (
-                  <Button size="sm" variant="outline" onClick={() => addRow(idx)}>
+                  <Button size="sm" variant="ghost" onClick={() => addRow(idx)}>
                     <Plus className="mr-1 h-3 w-3" /> Window
                   </Button>
                 )}
@@ -462,7 +653,7 @@ function WeeklyHoursSection({
               ) : (
                 <div className="space-y-2">
                   {dayRows.map(({ r, i }) => (
-                    <div key={i} className="flex items-center gap-2">
+                    <div key={i} className="flex flex-wrap items-center gap-2">
                       <Input
                         type="time"
                         value={r.start_time}
@@ -486,6 +677,11 @@ function WeeklyHoursSection({
                         }}
                         className="h-9 w-32"
                       />
+                      {useBusinessHours && (
+                        <span className="text-[11px] text-muted-foreground">
+                          ({fmt12(r.start_time)} – {fmt12(r.end_time)})
+                        </span>
+                      )}
                       {!useBusinessHours && (
                         <Button
                           size="sm"
@@ -503,7 +699,12 @@ function WeeklyHoursSection({
           );
         })}
       </div>
-      <div className="mt-4 flex justify-end">
+      <div className="mt-4 flex items-center justify-between">
+        <p className="text-[11px] text-muted-foreground">
+          {useBusinessHours
+            ? "Saves a snapshot to your booking schedule. Re-save after editing Hours."
+            : "These hours control when slots appear on your public booking page."}
+        </p>
         <Button onClick={save} disabled={saving}>
           {saving ? "Saving…" : "Save booking hours"}
         </Button>
@@ -532,7 +733,7 @@ function ExceptionsSection({
   const [endTime, setEndTime] = useState("12:00");
 
   async function add() {
-    if (!date) return;
+    if (!date) return toast.error("Pick a date");
     const payload: any = { businessId, date, note: note || null };
     if (mode === "closed_all") {
       payload.closed = true;
@@ -552,6 +753,7 @@ function ExceptionsSection({
       setDate("");
       setNote("");
       onChange();
+      toast.success("Date override added");
     } catch (e: any) {
       toast.error(e?.message);
     }
@@ -560,22 +762,23 @@ function ExceptionsSection({
   return (
     <Card className="p-5">
       <h2 className="mb-1 font-display text-lg font-semibold">Holidays &amp; date overrides</h2>
-      <p className="mb-3 text-xs text-muted-foreground">
-        Close a full day, block a specific time range, or open a custom window for one date.
+      <p className="mb-4 text-xs text-muted-foreground">
+        Close a full day, block part of a day, or open a special window for one date — perfect for
+        holidays, lunch breaks, or one-off events.
       </p>
-      <div className="mb-3 grid gap-2 sm:grid-cols-[auto,1fr] sm:items-end">
-        <div className="flex flex-wrap items-end gap-2">
+      <div className="mb-4 rounded-lg border border-border bg-muted/20 p-3">
+        <div className="grid gap-2 sm:grid-cols-[auto,auto,1fr,auto] sm:items-end">
           <div>
-            <Label>Date</Label>
+            <Label className="text-xs">Date</Label>
             <Input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="h-9 w-44"
+              className="h-9 w-40"
             />
           </div>
           <div>
-            <Label>Type</Label>
+            <Label className="text-xs">Type</Label>
             <select
               value={mode}
               onChange={(e) => setMode(e.target.value as typeof mode)}
@@ -587,9 +790,9 @@ function ExceptionsSection({
             </select>
           </div>
           {mode !== "closed_all" && (
-            <>
+            <div className="flex items-end gap-2">
               <div>
-                <Label>From</Label>
+                <Label className="text-xs">From</Label>
                 <Input
                   type="time"
                   value={startTime}
@@ -598,7 +801,7 @@ function ExceptionsSection({
                 />
               </div>
               <div>
-                <Label>To</Label>
+                <Label className="text-xs">To</Label>
                 <Input
                   type="time"
                   value={endTime}
@@ -606,39 +809,48 @@ function ExceptionsSection({
                   className="h-9 w-28"
                 />
               </div>
-            </>
+            </div>
           )}
-        </div>
-        <div className="flex items-end gap-2">
-          <div className="flex-1">
-            <Label>Note</Label>
+          <div className={mode === "closed_all" ? "sm:col-span-2" : ""}>
+            <Label className="text-xs">Note (optional)</Label>
             <Input
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="Holiday, lunch break, etc."
+              placeholder="Holiday, staff training, etc."
               maxLength={200}
               className="h-9"
             />
           </div>
-          <Button onClick={add}>Add</Button>
+        </div>
+        <div className="mt-3 flex justify-end">
+          <Button size="sm" onClick={add}>
+            <Plus className="mr-1 h-3 w-3" /> Add override
+          </Button>
         </div>
       </div>
+
       <div className="space-y-2">
         {exceptions.map((e) => {
           const hasRange = !!(e.start_time && e.end_time);
           const label = !hasRange
             ? "Closed all day"
             : e.closed
-              ? `Blocked ${e.start_time}–${e.end_time}`
-              : `Open only ${e.start_time}–${e.end_time}`;
+              ? `Blocked ${fmt12(e.start_time)}–${fmt12(e.end_time)}`
+              : `Open only ${fmt12(e.start_time)}–${fmt12(e.end_time)}`;
           const variant = e.closed ? "secondary" : "outline";
           return (
             <div
               key={e.id}
               className="flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm"
             >
-              <div>
-                <span className="font-medium">{e.date}</span>
+              <div className="min-w-0">
+                <span className="font-medium">
+                  {new Date(e.date + "T00:00:00").toLocaleDateString(undefined, {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
                 <Badge variant={variant} className="ml-2">
                   {label}
                 </Badge>
@@ -654,7 +866,9 @@ function ExceptionsSection({
             </div>
           );
         })}
-        {exceptions.length === 0 && <p className="text-sm text-muted-foreground">No exceptions.</p>}
+        {exceptions.length === 0 && (
+          <p className="text-xs text-muted-foreground">No date overrides yet.</p>
+        )}
       </div>
     </Card>
   );
@@ -676,11 +890,13 @@ function toLocalDateString(d: Date) {
 
 function BookingsInboxSection({
   businessId,
+  businessName,
   bookings,
   assignees,
   onChange,
 }: {
   businessId: string;
+  businessName?: string;
   bookings: Booking[];
   assignees: Assignee[];
   onChange: () => void;
@@ -738,13 +954,19 @@ function BookingsInboxSection({
   return (
     <Card className="p-5">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <h2 className="font-display text-lg font-semibold">Bookings</h2>
+        <div>
+          <h2 className="font-display text-lg font-semibold">Bookings inbox</h2>
+          <p className="text-xs text-muted-foreground">
+            Manage incoming requests {businessName ? `for ${businessName}` : ""} — approve, assign,
+            and track completion.
+          </p>
+        </div>
         <div className="inline-flex rounded-md border border-border p-0.5 text-xs">
           <button
             type="button"
             onClick={() => setView("list")}
             className={cn(
-              "inline-flex items-center gap-1 rounded px-2 py-1",
+              "inline-flex items-center gap-1 rounded px-2.5 py-1",
               view === "list" ? "bg-primary text-primary-foreground" : "text-muted-foreground",
             )}
           >
@@ -754,7 +976,7 @@ function BookingsInboxSection({
             type="button"
             onClick={() => setView("calendar")}
             className={cn(
-              "inline-flex items-center gap-1 rounded px-2 py-1",
+              "inline-flex items-center gap-1 rounded px-2.5 py-1",
               view === "calendar" ? "bg-primary text-primary-foreground" : "text-muted-foreground",
             )}
           >
@@ -818,9 +1040,13 @@ function BookingsInboxSection({
       )}
 
       {visible.length === 0 && (
-        <p className="text-sm text-muted-foreground">
-          {view === "calendar" ? "No bookings on this day." : "No bookings."}
-        </p>
+        <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+          {view === "calendar"
+            ? "No bookings on this day."
+            : bookings.length === 0
+              ? "No bookings yet — share your public booking page to start receiving requests."
+              : "No bookings match this filter."}
+        </div>
       )}
 
       <div className="space-y-2">
