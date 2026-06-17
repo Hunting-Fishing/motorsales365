@@ -890,7 +890,7 @@ function SellPage() {
           </p>
 
           <div className="mt-6 space-y-4 rounded-xl border border-border bg-card p-5 sm:p-6">
-            <h2 className="font-display text-base font-semibold">How selling works</h2>
+            <h2 className="text-sm font-semibold">How selling works</h2>
             <ol className="ml-5 list-decimal space-y-1 text-sm text-muted-foreground">
               <li>Create a free account (or sign in).</li>
               <li>Add up to 12 photos and 1 walkaround video (free plan).</li>
@@ -918,14 +918,16 @@ function SellPage() {
 
   return (
     <SiteLayout>
-      <div className="container mx-auto max-w-3xl px-4 py-6 sm:py-10">
-        <h1 className="font-display text-2xl sm:text-3xl font-bold">Post a listing</h1>
-        <p className="text-sm sm:text-base text-muted-foreground">Reach buyers across the Philippines.</p>
+      <div className="container mx-auto max-w-5xl px-3 py-4 sm:py-6">
+        <div className="flex items-end justify-between gap-3">
+          <h1 className="font-display text-xl sm:text-2xl font-bold">Post a listing</h1>
+          <span className="text-xs text-muted-foreground">Reach buyers across the Philippines.</span>
+        </div>
 
         {paymentStatus && pendingListingId ? (
           <div
             role="alert"
-            className="mt-4 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-destructive/40 bg-destructive/5 p-3 sm:p-4"
+            className="mt-3 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-destructive/40 bg-destructive/5 p-3"
           >
             <div className="flex items-start gap-2">
               <AlertCircle className="mt-0.5 h-5 w-5 text-destructive" />
@@ -935,7 +937,7 @@ function SellPage() {
                     ? "Payment cancelled"
                     : "Payment didn't go through"}
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Your listing is saved and still pending payment. You can resume checkout
                   any time — nothing was charged.
                 </p>
@@ -957,18 +959,6 @@ function SellPage() {
         ) : null}
 
 
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3 sm:p-4">
-          <div>
-            <div className="font-semibold">Already selling on Facebook Marketplace?</div>
-            <p className="text-sm text-muted-foreground">
-              Import a listing in seconds — we verify your FB profile so buyers know it's the real
-              you.
-            </p>
-          </div>
-          <Button asChild variant="default" size="sm" className="w-full sm:w-auto">
-            <Link to="/sell/import">Import from Facebook</Link>
-          </Button>
-        </div>
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-3">
           {(() => {
@@ -1010,41 +1000,38 @@ function SellPage() {
 
             );
           })()}
-          <section data-tab="details" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "details" ? "" : "hidden"}`}>
-
-
-            <h2 className="font-display text-base font-semibold">Details</h2>
-            {myRides.length > 0 && (
-              <div className="rounded-lg border border-primary/30 bg-primary/5 p-2.5">
-                <Label className="text-xs font-semibold">Pull from your Rides</Label>
-                <p className="mt-0.5 text-[11px] text-muted-foreground">
-                  Prefills vehicle details and adds a link back to your Rides page for more photos.
-                </p>
-                <Select
-                  value={sourceRideId ?? ""}
-                  onValueChange={(v) => { if (v) prefillFromRide(v); }}
-                >
-                  <SelectTrigger className="mt-1.5 h-9">
-                    <SelectValue placeholder="Choose one of your rides…" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {myRides.map((r) => {
-                      const label = [r.year, r.make, r.model].filter(Boolean).join(" ");
-                      return (
-                        <SelectItem key={r.id} value={r.id}>
-                          {r.name ? `${r.name}${label ? ` — ${label}` : ""}` : label || "Untitled ride"}
-                        </SelectItem>
-                      );
-                    })}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-            <div className="grid gap-4 sm:grid-cols-2">
+          <section data-tab="details" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "details" ? "" : "hidden"}`}>
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="text-sm font-semibold">Basics</h2>
+              {myRides.length > 0 && (
+                <div className="flex items-center gap-2">
+                  <span className="hidden sm:inline text-[11px] text-muted-foreground">Pull from Rides:</span>
+                  <Select
+                    value={sourceRideId ?? ""}
+                    onValueChange={(v) => { if (v) prefillFromRide(v); }}
+                  >
+                    <SelectTrigger className="h-8 w-[200px] text-xs">
+                      <SelectValue placeholder="Choose a ride…" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {myRides.map((r) => {
+                        const label = [r.year, r.make, r.model].filter(Boolean).join(" ");
+                        return (
+                          <SelectItem key={r.id} value={r.id}>
+                            {r.name ? `${r.name}${label ? ` — ${label}` : ""}` : label || "Untitled ride"}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
               <div>
-                <Label>Category</Label>
+                <Label className="text-xs">Category</Label>
                 <Select value={category} onValueChange={setCategory}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-9 text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -1057,9 +1044,9 @@ function SellPage() {
                 </Select>
               </div>
               <div>
-                <Label>Condition</Label>
+                <Label className="text-xs">Condition</Label>
                 <Select value={condition} onValueChange={setCondition}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-9 text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -1069,85 +1056,81 @@ function SellPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="sm:col-span-2">
-                <Label htmlFor="title">Title</Label>
+              {(category === "car" || category === "motorcycle" || category === "truck") ? (
+                <div>
+                  <Label className="text-xs">Registration</Label>
+                  <Select
+                    value={registrationStatus}
+                    onValueChange={(v) => setRegistrationStatus(v as typeof registrationStatus)}
+                  >
+                    <SelectTrigger className="h-9 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="registered">Registered</SelectItem>
+                      <SelectItem value="unregistered">Unregistered</SelectItem>
+                      <SelectItem value="for_transfer">For transfer</SelectItem>
+                      <SelectItem value="unknown">Not specified</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              ) : null}
+              <div>
+                <Label htmlFor="price" className="text-xs">Asking price (₱)</Label>
                 <Input
-                  id="title"
-                  required
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="2019 Toyota Vios 1.3 E AT"
+                  id="price"
+                  type="number"
+                  min="0"
+                  className="h-9 text-sm"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  placeholder="e.g. 450000"
                 />
               </div>
-              <div className="sm:col-span-2 space-y-3 rounded-lg border border-border bg-muted/30 p-3">
-                <div>
-                  <Label className="text-sm font-semibold">Pricing — fill any that apply</Label>
-                  <p className="mt-0.5 text-[11px] text-muted-foreground">
-                    Real numbers only. Placeholder prices (₱1, ₱2…) are rejected and lower your seller score.
-                  </p>
-                </div>
-                <div>
-                  <Label htmlFor="price" className="text-xs">Asking price (₱)</Label>
-                  <Input
-                    id="price"
-                    type="number"
-                    min="0"
-                    className="mt-1"
-                    value={price}
-                    onChange={(e) => setPrice(e.target.value)}
-                    placeholder="e.g. 450000"
-                  />
-                  <p className="mt-0.5 text-[10px] text-muted-foreground">Full cash price</p>
-                </div>
-                <div className="flex flex-wrap items-center gap-4 text-xs">
-                  <label className="inline-flex items-center gap-1.5">
-                    <input
-                      type="checkbox"
-                      className="h-3.5 w-3.5 accent-primary"
-                      checked={negotiable}
-                      onChange={(e) => setNegotiable(e.target.checked)}
-                    />
-                    Negotiable
-                  </label>
-                  <label className="inline-flex items-center gap-1.5">
-                    <input
-                      type="checkbox"
-                      className="h-3.5 w-3.5 accent-primary"
-                      checked={priceHidden}
-                      onChange={(e) => setPriceHidden(e.target.checked)}
-                    />
-                    Hide price — buyers must message me
-                  </label>
-                </div>
-                {(category === "car" || category === "motorcycle" || category === "truck") && (
-                  <div>
-                    <Label className="text-xs">Registration</Label>
-                    <Select
-                      value={registrationStatus}
-                      onValueChange={(v) => setRegistrationStatus(v as typeof registrationStatus)}
-                    >
-                      <SelectTrigger className="mt-1 h-9">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="registered">Registered (OR/CR current)</SelectItem>
-                        <SelectItem value="unregistered">Unregistered / expired</SelectItem>
-                        <SelectItem value="for_transfer">For transfer of ownership</SelectItem>
-                        <SelectItem value="unknown">Not specified</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-              </div>
+            </div>
+            <div>
+              <Label htmlFor="title" className="text-xs">Title</Label>
+              <Input
+                id="title"
+                required
+                className="h-9 text-sm"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                placeholder="2019 Toyota Vios 1.3 E AT"
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-4 text-xs">
+              <label className="inline-flex items-center gap-1.5">
+                <input
+                  type="checkbox"
+                  className="h-3.5 w-3.5 accent-primary"
+                  checked={negotiable}
+                  onChange={(e) => setNegotiable(e.target.checked)}
+                />
+                Negotiable
+              </label>
+              <label className="inline-flex items-center gap-1.5">
+                <input
+                  type="checkbox"
+                  className="h-3.5 w-3.5 accent-primary"
+                  checked={priceHidden}
+                  onChange={(e) => setPriceHidden(e.target.checked)}
+                />
+                Hide price — buyers must message me
+              </label>
+              <span className="text-[11px] text-muted-foreground">
+                Real prices only — placeholders (₱1, ₱2…) lower your seller score.
+              </span>
             </div>
           </section>
 
 
+
           {SERVICE_CATEGORIES.has(category) && (
-            <section data-tab="details" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "details" ? "" : "hidden"}`}>
+            <section data-tab="details" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "details" ? "" : "hidden"}`}>
 
               <div>
-                <h2 className="font-display text-base font-semibold">What do you offer?</h2>
+                <h2 className="text-sm font-semibold">What do you offer?</h2>
                 <p className="text-xs text-muted-foreground">
                   Pick everything that applies — buyers filter by these tags.
                 </p>
@@ -1160,11 +1143,11 @@ function SellPage() {
             </section>
           )}
 
-          <section data-tab="details" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "details" ? "" : "hidden"}`}>
+          <section data-tab="details" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "details" ? "" : "hidden"}`}>
 
-            <h2 className="font-display text-base font-semibold">Details</h2>
+            <h2 className="text-sm font-semibold">Details</h2>
             {category === "repair" || category === "bodyshop" || category === "salvage" ? (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 <div className="sm:col-span-2">
                   <Label>Operating hours</Label>
                   <Input
@@ -1199,7 +1182,7 @@ function SellPage() {
                 </label>
               </div>
             ) : category === "carwash" ? (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 <div className="sm:col-span-2">
                   <Label>Services offered</Label>
                   <div className="mt-2 flex flex-wrap gap-2">
@@ -1270,7 +1253,7 @@ function SellPage() {
                 </label>
               </div>
             ) : category === "parts" ? (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
                   <Label>Part type</Label>
                   <Select value={partType} onValueChange={setPartType}>
@@ -1327,7 +1310,7 @@ function SellPage() {
               </div>
             ) : category === "used_part" ? (
               <div className="space-y-4">
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                   <div>
                     <Label>Vehicle system *</Label>
                     <Select value={usedPartSystem} onValueChange={setUsedPartSystem}>
@@ -1404,7 +1387,7 @@ function SellPage() {
                 </div>
               </div>
             ) : category === "drone" ? (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
                   <Label>Business type</Label>
                   <Select value={droneBizType} onValueChange={setDroneBizType}>
@@ -1468,7 +1451,7 @@ function SellPage() {
                 </label>
               </div>
             ) : category === "towing" ? (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
                   <Label>Service type</Label>
                   <Select value={towServiceType} onValueChange={setTowServiceType}>
@@ -1612,7 +1595,7 @@ function SellPage() {
                 />
               </div>
             ) : (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
                   <Label>Make / Brand</Label>
                   <Input value={make} onChange={(e) => setMake(e.target.value)} />
@@ -1627,7 +1610,7 @@ function SellPage() {
                 </div>
               </div>
             )}
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {(category === "car" || category === "motorcycle") && (
                 <>
                   <div>
@@ -1694,12 +1677,11 @@ function SellPage() {
             )}
           </section>
 
-          <section data-tab="location" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "location" ? "" : "hidden"}`}>
-
-            <h2 className="font-display text-base font-semibold">Location</h2>
-            <p className="text-xs text-muted-foreground">
-              Based on the official PSA Philippine Standard Geographic Code.
-            </p>
+          <section data-tab="location" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "location" ? "" : "hidden"}`}>
+            <div className="flex items-baseline justify-between gap-2">
+              <h2 className="text-sm font-semibold">Location & seller</h2>
+              <span className="text-[11px] text-muted-foreground">PSA PSGC</span>
+            </div>
             <LocationPicker
               value={{ region, province, city, barangay }}
               onChange={(v) => {
@@ -1709,91 +1691,91 @@ function SellPage() {
                 setBarangay(v.barangay ?? null);
               }}
             />
-          </section>
-
-          <section data-tab="location" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "location" ? "" : "hidden"}`}>
-
-            <h2 className="font-display text-base font-semibold">Seller type</h2>
-            <RadioGroup
-              value={sellerType}
-              onValueChange={(v: any) => setSellerType(v)}
-              className="grid gap-3 sm:grid-cols-2"
-            >
-              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 hover:bg-secondary/50">
-                <RadioGroupItem value="private" className="mt-1" />
-                <div>
-                  <div className="font-medium">Private seller</div>
-                  <div className="text-xs text-muted-foreground">
-                    I'm selling my personal vehicle
-                  </div>
-                </div>
-              </label>
-              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 hover:bg-secondary/50">
-                <RadioGroupItem value="business" className="mt-1" />
-                <div>
-                  <div className="font-medium">Business / Dealer</div>
-                  <div className="text-xs text-muted-foreground">I sell vehicles as a business</div>
-                </div>
-              </label>
-            </RadioGroup>
-            <div className="pt-2">
-              <Label htmlFor="phone">Contact phone (optional)</Label>
-              <PhoneInput
-                id="phone"
-                iso={phoneIso}
-                national={phoneNational}
-                onChange={({ iso, national }) => {
-                  setPhoneIso(iso);
-                  setPhoneNational(national);
-                  setPhone(buildE164(iso, national) ?? "");
-                }}
-              />
+            <div className="grid gap-2 sm:grid-cols-3 pt-1">
+              <div className="sm:col-span-2">
+                <Label className="text-xs">Seller type</Label>
+                <RadioGroup
+                  value={sellerType}
+                  onValueChange={(v: any) => setSellerType(v)}
+                  className="grid gap-2 sm:grid-cols-2"
+                >
+                  <label className="flex cursor-pointer items-center gap-2 rounded-md border border-border p-2 text-xs hover:bg-secondary/50">
+                    <RadioGroupItem value="private" />
+                    <div>
+                      <div className="font-medium">Private seller</div>
+                      <div className="text-[11px] text-muted-foreground">Personal vehicle</div>
+                    </div>
+                  </label>
+                  <label className="flex cursor-pointer items-center gap-2 rounded-md border border-border p-2 text-xs hover:bg-secondary/50">
+                    <RadioGroupItem value="business" />
+                    <div>
+                      <div className="font-medium">Business / Dealer</div>
+                      <div className="text-[11px] text-muted-foreground">I sell as a business</div>
+                    </div>
+                  </label>
+                </RadioGroup>
+              </div>
+              <div>
+                <Label htmlFor="phone" className="text-xs">Contact phone (optional)</Label>
+                <PhoneInput
+                  id="phone"
+                  iso={phoneIso}
+                  national={phoneNational}
+                  onChange={({ iso, national }) => {
+                    setPhoneIso(iso);
+                    setPhoneNational(national);
+                    setPhone(buildE164(iso, national) ?? "");
+                  }}
+                />
+              </div>
             </div>
           </section>
 
 
-          <section data-tab="plan" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "plan" ? "" : "hidden"}`}>
 
-            <h2 className="font-display text-base font-semibold">Plan</h2>
+          <section data-tab="plan" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "plan" ? "" : "hidden"}`}>
+
+            <h2 className="text-sm font-semibold">Plan</h2>
             <RadioGroup
               value={plan}
               onValueChange={(v: any) => setPlan(v)}
-              className="grid gap-3 sm:grid-cols-3"
+              className="grid gap-2 sm:grid-cols-3"
             >
-              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 hover:bg-secondary/50">
-                <RadioGroupItem value="free" className="mt-1" />
+              <label className="flex cursor-pointer items-start gap-2 rounded-lg border border-border p-2.5 hover:bg-secondary/50">
+                <RadioGroupItem value="free" className="mt-0.5" />
                 <div>
-                  <div className="font-medium">Free — ₱0</div>
-                  <div className="text-xs text-muted-foreground">
-                    Up to 12 photos, 1 video. 5 active listings.
+                  <div className="text-sm font-medium">Free — ₱0</div>
+                  <div className="text-[11px] text-muted-foreground">
+                    12 photos, 1 video · 5 active
                   </div>
                 </div>
               </label>
-              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 hover:bg-secondary/50">
-                <RadioGroupItem value="standard" className="mt-1" />
+              <label className="flex cursor-pointer items-start gap-2 rounded-lg border border-border p-2.5 hover:bg-secondary/50">
+                <RadioGroupItem value="standard" className="mt-0.5" />
                 <div>
-                  <div className="font-medium">
+                  <div className="text-sm font-medium">
                     Standard — {formatPHP(pricing.listing_fee_php ?? 20)}
                   </div>
-                  <div className="text-xs text-muted-foreground">Up to 20 photos, 3 videos</div>
+                  <div className="text-[11px] text-muted-foreground">20 photos, 3 videos</div>
                 </div>
               </label>
-              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 hover:bg-secondary/50">
-                <RadioGroupItem value="upgraded" className="mt-1" />
+              <label className="flex cursor-pointer items-start gap-2 rounded-lg border border-border p-2.5 hover:bg-secondary/50">
+                <RadioGroupItem value="upgraded" className="mt-0.5" />
                 <div>
-                  <div className="font-medium">
+                  <div className="text-sm font-medium">
                     Upgraded —{" "}
                     {formatPHP((pricing.listing_fee_php ?? 20) + (pricing.upgrade_fee_php ?? 100))}
                   </div>
-                  <div className="text-xs text-muted-foreground">Up to 20 photos, 3 videos</div>
+                  <div className="text-[11px] text-muted-foreground">20 photos, 3 videos</div>
                 </div>
               </label>
             </RadioGroup>
+
           </section>
 
-          <section data-tab="plan" className={`space-y-2 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "plan" ? "" : "hidden"}`}>
+          <section data-tab="plan" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "plan" ? "" : "hidden"}`}>
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-base font-semibold">Add a boost (optional)</h2>
+              <h2 className="text-sm font-semibold">Add a boost (optional)</h2>
               {selectedBoost && (
                 <button
                   type="button"
@@ -1836,8 +1818,8 @@ function SellPage() {
           </section>
 
 
-          <section data-tab="media" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "media" ? "" : "hidden"}`}>
-            <h2 className="font-display text-base font-semibold">Photos & video</h2>
+          <section data-tab="media" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "media" ? "" : "hidden"}`}>
+            <h2 className="text-sm font-semibold">Photos & video</h2>
             {(() => {
               const tierCaps: Record<
                 "free" | "standard" | "upgraded",
