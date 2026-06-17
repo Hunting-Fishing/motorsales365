@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 17, 2026 (expanded service listing metadata: price ranges, coverage area, response time, service radius, and tag facets shown publicly on business pages and used for directory filtering.)";
+  const lastUpdated = "June 17, 2026 (expanded business contact details: Facebook Page URL, WhatsApp number, and a structured Brands Carried list per business — used publicly on business pages and for future directory filtering.)";
 
   return (
     <SiteLayout>
