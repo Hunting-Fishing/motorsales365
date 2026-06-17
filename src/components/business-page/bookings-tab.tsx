@@ -13,11 +13,29 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableScroll,
+} from "@/components/ui/table";
+import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
+  SelectGroup,
+  SelectLabel,
 } from "@/components/ui/select";
 import {
   Trash2,
@@ -29,8 +47,9 @@ import {
   ExternalLink,
   Clock,
   CheckCircle2,
-  Sparkles,
   Pencil,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import {
   upsertBookableItem,
@@ -50,7 +69,17 @@ import {
   type StructuredHours,
 } from "@/lib/business-hours";
 import { formatE164 } from "@/data/country-codes";
+import { TAG_GROUPS } from "@/data/service-tags";
 import { cn } from "@/lib/utils";
+
+const BOOKABLE_CATALOG_GROUPS = ["repair", "body", "wash", "salvage"] as const;
+const STATUS_DOT: Record<string, string> = {
+  pending: "bg-amber-500",
+  confirmed: "bg-emerald-500",
+  completed: "bg-slate-400",
+  cancelled: "bg-rose-500",
+  no_show: "bg-zinc-400",
+};
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -100,71 +129,46 @@ export function BookingsTab({
 
   return (
     <div className="space-y-6">
-      {/* Overview / How it works */}
-      <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background p-5">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="max-w-2xl">
-            <div className="mb-1 flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <h2 className="font-display text-lg font-semibold">Online bookings</h2>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Let customers book appointments directly from your 365 MotorSales business page.
-              Bookings respect your <strong>Hours</strong> tab — change open hours there and they
-              flow through automatically.
-            </p>
-            <ol className="mt-3 grid gap-1.5 text-xs text-muted-foreground sm:grid-cols-2">
-              <li className="flex gap-2">
-                <span className="font-semibold text-primary">1.</span> Add a bookable service below
-                (e.g. <em>Tow request</em>, <em>Free estimate</em>).
-              </li>
-              <li className="flex gap-2">
-                <span className="font-semibold text-primary">2.</span> Confirm your booking hours
-                match your Hours tab.
-              </li>
-              <li className="flex gap-2">
-                <span className="font-semibold text-primary">3.</span> Customers pick a date &amp;
-                time on your public page.
-              </li>
-              <li className="flex gap-2">
-                <span className="font-semibold text-primary">4.</span> You approve here and assign
-                to a staff member.
-              </li>
-            </ol>
+      {/* Slim overview banner */}
+      <Card className="flex flex-wrap items-center justify-between gap-3 border-primary/20 bg-gradient-to-r from-primary/5 via-background to-background px-4 py-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <CalendarDays className="h-4 w-4 text-primary shrink-0" />
+            <h2 className="font-display text-base font-semibold">Online bookings</h2>
+            <Badge variant="secondary" className="text-[10px]">
+              {hasItems ? `${items.length} service${items.length === 1 ? "" : "s"}` : "0 services"}
+            </Badge>
+            <Badge variant={pending ? "destructive" : "outline"} className="text-[10px]">
+              {pending} pending
+            </Badge>
+            <Badge variant="outline" className="text-[10px]">
+              {confirmed} confirmed
+            </Badge>
           </div>
-          <div className="flex flex-col items-stretch gap-2 sm:items-end">
-            <div className="flex gap-2 text-xs">
-              <Badge variant="secondary" className="px-2 py-1">
-                {hasItems ? `${items.length} service${items.length === 1 ? "" : "s"}` : "No services yet"}
-              </Badge>
-              <Badge variant={pending ? "destructive" : "outline"} className="px-2 py-1">
-                {pending} pending
-              </Badge>
-              <Badge variant="outline" className="px-2 py-1">
-                {confirmed} confirmed
-              </Badge>
-            </div>
-            {businessSlug && hasItems && (
+          <p className="mt-1 text-xs text-muted-foreground">
+            Bookings respect your <strong>Hours</strong> tab — change open hours there and they flow through automatically.
+          </p>
+        </div>
+        {businessSlug && (
+          <div className="flex flex-col items-end gap-1">
+            {hasItems && (
               <Link
                 to="/businesses/$slug/book"
                 params={{ slug: businessSlug }}
                 target="_blank"
                 rel="noopener"
               >
-                <Button size="sm" variant="outline" className="w-full sm:w-auto">
+                <Button size="sm" variant="outline">
                   <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
-                  Preview public booking page
+                  Preview public page
                 </Button>
               </Link>
             )}
-            {businessSlug && (
-              <div className="text-[11px] text-muted-foreground sm:text-right">
-                Public link:{" "}
-                <code className="rounded bg-muted px-1 py-0.5">/businesses/{businessSlug}/book</code>
-              </div>
-            )}
+            <code className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+              /businesses/{businessSlug}/book
+            </code>
           </div>
-        </div>
+        )}
       </Card>
 
       <BookableItemsSection businessId={businessId} items={items} onChange={onChange} />
@@ -192,7 +196,7 @@ const emptyItem = {
   title: "",
   description: "",
   duration_min: 30,
-  buffer_min: 0,
+  buffer_min: 10,
   price_php: null as number | null,
   max_concurrent: 1,
   require_approval: true,
@@ -256,196 +260,296 @@ function BookableItemsSection({
     }
   }
 
+  async function toggleActive(it: Item) {
+    try {
+      await upsert({
+        data: {
+          businessId,
+          id: it.id,
+          title: it.title,
+          description: it.description ?? null,
+          duration_min: it.duration_min,
+          buffer_min: it.buffer_min ?? 0,
+          price_php: it.price_php ?? null,
+          max_concurrent: it.max_concurrent ?? 1,
+          require_approval: !!it.require_approval,
+          lead_time_hours: it.lead_time_hours ?? 2,
+          horizon_days: it.horizon_days ?? 30,
+          active: !it.active,
+        },
+      });
+      onChange();
+    } catch (e: any) {
+      toast.error(e?.message);
+    }
+  }
+
+  function startFromCatalog(title: string) {
+    setDraft({ ...emptyItem, title });
+  }
+
   return (
-    <Card className="p-5">
-      <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h2 className="font-display text-lg font-semibold">Bookable services</h2>
+    <Card className="px-4 py-4">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h2 className="font-display text-base font-semibold">Bookable services</h2>
           <p className="text-xs text-muted-foreground">
-            Each service customers can book — set the duration, price, and whether you approve
-            requests manually.
+            Pick from the catalog or add your own. Click a row to edit details.
           </p>
         </div>
-        {!draft && (
+        <div className="flex items-center gap-2">
+          <Select onValueChange={(v) => v && startFromCatalog(v)}>
+            <SelectTrigger className="h-8 w-[210px] text-xs">
+              <SelectValue placeholder="+ Select from catalog" />
+            </SelectTrigger>
+            <SelectContent>
+              {TAG_GROUPS.filter((g) =>
+                (BOOKABLE_CATALOG_GROUPS as readonly string[]).includes(g.key),
+              ).map((g) => (
+                <SelectGroup key={g.key}>
+                  <SelectLabel>{g.label}</SelectLabel>
+                  {g.tags.map((t) => (
+                    <SelectItem key={t} value={t}>
+                      {t}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              ))}
+            </SelectContent>
+          </Select>
           <Button size="sm" onClick={() => setDraft({ ...emptyItem })}>
-            <Plus className="mr-1 h-4 w-4" /> Add service
+            <Plus className="mr-1 h-4 w-4" /> Add manually
           </Button>
-        )}
+        </div>
       </div>
 
-      {draft && (
-        <div className="mb-4 space-y-4 rounded-lg border border-primary/30 bg-primary/[0.02] p-4">
-          <div>
-            <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Basics
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <Label>Service title *</Label>
-                <Input
-                  value={draft.title}
-                  onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-                  maxLength={120}
-                  placeholder="e.g. Tow request, Vehicle inspection"
-                />
-                <FieldHelp>What customers will see on the booking page.</FieldHelp>
-              </div>
-              <div>
-                <Label>Price (PHP, optional)</Label>
-                <Input
-                  type="number"
-                  value={draft.price_php ?? ""}
-                  onChange={(e) =>
-                    setDraft({
-                      ...draft,
-                      price_php: e.target.value === "" ? null : Number(e.target.value),
-                    })
-                  }
-                  placeholder="Leave blank if quote-on-request"
-                />
-                <FieldHelp>Shown as a guide price — leave blank for "Inquire for pricing".</FieldHelp>
-              </div>
-              <div className="sm:col-span-2">
-                <Label>Description</Label>
-                <Textarea
-                  value={draft.description ?? ""}
-                  onChange={(e) => setDraft({ ...draft, description: e.target.value })}
-                  rows={2}
-                  maxLength={1000}
-                  placeholder="What's included, what to bring, etc."
-                />
-              </div>
-            </div>
-          </div>
+      <TableScroll minWidth="640px">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[34%]">Service</TableHead>
+              <TableHead>Duration</TableHead>
+              <TableHead>Buffer</TableHead>
+              <TableHead>Lead</TableHead>
+              <TableHead>Max/slot</TableHead>
+              <TableHead>Price</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {items.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="py-8 text-center text-sm text-muted-foreground">
+                  No bookable services yet — use the buttons above to add one.
+                </TableCell>
+              </TableRow>
+            ) : (
+              items.map((it) => (
+                <TableRow
+                  key={it.id}
+                  className="cursor-pointer"
+                  onClick={() => setDraft(it)}
+                >
+                  <TableCell className="font-medium">
+                    <div className="truncate">{it.title}</div>
+                    {it.description && (
+                      <div className="truncate text-[11px] text-muted-foreground">
+                        {it.description}
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-xs">{it.duration_min}m</TableCell>
+                  <TableCell className="text-xs">{it.buffer_min ?? 0}m</TableCell>
+                  <TableCell className="text-xs">{it.lead_time_hours ?? 0}h</TableCell>
+                  <TableCell className="text-xs">{it.max_concurrent ?? 1}</TableCell>
+                  <TableCell className="text-xs">
+                    {it.price_php != null ? `₱${it.price_php.toLocaleString()}` : "—"}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={it.active ? "default" : "secondary"} className="text-[10px]">
+                      {it.active ? "Active" : "Inactive"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex justify-end gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setDraft(it)}
+                        aria-label="Edit"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => toggleActive(it)}
+                        aria-label={it.active ? "Disable" : "Enable"}
+                        title={it.active ? "Disable" : "Enable"}
+                      >
+                        <CheckCircle2
+                          className={cn(
+                            "h-4 w-4",
+                            it.active ? "text-emerald-500" : "text-muted-foreground",
+                          )}
+                        />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => del(it.id)}
+                        aria-label="Delete"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </TableScroll>
 
-          <div>
-            <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Scheduling rules
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
+      <Dialog open={!!draft} onOpenChange={(o) => !o && setDraft(null)}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{draft?.id ? "Edit service" : "New bookable service"}</DialogTitle>
+          </DialogHeader>
+          {draft && (
+            <div className="space-y-5">
               <div>
-                <Label>Duration (minutes)</Label>
-                <Input
-                  type="number"
-                  min={5}
-                  value={draft.duration_min}
-                  onChange={(e) => setDraft({ ...draft, duration_min: Number(e.target.value) })}
-                />
-                <FieldHelp>How long one appointment takes.</FieldHelp>
-              </div>
-              <div>
-                <Label>Buffer between bookings (min)</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={draft.buffer_min}
-                  onChange={(e) => setDraft({ ...draft, buffer_min: Number(e.target.value) })}
-                />
-                <FieldHelp>Cleanup / travel time added after each booking.</FieldHelp>
-              </div>
-              <div>
-                <Label>Max concurrent</Label>
-                <Input
-                  type="number"
-                  min={1}
-                  value={draft.max_concurrent}
-                  onChange={(e) => setDraft({ ...draft, max_concurrent: Number(e.target.value) })}
-                />
-                <FieldHelp>How many customers you can serve at once (bays, trucks, staff).</FieldHelp>
-              </div>
-              <div>
-                <Label>Lead time (hours)</Label>
-                <Input
-                  type="number"
-                  min={0}
-                  value={draft.lead_time_hours}
-                  onChange={(e) => setDraft({ ...draft, lead_time_hours: Number(e.target.value) })}
-                />
-                <FieldHelp>Minimum notice before a booking can start.</FieldHelp>
-              </div>
-              <div>
-                <Label>Booking horizon (days)</Label>
-                <Input
-                  type="number"
-                  min={1}
-                  value={draft.horizon_days}
-                  onChange={(e) => setDraft({ ...draft, horizon_days: Number(e.target.value) })}
-                />
-                <FieldHelp>How far in advance customers can book.</FieldHelp>
-              </div>
-              <div className="flex items-center justify-between rounded-md border border-border bg-background px-3 py-2">
-                <div>
-                  <Label className="m-0">Require approval</Label>
-                  <p className="text-[11px] text-muted-foreground">
-                    {draft.require_approval
-                      ? "You'll confirm each booking before it's final."
-                      : "Bookings auto-confirm — slot is held immediately."}
-                  </p>
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Basics
                 </div>
-                <Switch
-                  checked={!!draft.require_approval}
-                  onCheckedChange={(v) => setDraft({ ...draft, require_approval: v })}
-                />
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="sm:col-span-2">
+                    <Label>Service title *</Label>
+                    <Input
+                      value={draft.title}
+                      onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                      maxLength={120}
+                      placeholder="e.g. Oil change, Tow request, Vehicle inspection"
+                    />
+                    <FieldHelp>What customers will see on the booking page.</FieldHelp>
+                  </div>
+                  <div>
+                    <Label>Price (PHP, optional)</Label>
+                    <Input
+                      type="number"
+                      value={draft.price_php ?? ""}
+                      onChange={(e) =>
+                        setDraft({
+                          ...draft,
+                          price_php: e.target.value === "" ? null : Number(e.target.value),
+                        })
+                      }
+                      placeholder="Leave blank for quote-on-request"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between rounded-md border border-border bg-background px-3 py-2">
+                    <Label className="m-0">Active</Label>
+                    <Switch
+                      checked={draft.active !== false}
+                      onCheckedChange={(v) => setDraft({ ...draft, active: v })}
+                    />
+                  </div>
+                  <div className="sm:col-span-2">
+                    <Label>Description</Label>
+                    <Textarea
+                      value={draft.description ?? ""}
+                      onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+                      rows={2}
+                      maxLength={1000}
+                      placeholder="What's included, what to bring, etc."
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                  Scheduling rules
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <Label>Duration (minutes)</Label>
+                    <Input
+                      type="number"
+                      min={5}
+                      value={draft.duration_min}
+                      onChange={(e) => setDraft({ ...draft, duration_min: Number(e.target.value) })}
+                    />
+                  </div>
+                  <div>
+                    <Label>Buffer between bookings (min)</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={draft.buffer_min}
+                      onChange={(e) => setDraft({ ...draft, buffer_min: Number(e.target.value) })}
+                    />
+                  </div>
+                  <div>
+                    <Label>Max concurrent</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      value={draft.max_concurrent}
+                      onChange={(e) =>
+                        setDraft({ ...draft, max_concurrent: Number(e.target.value) })
+                      }
+                    />
+                    <FieldHelp>How many customers you can serve at once.</FieldHelp>
+                  </div>
+                  <div>
+                    <Label>Lead time (hours)</Label>
+                    <Input
+                      type="number"
+                      min={0}
+                      value={draft.lead_time_hours}
+                      onChange={(e) =>
+                        setDraft({ ...draft, lead_time_hours: Number(e.target.value) })
+                      }
+                    />
+                    <FieldHelp>Minimum notice before a booking can start.</FieldHelp>
+                  </div>
+                  <div>
+                    <Label>Booking horizon (days)</Label>
+                    <Input
+                      type="number"
+                      min={1}
+                      value={draft.horizon_days}
+                      onChange={(e) =>
+                        setDraft({ ...draft, horizon_days: Number(e.target.value) })
+                      }
+                    />
+                  </div>
+                  <div className="flex items-center justify-between rounded-md border border-border bg-background px-3 py-2">
+                    <div>
+                      <Label className="m-0">Require approval</Label>
+                      <p className="text-[11px] text-muted-foreground">
+                        {draft.require_approval ? "Manual confirm" : "Auto-confirms"}
+                      </p>
+                    </div>
+                    <Switch
+                      checked={!!draft.require_approval}
+                      onCheckedChange={(v) => setDraft({ ...draft, require_approval: v })}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-
-          <div className="flex justify-end gap-2 border-t border-border pt-3">
+          )}
+          <DialogFooter>
             <Button variant="outline" onClick={() => setDraft(null)}>
               Cancel
             </Button>
-            <Button onClick={save}>{draft.id ? "Update service" : "Create service"}</Button>
-          </div>
-        </div>
-      )}
-
-      {items.length === 0 && !draft && (
-        <div className="rounded-lg border border-dashed border-border p-6 text-center">
-          <CalendarDays className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
-          <p className="text-sm font-medium">No bookable services yet</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Add your first service so customers can book online.
-          </p>
-        </div>
-      )}
-
-      <div className="grid gap-2 sm:grid-cols-2">
-        {items.map((it) => (
-          <div
-            key={it.id}
-            className="flex items-start justify-between gap-2 rounded-lg border border-border p-3 transition-colors hover:border-primary/40"
-          >
-            <div className="min-w-0 flex-1">
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="font-medium">{it.title}</span>
-                {!it.active && <Badge variant="secondary">inactive</Badge>}
-                {it.require_approval ? (
-                  <Badge variant="outline" className="text-[10px]">manual approval</Badge>
-                ) : (
-                  <Badge variant="outline" className="text-[10px]">auto-confirms</Badge>
-                )}
-              </div>
-              <div className="mt-1 flex flex-wrap gap-x-2 gap-y-0.5 text-xs text-muted-foreground">
-                <span><Clock className="mr-0.5 inline h-3 w-3" />{it.duration_min} min</span>
-                {it.price_php != null && <span>· ₱{it.price_php.toLocaleString()}</span>}
-                {it.max_concurrent > 1 && <span>· up to {it.max_concurrent} at once</span>}
-                <span>· {it.lead_time_hours}h notice</span>
-              </div>
-              {it.description && (
-                <p className="mt-1.5 line-clamp-2 text-xs text-muted-foreground">{it.description}</p>
-              )}
-            </div>
-            <div className="flex shrink-0 gap-1">
-              <Button size="sm" variant="ghost" onClick={() => setDraft(it)} aria-label="Edit">
-                <Pencil className="h-4 w-4" />
-              </Button>
-              <Button size="sm" variant="ghost" onClick={() => del(it.id)} aria-label="Delete">
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        ))}
-      </div>
+            <Button onClick={save}>{draft?.id ? "Update service" : "Create service"}</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
@@ -949,16 +1053,63 @@ function BookingsInboxSection({
     }
   }
 
-  const visible = view === "calendar" ? calendarFiltered : statusFiltered;
+  // Statuses per day (for dot rendering)
+  const statusesByDay = useMemo(() => {
+    const m = new Map<string, string[]>();
+    for (const b of statusFiltered) {
+      const k = toLocalDateString(new Date(b.starts_at));
+      const arr = m.get(k) ?? [];
+      arr.push(b.status);
+      m.set(k, arr);
+    }
+    return m;
+  }, [statusFiltered]);
+
+  // Default to calendar view when there's more than 5 bookings
+  useMemo(() => {
+    if (bookings.length > 5 && view === "list") setView("calendar");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function CustomDayButton(props: any) {
+    const { day, modifiers, className, ...rest } = props;
+    const key = toLocalDateString(day.date);
+    const statuses = statusesByDay.get(key) ?? [];
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        data-day={day.date.toLocaleDateString()}
+        data-selected-single={modifiers.selected || undefined}
+        data-today={modifiers.today || undefined}
+        className={cn(
+          "relative flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-0 leading-none font-normal data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[today=true]:ring-1 data-[today=true]:ring-primary/40",
+          className,
+        )}
+        {...rest}
+      >
+        <span>{day.date.getDate()}</span>
+        {statuses.length > 0 && (
+          <span className="absolute bottom-0.5 left-1/2 flex -translate-x-1/2 gap-0.5">
+            {statuses.slice(0, 3).map((s, i) => (
+              <span key={i} className={cn("h-1 w-1 rounded-full", STATUS_DOT[s] ?? "bg-foreground")} />
+            ))}
+            {statuses.length > 3 && (
+              <span className="text-[8px] leading-none text-muted-foreground">+{statuses.length - 3}</span>
+            )}
+          </span>
+        )}
+      </Button>
+    );
+  }
 
   return (
-    <Card className="p-5">
+    <Card className="px-4 py-4">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h2 className="font-display text-lg font-semibold">Bookings inbox</h2>
+        <div className="min-w-0">
+          <h2 className="font-display text-base font-semibold">Bookings inbox</h2>
           <p className="text-xs text-muted-foreground">
-            Manage incoming requests {businessName ? `for ${businessName}` : ""} — approve, assign,
-            and track completion.
+            Manage incoming requests {businessName ? `for ${businessName}` : ""} — approve, assign, complete.
           </p>
         </div>
         <div className="inline-flex rounded-md border border-border p-0.5 text-xs">
@@ -985,20 +1136,22 @@ function BookingsInboxSection({
         </div>
       </div>
 
-      <div className="mb-3 flex flex-wrap gap-1">
+      <div className="mb-3 flex flex-wrap items-center gap-1">
         {["all", "pending", "confirmed", "completed", "cancelled", "no_show"].map((s) => (
           <button
             key={s}
             type="button"
             onClick={() => setFilter(s)}
-            className={`rounded-full border px-3 py-1 text-xs ${
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs",
               filter === s
                 ? "border-primary bg-primary/10 text-primary"
-                : "border-border text-muted-foreground"
-            }`}
+                : "border-border text-muted-foreground hover:text-foreground",
+            )}
           >
+            {s !== "all" && <span className={cn("h-1.5 w-1.5 rounded-full", STATUS_DOT[s])} />}
             {s === "all" ? "All" : STATUS_LABEL[s]}
-            <span className="ml-1 opacity-70">
+            <span className="opacity-70">
               ({s === "all" ? bookings.length : bookings.filter((b) => b.status === s).length})
             </span>
           </button>
@@ -1006,162 +1159,231 @@ function BookingsInboxSection({
       </div>
 
       {view === "calendar" && (
-        <div className="mb-4 grid gap-4 md:grid-cols-[auto,1fr]">
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={setSelectedDate}
-            className={cn("pointer-events-auto rounded-md border p-3")}
-            modifiers={{
-              hasBookings: (date) => (countsByDay.get(toLocalDateString(date)) ?? 0) > 0,
-            }}
-            modifiersClassNames={{
-              hasBookings: "relative font-semibold text-primary",
-            }}
-          />
-          <div className="text-xs text-muted-foreground">
-            {selectedDate ? (
-              <>
-                <strong className="text-foreground">
-                  {selectedDate.toLocaleDateString(undefined, {
-                    weekday: "long",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </strong>{" "}
-                · {calendarFiltered.length} booking
-                {calendarFiltered.length === 1 ? "" : "s"}
-              </>
-            ) : (
-              "Pick a date to see bookings"
-            )}
+        <div className="mb-4 grid gap-4 lg:grid-cols-[auto_1fr]">
+          <div className="rounded-md border border-border p-2">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={setSelectedDate}
+              className="pointer-events-auto"
+              components={{ DayButton: CustomDayButton }}
+            />
+            <div className="mt-2 flex flex-wrap gap-2 border-t border-border pt-2 text-[10px] text-muted-foreground">
+              {Object.entries(STATUS_LABEL).map(([k, label]) => (
+                <span key={k} className="inline-flex items-center gap-1">
+                  <span className={cn("h-1.5 w-1.5 rounded-full", STATUS_DOT[k])} />
+                  {label}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="min-w-0">
+            <div className="mb-2 flex items-center justify-between border-b border-border pb-2">
+              <div className="text-sm">
+                <strong>
+                  {selectedDate
+                    ? selectedDate.toLocaleDateString(undefined, {
+                        weekday: "long",
+                        month: "long",
+                        day: "numeric",
+                      })
+                    : "Pick a date"}
+                </strong>
+                <span className="ml-2 text-xs text-muted-foreground">
+                  {calendarFiltered.length} booking{calendarFiltered.length === 1 ? "" : "s"}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7"
+                  onClick={() => {
+                    const d = new Date(selectedDate ?? new Date());
+                    d.setDate(d.getDate() - 1);
+                    setSelectedDate(d);
+                  }}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7"
+                  onClick={() => {
+                    const d = new Date(selectedDate ?? new Date());
+                    d.setDate(d.getDate() + 1);
+                    setSelectedDate(d);
+                  }}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <BookingList
+              bookings={calendarFiltered}
+              assignees={assignees}
+              setStatus={setStatus}
+              setAssignee={setAssignee}
+              emptyText="No bookings on this day."
+            />
           </div>
         </div>
       )}
 
-      {visible.length === 0 && (
-        <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-          {view === "calendar"
-            ? "No bookings on this day."
-            : bookings.length === 0
+      {view === "list" && (
+        <BookingList
+          bookings={statusFiltered}
+          assignees={assignees}
+          setStatus={setStatus}
+          setAssignee={setAssignee}
+          emptyText={
+            bookings.length === 0
               ? "No bookings yet — share your public booking page to start receiving requests."
-              : "No bookings match this filter."}
-        </div>
+              : "No bookings match this filter."
+          }
+        />
       )}
+    </Card>
+  );
+}
 
-      <div className="space-y-2">
-        {visible
-          .slice()
-          .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())
-          .map((b) => {
-            const assignee = assignees.find((a) => a.user_id === b.assigned_user_id);
-            return (
-              <div key={b.id} className="rounded-md border border-border p-3">
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-medium">{b.customer_name}</span>
-                      <Badge
-                        variant={
-                          b.status === "pending"
-                            ? "destructive"
-                            : b.status === "confirmed"
-                              ? "default"
-                              : "secondary"
-                        }
-                      >
-                        {STATUS_LABEL[b.status]}
-                      </Badge>
-                      {assignee && (
-                        <Badge variant="outline" className="gap-1">
-                          <UserRound className="h-3 w-3" /> {assignee.full_name}
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="mt-0.5 text-xs text-muted-foreground">
-                      {new Date(b.starts_at).toLocaleString()} →{" "}
-                      {new Date(b.ends_at).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </div>
-                    <div className="mt-0.5 text-xs text-muted-foreground">
-                      {b.customer_phone && <span>{formatE164(b.customer_phone)}</span>}
-                      {b.customer_phone && b.customer_email && <span> · </span>}
-                      {b.customer_email && <span>{b.customer_email}</span>}
-                    </div>
-                    {b.notes && <div className="mt-1 text-xs">{b.notes}</div>}
-                  </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <Select
-                      value={b.assigned_user_id ?? "__none__"}
-                      onValueChange={(v) => setAssignee(b.id, v === "__none__" ? null : v)}
+function BookingList({
+  bookings,
+  assignees,
+  setStatus,
+  setAssignee,
+  emptyText,
+}: {
+  bookings: Booking[];
+  assignees: Assignee[];
+  setStatus: (id: string, s: string) => void;
+  setAssignee: (id: string, userId: string | null) => void;
+  emptyText: string;
+}) {
+  if (bookings.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+        {emptyText}
+      </div>
+    );
+  }
+  return (
+    <div className="space-y-2">
+      {bookings
+        .slice()
+        .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())
+        .map((b) => {
+          const assignee = assignees.find((a) => a.user_id === b.assigned_user_id);
+          return (
+            <div key={b.id} className="rounded-md border border-border p-3">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={cn("h-2 w-2 rounded-full", STATUS_DOT[b.status])} />
+                    <span className="font-medium">{b.customer_name}</span>
+                    <Badge
+                      variant={
+                        b.status === "pending"
+                          ? "destructive"
+                          : b.status === "confirmed"
+                            ? "default"
+                            : "secondary"
+                      }
+                      className="text-[10px]"
                     >
-                      <SelectTrigger className="h-8 w-[180px] text-xs">
-                        <SelectValue placeholder="Assign…" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="__none__">Unassigned</SelectItem>
-                        {assignees.map((a) => (
-                          <SelectItem key={a.user_id} value={a.user_id}>
-                            <span className="inline-flex items-center gap-1">
-                              <UserRound className="h-3 w-3" />
-                              {a.full_name}
-                              {a.role === "owner" && (
-                                <span className="text-[10px] text-muted-foreground">(owner)</span>
-                              )}
-                            </span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <div className="flex flex-wrap justify-end gap-1">
-                      {b.status === "pending" && (
-                        <>
-                          <Button size="sm" onClick={() => setStatus(b.id, "confirmed")}>
-                            Confirm
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setStatus(b.id, "cancelled")}
-                          >
-                            Decline
-                          </Button>
-                        </>
-                      )}
-                      {b.status === "confirmed" && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setStatus(b.id, "completed")}
-                          >
-                            Mark done
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => setStatus(b.id, "no_show")}
-                          >
-                            No-show
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => setStatus(b.id, "cancelled")}
-                          >
-                            Cancel
-                          </Button>
-                        </>
-                      )}
-                    </div>
+                      {STATUS_LABEL[b.status]}
+                    </Badge>
+                    {assignee && (
+                      <Badge variant="outline" className="gap-1 text-[10px]">
+                        <UserRound className="h-3 w-3" /> {assignee.full_name}
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="mt-0.5 text-xs text-muted-foreground">
+                    <Clock className="mr-0.5 inline h-3 w-3" />
+                    {new Date(b.starts_at).toLocaleString()} →{" "}
+                    {new Date(b.ends_at).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </div>
+                  <div className="mt-0.5 text-xs text-muted-foreground">
+                    {b.customer_phone && <span>{formatE164(b.customer_phone)}</span>}
+                    {b.customer_phone && b.customer_email && <span> · </span>}
+                    {b.customer_email && <span>{b.customer_email}</span>}
+                  </div>
+                  {b.notes && <div className="mt-1 text-xs">{b.notes}</div>}
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <Select
+                    value={b.assigned_user_id ?? "__none__"}
+                    onValueChange={(v) => setAssignee(b.id, v === "__none__" ? null : v)}
+                  >
+                    <SelectTrigger className="h-8 w-[180px] text-xs">
+                      <SelectValue placeholder="Assign…" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">Unassigned</SelectItem>
+                      {assignees.map((a) => (
+                        <SelectItem key={a.user_id} value={a.user_id}>
+                          <span className="inline-flex items-center gap-1">
+                            <UserRound className="h-3 w-3" />
+                            {a.full_name}
+                            {a.role === "owner" && (
+                              <span className="text-[10px] text-muted-foreground">(owner)</span>
+                            )}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="flex flex-wrap justify-end gap-1">
+                    {b.status === "pending" && (
+                      <>
+                        <Button size="sm" onClick={() => setStatus(b.id, "confirmed")}>
+                          Confirm
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setStatus(b.id, "cancelled")}
+                        >
+                          Decline
+                        </Button>
+                      </>
+                    )}
+                    {b.status === "confirmed" && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setStatus(b.id, "completed")}
+                        >
+                          Mark done
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setStatus(b.id, "no_show")}
+                        >
+                          No-show
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setStatus(b.id, "cancelled")}
+                        >
+                          Cancel
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
-            );
-          })}
-      </div>
-    </Card>
+            </div>
+          );
+        })}
+    </div>
   );
 }
