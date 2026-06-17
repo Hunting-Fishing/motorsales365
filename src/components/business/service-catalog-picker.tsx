@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -14,11 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Search, Plus, X, Pencil, Lightbulb, Loader2 } from "lucide-react";
+import { Search, Plus, Lightbulb, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { FUEL_STATION_CATALOG, UNIT_OPTIONS, type CatalogItem } from "@/data/fuel-station-catalog";
-import { blankService, type ServiceFormValue } from "./service-catalog-picker.utils";
+import { UNIT_OPTIONS, type CatalogItem } from "@/data/fuel-station-catalog";
+import { type ServiceFormValue } from "./service-catalog-picker.utils";
 import {
   listCatalogForType,
   submitServiceSuggestion,
