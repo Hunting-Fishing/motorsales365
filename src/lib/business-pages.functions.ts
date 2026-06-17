@@ -251,6 +251,7 @@ export const getBusinessPage = createServerFn({ method: "GET" })
       photos: photos ?? [],
       contactChannels: contactChannels ?? [],
       bookableItems: bookableItems ?? [],
+      brands: brands ?? [],
     };
   });
 
