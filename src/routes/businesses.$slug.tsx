@@ -640,11 +640,18 @@ function BusinessProfilePage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-2">
                         <div className="font-medium">{s.title}</div>
-                        {s.price_label && (
-                          <Badge variant="secondary" className="shrink-0 font-semibold">
-                            {s.price_label}
-                          </Badge>
-                        )}
+                        {(() => {
+                          const label =
+                            s.price_label ||
+                            (s.price_php != null
+                              ? `₱${Number(s.price_php).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${s.unit ? `/${s.unit}` : ""}`
+                              : null);
+                          return label ? (
+                            <Badge variant="secondary" className="shrink-0 font-semibold">
+                              {label}
+                            </Badge>
+                          ) : null;
+                        })()}
                       </div>
                       {s.description && (
                         <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
