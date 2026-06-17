@@ -12,7 +12,9 @@ import {
   Instagram,
   Facebook,
   Linkedin,
+  Play,
 } from "lucide-react";
+import { isVideoUrl } from "@/lib/media-kind";
 
 type Album = {
   id: string;
