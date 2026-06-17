@@ -840,16 +840,124 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
               className="h-11"
             />
           </div>
+          <div>
+            <Label>Facebook Page URL</Label>
+            <Input
+              type="url"
+              value={facebookUrl}
+              onChange={(e) => setFacebookUrl(e.target.value)}
+              maxLength={500}
+              placeholder="https://facebook.com/yourpage"
+              className="h-11"
+            />
+          </div>
+          <div>
+            <Label>WhatsApp number</Label>
+            <Input
+              type="tel"
+              value={whatsappNumber}
+              onChange={(e) => setWhatsappNumber(e.target.value)}
+              maxLength={40}
+              placeholder="+63 9XX XXX XXXX"
+              className="h-11"
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Saved as international format (e.g. +639XXXXXXXXX).
+            </p>
+          </div>
         </div>
-        <div>
-          <Label>Brands carried (optional)</Label>
-          <Textarea
-            value={brandsCarried}
-            onChange={(e) => setBrandsCarried(e.target.value)}
-            rows={2}
-            maxLength={2000}
-            placeholder="Toyota, Honda, Mitsubishi, …"
-          />
+
+        {/* Brands carried — structured chip editor */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label>Brands carried</Label>
+            <span className="text-xs text-muted-foreground">{brands.length}/60</span>
+          </div>
+          {brands.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {brands.map((b, i) => (
+                <span
+                  key={`${b}-${i}`}
+                  className="inline-flex items-center gap-1 rounded-full border border-border bg-secondary px-2.5 py-1 text-xs"
+                >
+                  {b}
+                  <button
+                    type="button"
+                    onClick={() => removeBrand(i)}
+                    className="rounded-full text-muted-foreground hover:text-foreground"
+                    aria-label={`Remove ${b}`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="flex gap-2">
+            <Input
+              value={brandInput}
+              onChange={(e) => setBrandInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === ",") {
+                  e.preventDefault();
+                  addBrand(brandInput);
+                }
+              }}
+              maxLength={80}
+              placeholder="Type a brand and press Enter…"
+              className="h-10"
+            />
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => addBrand(brandInput)}
+              disabled={!brandInput.trim()}
+            >
+              <Plus className="mr-1 h-4 w-4" />
+              Add
+            </Button>
+          </div>
+          {topSuggestions.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-xs text-muted-foreground">Suggested:</span>
+              {topSuggestions.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => addBrand(s)}
+                  className="rounded-full border border-dashed border-border px-2.5 py-1 text-xs text-muted-foreground hover:border-primary hover:text-foreground"
+                >
+                  + {s}
+                </button>
+              ))}
+              {moreSuggestions.length > 0 && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="rounded-full border border-dashed border-border px-2.5 py-1 text-xs text-muted-foreground hover:text-foreground"
+                    >
+                      +{moreSuggestions.length} more
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="start" className="w-72 p-2">
+                    <div className="flex flex-wrap gap-1.5">
+                      {moreSuggestions.map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => addBrand(s)}
+                          className="rounded-full border border-border bg-background px-2.5 py-1 text-xs hover:bg-secondary"
+                        >
+                          + {s}
+                        </button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
