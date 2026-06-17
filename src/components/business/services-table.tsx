@@ -427,7 +427,7 @@ function ServiceRow({
   const inlineSuggestions = unmatchedSuggestions.slice(0, 5);
   const moreSuggestions = unmatchedSuggestions.slice(5);
 
-  const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  const Field = ({ label, children }: { label: string; children: ReactNode }) => (
     <div className="flex flex-col gap-1 md:contents">
       <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground md:hidden">
         {label}
