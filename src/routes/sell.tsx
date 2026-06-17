@@ -1678,11 +1678,10 @@ function SellPage() {
           </section>
 
           <section data-tab="location" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "location" ? "" : "hidden"}`}>
-
-            <h2 className="text-sm font-semibold">Location</h2>
-            <p className="text-xs text-muted-foreground">
-              Based on the official PSA Philippine Standard Geographic Code.
-            </p>
+            <div className="flex items-baseline justify-between gap-2">
+              <h2 className="text-sm font-semibold">Location & seller</h2>
+              <span className="text-[11px] text-muted-foreground">PSA PSGC</span>
+            </div>
             <LocationPicker
               value={{ region, province, city, barangay }}
               onChange={(v) => {
@@ -1692,47 +1691,46 @@ function SellPage() {
                 setBarangay(v.barangay ?? null);
               }}
             />
-          </section>
-
-          <section data-tab="location" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "location" ? "" : "hidden"}`}>
-
-            <h2 className="text-sm font-semibold">Seller type</h2>
-            <RadioGroup
-              value={sellerType}
-              onValueChange={(v: any) => setSellerType(v)}
-              className="grid gap-3 sm:grid-cols-2"
-            >
-              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 hover:bg-secondary/50">
-                <RadioGroupItem value="private" className="mt-1" />
-                <div>
-                  <div className="font-medium">Private seller</div>
-                  <div className="text-xs text-muted-foreground">
-                    I'm selling my personal vehicle
-                  </div>
-                </div>
-              </label>
-              <label className="flex cursor-pointer items-start gap-3 rounded-lg border border-border p-4 hover:bg-secondary/50">
-                <RadioGroupItem value="business" className="mt-1" />
-                <div>
-                  <div className="font-medium">Business / Dealer</div>
-                  <div className="text-xs text-muted-foreground">I sell vehicles as a business</div>
-                </div>
-              </label>
-            </RadioGroup>
-            <div className="pt-2">
-              <Label htmlFor="phone">Contact phone (optional)</Label>
-              <PhoneInput
-                id="phone"
-                iso={phoneIso}
-                national={phoneNational}
-                onChange={({ iso, national }) => {
-                  setPhoneIso(iso);
-                  setPhoneNational(national);
-                  setPhone(buildE164(iso, national) ?? "");
-                }}
-              />
+            <div className="grid gap-2 sm:grid-cols-3 pt-1">
+              <div className="sm:col-span-2">
+                <Label className="text-xs">Seller type</Label>
+                <RadioGroup
+                  value={sellerType}
+                  onValueChange={(v: any) => setSellerType(v)}
+                  className="grid gap-2 sm:grid-cols-2"
+                >
+                  <label className="flex cursor-pointer items-center gap-2 rounded-md border border-border p-2 text-xs hover:bg-secondary/50">
+                    <RadioGroupItem value="private" />
+                    <div>
+                      <div className="font-medium">Private seller</div>
+                      <div className="text-[11px] text-muted-foreground">Personal vehicle</div>
+                    </div>
+                  </label>
+                  <label className="flex cursor-pointer items-center gap-2 rounded-md border border-border p-2 text-xs hover:bg-secondary/50">
+                    <RadioGroupItem value="business" />
+                    <div>
+                      <div className="font-medium">Business / Dealer</div>
+                      <div className="text-[11px] text-muted-foreground">I sell as a business</div>
+                    </div>
+                  </label>
+                </RadioGroup>
+              </div>
+              <div>
+                <Label htmlFor="phone" className="text-xs">Contact phone (optional)</Label>
+                <PhoneInput
+                  id="phone"
+                  iso={phoneIso}
+                  national={phoneNational}
+                  onChange={({ iso, national }) => {
+                    setPhoneIso(iso);
+                    setPhoneNational(national);
+                    setPhone(buildE164(iso, national) ?? "");
+                  }}
+                />
+              </div>
             </div>
           </section>
+
 
 
           <section data-tab="plan" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "plan" ? "" : "hidden"}`}>
