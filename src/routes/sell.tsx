@@ -1122,7 +1122,8 @@ function SellPage() {
             </section>
           )}
 
-          <section className="space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4">
+          <section data-tab="details" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "details" ? "" : "hidden"}`}>
+
             <h2 className="font-display text-base font-semibold">Details</h2>
             {category === "repair" || category === "bodyshop" || category === "salvage" ? (
               <div className="grid gap-4 sm:grid-cols-2">
