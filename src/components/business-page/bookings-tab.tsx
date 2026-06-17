@@ -238,6 +238,19 @@ export function BookingsTab({
   const confirmed = bookings.filter((b: any) => b.status === "confirmed").length;
   const hasItems = items.length > 0;
 
+  const storageKey = `bookings-enabled:${businessId}`;
+  const [enabled, setEnabled] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    const v = window.localStorage.getItem(storageKey);
+    return v === null ? true : v === "1";
+  });
+  const toggleEnabled = (next: boolean) => {
+    setEnabled(next);
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(storageKey, next ? "1" : "0");
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Slim overview banner */}
@@ -246,21 +259,31 @@ export function BookingsTab({
           <div className="flex items-center gap-2">
             <CalendarDays className="h-4 w-4 text-primary shrink-0" />
             <h2 className="font-display text-base font-semibold">Online bookings</h2>
-            <Badge variant="secondary" className="text-[10px]">
-              {hasItems ? `${items.length} service${items.length === 1 ? "" : "s"}` : "0 services"}
-            </Badge>
-            <Badge variant={pending ? "destructive" : "outline"} className="text-[10px]">
-              {pending} pending
-            </Badge>
-            <Badge variant="outline" className="text-[10px]">
-              {confirmed} confirmed
-            </Badge>
+            <label className="ml-1 flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
+              <Switch checked={enabled} onCheckedChange={toggleEnabled} aria-label="Enable bookings" />
+              <span>{enabled ? "On" : "Off"}</span>
+            </label>
+            {enabled && (
+              <>
+                <Badge variant="secondary" className="text-[10px]">
+                  {hasItems ? `${items.length} service${items.length === 1 ? "" : "s"}` : "0 services"}
+                </Badge>
+                <Badge variant={pending ? "destructive" : "outline"} className="text-[10px]">
+                  {pending} pending
+                </Badge>
+                <Badge variant="outline" className="text-[10px]">
+                  {confirmed} confirmed
+                </Badge>
+              </>
+            )}
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
-            Bookings respect your <strong>Hours</strong> tab — change open hours there and they flow through automatically.
+            {enabled
+              ? <>Bookings respect your <strong>Hours</strong> tab — change open hours there and they flow through automatically.</>
+              : "Bookings are turned off. Customers won't see the booking page until you turn this on."}
           </p>
         </div>
-        {businessSlug && (
+        {enabled && businessSlug && (
           <div className="flex flex-col items-end gap-1">
             {hasItems && (
               <Link
@@ -282,24 +305,29 @@ export function BookingsTab({
         )}
       </Card>
 
-      <BookableItemsSection businessId={businessId} businessKind={businessKind} items={items} onChange={onChange} />
-      <WeeklyHoursSection
-        businessId={businessId}
-        businessHours={businessHours}
-        availability={availability}
-        onChange={onChange}
-      />
-      <ExceptionsSection businessId={businessId} exceptions={exceptions} onChange={onChange} />
-      <BookingsInboxSection
-        businessId={businessId}
-        businessName={businessName}
-        bookings={bookings}
-        assignees={assignees}
-        onChange={onChange}
-      />
+      {enabled && (
+        <>
+          <BookableItemsSection businessId={businessId} businessKind={businessKind} items={items} onChange={onChange} />
+          <WeeklyHoursSection
+            businessId={businessId}
+            businessHours={businessHours}
+            availability={availability}
+            onChange={onChange}
+          />
+          <ExceptionsSection businessId={businessId} exceptions={exceptions} onChange={onChange} />
+          <BookingsInboxSection
+            businessId={businessId}
+            businessName={businessName}
+            bookings={bookings}
+            assignees={assignees}
+            onChange={onChange}
+          />
+        </>
+      )}
     </div>
   );
 }
+
 
 /* ---------- Items ---------- */
 
