@@ -847,7 +847,7 @@ function SellPage() {
           </p>
 
           <div className="mt-6 space-y-4 rounded-xl border border-border bg-card p-5 sm:p-6">
-            <h2 className="font-display text-lg font-semibold">How selling works</h2>
+            <h2 className="font-display text-base font-semibold">How selling works</h2>
             <ol className="ml-5 list-decimal space-y-1 text-sm text-muted-foreground">
               <li>Create a free account (or sign in).</li>
               <li>Add up to 12 photos and 1 walkaround video (free plan).</li>
@@ -927,9 +927,9 @@ function SellPage() {
           </Button>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
-            <h2 className="font-display text-lg font-semibold">Category & basics</h2>
+        <form onSubmit={handleSubmit} className="mt-4 space-y-3">
+          <section className="space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4">
+            <h2 className="font-display text-base font-semibold">Category & basics</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label>Category</Label>
@@ -1074,9 +1074,9 @@ function SellPage() {
           </section>
 
           {SERVICE_CATEGORIES.has(category) && (
-            <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
+            <section className="space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4">
               <div>
-                <h2 className="font-display text-lg font-semibold">What do you offer?</h2>
+                <h2 className="font-display text-base font-semibold">What do you offer?</h2>
                 <p className="text-xs text-muted-foreground">
                   Pick everything that applies — buyers filter by these tags.
                 </p>
@@ -1089,8 +1089,8 @@ function SellPage() {
             </section>
           )}
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
-            <h2 className="font-display text-lg font-semibold">Details</h2>
+          <section className="space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4">
+            <h2 className="font-display text-base font-semibold">Details</h2>
             {category === "repair" || category === "bodyshop" || category === "salvage" ? (
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
@@ -1597,8 +1597,8 @@ function SellPage() {
             )}
           </section>
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
-            <h2 className="font-display text-lg font-semibold">Location</h2>
+          <section className="space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4">
+            <h2 className="font-display text-base font-semibold">Location</h2>
             <p className="text-xs text-muted-foreground">
               Based on the official PSA Philippine Standard Geographic Code.
             </p>
@@ -1613,8 +1613,8 @@ function SellPage() {
             />
           </section>
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
-            <h2 className="font-display text-lg font-semibold">Seller type</h2>
+          <section className="space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4">
+            <h2 className="font-display text-base font-semibold">Seller type</h2>
             <RadioGroup
               value={sellerType}
               onValueChange={(v: any) => setSellerType(v)}
@@ -1639,8 +1639,8 @@ function SellPage() {
             </RadioGroup>
           </section>
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
-            <h2 className="font-display text-lg font-semibold">Plan</h2>
+          <section className="space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4">
+            <h2 className="font-display text-base font-semibold">Plan</h2>
             <RadioGroup
               value={plan}
               onValueChange={(v: any) => setPlan(v)}
@@ -1677,9 +1677,9 @@ function SellPage() {
             </RadioGroup>
           </section>
 
-          <section className="space-y-3 rounded-xl border border-border bg-card p-4 sm:p-6">
+          <section className="space-y-2 rounded-xl border border-border bg-card p-3 sm:p-4">
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-lg font-semibold">Add a boost (optional)</h2>
+              <h2 className="font-display text-base font-semibold">Add a boost (optional)</h2>
               {selectedBoost && (
                 <button
                   type="button"
@@ -1722,8 +1722,8 @@ function SellPage() {
           </section>
 
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
-            <h2 className="font-display text-lg font-semibold">Photos & video</h2>
+          <section className="space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4">
+            <h2 className="font-display text-base font-semibold">Photos & video</h2>
             {(() => {
               const tierCaps: Record<
                 "free" | "standard" | "upgraded",
