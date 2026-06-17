@@ -2009,26 +2009,49 @@ function SellPage() {
             </div>
           </section>
 
-          <div className="flex flex-col items-stretch justify-between gap-3 rounded-xl border border-border bg-card p-4 sm:p-6 sm:flex-row sm:items-center">
+          <div className="flex flex-col items-stretch justify-between gap-3 rounded-xl border border-border bg-card p-3 sm:p-4 sm:flex-row sm:items-center">
             <div>
-              <div className="text-sm text-muted-foreground">Total listing fee</div>
-              <div className="font-display text-2xl font-bold text-primary">
+              <div className="text-xs text-muted-foreground">Total listing fee</div>
+              <div className="font-display text-xl font-bold text-primary">
                 {formatPHP(totalFee)}
               </div>
-              <div className="text-xs text-muted-foreground">
+              <div className="text-[11px] text-muted-foreground">
                 Listing publishes after payment is confirmed.
               </div>
             </div>
             <div className="mb-1"><FormFeedbackLink formId="post-listing" /></div>
-            <div className="flex flex-col-reverse gap-2 sm:flex-row">
-              <Button asChild type="button" variant="outline" className="w-full sm:w-auto">
-                <Link to="/dashboard">Cancel</Link>
-              </Button>
-              <Button type="submit" disabled={submitting} size="lg" className="w-full sm:w-auto">
-                {submitting ? "Submitting…" : "Submit listing"}
-              </Button>
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
+              {(() => {
+                const order = ["basics", "details", "location", "plan", "media"] as const;
+                const i = order.indexOf(activeTab);
+                return (
+                  <>
+                    {i > 0 && (
+                      <Button type="button" variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => setActiveTab(order[i - 1])}>
+                        ← Back
+                      </Button>
+                    )}
+                    {i < order.length - 1 && (
+                      <Button type="button" size="sm" className="w-full sm:w-auto" onClick={() => { setActiveTab(order[i + 1]); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+                        Next →
+                      </Button>
+                    )}
+                    {i === order.length - 1 && (
+                      <>
+                        <Button asChild type="button" variant="outline" size="sm" className="w-full sm:w-auto">
+                          <Link to="/dashboard">Cancel</Link>
+                        </Button>
+                        <Button type="submit" disabled={submitting} size="lg" className="w-full sm:w-auto">
+                          {submitting ? "Submitting…" : "Submit listing"}
+                        </Button>
+                      </>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           </div>
+
         </form>
       </div>
     </SiteLayout>
