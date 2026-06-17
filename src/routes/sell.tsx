@@ -1106,7 +1106,8 @@ function SellPage() {
           </section>
 
           {SERVICE_CATEGORIES.has(category) && (
-            <section className="space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4">
+            <section data-tab="details" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "details" ? "" : "hidden"}`}>
+
               <div>
                 <h2 className="font-display text-base font-semibold">What do you offer?</h2>
                 <p className="text-xs text-muted-foreground">
