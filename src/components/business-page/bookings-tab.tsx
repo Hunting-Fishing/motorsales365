@@ -322,16 +322,21 @@ function FieldHelp({ children }: { children: React.ReactNode }) {
 
 function BookableItemsSection({
   businessId,
+  businessKind,
   items,
   onChange,
 }: {
   businessId: string;
+  businessKind?: string | null;
   items: Item[];
   onChange: () => void;
 }) {
   const upsert = useServerFn(upsertBookableItem);
   const remove = useServerFn(deleteBookableItem);
   const [draft, setDraft] = useState<any | null>(null);
+  const { primary, extras } = useMemo(() => buildCatalogs(businessKind), [businessKind]);
+  const primaryGrouped = useMemo(() => groupRows(primary), [primary]);
+  const extrasGrouped = useMemo(() => groupRows(extras), [extras]);
 
   async function save() {
     if (!draft.title?.trim()) return toast.error("Title is required");
