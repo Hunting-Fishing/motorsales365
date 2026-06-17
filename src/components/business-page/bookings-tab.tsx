@@ -13,11 +13,29 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "@/components/ui/calendar";
 import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableScroll,
+} from "@/components/ui/table";
+import {
   Select,
   SelectTrigger,
   SelectValue,
   SelectContent,
   SelectItem,
+  SelectGroup,
+  SelectLabel,
 } from "@/components/ui/select";
 import {
   Trash2,
@@ -29,8 +47,9 @@ import {
   ExternalLink,
   Clock,
   CheckCircle2,
-  Sparkles,
   Pencil,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import {
   upsertBookableItem,
@@ -50,7 +69,17 @@ import {
   type StructuredHours,
 } from "@/lib/business-hours";
 import { formatE164 } from "@/data/country-codes";
+import { TAG_GROUPS } from "@/data/service-tags";
 import { cn } from "@/lib/utils";
+
+const BOOKABLE_CATALOG_GROUPS = ["repair", "body", "wash", "salvage"] as const;
+const STATUS_DOT: Record<string, string> = {
+  pending: "bg-amber-500",
+  confirmed: "bg-emerald-500",
+  completed: "bg-slate-400",
+  cancelled: "bg-rose-500",
+  no_show: "bg-zinc-400",
+};
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
