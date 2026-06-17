@@ -282,7 +282,7 @@ export function BookingsTab({
         )}
       </Card>
 
-      <BookableItemsSection businessId={businessId} items={items} onChange={onChange} />
+      <BookableItemsSection businessId={businessId} businessKind={businessKind} items={items} onChange={onChange} />
       <WeeklyHoursSection
         businessId={businessId}
         businessHours={businessHours}
