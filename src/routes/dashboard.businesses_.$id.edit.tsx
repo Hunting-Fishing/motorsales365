@@ -60,10 +60,10 @@ import {
   PricingFields,
   blankService,
   fromCatalogItem,
-  formatServicePrice,
+  
   type ServiceFormValue,
 } from "@/components/business/service-catalog-picker";
-import { CATEGORY_LABEL } from "@/data/fuel-station-catalog";
+import { CATEGORY_LABEL, UNIT_OPTIONS } from "@/data/fuel-station-catalog";
 import { GalleryTab, ContactChannelsTab } from "@/components/business-page/gallery-contact-tabs";
 import { LocationPicker } from "@/components/businesses/location-picker";
 import { BookingsTab } from "@/components/business-page/bookings-tab";
@@ -1004,9 +1004,22 @@ function ServicesTab({
           existingKeys={existingKeys}
           typeSlug={typeSlug}
           businessId={businessId}
-          onPick={(item) => {
+          onPick={async (item) => {
             const v = fromCatalogItem(item);
-            setEditing({ ...v, businessId, sort_order: services.length });
+            // Add immediately as a row — no modal. Owner edits price inline.
+            await upsert({
+              data: {
+                businessId,
+                title: v.title,
+                description: v.description,
+                category: v.category,
+                unit: v.unit,
+                catalog_key: v.catalog_key,
+                sort_order: services.length,
+                active: true,
+              } as any,
+            });
+            onChange();
           }}
           onCustom={() =>
             setEditing({ ...blankService(), businessId, sort_order: services.length })
@@ -1019,7 +1032,7 @@ function ServicesTab({
           No services yet. Pick from the catalog above to add your first one.
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-5">
           {Object.entries(groupedByCategory).map(([cat, list]) => (
             <div key={cat}>
               <div className="mb-2 flex items-center gap-2">
@@ -1030,53 +1043,32 @@ function ServicesTab({
                   {list.length}
                 </Badge>
               </div>
-              <div className="space-y-2">
-                {list.map((s: any) => {
-                  const priceStr = formatServicePrice(s);
-                  return (
-                    <Card key={s.id} className="flex items-center gap-3 p-3">
-                      {s.photo_url ? (
-                        <img src={s.photo_url} alt={s.title ? `${s.title} service photo` : "Service photo"} className="h-14 w-14 rounded object-cover" />
-                      ) : (
-                        <div className="flex h-14 w-14 items-center justify-center rounded bg-muted text-muted-foreground">
-                          <ImageIcon className="h-5 w-5" />
-                        </div>
-                      )}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-1.5">
-                          <span className="truncate font-medium">{s.title}</span>
-                          {!s.active && (
-                            <Badge variant="secondary" className="text-[10px]">
-                              Hidden
-                            </Badge>
-                          )}
-                        </div>
-                        {priceStr ? (
-                          <div className="text-sm font-semibold text-primary">{priceStr}</div>
-                        ) : (
-                          <div className="text-xs text-muted-foreground italic">No price set</div>
-                        )}
-                      </div>
-                      <div className="flex gap-1">
-                        <Button size="sm" variant="outline" onClick={() => setEditing(s)}>
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={async () => {
-                            if (!(await confirm({ title: "Delete this item?", destructive: true })))
-                              return;
-                            await del({ data: { businessId, id: s.id } });
-                            onChange();
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </Card>
-                  );
-                })}
+              {/* Spreadsheet-style header */}
+              <div className="hidden grid-cols-[1fr_110px_140px_1fr_auto] gap-2 px-3 pb-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground sm:grid">
+                <span>Service</span>
+                <span>Price (₱)</span>
+                <span>Unit</span>
+                <span>Note</span>
+                <span className="sr-only">Actions</span>
+              </div>
+              <div className="divide-y rounded-md border border-border">
+                {list.map((s: any) => (
+                  <ServiceMenuRow
+                    key={s.id}
+                    svc={s}
+                    onEditFull={() => setEditing(s)}
+                    onDelete={async () => {
+                      if (!(await confirm({ title: "Delete this item?", destructive: true })))
+                        return;
+                      await del({ data: { businessId, id: s.id } });
+                      onChange();
+                    }}
+                    onSave={async (patch) => {
+                      await upsert({ data: { businessId, id: s.id, title: s.title, ...patch } as any });
+                      onChange();
+                    }}
+                  />
+                ))}
               </div>
             </div>
           ))}
@@ -1099,6 +1091,115 @@ function ServicesTab({
     </div>
   );
 }
+
+function ServiceMenuRow({
+  svc,
+  onSave,
+  onDelete,
+  onEditFull,
+}: {
+  svc: any;
+  onSave: (patch: { price_php: number | null; unit: string | null; price_label: string | null }) => Promise<void>;
+  onDelete: () => void;
+  onEditFull: () => void;
+}) {
+  const [price, setPrice] = useState<string>(svc.price_php != null ? String(svc.price_php) : "");
+  const [unit, setUnit] = useState<string>(svc.unit ?? "none");
+  const [note, setNote] = useState<string>(svc.price_label ?? "");
+  const [savingFlash, setSavingFlash] = useState(false);
+
+  const commit = async (overrides?: Partial<{ price: string; unit: string; note: string }>) => {
+    const pStr = (overrides?.price ?? price).trim();
+    const uVal = overrides?.unit ?? unit;
+    const nVal = overrides?.note ?? note;
+    const priceNum = pStr === "" ? null : Number(pStr);
+    if (pStr !== "" && (Number.isNaN(priceNum!) || priceNum! < 0)) {
+      toast.error("Enter a valid price");
+      return;
+    }
+    const changed =
+      (svc.price_php ?? null) !== priceNum ||
+      (svc.unit ?? null) !== (uVal === "none" ? null : uVal) ||
+      (svc.price_label ?? "") !== nVal;
+    if (!changed) return;
+    try {
+      setSavingFlash(true);
+      await onSave({
+        price_php: priceNum,
+        unit: uVal === "none" ? null : uVal,
+        price_label: nVal.trim() === "" ? null : nVal.trim(),
+      });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not save");
+    } finally {
+      setTimeout(() => setSavingFlash(false), 400);
+    }
+  };
+
+  return (
+    <div
+      className={`grid grid-cols-1 items-center gap-2 px-3 py-2 sm:grid-cols-[1fr_110px_140px_1fr_auto] ${savingFlash ? "bg-primary/5" : ""}`}
+    >
+      <div className="min-w-0">
+        <div className="flex items-center gap-1.5">
+          <span className="truncate text-sm font-medium">{svc.title}</span>
+          {!svc.active && (
+            <Badge variant="secondary" className="text-[10px]">
+              Hidden
+            </Badge>
+          )}
+        </div>
+      </div>
+      <Input
+        inputMode="decimal"
+        placeholder="0"
+        value={price}
+        onChange={(e) => setPrice(e.target.value)}
+        onBlur={() => commit()}
+        className="h-9"
+        aria-label="Price in pesos"
+      />
+      <Select
+        value={unit}
+        onValueChange={(v) => {
+          setUnit(v);
+          commit({ unit: v });
+        }}
+      >
+        <SelectTrigger className="h-9">
+          <SelectValue placeholder="Unit" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="none">— none —</SelectItem>
+          {UNIT_OPTIONS.map((u) => (
+            <SelectItem key={u.value} value={u.value}>
+              {u.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Input
+        placeholder="e.g. Metro Manila only"
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        onBlur={() => commit()}
+        maxLength={60}
+        className="h-9"
+        aria-label="Note"
+      />
+      <div className="flex justify-end gap-1">
+        <Button size="sm" variant="ghost" onClick={onEditFull} title="More options (photo, description)">
+          <Pencil className="h-4 w-4" />
+        </Button>
+        <Button size="sm" variant="ghost" onClick={onDelete} title="Delete">
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+
 
 function ServiceEditor({
   initial,
