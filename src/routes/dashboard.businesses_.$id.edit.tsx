@@ -1092,6 +1092,115 @@ function ServicesTab({
   );
 }
 
+function ServiceMenuRow({
+  svc,
+  onSave,
+  onDelete,
+  onEditFull,
+}: {
+  svc: any;
+  onSave: (patch: { price_php: number | null; unit: string | null; price_label: string | null }) => Promise<void>;
+  onDelete: () => void;
+  onEditFull: () => void;
+}) {
+  const [price, setPrice] = useState<string>(svc.price_php != null ? String(svc.price_php) : "");
+  const [unit, setUnit] = useState<string>(svc.unit ?? "none");
+  const [note, setNote] = useState<string>(svc.price_label ?? "");
+  const [savingFlash, setSavingFlash] = useState(false);
+
+  const commit = async (overrides?: Partial<{ price: string; unit: string; note: string }>) => {
+    const pStr = (overrides?.price ?? price).trim();
+    const uVal = overrides?.unit ?? unit;
+    const nVal = overrides?.note ?? note;
+    const priceNum = pStr === "" ? null : Number(pStr);
+    if (pStr !== "" && (Number.isNaN(priceNum!) || priceNum! < 0)) {
+      toast.error("Enter a valid price");
+      return;
+    }
+    const changed =
+      (svc.price_php ?? null) !== priceNum ||
+      (svc.unit ?? null) !== (uVal === "none" ? null : uVal) ||
+      (svc.price_label ?? "") !== nVal;
+    if (!changed) return;
+    try {
+      setSavingFlash(true);
+      await onSave({
+        price_php: priceNum,
+        unit: uVal === "none" ? null : uVal,
+        price_label: nVal.trim() === "" ? null : nVal.trim(),
+      });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not save");
+    } finally {
+      setTimeout(() => setSavingFlash(false), 400);
+    }
+  };
+
+  return (
+    <div
+      className={`grid grid-cols-1 items-center gap-2 px-3 py-2 sm:grid-cols-[1fr_110px_140px_1fr_auto] ${savingFlash ? "bg-primary/5" : ""}`}
+    >
+      <div className="min-w-0">
+        <div className="flex items-center gap-1.5">
+          <span className="truncate text-sm font-medium">{svc.title}</span>
+          {!svc.active && (
+            <Badge variant="secondary" className="text-[10px]">
+              Hidden
+            </Badge>
+          )}
+        </div>
+      </div>
+      <Input
+        inputMode="decimal"
+        placeholder="0"
+        value={price}
+        onChange={(e) => setPrice(e.target.value)}
+        onBlur={() => commit()}
+        className="h-9"
+        aria-label="Price in pesos"
+      />
+      <Select
+        value={unit}
+        onValueChange={(v) => {
+          setUnit(v);
+          commit({ unit: v });
+        }}
+      >
+        <SelectTrigger className="h-9">
+          <SelectValue placeholder="Unit" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="none">— none —</SelectItem>
+          {UNIT_OPTIONS.map((u) => (
+            <SelectItem key={u.value} value={u.value}>
+              {u.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Input
+        placeholder="e.g. Metro Manila only"
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        onBlur={() => commit()}
+        maxLength={60}
+        className="h-9"
+        aria-label="Note"
+      />
+      <div className="flex justify-end gap-1">
+        <Button size="sm" variant="ghost" onClick={onEditFull} title="More options (photo, description)">
+          <Pencil className="h-4 w-4" />
+        </Button>
+        <Button size="sm" variant="ghost" onClick={onDelete} title="Delete">
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+
+
 function ServiceEditor({
   initial,
   businessId,
