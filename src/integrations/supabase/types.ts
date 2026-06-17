@@ -931,6 +931,41 @@ export type Database = {
           },
         ]
       }
+      business_brands: {
+        Row: {
+          business_id: string
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          sort_order: number
+        }
+        Insert: {
+          business_id: string
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          sort_order?: number
+        }
+        Update: {
+          business_id?: string
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "business_brands_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       business_claim_audit: {
         Row: {
           action: string
@@ -2265,6 +2300,7 @@ export type Database = {
           cta_primary: string
           description: string | null
           email: string | null
+          facebook_url: string | null
           featured: boolean
           featured_until: string | null
           featured_video_provider: string | null
@@ -2306,6 +2342,7 @@ export type Database = {
           updated_at: string
           vanity_slug: string | null
           website: string | null
+          whatsapp_number: string | null
         }
         Insert: {
           attribution?: string | null
@@ -2318,6 +2355,7 @@ export type Database = {
           cta_primary?: string
           description?: string | null
           email?: string | null
+          facebook_url?: string | null
           featured?: boolean
           featured_until?: string | null
           featured_video_provider?: string | null
@@ -2359,6 +2397,7 @@ export type Database = {
           updated_at?: string
           vanity_slug?: string | null
           website?: string | null
+          whatsapp_number?: string | null
         }
         Update: {
           attribution?: string | null
@@ -2371,6 +2410,7 @@ export type Database = {
           cta_primary?: string
           description?: string | null
           email?: string | null
+          facebook_url?: string | null
           featured?: boolean
           featured_until?: string | null
           featured_video_provider?: string | null
@@ -2412,6 +2452,7 @@ export type Database = {
           updated_at?: string
           vanity_slug?: string | null
           website?: string | null
+          whatsapp_number?: string | null
         }
         Relationships: [
           {

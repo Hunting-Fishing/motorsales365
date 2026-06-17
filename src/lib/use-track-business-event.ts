@@ -10,6 +10,7 @@ type Kind =
   | "call_click"
   | "whatsapp_click"
   | "messenger_click"
+  | "facebook_click"
   | "website_click"
   | "contact_click"
   | "share_click"

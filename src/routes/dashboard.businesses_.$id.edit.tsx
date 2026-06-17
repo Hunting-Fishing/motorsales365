@@ -43,7 +43,12 @@ import {
   Upload,
   ExternalLink,
   Image as ImageIcon,
+  X,
+  Facebook,
+  MessageCircle,
 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { getBrandSuggestions } from "@/data/brand-suggestions";
 import { WeekHoursEditor } from "@/components/business/hours-editor";
 import {
   isStructuredHours,
@@ -597,7 +602,60 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
   const [email, setEmail] = useState<string>(biz.email ?? "");
   const [website, setWebsite] = useState<string>(biz.website ?? "");
   const [messengerUrl, setMessengerUrl] = useState<string>(biz.messenger_url ?? "");
-  const [brandsCarried, setBrandsCarried] = useState<string>(biz.brands_carried ?? "");
+  const [facebookUrl, setFacebookUrl] = useState<string>(biz.facebook_url ?? "");
+  const [whatsappNumber, setWhatsappNumber] = useState<string>(biz.whatsapp_number ?? "");
+  const [brands, setBrands] = useState<string[]>([]);
+  const [brandInput, setBrandInput] = useState("");
+
+  // Hydrate brand list from DB on mount (public SELECT policy allows the read)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("business_brands")
+        .select("name, sort_order")
+        .eq("business_id", biz.id)
+        .order("sort_order");
+      if (cancelled) return;
+      const rows = (data ?? []) as { name: string }[];
+      if (rows.length > 0) {
+        setBrands(rows.map((r) => r.name));
+      } else if (biz.brands_carried) {
+        // Legacy fallback: split free-text into chips
+        setBrands(
+          String(biz.brands_carried)
+            .split(/[,\n;]+/)
+            .map((s) => s.trim())
+            .filter(Boolean)
+            .slice(0, 60),
+        );
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [biz.id, biz.brands_carried]);
+
+  const brandSuggestions = getBrandSuggestions(biz.type_slug);
+  const lowerSet = new Set(brands.map((b) => b.toLowerCase()));
+  const remainingSuggestions = brandSuggestions.filter((s) => !lowerSet.has(s.toLowerCase()));
+  const topSuggestions = remainingSuggestions.slice(0, 8);
+  const moreSuggestions = remainingSuggestions.slice(8);
+
+  const addBrand = (raw: string) => {
+    const name = raw.trim();
+    if (!name) return;
+    if (brands.length >= 60) {
+      toast.error("Maximum of 60 brands");
+      return;
+    }
+    if (brands.some((b) => b.toLowerCase() === name.toLowerCase())) return;
+    setBrands((prev) => [...prev, name]);
+    setBrandInput("");
+  };
+  const removeBrand = (idx: number) => {
+    setBrands((prev) => prev.filter((_, i) => i !== idx));
+  };
   const [themeColor, setThemeColor] = useState<string>(biz.theme_color ?? "#0ea5e9");
   const [showServices, setShowServices] = useState<boolean>(biz.show_services ?? true);
   const [showProducts, setShowProducts] = useState<boolean>(biz.show_products ?? true);
@@ -657,7 +715,10 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
           email: email.trim() || null,
           website: website.trim() || null,
           messenger_url: messengerUrl.trim() || null,
-          brands_carried: brandsCarried.trim() || null,
+          facebook_url: facebookUrl.trim() || null,
+          whatsapp_number: whatsappNumber.trim() || null,
+          brands: brands.map((name) => ({ name })),
+          brands_carried: brands.length > 0 ? brands.join(", ") : null,
           theme_color: themeColor || null,
           show_services: showServices,
           show_products: showProducts,
@@ -779,16 +840,124 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
               className="h-11"
             />
           </div>
+          <div>
+            <Label>Facebook Page URL</Label>
+            <Input
+              type="url"
+              value={facebookUrl}
+              onChange={(e) => setFacebookUrl(e.target.value)}
+              maxLength={500}
+              placeholder="https://facebook.com/yourpage"
+              className="h-11"
+            />
+          </div>
+          <div>
+            <Label>WhatsApp number</Label>
+            <Input
+              type="tel"
+              value={whatsappNumber}
+              onChange={(e) => setWhatsappNumber(e.target.value)}
+              maxLength={40}
+              placeholder="+63 9XX XXX XXXX"
+              className="h-11"
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Saved as international format (e.g. +639XXXXXXXXX).
+            </p>
+          </div>
         </div>
-        <div>
-          <Label>Brands carried (optional)</Label>
-          <Textarea
-            value={brandsCarried}
-            onChange={(e) => setBrandsCarried(e.target.value)}
-            rows={2}
-            maxLength={2000}
-            placeholder="Toyota, Honda, Mitsubishi, …"
-          />
+
+        {/* Brands carried — structured chip editor */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label>Brands carried</Label>
+            <span className="text-xs text-muted-foreground">{brands.length}/60</span>
+          </div>
+          {brands.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {brands.map((b, i) => (
+                <span
+                  key={`${b}-${i}`}
+                  className="inline-flex items-center gap-1 rounded-full border border-border bg-secondary px-2.5 py-1 text-xs"
+                >
+                  {b}
+                  <button
+                    type="button"
+                    onClick={() => removeBrand(i)}
+                    className="rounded-full text-muted-foreground hover:text-foreground"
+                    aria-label={`Remove ${b}`}
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="flex gap-2">
+            <Input
+              value={brandInput}
+              onChange={(e) => setBrandInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === ",") {
+                  e.preventDefault();
+                  addBrand(brandInput);
+                }
+              }}
+              maxLength={80}
+              placeholder="Type a brand and press Enter…"
+              className="h-10"
+            />
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() => addBrand(brandInput)}
+              disabled={!brandInput.trim()}
+            >
+              <Plus className="mr-1 h-4 w-4" />
+              Add
+            </Button>
+          </div>
+          {topSuggestions.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-xs text-muted-foreground">Suggested:</span>
+              {topSuggestions.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => addBrand(s)}
+                  className="rounded-full border border-dashed border-border px-2.5 py-1 text-xs text-muted-foreground hover:border-primary hover:text-foreground"
+                >
+                  + {s}
+                </button>
+              ))}
+              {moreSuggestions.length > 0 && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="rounded-full border border-dashed border-border px-2.5 py-1 text-xs text-muted-foreground hover:text-foreground"
+                    >
+                      +{moreSuggestions.length} more
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="start" className="w-72 p-2">
+                    <div className="flex flex-wrap gap-1.5">
+                      {moreSuggestions.map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => addBrand(s)}
+                          className="rounded-full border border-border bg-background px-2.5 py-1 text-xs hover:bg-secondary"
+                        >
+                          + {s}
+                        </button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

@@ -15,6 +15,7 @@ import {
   CalendarDays,
   Info,
   Award,
+  Facebook,
 } from "lucide-react";
 import {
   TooltipProvider,
@@ -248,11 +249,13 @@ function BusinessProfilePage() {
   };
 
   const messengerHref = biz.messenger_url || null;
+  const facebookHref = (biz as any).facebook_url || null;
   const telHref = biz.phone ? `tel:${biz.phone}` : null;
   const whatsappHref = waMeUrl(
-    biz.phone,
+    (biz as any).whatsapp_number || biz.phone,
     `Hi ${biz.name}, I found you on 365 Motor Sales and would like to ask about your services.`,
   );
+  const brandsList: { name: string }[] = ((data as any)?.brands ?? []) as { name: string }[];
 
   return (
     <SiteLayout>
@@ -415,6 +418,19 @@ function BusinessProfilePage() {
                         </a>
                       </Button>
                     )}
+                    {facebookHref && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        asChild
+                        onClick={() => track("facebook_click")}
+                      >
+                        <a href={facebookHref} target="_blank" rel="noreferrer">
+                          <Facebook className="mr-1 h-4 w-4" />
+                          Facebook
+                        </a>
+                      </Button>
+                    )}
                     <Button size="sm" variant="outline" asChild>
                       <a href="#inquiry">
                         <Mail className="mr-1 h-4 w-4" />
@@ -516,12 +532,25 @@ function BusinessProfilePage() {
               <p className="whitespace-pre-wrap text-sm text-muted-foreground">
                 {biz.description || "No description provided."}
               </p>
-              {biz.brands_carried && (
+              {(brandsList.length > 0 || biz.brands_carried) && (
                 <div className="mt-3">
                   <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                     Brands carried
                   </div>
-                  <div className="mt-1 text-sm">{biz.brands_carried}</div>
+                  {brandsList.length > 0 ? (
+                    <div className="mt-1.5 flex flex-wrap gap-1.5">
+                      {brandsList.map((b, i) => (
+                        <span
+                          key={`${b.name}-${i}`}
+                          className="rounded-full border border-border bg-secondary px-2.5 py-0.5 text-xs"
+                        >
+                          {b.name}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="mt-1 text-sm">{biz.brands_carried}</div>
+                  )}
                 </div>
               )}
               {biz.hours && (
