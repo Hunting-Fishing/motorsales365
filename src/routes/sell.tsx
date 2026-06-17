@@ -1714,7 +1714,7 @@ function SellPage() {
             </RadioGroup>
           </section>
 
-          <section className="space-y-2 rounded-xl border border-border bg-card p-3 sm:p-4">
+          <section data-tab="plan" className={`space-y-2 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "plan" ? "" : "hidden"}`}>
             <div className="flex items-center justify-between">
               <h2 className="font-display text-base font-semibold">Add a boost (optional)</h2>
               {selectedBoost && (
