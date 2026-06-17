@@ -1731,7 +1731,7 @@ function SellPage() {
 
           <section data-tab="location" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "location" ? "" : "hidden"}`}>
             <div className="flex items-baseline justify-between gap-2">
-              <h2 className="text-sm font-semibold">Location & seller</h2>
+              <h2 className="text-sm font-semibold">Location &amp; contact</h2>
               <span className="text-[11px] text-muted-foreground">PSA PSGC</span>
             </div>
             <LocationPicker
@@ -1743,30 +1743,7 @@ function SellPage() {
                 setBarangay(v.barangay ?? null);
               }}
             />
-            <div className="grid gap-2 sm:grid-cols-3 pt-1">
-              <div className="sm:col-span-2">
-                <Label className="text-xs">Seller type</Label>
-                <RadioGroup
-                  value={sellerType}
-                  onValueChange={(v: any) => setSellerType(v)}
-                  className="grid gap-2 sm:grid-cols-2"
-                >
-                  <label className="flex cursor-pointer items-center gap-2 rounded-md border border-border p-2 text-xs hover:bg-secondary/50">
-                    <RadioGroupItem value="private" />
-                    <div>
-                      <div className="font-medium">Private seller</div>
-                      <div className="text-[11px] text-muted-foreground">Personal vehicle</div>
-                    </div>
-                  </label>
-                  <label className="flex cursor-pointer items-center gap-2 rounded-md border border-border p-2 text-xs hover:bg-secondary/50">
-                    <RadioGroupItem value="business" />
-                    <div>
-                      <div className="font-medium">Business / Dealer</div>
-                      <div className="text-[11px] text-muted-foreground">I sell as a business</div>
-                    </div>
-                  </label>
-                </RadioGroup>
-              </div>
+            <div className="grid gap-2 sm:grid-cols-2 pt-1">
               <div>
                 <Label htmlFor="phone" className="text-xs">Contact phone (optional)</Label>
                 <PhoneInput
