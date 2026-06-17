@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Progress } from "@/components/ui/progress";
 import {
   Select,
   SelectContent,
@@ -210,22 +211,60 @@ function ImportPage() {
 
   return (
     <SiteLayout>
-      <div className="container mx-auto max-w-3xl px-4 py-10">
+      <div className="container mx-auto max-w-3xl px-4 py-6 sm:py-8">
         <Button asChild variant="ghost" size="sm" className="mb-4">
           <Link to="/sell">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to manual posting
           </Link>
         </Button>
-        <h1 className="font-display text-3xl font-bold">Import from Facebook Marketplace</h1>
-        <p className="text-muted-foreground">
+        <h1 className="font-display text-2xl sm:text-3xl font-bold">Import from Facebook Marketplace</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
           Paste a Facebook Marketplace listing URL. We'll extract the details and verify it's yours.
         </p>
+
+        {(() => {
+          const STEPS = [
+            { key: "url", label: "Paste URL" },
+            { key: "verify", label: "Verify" },
+            { key: "preview", label: "Review" },
+          ] as const;
+          const idx = Math.max(0, STEPS.findIndex((s) => s.key === step));
+          const pct = step === "done" ? 100 : ((idx + 1) / STEPS.length) * 100;
+          return (
+            <div className="mt-4 sticky top-14 z-20 -mx-3 sm:mx-0 bg-background/95 backdrop-blur border-b border-border sm:rounded-xl sm:border sm:bg-card">
+              <div className="flex overflow-x-auto no-scrollbar px-1 py-1 gap-1">
+                {STEPS.map((s, i) => (
+                  <div
+                    key={s.key}
+                    className={`whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-medium ${
+                      step === s.key
+                        ? "bg-primary text-primary-foreground"
+                        : i < idx
+                          ? "text-foreground"
+                          : "text-muted-foreground"
+                    }`}
+                  >
+                    <span className="mr-1 opacity-60">{i < idx ? "✓" : `${i + 1}.`}</span>{s.label}
+                  </div>
+                ))}
+              </div>
+              <div className="px-2 pb-2">
+                <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1">
+                  <span>Step {Math.min(idx + 1, STEPS.length)} of {STEPS.length} — {STEPS[idx]?.label}</span>
+                  <span>{Math.round(pct)}%</span>
+                </div>
+                <Progress value={pct} className="h-1.5" />
+              </div>
+            </div>
+          );
+        })()}
+
 
         {step === "url" && (
           <form
             onSubmit={onScrape}
-            className="mt-8 space-y-4 rounded-xl border border-border bg-card p-6"
+            className="mt-4 space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4"
           >
             <div>
               <Label htmlFor="fb-url">Facebook Marketplace URL</Label>
@@ -260,8 +299,8 @@ function ImportPage() {
         )}
 
         {step === "verify" && extracted && (
-          <div className="mt-8 space-y-4 rounded-xl border border-border bg-card p-6">
-            <h2 className="font-display text-lg font-semibold">
+          <div className="mt-4 space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4">
+            <h2 className="font-display text-base font-semibold">
               Verify this is your Facebook profile
             </h2>
             <p className="text-sm text-muted-foreground">
@@ -348,14 +387,14 @@ function ImportPage() {
         )}
 
         {step === "preview" && extracted && (
-          <form onSubmit={onFinalize} className="mt-8 space-y-6">
+          <form onSubmit={onFinalize} className="mt-4 space-y-3">
             <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-4 text-sm">
               <CheckCircle2 className="mr-2 inline h-4 w-4 text-emerald-600" />
               Verified as the Facebook seller. Review the imported details below.
             </div>
 
-            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
-              <h2 className="font-display text-lg font-semibold">Basics</h2>
+            <section className="space-y-4 rounded-xl border border-border bg-card p-3 sm:p-4">
+              <h2 className="font-display text-base font-semibold">Basics</h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <Label>Category</Label>
@@ -418,8 +457,8 @@ function ImportPage() {
               </div>
             </section>
 
-            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
-              <h2 className="font-display text-lg font-semibold">Location</h2>
+            <section className="space-y-4 rounded-xl border border-border bg-card p-3 sm:p-4">
+              <h2 className="font-display text-base font-semibold">Location</h2>
               {extracted.locationText && (
                 <p className="text-xs text-muted-foreground">
                   Detected from FB: "{extracted.locationText}" — please confirm below.
@@ -436,8 +475,8 @@ function ImportPage() {
               />
             </section>
 
-            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
-              <h2 className="font-display text-lg font-semibold">
+            <section className="space-y-4 rounded-xl border border-border bg-card p-3 sm:p-4">
+              <h2 className="font-display text-base font-semibold">
                 Photos ({selectedPhotos.size}/{extracted.images.length})
               </h2>
               <p className="text-xs text-muted-foreground">
