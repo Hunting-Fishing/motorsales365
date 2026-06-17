@@ -104,14 +104,6 @@ function buildItems(d: ChecklistInput): Item[] {
       tabValue: "contact",
     },
     {
-      key: "bookings",
-      label: "Enable bookings (optional)",
-      description:
-        "Let customers book a slot directly — set at least one bookable service and weekly hours.",
-      done: (d.bookableItems?.length ?? 0) >= 1 && (d.availability?.length ?? 0) >= 1,
-      tabValue: "bookings",
-    },
-    {
       key: "vanity",
       label: "Claim a short URL",
       description: "Pick a clean address like /b/yourshop — easier to share, more professional.",
