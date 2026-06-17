@@ -15,6 +15,7 @@ import {
   CalendarDays,
   Info,
   Award,
+  Facebook,
 } from "lucide-react";
 import {
   TooltipProvider,
