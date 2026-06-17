@@ -298,14 +298,31 @@ function BookingPage() {
                   </div>
                   <div>
                     <Label htmlFor="b-phone">Phone</Label>
-                    <Input
-                      id="b-phone"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      maxLength={40}
-                      placeholder="+63…"
-                    />
+                    <div className="flex gap-2">
+                      <select
+                        aria-label="Country code"
+                        value={phoneIso}
+                        onChange={(e) => setPhoneIso(e.target.value)}
+                        className="h-10 rounded-md border border-input bg-background px-2 text-sm"
+                      >
+                        {COUNTRY_CODES.map((c) => (
+                          <option key={c.iso} value={c.iso}>
+                            {c.flag} {c.dial}
+                          </option>
+                        ))}
+                      </select>
+                      <Input
+                        id="b-phone"
+                        type="tel"
+                        inputMode="tel"
+                        value={formatNational(phoneNational, phoneIso)}
+                        onChange={(e) => setPhoneNational(e.target.value.replace(/\D/g, ""))}
+                        maxLength={24}
+                        placeholder="969-434-3430"
+                      />
+                    </div>
                   </div>
+
                   <div className="sm:col-span-2">
                     <Label htmlFor="b-email">Email</Label>
                     <Input
