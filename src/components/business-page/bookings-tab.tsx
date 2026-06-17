@@ -1053,8 +1053,6 @@ function BookingsInboxSection({
     }
   }
 
-  const visible = view === "calendar" ? calendarFiltered : statusFiltered;
-
   // Statuses per day (for dot rendering)
   const statusesByDay = useMemo(() => {
     const m = new Map<string, string[]>();
@@ -1072,8 +1070,6 @@ function BookingsInboxSection({
     if (bookings.length > 5 && view === "list") setView("calendar");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const visible = view === "calendar" ? calendarFiltered : statusFiltered;
 
   function CustomDayButton(props: any) {
     const { day, modifiers, className, ...rest } = props;
