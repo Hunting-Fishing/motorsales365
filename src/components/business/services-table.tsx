@@ -283,34 +283,28 @@ export function ServicesTable({
           No services yet. Click <strong>Add service</strong> to pick one.
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/30 text-left text-[11px] uppercase tracking-wide text-muted-foreground">
-              <tr>
-                <th className="px-3 py-2">Service</th>
-                <th className="px-3 py-2">From ₱</th>
-                <th className="px-3 py-2">To ₱</th>
-                <th className="px-3 py-2">Unit</th>
-                <th className="px-3 py-2">Note</th>
-                <th className="px-3 py-2">Coverage</th>
-                <th className="px-3 py-2">ETA (min)</th>
-                <th className="px-3 py-2">Market</th>
-                <th className="px-3 py-2"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {value.map((row, idx) => (
-                <ServiceRow
-                  key={`${row.catalog_id ?? row.pending_suggestion_id ?? "row"}-${idx}`}
-                  row={row}
-                  businessId={businessId ?? null}
-                  tagSuggestions={tagSuggestions}
-                  onPatch={(patch) => patchAt(idx, patch)}
-                  onRemove={() => removeAt(idx)}
-                />
-              ))}
-            </tbody>
-          </table>
+        <div className="divide-y divide-border">
+          <div className="hidden md:grid md:grid-cols-[minmax(0,1.4fr)_88px_88px_140px_minmax(0,1fr)_150px_72px_88px_36px] gap-2 bg-muted/30 px-3 py-2 text-[11px] uppercase tracking-wide text-muted-foreground">
+            <div>Service</div>
+            <div>From ₱</div>
+            <div>To ₱</div>
+            <div>Unit</div>
+            <div>Note</div>
+            <div>Coverage</div>
+            <div>ETA m</div>
+            <div>Market</div>
+            <div />
+          </div>
+          {value.map((row, idx) => (
+            <ServiceRow
+              key={`${row.catalog_id ?? row.pending_suggestion_id ?? "row"}-${idx}`}
+              row={row}
+              businessId={businessId ?? null}
+              tagSuggestions={tagSuggestions}
+              onPatch={(patch) => patchAt(idx, patch)}
+              onRemove={() => removeAt(idx)}
+            />
+          ))}
         </div>
       )}
 
