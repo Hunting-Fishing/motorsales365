@@ -413,31 +413,61 @@ function BookableItemsSection({
             Pick from the catalog or add your own. Click a row to edit details.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Select onValueChange={(v) => v && startFromCatalog(v)}>
-            <SelectTrigger className="h-8 w-[210px] text-xs">
+        <div className="flex flex-wrap items-center gap-2">
+          <Select value="" onValueChange={(v) => v && startFromCatalog(v)}>
+            <SelectTrigger className="h-8 w-[230px] text-xs">
               <SelectValue placeholder="+ Select from catalog" />
             </SelectTrigger>
-            <SelectContent>
-              {TAG_GROUPS.filter((g) =>
-                (BOOKABLE_CATALOG_GROUPS as readonly string[]).includes(g.key),
-              ).map((g) => (
-                <SelectGroup key={g.key}>
-                  <SelectLabel>{g.label}</SelectLabel>
-                  {g.tags.map((t) => (
-                    <SelectItem key={t} value={t}>
-                      {t}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              ))}
+            <SelectContent className="max-h-[360px]">
+              {Object.keys(primaryGrouped).length === 0 ? (
+                <div className="px-2 py-3 text-xs text-muted-foreground">
+                  No catalog matched. Use + Extras or + Add manually.
+                </div>
+              ) : (
+                Object.keys(primaryGrouped)
+                  .sort((a, b) => a.localeCompare(b))
+                  .map((groupLabel) => (
+                    <SelectGroup key={groupLabel}>
+                      <SelectLabel>{groupLabel}</SelectLabel>
+                      {primaryGrouped[groupLabel].map((t) => (
+                        <SelectItem key={t} value={t}>
+                          {t}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  ))
+              )}
             </SelectContent>
           </Select>
+
+          {extras.length > 0 && (
+            <Select value="" onValueChange={(v) => v && startFromCatalog(v)}>
+              <SelectTrigger className="h-8 w-[180px] text-xs">
+                <SelectValue placeholder="+ Extras (master list)" />
+              </SelectTrigger>
+              <SelectContent className="max-h-[360px]">
+                {Object.keys(extrasGrouped)
+                  .sort((a, b) => a.localeCompare(b))
+                  .map((groupLabel) => (
+                    <SelectGroup key={groupLabel}>
+                      <SelectLabel>{groupLabel}</SelectLabel>
+                      {extrasGrouped[groupLabel].map((t) => (
+                        <SelectItem key={t} value={t}>
+                          {t}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  ))}
+              </SelectContent>
+            </Select>
+          )}
+
           <Button size="sm" onClick={() => setDraft({ ...emptyItem })}>
             <Plus className="mr-1 h-4 w-4" /> Add manually
           </Button>
         </div>
       </div>
+
 
       <TableScroll minWidth="640px">
         <Table>
