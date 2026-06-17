@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,9 +15,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Search, Plus, X, Pencil } from "lucide-react";
+import { Search, Plus, X, Pencil, Lightbulb, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { FUEL_STATION_CATALOG, UNIT_OPTIONS, type CatalogItem } from "@/data/fuel-station-catalog";
 import { blankService, type ServiceFormValue } from "./service-catalog-picker.utils";
+import {
+  listCatalogForType,
+  submitServiceSuggestion,
+  type CatalogEntry,
+} from "@/lib/service-catalog.functions";
 
 // Re-export the helpers from the colocated utils module so existing call sites
 // importing them from this file continue to work.
