@@ -210,12 +210,23 @@ export function PublicGallerySection({
               </button>
             </>
           )}
-          <img
-            src={openPhotos[lightboxIdx].url}
-            alt={openPhotos[lightboxIdx].caption ?? ""}
-            className="max-h-[90vh] max-w-[90vw] object-contain"
-            onClick={(e) => e.stopPropagation()}
-          />
+          {isVideoUrl(openPhotos[lightboxIdx].url) ? (
+            <video
+              src={openPhotos[lightboxIdx].url}
+              className="max-h-[90vh] max-w-[90vw]"
+              controls
+              autoPlay
+              playsInline
+              onClick={(e) => e.stopPropagation()}
+            />
+          ) : (
+            <img
+              src={openPhotos[lightboxIdx].url}
+              alt={openPhotos[lightboxIdx].caption ?? ""}
+              className="max-h-[90vh] max-w-[90vw] object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+          )}
           {openPhotos[lightboxIdx].caption && (
             <div className="absolute inset-x-0 bottom-4 mx-auto max-w-2xl px-4 text-center text-sm text-white">
               {openPhotos[lightboxIdx].caption}
