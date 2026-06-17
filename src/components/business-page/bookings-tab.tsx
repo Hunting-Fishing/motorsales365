@@ -1055,14 +1055,65 @@ function BookingsInboxSection({
 
   const visible = view === "calendar" ? calendarFiltered : statusFiltered;
 
+  // Statuses per day (for dot rendering)
+  const statusesByDay = useMemo(() => {
+    const m = new Map<string, string[]>();
+    for (const b of statusFiltered) {
+      const k = toLocalDateString(new Date(b.starts_at));
+      const arr = m.get(k) ?? [];
+      arr.push(b.status);
+      m.set(k, arr);
+    }
+    return m;
+  }, [statusFiltered]);
+
+  // Default to calendar view when there's more than 5 bookings
+  useMemo(() => {
+    if (bookings.length > 5 && view === "list") setView("calendar");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const visible = view === "calendar" ? calendarFiltered : statusFiltered;
+
+  function CustomDayButton(props: any) {
+    const { day, modifiers, className, ...rest } = props;
+    const key = toLocalDateString(day.date);
+    const statuses = statusesByDay.get(key) ?? [];
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        data-day={day.date.toLocaleDateString()}
+        data-selected-single={modifiers.selected || undefined}
+        data-today={modifiers.today || undefined}
+        className={cn(
+          "relative flex aspect-square size-auto w-full min-w-(--cell-size) flex-col gap-0 leading-none font-normal data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[today=true]:ring-1 data-[today=true]:ring-primary/40",
+          className,
+        )}
+        {...rest}
+      >
+        <span>{day.date.getDate()}</span>
+        {statuses.length > 0 && (
+          <span className="absolute bottom-0.5 left-1/2 flex -translate-x-1/2 gap-0.5">
+            {statuses.slice(0, 3).map((s, i) => (
+              <span key={i} className={cn("h-1 w-1 rounded-full", STATUS_DOT[s] ?? "bg-foreground")} />
+            ))}
+            {statuses.length > 3 && (
+              <span className="text-[8px] leading-none text-muted-foreground">+{statuses.length - 3}</span>
+            )}
+          </span>
+        )}
+      </Button>
+    );
+  }
+
   return (
-    <Card className="p-5">
+    <Card className="px-4 py-4">
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h2 className="font-display text-lg font-semibold">Bookings inbox</h2>
+        <div className="min-w-0">
+          <h2 className="font-display text-base font-semibold">Bookings inbox</h2>
           <p className="text-xs text-muted-foreground">
-            Manage incoming requests {businessName ? `for ${businessName}` : ""} — approve, assign,
-            and track completion.
+            Manage incoming requests {businessName ? `for ${businessName}` : ""} — approve, assign, complete.
           </p>
         </div>
         <div className="inline-flex rounded-md border border-border p-0.5 text-xs">
@@ -1089,20 +1140,22 @@ function BookingsInboxSection({
         </div>
       </div>
 
-      <div className="mb-3 flex flex-wrap gap-1">
+      <div className="mb-3 flex flex-wrap items-center gap-1">
         {["all", "pending", "confirmed", "completed", "cancelled", "no_show"].map((s) => (
           <button
             key={s}
             type="button"
             onClick={() => setFilter(s)}
-            className={`rounded-full border px-3 py-1 text-xs ${
+            className={cn(
+              "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs",
               filter === s
                 ? "border-primary bg-primary/10 text-primary"
-                : "border-border text-muted-foreground"
-            }`}
+                : "border-border text-muted-foreground hover:text-foreground",
+            )}
           >
+            {s !== "all" && <span className={cn("h-1.5 w-1.5 rounded-full", STATUS_DOT[s])} />}
             {s === "all" ? "All" : STATUS_LABEL[s]}
-            <span className="ml-1 opacity-70">
+            <span className="opacity-70">
               ({s === "all" ? bookings.length : bookings.filter((b) => b.status === s).length})
             </span>
           </button>
@@ -1110,162 +1163,231 @@ function BookingsInboxSection({
       </div>
 
       {view === "calendar" && (
-        <div className="mb-4 grid gap-4 md:grid-cols-[auto,1fr]">
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={setSelectedDate}
-            className={cn("pointer-events-auto rounded-md border p-3")}
-            modifiers={{
-              hasBookings: (date) => (countsByDay.get(toLocalDateString(date)) ?? 0) > 0,
-            }}
-            modifiersClassNames={{
-              hasBookings: "relative font-semibold text-primary",
-            }}
-          />
-          <div className="text-xs text-muted-foreground">
-            {selectedDate ? (
-              <>
-                <strong className="text-foreground">
-                  {selectedDate.toLocaleDateString(undefined, {
-                    weekday: "long",
-                    month: "long",
-                    day: "numeric",
-                  })}
-                </strong>{" "}
-                · {calendarFiltered.length} booking
-                {calendarFiltered.length === 1 ? "" : "s"}
-              </>
-            ) : (
-              "Pick a date to see bookings"
-            )}
+        <div className="mb-4 grid gap-4 lg:grid-cols-[auto_1fr]">
+          <div className="rounded-md border border-border p-2">
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={setSelectedDate}
+              className="pointer-events-auto"
+              components={{ DayButton: CustomDayButton }}
+            />
+            <div className="mt-2 flex flex-wrap gap-2 border-t border-border pt-2 text-[10px] text-muted-foreground">
+              {Object.entries(STATUS_LABEL).map(([k, label]) => (
+                <span key={k} className="inline-flex items-center gap-1">
+                  <span className={cn("h-1.5 w-1.5 rounded-full", STATUS_DOT[k])} />
+                  {label}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="min-w-0">
+            <div className="mb-2 flex items-center justify-between border-b border-border pb-2">
+              <div className="text-sm">
+                <strong>
+                  {selectedDate
+                    ? selectedDate.toLocaleDateString(undefined, {
+                        weekday: "long",
+                        month: "long",
+                        day: "numeric",
+                      })
+                    : "Pick a date"}
+                </strong>
+                <span className="ml-2 text-xs text-muted-foreground">
+                  {calendarFiltered.length} booking{calendarFiltered.length === 1 ? "" : "s"}
+                </span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7"
+                  onClick={() => {
+                    const d = new Date(selectedDate ?? new Date());
+                    d.setDate(d.getDate() - 1);
+                    setSelectedDate(d);
+                  }}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7"
+                  onClick={() => {
+                    const d = new Date(selectedDate ?? new Date());
+                    d.setDate(d.getDate() + 1);
+                    setSelectedDate(d);
+                  }}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <BookingList
+              bookings={calendarFiltered}
+              assignees={assignees}
+              setStatus={setStatus}
+              setAssignee={setAssignee}
+              emptyText="No bookings on this day."
+            />
           </div>
         </div>
       )}
 
-      {visible.length === 0 && (
-        <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-          {view === "calendar"
-            ? "No bookings on this day."
-            : bookings.length === 0
+      {view === "list" && (
+        <BookingList
+          bookings={statusFiltered}
+          assignees={assignees}
+          setStatus={setStatus}
+          setAssignee={setAssignee}
+          emptyText={
+            bookings.length === 0
               ? "No bookings yet — share your public booking page to start receiving requests."
-              : "No bookings match this filter."}
-        </div>
+              : "No bookings match this filter."
+          }
+        />
       )}
+    </Card>
+  );
+}
 
-      <div className="space-y-2">
-        {visible
-          .slice()
-          .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())
-          .map((b) => {
-            const assignee = assignees.find((a) => a.user_id === b.assigned_user_id);
-            return (
-              <div key={b.id} className="rounded-md border border-border p-3">
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-medium">{b.customer_name}</span>
-                      <Badge
-                        variant={
-                          b.status === "pending"
-                            ? "destructive"
-                            : b.status === "confirmed"
-                              ? "default"
-                              : "secondary"
-                        }
-                      >
-                        {STATUS_LABEL[b.status]}
-                      </Badge>
-                      {assignee && (
-                        <Badge variant="outline" className="gap-1">
-                          <UserRound className="h-3 w-3" /> {assignee.full_name}
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="mt-0.5 text-xs text-muted-foreground">
-                      {new Date(b.starts_at).toLocaleString()} →{" "}
-                      {new Date(b.ends_at).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </div>
-                    <div className="mt-0.5 text-xs text-muted-foreground">
-                      {b.customer_phone && <span>{formatE164(b.customer_phone)}</span>}
-                      {b.customer_phone && b.customer_email && <span> · </span>}
-                      {b.customer_email && <span>{b.customer_email}</span>}
-                    </div>
-                    {b.notes && <div className="mt-1 text-xs">{b.notes}</div>}
-                  </div>
-                  <div className="flex flex-col items-end gap-2">
-                    <Select
-                      value={b.assigned_user_id ?? "__none__"}
-                      onValueChange={(v) => setAssignee(b.id, v === "__none__" ? null : v)}
+function BookingList({
+  bookings,
+  assignees,
+  setStatus,
+  setAssignee,
+  emptyText,
+}: {
+  bookings: Booking[];
+  assignees: Assignee[];
+  setStatus: (id: string, s: string) => void;
+  setAssignee: (id: string, userId: string | null) => void;
+  emptyText: string;
+}) {
+  if (bookings.length === 0) {
+    return (
+      <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+        {emptyText}
+      </div>
+    );
+  }
+  return (
+    <div className="space-y-2">
+      {bookings
+        .slice()
+        .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())
+        .map((b) => {
+          const assignee = assignees.find((a) => a.user_id === b.assigned_user_id);
+          return (
+            <div key={b.id} className="rounded-md border border-border p-3">
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={cn("h-2 w-2 rounded-full", STATUS_DOT[b.status])} />
+                    <span className="font-medium">{b.customer_name}</span>
+                    <Badge
+                      variant={
+                        b.status === "pending"
+                          ? "destructive"
+                          : b.status === "confirmed"
+                            ? "default"
+                            : "secondary"
+                      }
+                      className="text-[10px]"
                     >
-                      <SelectTrigger className="h-8 w-[180px] text-xs">
-                        <SelectValue placeholder="Assign…" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="__none__">Unassigned</SelectItem>
-                        {assignees.map((a) => (
-                          <SelectItem key={a.user_id} value={a.user_id}>
-                            <span className="inline-flex items-center gap-1">
-                              <UserRound className="h-3 w-3" />
-                              {a.full_name}
-                              {a.role === "owner" && (
-                                <span className="text-[10px] text-muted-foreground">(owner)</span>
-                              )}
-                            </span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <div className="flex flex-wrap justify-end gap-1">
-                      {b.status === "pending" && (
-                        <>
-                          <Button size="sm" onClick={() => setStatus(b.id, "confirmed")}>
-                            Confirm
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setStatus(b.id, "cancelled")}
-                          >
-                            Decline
-                          </Button>
-                        </>
-                      )}
-                      {b.status === "confirmed" && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setStatus(b.id, "completed")}
-                          >
-                            Mark done
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => setStatus(b.id, "no_show")}
-                          >
-                            No-show
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            onClick={() => setStatus(b.id, "cancelled")}
-                          >
-                            Cancel
-                          </Button>
-                        </>
-                      )}
-                    </div>
+                      {STATUS_LABEL[b.status]}
+                    </Badge>
+                    {assignee && (
+                      <Badge variant="outline" className="gap-1 text-[10px]">
+                        <UserRound className="h-3 w-3" /> {assignee.full_name}
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="mt-0.5 text-xs text-muted-foreground">
+                    <Clock className="mr-0.5 inline h-3 w-3" />
+                    {new Date(b.starts_at).toLocaleString()} →{" "}
+                    {new Date(b.ends_at).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </div>
+                  <div className="mt-0.5 text-xs text-muted-foreground">
+                    {b.customer_phone && <span>{formatE164(b.customer_phone)}</span>}
+                    {b.customer_phone && b.customer_email && <span> · </span>}
+                    {b.customer_email && <span>{b.customer_email}</span>}
+                  </div>
+                  {b.notes && <div className="mt-1 text-xs">{b.notes}</div>}
+                </div>
+                <div className="flex flex-col items-end gap-2">
+                  <Select
+                    value={b.assigned_user_id ?? "__none__"}
+                    onValueChange={(v) => setAssignee(b.id, v === "__none__" ? null : v)}
+                  >
+                    <SelectTrigger className="h-8 w-[180px] text-xs">
+                      <SelectValue placeholder="Assign…" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">Unassigned</SelectItem>
+                      {assignees.map((a) => (
+                        <SelectItem key={a.user_id} value={a.user_id}>
+                          <span className="inline-flex items-center gap-1">
+                            <UserRound className="h-3 w-3" />
+                            {a.full_name}
+                            {a.role === "owner" && (
+                              <span className="text-[10px] text-muted-foreground">(owner)</span>
+                            )}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="flex flex-wrap justify-end gap-1">
+                    {b.status === "pending" && (
+                      <>
+                        <Button size="sm" onClick={() => setStatus(b.id, "confirmed")}>
+                          Confirm
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setStatus(b.id, "cancelled")}
+                        >
+                          Decline
+                        </Button>
+                      </>
+                    )}
+                    {b.status === "confirmed" && (
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setStatus(b.id, "completed")}
+                        >
+                          Mark done
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setStatus(b.id, "no_show")}
+                        >
+                          No-show
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setStatus(b.id, "cancelled")}
+                        >
+                          Cancel
+                        </Button>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
-            );
-          })}
-      </div>
-    </Card>
+            </div>
+          );
+        })}
+    </div>
   );
 }
