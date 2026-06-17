@@ -1648,7 +1648,8 @@ function SellPage() {
             />
           </section>
 
-          <section className="space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4">
+          <section data-tab="location" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "location" ? "" : "hidden"}`}>
+
             <h2 className="font-display text-base font-semibold">Seller type</h2>
             <RadioGroup
               value={sellerType}
