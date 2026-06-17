@@ -73,6 +73,56 @@ import { TAG_GROUPS } from "@/data/service-tags";
 import { cn } from "@/lib/utils";
 
 const BOOKABLE_CATALOG_GROUPS = ["repair", "body", "wash", "salvage"] as const;
+
+// Per business-kind, which TAG_GROUPS keys are the "primary" catalog the
+// owner should see first in "+ Select from catalog". Everything else from
+// the BOOKABLE_CATALOG_GROUPS pool moves under "+ Extras".
+const PRIMARY_CATALOG_BY_KIND: Record<string, readonly string[]> = {
+  repair_shop: ["repair"],
+  motorcycle_shop: ["repair"],
+  tire_shop: ["repair"],
+  battery_shop: ["repair"],
+  towing: ["repair"],
+  body_paint: ["body"],
+  carwash: ["wash"],
+  salvage: ["salvage"],
+  parts_accessories: ["salvage"],
+  inspection: ["repair"],
+  accessories: ["body"],
+  audio_tint: ["body"],
+};
+
+// Extra hand-curated rows per kind that aren't in TAG_GROUPS but make sense
+// as bookable services. Alphabetized at render.
+const EXTRA_CATALOG_BY_KIND: Record<string, string[]> = {
+  towing: [
+    "Flatbed tow",
+    "Wheel-lift tow",
+    "Heavy-duty tow",
+    "Motorcycle tow",
+    "Accident recovery",
+    "Winch-out",
+    "Lockout assistance",
+    "Battery jump-start",
+    "Fuel delivery",
+    "Tire change (roadside)",
+  ],
+  tire_shop: [
+    "Vulcanizing (patch)",
+    "Nitrogen fill",
+    "Tire rotation",
+    "Tubeless conversion",
+    "Mobile fitting",
+  ],
+  battery_shop: ["Battery delivery & install", "Free battery testing", "Trade-in"],
+  motorcycle_shop: ["Motorcycle PMS", "Motorcycle tune-up", "Chain & sprocket service"],
+  fuel_station: ["EV charging session"],
+  inspection: ["Pre-purchase inspection (PPI)", "OBD scan", "Smoke / emissions test"],
+  driving_school: ["TDC (theory)", "PDC (practical)", "Refresher course", "Private lesson"],
+  lto_services: ["LTO renewal assist", "Plate pickup", "Stencil"],
+  audio_tint: ["Window tint install", "Dashcam install", "Head unit install"],
+};
+
 const STATUS_DOT: Record<string, string> = {
   pending: "bg-amber-500",
   confirmed: "bg-emerald-500",
@@ -80,6 +130,65 @@ const STATUS_DOT: Record<string, string> = {
   cancelled: "bg-rose-500",
   no_show: "bg-zinc-400",
 };
+
+type CatalogRow = { title: string; groupLabel: string };
+
+function buildCatalogs(kind?: string | null): { primary: CatalogRow[]; extras: CatalogRow[] } {
+  const primaryKeys = (kind && PRIMARY_CATALOG_BY_KIND[kind]) || [];
+  const primarySet = new Set<string>();
+  const primary: CatalogRow[] = [];
+
+  // Curated extras first (most relevant to this kind)
+  const curated = (kind && EXTRA_CATALOG_BY_KIND[kind]) || [];
+  for (const t of curated) {
+    if (!primarySet.has(t)) {
+      primarySet.add(t);
+      primary.push({ title: t, groupLabel: "Common for your business" });
+    }
+  }
+
+  // Then matching TAG_GROUPS
+  for (const g of TAG_GROUPS) {
+    if (!primaryKeys.includes(g.key)) continue;
+    for (const t of [...g.tags].sort((a, b) => a.localeCompare(b))) {
+      if (primarySet.has(t)) continue;
+      primarySet.add(t);
+      primary.push({ title: t, groupLabel: g.label });
+    }
+  }
+
+  // Extras = everything else in BOOKABLE_CATALOG_GROUPS not already in primary
+  const extras: CatalogRow[] = [];
+  for (const g of TAG_GROUPS) {
+    if (!(BOOKABLE_CATALOG_GROUPS as readonly string[]).includes(g.key)) continue;
+    if (primaryKeys.includes(g.key)) continue;
+    for (const t of [...g.tags].sort((a, b) => a.localeCompare(b))) {
+      if (primarySet.has(t)) continue;
+      extras.push({ title: t, groupLabel: g.label });
+    }
+  }
+
+  // If no kind-specific primary, fall back: everything is primary, no extras.
+  if (primary.length === 0) {
+    const all: CatalogRow[] = [];
+    for (const g of TAG_GROUPS) {
+      if (!(BOOKABLE_CATALOG_GROUPS as readonly string[]).includes(g.key)) continue;
+      for (const t of [...g.tags].sort((a, b) => a.localeCompare(b))) {
+        all.push({ title: t, groupLabel: g.label });
+      }
+    }
+    return { primary: all, extras: [] };
+  }
+
+  return { primary, extras };
+}
+
+function groupRows(rows: CatalogRow[]): Record<string, string[]> {
+  const out: Record<string, string[]> = {};
+  for (const r of rows) (out[r.groupLabel] ||= []).push(r.title);
+  for (const k of Object.keys(out)) out[k].sort((a, b) => a.localeCompare(b));
+  return out;
+}
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
