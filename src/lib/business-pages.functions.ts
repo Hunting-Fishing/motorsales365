@@ -415,7 +415,13 @@ export const updateBusinessPageSettings = createServerFn({ method: "POST" })
         email: z.string().email().max(200).nullable().optional(),
         website: lenientUrl(500),
         messenger_url: lenientUrl(500),
+        facebook_url: lenientUrl(500),
+        whatsapp_number: z.string().max(40).nullable().optional(),
         brands_carried: z.string().max(2000).nullable().optional(),
+        brands: z
+          .array(z.object({ name: z.string().trim().min(1).max(80) }))
+          .max(60)
+          .optional(),
         theme_color: z
           .string()
           .regex(/^#[0-9a-fA-F]{6}$/)
@@ -446,12 +452,60 @@ export const updateBusinessPageSettings = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     await assertEditor(supabase, userId, data.businessId);
-    const { businessId, ...patch } = data;
+    const { businessId, brands, whatsapp_number, ...rest } = data;
+
+    // Normalize WhatsApp: digits-only, default PH +63 when local format
+    let normalizedWhatsapp: string | null | undefined = whatsapp_number;
+    if (whatsapp_number !== undefined && whatsapp_number !== null) {
+      const trimmed = whatsapp_number.trim();
+      const digits = trimmed.replace(/\D/g, "");
+      if (digits.length === 0) normalizedWhatsapp = null;
+      else if (trimmed.startsWith("+")) normalizedWhatsapp = `+${digits}`;
+      else if (digits.startsWith("63")) normalizedWhatsapp = `+${digits}`;
+      else if (digits.startsWith("0")) normalizedWhatsapp = `+63${digits.slice(1)}`;
+      else if (digits.startsWith("9") && digits.length === 10) normalizedWhatsapp = `+63${digits}`;
+      else normalizedWhatsapp = `+${digits}`;
+    }
+
+    const patch: Record<string, unknown> = { ...rest };
+    if (whatsapp_number !== undefined) patch.whatsapp_number = normalizedWhatsapp;
+
     const { error } = await supabase
       .from("businesses")
       .update(patch as any)
       .eq("id", businessId);
     if (error) throw new Error(error.message);
+
+    if (brands !== undefined) {
+      // Replace strategy: clear & reinsert in order (≤60 rows).
+      const { error: delErr } = await supabase
+        .from("business_brands")
+        .delete()
+        .eq("business_id", businessId);
+      if (delErr) throw new Error(delErr.message);
+
+      const seen = new Set<string>();
+      const rows = brands
+        .map((b, i) => {
+          const name = b.name.trim();
+          const slug = name
+            .toLowerCase()
+            .normalize("NFKD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "");
+          if (!slug || seen.has(slug)) return null;
+          seen.add(slug);
+          return { business_id: businessId, name, slug, sort_order: i };
+        })
+        .filter((r): r is { business_id: string; name: string; slug: string; sort_order: number } => r !== null);
+
+      if (rows.length > 0) {
+        const { error: insErr } = await supabase.from("business_brands").insert(rows as any);
+        if (insErr) throw new Error(insErr.message);
+      }
+    }
+
     return { ok: true };
   });
 
