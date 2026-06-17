@@ -43,7 +43,12 @@ import {
   Upload,
   ExternalLink,
   Image as ImageIcon,
+  X,
+  Facebook,
+  MessageCircle,
 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { getBrandSuggestions } from "@/data/brand-suggestions";
 import { WeekHoursEditor } from "@/components/business/hours-editor";
 import {
   isStructuredHours,
