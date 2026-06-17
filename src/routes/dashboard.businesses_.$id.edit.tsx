@@ -602,7 +602,60 @@ function ProfileTab({ biz, userId, onSaved }: { biz: any; userId: string; onSave
   const [email, setEmail] = useState<string>(biz.email ?? "");
   const [website, setWebsite] = useState<string>(biz.website ?? "");
   const [messengerUrl, setMessengerUrl] = useState<string>(biz.messenger_url ?? "");
-  const [brandsCarried, setBrandsCarried] = useState<string>(biz.brands_carried ?? "");
+  const [facebookUrl, setFacebookUrl] = useState<string>(biz.facebook_url ?? "");
+  const [whatsappNumber, setWhatsappNumber] = useState<string>(biz.whatsapp_number ?? "");
+  const [brands, setBrands] = useState<string[]>([]);
+  const [brandInput, setBrandInput] = useState("");
+
+  // Hydrate brand list from DB on mount (public SELECT policy allows the read)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from("business_brands")
+        .select("name, sort_order")
+        .eq("business_id", biz.id)
+        .order("sort_order");
+      if (cancelled) return;
+      const rows = (data ?? []) as { name: string }[];
+      if (rows.length > 0) {
+        setBrands(rows.map((r) => r.name));
+      } else if (biz.brands_carried) {
+        // Legacy fallback: split free-text into chips
+        setBrands(
+          String(biz.brands_carried)
+            .split(/[,\n;]+/)
+            .map((s) => s.trim())
+            .filter(Boolean)
+            .slice(0, 60),
+        );
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [biz.id, biz.brands_carried]);
+
+  const brandSuggestions = getBrandSuggestions(biz.type_slug);
+  const lowerSet = new Set(brands.map((b) => b.toLowerCase()));
+  const remainingSuggestions = brandSuggestions.filter((s) => !lowerSet.has(s.toLowerCase()));
+  const topSuggestions = remainingSuggestions.slice(0, 8);
+  const moreSuggestions = remainingSuggestions.slice(8);
+
+  const addBrand = (raw: string) => {
+    const name = raw.trim();
+    if (!name) return;
+    if (brands.length >= 60) {
+      toast.error("Maximum of 60 brands");
+      return;
+    }
+    if (brands.some((b) => b.toLowerCase() === name.toLowerCase())) return;
+    setBrands((prev) => [...prev, name]);
+    setBrandInput("");
+  };
+  const removeBrand = (idx: number) => {
+    setBrands((prev) => prev.filter((_, i) => i !== idx));
+  };
   const [themeColor, setThemeColor] = useState<string>(biz.theme_color ?? "#0ea5e9");
   const [showServices, setShowServices] = useState<boolean>(biz.show_services ?? true);
   const [showProducts, setShowProducts] = useState<boolean>(biz.show_products ?? true);
