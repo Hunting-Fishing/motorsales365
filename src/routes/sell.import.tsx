@@ -210,14 +210,14 @@ function ImportPage() {
 
   return (
     <SiteLayout>
-      <div className="container mx-auto max-w-3xl px-4 py-10">
+      <div className="container mx-auto max-w-3xl px-4 py-6 sm:py-8">
         <Button asChild variant="ghost" size="sm" className="mb-4">
           <Link to="/sell">
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to manual posting
           </Link>
         </Button>
-        <h1 className="font-display text-3xl font-bold">Import from Facebook Marketplace</h1>
+        <h1 className="font-display text-2xl sm:text-3xl font-bold">Import from Facebook Marketplace</h1>
         <p className="text-muted-foreground">
           Paste a Facebook Marketplace listing URL. We'll extract the details and verify it's yours.
         </p>
@@ -225,7 +225,7 @@ function ImportPage() {
         {step === "url" && (
           <form
             onSubmit={onScrape}
-            className="mt-8 space-y-4 rounded-xl border border-border bg-card p-6"
+            className="mt-4 space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4"
           >
             <div>
               <Label htmlFor="fb-url">Facebook Marketplace URL</Label>
@@ -260,8 +260,8 @@ function ImportPage() {
         )}
 
         {step === "verify" && extracted && (
-          <div className="mt-8 space-y-4 rounded-xl border border-border bg-card p-6">
-            <h2 className="font-display text-lg font-semibold">
+          <div className="mt-4 space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4">
+            <h2 className="font-display text-base font-semibold">
               Verify this is your Facebook profile
             </h2>
             <p className="text-sm text-muted-foreground">
@@ -348,14 +348,14 @@ function ImportPage() {
         )}
 
         {step === "preview" && extracted && (
-          <form onSubmit={onFinalize} className="mt-8 space-y-6">
+          <form onSubmit={onFinalize} className="mt-4 space-y-3">
             <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 p-4 text-sm">
               <CheckCircle2 className="mr-2 inline h-4 w-4 text-emerald-600" />
               Verified as the Facebook seller. Review the imported details below.
             </div>
 
-            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
-              <h2 className="font-display text-lg font-semibold">Basics</h2>
+            <section className="space-y-4 rounded-xl border border-border bg-card p-3 sm:p-4">
+              <h2 className="font-display text-base font-semibold">Basics</h2>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <Label>Category</Label>
@@ -418,8 +418,8 @@ function ImportPage() {
               </div>
             </section>
 
-            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
-              <h2 className="font-display text-lg font-semibold">Location</h2>
+            <section className="space-y-4 rounded-xl border border-border bg-card p-3 sm:p-4">
+              <h2 className="font-display text-base font-semibold">Location</h2>
               {extracted.locationText && (
                 <p className="text-xs text-muted-foreground">
                   Detected from FB: "{extracted.locationText}" — please confirm below.
@@ -436,8 +436,8 @@ function ImportPage() {
               />
             </section>
 
-            <section className="space-y-4 rounded-xl border border-border bg-card p-6">
-              <h2 className="font-display text-lg font-semibold">
+            <section className="space-y-4 rounded-xl border border-border bg-card p-3 sm:p-4">
+              <h2 className="font-display text-base font-semibold">
                 Photos ({selectedPhotos.size}/{extracted.images.length})
               </h2>
               <p className="text-xs text-muted-foreground">
