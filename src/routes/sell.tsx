@@ -949,14 +949,24 @@ function SellPage() {
                       className={`whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-medium transition ${
                         activeTab === t.key
                           ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:bg-secondary"
+                          : i < idx
+                            ? "text-foreground hover:bg-secondary"
+                            : "text-muted-foreground hover:bg-secondary"
                       }`}
                     >
-                      <span className="mr-1 opacity-60">{i + 1}.</span>{t.label}
+                      <span className="mr-1 opacity-60">{i < idx ? "✓" : `${i + 1}.`}</span>{t.label}
                     </button>
                   ))}
                 </div>
+                <div className="px-2 pb-2">
+                  <div className="flex items-center justify-between text-[10px] text-muted-foreground mb-1">
+                    <span>Step {idx + 1} of {TABS.length} — {TABS[idx]?.label}</span>
+                    <span>{Math.round(((idx + 1) / TABS.length) * 100)}%</span>
+                  </div>
+                  <Progress value={((idx + 1) / TABS.length) * 100} className="h-1.5" />
+                </div>
               </div>
+
             );
           })()}
           <section data-tab="basics" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "basics" ? "" : "hidden"}`}>
