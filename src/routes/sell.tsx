@@ -1016,46 +1016,18 @@ function SellPage() {
                     Real numbers only. Placeholder prices (₱1, ₱2…) are rejected and lower your seller score.
                   </p>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <div>
-                    <Label htmlFor="price" className="text-xs">Asking price (₱)</Label>
-                    <Input
-                      id="price"
-                      type="number"
-                      min="0"
-                      className="mt-1"
-                      value={price}
-                      onChange={(e) => setPrice(e.target.value)}
-                      placeholder="e.g. 450000"
-                    />
-                    <p className="mt-0.5 text-[10px] text-muted-foreground">Full cash price</p>
-                  </div>
-                  <div>
-                    <Label htmlFor="monthly" className="text-xs">Monthly payment (₱/mo)</Label>
-                    <Input
-                      id="monthly"
-                      type="number"
-                      min="0"
-                      className="mt-1"
-                      value={monthly}
-                      onChange={(e) => setMonthly(e.target.value)}
-                      placeholder="e.g. 12000"
-                    />
-                    <p className="mt-0.5 text-[10px] text-muted-foreground">Financing monthly</p>
-                  </div>
-                  <div>
-                    <Label htmlFor="dp" className="text-xs">Down payment (₱)</Label>
-                    <Input
-                      id="dp"
-                      type="number"
-                      min="0"
-                      className="mt-1"
-                      value={downPayment}
-                      onChange={(e) => setDownPayment(e.target.value)}
-                      placeholder="e.g. 80000"
-                    />
-                    <p className="mt-0.5 text-[10px] text-muted-foreground">Cash-out to start financing</p>
-                  </div>
+                <div>
+                  <Label htmlFor="price" className="text-xs">Asking price (₱)</Label>
+                  <Input
+                    id="price"
+                    type="number"
+                    min="0"
+                    className="mt-1"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    placeholder="e.g. 450000"
+                  />
+                  <p className="mt-0.5 text-[10px] text-muted-foreground">Full cash price</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-4 text-xs">
                   <label className="inline-flex items-center gap-1.5">
@@ -1097,21 +1069,9 @@ function SellPage() {
                   </div>
                 )}
               </div>
-              <div>
-                <Label htmlFor="phone">Contact phone (optional)</Label>
-                <PhoneInput
-                  id="phone"
-                  iso={phoneIso}
-                  national={phoneNational}
-                  onChange={({ iso, national }) => {
-                    setPhoneIso(iso);
-                    setPhoneNational(national);
-                    setPhone(buildE164(iso, national) ?? "");
-                  }}
-                />
-              </div>
             </div>
           </section>
+
 
           {SERVICE_CATEGORIES.has(category) && (
             <section data-tab="details" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "details" ? "" : "hidden"}`}>
