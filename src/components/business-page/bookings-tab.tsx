@@ -129,71 +129,46 @@ export function BookingsTab({
 
   return (
     <div className="space-y-6">
-      {/* Overview / How it works */}
-      <Card className="overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 via-background to-background p-5">
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="max-w-2xl">
-            <div className="mb-1 flex items-center gap-2">
-              <Sparkles className="h-4 w-4 text-primary" />
-              <h2 className="font-display text-lg font-semibold">Online bookings</h2>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Let customers book appointments directly from your 365 MotorSales business page.
-              Bookings respect your <strong>Hours</strong> tab — change open hours there and they
-              flow through automatically.
-            </p>
-            <ol className="mt-3 grid gap-1.5 text-xs text-muted-foreground sm:grid-cols-2">
-              <li className="flex gap-2">
-                <span className="font-semibold text-primary">1.</span> Add a bookable service below
-                (e.g. <em>Tow request</em>, <em>Free estimate</em>).
-              </li>
-              <li className="flex gap-2">
-                <span className="font-semibold text-primary">2.</span> Confirm your booking hours
-                match your Hours tab.
-              </li>
-              <li className="flex gap-2">
-                <span className="font-semibold text-primary">3.</span> Customers pick a date &amp;
-                time on your public page.
-              </li>
-              <li className="flex gap-2">
-                <span className="font-semibold text-primary">4.</span> You approve here and assign
-                to a staff member.
-              </li>
-            </ol>
+      {/* Slim overview banner */}
+      <Card className="flex flex-wrap items-center justify-between gap-3 border-primary/20 bg-gradient-to-r from-primary/5 via-background to-background px-4 py-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <CalendarDays className="h-4 w-4 text-primary shrink-0" />
+            <h2 className="font-display text-base font-semibold">Online bookings</h2>
+            <Badge variant="secondary" className="text-[10px]">
+              {hasItems ? `${items.length} service${items.length === 1 ? "" : "s"}` : "0 services"}
+            </Badge>
+            <Badge variant={pending ? "destructive" : "outline"} className="text-[10px]">
+              {pending} pending
+            </Badge>
+            <Badge variant="outline" className="text-[10px]">
+              {confirmed} confirmed
+            </Badge>
           </div>
-          <div className="flex flex-col items-stretch gap-2 sm:items-end">
-            <div className="flex gap-2 text-xs">
-              <Badge variant="secondary" className="px-2 py-1">
-                {hasItems ? `${items.length} service${items.length === 1 ? "" : "s"}` : "No services yet"}
-              </Badge>
-              <Badge variant={pending ? "destructive" : "outline"} className="px-2 py-1">
-                {pending} pending
-              </Badge>
-              <Badge variant="outline" className="px-2 py-1">
-                {confirmed} confirmed
-              </Badge>
-            </div>
-            {businessSlug && hasItems && (
+          <p className="mt-1 text-xs text-muted-foreground">
+            Bookings respect your <strong>Hours</strong> tab — change open hours there and they flow through automatically.
+          </p>
+        </div>
+        {businessSlug && (
+          <div className="flex flex-col items-end gap-1">
+            {hasItems && (
               <Link
                 to="/businesses/$slug/book"
                 params={{ slug: businessSlug }}
                 target="_blank"
                 rel="noopener"
               >
-                <Button size="sm" variant="outline" className="w-full sm:w-auto">
+                <Button size="sm" variant="outline">
                   <ExternalLink className="mr-1.5 h-3.5 w-3.5" />
-                  Preview public booking page
+                  Preview public page
                 </Button>
               </Link>
             )}
-            {businessSlug && (
-              <div className="text-[11px] text-muted-foreground sm:text-right">
-                Public link:{" "}
-                <code className="rounded bg-muted px-1 py-0.5">/businesses/{businessSlug}/book</code>
-              </div>
-            )}
+            <code className="rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">
+              /businesses/{businessSlug}/book
+            </code>
           </div>
-        </div>
+        )}
       </Card>
 
       <BookableItemsSection businessId={businessId} items={items} onChange={onChange} />
