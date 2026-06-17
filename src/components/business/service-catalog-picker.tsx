@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,9 +15,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Search, Plus, X, Pencil } from "lucide-react";
+import { Search, Plus, X, Pencil, Lightbulb, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { FUEL_STATION_CATALOG, UNIT_OPTIONS, type CatalogItem } from "@/data/fuel-station-catalog";
 import { blankService, type ServiceFormValue } from "./service-catalog-picker.utils";
+import {
+  listCatalogForType,
+  submitServiceSuggestion,
+  type CatalogEntry,
+} from "@/lib/service-catalog.functions";
 
 // Re-export the helpers from the colocated utils module so existing call sites
 // importing them from this file continue to work.
@@ -31,13 +38,16 @@ export function CatalogPicker({
   onPick,
   onCustom,
   typeSlug,
+  businessId,
 }: {
   existingKeys: Set<string>;
   onPick: (item: CatalogItem) => void;
   onCustom: () => void;
-  /** Business type slug. Only "fuel_station" gets the fuel catalog;
-   * everything else gets an "Add custom item" panel. */
+  /** Business type slug. "fuel_station" uses the bundled in-code catalog;
+   * everything else loads the DB-backed catalog for that type. */
   typeSlug?: string | null;
+  /** Used when submitting a "suggest a new item" request. */
+  businessId?: string | null;
 }) {
   const useFuelCatalog = typeSlug === "fuel_station";
   const [q, setQ] = useState("");
@@ -58,23 +68,17 @@ export function CatalogPicker({
     return hits.slice(0, 40);
   }, [q, useFuelCatalog]);
 
-  // Non-fuel businesses: simple custom-only panel (no curated catalog yet).
+  // Non-fuel: DB-backed catalog tailored to this business type, with a
+  // "suggest a new item" flow that notifies admins.
   if (!useFuelCatalog) {
     return (
-      <Card className="overflow-hidden border-primary/30">
-        <div className="border-b border-border bg-muted/40 p-3">
-          <div className="flex items-center justify-between gap-2">
-            <h3 className="text-sm font-semibold">Add a service or product</h3>
-            <Button size="sm" variant="default" onClick={onCustom}>
-              <Plus className="mr-1 h-4 w-4" /> Add custom item
-            </Button>
-          </div>
-        </div>
-        <div className="p-4 text-sm text-muted-foreground">
-          Describe each service or product you offer (title, price, optional photo and description).
-          A curated catalog for this business type is coming soon — for now, add items manually.
-        </div>
-      </Card>
+      <DbCatalogPicker
+        typeSlug={typeSlug ?? null}
+        businessId={businessId ?? null}
+        existingKeys={existingKeys}
+        onPick={onPick}
+        onCustom={onCustom}
+      />
     );
   }
 
@@ -197,6 +201,211 @@ function CatalogRow({
     </button>
   );
 }
+
+/* ---------------- DB-backed catalog picker (non-fuel types) ---------------- */
+
+function entryToCatalogItem(e: CatalogEntry): CatalogItem {
+  return {
+    key: e.key,
+    title: e.title,
+    description: e.description ?? undefined,
+    unit: e.default_unit ?? undefined,
+    category: e.business_type_slug,
+  };
+}
+
+function DbCatalogPicker({
+  typeSlug,
+  businessId,
+  existingKeys,
+  onPick,
+  onCustom,
+}: {
+  typeSlug: string | null;
+  businessId: string | null;
+  existingKeys: Set<string>;
+  onPick: (item: CatalogItem) => void;
+  onCustom: () => void;
+}) {
+  const [q, setQ] = useState("");
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [proposedTitle, setProposedTitle] = useState("");
+  const [proposedUnit, setProposedUnit] = useState<string>("none");
+  const [proposedDesc, setProposedDesc] = useState("");
+
+  const enabled = !!typeSlug;
+  const { data, isLoading } = useQuery({
+    queryKey: ["service-catalog", typeSlug],
+    queryFn: () => listCatalogForType({ data: { businessTypeSlug: typeSlug! } }),
+    enabled,
+    staleTime: 5 * 60_000,
+  });
+
+  const suggestMutation = useMutation({
+    mutationFn: async () => {
+      const title = proposedTitle.trim();
+      if (title.length < 2) throw new Error("Title is too short");
+      return submitServiceSuggestion({
+        data: {
+          businessTypeSlug: typeSlug!,
+          proposedTitle: title,
+          proposedUnit: proposedUnit === "none" ? null : proposedUnit,
+          proposedDescription: proposedDesc.trim() || null,
+          submitterBusinessId: businessId ?? null,
+        },
+      });
+    },
+    onSuccess: () => {
+      toast.success("Suggestion sent to admins for review.");
+      setSuggestOpen(false);
+      setProposedTitle("");
+      setProposedUnit("none");
+      setProposedDesc("");
+    },
+    onError: (e: unknown) => {
+      toast.error(e instanceof Error ? e.message : "Could not submit suggestion.");
+    },
+  });
+
+  const entries = data ?? [];
+  const filtered = useMemo(() => {
+    const term = q.trim().toLowerCase();
+    if (!term) return entries;
+    return entries.filter(
+      (e) =>
+        e.title.toLowerCase().includes(term) ||
+        (e.description ?? "").toLowerCase().includes(term),
+    );
+  }, [entries, q]);
+
+  return (
+    <Card className="overflow-hidden border-primary/30">
+      <div className="border-b border-border bg-muted/40 p-3">
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <h3 className="text-sm font-semibold">Pick from the catalog</h3>
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={() => setSuggestOpen((v) => !v)}>
+              <Lightbulb className="mr-1 h-4 w-4" /> Suggest new
+            </Button>
+            <Button size="sm" variant="outline" onClick={onCustom}>
+              <Plus className="mr-1 h-4 w-4" /> Custom item
+            </Button>
+          </div>
+        </div>
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search services & products…"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+      </div>
+
+      {suggestOpen && (
+        <div className="space-y-2 border-b border-border bg-muted/20 p-3">
+          <p className="text-xs text-muted-foreground">
+            Don't see what you offer? Suggest a new item — admins will review and add it to the
+            catalog for everyone.
+          </p>
+          <div className="grid gap-2 sm:grid-cols-3">
+            <div className="sm:col-span-2">
+              <Label className="text-xs">Service / product name *</Label>
+              <Input
+                placeholder="e.g. Brake fluid flush"
+                value={proposedTitle}
+                onChange={(e) => setProposedTitle(e.target.value)}
+                maxLength={100}
+              />
+            </div>
+            <div>
+              <Label className="text-xs">Default unit</Label>
+              <Select value={proposedUnit} onValueChange={setProposedUnit}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Unit" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">— none —</SelectItem>
+                  {UNIT_OPTIONS.map((u) => (
+                    <SelectItem key={u.value} value={u.value}>
+                      {u.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div>
+            <Label className="text-xs">Short description (optional)</Label>
+            <Textarea
+              rows={2}
+              placeholder="What does this service include?"
+              value={proposedDesc}
+              onChange={(e) => setProposedDesc(e.target.value)}
+              maxLength={500}
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button size="sm" variant="ghost" onClick={() => setSuggestOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => suggestMutation.mutate()}
+              disabled={suggestMutation.isPending || proposedTitle.trim().length < 2}
+            >
+              {suggestMutation.isPending ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Lightbulb className="mr-1 h-4 w-4" />
+              )}
+              Send suggestion
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <div className="max-h-80 overflow-y-auto p-2">
+        {isLoading ? (
+          <div className="flex items-center justify-center gap-2 p-6 text-sm text-muted-foreground">
+            <Loader2 className="h-4 w-4 animate-spin" /> Loading catalog…
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="p-6 text-center text-sm text-muted-foreground">
+            {entries.length === 0
+              ? "No catalog entries yet for this business type."
+              : "No matches."}{" "}
+            <button className="text-primary underline" onClick={onCustom}>
+              Add a custom item
+            </button>{" "}
+            or{" "}
+            <button className="text-primary underline" onClick={() => setSuggestOpen(true)}>
+              suggest a new one
+            </button>
+            .
+          </div>
+        ) : (
+          <div className="grid gap-1 sm:grid-cols-2">
+            {filtered.map((e) => {
+              const item = entryToCatalogItem(e);
+              return (
+                <CatalogRow
+                  key={e.id}
+                  item={item}
+                  disabled={existingKeys.has(item.key)}
+                  onPick={onPick}
+                />
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </Card>
+  );
+}
+
+
 
 /* ---------------- Pricing fields ---------------- */
 

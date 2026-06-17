@@ -979,7 +979,7 @@ function ServicesTab({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-sm text-muted-foreground">
           {services.length === 0
-            ? "Start by picking from the catalog of fuel-station services & products."
+            ? "Start by picking from the catalog tailored to your business type."
             : "Pick more items from the catalog, or add a custom one."}
         </p>
         <Button
@@ -1003,6 +1003,7 @@ function ServicesTab({
         <CatalogPicker
           existingKeys={existingKeys}
           typeSlug={typeSlug}
+          businessId={businessId}
           onPick={(item) => {
             const v = fromCatalogItem(item);
             setEditing({ ...v, businessId, sort_order: services.length });
