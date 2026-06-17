@@ -918,14 +918,16 @@ function SellPage() {
 
   return (
     <SiteLayout>
-      <div className="container mx-auto max-w-3xl px-4 py-6 sm:py-10">
-        <h1 className="font-display text-2xl sm:text-3xl font-bold">Post a listing</h1>
-        <p className="text-sm sm:text-base text-muted-foreground">Reach buyers across the Philippines.</p>
+      <div className="container mx-auto max-w-5xl px-3 py-4 sm:py-6">
+        <div className="flex items-end justify-between gap-3">
+          <h1 className="font-display text-xl sm:text-2xl font-bold">Post a listing</h1>
+          <span className="text-xs text-muted-foreground">Reach buyers across the Philippines.</span>
+        </div>
 
         {paymentStatus && pendingListingId ? (
           <div
             role="alert"
-            className="mt-4 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-destructive/40 bg-destructive/5 p-3 sm:p-4"
+            className="mt-3 flex flex-wrap items-start justify-between gap-3 rounded-xl border border-destructive/40 bg-destructive/5 p-3"
           >
             <div className="flex items-start gap-2">
               <AlertCircle className="mt-0.5 h-5 w-5 text-destructive" />
@@ -935,7 +937,7 @@ function SellPage() {
                     ? "Payment cancelled"
                     : "Payment didn't go through"}
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Your listing is saved and still pending payment. You can resume checkout
                   any time — nothing was charged.
                 </p>
@@ -957,18 +959,6 @@ function SellPage() {
         ) : null}
 
 
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-primary/30 bg-primary/5 p-3 sm:p-4">
-          <div>
-            <div className="font-semibold">Already selling on Facebook Marketplace?</div>
-            <p className="text-sm text-muted-foreground">
-              Import a listing in seconds — we verify your FB profile so buyers know it's the real
-              you.
-            </p>
-          </div>
-          <Button asChild variant="default" size="sm" className="w-full sm:w-auto">
-            <Link to="/sell/import">Import from Facebook</Link>
-          </Button>
-        </div>
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-3">
           {(() => {

@@ -68,7 +68,6 @@ import { Route as ShopCategoriesRouteImport } from './routes/shop.categories'
 import { Route as ShopCategoryRouteImport } from './routes/shop.$category'
 import { Route as ServicesInspectionRouteImport } from './routes/services.inspection'
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
-import { Route as SellImportRouteImport } from './routes/sell.import'
 import { Route as SSlugRouteImport } from './routes/s.$slug'
 import { Route as RidesSlugRouteImport } from './routes/rides.$slug'
 import { Route as RCodeRouteImport } from './routes/r.$code'
@@ -507,11 +506,6 @@ const SellerIdRoute = SellerIdRouteImport.update({
   id: '/seller/$id',
   path: '/seller/$id',
   getParentRoute: () => rootRouteImport,
-} as any)
-const SellImportRoute = SellImportRouteImport.update({
-  id: '/import',
-  path: '/import',
-  getParentRoute: () => SellRoute,
 } as any)
 const SSlugRoute = SSlugRouteImport.update({
   id: '/s/$slug',
@@ -1297,7 +1291,7 @@ export interface FileRoutesByFullPath {
   '/report': typeof ReportRoute
   '/reset-password': typeof ResetPasswordRoute
   '/robots.txt': typeof RobotsDottxtRoute
-  '/sell': typeof SellRouteWithChildren
+  '/sell': typeof SellRoute
   '/shop-manager': typeof ShopManagerRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1394,7 +1388,6 @@ export interface FileRoutesByFullPath {
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
   '/s/$slug': typeof SSlugRoute
-  '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
   '/services/inspection': typeof ServicesInspectionRoute
   '/shop/$category': typeof ShopCategoryRoute
@@ -1499,7 +1492,7 @@ export interface FileRoutesByTo {
   '/report': typeof ReportRoute
   '/reset-password': typeof ResetPasswordRoute
   '/robots.txt': typeof RobotsDottxtRoute
-  '/sell': typeof SellRouteWithChildren
+  '/sell': typeof SellRoute
   '/shop-manager': typeof ShopManagerRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1595,7 +1588,6 @@ export interface FileRoutesByTo {
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
   '/s/$slug': typeof SSlugRoute
-  '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
   '/services/inspection': typeof ServicesInspectionRoute
   '/shop/$category': typeof ShopCategoryRoute
@@ -1704,7 +1696,7 @@ export interface FileRoutesById {
   '/report': typeof ReportRoute
   '/reset-password': typeof ResetPasswordRoute
   '/robots.txt': typeof RobotsDottxtRoute
-  '/sell': typeof SellRouteWithChildren
+  '/sell': typeof SellRoute
   '/shop-manager': typeof ShopManagerRoute
   '/signup': typeof SignupRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -1801,7 +1793,6 @@ export interface FileRoutesById {
   '/r/$code': typeof RCodeRouteWithChildren
   '/rides/$slug': typeof RidesSlugRoute
   '/s/$slug': typeof SSlugRoute
-  '/sell/import': typeof SellImportRoute
   '/seller/$id': typeof SellerIdRoute
   '/services/inspection': typeof ServicesInspectionRoute
   '/shop/$category': typeof ShopCategoryRoute
@@ -2008,7 +1999,6 @@ export interface FileRouteTypes {
     | '/r/$code'
     | '/rides/$slug'
     | '/s/$slug'
-    | '/sell/import'
     | '/seller/$id'
     | '/services/inspection'
     | '/shop/$category'
@@ -2209,7 +2199,6 @@ export interface FileRouteTypes {
     | '/r/$code'
     | '/rides/$slug'
     | '/s/$slug'
-    | '/sell/import'
     | '/seller/$id'
     | '/services/inspection'
     | '/shop/$category'
@@ -2414,7 +2403,6 @@ export interface FileRouteTypes {
     | '/r/$code'
     | '/rides/$slug'
     | '/s/$slug'
-    | '/sell/import'
     | '/seller/$id'
     | '/services/inspection'
     | '/shop/$category'
@@ -2524,7 +2512,7 @@ export interface RootRouteChildren {
   ReportRoute: typeof ReportRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
-  SellRoute: typeof SellRouteWithChildren
+  SellRoute: typeof SellRoute
   ShopManagerRoute: typeof ShopManagerRoute
   SignupRoute: typeof SignupRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -3022,13 +3010,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/seller/$id'
       preLoaderRoute: typeof SellerIdRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/sell/import': {
-      id: '/sell/import'
-      path: '/import'
-      fullPath: '/sell/import'
-      preLoaderRoute: typeof SellImportRouteImport
-      parentRoute: typeof SellRoute
     }
     '/s/$slug': {
       id: '/s/$slug'
@@ -4318,16 +4299,6 @@ const PaymentsRouteWithChildren = PaymentsRoute._addFileChildren(
   PaymentsRouteChildren,
 )
 
-interface SellRouteChildren {
-  SellImportRoute: typeof SellImportRoute
-}
-
-const SellRouteChildren: SellRouteChildren = {
-  SellImportRoute: SellImportRoute,
-}
-
-const SellRouteWithChildren = SellRoute._addFileChildren(SellRouteChildren)
-
 interface BusinessesSlugRouteChildren {
   BusinessesSlugBookRoute: typeof BusinessesSlugBookRoute
 }
@@ -4391,7 +4362,7 @@ const rootRouteChildren: RootRouteChildren = {
   ReportRoute: ReportRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
-  SellRoute: SellRouteWithChildren,
+  SellRoute: SellRoute,
   ShopManagerRoute: ShopManagerRoute,
   SignupRoute: SignupRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
