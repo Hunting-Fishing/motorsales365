@@ -1,49 +1,43 @@
-## Bookings tab redesign — round 2
+# Restructure Post a Listing Form
 
-Three focused changes to `src/components/business-page/bookings-tab.tsx` (no schema or server changes).
+Tighten the tabbed Sell form: remove unused finance fields, merge Basics into Details, move phone to Location & Seller, and add a "Pull from my Rides" picker that auto-populates fields and links back to the Rides page.
 
-### 1. Bookable Services → compact data table
+## Tab restructure
 
-Replace the current oversized two‑column card grid with a single `Table` (using `@/components/ui/table`):
+New tab order (4 tabs instead of 5):
 
-| Service | Duration | Buffer | Lead time | Max/slot | Status | Actions |
-|---|---|---|---|---|---|---|
-| Oil Change | 30m | 10m | 2h | 1 | Active | Edit · Disable · Delete |
+1. **Details** — title, description, price (+ negotiable / hide price), condition, registration status, category-specific fields, vehicle quality, fitment, etc. (Everything currently in Basics + Details merged here.)
+2. **Location & Seller** — LocationPicker, seller type (private/business), and the `PhoneInput` moved here from Basics.
+3. **Plan & Boost** — unchanged.
+4. **Photos** — unchanged.
 
-- Row click (or "Edit" button) opens an inline drawer/dialog with the existing full form (Basics + Scheduling Rules) — keeps advanced fields off the main screen.
-- "Add service" toolbar above the table with two entry points:
-  - **Select from catalog** — dropdown sourced from `src/data/service-tags.ts` (already used elsewhere). Picking one prefills name + sensible defaults (duration 30m, buffer 10m, lead 2h, max 1).
-  - **Add manually** — opens the same dialog with empty fields.
-- Empty state inside the table: one row explaining "No bookable services yet" + the two add buttons.
-- Mobile: wrap in `TableScroll` so it stays usable on narrow screens.
+Update the `TABS` array, the `order` used by Back/Next, the progress bar denominator (now `/4`), and every `data-tab="basics"` section — fold its contents into the Details section. Remove the now-unused `activeTab === "basics"` branch.
 
-Result: the section collapses from a full‑screen grid to ~1 screen row per service.
+## Remove finance fields
 
-### 2. Real Booking Calendar
+- Delete the **Monthly payment (₱/mo)** and **Down payment (₱)** inputs from the price block.
+- Remove the `monthly` and `downPayment` `useState` hooks.
+- Remove `monthly_php` and `down_payment_php` from the insert payload around line 756 (send `null`/omit so DB stays compatible).
 
-Replace the current "calendar view" (which just highlights days) with a proper month calendar that shows every booking and request on its day.
+## Auto-populate from Rides
 
-- Use existing `Calendar` from `@/components/ui/calendar` in `mode="single"` with a custom `DayButton` component that renders:
-  - the date number
-  - up to 2 colored dots / mini‑pills per booking on that day (color = status: amber=pending, emerald=confirmed, slate=completed, rose=cancelled)
-  - "+N" overflow indicator
-- Selecting a day reveals a right‑hand panel (or below on mobile) listing that day's bookings sorted by time, each with: time range, customer name, service, status badge, assignee, and the existing action buttons (Confirm / Decline / Complete / Assign).
-- Top of the calendar: legend + status filter chips (All · Pending · Confirmed · Completed · Cancelled) and a month nav.
-- Keeps the existing List view as a toggle (`List | Calendar`) — Calendar becomes the default when there are >5 bookings.
+Add a **"Pull from my Rides"** action at the top of the Details tab (only shown when the signed-in user has at least one ride):
 
-### 3. Tighten overall layout
+- On mount, query `rides` filtered by `owner_id = user.id` (id, name, year, make, model, vehicle_type) and store in state.
+- If results exist, show a compact `Select` "Prefill from your Rides" above the title field with each ride as an option, plus a hint "Adds photos & a link back to your Rides page."
+- On select, reuse the existing `from_ride` prefill logic (extract it into a `prefillFromRide(rideId)` helper so both the URL param effect and the picker call it).
+- After prefill, append a line to the description: `More photos & build details: https://www.365motorsales.com/rides/<id>` (only if not already present), and store `source_ride_id` in component state to include in the listing insert payload as a new column reference — if the column does not exist yet, just embed the link in the description (no schema change in this plan).
 
-- Collapse "How it works" overview card into a single slim banner with the public booking link + 3 inline stats (services / pending / confirmed this week).
-- Bookable Services, Hours sync, Holidays & Overrides, and Inbox each become a `Card` with `py-4` padding (currently `py-6`+) and `text-sm` body copy.
-- Move Scheduling Rules out of the always‑visible form into the edit dialog (point 1).
+The existing `?from_ride=<id>` URL flow keeps working unchanged.
 
-### Files touched
+## Auto-populate other fields
 
-- `src/components/business-page/bookings-tab.tsx` — all UI changes above.
-- No new files, no migrations, no server‑function changes.
+- Phone: when empty, prefill from `profile.phone` / `profile.contact_phone` (already loaded via `useAuth` if available; otherwise fetch from `profiles` once).
+- Location: when empty, prefill region/province/city/barangay from the user's profile defaults.
+- Seller type: already synced from `effectiveSellerType` — leave as is.
 
-### Out of scope
+## Files touched
 
-- Drag‑to‑reschedule on the calendar.
-- Week / day calendar views (month only for this pass).
-- Editing booking time after creation.
+- `src/routes/sell.tsx` — all changes above.
+
+No database migration, no other component changes.
