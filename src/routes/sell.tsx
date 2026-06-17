@@ -1000,9 +1000,10 @@ function SellPage() {
 
             );
           })()}
-          <section data-tab="details" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "details" ? "" : "hidden"}`}>
+          <section data-tab="details" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "details" ? "" : "hidden"}`}>
+            {/* Header */}
             <div className="flex items-center justify-between gap-2">
-              <h2 className="text-sm font-semibold">Basics</h2>
+              <h2 className="text-sm font-semibold">Listing details</h2>
               {myRides.length > 0 && (
                 <div className="flex items-center gap-2">
                   <span className="hidden sm:inline text-[11px] text-muted-foreground">Pull from Rides:</span>
@@ -1027,558 +1028,165 @@ function SellPage() {
                 </div>
               )}
             </div>
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+
+            {/* LISTING */}
+            <div className="space-y-2">
+              <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Listing</h3>
               <div>
-                <Label className="text-xs">Category</Label>
-                <Select value={category} onValueChange={setCategory}>
-                  <SelectTrigger className="h-9 text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CATEGORIES.map((c) => (
-                      <SelectItem key={c.slug} value={c.slug}>
-                        {c.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label htmlFor="title" className="text-xs">Title</Label>
+                <Input
+                  id="title"
+                  required
+                  className="h-9 text-sm"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="2019 Toyota Vios 1.3 E AT"
+                />
               </div>
-              <div>
-                <Label className="text-xs">Condition</Label>
-                <Select value={condition} onValueChange={setCondition}>
-                  <SelectTrigger className="h-9 text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="Brand new">Brand new</SelectItem>
-                    <SelectItem value="Used">Used</SelectItem>
-                    <SelectItem value="For parts">For parts</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              {(category === "car" || category === "motorcycle" || category === "truck") ? (
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                 <div>
-                  <Label className="text-xs">Registration</Label>
-                  <Select
-                    value={registrationStatus}
-                    onValueChange={(v) => setRegistrationStatus(v as typeof registrationStatus)}
-                  >
+                  <Label className="text-xs">Category</Label>
+                  <Select value={category} onValueChange={setCategory}>
                     <SelectTrigger className="h-9 text-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="registered">Registered</SelectItem>
-                      <SelectItem value="unregistered">Unregistered</SelectItem>
-                      <SelectItem value="for_transfer">For transfer</SelectItem>
-                      <SelectItem value="unknown">Not specified</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              ) : null}
-              <div>
-                <Label htmlFor="price" className="text-xs">Asking price (₱)</Label>
-                <Input
-                  id="price"
-                  type="number"
-                  min="0"
-                  className="h-9 text-sm"
-                  value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  placeholder="e.g. 450000"
-                />
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="title" className="text-xs">Title</Label>
-              <Input
-                id="title"
-                required
-                className="h-9 text-sm"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="2019 Toyota Vios 1.3 E AT"
-              />
-            </div>
-            <div className="flex flex-wrap items-center gap-4 text-xs">
-              <label className="inline-flex items-center gap-1.5">
-                <input
-                  type="checkbox"
-                  className="h-3.5 w-3.5 accent-primary"
-                  checked={negotiable}
-                  onChange={(e) => setNegotiable(e.target.checked)}
-                />
-                Negotiable
-              </label>
-              <label className="inline-flex items-center gap-1.5">
-                <input
-                  type="checkbox"
-                  className="h-3.5 w-3.5 accent-primary"
-                  checked={priceHidden}
-                  onChange={(e) => setPriceHidden(e.target.checked)}
-                />
-                Hide price — buyers must message me
-              </label>
-              <span className="text-[11px] text-muted-foreground">
-                Real prices only — placeholders (₱1, ₱2…) lower your seller score.
-              </span>
-            </div>
-          </section>
-
-
-
-          {SERVICE_CATEGORIES.has(category) && (
-            <section data-tab="details" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "details" ? "" : "hidden"}`}>
-
-              <div>
-                <h2 className="text-sm font-semibold">What do you offer?</h2>
-                <p className="text-xs text-muted-foreground">
-                  Pick everything that applies — buyers filter by these tags.
-                </p>
-              </div>
-              <TagPicker
-                value={serviceTags}
-                onChange={setServiceTags}
-                defaultGroups={CATEGORY_DEFAULT_GROUPS[category] ?? []}
-              />
-            </section>
-          )}
-
-          <section data-tab="details" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "details" ? "" : "hidden"}`}>
-
-            <h2 className="text-sm font-semibold">Details</h2>
-            {category === "repair" || category === "bodyshop" || category === "salvage" ? (
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                <div className="sm:col-span-2">
-                  <Label>Operating hours</Label>
-                  <Input
-                    value={serviceHours}
-                    onChange={(e) => setServiceHours(e.target.value)}
-                    placeholder="Mon–Sat, 8AM–6PM"
-                  />
-                </div>
-                <div>
-                  <Label>Brands serviced (optional)</Label>
-                  <Input
-                    value={serviceBrands}
-                    onChange={(e) => setServiceBrands(e.target.value)}
-                    placeholder="Toyota, Honda, Ford…"
-                  />
-                </div>
-                <div>
-                  <Label>Warranty (optional)</Label>
-                  <Input
-                    value={serviceWarranty}
-                    onChange={(e) => setServiceWarranty(e.target.value)}
-                    placeholder="e.g. 30-day parts & labor"
-                  />
-                </div>
-                <label className="flex items-center gap-2 text-sm sm:col-span-2">
-                  <input
-                    type="checkbox"
-                    checked={serviceWalkIn}
-                    onChange={(e) => setServiceWalkIn(e.target.checked)}
-                  />
-                  Accepts walk-ins
-                </label>
-              </div>
-            ) : category === "carwash" ? (
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                <div className="sm:col-span-2">
-                  <Label>Services offered</Label>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {CARWASH_SERVICES.map((s) => {
-                      const active = washServices.includes(s);
-                      return (
-                        <button
-                          type="button"
-                          key={s}
-                          onClick={() =>
-                            setWashServices((prev) =>
-                              active ? prev.filter((x) => x !== s) : [...prev, s],
-                            )
-                          }
-                          className={`rounded-full border px-3 py-1 text-xs ${active ? "border-primary bg-primary/10 text-primary" : "border-border bg-background text-muted-foreground"}`}
-                        >
-                          {s}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-                <div>
-                  <Label>Pricing tier</Label>
-                  <Select value={washTier} onValueChange={setWashTier}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Budget">Budget</SelectItem>
-                      <SelectItem value="Mid">Mid-range</SelectItem>
-                      <SelectItem value="Premium">Premium</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Starting price (₱)</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={washStartingPrice}
-                    onChange={(e) => setWashStartingPrice(e.target.value)}
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <Label>Operating hours</Label>
-                  <Input
-                    value={washHours}
-                    onChange={(e) => setWashHours(e.target.value)}
-                    placeholder="Mon–Sat, 8AM–6PM"
-                  />
-                </div>
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={washWalkIn}
-                    onChange={(e) => setWashWalkIn(e.target.checked)}
-                  />
-                  Accepts walk-ins
-                </label>
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={wash247}
-                    onChange={(e) => setWash247(e.target.checked)}
-                  />
-                  Open 24/7
-                </label>
-              </div>
-            ) : category === "parts" ? (
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                <div>
-                  <Label>Part type</Label>
-                  <Select value={partType} onValueChange={setPartType}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {PARTS_TYPES.map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {s}
+                      {CATEGORIES.map((c) => (
+                        <SelectItem key={c.slug} value={c.slug}>
+                          {c.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label>Brand</Label>
-                  <Input
-                    value={partBrand}
-                    onChange={(e) => setPartBrand(e.target.value)}
-                    placeholder="e.g. Bosch, OEM Toyota"
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <Label>Fits (make / model / year)</Label>
-                  <Input
-                    value={partFits}
-                    onChange={(e) => setPartFits(e.target.value)}
-                    placeholder="e.g. Toyota Vios 2015–2020"
-                  />
-                </div>
-                <div>
-                  <Label>OEM or Aftermarket</Label>
-                  <Select value={partOemAfter} onValueChange={setPartOemAfter}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select" />
+                  <Label className="text-xs">Condition</Label>
+                  <Select value={condition} onValueChange={setCondition}>
+                    <SelectTrigger className="h-9 text-sm">
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="OEM">OEM</SelectItem>
-                      <SelectItem value="Aftermarket">Aftermarket</SelectItem>
-                      <SelectItem value="Surplus">Surplus</SelectItem>
+                      <SelectItem value="Brand new">Brand new</SelectItem>
+                      <SelectItem value="Used">Used</SelectItem>
+                      <SelectItem value="For parts">For parts</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
-                  <Label>Stock quantity</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={partStock}
-                    onChange={(e) => setPartStock(e.target.value)}
-                  />
-                </div>
-              </div>
-            ) : category === "used_part" ? (
-              <div className="space-y-4">
-                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                {(category === "car" || category === "motorcycle" || category === "truck") ? (
                   <div>
-                    <Label>Vehicle system *</Label>
-                    <Select value={usedPartSystem} onValueChange={setUsedPartSystem}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select system" />
+                    <Label className="text-xs">Registration</Label>
+                    <Select
+                      value={registrationStatus}
+                      onValueChange={(v) => setRegistrationStatus(v as typeof registrationStatus)}
+                    >
+                      <SelectTrigger className="h-9 text-sm">
+                        <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        {NEEDED_PARTS_GROUPS.map((g) => (
-                          <SelectItem key={g.key} value={g.key}>
-                            {g.label}
-                          </SelectItem>
-                        ))}
+                        <SelectItem value="registered">Registered</SelectItem>
+                        <SelectItem value="unregistered">Unregistered</SelectItem>
+                        <SelectItem value="for_transfer">For transfer</SelectItem>
+                        <SelectItem value="unknown">Not specified</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div>
-                    <Label>Part name *</Label>
-                    <Input
-                      value={usedPartName}
-                      onChange={(e) => setUsedPartName(e.target.value)}
-                      placeholder="e.g. Alternator, Front bumper"
-                    />
-                  </div>
-                  <div>
-                    <Label>Condition</Label>
-                    <Select value={usedPartCondition} onValueChange={setUsedPartCondition}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="nos">New old stock (NOS)</SelectItem>
-                        <SelectItem value="used_excellent">Used — excellent</SelectItem>
-                        <SelectItem value="used_good">Used — good</SelectItem>
-                        <SelectItem value="used_fair">Used — fair</SelectItem>
-                        <SelectItem value="for_parts">For parts / not working</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>OEM or Aftermarket</Label>
-                    <Select value={usedPartOemAfter} onValueChange={setUsedPartOemAfter}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="OEM">OEM</SelectItem>
-                        <SelectItem value="Aftermarket">Aftermarket</SelectItem>
-                        <SelectItem value="Surplus">Surplus / JDM</SelectItem>
-                        <SelectItem value="Unknown">Unknown</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>Part number (optional)</Label>
-                    <Input
-                      value={usedPartNumber}
-                      onChange={(e) => setUsedPartNumber(e.target.value)}
-                      placeholder="OEM or aftermarket part #"
-                    />
-                  </div>
-                  <div>
-                    <Label>Warranty (days, optional)</Label>
-                    <Input
-                      type="number"
-                      min="0"
-                      value={usedPartWarrantyDays}
-                      onChange={(e) => setUsedPartWarrantyDays(e.target.value)}
-                      placeholder="e.g. 7"
-                    />
-                  </div>
-                </div>
-                <div className="rounded-lg border border-border bg-muted/20 p-3">
-                  <FitmentEditor value={fitmentRows} onChange={setFitmentRows} />
+                ) : null}
+                <div>
+                  <Label className="text-xs">Seller type</Label>
+                  <Select value={sellerType} onValueChange={(v: any) => setSellerType(v)}>
+                    <SelectTrigger className="h-9 text-sm">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="private">Private seller</SelectItem>
+                      <SelectItem value="business">Business / Dealer</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
-            ) : category === "drone" ? (
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            </div>
+
+            {/* PRICE */}
+            <div className="space-y-2 border-t border-border/60 pt-3">
+              <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Price</h3>
+              <div className="grid gap-2 sm:grid-cols-[200px_1fr] items-end">
                 <div>
-                  <Label>Business type</Label>
-                  <Select value={droneBizType} onValueChange={setDroneBizType}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {DRONE_BUSINESS_TYPES.map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {s}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Brands carried</Label>
+                  <Label htmlFor="price" className="text-xs">Asking price (₱)</Label>
                   <Input
-                    value={droneBrands}
-                    onChange={(e) => setDroneBrands(e.target.value)}
-                    placeholder="DJI, Autel, Skydio"
-                  />
-                </div>
-                <div className="sm:col-span-2">
-                  <Label>Services offered</Label>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {DRONE_SERVICES.map((s) => {
-                      const active = droneServices.includes(s);
-                      return (
-                        <button
-                          type="button"
-                          key={s}
-                          onClick={() =>
-                            setDroneServices((prev) =>
-                              active ? prev.filter((x) => x !== s) : [...prev, s],
-                            )
-                          }
-                          className={`rounded-full border px-3 py-1 text-xs ${active ? "border-primary bg-primary/10 text-primary" : "border-border bg-background text-muted-foreground"}`}
-                        >
-                          {s}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-                <div className="sm:col-span-2">
-                  <Label>Coverage regions (comma-separated)</Label>
-                  <Input
-                    value={droneCoverage}
-                    onChange={(e) => setDroneCoverage(e.target.value)}
-                    placeholder="NCR, Region IV-A"
-                  />
-                </div>
-                <label className="flex items-center gap-2 text-sm sm:col-span-2">
-                  <input
-                    type="checkbox"
-                    checked={droneLicensed}
-                    onChange={(e) => setDroneLicensed(e.target.checked)}
-                  />
-                  Licensed CAAP operator
-                </label>
-              </div>
-            ) : category === "towing" ? (
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                <div>
-                  <Label>Service type</Label>
-                  <Select value={towServiceType} onValueChange={setTowServiceType}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {TOW_SERVICE_TYPES.map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {s}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Vehicle capacity</Label>
-                  <Select value={towCapacity} onValueChange={setTowCapacity}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {TOW_CAPACITIES.map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {s}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="sm:col-span-2">
-                  <Label>Coverage regions (comma-separated)</Label>
-                  <Input
-                    value={towCoverage}
-                    onChange={(e) => setTowCoverage(e.target.value)}
-                    placeholder="NCR, Region IV-A, Region III"
-                  />
-                </div>
-                <div>
-                  <Label>Base rate (₱)</Label>
-                  <Input
+                    id="price"
                     type="number"
                     min="0"
-                    value={towBaseRate}
-                    onChange={(e) => setTowBaseRate(e.target.value)}
+                    className="h-9 text-sm"
+                    value={price}
+                    onChange={(e) => setPrice(e.target.value)}
+                    placeholder="e.g. 450000"
                   />
                 </div>
-                <div>
-                  <Label>Per-km rate (₱)</Label>
-                  <Input
-                    type="number"
-                    min="0"
-                    value={towPerKm}
-                    onChange={(e) => setTowPerKm(e.target.value)}
-                  />
-                </div>
-                <label className="flex items-center gap-2 text-sm sm:col-span-2">
-                  <input
-                    type="checkbox"
-                    checked={tow247}
-                    onChange={(e) => setTow247(e.target.checked)}
-                  />
-                  Available 24/7
-                </label>
-                <div className="sm:col-span-2">
-                  <Label className="mb-2 block">Accepted payments</Label>
-                  <div className="flex flex-wrap gap-3">
-                    {["GCash", "Maya", "Cash", "Bank transfer"].map((p) => {
-                      const checked = towPayments.includes(p);
-                      return (
-                        <label key={p} className="flex items-center gap-2 text-sm">
-                          <input
-                            type="checkbox"
-                            checked={checked}
-                            onChange={(e) =>
-                              setTowPayments((prev) =>
-                                e.target.checked
-                                  ? [...prev, p]
-                                  : prev.filter((x) => x !== p),
-                              )
-                            }
-                          />
-                          {p}
-                        </label>
-                      );
-                    })}
-                  </div>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs pb-1">
+                  <label className="inline-flex items-center gap-1.5">
+                    <input
+                      type="checkbox"
+                      className="h-3.5 w-3.5 accent-primary"
+                      checked={negotiable}
+                      onChange={(e) => setNegotiable(e.target.checked)}
+                    />
+                    Negotiable
+                  </label>
+                  <label className="inline-flex items-center gap-1.5">
+                    <input
+                      type="checkbox"
+                      className="h-3.5 w-3.5 accent-primary"
+                      checked={priceHidden}
+                      onChange={(e) => setPriceHidden(e.target.checked)}
+                    />
+                    Hide price — buyers must message me
+                  </label>
+                  <span className="text-[11px] text-muted-foreground basis-full">
+                    Real prices only — placeholders (₱1, ₱2…) lower your seller score.
+                  </span>
                 </div>
               </div>
-            ) : category === "car" || category === "motorcycle" ? (
-              <div className="space-y-2">
-                <div className="grid gap-2 sm:grid-cols-2">
-                  <div className="sm:col-span-2">
-                    <Label>VIN / chassis</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Optional"
-                        value={vehicleQuality.vin_chassis ?? ""}
-                        maxLength={17}
-                        onChange={(e) =>
-                          setVehicleQuality((prev) => ({
-                            ...prev,
-                            vin_chassis: e.target.value.toUpperCase().replace(/\s+/g, ""),
-                          }))
-                        }
-                      />
-                      <VinScanDialog
-                        onResult={(r) => {
-                          setVehicleQuality((prev) => ({ ...prev, vin_chassis: r.vin }));
-                          if (r.year) setYear(r.year);
-                          if (r.make) setMake(r.make);
-                          if (r.model) setModel(r.model);
-                          if (r.fuel) setFuel(r.fuel);
-                          if (r.transmission) setTransmission(r.transmission);
-                        }}
-                      />
-                    </div>
-                    <p className="mt-0.5 text-[11px] text-muted-foreground">
-                      11–17 letters and numbers, no I/O/Q. Shown only when a buyer requests verification.
+            </div>
+
+            {/* VEHICLE (car / motorcycle only) */}
+            {(category === "car" || category === "motorcycle") && (
+              <div className="space-y-2 border-t border-border/60 pt-3">
+                <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Vehicle</h3>
+                <div>
+                  <Label className="text-xs">VIN / chassis</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      className="h-9 text-sm"
+                      placeholder="Optional"
+                      value={vehicleQuality.vin_chassis ?? ""}
+                      maxLength={17}
+                      onChange={(e) =>
+                        setVehicleQuality((prev) => ({
+                          ...prev,
+                          vin_chassis: e.target.value.toUpperCase().replace(/\s+/g, ""),
+                        }))
+                      }
+                    />
+                    <VinScanDialog
+                      onResult={(r) => {
+                        setVehicleQuality((prev) => ({ ...prev, vin_chassis: r.vin }));
+                        if (r.year) setYear(r.year);
+                        if (r.make) setMake(r.make);
+                        if (r.model) setModel(r.model);
+                        if (r.fuel) setFuel(r.fuel);
+                        if (r.transmission) setTransmission(r.transmission);
+                      }}
+                    />
+                  </div>
+                  <p className="mt-0.5 text-[11px] text-muted-foreground">
+                    11–17 letters and numbers, no I/O/Q. Shown only when a buyer requests verification.
+                  </p>
+                  {vehicleQualityIssues.find((i) => i.field === "vin_chassis") && (
+                    <p className="mt-0.5 text-[11px] text-destructive flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      {vehicleQualityIssues.find((i) => i.field === "vin_chassis")?.message}
                     </p>
-                    {vehicleQualityIssues.find((i) => i.field === "vin_chassis") && (
-                      <p className="mt-0.5 text-[11px] text-destructive flex items-center gap-1">
-                        <AlertCircle className="h-3 w-3" />
-                        {vehicleQualityIssues.find((i) => i.field === "vin_chassis")?.message}
-                      </p>
-                    )}
-                  </div>
+                  )}
                 </div>
                 <VehiclePicker
                   category={category as "car" | "motorcycle"}
@@ -1593,34 +1201,15 @@ function SellPage() {
                     setEngine(v.engine ?? "");
                   }}
                 />
-              </div>
-            ) : (
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                <div>
-                  <Label>Make / Brand</Label>
-                  <Input value={make} onChange={(e) => setMake(e.target.value)} />
-                </div>
-                <div>
-                  <Label>Model</Label>
-                  <Input value={model} onChange={(e) => setModel(e.target.value)} />
-                </div>
-                <div>
-                  <Label>Year</Label>
-                  <Input value={year} onChange={(e) => setYear(e.target.value)} />
-                </div>
-              </div>
-            )}
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {(category === "car" || category === "motorcycle") && (
-                <>
+                <div className="grid gap-2 sm:grid-cols-3">
                   <div>
-                    <Label>Mileage (km)</Label>
-                    <Input value={mileage} onChange={(e) => setMileage(e.target.value)} />
+                    <Label className="text-xs">Mileage (km)</Label>
+                    <Input className="h-9 text-sm" value={mileage} onChange={(e) => setMileage(e.target.value)} />
                   </div>
                   <div>
-                    <Label>Transmission</Label>
+                    <Label className="text-xs">Transmission</Label>
                     <Select value={transmission} onValueChange={setTransmission}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-9 text-sm">
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
                       <SelectContent>
@@ -1631,9 +1220,9 @@ function SellPage() {
                     </Select>
                   </div>
                   <div>
-                    <Label>Fuel</Label>
+                    <Label className="text-xs">Fuel</Label>
                     <Select value={fuel} onValueChange={setFuel}>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-9 text-sm">
                         <SelectValue placeholder="Select" />
                       </SelectTrigger>
                       <SelectContent>
@@ -1644,28 +1233,479 @@ function SellPage() {
                       </SelectContent>
                     </Select>
                   </div>
-                </>
-              )}
-              <div className="sm:col-span-2">
-                <Label>Description</Label>
-                <Textarea
-                  rows={5}
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
+                </div>
+              </div>
+            )}
+
+            {/* CATEGORY DETAILS — service tags + category-specific block */}
+            {(SERVICE_CATEGORIES.has(category) ||
+              category === "repair" || category === "bodyshop" || category === "salvage" ||
+              category === "carwash" || category === "parts" || category === "used_part" ||
+              category === "drone" || category === "towing" ||
+              !(category === "car" || category === "motorcycle")) && (
+              <div className="space-y-2 border-t border-border/60 pt-3">
+                <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                  {SERVICE_CATEGORIES.has(category) ? "What you offer" : "Category details"}
+                </h3>
+                {SERVICE_CATEGORIES.has(category) && (
+                  <div className="space-y-1">
+                    <p className="text-[11px] text-muted-foreground">
+                      Pick everything that applies — buyers filter by these tags.
+                    </p>
+                    <TagPicker
+                      value={serviceTags}
+                      onChange={setServiceTags}
+                      defaultGroups={CATEGORY_DEFAULT_GROUPS[category] ?? []}
+                    />
+                  </div>
+                )}
+                {category === "repair" || category === "bodyshop" || category === "salvage" ? (
+                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="sm:col-span-2">
+                      <Label className="text-xs">Operating hours</Label>
+                      <Input
+                        className="h-9 text-sm"
+                        value={serviceHours}
+                        onChange={(e) => setServiceHours(e.target.value)}
+                        placeholder="Mon–Sat, 8AM–6PM"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Brands serviced (optional)</Label>
+                      <Input
+                        className="h-9 text-sm"
+                        value={serviceBrands}
+                        onChange={(e) => setServiceBrands(e.target.value)}
+                        placeholder="Toyota, Honda, Ford…"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Warranty (optional)</Label>
+                      <Input
+                        className="h-9 text-sm"
+                        value={serviceWarranty}
+                        onChange={(e) => setServiceWarranty(e.target.value)}
+                        placeholder="e.g. 30-day parts & labor"
+                      />
+                    </div>
+                    <label className="flex items-center gap-2 text-xs sm:col-span-2">
+                      <input
+                        type="checkbox"
+                        checked={serviceWalkIn}
+                        onChange={(e) => setServiceWalkIn(e.target.checked)}
+                      />
+                      Accepts walk-ins
+                    </label>
+                  </div>
+                ) : category === "carwash" ? (
+                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="sm:col-span-2 lg:col-span-3">
+                      <Label className="text-xs">Services offered</Label>
+                      <div className="mt-1 flex flex-wrap gap-1.5">
+                        {CARWASH_SERVICES.map((s) => {
+                          const active = washServices.includes(s);
+                          return (
+                            <button
+                              type="button"
+                              key={s}
+                              onClick={() =>
+                                setWashServices((prev) =>
+                                  active ? prev.filter((x) => x !== s) : [...prev, s],
+                                )
+                              }
+                              className={`rounded-full border px-2.5 py-0.5 text-xs ${active ? "border-primary bg-primary/10 text-primary" : "border-border bg-background text-muted-foreground"}`}
+                            >
+                              {s}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Pricing tier</Label>
+                      <Select value={washTier} onValueChange={setWashTier}>
+                        <SelectTrigger className="h-9 text-sm">
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Budget">Budget</SelectItem>
+                          <SelectItem value="Mid">Mid-range</SelectItem>
+                          <SelectItem value="Premium">Premium</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Starting price (₱)</Label>
+                      <Input
+                        className="h-9 text-sm"
+                        type="number"
+                        min="0"
+                        value={washStartingPrice}
+                        onChange={(e) => setWashStartingPrice(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Operating hours</Label>
+                      <Input
+                        className="h-9 text-sm"
+                        value={washHours}
+                        onChange={(e) => setWashHours(e.target.value)}
+                        placeholder="Mon–Sat, 8AM–6PM"
+                      />
+                    </div>
+                    <label className="flex items-center gap-2 text-xs">
+                      <input
+                        type="checkbox"
+                        checked={washWalkIn}
+                        onChange={(e) => setWashWalkIn(e.target.checked)}
+                      />
+                      Accepts walk-ins
+                    </label>
+                    <label className="flex items-center gap-2 text-xs">
+                      <input
+                        type="checkbox"
+                        checked={wash247}
+                        onChange={(e) => setWash247(e.target.checked)}
+                      />
+                      Open 24/7
+                    </label>
+                  </div>
+                ) : category === "parts" ? (
+                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    <div>
+                      <Label className="text-xs">Part type</Label>
+                      <Select value={partType} onValueChange={setPartType}>
+                        <SelectTrigger className="h-9 text-sm">
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {PARTS_TYPES.map((s) => (
+                            <SelectItem key={s} value={s}>
+                              {s}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Brand</Label>
+                      <Input
+                        className="h-9 text-sm"
+                        value={partBrand}
+                        onChange={(e) => setPartBrand(e.target.value)}
+                        placeholder="e.g. Bosch, OEM Toyota"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">OEM or Aftermarket</Label>
+                      <Select value={partOemAfter} onValueChange={setPartOemAfter}>
+                        <SelectTrigger className="h-9 text-sm">
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="OEM">OEM</SelectItem>
+                          <SelectItem value="Aftermarket">Aftermarket</SelectItem>
+                          <SelectItem value="Surplus">Surplus</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <Label className="text-xs">Fits (make / model / year)</Label>
+                      <Input
+                        className="h-9 text-sm"
+                        value={partFits}
+                        onChange={(e) => setPartFits(e.target.value)}
+                        placeholder="e.g. Toyota Vios 2015–2020"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Stock quantity</Label>
+                      <Input
+                        className="h-9 text-sm"
+                        type="number"
+                        min="0"
+                        value={partStock}
+                        onChange={(e) => setPartStock(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                ) : category === "used_part" ? (
+                  <div className="space-y-2">
+                    <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                      <div>
+                        <Label className="text-xs">Vehicle system *</Label>
+                        <Select value={usedPartSystem} onValueChange={setUsedPartSystem}>
+                          <SelectTrigger className="h-9 text-sm">
+                            <SelectValue placeholder="Select system" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {NEEDED_PARTS_GROUPS.map((g) => (
+                              <SelectItem key={g.key} value={g.key}>
+                                {g.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs">Part name *</Label>
+                        <Input
+                          className="h-9 text-sm"
+                          value={usedPartName}
+                          onChange={(e) => setUsedPartName(e.target.value)}
+                          placeholder="e.g. Alternator, Front bumper"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs">Condition</Label>
+                        <Select value={usedPartCondition} onValueChange={setUsedPartCondition}>
+                          <SelectTrigger className="h-9 text-sm">
+                            <SelectValue placeholder="Select" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="nos">New old stock (NOS)</SelectItem>
+                            <SelectItem value="used_excellent">Used — excellent</SelectItem>
+                            <SelectItem value="used_good">Used — good</SelectItem>
+                            <SelectItem value="used_fair">Used — fair</SelectItem>
+                            <SelectItem value="for_parts">For parts / not working</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs">OEM or Aftermarket</Label>
+                        <Select value={usedPartOemAfter} onValueChange={setUsedPartOemAfter}>
+                          <SelectTrigger className="h-9 text-sm">
+                            <SelectValue placeholder="Select" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="OEM">OEM</SelectItem>
+                            <SelectItem value="Aftermarket">Aftermarket</SelectItem>
+                            <SelectItem value="Surplus">Surplus / JDM</SelectItem>
+                            <SelectItem value="Unknown">Unknown</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label className="text-xs">Part number (optional)</Label>
+                        <Input
+                          className="h-9 text-sm"
+                          value={usedPartNumber}
+                          onChange={(e) => setUsedPartNumber(e.target.value)}
+                          placeholder="OEM or aftermarket part #"
+                        />
+                      </div>
+                      <div>
+                        <Label className="text-xs">Warranty (days, optional)</Label>
+                        <Input
+                          className="h-9 text-sm"
+                          type="number"
+                          min="0"
+                          value={usedPartWarrantyDays}
+                          onChange={(e) => setUsedPartWarrantyDays(e.target.value)}
+                          placeholder="e.g. 7"
+                        />
+                      </div>
+                    </div>
+                    <div className="pt-1">
+                      <FitmentEditor value={fitmentRows} onChange={setFitmentRows} />
+                    </div>
+                  </div>
+                ) : category === "drone" ? (
+                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    <div>
+                      <Label className="text-xs">Business type</Label>
+                      <Select value={droneBizType} onValueChange={setDroneBizType}>
+                        <SelectTrigger className="h-9 text-sm">
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {DRONE_BUSINESS_TYPES.map((s) => (
+                            <SelectItem key={s} value={s}>
+                              {s}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Brands carried</Label>
+                      <Input
+                        className="h-9 text-sm"
+                        value={droneBrands}
+                        onChange={(e) => setDroneBrands(e.target.value)}
+                        placeholder="DJI, Autel, Skydio"
+                      />
+                    </div>
+                    <label className="flex items-center gap-2 text-xs">
+                      <input
+                        type="checkbox"
+                        checked={droneLicensed}
+                        onChange={(e) => setDroneLicensed(e.target.checked)}
+                      />
+                      Licensed CAAP operator
+                    </label>
+                    <div className="sm:col-span-2 lg:col-span-3">
+                      <Label className="text-xs">Services offered</Label>
+                      <div className="mt-1 flex flex-wrap gap-1.5">
+                        {DRONE_SERVICES.map((s) => {
+                          const active = droneServices.includes(s);
+                          return (
+                            <button
+                              type="button"
+                              key={s}
+                              onClick={() =>
+                                setDroneServices((prev) =>
+                                  active ? prev.filter((x) => x !== s) : [...prev, s],
+                                )
+                              }
+                              className={`rounded-full border px-2.5 py-0.5 text-xs ${active ? "border-primary bg-primary/10 text-primary" : "border-border bg-background text-muted-foreground"}`}
+                            >
+                              {s}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div className="sm:col-span-2 lg:col-span-3">
+                      <Label className="text-xs">Coverage regions (comma-separated)</Label>
+                      <Input
+                        className="h-9 text-sm"
+                        value={droneCoverage}
+                        onChange={(e) => setDroneCoverage(e.target.value)}
+                        placeholder="NCR, Region IV-A"
+                      />
+                    </div>
+                  </div>
+                ) : category === "towing" ? (
+                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    <div>
+                      <Label className="text-xs">Service type</Label>
+                      <Select value={towServiceType} onValueChange={setTowServiceType}>
+                        <SelectTrigger className="h-9 text-sm">
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {TOW_SERVICE_TYPES.map((s) => (
+                            <SelectItem key={s} value={s}>
+                              {s}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs">Vehicle capacity</Label>
+                      <Select value={towCapacity} onValueChange={setTowCapacity}>
+                        <SelectTrigger className="h-9 text-sm">
+                          <SelectValue placeholder="Select" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {TOW_CAPACITIES.map((s) => (
+                            <SelectItem key={s} value={s}>
+                              {s}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <label className="flex items-center gap-2 text-xs">
+                      <input
+                        type="checkbox"
+                        checked={tow247}
+                        onChange={(e) => setTow247(e.target.checked)}
+                      />
+                      Available 24/7
+                    </label>
+                    <div>
+                      <Label className="text-xs">Base rate (₱)</Label>
+                      <Input
+                        className="h-9 text-sm"
+                        type="number"
+                        min="0"
+                        value={towBaseRate}
+                        onChange={(e) => setTowBaseRate(e.target.value)}
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Per-km rate (₱)</Label>
+                      <Input
+                        className="h-9 text-sm"
+                        type="number"
+                        min="0"
+                        value={towPerKm}
+                        onChange={(e) => setTowPerKm(e.target.value)}
+                      />
+                    </div>
+                    <div className="sm:col-span-2 lg:col-span-3">
+                      <Label className="text-xs">Coverage regions (comma-separated)</Label>
+                      <Input
+                        className="h-9 text-sm"
+                        value={towCoverage}
+                        onChange={(e) => setTowCoverage(e.target.value)}
+                        placeholder="NCR, Region IV-A, Region III"
+                      />
+                    </div>
+                    <div className="sm:col-span-2 lg:col-span-3">
+                      <Label className="text-xs mb-1 block">Accepted payments</Label>
+                      <div className="flex flex-wrap gap-3">
+                        {["GCash", "Maya", "Cash", "Bank transfer"].map((p) => {
+                          const checked = towPayments.includes(p);
+                          return (
+                            <label key={p} className="flex items-center gap-2 text-xs">
+                              <input
+                                type="checkbox"
+                                checked={checked}
+                                onChange={(e) =>
+                                  setTowPayments((prev) =>
+                                    e.target.checked
+                                      ? [...prev, p]
+                                      : prev.filter((x) => x !== p),
+                                  )
+                                }
+                              />
+                              {p}
+                            </label>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ) : !(category === "car" || category === "motorcycle") ? (
+                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    <div>
+                      <Label className="text-xs">Make / Brand</Label>
+                      <Input className="h-9 text-sm" value={make} onChange={(e) => setMake(e.target.value)} />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Model</Label>
+                      <Input className="h-9 text-sm" value={model} onChange={(e) => setModel(e.target.value)} />
+                    </div>
+                    <div>
+                      <Label className="text-xs">Year</Label>
+                      <Input className="h-9 text-sm" value={year} onChange={(e) => setYear(e.target.value)} />
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            )}
+
+            {/* CONDITION & QUALITY (car / motorcycle) */}
+            {(category === "car" || category === "motorcycle") && (
+              <div className="space-y-2 border-t border-border/60 pt-3">
+                <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Condition &amp; quality</h3>
+                <VehicleQualityFields
+                  category={category as "car" | "motorcycle"}
+                  value={vehicleQuality}
+                  onChange={setVehicleQuality}
+                  issues={vehicleQualityIssues}
                 />
               </div>
-            </div>
-            {(category === "car" || category === "motorcycle") && (
-              <VehicleQualityFields
-                category={category as "car" | "motorcycle"}
-                value={vehicleQuality}
-                onChange={setVehicleQuality}
-                issues={vehicleQualityIssues}
-              />
             )}
+
+            {/* FILTERS (category-attribute categories) */}
             {isAttrCategory(category) && (
-              <div className="rounded-md border border-border/60 bg-background/40 p-4">
-                <h3 className="mb-3 font-display text-sm font-semibold">
+              <div className="space-y-2 border-t border-border/60 pt-3">
+                <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
                   {CATEGORY_LABEL_MAP[category] ?? "Details"} — buyers filter by these
                 </h3>
                 <CategoryAttributesEditor
@@ -1675,11 +1715,23 @@ function SellPage() {
                 />
               </div>
             )}
+
+            {/* DESCRIPTION */}
+            <div className="space-y-2 border-t border-border/60 pt-3">
+              <h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">Description</h3>
+              <Textarea
+                rows={4}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Tell buyers what makes this listing stand out…"
+              />
+            </div>
           </section>
+
 
           <section data-tab="location" className={`space-y-2 rounded-xl border border-border bg-card p-2.5 sm:p-3 ${activeTab === "location" ? "" : "hidden"}`}>
             <div className="flex items-baseline justify-between gap-2">
-              <h2 className="text-sm font-semibold">Location & seller</h2>
+              <h2 className="text-sm font-semibold">Location &amp; contact</h2>
               <span className="text-[11px] text-muted-foreground">PSA PSGC</span>
             </div>
             <LocationPicker
@@ -1691,30 +1743,7 @@ function SellPage() {
                 setBarangay(v.barangay ?? null);
               }}
             />
-            <div className="grid gap-2 sm:grid-cols-3 pt-1">
-              <div className="sm:col-span-2">
-                <Label className="text-xs">Seller type</Label>
-                <RadioGroup
-                  value={sellerType}
-                  onValueChange={(v: any) => setSellerType(v)}
-                  className="grid gap-2 sm:grid-cols-2"
-                >
-                  <label className="flex cursor-pointer items-center gap-2 rounded-md border border-border p-2 text-xs hover:bg-secondary/50">
-                    <RadioGroupItem value="private" />
-                    <div>
-                      <div className="font-medium">Private seller</div>
-                      <div className="text-[11px] text-muted-foreground">Personal vehicle</div>
-                    </div>
-                  </label>
-                  <label className="flex cursor-pointer items-center gap-2 rounded-md border border-border p-2 text-xs hover:bg-secondary/50">
-                    <RadioGroupItem value="business" />
-                    <div>
-                      <div className="font-medium">Business / Dealer</div>
-                      <div className="text-[11px] text-muted-foreground">I sell as a business</div>
-                    </div>
-                  </label>
-                </RadioGroup>
-              </div>
+            <div className="grid gap-2 sm:grid-cols-2 pt-1">
               <div>
                 <Label htmlFor="phone" className="text-xs">Contact phone (optional)</Label>
                 <PhoneInput

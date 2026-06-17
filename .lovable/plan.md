@@ -1,54 +1,65 @@
 ## Goal
-Make `/sell` dramatically more compact across all 4 tabs — fewer cards, tighter spacing, 2–4 fields per row wherever sensible, and remove the Facebook Marketplace import entry point. Keep all information and existing logic intact.
 
-## 1. Remove Facebook Marketplace import
-- `src/routes/sell.tsx`: delete the "Already selling on Facebook Marketplace?" banner (~lines 960–971) and its `<Link to="/sell/import">` button.
-- Delete `src/routes/sell.import.tsx` so the `/sell/import` route is gone.
-- Leave `src/lib/facebook-import.*` server code in place (still referenced by `business-discover.server.ts`); only the user-facing entry point is removed.
+Right now the Details tab renders as **three separate cards** ("Basics", "What do you offer?", and a generic "Details" block that also hosts VIN + VehiclePicker + Mileage/Trans/Fuel + Description + VehicleQualityFields + CategoryAttributesEditor). It reads as messy because the same logical concept (the listing's identity + specs + condition) is split across three bordered cards, while unrelated concepts (asking price vs. VIN vs. category filters) sit next to each other inside the same card.
 
-## 2. Global density pass on `/sell`
-Apply consistently to every `<section>` block in the form:
-- Card padding `p-3 sm:p-4` → `p-2.5 sm:p-3`; section vertical rhythm `space-y-3` → `space-y-2`.
-- Section headings: `font-display text-base font-semibold` → `text-sm font-semibold`, with `mb-1` not implicit margin.
-- All grids: `gap-4` → `gap-2 sm:gap-3`. Promote `sm:grid-cols-2` to `sm:grid-cols-2 lg:grid-cols-3` (and `lg:grid-cols-4` where fields are short like Year/Make/Model/Trim, Mileage/Transmission/Fuel, Stock/Brand/OEM).
-- Labels: add a shared `text-xs font-medium` style; inputs/selects/triggers use `h-9 text-sm`.
-- Helper text: `text-[11px]` and collapse to a single line where possible.
-- Outer container `max-w-3xl` → `max-w-5xl` so multi-column rows actually have room.
-- Remove the page subhead "Reach buyers across the Philippines." (saves a row).
+This plan collapses the Details tab into **one card** with clearly labeled sub‑sections (no extra borders, just `<h3>` dividers), reorders fields so they match how buyers actually scan a marketplace listing, and tightens spacing. Nothing is removed.
 
-## 3. Tab-by-tab reorganization
+## New single-card structure (Details tab)
 
-### Details tab
-Combine the current 3 stacked cards (Basics, Service category extras, Vehicle details) into **one card with collapsible subsections**:
-1. Row 1 (4-up on lg): Category · Condition · Registration · Negotiable/Hide-price chips
-2. Row 2 (full): Title
-3. Row 3 (3-up): Asking price · "Negotiable" toggle · "Hide price" toggle inline
-4. "Pull from your Rides" collapses to a compact inline `<Select>` on the top-right of the card header (only when `myRides.length > 0`), not a full banner.
-5. Vehicle block (when category is vehicle): VIN row (input + Scan button, 2-up), then Year/Make/Model/Trim in a 4-up grid on lg, then Mileage/Transmission/Fuel in 3-up.
-6. Description: full-width textarea, reduce `min-h` to `min-h-[96px]`.
-7. Category-specific blocks (service/parts/used_part/drone/towing/etc.) stay but switch to `grid sm:grid-cols-2 lg:grid-cols-3 gap-2`, smaller chips (`px-2 py-0.5 text-[11px]`), and no extra wrapper card — render inside the same Details card under a thin divider.
+One `<section data-tab="details">` card. Inside, sub-sections separated by a thin `border-t` divider and a small uppercase `text-[11px] text-muted-foreground` eyebrow — no nested cards.
 
-### Location & Seller tab
-One card, 3-up grid on lg:
-- Row 1: Region · Province · City (from LocationPicker, rendered inline rather than its default stacked layout if it accepts a `layout="inline"` prop; otherwise wrap with `[&_label]:text-xs [&_>div]:gap-2`).
-- Row 2: Barangay · Landmark · Seller type
-- Row 3: Phone (PhoneInput, 2 cols) · "Show exact pin" toggle (1 col)
+```
+┌─ DETAILS card ──────────────────────────────────────────────┐
+│ Header row: "Listing details"            [Pull from Rides ▾]│
+├─ LISTING ───────────────────────────────────────────────────┤
+│ Title (full width)                                          │
+│ Category │ Condition │ Registration* │ Seller type          │  (lg:grid-cols-4)
+├─ PRICE ─────────────────────────────────────────────────────┤
+│ Asking price │ ☐ Negotiable  ☐ Hide price (inline)          │  (1 input + inline checks)
+├─ VEHICLE  (only for car / motorcycle) ──────────────────────┤
+│ VIN / chassis  [Scan]                                       │  (full width, helper text)
+│ Year │ Make │ Model │ Trim/Engine                           │  (VehiclePicker, kept as-is)
+│ Mileage │ Transmission │ Fuel                               │  (lg:grid-cols-3)
+├─ CATEGORY DETAILS  (only when applicable) ──────────────────┤
+│ Renders the category-specific block currently inside the    │
+│ third card: repair/bodyshop, carwash, parts, used_part,     │
+│ drone, towing, OR generic Make/Model/Year for non-vehicle   │
+│ categories. Same fields, same grid, just no nested border.  │
+├─ CONDITION & QUALITY  (only car / motorcycle) ──────────────┤
+│ <VehicleQualityFields …/> — unchanged internals             │
+├─ FILTERS  (only for isAttrCategory) ────────────────────────┤
+│ "Buyers filter by these" + <CategoryAttributesEditor/>      │
+├─ DESCRIPTION ───────────────────────────────────────────────┤
+│ Textarea, rows={4}, full width                              │
+└─────────────────────────────────────────────────────────────┘
+```
 
-### Plan & Boost tab
-- Plan cards: switch from stacked to `grid sm:grid-cols-2 lg:grid-cols-3 gap-2`, reduce internal padding, drop long marketing copy to a single line + "details" popover.
-- Boost add-ons: render as a compact 2-up checklist instead of stacked rows.
+Why this order: Listing identity first (what is it / who's selling), then price (the #1 buyer scan), then the spec block (vehicle facts), then condition/quality, then category-specific filter attributes, then the long-form prose at the bottom. Matches the order a buyer reads a listing card → detail page.
 
-### Photos tab
-- Uploader stays full-width (drag area needs space), but trim padding and helper text. Thumbnail grid bumped from 3 to 4–6 cols on lg.
+Moves:
+- "Seller type" RadioGroup leaves the Location tab and joins the LISTING row as a 4th cell (compact `Select` instead of two radio cards — same two options "Private" / "Business / Dealer"). The Location tab keeps Phone + LocationPicker only.
+- "What do you offer?" (service TagPicker for repair/bodyshop/salvage/etc.) becomes a CATEGORY DETAILS sub-section inside the same card, rendered above the category-specific grid for service categories. No more separate bordered card.
+- VIN/chassis moves out of the "car/motorcycle" branch into a dedicated VEHICLE sub-section so it visually sits above Year/Make/Model (matches the earlier "VIN above make/model" request).
+- Description moves to the bottom of the card (it's the longest field; keeping it last stops it from pushing structured fields below the fold).
+- Drop the `<h2>` headings on the inner blocks; use `<h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">` as section eyebrows so the whole card reads as one surface.
 
-## 4. Sticky tab strip
-Already compact; keep but reduce `py-1` → `py-0.5`, progress bar `h-1.5` → `h-1`. Stepper labels stay full on `sm+`, abbreviate to "1 / 2 / 3 / 4" under `sm`.
+## Density pass (Details card only)
 
-## Files touched
-- `src/routes/sell.tsx` — major layout/spacing rework, FB banner removal, single Details card, multi-column rows.
-- `src/routes/sell.import.tsx` — delete.
-- No other files; no schema, no business logic, no submit-payload changes.
+- Card padding stays `p-3 sm:p-4` so the single card has breathing room, but inner `space-y-2` between sub-sections and `gap-2` inside grids.
+- All `<Label>` → `text-xs`; all `<Input>`/`<SelectTrigger>` → `h-9 text-sm` (already the pattern in the Basics row, extend to the vehicle + category grids which currently use the default `h-10`).
+- Replace nested bordered wrappers (`rounded-md border border-border/60 bg-background/40 p-4` on CategoryAttributesEditor, `rounded-lg border border-border bg-muted/20 p-3` on FitmentEditor) with plain `pt-2` since they now live inside a single card.
+- Sub-section divider: `border-t border-border/60 pt-2 mt-2` (no horizontal padding change).
+- Drop the standalone "Title" row width — keep full width but move it into the LISTING grid as `lg:col-span-4` so the 4-up row underneath aligns.
 
 ## Out of scope
-- No changes to validation, submit logic, pricing rules, or what gets saved.
-- No changes to LocationPicker, VehiclePicker, VehicleQualityFields internals beyond container styling — if any can't render inline cleanly, wrap them with utility-class overrides rather than refactoring the component.
+
+- Location, Plan & Boost, Photos tabs (the user called out the Details page specifically).
+- VehiclePicker, VehicleQualityFields, CategoryAttributesEditor, TagPicker, FitmentEditor internals — only their wrapper styling changes.
+- Validation, submit logic, what gets saved.
+- Tab strip / progress bar.
+
+## Files
+
+- `src/routes/sell.tsx` — restructure lines ~1003–1678 into one section; move Seller-type RadioGroup out of the Location section at ~1694–1717 into the new LISTING grid (replace with a compact `Select`); minor spacing tweaks on the Location section header.
+
+No other files touched.
