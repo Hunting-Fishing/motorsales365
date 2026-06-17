@@ -929,7 +929,6 @@ function SellPage() {
         <form onSubmit={handleSubmit} className="mt-4 space-y-3">
           {(() => {
             const TABS = [
-              { key: "basics", label: "Basics" },
               { key: "details", label: "Details" },
               { key: "location", label: "Location & Seller" },
               { key: "plan", label: "Plan & Boost" },
@@ -967,7 +966,8 @@ function SellPage() {
 
             );
           })()}
-          <section data-tab="basics" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "basics" ? "" : "hidden"}`}>
+          <section data-tab="details" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "details" ? "" : "hidden"}`}>
+
 
             <h2 className="font-display text-base font-semibold">Category & basics</h2>
             <div className="grid gap-4 sm:grid-cols-2">
