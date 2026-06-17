@@ -36,7 +36,7 @@ type Photo = {
 };
 
 const MAX_IMAGE_BYTES = 15 * 1024 * 1024; // 15 MB
-const MAX_VIDEO_BYTES = 100 * 1024 * 1024; // 100 MB
+const MAX_VIDEO_BYTES = 50 * 1024 * 1024; // 50 MB (Supabase default bucket limit)
 
 async function uploadGalleryFile(
   userId: string,
