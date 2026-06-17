@@ -495,6 +495,21 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  COUNTRY_CODES,
+  parseE164,
+  buildE164,
+  formatNational,
+  findCountryByDial,
+} from "@/data/country-codes";
 
 type Channel = {
   id: string;
@@ -517,10 +532,9 @@ const KIND_LABELS: Record<string, string> = {
   linkedin: "LinkedIn",
 };
 
+const PHONE_KINDS = new Set(["phone", "whatsapp", "viber"]);
+
 const KIND_PLACEHOLDER: Record<string, string> = {
-  phone: "+63 969 606 3830",
-  whatsapp: "+63 969 606 3830",
-  viber: "+63 969 606 3830",
   telegram: "@yourhandle",
   instagram: "@yourhandle",
   tiktok: "@yourhandle",
@@ -529,6 +543,63 @@ const KIND_PLACEHOLDER: Record<string, string> = {
   x: "@yourhandle",
   linkedin: "https://linkedin.com/company/yourname",
 };
+
+function formatChannelValue(kind: string, value: string): string {
+  if (PHONE_KINDS.has(kind)) {
+    const parsed = parseE164(value);
+    const country = COUNTRY_CODES.find((c) => c.iso === parsed.iso);
+    if (country) return `${country.flag} ${country.dial} ${formatNational(parsed.national)}`;
+  }
+  return value;
+}
+
+function PhoneField({
+  iso,
+  national,
+  onIsoChange,
+  onNationalChange,
+}: {
+  iso: string;
+  national: string;
+  onIsoChange: (v: string) => void;
+  onNationalChange: (v: string) => void;
+}) {
+  const country = COUNTRY_CODES.find((c) => c.iso === iso) ?? COUNTRY_CODES[0];
+  return (
+    <div className="flex gap-2">
+      <Select value={iso} onValueChange={onIsoChange}>
+        <SelectTrigger className="h-11 w-[140px]" aria-label="Country code">
+          <SelectValue>
+            <span className="inline-flex items-center gap-1">
+              <span>{country.flag}</span>
+              <span className="text-sm">{country.dial}</span>
+            </span>
+          </SelectValue>
+        </SelectTrigger>
+        <SelectContent className="max-h-72">
+          {COUNTRY_CODES.map((c) => (
+            <SelectItem key={c.iso} value={c.iso}>
+              <span className="inline-flex items-center gap-2">
+                <span>{c.flag}</span>
+                <span className="text-sm">{c.dial}</span>
+                <span className="text-xs text-muted-foreground">{c.name}</span>
+              </span>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      <Input
+        type="tel"
+        inputMode="tel"
+        value={national}
+        onChange={(e) => onNationalChange(e.target.value.replace(/[^\d ]/g, ""))}
+        placeholder="969 606 3830"
+        className="h-11 flex-1"
+        maxLength={20}
+      />
+    </div>
+  );
+}
 
 export function ContactChannelsTab({
   businessId,
@@ -542,34 +613,83 @@ export function ContactChannelsTab({
   const upsert = useServerFn(upsertContactChannel);
   const del = useServerFn(deleteContactChannel);
   const [adding, setAdding] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [kind, setKind] = useState<string>("phone");
   const [label, setLabel] = useState("");
   const [value, setValue] = useState("");
+  const [iso, setIso] = useState<string>("PH");
+  const [national, setNational] = useState<string>("");
+  const [saving, setSaving] = useState(false);
 
-  const add = async () => {
-    if (!value.trim()) return;
+  const resetForm = () => {
+    setKind("phone");
+    setLabel("");
+    setValue("");
+    setIso("PH");
+    setNational("");
+    setAdding(false);
+    setEditingId(null);
+  };
+
+  const startEdit = (c: Channel) => {
+    setEditingId(c.id);
+    setAdding(true);
+    setKind(c.kind);
+    setLabel(c.label ?? "");
+    if (PHONE_KINDS.has(c.kind)) {
+      const p = parseE164(c.value);
+      setIso(p.iso);
+      setNational(formatNational(p.national));
+      setValue("");
+    } else {
+      setValue(c.value);
+      setIso("PH");
+      setNational("");
+    }
+  };
+
+  const save = async () => {
+    let finalValue = value.trim();
+    if (PHONE_KINDS.has(kind)) {
+      const built = buildE164(iso, national);
+      if (!built) {
+        toast.error("Enter a valid phone number");
+        return;
+      }
+      finalValue = built;
+    }
+    if (!finalValue) {
+      toast.error("Enter a value");
+      return;
+    }
+    if (kind === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(finalValue)) {
+      toast.error("Enter a valid email");
+      return;
+    }
+    setSaving(true);
     try {
       await upsert({
         data: {
+          id: editingId ?? undefined,
           businessId,
           kind: kind as any,
           label: label.trim() || null,
-          value: value.trim(),
-          sort_order: channels.length,
-        },
+          value: finalValue,
+          sort_order: editingId ? undefined : channels.length,
+        } as any,
       });
-      setKind("phone");
-      setLabel("");
-      setValue("");
-      setAdding(false);
-      toast.success("Added");
+      toast.success(editingId ? "Updated" : "Added");
+      resetForm();
       onChange();
     } catch (e: any) {
       toast.error(e?.message ?? "Failed");
+    } finally {
+      setSaving(false);
     }
   };
 
   const remove = async (id: string) => {
+    if (!(await confirm({ title: "Remove this contact channel?" }))) return;
     try {
       await del({ data: { businessId, id } });
       onChange();
@@ -580,7 +700,7 @@ export function ContactChannelsTab({
 
   return (
     <Card className="space-y-4 p-4 md:p-5">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 className="font-display text-lg font-semibold">Contact channels</h2>
           <p className="text-xs text-muted-foreground">
@@ -597,15 +717,16 @@ export function ContactChannelsTab({
       </div>
 
       {adding && (
-        <div className="space-y-2 rounded-lg border border-border p-3">
-          <div className="grid gap-2 sm:grid-cols-2">
-            <div>
+        <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="space-y-1">
               <Label>Channel</Label>
               <Select
                 value={kind}
                 onValueChange={(v) => {
                   setKind(v);
                   setValue("");
+                  setNational("");
                 }}
               >
                 <SelectTrigger className="h-11">
@@ -620,7 +741,7 @@ export function ContactChannelsTab({
                 </SelectContent>
               </Select>
             </div>
-            <div>
+            <div className="space-y-1">
               <Label>Label (optional)</Label>
               <Input
                 value={label}
@@ -631,52 +752,91 @@ export function ContactChannelsTab({
               />
             </div>
           </div>
-          <div>
+          <div className="space-y-1">
             <Label>{KIND_LABELS[kind]} value</Label>
-            <Input
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              maxLength={200}
-              placeholder={KIND_PLACEHOLDER[kind]}
-              className="h-11"
-            />
+            {PHONE_KINDS.has(kind) ? (
+              <PhoneField
+                iso={iso}
+                national={national}
+                onIsoChange={setIso}
+                onNationalChange={setNational}
+              />
+            ) : (
+              <Input
+                type={kind === "email" ? "email" : "text"}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                maxLength={200}
+                placeholder={KIND_PLACEHOLDER[kind]}
+                className="h-11"
+              />
+            )}
+            {PHONE_KINDS.has(kind) && (
+              <p className="text-[11px] text-muted-foreground">
+                Pick the country, then type the local number — we store it as international format.
+              </p>
+            )}
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="ghost" size="sm" onClick={() => setAdding(false)}>
+            <Button variant="ghost" size="sm" onClick={resetForm} disabled={saving}>
               Cancel
             </Button>
-            <Button size="sm" onClick={add}>
-              Add
+            <Button size="sm" onClick={save} disabled={saving}>
+              {editingId ? "Save" : "Add"}
             </Button>
           </div>
         </div>
       )}
 
-      {channels.length === 0 && !adding && (
+      {channels.length === 0 && !adding ? (
         <p className="rounded-lg border border-dashed border-border p-4 text-center text-sm text-muted-foreground">
-          No extra contact channels yet.
+          No contact channels yet.
         </p>
+      ) : (
+        <div className="overflow-x-auto rounded-lg border border-border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[120px]">Channel</TableHead>
+                <TableHead className="w-[140px]">Label</TableHead>
+                <TableHead>Value</TableHead>
+                <TableHead className="w-[110px] text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {channels.map((c) => (
+                <TableRow key={c.id}>
+                  <TableCell className="font-medium">{KIND_LABELS[c.kind] ?? c.kind}</TableCell>
+                  <TableCell className="text-muted-foreground">{c.label ?? "—"}</TableCell>
+                  <TableCell className="break-all text-sm">
+                    {formatChannelValue(c.kind, c.value)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="inline-flex gap-1">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Edit contact"
+                        onClick={() => startEdit(c)}
+                      >
+                        <Pencil className="h-4 w-4" aria-hidden="true" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Remove contact"
+                        onClick={() => remove(c.id)}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" aria-hidden="true" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       )}
-
-      <div className="space-y-2">
-        {channels.map((c) => (
-          <div
-            key={c.id}
-            className="flex items-center justify-between gap-2 rounded-lg border border-border p-3"
-          >
-            <div className="min-w-0">
-              <div className="text-sm font-medium">
-                {KIND_LABELS[c.kind] ?? c.kind}
-                {c.label && <span className="ml-2 text-xs text-muted-foreground">— {c.label}</span>}
-              </div>
-              <div className="truncate text-sm text-muted-foreground">{c.value}</div>
-            </div>
-            <Button variant="ghost" size="icon" aria-label="Remove contact" onClick={() => remove(c.id)}>
-              <Trash2 className="h-4 w-4 text-destructive" aria-hidden="true" />
-            </Button>
-          </div>
-        ))}
-      </div>
     </Card>
   );
 }
