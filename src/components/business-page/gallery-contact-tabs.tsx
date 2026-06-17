@@ -442,19 +442,41 @@ export function GalleryTab({
                     </div>
                   );
                 })}
-                <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-md border border-dashed border-border bg-muted/30 text-xs text-muted-foreground hover:bg-muted/60">
+                <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-md border border-dashed border-border bg-muted/30 p-2 text-center text-xs text-muted-foreground hover:bg-muted/60">
                   <Upload className="h-4 w-4" />
-                  {uploadingFor === a.id ? "Uploading…" : "Add"}
+                  {uploadingFor === a.id ? "Uploading…" : "Add photo or video"}
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/*,video/*"
                     multiple
                     className="hidden"
                     disabled={uploadingFor === a.id}
-                    onChange={(e) => onFiles(a.id, e.target.files)}
+                    onChange={(e) => {
+                      onFiles(a.id, e.target.files);
+                      e.target.value = "";
+                    }}
                   />
                 </label>
               </div>
+
+              {uploadingFor === a.id && uploadProgress.length > 0 && (
+                <div className="space-y-2 rounded-md border border-border bg-muted/40 p-2">
+                  {uploadProgress.map((p, i) => (
+                    <div key={i} className="space-y-1">
+                      <div className="flex items-center justify-between gap-2 text-xs">
+                        <span className="truncate text-muted-foreground">
+                          {p.kind === "video" ? "🎬 " : "🖼️ "}
+                          {p.name}
+                        </span>
+                        <span className="tabular-nums text-muted-foreground">
+                          {p.percent}%
+                        </span>
+                      </div>
+                      <Progress value={p.percent} className="h-1.5" />
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           );
         })}
