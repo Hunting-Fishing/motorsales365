@@ -263,11 +263,9 @@ type Props = {
   onChange: (next: VehicleQuality) => void;
   /** Show per-field errors after a failed submit. Pass the issues array from validateVehicleQuality. */
   issues?: VehicleQualityIssue[];
-  /** Optional scanner slot rendered next to the VIN field (e.g. <VinScanDialog />). */
-  vinScanSlot?: React.ReactNode;
 };
 
-export function VehicleQualityFields({ category, value, onChange, issues = [], vinScanSlot }: Props) {
+export function VehicleQualityFields({ category, value, onChange, issues = [] }: Props) {
   const set = <K extends keyof VehicleQuality>(k: K, v: VehicleQuality[K]) =>
     onChange({ ...value, [k]: v });
 
@@ -277,7 +275,7 @@ export function VehicleQualityFields({ category, value, onChange, issues = [], v
   const completeness = vehicleQualityCompleteness(category, value);
 
   return (
-    <div className="space-y-4 rounded-xl border border-border bg-card/40 p-4">
+    <div className="space-y-2 rounded-lg border border-border bg-card/40 p-3">
       <div>
         <h3 className="font-display text-base font-semibold">Vehicle details & documents</h3>
         <p className="text-xs text-muted-foreground">
@@ -286,7 +284,7 @@ export function VehicleQualityFields({ category, value, onChange, issues = [], v
       </div>
 
       {/* Completeness meter */}
-      <div className="rounded-lg border border-border/60 bg-background/40 p-3">
+      <div className="rounded-md border border-border/60 bg-background/40 p-2">
         <div className="mb-1.5 flex items-center justify-between text-xs">
           <span className="flex items-center gap-1.5 font-medium">
             {completeness.percent === 100 ? (
@@ -309,7 +307,7 @@ export function VehicleQualityFields({ category, value, onChange, issues = [], v
         )}
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-2 sm:grid-cols-2">
         <FieldShell label="Variant / trim" error={errFor("variant")}>
           <Input
             placeholder={category === "car" ? "e.g. 1.3 E AT" : "e.g. Standard / Premium"}
@@ -458,25 +456,6 @@ export function VehicleQualityFields({ category, value, onChange, issues = [], v
           </div>
         )}
 
-        <div className="sm:col-span-2">
-          <FieldShell
-            label="VIN / chassis (kept private to buyer on request)"
-            error={errFor("vin_chassis")}
-            hint="11–17 letters and numbers, no I/O/Q. Shown only when a buyer requests verification."
-          >
-            <div className="flex gap-2">
-              <Input
-                placeholder="Optional"
-                value={value.vin_chassis ?? ""}
-                maxLength={17}
-                onChange={(e) =>
-                  set("vin_chassis", e.target.value.toUpperCase().replace(/\s+/g, ""))
-                }
-              />
-              {vinScanSlot}
-            </div>
-          </FieldShell>
-        </div>
       </div>
 
       <div className="flex flex-wrap gap-4 pt-2">
