@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import {
   Select,
@@ -14,11 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Search, Plus, X, Pencil, Lightbulb, Loader2 } from "lucide-react";
+import { Search, Plus, Lightbulb, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { FUEL_STATION_CATALOG, UNIT_OPTIONS, type CatalogItem } from "@/data/fuel-station-catalog";
-import { blankService, type ServiceFormValue } from "./service-catalog-picker.utils";
+import { UNIT_OPTIONS, type CatalogItem } from "@/data/fuel-station-catalog";
+import { type ServiceFormValue } from "./service-catalog-picker.utils";
 import {
   listCatalogForType,
   submitServiceSuggestion,
@@ -43,122 +41,22 @@ export function CatalogPicker({
   existingKeys: Set<string>;
   onPick: (item: CatalogItem) => void;
   onCustom: () => void;
-  /** Business type slug. "fuel_station" uses the bundled in-code catalog;
-   * everything else loads the DB-backed catalog for that type. */
+  /** Business type slug — loads the DB-backed catalog tailored to that type. */
   typeSlug?: string | null;
   /** Used when submitting a "suggest a new item" request. */
   businessId?: string | null;
 }) {
-  const useFuelCatalog = typeSlug === "fuel_station";
-  const [q, setQ] = useState("");
-  const [activeGroup, setActiveGroup] = useState<string>(FUEL_STATION_CATALOG[0].key);
-
-  const filtered = useMemo(() => {
-    if (!useFuelCatalog) return null;
-    const term = q.trim().toLowerCase();
-    if (!term) return null;
-    const hits: { group: string; item: CatalogItem }[] = [];
-    for (const g of FUEL_STATION_CATALOG) {
-      for (const it of g.items) {
-        if (it.title.toLowerCase().includes(term) || it.description?.toLowerCase().includes(term)) {
-          hits.push({ group: g.label, item: it });
-        }
-      }
-    }
-    return hits.slice(0, 40);
-  }, [q, useFuelCatalog]);
-
-  // Non-fuel: DB-backed catalog tailored to this business type, with a
-  // "suggest a new item" flow that notifies admins.
-  if (!useFuelCatalog) {
-    return (
-      <DbCatalogPicker
-        typeSlug={typeSlug ?? null}
-        businessId={businessId ?? null}
-        existingKeys={existingKeys}
-        onPick={onPick}
-        onCustom={onCustom}
-      />
-    );
-  }
-
   return (
-    <Card className="overflow-hidden border-primary/30">
-      <div className="border-b border-border bg-muted/40 p-3">
-        <div className="mb-2 flex items-center justify-between gap-2">
-          <h3 className="text-sm font-semibold">Pick from the fuel-station catalog</h3>
-          <Button size="sm" variant="outline" onClick={onCustom}>
-            <Plus className="mr-1 h-4 w-4" /> Custom item
-          </Button>
-        </div>
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search fuels, lubricants, car wash, store items…"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-      </div>
-
-      {filtered ? (
-        <div className="max-h-80 overflow-y-auto p-2">
-          {filtered.length === 0 ? (
-            <div className="p-6 text-center text-sm text-muted-foreground">
-              No matches.{" "}
-              <button className="text-primary underline" onClick={onCustom}>
-                Add a custom item
-              </button>
-              .
-            </div>
-          ) : (
-            <div className="grid gap-1">
-              {filtered.map(({ group, item }) => (
-                <CatalogRow
-                  key={item.key}
-                  item={item}
-                  groupLabel={group}
-                  disabled={existingKeys.has(item.key)}
-                  onPick={onPick}
-                />
-              ))}
-            </div>
-          )}
-        </div>
-      ) : (
-        <Tabs value={activeGroup} onValueChange={setActiveGroup}>
-          <div className="overflow-x-auto">
-            <TabsList className="m-2 inline-flex w-max">
-              {FUEL_STATION_CATALOG.map((g) => (
-                <TabsTrigger key={g.key} value={g.key} className="text-xs">
-                  {g.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </div>
-          {FUEL_STATION_CATALOG.map((g) => (
-            <TabsContent key={g.key} value={g.key} className="m-0">
-              {g.description && (
-                <p className="px-4 pb-1 pt-1 text-xs text-muted-foreground">{g.description}</p>
-              )}
-              <div className="grid max-h-72 gap-1 overflow-y-auto p-2 sm:grid-cols-2">
-                {g.items.map((item) => (
-                  <CatalogRow
-                    key={item.key}
-                    item={item}
-                    disabled={existingKeys.has(item.key)}
-                    onPick={onPick}
-                  />
-                ))}
-              </div>
-            </TabsContent>
-          ))}
-        </Tabs>
-      )}
-    </Card>
+    <DbCatalogPicker
+      typeSlug={typeSlug ?? null}
+      businessId={businessId ?? null}
+      existingKeys={existingKeys}
+      onPick={onPick}
+      onCustom={onCustom}
+    />
   );
 }
+
 
 function CatalogRow({
   item,
