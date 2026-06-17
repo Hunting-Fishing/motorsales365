@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type KeyboardEvent } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,6 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +34,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Plus, Trash2, BarChart3, Loader2 } from "lucide-react";
+import { Plus, Trash2, BarChart3, Loader2, X } from "lucide-react";
 import { toast } from "sonner";
 import {
   listCatalogForType,
@@ -34,6 +42,25 @@ import {
   getServicePriceStats,
   type CatalogEntry,
 } from "@/lib/service-catalog.functions";
+import { UNIT_OPTIONS } from "@/data/fuel-station-catalog";
+import { SERVICE_TAG_SUGGESTIONS } from "@/data/service-tags";
+
+export type RegionScope =
+  | "on_site"
+  | "barangay"
+  | "city"
+  | "province"
+  | "region"
+  | "nationwide";
+
+export const REGION_SCOPE_OPTIONS: { value: RegionScope; label: string }[] = [
+  { value: "on_site", label: "On-site only" },
+  { value: "barangay", label: "Barangay" },
+  { value: "city", label: "City / Municipality" },
+  { value: "province", label: "Province" },
+  { value: "region", label: "Region" },
+  { value: "nationwide", label: "Nationwide" },
+];
 
 export type DraftService = {
   /** Catalog id, or null when this row is a pending suggestion. */
@@ -43,7 +70,13 @@ export type DraftService = {
   description: string | null;
   unit: string | null;
   price_php: number | null;
+  max_price_php: number | null;
   notes: string | null;
+  region_scope: RegionScope | null;
+  service_radius_km: number | null;
+  eta_minutes: number | null;
+  tags: string[];
+  available_24_7: boolean;
 };
 
 export function ServicesTable({
@@ -68,6 +101,8 @@ export function ServicesTable({
   const [sDesc, setSDesc] = useState("");
   const [sPrice, setSPrice] = useState("");
   const [sSubmitting, setSSubmitting] = useState(false);
+
+  const tagSuggestions = SERVICE_TAG_SUGGESTIONS[typeSlug] ?? SERVICE_TAG_SUGGESTIONS.default;
 
   useEffect(() => {
     if (!typeSlug) return;
@@ -97,7 +132,13 @@ export function ServicesTable({
         description: entry.description,
         unit: entry.default_unit,
         price_php: null,
+        max_price_php: null,
         notes: null,
+        region_scope: null,
+        service_radius_km: null,
+        eta_minutes: null,
+        tags: [],
+        available_24_7: false,
       },
     ]);
   };
@@ -134,10 +175,18 @@ export function ServicesTable({
           description: sDesc.trim() || null,
           unit: sUnit || null,
           price_php: priceNum && !Number.isNaN(priceNum) ? priceNum : null,
+          max_price_php: null,
           notes: null,
+          region_scope: null,
+          service_radius_km: null,
+          eta_minutes: null,
+          tags: [],
+          available_24_7: false,
         },
       ]);
-      toast.success("Sent for review — your service is listed now and goes live once an admin approves it.");
+      toast.success(
+        "Sent for review — your service is listed now and goes live once an admin approves it.",
+      );
       setSuggestOpen(false);
       setSTitle("");
       setSDesc("");
@@ -164,14 +213,18 @@ export function ServicesTable({
         <div>
           <h3 className="text-sm font-semibold">Services & pricing</h3>
           <p className="text-xs text-muted-foreground">
-            Add each service you offer with its price. Customers can compare prices across providers.
+            Add each service with price, coverage, ETA and tags. Customers filter and sort by these on the directory.
           </p>
         </div>
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button size="sm" type="button" disabled={loading}>
-                {loading ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : <Plus className="mr-1 h-4 w-4" />}
+                {loading ? (
+                  <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                ) : (
+                  <Plus className="mr-1 h-4 w-4" />
+                )}
                 Add service
               </Button>
             </DropdownMenuTrigger>
@@ -180,7 +233,7 @@ export function ServicesTable({
               <DropdownMenuSeparator />
               {catalog.length === 0 && (
                 <div className="px-2 py-3 text-xs text-muted-foreground">
-                  No catalog entries yet. Use “Suggest new” below.
+                  No catalog entries yet. Use “Add custom service” below.
                 </div>
               )}
               {catalog.map((entry) => {
@@ -199,7 +252,9 @@ export function ServicesTable({
                           /{entry.default_unit}
                         </span>
                       )}
-                      {used && <span className="ml-2 text-[10px] text-muted-foreground">added</span>}
+                      {used && (
+                        <span className="ml-2 text-[10px] text-muted-foreground">added</span>
+                      )}
                     </span>
                     {entry.description && (
                       <span className="line-clamp-1 text-[11px] text-muted-foreground">
@@ -230,77 +285,29 @@ export function ServicesTable({
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-muted/30 text-left text-xs uppercase text-muted-foreground">
+            <thead className="bg-muted/30 text-left text-[11px] uppercase tracking-wide text-muted-foreground">
               <tr>
                 <th className="px-3 py-2">Service</th>
-                <th className="px-3 py-2">Your price (₱)</th>
+                <th className="px-3 py-2">From ₱</th>
+                <th className="px-3 py-2">To ₱</th>
                 <th className="px-3 py-2">Unit</th>
-                <th className="px-3 py-2">Notes</th>
+                <th className="px-3 py-2">Note</th>
+                <th className="px-3 py-2">Coverage</th>
+                <th className="px-3 py-2">ETA (min)</th>
                 <th className="px-3 py-2">Market</th>
                 <th className="px-3 py-2"></th>
               </tr>
             </thead>
             <tbody>
               {value.map((row, idx) => (
-                <tr key={`${row.catalog_id ?? row.pending_suggestion_id ?? "row"}-${idx}`} className="border-t border-border align-top">
-                  <td className="px-3 py-2">
-                    <div className="font-medium">{row.title}</div>
-                    {row.description && (
-                      <div className="line-clamp-2 text-xs text-muted-foreground">{row.description}</div>
-                    )}
-                    {row.pending_suggestion_id && (
-                      <Badge variant="outline" className="mt-1 text-[10px]">
-                        Pending review
-                      </Badge>
-                    )}
-                  </td>
-                  <td className="px-3 py-2">
-                    <Input
-                      inputMode="decimal"
-                      className="w-28"
-                      value={row.price_php ?? ""}
-                      placeholder="e.g. 200"
-                      onChange={(e) => {
-                        const v = e.target.value.trim();
-                        patchAt(idx, { price_php: v === "" ? null : Number(v) });
-                      }}
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <Input
-                      className="w-20"
-                      value={row.unit ?? ""}
-                      placeholder="unit"
-                      onChange={(e) => patchAt(idx, { unit: e.target.value || null })}
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    <Input
-                      className="min-w-[10rem]"
-                      value={row.notes ?? ""}
-                      placeholder='e.g. "+ fuel at pump"'
-                      onChange={(e) => patchAt(idx, { notes: e.target.value || null })}
-                    />
-                  </td>
-                  <td className="px-3 py-2">
-                    {row.catalog_id ? (
-                      <MarketStats catalogId={row.catalog_id} excludeBusinessId={businessId ?? null} />
-                    ) : (
-                      <span className="text-xs text-muted-foreground">—</span>
-                    )}
-                  </td>
-                  <td className="px-3 py-2 text-right">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      type="button"
-                      onClick={() => removeAt(idx)}
-                      aria-label="Remove service"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </td>
-                </tr>
+                <ServiceRow
+                  key={`${row.catalog_id ?? row.pending_suggestion_id ?? "row"}-${idx}`}
+                  row={row}
+                  businessId={businessId ?? null}
+                  tagSuggestions={tagSuggestions}
+                  onPatch={(patch) => patchAt(idx, patch)}
+                  onRemove={() => removeAt(idx)}
+                />
               ))}
             </tbody>
           </table>
@@ -372,6 +379,274 @@ export function ServicesTable({
   );
 }
 
+function ServiceRow({
+  row,
+  businessId,
+  tagSuggestions,
+  onPatch,
+  onRemove,
+}: {
+  row: DraftService;
+  businessId: string | null;
+  tagSuggestions: string[];
+  onPatch: (patch: Partial<DraftService>) => void;
+  onRemove: () => void;
+}) {
+  const [tagDraft, setTagDraft] = useState("");
+
+  const radiusRelevant =
+    row.region_scope === null ||
+    row.region_scope === "on_site" ||
+    row.region_scope === "barangay" ||
+    row.region_scope === "city";
+
+  const addTag = (raw: string) => {
+    const t = raw.trim().toLowerCase();
+    if (!t) return;
+    if (t.length > 30) {
+      toast.error("Tag too long (max 30 chars)");
+      return;
+    }
+    if (row.tags.includes(t)) return;
+    if (row.tags.length >= 12) {
+      toast.error("Max 12 tags per service");
+      return;
+    }
+    onPatch({ tags: [...row.tags, t] });
+    setTagDraft("");
+  };
+
+  const removeTag = (t: string) =>
+    onPatch({ tags: row.tags.filter((x) => x !== t) });
+
+  const onTagKey = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      addTag(tagDraft);
+    } else if (e.key === "Backspace" && tagDraft === "" && row.tags.length > 0) {
+      e.preventDefault();
+      onPatch({ tags: row.tags.slice(0, -1) });
+    }
+  };
+
+  const unmatchedSuggestions = tagSuggestions.filter((t) => !row.tags.includes(t)).slice(0, 8);
+
+  return (
+    <>
+      <tr className="border-t border-border align-top">
+        <td className="px-3 py-2">
+          <div className="font-medium leading-tight">{row.title}</div>
+          {row.description && (
+            <div className="line-clamp-2 text-xs text-muted-foreground">{row.description}</div>
+          )}
+          {row.pending_suggestion_id && (
+            <Badge variant="outline" className="mt-1 text-[10px]">
+              Pending review
+            </Badge>
+          )}
+        </td>
+        <td className="px-3 py-2">
+          <Input
+            inputMode="decimal"
+            className="w-24"
+            value={row.price_php ?? ""}
+            placeholder="200"
+            onChange={(e) => {
+              const v = e.target.value.trim();
+              onPatch({ price_php: v === "" ? null : Number(v) });
+            }}
+          />
+        </td>
+        <td className="px-3 py-2">
+          <Input
+            inputMode="decimal"
+            className="w-24"
+            value={row.max_price_php ?? ""}
+            placeholder="optional"
+            onChange={(e) => {
+              const v = e.target.value.trim();
+              onPatch({ max_price_php: v === "" ? null : Number(v) });
+            }}
+          />
+        </td>
+        <td className="px-3 py-2">
+          <Select
+            value={row.unit ?? ""}
+            onValueChange={(v) => onPatch({ unit: v || null })}
+          >
+            <SelectTrigger className="w-[140px]">
+              <SelectValue placeholder="unit" />
+            </SelectTrigger>
+            <SelectContent>
+              {UNIT_OPTIONS.map((u) => (
+                <SelectItem key={u.value} value={u.value}>
+                  {u.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </td>
+        <td className="px-3 py-2">
+          <Input
+            className="min-w-[10rem]"
+            value={row.notes ?? ""}
+            placeholder='"+ fuel at pump"'
+            maxLength={120}
+            onChange={(e) => onPatch({ notes: e.target.value || null })}
+          />
+        </td>
+        <td className="px-3 py-2">
+          <Select
+            value={row.region_scope ?? ""}
+            onValueChange={(v) =>
+              onPatch({ region_scope: (v || null) as RegionScope | null })
+            }
+          >
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="—" />
+            </SelectTrigger>
+            <SelectContent>
+              {REGION_SCOPE_OPTIONS.map((r) => (
+                <SelectItem key={r.value} value={r.value}>
+                  {r.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </td>
+        <td className="px-3 py-2">
+          <Input
+            inputMode="numeric"
+            className="w-20"
+            value={row.eta_minutes ?? ""}
+            placeholder="—"
+            onChange={(e) => {
+              const v = e.target.value.trim();
+              const n = v === "" ? null : Math.max(0, Math.floor(Number(v)));
+              onPatch({ eta_minutes: Number.isNaN(n as number) ? null : n });
+            }}
+          />
+        </td>
+        <td className="px-3 py-2">
+          {row.catalog_id ? (
+            <MarketStats catalogId={row.catalog_id} excludeBusinessId={businessId} />
+          ) : (
+            <span className="text-xs text-muted-foreground">—</span>
+          )}
+        </td>
+        <td className="px-3 py-2 text-right">
+          <Button
+            size="sm"
+            variant="ghost"
+            type="button"
+            onClick={onRemove}
+            aria-label="Remove service"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </td>
+      </tr>
+      <tr className="border-t border-border/40 bg-muted/20">
+        <td colSpan={9} className="px-3 py-2">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+            {/* Tag chips */}
+            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
+              <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+                Tags
+              </span>
+              {row.tags.map((t) => (
+                <Badge
+                  key={t}
+                  variant="secondary"
+                  className="gap-1 pl-2 pr-1 text-[11px]"
+                >
+                  {t}
+                  <button
+                    type="button"
+                    onClick={() => removeTag(t)}
+                    aria-label={`Remove tag ${t}`}
+                    className="rounded-sm hover:bg-background/60"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Input
+                    value={tagDraft}
+                    onChange={(e) => setTagDraft(e.target.value)}
+                    onKeyDown={onTagKey}
+                    onBlur={() => tagDraft && addTag(tagDraft)}
+                    placeholder="+ tag"
+                    className="h-7 w-28 text-xs"
+                  />
+                </PopoverTrigger>
+                {unmatchedSuggestions.length > 0 && (
+                  <PopoverContent
+                    align="start"
+                    className="w-56 p-2"
+                    onOpenAutoFocus={(e) => e.preventDefault()}
+                  >
+                    <p className="mb-1 text-[10px] uppercase text-muted-foreground">
+                      Suggestions
+                    </p>
+                    <div className="flex flex-wrap gap-1">
+                      {unmatchedSuggestions.map((t) => (
+                        <button
+                          key={t}
+                          type="button"
+                          onClick={() => addTag(t)}
+                          className="rounded-full border border-border bg-background px-2 py-0.5 text-[11px] hover:bg-accent"
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                )}
+              </Popover>
+            </div>
+
+            {/* Radius */}
+            <label className={`flex items-center gap-1 text-xs ${radiusRelevant ? "" : "opacity-60"}`}>
+              <span className="text-muted-foreground">Radius</span>
+              <Input
+                inputMode="numeric"
+                className="h-7 w-16"
+                value={row.service_radius_km ?? ""}
+                placeholder="—"
+                onChange={(e) => {
+                  const v = e.target.value.trim();
+                  const n = v === "" ? null : Math.max(0, Math.floor(Number(v)));
+                  onPatch({
+                    service_radius_km: Number.isNaN(n as number) ? null : n,
+                  });
+                }}
+              />
+              <span className="text-muted-foreground">km</span>
+            </label>
+
+            {/* 24/7 */}
+            <label className="flex items-center gap-1.5 text-xs">
+              <Switch
+                checked={row.available_24_7}
+                onCheckedChange={(checked) => {
+                  const next = new Set(row.tags);
+                  if (checked) next.add("24/7");
+                  else next.delete("24/7");
+                  onPatch({ available_24_7: checked, tags: Array.from(next) });
+                }}
+              />
+              <span>24/7</span>
+            </label>
+          </div>
+        </td>
+      </tr>
+    </>
+  );
+}
+
 function MarketStats({
   catalogId,
   excludeBusinessId,
@@ -385,7 +660,13 @@ function MarketStats({
     avg: number | null;
     min: number | null;
     max: number | null;
-    samples: { businessId: string; name: string; slug: string; price: number; unit: string | null }[];
+    samples: {
+      businessId: string;
+      name: string;
+      slug: string;
+      price: number;
+      unit: string | null;
+    }[];
   } | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -398,18 +679,22 @@ function MarketStats({
   }, [catalogId, excludeBusinessId, statsFn]);
 
   if (loading) return <span className="text-xs text-muted-foreground">…</span>;
-  if (!s || s.count === 0) return <span className="text-xs text-muted-foreground">No data</span>;
+  if (!s || s.count === 0)
+    return <span className="text-xs text-muted-foreground">No data</span>;
 
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button type="button" className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+        <button
+          type="button"
+          className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
+        >
           <BarChart3 className="h-3.5 w-3.5" />
           {s.count} · avg ₱{s.avg}
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-72">
-        <div className="text-xs font-semibold mb-2">
+        <div className="mb-2 text-xs font-semibold">
           {s.count} businesses · ₱{s.min} – ₱{s.max} (avg ₱{s.avg})
         </div>
         {s.samples.length === 0 ? (
@@ -417,7 +702,7 @@ function MarketStats({
             Sample list hidden until 3+ providers price this service.
           </p>
         ) : (
-          <ul className="space-y-1 text-xs max-h-48 overflow-y-auto">
+          <ul className="max-h-48 space-y-1 overflow-y-auto text-xs">
             {s.samples
               .slice()
               .sort((a, b) => a.price - b.price)

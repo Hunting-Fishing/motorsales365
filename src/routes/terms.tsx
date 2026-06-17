@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 15, 2026 (re-priced 365 Dispatch tiers: Solo ₱250/mo 1 driver, Team ₱500/mo up to 5 drivers, Unlimited ₱1,000/mo unlimited drivers; legacy Starter/Pro/Fleet plans grandfathered.)";
+  const lastUpdated = "June 17, 2026 (expanded service listing metadata: price ranges, coverage area, response time, service radius, and tag facets shown publicly on business pages and used for directory filtering.)";
 
   return (
     <SiteLayout>

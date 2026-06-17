@@ -1865,57 +1865,75 @@ export type Database = {
       business_services: {
         Row: {
           active: boolean
+          available_24_7: boolean
           business_id: string
           catalog_id: string | null
           catalog_key: string | null
           category: string | null
           created_at: string
           description: string | null
+          eta_minutes: number | null
           id: string
+          max_price_php: number | null
           pending_suggestion_id: string | null
           photo_url: string | null
           price_label: string | null
           price_php: number | null
+          region_scope: string | null
           sale_price_php: number | null
+          service_radius_km: number | null
           sort_order: number
+          tags: string[]
           title: string
           unit: string | null
           updated_at: string
         }
         Insert: {
           active?: boolean
+          available_24_7?: boolean
           business_id: string
           catalog_id?: string | null
           catalog_key?: string | null
           category?: string | null
           created_at?: string
           description?: string | null
+          eta_minutes?: number | null
           id?: string
+          max_price_php?: number | null
           pending_suggestion_id?: string | null
           photo_url?: string | null
           price_label?: string | null
           price_php?: number | null
+          region_scope?: string | null
           sale_price_php?: number | null
+          service_radius_km?: number | null
           sort_order?: number
+          tags?: string[]
           title: string
           unit?: string | null
           updated_at?: string
         }
         Update: {
           active?: boolean
+          available_24_7?: boolean
           business_id?: string
           catalog_id?: string | null
           catalog_key?: string | null
           category?: string | null
           created_at?: string
           description?: string | null
+          eta_minutes?: number | null
           id?: string
+          max_price_php?: number | null
           pending_suggestion_id?: string | null
           photo_url?: string | null
           price_label?: string | null
           price_php?: number | null
+          region_scope?: string | null
           sale_price_php?: number | null
+          service_radius_km?: number | null
           sort_order?: number
+          tags?: string[]
           title?: string
           unit?: string | null
           updated_at?: string

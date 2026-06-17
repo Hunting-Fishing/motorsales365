@@ -136,3 +136,52 @@ export const SERVICE_CATEGORIES = new Set(["repair", "bodyshop", "parts", "salva
 export function tagGroupFor(key: string): TagGroup | undefined {
   return TAG_GROUPS.find((g) => g.key === key);
 }
+
+// Short, lowercase facet tags shown as suggestions on each service row in the
+// business editor. Keyed by business_type slug; "default" covers unknown types.
+// Tags here power the public directory's filter chips, so keep them concise
+// and standardized.
+export const SERVICE_TAG_SUGGESTIONS: Record<string, string[]> = {
+  default: ["24/7", "appointment", "walk-in", "warranty", "pickup-dropoff", "mobile"],
+  tow: [
+    "24/7",
+    "flatbed",
+    "wheel-lift",
+    "heavy-duty",
+    "motorcycle",
+    "long-distance",
+    "accident",
+    "lockout",
+    "winch-out",
+  ],
+  roadside: ["24/7", "jump-start", "tire-change", "fuel-delivery", "lockout", "battery"],
+  fuel_station: ["diesel", "gas", "premium", "lpg", "e-payment", "convenience-store"],
+  repair_shop: [
+    "diagnostics",
+    "warranty",
+    "oem-parts",
+    "diesel",
+    "ev-hybrid",
+    "performance",
+    "appointment",
+  ],
+  tire_shop: ["mounting", "balancing", "alignment", "patch", "nitrogen", "tubeless"],
+  battery_shop: ["delivery", "install", "warranty", "trade-in"],
+  carwash: ["hand-wash", "interior", "engine-bay", "motorcycle", "wax", "ceramic"],
+  bodyshop: ["insurance-accepted", "paint", "dent-repair", "frame", "loaner"],
+  parts_supplier: ["oem", "aftermarket", "used", "rebuilt", "delivery", "cod"],
+  dealership: ["brand-new", "test-drive", "trade-in", "financing", "warranty"],
+  used_dealer: ["financing", "trade-in", "warranty", "casa-maintained"],
+  rental: ["self-drive", "with-driver", "long-term", "airport-pickup", "delivery"],
+  driving_school: ["lto-accredited", "manual", "automatic", "tdc", "pdc"],
+  inspection: ["pms", "pre-purchase", "obd", "emissions"],
+  insurance: ["ctpl", "comprehensive", "accredited-shops", "quick-claims"],
+  motorcycle_shop: ["scooter", "underbone", "big-bike", "tuning", "parts"],
+  audio_tint: ["sound-system", "ceramic-tint", "alarm", "dashcam"],
+  accessories: ["led", "mats", "covers", "racks", "delivery"],
+  transport: ["lipat-bahay", "delivery", "long-distance", "cold-chain", "fragile"],
+  salvage: ["used-parts", "core-buyback", "pick-a-part", "vehicle-buyback"],
+  financing: ["online-application", "fast-approval", "no-collateral", "trade-in"],
+  lto: ["renewal", "registration", "drivers-license", "plate-pickup"],
+  corporate_fleet: ["fleet-discount", "monthly-billing", "priority-service"],
+};
