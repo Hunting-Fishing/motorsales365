@@ -628,39 +628,70 @@ function BusinessProfilePage() {
                 <h2 className="font-display text-lg font-semibold">Services</h2>
               </div>
               <div className="grid gap-3 sm:grid-cols-2">
-                {services.map((s: any) => (
-                  <div key={s.id} className="flex gap-3 rounded-lg border border-border p-3">
-                    {s.photo_url && (
-                      <img
-                        src={s.photo_url}
-                        alt={s.title ? `${s.title} service photo` : "Service photo"}
-                        className="h-16 w-16 shrink-0 rounded-md object-cover"
-                      />
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="font-medium">{s.title}</div>
-                        {(() => {
-                          const label =
-                            s.price_label ||
-                            (s.price_php != null
-                              ? `₱${Number(s.price_php).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}${s.unit ? `/${s.unit}` : ""}`
-                              : null);
-                          return label ? (
-                            <Badge variant="secondary" className="shrink-0 font-semibold">
-                              {label}
-                            </Badge>
-                          ) : null;
-                        })()}
-                      </div>
-                      {s.description && (
-                        <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
-                          {s.description}
-                        </p>
+                {services.map((s: any) => {
+                  const hasMax =
+                    s.max_price_php != null &&
+                    s.price_php != null &&
+                    Number(s.max_price_php) > Number(s.price_php);
+                  const fmt = (n: number) =>
+                    `₱${Number(n).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`;
+                  const priceLabel =
+                    s.price_label ||
+                    (s.price_php != null
+                      ? hasMax
+                        ? `${fmt(s.price_php)} – ${fmt(s.max_price_php)}${s.unit ? `/${s.unit}` : ""}`
+                        : `${fmt(s.price_php)}${s.unit ? `/${s.unit}` : ""}`
+                      : null);
+                  const tags: string[] = Array.isArray(s.tags) ? s.tags : [];
+                  const visibleTags = tags.filter((t) => t !== "24/7").slice(0, 4);
+                  return (
+                    <div key={s.id} className="flex gap-3 rounded-lg border border-border p-3">
+                      {s.photo_url && (
+                        <img
+                          src={s.photo_url}
+                          alt={s.title ? `${s.title} service photo` : "Service photo"}
+                          className="h-16 w-16 shrink-0 rounded-md object-cover"
+                        />
                       )}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="font-medium">{s.title}</div>
+                          {priceLabel && (
+                            <Badge variant="secondary" className="shrink-0 font-semibold">
+                              {priceLabel}
+                            </Badge>
+                          )}
+                        </div>
+                        {s.description && (
+                          <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                            {s.description}
+                          </p>
+                        )}
+                        {(s.available_24_7 ||
+                          s.eta_minutes != null ||
+                          visibleTags.length > 0) && (
+                          <div className="mt-2 flex flex-wrap items-center gap-1">
+                            {s.available_24_7 && (
+                              <Badge className="bg-emerald-600 text-[10px] text-white hover:bg-emerald-600">
+                                24/7
+                              </Badge>
+                            )}
+                            {s.eta_minutes != null && (
+                              <Badge variant="outline" className="text-[10px]">
+                                ETA ~{s.eta_minutes} min
+                              </Badge>
+                            )}
+                            {visibleTags.map((t) => (
+                              <Badge key={t} variant="outline" className="text-[10px]">
+                                {t}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </Card>
           )}
