@@ -417,6 +417,19 @@ function BusinessProfilePage() {
                         </a>
                       </Button>
                     )}
+                    {facebookHref && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        asChild
+                        onClick={() => track("facebook_click")}
+                      >
+                        <a href={facebookHref} target="_blank" rel="noreferrer">
+                          <Facebook className="mr-1 h-4 w-4" />
+                          Facebook
+                        </a>
+                      </Button>
+                    )}
                     <Button size="sm" variant="outline" asChild>
                       <a href="#inquiry">
                         <Mail className="mr-1 h-4 w-4" />
