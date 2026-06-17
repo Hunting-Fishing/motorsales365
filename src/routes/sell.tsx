@@ -245,6 +245,7 @@ function SellPage() {
   const { payment: paymentStatus, listingId: pendingListingId } = Route.useSearch();
 
   const [category, setCategory] = useState("car");
+  const [activeTab, setActiveTab] = useState<"basics" | "details" | "location" | "plan" | "media">("basics");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
