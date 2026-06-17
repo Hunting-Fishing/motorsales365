@@ -1,65 +1,91 @@
-## Problem
-
-Right now, clicking a catalog item (e.g. "Flatbed Tow") opens the full `ServiceEditor` form (photo upload, title, description, pricing block, custom price label, public toggle). That is too much for Filipino business owners who aren't tech-savvy, and the resulting data is inconsistent across businesses so buyers can't easily compare prices.
-
-The previous design was a simple spreadsheet-style menu: one row per service with just `Service | Price | (optional region/note)`. We want that back as the default flow, and standardize it across every business type so buyers see the same shape everywhere.
 
 ## Goal
 
-A simple, standardized "restaurant menu" style editor:
-- Pick from the catalog → row appears immediately in the list (no modal/form).
-- Each row is a single line: **Service name | Price (₱) | Unit | (optional) Note** with a delete button.
-- One save action commits any edits. No photo upload, no description, no "active" switch by default — that lives behind an optional "More" toggle for power users.
-- Identical UX for every business type (tow, repair, carwash, tires, fuel, etc.), so listings stay comparable.
+Bring back the clean, compact "restaurant menu" service editor that already exists in the codebase as `src/components/business/services-table.tsx`. You were right — that exact format is still in the repo, just disconnected. The current Services tab is using a heavier picker + per‑service modal that doesn't match what we shipped originally.
 
-## Scope
+## What lives in the codebase already (unused)
 
-Frontend only. Database schema, server functions, and the catalog data stay as-is. We're changing the editor presentation, not the saved fields.
+- `src/components/business/services-table.tsx` — `ServicesTable` component:
+  - Single **"+ Add service" dropdown** (one‑line items, tailored to the business type via `listCatalogForType(typeSlug)`)
+  - Spreadsheet table: **Service · Price (₱) · Unit · Notes · Market · Delete**
+  - **Custom item** = small inline dialog (name, price, unit, description) → adds the row immediately AND submits to admin for review (`submitServiceSuggestion`). Row shows a "Pending review" badge until approved.
+  - **Market** column = popover with `count · avg · min–max` from `getServicePriceStats`, plus a sample list once 3+ providers price it. This is exactly the data‑collection / cross‑business comparison angle you asked for.
+- `src/lib/business-services-save.functions.ts` — `saveBusinessServices` server fn that persists the whole `DraftService[]` in one call (delete + insert, RLS‑enforced).
 
-## Changes
+Both have been sitting idle since we switched to the catalog‑card UI.
 
-### 1. `src/components/business/service-catalog-picker.tsx`
-- Keep `CatalogPicker` exactly as-is (search + suggest + custom + grouped rows). It's working.
-- Add a new exported `ServiceMenuRow` component: an inline row with
-  - Service title (read-only, from catalog)
-  - `₱ price` input (numeric, the only thing most owners need to fill)
-  - Unit dropdown (defaults to the catalog item's `default_unit`, dropdown shows `UNIT_OPTIONS`)
-  - Short "Note" input (maps to existing `price_label` or `description` — pick `price_label` so it shows on the public page next to the price, e.g. "Metro Manila only")
-  - Trash icon to delete
-  - A small "More" disclosure that reveals: photo, long description, promo price, hidden toggle (keeps power-user fields available without cluttering the default view).
-- `PricingFields` stays for the "More" panel but the default row uses a compact inline version.
+## What to change
 
-### 2. `src/routes/dashboard.businesses_.$id.edit.tsx` (services section, ~lines 970–1100)
-- When the user picks a catalog item, **do not** open `ServiceEditor`. Instead, immediately call `upsertBusinessService` with `{ title, catalog_key, category, unit: default_unit }` and refresh — the row joins the menu list.
-- Replace the current `Card` per-service block with `ServiceMenuRow` rows grouped by category (same grouping we already have).
-- Each row autosaves on blur of the price/unit/note inputs (debounced) via `upsertBusinessService`. Buyers always see fresh prices, and owners never hit a "Save" wall.
-- Keep "Custom item" → that one still opens the full `ServiceEditor` (custom items need a title field).
-- Keep delete confirmation.
+### 1. `src/routes/dashboard.businesses_.$id.edit.tsx` — `ServicesTab`
 
-### 3. Public page (`src/routes/businesses.$slug.tsx`)
-- No structural change. The existing `formatServicePrice` already renders `₱price/unit` and respects `price_label`. Standardized rows in the editor will naturally produce standardized output.
+Replace the entire current body (the `showPicker` toggle, `CatalogPicker`, grouped `ServiceMenuRow` rendering, and the `ServiceEditor` modal mount) with the original table:
 
-## Technical notes (for the dev reading this)
+```tsx
+import { ServicesTable, type DraftService } from "@/components/business/services-table";
+import { saveBusinessServices } from "@/lib/business-services-save.functions";
 
-- Autosave: wrap each row in a small `useDebouncedCallback` (200–400ms) around `upsertBusinessService`. On error, toast + revert local state.
-- Type changes: none. `ServiceFormValue` already has `price_php`, `unit`, `price_label`.
-- Sort order: preserve `sort_order` on insert (use `services.length` like today).
-- A11y: each input gets an associated `<Label className="sr-only">` because the column header is shown once at the top of the table.
+function ServicesTab({ businessId, typeSlug, services, onChange }) {
+  const save = useServerFn(saveBusinessServices);
+
+  // Adapt existing DB rows -> DraftService shape the table expects
+  const initial: DraftService[] = useMemo(
+    () => services.map((s) => ({
+      catalog_id: s.catalog_id ?? null,
+      pending_suggestion_id: s.pending_suggestion_id ?? null,
+      title: s.title,
+      description: s.description ?? null,
+      unit: s.unit ?? null,
+      price_php: s.price_php ?? null,
+      notes: s.price_label ?? null,
+    })),
+    [services],
+  );
+
+  const [draft, setDraft] = useState<DraftService[]>(initial);
+  useEffect(() => setDraft(initial), [initial]);
+
+  // Debounced autosave on any change (300–500ms)
+  const dirty = draft !== initial;
+  useDebouncedEffect(() => {
+    if (!dirty) return;
+    save({ data: { businessId, services: draft } })
+      .then(() => onChange());
+  }, [draft], 400);
+
+  if (!typeSlug) return <Card>Choose a business type first.</Card>;
+
+  return <ServicesTable typeSlug={typeSlug} businessId={businessId} value={draft} onChange={setDraft} />;
+}
+```
+
+Delete from the file:
+- `ServiceMenuRow` (lines ~1095–end of that function)
+- `ServiceEditor` (lines ~1204–end of that function)
+- The `CatalogPicker` import and the `showPicker` / grouped-by-category rendering
+
+Keep `upsertBusinessService` / `deleteBusinessService` imports only if they are still used by other tabs in the file; otherwise drop them too.
+
+### 2. Nothing else needs to change
+
+- `services-table.tsx` already does the catalog dropdown, custom‑item dialog, market stats popover, and pending‑review badge — leave it alone.
+- `business-services-save.functions.ts` already handles persistence — leave it alone.
+- Public business page (`src/routes/businesses.$slug.tsx`) reads the same `business_services` rows and keeps working.
+
+## Why this is the right call
+
+- **Clean & compact** — one row per service, fits the screen, no nested cards or modals for the 95% case.
+- **User‑friendly for non‑tech owners** — pick from a list, type a price, done. Custom item is a 3‑field dialog, not a full form.
+- **Standardized across business types** — same UI for fuel stations, tow, repair, etc. Catalog is data‑driven per `typeSlug`.
+- **Growth + data collection** — every custom item goes into `service_suggestions` for admin review and feeds the catalog over time.
+- **Service / comparison** — the **Market** column shows real cross‑business pricing, which is the comparison feature you've wanted users to see when sorting/searching.
+
+## Files to edit
+
+- `src/routes/dashboard.businesses_.$id.edit.tsx` — replace `ServicesTab` body; delete `ServiceMenuRow` and `ServiceEditor`.
 
 ## Out of scope
 
-- Catalog data, suggestions flow, admin review — all unchanged.
-- Products tab — unchanged (this only touches Services).
-- Schema/migrations — none.
-
-## Visual sketch
-
-```text
-Towing                                                    [+ Add from catalog]
-────────────────────────────────────────────────────────────────────────────
- Service                  Price (₱)   Unit       Note                    ⋯
- Flatbed Tow              [  2500  ]  [per trip] [Metro Manila only ]   🗑  ▸More
- Wheel-lift Tow           [  1800  ]  [per trip] [                  ]   🗑  ▸More
- Roadside Jumpstart       [   500  ]  [per job ] [                  ]   🗑  ▸More
-                                                            [+ Custom item]
-```
+- Catalog seed data (already populated for all business types last turn).
+- Admin review screen for `service_suggestions` (already exists).
+- Products tab.
+- DB schema / migrations.
