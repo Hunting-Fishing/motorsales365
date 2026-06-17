@@ -1,72 +1,81 @@
-# Contact Details Upgrade — FB Page, WhatsApp, Brands Table
+# Plan
 
-Goal: extend the "Contact details" card so businesses can capture their Facebook Page link and WhatsApp number, and replace the free-text "Brands carried" textarea with a structured, chip-style brand picker that suggests brands based on the business type (Toyota/Honda for dealers, Michelin/BFGoodrich for tire shops, Shell/Mobil for fuel, etc.) with manual add still allowed.
+## 1. Better phone number formatting
 
-## Changes
+**File:** `src/components/business-page/gallery-contact-tabs.tsx` (+ small helper in `src/data/country-codes.ts`).
 
-### 1. Database (migration)
-- Add to `businesses`:
-  - `facebook_url TEXT` (nullable)
-  - `whatsapp_number TEXT` (nullable, stored as E.164 like `+639XXXXXXXXX`)
-- New table `business_brands`:
-  - `id`, `business_id` (FK → businesses, on delete cascade), `name TEXT NOT NULL`, `slug TEXT` (lowercased, for filter joins later), `sort_order INT`, `created_at`
-  - Unique `(business_id, slug)` to prevent dupes
-  - RLS: owner can CRUD their rows; `anon`+`authenticated` can SELECT (public directory needs to read brands per business)
-  - GRANTs: anon SELECT; authenticated SELECT/INSERT/UPDATE/DELETE; service_role ALL
-  - Index `(business_id, sort_order)` and `(slug)` for future filtering
+- Add a `formatNationalNumber(iso, digits)` helper that inserts dashes per country:
+  - PH (10 digits): `XXX-XXX-XXXX` (e.g. `917-555-1234`).
+  - US/CA (10): `XXX-XXX-XXXX`.
+  - GB (10–11): `XXXX-XXXXXX`.
+  - JP (9–10): `XX-XXXX-XXXX`.
+  - AU (9): `XXX-XXX-XXX`.
+  - Default: group 3-3-rest.
+- Wire it into the `PhoneField` input so the user sees dashes as they type (controlled value = formatted, stored value = digits only). The stored channel value remains E.164 (`+63 917-555-1234` only for display).
+- Display the formatted version in the contact-channels table and on the public business page (`public-sections.tsx` where phone is rendered).
+- Reuse the same helper in the Bookings inbox so the customer's phone is shown formatted, and in `businesses.$slug.book.tsx` for the customer phone input.
 
-### 2. Brand suggestions catalog (`src/data/brand-suggestions.ts` — new)
-Per `business_kind`, a curated list of common brands in the Philippine market:
-- dealership / used_dealership / rental / corporate: Toyota, Honda, Mitsubishi, Nissan, Ford, Hyundai, Kia, Suzuki, Chevrolet, Isuzu, Mazda, MG, Geely, BYD, Foton, Subaru, Lexus, BMW, Mercedes-Benz, Audi
-- motorcycle_shop: Honda, Yamaha, Suzuki, Kawasaki, KTM, Royal Enfield, Rusi, Kymco, SYM, Vespa
-- tire_shop: Michelin, Bridgestone, Yokohama, BFGoodrich, Goodyear, Dunlop, Continental, Pirelli, Maxxis, GT Radial, Westlake, Toyo
-- battery_shop: Motolite, Amaron, GS, 3K, Yuasa, ACDelco
-- fuel_station: Shell, Petron, Caltex, Phoenix, Total, Seaoil, Cleanfuel, Unioil
-- parts_accessories / accessories: Bosch, Denso, NGK, Brembo, KYB, Monroe, Sachs, Mann-Filter, OEM
-- carwash / audio_tint: 3M, Meguiar's, Chemical Guys, Sonax, Llumar, V-Kool, Solar Gard
-- repair_shop / body_paint: Bosch, Castrol, Mobil 1, Shell Helix, 3M, Sikkens, PPG, DuPont
-- towing: (typically empty — show a small "Service brands you partner with" hint)
-- Fallback for `other` / unknown: generic top OEMs
+## 2. Bookings respect business open hours
 
-Export: `getBrandSuggestions(kind: string | null | undefined): string[]`
+Today, weekly availability for bookings is stored separately in `business_availability` and is unrelated to the "Hours" tab (`businesses.hours` JSON via `business-hours.ts`).
 
-### 3. UI — `src/routes/dashboard.businesses_.$id.edit.tsx` (ProfileTab Contact details card)
-Layout stays as a single card with two-column grid; mobile responsive.
-- Row 1: Phone | Email
-- Row 2: Website | Messenger URL
-- Row 3 (new): Facebook Page URL | WhatsApp number (PH-aware input with `+63` hint, auto-normalize)
-- Brands carried section replaces the textarea with:
-  - Chip list of currently saved brands (× to remove, drag-to-reorder optional via simple up/down — skip for now, use insertion order)
-  - Inline input + Add button (Enter to add)
-  - Suggested chips (dashed style) below input: top 8 from `getBrandSuggestions(biz.business_kind)`, "+N more" popover for the rest
-  - Click suggestion → instantly added; duplicates (case-insensitive) ignored
-  - All edits are local state; persisted on Save
+Changes in `src/components/business-page/bookings-tab.tsx` → `WeeklyHoursSection`:
 
-### 4. Server save (`src/lib/business-pages.functions.ts` → `updateBusinessPageSettings`)
-- Extend schema with `facebook_url: lenientUrl(500)`, `whatsapp_number: z.string().max(40).nullable().optional()` (normalize to E.164 `+63…` server-side; strip spaces/dashes)
-- Accept `brands: z.array(z.object({ name: z.string().min(1).max(80) })).max(60).optional()`
-- When `brands` is provided: delete existing `business_brands` rows for the business and re-insert in order (simple, atomic enough for this scale). Compute `slug` = lowercase + collapse whitespace + remove non-alphanumeric.
-- Drop the legacy `brands_carried` write (keep column for back-compat; do not surface in editor).
+- Add a toggle **"Use my business open hours"** (on by default when no custom rows exist).
+- When on: derive availability rows from `businesses.hours.primary` (one row per day per open range, weekday number 0=Sun…6=Sat), show them read-only with a banner "Synced from your Hours tab — edit there to change", and persist them on Save via the existing `replaceWeeklyAvailability`.
+- When off: keep the existing custom editor (per-day ranges, "Custom hours"), so users can override (e.g. shorter booking window than store hours).
+- Add a "Re-sync from Hours" button that re-imports the current open hours into custom mode for fine-tuning.
+- `24h` days map to a single `00:00–23:59` window; `closed` days produce no rows.
 
-### 5. Loader / public page
-- `src/lib/business-pages.functions.ts` loader: also select `facebook_url`, `whatsapp_number`, and fetch `business_brands` ordered by `sort_order`.
-- `src/routes/businesses.$slug.tsx`:
-  - In the contact rail, add Facebook and WhatsApp icon buttons when set (WhatsApp deep-links to `https://wa.me/<digits>`).
-  - Render brands as a chip list (replacing the current `brands_carried` line), falling back to `brands_carried` only if no rows exist (legacy data).
+Slot computation (`business-bookings-slots.ts`) already consumes `availability` rows + exceptions, so no change needed there.
 
-### 6. Terms sync
-- `/terms` "Last updated" bump (data collection now stores Facebook URL, WhatsApp number, and a structured brands list per business).
+## 3. Booking calendar view in the dashboard
 
-## Out of scope (next iteration)
-- Public directory filter "Carries brand: Toyota" — table + slug are set up for it, but the filter UI/query is not built here.
-- Brand logos / icons.
-- Drag-reorder of brand chips.
-- Admin moderation of custom brand names.
+**File:** `src/components/business-page/bookings-tab.tsx` → `BookingsInboxSection`.
 
-## Files
-- New migration (columns + `business_brands` table + grants + RLS + indexes)
-- `src/data/brand-suggestions.ts` (new)
-- `src/lib/business-pages.functions.ts` (schema + save + loader)
-- `src/routes/dashboard.businesses_.$id.edit.tsx` (Contact details card + brands chip editor)
-- `src/routes/businesses.$slug.tsx` (FB + WhatsApp buttons, brands chips)
-- `src/routes/terms.tsx` (Last updated date)
+- Add a **List / Calendar** toggle above the inbox.
+- Calendar view: month grid (using existing `@/components/ui/calendar`) with day badges showing booking counts. Clicking a day reveals that day's bookings grouped by time, with the same status filter and action buttons (confirm / decline / complete / no-show).
+- Each booking row shows: time, service title, customer name + formatted phone, status badge, and the assigned staff member (see #4).
+- Keep the existing list view as default for accessibility.
+
+## 4. Assign bookings to approved staff / owner
+
+**Schema migration** (new file in `supabase/migrations/`):
+
+- Add `assigned_user_id uuid null references auth.users(id)` to `public.business_bookings`.
+- Index on `(business_id, assigned_user_id)`.
+- Update existing RLS so owners and staff with booking access can update `assigned_user_id`; the assignee can also see/update bookings assigned to them.
+- Regenerate types after approval (automatic).
+
+**Server functions** (`src/lib/business-bookings.functions.ts`):
+
+- Extend `updateBookingStatus` (or add `assignBooking`) to accept `assigned_user_id`.
+- Extend `listBookings`/`getBookingConfig` to return staff list (owner + entries from `business_staff` whose role allows bookings and whose `accepted_at` is not null).
+
+**UI** in `BookingsInboxSection` (both list and calendar):
+
+- Per-booking **Assign** dropdown populated with owner + approved staff.
+- Reassigning sends a toast and triggers `onChange()` to refetch.
+- Optional filter "Assigned to: anyone / me / unassigned".
+
+**Email/notification:** out of scope for this pass (existing `booking-owner` email already fires; we can add an assignee notification in a follow-up).
+
+## 5. Public booking page – pick a staff member (optional)
+
+**File:** `src/routes/businesses.$slug.book.tsx`.
+
+- If the bookable item has more than one approved staff member available, show an optional "Preferred staff" select (defaults to "No preference"). Selection is stored as `assigned_user_id` on creation; owner can still reassign from the inbox.
+
+## Technical notes
+
+- All phone formatting stays presentation-only; canonical storage remains E.164. Validation rules in `PhoneField` (`buildE164`/`parseE164`) are unchanged.
+- Syncing hours → availability happens client-side on Save; we do not duplicate data automatically on the Hours tab to avoid surprise writes.
+- The calendar dashboard reuses the already-fetched `bookings` array; no new server call.
+- Staff list comes from existing `business_staff` table; no new role plumbing.
+- Migration follows the required order: CREATE column → GRANT (already in place for table) → policy updates.
+
+## Out of scope (call out for follow-up)
+
+- SMS/WhatsApp reminders to the customer.
+- ICS calendar export / Google Calendar sync for the assignee.
+- Per-staff working hours (currently hours are business-wide).

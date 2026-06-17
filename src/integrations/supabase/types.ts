@@ -870,6 +870,7 @@ export type Database = {
       }
       business_bookings: {
         Row: {
+          assigned_user_id: string | null
           bookable_item_id: string
           business_id: string
           created_at: string
@@ -885,6 +886,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          assigned_user_id?: string | null
           bookable_item_id: string
           business_id: string
           created_at?: string
@@ -900,6 +902,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          assigned_user_id?: string | null
           bookable_item_id?: string
           business_id?: string
           created_at?: string
