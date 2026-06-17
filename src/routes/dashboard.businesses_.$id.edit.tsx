@@ -1003,6 +1003,7 @@ function ServicesTab({
         <CatalogPicker
           existingKeys={existingKeys}
           typeSlug={typeSlug}
+          businessId={businessId}
           onPick={(item) => {
             const v = fromCatalogItem(item);
             setEditing({ ...v, businessId, sort_order: services.length });
