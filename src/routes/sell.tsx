@@ -245,6 +245,7 @@ function SellPage() {
   const { payment: paymentStatus, listingId: pendingListingId } = Route.useSearch();
 
   const [category, setCategory] = useState("car");
+  const [activeTab, setActiveTab] = useState<"basics" | "details" | "location" | "plan" | "media">("basics");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
@@ -847,7 +848,7 @@ function SellPage() {
           </p>
 
           <div className="mt-6 space-y-4 rounded-xl border border-border bg-card p-5 sm:p-6">
-            <h2 className="font-display text-lg font-semibold">How selling works</h2>
+            <h2 className="font-display text-base font-semibold">How selling works</h2>
             <ol className="ml-5 list-decimal space-y-1 text-sm text-muted-foreground">
               <li>Create a free account (or sign in).</li>
               <li>Add up to 12 photos and 1 walkaround video (free plan).</li>
@@ -927,9 +928,40 @@ function SellPage() {
           </Button>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
-          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
-            <h2 className="font-display text-lg font-semibold">Category & basics</h2>
+        <form onSubmit={handleSubmit} className="mt-4 space-y-3">
+          {(() => {
+            const TABS = [
+              { key: "basics", label: "Basics" },
+              { key: "details", label: "Details" },
+              { key: "location", label: "Location & Seller" },
+              { key: "plan", label: "Plan & Boost" },
+              { key: "media", label: "Photos" },
+            ] as const;
+            const idx = TABS.findIndex((t) => t.key === activeTab);
+            return (
+              <div className="sticky top-14 z-20 -mx-3 sm:mx-0 bg-background/95 backdrop-blur border-b border-border sm:rounded-xl sm:border sm:bg-card">
+                <div className="flex overflow-x-auto no-scrollbar px-1 py-1 gap-1">
+                  {TABS.map((t, i) => (
+                    <button
+                      key={t.key}
+                      type="button"
+                      onClick={() => setActiveTab(t.key)}
+                      className={`whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                        activeTab === t.key
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:bg-secondary"
+                      }`}
+                    >
+                      <span className="mr-1 opacity-60">{i + 1}.</span>{t.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+          <section data-tab="basics" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "basics" ? "" : "hidden"}`}>
+
+            <h2 className="font-display text-base font-semibold">Category & basics</h2>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <Label>Category</Label>
@@ -1074,9 +1106,10 @@ function SellPage() {
           </section>
 
           {SERVICE_CATEGORIES.has(category) && (
-            <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
+            <section data-tab="details" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "details" ? "" : "hidden"}`}>
+
               <div>
-                <h2 className="font-display text-lg font-semibold">What do you offer?</h2>
+                <h2 className="font-display text-base font-semibold">What do you offer?</h2>
                 <p className="text-xs text-muted-foreground">
                   Pick everything that applies — buyers filter by these tags.
                 </p>
@@ -1089,8 +1122,9 @@ function SellPage() {
             </section>
           )}
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
-            <h2 className="font-display text-lg font-semibold">Details</h2>
+          <section data-tab="details" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "details" ? "" : "hidden"}`}>
+
+            <h2 className="font-display text-base font-semibold">Details</h2>
             {category === "repair" || category === "bodyshop" || category === "salvage" ? (
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="sm:col-span-2">
@@ -1597,8 +1631,9 @@ function SellPage() {
             )}
           </section>
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
-            <h2 className="font-display text-lg font-semibold">Location</h2>
+          <section data-tab="location" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "location" ? "" : "hidden"}`}>
+
+            <h2 className="font-display text-base font-semibold">Location</h2>
             <p className="text-xs text-muted-foreground">
               Based on the official PSA Philippine Standard Geographic Code.
             </p>
@@ -1613,8 +1648,9 @@ function SellPage() {
             />
           </section>
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
-            <h2 className="font-display text-lg font-semibold">Seller type</h2>
+          <section data-tab="location" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "location" ? "" : "hidden"}`}>
+
+            <h2 className="font-display text-base font-semibold">Seller type</h2>
             <RadioGroup
               value={sellerType}
               onValueChange={(v: any) => setSellerType(v)}
@@ -1639,8 +1675,9 @@ function SellPage() {
             </RadioGroup>
           </section>
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
-            <h2 className="font-display text-lg font-semibold">Plan</h2>
+          <section data-tab="plan" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "plan" ? "" : "hidden"}`}>
+
+            <h2 className="font-display text-base font-semibold">Plan</h2>
             <RadioGroup
               value={plan}
               onValueChange={(v: any) => setPlan(v)}
@@ -1677,9 +1714,9 @@ function SellPage() {
             </RadioGroup>
           </section>
 
-          <section className="space-y-3 rounded-xl border border-border bg-card p-4 sm:p-6">
+          <section data-tab="plan" className={`space-y-2 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "plan" ? "" : "hidden"}`}>
             <div className="flex items-center justify-between">
-              <h2 className="font-display text-lg font-semibold">Add a boost (optional)</h2>
+              <h2 className="font-display text-base font-semibold">Add a boost (optional)</h2>
               {selectedBoost && (
                 <button
                   type="button"
@@ -1722,8 +1759,8 @@ function SellPage() {
           </section>
 
 
-          <section className="space-y-4 rounded-xl border border-border bg-card p-4 sm:p-6">
-            <h2 className="font-display text-lg font-semibold">Photos & video</h2>
+          <section data-tab="media" className={`space-y-3 rounded-xl border border-border bg-card p-3 sm:p-4 ${activeTab === "media" ? "" : "hidden"}`}>
+            <h2 className="font-display text-base font-semibold">Photos & video</h2>
             {(() => {
               const tierCaps: Record<
                 "free" | "standard" | "upgraded",
@@ -1972,26 +2009,49 @@ function SellPage() {
             </div>
           </section>
 
-          <div className="flex flex-col items-stretch justify-between gap-3 rounded-xl border border-border bg-card p-4 sm:p-6 sm:flex-row sm:items-center">
+          <div className="flex flex-col items-stretch justify-between gap-3 rounded-xl border border-border bg-card p-3 sm:p-4 sm:flex-row sm:items-center">
             <div>
-              <div className="text-sm text-muted-foreground">Total listing fee</div>
-              <div className="font-display text-2xl font-bold text-primary">
+              <div className="text-xs text-muted-foreground">Total listing fee</div>
+              <div className="font-display text-xl font-bold text-primary">
                 {formatPHP(totalFee)}
               </div>
-              <div className="text-xs text-muted-foreground">
+              <div className="text-[11px] text-muted-foreground">
                 Listing publishes after payment is confirmed.
               </div>
             </div>
             <div className="mb-1"><FormFeedbackLink formId="post-listing" /></div>
-            <div className="flex flex-col-reverse gap-2 sm:flex-row">
-              <Button asChild type="button" variant="outline" className="w-full sm:w-auto">
-                <Link to="/dashboard">Cancel</Link>
-              </Button>
-              <Button type="submit" disabled={submitting} size="lg" className="w-full sm:w-auto">
-                {submitting ? "Submitting…" : "Submit listing"}
-              </Button>
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center">
+              {(() => {
+                const order = ["basics", "details", "location", "plan", "media"] as const;
+                const i = order.indexOf(activeTab);
+                return (
+                  <>
+                    {i > 0 && (
+                      <Button type="button" variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => setActiveTab(order[i - 1])}>
+                        ← Back
+                      </Button>
+                    )}
+                    {i < order.length - 1 && (
+                      <Button type="button" size="sm" className="w-full sm:w-auto" onClick={() => { setActiveTab(order[i + 1]); window.scrollTo({ top: 0, behavior: "smooth" }); }}>
+                        Next →
+                      </Button>
+                    )}
+                    {i === order.length - 1 && (
+                      <>
+                        <Button asChild type="button" variant="outline" size="sm" className="w-full sm:w-auto">
+                          <Link to="/dashboard">Cancel</Link>
+                        </Button>
+                        <Button type="submit" disabled={submitting} size="lg" className="w-full sm:w-auto">
+                          {submitting ? "Submitting…" : "Submit listing"}
+                        </Button>
+                      </>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           </div>
+
         </form>
       </div>
     </SiteLayout>
