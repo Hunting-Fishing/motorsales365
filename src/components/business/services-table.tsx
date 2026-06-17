@@ -423,52 +423,64 @@ function ServiceRow({
     }
   };
 
-  const unmatchedSuggestions = tagSuggestions.filter((t) => !row.tags.includes(t)).slice(0, 8);
+  const unmatchedSuggestions = tagSuggestions.filter((t) => !row.tags.includes(t));
+  const inlineSuggestions = unmatchedSuggestions.slice(0, 5);
+  const moreSuggestions = unmatchedSuggestions.slice(5);
+
+  const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
+    <div className="flex flex-col gap-1 md:contents">
+      <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground md:hidden">
+        {label}
+      </span>
+      {children}
+    </div>
+  );
 
   return (
-    <>
-      <tr className="border-t border-border align-top">
-        <td className="px-3 py-2">
-          <div className="font-medium leading-tight">{row.title}</div>
-          {row.description && (
-            <div className="line-clamp-2 text-xs text-muted-foreground">{row.description}</div>
-          )}
-          {row.pending_suggestion_id && (
-            <Badge variant="outline" className="mt-1 text-[10px]">
-              Pending review
-            </Badge>
-          )}
-        </td>
-        <td className="px-3 py-2">
+    <div className="px-3 py-3">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-[minmax(0,1.4fr)_88px_88px_140px_minmax(0,1fr)_150px_72px_88px_36px] md:items-center md:gap-2">
+        <Field label="Service">
+          <div className="col-span-2 md:col-span-1">
+            <div className="font-medium leading-tight">{row.title}</div>
+            {row.description && (
+              <div className="line-clamp-2 text-xs text-muted-foreground">
+                {row.description}
+              </div>
+            )}
+            {row.pending_suggestion_id && (
+              <Badge variant="outline" className="mt-1 text-[10px]">
+                Pending review
+              </Badge>
+            )}
+          </div>
+        </Field>
+
+        <Field label="From ₱">
           <Input
             inputMode="decimal"
-            className="w-24"
+            className="w-full md:w-[88px]"
             value={row.price_php ?? ""}
             placeholder="200"
-            onChange={(e) => {
-              const v = e.target.value.trim();
-              onPatch({ price_php: v === "" ? null : Number(v) });
-            }}
+            onChange={(e) => onPatch({ price_php: parseMoney(e.target.value) })}
           />
-        </td>
-        <td className="px-3 py-2">
+        </Field>
+
+        <Field label="To ₱ (optional)">
           <Input
             inputMode="decimal"
-            className="w-24"
+            className="w-full md:w-[88px]"
             value={row.max_price_php ?? ""}
             placeholder="optional"
-            onChange={(e) => {
-              const v = e.target.value.trim();
-              onPatch({ max_price_php: v === "" ? null : Number(v) });
-            }}
+            onChange={(e) => onPatch({ max_price_php: parseMoney(e.target.value) })}
           />
-        </td>
-        <td className="px-3 py-2">
+        </Field>
+
+        <Field label="Unit">
           <Select
             value={row.unit ?? ""}
             onValueChange={(v) => onPatch({ unit: v || null })}
           >
-            <SelectTrigger className="w-[140px]">
+            <SelectTrigger className="w-full md:w-[140px]">
               <SelectValue placeholder="unit" />
             </SelectTrigger>
             <SelectContent>
@@ -479,24 +491,26 @@ function ServiceRow({
               ))}
             </SelectContent>
           </Select>
-        </td>
-        <td className="px-3 py-2">
+        </Field>
+
+        <Field label="Note">
           <Input
-            className="min-w-[10rem]"
+            className="col-span-2 w-full md:col-span-1"
             value={row.notes ?? ""}
             placeholder='"+ fuel at pump"'
             maxLength={120}
             onChange={(e) => onPatch({ notes: e.target.value || null })}
           />
-        </td>
-        <td className="px-3 py-2">
+        </Field>
+
+        <Field label="Coverage">
           <Select
             value={row.region_scope ?? ""}
             onValueChange={(v) =>
               onPatch({ region_scope: (v || null) as RegionScope | null })
             }
           >
-            <SelectTrigger className="w-[160px]">
+            <SelectTrigger className="w-full md:w-[150px]">
               <SelectValue placeholder="—" />
             </SelectTrigger>
             <SelectContent>
@@ -507,28 +521,31 @@ function ServiceRow({
               ))}
             </SelectContent>
           </Select>
-        </td>
-        <td className="px-3 py-2">
+        </Field>
+
+        <Field label="ETA (min)">
           <Input
             inputMode="numeric"
-            className="w-20"
+            className="w-full md:w-[72px]"
             value={row.eta_minutes ?? ""}
             placeholder="—"
-            onChange={(e) => {
-              const v = e.target.value.trim();
-              const n = v === "" ? null : Math.max(0, Math.floor(Number(v)));
-              onPatch({ eta_minutes: Number.isNaN(n as number) ? null : n });
-            }}
+            onChange={(e) =>
+              onPatch({ eta_minutes: parseIntSafe(e.target.value, 10080) })
+            }
           />
-        </td>
-        <td className="px-3 py-2">
-          {row.catalog_id ? (
-            <MarketStats catalogId={row.catalog_id} excludeBusinessId={businessId} />
-          ) : (
-            <span className="text-xs text-muted-foreground">—</span>
-          )}
-        </td>
-        <td className="px-3 py-2 text-right">
+        </Field>
+
+        <Field label="Market">
+          <div>
+            {row.catalog_id ? (
+              <MarketStats catalogId={row.catalog_id} excludeBusinessId={businessId} />
+            ) : (
+              <span className="text-xs text-muted-foreground">—</span>
+            )}
+          </div>
+        </Field>
+
+        <div className="col-span-2 flex justify-end md:col-span-1 md:justify-center">
           <Button
             size="sm"
             variant="ghost"
@@ -538,107 +555,140 @@ function ServiceRow({
           >
             <Trash2 className="h-4 w-4" />
           </Button>
-        </td>
-      </tr>
-      <tr className="border-t border-border/40 bg-muted/20">
-        <td colSpan={9} className="px-3 py-2">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-            {/* Tag chips */}
-            <div className="flex min-w-0 flex-1 flex-wrap items-center gap-1">
-              <span className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                Tags
-              </span>
-              {row.tags.map((t) => (
-                <Badge
-                  key={t}
-                  variant="secondary"
-                  className="gap-1 pl-2 pr-1 text-[11px]"
+        </div>
+      </div>
+
+      {/* Tags + radius + 24/7 row */}
+      <div className="mt-3 flex flex-wrap items-start gap-x-4 gap-y-2 rounded-md bg-muted/30 p-2">
+        <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+          <div className="flex flex-wrap items-center gap-1">
+            <span className="text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+              Tags
+            </span>
+            {row.tags.map((t) => (
+              <Badge
+                key={t}
+                variant="secondary"
+                className="gap-1 pl-2 pr-1 text-[11px]"
+              >
+                {t}
+                <button
+                  type="button"
+                  onClick={() => removeTag(t)}
+                  aria-label={`Remove tag ${t}`}
+                  className="rounded-sm hover:bg-background/60"
                 >
-                  {t}
-                  <button
-                    type="button"
-                    onClick={() => removeTag(t)}
-                    aria-label={`Remove tag ${t}`}
-                    className="rounded-sm hover:bg-background/60"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
+                  <X className="h-3 w-3" />
+                </button>
+              </Badge>
+            ))}
+            <Input
+              value={tagDraft}
+              onChange={(e) => setTagDraft(e.target.value)}
+              onKeyDown={onTagKey}
+              onBlur={() => tagDraft && addTag(tagDraft)}
+              placeholder="+ tag"
+              className="h-7 w-24 text-xs"
+            />
+          </div>
+          {inlineSuggestions.length > 0 && (
+            <div className="flex flex-wrap items-center gap-1">
+              <span className="text-[10px] uppercase text-muted-foreground">
+                Suggested:
+              </span>
+              {inlineSuggestions.map((t) => (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => addTag(t)}
+                  className="rounded-full border border-dashed border-border bg-background px-2 py-0.5 text-[11px] text-muted-foreground hover:border-solid hover:bg-accent hover:text-foreground"
+                >
+                  + {t}
+                </button>
               ))}
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Input
-                    value={tagDraft}
-                    onChange={(e) => setTagDraft(e.target.value)}
-                    onKeyDown={onTagKey}
-                    onBlur={() => tagDraft && addTag(tagDraft)}
-                    placeholder="+ tag"
-                    className="h-7 w-28 text-xs"
-                  />
-                </PopoverTrigger>
-                {unmatchedSuggestions.length > 0 && (
+              {moreSuggestions.length > 0 && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="rounded-full border border-border bg-background px-2 py-0.5 text-[11px] text-muted-foreground hover:bg-accent"
+                    >
+                      +{moreSuggestions.length} more
+                    </button>
+                  </PopoverTrigger>
                   <PopoverContent
                     align="start"
-                    className="w-56 p-2"
+                    className="w-64 p-2"
                     onOpenAutoFocus={(e) => e.preventDefault()}
                   >
-                    <p className="mb-1 text-[10px] uppercase text-muted-foreground">
-                      Suggestions
-                    </p>
                     <div className="flex flex-wrap gap-1">
-                      {unmatchedSuggestions.map((t) => (
+                      {moreSuggestions.map((t) => (
                         <button
                           key={t}
                           type="button"
                           onClick={() => addTag(t)}
                           className="rounded-full border border-border bg-background px-2 py-0.5 text-[11px] hover:bg-accent"
                         >
-                          {t}
+                          + {t}
                         </button>
                       ))}
                     </div>
                   </PopoverContent>
-                )}
-              </Popover>
+                </Popover>
+              )}
             </div>
+          )}
+        </div>
 
-            {/* Radius */}
-            <label className={`flex items-center gap-1 text-xs ${radiusRelevant ? "" : "opacity-60"}`}>
-              <span className="text-muted-foreground">Radius</span>
-              <Input
-                inputMode="numeric"
-                className="h-7 w-16"
-                value={row.service_radius_km ?? ""}
-                placeholder="—"
-                onChange={(e) => {
-                  const v = e.target.value.trim();
-                  const n = v === "" ? null : Math.max(0, Math.floor(Number(v)));
-                  onPatch({
-                    service_radius_km: Number.isNaN(n as number) ? null : n,
-                  });
-                }}
-              />
-              <span className="text-muted-foreground">km</span>
-            </label>
+        <label
+          className={`flex items-center gap-1 text-xs ${radiusRelevant ? "" : "opacity-60"}`}
+        >
+          <span className="text-muted-foreground">Radius</span>
+          <Input
+            inputMode="numeric"
+            className="h-7 w-16"
+            value={row.service_radius_km ?? ""}
+            placeholder="—"
+            onChange={(e) =>
+              onPatch({ service_radius_km: parseIntSafe(e.target.value, 2000) })
+            }
+          />
+          <span className="text-muted-foreground">km</span>
+        </label>
 
-            {/* 24/7 */}
-            <label className="flex items-center gap-1.5 text-xs">
-              <Switch
-                checked={row.available_24_7}
-                onCheckedChange={(checked) => {
-                  const next = new Set(row.tags);
-                  if (checked) next.add("24/7");
-                  else next.delete("24/7");
-                  onPatch({ available_24_7: checked, tags: Array.from(next) });
-                }}
-              />
-              <span>24/7</span>
-            </label>
-          </div>
-        </td>
-      </tr>
-    </>
+        <label className="flex items-center gap-1.5 text-xs">
+          <Switch
+            checked={row.available_24_7}
+            onCheckedChange={(checked) => {
+              const next = new Set(row.tags);
+              if (checked) next.add("24/7");
+              else next.delete("24/7");
+              onPatch({ available_24_7: checked, tags: Array.from(next) });
+            }}
+          />
+          <span>24/7</span>
+        </label>
+      </div>
+    </div>
   );
+}
+
+/** Parse a money string: strip commas, spaces, and ₱; returns null when empty or invalid. */
+function parseMoney(raw: string): number | null {
+  const cleaned = raw.replace(/[₱,\s]/g, "").trim();
+  if (cleaned === "") return null;
+  const n = Number(cleaned);
+  if (!Number.isFinite(n) || n < 0) return null;
+  return n;
+}
+
+/** Parse a non-negative integer with an upper bound; strips commas/spaces. */
+function parseIntSafe(raw: string, max: number): number | null {
+  const cleaned = raw.replace(/[,\s]/g, "").trim();
+  if (cleaned === "") return null;
+  const n = Math.floor(Number(cleaned));
+  if (!Number.isFinite(n) || n < 0) return null;
+  return Math.min(n, max);
 }
 
 function MarketStats({
