@@ -116,6 +116,7 @@ export const getBusinessPage = createServerFn({ method: "GET" })
       { data: photos },
       { data: contactChannels },
       { data: bookableItems },
+      { data: brands },
     ] = await Promise.all([
       supabaseAdmin
         .from("business_types")
