@@ -128,7 +128,7 @@ export const getBusinessPage = createServerFn({ method: "GET" })
         .eq("business_id", (biz as any).id),
       supabaseAdmin
         .from("business_services")
-        .select("id, title, description, price_label, photo_url, sort_order")
+        .select("id, title, description, price_label, price_php, sale_price_php, unit, photo_url, sort_order")
         .eq("business_id", (biz as any).id)
         .eq("active", true)
         .order("sort_order"),
