@@ -21,6 +21,7 @@ import {
   type CustomTemplateRow,
 } from "@/lib/share-kit-templates.functions";
 import { detectQrSlotFromUrl, isDetected } from "@/lib/share-kit/detect-qr-slot";
+import { assessQrReadability } from "@/lib/share-kit/qr-readability";
 import { siteOrigin } from "@/lib/site-config";
 
 export const Route = createFileRoute("/admin/advertisements/share-kit")({
@@ -137,33 +138,50 @@ function AdminShareKitPage() {
   }
 
   // Run detector against the signed image and persist new QR placement.
-  // Returns true on detected + saved, false on no-confidence / error.
-  async function autoFitOne(row: CustomTemplateRow): Promise<boolean> {
+  // Returns { placed, readable } so callers can warn on low-readability
+  // results even when placement succeeds.
+  async function autoFitOne(
+    row: CustomTemplateRow,
+  ): Promise<{ placed: boolean; readable: boolean; reasons: string[] }> {
     const slot = await detectQrSlotFromUrl(row.image_url);
-    if (!isDetected(slot)) return false;
+    if (!isDetected(slot)) return { placed: false, readable: false, reasons: [] };
     await updateQrFn({
-      data: {
-        id: row.id,
-        qr_cx: slot.cx,
-        qr_cy: slot.cy,
-        qr_size: slot.size,
-      },
+      data: { id: row.id, qr_cx: slot.cx, qr_cy: slot.cy, qr_size: slot.size },
     });
-    return true;
+    const report = await assessQrReadability({
+      link: "https://365motorsales.com/r/ABCDEFGH",
+      template: {
+        width: row.width,
+        height: row.height,
+        qr: { cx: slot.cx, cy: slot.cy, size: slot.size, platePadding: 0 },
+        background: "#ffffff",
+        imageUrl: row.image_url,
+      },
+      placement: { cx: slot.cx, cy: slot.cy, size: slot.size },
+    }).catch(() => null);
+    return {
+      placed: true,
+      readable: report?.ok ?? true,
+      reasons: report?.reasons ?? [],
+    };
   }
 
   async function autoFitCard(row: CustomTemplateRow) {
     setAutoFittingId(row.id);
     try {
-      const ok = await autoFitOne(row);
-      if (ok) {
+      const res = await autoFitOne(row);
+      if (res.placed && res.readable) {
         toast.success(`Auto-fit QR for "${row.label}"`);
-        qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+      } else if (res.placed && !res.readable) {
+        toast.warning(
+          `Placed QR on "${row.label}", but readability is low: ${res.reasons.join(" ")}`,
+        );
       } else {
         toast.warning(
           `Could not find a white QR panel in "${row.label}". Use Edit layout to place it manually.`,
         );
       }
+      qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
     } catch (e: any) {
       toast.error(e?.message ?? "Auto-fit failed");
     } finally {
@@ -182,6 +200,7 @@ function AdminShareKitPage() {
     setBulkFitting(true);
     const concurrency = 4;
     let detected = 0;
+    let unreadable = 0;
     let skipped = 0;
     let failed = 0;
     const t = toast.loading(`Auto-fitting 0 / ${rows.length}…`);
@@ -193,9 +212,13 @@ function AdminShareKitPage() {
         const idx = cursor++;
         const row = rows[idx];
         try {
-          const ok = await autoFitOne(row);
-          if (ok) detected++;
-          else skipped++;
+          const res = await autoFitOne(row);
+          if (res.placed) {
+            detected++;
+            if (!res.readable) unreadable++;
+          } else {
+            skipped++;
+          }
         } catch {
           failed++;
         }
@@ -208,7 +231,7 @@ function AdminShareKitPage() {
     );
     toast.dismiss(t);
     toast.success(
-      `Auto-fit done — ${detected} placed, ${skipped} no panel, ${failed} failed`,
+      `Auto-fit done — ${detected} placed (${unreadable} low-readability), ${skipped} no panel, ${failed} failed`,
     );
     qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
     setBulkFitting(false);

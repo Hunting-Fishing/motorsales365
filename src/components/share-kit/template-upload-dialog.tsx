@@ -26,6 +26,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { upsertShareKitCustomTemplate } from "@/lib/share-kit-templates.functions";
 import { detectQrSlotFromBlob, isDetected } from "@/lib/share-kit/detect-qr-slot";
+import { assessQrReadability } from "@/lib/share-kit/qr-readability";
 
 interface Props {
   open: boolean;
@@ -49,6 +50,10 @@ type Item = {
   qrCy: number;
   qrSize: number;
   qrDetected: boolean;
+  readable: boolean;
+  readabilityReasons: string[];
+  modulePx: number;
+  contrast: number;
 };
 
 const ACCEPT = "image/png,image/jpeg,image/webp";
@@ -140,6 +145,24 @@ export function ShareKitTemplateUpload({ open, onOpenChange, onSaved }: Props) {
       try {
         const { w, h, url } = await readDims(f);
         const slot = await detectQrSlotFromBlob(f);
+        const placement = isDetected(slot)
+          ? { cx: slot.cx, cy: slot.cy, size: slot.size }
+          : { ...QR_DEFAULTS };
+        // Use a representative referral link to estimate QR version + module
+        // count. Real per-user links are the same length pattern, so the
+        // readability check is accurate at upload time.
+        const sampleLink = "https://365motorsales.com/r/ABCDEFGH";
+        const report = await assessQrReadability({
+          link: sampleLink,
+          template: {
+            width: w,
+            height: h,
+            qr: { cx: placement.cx, cy: placement.cy, size: placement.size, platePadding: 0 },
+            background: "#ffffff",
+          },
+          placement,
+          baseImageSrc: f,
+        }).catch(() => null);
         next.push({
           id: `${f.name}-${f.size}-${Math.random().toString(36).slice(2, 8)}`,
           file: f,
@@ -153,6 +176,10 @@ export function ShareKitTemplateUpload({ open, onOpenChange, onSaved }: Props) {
           qrCy: slot.cy,
           qrSize: slot.size,
           qrDetected: isDetected(slot),
+          readable: report?.ok ?? true,
+          readabilityReasons: report?.reasons ?? [],
+          modulePx: report?.modulePx ?? 0,
+          contrast: report?.contrast ?? 0,
         });
       } catch {
         toast.error(`Skipped ${f.name} (could not read image).`);
@@ -414,6 +441,14 @@ export function ShareKitTemplateUpload({ open, onOpenChange, onSaved }: Props) {
                           title="No white panel found — using default placement. You can fine-tune from the card after upload."
                         >
                           <AlertCircle className="h-3 w-3" /> QR default
+                        </span>
+                      )}
+                      {!it.readable && (
+                        <span
+                          className="flex items-center gap-1 rounded-full bg-red-50 px-1.5 py-0.5 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+                          title={it.readabilityReasons.join("\n")}
+                        >
+                          <AlertCircle className="h-3 w-3" /> QR may not scan
                         </span>
                       )}
                       {it.status === "uploading" && (
