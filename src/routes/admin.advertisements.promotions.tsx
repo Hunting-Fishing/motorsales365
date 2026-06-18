@@ -38,7 +38,7 @@ import {
 import { ListingPromosPanel } from "@/components/admin/listing-promos-panel";
 import { formatDate } from "@/lib/format";
 
-export const Route = createFileRoute("/admin/promotions")({
+export const Route = createFileRoute("/admin/advertisements/promotions")({
   head: () => ({
     meta: [
       { title: "Promotions & Discounts — Admin" },

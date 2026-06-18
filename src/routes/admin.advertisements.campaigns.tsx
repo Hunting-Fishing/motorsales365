@@ -19,7 +19,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { formatDate } from "@/lib/format";
 import { listAds, upsertAd, deleteAd } from "@/lib/ads.functions";
 
-export const Route = createFileRoute("/admin/ad-campaigns")({
+export const Route = createFileRoute("/admin/advertisements/campaigns")({
   component: AdminAdCampaignsPage,
   head: () => ({
     meta: [{ title: "Ad campaigns — Admin" }, { name: "robots", content: "noindex,nofollow" }],
