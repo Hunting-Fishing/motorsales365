@@ -315,15 +315,31 @@ function AdminShareKitPage() {
                   override={layouts?.[t.id]}
                 />
                 {isAdmin && (
-                  <div className="mt-2 flex justify-end gap-2">
+                  <div className="mt-2 flex flex-wrap justify-end gap-2">
                     {custom ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => deleteCustom(custom.id, custom.label)}
-                      >
-                        <Trash2 className="mr-1 h-4 w-4" /> Delete
-                      </Button>
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => autoFitCard(custom)}
+                          disabled={autoFittingId === custom.id || bulkFitting}
+                          title="Detect the white SCAN HERE panel and snap the QR into it"
+                        >
+                          {autoFittingId === custom.id ? (
+                            <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                          ) : (
+                            <Wand2 className="mr-1 h-4 w-4" />
+                          )}
+                          Auto-fit QR
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => deleteCustom(custom.id, custom.label)}
+                        >
+                          <Trash2 className="mr-1 h-4 w-4" /> Delete
+                        </Button>
+                      </>
                     ) : (
                       <Button
                         variant="outline"
