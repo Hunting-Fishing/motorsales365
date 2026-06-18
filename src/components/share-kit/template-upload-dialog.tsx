@@ -26,6 +26,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { upsertShareKitCustomTemplate } from "@/lib/share-kit-templates.functions";
 import { detectQrSlotFromBlob, isDetected } from "@/lib/share-kit/detect-qr-slot";
+import { assessQrReadability } from "@/lib/share-kit/qr-readability";
 
 interface Props {
   open: boolean;
