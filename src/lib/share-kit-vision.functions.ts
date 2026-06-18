@@ -126,11 +126,25 @@ export const detectScanHereWithVision = createServerFn({ method: "POST" })
       text = result.text;
     } catch (err: any) {
       const msg = String(err?.message ?? err);
-      if (/429|rate.?limit/i.test(msg)) {
-        throw new Error("AI rate-limited. Please retry in a moment.");
+      if (/402|payment.?required|credit/i.test(msg)) {
+        return {
+          found: false,
+          cx: 0,
+          cy: 0,
+          size: 0,
+          confidence: 0,
+          reasoning: "AI_CREDITS_EXHAUSTED",
+        };
       }
-      if (/402|credit/i.test(msg)) {
-        throw new Error("Lovable AI credits exhausted. Add credits in Settings to keep using Smart fit.");
+      if (/429|rate.?limit/i.test(msg)) {
+        return {
+          found: false,
+          cx: 0,
+          cy: 0,
+          size: 0,
+          confidence: 0,
+          reasoning: "AI_RATE_LIMITED",
+        };
       }
       throw new Error(`Smart fit failed: ${msg.slice(0, 200)}`);
     }
