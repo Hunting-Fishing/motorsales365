@@ -23,7 +23,9 @@ import {
   AlertTriangle,
   MapPin,
   Truck,
+  ChevronDown,
 } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useAuth } from "@/hooks/use-auth";
 import { SiteLayout } from "@/components/site-layout";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -75,7 +77,7 @@ const NAV: NavItem[] = [
     info: "Snapshot of platform health, KPIs and quick links.",
   },
 
-  // SALES
+  // SALES & ADVERTISING
   {
     to: "/admin/sales",
     label: "Sales Hub",
@@ -83,7 +85,7 @@ const NAV: NavItem[] = [
     exact: true,
     roles: ["admin", "sales", "advertising", "support"],
     info: "Consolidated sales workspace: overview, accounts, ads, promotions, referrals and QR share-kit.",
-    section: "Sales",
+    section: "Sales & Advertising",
   },
   {
     to: "/admin/accounts",
@@ -91,7 +93,7 @@ const NAV: NavItem[] = [
     Icon: UserCog,
     roles: ["admin", "sales", "support"],
     info: "Manage customer & business subscriptions: plans, discounts, pause/ban, lifetime spend.",
-    section: "Sales",
+    section: "Sales & Advertising",
   },
   {
     to: "/admin/analytics",
@@ -99,15 +101,15 @@ const NAV: NavItem[] = [
     Icon: BarChart3,
     roles: ["admin", "sales", "support"],
     info: "Traffic, listings, conversions and other platform analytics.",
-    section: "Sales",
+    section: "Sales & Advertising",
   },
   {
     to: "/admin/advertisements",
     label: "Advertisements",
     Icon: Megaphone,
     roles: ["admin", "advertising", "sales"],
-    info: "Ad inquiries, sponsored campaigns and promotions/discounts — all in one tabbed workspace.",
-    section: "Sales",
+    info: "Ad inquiries, sponsored campaigns, promotions, share-kit and history — tabbed workspace.",
+    section: "Sales & Advertising",
   },
   {
     to: "/admin/shop",
@@ -115,7 +117,7 @@ const NAV: NavItem[] = [
     Icon: Store,
     roles: ["admin", "advertising", "sales"],
     info: "Manage affiliate products, networks and click analytics.",
-    section: "Sales",
+    section: "Sales & Advertising",
   },
   {
     to: "/admin/referrals",
@@ -123,7 +125,7 @@ const NAV: NavItem[] = [
     Icon: QrCode,
     roles: ["admin", "sales"],
     info: "Staff QR codes and redemption history.",
-    section: "Sales",
+    section: "Sales & Advertising",
   },
   {
     to: "/admin/advertisements/share-kit",
@@ -131,7 +133,7 @@ const NAV: NavItem[] = [
     Icon: QrCode,
     roles: ["admin", "sales", "advertising", "support", "moderator"],
     info: "Your personal QR applied to printable templates (arm band, shirt, banners).",
-    section: "Sales",
+    section: "Sales & Advertising",
   },
   {
     to: "/admin/lead-offers",
@@ -139,7 +141,7 @@ const NAV: NavItem[] = [
     Icon: Inbox,
     roles: ["admin"],
     info: "Post qualified buyer leads. Featured/Premium businesses pay per unlock.",
-    section: "Sales",
+    section: "Sales & Advertising",
   },
   {
     to: "/admin/sales-reps",
@@ -147,7 +149,91 @@ const NAV: NavItem[] = [
     Icon: UserCog,
     roles: ["admin"],
     info: "Manage sales reps, territories and assignments.",
-    section: "Sales",
+    section: "Sales & Advertising",
+  },
+
+  // BUSINESSES
+  {
+    to: "/admin/businesses",
+    label: "Directory",
+    Icon: Store,
+    roles: ["admin", "moderator"],
+    info: "Approve and moderate the Business directory.",
+    section: "Businesses",
+  },
+  {
+    to: "/admin/discover-businesses",
+    label: "Discover",
+    Icon: Store,
+    roles: ["admin", "moderator"],
+    info: "Find, verify and import businesses from Google & Facebook.",
+    section: "Businesses",
+  },
+  {
+    to: "/admin/claims",
+    label: "Claims",
+    Icon: ShieldCheck,
+    roles: ["admin", "moderator"],
+    info: "Review claim requests for seeded businesses.",
+    section: "Businesses",
+  },
+  {
+    to: "/admin/verifications",
+    label: "Verifications",
+    Icon: ShieldCheck,
+    roles: ["admin", "moderator"],
+    info: "Approve or reject business verification requests.",
+    section: "Businesses",
+  },
+  {
+    to: "/admin/type-suggestions",
+    label: "Type suggestions",
+    Icon: Sparkles,
+    roles: ["admin"],
+    info: "Review user-submitted new business types.",
+    section: "Businesses",
+  },
+  {
+    to: "/admin/service-suggestions",
+    label: "Service suggestions",
+    Icon: Sparkles,
+    roles: ["admin"],
+    info: "Approve user-submitted services into the shared catalog.",
+    section: "Businesses",
+  },
+  {
+    to: "/admin/service-suggestion-audit",
+    label: "Service audit log",
+    Icon: Sparkles,
+    roles: ["admin"],
+    info: "History of decisions on service suggestions.",
+    section: "Businesses",
+  },
+
+  // LISTINGS & MODERATION
+  {
+    to: "/admin/listings",
+    label: "Listings",
+    Icon: ListChecks,
+    roles: ["admin", "moderator", "support"],
+    info: "Moderate vehicle/service listings.",
+    section: "Listings & Moderation",
+  },
+  {
+    to: "/admin/reports",
+    label: "Activity & Reports",
+    Icon: Inbox,
+    roles: ["admin", "moderator", "support", "sales"],
+    info: "Unified inbox: reports, inquiries, admin audit log.",
+    section: "Listings & Moderation",
+  },
+  {
+    to: "/admin/location-corrections",
+    label: "Location fixes",
+    Icon: MapPin,
+    roles: ["admin", "moderator"],
+    info: "User-submitted map pin corrections.",
+    section: "Listings & Moderation",
   },
 
   // OPERATIONS
@@ -174,88 +260,6 @@ const NAV: NavItem[] = [
     roles: ["admin", "moderator"],
     info: "Courses, modules, lessons, quizzes and Partner Training schools.",
     section: "Operations",
-  },
-
-  // MODERATION
-  {
-    to: "/admin/listings",
-    label: "Listings",
-    Icon: ListChecks,
-    roles: ["admin", "moderator", "support"],
-    info: "Moderate vehicle/service listings.",
-    section: "Moderation",
-  },
-  {
-    to: "/admin/businesses",
-    label: "Businesses",
-    Icon: Store,
-    roles: ["admin", "moderator"],
-    info: "Approve and moderate the Business directory.",
-    section: "Moderation",
-  },
-  {
-    to: "/admin/discover-businesses",
-    label: "Discover Businesses",
-    Icon: Store,
-    roles: ["admin", "moderator"],
-    info: "Find, verify and import businesses from Google & Facebook.",
-    section: "Moderation",
-  },
-  {
-    to: "/admin/claims",
-    label: "Business Claims",
-    Icon: ShieldCheck,
-    roles: ["admin", "moderator"],
-    info: "Review claim requests for seeded businesses.",
-    section: "Moderation",
-  },
-  {
-    to: "/admin/verifications",
-    label: "Verifications",
-    Icon: ShieldCheck,
-    roles: ["admin", "moderator"],
-    info: "Approve or reject business verification requests.",
-    section: "Moderation",
-  },
-  {
-    to: "/admin/type-suggestions",
-    label: "Type suggestions",
-    Icon: Sparkles,
-    roles: ["admin"],
-    info: "Review user-submitted new business types.",
-    section: "Moderation",
-  },
-  {
-    to: "/admin/service-suggestions",
-    label: "Service suggestions",
-    Icon: Sparkles,
-    roles: ["admin"],
-    info: "Approve user-submitted services into the shared catalog.",
-    section: "Moderation",
-  },
-  {
-    to: "/admin/service-suggestion-audit",
-    label: "Service audit log",
-    Icon: Sparkles,
-    roles: ["admin"],
-    info: "History of decisions on service suggestions.",
-    section: "Moderation",
-  },
-  {
-    to: "/admin/location-corrections",
-    label: "Location fixes",
-    Icon: MapPin,
-    roles: ["admin", "moderator"],
-    info: "User-submitted map pin corrections.",
-    section: "Moderation",
-  },
-  {
-    to: "/admin/reports",
-    label: "Activity",
-    Icon: Inbox,
-    roles: ["admin", "moderator", "support", "sales"],
-    info: "Unified inbox: reports, inquiries, admin audit log.",
-    section: "Moderation",
   },
 
   // PEOPLE
@@ -334,6 +338,7 @@ const NAV: NavItem[] = [
     section: "Platform",
   },
 ];
+
 
 function AdminLayout() {
   const { user, isAdmin, isSales, isModerator, isSupport, isAdvertising, isStaff, loading } =
@@ -443,71 +448,11 @@ function AdminLayout() {
               </span>
               <AdminNotificationBell enabled={hasAccess} />
             </div>
-            <nav className="flex flex-col gap-1">
-              {(() => {
-                const out: ReactNode[] = [];
-                let lastSection: string | undefined = undefined;
-                visibleNav.forEach((item) => {
-                  const { to, label, Icon, exact, info, section, external } = item;
-                  if (section !== lastSection) {
-                    lastSection = section;
-                    if (section) {
-                      out.push(
-                        <div
-                          key={`sec-${section}`}
-                          className="mt-3 px-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70"
-                        >
-                          {section}
-                        </div>,
-                      );
-                    }
-                  }
-                  const count = pendingCountForRoute(to, pendingCounts);
-                  const linkClass =
-                    "flex flex-1 shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary";
-                  out.push(
-                    <div key={to} className="group flex shrink-0 items-center gap-1">
-                      {external ? (
-                        <a href={to} className={linkClass}>
-                          <Icon className="h-4 w-4" />
-                          <span className="flex-1">{label}</span>
-                        </a>
-                      ) : (
-                        <Link
-                          to={to}
-                          activeOptions={{ exact: !!exact }}
-                          activeProps={{ className: "bg-primary text-primary-foreground" }}
-                          className={linkClass}
-                        >
-                          <Icon className="h-4 w-4" />
-                          <span className="flex-1">{label}</span>
-                          {count > 0 && (
-                            <span className="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-semibold leading-none text-destructive-foreground">
-                              {count > 99 ? "99+" : count}
-                            </span>
-                          )}
-                        </Link>
-                      )}
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button
-                            type="button"
-                            aria-label={`About ${label}`}
-                            className="rounded-md p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
-                          >
-                            <Info className="h-3.5 w-3.5" />
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="right" className="max-w-xs">
-                          {info}
-                        </TooltipContent>
-                      </Tooltip>
-                    </div>,
-                  );
-                });
-                return out;
-              })()}
-            </nav>
+            <SidebarNav
+              visibleNav={visibleNav}
+              pendingCounts={pendingCounts}
+            />
+
           </aside>
           <div className="min-w-0">
             <Outlet />
@@ -535,5 +480,97 @@ function AdminMobileSelect({ items }: { items: { to: string; label: string }[] }
         ))}
       </SelectContent>
     </Select>
+  );
+}
+
+function SidebarNav({
+  visibleNav,
+  pendingCounts,
+}: {
+  visibleNav: NavItem[];
+  pendingCounts: any;
+}) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  // Group items by section. Items without a section (Overview) render at top.
+  const groups: { section: string | undefined; items: NavItem[] }[] = [];
+  visibleNav.forEach((item) => {
+    const last = groups[groups.length - 1];
+    if (last && last.section === item.section) last.items.push(item);
+    else groups.push({ section: item.section, items: [item] });
+  });
+
+  const renderLink = (item: NavItem) => {
+    const { to, label, Icon, exact, info, external } = item;
+    const count = pendingCountForRoute(to, pendingCounts);
+    const linkClass =
+      "flex flex-1 shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary";
+    return (
+      <div key={to} className="group flex shrink-0 items-center gap-1">
+        {external ? (
+          <a href={to} className={linkClass}>
+            <Icon className="h-4 w-4" />
+            <span className="flex-1">{label}</span>
+          </a>
+        ) : (
+          <Link
+            to={to}
+            activeOptions={{ exact: !!exact }}
+            activeProps={{ className: "bg-primary text-primary-foreground" }}
+            className={linkClass}
+          >
+            <Icon className="h-4 w-4" />
+            <span className="flex-1">{label}</span>
+            {count > 0 && (
+              <span className="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-semibold leading-none text-destructive-foreground">
+                {count > 99 ? "99+" : count}
+              </span>
+            )}
+          </Link>
+        )}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              aria-label={`About ${label}`}
+              className="rounded-md p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
+            >
+              <Info className="h-3.5 w-3.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="right" className="max-w-xs">
+            {info}
+          </TooltipContent>
+        </Tooltip>
+      </div>
+    );
+  };
+
+  return (
+    <nav className="flex flex-col gap-1">
+      {groups.map((g, idx) => {
+        if (!g.section) {
+          return (
+            <div key={`top-${idx}`} className="flex flex-col gap-1">
+              {g.items.map(renderLink)}
+            </div>
+          );
+        }
+        const hasActive = g.items.some((i) =>
+          i.exact ? pathname === i.to : pathname.startsWith(i.to),
+        );
+        return (
+          <Collapsible key={g.section} defaultOpen={hasActive} className="mt-2">
+            <CollapsibleTrigger className="group flex w-full items-center justify-between rounded-md px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 hover:bg-secondary hover:text-foreground">
+              <span>{g.section}</span>
+              <ChevronDown className="h-3.5 w-3.5 transition-transform group-data-[state=closed]:-rotate-90" />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-1 flex flex-col gap-1">
+              {g.items.map(renderLink)}
+            </CollapsibleContent>
+          </Collapsible>
+        );
+      })}
+    </nav>
   );
 }
