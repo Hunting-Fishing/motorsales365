@@ -137,9 +137,11 @@ function AdminAdCampaignsPage() {
               ))}
             </SelectContent>
           </Select>
-          <Button onClick={() => setEditing({ ...EMPTY })}>
-            <Plus className="h-4 w-4 mr-1" /> New campaign
-          </Button>
+          {isAdmin && (
+            <Button onClick={() => setEditing({ ...EMPTY })}>
+              <Plus className="h-4 w-4 mr-1" /> New campaign
+            </Button>
+          )}
         </div>
       </div>
 
