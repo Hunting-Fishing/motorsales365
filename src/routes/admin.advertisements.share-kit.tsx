@@ -63,6 +63,9 @@ function AdminShareKitPage() {
   const [staff, setStaff] = useState<StaffRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [autoFittingId, setAutoFittingId] = useState<string | null>(null);
+  const [bulkFitting, setBulkFitting] = useState(false);
+
 
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/login" });
