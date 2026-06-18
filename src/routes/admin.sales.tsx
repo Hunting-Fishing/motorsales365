@@ -30,9 +30,9 @@ type Tile = {
 const TILES: Tile[] = [
   { to: "/admin/accounts", label: "Accounts", desc: "Customer & business accounts, plans, lifetime spend.", Icon: UserCog },
   { to: "/admin/analytics", label: "Analytics", desc: "Traffic, conversions, sales performance.", Icon: BarChart3 },
-  { to: "/admin/advertising", label: "Ad Inquiries", desc: "Inbound advertiser inquiries and CRM.", Icon: Inbox },
-  { to: "/admin/ad-campaigns", label: "Ad Campaigns", desc: "Sponsored placements, scheduling, creative.", Icon: Megaphone },
-  { to: "/admin/promotions", label: "Promotions & Discounts", desc: "Promo codes and one-off customer discounts.", Icon: Ticket },
+  { to: "/admin/advertisements/inquiries", label: "Ad Inquiries", desc: "Inbound advertiser inquiries and CRM.", Icon: Inbox },
+  { to: "/admin/advertisements/campaigns", label: "Ad Campaigns", desc: "Sponsored placements, scheduling, creative.", Icon: Megaphone },
+  { to: "/admin/advertisements/promotions", label: "Promotions & Discounts", desc: "Promo codes and one-off customer discounts.", Icon: Ticket },
   { to: "/admin/shop", label: "Affiliate Shop", desc: "Affiliate networks, products and click analytics.", Icon: Store },
   { to: "/admin/referrals", label: "Referrals", desc: "Staff QR codes and redemption history.", Icon: QrCode },
   { to: "/dashboard/share-kit", label: "My QR / Share Kit", desc: "Apply your QR to printable templates (arm band, shirt, banners).", Icon: QrCode, external: true },
