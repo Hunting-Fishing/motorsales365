@@ -291,6 +291,42 @@ export type Database = {
         }
         Relationships: []
       }
+      advertisement_history: {
+        Row: {
+          action: string
+          changed_at: string
+          changed_by: string | null
+          id: string
+          note: string | null
+          previous: Json | null
+          snapshot: Json
+          source: string
+          source_id: string | null
+        }
+        Insert: {
+          action: string
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          note?: string | null
+          previous?: Json | null
+          snapshot: Json
+          source: string
+          source_id?: string | null
+        }
+        Update: {
+          action?: string
+          changed_at?: string
+          changed_by?: string | null
+          id?: string
+          note?: string | null
+          previous?: Json | null
+          snapshot?: Json
+          source?: string
+          source_id?: string | null
+        }
+        Relationships: []
+      }
       advertisements: {
         Row: {
           advertiser_email: string | null
