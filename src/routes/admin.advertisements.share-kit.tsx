@@ -372,17 +372,17 @@ function AdminShareKitPage() {
           <>
             <Button
               size="sm"
-              onClick={() => smartFitAll(signedRows)}
-              disabled={bulkFitting || signedRows.length === 0}
+              onClick={() => smartFitAllAds(smartTargets)}
+              disabled={bulkFitting || smartTargets.length === 0}
               className="ml-auto"
-              title="Use AI vision to find each flyer's Scan Here panel and snap the QR into it"
+              title="AI-detects the Scan Here panel on every flyer and snaps the QR into it"
             >
               {bulkFitting ? (
                 <Loader2 className="mr-1 h-4 w-4 animate-spin" />
               ) : (
                 <Sparkles className="mr-1 h-4 w-4" />
               )}
-              Smart auto-fit (AI)
+              Smart fit all ads ({smartTargets.length})
             </Button>
             <Button size="sm" onClick={() => setUploadOpen(true)}>
               <Plus className="mr-1 h-4 w-4" /> Upload new template
