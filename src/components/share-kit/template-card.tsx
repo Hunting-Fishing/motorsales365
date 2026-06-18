@@ -163,6 +163,7 @@ export function TemplateCard({ template, context, override }: Props) {
   const aspect = template.height / template.width;
 
   return (
+    <>
     <Card className="overflow-hidden">
       {editing ? (
         <div className="p-3">
