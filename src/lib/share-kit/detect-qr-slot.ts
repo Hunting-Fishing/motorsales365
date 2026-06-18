@@ -206,9 +206,6 @@ function analyseImage(img: HTMLImageElement): DetectedQrSlot {
 function clamp(v: number, lo: number, hi: number) {
   return Math.min(hi, Math.max(lo, v));
 }
-function clamp01(v: number) {
-  return clamp(v, 0, 1);
-}
 
 export async function detectQrSlotFromBlob(blob: Blob): Promise<DetectedQrSlot> {
   try {
