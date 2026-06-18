@@ -208,58 +208,34 @@ export function TemplateCard({ template, context, override }: Props) {
           </div>
         </button>
       )}
-      <div className="space-y-3 p-4">
+      <div className="space-y-2 p-2">
         <div>
-          <div className="font-display text-base font-bold">{template.label}</div>
-          <p className="text-xs text-muted-foreground">{template.description}</p>
-          <div className="mt-1 text-[10px] uppercase tracking-wider text-muted-foreground">
-            {template.width} × {template.height}px{override ? " · custom layout" : ""}
+          <div className="font-display text-xs font-bold leading-tight line-clamp-1">{template.label}</div>
+          <div className="text-[9px] uppercase tracking-wider text-muted-foreground">
+            {template.width}×{template.height}{override ? " · custom" : ""}
           </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          <Button size="sm" onClick={handleDownload} disabled={busy || !previewUrl || editing}>
-            <Download className="mr-1 h-4 w-4" aria-hidden="true" /> Download
+        <div className="flex flex-wrap gap-1">
+          <Button size="icon" variant="default" className="h-7 w-7" onClick={handleDownload} disabled={busy || !previewUrl || editing} aria-label="Download" title="Download">
+            <Download className="h-3.5 w-3.5" aria-hidden="true" />
           </Button>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={handleNativeShare}
-            disabled={busy || !previewUrl || editing}
-          >
-            <Share2 className="mr-1 h-4 w-4" aria-hidden="true" /> Share
+          <Button size="icon" variant="outline" className="h-7 w-7" onClick={handleNativeShare} disabled={busy || !previewUrl || editing} aria-label="Share" title="Share">
+            <Share2 className="h-3.5 w-3.5" aria-hidden="true" />
           </Button>
-          <Button
-            size="sm"
-            variant={editing ? "default" : "outline"}
-            onClick={() => setEditing((v) => !v)}
-            aria-pressed={editing}
-          >
-            <SlidersHorizontal className="mr-1 h-4 w-4" aria-hidden="true" />
-            {editing ? "Close editor" : "Edit layout"}
+          <Button size="icon" variant={editing ? "default" : "outline"} className="h-7 w-7" onClick={() => setEditing((v) => !v)} aria-pressed={editing} aria-label="Edit layout" title="Edit layout">
+            <SlidersHorizontal className="h-3.5 w-3.5" aria-hidden="true" />
           </Button>
-          <Button size="sm" variant="outline" onClick={handleCopy} disabled={editing}>
-            <Copy className="mr-1 h-4 w-4" aria-hidden="true" /> Copy link
+          <Button size="icon" variant="outline" className="h-7 w-7" onClick={handleCopy} disabled={editing} aria-label="Copy link" title="Copy link">
+            <Copy className="h-3.5 w-3.5" aria-hidden="true" />
           </Button>
           <a href={fbHref} target="_blank" rel="noreferrer">
-            <Button
-              size="sm"
-              variant="ghost"
-              aria-label="Share on Facebook"
-              title="Share on Facebook"
-              disabled={editing}
-            >
-              <Facebook className="h-4 w-4" aria-hidden="true" />
+            <Button size="icon" variant="ghost" className="h-7 w-7" aria-label="Share on Facebook" title="Share on Facebook" disabled={editing}>
+              <Facebook className="h-3.5 w-3.5" aria-hidden="true" />
             </Button>
           </a>
           <a href={waHref} target="_blank" rel="noreferrer">
-            <Button
-              size="sm"
-              variant="ghost"
-              aria-label="Share on WhatsApp"
-              title="Share on WhatsApp"
-              disabled={editing}
-            >
-              <MessageCircle className="h-4 w-4" aria-hidden="true" />
+            <Button size="icon" variant="ghost" className="h-7 w-7" aria-label="Share on WhatsApp" title="Share on WhatsApp" disabled={editing}>
+              <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" />
             </Button>
           </a>
         </div>

@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { TemplateCard } from "@/components/share-kit/template-card";
 import { ShareKitTemplateUpload } from "@/components/share-kit/template-upload-dialog";
+import { useSignedCustomTemplates } from "@/components/share-kit/use-signed-custom-templates";
 import { TEMPLATES } from "@/lib/share-kit/templates";
 import type { ShareTemplate } from "@/lib/share-kit/types";
 import { listShareKitLayouts } from "@/lib/share-kit-layouts.functions";
@@ -113,6 +114,7 @@ function ShareKitPage() {
     queryFn: () => customFn(),
     enabled: !!user,
   });
+  const { data: signedCustoms } = useSignedCustomTemplates(customData?.templates);
 
   const deleteFn = useServerFn(deleteShareKitCustomTemplate);
   const hideFn = useServerFn(setBuiltinHidden);
@@ -169,8 +171,11 @@ function ShareKitPage() {
   }
 
   const hiddenBuiltins = new Set(customData?.hiddenBuiltins ?? []);
-  const customTemplates = (customData?.templates ?? []).map(customToTemplate);
-  const customById = new Map((customData?.templates ?? []).map((r) => [`custom:${r.id}`, r]));
+  const signedRows: CustomTemplateRow[] = signedCustoms ?? customData?.templates ?? [];
+  const customTemplates = signedRows.map(customToTemplate);
+  const customById = new Map<string, CustomTemplateRow>(
+    signedRows.map((r) => [`custom:${r.id}`, r]),
+  );
   // Active grid: never show hidden built-ins (history is gated behind admin toggle below)
   const activeBuiltins = TEMPLATES.filter((t) => !hiddenBuiltins.has(t.id));
   const historyBuiltins = TEMPLATES.filter((t) => hiddenBuiltins.has(t.id));
@@ -229,11 +234,11 @@ function ShareKitPage() {
       </div>
 
       {context && (
-        <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]">
+        <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(140px,1fr))]">
           {allTemplates.map((t) => {
             const custom = customById.get(t.id);
             return (
-              <div key={t.id} className="relative mx-auto w-full max-w-[240px]">
+              <div key={t.id} className="relative mx-auto w-full max-w-[180px]">
                 <TemplateCard
                   template={t}
                   context={context}
@@ -280,9 +285,9 @@ function ShareKitPage() {
           {historyBuiltins.length === 0 ? (
             <p className="text-sm text-muted-foreground">Nothing in history yet.</p>
           ) : (
-            <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]">
+            <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(140px,1fr))]">
               {historyBuiltins.map((t) => (
-                <div key={t.id} className="relative mx-auto w-full max-w-[240px] opacity-80">
+                <div key={t.id} className="relative mx-auto w-full max-w-[180px] opacity-80">
                   <TemplateCard template={t} context={context} override={layouts?.[t.id]} />
                   <div className="mt-2 flex justify-end">
                     <Button variant="outline" size="sm" onClick={() => restoreBuiltin(t.id)}>

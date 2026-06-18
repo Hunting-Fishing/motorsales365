@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { TemplateCard } from "@/components/share-kit/template-card";
 import { ShareKitTemplateUpload } from "@/components/share-kit/template-upload-dialog";
+import { useSignedCustomTemplates } from "@/components/share-kit/use-signed-custom-templates";
 import { TEMPLATES } from "@/lib/share-kit/templates";
 import type { ShareTemplate } from "@/lib/share-kit/types";
 import { listShareKitLayouts } from "@/lib/share-kit-layouts.functions";
@@ -102,6 +103,8 @@ function AdminShareKitPage() {
     queryFn: () => customFn(),
     enabled: !!user,
   });
+  const { data: signedCustoms } = useSignedCustomTemplates(customData?.templates);
+
 
   const deleteFn = useServerFn(deleteShareKitCustomTemplate);
   const hideFn = useServerFn(setBuiltinHidden);
@@ -144,8 +147,9 @@ function AdminShareKitPage() {
   }
 
   const hiddenBuiltins = new Set(customData?.hiddenBuiltins ?? []);
-  const customTemplates = (customData?.templates ?? []).map(customToTemplate);
-  const customById = new Map((customData?.templates ?? []).map((r) => [`custom:${r.id}`, r]));
+  const signedRows: CustomTemplateRow[] = signedCustoms ?? customData?.templates ?? [];
+  const customTemplates = signedRows.map(customToTemplate);
+  const customById = new Map<string, CustomTemplateRow>(signedRows.map((r) => [`custom:${r.id}`, r]));
   const visibleBuiltins = TEMPLATES.filter((t) => isAdmin || !hiddenBuiltins.has(t.id));
   const allTemplates: ShareTemplate[] = [...customTemplates, ...visibleBuiltins];
 
