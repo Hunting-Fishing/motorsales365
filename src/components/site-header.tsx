@@ -19,8 +19,9 @@ import {
   Inbox,
   Building2,
   CreditCard,
+  UserCog,
 } from "lucide-react";
-import { useAuth, type SellerType } from "@/hooks/use-auth";
+import { useAuth, type SellerType, type AppRole } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/brand-logo";
 import { supabase } from "@/integrations/supabase/client";
@@ -55,6 +56,18 @@ const SELLER_VIEW_OPTIONS: { value: SellerType; label: string }[] = [
   { value: "insurance", label: "Insurance" },
 ];
 
+const ROLE_SIM_OPTIONS: { value: AppRole; label: string }[] = [
+  { value: "admin", label: "Admin" },
+  { value: "sales", label: "Sales" },
+  { value: "sales_junior", label: "Sales · Junior" },
+  { value: "sales_senior", label: "Sales · Senior" },
+  { value: "sales_manager", label: "Sales · Manager" },
+  { value: "moderator", label: "Moderator" },
+  { value: "support", label: "Support" },
+  { value: "advertising", label: "Advertising" },
+  { value: "user", label: "Regular user (no staff)" },
+];
+
 export function SiteHeader() {
   const {
     user,
@@ -68,6 +81,10 @@ export function SiteHeader() {
     effectiveSellerType,
     simulatedSellerType,
     setSimulatedSellerType,
+    realIsAdmin,
+    effectiveRoles,
+    simulatedRoles,
+    setSimulatedRoles,
   } = useAuth();
   const navigate = useNavigate();
 
@@ -271,6 +288,59 @@ export function SiteHeader() {
                     </DropdownMenuItem>
                   </>
                 )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+
+          {/* Role simulator — real admins only */}
+          {user && realIsAdmin && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="hidden md:inline-flex gap-2" title="Simulate staff roles (UI only)">
+                  <UserCog className="h-4 w-4" />
+                  <span className="hidden lg:inline">
+                    Role:{" "}
+                    {simulatedRoles && simulatedRoles.length > 0
+                      ? simulatedRoles.join(", ")
+                      : "Admin (real)"}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64">
+                <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Simulate role (UI only)
+                </div>
+                {ROLE_SIM_OPTIONS.map((o) => {
+                  const active = (simulatedRoles ?? []).includes(o.value);
+                  return (
+                    <DropdownMenuItem
+                      key={o.value}
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        const current = simulatedRoles ?? [];
+                        const next = active
+                          ? current.filter((r) => r !== o.value)
+                          : [...current, o.value];
+                        setSimulatedRoles(next.length ? next : null);
+                      }}
+                    >
+                      {active ? "✓ " : "  "}
+                      {o.label}
+                    </DropdownMenuItem>
+                  );
+                })}
+                {simulatedRoles && simulatedRoles.length > 0 && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={() => setSimulatedRoles(null)}>
+                      Reset to my real roles
+                    </DropdownMenuItem>
+                  </>
+                )}
+                <DropdownMenuSeparator />
+                <div className="px-2 py-1 text-[10px] text-muted-foreground">
+                  Effective: {effectiveRoles.join(", ") || "none"}
+                </div>
               </DropdownMenuContent>
             </DropdownMenu>
           )}

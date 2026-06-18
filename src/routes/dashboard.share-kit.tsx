@@ -63,7 +63,8 @@ function customToTemplate(row: CustomTemplateRow): ShareTemplate {
 }
 
 function ShareKitPage() {
-  const { user, isAdmin, loading: authLoading } = useAuth();
+  const { user, realIsAdmin, loading: authLoading } = useAuth();
+  const isAdmin = realIsAdmin;
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [staff, setStaff] = useState<StaffRow | null>(null);
