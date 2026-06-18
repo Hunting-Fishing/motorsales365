@@ -186,11 +186,13 @@ function AdminAdCampaignsPage() {
               </div>
               <div className="flex flex-col gap-1">
                 <Button size="sm" variant="outline" onClick={() => setEditing({ ...a })}>
-                  <Pencil className="h-3 w-3 mr-1" /> Edit
+                  <Pencil className="h-3 w-3 mr-1" /> {isAdmin ? "Edit" : "View"}
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => remove(a.id)}>
-                  <Trash2 className="h-3 w-3 mr-1" /> Delete
-                </Button>
+                {isAdmin && (
+                  <Button size="sm" variant="ghost" onClick={() => remove(a.id)}>
+                    <Trash2 className="h-3 w-3 mr-1" /> Delete
+                  </Button>
+                )}
               </div>
             </div>
           ))}
