@@ -178,24 +178,34 @@ export function TemplateCard({ template, context, override }: Props) {
           />
         </div>
       ) : (
-        <div className="bg-muted/30 p-3">
+        <button
+          type="button"
+          onClick={() => previewUrl && setZoomOpen(true)}
+          className="block w-full bg-muted/30 p-2 text-left transition hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary"
+          aria-label={`Expand preview of ${template.label}`}
+        >
           <div
             className="relative w-full overflow-hidden rounded-md border border-border bg-white"
             style={{ paddingTop: `${aspect * 100}%` }}
           >
             {previewUrl ? (
-              <img
-                src={previewUrl}
-                alt={`Preview of ${template.label} with your personal QR code`}
-                className="absolute inset-0 h-full w-full object-contain"
-              />
+              <>
+                <img
+                  src={previewUrl}
+                  alt={`Preview of ${template.label} with your personal QR code`}
+                  className="absolute inset-0 h-full w-full object-contain"
+                />
+                <span className="absolute right-1.5 top-1.5 rounded-md bg-background/80 p-1 text-muted-foreground shadow-sm backdrop-blur-sm">
+                  <Maximize2 className="h-3.5 w-3.5" aria-hidden="true" />
+                </span>
+              </>
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-xs text-muted-foreground">
                 Rendering…
               </div>
             )}
           </div>
-        </div>
+        </button>
       )}
       <div className="space-y-3 p-4">
         <div>
