@@ -326,7 +326,7 @@ function AdminAdCampaignsPage() {
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
-            <Button onClick={save}>Save</Button>
+            {isAdmin && <Button onClick={save}>Save</Button>}
           </DialogFooter>
         </DialogContent>
       </Dialog>
