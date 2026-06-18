@@ -113,6 +113,7 @@ function AdminShareKitPage() {
 
   const deleteFn = useServerFn(deleteShareKitCustomTemplate);
   const hideFn = useServerFn(setBuiltinHidden);
+  const updateQrFn = useServerFn(updateShareKitTemplateQrPlacement);
 
   async function deleteCustom(id: string, label: string) {
     if (!confirm(`Delete template "${label}"? This cannot be undone.`)) return;
@@ -134,6 +135,85 @@ function AdminShareKitPage() {
       toast.error(e?.message ?? "Failed");
     }
   }
+
+  // Run detector against the signed image and persist new QR placement.
+  // Returns true on detected + saved, false on no-confidence / error.
+  async function autoFitOne(row: CustomTemplateRow): Promise<boolean> {
+    const slot = await detectQrSlotFromUrl(row.image_url);
+    if (!isDetected(slot)) return false;
+    await updateQrFn({
+      data: {
+        id: row.id,
+        qr_cx: slot.cx,
+        qr_cy: slot.cy,
+        qr_size: slot.size,
+      },
+    });
+    return true;
+  }
+
+  async function autoFitCard(row: CustomTemplateRow) {
+    setAutoFittingId(row.id);
+    try {
+      const ok = await autoFitOne(row);
+      if (ok) {
+        toast.success(`Auto-fit QR for "${row.label}"`);
+        qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+      } else {
+        toast.warning(
+          `Could not find a white QR panel in "${row.label}". Use Edit layout to place it manually.`,
+        );
+      }
+    } catch (e: any) {
+      toast.error(e?.message ?? "Auto-fit failed");
+    } finally {
+      setAutoFittingId(null);
+    }
+  }
+
+  async function autoFitAll(rows: CustomTemplateRow[]) {
+    if (rows.length === 0) return;
+    if (
+      !confirm(
+        `Auto-fit QR on all ${rows.length} custom templates? This may overwrite manual adjustments.`,
+      )
+    )
+      return;
+    setBulkFitting(true);
+    const concurrency = 4;
+    let detected = 0;
+    let skipped = 0;
+    let failed = 0;
+    const t = toast.loading(`Auto-fitting 0 / ${rows.length}…`);
+    let processed = 0;
+    let cursor = 0;
+
+    async function worker() {
+      while (cursor < rows.length) {
+        const idx = cursor++;
+        const row = rows[idx];
+        try {
+          const ok = await autoFitOne(row);
+          if (ok) detected++;
+          else skipped++;
+        } catch {
+          failed++;
+        }
+        processed++;
+        toast.loading(`Auto-fitting ${processed} / ${rows.length}…`, { id: t });
+      }
+    }
+    await Promise.all(
+      Array.from({ length: Math.min(concurrency, rows.length) }, () => worker()),
+    );
+    toast.dismiss(t);
+    toast.success(
+      `Auto-fit done — ${detected} placed, ${skipped} no panel, ${failed} failed`,
+    );
+    qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+    setBulkFitting(false);
+  }
+
 
   if (authLoading || loading) {
     return <div className="p-12 text-center text-muted-foreground">Loading your share kit…</div>;
