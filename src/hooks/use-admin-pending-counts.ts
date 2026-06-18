@@ -69,7 +69,9 @@ export function pendingCountForRoute(
       return counts.claims_pending;
     case "/admin/payments":
       return counts.payments_pending;
-    case "/admin/advertising":
+    case "/admin/advertisements":
+      return counts.ad_inquiries_open + counts.ad_campaigns_pending;
+    case "/admin/advertisements/inquiries":
       return counts.ad_inquiries_open;
     case "/admin/inquiries":
       return counts.service_inquiries_open + counts.business_inquiries_open;
@@ -77,7 +79,7 @@ export function pendingCountForRoute(
       return counts.location_corrections_pending;
     case "/admin/type-suggestions":
       return counts.type_suggestions_pending;
-    case "/admin/ad-campaigns":
+    case "/admin/advertisements/campaigns":
       return counts.ad_campaigns_pending;
     case "/admin/alerts":
       return counts.ops_alerts_unack;
@@ -95,12 +97,12 @@ export const ADMIN_NOTIFICATION_ITEMS: { key: keyof AdminPendingCounts; label: s
   { key: "verifications_pending", label: "Pending verifications", to: "/admin/verifications" },
   { key: "claims_pending", label: "Business claims", to: "/admin/claims" },
   { key: "payments_pending", label: "Payments to review", to: "/admin/payments" },
-  { key: "ad_inquiries_open", label: "Ad inquiries", to: "/admin/advertising" },
+  { key: "ad_inquiries_open", label: "Ad inquiries", to: "/admin/advertisements/inquiries" },
   { key: "service_inquiries_open", label: "Service inquiries", to: "/admin/inquiries" },
   { key: "business_inquiries_open", label: "Business inquiries", to: "/admin/inquiries" },
   { key: "location_corrections_pending", label: "Location fixes", to: "/admin/location-corrections" },
   { key: "type_suggestions_pending", label: "Type suggestions", to: "/admin/type-suggestions" },
-  { key: "ad_campaigns_pending", label: "Ad campaigns to review", to: "/admin/ad-campaigns" },
+  { key: "ad_campaigns_pending", label: "Ad campaigns to review", to: "/admin/advertisements/campaigns" },
   { key: "ops_alerts_unack", label: "Ops alerts", to: "/admin/alerts" },
   { key: "support_tickets_open", label: "Support tickets", to: "/admin/inquiries" },
   { key: "discover_queue_pending", label: "Discover queue", to: "/admin/discover-businesses" },

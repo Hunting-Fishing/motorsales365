@@ -89,7 +89,7 @@ const AdInquiryStaffNotice = ({
           </Text>
         </Section>
         <Section style={{ margin: "20px 0" }}>
-          <Button href={`${SITE_URL}/admin/advertising`} style={button}>
+          <Button href={`${SITE_URL}/admin/advertisements/inquiries`} style={button}>
             Open inbox
           </Button>
         </Section>

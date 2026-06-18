@@ -1,5 +1,5 @@
 // Single source of truth for placement catalog used by /advertise,
-// /dashboard/sponsorships, and /admin/advertising.
+// /dashboard/sponsorships, and /admin/advertisements/inquiries.
 
 export const SECTIONS = [
   {

@@ -21,7 +21,7 @@ import { SECTIONS, FORMATS, sectionLabel, formatLabel } from "@/components/adver
 import { ContactRequestButton } from "@/components/admin/contact-request-button";
 import { useStaffScope } from "@/hooks/use-staff-scope";
 
-export const Route = createFileRoute("/admin/advertising")({
+export const Route = createFileRoute("/admin/advertisements/inquiries")({
   component: AdminAdvertising,
 });
 
@@ -525,7 +525,7 @@ function AdminAdvertising() {
                     Convert this inquiry into a live ad campaign.
                   </div>
                   <Button asChild size="sm" variant="outline">
-                    <Link to="/admin/ad-campaigns">Open ad campaigns</Link>
+                    <Link to="/admin/advertisements/campaigns">Open ad campaigns</Link>
                   </Button>
                 </div>
               )}
