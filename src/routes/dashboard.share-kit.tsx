@@ -241,17 +241,21 @@ function ShareKitPage() {
                       >
                         <Trash2 className="mr-1 h-4 w-4" /> Delete
                       </Button>
+                    ) : builtinHidden ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => restoreBuiltin(t.id)}
+                      >
+                        <Eye className="mr-1 h-4 w-4" /> Restore
+                      </Button>
                     ) : (
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => toggleBuiltinHidden(t.id, builtinHidden)}
+                        onClick={() => deleteBuiltin(t.id, t.label)}
                       >
-                        {builtinHidden ? (
-                          <><Eye className="mr-1 h-4 w-4" /> Show to staff</>
-                        ) : (
-                          <><EyeOff className="mr-1 h-4 w-4" /> Hide from staff</>
-                        )}
+                        <Trash2 className="mr-1 h-4 w-4" /> Delete
                       </Button>
                     )}
                   </div>
