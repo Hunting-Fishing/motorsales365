@@ -13,7 +13,7 @@ const upsertSchema = z.object({
 });
 
 const deleteSchema = z.object({
-  templateId: z.string().min(1).max(100).regex(/^[a-z0-9_-]+$/i),
+  templateId: z.string().min(1).max(100).regex(/^[a-z0-9_:-]+$/i),
 });
 
 type Row = { template_id: string; cx: number; cy: number; size: number };
