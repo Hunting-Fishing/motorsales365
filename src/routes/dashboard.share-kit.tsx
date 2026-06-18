@@ -126,10 +126,21 @@ function ShareKitPage() {
     }
   }
 
-  async function toggleBuiltinHidden(templateId: string, currentlyHidden: boolean) {
+  async function deleteBuiltin(templateId: string, label: string) {
+    if (!confirm(`Delete template "${label}"? It will be hidden from staff and moved to history.`)) return;
     try {
-      await hideFn({ data: { templateId, hidden: !currentlyHidden } });
-      toast.success(currentlyHidden ? "Template restored" : "Template hidden");
+      await hideFn({ data: { templateId, hidden: true } });
+      toast.success("Template deleted");
+      qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    }
+  }
+
+  async function restoreBuiltin(templateId: string) {
+    try {
+      await hideFn({ data: { templateId, hidden: false } });
+      toast.success("Template restored");
       qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
     } catch (e: any) {
       toast.error(e?.message ?? "Failed");
