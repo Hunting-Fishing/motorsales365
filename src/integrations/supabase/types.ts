@@ -6878,6 +6878,81 @@ export type Database = {
           },
         ]
       }
+      share_kit_custom_templates: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          description: string | null
+          height: number
+          id: string
+          image_url: string
+          label: string
+          qr_cx: number
+          qr_cy: number
+          qr_size: number
+          share_text: string
+          slug: string
+          sort_order: number
+          updated_at: string
+          width: number
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          height: number
+          id?: string
+          image_url: string
+          label: string
+          qr_cx?: number
+          qr_cy?: number
+          qr_size?: number
+          share_text?: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+          width: number
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          height?: number
+          id?: string
+          image_url?: string
+          label?: string
+          qr_cx?: number
+          qr_cy?: number
+          qr_size?: number
+          share_text?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+          width?: number
+        }
+        Relationships: []
+      }
+      share_kit_hidden_builtins: {
+        Row: {
+          hidden_at: string
+          hidden_by: string | null
+          template_id: string
+        }
+        Insert: {
+          hidden_at?: string
+          hidden_by?: string | null
+          template_id: string
+        }
+        Update: {
+          hidden_at?: string
+          hidden_by?: string | null
+          template_id?: string
+        }
+        Relationships: []
+      }
       share_kit_layouts: {
         Row: {
           cx: number
