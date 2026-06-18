@@ -302,6 +302,7 @@ export function TemplateCard({ template, context, override }: Props) {
         </div>
       </div>
     </Card>
+    </div>
     <Dialog open={zoomOpen} onOpenChange={setZoomOpen}>
       <DialogContent className="max-w-[95vw] sm:max-w-[90vw] lg:max-w-5xl p-3 sm:p-4">
         <DialogTitle className="text-base">{template.label}</DialogTitle>
