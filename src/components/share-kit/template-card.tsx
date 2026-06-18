@@ -224,6 +224,7 @@ export function TemplateCard({ template, context, override }: Props) {
 
   return (
     <>
+    <div ref={containerRef}>
     <Card className="overflow-hidden">
       {editing ? (
         <div className="p-3">
