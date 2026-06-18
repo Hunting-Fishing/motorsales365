@@ -19,8 +19,9 @@ import {
   Inbox,
   Building2,
   CreditCard,
+  UserCog,
 } from "lucide-react";
-import { useAuth, type SellerType } from "@/hooks/use-auth";
+import { useAuth, type SellerType, type AppRole } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { BrandLogo } from "@/components/brand-logo";
 import { supabase } from "@/integrations/supabase/client";
