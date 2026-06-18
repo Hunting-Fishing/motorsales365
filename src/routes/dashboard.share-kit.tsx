@@ -171,8 +171,10 @@ function ShareKitPage() {
   const hiddenBuiltins = new Set(customData?.hiddenBuiltins ?? []);
   const customTemplates = (customData?.templates ?? []).map(customToTemplate);
   const customById = new Map((customData?.templates ?? []).map((r) => [`custom:${r.id}`, r]));
-  const visibleBuiltins = TEMPLATES.filter((t) => isAdmin || !hiddenBuiltins.has(t.id));
-  const allTemplates: ShareTemplate[] = [...customTemplates, ...visibleBuiltins];
+  // Active grid: never show hidden built-ins (history is gated behind admin toggle below)
+  const activeBuiltins = TEMPLATES.filter((t) => !hiddenBuiltins.has(t.id));
+  const historyBuiltins = TEMPLATES.filter((t) => hiddenBuiltins.has(t.id));
+  const allTemplates: ShareTemplate[] = [...customTemplates, ...activeBuiltins];
 
   return (
     <div className="space-y-6">
