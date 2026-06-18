@@ -139,6 +139,7 @@ export function ShareKitTemplateUpload({ open, onOpenChange, onSaved }: Props) {
     for (const f of arr) {
       try {
         const { w, h, url } = await readDims(f);
+        const slot = await detectQrSlotFromBlob(f);
         next.push({
           id: `${f.name}-${f.size}-${Math.random().toString(36).slice(2, 8)}`,
           file: f,
@@ -148,6 +149,10 @@ export function ShareKitTemplateUpload({ open, onOpenChange, onSaved }: Props) {
           height: h,
           status: "pending",
           progress: 0,
+          qrCx: slot.cx,
+          qrCy: slot.cy,
+          qrSize: slot.size,
+          qrDetected: isDetected(slot),
         });
       } catch {
         toast.error(`Skipped ${f.name} (could not read image).`);
