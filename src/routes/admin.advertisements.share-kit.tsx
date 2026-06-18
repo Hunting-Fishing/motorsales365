@@ -66,6 +66,7 @@ function AdminShareKitPage() {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [autoFittingId, setAutoFittingId] = useState<string | null>(null);
   const [bulkFitting, setBulkFitting] = useState(false);
+  const [applyingAllId, setApplyingAllId] = useState<string | null>(null);
 
 
   useEffect(() => {
