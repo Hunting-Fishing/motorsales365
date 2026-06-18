@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Eye, EyeOff, Plus, Trash2 } from "lucide-react";
+import { Eye, Plus, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -126,10 +126,21 @@ function ShareKitPage() {
     }
   }
 
-  async function toggleBuiltinHidden(templateId: string, currentlyHidden: boolean) {
+  async function deleteBuiltin(templateId: string, label: string) {
+    if (!confirm(`Delete template "${label}"? It will be hidden from staff and moved to history.`)) return;
     try {
-      await hideFn({ data: { templateId, hidden: !currentlyHidden } });
-      toast.success(currentlyHidden ? "Template restored" : "Template hidden");
+      await hideFn({ data: { templateId, hidden: true } });
+      toast.success("Template deleted");
+      qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    }
+  }
+
+  async function restoreBuiltin(templateId: string) {
+    try {
+      await hideFn({ data: { templateId, hidden: false } });
+      toast.success("Template restored");
       qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
     } catch (e: any) {
       toast.error(e?.message ?? "Failed");
@@ -230,17 +241,21 @@ function ShareKitPage() {
                       >
                         <Trash2 className="mr-1 h-4 w-4" /> Delete
                       </Button>
+                    ) : builtinHidden ? (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => restoreBuiltin(t.id)}
+                      >
+                        <Eye className="mr-1 h-4 w-4" /> Restore
+                      </Button>
                     ) : (
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => toggleBuiltinHidden(t.id, builtinHidden)}
+                        onClick={() => deleteBuiltin(t.id, t.label)}
                       >
-                        {builtinHidden ? (
-                          <><Eye className="mr-1 h-4 w-4" /> Show to staff</>
-                        ) : (
-                          <><EyeOff className="mr-1 h-4 w-4" /> Hide from staff</>
-                        )}
+                        <Trash2 className="mr-1 h-4 w-4" /> Delete
                       </Button>
                     )}
                   </div>
