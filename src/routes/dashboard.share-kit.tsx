@@ -169,8 +169,9 @@ function ShareKitPage() {
   }
 
   const hiddenBuiltins = new Set(customData?.hiddenBuiltins ?? []);
-  const customTemplates = (customData?.templates ?? []).map(customToTemplate);
-  const customById = new Map((customData?.templates ?? []).map((r) => [`custom:${r.id}`, r]));
+  const signedRows = signedCustoms ?? customData?.templates ?? [];
+  const customTemplates = signedRows.map(customToTemplate);
+  const customById = new Map(signedRows.map((r) => [`custom:${r.id}`, r]));
   // Active grid: never show hidden built-ins (history is gated behind admin toggle below)
   const activeBuiltins = TEMPLATES.filter((t) => !hiddenBuiltins.has(t.id));
   const historyBuiltins = TEMPLATES.filter((t) => hiddenBuiltins.has(t.id));
