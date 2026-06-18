@@ -1,55 +1,52 @@
-# Smart fit all ads — one action
+## Goal
 
-Replace the current admin "Smart auto-fit (AI)" button (which only touches custom uploads) with a single **Smart fit all ads** action that runs Smart auto-fit across every advertisement on the page in one step.
+Transform `/r/$code` (currently a compact "Jordi sent you here" card) into a full marketing landing page that captivates visitors and converts them to sign up / browse / partner, while preserving the existing referral attribution, scan-counting, and promos logic.
 
-## Scope of "every ad"
+## Scope
 
-| Ad type | Image source | Persisted to | Action |
-| --- | --- | --- | --- |
-| Custom uploads (`signedRows`) | `row.image_url` | `share_kit_custom_templates.qr_cx/cy/size` via `updateShareKitTemplateQrPlacement` | Vision → heuristic fallback (today's `smartFitOne`) |
-| Built-in `kind: "image"` (rear-shirt, arm-band, …) | `template.imageUrl` | `share_kit_layouts` per-user override via `upsertShareKitLayout` (templateId = built-in id) | Vision only (no pixel heuristic for remote PNGs) |
-| Built-in `kind: "svg"` | n/a — QR slot is hard-coded in the SVG | — | Skipped (already correctly placed) |
+Single file: `src/routes/r.$code.tsx`. No backend, schema, or routing changes. All existing tracking (`record_referral_touch`, scan logging, localStorage visit count, active promos, referral credit semantics) is kept exactly as-is.
 
-Built-in image ads need a per-user override path because their default `qr` coords ship in `TEMPLATES` and are not editable globally. The existing `share_kit_layouts` table + `upsertShareKitLayout` server function already handle this.
+## Layout (top → bottom)
 
-## UI changes (`src/routes/admin.advertisements.share-kit.tsx`)
+1. **Referral credit card (kept at top, as requested)**
+   - Existing "Referred by · {staffName} sent you here" card.
+   - Keep: counted/repeat-scan chip + tooltip, visit-count info, active promos, and the two primary CTAs (Create an account / Browse listings).
+   - Add a third button: **Partner your business with us** → `/businesses` (existing route).
+   - Add a small "Contact: {referrer email} mailto" line below the CTAs, using the referring staff member's email pulled from `profiles.email` via the existing referral lookup (extend the current `staff_referrals` query to also fetch the linked profile's email). If no email is available, hide the line — never show a placeholder.
 
-- Rename the toolbar button to **Smart fit all ads** (keep `Sparkles` icon, keep admin-only gate).
-- Drop the `confirm()` dialog — single click runs immediately, progress + result are shown via toast.
-- Disabled state: `bulkFitting || totalEligible === 0`.
-- Tooltip: "AI-detects the Scan Here panel on every flyer and snaps the QR into it."
-- Remove the per-card "Smart fit" button to commit to one action (per-card layout editor stays).
+2. **Hero**
+   - H1: "365 Motor Sales — The Motor Marketplace Built for the Philippines"
+   - Subhead: "Buy. Sell. List. Partner. Learn. Play."
+   - Short intro paragraph from the brief.
+   - CTAs: "List With 365 Motor Sales" (→ `/listings/new`) and "Partner Your Business With Us" (→ `/businesses`).
 
-## Logic changes
+3. **Why 365 Is Different** — two-column comparison: "Generic feeds" vs "365 Motor Sales".
 
-Extend `smartFitOne` into a polymorphic `smartFitAny(target)` where `target` is either:
+4. **What You Can List** — two cards: Vehicle Listings (cars, motorcycles, trucks, vans, heavy/farm/construction equipment, marine) and Business Listings (tire/vulcanizing, car wash, auto/moto repair, aircon, towing, driving schools, insurance, parts, batteries, accessories, wraps, detailing, salvage, equipment service).
 
-```ts
-{ kind: "custom"; row: CustomTemplateRow }
-{ kind: "builtin-image"; template: ShareTemplate }
-```
+5. **Business Network Advantage** — short pitch paragraph.
 
-- `custom` branch persists with `updateQrFn` (unchanged).
-- `builtin-image` branch persists with `useServerFn(upsertShareKitLayout)` passing `{ templateId: template.id, qrCx, qrCy, qrSize }`.
-- Both branches still call vision first, then the heuristic for customs, and run `assessQrReadability` for the toast summary.
-- SVG built-ins are filtered out before queueing.
+6. **Coming Soon** — three feature cards: Online Parts Ordering, Shop Management Software, Education + International Skills Training. Each lists the planned bullets from the brief, with a "Coming soon" badge.
 
-Replace `smartFitAll(rows)` with `smartFitAllAds()`:
+7. **Mobile Game Ecosystem** — card with "Earn Freebies & Add Boosts" highlight and bullets.
 
-1. Build `targets = [...customs.map(custom), ...visibleBuiltins.filter(kind==='image').map(builtinImage)]`.
-2. Worker pool, concurrency 3 (vision-bound).
-3. Toast loading: `Smart-fitting N / total — A AI · H heuristic · R review`.
-4. On finish, invalidate both `["share-kit-custom-templates"]` and `["share-kit-layouts"]` so the cards re-render with the new placements.
-5. Hard-stop on `credits exhausted` / `LOVABLE_API_KEY` errors (already implemented).
+8. **Built for the Philippines First** — short closer + bullet list of audiences.
+
+9. **Final CTA band** — "Join the 365 Motor Sales Network" with three buttons: List a vehicle, List a business, Browse listings. Repeats the referrer email mailto line.
+
+All copy comes verbatim (lightly tightened) from the user's brief.
 
 ## Technical notes
 
-- No DB migration. `share_kit_layouts` already exists with the `templateId` regex `^[a-z0-9_:-]+$/i` that accepts built-in ids.
-- No schema or API contract changes; reuses existing `detectScanHereWithVision`, `updateShareKitTemplateQrPlacement`, `upsertShareKitLayout`.
-- No change to upload dialog, vision function, or readability assessor.
+- Keep `SiteLayout` + `TooltipProvider` wrapper. Replace the single `max-w-2xl` container with a wider container (`max-w-5xl`) for the marketing sections; the referral credit card stays `max-w-2xl` centered at the top.
+- Add `head()` meta: title "Referred to 365 Motor Sales — Philippines Motor Marketplace", description, og:title/og:description, canonical to `https://365motorsales.com/r/{code}`.
+- Extend the `staff_referrals` Supabase select to join the referring profile and read `email` (e.g. `profiles!staff_referrals_user_id_fkey(email, full_name)`). Use it for both the displayed name (existing) and the new contact mailto.
+- All styling uses existing semantic tokens (`bg-card`, `border-border`, `text-muted-foreground`, `bg-primary`, etc.). No hardcoded colors.
+- Icons from `lucide-react` (already in project).
+- No new dependencies, no new routes, no schema changes.
 
-## Files
+## Out of scope
 
-- Edit: `src/routes/admin.advertisements.share-kit.tsx`
-
-No new files, no migrations, no env vars.
+- Changing referral tracking, scan counting, or promo logic.
+- Adding new pages (e.g. dedicated `/partner`).
+- Adding `og:image` (will be added separately if user wants).
