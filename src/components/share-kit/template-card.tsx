@@ -28,6 +28,7 @@ export function TemplateCard({ template, context, override }: Props) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [zoomOpen, setZoomOpen] = useState(false);
   const qc = useQueryClient();
   const upsertFn = useServerFn(upsertShareKitLayout);
   const deleteFn = useServerFn(deleteShareKitLayout);
