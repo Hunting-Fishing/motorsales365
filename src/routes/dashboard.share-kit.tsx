@@ -229,40 +229,25 @@ function ShareKitPage() {
       </div>
 
       {context && (
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
           {allTemplates.map((t) => {
             const custom = customById.get(t.id);
-            const isBuiltin = !custom;
-            const builtinHidden = isBuiltin && hiddenBuiltins.has(t.id);
             return (
               <div key={t.id} className="relative">
-                {builtinHidden && (
-                  <div className="absolute inset-0 z-10 rounded-xl bg-background/80 backdrop-blur-sm flex items-center justify-center text-xs font-semibold text-muted-foreground pointer-events-none">
-                    Hidden from staff
-                  </div>
-                )}
                 <TemplateCard
                   template={t}
                   context={context}
                   override={layouts?.[t.id]}
                 />
                 {isAdmin && (
-                  <div className="mt-2 flex justify-end gap-2">
+                  <div className="mt-2 flex justify-end">
                     {custom ? (
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => deleteCustom(custom.id, custom.label)}
                       >
-                        <Trash2 className="mr-1 h-4 w-4" /> Delete
-                      </Button>
-                    ) : builtinHidden ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => restoreBuiltin(t.id)}
-                      >
-                        <Eye className="mr-1 h-4 w-4" /> Restore
+                        <Trash2 className="mr-1 h-3.5 w-3.5" /> Delete
                       </Button>
                     ) : (
                       <Button
@@ -270,7 +255,7 @@ function ShareKitPage() {
                         size="sm"
                         onClick={() => deleteBuiltin(t.id, t.label)}
                       >
-                        <Trash2 className="mr-1 h-4 w-4" /> Delete
+                        <EyeOff className="mr-1 h-3.5 w-3.5" /> Archive
                       </Button>
                     )}
                   </div>
@@ -279,6 +264,36 @@ function ShareKitPage() {
             );
           })}
         </div>
+      )}
+
+      {isAdmin && showHistory && context && (
+        <section className="rounded-xl border border-dashed border-border bg-muted/20 p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <h2 className="font-display text-lg font-bold">Archived templates</h2>
+              <p className="text-xs text-muted-foreground">
+                Hidden from staff. Restore to make them available again.
+              </p>
+            </div>
+            <span className="text-xs text-muted-foreground">{historyBuiltins.length} archived</span>
+          </div>
+          {historyBuiltins.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Nothing in history yet.</p>
+          ) : (
+            <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
+              {historyBuiltins.map((t) => (
+                <div key={t.id} className="relative opacity-80">
+                  <TemplateCard template={t} context={context} override={layouts?.[t.id]} />
+                  <div className="mt-2 flex justify-end">
+                    <Button variant="outline" size="sm" onClick={() => restoreBuiltin(t.id)}>
+                      <Eye className="mr-1 h-3.5 w-3.5" /> Restore
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
       )}
 
       <p className="text-xs text-muted-foreground">
