@@ -461,41 +461,69 @@ function AdminLayout() {
               <AdminNotificationBell enabled={hasAccess} />
             </div>
             <nav className="flex flex-col gap-1">
-              {visibleNav.map(({ to, label, Icon, exact, info }) => {
-                const count = pendingCountForRoute(to, pendingCounts);
-                return (
-                  <div key={to} className="group flex shrink-0 items-center gap-1">
-                    <Link
-                      to={to}
-                      activeOptions={{ exact: !!exact }}
-                      activeProps={{ className: "bg-primary text-primary-foreground" }}
-                      className="flex flex-1 shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary"
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span className="flex-1">{label}</span>
-                      {count > 0 && (
-                        <span className="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-semibold leading-none text-destructive-foreground">
-                          {count > 99 ? "99+" : count}
-                        </span>
-                      )}
-                    </Link>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          aria-label={`About ${label}`}
-                          className="rounded-md p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
+              {(() => {
+                const out: React.ReactNode[] = [];
+                let lastSection: string | undefined = undefined;
+                visibleNav.forEach((item) => {
+                  const { to, label, Icon, exact, info, section, external } = item;
+                  if (section !== lastSection) {
+                    lastSection = section;
+                    if (section) {
+                      out.push(
+                        <div
+                          key={`sec-${section}`}
+                          className="mt-3 px-3 pb-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70"
                         >
-                          <Info className="h-3.5 w-3.5" />
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="right" className="max-w-xs">
-                        {info}
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                );
-              })}
+                          {section}
+                        </div>,
+                      );
+                    }
+                  }
+                  const count = pendingCountForRoute(to, pendingCounts);
+                  const linkClass =
+                    "flex flex-1 shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary";
+                  out.push(
+                    <div key={to} className="group flex shrink-0 items-center gap-1">
+                      {external ? (
+                        <a href={to} className={linkClass}>
+                          <Icon className="h-4 w-4" />
+                          <span className="flex-1">{label}</span>
+                        </a>
+                      ) : (
+                        <Link
+                          to={to}
+                          activeOptions={{ exact: !!exact }}
+                          activeProps={{ className: "bg-primary text-primary-foreground" }}
+                          className={linkClass}
+                        >
+                          <Icon className="h-4 w-4" />
+                          <span className="flex-1">{label}</span>
+                          {count > 0 && (
+                            <span className="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-semibold leading-none text-destructive-foreground">
+                              {count > 99 ? "99+" : count}
+                            </span>
+                          )}
+                        </Link>
+                      )}
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            aria-label={`About ${label}`}
+                            className="rounded-md p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                          >
+                            <Info className="h-3.5 w-3.5" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="right" className="max-w-xs">
+                          {info}
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>,
+                  );
+                });
+                return out;
+              })()}
             </nav>
           </aside>
           <div className="min-w-0">
