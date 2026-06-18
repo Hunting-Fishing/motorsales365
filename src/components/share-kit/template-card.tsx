@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { Download, Share2, Copy, Facebook, MessageCircle, SlidersHorizontal } from "lucide-react";
+import { Download, Share2, Copy, Facebook, MessageCircle, SlidersHorizontal, Maximize2 } from "lucide-react";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { canNativeShare } from "@/lib/share";
 import { composeTemplate, canvasToBlob } from "@/lib/share-kit/compose";
 import type { QrOverride } from "@/lib/share-kit/compose";
