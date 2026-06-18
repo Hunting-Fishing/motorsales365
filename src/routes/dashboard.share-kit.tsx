@@ -234,11 +234,11 @@ function ShareKitPage() {
       </div>
 
       {context && (
-        <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]">
+        <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(140px,1fr))]">
           {allTemplates.map((t) => {
             const custom = customById.get(t.id);
             return (
-              <div key={t.id} className="relative mx-auto w-full max-w-[240px]">
+              <div key={t.id} className="relative mx-auto w-full max-w-[180px]">
                 <TemplateCard
                   template={t}
                   context={context}
@@ -285,9 +285,9 @@ function ShareKitPage() {
           {historyBuiltins.length === 0 ? (
             <p className="text-sm text-muted-foreground">Nothing in history yet.</p>
           ) : (
-            <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]">
+            <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(140px,1fr))]">
               {historyBuiltins.map((t) => (
-                <div key={t.id} className="relative mx-auto w-full max-w-[240px] opacity-80">
+                <div key={t.id} className="relative mx-auto w-full max-w-[180px] opacity-80">
                   <TemplateCard template={t} context={context} override={layouts?.[t.id]} />
                   <div className="mt-2 flex justify-end">
                     <Button variant="outline" size="sm" onClick={() => restoreBuiltin(t.id)}>
