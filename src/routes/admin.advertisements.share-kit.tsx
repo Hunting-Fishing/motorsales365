@@ -313,6 +313,27 @@ function AdminShareKitPage() {
   const visibleBuiltins = TEMPLATES.filter((t) => isAdmin || !hiddenBuiltins.has(t.id));
   const allTemplates: ShareTemplate[] = [...customTemplates, ...visibleBuiltins];
 
+  const smartTargets: SmartTarget[] = [
+    ...signedRows.map<SmartTarget>((r) => ({
+      kind: "custom",
+      id: r.id,
+      label: r.label,
+      imageUrl: r.image_url,
+      width: r.width,
+      height: r.height,
+    })),
+    ...visibleBuiltins
+      .filter((t) => t.kind === "image" && !!t.imageUrl)
+      .map<SmartTarget>((t) => ({
+        kind: "builtin-image",
+        id: t.id,
+        label: t.label,
+        imageUrl: t.imageUrl!,
+        width: t.width,
+        height: t.height,
+      })),
+  ];
+
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-start justify-between gap-3">
