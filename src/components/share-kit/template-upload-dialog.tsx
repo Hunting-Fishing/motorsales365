@@ -25,6 +25,7 @@ import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { upsertShareKitCustomTemplate } from "@/lib/share-kit-templates.functions";
+import { detectQrSlotFromBlob, isDetected } from "@/lib/share-kit/detect-qr-slot";
 
 interface Props {
   open: boolean;
@@ -44,6 +45,10 @@ type Item = {
   status: Status;
   progress: number; // 0-100
   error?: string;
+  qrCx: number;
+  qrCy: number;
+  qrSize: number;
+  qrDetected: boolean;
 };
 
 const ACCEPT = "image/png,image/jpeg,image/webp";
@@ -134,6 +139,7 @@ export function ShareKitTemplateUpload({ open, onOpenChange, onSaved }: Props) {
     for (const f of arr) {
       try {
         const { w, h, url } = await readDims(f);
+        const slot = await detectQrSlotFromBlob(f);
         next.push({
           id: `${f.name}-${f.size}-${Math.random().toString(36).slice(2, 8)}`,
           file: f,
@@ -143,6 +149,10 @@ export function ShareKitTemplateUpload({ open, onOpenChange, onSaved }: Props) {
           height: h,
           status: "pending",
           progress: 0,
+          qrCx: slot.cx,
+          qrCy: slot.cy,
+          qrSize: slot.size,
+          qrDetected: isDetected(slot),
         });
       } catch {
         toast.error(`Skipped ${f.name} (could not read image).`);
@@ -216,9 +226,9 @@ export function ShareKitTemplateUpload({ open, onOpenChange, onSaved }: Props) {
           image_url: pub.publicUrl,
           width: it.width,
           height: it.height,
-          qr_cx: QR_DEFAULTS.cx,
-          qr_cy: QR_DEFAULTS.cy,
-          qr_size: QR_DEFAULTS.size,
+          qr_cx: it.qrDetected ? it.qrCx : QR_DEFAULTS.cx,
+          qr_cy: it.qrDetected ? it.qrCy : QR_DEFAULTS.cy,
+          qr_size: it.qrDetected ? it.qrSize : QR_DEFAULTS.size,
           sort_order: 0,
           active: true,
         },
@@ -392,8 +402,20 @@ export function ShareKitTemplateUpload({ open, onOpenChange, onSaved }: Props) {
                       placeholder="Template name"
                       className="h-8 text-sm"
                     />
-                    <div className="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground">
+                    <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted-foreground">
                       <span>{it.width} × {it.height}px</span>
+                      {it.qrDetected ? (
+                        <span className="flex items-center gap-1 rounded-full bg-emerald-50 px-1.5 py-0.5 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300">
+                          <CheckCircle2 className="h-3 w-3" /> QR auto-fit
+                        </span>
+                      ) : (
+                        <span
+                          className="flex items-center gap-1 rounded-full bg-amber-50 px-1.5 py-0.5 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300"
+                          title="No white panel found — using default placement. You can fine-tune from the card after upload."
+                        >
+                          <AlertCircle className="h-3 w-3" /> QR default
+                        </span>
+                      )}
                       {it.status === "uploading" && (
                         <span className="flex items-center gap-1 text-primary">
                           <Loader2 className="h-3 w-3 animate-spin" /> {it.progress}%

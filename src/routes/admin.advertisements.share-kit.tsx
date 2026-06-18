@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Eye, EyeOff, Plus, Trash2 } from "lucide-react";
+import { Eye, EyeOff, Plus, Trash2, Wand2, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -17,8 +17,10 @@ import {
   listShareKitCustomTemplates,
   deleteShareKitCustomTemplate,
   setBuiltinHidden,
+  updateShareKitTemplateQrPlacement,
   type CustomTemplateRow,
 } from "@/lib/share-kit-templates.functions";
+import { detectQrSlotFromUrl, isDetected } from "@/lib/share-kit/detect-qr-slot";
 import { siteOrigin } from "@/lib/site-config";
 
 export const Route = createFileRoute("/admin/advertisements/share-kit")({
@@ -61,6 +63,9 @@ function AdminShareKitPage() {
   const [staff, setStaff] = useState<StaffRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [autoFittingId, setAutoFittingId] = useState<string | null>(null);
+  const [bulkFitting, setBulkFitting] = useState(false);
+
 
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/login" });
@@ -108,6 +113,7 @@ function AdminShareKitPage() {
 
   const deleteFn = useServerFn(deleteShareKitCustomTemplate);
   const hideFn = useServerFn(setBuiltinHidden);
+  const updateQrFn = useServerFn(updateShareKitTemplateQrPlacement);
 
   async function deleteCustom(id: string, label: string) {
     if (!confirm(`Delete template "${label}"? This cannot be undone.`)) return;
@@ -129,6 +135,85 @@ function AdminShareKitPage() {
       toast.error(e?.message ?? "Failed");
     }
   }
+
+  // Run detector against the signed image and persist new QR placement.
+  // Returns true on detected + saved, false on no-confidence / error.
+  async function autoFitOne(row: CustomTemplateRow): Promise<boolean> {
+    const slot = await detectQrSlotFromUrl(row.image_url);
+    if (!isDetected(slot)) return false;
+    await updateQrFn({
+      data: {
+        id: row.id,
+        qr_cx: slot.cx,
+        qr_cy: slot.cy,
+        qr_size: slot.size,
+      },
+    });
+    return true;
+  }
+
+  async function autoFitCard(row: CustomTemplateRow) {
+    setAutoFittingId(row.id);
+    try {
+      const ok = await autoFitOne(row);
+      if (ok) {
+        toast.success(`Auto-fit QR for "${row.label}"`);
+        qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+      } else {
+        toast.warning(
+          `Could not find a white QR panel in "${row.label}". Use Edit layout to place it manually.`,
+        );
+      }
+    } catch (e: any) {
+      toast.error(e?.message ?? "Auto-fit failed");
+    } finally {
+      setAutoFittingId(null);
+    }
+  }
+
+  async function autoFitAll(rows: CustomTemplateRow[]) {
+    if (rows.length === 0) return;
+    if (
+      !confirm(
+        `Auto-fit QR on all ${rows.length} custom templates? This may overwrite manual adjustments.`,
+      )
+    )
+      return;
+    setBulkFitting(true);
+    const concurrency = 4;
+    let detected = 0;
+    let skipped = 0;
+    let failed = 0;
+    const t = toast.loading(`Auto-fitting 0 / ${rows.length}…`);
+    let processed = 0;
+    let cursor = 0;
+
+    async function worker() {
+      while (cursor < rows.length) {
+        const idx = cursor++;
+        const row = rows[idx];
+        try {
+          const ok = await autoFitOne(row);
+          if (ok) detected++;
+          else skipped++;
+        } catch {
+          failed++;
+        }
+        processed++;
+        toast.loading(`Auto-fitting ${processed} / ${rows.length}…`, { id: t });
+      }
+    }
+    await Promise.all(
+      Array.from({ length: Math.min(concurrency, rows.length) }, () => worker()),
+    );
+    toast.dismiss(t);
+    toast.success(
+      `Auto-fit done — ${detected} placed, ${skipped} no panel, ${failed} failed`,
+    );
+    qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+    setBulkFitting(false);
+  }
+
 
   if (authLoading || loading) {
     return <div className="p-12 text-center text-muted-foreground">Loading your share kit…</div>;
@@ -188,9 +273,26 @@ function AdminShareKitPage() {
           <Button variant="outline" size="sm">Classic A4 poster</Button>
         </Link>
         {isAdmin && (
-          <Button size="sm" onClick={() => setUploadOpen(true)} className="ml-auto">
-            <Plus className="mr-1 h-4 w-4" /> Upload new template
-          </Button>
+          <>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => autoFitAll(signedRows)}
+              disabled={bulkFitting || signedRows.length === 0}
+              className="ml-auto"
+              title="Run auto-detection on every custom template"
+            >
+              {bulkFitting ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Wand2 className="mr-1 h-4 w-4" />
+              )}
+              Auto-fit QR on all
+            </Button>
+            <Button size="sm" onClick={() => setUploadOpen(true)}>
+              <Plus className="mr-1 h-4 w-4" /> Upload new template
+            </Button>
+          </>
         )}
       </div>
 
@@ -213,15 +315,31 @@ function AdminShareKitPage() {
                   override={layouts?.[t.id]}
                 />
                 {isAdmin && (
-                  <div className="mt-2 flex justify-end gap-2">
+                  <div className="mt-2 flex flex-wrap justify-end gap-2">
                     {custom ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => deleteCustom(custom.id, custom.label)}
-                      >
-                        <Trash2 className="mr-1 h-4 w-4" /> Delete
-                      </Button>
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => autoFitCard(custom)}
+                          disabled={autoFittingId === custom.id || bulkFitting}
+                          title="Detect the white SCAN HERE panel and snap the QR into it"
+                        >
+                          {autoFittingId === custom.id ? (
+                            <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                          ) : (
+                            <Wand2 className="mr-1 h-4 w-4" />
+                          )}
+                          Auto-fit QR
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => deleteCustom(custom.id, custom.label)}
+                        >
+                          <Trash2 className="mr-1 h-4 w-4" /> Delete
+                        </Button>
+                      </>
                     ) : (
                       <Button
                         variant="outline"

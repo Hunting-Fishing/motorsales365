@@ -113,3 +113,28 @@ export const setBuiltinHidden = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+// Update only QR placement on an existing custom template.
+// Used by the auto-fit / re-detect flow so we don't have to resend image_url etc.
+export const updateShareKitTemplateQrPlacement = createServerFn({ method: "POST" })
+  .middleware([requireAdminRoleAudited("shareKit.updateQrPlacement")])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        qr_cx: z.number().min(0).max(1),
+        qr_cy: z.number().min(0).max(1),
+        qr_size: z.number().min(0.05).max(0.8),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context as any;
+    const { error } = await supabase
+      .from("share_kit_custom_templates")
+      .update({ qr_cx: data.qr_cx, qr_cy: data.qr_cy, qr_size: data.qr_size })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
