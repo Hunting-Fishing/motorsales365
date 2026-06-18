@@ -25,6 +25,7 @@ import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { upsertShareKitCustomTemplate } from "@/lib/share-kit-templates.functions";
+import { detectQrSlotFromBlob, isDetected } from "@/lib/share-kit/detect-qr-slot";
 
 interface Props {
   open: boolean;
@@ -44,6 +45,10 @@ type Item = {
   status: Status;
   progress: number; // 0-100
   error?: string;
+  qrCx: number;
+  qrCy: number;
+  qrSize: number;
+  qrDetected: boolean;
 };
 
 const ACCEPT = "image/png,image/jpeg,image/webp";
