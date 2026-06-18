@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Eye, EyeOff, Plus, Trash2, Wand2, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Plus, Trash2, Wand2, Loader2, Crosshair } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -66,6 +66,7 @@ function AdminShareKitPage() {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [autoFittingId, setAutoFittingId] = useState<string | null>(null);
   const [bulkFitting, setBulkFitting] = useState(false);
+  const [applyingAllId, setApplyingAllId] = useState<string | null>(null);
 
 
   useEffect(() => {
@@ -237,6 +238,62 @@ function AdminShareKitPage() {
     setBulkFitting(false);
   }
 
+  // Copy a QR placement (cx/cy/size) to every OTHER custom template.
+  // Prefers the per-user layout override when present — that's what the
+  // admin sees on the card and what they typically just fine-tuned.
+  async function applyPlacementToAll(source: CustomTemplateRow) {
+    const targets = (signedRows ?? []).filter((r) => r.id !== source.id);
+    if (targets.length === 0) {
+      toast.info("No other custom templates to update.");
+      return;
+    }
+    const override = layouts?.[`custom:${source.id}`];
+    const placement = override
+      ? { qr_cx: override.cx, qr_cy: override.cy, qr_size: override.size }
+      : {
+          qr_cx: Number(source.qr_cx),
+          qr_cy: Number(source.qr_cy),
+          qr_size: Number(source.qr_size),
+        };
+    if (
+      !confirm(
+        `Apply "${source.label}" QR placement to all ${targets.length} other custom templates? This overwrites their saved placement.`,
+      )
+    )
+      return;
+    setApplyingAllId(source.id);
+    const concurrency = 4;
+    let done = 0;
+    let failed = 0;
+    let cursor = 0;
+    const t = toast.loading(`Applying placement 0 / ${targets.length}…`);
+    async function worker() {
+      while (cursor < targets.length) {
+        const row = targets[cursor++];
+        try {
+          await updateQrFn({ data: { id: row.id, ...placement } });
+        } catch {
+          failed++;
+        }
+        done++;
+        toast.loading(`Applying placement ${done} / ${targets.length}…`, { id: t });
+      }
+    }
+    await Promise.all(
+      Array.from({ length: Math.min(concurrency, targets.length) }, () => worker()),
+    );
+    toast.dismiss(t);
+    toast.success(
+      `Applied to ${done - failed} templates${failed ? `, ${failed} failed` : ""}.`,
+    );
+    qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+    setApplyingAllId(null);
+  }
+
+
+
+
+
 
   if (authLoading || loading) {
     return <div className="p-12 text-center text-muted-foreground">Loading your share kit…</div>;
@@ -354,6 +411,20 @@ function AdminShareKitPage() {
                             <Wand2 className="mr-1 h-4 w-4" />
                           )}
                           Auto-fit QR
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => applyPlacementToAll(custom)}
+                          disabled={applyingAllId !== null || bulkFitting}
+                          title="Copy this QR placement (cx / cy / size) to every other custom template"
+                        >
+                          {applyingAllId === custom.id ? (
+                            <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                          ) : (
+                            <Crosshair className="mr-1 h-4 w-4" />
+                          )}
+                          Apply placement to all
                         </Button>
                         <Button
                           variant="outline"
