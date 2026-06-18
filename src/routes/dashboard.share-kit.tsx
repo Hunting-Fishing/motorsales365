@@ -113,6 +113,7 @@ function ShareKitPage() {
     queryFn: () => customFn(),
     enabled: !!user,
   });
+  const { data: signedCustoms } = useSignedCustomTemplates(customData?.templates);
 
   const deleteFn = useServerFn(deleteShareKitCustomTemplate);
   const hideFn = useServerFn(setBuiltinHidden);
