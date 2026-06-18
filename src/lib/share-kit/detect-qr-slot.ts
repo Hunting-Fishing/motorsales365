@@ -29,7 +29,11 @@ const ANALYSIS_LONG_EDGE = 320;
 const FILL_RATIO = 0.9;
 // Cap QR size so we never produce something larger than the panel allows.
 const MAX_SIZE = 0.45;
-const MIN_SIZE = 0.08;
+// Smallest size that still scans reliably on print + camera.
+const MIN_READABLE_SIZE = 0.08;
+// Inset the detected rect by this many normalized units on every side so the
+// QR never butts right up against the printed border of the Scan Here panel.
+const RECT_INSET = 0.005;
 
 export function defaultQrSlot(): DetectedQrSlot {
   return { ...DEFAULTS, confidence: 0 };
