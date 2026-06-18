@@ -557,7 +557,6 @@ function ReferralLanding() {
           )}
         </div>
       </TooltipProvider>
-    </SiteLayout>
   );
 }
 
