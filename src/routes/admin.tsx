@@ -126,13 +126,12 @@ const NAV: NavItem[] = [
     section: "Sales",
   },
   {
-    to: "/dashboard/share-kit",
+    to: "/admin/advertisements/share-kit",
     label: "My QR / Share Kit",
     Icon: QrCode,
     roles: ["admin", "sales", "advertising", "support", "moderator"],
     info: "Your personal QR applied to printable templates (arm band, shirt, banners).",
     section: "Sales",
-    external: true,
   },
   {
     to: "/admin/lead-offers",

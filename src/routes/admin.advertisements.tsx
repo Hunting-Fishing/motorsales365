@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { Inbox, Megaphone, Ticket } from "lucide-react";
+import { Inbox, Megaphone, Ticket, QrCode, History } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +14,12 @@ export const Route = createFileRoute("/admin/advertisements")({
 });
 
 type Tab = {
-  to: "/admin/advertisements/inquiries" | "/admin/advertisements/campaigns" | "/admin/advertisements/promotions";
+  to:
+    | "/admin/advertisements/inquiries"
+    | "/admin/advertisements/campaigns"
+    | "/admin/advertisements/promotions"
+    | "/admin/advertisements/share-kit"
+    | "/admin/advertisements/history";
   label: string;
   desc: string;
   Icon: typeof Inbox;
@@ -42,6 +47,20 @@ const TABS: Tab[] = [
     desc: "Promo codes and one-off customer discounts.",
     Icon: Ticket,
     roles: ["admin", "sales"],
+  },
+  {
+    to: "/admin/advertisements/share-kit",
+    label: "My QR / Share Kit",
+    desc: "Your personal QR on printable templates.",
+    Icon: QrCode,
+    roles: ["admin", "advertising", "sales"],
+  },
+  {
+    to: "/admin/advertisements/history",
+    label: "History",
+    desc: "Legal record of all ad / promo changes.",
+    Icon: History,
+    roles: ["admin"],
   },
 ];
 

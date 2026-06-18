@@ -137,9 +137,11 @@ function AdminAdCampaignsPage() {
               ))}
             </SelectContent>
           </Select>
-          <Button onClick={() => setEditing({ ...EMPTY })}>
-            <Plus className="h-4 w-4 mr-1" /> New campaign
-          </Button>
+          {isAdmin && (
+            <Button onClick={() => setEditing({ ...EMPTY })}>
+              <Plus className="h-4 w-4 mr-1" /> New campaign
+            </Button>
+          )}
         </div>
       </div>
 
@@ -184,11 +186,13 @@ function AdminAdCampaignsPage() {
               </div>
               <div className="flex flex-col gap-1">
                 <Button size="sm" variant="outline" onClick={() => setEditing({ ...a })}>
-                  <Pencil className="h-3 w-3 mr-1" /> Edit
+                  <Pencil className="h-3 w-3 mr-1" /> {isAdmin ? "Edit" : "View"}
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => remove(a.id)}>
-                  <Trash2 className="h-3 w-3 mr-1" /> Delete
-                </Button>
+                {isAdmin && (
+                  <Button size="sm" variant="ghost" onClick={() => remove(a.id)}>
+                    <Trash2 className="h-3 w-3 mr-1" /> Delete
+                  </Button>
+                )}
               </div>
             </div>
           ))}
@@ -322,7 +326,7 @@ function AdminAdCampaignsPage() {
           )}
           <DialogFooter>
             <Button variant="outline" onClick={() => setEditing(null)}>Cancel</Button>
-            <Button onClick={save}>Save</Button>
+            {isAdmin && <Button onClick={save}>Save</Button>}
           </DialogFooter>
         </DialogContent>
       </Dialog>

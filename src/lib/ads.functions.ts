@@ -1,7 +1,10 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { requireDomainRole } from "@/integrations/supabase/admin-middleware";
+import {
+  requireAdminRoleAudited,
+  requireDomainRole,
+} from "@/integrations/supabase/admin-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
 const placementSchema = z.enum([
@@ -101,9 +104,9 @@ export const listAds = createServerFn({ method: "GET" })
     return { ads: data ?? [] };
   });
 
-// ADMIN: upsert ad
+// ADMIN ONLY: upsert ad
 export const upsertAd = createServerFn({ method: "POST" })
-  .middleware([requireDomainRole("ads_manager", "ads.upsertAd")])
+  .middleware([requireAdminRoleAudited("ads.upsertAd")])
   .inputValidator((input: unknown) =>
     z
       .object({
@@ -141,7 +144,7 @@ export const upsertAd = createServerFn({ method: "POST" })
   });
 
 export const deleteAd = createServerFn({ method: "POST" })
-  .middleware([requireDomainRole("ads_manager", "ads.deleteAd")])
+  .middleware([requireAdminRoleAudited("ads.deleteAd")])
   .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;

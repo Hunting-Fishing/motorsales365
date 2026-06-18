@@ -35,7 +35,7 @@ const TILES: Tile[] = [
   { to: "/admin/advertisements/promotions", label: "Promotions & Discounts", desc: "Promo codes and one-off customer discounts.", Icon: Ticket },
   { to: "/admin/shop", label: "Affiliate Shop", desc: "Affiliate networks, products and click analytics.", Icon: Store },
   { to: "/admin/referrals", label: "Referrals", desc: "Staff QR codes and redemption history.", Icon: QrCode },
-  { to: "/dashboard/share-kit", label: "My QR / Share Kit", desc: "Apply your QR to printable templates (arm band, shirt, banners).", Icon: QrCode, external: true },
+  { to: "/admin/advertisements/share-kit", label: "My QR / Share Kit", desc: "Apply your QR to printable templates (arm band, shirt, banners).", Icon: QrCode },
   { to: "/admin/lead-offers", label: "Lead Marketplace", desc: "Qualified buyer leads businesses pay to unlock.", Icon: Inbox },
   { to: "/admin/sales-reps", label: "Sales Reps", desc: "Reps, territories and assignments.", Icon: UserCog },
 ];
