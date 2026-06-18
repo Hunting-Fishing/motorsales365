@@ -404,30 +404,16 @@ function AdminShareKitPage() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => autoFitCard(custom)}
+                          onClick={() => smartFitCard(custom)}
                           disabled={autoFittingId === custom.id || bulkFitting}
-                          title="Detect the white SCAN HERE panel and snap the QR into it"
+                          title="Use AI vision to find this flyer's Scan Here panel and snap the QR into it"
                         >
                           {autoFittingId === custom.id ? (
                             <Loader2 className="mr-1 h-4 w-4 animate-spin" />
                           ) : (
-                            <Wand2 className="mr-1 h-4 w-4" />
+                            <Sparkles className="mr-1 h-4 w-4" />
                           )}
-                          Auto-fit QR
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => applyPlacementToAll(custom)}
-                          disabled={applyingAllId !== null || bulkFitting}
-                          title="Copy this QR placement (cx / cy / size) to every other custom template"
-                        >
-                          {applyingAllId === custom.id ? (
-                            <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                          ) : (
-                            <Crosshair className="mr-1 h-4 w-4" />
-                          )}
-                          Apply placement to all
+                          Smart fit
                         </Button>
                         <Button
                           variant="outline"
