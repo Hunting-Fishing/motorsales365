@@ -2,41 +2,40 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getVisitorId, recordTouch } from "@/lib/referral";
-import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
+  ArrowRight,
   CheckCircle2,
-  RotateCcw,
   Info,
   Mail,
-  Car,
-  Wrench,
-  Package,
-  GraduationCap,
-  Gamepad2,
-  Building2,
-  MapPin,
+  RotateCcw,
   Sparkles,
-  CheckCircle,
-  XCircle,
 } from "lucide-react";
 import { siteOrigin } from "@/lib/site-config";
+import findVehiclesAsset from "@/assets/referral/referral-find-vehicles.png.asset.json";
+import socialPostAsset from "@/assets/referral/referral-social-post.png.asset.json";
+import everythingInOnePlaceAsset from "@/assets/referral/referral-everything-in-one-place.png.asset.json";
+import servicesNearYouAsset from "@/assets/referral/referral-services-near-you.png.asset.json";
+import postConnectSellAsset from "@/assets/referral/referral-post-connect-sell.png.asset.json";
+import manyOpportunitiesAsset from "@/assets/referral/referral-many-opportunities.png.asset.json";
+import comingSoonAsset from "@/assets/referral/referral-coming-soon.png.asset.json";
+import whatsNextAsset from "@/assets/referral/referral-whats-next.png.asset.json";
 
 export const Route = createFileRoute("/r/$code")({
   head: ({ params }) => ({
     meta: [
-      { title: "Referred to 365 Motor Sales — Philippines Motor Marketplace" },
+      { title: "365 Motor Sales Referral — Philippines Motor Marketplace" },
       {
         name: "description",
         content:
-          "Buy. Sell. List. Partner. Learn. Play. Join the Philippines' dedicated motor ecosystem — vehicles, parts, repair shops, business pages, training, and more.",
+          "Discover 365 Motor Sales through a shared feature page for vehicles, businesses, services, future tools, and upcoming platform features in the Philippines.",
       },
-      { property: "og:title", content: "365 Motor Sales — Built for the Philippines" },
+      { property: "og:title", content: "365 Motor Sales — The Motor Marketplace Built for the Philippines" },
       {
         property: "og:description",
         content:
-          "One marketplace for vehicles, equipment, parts, repair shops, and motor businesses across the Philippines.",
+          "Search listings, discover services, connect with businesses, and explore the growing 365 motor ecosystem.",
       },
       { property: "og:url", content: `https://365motorsales.com/r/${params.code}` },
       { name: "robots", content: "noindex, nofollow" },
@@ -57,7 +56,96 @@ type Promo = {
   terms: string | null;
 };
 
+type ImagePanel = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  image: string;
+  alt: string;
+};
+
 const VISITS_KEY = (code: string) => `mref_visits_${code}`;
+
+const FEATURE_CHIPS = [
+  "Cars",
+  "Motorcycles",
+  "Parts",
+  "Businesses",
+  "Map",
+  "Tow & Deliver",
+  "Education",
+  "Shop Manager",
+];
+
+const PRIMARY_PANELS: ImagePanel[] = [
+  {
+    eyebrow: "Marketplace",
+    title: "Find vehicles, parts, and services faster",
+    description:
+      "A structured motor marketplace built for search, discovery, and direct action across the Philippines.",
+    image: findVehiclesAsset.url,
+    alt: "365 Motor Sales feature graphic showing vehicle listings on desktop and mobile with create account and browse listings calls to action.",
+  },
+  {
+    eyebrow: "Featured page",
+    title: "More than just a social post",
+    description:
+      "Every QR code can lead into the same shared 365 showcase page while still keeping credit tied to the person whose QR was scanned.",
+    image: socialPostAsset.url,
+    alt: "365 Motor Sales promotional image highlighting organized categories, searchable listings, map discovery, business pages, and browse listings and create account actions.",
+  },
+  {
+    eyebrow: "One ecosystem",
+    title: "Everything motor in one place",
+    description:
+      "Marketplace, services, logistics, learning, export, shop tools, and business growth connected in one destination.",
+    image: everythingInOnePlaceAsset.url,
+    alt: "365 Motor Sales campaign image featuring listings, wanted board, tow and deliver, export, shop, learn, and shop manager platform sections.",
+  },
+];
+
+const SECONDARY_PANELS: ImagePanel[] = [
+  {
+    eyebrow: "Services",
+    title: "Discover motor services near you",
+    description:
+      "Show towing, parts stores, repairs, tire shops, aircon repair, car wash, and local businesses on a stronger featured page.",
+    image: servicesNearYouAsset.url,
+    alt: "365 Motor Sales map-based services image showing parts stores, towing, motorcycle repair, tire vulcanizing, car wash, and aircon repair across the Philippines.",
+  },
+  {
+    eyebrow: "Sellers & buyers",
+    title: "Post. Connect. Sell.",
+    description:
+      "Bring buyers and sellers into the same marketplace with trust signals, business pages, and listing-first calls to action.",
+    image: postConnectSellAsset.url,
+    alt: "365 Motor Sales signup and listing promotional image featuring sellers and buyers using desktop and mobile experiences.",
+  },
+  {
+    eyebrow: "Growth",
+    title: "One platform, many opportunities",
+    description:
+      "Use one shared destination page to explain the bigger 365 vision to buyers, sellers, shops, and future partners.",
+    image: manyOpportunitiesAsset.url,
+    alt: "365 Motor Sales platform overview image showing post listings, wanted board, tow and deliver, shop, learn, shop manager, and export opportunities.",
+  },
+  {
+    eyebrow: "Coming soon",
+    title: "Feature the roadmap clearly",
+    description:
+      "Highlight online parts ordering, shop software, education, games and rewards, and international learning standards.",
+    image: comingSoonAsset.url,
+    alt: "365 Motor Sales upcoming features image showing online parts ordering, shop management software, education and skills, mobile games and rewards, and international learning standards.",
+  },
+  {
+    eyebrow: "Future",
+    title: "What’s next for 365",
+    description:
+      "A shared QR destination can also sell the next chapter of the platform so every scan markets what is live and what is coming.",
+    image: whatsNextAsset.url,
+    alt: "365 Motor Sales future roadmap image showing online parts ordering, shop management software, education and skills, mobile games and rewards, and trust and verification.",
+  },
+];
 
 function ReferralLanding() {
   const { code } = Route.useParams();
@@ -72,75 +160,127 @@ function ReferralLanding() {
   const [firstSeenAt, setFirstSeenAt] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+
+    const withTimeout = async <T,>(promise: Promise<T>, ms: number) => {
+      return await Promise.race<T>([
+        promise,
+        new Promise<T>((_, reject) => {
+          window.setTimeout(() => reject(new Error(`Timed out after ${ms}ms`)), ms);
+        }),
+      ]);
+    };
+
     (async () => {
-      const visitorId = getVisitorId();
-      const ua = navigator.userAgent;
-      const { data, error } = await (supabase.rpc as any)("record_qr_scan", {
-        _code: code,
-        _visitor_id: visitorId,
-        _user_agent: ua,
-        _landing: `${siteOrigin()}${window.location.pathname}${window.location.search}`,
-      });
-      if (error || !data?.ok) {
-        setActive(false);
-        setLoading(false);
-        return;
-      }
-      setStaffName(data.first_name || data.staff_name || null);
-      setActive(Boolean(data.active));
-      setCounted(data.active ? Boolean(data.counted) : null);
-      if (data.active) recordTouch(code);
-
       try {
-        const raw = localStorage.getItem(VISITS_KEY(code));
-        const prev = raw ? JSON.parse(raw) : { count: 0, first: null as string | null };
-        const next = {
-          count: (prev.count || 0) + 1,
-          first: prev.first || new Date().toISOString(),
-        };
-        localStorage.setItem(VISITS_KEY(code), JSON.stringify(next));
-        setVisitCount(next.count);
-        setFirstSeenAt(next.first);
-      } catch {
-        setVisitCount(1);
-      }
+        const visitorId = getVisitorId();
+        const ua = navigator.userAgent;
+        const landing = `${siteOrigin()}${window.location.pathname}${window.location.search}`;
 
-      // Referrer contact (public, security-definer RPC)
-      const { data: contact } = await (supabase.rpc as any)("get_referrer_contact", {
-        _code: code,
-      });
-      const first = Array.isArray(contact) ? contact[0] : contact;
-      if (first?.email) setStaffEmail(first.email);
-      if (first?.full_name && !data.first_name && !data.staff_name) {
-        setStaffName(first.full_name);
-      }
+        let scanData: any = null;
+        try {
+          const scanResult = await withTimeout(
+            (supabase.rpc as any)("record_qr_scan", {
+              _code: code,
+              _visitor_id: visitorId,
+              _user_agent: ua,
+              _landing: landing,
+            }),
+            8000,
+          );
 
-      // Look up the staff_referral_id, then load active promos.
-      const sb = supabase as any;
-      const { data: staff } = await sb
-        .from("staff_referrals")
-        .select("id")
-        .eq("referral_code", code)
-        .maybeSingle();
-      if (staff?.id) {
-        const nowIso = new Date().toISOString();
-        const { data: pr } = await sb
-          .from("staff_promotions")
-          .select(
-            "id,title,description,kind,percent_off,flat_amount_php,applies_to,ends_at,terms,starts_at,active",
-          )
-          .eq("staff_referral_id", staff.id)
-          .eq("active", true);
-        const filtered = ((pr as any[]) || []).filter(
-          (p) => (!p.starts_at || p.starts_at <= nowIso) && (!p.ends_at || p.ends_at >= nowIso),
-        );
-        setPromos(filtered as Promo[]);
+          if (!cancelled) {
+            const { data, error } = scanResult as { data?: any; error?: any };
+            if (!error && data?.ok) {
+              scanData = data;
+              setStaffName(data.first_name || data.staff_name || null);
+              setActive(Boolean(data.active));
+              setCounted(data.active ? Boolean(data.counted) : null);
+              if (data.active) recordTouch(code);
+            } else {
+              setActive(true);
+            }
+          }
+        } catch {
+          if (!cancelled) setActive(true);
+        }
+
+        try {
+          const raw = localStorage.getItem(VISITS_KEY(code));
+          const prev = raw ? JSON.parse(raw) : { count: 0, first: null as string | null };
+          const next = {
+            count: (prev.count || 0) + 1,
+            first: prev.first || new Date().toISOString(),
+          };
+          localStorage.setItem(VISITS_KEY(code), JSON.stringify(next));
+          if (!cancelled) {
+            setVisitCount(next.count);
+            setFirstSeenAt(next.first);
+          }
+        } catch {
+          if (!cancelled) setVisitCount(1);
+        }
+
+        try {
+          const contactResult = (await withTimeout(
+            (supabase.rpc as any)("get_referrer_contact", {
+              _code: code,
+            }),
+            8000,
+          )) as any;
+          const contact = contactResult?.data;
+          const first = Array.isArray(contact) ? contact[0] : contact;
+          if (!cancelled) {
+            if (first?.email) setStaffEmail(first.email);
+            if (first?.full_name && !scanData?.first_name && !scanData?.staff_name) {
+              setStaffName(first.full_name);
+            }
+          }
+        } catch {
+          // Non-blocking; page should still render even if contact lookup fails.
+        }
+
+        try {
+          const sb = supabase as any;
+          const staffResult = (await withTimeout(
+            sb.from("staff_referrals").select("id").eq("referral_code", code).maybeSingle(),
+            8000,
+          )) as any;
+          const staff = staffResult?.data;
+
+          if (staff?.id) {
+            const nowIso = new Date().toISOString();
+            const promoResult = (await withTimeout(
+              sb
+                .from("staff_promotions")
+                .select(
+                  "id,title,description,kind,percent_off,flat_amount_php,applies_to,ends_at,terms,starts_at,active",
+                )
+                .eq("staff_referral_id", staff.id)
+                .eq("active", true),
+              8000,
+            )) as any;
+            const pr = promoResult?.data;
+
+            const filtered = ((pr as any[]) || []).filter(
+              (p) => (!p.starts_at || p.starts_at <= nowIso) && (!p.ends_at || p.ends_at >= nowIso),
+            );
+            if (!cancelled) setPromos(filtered as Promo[]);
+          }
+        } catch {
+          // Non-blocking; active promos are optional UI.
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-      setLoading(false);
     })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [code]);
 
-  const referrer = staffName || "Your referrer";
+  const referrer = staffName || "your referrer";
   const contactLine = staffEmail ? (
     <a
       href={`mailto:${staffEmail}`}
@@ -152,16 +292,15 @@ function ReferralLanding() {
   ) : null;
 
   return (
-    <SiteLayout>
-      <TooltipProvider delayDuration={150}>
-        <div className="container mx-auto max-w-5xl px-4 py-10">
-          {loading ? (
+    <TooltipProvider delayDuration={150}>
+      <div className="container mx-auto max-w-7xl px-4 py-8 sm:py-10">
+        {loading ? (
             <p className="text-center text-muted-foreground">Loading…</p>
           ) : active === false ? (
             <div className="mx-auto max-w-2xl rounded-xl border border-border bg-card p-8 text-center">
               <h1 className="font-display text-2xl font-bold">Referral link unavailable</h1>
               <p className="mt-2 text-muted-foreground">
-                This referral code isn't active. You can still create an account and browse.
+                This referral code isn&apos;t active. You can still create an account and browse.
               </p>
               <Button className="mt-6" onClick={() => navigate({ to: "/" })}>
                 Continue to site
@@ -169,60 +308,75 @@ function ReferralLanding() {
             </div>
           ) : (
             <>
-              {/* 1. Referral credit card (top) */}
-              <div className="mx-auto max-w-2xl rounded-xl border border-border bg-card p-6 shadow-sm">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                      Referred by
+              <section className="rounded-xl border border-border bg-card p-5 shadow-sm sm:p-6">
+                <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+                  <div className="max-w-3xl">
+                    <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">
+                      Referral credit
                     </p>
-                    <h1 className="font-display mt-1 text-2xl font-bold sm:text-3xl">
-                      {referrer} sent you here
-                    </h1>
+                    <div className="mt-2 flex flex-wrap items-center gap-3">
+                      <h2 className="font-display text-2xl font-bold sm:text-3xl">
+                        {referrer} brought you to 365 Motor Sales
+                      </h2>
+                      {counted !== null && (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <button
+                              type="button"
+                              className={
+                                "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors " +
+                                (counted
+                                  ? "bg-primary/15 text-primary hover:bg-primary/20"
+                                  : "bg-secondary text-muted-foreground hover:bg-secondary/80")
+                              }
+                              aria-label={counted ? "New scan counted" : "Repeat scan"}
+                            >
+                              {counted ? (
+                                <CheckCircle2 className="h-3.5 w-3.5" />
+                              ) : (
+                                <RotateCcw className="h-3.5 w-3.5" />
+                              )}
+                              <span>{counted ? "New scan counted" : "Repeat scan"}</span>
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" align="start" className="max-w-[260px] text-xs">
+                            {counted ? (
+                              <p>
+                                First scan from this device — counted toward {referrer}&apos;s stats.
+                                Repeat visits won&apos;t inflate their numbers.
+                              </p>
+                            ) : (
+                              <p>
+                                You&apos;ve already scanned this code from this device. We don&apos;t
+                                count repeat scans, so {referrer}&apos;s stats stay accurate.
+                              </p>
+                            )}
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
+                    <p className="mt-3 max-w-2xl text-muted-foreground">
+                      This QR keeps {referrer}&apos;s referral credit, but the page now works like a
+                      shared featured destination for every 365 user — one stronger page that sells
+                      the platform, the services, and the upcoming roadmap.
+                    </p>
+                    {contactLine && (
+                      <p className="mt-3 text-sm text-muted-foreground">
+                        Contact {referrer}: {contactLine}
+                      </p>
+                    )}
                   </div>
-                  {counted !== null && (
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <button
-                          type="button"
-                          className={
-                            "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors " +
-                            (counted
-                              ? "bg-primary/15 text-primary hover:bg-primary/20"
-                              : "bg-secondary text-muted-foreground hover:bg-secondary/80")
-                          }
-                          aria-label={counted ? "New scan counted" : "Repeat scan"}
-                        >
-                          {counted ? (
-                            <CheckCircle2 className="h-3.5 w-3.5" />
-                          ) : (
-                            <RotateCcw className="h-3.5 w-3.5" />
-                          )}
-                          <span>{counted ? "New scan counted" : "Repeat scan"}</span>
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom" align="end" className="max-w-[260px] text-xs">
-                        {counted ? (
-                          <p>
-                            First scan from this device — counted toward {referrer}'s stats.
-                            Repeat visits won't inflate their numbers.
-                          </p>
-                        ) : (
-                          <p>
-                            You've already scanned this code from this device. We don't count
-                            repeat scans, so {referrer}'s stats stay accurate.
-                          </p>
-                        )}
-                      </TooltipContent>
-                    </Tooltip>
-                  )}
-                </div>
 
-                <p className="mt-2 text-muted-foreground">
-                  {counted === false
-                    ? `Welcome back! Your original visit is still credited to ${referrer}.`
-                    : `Your visit is credited to ${referrer}. Sign up in this browser within 90 days and they'll receive credit for your account.`}
-                </p>
+                  <div className="flex flex-wrap gap-3 lg:justify-end">
+                    <Button onClick={() => navigate({ to: "/signup" })}>Create account</Button>
+                    <Button variant="outline" onClick={() => navigate({ to: "/" })}>
+                      Browse listings
+                    </Button>
+                    <Button variant="outline" onClick={() => navigate({ to: "/businesses" })}>
+                      Partner your business
+                    </Button>
+                  </div>
+                </div>
 
                 {visitCount > 0 && (
                   <div className="mt-4 flex items-center gap-2 rounded-lg border border-dashed border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
@@ -232,12 +386,9 @@ function ReferralLanding() {
                         <>This is your first visit to this referral page.</>
                       ) : (
                         <>
-                          You've opened this page{" "}
-                          <strong className="text-foreground">{visitCount}</strong> times
-                          {firstSeenAt ? (
-                            <> since {new Date(firstSeenAt).toLocaleDateString()}</>
-                          ) : null}
-                          . Only the first scan counts toward stats.
+                          You&apos;ve opened this page <strong className="text-foreground">{visitCount}</strong>
+                          {firstSeenAt ? <> times since {new Date(firstSeenAt).toLocaleDateString()}</> : <> times</>}.
+                          Only the first scan counts toward stats.
                         </>
                       )}
                     </span>
@@ -245,413 +396,191 @@ function ReferralLanding() {
                 )}
 
                 {promos.length > 0 && (
-                  <div className="mt-6">
-                    <h2 className="font-display text-lg font-semibold">Active offers</h2>
-                    <ul className="mt-3 space-y-3">
-                      {promos.map((p) => (
-                        <li key={p.id} className="rounded-lg border border-border p-4">
-                          <div className="flex items-center justify-between gap-3">
-                            <div className="font-semibold">{p.title}</div>
-                            <span className="rounded-full bg-secondary px-2 py-0.5 text-xs uppercase">
-                              {p.kind}
-                            </span>
-                          </div>
-                          {p.description && (
-                            <p className="mt-1 text-sm text-muted-foreground">{p.description}</p>
-                          )}
-                          <div className="mt-2 text-sm">
-                            {p.percent_off ? (
-                              <span className="font-semibold">{p.percent_off}% off</span>
-                            ) : null}
-                            {p.flat_amount_php ? (
-                              <span className="font-semibold">₱{p.flat_amount_php}</span>
-                            ) : null}
-                            {(p.percent_off || p.flat_amount_php) && (
-                              <span className="text-muted-foreground">
-                                {" "}
-                                · applies to {p.applies_to}
-                              </span>
-                            )}
-                          </div>
-                          {p.ends_at && (
-                            <p className="mt-1 text-xs text-muted-foreground">
-                              Ends {new Date(p.ends_at).toLocaleDateString()}
+                  <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                    {promos.map((p) => (
+                      <div key={p.id} className="rounded-lg border border-border bg-background p-4">
+                        <div className="flex items-start justify-between gap-3">
+                          <div>
+                            <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
+                              Active offer
                             </p>
+                            <h3 className="mt-1 font-semibold">{p.title}</h3>
+                          </div>
+                          <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                            {p.kind}
+                          </span>
+                        </div>
+                        {p.description && (
+                          <p className="mt-2 text-sm text-muted-foreground">{p.description}</p>
+                        )}
+                        <p className="mt-3 text-sm font-medium text-foreground">
+                          {p.percent_off ? `${p.percent_off}% off` : null}
+                          {p.percent_off && p.flat_amount_php ? " · " : null}
+                          {p.flat_amount_php ? `₱${p.flat_amount_php}` : null}
+                          {(p.percent_off || p.flat_amount_php) && (
+                            <span className="font-normal text-muted-foreground">
+                              {" "}· applies to {p.applies_to}
+                            </span>
                           )}
-                          {p.terms && (
-                            <p className="mt-1 text-xs text-muted-foreground">{p.terms}</p>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                <div className="mt-6 flex flex-wrap gap-3">
-                  <Button onClick={() => navigate({ to: "/signup" })}>Create an account</Button>
-                  <Button variant="outline" onClick={() => navigate({ to: "/" })}>
-                    Browse listings
-                  </Button>
-                  <Button variant="outline" onClick={() => navigate({ to: "/businesses" })}>
-                    Partner your business
-                  </Button>
-                </div>
-                {contactLine && (
-                  <p className="mt-4 text-sm text-muted-foreground">
-                    Contact {referrer}: {contactLine}
-                  </p>
-                )}
-              </div>
-
-              {/* 2. Hero */}
-              <section className="mx-auto mt-14 max-w-3xl text-center">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-                  365 Motor Sales
-                </p>
-                <h2 className="font-display mt-3 text-3xl font-bold leading-tight sm:text-5xl">
-                  The Motor Marketplace Built for the Philippines
-                </h2>
-                <p className="mt-4 text-lg font-medium text-muted-foreground">
-                  Buy. Sell. List. Partner. Learn. Play.
-                </p>
-                <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-                  365 Motor Sales is more than a vehicle listing website. We are building a
-                  dedicated motor ecosystem for the Philippines — connecting vehicles,
-                  motorcycles, trucks, equipment, parts suppliers, repair shops, service
-                  businesses, education, and future mobile game engagement into one growing
-                  network.
-                </p>
-                <div className="mt-6 flex flex-wrap justify-center gap-3">
-                  <Button size="lg" onClick={() => navigate({ to: "/listings/new" } as any)}>
-                    List With 365 Motor Sales
-                  </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    onClick={() => navigate({ to: "/businesses" })}
-                  >
-                    Partner Your Business With Us
-                  </Button>
-                </div>
-                {contactLine && (
-                  <p className="mt-4 text-sm text-muted-foreground">
-                    Reach the 365 team via {referrer}: {contactLine}
-                  </p>
-                )}
-              </section>
-
-              {/* 3. Why 365 Is Different */}
-              <section className="mt-16">
-                <h2 className="font-display text-center text-2xl font-bold sm:text-3xl">
-                  Why 365 Is Different
-                </h2>
-                <p className="mx-auto mt-3 max-w-2xl text-center text-muted-foreground">
-                  Most online selling spaces are built as general posting feeds. They're fast,
-                  but they aren't built specifically for the motor industry.
-                </p>
-                <div className="mt-8 grid gap-4 md:grid-cols-2">
-                  <div className="rounded-xl border border-border bg-card p-6">
-                    <h3 className="font-display flex items-center gap-2 text-lg font-semibold text-muted-foreground">
-                      <XCircle className="h-5 w-5" />
-                      Generic social feeds
-                    </h3>
-                    <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-                      {[
-                        "Posts that disappear quickly",
-                        "Poor search structure",
-                        "Weak category organization",
-                        "Limited business identity",
-                        "No built-in shop tools",
-                        "No parts ordering pathway",
-                        "No education layer",
-                        "No long-term vehicle or business ecosystem",
-                      ].map((t) => (
-                        <li key={t} className="flex gap-2">
-                          <span className="text-muted-foreground/60">—</span>
-                          {t}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="rounded-xl border border-primary/30 bg-primary/5 p-6">
-                    <h3 className="font-display flex items-center gap-2 text-lg font-semibold text-primary">
-                      <CheckCircle className="h-5 w-5" />
-                      365 Motor Sales
-                    </h3>
-                    <ul className="mt-3 space-y-2 text-sm">
-                      {[
-                        "Vehicle and equipment listings",
-                        "Motor business pages",
-                        "Parts supplier visibility",
-                        "Shop and service networking",
-                        "Future online parts ordering",
-                        "Future shop management software",
-                        "Skills education and training",
-                        "Mobile game and attention-building systems",
-                        "Philippines-first rollout with global expansion potential",
-                      ].map((t) => (
-                        <li key={t} className="flex gap-2">
-                          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                          <span>{t}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </section>
-
-              {/* 4. What You Can List */}
-              <section className="mt-16">
-                <h2 className="font-display text-center text-2xl font-bold sm:text-3xl">
-                  What You Can List
-                </h2>
-                <p className="mx-auto mt-3 max-w-2xl text-center text-muted-foreground">
-                  365 Motor Sales is built for the full motor economy.
-                </p>
-                <div className="mt-8 grid gap-4 md:grid-cols-2">
-                  <div className="rounded-xl border border-border bg-card p-6">
-                    <h3 className="font-display flex items-center gap-2 text-lg font-semibold">
-                      <Car className="h-5 w-5 text-primary" />
-                      Vehicle Listings
-                    </h3>
-                    <div className="mt-3 flex flex-wrap gap-2 text-sm">
-                      {[
-                        "Cars",
-                        "Motorcycles",
-                        "Trucks",
-                        "Vans",
-                        "Heavy equipment",
-                        "Farm equipment",
-                        "Construction equipment",
-                        "Marine & small engine",
-                      ].map((t) => (
-                        <span
-                          key={t}
-                          className="rounded-full border border-border bg-background px-3 py-1"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="rounded-xl border border-border bg-card p-6">
-                    <h3 className="font-display flex items-center gap-2 text-lg font-semibold">
-                      <Building2 className="h-5 w-5 text-primary" />
-                      Business Listings
-                    </h3>
-                    <div className="mt-3 flex flex-wrap gap-2 text-sm">
-                      {[
-                        "Tire repair / vulcanizing",
-                        "Car wash",
-                        "Auto repair",
-                        "Motorcycle repair",
-                        "Aircon repair",
-                        "Towing",
-                        "Driving schools",
-                        "Insurance",
-                        "Parts stores",
-                        "Battery shops",
-                        "Accessories",
-                        "Wraps & signage",
-                        "Detailing",
-                        "Salvage yards",
-                        "Equipment service",
-                      ].map((t) => (
-                        <span
-                          key={t}
-                          className="rounded-full border border-border bg-background px-3 py-1"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              {/* 5. Business Network Advantage */}
-              <section className="mx-auto mt-16 max-w-3xl rounded-xl border border-border bg-card p-8 text-center">
-                <h2 className="font-display text-2xl font-bold sm:text-3xl">
-                  The Business Network Advantage
-                </h2>
-                <p className="mt-3 text-muted-foreground">
-                  A buyer looking for a vehicle may also need insurance, financing, inspection,
-                  tires, repairs, accessories, towing, detailing, registration help, or parts. A
-                  shop may need customers, parts suppliers, digital tools, training, and online
-                  visibility. 365 Motor Sales connects these opportunities in one ecosystem.
-                </p>
-                <p className="mt-4 text-sm text-muted-foreground">
-                  Your business page becomes your digital storefront — services, photos,
-                  contact, location, special offers, category, future reviews, and future
-                  booking tools.
-                </p>
-              </section>
-
-              {/* 6. Coming Soon */}
-              <section className="mt-16">
-                <h2 className="font-display text-center text-2xl font-bold sm:text-3xl">
-                  Coming Soon
-                </h2>
-                <div className="mt-8 grid gap-4 md:grid-cols-3">
-                  {[
-                    {
-                      icon: Package,
-                      title: "Online Parts Ordering",
-                      bullets: [
-                        "Online parts listings",
-                        "Supplier pages",
-                        "Fitment notes",
-                        "Quote requests",
-                        "Shop procurement tools",
-                        "Direct customer ordering",
-                        "Future salvage-yard inventory network",
-                      ],
-                    },
-                    {
-                      icon: Wrench,
-                      title: "Shop Management Software",
-                      bullets: [
-                        "Customer records",
-                        "Job cards & estimates",
-                        "Invoices",
-                        "Digital inspections",
-                        "Parts & inventory tracking",
-                        "Service reminders",
-                        "Staff workflow & sales tracking",
-                      ],
-                    },
-                    {
-                      icon: GraduationCap,
-                      title: "Education & Skills Training",
-                      bullets: [
-                        "Automotive & motorcycle basics",
-                        "Diagnostic thinking",
-                        "Electrical fundamentals",
-                        "Parts identification",
-                        "Shop safety & customer service",
-                        "Business startup basics",
-                        "Canadian Red Seal-level technician knowledge",
-                      ],
-                    },
-                  ].map(({ icon: Icon, title, bullets }) => (
-                    <div key={title} className="rounded-xl border border-border bg-card p-6">
-                      <div className="flex items-center justify-between gap-2">
-                        <Icon className="h-6 w-6 text-primary" />
-                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
-                          Coming soon
-                        </span>
+                        </p>
+                        {p.ends_at && (
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            Ends {new Date(p.ends_at).toLocaleDateString()}
+                          </p>
+                        )}
+                        {p.terms && <p className="mt-1 text-xs text-muted-foreground">{p.terms}</p>}
                       </div>
-                      <h3 className="font-display mt-3 text-lg font-semibold">{title}</h3>
-                      <ul className="mt-3 space-y-1.5 text-sm text-muted-foreground">
-                        {bullets.map((b) => (
-                          <li key={b} className="flex gap-2">
-                            <span className="text-primary/70">•</span>
-                            <span>{b}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
-              {/* 7. Mobile Game Ecosystem */}
-              <section className="mx-auto mt-16 max-w-4xl rounded-xl border border-primary/30 bg-gradient-to-br from-primary/5 to-transparent p-8">
-                <div className="flex flex-col items-start gap-4 sm:flex-row">
-                  <div className="rounded-xl bg-primary/10 p-3">
-                    <Gamepad2 className="h-7 w-7 text-primary" />
+                    ))}
                   </div>
-                  <div className="flex-1">
-                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
-                      Upcoming
-                    </span>
-                    <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
-                      Mobile Game Ecosystem
-                    </h2>
-                    <p className="mt-2 text-muted-foreground">
-                      The upcoming 365 companion garage game — idle racing, merge mechanics,
-                      garage upgrades, route problems, and more.
-                    </p>
-                    <p className="mt-3 inline-flex items-center gap-2 rounded-lg bg-card px-3 py-1.5 text-sm font-semibold">
-                      <Sparkles className="h-4 w-4 text-primary" />
-                      Earn freebies and add boosts
-                    </p>
-                    <ul className="mt-4 grid gap-1.5 text-sm text-muted-foreground sm:grid-cols-2">
-                      {[
-                        "Brand awareness",
-                        "Automotive learning",
-                        "Parts education",
-                        "Vehicle upgrade concepts",
-                        "Sponsor opportunities",
-                        "Rewards & digital collectibles",
-                      ].map((t) => (
-                        <li key={t} className="flex gap-2">
-                          <span className="text-primary/70">•</span>
-                          {t}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </section>
-
-              {/* 8. Built for the Philippines First */}
-              <section className="mt-16">
-                <div className="flex items-center justify-center gap-2">
-                  <MapPin className="h-5 w-5 text-primary" />
-                  <h2 className="font-display text-center text-2xl font-bold sm:text-3xl">
-                    Built for the Philippines First
-                  </h2>
-                </div>
-                <p className="mx-auto mt-3 max-w-2xl text-center text-muted-foreground">
-                  The opportunity is organizing the full motor economy — sellers, buyers,
-                  dealers, shops, parts suppliers, towing, insurance, driving schools,
-                  equipment owners, mechanics, students, teachers, game users, and future
-                  exporters.
-                </p>
-              </section>
-
-              {/* 9. Final CTA */}
-              <section className="mt-16 rounded-2xl border border-border bg-card p-8 text-center sm:p-12">
-                <h2 className="font-display text-2xl font-bold sm:text-3xl">
-                  Join the 365 Motor Sales Network
-                </h2>
-                <p className="mx-auto mt-3 max-w-2xl text-muted-foreground">
-                  Whether you sell vehicles, repair motorcycles, wash cars, tow trucks, teach
-                  driving, sell parts, manage a shop, or want to partner with the platform —
-                  365 Motor Sales is being built for you.
-                </p>
-                <div className="mt-6 flex flex-wrap justify-center gap-3">
-                  <Button size="lg" onClick={() => navigate({ to: "/listings/new" } as any)}>
-                    List a vehicle
-                  </Button>
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    onClick={() => navigate({ to: "/businesses" })}
-                  >
-                    List a business
-                  </Button>
-                  <Button size="lg" variant="outline" onClick={() => navigate({ to: "/" })}>
-                    Browse listings
-                  </Button>
-                </div>
-                <p className="mt-6 text-sm text-muted-foreground">
-                  Website:{" "}
-                  <a href="https://365motorsales.com" className="font-medium text-primary hover:underline">
-                    365motorsales.com
-                  </a>
-                </p>
-                {contactLine && (
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Contact {referrer}: {contactLine}
-                  </p>
                 )}
+              </section>
+
+              <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-primary">
+                    Shared 365 feature page
+                  </p>
+                  <h1 className="font-display mt-3 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
+                    365 Motor Sales
+                  </h1>
+                  <p className="mt-3 text-xl font-semibold text-foreground sm:text-2xl">
+                    The motor marketplace built for the Philippines.
+                  </p>
+                  <p className="mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">
+                    Keep the referral setup, keep every user&apos;s QR working, and send every scan into
+                    one stronger destination page that explains what 365 already does and what is
+                    coming next.
+                  </p>
+
+                  <div className="mt-6 flex flex-wrap gap-2">
+                    {FEATURE_CHIPS.map((chip) => (
+                      <span
+                        key={chip}
+                        className="rounded-full border border-border bg-card px-3 py-1.5 text-sm font-medium text-foreground"
+                      >
+                        {chip}
+                      </span>
+                    ))}
+                  </div>
+
+                  <div className="mt-7 flex flex-wrap gap-3">
+                    <Button size="lg" onClick={() => navigate({ to: "/signup" })}>
+                      Join 365
+                    </Button>
+                    <Button size="lg" variant="outline" onClick={() => navigate({ to: "/" })}>
+                      Browse website
+                    </Button>
+                  </div>
+                </div>
+
+                <FeatureImage
+                  image={PRIMARY_PANELS[0].image}
+                  alt={PRIMARY_PANELS[0].alt}
+                  eyebrow={PRIMARY_PANELS[0].eyebrow}
+                  title={PRIMARY_PANELS[0].title}
+                  description={PRIMARY_PANELS[0].description}
+                  priority
+                />
+              </section>
+
+              <section className="mt-10 grid gap-6 lg:grid-cols-2">
+                <FeatureImage
+                  image={PRIMARY_PANELS[1].image}
+                  alt={PRIMARY_PANELS[1].alt}
+                  eyebrow={PRIMARY_PANELS[1].eyebrow}
+                  title={PRIMARY_PANELS[1].title}
+                  description={PRIMARY_PANELS[1].description}
+                />
+                <FeatureImage
+                  image={PRIMARY_PANELS[2].image}
+                  alt={PRIMARY_PANELS[2].alt}
+                  eyebrow={PRIMARY_PANELS[2].eyebrow}
+                  title={PRIMARY_PANELS[2].title}
+                  description={PRIMARY_PANELS[2].description}
+                />
+              </section>
+
+              <section className="mt-10 grid gap-6 lg:grid-cols-2">
+                {SECONDARY_PANELS.slice(0, 2).map((panel) => (
+                  <FeatureImage
+                    key={panel.title}
+                    image={panel.image}
+                    alt={panel.alt}
+                    eyebrow={panel.eyebrow}
+                    title={panel.title}
+                    description={panel.description}
+                  />
+                ))}
+              </section>
+
+              <section className="mt-10 grid gap-6 lg:grid-cols-3">
+                {SECONDARY_PANELS.slice(2).map((panel) => (
+                  <FeatureImage
+                    key={panel.title}
+                    image={panel.image}
+                    alt={panel.alt}
+                    eyebrow={panel.eyebrow}
+                    title={panel.title}
+                    description={panel.description}
+                  />
+                ))}
+              </section>
+
+              <section className="mt-10 rounded-2xl border border-border bg-card p-6 sm:p-8">
+                <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+                  <div>
+                    <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                      <Sparkles className="h-3.5 w-3.5" />
+                      Shared destination for every QR code
+                    </p>
+                    <h2 className="font-display mt-3 text-2xl font-bold sm:text-3xl">
+                      One page can do the selling for the whole network.
+                    </h2>
+                    <p className="mt-3 max-w-3xl text-muted-foreground">
+                      Buyers get the big picture. Sellers see the opportunity. Shops see where
+                      they fit. Partners see the roadmap. And the person whose QR was scanned still
+                      gets the referral credit.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-3 lg:justify-end">
+                    <Button size="lg" onClick={() => navigate({ to: "/signup" })}>
+                      Sign up free <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                    <Button size="lg" variant="outline" onClick={() => navigate({ to: "/businesses" })}>
+                      Grow with us
+                    </Button>
+                  </div>
+                </div>
               </section>
             </>
           )}
         </div>
       </TooltipProvider>
-    </SiteLayout>
+  );
+}
+
+function FeatureImage({
+  image,
+  alt,
+  eyebrow,
+  title,
+  description,
+  priority = false,
+}: ImagePanel & { priority?: boolean }) {
+  return (
+    <article className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+      <img
+        src={image}
+        alt={alt}
+        className="aspect-[16/10] w-full object-cover object-center"
+        loading={priority ? "eager" : "lazy"}
+      />
+      <div className="p-4 sm:p-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">{eyebrow}</p>
+        <h2 className="font-display mt-2 text-xl font-bold leading-tight sm:text-2xl">{title}</h2>
+        <p className="mt-2 text-sm text-muted-foreground sm:text-base">{description}</p>
+      </div>
+    </article>
   );
 }
