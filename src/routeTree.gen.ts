@@ -175,8 +175,10 @@ import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocod
 import { Route as ApiPublicGeoSearchRouteImport } from './routes/api/public/geo-search'
 import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
 import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions_.$staffId'
+import { Route as AdminAdvertisementsShareKitRouteImport } from './routes/admin.advertisements.share-kit'
 import { Route as AdminAdvertisementsPromotionsRouteImport } from './routes/admin.advertisements.promotions'
 import { Route as AdminAdvertisementsInquiriesRouteImport } from './routes/admin.advertisements.inquiries'
+import { Route as AdminAdvertisementsHistoryRouteImport } from './routes/admin.advertisements.history'
 import { Route as AdminAdvertisementsCampaignsRouteImport } from './routes/admin.advertisements.campaigns'
 import { Route as AuthenticatedDisputeReportIdRouteImport } from './routes/_authenticated/dispute.$reportId'
 import { Route as AuthenticatedDashboardStaffRequestsRouteImport } from './routes/_authenticated/dashboard.staff-requests'
@@ -1051,6 +1053,12 @@ const AdminRedemptionsStaffIdRoute = AdminRedemptionsStaffIdRouteImport.update({
   path: '/redemptions/$staffId',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAdvertisementsShareKitRoute =
+  AdminAdvertisementsShareKitRouteImport.update({
+    id: '/share-kit',
+    path: '/share-kit',
+    getParentRoute: () => AdminAdvertisementsRoute,
+  } as any)
 const AdminAdvertisementsPromotionsRoute =
   AdminAdvertisementsPromotionsRouteImport.update({
     id: '/promotions',
@@ -1061,6 +1069,12 @@ const AdminAdvertisementsInquiriesRoute =
   AdminAdvertisementsInquiriesRouteImport.update({
     id: '/inquiries',
     path: '/inquiries',
+    getParentRoute: () => AdminAdvertisementsRoute,
+  } as any)
+const AdminAdvertisementsHistoryRoute =
+  AdminAdvertisementsHistoryRouteImport.update({
+    id: '/history',
+    path: '/history',
     getParentRoute: () => AdminAdvertisementsRoute,
   } as any)
 const AdminAdvertisementsCampaignsRoute =
@@ -1436,8 +1450,10 @@ export interface FileRoutesByFullPath {
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
   '/admin/advertisements/campaigns': typeof AdminAdvertisementsCampaignsRoute
+  '/admin/advertisements/history': typeof AdminAdvertisementsHistoryRoute
   '/admin/advertisements/inquiries': typeof AdminAdvertisementsInquiriesRoute
   '/admin/advertisements/promotions': typeof AdminAdvertisementsPromotionsRoute
+  '/admin/advertisements/share-kit': typeof AdminAdvertisementsShareKitRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1638,8 +1654,10 @@ export interface FileRoutesByTo {
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
   '/admin/advertisements/campaigns': typeof AdminAdvertisementsCampaignsRoute
+  '/admin/advertisements/history': typeof AdminAdvertisementsHistoryRoute
   '/admin/advertisements/inquiries': typeof AdminAdvertisementsInquiriesRoute
   '/admin/advertisements/promotions': typeof AdminAdvertisementsPromotionsRoute
+  '/admin/advertisements/share-kit': typeof AdminAdvertisementsShareKitRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1846,8 +1864,10 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/_authenticated/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
   '/admin/advertisements/campaigns': typeof AdminAdvertisementsCampaignsRoute
+  '/admin/advertisements/history': typeof AdminAdvertisementsHistoryRoute
   '/admin/advertisements/inquiries': typeof AdminAdvertisementsInquiriesRoute
   '/admin/advertisements/promotions': typeof AdminAdvertisementsPromotionsRoute
+  '/admin/advertisements/share-kit': typeof AdminAdvertisementsShareKitRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -2055,8 +2075,10 @@ export interface FileRouteTypes {
     | '/dashboard/staff-requests'
     | '/dispute/$reportId'
     | '/admin/advertisements/campaigns'
+    | '/admin/advertisements/history'
     | '/admin/advertisements/inquiries'
     | '/admin/advertisements/promotions'
+    | '/admin/advertisements/share-kit'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2257,8 +2279,10 @@ export interface FileRouteTypes {
     | '/dashboard/staff-requests'
     | '/dispute/$reportId'
     | '/admin/advertisements/campaigns'
+    | '/admin/advertisements/history'
     | '/admin/advertisements/inquiries'
     | '/admin/advertisements/promotions'
+    | '/admin/advertisements/share-kit'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2464,8 +2488,10 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/staff-requests'
     | '/_authenticated/dispute/$reportId'
     | '/admin/advertisements/campaigns'
+    | '/admin/advertisements/history'
     | '/admin/advertisements/inquiries'
     | '/admin/advertisements/promotions'
+    | '/admin/advertisements/share-kit'
     | '/admin/redemptions_/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -3798,6 +3824,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRedemptionsStaffIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/advertisements/share-kit': {
+      id: '/admin/advertisements/share-kit'
+      path: '/share-kit'
+      fullPath: '/admin/advertisements/share-kit'
+      preLoaderRoute: typeof AdminAdvertisementsShareKitRouteImport
+      parentRoute: typeof AdminAdvertisementsRoute
+    }
     '/admin/advertisements/promotions': {
       id: '/admin/advertisements/promotions'
       path: '/promotions'
@@ -3810,6 +3843,13 @@ declare module '@tanstack/react-router' {
       path: '/inquiries'
       fullPath: '/admin/advertisements/inquiries'
       preLoaderRoute: typeof AdminAdvertisementsInquiriesRouteImport
+      parentRoute: typeof AdminAdvertisementsRoute
+    }
+    '/admin/advertisements/history': {
+      id: '/admin/advertisements/history'
+      path: '/history'
+      fullPath: '/admin/advertisements/history'
+      preLoaderRoute: typeof AdminAdvertisementsHistoryRouteImport
       parentRoute: typeof AdminAdvertisementsRoute
     }
     '/admin/advertisements/campaigns': {
@@ -4106,15 +4146,19 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface AdminAdvertisementsRouteChildren {
   AdminAdvertisementsCampaignsRoute: typeof AdminAdvertisementsCampaignsRoute
+  AdminAdvertisementsHistoryRoute: typeof AdminAdvertisementsHistoryRoute
   AdminAdvertisementsInquiriesRoute: typeof AdminAdvertisementsInquiriesRoute
   AdminAdvertisementsPromotionsRoute: typeof AdminAdvertisementsPromotionsRoute
+  AdminAdvertisementsShareKitRoute: typeof AdminAdvertisementsShareKitRoute
   AdminAdvertisementsIndexRoute: typeof AdminAdvertisementsIndexRoute
 }
 
 const AdminAdvertisementsRouteChildren: AdminAdvertisementsRouteChildren = {
   AdminAdvertisementsCampaignsRoute: AdminAdvertisementsCampaignsRoute,
+  AdminAdvertisementsHistoryRoute: AdminAdvertisementsHistoryRoute,
   AdminAdvertisementsInquiriesRoute: AdminAdvertisementsInquiriesRoute,
   AdminAdvertisementsPromotionsRoute: AdminAdvertisementsPromotionsRoute,
+  AdminAdvertisementsShareKitRoute: AdminAdvertisementsShareKitRoute,
   AdminAdvertisementsIndexRoute: AdminAdvertisementsIndexRoute,
 }
 
