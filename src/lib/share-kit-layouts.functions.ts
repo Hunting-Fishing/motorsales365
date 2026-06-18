@@ -6,7 +6,7 @@ export type LayoutOverride = { cx: number; cy: number; size: number };
 export type LayoutMap = Record<string, LayoutOverride>;
 
 const upsertSchema = z.object({
-  templateId: z.string().min(1).max(100).regex(/^[a-z0-9_-]+$/i),
+  templateId: z.string().min(1).max(100).regex(/^[a-z0-9_:-]+$/i),
   cx: z.number().min(0).max(1),
   cy: z.number().min(0).max(1),
   size: z.number().min(0.05).max(0.8),
