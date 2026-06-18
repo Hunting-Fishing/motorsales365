@@ -69,7 +69,9 @@ export function pendingCountForRoute(
       return counts.claims_pending;
     case "/admin/payments":
       return counts.payments_pending;
-    case "/admin/advertising":
+    case "/admin/advertisements":
+      return counts.ad_inquiries_open + counts.ad_campaigns_pending;
+    case "/admin/advertisements/inquiries":
       return counts.ad_inquiries_open;
     case "/admin/inquiries":
       return counts.service_inquiries_open + counts.business_inquiries_open;
@@ -77,7 +79,7 @@ export function pendingCountForRoute(
       return counts.location_corrections_pending;
     case "/admin/type-suggestions":
       return counts.type_suggestions_pending;
-    case "/admin/ad-campaigns":
+    case "/admin/advertisements/campaigns":
       return counts.ad_campaigns_pending;
     case "/admin/alerts":
       return counts.ops_alerts_unack;
