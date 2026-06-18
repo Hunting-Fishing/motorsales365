@@ -410,6 +410,20 @@ function AdminShareKitPage() {
                         <Button
                           variant="outline"
                           size="sm"
+                          onClick={() => applyPlacementToAll(custom)}
+                          disabled={applyingAllId !== null || bulkFitting}
+                          title="Copy this QR placement (cx / cy / size) to every other custom template"
+                        >
+                          {applyingAllId === custom.id ? (
+                            <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+                          ) : (
+                            <Crosshair className="mr-1 h-4 w-4" />
+                          )}
+                          Apply placement to all
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
                           onClick={() => deleteCustom(custom.id, custom.label)}
                         >
                           <Trash2 className="mr-1 h-4 w-4" /> Delete
