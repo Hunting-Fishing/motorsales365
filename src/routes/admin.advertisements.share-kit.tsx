@@ -412,27 +412,13 @@ function AdminShareKitPage() {
                 {isAdmin && (
                   <div className="mt-2 flex flex-wrap justify-end gap-2">
                     {custom ? (
-                      <>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => smartFitCard(custom)}
-                          disabled={autoFittingId === custom.id || bulkFitting}
-                          title="Use AI vision to find this flyer's Scan Here panel and snap the QR into it"
-                        >
-                          {autoFittingId === custom.id ? (
-                            <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                          ) : (
-                            <Sparkles className="mr-1 h-4 w-4" />
-                          )}
-                          Smart fit
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => deleteCustom(custom.id, custom.label)}
-                        >
-                          <Trash2 className="mr-1 h-4 w-4" /> Delete
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => deleteCustom(custom.id, custom.label)}
+                        disabled={bulkFitting}
+                      >
+                        <Trash2 className="mr-1 h-4 w-4" /> Delete
                         </Button>
                       </>
                     ) : (
