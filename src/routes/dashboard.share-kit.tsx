@@ -280,9 +280,9 @@ function ShareKitPage() {
           {historyBuiltins.length === 0 ? (
             <p className="text-sm text-muted-foreground">Nothing in history yet.</p>
           ) : (
-            <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
+            <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]">
               {historyBuiltins.map((t) => (
-                <div key={t.id} className="relative opacity-80">
+                <div key={t.id} className="relative mx-auto w-full max-w-[240px] opacity-80">
                   <TemplateCard template={t} context={context} override={layouts?.[t.id]} />
                   <div className="mt-2 flex justify-end">
                     <Button variant="outline" size="sm" onClick={() => restoreBuiltin(t.id)}>
