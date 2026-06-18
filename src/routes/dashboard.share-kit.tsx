@@ -211,9 +211,20 @@ function ShareKitPage() {
           <Button variant="outline" size="sm">Classic A4 poster</Button>
         </Link>
         {isAdmin && (
-          <Button size="sm" onClick={() => setUploadOpen(true)} className="ml-auto">
-            <Plus className="mr-1 h-4 w-4" /> Upload new template
-          </Button>
+          <>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setShowHistory((v) => !v)}
+              className="ml-auto"
+            >
+              <History className="mr-1 h-4 w-4" />
+              {showHistory ? "Hide history" : `History (${historyBuiltins.length})`}
+            </Button>
+            <Button size="sm" onClick={() => setUploadOpen(true)}>
+              <Plus className="mr-1 h-4 w-4" /> Upload new template
+            </Button>
+          </>
         )}
       </div>
 
