@@ -154,6 +154,7 @@ import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as AdminAdvertisementsRouteImport } from './routes/admin.advertisements'
 import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
 import { Route as DashboardTeamIndexRouteImport } from './routes/dashboard.team.index'
+import { Route as AdminAdvertisementsIndexRouteImport } from './routes/admin.advertisements.index'
 import { Route as ShopPSlugRouteImport } from './routes/shop.p.$slug'
 import { Route as ShopDepartmentSlugRouteImport } from './routes/shop.department.$slug'
 import { Route as ShopBrandSlugRouteImport } from './routes/shop.brand.$slug'
@@ -941,6 +942,12 @@ const DashboardTeamIndexRoute = DashboardTeamIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DashboardTeamRoute,
 } as any)
+const AdminAdvertisementsIndexRoute =
+  AdminAdvertisementsIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AdminAdvertisementsRoute,
+  } as any)
 const ShopPSlugRoute = ShopPSlugRouteImport.update({
   id: '/shop/p/$slug',
   path: '/shop/p/$slug',
@@ -1451,6 +1458,7 @@ export interface FileRoutesByFullPath {
   '/shop/brand/$slug': typeof ShopBrandSlugRoute
   '/shop/department/$slug': typeof ShopDepartmentSlugRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
+  '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
@@ -1521,7 +1529,6 @@ export interface FileRoutesByTo {
   '/verified': typeof VerifiedRoute
   '/verify-email': typeof VerifyEmailRoute
   '/admin/accounts': typeof AdminAccountsRoute
-  '/admin/advertisements': typeof AdminAdvertisementsRouteWithChildren
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -1652,6 +1659,7 @@ export interface FileRoutesByTo {
   '/shop/brand/$slug': typeof ShopBrandSlugRoute
   '/shop/department/$slug': typeof ShopDepartmentSlugRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
+  '/admin/advertisements': typeof AdminAdvertisementsIndexRoute
   '/dashboard/team': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
@@ -1860,6 +1868,7 @@ export interface FileRoutesById {
   '/shop/brand/$slug': typeof ShopBrandSlugRoute
   '/shop/department/$slug': typeof ShopDepartmentSlugRoute
   '/shop/p/$slug': typeof ShopPSlugRoute
+  '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
@@ -2068,6 +2077,7 @@ export interface FileRouteTypes {
     | '/shop/brand/$slug'
     | '/shop/department/$slug'
     | '/shop/p/$slug'
+    | '/admin/advertisements/'
     | '/dashboard/team/'
     | '/api/public/fx/refresh'
     | '/api/public/hooks/annual-bonuses'
@@ -2138,7 +2148,6 @@ export interface FileRouteTypes {
     | '/verified'
     | '/verify-email'
     | '/admin/accounts'
-    | '/admin/advertisements'
     | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/audit'
@@ -2269,6 +2278,7 @@ export interface FileRouteTypes {
     | '/shop/brand/$slug'
     | '/shop/department/$slug'
     | '/shop/p/$slug'
+    | '/admin/advertisements'
     | '/dashboard/team'
     | '/api/public/fx/refresh'
     | '/api/public/hooks/annual-bonuses'
@@ -2476,6 +2486,7 @@ export interface FileRouteTypes {
     | '/shop/brand/$slug'
     | '/shop/department/$slug'
     | '/shop/p/$slug'
+    | '/admin/advertisements/'
     | '/dashboard/team/'
     | '/api/public/fx/refresh'
     | '/api/public/hooks/annual-bonuses'
@@ -3640,6 +3651,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardTeamIndexRouteImport
       parentRoute: typeof DashboardTeamRoute
     }
+    '/admin/advertisements/': {
+      id: '/admin/advertisements/'
+      path: '/'
+      fullPath: '/admin/advertisements/'
+      preLoaderRoute: typeof AdminAdvertisementsIndexRouteImport
+      parentRoute: typeof AdminAdvertisementsRoute
+    }
     '/shop/p/$slug': {
       id: '/shop/p/$slug'
       path: '/shop/p/$slug'
@@ -4090,12 +4108,14 @@ interface AdminAdvertisementsRouteChildren {
   AdminAdvertisementsCampaignsRoute: typeof AdminAdvertisementsCampaignsRoute
   AdminAdvertisementsInquiriesRoute: typeof AdminAdvertisementsInquiriesRoute
   AdminAdvertisementsPromotionsRoute: typeof AdminAdvertisementsPromotionsRoute
+  AdminAdvertisementsIndexRoute: typeof AdminAdvertisementsIndexRoute
 }
 
 const AdminAdvertisementsRouteChildren: AdminAdvertisementsRouteChildren = {
   AdminAdvertisementsCampaignsRoute: AdminAdvertisementsCampaignsRoute,
   AdminAdvertisementsInquiriesRoute: AdminAdvertisementsInquiriesRoute,
   AdminAdvertisementsPromotionsRoute: AdminAdvertisementsPromotionsRoute,
+  AdminAdvertisementsIndexRoute: AdminAdvertisementsIndexRoute,
 }
 
 const AdminAdvertisementsRouteWithChildren =
