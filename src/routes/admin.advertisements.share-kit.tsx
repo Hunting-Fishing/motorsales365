@@ -47,8 +47,8 @@ function customToTemplate(row: CustomTemplateRow): ShareTemplate {
       cx: Number(row.qr_cx),
       cy: Number(row.qr_cy),
       size: Number(row.qr_size),
-      platePadding: 0.08,
-      plateRadius: 0.12,
+      platePadding: 0,
+      plateRadius: 0,
     },
     shareText: row.share_text,
   };
