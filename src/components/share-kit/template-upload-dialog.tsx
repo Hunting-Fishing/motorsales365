@@ -50,6 +50,10 @@ type Item = {
   qrCy: number;
   qrSize: number;
   qrDetected: boolean;
+  readable: boolean;
+  readabilityReasons: string[];
+  modulePx: number;
+  contrast: number;
 };
 
 const ACCEPT = "image/png,image/jpeg,image/webp";
