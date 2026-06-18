@@ -133,7 +133,6 @@ import { Route as AdminRewardsRouteImport } from './routes/admin.rewards'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminReferralsRouteImport } from './routes/admin.referrals'
 import { Route as AdminRedemptionsRouteImport } from './routes/admin.redemptions'
-import { Route as AdminPromotionsRouteImport } from './routes/admin.promotions'
 import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
@@ -152,8 +151,6 @@ import { Route as AdminBusinessesRouteImport } from './routes/admin.businesses'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
-import { Route as AdminAdvertisingRouteImport } from './routes/admin.advertising'
-import { Route as AdminAdCampaignsRouteImport } from './routes/admin.ad-campaigns'
 import { Route as AdminAccountsRouteImport } from './routes/admin.accounts'
 import { Route as DashboardTeamIndexRouteImport } from './routes/dashboard.team.index'
 import { Route as ShopPSlugRouteImport } from './routes/shop.p.$slug'
@@ -176,6 +173,9 @@ import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocod
 import { Route as ApiPublicGeoSearchRouteImport } from './routes/api/public/geo-search'
 import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
 import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions_.$staffId'
+import { Route as AdminAdvertisementsPromotionsRouteImport } from './routes/admin.advertisements.promotions'
+import { Route as AdminAdvertisementsInquiriesRouteImport } from './routes/admin.advertisements.inquiries'
+import { Route as AdminAdvertisementsCampaignsRouteImport } from './routes/admin.advertisements.campaigns'
 import { Route as AuthenticatedDisputeReportIdRouteImport } from './routes/_authenticated/dispute.$reportId'
 import { Route as AuthenticatedDashboardStaffRequestsRouteImport } from './routes/_authenticated/dashboard.staff-requests'
 import { Route as AuthenticatedDashboardPartsWantedRouteImport } from './routes/_authenticated/dashboard.parts-wanted'
@@ -834,11 +834,6 @@ const AdminRedemptionsRoute = AdminRedemptionsRouteImport.update({
   path: '/redemptions',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminPromotionsRoute = AdminPromotionsRouteImport.update({
-  id: '/promotions',
-  path: '/promotions',
-  getParentRoute: () => AdminRoute,
-} as any)
 const AdminPricingRoute = AdminPricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
@@ -928,16 +923,6 @@ const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
 const AdminAlertsRoute = AdminAlertsRouteImport.update({
   id: '/alerts',
   path: '/alerts',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminAdvertisingRoute = AdminAdvertisingRouteImport.update({
-  id: '/advertising',
-  path: '/advertising',
-  getParentRoute: () => AdminRoute,
-} as any)
-const AdminAdCampaignsRoute = AdminAdCampaignsRouteImport.update({
-  id: '/ad-campaigns',
-  path: '/ad-campaigns',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminAccountsRoute = AdminAccountsRouteImport.update({
@@ -1053,6 +1038,24 @@ const AdminRedemptionsStaffIdRoute = AdminRedemptionsStaffIdRouteImport.update({
   path: '/redemptions/$staffId',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAdvertisementsPromotionsRoute =
+  AdminAdvertisementsPromotionsRouteImport.update({
+    id: '/advertisements/promotions',
+    path: '/advertisements/promotions',
+    getParentRoute: () => AdminRoute,
+  } as any)
+const AdminAdvertisementsInquiriesRoute =
+  AdminAdvertisementsInquiriesRouteImport.update({
+    id: '/advertisements/inquiries',
+    path: '/advertisements/inquiries',
+    getParentRoute: () => AdminRoute,
+  } as any)
+const AdminAdvertisementsCampaignsRoute =
+  AdminAdvertisementsCampaignsRouteImport.update({
+    id: '/advertisements/campaigns',
+    path: '/advertisements/campaigns',
+    getParentRoute: () => AdminRoute,
+  } as any)
 const AuthenticatedDisputeReportIdRoute =
   AuthenticatedDisputeReportIdRouteImport.update({
     id: '/dispute/$reportId',
@@ -1309,8 +1312,6 @@ export interface FileRoutesByFullPath {
   '/verified': typeof VerifiedRoute
   '/verify-email': typeof VerifyEmailRoute
   '/admin/accounts': typeof AdminAccountsRoute
-  '/admin/ad-campaigns': typeof AdminAdCampaignsRoute
-  '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -1329,7 +1330,6 @@ export interface FileRoutesByFullPath {
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
-  '/admin/promotions': typeof AdminPromotionsRoute
   '/admin/redemptions': typeof AdminRedemptionsRoute
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -1421,6 +1421,9 @@ export interface FileRoutesByFullPath {
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
+  '/admin/advertisements/campaigns': typeof AdminAdvertisementsCampaignsRoute
+  '/admin/advertisements/inquiries': typeof AdminAdvertisementsInquiriesRoute
+  '/admin/advertisements/promotions': typeof AdminAdvertisementsPromotionsRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1511,8 +1514,6 @@ export interface FileRoutesByTo {
   '/verified': typeof VerifiedRoute
   '/verify-email': typeof VerifyEmailRoute
   '/admin/accounts': typeof AdminAccountsRoute
-  '/admin/ad-campaigns': typeof AdminAdCampaignsRoute
-  '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -1531,7 +1532,6 @@ export interface FileRoutesByTo {
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
-  '/admin/promotions': typeof AdminPromotionsRoute
   '/admin/redemptions': typeof AdminRedemptionsRoute
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -1622,6 +1622,9 @@ export interface FileRoutesByTo {
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
+  '/admin/advertisements/campaigns': typeof AdminAdvertisementsCampaignsRoute
+  '/admin/advertisements/inquiries': typeof AdminAdvertisementsInquiriesRoute
+  '/admin/advertisements/promotions': typeof AdminAdvertisementsPromotionsRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1716,8 +1719,6 @@ export interface FileRoutesById {
   '/verified': typeof VerifiedRoute
   '/verify-email': typeof VerifyEmailRoute
   '/admin/accounts': typeof AdminAccountsRoute
-  '/admin/ad-campaigns': typeof AdminAdCampaignsRoute
-  '/admin/advertising': typeof AdminAdvertisingRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/audit': typeof AdminAuditRoute
@@ -1736,7 +1737,6 @@ export interface FileRoutesById {
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/pricing': typeof AdminPricingRoute
-  '/admin/promotions': typeof AdminPromotionsRoute
   '/admin/redemptions': typeof AdminRedemptionsRoute
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -1828,6 +1828,9 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/_authenticated/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/_authenticated/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
+  '/admin/advertisements/campaigns': typeof AdminAdvertisementsCampaignsRoute
+  '/admin/advertisements/inquiries': typeof AdminAdvertisementsInquiriesRoute
+  '/admin/advertisements/promotions': typeof AdminAdvertisementsPromotionsRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1923,8 +1926,6 @@ export interface FileRouteTypes {
     | '/verified'
     | '/verify-email'
     | '/admin/accounts'
-    | '/admin/ad-campaigns'
-    | '/admin/advertising'
     | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/audit'
@@ -1943,7 +1944,6 @@ export interface FileRouteTypes {
     | '/admin/payments'
     | '/admin/performance'
     | '/admin/pricing'
-    | '/admin/promotions'
     | '/admin/redemptions'
     | '/admin/referrals'
     | '/admin/reports'
@@ -2035,6 +2035,9 @@ export interface FileRouteTypes {
     | '/dashboard/parts-wanted'
     | '/dashboard/staff-requests'
     | '/dispute/$reportId'
+    | '/admin/advertisements/campaigns'
+    | '/admin/advertisements/inquiries'
+    | '/admin/advertisements/promotions'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2125,8 +2128,6 @@ export interface FileRouteTypes {
     | '/verified'
     | '/verify-email'
     | '/admin/accounts'
-    | '/admin/ad-campaigns'
-    | '/admin/advertising'
     | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/audit'
@@ -2145,7 +2146,6 @@ export interface FileRouteTypes {
     | '/admin/payments'
     | '/admin/performance'
     | '/admin/pricing'
-    | '/admin/promotions'
     | '/admin/redemptions'
     | '/admin/referrals'
     | '/admin/reports'
@@ -2236,6 +2236,9 @@ export interface FileRouteTypes {
     | '/dashboard/parts-wanted'
     | '/dashboard/staff-requests'
     | '/dispute/$reportId'
+    | '/admin/advertisements/campaigns'
+    | '/admin/advertisements/inquiries'
+    | '/admin/advertisements/promotions'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2329,8 +2332,6 @@ export interface FileRouteTypes {
     | '/verified'
     | '/verify-email'
     | '/admin/accounts'
-    | '/admin/ad-campaigns'
-    | '/admin/advertising'
     | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/audit'
@@ -2349,7 +2350,6 @@ export interface FileRouteTypes {
     | '/admin/payments'
     | '/admin/performance'
     | '/admin/pricing'
-    | '/admin/promotions'
     | '/admin/redemptions'
     | '/admin/referrals'
     | '/admin/reports'
@@ -2441,6 +2441,9 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/parts-wanted'
     | '/_authenticated/dashboard/staff-requests'
     | '/_authenticated/dispute/$reportId'
+    | '/admin/advertisements/campaigns'
+    | '/admin/advertisements/inquiries'
+    | '/admin/advertisements/promotions'
     | '/admin/redemptions_/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -3478,13 +3481,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRedemptionsRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/promotions': {
-      id: '/admin/promotions'
-      path: '/promotions'
-      fullPath: '/admin/promotions'
-      preLoaderRoute: typeof AdminPromotionsRouteImport
-      parentRoute: typeof AdminRoute
-    }
     '/admin/pricing': {
       id: '/admin/pricing'
       path: '/pricing'
@@ -3609,20 +3605,6 @@ declare module '@tanstack/react-router' {
       path: '/alerts'
       fullPath: '/admin/alerts'
       preLoaderRoute: typeof AdminAlertsRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/advertising': {
-      id: '/admin/advertising'
-      path: '/advertising'
-      fullPath: '/admin/advertising'
-      preLoaderRoute: typeof AdminAdvertisingRouteImport
-      parentRoute: typeof AdminRoute
-    }
-    '/admin/ad-campaigns': {
-      id: '/admin/ad-campaigns'
-      path: '/ad-campaigns'
-      fullPath: '/admin/ad-campaigns'
-      preLoaderRoute: typeof AdminAdCampaignsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/accounts': {
@@ -3777,6 +3759,27 @@ declare module '@tanstack/react-router' {
       path: '/redemptions/$staffId'
       fullPath: '/admin/redemptions/$staffId'
       preLoaderRoute: typeof AdminRedemptionsStaffIdRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/advertisements/promotions': {
+      id: '/admin/advertisements/promotions'
+      path: '/advertisements/promotions'
+      fullPath: '/admin/advertisements/promotions'
+      preLoaderRoute: typeof AdminAdvertisementsPromotionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/advertisements/inquiries': {
+      id: '/admin/advertisements/inquiries'
+      path: '/advertisements/inquiries'
+      fullPath: '/admin/advertisements/inquiries'
+      preLoaderRoute: typeof AdminAdvertisementsInquiriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/advertisements/campaigns': {
+      id: '/admin/advertisements/campaigns'
+      path: '/advertisements/campaigns'
+      fullPath: '/admin/advertisements/campaigns'
+      preLoaderRoute: typeof AdminAdvertisementsCampaignsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/_authenticated/dispute/$reportId': {
@@ -4066,8 +4069,6 @@ const AuthenticatedRouteRouteWithChildren =
 
 interface AdminRouteChildren {
   AdminAccountsRoute: typeof AdminAccountsRoute
-  AdminAdCampaignsRoute: typeof AdminAdCampaignsRoute
-  AdminAdvertisingRoute: typeof AdminAdvertisingRoute
   AdminAlertsRoute: typeof AdminAlertsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminAuditRoute: typeof AdminAuditRoute
@@ -4086,7 +4087,6 @@ interface AdminRouteChildren {
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
   AdminPricingRoute: typeof AdminPricingRoute
-  AdminPromotionsRoute: typeof AdminPromotionsRoute
   AdminRedemptionsRoute: typeof AdminRedemptionsRoute
   AdminReferralsRoute: typeof AdminReferralsRoute
   AdminReportsRoute: typeof AdminReportsRoute
@@ -4102,13 +4102,14 @@ interface AdminRouteChildren {
   AdminUsersRoute: typeof AdminUsersRoute
   AdminVerificationsRoute: typeof AdminVerificationsRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  AdminAdvertisementsCampaignsRoute: typeof AdminAdvertisementsCampaignsRoute
+  AdminAdvertisementsInquiriesRoute: typeof AdminAdvertisementsInquiriesRoute
+  AdminAdvertisementsPromotionsRoute: typeof AdminAdvertisementsPromotionsRoute
   AdminRedemptionsStaffIdRoute: typeof AdminRedemptionsStaffIdRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAccountsRoute: AdminAccountsRoute,
-  AdminAdCampaignsRoute: AdminAdCampaignsRoute,
-  AdminAdvertisingRoute: AdminAdvertisingRoute,
   AdminAlertsRoute: AdminAlertsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminAuditRoute: AdminAuditRoute,
@@ -4127,7 +4128,6 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
   AdminPricingRoute: AdminPricingRoute,
-  AdminPromotionsRoute: AdminPromotionsRoute,
   AdminRedemptionsRoute: AdminRedemptionsRoute,
   AdminReferralsRoute: AdminReferralsRoute,
   AdminReportsRoute: AdminReportsRoute,
@@ -4143,6 +4143,9 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminUsersRoute: AdminUsersRoute,
   AdminVerificationsRoute: AdminVerificationsRoute,
   AdminIndexRoute: AdminIndexRoute,
+  AdminAdvertisementsCampaignsRoute: AdminAdvertisementsCampaignsRoute,
+  AdminAdvertisementsInquiriesRoute: AdminAdvertisementsInquiriesRoute,
+  AdminAdvertisementsPromotionsRoute: AdminAdvertisementsPromotionsRoute,
   AdminRedemptionsStaffIdRoute: AdminRedemptionsStaffIdRoute,
 }
 
