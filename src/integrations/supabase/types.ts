@@ -9272,6 +9272,13 @@ export type Database = {
           status: Database["public"]["Enums"]["passport_verification_status"]
         }[]
       }
+      get_referrer_contact: {
+        Args: { _code: string }
+        Returns: {
+          email: string
+          full_name: string
+        }[]
+      }
       get_trust_score: { Args: { _user_id: string }; Returns: number }
       get_wanted_post_contact: { Args: { _post_id: string }; Returns: string }
       get_wanted_response_contact: {
