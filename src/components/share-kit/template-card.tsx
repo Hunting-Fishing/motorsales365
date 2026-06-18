@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { Download, Share2, Copy, Facebook, MessageCircle, SlidersHorizontal } from "lucide-react";
+import { Download, Share2, Copy, Facebook, MessageCircle, SlidersHorizontal, Maximize2 } from "lucide-react";
 import { toast } from "sonner";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { canNativeShare } from "@/lib/share";
 import { composeTemplate, canvasToBlob } from "@/lib/share-kit/compose";
 import type { QrOverride } from "@/lib/share-kit/compose";
@@ -27,6 +28,7 @@ export function TemplateCard({ template, context, override }: Props) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [zoomOpen, setZoomOpen] = useState(false);
   const qc = useQueryClient();
   const upsertFn = useServerFn(upsertShareKitLayout);
   const deleteFn = useServerFn(deleteShareKitLayout);
@@ -161,6 +163,7 @@ export function TemplateCard({ template, context, override }: Props) {
   const aspect = template.height / template.width;
 
   return (
+    <>
     <Card className="overflow-hidden">
       {editing ? (
         <div className="p-3">
@@ -176,24 +179,34 @@ export function TemplateCard({ template, context, override }: Props) {
           />
         </div>
       ) : (
-        <div className="bg-muted/30 p-3">
+        <button
+          type="button"
+          onClick={() => previewUrl && setZoomOpen(true)}
+          className="block w-full bg-muted/30 p-2 text-left transition hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-primary"
+          aria-label={`Expand preview of ${template.label}`}
+        >
           <div
             className="relative w-full overflow-hidden rounded-md border border-border bg-white"
             style={{ paddingTop: `${aspect * 100}%` }}
           >
             {previewUrl ? (
-              <img
-                src={previewUrl}
-                alt={`Preview of ${template.label} with your personal QR code`}
-                className="absolute inset-0 h-full w-full object-contain"
-              />
+              <>
+                <img
+                  src={previewUrl}
+                  alt={`Preview of ${template.label} with your personal QR code`}
+                  className="absolute inset-0 h-full w-full object-contain"
+                />
+                <span className="absolute right-1.5 top-1.5 rounded-md bg-background/80 p-1 text-muted-foreground shadow-sm backdrop-blur-sm">
+                  <Maximize2 className="h-3.5 w-3.5" aria-hidden="true" />
+                </span>
+              </>
             ) : (
               <div className="absolute inset-0 flex items-center justify-center text-xs text-muted-foreground">
                 Rendering…
               </div>
             )}
           </div>
-        </div>
+        </button>
       )}
       <div className="space-y-3 p-4">
         <div>
@@ -252,5 +265,32 @@ export function TemplateCard({ template, context, override }: Props) {
         </div>
       </div>
     </Card>
+    <Dialog open={zoomOpen} onOpenChange={setZoomOpen}>
+      <DialogContent className="max-w-[95vw] sm:max-w-[90vw] lg:max-w-5xl p-3 sm:p-4">
+        <DialogTitle className="text-base">{template.label}</DialogTitle>
+        <DialogDescription className="sr-only">Full-size preview of {template.label}</DialogDescription>
+        {previewUrl && (
+          <div className="flex max-h-[80vh] items-center justify-center overflow-auto bg-muted/20 rounded-md">
+            <img
+              src={previewUrl}
+              alt={`Full-size preview of ${template.label}`}
+              className="max-h-[80vh] w-auto object-contain"
+            />
+          </div>
+        )}
+        <div className="flex flex-wrap gap-2 pt-1">
+          <Button size="sm" onClick={handleDownload} disabled={busy || !previewUrl}>
+            <Download className="mr-1 h-4 w-4" /> Download
+          </Button>
+          <Button size="sm" variant="outline" onClick={handleNativeShare} disabled={busy || !previewUrl}>
+            <Share2 className="mr-1 h-4 w-4" /> Share
+          </Button>
+          <Button size="sm" variant="outline" onClick={handleCopy}>
+            <Copy className="mr-1 h-4 w-4" /> Copy link
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

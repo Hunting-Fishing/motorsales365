@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Eye, Plus, Trash2 } from "lucide-react";
+import { Eye, EyeOff, Plus, Trash2, History } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -70,6 +70,7 @@ function ShareKitPage() {
   const [staff, setStaff] = useState<StaffRow | null>(null);
   const [loading, setLoading] = useState(true);
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [showHistory, setShowHistory] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/login" });
@@ -170,8 +171,10 @@ function ShareKitPage() {
   const hiddenBuiltins = new Set(customData?.hiddenBuiltins ?? []);
   const customTemplates = (customData?.templates ?? []).map(customToTemplate);
   const customById = new Map((customData?.templates ?? []).map((r) => [`custom:${r.id}`, r]));
-  const visibleBuiltins = TEMPLATES.filter((t) => isAdmin || !hiddenBuiltins.has(t.id));
-  const allTemplates: ShareTemplate[] = [...customTemplates, ...visibleBuiltins];
+  // Active grid: never show hidden built-ins (history is gated behind admin toggle below)
+  const activeBuiltins = TEMPLATES.filter((t) => !hiddenBuiltins.has(t.id));
+  const historyBuiltins = TEMPLATES.filter((t) => hiddenBuiltins.has(t.id));
+  const allTemplates: ShareTemplate[] = [...customTemplates, ...activeBuiltins];
 
   return (
     <div className="space-y-6">
@@ -208,47 +211,43 @@ function ShareKitPage() {
           <Button variant="outline" size="sm">Classic A4 poster</Button>
         </Link>
         {isAdmin && (
-          <Button size="sm" onClick={() => setUploadOpen(true)} className="ml-auto">
-            <Plus className="mr-1 h-4 w-4" /> Upload new template
-          </Button>
+          <>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setShowHistory((v) => !v)}
+              className="ml-auto"
+            >
+              <History className="mr-1 h-4 w-4" />
+              {showHistory ? "Hide history" : `History (${historyBuiltins.length})`}
+            </Button>
+            <Button size="sm" onClick={() => setUploadOpen(true)}>
+              <Plus className="mr-1 h-4 w-4" /> Upload new template
+            </Button>
+          </>
         )}
       </div>
 
       {context && (
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
           {allTemplates.map((t) => {
             const custom = customById.get(t.id);
-            const isBuiltin = !custom;
-            const builtinHidden = isBuiltin && hiddenBuiltins.has(t.id);
             return (
               <div key={t.id} className="relative">
-                {builtinHidden && (
-                  <div className="absolute inset-0 z-10 rounded-xl bg-background/80 backdrop-blur-sm flex items-center justify-center text-xs font-semibold text-muted-foreground pointer-events-none">
-                    Hidden from staff
-                  </div>
-                )}
                 <TemplateCard
                   template={t}
                   context={context}
                   override={layouts?.[t.id]}
                 />
                 {isAdmin && (
-                  <div className="mt-2 flex justify-end gap-2">
+                  <div className="mt-2 flex justify-end">
                     {custom ? (
                       <Button
                         variant="outline"
                         size="sm"
                         onClick={() => deleteCustom(custom.id, custom.label)}
                       >
-                        <Trash2 className="mr-1 h-4 w-4" /> Delete
-                      </Button>
-                    ) : builtinHidden ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => restoreBuiltin(t.id)}
-                      >
-                        <Eye className="mr-1 h-4 w-4" /> Restore
+                        <Trash2 className="mr-1 h-3.5 w-3.5" /> Delete
                       </Button>
                     ) : (
                       <Button
@@ -256,7 +255,7 @@ function ShareKitPage() {
                         size="sm"
                         onClick={() => deleteBuiltin(t.id, t.label)}
                       >
-                        <Trash2 className="mr-1 h-4 w-4" /> Delete
+                        <EyeOff className="mr-1 h-3.5 w-3.5" /> Archive
                       </Button>
                     )}
                   </div>
@@ -265,6 +264,36 @@ function ShareKitPage() {
             );
           })}
         </div>
+      )}
+
+      {isAdmin && showHistory && context && (
+        <section className="rounded-xl border border-dashed border-border bg-muted/20 p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <div>
+              <h2 className="font-display text-lg font-bold">Archived templates</h2>
+              <p className="text-xs text-muted-foreground">
+                Hidden from staff. Restore to make them available again.
+              </p>
+            </div>
+            <span className="text-xs text-muted-foreground">{historyBuiltins.length} archived</span>
+          </div>
+          {historyBuiltins.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Nothing in history yet.</p>
+          ) : (
+            <div className="grid gap-3 grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
+              {historyBuiltins.map((t) => (
+                <div key={t.id} className="relative opacity-80">
+                  <TemplateCard template={t} context={context} override={layouts?.[t.id]} />
+                  <div className="mt-2 flex justify-end">
+                    <Button variant="outline" size="sm" onClick={() => restoreBuiltin(t.id)}>
+                      <Eye className="mr-1 h-3.5 w-3.5" /> Restore
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
       )}
 
       <p className="text-xs text-muted-foreground">
