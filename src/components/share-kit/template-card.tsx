@@ -116,8 +116,15 @@ export function TemplateCard({ template, context, override }: Props) {
         toast.success("Caption copied — paste it into your post");
       }
     } catch (e) {
-      if ((e as Error)?.name !== "AbortError") {
-        toast.error("Share failed");
+      if ((e as Error)?.name === "AbortError") {
+        // user cancelled — no-op
+      } else {
+        try {
+          await navigator.clipboard.writeText(`${shareText}\n${context.link}`);
+          toast.success("Caption + link copied — paste it into your post");
+        } catch {
+          toast.error("Share failed — try Download or Copy link instead");
+        }
       }
     } finally {
       setBusy(false);
