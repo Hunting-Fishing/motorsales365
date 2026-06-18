@@ -1,77 +1,70 @@
+
 ## Goal
 
-Collapse three sidebar entries — **Ad Inquiries**, **Ad Campaigns**, **Promotions & Discounts** — into one **Advertisements** entry in the admin sidebar, with the three pages becoming tabs inside a single Advertisements workspace. This tightens the sidebar and groups related advertising tools together as the platform grows.
+Consolidate the QR / Share Kit into the **Advertisements** tabbed workspace (also keep it in the side nav for quick access), lock advertisement upload/delete to the **admin** role only, and add a permanent **History** log of all advertisements/promotions for legal recordkeeping.
 
-## Sidebar (before → after)
+---
 
-Before (Sales section):
-```text
-Sales Hub
-Accounts
-Analytics
-Ad Inquiries            <-- remove
-Ad Campaigns            <-- remove
-Promotions & Discounts  <-- remove
-Affiliate Shop
-Referrals
-My QR / Share Kit
-Lead Marketplace
-```
+## 1. Share Kit as an Advertisements tab
 
-After:
-```text
-Sales Hub
-Accounts
-Analytics
-Advertisements          <-- new (tabs: Inquiries · Campaigns · Promotions)
-Affiliate Shop
-Referrals
-My QR / Share Kit
-Lead Marketplace
-```
+- Add a new tab to `src/routes/admin.advertisements.tsx`:
+  - `{ to: "/admin/advertisements/share-kit", label: "My QR / Share Kit", icon: QrCode, roles: ["admin","sales","advertising"] }`
+- Create `src/routes/admin.advertisements.share-kit.tsx` that renders the existing Share Kit UI (reuse the component currently used at `/admin/sales` for screenshot/QR). No business-logic change — pure relocation/wrap.
+- Side nav (`src/routes/admin.tsx`): keep a top-level **My QR / Share Kit** link pointing to `/admin/advertisements/share-kit` so it remains one click away while still living under Advertisements.
+- Sales hub (`admin.sales.tsx`): update the "My QR" tile to point to the new path.
 
-## Advertisements page layout
+## 2. Admin-only upload / delete on Advertisements
 
-New route `/admin/advertisements` (layout route) with three children rendered as tabs:
+Restrict mutation on the **Campaigns** tab (the upload/delete surface) so only users with the `admin` role can create or remove ads. `sales` and `advertising` roles get read-only access.
+
+- `src/routes/admin.advertisements.campaigns.tsx`: hide the "Upload / New Ad" button and the per-row Delete action unless `useAuth().isAdmin`. Replace with a disabled tooltip ("Admin only") for visibility.
+- `src/lib/ads.functions.ts`: tighten `upsertAd` and `deleteAd` server-side — require `has_role(userId,'admin')`, not just any admin-domain role. Returns 403 otherwise. This is the authoritative check; the UI gate is convenience.
+
+## 3. Advertisement history log (legal record)
+
+New append-only table that captures every create / update / delete / status change on `advertisements`, plus snapshots from `ad_inquiries` and `promotions` so the business has one durable timeline.
+
+### Schema (migration)
 
 ```text
-┌─ Advertisements ──────────────────────────────────────┐
-│ [ Inquiries ] [ Campaigns ] [ Promotions ]            │
-├───────────────────────────────────────────────────────┤
-│  <Outlet />  (active tab content)                     │
-└───────────────────────────────────────────────────────┘
+public.advertisement_history
+  id uuid pk
+  ad_id uuid null            -- nullable so deletions retain the snapshot
+  source text not null       -- 'advertisement' | 'ad_inquiry' | 'promotion'
+  action text not null       -- 'created' | 'updated' | 'deleted' | 'status_changed'
+  snapshot jsonb not null    -- full row at time of event
+  changed_by uuid null       -- auth.uid()
+  changed_at timestamptz default now()
+  note text null
 ```
 
-Tabs map to existing pages — no business logic changes, just relocation:
+- GRANT SELECT to `authenticated`, ALL to `service_role`.
+- RLS: SELECT allowed to `admin` role only (legal record). No UPDATE/DELETE policies → effectively append-only from the app.
+- Triggers on `public.advertisements`, `public.ad_inquiries`, `public.promotions` (AFTER INSERT/UPDATE/DELETE) that write a row with the full `OLD`/`NEW` snapshot.
 
-| Tab        | Route                                  | Source page (moved)            |
-| ---------- | -------------------------------------- | ------------------------------ |
-| Inquiries  | `/admin/advertisements/inquiries`      | current `/admin/advertising`   |
-| Campaigns  | `/admin/advertisements/campaigns`      | current `/admin/ad-campaigns`  |
-| Promotions | `/admin/advertisements/promotions`     | current `/admin/promotions`    |
+### UI
 
-Default tab = Inquiries (redirect `/admin/advertisements` → `/admin/advertisements/inquiries`).
+- New tab **History** in the Advertisements layout, admin-only: `/admin/advertisements/history`.
+- `admin.advertisements.history.tsx` lists entries newest-first with filters (source, action, date range, ad id) and an expandable JSON snapshot viewer. Read via a new `listAdHistory` server fn (admin-gated).
 
-Role gating preserved per tab (admin/advertising/sales as today). Tabs the current user can't access are hidden, not disabled.
+## 4. Files touched
 
-## Technical changes
+**Created**
+- `src/routes/admin.advertisements.share-kit.tsx`
+- `src/routes/admin.advertisements.history.tsx`
+- `src/lib/ad-history.functions.ts` (admin `listAdHistory`)
+- Migration for `advertisement_history` table + triggers
 
-1. **New layout route** `src/routes/admin.advertisements.tsx`
-   - Header + tab bar using shadcn `Tabs` linked to the active child route (via `useRouterState` pathname), renders `<Outlet />`.
-   - Index redirect to `/admin/advertisements/inquiries`.
+**Edited**
+- `src/routes/admin.advertisements.tsx` (add Share Kit + History tabs, role filter)
+- `src/routes/admin.advertisements.campaigns.tsx` (hide upload/delete unless admin)
+- `src/routes/admin.tsx` (sidebar: keep "My QR / Share Kit" pointing to new path)
+- `src/routes/admin.sales.tsx` (update My QR tile link)
+- `src/lib/ads.functions.ts` (require `admin` role on `upsertAd`/`deleteAd`)
+- `src/hooks/use-admin-pending-counts.ts` (no count for share-kit/history; just route map entries)
 
-2. **New child routes** (thin wrappers re-exporting existing page components):
-   - `src/routes/admin.advertisements.inquiries.tsx`
-   - `src/routes/admin.advertisements.campaigns.tsx`
-   - `src/routes/admin.advertisements.promotions.tsx`
+## Technical notes
 
-3. **Refactor existing page files** to export their content as components from `src/components/admin/advertisements/` (or keep in place and import). The old routes (`/admin/advertising`, `/admin/ad-campaigns`, `/admin/promotions`) become redirects to the new tab URLs so any saved links / emails keep working.
-
-4. **Sidebar (`src/routes/admin.tsx`)**: remove the three NAV entries, add one consolidated `Advertisements` entry (Icon: `Megaphone`, roles: union of the three = `["admin", "advertising", "sales"]`, `info` summarising all three).
-
-5. **Sales Hub (`src/routes/admin.sales.tsx`)**: update the tile links to point at the new tab URLs (Ad Inquiries → `/advertisements/inquiries`, etc.) so the hub stays consistent.
-
-## Out of scope
-
-- No changes to the underlying inquiry / campaign / promotion data, schemas, or component logic.
-- No visual redesign of the individual pages — only the wrapping shell and navigation.
+- The campaigns tab stays visible to `sales`/`advertising` for review and reporting; only the mutation controls are gated. Server fns enforce the same rule so a crafted request can't bypass the UI.
+- Triggers use `SECURITY DEFINER` with `set search_path = public` and insert into `advertisement_history` regardless of caller role, so RLS on source tables doesn't block logging.
+- No changes to the Terms/Privacy pages — this is internal recordkeeping, not a user-facing data-handling change.
