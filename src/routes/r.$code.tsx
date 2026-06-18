@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { getVisitorId, recordTouch } from "@/lib/referral";
-import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
@@ -161,75 +160,124 @@ function ReferralLanding() {
   const [firstSeenAt, setFirstSeenAt] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+
+    const withTimeout = async <T,>(promise: Promise<T>, ms: number) => {
+      return await Promise.race<T>([
+        promise,
+        new Promise<T>((_, reject) => {
+          window.setTimeout(() => reject(new Error(`Timed out after ${ms}ms`)), ms);
+        }),
+      ]);
+    };
+
     (async () => {
-      const visitorId = getVisitorId();
-      const ua = navigator.userAgent;
-      const { data, error } = await (supabase.rpc as any)("record_qr_scan", {
-        _code: code,
-        _visitor_id: visitorId,
-        _user_agent: ua,
-        _landing: `${siteOrigin()}${window.location.pathname}${window.location.search}`,
-      });
-
-      if (error || !data?.ok) {
-        setActive(false);
-        setLoading(false);
-        return;
-      }
-
-      setStaffName(data.first_name || data.staff_name || null);
-      setActive(Boolean(data.active));
-      setCounted(data.active ? Boolean(data.counted) : null);
-      if (data.active) recordTouch(code);
-
       try {
-        const raw = localStorage.getItem(VISITS_KEY(code));
-        const prev = raw ? JSON.parse(raw) : { count: 0, first: null as string | null };
-        const next = {
-          count: (prev.count || 0) + 1,
-          first: prev.first || new Date().toISOString(),
-        };
-        localStorage.setItem(VISITS_KEY(code), JSON.stringify(next));
-        setVisitCount(next.count);
-        setFirstSeenAt(next.first);
-      } catch {
-        setVisitCount(1);
+        const visitorId = getVisitorId();
+        const ua = navigator.userAgent;
+        const landing = `${siteOrigin()}${window.location.pathname}${window.location.search}`;
+
+        let scanData: any = null;
+        try {
+          const scanResult = await withTimeout(
+            (supabase.rpc as any)("record_qr_scan", {
+              _code: code,
+              _visitor_id: visitorId,
+              _user_agent: ua,
+              _landing: landing,
+            }),
+            8000,
+          );
+
+          if (!cancelled) {
+            const { data, error } = scanResult as { data?: any; error?: any };
+            if (!error && data?.ok) {
+              scanData = data;
+              setStaffName(data.first_name || data.staff_name || null);
+              setActive(Boolean(data.active));
+              setCounted(data.active ? Boolean(data.counted) : null);
+              if (data.active) recordTouch(code);
+            } else {
+              setActive(true);
+            }
+          }
+        } catch {
+          if (!cancelled) setActive(true);
+        }
+
+        try {
+          const raw = localStorage.getItem(VISITS_KEY(code));
+          const prev = raw ? JSON.parse(raw) : { count: 0, first: null as string | null };
+          const next = {
+            count: (prev.count || 0) + 1,
+            first: prev.first || new Date().toISOString(),
+          };
+          localStorage.setItem(VISITS_KEY(code), JSON.stringify(next));
+          if (!cancelled) {
+            setVisitCount(next.count);
+            setFirstSeenAt(next.first);
+          }
+        } catch {
+          if (!cancelled) setVisitCount(1);
+        }
+
+        try {
+          const contactResult = (await withTimeout(
+            (supabase.rpc as any)("get_referrer_contact", {
+              _code: code,
+            }),
+            8000,
+          )) as any;
+          const contact = contactResult?.data;
+          const first = Array.isArray(contact) ? contact[0] : contact;
+          if (!cancelled) {
+            if (first?.email) setStaffEmail(first.email);
+            if (first?.full_name && !scanData?.first_name && !scanData?.staff_name) {
+              setStaffName(first.full_name);
+            }
+          }
+        } catch {
+          // Non-blocking; page should still render even if contact lookup fails.
+        }
+
+        try {
+          const sb = supabase as any;
+          const staffResult = (await withTimeout(
+            sb.from("staff_referrals").select("id").eq("referral_code", code).maybeSingle(),
+            8000,
+          )) as any;
+          const staff = staffResult?.data;
+
+          if (staff?.id) {
+            const nowIso = new Date().toISOString();
+            const promoResult = (await withTimeout(
+              sb
+                .from("staff_promotions")
+                .select(
+                  "id,title,description,kind,percent_off,flat_amount_php,applies_to,ends_at,terms,starts_at,active",
+                )
+                .eq("staff_referral_id", staff.id)
+                .eq("active", true),
+              8000,
+            )) as any;
+            const pr = promoResult?.data;
+
+            const filtered = ((pr as any[]) || []).filter(
+              (p) => (!p.starts_at || p.starts_at <= nowIso) && (!p.ends_at || p.ends_at >= nowIso),
+            );
+            if (!cancelled) setPromos(filtered as Promo[]);
+          }
+        } catch {
+          // Non-blocking; active promos are optional UI.
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
       }
-
-      const { data: contact } = await (supabase.rpc as any)("get_referrer_contact", {
-        _code: code,
-      });
-      const first = Array.isArray(contact) ? contact[0] : contact;
-      if (first?.email) setStaffEmail(first.email);
-      if (first?.full_name && !data.first_name && !data.staff_name) {
-        setStaffName(first.full_name);
-      }
-
-      const sb = supabase as any;
-      const { data: staff } = await sb
-        .from("staff_referrals")
-        .select("id")
-        .eq("referral_code", code)
-        .maybeSingle();
-
-      if (staff?.id) {
-        const nowIso = new Date().toISOString();
-        const { data: pr } = await sb
-          .from("staff_promotions")
-          .select(
-            "id,title,description,kind,percent_off,flat_amount_php,applies_to,ends_at,terms,starts_at,active",
-          )
-          .eq("staff_referral_id", staff.id)
-          .eq("active", true);
-
-        const filtered = ((pr as any[]) || []).filter(
-          (p) => (!p.starts_at || p.starts_at <= nowIso) && (!p.ends_at || p.ends_at >= nowIso),
-        );
-        setPromos(filtered as Promo[]);
-      }
-
-      setLoading(false);
     })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [code]);
 
   const referrer = staffName || "your referrer";
@@ -244,10 +292,9 @@ function ReferralLanding() {
   ) : null;
 
   return (
-    <SiteLayout>
-      <TooltipProvider delayDuration={150}>
-        <div className="container mx-auto max-w-7xl px-4 py-8 sm:py-10">
-          {loading ? (
+    <TooltipProvider delayDuration={150}>
+      <div className="container mx-auto max-w-7xl px-4 py-8 sm:py-10">
+        {loading ? (
             <p className="text-center text-muted-foreground">Loading…</p>
           ) : active === false ? (
             <div className="mx-auto max-w-2xl rounded-xl border border-border bg-card p-8 text-center">
