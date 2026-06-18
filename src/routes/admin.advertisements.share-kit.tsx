@@ -419,8 +419,7 @@ function AdminShareKitPage() {
                         disabled={bulkFitting}
                       >
                         <Trash2 className="mr-1 h-4 w-4" /> Delete
-                        </Button>
-                      </>
+                      </Button>
                     ) : (
                       <Button
                         variant="outline"
