@@ -6,10 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { adminUpdateUserProfile } from "@/lib/admin-profile.functions";
 import { logAdminAudit, type AdminAuditEntry } from "@/lib/admin-audit";
 import { Staff365Badge } from "@/components/admin/staff-365-badge";
-import { BUSINESS_KIND_OPTIONS } from "@/data/business-kinds";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -26,12 +24,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-type StaffRole = "admin" | "moderator" | "support" | "sales" | "advertising";
-const STAFF_ROLES: StaffRole[] = ["admin", "moderator", "support", "sales", "advertising"];
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  AddressSection,
+  BusinessKindSelect,
+  Field,
+  RoleChips,
+  STAFF_ROLES,
+  compactInput,
+  type StaffRole,
+} from "@/components/admin/user-form-tabs";
+import { UserAdvertisementsTab } from "@/components/admin/user-advertisements-tab";
 
 type EditableUser = {
   id: string;
+  email?: string | null;
   full_name?: string | null;
   first_name?: string | null;
   last_name?: string | null;
@@ -65,6 +72,7 @@ export function EditProfileDialog({
 }) {
   const updateProfile = useServerFn(adminUpdateUserProfile);
   const [open, setOpen] = useState(false);
+  const [tab, setTab] = useState("identity");
   const [saving, setSaving] = useState(false);
   const [avatarUploading, setAvatarUploading] = useState(false);
 
@@ -90,11 +98,11 @@ export function EditProfileDialog({
     seller_type: "private" as "private" | "business",
     verification_status: "unverified" as "unverified" | "pending" | "verified" | "rejected",
   });
-  const [originalEmail, setOriginalEmail] = useState("");
   const [roles, setRoles] = useState<StaffRole[]>([]);
 
   useEffect(() => {
     if (!open) return;
+    setTab("identity");
     setForm({
       full_name: user.full_name ?? "",
       first_name: user.first_name ?? "",
@@ -122,7 +130,6 @@ export function EditProfileDialog({
         (STAFF_ROLES as string[]).includes(r),
       ),
     );
-    setOriginalEmail("");
   }, [open, user]);
 
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) =>
@@ -153,7 +160,6 @@ export function EditProfileDialog({
   const submit = async () => {
     setSaving(true);
     try {
-      // 1. Profile + email server-side update.
       const payload: any = { targetUserId: user.id };
       const setIfDiff = (k: string, current: any, original: any) => {
         const a = current === "" ? null : current;
@@ -177,7 +183,8 @@ export function EditProfileDialog({
       setIfDiff("business_province", form.business_province, user.business_province);
       setIfDiff("business_city", form.business_city, user.business_city);
       setIfDiff("business_postal_code", form.business_postal_code, user.business_postal_code);
-      if (form.seller_type !== (user.seller_type ?? "private")) payload.seller_type = form.seller_type;
+      if (form.seller_type !== (user.seller_type ?? "private"))
+        payload.seller_type = form.seller_type;
       if (form.verification_status !== (user.verification_status ?? "unverified"))
         payload.verification_status = form.verification_status;
       if (form.email.trim()) payload.email = form.email.trim();
@@ -186,7 +193,6 @@ export function EditProfileDialog({
         await updateProfile({ data: payload });
       }
 
-      // 2. Roles sync (client-side, RLS allows admin).
       const current = new Set<StaffRole>(
         ((user.roles ?? []) as string[]).filter((r): r is StaffRole =>
           (STAFF_ROLES as string[]).includes(r),
@@ -249,235 +255,176 @@ export function EditProfileDialog({
           Edit
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[85vh] max-w-2xl overflow-y-auto">
+      <DialogContent className="max-h-[88vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             Edit user profile
             {is365Staff && <Staff365Badge size="sm" />}
           </DialogTitle>
           <DialogDescription>
-            {user.full_name ?? "(no name)"} — change identity, address, business, email, avatar,
-            roles, and verification.
+            {user.full_name ?? "(no name)"} — identity, address, business, roles, and ad templates.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Identity */}
-          <section className="space-y-3">
-            <h3 className="text-sm font-semibold">Identity</h3>
+        <Tabs value={tab} onValueChange={setTab} className="mt-2">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="identity">Identity</TabsTrigger>
+            <TabsTrigger value="address">Address</TabsTrigger>
+            <TabsTrigger value="business">Business</TabsTrigger>
+            <TabsTrigger value="roles">Roles</TabsTrigger>
+            <TabsTrigger value="ads">Ads</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="identity" className="mt-3 space-y-3">
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="grid gap-1.5 sm:col-span-2">
-                <Label>Full name</Label>
-                <Input value={form.full_name} onChange={(e) => set("full_name", e.target.value)} />
-              </div>
-              <div className="grid gap-1.5">
-                <Label>First name</Label>
+              <Field label="Full name">
                 <Input
-                  value={form.first_name}
-                  onChange={(e) => set("first_name", e.target.value)}
+                  className={compactInput()}
+                  value={form.full_name}
+                  onChange={(e) => set("full_name", e.target.value)}
                 />
-              </div>
-              <div className="grid gap-1.5">
-                <Label>Last name</Label>
-                <Input value={form.last_name} onChange={(e) => set("last_name", e.target.value)} />
-              </div>
-              <div className="grid gap-1.5">
-                <Label>Phone</Label>
+              </Field>
+              <Field label="Phone">
                 <Input
+                  className={compactInput()}
                   value={form.phone}
                   onChange={(e) => set("phone", e.target.value)}
                   placeholder="+639XXXXXXXXX"
                 />
-              </div>
-              <div className="grid gap-1.5">
-                <Label>Email (change auth email)</Label>
+              </Field>
+              <Field label="First name">
                 <Input
-                  type="email"
-                  value={form.email}
-                  onChange={(e) => set("email", e.target.value)}
-                  placeholder="leave blank to keep current"
+                  className={compactInput()}
+                  value={form.first_name}
+                  onChange={(e) => set("first_name", e.target.value)}
                 />
+              </Field>
+              <Field label="Last name">
+                <Input
+                  className={compactInput()}
+                  value={form.last_name}
+                  onChange={(e) => set("last_name", e.target.value)}
+                />
+              </Field>
+              <div className="sm:col-span-2">
+                <Field label="Email (change auth email)">
+                  <Input
+                    className={compactInput()}
+                    type="email"
+                    value={form.email}
+                    onChange={(e) => set("email", e.target.value)}
+                    placeholder="leave blank to keep current"
+                  />
+                </Field>
               </div>
             </div>
-          </section>
 
-          {/* Avatar */}
-          <section className="space-y-3">
-            <h3 className="text-sm font-semibold">Avatar</h3>
-            <div className="flex items-center gap-3">
-              {form.avatar_url ? (
-                <img
-                  src={form.avatar_url}
-                  alt=""
-                  className="h-14 w-14 rounded-full border border-border object-cover"
+            <Field label="Avatar">
+              <div className="flex items-center gap-3">
+                {form.avatar_url ? (
+                  <img
+                    src={form.avatar_url}
+                    alt=""
+                    className="h-12 w-12 rounded-full border border-border object-cover"
+                  />
+                ) : (
+                  <div className="h-12 w-12 rounded-full border border-dashed border-border bg-muted" />
+                )}
+                <Input
+                  type="file"
+                  accept="image/*"
+                  disabled={avatarUploading}
+                  className={compactInput()}
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleAvatarUpload(f);
+                  }}
                 />
-              ) : (
-                <div className="h-14 w-14 rounded-full border border-dashed border-border bg-muted" />
-              )}
-              <Input
-                type="file"
-                accept="image/*"
-                disabled={avatarUploading}
-                onChange={(e) => {
-                  const f = e.target.files?.[0];
-                  if (f) handleAvatarUpload(f);
-                }}
-              />
-              {form.avatar_url && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={() => set("avatar_url", "")}
-                >
-                  Remove
-                </Button>
-              )}
-            </div>
-          </section>
+                {form.avatar_url && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => set("avatar_url", "")}
+                  >
+                    Remove
+                  </Button>
+                )}
+              </div>
+            </Field>
+          </TabsContent>
 
-          {/* Address */}
-          <section className="space-y-3">
-            <h3 className="text-sm font-semibold">Address</h3>
+          <TabsContent value="address" className="mt-3">
+            <AddressSection
+              value={{
+                street_address: form.street_address,
+                signup_city: form.signup_city,
+                signup_province: form.signup_province,
+                signup_region: form.signup_region,
+                postal_code: form.postal_code,
+              }}
+              onChange={(p) => setForm((s) => ({ ...s, ...p }))}
+            />
+          </TabsContent>
+
+          <TabsContent value="business" className="mt-3 space-y-3">
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="grid gap-1.5 sm:col-span-2">
-                <Label>Street address</Label>
+              <Field label="Business name">
                 <Input
-                  value={form.street_address}
-                  onChange={(e) => set("street_address", e.target.value)}
-                />
-              </div>
-              <div className="grid gap-1.5">
-                <Label>City</Label>
-                <Input
-                  value={form.signup_city}
-                  onChange={(e) => set("signup_city", e.target.value)}
-                />
-              </div>
-              <div className="grid gap-1.5">
-                <Label>Province</Label>
-                <Input
-                  value={form.signup_province}
-                  onChange={(e) => set("signup_province", e.target.value)}
-                />
-              </div>
-              <div className="grid gap-1.5">
-                <Label>Region</Label>
-                <Input
-                  value={form.signup_region}
-                  onChange={(e) => set("signup_region", e.target.value)}
-                />
-              </div>
-              <div className="grid gap-1.5">
-                <Label>Postal code</Label>
-                <Input
-                  value={form.postal_code}
-                  onChange={(e) => set("postal_code", e.target.value)}
-                />
-              </div>
-            </div>
-          </section>
-
-          {/* Business */}
-          <section className="space-y-3">
-            <h3 className="text-sm font-semibold">Business</h3>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="grid gap-1.5">
-                <Label>Business name</Label>
-                <Input
+                  className={compactInput()}
                   value={form.business_name}
                   onChange={(e) => set("business_name", e.target.value)}
                 />
-              </div>
-              <div className="grid gap-1.5">
-                <Label>Business kind</Label>
-                <Select
-                  value={form.business_kind || "none"}
-                  onValueChange={(v) => set("business_kind", v === "none" ? "" : (v as any))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">None</SelectItem>
-                    {BUSINESS_KIND_OPTIONS.map((opt) => (
-                      <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="grid gap-1.5 sm:col-span-2">
-                <Label>Business address</Label>
-                <Input
-                  value={form.business_address}
-                  onChange={(e) => set("business_address", e.target.value)}
+              </Field>
+              <Field label="Business kind">
+                <BusinessKindSelect
+                  value={form.business_kind}
+                  onChange={(v) => set("business_kind", v)}
                 />
+              </Field>
+              <div className="sm:col-span-2">
+                <Field label="Business address">
+                  <Input
+                    className={compactInput()}
+                    value={form.business_address}
+                    onChange={(e) => set("business_address", e.target.value)}
+                  />
+                </Field>
               </div>
-              <div className="grid gap-1.5">
-                <Label>Business city</Label>
+              <Field label="Business city">
                 <Input
+                  className={compactInput()}
                   value={form.business_city}
                   onChange={(e) => set("business_city", e.target.value)}
                 />
-              </div>
-              <div className="grid gap-1.5">
-                <Label>Business province</Label>
+              </Field>
+              <Field label="Business province">
                 <Input
+                  className={compactInput()}
                   value={form.business_province}
                   onChange={(e) => set("business_province", e.target.value)}
                 />
-              </div>
-              <div className="grid gap-1.5">
-                <Label>Business region</Label>
+              </Field>
+              <Field label="Business region">
                 <Input
+                  className={compactInput()}
                   value={form.business_region}
                   onChange={(e) => set("business_region", e.target.value)}
                 />
-              </div>
-              <div className="grid gap-1.5">
-                <Label>Business postal code</Label>
+              </Field>
+              <Field label="Business postal code">
                 <Input
+                  className={compactInput()}
                   value={form.business_postal_code}
                   onChange={(e) => set("business_postal_code", e.target.value)}
                 />
-              </div>
-            </div>
-          </section>
-
-          {/* Access */}
-          <section className="space-y-3">
-            <h3 className="text-sm font-semibold">Roles &amp; access</h3>
-            <div className="grid gap-1.5">
-              <Label>Staff roles</Label>
-              <div className="flex flex-wrap gap-1.5">
-                {STAFF_ROLES.map((r) => {
-                  const on = roles.includes(r);
-                  return (
-                    <button
-                      key={r}
-                      type="button"
-                      onClick={() => toggleRole(r)}
-                      className={`rounded-full border px-3 py-1 text-xs font-medium transition ${
-                        on
-                          ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border bg-background text-muted-foreground hover:border-primary/50"
-                      }`}
-                    >
-                      {on ? "✓ " : "+ "}
-                      {r}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="grid gap-1.5">
-                <Label>Seller type</Label>
+              </Field>
+              <Field label="Seller type">
                 <Select
                   value={form.seller_type}
                   onValueChange={(v) => set("seller_type", v as any)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className={compactInput()}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -485,14 +432,13 @@ export function EditProfileDialog({
                     <SelectItem value="business">Business</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-              <div className="grid gap-1.5">
-                <Label>Verification</Label>
+              </Field>
+              <Field label="Verification">
                 <Select
                   value={form.verification_status}
                   onValueChange={(v) => set("verification_status", v as any)}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger className={compactInput()}>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -502,10 +448,25 @@ export function EditProfileDialog({
                     <SelectItem value="rejected">Rejected</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
+              </Field>
             </div>
-          </section>
-        </div>
+          </TabsContent>
+
+          <TabsContent value="roles" className="mt-3 space-y-2">
+            <Field label="Staff roles">
+              <RoleChips roles={roles} onToggle={toggleRole} />
+            </Field>
+            <p className="text-xs text-muted-foreground">Base &quot;user&quot; role is always kept.</p>
+          </TabsContent>
+
+          <TabsContent value="ads" className="mt-3">
+            <UserAdvertisementsTab
+              userId={user.id}
+              fullName={user.full_name ?? ""}
+              email={user.email ?? null}
+            />
+          </TabsContent>
+        </Tabs>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)} disabled={saving}>

@@ -1,65 +1,36 @@
 ## Goal
 
-Right now the Details tab renders as **three separate cards** ("Basics", "What do you offer?", and a generic "Details" block that also hosts VIN + VehiclePicker + Mileage/Trans/Fuel + Description + VehicleQualityFields + CategoryAttributesEditor). It reads as messy because the same logical concept (the listing's identity + specs + condition) is split across three bordered cards, while unrelated concepts (asking price vs. VIN vs. category filters) sit next to each other inside the same card.
+Make the **Add user** and **Edit user** flows consistent: same tab structure, same fields, same look. Persist first name / last name on create (currently only `full_name` is saved, which is why the edit dialog later shows them blank). Add an **Advertisements** tab to the edit dialog that drops the user's referral QR onto the existing Share-Kit templates.
 
-This plan collapses the Details tab into **one card** with clearly labeled sub‑sections (no extra borders, just `<h3>` dividers), reorders fields so they match how buyers actually scan a marketplace listing, and tightens spacing. Nothing is removed.
+## Tabs (identical in both dialogs)
 
-## New single-card structure (Details tab)
+1. **Identity** — Email*, First name*, Last name*, Full name (auto-fills from first+last but editable), Phone, Avatar. In Add: Temporary password lives here.
+2. **Address** — Street, City, Province, Region, Postal code.
+3. **Business** — Business name, Business kind, Business address/city/province/region/postal code, Seller type, Mark verified (Add) / Verification status (Edit).
+4. **Roles & access** — Account type (Add only, hidden when `lockStaff`), Staff roles chips. Note: staff QR row auto-created.
+5. **Advertisements** — Renders the share-kit templates with this user's referral code/QR baked in (reuses `TEMPLATES` from `src/lib/share-kit/templates.ts` + `TemplateCard`). Add dialog shows this tab disabled with "available after creation"; Edit dialog renders the live previews and download buttons. Allows quick selection of preset templates per user.
 
-One `<section data-tab="details">` card. Inside, sub-sections separated by a thin `border-t` divider and a small uppercase `text-[11px] text-muted-foreground` eyebrow — no nested cards.
+Tab strip uses shadcn `Tabs` with a wizard-style "Next / Back" footer on Add (Identity → Address → Business → Roles → Create) so admins fill sections in order; Edit is free-tab navigation with one "Save changes" footer.
 
-```
-┌─ DETAILS card ──────────────────────────────────────────────┐
-│ Header row: "Listing details"            [Pull from Rides ▾]│
-├─ LISTING ───────────────────────────────────────────────────┤
-│ Title (full width)                                          │
-│ Category │ Condition │ Registration* │ Seller type          │  (lg:grid-cols-4)
-├─ PRICE ─────────────────────────────────────────────────────┤
-│ Asking price │ ☐ Negotiable  ☐ Hide price (inline)          │  (1 input + inline checks)
-├─ VEHICLE  (only for car / motorcycle) ──────────────────────┤
-│ VIN / chassis  [Scan]                                       │  (full width, helper text)
-│ Year │ Make │ Model │ Trim/Engine                           │  (VehiclePicker, kept as-is)
-│ Mileage │ Transmission │ Fuel                               │  (lg:grid-cols-3)
-├─ CATEGORY DETAILS  (only when applicable) ──────────────────┤
-│ Renders the category-specific block currently inside the    │
-│ third card: repair/bodyshop, carwash, parts, used_part,     │
-│ drone, towing, OR generic Make/Model/Year for non-vehicle   │
-│ categories. Same fields, same grid, just no nested border.  │
-├─ CONDITION & QUALITY  (only car / motorcycle) ──────────────┤
-│ <VehicleQualityFields …/> — unchanged internals             │
-├─ FILTERS  (only for isAttrCategory) ────────────────────────┤
-│ "Buyers filter by these" + <CategoryAttributesEditor/>      │
-├─ DESCRIPTION ───────────────────────────────────────────────┤
-│ Textarea, rows={4}, full width                              │
-└─────────────────────────────────────────────────────────────┘
-```
+## Database / server changes
 
-Why this order: Listing identity first (what is it / who's selling), then price (the #1 buyer scan), then the spec block (vehicle facts), then condition/quality, then category-specific filter attributes, then the long-form prose at the bottom. Matches the order a buyer reads a listing card → detail page.
+- `src/routes/api/admin/create-user.tsx`: extend `Body` Zod schema with `first_name?`, `last_name?`, `phone?`, `street_address?`, `signup_city?`, `signup_province?`, `signup_region?`, `postal_code?`, `business_address?`, `business_city?`, `business_province?`, `business_region?`, `business_postal_code?`. Pass all provided values into the `profiles` upsert (alongside the existing `full_name`, `seller_type`, `business_name`, `business_kind`, `verification_status`). No new tables — all columns already exist on `profiles`.
+- No migration needed (columns confirmed present in `profiles`, used by `EditProfileDialog` + `adminUpdateUserProfile`).
 
-Moves:
-- "Seller type" RadioGroup leaves the Location tab and joins the LISTING row as a 4th cell (compact `Select` instead of two radio cards — same two options "Private" / "Business / Dealer"). The Location tab keeps Phone + LocationPicker only.
-- "What do you offer?" (service TagPicker for repair/bodyshop/salvage/etc.) becomes a CATEGORY DETAILS sub-section inside the same card, rendered above the category-specific grid for service categories. No more separate bordered card.
-- VIN/chassis moves out of the "car/motorcycle" branch into a dedicated VEHICLE sub-section so it visually sits above Year/Make/Model (matches the earlier "VIN above make/model" request).
-- Description moves to the bottom of the card (it's the longest field; keeping it last stops it from pushing structured fields below the fold).
-- Drop the `<h2>` headings on the inner blocks; use `<h3 className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">` as section eyebrows so the whole card reads as one surface.
+## Files to edit / add
 
-## Density pass (Details card only)
-
-- Card padding stays `p-3 sm:p-4` so the single card has breathing room, but inner `space-y-2` between sub-sections and `gap-2` inside grids.
-- All `<Label>` → `text-xs`; all `<Input>`/`<SelectTrigger>` → `h-9 text-sm` (already the pattern in the Basics row, extend to the vehicle + category grids which currently use the default `h-10`).
-- Replace nested bordered wrappers (`rounded-md border border-border/60 bg-background/40 p-4` on CategoryAttributesEditor, `rounded-lg border border-border bg-muted/20 p-3` on FitmentEditor) with plain `pt-2` since they now live inside a single card.
-- Sub-section divider: `border-t border-border/60 pt-2 mt-2` (no horizontal padding change).
-- Drop the standalone "Title" row width — keep full width but move it into the LISTING grid as `lg:col-span-4` so the 4-up row underneath aligns.
+- **Add** `src/components/admin/user-form-tabs.tsx` — shared field components used by both dialogs (IdentitySection, AddressSection, BusinessSection, RolesSection, AdvertisementsSection) so the two dialogs stay in lock-step.
+- **Edit** `src/components/admin/add-user-dialog.tsx` — replace flat layout with `Tabs` + wizard footer, send the new fields to `/api/admin/create-user`.
+- **Edit** `src/components/admin/edit-profile-dialog.tsx` — wrap existing sections in matching `Tabs`, add Advertisements tab. Keep current submit logic.
+- **Edit** `src/routes/api/admin/create-user.tsx` — accept and persist the new profile fields.
+- **Reuse** `src/lib/share-kit/templates.ts` + `src/components/share-kit/template-card.tsx` inside the Advertisements tab; pass the target user's referral code (look up `staff_referrals.code` for staff, otherwise `user_referrals.code`).
 
 ## Out of scope
 
-- Location, Plan & Boost, Photos tabs (the user called out the Details page specifically).
-- VehiclePicker, VehicleQualityFields, CategoryAttributesEditor, TagPicker, FitmentEditor internals — only their wrapper styling changes.
-- Validation, submit logic, what gets saved.
-- Tab strip / progress bar.
+- No changes to public sign-up form, no new role types, no new share-kit templates (only surfacing existing ones per-user), no email/Cloudflare routing changes.
 
-## Files
+## Acceptance
 
-- `src/routes/sell.tsx` — restructure lines ~1003–1678 into one section; move Seller-type RadioGroup out of the Location section at ~1694–1717 into the new LISTING grid (replace with a compact `Select`); minor spacing tweaks on the Location section header.
-
-No other files touched.
+- Creating "Billy Bailey" via Add user persists `first_name=Billy`, `last_name=Bailey`, `full_name="Billy Bailey"` on `profiles`. Opening Edit immediately shows both populated.
+- Both dialogs show the same 5 tabs with the same field labels and order.
+- Edit → Advertisements lists the share-kit templates with the user's QR rendered, matching `/dashboard/share-kit`.

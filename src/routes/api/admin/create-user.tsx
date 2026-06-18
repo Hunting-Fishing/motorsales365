@@ -12,12 +12,27 @@ const SellerTypeEnum = z.enum(["private", "dealer", "repair_shop", "insurance"])
 const Body = z.object({
   email: z.string().email().max(255),
   full_name: z.string().trim().min(1).max(120),
+  first_name: z.string().trim().max(80).optional(),
+  last_name: z.string().trim().max(80).optional(),
+  phone: z.string().trim().max(40).optional(),
   password: z.string().min(8).max(72),
   account_type: z.enum(["staff", "business"]),
   roles: z.array(RoleEnum).default([]),
+  // address
+  street_address: z.string().trim().max(200).optional(),
+  signup_city: z.string().trim().max(120).optional(),
+  signup_province: z.string().trim().max(120).optional(),
+  signup_region: z.string().trim().max(120).optional(),
+  postal_code: z.string().trim().max(20).optional(),
+  // business
   seller_type: SellerTypeEnum.optional(),
   business_name: z.string().trim().max(160).optional(),
   business_kind: z.enum(BUSINESS_KIND_VALUES).optional(),
+  business_address: z.string().trim().max(300).optional(),
+  business_city: z.string().trim().max(120).optional(),
+  business_province: z.string().trim().max(120).optional(),
+  business_region: z.string().trim().max(120).optional(),
+  business_postal_code: z.string().trim().max(20).optional(),
   mark_verified: z.boolean().optional(),
   enforce_domain: z.string().trim().max(120).optional(),
 });
@@ -26,6 +41,16 @@ function admin() {
   return createClient<Database>(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, {
     auth: { persistSession: false, autoRefreshToken: false },
   });
+}
+
+function normalizeE164(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const digits = raw.replace(/[^0-9+]/g, "");
+  if (digits.startsWith("+")) return digits;
+  if (digits.startsWith("09") && digits.length === 11) return "+63" + digits.slice(1);
+  if (digits.startsWith("9") && digits.length === 10) return "+63" + digits;
+  if (digits.startsWith("63") && digits.length === 12) return "+" + digits;
+  return digits || null;
 }
 
 export const Route = createFileRoute("/api/admin/create-user")({
@@ -67,7 +92,6 @@ export const Route = createFileRoute("/api/admin/create-user")({
           }
           actorId = userData.user.id;
 
-          // Verify caller is admin
           const { data: rolesData } = await sb
             .from("user_roles")
             .select("role")
@@ -113,12 +137,15 @@ export const Route = createFileRoute("/api/admin/create-user")({
             );
           }
 
-          // Create auth user (email_confirm so they can sign in immediately)
           const { data: created, error: createErr } = await sb.auth.admin.createUser({
             email: input.email,
             password: input.password,
             email_confirm: true,
-            user_metadata: { full_name: input.full_name },
+            user_metadata: {
+              full_name: input.full_name,
+              first_name: input.first_name,
+              last_name: input.last_name,
+            },
           });
           if (createErr || !created.user) {
             await logRouteAccess({
@@ -139,8 +166,6 @@ export const Route = createFileRoute("/api/admin/create-user")({
           }
           const newUserId = created.user.id;
 
-          // handle_new_user trigger creates profile + 'user' role.
-          // Insert any extra staff roles.
           if (input.account_type === "staff" && input.roles.length > 0) {
             const rows = input.roles.map((role) => ({ user_id: newUserId, role }));
             const { error: roleErr } = await sb.from("user_roles").insert(rows as any);
@@ -166,22 +191,40 @@ export const Route = createFileRoute("/api/admin/create-user")({
             }
           }
 
-          // Update profile for business accounts
-          if (input.account_type === "business") {
-            const profileUpdate: any = {
-              full_name: input.full_name,
-              seller_type: input.seller_type ?? "private",
-            };
-            if (input.business_name) profileUpdate.business_name = input.business_name;
-            if (input.business_kind) profileUpdate.business_kind = input.business_kind;
-            if (input.mark_verified) {
-              profileUpdate.verification_status = "verified";
-              profileUpdate.verified_at = new Date().toISOString();
-            }
-            await sb.from("profiles").update(profileUpdate).eq("id", newUserId);
-          } else {
-            await sb.from("profiles").update({ full_name: input.full_name }).eq("id", newUserId);
+          // Build a full profile update from every provided field.
+          const profilePatch: Record<string, any> = { full_name: input.full_name };
+          const copyIf = (k: keyof typeof input, dst?: string) => {
+            const v = input[k];
+            if (v !== undefined && v !== "") profilePatch[(dst ?? (k as string))] = v;
+          };
+          copyIf("first_name");
+          copyIf("last_name");
+          if (input.phone) {
+            profilePatch.phone = input.phone;
+            profilePatch.phone_e164 = normalizeE164(input.phone);
           }
+          copyIf("street_address");
+          copyIf("signup_city");
+          copyIf("signup_province");
+          copyIf("signup_region");
+          copyIf("postal_code");
+
+          if (input.account_type === "business") {
+            profilePatch.seller_type = input.seller_type ?? "private";
+            copyIf("business_name");
+            copyIf("business_kind");
+            copyIf("business_address");
+            copyIf("business_city");
+            copyIf("business_province");
+            copyIf("business_region");
+            copyIf("business_postal_code");
+            if (input.mark_verified) {
+              profilePatch.verification_status = "verified";
+              profilePatch.verified_at = new Date().toISOString();
+            }
+          }
+
+          await sb.from("profiles").update(profilePatch as any).eq("id", newUserId);
 
           await logRouteAccess({
             actorId,
