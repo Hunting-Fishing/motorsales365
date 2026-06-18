@@ -75,7 +75,7 @@ const NAV: NavItem[] = [
     info: "Snapshot of platform health, KPIs and quick links.",
   },
 
-  // SALES
+  // SALES & ADVERTISING
   {
     to: "/admin/sales",
     label: "Sales Hub",
@@ -83,7 +83,7 @@ const NAV: NavItem[] = [
     exact: true,
     roles: ["admin", "sales", "advertising", "support"],
     info: "Consolidated sales workspace: overview, accounts, ads, promotions, referrals and QR share-kit.",
-    section: "Sales",
+    section: "Sales & Advertising",
   },
   {
     to: "/admin/accounts",
@@ -91,7 +91,7 @@ const NAV: NavItem[] = [
     Icon: UserCog,
     roles: ["admin", "sales", "support"],
     info: "Manage customer & business subscriptions: plans, discounts, pause/ban, lifetime spend.",
-    section: "Sales",
+    section: "Sales & Advertising",
   },
   {
     to: "/admin/analytics",
@@ -99,15 +99,15 @@ const NAV: NavItem[] = [
     Icon: BarChart3,
     roles: ["admin", "sales", "support"],
     info: "Traffic, listings, conversions and other platform analytics.",
-    section: "Sales",
+    section: "Sales & Advertising",
   },
   {
     to: "/admin/advertisements",
     label: "Advertisements",
     Icon: Megaphone,
     roles: ["admin", "advertising", "sales"],
-    info: "Ad inquiries, sponsored campaigns and promotions/discounts — all in one tabbed workspace.",
-    section: "Sales",
+    info: "Ad inquiries, sponsored campaigns, promotions, share-kit and history — tabbed workspace.",
+    section: "Sales & Advertising",
   },
   {
     to: "/admin/shop",
@@ -115,7 +115,7 @@ const NAV: NavItem[] = [
     Icon: Store,
     roles: ["admin", "advertising", "sales"],
     info: "Manage affiliate products, networks and click analytics.",
-    section: "Sales",
+    section: "Sales & Advertising",
   },
   {
     to: "/admin/referrals",
@@ -123,7 +123,7 @@ const NAV: NavItem[] = [
     Icon: QrCode,
     roles: ["admin", "sales"],
     info: "Staff QR codes and redemption history.",
-    section: "Sales",
+    section: "Sales & Advertising",
   },
   {
     to: "/admin/advertisements/share-kit",
@@ -131,7 +131,7 @@ const NAV: NavItem[] = [
     Icon: QrCode,
     roles: ["admin", "sales", "advertising", "support", "moderator"],
     info: "Your personal QR applied to printable templates (arm band, shirt, banners).",
-    section: "Sales",
+    section: "Sales & Advertising",
   },
   {
     to: "/admin/lead-offers",
@@ -139,7 +139,7 @@ const NAV: NavItem[] = [
     Icon: Inbox,
     roles: ["admin"],
     info: "Post qualified buyer leads. Featured/Premium businesses pay per unlock.",
-    section: "Sales",
+    section: "Sales & Advertising",
   },
   {
     to: "/admin/sales-reps",
@@ -147,7 +147,91 @@ const NAV: NavItem[] = [
     Icon: UserCog,
     roles: ["admin"],
     info: "Manage sales reps, territories and assignments.",
-    section: "Sales",
+    section: "Sales & Advertising",
+  },
+
+  // BUSINESSES
+  {
+    to: "/admin/businesses",
+    label: "Directory",
+    Icon: Store,
+    roles: ["admin", "moderator"],
+    info: "Approve and moderate the Business directory.",
+    section: "Businesses",
+  },
+  {
+    to: "/admin/discover-businesses",
+    label: "Discover",
+    Icon: Store,
+    roles: ["admin", "moderator"],
+    info: "Find, verify and import businesses from Google & Facebook.",
+    section: "Businesses",
+  },
+  {
+    to: "/admin/claims",
+    label: "Claims",
+    Icon: ShieldCheck,
+    roles: ["admin", "moderator"],
+    info: "Review claim requests for seeded businesses.",
+    section: "Businesses",
+  },
+  {
+    to: "/admin/verifications",
+    label: "Verifications",
+    Icon: ShieldCheck,
+    roles: ["admin", "moderator"],
+    info: "Approve or reject business verification requests.",
+    section: "Businesses",
+  },
+  {
+    to: "/admin/type-suggestions",
+    label: "Type suggestions",
+    Icon: Sparkles,
+    roles: ["admin"],
+    info: "Review user-submitted new business types.",
+    section: "Businesses",
+  },
+  {
+    to: "/admin/service-suggestions",
+    label: "Service suggestions",
+    Icon: Sparkles,
+    roles: ["admin"],
+    info: "Approve user-submitted services into the shared catalog.",
+    section: "Businesses",
+  },
+  {
+    to: "/admin/service-suggestion-audit",
+    label: "Service audit log",
+    Icon: Sparkles,
+    roles: ["admin"],
+    info: "History of decisions on service suggestions.",
+    section: "Businesses",
+  },
+
+  // LISTINGS & MODERATION
+  {
+    to: "/admin/listings",
+    label: "Listings",
+    Icon: ListChecks,
+    roles: ["admin", "moderator", "support"],
+    info: "Moderate vehicle/service listings.",
+    section: "Listings & Moderation",
+  },
+  {
+    to: "/admin/reports",
+    label: "Activity & Reports",
+    Icon: Inbox,
+    roles: ["admin", "moderator", "support", "sales"],
+    info: "Unified inbox: reports, inquiries, admin audit log.",
+    section: "Listings & Moderation",
+  },
+  {
+    to: "/admin/location-corrections",
+    label: "Location fixes",
+    Icon: MapPin,
+    roles: ["admin", "moderator"],
+    info: "User-submitted map pin corrections.",
+    section: "Listings & Moderation",
   },
 
   // OPERATIONS
@@ -174,88 +258,6 @@ const NAV: NavItem[] = [
     roles: ["admin", "moderator"],
     info: "Courses, modules, lessons, quizzes and Partner Training schools.",
     section: "Operations",
-  },
-
-  // MODERATION
-  {
-    to: "/admin/listings",
-    label: "Listings",
-    Icon: ListChecks,
-    roles: ["admin", "moderator", "support"],
-    info: "Moderate vehicle/service listings.",
-    section: "Moderation",
-  },
-  {
-    to: "/admin/businesses",
-    label: "Businesses",
-    Icon: Store,
-    roles: ["admin", "moderator"],
-    info: "Approve and moderate the Business directory.",
-    section: "Moderation",
-  },
-  {
-    to: "/admin/discover-businesses",
-    label: "Discover Businesses",
-    Icon: Store,
-    roles: ["admin", "moderator"],
-    info: "Find, verify and import businesses from Google & Facebook.",
-    section: "Moderation",
-  },
-  {
-    to: "/admin/claims",
-    label: "Business Claims",
-    Icon: ShieldCheck,
-    roles: ["admin", "moderator"],
-    info: "Review claim requests for seeded businesses.",
-    section: "Moderation",
-  },
-  {
-    to: "/admin/verifications",
-    label: "Verifications",
-    Icon: ShieldCheck,
-    roles: ["admin", "moderator"],
-    info: "Approve or reject business verification requests.",
-    section: "Moderation",
-  },
-  {
-    to: "/admin/type-suggestions",
-    label: "Type suggestions",
-    Icon: Sparkles,
-    roles: ["admin"],
-    info: "Review user-submitted new business types.",
-    section: "Moderation",
-  },
-  {
-    to: "/admin/service-suggestions",
-    label: "Service suggestions",
-    Icon: Sparkles,
-    roles: ["admin"],
-    info: "Approve user-submitted services into the shared catalog.",
-    section: "Moderation",
-  },
-  {
-    to: "/admin/service-suggestion-audit",
-    label: "Service audit log",
-    Icon: Sparkles,
-    roles: ["admin"],
-    info: "History of decisions on service suggestions.",
-    section: "Moderation",
-  },
-  {
-    to: "/admin/location-corrections",
-    label: "Location fixes",
-    Icon: MapPin,
-    roles: ["admin", "moderator"],
-    info: "User-submitted map pin corrections.",
-    section: "Moderation",
-  },
-  {
-    to: "/admin/reports",
-    label: "Activity",
-    Icon: Inbox,
-    roles: ["admin", "moderator", "support", "sales"],
-    info: "Unified inbox: reports, inquiries, admin audit log.",
-    section: "Moderation",
   },
 
   // PEOPLE
@@ -334,6 +336,7 @@ const NAV: NavItem[] = [
     section: "Platform",
   },
 ];
+
 
 function AdminLayout() {
   const { user, isAdmin, isSales, isModerator, isSupport, isAdvertising, isStaff, loading } =
