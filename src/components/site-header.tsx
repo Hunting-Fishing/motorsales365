@@ -222,6 +222,23 @@ export function SiteHeader() {
             </Link>
           </Button>
 
+          {/* Admin Portal shortcut — visible for all staff roles */}
+          {user && isStaff && (
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="hidden md:inline-flex gap-1.5"
+              title="Admin portal"
+            >
+              <Link to="/admin">
+                <Shield className="h-4 w-4" />
+                <span>Admin</span>
+              </Link>
+            </Button>
+          )}
+
+
           {user && isStaff && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
