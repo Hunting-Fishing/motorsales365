@@ -158,19 +158,47 @@ function analyseImage(img: HTMLImageElement): DetectedQrSlot {
   const aspect = rect.w / Math.max(1, rect.h);
   if (aspect < 0.45 || aspect > 2.2) return defaultQrSlot();
 
-  // Center + size in normalized image coordinates.
-  const cxAbsPx = (rect.x + rect.w / 2) * (srcW / w);
-  const cyAbsPx = (rect.y + rect.h / 2) * (srcH / h);
-  const sidePx = Math.min(rect.w * (srcW / w), rect.h * (srcH / h));
+  // Rect dimensions back in source-pixel space.
+  const rectWpx = rect.w * (srcW / w);
+  const rectHpx = rect.h * (srcH / h);
 
-  const cx = clamp01(cxAbsPx / srcW);
-  const cy = clamp01(cyAbsPx / srcH);
-  // template.qr.size is expressed relative to the template WIDTH.
+  // Largest QR that still fits inside the rect (with a small inset so we
+  // don't sit on the printed border of the Scan Here panel).
+  const maxFitPx =
+    Math.min(rectWpx, rectHpx) - 2 * RECT_INSET * srcW;
+  const maxFitNorm = Math.max(0, maxFitPx) / srcW;
+
+  // If the panel is too small to hold a readable QR, treat as not detected.
+  if (maxFitNorm < MIN_READABLE_SIZE) return defaultQrSlot();
+
+  // Target size: breathing-room shrink, but never below the readable
+  // minimum and never larger than what physically fits in the panel.
+  const targetNorm = (Math.min(rectWpx, rectHpx) * FILL_RATIO) / srcW;
   const size = clamp(
-    (sidePx * FILL_RATIO) / srcW,
-    MIN_SIZE,
-    MAX_SIZE,
+    targetNorm,
+    MIN_READABLE_SIZE,
+    Math.min(MAX_SIZE, maxFitNorm),
   );
+
+  // Convert QR side to normalized units in BOTH axes (template uses width).
+  const halfW = size / 2; // x-axis (normalized to width)
+  const halfH = (size * srcW) / srcH / 2; // y-axis (normalized to height)
+
+  // Center of the detected rect in normalized image coords.
+  let cx = (rect.x + rect.w / 2) / w;
+  let cy = (rect.y + rect.h / 2) / h;
+
+  // Keep the QR fully inside the detected rect (post-inset).
+  const rectLeft = rect.x / w + RECT_INSET;
+  const rectRight = (rect.x + rect.w) / w - RECT_INSET;
+  const rectTop = rect.y / h + (RECT_INSET * srcW) / srcH;
+  const rectBottom = (rect.y + rect.h) / h - (RECT_INSET * srcW) / srcH;
+  cx = clamp(cx, rectLeft + halfW, rectRight - halfW);
+  cy = clamp(cy, rectTop + halfH, rectBottom - halfH);
+
+  // Final safety: never let the QR cross the image edges.
+  cx = clamp(cx, halfW, 1 - halfW);
+  cy = clamp(cy, halfH, 1 - halfH);
 
   return { cx, cy, size, confidence };
 }
