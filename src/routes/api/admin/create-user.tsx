@@ -224,7 +224,7 @@ export const Route = createFileRoute("/api/admin/create-user")({
             }
           }
 
-          await sb.from("profiles").update(profilePatch).eq("id", newUserId);
+          await sb.from("profiles").update(profilePatch as any).eq("id", newUserId);
 
           await logRouteAccess({
             actorId,
