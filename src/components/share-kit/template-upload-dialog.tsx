@@ -443,6 +443,14 @@ export function ShareKitTemplateUpload({ open, onOpenChange, onSaved }: Props) {
                           <AlertCircle className="h-3 w-3" /> QR default
                         </span>
                       )}
+                      {!it.readable && (
+                        <span
+                          className="flex items-center gap-1 rounded-full bg-red-50 px-1.5 py-0.5 text-red-700 dark:bg-red-900/30 dark:text-red-300"
+                          title={it.readabilityReasons.join("\n")}
+                        >
+                          <AlertCircle className="h-3 w-3" /> QR may not scan
+                        </span>
+                      )}
                       {it.status === "uploading" && (
                         <span className="flex items-center gap-1 text-primary">
                           <Loader2 className="h-3 w-3 animate-spin" /> {it.progress}%
