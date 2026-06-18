@@ -462,7 +462,7 @@ function AdminLayout() {
             </div>
             <nav className="flex flex-col gap-1">
               {(() => {
-                const out: React.ReactNode[] = [];
+                const out: ReactNode[] = [];
                 let lastSection: string | undefined = undefined;
                 visibleNav.forEach((item) => {
                   const { to, label, Icon, exact, info, section, external } = item;
