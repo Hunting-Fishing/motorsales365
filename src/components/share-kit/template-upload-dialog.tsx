@@ -145,6 +145,24 @@ export function ShareKitTemplateUpload({ open, onOpenChange, onSaved }: Props) {
       try {
         const { w, h, url } = await readDims(f);
         const slot = await detectQrSlotFromBlob(f);
+        const placement = isDetected(slot)
+          ? { cx: slot.cx, cy: slot.cy, size: slot.size }
+          : { ...QR_DEFAULTS };
+        // Use a representative referral link to estimate QR version + module
+        // count. Real per-user links are the same length pattern, so the
+        // readability check is accurate at upload time.
+        const sampleLink = "https://365motorsales.com/r/ABCDEFGH";
+        const report = await assessQrReadability({
+          link: sampleLink,
+          template: {
+            width: w,
+            height: h,
+            qr: { cx: placement.cx, cy: placement.cy, size: placement.size, platePadding: 0 },
+            background: "#ffffff",
+          },
+          placement,
+          baseImageSrc: f,
+        }).catch(() => null);
         next.push({
           id: `${f.name}-${f.size}-${Math.random().toString(36).slice(2, 8)}`,
           file: f,
@@ -158,6 +176,10 @@ export function ShareKitTemplateUpload({ open, onOpenChange, onSaved }: Props) {
           qrCy: slot.cy,
           qrSize: slot.size,
           qrDetected: isDetected(slot),
+          readable: report?.ok ?? true,
+          readabilityReasons: report?.reasons ?? [],
+          modulePx: report?.modulePx ?? 0,
+          contrast: report?.contrast ?? 0,
         });
       } catch {
         toast.error(`Skipped ${f.name} (could not read image).`);
