@@ -22,6 +22,7 @@ import {
 } from "@/lib/share-kit-templates.functions";
 import { detectQrSlotFromUrl, isDetected } from "@/lib/share-kit/detect-qr-slot";
 import { assessQrReadability } from "@/lib/share-kit/qr-readability";
+import { detectScanHereWithVision } from "@/lib/share-kit-vision.functions";
 import { siteOrigin } from "@/lib/site-config";
 
 export const Route = createFileRoute("/admin/advertisements/share-kit")({
