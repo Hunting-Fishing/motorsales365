@@ -144,7 +144,7 @@ export const upsertAd = createServerFn({ method: "POST" })
   });
 
 export const deleteAd = createServerFn({ method: "POST" })
-  .middleware([requireDomainRole("ads_manager", "ads.deleteAd")])
+  .middleware([requireAdminRoleAudited("ads.deleteAd")])
   .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context;
