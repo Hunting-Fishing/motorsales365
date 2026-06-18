@@ -12,7 +12,7 @@ import { ShareKitTemplateUpload } from "@/components/share-kit/template-upload-d
 import { useSignedCustomTemplates } from "@/components/share-kit/use-signed-custom-templates";
 import { TEMPLATES } from "@/lib/share-kit/templates";
 import type { ShareTemplate } from "@/lib/share-kit/types";
-import { listShareKitLayouts } from "@/lib/share-kit-layouts.functions";
+import { listShareKitLayouts, upsertShareKitLayout } from "@/lib/share-kit-layouts.functions";
 import {
   listShareKitCustomTemplates,
   deleteShareKitCustomTemplate,
@@ -24,6 +24,10 @@ import { detectQrSlotFromUrl, isDetected } from "@/lib/share-kit/detect-qr-slot"
 import { assessQrReadability } from "@/lib/share-kit/qr-readability";
 import { detectScanHereWithVision } from "@/lib/share-kit-vision.functions";
 import { siteOrigin } from "@/lib/site-config";
+
+type SmartTarget =
+  | { kind: "custom"; id: string; label: string; imageUrl: string; width: number; height: number }
+  | { kind: "builtin-image"; id: string; label: string; imageUrl: string; width: number; height: number };
 
 export const Route = createFileRoute("/admin/advertisements/share-kit")({
   component: AdminShareKitPage,
