@@ -104,9 +104,9 @@ export const listAds = createServerFn({ method: "GET" })
     return { ads: data ?? [] };
   });
 
-// ADMIN: upsert ad
+// ADMIN ONLY: upsert ad
 export const upsertAd = createServerFn({ method: "POST" })
-  .middleware([requireDomainRole("ads_manager", "ads.upsertAd")])
+  .middleware([requireAdminRoleAudited("ads.upsertAd")])
   .inputValidator((input: unknown) =>
     z
       .object({
