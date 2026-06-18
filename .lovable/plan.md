@@ -1,56 +1,46 @@
-# Consolidate Dashboard navigation into hubs with tabs
+## Goal
 
-Today the `/dashboard` sidebar has **22+ flat links** (My listings, My rides, Vehicle passport, Saved, Saved products, Liked, Saved searches, My learning, Messages, My businesses, Ad campaigns, Sponsorships, Shop Manager, Profile, My QR, Verification, Billing, Boost history, Wanted, Blocked, Team, Staff, Referral, Share kit, Tow, Dispatch, Job history…). That is what users are calling "everywhere / not organized." We'll apply the same hybrid pattern we already shipped for the Admin portal: a small set of **hub pages**, each with a **tabs row** at the top for its sub-pages, plus a few standalone links for things that don't belong in a hub.
+When a flyer is uploaded, automatically find the white "SCAN HERE" panel and place the QR inside it — correctly sized and centered — no matter where the panel sits on the image. Provide a one-click "Auto-fit QR" for flyers already in the library.
 
-## Proposed hub layout
+## How it works (plain language)
 
-Sidebar shrinks from ~22 links to ~7 entries.
+Each flyer is scanned in the browser as it's added. The code looks for the biggest clean white rectangle on the image (the "SCAN HERE" plate). It then:
 
-```text
-SIDEBAR                       HUB PAGE TABS (top of content area)
-─────────────────────────     ──────────────────────────────────────────────────
-Overview                      (dashboard home — quick stats, shortcuts)
-My Garage           ▸         Listings · Rides · Vehicle Passport · Wanted posts
-Saved & Activity    ▸         Saved listings · Saved products · Saved searches · Liked
-Inbox               ▸         Messages · Blocked users
-My Business         ▸         Businesses · Shop Manager · Ad campaigns · Sponsorships
-                              · Team* · Staff & Access*       (*only if in an org)
-Referral & Share    ▸         My referral · Share Kit · My QR code   (only if staff/referral)
-Dispatch            ▸         Tow requests · 365 Dispatch · Job history (only if provider)
-Account             ▸         Profile · Verification · Billing · Boost history · My learning
-─────────────────────────
-Admin / Staff console         (single link, staff only — unchanged)
-```
+1. Centers the QR on that rectangle.
+2. Sizes the QR to fill ~90% of the rectangle's shorter side (so it always fits with a small breathing margin).
+3. Saves those coordinates with the flyer so every user's personal QR lands in the right spot.
 
-Conditional hubs (Referral, Dispatch, Team/Staff tabs) stay conditional — exactly like today — so non-staff users see an even shorter sidebar.
+If no convincing white panel is found (e.g. the image is dark all over), it falls back to the current defaults and flags the flyer so an admin can tweak it with the existing layout editor.
 
-## How the tabs work
+## What changes for the user
 
-Same shape as `/admin/advertisements`:
+- **Upload dialog**: each file row gets a small "QR auto-fit ✓" or "QR not detected — using default" badge so it's obvious what happened before clicking Upload.
+- **Admin card actions**: a new "Auto-fit QR" button on each custom template runs the same detector against the stored image and saves the result. Useful for the 50+ flyers already uploaded.
+- **Bulk action** at the top of the admin Share-Kit grid: "Auto-fit QR on all custom templates" — runs detection on every custom flyer in one pass.
 
-- Each hub gets a parent route that renders a sticky `Tabs` row built from `@tanstack/react-router` `<Link>` + `useRouterState`, then `<Outlet />` for the active sub-page.
-- The hub's index tab opens the first sub-page (e.g. `/dashboard/garage` → Listings).
-- Existing routes are **kept at their current URLs** so external links, emails, and bookmarks don't break — the hub pages just render the same content under a tab wrapper.
-- Mobile: the existing dropdown sidebar becomes a 2-level dropdown (Hub → sub-page) using the same `DropdownMenu` we already use.
+## Technical section
 
-## Technical notes
+**New module** `src/lib/share-kit/detect-qr-slot.ts`
+- `detectQrSlot(image: HTMLImageElement | Blob): Promise<{ cx: number; cy: number; size: number; confidence: number } | null>`
+- Steps: draw image into an offscreen canvas downscaled to ~300px on the long edge → build a binary mask where `R>235 && G>235 && B>235` (near-white) → run the classic largest-rectangle-in-binary-matrix algorithm (per-row histogram + monotonic stack) to find the biggest axis-aligned white rectangle → translate back to normalized (0–1) coords on the original image.
+- `cx`, `cy` = rectangle center. `size` = `0.9 * min(rectW, rectH) / imageWidth` (kept in template-width units to match existing schema). `confidence` = rect area / total image area; treat `<0.025` as "not detected".
+- Pure client-side, no server work, ~20–60 ms per image.
 
-- Edit `src/routes/dashboard.tsx`: replace the flat `BASE_NAV` array with a grouped `NAV_HUBS` structure; the sidebar maps over hubs and the desktop active state highlights the hub whose sub-routes match the current pathname.
-- Add thin parent route files: `src/routes/dashboard.garage.tsx`, `dashboard.saved.tsx`, `dashboard.inbox.tsx`, `dashboard.business.tsx`, `dashboard.account.tsx`. Each renders a `<HubTabs items=[...] />` + `<Outlet />`. The existing leaf routes (`dashboard.rides.tsx`, `dashboard.vehicles.tsx`, etc.) keep their URLs and need no changes.
-- Reuse the existing `Tabs` styling from the Advertisements hub (`src/routes/admin.advertisements.tsx`) for visual consistency.
-- Update the mobile `MobileNavMenu` in `dashboard.tsx` to render hubs with their sub-items grouped under headers.
-- No data, permissions, or business logic changes — purely navigation/presentation.
-- No DB changes, no server-fn changes.
+**Upload integration** `src/components/share-kit/template-upload-dialog.tsx`
+- After `loadImage` resolves for an item (existing flow that captures `width`/`height`), also call `detectQrSlot` and store `qrCx`, `qrCy`, `qrSize`, `qrDetected` on the `Item`.
+- Render a badge per row using those flags.
+- In `uploadOne`, replace the hard-coded `QR_DEFAULTS.*` with the detected values (or defaults when `qrDetected === false`).
 
-## Out of scope (confirm if you want these included)
+**Admin re-detect**
+- Add `redetectQrSlot(templateId)` UI in `src/routes/admin.advertisements.share-kit.tsx`: load the image via the existing signed URL, run `detectQrSlot`, and call the existing `upsertCustomShareKitTemplate` server function with the new `qr_cx/cy/size`.
+- New "Auto-fit QR on all" button iterates over `customTemplates` with a small concurrency limit (4) and a toast progress counter.
+- No DB migration needed — reuses existing `qr_cx`, `qr_cy`, `qr_size` columns.
 
-- Reorganizing the **main site header** (Post a listing / Admin / avatar). Today's task is the user portal sidebar only.
-- Reorganizing the **Shop Manager** internal navigation — that's a separate app.
-- Renaming any pages — labels above keep current wording.
+**Existing manual editor untouched**
+- The "Edit layout" slider stays as the fine-tune / fallback path for the rare image where detection picks the wrong rectangle.
 
-## Acceptance
+## Out of scope
 
-- `/dashboard` sidebar shows ≤ 8 entries (plus conditional Dispatch/Referral/Admin).
-- Each hub page shows a tabs row matching the list above; clicking a tab navigates to the existing leaf URL.
-- All existing dashboard URLs continue to work (no 404s, no broken bookmarks).
-- Mobile dropdown groups items under hub headers.
+- Server-side detection / image processing (kept fully client-side for cost and simplicity).
+- Detecting non-rectangular or rotated panels (the current flyers all use axis-aligned plates).
+- Changing the QR's color or styling.
