@@ -56,6 +56,18 @@ const SELLER_VIEW_OPTIONS: { value: SellerType; label: string }[] = [
   { value: "insurance", label: "Insurance" },
 ];
 
+const ROLE_SIM_OPTIONS: { value: AppRole; label: string }[] = [
+  { value: "admin", label: "Admin" },
+  { value: "sales", label: "Sales" },
+  { value: "sales_junior", label: "Sales · Junior" },
+  { value: "sales_senior", label: "Sales · Senior" },
+  { value: "sales_manager", label: "Sales · Manager" },
+  { value: "moderator", label: "Moderator" },
+  { value: "support", label: "Support" },
+  { value: "advertising", label: "Advertising" },
+  { value: "user", label: "Regular user (no staff)" },
+];
+
 export function SiteHeader() {
   const {
     user,
@@ -69,6 +81,10 @@ export function SiteHeader() {
     effectiveSellerType,
     simulatedSellerType,
     setSimulatedSellerType,
+    realIsAdmin,
+    effectiveRoles,
+    simulatedRoles,
+    setSimulatedRoles,
   } = useAuth();
   const navigate = useNavigate();
 
