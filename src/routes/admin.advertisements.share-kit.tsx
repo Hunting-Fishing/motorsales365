@@ -116,6 +116,7 @@ function AdminShareKitPage() {
   const deleteFn = useServerFn(deleteShareKitCustomTemplate);
   const hideFn = useServerFn(setBuiltinHidden);
   const updateQrFn = useServerFn(updateShareKitTemplateQrPlacement);
+  const visionFn = useServerFn(detectScanHereWithVision);
 
   async function deleteCustom(id: string, label: string) {
     if (!confirm(`Delete template "${label}"? This cannot be undone.`)) return;
