@@ -1,70 +1,56 @@
+# Consolidate Dashboard navigation into hubs with tabs
 
-## Goal
+Today the `/dashboard` sidebar has **22+ flat links** (My listings, My rides, Vehicle passport, Saved, Saved products, Liked, Saved searches, My learning, Messages, My businesses, Ad campaigns, Sponsorships, Shop Manager, Profile, My QR, Verification, Billing, Boost history, Wanted, Blocked, Team, Staff, Referral, Share kit, Tow, Dispatch, Job history…). That is what users are calling "everywhere / not organized." We'll apply the same hybrid pattern we already shipped for the Admin portal: a small set of **hub pages**, each with a **tabs row** at the top for its sub-pages, plus a few standalone links for things that don't belong in a hub.
 
-Consolidate the QR / Share Kit into the **Advertisements** tabbed workspace (also keep it in the side nav for quick access), lock advertisement upload/delete to the **admin** role only, and add a permanent **History** log of all advertisements/promotions for legal recordkeeping.
+## Proposed hub layout
 
----
-
-## 1. Share Kit as an Advertisements tab
-
-- Add a new tab to `src/routes/admin.advertisements.tsx`:
-  - `{ to: "/admin/advertisements/share-kit", label: "My QR / Share Kit", icon: QrCode, roles: ["admin","sales","advertising"] }`
-- Create `src/routes/admin.advertisements.share-kit.tsx` that renders the existing Share Kit UI (reuse the component currently used at `/admin/sales` for screenshot/QR). No business-logic change — pure relocation/wrap.
-- Side nav (`src/routes/admin.tsx`): keep a top-level **My QR / Share Kit** link pointing to `/admin/advertisements/share-kit` so it remains one click away while still living under Advertisements.
-- Sales hub (`admin.sales.tsx`): update the "My QR" tile to point to the new path.
-
-## 2. Admin-only upload / delete on Advertisements
-
-Restrict mutation on the **Campaigns** tab (the upload/delete surface) so only users with the `admin` role can create or remove ads. `sales` and `advertising` roles get read-only access.
-
-- `src/routes/admin.advertisements.campaigns.tsx`: hide the "Upload / New Ad" button and the per-row Delete action unless `useAuth().isAdmin`. Replace with a disabled tooltip ("Admin only") for visibility.
-- `src/lib/ads.functions.ts`: tighten `upsertAd` and `deleteAd` server-side — require `has_role(userId,'admin')`, not just any admin-domain role. Returns 403 otherwise. This is the authoritative check; the UI gate is convenience.
-
-## 3. Advertisement history log (legal record)
-
-New append-only table that captures every create / update / delete / status change on `advertisements`, plus snapshots from `ad_inquiries` and `promotions` so the business has one durable timeline.
-
-### Schema (migration)
+Sidebar shrinks from ~22 links to ~7 entries.
 
 ```text
-public.advertisement_history
-  id uuid pk
-  ad_id uuid null            -- nullable so deletions retain the snapshot
-  source text not null       -- 'advertisement' | 'ad_inquiry' | 'promotion'
-  action text not null       -- 'created' | 'updated' | 'deleted' | 'status_changed'
-  snapshot jsonb not null    -- full row at time of event
-  changed_by uuid null       -- auth.uid()
-  changed_at timestamptz default now()
-  note text null
+SIDEBAR                       HUB PAGE TABS (top of content area)
+─────────────────────────     ──────────────────────────────────────────────────
+Overview                      (dashboard home — quick stats, shortcuts)
+My Garage           ▸         Listings · Rides · Vehicle Passport · Wanted posts
+Saved & Activity    ▸         Saved listings · Saved products · Saved searches · Liked
+Inbox               ▸         Messages · Blocked users
+My Business         ▸         Businesses · Shop Manager · Ad campaigns · Sponsorships
+                              · Team* · Staff & Access*       (*only if in an org)
+Referral & Share    ▸         My referral · Share Kit · My QR code   (only if staff/referral)
+Dispatch            ▸         Tow requests · 365 Dispatch · Job history (only if provider)
+Account             ▸         Profile · Verification · Billing · Boost history · My learning
+─────────────────────────
+Admin / Staff console         (single link, staff only — unchanged)
 ```
 
-- GRANT SELECT to `authenticated`, ALL to `service_role`.
-- RLS: SELECT allowed to `admin` role only (legal record). No UPDATE/DELETE policies → effectively append-only from the app.
-- Triggers on `public.advertisements`, `public.ad_inquiries`, `public.promotions` (AFTER INSERT/UPDATE/DELETE) that write a row with the full `OLD`/`NEW` snapshot.
+Conditional hubs (Referral, Dispatch, Team/Staff tabs) stay conditional — exactly like today — so non-staff users see an even shorter sidebar.
 
-### UI
+## How the tabs work
 
-- New tab **History** in the Advertisements layout, admin-only: `/admin/advertisements/history`.
-- `admin.advertisements.history.tsx` lists entries newest-first with filters (source, action, date range, ad id) and an expandable JSON snapshot viewer. Read via a new `listAdHistory` server fn (admin-gated).
+Same shape as `/admin/advertisements`:
 
-## 4. Files touched
-
-**Created**
-- `src/routes/admin.advertisements.share-kit.tsx`
-- `src/routes/admin.advertisements.history.tsx`
-- `src/lib/ad-history.functions.ts` (admin `listAdHistory`)
-- Migration for `advertisement_history` table + triggers
-
-**Edited**
-- `src/routes/admin.advertisements.tsx` (add Share Kit + History tabs, role filter)
-- `src/routes/admin.advertisements.campaigns.tsx` (hide upload/delete unless admin)
-- `src/routes/admin.tsx` (sidebar: keep "My QR / Share Kit" pointing to new path)
-- `src/routes/admin.sales.tsx` (update My QR tile link)
-- `src/lib/ads.functions.ts` (require `admin` role on `upsertAd`/`deleteAd`)
-- `src/hooks/use-admin-pending-counts.ts` (no count for share-kit/history; just route map entries)
+- Each hub gets a parent route that renders a sticky `Tabs` row built from `@tanstack/react-router` `<Link>` + `useRouterState`, then `<Outlet />` for the active sub-page.
+- The hub's index tab opens the first sub-page (e.g. `/dashboard/garage` → Listings).
+- Existing routes are **kept at their current URLs** so external links, emails, and bookmarks don't break — the hub pages just render the same content under a tab wrapper.
+- Mobile: the existing dropdown sidebar becomes a 2-level dropdown (Hub → sub-page) using the same `DropdownMenu` we already use.
 
 ## Technical notes
 
-- The campaigns tab stays visible to `sales`/`advertising` for review and reporting; only the mutation controls are gated. Server fns enforce the same rule so a crafted request can't bypass the UI.
-- Triggers use `SECURITY DEFINER` with `set search_path = public` and insert into `advertisement_history` regardless of caller role, so RLS on source tables doesn't block logging.
-- No changes to the Terms/Privacy pages — this is internal recordkeeping, not a user-facing data-handling change.
+- Edit `src/routes/dashboard.tsx`: replace the flat `BASE_NAV` array with a grouped `NAV_HUBS` structure; the sidebar maps over hubs and the desktop active state highlights the hub whose sub-routes match the current pathname.
+- Add thin parent route files: `src/routes/dashboard.garage.tsx`, `dashboard.saved.tsx`, `dashboard.inbox.tsx`, `dashboard.business.tsx`, `dashboard.account.tsx`. Each renders a `<HubTabs items=[...] />` + `<Outlet />`. The existing leaf routes (`dashboard.rides.tsx`, `dashboard.vehicles.tsx`, etc.) keep their URLs and need no changes.
+- Reuse the existing `Tabs` styling from the Advertisements hub (`src/routes/admin.advertisements.tsx`) for visual consistency.
+- Update the mobile `MobileNavMenu` in `dashboard.tsx` to render hubs with their sub-items grouped under headers.
+- No data, permissions, or business logic changes — purely navigation/presentation.
+- No DB changes, no server-fn changes.
+
+## Out of scope (confirm if you want these included)
+
+- Reorganizing the **main site header** (Post a listing / Admin / avatar). Today's task is the user portal sidebar only.
+- Reorganizing the **Shop Manager** internal navigation — that's a separate app.
+- Renaming any pages — labels above keep current wording.
+
+## Acceptance
+
+- `/dashboard` sidebar shows ≤ 8 entries (plus conditional Dispatch/Referral/Admin).
+- Each hub page shows a tabs row matching the list above; clicking a tab navigates to the existing leaf URL.
+- All existing dashboard URLs continue to work (no 404s, no broken bookmarks).
+- Mobile dropdown groups items under hub headers.
