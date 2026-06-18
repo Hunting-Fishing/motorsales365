@@ -138,73 +138,115 @@ function AdminShareKitPage() {
     }
   }
 
-  // Run detector against the signed image and persist new QR placement.
-  // Returns { placed, readable } so callers can warn on low-readability
-  // results even when placement succeeds.
-  async function autoFitOne(
-    row: CustomTemplateRow,
-  ): Promise<{ placed: boolean; readable: boolean; reasons: string[] }> {
-    const slot = await detectQrSlotFromUrl(row.image_url);
-    if (!isDetected(slot)) return { placed: false, readable: false, reasons: [] };
-    await updateQrFn({
-      data: { id: row.id, qr_cx: slot.cx, qr_cy: slot.cy, qr_size: slot.size },
-    });
+  // Smart fit: Gemini vision first, heuristic fallback, readability check.
+  type SmartResult = {
+    placed: boolean;
+    source: "ai" | "heuristic" | "none";
+    readable: boolean;
+    reasons: string[];
+    confidence: number;
+  };
+
+  async function smartFitOne(row: CustomTemplateRow): Promise<SmartResult> {
+    // 1) Try AI vision.
+    let cx = 0, cy = 0, size = 0;
+    let source: SmartResult["source"] = "none";
+    let confidence = 0;
+
+    try {
+      const ai = await visionFn({
+        data: { imageUrl: row.image_url, width: row.width, height: row.height },
+      });
+      if (ai.found && ai.confidence >= 0.55) {
+        cx = ai.cx;
+        cy = ai.cy;
+        size = ai.size;
+        confidence = ai.confidence;
+        source = "ai";
+      }
+    } catch (e: any) {
+      // Surface budget/key errors loudly; quietly fall back for transient ones.
+      const msg = String(e?.message ?? "");
+      if (/credits exhausted|LOVABLE_API_KEY/i.test(msg)) throw e;
+    }
+
+    // 2) Heuristic fallback.
+    if (source === "none") {
+      const slot = await detectQrSlotFromUrl(row.image_url);
+      if (isDetected(slot)) {
+        cx = slot.cx;
+        cy = slot.cy;
+        size = slot.size;
+        confidence = slot.confidence;
+        source = "heuristic";
+      } else {
+        return { placed: false, source: "none", readable: false, reasons: [], confidence: 0 };
+      }
+    }
+
+    // 3) Persist.
+    await updateQrFn({ data: { id: row.id, qr_cx: cx, qr_cy: cy, qr_size: size } });
+
+    // 4) Readability sanity check (won't block — just reports).
     const report = await assessQrReadability({
       link: "https://365motorsales.com/r/ABCDEFGH",
       template: {
         width: row.width,
         height: row.height,
-        qr: { cx: slot.cx, cy: slot.cy, size: slot.size, platePadding: 0 },
+        qr: { cx, cy, size, platePadding: 0 },
         background: "#ffffff",
         imageUrl: row.image_url,
       },
-      placement: { cx: slot.cx, cy: slot.cy, size: slot.size },
+      placement: { cx, cy, size },
     }).catch(() => null);
+
     return {
       placed: true,
+      source,
       readable: report?.ok ?? true,
       reasons: report?.reasons ?? [],
+      confidence,
     };
   }
 
-  async function autoFitCard(row: CustomTemplateRow) {
+  async function smartFitCard(row: CustomTemplateRow) {
     setAutoFittingId(row.id);
     try {
-      const res = await autoFitOne(row);
-      if (res.placed && res.readable) {
-        toast.success(`Auto-fit QR for "${row.label}"`);
-      } else if (res.placed && !res.readable) {
+      const res = await smartFitOne(row);
+      if (!res.placed) {
+        toast.warning(`Could not locate a Scan Here panel in "${row.label}". Open Edit layout to place it manually.`);
+      } else if (!res.readable) {
         toast.warning(
-          `Placed QR on "${row.label}", but readability is low: ${res.reasons.join(" ")}`,
+          `Placed (${res.source.toUpperCase()}) on "${row.label}", but readability is low: ${res.reasons.join(" ")}`,
         );
       } else {
-        toast.warning(
-          `Could not find a white QR panel in "${row.label}". Use Edit layout to place it manually.`,
-        );
+        toast.success(`Smart fit "${row.label}" via ${res.source.toUpperCase()} (${Math.round(res.confidence * 100)}% confidence)`);
       }
       qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
     } catch (e: any) {
-      toast.error(e?.message ?? "Auto-fit failed");
+      toast.error(e?.message ?? "Smart fit failed");
     } finally {
       setAutoFittingId(null);
     }
   }
 
-  async function autoFitAll(rows: CustomTemplateRow[]) {
+  async function smartFitAll(rows: CustomTemplateRow[]) {
     if (rows.length === 0) return;
     if (
       !confirm(
-        `Auto-fit QR on all ${rows.length} custom templates? This may overwrite manual adjustments.`,
+        `Smart-fit QR on all ${rows.length} custom templates using AI vision? This overwrites their saved placement.`,
       )
     )
       return;
     setBulkFitting(true);
-    const concurrency = 4;
-    let detected = 0;
+    // Vision calls are heavier than canvas scans — keep concurrency modest.
+    const concurrency = 3;
+    let aiPlaced = 0;
+    let heuristicPlaced = 0;
     let unreadable = 0;
     let skipped = 0;
     let failed = 0;
-    const t = toast.loading(`Auto-fitting 0 / ${rows.length}…`);
+    const t = toast.loading(`Smart-fitting 0 / ${rows.length}…`);
     let processed = 0;
     let cursor = 0;
 
@@ -213,18 +255,28 @@ function AdminShareKitPage() {
         const idx = cursor++;
         const row = rows[idx];
         try {
-          const res = await autoFitOne(row);
+          const res = await smartFitOne(row);
           if (res.placed) {
-            detected++;
+            if (res.source === "ai") aiPlaced++;
+            else heuristicPlaced++;
             if (!res.readable) unreadable++;
           } else {
             skipped++;
           }
-        } catch {
+        } catch (e: any) {
           failed++;
+          // Hard-stop on auth/credit errors — no point hammering more rows.
+          const msg = String(e?.message ?? "");
+          if (/credits exhausted|LOVABLE_API_KEY/i.test(msg)) {
+            cursor = rows.length;
+            toast.error(msg);
+          }
         }
         processed++;
-        toast.loading(`Auto-fitting ${processed} / ${rows.length}…`, { id: t });
+        toast.loading(
+          `Smart-fitting ${processed} / ${rows.length} — ${aiPlaced} AI, ${heuristicPlaced} heuristic${unreadable ? `, ${unreadable} review` : ""}`,
+          { id: t },
+        );
       }
     }
     await Promise.all(
@@ -232,63 +284,13 @@ function AdminShareKitPage() {
     );
     toast.dismiss(t);
     toast.success(
-      `Auto-fit done — ${detected} placed (${unreadable} low-readability), ${skipped} no panel, ${failed} failed`,
+      `Smart-fit done — ${aiPlaced} AI-placed, ${heuristicPlaced} heuristic fallback, ${unreadable} need review, ${skipped} no panel, ${failed} failed`,
     );
     qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
     setBulkFitting(false);
   }
 
-  // Copy a QR placement (cx/cy/size) to every OTHER custom template.
-  // Prefers the per-user layout override when present — that's what the
-  // admin sees on the card and what they typically just fine-tuned.
-  async function applyPlacementToAll(source: CustomTemplateRow) {
-    const targets = (signedRows ?? []).filter((r) => r.id !== source.id);
-    if (targets.length === 0) {
-      toast.info("No other custom templates to update.");
-      return;
-    }
-    const override = layouts?.[`custom:${source.id}`];
-    const placement = override
-      ? { qr_cx: override.cx, qr_cy: override.cy, qr_size: override.size }
-      : {
-          qr_cx: Number(source.qr_cx),
-          qr_cy: Number(source.qr_cy),
-          qr_size: Number(source.qr_size),
-        };
-    if (
-      !confirm(
-        `Apply "${source.label}" QR placement to all ${targets.length} other custom templates? This overwrites their saved placement.`,
-      )
-    )
-      return;
-    setApplyingAllId(source.id);
-    const concurrency = 4;
-    let done = 0;
-    let failed = 0;
-    let cursor = 0;
-    const t = toast.loading(`Applying placement 0 / ${targets.length}…`);
-    async function worker() {
-      while (cursor < targets.length) {
-        const row = targets[cursor++];
-        try {
-          await updateQrFn({ data: { id: row.id, ...placement } });
-        } catch {
-          failed++;
-        }
-        done++;
-        toast.loading(`Applying placement ${done} / ${targets.length}…`, { id: t });
-      }
-    }
-    await Promise.all(
-      Array.from({ length: Math.min(concurrency, targets.length) }, () => worker()),
-    );
-    toast.dismiss(t);
-    toast.success(
-      `Applied to ${done - failed} templates${failed ? `, ${failed} failed` : ""}.`,
-    );
-    qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
-    setApplyingAllId(null);
-  }
+
 
 
 
