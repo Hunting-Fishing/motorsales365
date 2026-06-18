@@ -12,7 +12,7 @@ import { ShareKitTemplateUpload } from "@/components/share-kit/template-upload-d
 import { useSignedCustomTemplates } from "@/components/share-kit/use-signed-custom-templates";
 import { TEMPLATES } from "@/lib/share-kit/templates";
 import type { ShareTemplate } from "@/lib/share-kit/types";
-import { listShareKitLayouts } from "@/lib/share-kit-layouts.functions";
+import { listShareKitLayouts, upsertShareKitLayout } from "@/lib/share-kit-layouts.functions";
 import {
   listShareKitCustomTemplates,
   deleteShareKitCustomTemplate,
@@ -24,6 +24,10 @@ import { detectQrSlotFromUrl, isDetected } from "@/lib/share-kit/detect-qr-slot"
 import { assessQrReadability } from "@/lib/share-kit/qr-readability";
 import { detectScanHereWithVision } from "@/lib/share-kit-vision.functions";
 import { siteOrigin } from "@/lib/site-config";
+
+type SmartTarget =
+  | { kind: "custom"; id: string; label: string; imageUrl: string; width: number; height: number }
+  | { kind: "builtin-image"; id: string; label: string; imageUrl: string; width: number; height: number };
 
 export const Route = createFileRoute("/admin/advertisements/share-kit")({
   component: AdminShareKitPage,
@@ -67,8 +71,6 @@ function AdminShareKitPage() {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [autoFittingId, setAutoFittingId] = useState<string | null>(null);
   const [bulkFitting, setBulkFitting] = useState(false);
-  
-
 
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/login" });
@@ -118,6 +120,7 @@ function AdminShareKitPage() {
   const hideFn = useServerFn(setBuiltinHidden);
   const updateQrFn = useServerFn(updateShareKitTemplateQrPlacement);
   const visionFn = useServerFn(detectScanHereWithVision);
+  const upsertLayoutFn = useServerFn(upsertShareKitLayout);
 
   async function deleteCustom(id: string, label: string) {
     if (!confirm(`Delete template "${label}"? This cannot be undone.`)) return;
@@ -140,7 +143,7 @@ function AdminShareKitPage() {
     }
   }
 
-  // Smart fit: Gemini vision first, heuristic fallback, readability check.
+  // Smart fit: Gemini vision first, heuristic fallback (customs only), readability check.
   type SmartResult = {
     placed: boolean;
     source: "ai" | "heuristic" | "none";
@@ -149,15 +152,22 @@ function AdminShareKitPage() {
     confidence: number;
   };
 
-  async function smartFitOne(row: CustomTemplateRow): Promise<SmartResult> {
-    // 1) Try AI vision.
+  function absoluteUrl(u: string): string {
+    if (/^https?:\/\//i.test(u)) return u;
+    const origin = siteOrigin().replace(/\/$/, "");
+    return `${origin}${u.startsWith("/") ? "" : "/"}${u}`;
+  }
+
+  async function smartFitAny(target: SmartTarget): Promise<SmartResult> {
+    const imageUrl = absoluteUrl(target.imageUrl);
     let cx = 0, cy = 0, size = 0;
     let source: SmartResult["source"] = "none";
     let confidence = 0;
 
+    // 1) AI vision
     try {
       const ai = await visionFn({
-        data: { imageUrl: row.image_url, width: row.width, height: row.height },
+        data: { imageUrl, width: target.width, height: target.height },
       });
       if (ai.found && ai.confidence >= 0.55) {
         cx = ai.cx;
@@ -167,37 +177,42 @@ function AdminShareKitPage() {
         source = "ai";
       }
     } catch (e: any) {
-      // Surface budget/key errors loudly; quietly fall back for transient ones.
       const msg = String(e?.message ?? "");
       if (/credits exhausted|LOVABLE_API_KEY/i.test(msg)) throw e;
     }
 
-    // 2) Heuristic fallback.
-    if (source === "none") {
-      const slot = await detectQrSlotFromUrl(row.image_url);
+    // 2) Heuristic fallback (custom uploads only — remote built-in PNGs aren't fetched client-side)
+    if (source === "none" && target.kind === "custom") {
+      const slot = await detectQrSlotFromUrl(imageUrl);
       if (isDetected(slot)) {
         cx = slot.cx;
         cy = slot.cy;
         size = slot.size;
         confidence = slot.confidence;
         source = "heuristic";
-      } else {
-        return { placed: false, source: "none", readable: false, reasons: [], confidence: 0 };
       }
     }
 
-    // 3) Persist.
-    await updateQrFn({ data: { id: row.id, qr_cx: cx, qr_cy: cy, qr_size: size } });
+    if (source === "none") {
+      return { placed: false, source: "none", readable: false, reasons: [], confidence: 0 };
+    }
 
-    // 4) Readability sanity check (won't block — just reports).
+    // 3) Persist
+    if (target.kind === "custom") {
+      await updateQrFn({ data: { id: target.id, qr_cx: cx, qr_cy: cy, qr_size: size } });
+    } else {
+      await upsertLayoutFn({ data: { templateId: target.id, cx, cy, size } });
+    }
+
+    // 4) Readability sanity check
     const report = await assessQrReadability({
       link: "https://365motorsales.com/r/ABCDEFGH",
       template: {
-        width: row.width,
-        height: row.height,
+        width: target.width,
+        height: target.height,
         qr: { cx, cy, size, platePadding: 0 },
         background: "#ffffff",
-        imageUrl: row.image_url,
+        imageUrl,
       },
       placement: { cx, cy, size },
     }).catch(() => null);
@@ -211,53 +226,26 @@ function AdminShareKitPage() {
     };
   }
 
-  async function smartFitCard(row: CustomTemplateRow) {
-    setAutoFittingId(row.id);
-    try {
-      const res = await smartFitOne(row);
-      if (!res.placed) {
-        toast.warning(`Could not locate a Scan Here panel in "${row.label}". Open Edit layout to place it manually.`);
-      } else if (!res.readable) {
-        toast.warning(
-          `Placed (${res.source.toUpperCase()}) on "${row.label}", but readability is low: ${res.reasons.join(" ")}`,
-        );
-      } else {
-        toast.success(`Smart fit "${row.label}" via ${res.source.toUpperCase()} (${Math.round(res.confidence * 100)}% confidence)`);
-      }
-      qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
-    } catch (e: any) {
-      toast.error(e?.message ?? "Smart fit failed");
-    } finally {
-      setAutoFittingId(null);
-    }
-  }
-
-  async function smartFitAll(rows: CustomTemplateRow[]) {
-    if (rows.length === 0) return;
-    if (
-      !confirm(
-        `Smart-fit QR on all ${rows.length} custom templates using AI vision? This overwrites their saved placement.`,
-      )
-    )
-      return;
+  async function smartFitAllAds(targets: SmartTarget[]) {
+    if (targets.length === 0) return;
     setBulkFitting(true);
-    // Vision calls are heavier than canvas scans — keep concurrency modest.
     const concurrency = 3;
     let aiPlaced = 0;
     let heuristicPlaced = 0;
     let unreadable = 0;
     let skipped = 0;
     let failed = 0;
-    const t = toast.loading(`Smart-fitting 0 / ${rows.length}…`);
+    const t = toast.loading(`Smart-fitting 0 / ${targets.length}…`);
     let processed = 0;
     let cursor = 0;
 
     async function worker() {
-      while (cursor < rows.length) {
+      while (cursor < targets.length) {
         const idx = cursor++;
-        const row = rows[idx];
+        const target = targets[idx];
+        setAutoFittingId(target.id);
         try {
-          const res = await smartFitOne(row);
+          const res = await smartFitAny(target);
           if (res.placed) {
             if (res.source === "ai") aiPlaced++;
             else heuristicPlaced++;
@@ -267,30 +255,33 @@ function AdminShareKitPage() {
           }
         } catch (e: any) {
           failed++;
-          // Hard-stop on auth/credit errors — no point hammering more rows.
           const msg = String(e?.message ?? "");
           if (/credits exhausted|LOVABLE_API_KEY/i.test(msg)) {
-            cursor = rows.length;
+            cursor = targets.length;
             toast.error(msg);
           }
         }
         processed++;
         toast.loading(
-          `Smart-fitting ${processed} / ${rows.length} — ${aiPlaced} AI, ${heuristicPlaced} heuristic${unreadable ? `, ${unreadable} review` : ""}`,
+          `Smart-fitting ${processed} / ${targets.length} — ${aiPlaced} AI · ${heuristicPlaced} heuristic${unreadable ? ` · ${unreadable} review` : ""}`,
           { id: t },
         );
       }
     }
     await Promise.all(
-      Array.from({ length: Math.min(concurrency, rows.length) }, () => worker()),
+      Array.from({ length: Math.min(concurrency, targets.length) }, () => worker()),
     );
     toast.dismiss(t);
+    setAutoFittingId(null);
     toast.success(
-      `Smart-fit done — ${aiPlaced} AI-placed, ${heuristicPlaced} heuristic fallback, ${unreadable} need review, ${skipped} no panel, ${failed} failed`,
+      `Smart fit done — ${aiPlaced} AI · ${heuristicPlaced} heuristic · ${unreadable} need review · ${skipped} no panel · ${failed} failed`,
     );
     qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+    qc.invalidateQueries({ queryKey: ["share-kit-layouts"] });
     setBulkFitting(false);
   }
+
+
 
 
 
@@ -321,6 +312,27 @@ function AdminShareKitPage() {
   const customById = new Map<string, CustomTemplateRow>(signedRows.map((r) => [`custom:${r.id}`, r]));
   const visibleBuiltins = TEMPLATES.filter((t) => isAdmin || !hiddenBuiltins.has(t.id));
   const allTemplates: ShareTemplate[] = [...customTemplates, ...visibleBuiltins];
+
+  const smartTargets: SmartTarget[] = [
+    ...signedRows.map<SmartTarget>((r) => ({
+      kind: "custom",
+      id: r.id,
+      label: r.label,
+      imageUrl: r.image_url,
+      width: r.width,
+      height: r.height,
+    })),
+    ...visibleBuiltins
+      .filter((t) => t.kind === "image" && !!t.imageUrl)
+      .map<SmartTarget>((t) => ({
+        kind: "builtin-image",
+        id: t.id,
+        label: t.label,
+        imageUrl: t.imageUrl!,
+        width: t.width,
+        height: t.height,
+      })),
+  ];
 
   return (
     <div className="space-y-6">
@@ -360,17 +372,17 @@ function AdminShareKitPage() {
           <>
             <Button
               size="sm"
-              onClick={() => smartFitAll(signedRows)}
-              disabled={bulkFitting || signedRows.length === 0}
+              onClick={() => smartFitAllAds(smartTargets)}
+              disabled={bulkFitting || smartTargets.length === 0}
               className="ml-auto"
-              title="Use AI vision to find each flyer's Scan Here panel and snap the QR into it"
+              title="AI-detects the Scan Here panel on every flyer and snaps the QR into it"
             >
               {bulkFitting ? (
                 <Loader2 className="mr-1 h-4 w-4 animate-spin" />
               ) : (
                 <Sparkles className="mr-1 h-4 w-4" />
               )}
-              Smart auto-fit (AI)
+              Smart fit all ads ({smartTargets.length})
             </Button>
             <Button size="sm" onClick={() => setUploadOpen(true)}>
               <Plus className="mr-1 h-4 w-4" /> Upload new template
@@ -400,29 +412,14 @@ function AdminShareKitPage() {
                 {isAdmin && (
                   <div className="mt-2 flex flex-wrap justify-end gap-2">
                     {custom ? (
-                      <>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => smartFitCard(custom)}
-                          disabled={autoFittingId === custom.id || bulkFitting}
-                          title="Use AI vision to find this flyer's Scan Here panel and snap the QR into it"
-                        >
-                          {autoFittingId === custom.id ? (
-                            <Loader2 className="mr-1 h-4 w-4 animate-spin" />
-                          ) : (
-                            <Sparkles className="mr-1 h-4 w-4" />
-                          )}
-                          Smart fit
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => deleteCustom(custom.id, custom.label)}
-                        >
-                          <Trash2 className="mr-1 h-4 w-4" /> Delete
-                        </Button>
-                      </>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => deleteCustom(custom.id, custom.label)}
+                        disabled={bulkFitting}
+                      >
+                        <Trash2 className="mr-1 h-4 w-4" /> Delete
+                      </Button>
                     ) : (
                       <Button
                         variant="outline"
