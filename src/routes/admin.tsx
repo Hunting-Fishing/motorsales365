@@ -482,3 +482,95 @@ function AdminMobileSelect({ items }: { items: { to: string; label: string }[] }
     </Select>
   );
 }
+
+function SidebarNav({
+  visibleNav,
+  pendingCounts,
+}: {
+  visibleNav: NavItem[];
+  pendingCounts: any;
+}) {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  // Group items by section. Items without a section (Overview) render at top.
+  const groups: { section: string | undefined; items: NavItem[] }[] = [];
+  visibleNav.forEach((item) => {
+    const last = groups[groups.length - 1];
+    if (last && last.section === item.section) last.items.push(item);
+    else groups.push({ section: item.section, items: [item] });
+  });
+
+  const renderLink = (item: NavItem) => {
+    const { to, label, Icon, exact, info, external } = item;
+    const count = pendingCountForRoute(to, pendingCounts);
+    const linkClass =
+      "flex flex-1 shrink-0 items-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-secondary";
+    return (
+      <div key={to} className="group flex shrink-0 items-center gap-1">
+        {external ? (
+          <a href={to} className={linkClass}>
+            <Icon className="h-4 w-4" />
+            <span className="flex-1">{label}</span>
+          </a>
+        ) : (
+          <Link
+            to={to}
+            activeOptions={{ exact: !!exact }}
+            activeProps={{ className: "bg-primary text-primary-foreground" }}
+            className={linkClass}
+          >
+            <Icon className="h-4 w-4" />
+            <span className="flex-1">{label}</span>
+            {count > 0 && (
+              <span className="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-semibold leading-none text-destructive-foreground">
+                {count > 99 ? "99+" : count}
+              </span>
+            )}
+          </Link>
+        )}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              aria-label={`About ${label}`}
+              className="rounded-md p-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
+            >
+              <Info className="h-3.5 w-3.5" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="right" className="max-w-xs">
+            {info}
+          </TooltipContent>
+        </Tooltip>
+      </div>
+    );
+  };
+
+  return (
+    <nav className="flex flex-col gap-1">
+      {groups.map((g, idx) => {
+        if (!g.section) {
+          return (
+            <div key={`top-${idx}`} className="flex flex-col gap-1">
+              {g.items.map(renderLink)}
+            </div>
+          );
+        }
+        const hasActive = g.items.some((i) =>
+          i.exact ? pathname === i.to : pathname.startsWith(i.to),
+        );
+        return (
+          <Collapsible key={g.section} defaultOpen={hasActive} className="mt-2">
+            <CollapsibleTrigger className="group flex w-full items-center justify-between rounded-md px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/70 hover:bg-secondary hover:text-foreground">
+              <span>{g.section}</span>
+              <ChevronDown className="h-3.5 w-3.5 transition-transform group-data-[state=closed]:-rotate-90" />
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-1 flex flex-col gap-1">
+              {g.items.map(renderLink)}
+            </CollapsibleContent>
+          </Collapsible>
+        );
+      })}
+    </nav>
+  );
+}
