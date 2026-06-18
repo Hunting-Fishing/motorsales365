@@ -292,6 +292,59 @@ export function SiteHeader() {
             </DropdownMenu>
           )}
 
+          {/* Role simulator — real admins only */}
+          {user && realIsAdmin && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="hidden md:inline-flex gap-2" title="Simulate staff roles (UI only)">
+                  <UserCog className="h-4 w-4" />
+                  <span className="hidden lg:inline">
+                    Role:{" "}
+                    {simulatedRoles && simulatedRoles.length > 0
+                      ? simulatedRoles.join(", ")
+                      : "Admin (real)"}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64">
+                <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Simulate role (UI only)
+                </div>
+                {ROLE_SIM_OPTIONS.map((o) => {
+                  const active = (simulatedRoles ?? []).includes(o.value);
+                  return (
+                    <DropdownMenuItem
+                      key={o.value}
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        const current = simulatedRoles ?? [];
+                        const next = active
+                          ? current.filter((r) => r !== o.value)
+                          : [...current, o.value];
+                        setSimulatedRoles(next.length ? next : null);
+                      }}
+                    >
+                      {active ? "✓ " : "  "}
+                      {o.label}
+                    </DropdownMenuItem>
+                  );
+                })}
+                {simulatedRoles && simulatedRoles.length > 0 && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onSelect={() => setSimulatedRoles(null)}>
+                      Reset to my real roles
+                    </DropdownMenuItem>
+                  </>
+                )}
+                <DropdownMenuSeparator />
+                <div className="px-2 py-1 text-[10px] text-muted-foreground">
+                  Effective: {effectiveRoles.join(", ") || "none"}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
+
           {loading ? (
             <div
               className="flex items-center gap-2 rounded-md border border-border bg-secondary/40 px-3 py-1.5"
