@@ -264,5 +264,32 @@ export function TemplateCard({ template, context, override }: Props) {
         </div>
       </div>
     </Card>
+    <Dialog open={zoomOpen} onOpenChange={setZoomOpen}>
+      <DialogContent className="max-w-[95vw] sm:max-w-[90vw] lg:max-w-5xl p-3 sm:p-4">
+        <DialogTitle className="text-base">{template.label}</DialogTitle>
+        <DialogDescription className="sr-only">Full-size preview of {template.label}</DialogDescription>
+        {previewUrl && (
+          <div className="flex max-h-[80vh] items-center justify-center overflow-auto bg-muted/20 rounded-md">
+            <img
+              src={previewUrl}
+              alt={`Full-size preview of ${template.label}`}
+              className="max-h-[80vh] w-auto object-contain"
+            />
+          </div>
+        )}
+        <div className="flex flex-wrap gap-2 pt-1">
+          <Button size="sm" onClick={handleDownload} disabled={busy || !previewUrl}>
+            <Download className="mr-1 h-4 w-4" /> Download
+          </Button>
+          <Button size="sm" variant="outline" onClick={handleNativeShare} disabled={busy || !previewUrl}>
+            <Share2 className="mr-1 h-4 w-4" /> Share
+          </Button>
+          <Button size="sm" variant="outline" onClick={handleCopy}>
+            <Copy className="mr-1 h-4 w-4" /> Copy link
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }
