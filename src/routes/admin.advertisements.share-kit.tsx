@@ -273,9 +273,26 @@ function AdminShareKitPage() {
           <Button variant="outline" size="sm">Classic A4 poster</Button>
         </Link>
         {isAdmin && (
-          <Button size="sm" onClick={() => setUploadOpen(true)} className="ml-auto">
-            <Plus className="mr-1 h-4 w-4" /> Upload new template
-          </Button>
+          <>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => autoFitAll(signedRows)}
+              disabled={bulkFitting || signedRows.length === 0}
+              className="ml-auto"
+              title="Run auto-detection on every custom template"
+            >
+              {bulkFitting ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Wand2 className="mr-1 h-4 w-4" />
+              )}
+              Auto-fit QR on all
+            </Button>
+            <Button size="sm" onClick={() => setUploadOpen(true)}>
+              <Plus className="mr-1 h-4 w-4" /> Upload new template
+            </Button>
+          </>
         )}
       </div>
 
