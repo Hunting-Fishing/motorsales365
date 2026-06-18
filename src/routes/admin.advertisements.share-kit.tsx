@@ -238,27 +238,30 @@ function AdminShareKitPage() {
     setBulkFitting(false);
   }
 
-  // Copy this template's QR placement (cx/cy/size) to every OTHER custom
-  // template. Useful when all flyers were designed with the Scan Here panel
-  // in the same physical spot and the admin nailed it on one.
+  // Copy a QR placement (cx/cy/size) to every OTHER custom template.
+  // Prefers the per-user layout override when present — that's what the
+  // admin sees on the card and what they typically just fine-tuned.
   async function applyPlacementToAll(source: CustomTemplateRow) {
     const targets = (signedRows ?? []).filter((r) => r.id !== source.id);
     if (targets.length === 0) {
       toast.info("No other custom templates to update.");
       return;
     }
+    const override = layouts?.[`custom:${source.id}`];
+    const placement = override
+      ? { qr_cx: override.cx, qr_cy: override.cy, qr_size: override.size }
+      : {
+          qr_cx: Number(source.qr_cx),
+          qr_cy: Number(source.qr_cy),
+          qr_size: Number(source.qr_size),
+        };
     if (
       !confirm(
-        `Apply "${source.label}" QR placement to all ${targets.length} other custom templates? This overwrites their current placement.`,
+        `Apply "${source.label}" QR placement to all ${targets.length} other custom templates? This overwrites their saved placement.`,
       )
     )
       return;
     setApplyingAllId(source.id);
-    const placement = {
-      qr_cx: Number(source.qr_cx),
-      qr_cy: Number(source.qr_cy),
-      qr_size: Number(source.qr_size),
-    };
     const concurrency = 4;
     let done = 0;
     let failed = 0;
@@ -286,6 +289,8 @@ function AdminShareKitPage() {
     qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
     setApplyingAllId(null);
   }
+
+
 
 
 
