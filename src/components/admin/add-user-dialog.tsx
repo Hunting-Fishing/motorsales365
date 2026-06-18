@@ -533,6 +533,3 @@ export function AddUserDialog({
     </Dialog>
   );
 }
-
-// Keep label reference used by `Label` in older snippets if needed.
-void Label;
