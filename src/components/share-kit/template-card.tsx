@@ -23,12 +23,37 @@ interface Props {
   override?: QrOverride;
 }
 
+// Global concurrency limiter so 50+ cards don't all decode/compose at once.
+let activeRenders = 0;
+const renderQueue: Array<() => void> = [];
+const MAX_CONCURRENT_RENDERS = 4;
+function acquireRenderSlot(): Promise<void> {
+  return new Promise((resolve) => {
+    const tryRun = () => {
+      if (activeRenders < MAX_CONCURRENT_RENDERS) {
+        activeRenders++;
+        resolve();
+      } else {
+        renderQueue.push(tryRun);
+      }
+    };
+    tryRun();
+  });
+}
+function releaseRenderSlot() {
+  activeRenders = Math.max(0, activeRenders - 1);
+  const next = renderQueue.shift();
+  if (next) next();
+}
+
 export function TemplateCard({ template, context, override }: Props) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [editing, setEditing] = useState(false);
   const [zoomOpen, setZoomOpen] = useState(false);
+  const [visible, setVisible] = useState(false);
   const qc = useQueryClient();
   const upsertFn = useServerFn(upsertShareKitLayout);
   const deleteFn = useServerFn(deleteShareKitLayout);
@@ -40,10 +65,42 @@ export function TemplateCard({ template, context, override }: Props) {
   };
   const effective: QrOverride = override ?? defaults;
 
+  // Lazy render: only compose when the card scrolls into view.
   useEffect(() => {
+    const el = containerRef.current;
+    if (!el || visible) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return;
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setVisible(true);
+            io.disconnect();
+            break;
+          }
+        }
+      },
+      { rootMargin: "400px 0px" },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [visible]);
+
+  useEffect(() => {
+    if (!visible) return;
     let cancelled = false;
+    let released = false;
     setPreviewUrl(null);
     (async () => {
+      await acquireRenderSlot();
+      if (cancelled) {
+        releaseRenderSlot();
+        released = true;
+        return;
+      }
       try {
         const canvas = await composeTemplate(template, context, effective);
         if (cancelled) return;
@@ -52,13 +109,16 @@ export function TemplateCard({ template, context, override }: Props) {
       } catch (e) {
         console.error("Template render failed", template.id, e);
         if (!cancelled) toast.error(`Could not render ${template.label}`);
+      } finally {
+        if (!released) releaseRenderSlot();
       }
     })();
     return () => {
       cancelled = true;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [template, context, effective.cx, effective.cy, effective.size]);
+  }, [visible, template, context, effective.cx, effective.cy, effective.size]);
+
 
   const fileName = `365-${template.id}-${context.code}.png`;
   const shareText = interpolate(template.shareText, context);
@@ -164,6 +224,7 @@ export function TemplateCard({ template, context, override }: Props) {
 
   return (
     <>
+    <div ref={containerRef}>
     <Card className="overflow-hidden">
       {editing ? (
         <div className="p-3">
@@ -241,6 +302,7 @@ export function TemplateCard({ template, context, override }: Props) {
         </div>
       </div>
     </Card>
+    </div>
     <Dialog open={zoomOpen} onOpenChange={setZoomOpen}>
       <DialogContent className="max-w-[95vw] sm:max-w-[90vw] lg:max-w-5xl p-3 sm:p-4">
         <DialogTitle className="text-base">{template.label}</DialogTitle>
