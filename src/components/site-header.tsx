@@ -239,8 +239,8 @@ export function SiteHeader() {
             </Link>
           </Button>
 
-          {/* Admin Portal shortcut — visible for all staff roles */}
-          {user && isAdmin && (
+          {/* Admin Portal shortcut — visible only to confirmed admins */}
+          {user && !loading && isAdmin && (
             <Button
               asChild
               variant="outline"
@@ -256,7 +256,7 @@ export function SiteHeader() {
           )}
 
 
-          {user && realIsAdmin && (
+          {user && !loading && realIsAdmin && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="hidden md:inline-flex gap-2">
@@ -293,7 +293,7 @@ export function SiteHeader() {
           )}
 
           {/* Role simulator — real admins only */}
-          {user && realIsAdmin && (
+          {user && !loading && realIsAdmin && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="hidden md:inline-flex gap-2" title="Simulate staff roles (UI only)">
