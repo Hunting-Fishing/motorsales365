@@ -55,6 +55,8 @@ export function UserDossierDialog({
   score: DossierScore;
 }) {
   const [tab, setTab] = useState("overview");
+  const { user: authUser } = useAuth();
+  const isSuperAdmin = (authUser?.email ?? "").toLowerCase() === SUPER_ADMIN_EMAIL;
   const displayName =
     identity.full_name || identity.business_name || identity.email || "User";
 
