@@ -45,26 +45,30 @@ const upsertSchema = z.object({
   active: z.boolean().default(true),
 });
 
-// List active custom templates + hidden built-in ids (any authed staff)
+// List active custom templates + hidden built-in ids + admin builtin category overrides (any authed staff)
 export const listShareKitCustomTemplates = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase } = context as any;
-    const [tplRes, hidRes] = await Promise.all([
+    const [tplRes, hidRes, biRes] = await Promise.all([
       supabase
         .from("share_kit_custom_templates")
         .select("*")
         .order("sort_order", { ascending: true })
         .order("created_at", { ascending: false }),
       supabase.from("share_kit_hidden_builtins").select("template_id"),
+      supabase.from("share_kit_builtin_categories").select("template_id, category, subcategory"),
     ]);
     if (tplRes.error) throw new Error(tplRes.error.message);
     if (hidRes.error) throw new Error(hidRes.error.message);
+    if (biRes.error) throw new Error(biRes.error.message);
     return {
       templates: (tplRes.data ?? []) as CustomTemplateRow[],
       hiddenBuiltins: ((hidRes.data ?? []) as { template_id: string }[]).map((r) => r.template_id),
+      builtinCategories: (biRes.data ?? []) as BuiltinCategoryRow[],
     };
   });
+
 
 export const upsertShareKitCustomTemplate = createServerFn({ method: "POST" })
   .middleware([requireAdminRoleAudited("shareKit.upsertTemplate")])
