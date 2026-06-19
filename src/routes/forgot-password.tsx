@@ -188,10 +188,10 @@ function ForgotPasswordPage() {
                   type="button"
                   className="w-full"
                   variant="secondary"
-                  disabled={emailCooldown.active || emailStatus === "sending"}
+                  disabled={emailCooldown.active || (emailStatus as string) === "sending"}
                   onClick={() => sendEmailReset(email)}
                 >
-                  {emailStatus === "sending" ? (
+                  {(emailStatus as string) === "sending" ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Sending…
                     </>
@@ -201,6 +201,7 @@ function ForgotPasswordPage() {
                     "Resend reset link"
                   )}
                 </Button>
+
 
                 <button
                   type="button"
