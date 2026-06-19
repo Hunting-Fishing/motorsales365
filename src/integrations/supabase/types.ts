@@ -1109,6 +1109,7 @@ export type Database = {
           decided_at: string | null
           evidence_url: string | null
           id: string
+          kind: string
           notes: string | null
           reviewer_notes: string | null
           reviewer_user_id: string | null
@@ -1124,6 +1125,7 @@ export type Database = {
           decided_at?: string | null
           evidence_url?: string | null
           id?: string
+          kind?: string
           notes?: string | null
           reviewer_notes?: string | null
           reviewer_user_id?: string | null
@@ -1139,6 +1141,7 @@ export type Database = {
           decided_at?: string | null
           evidence_url?: string | null
           id?: string
+          kind?: string
           notes?: string | null
           reviewer_notes?: string | null
           reviewer_user_id?: string | null
