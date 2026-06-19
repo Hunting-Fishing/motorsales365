@@ -361,7 +361,7 @@ function AdminShareKitPage() {
   const customById = new Map<string, CustomTemplateRow>(signedRows.map((r) => [`custom:${r.id}`, r]));
 
   // Apply built-in overrides on top of code-defined categories
-  const visibleBuiltins = TEMPLATES.filter((t) => isAdmin || !hiddenBuiltins.has(t.id)).map((t) => {
+  const visibleBuiltins = TEMPLATES.map((t) => {
     const override = builtinOverrides.get(t.id);
     if (!override) return t;
     return {
