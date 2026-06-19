@@ -505,3 +505,92 @@ export const deleteClaimEvidence = createServerFn({ method: "POST" })
     if (delErr) throw new Error(delErr.message);
     return { ok: true };
   });
+
+// ---------- Search businesses + ownership transfer requests ----------
+
+const SearchInput = z.object({
+  q: z.string().trim().min(2).max(100),
+});
+
+export const searchClaimableBusinesses = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => SearchInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const term = `%${data.q.replace(/[%_]/g, " ")}%`;
+    const { data: rows, error } = await supabase
+      .from("businesses")
+      .select("id,slug,name,logo_url,city,region,claim_state,owner_id")
+      .or(`name.ilike.${term},slug.ilike.${term},city.ilike.${term}`)
+      .order("name", { ascending: true })
+      .limit(20);
+    if (error) throw new Error(error.message);
+    return { results: rows ?? [] };
+  });
+
+const TransferInput = z.object({
+  businessId: z.string().uuid(),
+  reason: z.string().trim().min(20, "Please describe why ownership should transfer").max(2000),
+  contactMethod: z.enum(["email", "phone", "document"]),
+  contactValue: z.string().min(1).max(500).optional(),
+});
+
+export const submitOwnershipTransferRequest = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => TransferInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+
+    const { data: biz, error: bizErr } = await supabase
+      .from("businesses")
+      .select("id,name,owner_id")
+      .eq("id", data.businessId)
+      .maybeSingle();
+    if (bizErr) throw new Error(bizErr.message);
+    if (!biz) throw new Error("Business not found");
+    if (!biz.owner_id) throw new Error("This business is not yet claimed — use the regular claim flow.");
+    if (biz.owner_id === userId) throw new Error("You already own this business.");
+
+    // Don't allow a second open transfer request from the same user
+    const { data: existing } = await supabase
+      .from("business_claim_requests")
+      .select("id,status")
+      .eq("business_id", data.businessId)
+      .eq("claimant_user_id", userId)
+      .eq("kind", "transfer")
+      .in("status", ["pending"])
+      .maybeSingle();
+    if (existing) throw new Error("You already have a pending transfer request for this business.");
+
+    const { data: claim, error: insErr } = await supabase
+      .from("business_claim_requests")
+      .insert({
+        business_id: data.businessId,
+        claimant_user_id: userId,
+        kind: "transfer",
+        contact_method: data.contactMethod,
+        contact_value: data.contactValue ?? null,
+        notes: data.reason,
+      } as any)
+      .select("id")
+      .single();
+    if (insErr) throw new Error(insErr.message);
+
+    return { id: claim.id };
+  });
+
+export const listMyClaimRequests = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { supabase, userId } = context;
+    const { data, error } = await supabase
+      .from("business_claim_requests")
+      .select(
+        "id,business_id,kind,status,reviewer_notes,decided_at,created_at,notes,businesses(name,slug)",
+      )
+      .eq("claimant_user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    if (error) throw new Error(error.message);
+    return { requests: data ?? [] };
+  });
