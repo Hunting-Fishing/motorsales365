@@ -175,6 +175,7 @@ export const TEMPLATES: ShareTemplate[] = [
   {
     id: "rear-shirt",
     label: "Rear Shirt Ad",
+    category: "Print & Wearables",
     description: "Full Philippine motors hero artwork with services strip and contact card. Your QR sits at the bottom-right.",
     width: 1240,
     height: 1550,
@@ -200,6 +201,7 @@ export const TEMPLATES: ShareTemplate[] = [
   {
     id: "arm-band",
     label: "Arm Band Ad",
+    category: "Print & Wearables",
     description: "Compact logo + QR layout. Designed for stickers, arm bands, and chat posts.",
     width: 1240,
     height: 2000,
@@ -225,6 +227,7 @@ export const TEMPLATES: ShareTemplate[] = [
   {
     id: "square-social",
     label: "Square (Facebook / IG)",
+    category: "Social Posts",
     description: "1080×1080 social post with bold typography and your QR centered low.",
     width: 1080,
     height: 1080,
@@ -242,6 +245,7 @@ export const TEMPLATES: ShareTemplate[] = [
   {
     id: "story-reel",
     label: "Story / Reel (9:16)",
+    category: "Stories & Reels",
     description: "1080×1920 vertical for Stories, Reels, and TikTok with a giant QR.",
     width: 1080,
     height: 1920,
@@ -259,6 +263,7 @@ export const TEMPLATES: ShareTemplate[] = [
   {
     id: "banner-1200",
     label: "Landscape Banner (1200×630)",
+    category: "Social Posts",
     description: "Perfect for Facebook link previews and group posts.",
     width: 1200,
     height: 630,
@@ -276,6 +281,7 @@ export const TEMPLATES: ShareTemplate[] = [
   {
     id: "tow-247",
     label: "24/7 Tow Service",
+    category: "Services (Tow / Roadside)",
     description: "Bold emergency tow card — perfect for roadside flyers and group posts.",
     width: 1080,
     height: 1350,
@@ -300,6 +306,7 @@ export const TEMPLATES: ShareTemplate[] = [
   {
     id: "buy-cars",
     label: "Cars For Sale",
+    category: "Vehicles For Sale",
     description: "Bright automotive listing promo — drives buyers to your referral page.",
     width: 1080,
     height: 1080,
@@ -317,6 +324,7 @@ export const TEMPLATES: ShareTemplate[] = [
   {
     id: "parts-shop",
     label: "Parts & Accessories",
+    category: "Parts & Accessories",
     description: "Carbon-and-amber parts ad. Great for groups and online shop posts.",
     width: 1080,
     height: 1080,
