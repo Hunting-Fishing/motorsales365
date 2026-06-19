@@ -14,6 +14,8 @@ export type Staff365Row = {
   last_sign_in_at: string | null;
   email_confirmed_at: string | null;
   disabled: boolean;
+  has_route: boolean;
+  route_destination: string | null;
 };
 
 async function assertSuperAdmin(callerEmail: string | undefined) {
@@ -62,16 +64,36 @@ export const listStaff365 = createServerFn({ method: "POST" })
       (ps ?? []).forEach((p: any) => nameMap.set(p.id, p.full_name ?? null));
     }
 
-    const rows: Staff365Row[] = allUsers.map((u) => ({
-      id: u.id,
-      email: u.email ?? "",
-      full_name: nameMap.get(u.id) ?? null,
-      roles: roleMap.get(u.id) ?? [],
-      created_at: u.created_at ?? null,
-      last_sign_in_at: u.last_sign_in_at ?? null,
-      email_confirmed_at: u.email_confirmed_at ?? null,
-      disabled: !!(u.banned_until && new Date(u.banned_until).getTime() > Date.now()),
-    }));
+    // Cross-reference with Cloudflare Email Routing entries so we can flag
+    // staff inboxes that won't actually receive mail.
+    const routeMap = new Map<string, string | null>();
+    {
+      const { data: routes } = await supabaseAdmin
+        .from("email_routes")
+        .select("address,destination,active")
+        .eq("active", true);
+      (routes ?? []).forEach((r: any) => {
+        const addr = String(r.address ?? "").toLowerCase();
+        if (addr) routeMap.set(addr, r.destination ?? null);
+      });
+    }
+
+    const rows: Staff365Row[] = allUsers.map((u) => {
+      const emailLc = (u.email ?? "").toLowerCase();
+      const dest = routeMap.get(emailLc) ?? null;
+      return {
+        id: u.id,
+        email: u.email ?? "",
+        full_name: nameMap.get(u.id) ?? null,
+        roles: roleMap.get(u.id) ?? [],
+        created_at: u.created_at ?? null,
+        last_sign_in_at: u.last_sign_in_at ?? null,
+        email_confirmed_at: u.email_confirmed_at ?? null,
+        disabled: !!(u.banned_until && new Date(u.banned_until).getTime() > Date.now()),
+        has_route: routeMap.has(emailLc),
+        route_destination: dest,
+      };
+    });
 
     rows.sort((a, b) => (a.email > b.email ? 1 : -1));
     return { rows };
