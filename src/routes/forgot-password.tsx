@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { CheckCircle2, AlertCircle, Mail, Loader2 } from "lucide-react";
+import { CheckCircle2, AlertCircle, Mail, Loader2, Timer } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -184,11 +184,19 @@ function ForgotPasswordPage() {
                   </AlertDescription>
                 </Alert>
 
+                {emailCooldown.active && (
+                  <CooldownNotice
+                    remaining={emailCooldown.remaining}
+                    label="Resend available in"
+                  />
+                )}
+
                 <Button
                   type="button"
                   className="w-full"
-                  variant="secondary"
+                  variant={emailCooldown.active ? "outline" : "secondary"}
                   disabled={emailCooldown.active || (emailStatus as string) === "sending"}
+                  aria-disabled={emailCooldown.active || (emailStatus as string) === "sending"}
                   onClick={() => sendEmailReset(email)}
                 >
                   {(emailStatus as string) === "sending" ? (
@@ -202,6 +210,11 @@ function ForgotPasswordPage() {
                   )}
                 </Button>
 
+                {emailCooldown.active && (
+                  <p className="text-center text-xs text-muted-foreground">
+                    You can request another link once the timer ends.
+                  </p>
+                )}
 
                 <button
                   type="button"
@@ -237,9 +250,17 @@ function ForgotPasswordPage() {
                   </Alert>
                 )}
 
+                {emailCooldown.active && (
+                  <CooldownNotice
+                    remaining={emailCooldown.remaining}
+                    label="Resend available in"
+                  />
+                )}
+
                 <Button
                   type="submit"
                   disabled={emailStatus === "sending" || emailCooldown.active || !email.trim()}
+                  aria-disabled={emailStatus === "sending" || emailCooldown.active || !email.trim()}
                   className="w-full"
                 >
                   {emailStatus === "sending" ? (
@@ -254,6 +275,12 @@ function ForgotPasswordPage() {
                     </>
                   )}
                 </Button>
+
+                {emailCooldown.active && (
+                  <p className="text-center text-xs text-muted-foreground">
+                    You can request another link once the timer ends.
+                  </p>
+                )}
               </form>
             )}
           </TabsContent>
@@ -286,9 +313,17 @@ function ForgotPasswordPage() {
                   </Alert>
                 )}
 
+                {smsCooldown.active && (
+                  <CooldownNotice
+                    remaining={smsCooldown.remaining}
+                    label="Resend available in"
+                  />
+                )}
+
                 <Button
                   type="submit"
                   disabled={smsStatus === "sending" || smsCooldown.active}
+                  aria-disabled={smsStatus === "sending" || smsCooldown.active}
                   className="w-full"
                 >
                   {smsStatus === "sending" ? (
@@ -301,6 +336,12 @@ function ForgotPasswordPage() {
                     "Send OTP"
                   )}
                 </Button>
+
+                {smsCooldown.active && (
+                  <p className="text-center text-xs text-muted-foreground">
+                    You can request another code once the timer ends.
+                  </p>
+                )}
               </form>
             ) : (
               <form onSubmit={handleVerifySmsOtp} className="space-y-4">
@@ -349,15 +390,23 @@ function ForgotPasswordPage() {
 
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant={smsCooldown.active ? "outline" : "ghost"}
                   className="w-full"
                   disabled={smsCooldown.active || smsStatus === "sending"}
+                  aria-disabled={smsCooldown.active || smsStatus === "sending"}
                   onClick={sendSmsOtp}
                 >
                   {smsCooldown.active
                     ? `Resend OTP in ${formatTimer(smsCooldown.remaining)}`
                     : "Resend OTP"}
                 </Button>
+
+                {smsCooldown.active && (
+                  <CooldownNotice
+                    remaining={smsCooldown.remaining}
+                    label="Next OTP available in"
+                  />
+                )}
 
                 <button
                   type="button"
@@ -389,4 +438,19 @@ function formatTimer(seconds: number) {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+function CooldownNotice({ remaining, label }: { remaining: number; label: string }) {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="flex items-center justify-center gap-2 rounded-md border border-border bg-muted/40 px-3 py-2 text-xs font-medium text-muted-foreground"
+    >
+      <Timer className="h-3.5 w-3.5" aria-hidden="true" />
+      <span>
+        {label} <span className="tabular-nums">{formatTimer(remaining)}</span>
+      </span>
+    </div>
+  );
 }

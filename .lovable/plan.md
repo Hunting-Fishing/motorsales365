@@ -1,30 +1,38 @@
-# Reset-password UX polish
+## Goal
+Make the resend cooldown on `/forgot-password` unmistakable to users by adding a prominent countdown indicator and explicit disabled-state messaging.
 
-Add explicit loading/success/error UI, expired-token guidance, and a cooldown-gated resend.
+## Current behavior
+- Buttons swap label text to show `Resend in 0:45` or `Try again in 0:45` when disabled.
+- No visual distinction between "disabled because input is empty" and "disabled because cooldown is active."
+- Cooldown reason is implied, not stated.
 
-## `/forgot-password`
+## Changes
 
-- Add `status: 'idle' | 'sending' | 'sent' | 'error'` and `errorMsg` state for the **Email link** tab (toasts stay as a supplement).
-- After a successful send, replace the form with a **success panel**: green check icon, "Reset link sent to <email>. It expires in 1 hour. Check spam if you don't see it." plus a **Resend reset link** button.
-- **Cooldown timer**: when a link is sent (initial or resend), start a 60s cooldown stored in `useState` + `useEffect` interval. The Resend button shows `Resend in 0:45` and is disabled until the timer ends. Persist the cooldown deadline in `sessionStorage` keyed by email so a refresh keeps the timer honest.
-- Error state shows an inline destructive alert (in addition to the toast) with the Supabase message and a Retry hint; on rate-limit errors (`status 429` / "rate limit" in message), force the cooldown to ~60s and show "Too many requests — try again in X seconds".
-- SMS tab gets the same `status` model: spinner-labeled buttons, success/error alerts inline, and a 30s "Resend OTP" cooldown on the OTP step.
+### 1. Prominent cooldown timer (Email + SMS)
+Add a small dedicated countdown chip/badge above the primary button, visible only while the cooldown is active:
+- Shows `Resend available in 0:45` with a `Timer` (or `Clock`) icon.
+- Uses `text-muted-foreground` so it does not compete with alerts.
 
-## `/reset-password`
+### 2. Explicit disabled reasons
+When a button is disabled solely because of cooldown, append a subtle line of helper text beneath the button:
+- "You can request another link once the timer ends."
+- This distinguishes cooldown from validation errors.
 
-- Replace the boolean `mode` with `state: 'verifying' | 'request' | 'set' | 'updating' | 'success' | 'invalid' | 'expired'`.
-- While exchanging the token (`verifyOtp` / `exchangeCodeForSession`) show a centered **spinner + "Verifying your reset link…"** card so users don't see a flash of the request form.
-- On Supabase errors, classify the message:
-  - "expired", "otp_expired", "Token has expired" → `expired` state.
-  - everything else (invalid, already used, bad code) → `invalid` state.
-- `expired` / `invalid` panels show: destructive icon, plain-English explanation, and a **primary CTA "Request a new reset link"** that links to `/forgot-password`, plus a secondary "Back to sign in" link.
-- `updating` disables the form and shows a spinner button label.
-- `success` state shows a green panel "Password updated" and auto-redirects to `/dashboard` after a 1.5s delay (with a manual "Go to dashboard" button as fallback).
-- Password mismatch / length errors stay as inline field errors (already present), augmented with `aria-live="polite"` on the error region for accessibility.
+### 3. Clearer button states
+- **Initial request button** while cooldown active:
+  - Keep text `Try again in 0:45` (already present).
+  - Add `cursor-not-allowed` and ensure the existing shadcn `disabled:opacity-50` is visible.
+- **Success-panel resend button** while cooldown active:
+  - Keep text `Resend in 0:45`.
+  - Use `variant="outline"` instead of `secondary` so the disabled state is visually flatter and less inviting.
 
-## Files
+### 4. Rate-limit helper text
+When the cooldown was triggered by a 429/rate-limit error, show an additional inline warning:
+- "Too many requests. Please wait before trying again."
+- Already present as an Alert; keep it, but ensure the cooldown timer chip also appears so the user sees exactly how long to wait.
 
-- **Edit** `src/routes/forgot-password.tsx` — status states, success panel, cooldown timer (Email + SMS), inline alerts.
-- **Edit** `src/routes/reset-password.tsx` — state machine, verifying spinner, expired/invalid panels with CTA back to `/forgot-password`, success panel.
+## Files to edit
+- `src/routes/forgot-password.tsx` — add cooldown timer chip, helper text, and refine button variants during cooldown.
 
-No backend, schema, or new dependency changes — uses existing shadcn `Button`, `Alert` (or local destructive panel), `Input`, sonner toasts, and lucide icons.
+## No new dependencies
+Uses existing `lucide-react` icons and shadcn components.
