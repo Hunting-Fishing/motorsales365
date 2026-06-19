@@ -234,6 +234,7 @@ function UserActionsTab() {
             <tr>
               <th className="px-3 py-2 text-left">When</th>
               <th className="px-3 py-2 text-left">Action</th>
+              <th className="px-3 py-2 text-left">Entity</th>
               <th className="px-3 py-2 text-left">Target</th>
               <th className="px-3 py-2 text-left">Change</th>
               <th className="px-3 py-2 text-left">By</th>
@@ -242,7 +243,7 @@ function UserActionsTab() {
           <tbody>
             {rows.length === 0 && !loading && (
               <tr>
-                <td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">
+                <td colSpan={6} className="px-3 py-8 text-center text-muted-foreground">
                   No audit entries match.
                 </td>
               </tr>
@@ -254,6 +255,16 @@ function UserActionsTab() {
                 </td>
                 <td className="px-3 py-2">
                   <Badge variant="secondary">{ACTION_LABEL[r.action] ?? r.action}</Badge>
+                </td>
+                <td className="px-3 py-2 text-xs">
+                  {r.entity_type ? (
+                    <span title={r.metadata ? JSON.stringify(r.metadata, null, 2) : undefined}>
+                      <span className="text-muted-foreground">{r.entity_type}</span>
+                      {r.entity_id ? <span className="ml-1 font-mono">{r.entity_id}</span> : null}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  )}
                 </td>
                 <td className="px-3 py-2">{nameOf(r.target_user_id)}</td>
                 <td className="px-3 py-2 text-xs">
