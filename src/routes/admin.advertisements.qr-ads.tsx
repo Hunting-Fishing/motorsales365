@@ -21,7 +21,6 @@ import {
   CATEGORY_TREE,
   categoryLabel,
   subcategoryLabel,
-  
   UNCATEGORIZED_KEY,
   type CategoryKey,
 } from "@/lib/qr-ads/categories";
