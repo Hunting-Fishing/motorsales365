@@ -512,8 +512,8 @@ function AdminShareKitPage() {
 
       {context && (
         <div className="space-y-2">
-          {grouped.map((cat, idx) => {
-            const isOpen = openCats[cat.catKey] ?? idx === 0;
+          {grouped.map((cat) => {
+            const isOpen = openCats[cat.catKey] ?? true;
             return (
               <Collapsible
                 key={cat.catKey}
