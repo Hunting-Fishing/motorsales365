@@ -2,11 +2,14 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { z } from "zod";
 import { toast } from "sonner";
-import { ChevronDown, Eye, EyeOff, Plus, Trash2, Loader2, Sparkles, Tags } from "lucide-react";
+import { ChevronDown, Eye, EyeOff, Plus, Trash2, Loader2, Sparkles, Tags, Search, X } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { TemplateCard } from "@/components/qr-ads/template-card";
 import { QrAdTemplateUpload } from "@/components/qr-ads/template-upload-dialog";
@@ -47,15 +50,33 @@ type ClassifyTarget =
   | { kind: "custom"; id: string; label: string; imageUrl: string }
   | { kind: "builtin"; id: string; label: string; imageUrl: string };
 
+const adsSearchSchema = z.object({
+  q: fallback(z.string(), "").default(""),
+});
+
 export const Route = createFileRoute("/admin/advertisements/qr-ads")({
+  validateSearch: zodValidator(adsSearchSchema),
   component: AdminQrAdsPage,
   head: () => ({
     meta: [
-      { title: "QR Advertisements — Advertisements" },
+      { title: "QR Advertisements — Admin" },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
 });
+
+function matchesQuery(t: ShareTemplate, q: string): boolean {
+  if (!q) return true;
+  const needle = q.toLowerCase();
+  const cat = categoryLabel(t.category).toLowerCase();
+  const sub = subcategoryLabel(t.subcategory).toLowerCase();
+  return (
+    t.label.toLowerCase().includes(needle) ||
+    (t.description ?? "").toLowerCase().includes(needle) ||
+    cat.includes(needle) ||
+    sub.includes(needle)
+  );
+}
 
 type StaffRow = { referral_code: string; full_name: string; active: boolean };
 
