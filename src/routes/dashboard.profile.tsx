@@ -105,6 +105,50 @@ function ProfilePage() {
     setNewEmail("");
   };
 
+  // Password change
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [passwordSubmitting, setPasswordSubmitting] = useState(false);
+  const [resetSubmitting, setResetSubmitting] = useState(false);
+
+  const changePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user?.email) return toast.error("No account email on file.");
+    if (newPassword.length < 8) return toast.error("New password must be at least 8 characters.");
+    if (newPassword !== confirmNewPassword) return toast.error("New passwords do not match.");
+    if (newPassword === currentPassword)
+      return toast.error("New password must be different from the current one.");
+
+    setPasswordSubmitting(true);
+    const { error: signInErr } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword,
+    });
+    if (signInErr) {
+      setPasswordSubmitting(false);
+      return toast.error("Current password is incorrect.");
+    }
+    const { error: updErr } = await supabase.auth.updateUser({ password: newPassword });
+    setPasswordSubmitting(false);
+    if (updErr) return toast.error(updErr.message);
+    toast.success("Password updated.");
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmNewPassword("");
+  };
+
+  const sendPasswordResetEmail = async () => {
+    if (!user?.email) return toast.error("No account email on file.");
+    setResetSubmitting(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+      redirectTo: `${siteOrigin()}/reset-password`,
+    });
+    setResetSubmitting(false);
+    if (error) return toast.error(error.message);
+    toast.success(`Reset link sent to ${user.email}. Check your inbox.`);
+  };
+
   useEffect(() => {
     if (!user) return;
     supabase
@@ -365,6 +409,82 @@ function ProfilePage() {
             {emailSubmitting ? "Sending…" : "Send confirmation links"}
           </Button>
         </form>
+      </div>
+
+      {/* Password */}
+      <div className="mt-6 space-y-4 rounded-xl border border-border bg-card p-6">
+        <div>
+          <h2 className="font-display text-lg font-bold">Password</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Update your password below. If you don't remember your current password, send yourself
+            a reset link.
+          </p>
+        </div>
+
+        <form onSubmit={changePassword} className="space-y-3">
+          <div>
+            <Label htmlFor="current-pw">Current password</Label>
+            <Input
+              id="current-pw"
+              type="password"
+              autoComplete="current-password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+            />
+          </div>
+          <div>
+            <Label htmlFor="new-pw">New password</Label>
+            <Input
+              id="new-pw"
+              type="password"
+              minLength={8}
+              autoComplete="new-password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+          </div>
+          <div>
+            <Label htmlFor="confirm-pw">Confirm new password</Label>
+            <Input
+              id="confirm-pw"
+              type="password"
+              minLength={8}
+              autoComplete="new-password"
+              value={confirmNewPassword}
+              onChange={(e) => setConfirmNewPassword(e.target.value)}
+            />
+            {confirmNewPassword && newPassword !== confirmNewPassword && (
+              <p className="mt-1 text-xs text-destructive">Passwords do not match.</p>
+            )}
+          </div>
+          <Button
+            type="submit"
+            disabled={
+              passwordSubmitting ||
+              !currentPassword ||
+              !newPassword ||
+              newPassword !== confirmNewPassword
+            }
+          >
+            {passwordSubmitting ? "Updating…" : "Update password"}
+          </Button>
+        </form>
+
+        <div className="border-t border-border pt-4">
+          <p className="text-sm text-muted-foreground">
+            Forgot your current password? We'll email a secure reset link to{" "}
+            <strong>{user?.email ?? "your account"}</strong>.
+          </p>
+          <Button
+            type="button"
+            variant="secondary"
+            className="mt-3"
+            disabled={resetSubmitting || !user?.email}
+            onClick={sendPasswordResetEmail}
+          >
+            {resetSubmitting ? "Sending…" : "Email me a reset link"}
+          </Button>
+        </div>
       </div>
 
       {/* Security: TOTP two-factor authentication (free, no SMS) */}
