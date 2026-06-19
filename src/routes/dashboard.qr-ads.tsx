@@ -101,6 +101,17 @@ function QrAdsPage() {
   const { user, realIsAdmin, loading: authLoading } = useAuth();
   const isAdmin = realIsAdmin;
   const navigate = useNavigate();
+  const { q } = Route.useSearch();
+  const [queryInput, setQueryInput] = useState(q);
+  useEffect(() => { setQueryInput(q); }, [q]);
+  useEffect(() => {
+    const id = setTimeout(() => {
+      if (queryInput !== q) {
+        navigate({ to: ".", search: (prev: { q: string }) => ({ ...prev, q: queryInput }), replace: true });
+      }
+    }, 150);
+    return () => clearTimeout(id);
+  }, [queryInput, q, navigate]);
   const qc = useQueryClient();
   const [staff, setStaff] = useState<StaffRow | null>(null);
   const [loading, setLoading] = useState(true);
@@ -232,7 +243,10 @@ function QrAdsPage() {
     };
   });
   const historyBuiltins = TEMPLATES.filter((t) => hiddenBuiltins.has(t.id));
-  const allTemplates: ShareTemplate[] = [...customTemplates, ...activeBuiltins];
+  const allTemplatesUnfiltered: ShareTemplate[] = [...customTemplates, ...activeBuiltins];
+  const allTemplates: ShareTemplate[] = q
+    ? allTemplatesUnfiltered.filter((t) => matchesQuery(t, q))
+    : allTemplatesUnfiltered;
 
   type GroupedSub = { subKey: string; subLabel: string; items: ShareTemplate[] };
   type Grouped = { catKey: string; catLabel: string; subs: GroupedSub[]; total: number };
