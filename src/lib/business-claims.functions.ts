@@ -530,7 +530,7 @@ export const searchClaimableBusinesses = createServerFn({ method: "POST" })
 
 const TransferInput = z.object({
   businessId: z.string().uuid(),
-  reason: z.string().trim().min(20, "Please describe why ownership should transfer").max(2000),
+  reason: z.string().trim().min(10, "Please describe why ownership should transfer").max(2000),
   contactMethod: z.enum(["email", "phone", "document"]),
   contactValue: z.string().min(1).max(500).optional(),
 });
