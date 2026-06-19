@@ -9552,7 +9552,7 @@ export type Database = {
         | "driver"
         | "mechanic"
         | "clerk"
-      business_status: "pending" | "active" | "rejected" | "hidden"
+      business_status: "pending" | "active" | "rejected" | "hidden" | "archived"
       business_tier: "free" | "listed" | "featured" | "premium"
       course_level: "beginner" | "intermediate" | "advanced"
       course_status: "draft" | "published" | "archived"
@@ -9889,7 +9889,7 @@ export const Constants = {
         "mechanic",
         "clerk",
       ],
-      business_status: ["pending", "active", "rejected", "hidden"],
+      business_status: ["pending", "active", "rejected", "hidden", "archived"],
       business_tier: ["free", "listed", "featured", "premium"],
       course_level: ["beginner", "intermediate", "advanced"],
       course_status: ["draft", "published", "archived"],
