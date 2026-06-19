@@ -258,12 +258,21 @@ function BusinessesIndex() {
               Find dealers, mechanics, parts, towing & insurance near you.
             </p>
           </div>
-          <Button asChild size="sm" variant="outline">
-            <Link to="/businesses/submit">
-              <Plus className="mr-1 h-4 w-4" />
-              List your business
-            </Link>
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild size="sm" variant="outline">
+              <Link to="/dashboard/claim-business">
+                <Shield className="mr-1 h-4 w-4" />
+                Claim a business
+              </Link>
+            </Button>
+            <Button asChild size="sm" variant="outline">
+              <Link to="/businesses/submit">
+                <Plus className="mr-1 h-4 w-4" />
+                List your business
+              </Link>
+            </Button>
+          </div>
+
         </div>
 
         {/* Filters */}
