@@ -13,14 +13,23 @@ import { ShareKitTemplateUpload } from "@/components/share-kit/template-upload-d
 import { useSignedCustomTemplates } from "@/components/share-kit/use-signed-custom-templates";
 import { TEMPLATES } from "@/lib/share-kit/templates";
 import type { ShareTemplate } from "@/lib/share-kit/types";
+import {
+  CATEGORY_TREE,
+  categoryLabel,
+  subcategoryLabel,
+  UNCATEGORIZED_KEY,
+  type CategoryKey,
+} from "@/lib/share-kit/categories";
 import { listShareKitLayouts } from "@/lib/share-kit-layouts.functions";
 import {
   listShareKitCustomTemplates,
   deleteShareKitCustomTemplate,
   setBuiltinHidden,
   type CustomTemplateRow,
+  type BuiltinCategoryRow,
 } from "@/lib/share-kit-templates.functions";
 import { siteOrigin } from "@/lib/site-config";
+
 
 export const Route = createFileRoute("/dashboard/share-kit")({
   component: ShareKitPage,
@@ -61,8 +70,11 @@ function customToTemplate(row: CustomTemplateRow): ShareTemplate {
       plateRadius: 0,
     },
     shareText: row.share_text,
+    category: row.category ?? undefined,
+    subcategory: row.subcategory ?? undefined,
   };
 }
+
 
 function ShareKitPage() {
   const { user, realIsAdmin, loading: authLoading } = useAuth();
@@ -180,35 +192,64 @@ function ShareKitPage() {
   }
 
   const hiddenBuiltins = new Set(customData?.hiddenBuiltins ?? []);
+  const builtinOverrides = new Map<string, BuiltinCategoryRow>(
+    (customData?.builtinCategories ?? []).map((r) => [r.template_id, r]),
+  );
   const signedRows: CustomTemplateRow[] = signedCustoms ?? customData?.templates ?? [];
   const customTemplates = signedRows.map(customToTemplate);
   const customById = new Map<string, CustomTemplateRow>(
     signedRows.map((r) => [`custom:${r.id}`, r]),
   );
   // Active grid: never show hidden built-ins (history is gated behind admin toggle below)
-  const activeBuiltins = TEMPLATES.filter((t) => !hiddenBuiltins.has(t.id));
+  const activeBuiltins = TEMPLATES.filter((t) => !hiddenBuiltins.has(t.id)).map((t) => {
+    const override = builtinOverrides.get(t.id);
+    if (!override) return t;
+    return {
+      ...t,
+      category: override.category ?? t.category,
+      subcategory: override.subcategory ?? t.subcategory,
+    };
+  });
   const historyBuiltins = TEMPLATES.filter((t) => hiddenBuiltins.has(t.id));
   const allTemplates: ShareTemplate[] = [...customTemplates, ...activeBuiltins];
 
-  const CUSTOM_CAT = "Custom Uploads";
-  const CATEGORY_ORDER = [
-    CUSTOM_CAT,
-    "Social Posts",
-    "Stories & Reels",
-    "Print & Wearables",
-    "Vehicles For Sale",
-    "Parts & Accessories",
-    "Services (Tow / Roadside)",
-    "Other",
-  ];
-  const grouped = new Map<string, ShareTemplate[]>();
+  type GroupedSub = { subKey: string; subLabel: string; items: ShareTemplate[] };
+  type Grouped = { catKey: string; catLabel: string; subs: GroupedSub[]; total: number };
+
+  const groupedMap = new Map<string, Map<string, ShareTemplate[]>>();
   for (const t of allTemplates) {
-    const isCustom = t.id.startsWith("custom:");
-    const cat = isCustom ? CUSTOM_CAT : (t.category ?? "Other");
-    const arr = grouped.get(cat) ?? [];
-    arr.push(t);
-    grouped.set(cat, arr);
+    const catKey = t.category ?? UNCATEGORIZED_KEY;
+    const subKey = t.subcategory ?? UNCATEGORIZED_KEY;
+    if (!groupedMap.has(catKey)) groupedMap.set(catKey, new Map());
+    const subMap = groupedMap.get(catKey)!;
+    if (!subMap.has(subKey)) subMap.set(subKey, []);
+    subMap.get(subKey)!.push(t);
   }
+  const orderedCatKeys: string[] = [...CATEGORY_TREE.map((c) => c.key as string), UNCATEGORIZED_KEY];
+  const grouped: Grouped[] = orderedCatKeys
+    .filter((k) => groupedMap.has(k))
+    .map((catKey) => {
+      const subMap = groupedMap.get(catKey)!;
+      const cat = CATEGORY_TREE.find((c) => c.key === catKey);
+      const orderedSubKeys = cat
+        ? [...cat.subs.map((s) => s.key as string), UNCATEGORIZED_KEY]
+        : [UNCATEGORIZED_KEY];
+      const subs: GroupedSub[] = orderedSubKeys
+        .filter((k) => subMap.has(k))
+        .map((subKey) => ({
+          subKey,
+          subLabel: subKey === UNCATEGORIZED_KEY ? "Uncategorized" : subcategoryLabel(subKey),
+          items: subMap.get(subKey)!,
+        }));
+      const total = subs.reduce((acc, s) => acc + s.items.length, 0);
+      return {
+        catKey,
+        catLabel: catKey === UNCATEGORIZED_KEY ? "Uncategorized" : categoryLabel(catKey as CategoryKey),
+        subs,
+        total,
+      };
+    });
+
 
   const toggleCat = (cat: string, v: boolean) => {
     setOpenCats((prev) => {
@@ -274,67 +315,75 @@ function ShareKitPage() {
 
       {context && (
         <div className="space-y-2">
-          {CATEGORY_ORDER.map((cat) => {
-            const items = grouped.get(cat) ?? [];
-            if (items.length === 0) return null;
-            const isOpen = openCats[cat] ?? cat === CATEGORY_ORDER[0];
+          {grouped.map((cat, idx) => {
+            const isOpen = openCats[cat.catKey] ?? idx === 0;
             return (
               <Collapsible
-                key={cat}
+                key={cat.catKey}
                 open={isOpen}
-                onOpenChange={(v) => toggleCat(cat, v)}
+                onOpenChange={(v) => toggleCat(cat.catKey, v)}
                 className="rounded-lg border border-border bg-card/40"
               >
                 <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-muted/40">
                   <div className="flex items-center gap-2">
-                    <ChevronDown
-                      className={`h-4 w-4 transition-transform ${isOpen ? "" : "-rotate-90"}`}
-                    />
-                    <span className="text-sm font-semibold">{cat}</span>
+                    <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? "" : "-rotate-90"}`} />
+                    <span className="text-sm font-semibold">{cat.catLabel}</span>
                     <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
-                      {items.length}
+                      {cat.total}
                     </span>
                   </div>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <div className="grid gap-2 p-3 pt-1 [grid-template-columns:repeat(auto-fill,minmax(96px,1fr))]">
-                    {items.map((t) => {
-                      const custom = customById.get(t.id);
-                      return (
-                        <div key={t.id} className="relative mx-auto w-full max-w-[120px]">
-                          <TemplateCard
-                            template={t}
-                            context={context}
-                            override={layouts?.[t.id]}
-                          />
-                          {isAdmin && (
-                            <div className="mt-1 flex justify-end">
-                              {custom ? (
-                                <Button
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-6 w-6"
-                                  title="Delete"
-                                  onClick={() => deleteCustom(custom.id, custom.label)}
-                                >
-                                  <Trash2 className="h-3 w-3" />
-                                </Button>
-                              ) : (
-                                <Button
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-6 w-6"
-                                  title="Archive"
-                                  onClick={() => deleteBuiltin(t.id, t.label)}
-                                >
-                                  <EyeOff className="h-3 w-3" />
-                                </Button>
-                              )}
-                            </div>
-                          )}
+                  <div className="space-y-3 p-3 pt-1">
+                    {cat.subs.map((sub) => (
+                      <div key={sub.subKey} className="space-y-2">
+                        {(cat.subs.length > 1 || sub.subKey !== UNCATEGORIZED_KEY) && (
+                          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                            {sub.subLabel}
+                            <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px]">{sub.items.length}</span>
+                          </div>
+                        )}
+                        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                          {sub.items.map((t) => {
+                            const custom = customById.get(t.id);
+                            return (
+                              <div key={t.id} className="relative">
+                                <TemplateCard
+                                  template={t}
+                                  context={context}
+                                  override={layouts?.[t.id]}
+                                />
+                                {isAdmin && (
+                                  <div className="mt-1 flex justify-end">
+                                    {custom ? (
+                                      <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-6 w-6"
+                                        title="Delete"
+                                        onClick={() => deleteCustom(custom.id, custom.label)}
+                                      >
+                                        <Trash2 className="h-3 w-3" />
+                                      </Button>
+                                    ) : (
+                                      <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-6 w-6"
+                                        title="Archive"
+                                        onClick={() => deleteBuiltin(t.id, t.label)}
+                                      >
+                                        <EyeOff className="h-3 w-3" />
+                                      </Button>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
-                      );
-                    })}
+                      </div>
+                    ))}
                   </div>
                 </CollapsibleContent>
               </Collapsible>
@@ -342,6 +391,7 @@ function ShareKitPage() {
           })}
         </div>
       )}
+
 
       {isAdmin && showHistory && context && (
         <section className="rounded-xl border border-dashed border-border bg-muted/20 p-4">

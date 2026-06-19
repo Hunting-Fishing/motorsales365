@@ -3,31 +3,49 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Eye, EyeOff, Plus, Trash2, Loader2, Sparkles } from "lucide-react";
+import { ChevronDown, Eye, EyeOff, Plus, Trash2, Loader2, Sparkles, Tags } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { TemplateCard } from "@/components/share-kit/template-card";
 import { ShareKitTemplateUpload } from "@/components/share-kit/template-upload-dialog";
 import { useSignedCustomTemplates } from "@/components/share-kit/use-signed-custom-templates";
+import { CategoryPicker } from "@/components/share-kit/category-picker";
 import { TEMPLATES } from "@/lib/share-kit/templates";
 import type { ShareTemplate } from "@/lib/share-kit/types";
+import {
+  CATEGORY_TREE,
+  categoryLabel,
+  subcategoryLabel,
+  subsFor,
+  UNCATEGORIZED_KEY,
+  type CategoryKey,
+} from "@/lib/share-kit/categories";
 import { listShareKitLayouts, upsertShareKitLayout } from "@/lib/share-kit-layouts.functions";
 import {
   listShareKitCustomTemplates,
   deleteShareKitCustomTemplate,
   setBuiltinHidden,
   updateShareKitTemplateQrPlacement,
+  setShareKitCustomCategory,
+  setShareKitBuiltinCategory,
   type CustomTemplateRow,
+  type BuiltinCategoryRow,
 } from "@/lib/share-kit-templates.functions";
 import { detectQrSlotFromUrl, isDetected } from "@/lib/share-kit/detect-qr-slot";
 import { assessQrReadability } from "@/lib/share-kit/qr-readability";
 import { detectScanHereWithVision } from "@/lib/share-kit-vision.functions";
+import { classifyShareKitTemplate } from "@/lib/share-kit-classify.functions";
 import { siteOrigin } from "@/lib/site-config";
 
 type SmartTarget =
   | { kind: "custom"; id: string; label: string; imageUrl: string; width: number; height: number }
   | { kind: "builtin-image"; id: string; label: string; imageUrl: string; width: number; height: number };
+
+type ClassifyTarget =
+  | { kind: "custom"; id: string; label: string; imageUrl: string }
+  | { kind: "builtin"; id: string; label: string; imageUrl: string };
 
 export const Route = createFileRoute("/admin/advertisements/share-kit")({
   component: AdminShareKitPage,
@@ -59,6 +77,8 @@ function customToTemplate(row: CustomTemplateRow): ShareTemplate {
       plateRadius: 0,
     },
     shareText: row.share_text,
+    category: row.category ?? undefined,
+    subcategory: row.subcategory ?? undefined,
   };
 }
 
@@ -71,6 +91,15 @@ function AdminShareKitPage() {
   const [uploadOpen, setUploadOpen] = useState(false);
   const [autoFittingId, setAutoFittingId] = useState<string | null>(null);
   const [bulkFitting, setBulkFitting] = useState(false);
+  const [bulkClassifying, setBulkClassifying] = useState(false);
+  const [openCats, setOpenCats] = useState<Record<string, boolean>>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      return JSON.parse(localStorage.getItem("share-kit-open-cats-v2") ?? "{}");
+    } catch {
+      return {};
+    }
+  });
 
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/login" });
@@ -115,12 +144,14 @@ function AdminShareKitPage() {
   });
   const { data: signedCustoms } = useSignedCustomTemplates(customData?.templates);
 
-
   const deleteFn = useServerFn(deleteShareKitCustomTemplate);
   const hideFn = useServerFn(setBuiltinHidden);
   const updateQrFn = useServerFn(updateShareKitTemplateQrPlacement);
   const visionFn = useServerFn(detectScanHereWithVision);
   const upsertLayoutFn = useServerFn(upsertShareKitLayout);
+  const setCustomCatFn = useServerFn(setShareKitCustomCategory);
+  const setBuiltinCatFn = useServerFn(setShareKitBuiltinCategory);
+  const classifyFn = useServerFn(classifyShareKitTemplate);
 
   async function deleteCustom(id: string, label: string) {
     if (!confirm(`Delete template "${label}"? This cannot be undone.`)) return;
@@ -137,6 +168,26 @@ function AdminShareKitPage() {
     try {
       await hideFn({ data: { templateId, hidden: !currentlyHidden } });
       toast.success(currentlyHidden ? "Template restored" : "Template hidden");
+      qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    }
+  }
+
+  async function saveCustomCategory(id: string, category: string | null, subcategory: string | null) {
+    try {
+      await setCustomCatFn({ data: { id, category, subcategory } });
+      toast.success("Category updated");
+      qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed");
+    }
+  }
+
+  async function saveBuiltinCategory(templateId: string, category: string | null, subcategory: string | null) {
+    try {
+      await setBuiltinCatFn({ data: { templateId, category, subcategory } });
+      toast.success("Category updated");
       qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
     } catch (e: any) {
       toast.error(e?.message ?? "Failed");
@@ -163,48 +214,29 @@ function AdminShareKitPage() {
     let cx = 0, cy = 0, size = 0;
     let source: SmartResult["source"] = "none";
     let confidence = 0;
-
-    // 1) AI vision
     try {
-      const ai = await visionFn({
-        data: { imageUrl, width: target.width, height: target.height },
-      });
+      const ai = await visionFn({ data: { imageUrl, width: target.width, height: target.height } });
       if (ai.found && ai.confidence >= 0.55) {
-        cx = ai.cx;
-        cy = ai.cy;
-        size = ai.size;
-        confidence = ai.confidence;
-        source = "ai";
+        cx = ai.cx; cy = ai.cy; size = ai.size; confidence = ai.confidence; source = "ai";
       }
     } catch (e: any) {
       const msg = String(e?.message ?? "");
       if (/credits exhausted|LOVABLE_API_KEY/i.test(msg)) throw e;
     }
-
-    // 2) Heuristic fallback (custom uploads only — remote built-in PNGs aren't fetched client-side)
     if (source === "none" && target.kind === "custom") {
       const slot = await detectQrSlotFromUrl(imageUrl);
       if (isDetected(slot)) {
-        cx = slot.cx;
-        cy = slot.cy;
-        size = slot.size;
-        confidence = slot.confidence;
-        source = "heuristic";
+        cx = slot.cx; cy = slot.cy; size = slot.size; confidence = slot.confidence; source = "heuristic";
       }
     }
-
     if (source === "none") {
       return { placed: false, source: "none", readable: false, reasons: [], confidence: 0 };
     }
-
-    // 3) Persist
     if (target.kind === "custom") {
       await updateQrFn({ data: { id: target.id, qr_cx: cx, qr_cy: cy, qr_size: size } });
     } else {
       await upsertLayoutFn({ data: { templateId: target.id, cx, cy, size } });
     }
-
-    // 4) Readability sanity check
     const report = await assessQrReadability({
       link: "https://365motorsales.com/r/ABCDEFGH",
       template: {
@@ -216,7 +248,6 @@ function AdminShareKitPage() {
       },
       placement: { cx, cy, size },
     }).catch(() => null);
-
     return {
       placed: true,
       source,
@@ -230,15 +261,10 @@ function AdminShareKitPage() {
     if (targets.length === 0) return;
     setBulkFitting(true);
     const concurrency = 3;
-    let aiPlaced = 0;
-    let heuristicPlaced = 0;
-    let unreadable = 0;
-    let skipped = 0;
-    let failed = 0;
+    let aiPlaced = 0, heuristicPlaced = 0, unreadable = 0, skipped = 0, failed = 0;
     const t = toast.loading(`Smart-fitting 0 / ${targets.length}…`);
     let processed = 0;
     let cursor = 0;
-
     async function worker() {
       while (cursor < targets.length) {
         const idx = cursor++;
@@ -247,19 +273,13 @@ function AdminShareKitPage() {
         try {
           const res = await smartFitAny(target);
           if (res.placed) {
-            if (res.source === "ai") aiPlaced++;
-            else heuristicPlaced++;
+            if (res.source === "ai") aiPlaced++; else heuristicPlaced++;
             if (!res.readable) unreadable++;
-          } else {
-            skipped++;
-          }
+          } else { skipped++; }
         } catch (e: any) {
           failed++;
           const msg = String(e?.message ?? "");
-          if (/credits exhausted|LOVABLE_API_KEY/i.test(msg)) {
-            cursor = targets.length;
-            toast.error(msg);
-          }
+          if (/credits exhausted|LOVABLE_API_KEY/i.test(msg)) { cursor = targets.length; toast.error(msg); }
         }
         processed++;
         toast.loading(
@@ -268,27 +288,53 @@ function AdminShareKitPage() {
         );
       }
     }
-    await Promise.all(
-      Array.from({ length: Math.min(concurrency, targets.length) }, () => worker()),
-    );
+    await Promise.all(Array.from({ length: Math.min(concurrency, targets.length) }, () => worker()));
     toast.dismiss(t);
     setAutoFittingId(null);
-    toast.success(
-      `Smart fit done — ${aiPlaced} AI · ${heuristicPlaced} heuristic · ${unreadable} need review · ${skipped} no panel · ${failed} failed`,
-    );
+    toast.success(`Smart fit done — ${aiPlaced} AI · ${heuristicPlaced} heuristic · ${unreadable} need review · ${skipped} no panel · ${failed} failed`);
     qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
     qc.invalidateQueries({ queryKey: ["share-kit-layouts"] });
     setBulkFitting(false);
   }
 
-
-
-
-
-
-
-
-
+  async function classifyAllUncategorized(targets: ClassifyTarget[]) {
+    if (targets.length === 0) {
+      toast.info("Everything is already categorized.");
+      return;
+    }
+    setBulkClassifying(true);
+    const concurrency = 3;
+    let cursor = 0, processed = 0, ok = 0, failed = 0, skipped = 0;
+    const t = toast.loading(`Categorizing 0 / ${targets.length}…`);
+    async function worker() {
+      while (cursor < targets.length) {
+        const idx = cursor++;
+        const target = targets[idx];
+        try {
+          const res = await classifyFn({ data: { imageUrl: absoluteUrl(target.imageUrl) } });
+          if (res.subcategory && res.category) {
+            if (target.kind === "custom") {
+              await setCustomCatFn({ data: { id: target.id, category: res.category, subcategory: res.subcategory } });
+            } else {
+              await setBuiltinCatFn({ data: { templateId: target.id, category: res.category, subcategory: res.subcategory } });
+            }
+            ok++;
+          } else { skipped++; }
+        } catch (e: any) {
+          failed++;
+          const msg = String(e?.message ?? "");
+          if (/credits exhausted/i.test(msg)) { cursor = targets.length; toast.error(msg); }
+        }
+        processed++;
+        toast.loading(`Categorizing ${processed} / ${targets.length} — ${ok} tagged`, { id: t });
+      }
+    }
+    await Promise.all(Array.from({ length: Math.min(concurrency, targets.length) }, () => worker()));
+    toast.dismiss(t);
+    toast.success(`Auto-categorize done — ${ok} tagged · ${skipped} unclear · ${failed} failed`);
+    qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+    setBulkClassifying(false);
+  }
 
   if (authLoading || loading) {
     return <div className="p-12 text-center text-muted-foreground">Loading your share kit…</div>;
@@ -307,31 +353,90 @@ function AdminShareKitPage() {
   }
 
   const hiddenBuiltins = new Set(customData?.hiddenBuiltins ?? []);
+  const builtinOverrides = new Map<string, BuiltinCategoryRow>(
+    (customData?.builtinCategories ?? []).map((r) => [r.template_id, r]),
+  );
   const signedRows: CustomTemplateRow[] = signedCustoms ?? customData?.templates ?? [];
   const customTemplates = signedRows.map(customToTemplate);
   const customById = new Map<string, CustomTemplateRow>(signedRows.map((r) => [`custom:${r.id}`, r]));
-  const visibleBuiltins = TEMPLATES.filter((t) => isAdmin || !hiddenBuiltins.has(t.id));
+
+  // Apply built-in overrides on top of code-defined categories
+  const visibleBuiltins = TEMPLATES.filter((t) => isAdmin || !hiddenBuiltins.has(t.id)).map((t) => {
+    const override = builtinOverrides.get(t.id);
+    if (!override) return t;
+    return {
+      ...t,
+      category: override.category ?? t.category,
+      subcategory: override.subcategory ?? t.subcategory,
+    };
+  });
   const allTemplates: ShareTemplate[] = [...customTemplates, ...visibleBuiltins];
+
+  // Group by category -> subcategory
+  type GroupedSub = { subKey: string; subLabel: string; items: ShareTemplate[] };
+  type Grouped = { catKey: string; catLabel: string; subs: GroupedSub[]; total: number };
+
+  const groupedMap = new Map<string, Map<string, ShareTemplate[]>>();
+  for (const t of allTemplates) {
+    const catKey = t.category ?? UNCATEGORIZED_KEY;
+    const subKey = t.subcategory ?? UNCATEGORIZED_KEY;
+    if (!groupedMap.has(catKey)) groupedMap.set(catKey, new Map());
+    const subMap = groupedMap.get(catKey)!;
+    if (!subMap.has(subKey)) subMap.set(subKey, []);
+    subMap.get(subKey)!.push(t);
+  }
+
+  const orderedCatKeys: string[] = [...CATEGORY_TREE.map((c) => c.key as string), UNCATEGORIZED_KEY];
+  const grouped: Grouped[] = orderedCatKeys
+    .filter((k) => groupedMap.has(k))
+    .map((catKey) => {
+      const subMap = groupedMap.get(catKey)!;
+      const cat = CATEGORY_TREE.find((c) => c.key === catKey);
+      const orderedSubKeys = cat
+        ? [...cat.subs.map((s) => s.key as string), UNCATEGORIZED_KEY]
+        : [UNCATEGORIZED_KEY];
+      const subs: GroupedSub[] = orderedSubKeys
+        .filter((k) => subMap.has(k))
+        .map((subKey) => ({
+          subKey,
+          subLabel: subKey === UNCATEGORIZED_KEY ? "Uncategorized" : subcategoryLabel(subKey),
+          items: subMap.get(subKey)!,
+        }));
+      const total = subs.reduce((acc, s) => acc + s.items.length, 0);
+      return {
+        catKey,
+        catLabel: catKey === UNCATEGORIZED_KEY ? "Uncategorized" : categoryLabel(catKey as CategoryKey),
+        subs,
+        total,
+      };
+    });
+
+  const toggleCat = (cat: string, v: boolean) => {
+    setOpenCats((prev) => {
+      const next = { ...prev, [cat]: v };
+      try { localStorage.setItem("share-kit-open-cats-v2", JSON.stringify(next)); } catch {}
+      return next;
+    });
+  };
 
   const smartTargets: SmartTarget[] = [
     ...signedRows.map<SmartTarget>((r) => ({
-      kind: "custom",
-      id: r.id,
-      label: r.label,
-      imageUrl: r.image_url,
-      width: r.width,
-      height: r.height,
+      kind: "custom", id: r.id, label: r.label, imageUrl: r.image_url, width: r.width, height: r.height,
     })),
     ...visibleBuiltins
       .filter((t) => t.kind === "image" && !!t.imageUrl)
       .map<SmartTarget>((t) => ({
-        kind: "builtin-image",
-        id: t.id,
-        label: t.label,
-        imageUrl: t.imageUrl!,
-        width: t.width,
-        height: t.height,
+        kind: "builtin-image", id: t.id, label: t.label, imageUrl: t.imageUrl!,
+        width: t.width, height: t.height,
       })),
+  ];
+
+  const classifyTargets: ClassifyTarget[] = [
+    ...signedRows
+      .filter((r) => !r.subcategory)
+      .map<ClassifyTarget>((r) => ({ kind: "custom", id: r.id, label: r.label, imageUrl: r.image_url })),
+    ...TEMPLATES.filter((t) => t.kind === "image" && !!t.imageUrl && !builtinOverrides.get(t.id)?.subcategory && !t.subcategory)
+      .map<ClassifyTarget>((t) => ({ kind: "builtin", id: t.id, label: t.label, imageUrl: t.imageUrl! })),
   ];
 
   return (
@@ -372,9 +477,23 @@ function AdminShareKitPage() {
           <>
             <Button
               size="sm"
+              variant="outline"
+              onClick={() => classifyAllUncategorized(classifyTargets)}
+              disabled={bulkClassifying || classifyTargets.length === 0}
+              className="ml-auto"
+              title="Use AI vision to categorize every untagged ad"
+            >
+              {bulkClassifying ? (
+                <Loader2 className="mr-1 h-4 w-4 animate-spin" />
+              ) : (
+                <Tags className="mr-1 h-4 w-4" />
+              )}
+              Auto-categorize ({classifyTargets.length})
+            </Button>
+            <Button
+              size="sm"
               onClick={() => smartFitAllAds(smartTargets)}
               disabled={bulkFitting || smartTargets.length === 0}
-              className="ml-auto"
               title="AI-detects the Scan Here panel on every flyer and snaps the QR into it"
             >
               {bulkFitting ? (
@@ -392,50 +511,96 @@ function AdminShareKitPage() {
       </div>
 
       {context && (
-        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-          {allTemplates.map((t) => {
-            const custom = customById.get(t.id);
-            const isBuiltin = !custom;
-            const builtinHidden = isBuiltin && hiddenBuiltins.has(t.id);
+        <div className="space-y-2">
+          {grouped.map((cat, idx) => {
+            const isOpen = openCats[cat.catKey] ?? idx === 0;
             return (
-              <div key={t.id} className="relative">
-                {builtinHidden && (
-                  <div className="absolute inset-0 z-10 rounded-xl bg-background/80 backdrop-blur-sm flex items-center justify-center text-xs font-semibold text-muted-foreground pointer-events-none">
-                    Hidden from staff
+              <Collapsible
+                key={cat.catKey}
+                open={isOpen}
+                onOpenChange={(v) => toggleCat(cat.catKey, v)}
+                className="rounded-lg border border-border bg-card/40"
+              >
+                <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-muted/40">
+                  <div className="flex items-center gap-2">
+                    <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? "" : "-rotate-90"}`} />
+                    <span className="text-sm font-semibold">{cat.catLabel}</span>
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                      {cat.total}
+                    </span>
                   </div>
-                )}
-                <TemplateCard
-                  template={t}
-                  context={context}
-                  override={layouts?.[t.id]}
-                />
-                {isAdmin && (
-                  <div className="mt-2 flex flex-wrap justify-end gap-2">
-                    {custom ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => deleteCustom(custom.id, custom.label)}
-                        disabled={bulkFitting}
-                      >
-                        <Trash2 className="mr-1 h-4 w-4" /> Delete
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => toggleBuiltinHidden(t.id, builtinHidden)}
-                      >
-                        {builtinHidden ? (
-                          <><Eye className="mr-1 h-4 w-4" /> Show to staff</>
-                        ) : (
-                          <><EyeOff className="mr-1 h-4 w-4" /> Hide from staff</>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="space-y-3 p-3 pt-1">
+                    {cat.subs.map((sub) => (
+                      <div key={sub.subKey} className="space-y-2">
+                        {(cat.subs.length > 1 || sub.subKey !== UNCATEGORIZED_KEY) && (
+                          <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                            {sub.subLabel}
+                            <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px]">{sub.items.length}</span>
+                          </div>
                         )}
-                      </Button>
-                    )}
+                        <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                          {sub.items.map((t) => {
+                            const custom = customById.get(t.id);
+                            const isBuiltin = !custom;
+                            const builtinHidden = isBuiltin && hiddenBuiltins.has(t.id);
+                            const overrideForBuiltin = isBuiltin ? builtinOverrides.get(t.id) : undefined;
+                            const currentCat = custom ? custom.category : (overrideForBuiltin?.category ?? t.category ?? null);
+                            const currentSub = custom ? custom.subcategory : (overrideForBuiltin?.subcategory ?? t.subcategory ?? null);
+                            return (
+                              <div key={t.id} className="relative">
+                                {builtinHidden && (
+                                  <div className="absolute inset-0 z-10 rounded-xl bg-background/80 backdrop-blur-sm flex items-center justify-center text-xs font-semibold text-muted-foreground pointer-events-none">
+                                    Hidden from staff
+                                  </div>
+                                )}
+                                <TemplateCard template={t} context={context} override={layouts?.[t.id]} />
+                                {isAdmin && (
+                                  <div className="mt-1 flex justify-end gap-1">
+                                    <CategoryPicker
+                                      category={currentCat ?? null}
+                                      subcategory={currentSub ?? null}
+                                      onChange={(c, s) =>
+                                        custom
+                                          ? saveCustomCategory(custom.id, c, s)
+                                          : saveBuiltinCategory(t.id, c, s)
+                                      }
+                                      disabled={bulkFitting || bulkClassifying}
+                                    />
+                                    {custom ? (
+                                      <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-6 w-6"
+                                        title="Delete"
+                                        onClick={() => deleteCustom(custom.id, custom.label)}
+                                        disabled={bulkFitting}
+                                      >
+                                        <Trash2 className="h-3 w-3" />
+                                      </Button>
+                                    ) : (
+                                      <Button
+                                        variant="outline"
+                                        size="icon"
+                                        className="h-6 w-6"
+                                        title={builtinHidden ? "Show to staff" : "Hide from staff"}
+                                        onClick={() => toggleBuiltinHidden(t.id, builtinHidden)}
+                                      >
+                                        {builtinHidden ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+                                      </Button>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                )}
-              </div>
+                </CollapsibleContent>
+              </Collapsible>
             );
           })}
         </div>

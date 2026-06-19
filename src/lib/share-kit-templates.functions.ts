@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireAdminRoleAudited } from "@/integrations/supabase/admin-middleware";
+import { isValidCategory, isValidSubcategory } from "@/lib/share-kit/categories";
 
 export type CustomTemplateRow = {
   id: string;
@@ -17,7 +18,16 @@ export type CustomTemplateRow = {
   share_text: string;
   sort_order: number;
   active: boolean;
+  category: string | null;
+  subcategory: string | null;
 };
+
+export type BuiltinCategoryRow = {
+  template_id: string;
+  category: string | null;
+  subcategory: string | null;
+};
+
 
 const upsertSchema = z.object({
   id: z.string().uuid().optional(),
@@ -35,26 +45,30 @@ const upsertSchema = z.object({
   active: z.boolean().default(true),
 });
 
-// List active custom templates + hidden built-in ids (any authed staff)
+// List active custom templates + hidden built-in ids + admin builtin category overrides (any authed staff)
 export const listShareKitCustomTemplates = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase } = context as any;
-    const [tplRes, hidRes] = await Promise.all([
+    const [tplRes, hidRes, biRes] = await Promise.all([
       supabase
         .from("share_kit_custom_templates")
         .select("*")
         .order("sort_order", { ascending: true })
         .order("created_at", { ascending: false }),
       supabase.from("share_kit_hidden_builtins").select("template_id"),
+      supabase.from("share_kit_builtin_categories").select("template_id, category, subcategory"),
     ]);
     if (tplRes.error) throw new Error(tplRes.error.message);
     if (hidRes.error) throw new Error(hidRes.error.message);
+    if (biRes.error) throw new Error(biRes.error.message);
     return {
       templates: (tplRes.data ?? []) as CustomTemplateRow[],
       hiddenBuiltins: ((hidRes.data ?? []) as { template_id: string }[]).map((r) => r.template_id),
+      builtinCategories: (biRes.data ?? []) as BuiltinCategoryRow[],
     };
   });
+
 
 export const upsertShareKitCustomTemplate = createServerFn({ method: "POST" })
   .middleware([requireAdminRoleAudited("shareKit.upsertTemplate")])
@@ -138,3 +152,72 @@ export const updateShareKitTemplateQrPlacement = createServerFn({ method: "POST"
     return { ok: true };
   });
 
+
+const categoryPayloadSchema = z.object({
+  category: z.string().min(1).max(80).nullable(),
+  subcategory: z.string().min(1).max(80).nullable(),
+});
+
+function validateCatPair(category: string | null, subcategory: string | null) {
+  if (category !== null && !isValidCategory(category)) {
+    throw new Error(`Unknown category: ${category}`);
+  }
+  if (subcategory !== null && !isValidSubcategory(subcategory)) {
+    throw new Error(`Unknown subcategory: ${subcategory}`);
+  }
+}
+
+export const setShareKitCustomCategory = createServerFn({ method: "POST" })
+  .middleware([requireAdminRoleAudited("shareKit.setCustomCategory")])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+      })
+      .merge(categoryPayloadSchema)
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    validateCatPair(data.category, data.subcategory);
+    const { supabase } = context as any;
+    const { error } = await supabase
+      .from("share_kit_custom_templates")
+      .update({ category: data.category, subcategory: data.subcategory })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const setShareKitBuiltinCategory = createServerFn({ method: "POST" })
+  .middleware([requireAdminRoleAudited("shareKit.setBuiltinCategory")])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        templateId: z.string().min(1).max(100),
+      })
+      .merge(categoryPayloadSchema)
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    validateCatPair(data.category, data.subcategory);
+    const { supabase, userId } = context as any;
+    if (data.category === null && data.subcategory === null) {
+      const { error } = await supabase
+        .from("share_kit_builtin_categories")
+        .delete()
+        .eq("template_id", data.templateId);
+      if (error) throw new Error(error.message);
+      return { ok: true };
+    }
+    const { error } = await supabase
+      .from("share_kit_builtin_categories")
+      .upsert({
+        template_id: data.templateId,
+        category: data.category,
+        subcategory: data.subcategory,
+        updated_by: userId,
+        updated_at: new Date().toISOString(),
+      });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });

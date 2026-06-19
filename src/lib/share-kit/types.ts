@@ -36,9 +36,12 @@ export type ShareTemplate = {
   qr: QrPlate;
   /** Suggested share copy */
   shareText: string; // supports {name} {firstName} {code} {link}
-  /** Display grouping in the Share Kit UI */
+  /** Top-level grouping key (see categories.ts) */
   category?: string;
+  /** Sub-grouping key (see categories.ts) */
+  subcategory?: string;
 };
+
 
 export type TemplateContext = {
   name: string;

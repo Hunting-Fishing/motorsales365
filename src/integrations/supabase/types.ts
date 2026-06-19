@@ -6878,9 +6878,34 @@ export type Database = {
           },
         ]
       }
+      share_kit_builtin_categories: {
+        Row: {
+          category: string | null
+          subcategory: string | null
+          template_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          category?: string | null
+          subcategory?: string | null
+          template_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          category?: string | null
+          subcategory?: string | null
+          template_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       share_kit_custom_templates: {
         Row: {
           active: boolean
+          category: string | null
           created_at: string
           created_by: string | null
           description: string | null
@@ -6894,11 +6919,13 @@ export type Database = {
           share_text: string
           slug: string
           sort_order: number
+          subcategory: string | null
           updated_at: string
           width: number
         }
         Insert: {
           active?: boolean
+          category?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -6912,11 +6939,13 @@ export type Database = {
           share_text?: string
           slug: string
           sort_order?: number
+          subcategory?: string | null
           updated_at?: string
           width: number
         }
         Update: {
           active?: boolean
+          category?: string | null
           created_at?: string
           created_by?: string | null
           description?: string | null
@@ -6930,6 +6959,7 @@ export type Database = {
           share_text?: string
           slug?: string
           sort_order?: number
+          subcategory?: string | null
           updated_at?: string
           width?: number
         }
