@@ -18,7 +18,7 @@ type Tab = {
     | "/admin/advertisements/inquiries"
     | "/admin/advertisements/campaigns"
     | "/admin/advertisements/promotions"
-    | "/admin/advertisements/share-kit"
+    | "/admin/advertisements/qr-ads"
     | "/admin/advertisements/history";
   label: string;
   desc: string;
@@ -49,8 +49,8 @@ const TABS: Tab[] = [
     roles: ["admin", "sales"],
   },
   {
-    to: "/admin/advertisements/share-kit",
-    label: "My QR / Share Kit",
+    to: "/admin/advertisements/qr-ads",
+    label: "QR Advertisements",
     desc: "Your personal QR on printable templates.",
     Icon: QrCode,
     roles: ["admin", "advertising", "sales"],

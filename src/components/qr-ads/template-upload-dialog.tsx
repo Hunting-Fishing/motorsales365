@@ -24,9 +24,9 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
-import { upsertShareKitCustomTemplate } from "@/lib/share-kit-templates.functions";
-import { detectQrSlotFromBlob, isDetected } from "@/lib/share-kit/detect-qr-slot";
-import { assessQrReadability } from "@/lib/share-kit/qr-readability";
+import { upsertQrAdTemplate } from "@/lib/qr-ad-templates.functions";
+import { detectQrSlotFromBlob, isDetected } from "@/lib/qr-ads/detect-qr-slot";
+import { assessQrReadability } from "@/lib/qr-ads/qr-readability";
 
 interface Props {
   open: boolean;
@@ -117,8 +117,8 @@ async function uploadWithProgress(args: {
   });
 }
 
-export function ShareKitTemplateUpload({ open, onOpenChange, onSaved }: Props) {
-  const upsertFn = useServerFn(upsertShareKitCustomTemplate);
+export function QrAdTemplateUpload({ open, onOpenChange, onSaved }: Props) {
+  const upsertFn = useServerFn(upsertQrAdTemplate);
   const [items, setItems] = useState<Item[]>([]);
   const [busy, setBusy] = useState(false);
   const [dragOver, setDragOver] = useState(false);
@@ -347,7 +347,7 @@ export function ShareKitTemplateUpload({ open, onOpenChange, onSaved }: Props) {
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Upload share-kit templates</DialogTitle>
+          <DialogTitle>Upload QR ad templates</DialogTitle>
           <DialogDescription>
             Drag and drop one or many images. We'll handle the QR placement automatically — you can fine-tune any
             template later from its card.

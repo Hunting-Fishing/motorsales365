@@ -5652,6 +5652,138 @@ export type Database = {
         }
         Relationships: []
       }
+      qr_ad_builtin_categories: {
+        Row: {
+          category: string | null
+          subcategory: string | null
+          template_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          category?: string | null
+          subcategory?: string | null
+          template_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          category?: string | null
+          subcategory?: string | null
+          template_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      qr_ad_hidden_builtins: {
+        Row: {
+          hidden_at: string
+          hidden_by: string | null
+          template_id: string
+        }
+        Insert: {
+          hidden_at?: string
+          hidden_by?: string | null
+          template_id: string
+        }
+        Update: {
+          hidden_at?: string
+          hidden_by?: string | null
+          template_id?: string
+        }
+        Relationships: []
+      }
+      qr_ad_layouts: {
+        Row: {
+          cx: number
+          cy: number
+          size: number
+          template_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cx: number
+          cy: number
+          size: number
+          template_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cx?: number
+          cy?: number
+          size?: number
+          template_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      qr_ad_templates: {
+        Row: {
+          active: boolean
+          category: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          height: number
+          id: string
+          image_url: string
+          label: string
+          qr_cx: number
+          qr_cy: number
+          qr_size: number
+          share_text: string
+          slug: string
+          sort_order: number
+          subcategory: string | null
+          updated_at: string
+          width: number
+        }
+        Insert: {
+          active?: boolean
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          height: number
+          id?: string
+          image_url: string
+          label: string
+          qr_cx?: number
+          qr_cy?: number
+          qr_size?: number
+          share_text?: string
+          slug: string
+          sort_order?: number
+          subcategory?: string | null
+          updated_at?: string
+          width: number
+        }
+        Update: {
+          active?: boolean
+          category?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          height?: number
+          id?: string
+          image_url?: string
+          label?: string
+          qr_cx?: number
+          qr_cy?: number
+          qr_size?: number
+          share_text?: string
+          slug?: string
+          sort_order?: number
+          subcategory?: string | null
+          updated_at?: string
+          width?: number
+        }
+        Relationships: []
+      }
       qr_scans: {
         Row: {
           browser: string | null
@@ -6877,138 +7009,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      share_kit_builtin_categories: {
-        Row: {
-          category: string | null
-          subcategory: string | null
-          template_id: string
-          updated_at: string
-          updated_by: string | null
-        }
-        Insert: {
-          category?: string | null
-          subcategory?: string | null
-          template_id: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Update: {
-          category?: string | null
-          subcategory?: string | null
-          template_id?: string
-          updated_at?: string
-          updated_by?: string | null
-        }
-        Relationships: []
-      }
-      share_kit_custom_templates: {
-        Row: {
-          active: boolean
-          category: string | null
-          created_at: string
-          created_by: string | null
-          description: string | null
-          height: number
-          id: string
-          image_url: string
-          label: string
-          qr_cx: number
-          qr_cy: number
-          qr_size: number
-          share_text: string
-          slug: string
-          sort_order: number
-          subcategory: string | null
-          updated_at: string
-          width: number
-        }
-        Insert: {
-          active?: boolean
-          category?: string | null
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          height: number
-          id?: string
-          image_url: string
-          label: string
-          qr_cx?: number
-          qr_cy?: number
-          qr_size?: number
-          share_text?: string
-          slug: string
-          sort_order?: number
-          subcategory?: string | null
-          updated_at?: string
-          width: number
-        }
-        Update: {
-          active?: boolean
-          category?: string | null
-          created_at?: string
-          created_by?: string | null
-          description?: string | null
-          height?: number
-          id?: string
-          image_url?: string
-          label?: string
-          qr_cx?: number
-          qr_cy?: number
-          qr_size?: number
-          share_text?: string
-          slug?: string
-          sort_order?: number
-          subcategory?: string | null
-          updated_at?: string
-          width?: number
-        }
-        Relationships: []
-      }
-      share_kit_hidden_builtins: {
-        Row: {
-          hidden_at: string
-          hidden_by: string | null
-          template_id: string
-        }
-        Insert: {
-          hidden_at?: string
-          hidden_by?: string | null
-          template_id: string
-        }
-        Update: {
-          hidden_at?: string
-          hidden_by?: string | null
-          template_id?: string
-        }
-        Relationships: []
-      }
-      share_kit_layouts: {
-        Row: {
-          cx: number
-          cy: number
-          size: number
-          template_id: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          cx: number
-          cy: number
-          size: number
-          template_id: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          cx?: number
-          cy?: number
-          size?: number
-          template_id?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: []
       }
       shop_categories: {
         Row: {

@@ -7,15 +7,15 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { canNativeShare } from "@/lib/share";
-import { composeTemplate, canvasToBlob } from "@/lib/share-kit/compose";
-import type { QrOverride } from "@/lib/share-kit/compose";
-import type { ShareTemplate, TemplateContext } from "@/lib/share-kit/types";
-import { interpolate } from "@/lib/share-kit/types";
+import { composeTemplate, canvasToBlob } from "@/lib/qr-ads/compose";
+import type { QrOverride } from "@/lib/qr-ads/compose";
+import type { ShareTemplate, TemplateContext } from "@/lib/qr-ads/types";
+import { interpolate } from "@/lib/qr-ads/types";
 import { TemplateEditor } from "./template-editor";
 import {
-  upsertShareKitLayout,
-  deleteShareKitLayout,
-} from "@/lib/share-kit-layouts.functions";
+  upsertQrAdLayout,
+  deleteQrAdLayout,
+} from "@/lib/qr-ad-layouts.functions";
 
 interface Props {
   template: ShareTemplate;
@@ -55,8 +55,8 @@ export function TemplateCard({ template, context, override }: Props) {
   const [zoomOpen, setZoomOpen] = useState(false);
   const [visible, setVisible] = useState(false);
   const qc = useQueryClient();
-  const upsertFn = useServerFn(upsertShareKitLayout);
-  const deleteFn = useServerFn(deleteShareKitLayout);
+  const upsertFn = useServerFn(upsertQrAdLayout);
+  const deleteFn = useServerFn(deleteQrAdLayout);
 
   const defaults: QrOverride = {
     cx: template.qr.cx,
@@ -202,7 +202,7 @@ export function TemplateCard({ template, context, override }: Props) {
     mutationFn: (v: QrOverride) =>
       upsertFn({ data: { templateId: template.id, ...v } }),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["share-kit-layouts"] });
+      qc.invalidateQueries({ queryKey: ["qr-ad-layouts"] });
       setEditing(false);
       toast.success("Layout saved");
     },
@@ -212,7 +212,7 @@ export function TemplateCard({ template, context, override }: Props) {
   const resetMut = useMutation({
     mutationFn: () => deleteFn({ data: { templateId: template.id } }),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["share-kit-layouts"] });
+      qc.invalidateQueries({ queryKey: ["qr-ad-layouts"] });
     },
     onError: () => toast.error("Could not reset layout"),
   });

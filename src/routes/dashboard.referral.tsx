@@ -4,9 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { TemplateCard } from "@/components/share-kit/template-card";
-import { TEMPLATES } from "@/lib/share-kit/templates";
-import { listShareKitLayouts } from "@/lib/share-kit-layouts.functions";
+import { TemplateCard } from "@/components/qr-ads/template-card";
+import { TEMPLATES } from "@/lib/qr-ads/templates";
+import { listQrAdLayouts } from "@/lib/qr-ad-layouts.functions";
 
 import { Button } from "@/components/ui/button";
 import { Copy, Download, Printer, MousePointerClick, UserPlus, Percent, Users, Megaphone } from "lucide-react";
@@ -93,9 +93,9 @@ function StaffReferral() {
     })();
   }, [user]);
 
-  const layoutsFn = useServerFn(listShareKitLayouts);
+  const layoutsFn = useServerFn(listQrAdLayouts);
   const { data: layouts } = useQuery({
-    queryKey: ["share-kit-layouts"],
+    queryKey: ["qr-ad-layouts"],
     queryFn: () => layoutsFn(),
     enabled: !!user && !!staff,
   });
@@ -186,8 +186,8 @@ function StaffReferral() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Link to="/dashboard/share-kit">
-            <Button size="sm">Open share kit</Button>
+          <Link to="/dashboard/qr-ads">
+            <Button size="sm">Open QR ads</Button>
           </Link>
           <span
             className={`rounded-full px-3 py-1 text-xs ${staff.active ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}
@@ -340,9 +340,9 @@ function StaffReferral() {
             <span className="rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground">
               {TEMPLATES.length} designs
             </span>
-            <Link to="/dashboard/share-kit">
+            <Link to="/dashboard/qr-ads">
               <Button size="sm" variant="outline">
-                Open full share kit
+                Open full QR ads
               </Button>
             </Link>
           </div>

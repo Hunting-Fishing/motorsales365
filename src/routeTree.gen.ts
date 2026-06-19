@@ -99,6 +99,7 @@ import { Route as DashboardShareKitRouteImport } from './routes/dashboard.share-
 import { Route as DashboardSearchesRouteImport } from './routes/dashboard.searches'
 import { Route as DashboardRidesRouteImport } from './routes/dashboard.rides'
 import { Route as DashboardReferralRouteImport } from './routes/dashboard.referral'
+import { Route as DashboardQrAdsRouteImport } from './routes/dashboard.qr-ads'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
 import { Route as DashboardMessagesRouteImport } from './routes/dashboard.messages'
 import { Route as DashboardLikesRouteImport } from './routes/dashboard.likes'
@@ -176,6 +177,7 @@ import { Route as ApiPublicGeoSearchRouteImport } from './routes/api/public/geo-
 import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
 import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions_.$staffId'
 import { Route as AdminAdvertisementsShareKitRouteImport } from './routes/admin.advertisements.share-kit'
+import { Route as AdminAdvertisementsQrAdsRouteImport } from './routes/admin.advertisements.qr-ads'
 import { Route as AdminAdvertisementsPromotionsRouteImport } from './routes/admin.advertisements.promotions'
 import { Route as AdminAdvertisementsInquiriesRouteImport } from './routes/admin.advertisements.inquiries'
 import { Route as AdminAdvertisementsHistoryRouteImport } from './routes/admin.advertisements.history'
@@ -667,6 +669,11 @@ const DashboardReferralRoute = DashboardReferralRouteImport.update({
   path: '/referral',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardQrAdsRoute = DashboardQrAdsRouteImport.update({
+  id: '/qr-ads',
+  path: '/qr-ads',
+  getParentRoute: () => DashboardRoute,
+} as any)
 const DashboardProfileRoute = DashboardProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -1059,6 +1066,12 @@ const AdminAdvertisementsShareKitRoute =
     path: '/share-kit',
     getParentRoute: () => AdminAdvertisementsRoute,
   } as any)
+const AdminAdvertisementsQrAdsRoute =
+  AdminAdvertisementsQrAdsRouteImport.update({
+    id: '/qr-ads',
+    path: '/qr-ads',
+    getParentRoute: () => AdminAdvertisementsRoute,
+  } as any)
 const AdminAdvertisementsPromotionsRoute =
   AdminAdvertisementsPromotionsRouteImport.update({
     id: '/promotions',
@@ -1392,6 +1405,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/qr-ads': typeof DashboardQrAdsRoute
   '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
@@ -1453,6 +1467,7 @@ export interface FileRoutesByFullPath {
   '/admin/advertisements/history': typeof AdminAdvertisementsHistoryRoute
   '/admin/advertisements/inquiries': typeof AdminAdvertisementsInquiriesRoute
   '/admin/advertisements/promotions': typeof AdminAdvertisementsPromotionsRoute
+  '/admin/advertisements/qr-ads': typeof AdminAdvertisementsQrAdsRoute
   '/admin/advertisements/share-kit': typeof AdminAdvertisementsShareKitRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
@@ -1597,6 +1612,7 @@ export interface FileRoutesByTo {
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/qr-ads': typeof DashboardQrAdsRoute
   '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
@@ -1657,6 +1673,7 @@ export interface FileRoutesByTo {
   '/admin/advertisements/history': typeof AdminAdvertisementsHistoryRoute
   '/admin/advertisements/inquiries': typeof AdminAdvertisementsInquiriesRoute
   '/admin/advertisements/promotions': typeof AdminAdvertisementsPromotionsRoute
+  '/admin/advertisements/qr-ads': typeof AdminAdvertisementsQrAdsRoute
   '/admin/advertisements/share-kit': typeof AdminAdvertisementsShareKitRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
@@ -1806,6 +1823,7 @@ export interface FileRoutesById {
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/qr-ads': typeof DashboardQrAdsRoute
   '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
@@ -1867,6 +1885,7 @@ export interface FileRoutesById {
   '/admin/advertisements/history': typeof AdminAdvertisementsHistoryRoute
   '/admin/advertisements/inquiries': typeof AdminAdvertisementsInquiriesRoute
   '/admin/advertisements/promotions': typeof AdminAdvertisementsPromotionsRoute
+  '/admin/advertisements/qr-ads': typeof AdminAdvertisementsQrAdsRoute
   '/admin/advertisements/share-kit': typeof AdminAdvertisementsShareKitRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
@@ -2017,6 +2036,7 @@ export interface FileRouteTypes {
     | '/dashboard/likes'
     | '/dashboard/messages'
     | '/dashboard/profile'
+    | '/dashboard/qr-ads'
     | '/dashboard/referral'
     | '/dashboard/rides'
     | '/dashboard/searches'
@@ -2078,6 +2098,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/history'
     | '/admin/advertisements/inquiries'
     | '/admin/advertisements/promotions'
+    | '/admin/advertisements/qr-ads'
     | '/admin/advertisements/share-kit'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
@@ -2222,6 +2243,7 @@ export interface FileRouteTypes {
     | '/dashboard/likes'
     | '/dashboard/messages'
     | '/dashboard/profile'
+    | '/dashboard/qr-ads'
     | '/dashboard/referral'
     | '/dashboard/rides'
     | '/dashboard/searches'
@@ -2282,6 +2304,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/history'
     | '/admin/advertisements/inquiries'
     | '/admin/advertisements/promotions'
+    | '/admin/advertisements/qr-ads'
     | '/admin/advertisements/share-kit'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
@@ -2430,6 +2453,7 @@ export interface FileRouteTypes {
     | '/dashboard/likes'
     | '/dashboard/messages'
     | '/dashboard/profile'
+    | '/dashboard/qr-ads'
     | '/dashboard/referral'
     | '/dashboard/rides'
     | '/dashboard/searches'
@@ -2491,6 +2515,7 @@ export interface FileRouteTypes {
     | '/admin/advertisements/history'
     | '/admin/advertisements/inquiries'
     | '/admin/advertisements/promotions'
+    | '/admin/advertisements/qr-ads'
     | '/admin/advertisements/share-kit'
     | '/admin/redemptions_/$staffId'
     | '/api/admin/create-user'
@@ -3292,6 +3317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardReferralRouteImport
       parentRoute: typeof DashboardRoute
     }
+    '/dashboard/qr-ads': {
+      id: '/dashboard/qr-ads'
+      path: '/qr-ads'
+      fullPath: '/dashboard/qr-ads'
+      preLoaderRoute: typeof DashboardQrAdsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
     '/dashboard/profile': {
       id: '/dashboard/profile'
       path: '/profile'
@@ -3831,6 +3863,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdvertisementsShareKitRouteImport
       parentRoute: typeof AdminAdvertisementsRoute
     }
+    '/admin/advertisements/qr-ads': {
+      id: '/admin/advertisements/qr-ads'
+      path: '/qr-ads'
+      fullPath: '/admin/advertisements/qr-ads'
+      preLoaderRoute: typeof AdminAdvertisementsQrAdsRouteImport
+      parentRoute: typeof AdminAdvertisementsRoute
+    }
     '/admin/advertisements/promotions': {
       id: '/admin/advertisements/promotions'
       path: '/promotions'
@@ -4149,6 +4188,7 @@ interface AdminAdvertisementsRouteChildren {
   AdminAdvertisementsHistoryRoute: typeof AdminAdvertisementsHistoryRoute
   AdminAdvertisementsInquiriesRoute: typeof AdminAdvertisementsInquiriesRoute
   AdminAdvertisementsPromotionsRoute: typeof AdminAdvertisementsPromotionsRoute
+  AdminAdvertisementsQrAdsRoute: typeof AdminAdvertisementsQrAdsRoute
   AdminAdvertisementsShareKitRoute: typeof AdminAdvertisementsShareKitRoute
   AdminAdvertisementsIndexRoute: typeof AdminAdvertisementsIndexRoute
 }
@@ -4158,6 +4198,7 @@ const AdminAdvertisementsRouteChildren: AdminAdvertisementsRouteChildren = {
   AdminAdvertisementsHistoryRoute: AdminAdvertisementsHistoryRoute,
   AdminAdvertisementsInquiriesRoute: AdminAdvertisementsInquiriesRoute,
   AdminAdvertisementsPromotionsRoute: AdminAdvertisementsPromotionsRoute,
+  AdminAdvertisementsQrAdsRoute: AdminAdvertisementsQrAdsRoute,
   AdminAdvertisementsShareKitRoute: AdminAdvertisementsShareKitRoute,
   AdminAdvertisementsIndexRoute: AdminAdvertisementsIndexRoute,
 }
@@ -4321,6 +4362,7 @@ interface DashboardRouteChildren {
   DashboardLikesRoute: typeof DashboardLikesRoute
   DashboardMessagesRoute: typeof DashboardMessagesRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
+  DashboardQrAdsRoute: typeof DashboardQrAdsRoute
   DashboardReferralRoute: typeof DashboardReferralRoute
   DashboardRidesRoute: typeof DashboardRidesRoute
   DashboardSearchesRoute: typeof DashboardSearchesRoute
@@ -4353,6 +4395,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardLikesRoute: DashboardLikesRoute,
   DashboardMessagesRoute: DashboardMessagesRoute,
   DashboardProfileRoute: DashboardProfileRoute,
+  DashboardQrAdsRoute: DashboardQrAdsRoute,
   DashboardReferralRoute: DashboardReferralRoute,
   DashboardRidesRoute: DashboardRidesRoute,
   DashboardSearchesRoute: DashboardSearchesRoute,

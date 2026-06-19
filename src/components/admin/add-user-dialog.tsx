@@ -500,7 +500,7 @@ export function AddUserDialog({
 
             <TabsContent value="ads" className="mt-3">
               <div className="rounded-lg border border-dashed border-border p-4 text-sm text-muted-foreground">
-                Advertisement templates (QR posters, share-kit cards) become available after the
+                Advertisement templates (QR posters, QR ad cards) become available after the
                 user is created. Open Edit on the new user to assign template presets.
               </div>
             </TabsContent>

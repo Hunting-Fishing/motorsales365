@@ -3,9 +3,9 @@ import QRCode from "qrcode";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
-import { composeBaseOnly } from "@/lib/share-kit/compose";
-import type { ShareTemplate, TemplateContext } from "@/lib/share-kit/types";
-import type { QrOverride } from "@/lib/share-kit/compose";
+import { composeBaseOnly } from "@/lib/qr-ads/compose";
+import type { ShareTemplate, TemplateContext } from "@/lib/qr-ads/types";
+import type { QrOverride } from "@/lib/qr-ads/compose";
 
 interface Props {
   template: ShareTemplate;

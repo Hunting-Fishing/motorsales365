@@ -1,10 +1,10 @@
 import type { ShareTemplate } from "./types";
 
 /**
- * Built-in share-kit templates.
+ * Built-in QR ad templates.
  *
  * Intentionally empty — all live templates are now uploaded by admins
- * through the Share Kit admin page and stored in `share_kit_custom_templates`.
+ * through the QR Ads admin page and stored in `qr_ad_templates`.
  * The original hard-coded designs were testers and have been removed.
  */
 export const TEMPLATES: ShareTemplate[] = [];

@@ -1,7 +1,7 @@
 /**
- * AI-powered category classifier for Share Kit ads.
+ * AI-powered category classifier for QR Ads ads.
  * Looks at the rendered flyer / uploaded ad and picks one (category, subcategory)
- * from the taxonomy in `src/lib/share-kit/categories.ts`.
+ * from the taxonomy in `src/lib/qr-ads/categories.ts`.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
@@ -15,7 +15,7 @@ import {
   categoryFromSub,
   type CategoryKey,
   type SubcategoryKey,
-} from "@/lib/share-kit/categories";
+} from "@/lib/qr-ads/categories";
 
 const inputSchema = z.object({
   imageUrl: z.string().url(),
@@ -115,7 +115,7 @@ async function classifyOne(imageUrl: string): Promise<ClassifyResult> {
   return { category: cat, subcategory: sub, confidence: conf, reasoning: String(parsed?.reasoning ?? "").slice(0, 240) };
 }
 
-export const classifyShareKitTemplate = createServerFn({ method: "POST" })
-  .middleware([requireAdminRoleAudited("shareKit.classify")])
+export const classifyQrAdTemplate = createServerFn({ method: "POST" })
+  .middleware([requireAdminRoleAudited("qrAds.classify")])
   .inputValidator((input: unknown) => inputSchema.parse(input))
   .handler(async ({ data }): Promise<ClassifyResult> => classifyOne(data.imageUrl));
