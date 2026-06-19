@@ -184,11 +184,19 @@ function ForgotPasswordPage() {
                   </AlertDescription>
                 </Alert>
 
+                {emailCooldown.active && (
+                  <CooldownNotice
+                    remaining={emailCooldown.remaining}
+                    label="Resend available in"
+                  />
+                )}
+
                 <Button
                   type="button"
                   className="w-full"
-                  variant="secondary"
+                  variant={emailCooldown.active ? "outline" : "secondary"}
                   disabled={emailCooldown.active || (emailStatus as string) === "sending"}
+                  aria-disabled={emailCooldown.active || (emailStatus as string) === "sending"}
                   onClick={() => sendEmailReset(email)}
                 >
                   {(emailStatus as string) === "sending" ? (
@@ -202,6 +210,11 @@ function ForgotPasswordPage() {
                   )}
                 </Button>
 
+                {emailCooldown.active && (
+                  <p className="text-center text-xs text-muted-foreground">
+                    You can request another link once the timer ends.
+                  </p>
+                )}
 
                 <button
                   type="button"
