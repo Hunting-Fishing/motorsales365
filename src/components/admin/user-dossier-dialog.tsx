@@ -69,11 +69,9 @@ export function UserDossierDialog({
             <Badge variant="outline" className="text-[10px]">
               Trust {score.score}
             </Badge>
-            {isSuperAdmin && (
-              <span className="ml-auto">
-                <ResetPasswordDialog user={{ id: userId, full_name: displayName }} />
-              </span>
-            )}
+            <span className="ml-auto">
+              <ResetPasswordDialog user={{ id: userId, full_name: displayName }} />
+            </span>
           </DialogTitle>
         </DialogHeader>
 
