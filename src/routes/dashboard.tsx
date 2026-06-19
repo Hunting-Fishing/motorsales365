@@ -143,6 +143,7 @@ function buildHubs(opts: {
     items: [
       { to: "/dashboard/profile", label: "Profile", Icon: UserIcon },
       { to: "/dashboard/verification", label: "Verification", Icon: ShieldCheck },
+      { to: "/dashboard/claim-business", label: "Claim a business", Icon: Store },
       { to: "/dashboard/billing", label: "Billing", Icon: CreditCard },
       { to: "/dashboard/boosts", label: "Boost history", Icon: Rocket },
       { to: "/dashboard/learning", label: "My learning", Icon: GraduationCap },

@@ -1,53 +1,54 @@
-## Why QR-Ads are slow today
+## Goal
 
-`TemplateCard` calls `composeTemplate` per card, which on every card does:
+Add a self-serve "Claim a Business" entry point in the user dashboard so a signed-in user can search the business directory, then either claim an unclaimed listing or request an ownership transfer for a claimed one. All routes terminate at the existing admin review queue.
 
-1. Fetches and decodes the **template image** (`new Image()` + network) — the same image is re-fetched/decoded for every card that uses it. With 9+ cards on a category, that's 9+ identical decodes.
-2. Generates a **fresh QR code** via `QRCode.toDataURL` at H-level error correction and `width ≥ 512` — but every card on the page uses the **same `context.link`** (your referral URL), so the QR is identical for every card and is being recomputed every time.
-3. Exports the canvas with **`canvas.toDataURL("image/png")`** — this is synchronous, blocks the main thread, and produces a multi‑megabyte base64 string that the browser then has to re-decode to display in an `<img>`. This is the single biggest visible delay ("Rendering…" sits while the main thread is frozen encoding PNGs).
-4. A `MAX_CONCURRENT_RENDERS = 4` limiter keeps it serial-ish, but because each unit of work is heavy, the queue drains slowly.
+## What already exists (reused, not rebuilt)
 
-Net effect: even though work is lazy + intersection-observed, every card pays full cost as it enters the viewport.
+- `business_claim_requests`, `business_claim_evidence`, `business_claim_audit` tables + RLS.
+- `submitBusinessClaim` server fn, `ClaimCta` dialog, `EvidenceUploader` (storage bucket `claim-evidence`).
+- Admin review UI at `/admin/claims` with approve / approve & transfer.
+- Per-business claim CTA already on `/businesses/$slug`.
 
-## Fix (frontend only, no backend changes)
+The gap: there is no place to search/claim from the dashboard, and no formal "transfer request" path when a business is already owned by someone else.
 
-### 1. Module-level base-image cache in `src/lib/qr-ads/compose.ts`
-- Add `const baseImageCache = new Map<string, Promise<HTMLImageElement | ImageBitmap>>()` keyed by `template.imageUrl` (and a separate cache for SVG keyed by `template.id + serialized ctx` since SVG output depends on context).
-- `loadImage` becomes a thin wrapper that consults the cache so the same URL is fetched + decoded **once per session**.
-- Prefer `createImageBitmap(blob)` over `new Image()` when available — faster, decodes off the main thread.
+## New flow
 
-### 2. Shared QR-code cache
-- Add `const qrCache = new Map<string, Promise<HTMLImageElement | ImageBitmap>>()` keyed by `link` (size is normalized to one large bucket, e.g. 1024px, since we always scale on draw).
-- Generate the QR **once per `context.link`**, reuse across every card. This alone removes ~N-1 `QRCode.toDataURL` calls per page.
+### 1. New route `/dashboard/claim-business`
+- Added as a tab in the dashboard Account sub-nav next to Profile / Verification / Billing.
+- Search box (debounced) → calls a new public server fn `searchClaimableBusinesses({ q })` returning `{ id, slug, name, logo_url, city, region, claim_state, owner_id }` (publishable-key client, no PII).
+- Results list shows each business with a status badge and a single action button:
+  - `unclaimed` / `claim_pending` (no owner) → "Claim this business" → opens existing `ClaimCta` dialog.
+  - `owned` → "Request ownership transfer" → opens a new `TransferRequestDialog`.
+- Below the search: "My claim & transfer requests" list (status + reviewer notes) using existing data.
 
-### 3. Replace `toDataURL` with blob URLs
-- In `TemplateCard`, after `composeTemplate`, do `canvas.toBlob(...)` → `URL.createObjectURL(blob)` and feed that into `<img src>`. Massive win: no base64 encode, no second decode, async, off main thread.
-- Track the URL in a ref and `URL.revokeObjectURL` on unmount / when a new preview is generated to avoid leaks.
+### 2. Transfer-request submission
+- New server fn `submitOwnershipTransferRequest` in `src/lib/business-claims.functions.ts`:
+  - Inputs: `businessId`, `reason` (required, 20–2000 chars), `contactMethod` (`email|phone|document`), `contactValue?`.
+  - Inserts into `business_claim_requests` with a new `kind = 'transfer'` column (default `'claim'` for existing rows). Never auto-approves.
+  - Requires at least one evidence file uploaded to `claim-evidence` and linked via `business_claim_evidence` before submit is enabled (client-side gate, server re-checks count ≥ 1).
+- Migration:
+  - `ALTER TABLE business_claim_requests ADD COLUMN kind text NOT NULL DEFAULT 'claim' CHECK (kind IN ('claim','transfer'))`.
+  - Update the INSERT policy so transfer rows are allowed against owned businesses (`kind='transfer' AND owner_id IS NOT NULL`) while the existing claim path keeps its `unclaimed / claim_pending` restriction.
+  - Index on `(kind, status)` for the admin queue.
 
-### 4. Pre-warm on page mount
-- In `dashboard.qr-ads.tsx`, once `context` is available, kick off:
-  - one QR generation (`prewarmQr(context.link)`),
-  - parallel `prewarmBase(url)` for every unique built-in `template.imageUrl` that's in the current filter.
-- This is fire-and-forget (no await on render path); it just primes the caches so `TemplateCard` effects hit warm caches.
+### 3. Admin queue updates (`/admin/claims`)
+- New "Type" filter (Claim / Transfer / All) and a `kind` badge per row.
+- For `kind='transfer'`:
+  - Show current owner (name + id) and the requester side-by-side.
+  - "Approve & transfer" button reuses the existing `approve_business_claim` RPC path (already sets `owner_id`), so approving a transfer reassigns ownership atomically and writes a `business_claim_audit` row noting the previous owner.
+  - "Reject" works unchanged.
 
-### 5. Raise concurrency
-- With caches warm and `toBlob` async, per-card work is small. Raise `MAX_CONCURRENT_RENDERS` from 4 → 8 (configurable constant). Keep the limiter so we don't spam `toBlob` on mobile.
+### 4. Document requirement
+- Evidence-required policy enforced in `submitBusinessClaim` and `submitOwnershipTransferRequest` (server count check ≥ 1 from `business_claim_evidence` for the new claim id) — covers both flows from this new dashboard entry. Existing per-business CTA inherits the same rule.
 
-### 6. Keep download/share paths working
-- `getBlob()` in `TemplateCard` should keep using a real `canvas` ref (kept for full-resolution downloads). We still store the canvas — we just stop using `toDataURL` for the on-screen preview.
+## Out of scope
+
+- No changes to `/businesses/$slug` claim card (it keeps working as-is).
+- No notifications/email templates beyond what `business_claim_audit` already produces.
+- No bulk transfer tooling.
 
 ## Files touched
 
-- `src/lib/qr-ads/compose.ts` — add `loadBaseImage(template, ctx)`, `loadQrImage(link, sizeBucket)`, `prewarmBase`, `prewarmQr`; rewrite `composeTemplate` to use them; switch QR draw path to use cached image directly rather than `QRCode.toDataURL` + `loadImage` every call.
-- `src/components/qr-ads/template-card.tsx` — swap `toDataURL` for `toBlob` + `URL.createObjectURL`; revoke on unmount/replace; raise `MAX_CONCURRENT_RENDERS` to 8.
-- `src/routes/dashboard.qr-ads.tsx` — once `context` + `allTemplatesUnfiltered` are ready, call `prewarmQr(context.link)` and `prewarmBase` for each unique built-in `imageUrl` in a `useEffect`.
-
-## Out of scope (intentionally)
-
-- No server-side image generation / job queue — current architecture renders in the browser per user and that's correct (each user's QR differs). Caching + blob URLs eliminate the perceived delay without that complexity.
-- No change to admin upload / template management flow.
-- SVG-kind templates still re-render per ctx (rare; the heavy ones in the screenshot are image-kind).
-
-## Expected result
-
-First card paints visibly faster (no per-card PNG encode), and every subsequent card in the same category is near-instant because the base image and QR are already decoded in memory.
+- New: `src/routes/_authenticated/dashboard.claim-business.tsx`, `src/components/business-page/transfer-request-dialog.tsx`.
+- Edit: `src/lib/business-claims.functions.ts` (add search + transfer fn + evidence gate), `src/routes/admin.claims.tsx` (kind badge, filter, owner column), `src/routes/dashboard.tsx` (sub-nav link).
+- Migration: `business_claim_requests.kind` + updated INSERT policy + index.
