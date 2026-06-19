@@ -553,7 +553,6 @@ function SubmitBusinessPage() {
     { key: "review", label: "Hours & Review", icon: Clock },
   ] as const;
   type StepKey = (typeof STEPS)[number]["key"];
-  const [step, setStep] = useState<StepKey>("basics");
   const stepIndex = STEPS.findIndex((s) => s.key === step);
   const goTo = (k: StepKey) => {
     setStep(k);
