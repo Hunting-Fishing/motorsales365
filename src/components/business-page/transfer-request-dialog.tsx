@@ -116,8 +116,10 @@ export function TransferRequestDialog({
                 maxLength={2000}
                 placeholder="e.g. I am the registered owner, the previous account belonged to a former staff member who has left the business."
               />
-              <div className="mt-1 text-[10px] text-muted-foreground">
-                {reason.trim().length}/2000 — minimum 20 characters
+              <div className={`mt-1 text-[10px] ${reason.trim().length > 0 && reason.trim().length < 10 ? "text-destructive" : "text-muted-foreground"}`}>
+                {reason.trim().length}/2000 — minimum 10 characters
+                {reason.trim().length > 0 && reason.trim().length < 10 &&
+                  ` (add ${10 - reason.trim().length} more to continue)`}
               </div>
             </div>
             <div>
