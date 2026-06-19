@@ -92,6 +92,49 @@ export type CategoryDef = {
 
 export const CATEGORY_TREE: CategoryDef[] = [
   {
+    key: "brand-format",
+    label: "Brand & Format",
+    icon: Megaphone,
+    tone: "bg-sky-500/15 text-sky-600 dark:text-sky-400",
+    subs: [
+      { key: "social-posts", label: "Social Posts (1:1)" },
+      { key: "stories-reels", label: "Stories & Reels (9:16)" },
+      { key: "landscape-banner", label: "Landscape Banner" },
+      { key: "print-wearables", label: "Print & Wearables" },
+      { key: "stickers-decals", label: "Stickers & Decals" },
+      { key: "business-cards", label: "Business Cards" },
+    ],
+  },
+  {
+    key: "insurance-finance",
+    label: "Insurance, Finance & LTO",
+    icon: ShieldCheck,
+    tone: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+    subs: [
+      { key: "insurance", label: "Insurance" },
+      { key: "financing", label: "Financing & Loans" },
+      { key: "warranty-protection", label: "Warranty, LTO & Registration" },
+    ],
+  },
+  {
+    key: "membership-referrals",
+    label: "Membership & Referrals",
+    icon: BadgePercent,
+    tone: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+    subs: [
+      { key: "member-promo", label: "365 Member Promo" },
+      { key: "referral-card", label: "Referral Code Card" },
+      { key: "member-perks", label: "Member Perks" },
+    ],
+  },
+  {
+    key: "other",
+    label: "Other",
+    icon: Boxes,
+    tone: "bg-slate-500/15 text-slate-600 dark:text-slate-400",
+    subs: [{ key: "other", label: "Other" }],
+  },
+  {
     key: "repair-service",
     label: "Repair & Service Shops",
     icon: Wrench,
@@ -107,18 +150,6 @@ export const CATEGORY_TREE: CategoryDef[] = [
       { key: "diesel-heavy-duty", label: "Diesel & Heavy-Duty" },
       { key: "motorcycle-service", label: "Motorcycle Service" },
       { key: "inspection-testing", label: "Inspection & Testing" },
-    ],
-  },
-  {
-    key: "towing-roadside",
-    label: "Towing & Roadside",
-    icon: LifeBuoy,
-    tone: "bg-red-500/15 text-red-600 dark:text-red-400",
-    subs: [
-      { key: "tow-247", label: "24/7 Tow" },
-      { key: "roadside-assist", label: "Roadside Assistance" },
-      { key: "fleet-dispatch", label: "Fleet & Dispatch" },
-      { key: "heavy-recovery", label: "Heavy Recovery" },
     ],
   },
   {
@@ -138,14 +169,15 @@ export const CATEGORY_TREE: CategoryDef[] = [
     ],
   },
   {
-    key: "insurance-finance",
-    label: "Insurance, Finance & LTO",
-    icon: ShieldCheck,
-    tone: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+    key: "towing-roadside",
+    label: "Towing & Roadside",
+    icon: LifeBuoy,
+    tone: "bg-red-500/15 text-red-600 dark:text-red-400",
     subs: [
-      { key: "insurance", label: "Insurance" },
-      { key: "financing", label: "Financing & Loans" },
-      { key: "warranty-protection", label: "Warranty, LTO & Registration" },
+      { key: "tow-247", label: "24/7 Tow" },
+      { key: "roadside-assist", label: "Roadside Assistance" },
+      { key: "fleet-dispatch", label: "Fleet & Dispatch" },
+      { key: "heavy-recovery", label: "Heavy Recovery" },
     ],
   },
   {
@@ -158,38 +190,6 @@ export const CATEGORY_TREE: CategoryDef[] = [
       { key: "instructor-referrals", label: "Instructor Referrals" },
       { key: "workshops-events", label: "Workshops & Events" },
     ],
-  },
-  {
-    key: "membership-referrals",
-    label: "Membership & Referrals",
-    icon: BadgePercent,
-    tone: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
-    subs: [
-      { key: "member-promo", label: "365 Member Promo" },
-      { key: "referral-card", label: "Referral Code Card" },
-      { key: "member-perks", label: "Member Perks" },
-    ],
-  },
-  {
-    key: "brand-format",
-    label: "Brand & Format",
-    icon: Megaphone,
-    tone: "bg-sky-500/15 text-sky-600 dark:text-sky-400",
-    subs: [
-      { key: "social-posts", label: "Social Posts (1:1)" },
-      { key: "stories-reels", label: "Stories & Reels (9:16)" },
-      { key: "landscape-banner", label: "Landscape Banner" },
-      { key: "print-wearables", label: "Print & Wearables" },
-      { key: "stickers-decals", label: "Stickers & Decals" },
-      { key: "business-cards", label: "Business Cards" },
-    ],
-  },
-  {
-    key: "other",
-    label: "Other",
-    icon: Boxes,
-    tone: "bg-slate-500/15 text-slate-600 dark:text-slate-400",
-    subs: [{ key: "other", label: "Other" }],
   },
 ];
 
