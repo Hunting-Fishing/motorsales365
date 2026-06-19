@@ -9229,6 +9229,10 @@ export type Database = {
       }
       can_manage_shop: { Args: { _user_id: string }; Returns: boolean }
       can_moderate: { Args: { _user_id: string }; Returns: boolean }
+      can_read_org_invite: {
+        Args: { _invite_created_at: string; _invite_email: string }
+        Returns: boolean
+      }
       can_support: { Args: { _user_id: string }; Returns: boolean }
       cleanup_unverified_users: { Args: never; Returns: number }
       compute_user_tier: { Args: { _user_id: string }; Returns: string }
@@ -9410,6 +9414,10 @@ export type Database = {
       }
       is_org_member: {
         Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_sales_assigned_user: {
+        Args: { _rep: string; _target_user: string }
         Returns: boolean
       }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
