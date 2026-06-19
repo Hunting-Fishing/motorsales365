@@ -33,6 +33,7 @@ import {
   type BuiltinCategoryRow,
 } from "@/lib/qr-ad-templates.functions";
 import { siteOrigin } from "@/lib/site-config";
+import { prewarmBase, prewarmQr } from "@/lib/qr-ads/compose";
 
 
 const adsSearchSchema = z.object({
