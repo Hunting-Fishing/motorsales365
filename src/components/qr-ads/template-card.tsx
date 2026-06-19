@@ -24,9 +24,11 @@ interface Props {
 }
 
 // Global concurrency limiter so 50+ cards don't all decode/compose at once.
+// With shared base-image + QR caches and async toBlob, per-card work is light;
+// 8 keeps mobile sane without leaving the queue idle.
 let activeRenders = 0;
 const renderQueue: Array<() => void> = [];
-const MAX_CONCURRENT_RENDERS = 4;
+const MAX_CONCURRENT_RENDERS = 8;
 function acquireRenderSlot(): Promise<void> {
   return new Promise((resolve) => {
     const tryRun = () => {
