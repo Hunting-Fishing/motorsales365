@@ -411,6 +411,82 @@ function ProfilePage() {
         </form>
       </div>
 
+      {/* Password */}
+      <div className="mt-6 space-y-4 rounded-xl border border-border bg-card p-6">
+        <div>
+          <h2 className="font-display text-lg font-bold">Password</h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Update your password below. If you don't remember your current password, send yourself
+            a reset link.
+          </p>
+        </div>
+
+        <form onSubmit={changePassword} className="space-y-3">
+          <div>
+            <Label htmlFor="current-pw">Current password</Label>
+            <Input
+              id="current-pw"
+              type="password"
+              autoComplete="current-password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+            />
+          </div>
+          <div>
+            <Label htmlFor="new-pw">New password</Label>
+            <Input
+              id="new-pw"
+              type="password"
+              minLength={8}
+              autoComplete="new-password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
+          </div>
+          <div>
+            <Label htmlFor="confirm-pw">Confirm new password</Label>
+            <Input
+              id="confirm-pw"
+              type="password"
+              minLength={8}
+              autoComplete="new-password"
+              value={confirmNewPassword}
+              onChange={(e) => setConfirmNewPassword(e.target.value)}
+            />
+            {confirmNewPassword && newPassword !== confirmNewPassword && (
+              <p className="mt-1 text-xs text-destructive">Passwords do not match.</p>
+            )}
+          </div>
+          <Button
+            type="submit"
+            disabled={
+              passwordSubmitting ||
+              !currentPassword ||
+              !newPassword ||
+              newPassword !== confirmNewPassword
+            }
+          >
+            {passwordSubmitting ? "Updating…" : "Update password"}
+          </Button>
+        </form>
+
+        <div className="border-t border-border pt-4">
+          <p className="text-sm text-muted-foreground">
+            Forgot your current password? We'll email a secure reset link to{" "}
+            <strong>{user?.email ?? "your account"}</strong>.
+          </p>
+          <Button
+            type="button"
+            variant="secondary"
+            className="mt-3"
+            disabled={resetSubmitting || !user?.email}
+            onClick={sendPasswordResetEmail}
+          >
+            {resetSubmitting ? "Sending…" : "Email me a reset link"}
+          </Button>
+        </div>
+      </div>
+
       {/* Security: TOTP two-factor authentication (free, no SMS) */}
       <TotpSetupCard />
     </div>
