@@ -313,9 +313,17 @@ function ForgotPasswordPage() {
                   </Alert>
                 )}
 
+                {smsCooldown.active && (
+                  <CooldownNotice
+                    remaining={smsCooldown.remaining}
+                    label="Resend available in"
+                  />
+                )}
+
                 <Button
                   type="submit"
                   disabled={smsStatus === "sending" || smsCooldown.active}
+                  aria-disabled={smsStatus === "sending" || smsCooldown.active}
                   className="w-full"
                 >
                   {smsStatus === "sending" ? (
@@ -328,6 +336,12 @@ function ForgotPasswordPage() {
                     "Send OTP"
                   )}
                 </Button>
+
+                {smsCooldown.active && (
+                  <p className="text-center text-xs text-muted-foreground">
+                    You can request another code once the timer ends.
+                  </p>
+                )}
               </form>
             ) : (
               <form onSubmit={handleVerifySmsOtp} className="space-y-4">
