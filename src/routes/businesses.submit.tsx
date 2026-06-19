@@ -578,7 +578,7 @@ function SubmitBusinessPage() {
           aria-hidden
           className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-primary/10 via-primary/5 to-transparent"
         />
-        <div className="container relative mx-auto max-w-4xl px-4 py-8">
+        <div className="container relative mx-auto max-w-4xl px-4 py-8 pb-28 md:pb-8">
           <Link
             to="/businesses"
             className="text-sm text-muted-foreground transition-colors hover:text-foreground"
@@ -606,7 +606,7 @@ function SubmitBusinessPage() {
           </Card>
 
           {/* Stepper */}
-          <div className="sticky top-2 z-10 mb-4 overflow-x-auto rounded-2xl border border-border bg-card/90 p-2 shadow-sm backdrop-blur">
+          <div className="sticky top-14 z-10 mb-4 -mx-4 overflow-x-auto rounded-none border-y border-border bg-card/90 p-2 shadow-sm backdrop-blur md:top-2 md:mx-0 md:rounded-2xl md:border">
             <ol className="flex min-w-max items-center gap-1">
               {STEPS.map((s, i) => {
                 const Icon = s.icon;
@@ -1097,25 +1097,26 @@ function SubmitBusinessPage() {
             )}
 
             {/* ===== Footer nav ===== */}
-            <div className="sticky bottom-0 -mx-5 -mb-5 flex flex-wrap items-center justify-between gap-3 border-t border-border bg-card/95 px-5 py-3 backdrop-blur sm:-mx-7 sm:-mb-7 sm:px-7">
+            <div className="sticky bottom-16 -mx-5 -mb-5 flex flex-wrap items-center justify-between gap-3 border-t border-border bg-card/95 px-5 py-3 backdrop-blur md:bottom-0 sm:-mx-7 sm:-mb-7 sm:px-7">
               <Button
                 type="button"
                 variant="outline"
                 onClick={prev}
                 disabled={stepIndex === 0}
+                className="min-w-[88px]"
               >
                 <ChevronLeft className="mr-1 h-4 w-4" />
                 Back
               </Button>
-              <div className="text-xs text-muted-foreground">
+              <div className="order-last w-full text-center text-xs text-muted-foreground sm:order-none sm:w-auto">
                 Step {stepIndex + 1} of {STEPS.length}
               </div>
               {step === "review" ? (
-                <Button onClick={submit} disabled={submitting}>
+                <Button onClick={submit} disabled={submitting} className="min-w-[140px]">
                   {submitting ? "Submitting…" : "Submit for review"}
                 </Button>
               ) : (
-                <Button type="button" onClick={next}>
+                <Button type="button" onClick={next} className="min-w-[110px]">
                   Continue
                   <ChevronRight className="ml-1 h-4 w-4" />
                 </Button>
