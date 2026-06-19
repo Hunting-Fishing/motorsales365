@@ -112,7 +112,7 @@ function AdminQrAdsPage() {
   useEffect(() => {
     const id = setTimeout(() => {
       if (queryInput !== q) {
-        navigate({ to: ".", search: (prev) => ({ ...prev, q: queryInput }), replace: true });
+        navigate({ to: ".", search: (prev: { q: string }) => ({ ...prev, q: queryInput }), replace: true });
       }
     }, 150);
     return () => clearTimeout(id);
