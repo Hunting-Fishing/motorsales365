@@ -152,3 +152,72 @@ export const updateShareKitTemplateQrPlacement = createServerFn({ method: "POST"
     return { ok: true };
   });
 
+
+const categoryPayloadSchema = z.object({
+  category: z.string().min(1).max(80).nullable(),
+  subcategory: z.string().min(1).max(80).nullable(),
+});
+
+function validateCatPair(category: string | null, subcategory: string | null) {
+  if (category !== null && !isValidCategory(category)) {
+    throw new Error(`Unknown category: ${category}`);
+  }
+  if (subcategory !== null && !isValidSubcategory(subcategory)) {
+    throw new Error(`Unknown subcategory: ${subcategory}`);
+  }
+}
+
+export const setShareKitCustomCategory = createServerFn({ method: "POST" })
+  .middleware([requireAdminRoleAudited("shareKit.setCustomCategory")])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        id: z.string().uuid(),
+      })
+      .merge(categoryPayloadSchema)
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    validateCatPair(data.category, data.subcategory);
+    const { supabase } = context as any;
+    const { error } = await supabase
+      .from("share_kit_custom_templates")
+      .update({ category: data.category, subcategory: data.subcategory })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const setShareKitBuiltinCategory = createServerFn({ method: "POST" })
+  .middleware([requireAdminRoleAudited("shareKit.setBuiltinCategory")])
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        templateId: z.string().min(1).max(100),
+      })
+      .merge(categoryPayloadSchema)
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    validateCatPair(data.category, data.subcategory);
+    const { supabase, userId } = context as any;
+    if (data.category === null && data.subcategory === null) {
+      const { error } = await supabase
+        .from("share_kit_builtin_categories")
+        .delete()
+        .eq("template_id", data.templateId);
+      if (error) throw new Error(error.message);
+      return { ok: true };
+    }
+    const { error } = await supabase
+      .from("share_kit_builtin_categories")
+      .upsert({
+        template_id: data.templateId,
+        category: data.category,
+        subcategory: data.subcategory,
+        updated_by: userId,
+        updated_at: new Date().toISOString(),
+      });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
