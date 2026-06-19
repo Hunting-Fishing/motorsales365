@@ -250,9 +250,17 @@ function ForgotPasswordPage() {
                   </Alert>
                 )}
 
+                {emailCooldown.active && (
+                  <CooldownNotice
+                    remaining={emailCooldown.remaining}
+                    label="Resend available in"
+                  />
+                )}
+
                 <Button
                   type="submit"
                   disabled={emailStatus === "sending" || emailCooldown.active || !email.trim()}
+                  aria-disabled={emailStatus === "sending" || emailCooldown.active || !email.trim()}
                   className="w-full"
                 >
                   {emailStatus === "sending" ? (
@@ -267,6 +275,12 @@ function ForgotPasswordPage() {
                     </>
                   )}
                 </Button>
+
+                {emailCooldown.active && (
+                  <p className="text-center text-xs text-muted-foreground">
+                    You can request another link once the timer ends.
+                  </p>
+                )}
               </form>
             )}
           </TabsContent>
