@@ -4,9 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
-import { TemplateCard } from "@/components/qr-ads/template-card";
-import { TEMPLATES } from "@/lib/qr-ads/templates";
-import { listQrAdLayouts } from "@/lib/qr-ad-layouts.functions";
+
+
 
 import { Button } from "@/components/ui/button";
 import { Copy, Download, Printer, MousePointerClick, UserPlus, Percent, Users, Megaphone } from "lucide-react";
