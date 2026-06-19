@@ -135,6 +135,7 @@ import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminReferralsRouteImport } from './routes/admin.referrals'
 import { Route as AdminRedemptionsRouteImport } from './routes/admin.redemptions'
 import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
+import { Route as AdminPermissionsRouteImport } from './routes/admin.permissions'
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminPartsRouteImport } from './routes/admin.parts'
@@ -851,6 +852,11 @@ const AdminPricingRoute = AdminPricingRouteImport.update({
   path: '/pricing',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPermissionsRoute = AdminPermissionsRouteImport.update({
+  id: '/permissions',
+  path: '/permissions',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPerformanceRoute = AdminPerformanceRouteImport.update({
   id: '/performance',
   path: '/performance',
@@ -1377,6 +1383,7 @@ export interface FileRoutesByFullPath {
   '/admin/parts': typeof AdminPartsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
+  '/admin/permissions': typeof AdminPermissionsRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/redemptions': typeof AdminRedemptionsRoute
   '/admin/referrals': typeof AdminReferralsRoute
@@ -1585,6 +1592,7 @@ export interface FileRoutesByTo {
   '/admin/parts': typeof AdminPartsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
+  '/admin/permissions': typeof AdminPermissionsRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/redemptions': typeof AdminRedemptionsRoute
   '/admin/referrals': typeof AdminReferralsRoute
@@ -1797,6 +1805,7 @@ export interface FileRoutesById {
   '/admin/parts': typeof AdminPartsRoute
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/performance': typeof AdminPerformanceRoute
+  '/admin/permissions': typeof AdminPermissionsRoute
   '/admin/pricing': typeof AdminPricingRoute
   '/admin/redemptions': typeof AdminRedemptionsRoute
   '/admin/referrals': typeof AdminReferralsRoute
@@ -2011,6 +2020,7 @@ export interface FileRouteTypes {
     | '/admin/parts'
     | '/admin/payments'
     | '/admin/performance'
+    | '/admin/permissions'
     | '/admin/pricing'
     | '/admin/redemptions'
     | '/admin/referrals'
@@ -2219,6 +2229,7 @@ export interface FileRouteTypes {
     | '/admin/parts'
     | '/admin/payments'
     | '/admin/performance'
+    | '/admin/permissions'
     | '/admin/pricing'
     | '/admin/redemptions'
     | '/admin/referrals'
@@ -2430,6 +2441,7 @@ export interface FileRouteTypes {
     | '/admin/parts'
     | '/admin/payments'
     | '/admin/performance'
+    | '/admin/permissions'
     | '/admin/pricing'
     | '/admin/redemptions'
     | '/admin/referrals'
@@ -3581,6 +3593,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminPricingRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/permissions': {
+      id: '/admin/permissions'
+      path: '/permissions'
+      fullPath: '/admin/permissions'
+      preLoaderRoute: typeof AdminPermissionsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/performance': {
       id: '/admin/performance'
       path: '/performance'
@@ -4246,6 +4265,7 @@ interface AdminRouteChildren {
   AdminPartsRoute: typeof AdminPartsRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminPerformanceRoute: typeof AdminPerformanceRoute
+  AdminPermissionsRoute: typeof AdminPermissionsRoute
   AdminPricingRoute: typeof AdminPricingRoute
   AdminRedemptionsRoute: typeof AdminRedemptionsRoute
   AdminReferralsRoute: typeof AdminReferralsRoute
@@ -4286,6 +4306,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPartsRoute: AdminPartsRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminPerformanceRoute: AdminPerformanceRoute,
+  AdminPermissionsRoute: AdminPermissionsRoute,
   AdminPricingRoute: AdminPricingRoute,
   AdminRedemptionsRoute: AdminRedemptionsRoute,
   AdminReferralsRoute: AdminReferralsRoute,
