@@ -30,6 +30,8 @@ export type AdminNavItem = {
   Icon: LucideIcon;
   exact?: boolean;
   roles: AdminNavRole[];
+  /** Optional permission key for runtime, no-redeploy gating. Falls back to `roles` when absent. */
+  permissionKey?: string;
   info: string;
   section?: string;
   external?: boolean;
@@ -87,5 +89,6 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { to: "/admin/alerts", label: "Ops Alerts", Icon: AlertTriangle, roles: ["admin"], info: "Backend failures captured in-app.", section: "Platform" },
   { to: "/admin/feature-flags", label: "Payment & plan flags", Icon: Sparkles, roles: ["admin"], info: "Server-side toggles for payment rails, boost types and plans.", section: "Platform" },
   { to: "/admin/diagnostics", label: "Permission diagnostics", Icon: ShieldCheck, roles: ["admin"], info: "Inspect roles and permissions for any user.", section: "Platform" },
+  { to: "/admin/permissions", label: "Role permissions", Icon: ShieldCheck, roles: ["admin"], info: "Toggle specific permissions per role without redeploying.", section: "Platform" },
   { to: "/admin/sandbox", label: "Sandbox", Icon: FlaskConical, roles: ["admin"], info: "Internal sandbox for testing flows.", section: "Platform" },
 ];
