@@ -33,6 +33,7 @@ import {
   type BuiltinCategoryRow,
 } from "@/lib/qr-ad-templates.functions";
 import { siteOrigin } from "@/lib/site-config";
+import { prewarmBase, prewarmQr } from "@/lib/qr-ads/compose";
 
 
 const adsSearchSchema = z.object({
@@ -169,6 +170,20 @@ function QrAdsPage() {
     enabled: !!user,
   });
   const { data: signedCustoms } = useSignedCustomTemplates(customData?.templates);
+
+  // Pre-warm the shared QR + base-image caches so individual cards mount instantly.
+  useEffect(() => {
+    if (!context) return;
+    prewarmQr(context.link);
+    const urls = new Set<string>();
+    for (const t of TEMPLATES) {
+      if (t.kind === "image" && t.imageUrl) urls.add(t.imageUrl);
+    }
+    for (const r of signedCustoms ?? customData?.templates ?? []) {
+      if (r.image_url) urls.add(r.image_url);
+    }
+    urls.forEach(prewarmBase);
+  }, [context, signedCustoms, customData?.templates]);
 
   const deleteFn = useServerFn(deleteQrAdTemplate);
   const hideFn = useServerFn(setBuiltinHidden);

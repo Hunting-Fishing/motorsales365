@@ -2,8 +2,32 @@ import QRCode from "qrcode";
 import type { ShareTemplate, TemplateContext } from "./types";
 import { interpolate } from "./types";
 
-async function loadImage(src: string): Promise<HTMLImageElement> {
-  return new Promise((resolve, reject) => {
+// ----- Caches (module-level, last for the session) -------------------------
+
+type DecodedImage = HTMLImageElement | ImageBitmap;
+
+const baseImageCache = new Map<string, Promise<DecodedImage>>();
+const qrImageCache = new Map<string, Promise<DecodedImage>>();
+
+const QR_BUCKET_PX = 1024; // single high-res QR, scaled down on draw
+
+function canUseImageBitmap(): boolean {
+  return typeof createImageBitmap === "function" && typeof fetch === "function";
+}
+
+async function decodeFromUrl(src: string): Promise<DecodedImage> {
+  if (canUseImageBitmap()) {
+    try {
+      const res = await fetch(src, { mode: "cors", credentials: "omit" });
+      if (res.ok) {
+        const blob = await res.blob();
+        return await createImageBitmap(blob);
+      }
+    } catch {
+      // fall through to <img> path
+    }
+  }
+  return new Promise<HTMLImageElement>((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.onload = () => resolve(img);
@@ -12,8 +36,55 @@ async function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
+function imageWidth(img: DecodedImage): number {
+  return (img as HTMLImageElement).naturalWidth || (img as ImageBitmap).width;
+}
+function imageHeight(img: DecodedImage): number {
+  return (img as HTMLImageElement).naturalHeight || (img as ImageBitmap).height;
+}
+
+function loadBaseImageCached(url: string): Promise<DecodedImage> {
+  let p = baseImageCache.get(url);
+  if (!p) {
+    p = decodeFromUrl(url).catch((e) => {
+      baseImageCache.delete(url);
+      throw e;
+    });
+    baseImageCache.set(url, p);
+  }
+  return p;
+}
+
+function loadQrCached(link: string): Promise<DecodedImage> {
+  let p = qrImageCache.get(link);
+  if (!p) {
+    p = (async () => {
+      const dataUrl = await QRCode.toDataURL(link, {
+        errorCorrectionLevel: "H",
+        margin: 1,
+        width: QR_BUCKET_PX,
+        color: { dark: "#0b2a6b", light: "#ffffff" },
+      });
+      return decodeFromUrl(dataUrl);
+    })().catch((e) => {
+      qrImageCache.delete(link);
+      throw e;
+    });
+    qrImageCache.set(link, p);
+  }
+  return p;
+}
+
+export function prewarmBase(url: string): void {
+  void loadBaseImageCached(url).catch(() => {});
+}
+export function prewarmQr(link: string): void {
+  void loadQrCached(link).catch(() => {});
+}
+
+// ----- Drawing helpers ------------------------------------------------------
+
 function svgToDataUrl(svg: string): string {
-  // Use UTF-8 safe base64 encoding
   const encoded =
     typeof window !== "undefined"
       ? window.btoa(unescape(encodeURIComponent(svg)))
@@ -45,7 +116,30 @@ function roundedRect(
 
 export type QrOverride = { cx: number; cy: number; size: number };
 
-async function drawBase(
+async function drawBaseLayer(
+  c: CanvasRenderingContext2D,
+  template: ShareTemplate,
+  ctx: TemplateContext,
+) {
+  c.fillStyle = template.background || "#ffffff";
+  c.fillRect(0, 0, template.width, template.height);
+  if (template.kind === "image" && template.imageUrl) {
+    const img = await loadBaseImageCached(template.imageUrl);
+    const iw = imageWidth(img);
+    const ih = imageHeight(img);
+    const scale = Math.min(template.width / iw, template.height / ih);
+    const w = iw * scale;
+    const h = ih * scale;
+    c.drawImage(img as CanvasImageSource, (template.width - w) / 2, (template.height - h) / 2, w, h);
+  } else if (template.kind === "svg" && template.renderSvg) {
+    const svg = template.renderSvg(ctx);
+    // SVGs depend on context — don't cache cross-card; decode directly.
+    const img = await decodeFromUrl(svgToDataUrl(svg));
+    c.drawImage(img as CanvasImageSource, 0, 0, template.width, template.height);
+  }
+}
+
+export async function composeBaseOnly(
   template: ShareTemplate,
   ctx: TemplateContext,
 ): Promise<HTMLCanvasElement> {
@@ -54,27 +148,8 @@ async function drawBase(
   canvas.height = template.height;
   const c = canvas.getContext("2d");
   if (!c) throw new Error("2D canvas context unavailable");
-  c.fillStyle = template.background || "#ffffff";
-  c.fillRect(0, 0, template.width, template.height);
-  if (template.kind === "image" && template.imageUrl) {
-    const img = await loadImage(template.imageUrl);
-    const scale = Math.min(template.width / img.width, template.height / img.height);
-    const w = img.width * scale;
-    const h = img.height * scale;
-    c.drawImage(img, (template.width - w) / 2, (template.height - h) / 2, w, h);
-  } else if (template.kind === "svg" && template.renderSvg) {
-    const svg = template.renderSvg(ctx);
-    const img = await loadImage(svgToDataUrl(svg));
-    c.drawImage(img, 0, 0, template.width, template.height);
-  }
+  await drawBaseLayer(c, template, ctx);
   return canvas;
-}
-
-export async function composeBaseOnly(
-  template: ShareTemplate,
-  ctx: TemplateContext,
-): Promise<HTMLCanvasElement> {
-  return drawBase(template, ctx);
 }
 
 export async function composeTemplate(
@@ -88,43 +163,22 @@ export async function composeTemplate(
   const c = canvas.getContext("2d");
   if (!c) throw new Error("2D canvas context unavailable");
 
-  // Background
-  c.fillStyle = template.background || "#ffffff";
-  c.fillRect(0, 0, template.width, template.height);
+  // Base + QR in parallel — QR comes from a shared cache so most cards hit instantly.
+  const [, qrImg] = await Promise.all([
+    drawBaseLayer(c, template, ctx),
+    loadQrCached(ctx.link),
+  ]);
 
-  // Base layer
-  if (template.kind === "image" && template.imageUrl) {
-    const img = await loadImage(template.imageUrl);
-    // contain
-    const scale = Math.min(template.width / img.width, template.height / img.height);
-    const w = img.width * scale;
-    const h = img.height * scale;
-    c.drawImage(img, (template.width - w) / 2, (template.height - h) / 2, w, h);
-  } else if (template.kind === "svg" && template.renderSvg) {
-    const svg = template.renderSvg(ctx);
-    const img = await loadImage(svgToDataUrl(svg));
-    c.drawImage(img, 0, 0, template.width, template.height);
-  }
-
-  // QR (use override placement if provided)
   const qrCxRel = override?.cx ?? template.qr.cx;
   const qrCyRel = override?.cy ?? template.qr.cy;
   const qrSizeRel = override?.size ?? template.qr.size;
   const qrSizePx = qrSizeRel * template.width;
-  const qrPng = await QRCode.toDataURL(ctx.link, {
-    errorCorrectionLevel: "H",
-    margin: 1,
-    width: Math.max(512, Math.round(qrSizePx * 2)),
-    color: { dark: "#0b2a6b", light: "#ffffff" },
-  });
-  const qrImg = await loadImage(qrPng);
 
   const qrCx = qrCxRel * template.width;
   const qrCy = qrCyRel * template.height;
   const qrX = qrCx - qrSizePx / 2;
   const qrY = qrCy - qrSizePx / 2;
 
-  // White plate
   if (template.qr.platePadding && template.qr.platePadding > 0) {
     const pad = template.qr.platePadding * qrSizePx;
     const plateRadius = (template.qr.plateRadius ?? 0.04) * qrSizePx * 4;
@@ -138,9 +192,8 @@ export async function composeTemplate(
     c.restore();
   }
 
-  c.drawImage(qrImg, qrX, qrY, qrSizePx, qrSizePx);
+  c.drawImage(qrImg as CanvasImageSource, qrX, qrY, qrSizePx, qrSizePx);
 
-  // Caption under QR
   if (template.qr.caption) {
     const cap = template.qr.caption;
     const text = interpolate(cap.text, ctx);
