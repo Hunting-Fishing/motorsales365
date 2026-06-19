@@ -20,7 +20,7 @@ import {
   useAdminPendingCounts,
   pendingCountForRoute,
 } from "@/hooks/use-admin-pending-counts";
-import { ADMIN_NAV, type AdminAdminNavItem } from "@/lib/admin-nav";
+import { ADMIN_NAV, type AdminNavItem } from "@/lib/admin-nav";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
