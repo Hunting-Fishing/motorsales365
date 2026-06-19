@@ -33,6 +33,9 @@ type Row = {
   old_value: string | null;
   new_value: string | null;
   created_at: string;
+  entity_type?: string | null;
+  entity_id?: string | null;
+  metadata?: Record<string, unknown> | null;
 };
 
 const ACTION_LABEL: Record<string, string> = {
@@ -40,11 +43,45 @@ const ACTION_LABEL: Record<string, string> = {
   role_revoked: "Role revoked",
   verification_changed: "Verification changed",
   seller_type_changed: "Seller type changed",
+  permission_changed: "Permission changed",
 };
 
 function fmt(ts: string) {
   const d = new Date(ts);
   return `${d.toLocaleDateString()} ${d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
+}
+
+function downloadCsv(filename: string, rows: Row[], nameOf: (id: string) => string) {
+  const header = ["When", "Action", "Entity", "Target", "Field", "Old", "New", "By", "Metadata"];
+  const esc = (v: any) => {
+    const s = v === null || v === undefined ? "" : String(v);
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const lines = [header.join(",")];
+  for (const r of rows) {
+    lines.push(
+      [
+        fmt(r.created_at),
+        ACTION_LABEL[r.action] ?? r.action,
+        r.entity_type ? `${r.entity_type}:${r.entity_id ?? ""}` : "",
+        nameOf(r.target_user_id),
+        r.field,
+        r.old_value ?? "",
+        r.new_value ?? "",
+        nameOf(r.actor_id),
+        r.metadata ? JSON.stringify(r.metadata) : "",
+      ]
+        .map(esc)
+        .join(","),
+    );
+  }
+  const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function AdminAudit() {
@@ -172,12 +209,23 @@ function UserActionsTab() {
             <SelectItem value="role_revoked">Role revoked</SelectItem>
             <SelectItem value="verification_changed">Verification changed</SelectItem>
             <SelectItem value="seller_type_changed">Seller type changed</SelectItem>
+            <SelectItem value="permission_changed">Permission changed</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      <div className="mb-2 text-xs text-muted-foreground">
-        {loading ? "Loading…" : `${total} entries`}
+      <div className="mb-2 flex items-center justify-between">
+        <div className="text-xs text-muted-foreground">
+          {loading ? "Loading…" : `${total} entries`}
+        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={rows.length === 0}
+          onClick={() => downloadCsv(`admin-audit-${Date.now()}.csv`, rows, nameOf)}
+        >
+          Export CSV
+        </Button>
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-border bg-card">
@@ -186,6 +234,7 @@ function UserActionsTab() {
             <tr>
               <th className="px-3 py-2 text-left">When</th>
               <th className="px-3 py-2 text-left">Action</th>
+              <th className="px-3 py-2 text-left">Entity</th>
               <th className="px-3 py-2 text-left">Target</th>
               <th className="px-3 py-2 text-left">Change</th>
               <th className="px-3 py-2 text-left">By</th>
@@ -194,7 +243,7 @@ function UserActionsTab() {
           <tbody>
             {rows.length === 0 && !loading && (
               <tr>
-                <td colSpan={5} className="px-3 py-8 text-center text-muted-foreground">
+                <td colSpan={6} className="px-3 py-8 text-center text-muted-foreground">
                   No audit entries match.
                 </td>
               </tr>
@@ -206,6 +255,16 @@ function UserActionsTab() {
                 </td>
                 <td className="px-3 py-2">
                   <Badge variant="secondary">{ACTION_LABEL[r.action] ?? r.action}</Badge>
+                </td>
+                <td className="px-3 py-2 text-xs">
+                  {r.entity_type ? (
+                    <span title={r.metadata ? JSON.stringify(r.metadata, null, 2) : undefined}>
+                      <span className="text-muted-foreground">{r.entity_type}</span>
+                      {r.entity_id ? <span className="ml-1 font-mono">{r.entity_id}</span> : null}
+                    </span>
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  )}
                 </td>
                 <td className="px-3 py-2">{nameOf(r.target_user_id)}</td>
                 <td className="px-3 py-2 text-xs">
