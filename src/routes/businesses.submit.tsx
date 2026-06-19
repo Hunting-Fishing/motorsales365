@@ -36,7 +36,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Search, Upload, X, Image as ImageIcon } from "lucide-react";
+import { Search, Upload, X, Image as ImageIcon, Check, Building2, Wrench, Phone as PhoneIcon, MapPin, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { LocationDrilldown, type LocationValue } from "@/components/businesses/location-drilldown";
 import { LocationPicker } from "@/components/businesses/location-picker";
 import { resolvePsgc } from "@/lib/psgc";
