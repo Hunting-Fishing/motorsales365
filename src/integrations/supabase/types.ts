@@ -260,34 +260,43 @@ export type Database = {
           action: string
           actor_id: string
           created_at: string
-          field: string
+          entity_id: string | null
+          entity_type: string | null
+          field: string | null
           id: string
+          metadata: Json | null
           new_value: string | null
           note: string | null
           old_value: string | null
-          target_user_id: string
+          target_user_id: string | null
         }
         Insert: {
           action: string
           actor_id: string
           created_at?: string
-          field: string
+          entity_id?: string | null
+          entity_type?: string | null
+          field?: string | null
           id?: string
+          metadata?: Json | null
           new_value?: string | null
           note?: string | null
           old_value?: string | null
-          target_user_id: string
+          target_user_id?: string | null
         }
         Update: {
           action?: string
           actor_id?: string
           created_at?: string
-          field?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          field?: string | null
           id?: string
+          metadata?: Json | null
           new_value?: string | null
           note?: string | null
           old_value?: string | null
-          target_user_id?: string
+          target_user_id?: string | null
         }
         Relationships: []
       }
@@ -6440,6 +6449,30 @@ export type Database = {
         }
         Relationships: []
       }
+      role_permissions: {
+        Row: {
+          enabled: boolean
+          permission_key: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          enabled?: boolean
+          permission_key: string
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          enabled?: boolean
+          permission_key?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       route_audit_log: {
         Row: {
           actor_id: string
@@ -9337,6 +9370,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["business_staff_role"]
           _user: string
         }
+        Returns: boolean
+      }
+      has_permission: {
+        Args: { _key: string; _user_id: string }
         Returns: boolean
       }
       has_role: {
