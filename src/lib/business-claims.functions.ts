@@ -162,7 +162,7 @@ export const listPendingClaims = createServerFn({ method: "GET" })
     const { data, error } = await supabase
       .from("business_claim_requests")
       .select(
-        "id,business_id,claimant_user_id,contact_method,contact_value,evidence_url,notes,status,created_at,businesses(name,slug,city,region,phone,email)",
+        "id,business_id,claimant_user_id,contact_method,contact_value,evidence_url,notes,status,kind,created_at,businesses(name,slug,city,region,phone,email,owner_id)",
       )
       .in("status", ["pending"])
       .order("created_at", { ascending: false })
