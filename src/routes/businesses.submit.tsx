@@ -36,7 +36,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Search, Upload, X, Image as ImageIcon } from "lucide-react";
+import { Search, Upload, X, Image as ImageIcon, Check, Building2, Wrench, Phone as PhoneIcon, MapPin, Clock, ChevronLeft, ChevronRight } from "lucide-react";
 import { LocationDrilldown, type LocationValue } from "@/components/businesses/location-drilldown";
 import { LocationPicker } from "@/components/businesses/location-picker";
 import { resolvePsgc } from "@/lib/psgc";
@@ -126,6 +126,7 @@ function SubmitBusinessPage() {
   const [suggestLabel, setSuggestLabel] = useState("");
   const [suggestNotes, setSuggestNotes] = useState("");
   const [suggestSubmitting, setSuggestSubmitting] = useState(false);
+  const [step, setStep] = useState<"basics" | "services" | "contact" | "location" | "review">("basics");
 
   const submitTypeSuggestion = async () => {
     const label = suggestLabel.trim();
@@ -543,366 +544,587 @@ function SubmitBusinessPage() {
       </SiteLayout>
     );
 
+  // ----- Tabbed wizard -----
+  const STEPS = [
+    { key: "basics", label: "Basics", icon: Building2 },
+    { key: "services", label: "Services", icon: Wrench },
+    { key: "contact", label: "Contact", icon: PhoneIcon },
+    { key: "location", label: "Location", icon: MapPin },
+    { key: "review", label: "Hours & Review", icon: Clock },
+  ] as const;
+  type StepKey = (typeof STEPS)[number]["key"];
+  const stepIndex = STEPS.findIndex((s) => s.key === step);
+  const goTo = (k: StepKey) => {
+    setStep(k);
+    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+  const next = () => stepIndex < STEPS.length - 1 && goTo(STEPS[stepIndex + 1].key);
+  const prev = () => stepIndex > 0 && goTo(STEPS[stepIndex - 1].key);
+
+  // Lightweight completion hints (visual only; submit() still enforces rules)
+  const completed: Record<StepKey, boolean> = {
+    basics: name.trim().length > 0 && !!typeSlug,
+    services: services.length > 0,
+    contact: !!(phoneNational.trim() || email.trim() || website.trim() || messengerUrl.trim()),
+    location: !!(streetAddress.trim() || loc.city || (lat && lng)),
+    review: hasOpenDay(hours),
+  };
+
   return (
     <SiteLayout>
-      <div className="container mx-auto max-w-3xl px-4 py-8">
-        <Link to="/businesses" className="text-sm text-muted-foreground hover:text-foreground">
-          ← Back to businesses
-        </Link>
-        <h1 className="mt-2 font-display text-2xl font-bold tracking-tight md:text-3xl">
-          List your business
-        </h1>
-        <p className="mb-4 text-sm text-muted-foreground">
-          Submissions go through a quick review before being published.
-        </p>
+      <div className="relative">
+        {/* soft gradient band */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-gradient-to-b from-primary/10 via-primary/5 to-transparent"
+        />
+        <div className="container relative mx-auto max-w-4xl px-4 py-8">
+          <Link
+            to="/businesses"
+            className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+          >
+            ← Back to businesses
+          </Link>
+          <h1 className="mt-2 font-display text-3xl font-bold tracking-tight md:text-4xl">
+            List your business
+          </h1>
+          <p className="mb-6 text-sm text-muted-foreground">
+            Submissions go through a quick review before being published.
+          </p>
 
-        <Card className="mb-6 flex flex-col gap-2 border-primary/30 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="text-sm">
-            <div className="font-medium">Already listed on 365 MotorSales?</div>
-            <div className="text-muted-foreground">
-              Search the directory and claim your existing business, or request an ownership transfer.
-            </div>
-          </div>
-          <Button asChild variant="outline" size="sm">
-            <Link to="/dashboard/claim-business">Claim a business</Link>
-          </Button>
-        </Card>
-
-
-        <Card className="space-y-5 p-5">
-          <div>
-            <Label>Business name *</Label>
-            <Input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              maxLength={120}
-              placeholder="e.g. Quezon Ave Toyota"
-            />
-          </div>
-
-          <div>
-            <Label>Business logo / avatar</Label>
-            <p className="mb-2 text-xs text-muted-foreground">
-              Square works best. PNG or JPG, up to 5MB.
-            </p>
-            <div className="flex items-center gap-3">
-              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-muted">
-                {logoUrl ? (
-                  <img src={logoUrl} alt="Logo preview" className="h-full w-full object-cover" />
-                ) : (
-                  <ImageIcon className="h-6 w-6 text-muted-foreground/50" />
-                )}
-              </div>
-              <div className="flex flex-wrap gap-2">
-                <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-secondary">
-                  <Upload className="h-3.5 w-3.5" />
-                  {logoUploading ? "Uploading…" : logoUrl ? "Replace logo" : "Upload logo"}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={onLogoChange}
-                    disabled={logoUploading}
-                  />
-                </label>
-                {logoUrl && (
-                  <button
-                    type="button"
-                    onClick={() => setLogoUrl(null)}
-                    className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-secondary"
-                  >
-                    <X className="h-3.5 w-3.5" /> Remove
-                  </button>
-                )}
+          <Card className="mb-6 flex flex-col gap-2 border-primary/30 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="text-sm">
+              <div className="font-medium">Already listed on 365 MotorSales?</div>
+              <div className="text-muted-foreground">
+                Search the directory and claim your existing business, or request an ownership
+                transfer.
               </div>
             </div>
-          </div>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/dashboard/claim-business">Claim a business</Link>
+            </Button>
+          </Card>
 
-          <div>
-            <div className="mb-1 flex items-center justify-between gap-2">
-              <Label>Business type *</Label>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button type="button" variant="outline" size="sm">
-                    + Add
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="max-h-80 w-64 overflow-y-auto">
-                  <DropdownMenuLabel>Choose business type</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  {types.map((t) => (
-                    <DropdownMenuItem
-                      key={t.slug}
-                      onSelect={() => {
-                        setTypeSlug(t.slug);
-                        setSelectedTags([]);
-                      }}
-                    >
-                      {t.label}
-                      {typeSlug === t.slug ? " ✓" : ""}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-            <Select
-              value={typeSlug}
-              onValueChange={(v) => {
-                setTypeSlug(v);
-                setSelectedTags([]);
-              }}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Choose a type" />
-              </SelectTrigger>
-              <SelectContent>
-                {types.map((t) => (
-                  <SelectItem key={t.slug} value={t.slug}>
-                    {t.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          {visibleTags.length > 0 && (
-            <div>
-              <div className="mb-1 flex items-center justify-between gap-2">
-                <Label>
-                  Tags{" "}
-                  {selectedTags.length > 0 && (
-                    <span className="ml-1 text-xs text-muted-foreground">
-                      ({selectedTags.length} selected)
-                    </span>
-                  )}
-                </Label>
-                <Dialog open={tagsOpen} onOpenChange={setTagsOpen}>
-                  <DialogTrigger asChild>
-                    <Button type="button" variant="outline" size="sm">
-                      Browse all tags
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="max-h-[85vh] max-w-2xl overflow-hidden p-0">
-                    <DialogHeader className="border-b p-4">
-                      <DialogTitle>Browse all tags</DialogTitle>
-                    </DialogHeader>
-                    <div className="border-b p-4">
-                      <div className="relative">
-                        <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                          autoFocus
-                          placeholder="Search tags…"
-                          value={tagSearch}
-                          onChange={(e) => setTagSearch(e.target.value)}
-                          className="pl-9"
-                        />
-                      </div>
-                    </div>
-                    <div className="max-h-[55vh] space-y-5 overflow-y-auto p-4">
-                      {groupKeys.length === 0 && (
-                        <p className="py-8 text-center text-sm text-muted-foreground">
-                          No tags match "{tagSearch}"
-                        </p>
-                      )}
-                      {groupKeys.map((k) => (
-                        <div key={k}>
-                          <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                            {prettyCategory(k)}
-                          </div>
-                          <div className="flex flex-wrap gap-1.5">
-                            {grouped[k].map((t) => {
-                              const on = selectedTags.includes(t.slug);
-                              return (
-                                <button
-                                  type="button"
-                                  key={t.slug}
-                                  onClick={() => toggleTag(t.slug)}
-                                  className={`rounded-full border px-3 py-1 text-xs transition ${on ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}
-                                >
-                                  {t.label}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                    <DialogFooter className="border-t p-4">
-                      <span className="mr-auto self-center text-xs text-muted-foreground">
-                        {selectedTags.length} selected
-                      </span>
-                      <Button
-                        type="button"
-                        onClick={() => {
-                          setTagsOpen(false);
-                          setTagSearch("");
-                        }}
-                      >
-                        Done
-                      </Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </div>
-              <p className="mb-2 text-xs text-muted-foreground">
-                Top {popularTags.length} popular tags shown — use "Browse all tags" for the full
-                library.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {inlineTags.map((t) => {
-                  const on = selectedTags.includes(t.slug);
-                  return (
+          {/* Stepper */}
+          <div className="sticky top-2 z-10 mb-4 overflow-x-auto rounded-2xl border border-border bg-card/90 p-2 shadow-sm backdrop-blur">
+            <ol className="flex min-w-max items-center gap-1">
+              {STEPS.map((s, i) => {
+                const Icon = s.icon;
+                const active = s.key === step;
+                const done = completed[s.key] && !active;
+                return (
+                  <li key={s.key} className="flex items-center">
                     <button
                       type="button"
-                      key={t.slug}
-                      onClick={() => toggleTag(t.slug)}
-                      className={`rounded-full border px-3 py-1 text-xs transition ${on ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}
+                      onClick={() => goTo(s.key)}
+                      className={`group flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition ${
+                        active
+                          ? "bg-primary text-primary-foreground shadow"
+                          : done
+                            ? "text-foreground hover:bg-secondary"
+                            : "text-muted-foreground hover:bg-secondary"
+                      }`}
                     >
-                      {t.label}
+                      <span
+                        className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs ${
+                          active
+                            ? "bg-primary-foreground/20 text-primary-foreground"
+                            : done
+                              ? "bg-primary/15 text-primary"
+                              : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {done ? <Check className="h-3.5 w-3.5" /> : <Icon className="h-3.5 w-3.5" />}
+                      </span>
+                      <span className="whitespace-nowrap">
+                        <span className="mr-1 opacity-60">{i + 1}.</span>
+                        {s.label}
+                      </span>
                     </button>
-                  );
-                })}
+                    {i < STEPS.length - 1 && (
+                      <span className="mx-1 h-px w-4 shrink-0 bg-border sm:w-6" />
+                    )}
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+
+          <Card className="space-y-6 rounded-2xl p-5 ring-1 ring-border/60 sm:p-7">
+            {/* ===== BASICS ===== */}
+            {step === "basics" && (
+              <div className="space-y-5">
+                <div>
+                  <h2 className="font-display text-xl font-semibold">Tell us about your business</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Start with a name, logo, type, and a short description.
+                  </p>
+                </div>
+
+                <div>
+                  <Label>Business name *</Label>
+                  <Input
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    maxLength={120}
+                    placeholder="e.g. Quezon Ave Toyota"
+                  />
+                </div>
+
+                <div>
+                  <Label>Business logo / avatar</Label>
+                  <p className="mb-2 text-xs text-muted-foreground">
+                    Square works best. PNG or JPG, up to 5MB.
+                  </p>
+                  <label className="group flex cursor-pointer items-center gap-4 rounded-xl border-2 border-dashed border-border bg-muted/30 p-4 transition hover:border-primary/50 hover:bg-primary/5">
+                    <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-full border border-border bg-background">
+                      {logoUrl ? (
+                        <img
+                          src={logoUrl}
+                          alt="Logo preview"
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <ImageIcon className="h-7 w-7 text-muted-foreground/50" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 text-sm font-medium">
+                        <Upload className="h-4 w-4 text-primary" />
+                        {logoUploading
+                          ? "Uploading…"
+                          : logoUrl
+                            ? "Replace logo"
+                            : "Click to upload your logo"}
+                      </div>
+                      <div className="mt-0.5 text-xs text-muted-foreground">
+                        PNG or JPG · square recommended · max 5MB
+                      </div>
+                    </div>
+                    {logoUrl && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setLogoUrl(null);
+                        }}
+                        className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-3 py-1.5 text-xs font-medium hover:bg-secondary"
+                      >
+                        <X className="h-3.5 w-3.5" /> Remove
+                      </button>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={onLogoChange}
+                      disabled={logoUploading}
+                    />
+                  </label>
+                </div>
+
+                <div>
+                  <div className="mb-1 flex items-center justify-between gap-2">
+                    <Label>Business type *</Label>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button type="button" variant="outline" size="sm">
+                          + Add
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent
+                        align="end"
+                        className="max-h-80 w-64 overflow-y-auto"
+                      >
+                        <DropdownMenuLabel>Choose business type</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        {types.map((t) => (
+                          <DropdownMenuItem
+                            key={t.slug}
+                            onSelect={() => {
+                              setTypeSlug(t.slug);
+                              setSelectedTags([]);
+                            }}
+                          >
+                            {t.label}
+                            {typeSlug === t.slug ? " ✓" : ""}
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                  <Select
+                    value={typeSlug}
+                    onValueChange={(v) => {
+                      setTypeSlug(v);
+                      setSelectedTags([]);
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose a type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {types.map((t) => (
+                        <SelectItem key={t.slug} value={t.slug}>
+                          {t.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                {visibleTags.length > 0 && (
+                  <div>
+                    <div className="mb-1 flex items-center justify-between gap-2">
+                      <Label>
+                        Tags{" "}
+                        {selectedTags.length > 0 && (
+                          <span className="ml-1 text-xs text-muted-foreground">
+                            ({selectedTags.length} selected)
+                          </span>
+                        )}
+                      </Label>
+                      <Dialog open={tagsOpen} onOpenChange={setTagsOpen}>
+                        <DialogTrigger asChild>
+                          <Button type="button" variant="outline" size="sm">
+                            Browse all tags
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-h-[85vh] max-w-2xl overflow-hidden p-0">
+                          <DialogHeader className="border-b p-4">
+                            <DialogTitle>Browse all tags</DialogTitle>
+                          </DialogHeader>
+                          <div className="border-b p-4">
+                            <div className="relative">
+                              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                              <Input
+                                autoFocus
+                                placeholder="Search tags…"
+                                value={tagSearch}
+                                onChange={(e) => setTagSearch(e.target.value)}
+                                className="pl-9"
+                              />
+                            </div>
+                          </div>
+                          <div className="max-h-[55vh] space-y-5 overflow-y-auto p-4">
+                            {groupKeys.length === 0 && (
+                              <p className="py-8 text-center text-sm text-muted-foreground">
+                                No tags match "{tagSearch}"
+                              </p>
+                            )}
+                            {groupKeys.map((k) => (
+                              <div key={k}>
+                                <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                                  {prettyCategory(k)}
+                                </div>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {grouped[k].map((t) => {
+                                    const on = selectedTags.includes(t.slug);
+                                    return (
+                                      <button
+                                        type="button"
+                                        key={t.slug}
+                                        onClick={() => toggleTag(t.slug)}
+                                        className={`rounded-full border px-3 py-1 text-xs transition ${on ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}
+                                      >
+                                        {t.label}
+                                      </button>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          <DialogFooter className="border-t p-4">
+                            <span className="mr-auto self-center text-xs text-muted-foreground">
+                              {selectedTags.length} selected
+                            </span>
+                            <Button
+                              type="button"
+                              onClick={() => {
+                                setTagsOpen(false);
+                                setTagSearch("");
+                              }}
+                            >
+                              Done
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
+                    <p className="mb-2 text-xs text-muted-foreground">
+                      Top {popularTags.length} popular tags shown — use "Browse all tags" for the
+                      full library.
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {inlineTags.map((t) => {
+                        const on = selectedTags.includes(t.slug);
+                        return (
+                          <button
+                            type="button"
+                            key={t.slug}
+                            onClick={() => toggleTag(t.slug)}
+                            className={`rounded-full border px-3 py-1 text-xs transition ${on ? "border-primary bg-primary text-primary-foreground" : "border-border hover:bg-secondary"}`}
+                          >
+                            {t.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {["parts_accessories", "repair_shop", "body_paint", "salvage"].includes(typeSlug) && (
+                  <div>
+                    <Label>Brands carried / serviced</Label>
+                    <Input
+                      value={brandsCarried}
+                      onChange={(e) => setBrandsCarried(e.target.value)}
+                      maxLength={300}
+                      placeholder={
+                        typeSlug === "parts_accessories"
+                          ? "e.g. Bosch, Denso, NGK, Michelin, Yokohama"
+                          : typeSlug === "salvage"
+                            ? "e.g. Toyota, Honda, Mitsubishi, Isuzu"
+                            : "e.g. Toyota, Honda, Mitsubishi, Ford"
+                      }
+                    />
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Comma-separated. Helps buyers find you when searching for specific brands.
+                    </p>
+                  </div>
+                )}
+
+                <div>
+                  <Label>Description</Label>
+                  <Textarea
+                    rows={4}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    maxLength={2000}
+                    placeholder="What makes your business great? Specialties, years in business, languages spoken…"
+                  />
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {["parts_accessories", "repair_shop", "body_paint", "salvage"].includes(typeSlug) && (
-            <div>
-              <Label>Brands carried / serviced</Label>
-              <Input
-                value={brandsCarried}
-                onChange={(e) => setBrandsCarried(e.target.value)}
-                maxLength={300}
-                placeholder={
-                  typeSlug === "parts_accessories"
-                    ? "e.g. Bosch, Denso, NGK, Michelin, Yokohama"
-                    : typeSlug === "salvage"
-                      ? "e.g. Toyota, Honda, Mitsubishi, Isuzu"
-                      : "e.g. Toyota, Honda, Mitsubishi, Ford"
-                }
-              />
-              <p className="mt-1 text-xs text-muted-foreground">
-                Comma-separated. Helps buyers find you when searching for specific brands.
-              </p>
-            </div>
-          )}
-
-          <div>
-            <Label>Description</Label>
-            <Textarea
-              rows={4}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              maxLength={2000}
-            />
-          </div>
-
-          <ServicesTable typeSlug={typeSlug} value={services} onChange={setServices} />
-
-
-          <div className="grid gap-3 sm:grid-cols-2">
-            <div>
-              <Label>Phone</Label>
-              <PhoneInput
-                iso={phoneIso}
-                national={phoneNational}
-                onChange={({ iso, national }) => {
-                  setPhoneIso(iso);
-                  setPhoneNational(national);
-                }}
-              />
-            </div>
-            <div>
-              <Label>Email</Label>
-              <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-            </div>
-            <div>
-              <Label>Website</Label>
-              <Input
-                value={website}
-                onChange={(e) => setWebsite(e.target.value)}
-                placeholder="https://…"
-              />
-            </div>
-            <div>
-              <Label>Messenger / FB</Label>
-              <Input
-                value={messengerUrl}
-                onChange={(e) => setMessengerUrl(e.target.value)}
-                placeholder="https://m.me/…"
-              />
-            </div>
-          </div>
-
-          <div className="grid gap-3 sm:grid-cols-[1fr_160px]">
-            <div>
-              <Label>Street address</Label>
-              <Input
-                value={streetAddress}
-                onChange={(e) => setStreetAddress(e.target.value)}
-                maxLength={200}
-              />
-            </div>
-            <div>
-              <Label>Postal code</Label>
-              <Input
-                value={postalCode}
-                onChange={(e) => setPostalCode(e.target.value)}
-                maxLength={10}
-              />
-            </div>
-          </div>
-
-          <div>
-            <Label>Location</Label>
-            <LocationDrilldown value={loc} onChange={setLoc} />
-          </div>
-
-          <div>
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <Label>Pin your business on the map</Label>
-              <div className="flex flex-wrap gap-2">
-                <Button type="button" variant="outline" size="sm" onClick={geocodeAddress}>
-                  Find on map
-                </Button>
-                <Button type="button" variant="outline" size="sm" onClick={useMyLocation}>
-                  Use my location
-                </Button>
+            {/* ===== SERVICES ===== */}
+            {step === "services" && (
+              <div className="space-y-5">
+                <div>
+                  <h2 className="font-display text-xl font-semibold">Services & pricing</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Add the services you offer with optional pricing. You can skip this and add
+                    services later from your dashboard.
+                  </p>
+                </div>
+                <ServicesTable typeSlug={typeSlug} value={services} onChange={setServices} />
               </div>
-            </div>
-            <p className="mb-2 mt-1 text-xs text-muted-foreground">
-              Click the map or drag the pin to set the exact spot. Coordinates are saved with your
-              listing.
-            </p>
-            <LocationPicker
-              lat={lat ? Number(lat) : null}
-              lng={lng ? Number(lng) : null}
-              region={loc.region}
-              onChange={(la, ln) => setCoords(la, ln)}
-            />
-            <div className="mt-2 grid gap-2 sm:grid-cols-2">
-              <Input placeholder="Latitude" value={lat} onChange={(e) => setLat(e.target.value)} />
-              <Input placeholder="Longitude" value={lng} onChange={(e) => setLng(e.target.value)} />
-            </div>
-          </div>
+            )}
 
-          <div>
-            <Label>Business hours</Label>
-            <p className="mb-2 text-xs text-muted-foreground">
-              Set at least one open day so customers know when to reach you. You can refine these
-              any time from your dashboard.
-            </p>
-            <WeekHoursEditor value={hours} onChange={setHours} />
-          </div>
+            {/* ===== CONTACT ===== */}
+            {step === "contact" && (
+              <div className="space-y-5">
+                <div>
+                  <h2 className="font-display text-xl font-semibold">How customers can reach you</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Provide at least one way for buyers to contact you.
+                  </p>
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <Label>Phone</Label>
+                    <PhoneInput
+                      iso={phoneIso}
+                      national={phoneNational}
+                      onChange={({ iso, national }) => {
+                        setPhoneIso(iso);
+                        setPhoneNational(national);
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <Label>Email</Label>
+                    <Input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label>Website</Label>
+                    <Input
+                      value={website}
+                      onChange={(e) => setWebsite(e.target.value)}
+                      placeholder="https://…"
+                    />
+                  </div>
+                  <div>
+                    <Label>Messenger / FB</Label>
+                    <Input
+                      value={messengerUrl}
+                      onChange={(e) => setMessengerUrl(e.target.value)}
+                      placeholder="https://m.me/…"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
 
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <FormFeedbackLink formId="business-submit" />
-            <Button onClick={submit} disabled={submitting}>
-              {submitting ? "Submitting…" : "Submit for review"}
-            </Button>
-          </div>
-        </Card>
+            {/* ===== LOCATION ===== */}
+            {step === "location" && (
+              <div className="space-y-5">
+                <div>
+                  <h2 className="font-display text-xl font-semibold">Where you're located</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Help buyers find you — fill in the address and drop a pin on the map.
+                  </p>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-[1fr_160px]">
+                  <div>
+                    <Label>Street address</Label>
+                    <Input
+                      value={streetAddress}
+                      onChange={(e) => setStreetAddress(e.target.value)}
+                      maxLength={200}
+                    />
+                  </div>
+                  <div>
+                    <Label>Postal code</Label>
+                    <Input
+                      value={postalCode}
+                      onChange={(e) => setPostalCode(e.target.value)}
+                      maxLength={10}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label>Location</Label>
+                  <LocationDrilldown value={loc} onChange={setLoc} />
+                </div>
+
+                <div>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <Label>Pin your business on the map</Label>
+                    <div className="flex flex-wrap gap-2">
+                      <Button type="button" variant="outline" size="sm" onClick={geocodeAddress}>
+                        Find on map
+                      </Button>
+                      <Button type="button" variant="outline" size="sm" onClick={useMyLocation}>
+                        Use my location
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="mb-2 mt-1 text-xs text-muted-foreground">
+                    Click the map or drag the pin to set the exact spot. Coordinates are saved with
+                    your listing.
+                  </p>
+                  <LocationPicker
+                    lat={lat ? Number(lat) : null}
+                    lng={lng ? Number(lng) : null}
+                    region={loc.region}
+                    onChange={(la, ln) => setCoords(la, ln)}
+                  />
+                  <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                    <Input
+                      placeholder="Latitude"
+                      value={lat}
+                      onChange={(e) => setLat(e.target.value)}
+                    />
+                    <Input
+                      placeholder="Longitude"
+                      value={lng}
+                      onChange={(e) => setLng(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ===== HOURS & REVIEW ===== */}
+            {step === "review" && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="font-display text-xl font-semibold">Business hours & review</h2>
+                  <p className="text-sm text-muted-foreground">
+                    Set when customers can reach you, then review and submit.
+                  </p>
+                </div>
+
+                <div>
+                  <Label>Business hours *</Label>
+                  <p className="mb-2 text-xs text-muted-foreground">
+                    Set at least one open day so customers know when to reach you. You can refine
+                    these any time from your dashboard.
+                  </p>
+                  <WeekHoursEditor value={hours} onChange={setHours} />
+                </div>
+
+                <div className="rounded-xl border border-border bg-muted/30 p-4">
+                  <div className="mb-3 text-sm font-semibold">Review your listing</div>
+                  <dl className="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
+                    <div className="flex justify-between gap-2 sm:block">
+                      <dt className="text-muted-foreground">Name</dt>
+                      <dd className="truncate font-medium">{name || "—"}</dd>
+                    </div>
+                    <div className="flex justify-between gap-2 sm:block">
+                      <dt className="text-muted-foreground">Type</dt>
+                      <dd className="truncate font-medium">{selectedTypeLabel || "—"}</dd>
+                    </div>
+                    <div className="flex justify-between gap-2 sm:block">
+                      <dt className="text-muted-foreground">Tags</dt>
+                      <dd className="font-medium">{selectedTags.length}</dd>
+                    </div>
+                    <div className="flex justify-between gap-2 sm:block">
+                      <dt className="text-muted-foreground">Services</dt>
+                      <dd className="font-medium">{services.length}</dd>
+                    </div>
+                    <div className="flex justify-between gap-2 sm:block">
+                      <dt className="text-muted-foreground">City</dt>
+                      <dd className="truncate font-medium">{loc.city || "—"}</dd>
+                    </div>
+                    <div className="flex justify-between gap-2 sm:block">
+                      <dt className="text-muted-foreground">Hours set</dt>
+                      <dd className="font-medium">{hasOpenDay(hours) ? "Yes" : "No"}</dd>
+                    </div>
+                  </dl>
+                </div>
+
+                <FormFeedbackLink formId="business-submit" />
+              </div>
+            )}
+
+            {/* ===== Footer nav ===== */}
+            <div className="sticky bottom-0 -mx-5 -mb-5 flex flex-wrap items-center justify-between gap-3 border-t border-border bg-card/95 px-5 py-3 backdrop-blur sm:-mx-7 sm:-mb-7 sm:px-7">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={prev}
+                disabled={stepIndex === 0}
+              >
+                <ChevronLeft className="mr-1 h-4 w-4" />
+                Back
+              </Button>
+              <div className="text-xs text-muted-foreground">
+                Step {stepIndex + 1} of {STEPS.length}
+              </div>
+              {step === "review" ? (
+                <Button onClick={submit} disabled={submitting}>
+                  {submitting ? "Submitting…" : "Submit for review"}
+                </Button>
+              ) : (
+                <Button type="button" onClick={next}>
+                  Continue
+                  <ChevronRight className="ml-1 h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          </Card>
+        </div>
       </div>
     </SiteLayout>
   );
 }
+
