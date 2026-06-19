@@ -10,6 +10,18 @@
  * brand/referral content.
  */
 
+import {
+  Wrench,
+  LifeBuoy,
+  ShoppingBag,
+  ShieldCheck,
+  GraduationCap,
+  BadgePercent,
+  Megaphone,
+  Boxes,
+  type LucideIcon,
+} from "lucide-react";
+
 export type CategoryKey =
   | "repair-service"
   | "towing-roadside"
@@ -71,6 +83,10 @@ export type SubcategoryKey =
 export type CategoryDef = {
   key: CategoryKey;
   label: string;
+  /** Lucide icon used as the visual marker on category headers. */
+  icon: LucideIcon;
+  /** Tailwind classes for the icon's tinted tile (background + foreground). */
+  tone: string;
   subs: { key: SubcategoryKey; label: string }[];
 };
 
@@ -78,6 +94,8 @@ export const CATEGORY_TREE: CategoryDef[] = [
   {
     key: "repair-service",
     label: "Repair & Service Shops",
+    icon: Wrench,
+    tone: "bg-orange-500/15 text-orange-600 dark:text-orange-400",
     subs: [
       { key: "mechanic", label: "Auto Repair / Mechanic" },
       { key: "body-paint", label: "Body & Paint" },
@@ -94,6 +112,8 @@ export const CATEGORY_TREE: CategoryDef[] = [
   {
     key: "towing-roadside",
     label: "Towing & Roadside",
+    icon: LifeBuoy,
+    tone: "bg-red-500/15 text-red-600 dark:text-red-400",
     subs: [
       { key: "tow-247", label: "24/7 Tow" },
       { key: "roadside-assist", label: "Roadside Assistance" },
@@ -104,6 +124,8 @@ export const CATEGORY_TREE: CategoryDef[] = [
   {
     key: "sales-marketplace",
     label: "Sales & Marketplace",
+    icon: ShoppingBag,
+    tone: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
     subs: [
       { key: "cars-for-sale", label: "Cars For Sale" },
       { key: "motorcycles-for-sale", label: "Motorcycles For Sale" },
@@ -117,18 +139,22 @@ export const CATEGORY_TREE: CategoryDef[] = [
   },
   {
     key: "insurance-finance",
-    label: "Insurance & Finance",
+    label: "Insurance, Finance & LTO",
+    icon: ShieldCheck,
+    tone: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
     subs: [
       { key: "insurance", label: "Insurance" },
       { key: "financing", label: "Financing & Loans" },
-      { key: "warranty-protection", label: "Warranty & Protection" },
+      { key: "warranty-protection", label: "Warranty, LTO & Registration" },
     ],
   },
   {
     key: "training-certification",
     label: "Training & Certification",
+    icon: GraduationCap,
+    tone: "bg-violet-500/15 text-violet-600 dark:text-violet-400",
     subs: [
-      { key: "courses", label: "Courses" },
+      { key: "courses", label: "Driving Schools & Courses" },
       { key: "instructor-referrals", label: "Instructor Referrals" },
       { key: "workshops-events", label: "Workshops & Events" },
     ],
@@ -136,6 +162,8 @@ export const CATEGORY_TREE: CategoryDef[] = [
   {
     key: "membership-referrals",
     label: "Membership & Referrals",
+    icon: BadgePercent,
+    tone: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
     subs: [
       { key: "member-promo", label: "365 Member Promo" },
       { key: "referral-card", label: "Referral Code Card" },
@@ -145,6 +173,8 @@ export const CATEGORY_TREE: CategoryDef[] = [
   {
     key: "brand-format",
     label: "Brand & Format",
+    icon: Megaphone,
+    tone: "bg-sky-500/15 text-sky-600 dark:text-sky-400",
     subs: [
       { key: "social-posts", label: "Social Posts (1:1)" },
       { key: "stories-reels", label: "Stories & Reels (9:16)" },
@@ -157,6 +187,8 @@ export const CATEGORY_TREE: CategoryDef[] = [
   {
     key: "other",
     label: "Other",
+    icon: Boxes,
+    tone: "bg-slate-500/15 text-slate-600 dark:text-slate-400",
     subs: [{ key: "other", label: "Other" }],
   },
 ];
@@ -193,6 +225,13 @@ export function isValidSubcategory(key: unknown): key is SubcategoryKey {
 export function categoryFromSub(sub: string | null | undefined): CategoryKey | null {
   if (!sub) return null;
   return SUB_INDEX.get(sub as SubcategoryKey)?.cat ?? null;
+}
+
+/** Visual marker for a category (icon + tinted tile classes). Falls back to "other". */
+export function categoryVisual(key: string | null | undefined): { icon: LucideIcon; tone: string } {
+  const cat = key ? CATEGORY_INDEX.get(key as CategoryKey) : undefined;
+  const fallback = CATEGORY_INDEX.get("other")!;
+  return { icon: cat?.icon ?? fallback.icon, tone: cat?.tone ?? fallback.tone };
 }
 
 /** Allowed `(category, subcategory)` pairs, formatted for the AI classifier prompt. */
