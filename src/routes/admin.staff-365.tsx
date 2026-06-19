@@ -161,11 +161,38 @@ function Staff365Page() {
                     disabled
                   </span>
                 )}
+                {!u.last_sign_in_at && (
+                  <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:text-amber-400">
+                    never signed in
+                  </span>
+                )}
+                {!u.has_route ? (
+                  <span
+                    className="rounded-full bg-destructive/10 px-2 py-0.5 text-[11px] font-medium text-destructive"
+                    title="No Cloudflare Email Routing rule found — password reset & magic link emails sent to this address will not be delivered. Add a routing rule in the Email Routing tab."
+                  >
+                    no inbox route
+                  </span>
+                ) : (
+                  <span
+                    className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-700 dark:text-emerald-400"
+                    title={`Forwards to ${u.route_destination ?? "(unknown)"}`}
+                  >
+                    → {u.route_destination ?? "routed"}
+                  </span>
+                )}
               </div>
               <div className="text-xs text-muted-foreground">
                 joined {u.created_at ? formatDate(u.created_at) : "?"} · last sign-in{" "}
                 {u.last_sign_in_at ? formatDate(u.last_sign_in_at) : "never"}
               </div>
+              {!u.has_route && (
+                <div className="mt-1 text-xs text-destructive">
+                  Reset/magic-link emails won't reach this user. Either add a Cloudflare routing
+                  rule in the Email Routing tab, or use "Sign-in link" / "Reset password" here and
+                  send the link to them directly.
+                </div>
+              )}
               {u.roles.length > 0 && (
                 <div className="mt-1 flex flex-wrap gap-1">
                   {u.roles.map((r: string) => (

@@ -1,38 +1,30 @@
-## Goal
+I found two important signals:
 
-`/admin/advertisements/qr-ads` (and `/dashboard/qr-ads`) currently render the global "Page not found" inside the advertisements layout, even though both route files exist and `src/routeTree.gen.ts` registers them correctly. Finish the rework by getting both pages to render and clean up the remaining loose ends.
+- `notify.365motorsales.com` is verified and ready to send outgoing password-reset/auth emails.
+- There is no backend user or email-send log for `evelyn.s@365motorsales.com` or an Evelyn Gmail address, so the forgot-password form may be receiving an address that does not exist as an app login. For security, the auth system can still show a generic “check your email” message even when no matching user exists.
 
-## What I checked
+Plan:
 
-- Route files exist: `src/routes/admin.advertisements.qr-ads.tsx` and `src/routes/dashboard.qr-ads.tsx`, both with the right `createFileRoute("/admin/advertisements/qr-ads")` / `"/dashboard/qr-ads"` IDs.
-- `src/routeTree.gen.ts` registers both as children of their parents (`AdminAdvertisementsRouteChildren` includes `AdminAdvertisementsQrAdsRoute`).
-- Old `share-kit` routes are now thin `throw redirect(...)` files.
-- DB has the renamed tables (`qr_ad_templates`, `qr_ad_builtin_categories`, `qr_ad_hidden_builtins`, `qr_ad_layouts`).
-- No remaining `share_kit` / `ShareKit` / `share-kit` refs in `src/` outside the redirect route strings.
+1. Verify the staff account creation path
+   - Check why the Evelyn staff account did not appear in the backend after you created/routed the email.
+   - Confirm the app is creating the auth user, not only setting up the Cloudflare forwarding address.
 
-Most likely cause of the live 404: a stale dev-server / route-tree state from when files were mid-rename. There may also be a small import or runtime issue that I'll confirm by viewing the rendered route once the server is restarted.
+2. Improve first-login for 365 staff
+   - Update the 365 Staff “Create Employee” flow so it clearly distinguishes:
+     - creating the app login account
+     - creating/forwarding the `@365motorsales.com` mailbox/routing address
+   - After account creation, show the exact login email and temporary password in a safer confirmation state.
+   - Add a “Generate sign-in link” / “Reset password” recovery option directly after creation so first login does not depend on manually typing a generated password.
 
-## Plan
+3. Fix password reset guidance for staff
+   - Update forgot/reset-password copy so staff understand they must reset using their app login email, e.g. `evelyn.s@365motorsales.com`, not the destination Gmail unless that Gmail is also the actual app account.
+   - Keep reset links using the already-correct `/reset-password` token flow.
 
-1. Force a clean rebuild of the route tree
-   - Restart the dev server so the Router plugin re-reads `src/routes/` and regenerates `routeTree.gen.ts`.
-   - Open `/admin/advertisements/qr-ads` and `/dashboard/qr-ads` in the preview and confirm both render.
+4. Add admin-side troubleshooting visibility
+   - In the 365 Staff page, surface whether a user has ever signed in and whether the email is confirmed/disabled.
+   - Add a quick “copy reset/sign-in link” path for the super-admin when email routing is not yet working.
 
-2. If either page still 404s or throws after restart
-   - Read the dev console / network for the actual error and patch it in place. Likely candidates I already spotted to double-check:
-     - `src/routes/admin.advertisements.qr-ads.tsx` line 24 has a stray blank import slot inside the `@/lib/qr-ads/categories` block — harmless but I'll tidy it.
-     - Confirm `listQrAdLayouts` / `upsertQrAdLayout` are exported from `src/lib/qr-ad-layouts.functions.ts` and the server functions return the expected shape.
-     - Confirm `useSignedCustomTemplates` handles the new column names from `qr_ad_templates`.
-
-3. Clean up loose ends
-   - Verify the legacy redirect routes (`admin.advertisements.share-kit.tsx`, `dashboard.share-kit.tsx`) still redirect cleanly to the new URLs.
-   - Sanity-check the sidebar / nav entries (`admin.advertisements.tsx`, `admin.tsx`, `dashboard.tsx`, `dashboard.referral.tsx`, `my-qr.tsx`, `admin/user-advertisements-tab.tsx`) all point at `/qr-ads`. (Already done in the last pass, just verifying nothing slipped through.)
-   - Confirm the search box's `?q=` round-trip works (debounced URL update + initial value from URL).
-
-4. Out of scope
-   - No further DB renames, no storage bucket rename, no new categories or filters beyond what's already in.
-
-## Technical notes
-
-- Route tree regeneration is what fixes most "route file exists but URL 404s" cases in TanStack Start; the fix is operational, not code.
-- The redirect routes intentionally keep their `share-kit` path strings — those are the only remaining `share-kit` references in `src/` and they must stay so old bookmarks keep working.
+5. Validate after implementation
+   - Re-check the staff user exists in the backend.
+   - Re-check email logs for recovery/sign-in emails.
+   - Confirm a reset link is either sent to the `@365motorsales.com` routed inbox or can be copied from admin as a fallback.
