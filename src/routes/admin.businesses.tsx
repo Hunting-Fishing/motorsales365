@@ -259,16 +259,14 @@ function AdminBusinessesPage() {
                           Approve
                         </Button>
                       )}
-                      {b.status !== "rejected" && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => moderate(b.id, { status: "rejected" } as any)}
-                        >
-                          <X className="mr-1 h-4 w-4" />
-                          Reject
-                        </Button>
-                      )}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => moderate(b.id, { status: "rejected" } as any)}
+                      >
+                        <X className="mr-1 h-4 w-4" />
+                        {b.status === "rejected" ? "Re-reject" : "Reject"}
+                      </Button>
                       {b.status === "active" && (
                         <Button
                           size="sm"
