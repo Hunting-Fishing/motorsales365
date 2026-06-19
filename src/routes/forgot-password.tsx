@@ -439,3 +439,18 @@ function formatTimer(seconds: number) {
   const s = seconds % 60;
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
+
+function CooldownNotice({ remaining, label }: { remaining: number; label: string }) {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      className="flex items-center justify-center gap-2 rounded-md border border-border bg-muted/40 px-3 py-2 text-xs font-medium text-muted-foreground"
+    >
+      <Timer className="h-3.5 w-3.5" aria-hidden="true" />
+      <span>
+        {label} <span className="tabular-nums">{formatTimer(remaining)}</span>
+      </span>
+    </div>
+  );
+}
