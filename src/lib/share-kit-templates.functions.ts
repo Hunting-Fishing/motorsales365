@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireAdminRoleAudited } from "@/integrations/supabase/admin-middleware";
+import { isValidCategory, isValidSubcategory } from "@/lib/share-kit/categories";
 
 export type CustomTemplateRow = {
   id: string;
@@ -17,7 +18,16 @@ export type CustomTemplateRow = {
   share_text: string;
   sort_order: number;
   active: boolean;
+  category: string | null;
+  subcategory: string | null;
 };
+
+export type BuiltinCategoryRow = {
+  template_id: string;
+  category: string | null;
+  subcategory: string | null;
+};
+
 
 const upsertSchema = z.object({
   id: z.string().uuid().optional(),
