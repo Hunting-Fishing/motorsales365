@@ -87,7 +87,7 @@ function NewPartsWantedPage() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6 p-4">
+    <div className="mx-auto max-w-2xl space-y-6 p-4 pb-24 md:pb-4">
       <header>
         <h1 className="font-display text-2xl font-bold">Post a parts request</h1>
         <p className="text-sm text-muted-foreground">
