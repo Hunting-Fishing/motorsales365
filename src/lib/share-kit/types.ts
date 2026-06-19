@@ -36,6 +36,8 @@ export type ShareTemplate = {
   qr: QrPlate;
   /** Suggested share copy */
   shareText: string; // supports {name} {firstName} {code} {link}
+  /** Display grouping in the Share Kit UI */
+  category?: string;
 };
 
 export type TemplateContext = {

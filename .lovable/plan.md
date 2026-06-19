@@ -1,52 +1,33 @@
 ## Goal
+Group the Share Kit templates into collapsible categories and shrink the card size so many templates fit on screen.
 
-Transform `/r/$code` (currently a compact "Jordi sent you here" card) into a full marketing landing page that captivates visitors and converts them to sign up / browse / partner, while preserving the existing referral attribution, scan-counting, and promos logic.
+## Categories (derived from existing templates + metadata)
+Each built-in template gets a `category` tag in `src/lib/share-kit/templates.ts`:
+- **Social Posts** — `square-social`, `banner-1200`
+- **Stories & Reels** — `story-reel`
+- **Print & Wearables** — `rear-shirt`, `arm-band`
+- **Vehicles For Sale** — `buy-cars`
+- **Parts & Accessories** — `parts-shop`
+- **Services (Tow / Roadside)** — `tow-247`
+- **Custom Uploads** — all `custom:*` rows (admin-uploaded)
 
-## Scope
+Custom templates get an optional `category` column later if needed; for now they all land in "Custom Uploads".
 
-Single file: `src/routes/r.$code.tsx`. No backend, schema, or routing changes. All existing tracking (`record_referral_touch`, scan logging, localStorage visit count, active promos, referral credit semantics) is kept exactly as-is.
+## UI changes in `src/routes/dashboard.share-kit.tsx`
+1. Replace the single flat grid with a list of category sections rendered via the existing shadcn `Collapsible` component.
+2. Each section header shows: category name, count badge, chevron. Sections default **open** for the first one and **collapsed** for the rest (remember open/closed state in `localStorage` so it sticks per user).
+3. Shrink card cell: change grid track from `minmax(140px,1fr)` → `minmax(96px,1fr)`, and per-cell `max-w-[180px]` → `max-w-[120px]`. Tighten gaps (`gap-3` → `gap-2`) and admin action buttons become compact icon-only buttons under each card.
+4. Archived/history section keeps the same compact grid but stays in its own collapsible.
 
-## Layout (top → bottom)
-
-1. **Referral credit card (kept at top, as requested)**
-   - Existing "Referred by · {staffName} sent you here" card.
-   - Keep: counted/repeat-scan chip + tooltip, visit-count info, active promos, and the two primary CTAs (Create an account / Browse listings).
-   - Add a third button: **Partner your business with us** → `/businesses` (existing route).
-   - Add a small "Contact: {referrer email} mailto" line below the CTAs, using the referring staff member's email pulled from `profiles.email` via the existing referral lookup (extend the current `staff_referrals` query to also fetch the linked profile's email). If no email is available, hide the line — never show a placeholder.
-
-2. **Hero**
-   - H1: "365 Motor Sales — The Motor Marketplace Built for the Philippines"
-   - Subhead: "Buy. Sell. List. Partner. Learn. Play."
-   - Short intro paragraph from the brief.
-   - CTAs: "List With 365 Motor Sales" (→ `/listings/new`) and "Partner Your Business With Us" (→ `/businesses`).
-
-3. **Why 365 Is Different** — two-column comparison: "Generic feeds" vs "365 Motor Sales".
-
-4. **What You Can List** — two cards: Vehicle Listings (cars, motorcycles, trucks, vans, heavy/farm/construction equipment, marine) and Business Listings (tire/vulcanizing, car wash, auto/moto repair, aircon, towing, driving schools, insurance, parts, batteries, accessories, wraps, detailing, salvage, equipment service).
-
-5. **Business Network Advantage** — short pitch paragraph.
-
-6. **Coming Soon** — three feature cards: Online Parts Ordering, Shop Management Software, Education + International Skills Training. Each lists the planned bullets from the brief, with a "Coming soon" badge.
-
-7. **Mobile Game Ecosystem** — card with "Earn Freebies & Add Boosts" highlight and bullets.
-
-8. **Built for the Philippines First** — short closer + bullet list of audiences.
-
-9. **Final CTA band** — "Join the 365 Motor Sales Network" with three buttons: List a vehicle, List a business, Browse listings. Repeats the referrer email mailto line.
-
-All copy comes verbatim (lightly tightened) from the user's brief.
-
-## Technical notes
-
-- Keep `SiteLayout` + `TooltipProvider` wrapper. Replace the single `max-w-2xl` container with a wider container (`max-w-5xl`) for the marketing sections; the referral credit card stays `max-w-2xl` centered at the top.
-- Add `head()` meta: title "Referred to 365 Motor Sales — Philippines Motor Marketplace", description, og:title/og:description, canonical to `https://365motorsales.com/r/{code}`.
-- Extend the `staff_referrals` Supabase select to join the referring profile and read `email` (e.g. `profiles!staff_referrals_user_id_fkey(email, full_name)`). Use it for both the displayed name (existing) and the new contact mailto.
-- All styling uses existing semantic tokens (`bg-card`, `border-border`, `text-muted-foreground`, `bg-primary`, etc.). No hardcoded colors.
-- Icons from `lucide-react` (already in project).
-- No new dependencies, no new routes, no schema changes.
+## Technical details
+- Add `category?: string` to `ShareTemplate` in `src/lib/share-kit/types.ts`.
+- Tag each entry in `TEMPLATES` (templates.ts) with its category string.
+- In the route, `useMemo` to group `allTemplates` by category, preserving a fixed display order (`CATEGORY_ORDER` constant).
+- Use `Collapsible`/`CollapsibleTrigger`/`CollapsibleContent` from `@/components/ui/collapsible`.
+- Persist open state via `useState` seeded from `localStorage["share-kit-open-cats"]`.
+- No backend, RLS, or data-model changes.
 
 ## Out of scope
-
-- Changing referral tracking, scan counting, or promo logic.
-- Adding new pages (e.g. dedicated `/partner`).
-- Adding `og:image` (will be added separately if user wants).
+- Drag-and-drop reordering.
+- Per-user pinning/favorites.
+- Adding a `category` column to the custom-templates table (defer until needed).
