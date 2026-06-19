@@ -71,7 +71,7 @@ export const listQrAdTemplates = createServerFn({ method: "GET" })
 
 
 export const upsertQrAdTemplate = createServerFn({ method: "POST" })
-  .middleware([requireAdminRoleAudited("shareKit.upsertTemplate")])
+  .middleware([requireAdminRoleAudited("qrAds.upsertTemplate")])
   .inputValidator((input: unknown) => upsertSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context as any;
@@ -94,7 +94,7 @@ export const upsertQrAdTemplate = createServerFn({ method: "POST" })
   });
 
 export const deleteQrAdTemplate = createServerFn({ method: "POST" })
-  .middleware([requireAdminRoleAudited("shareKit.deleteTemplate")])
+  .middleware([requireAdminRoleAudited("qrAds.deleteTemplate")])
   .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context as any;
@@ -107,7 +107,7 @@ export const deleteQrAdTemplate = createServerFn({ method: "POST" })
   });
 
 export const setBuiltinHidden = createServerFn({ method: "POST" })
-  .middleware([requireAdminRoleAudited("shareKit.setBuiltinHidden")])
+  .middleware([requireAdminRoleAudited("qrAds.setBuiltinHidden")])
   .inputValidator((input: { templateId: string; hidden: boolean }) =>
     z.object({ templateId: z.string().min(1).max(100), hidden: z.boolean() }).parse(input),
   )
@@ -131,7 +131,7 @@ export const setBuiltinHidden = createServerFn({ method: "POST" })
 // Update only QR placement on an existing custom template.
 // Used by the auto-fit / re-detect flow so we don't have to resend image_url etc.
 export const updateQrAdTemplateQrPlacement = createServerFn({ method: "POST" })
-  .middleware([requireAdminRoleAudited("shareKit.updateQrPlacement")])
+  .middleware([requireAdminRoleAudited("qrAds.updateQrPlacement")])
   .inputValidator((input: unknown) =>
     z
       .object({
@@ -168,7 +168,7 @@ function validateCatPair(category: string | null, subcategory: string | null) {
 }
 
 export const setQrAdTemplateCategory = createServerFn({ method: "POST" })
-  .middleware([requireAdminRoleAudited("shareKit.setCustomCategory")])
+  .middleware([requireAdminRoleAudited("qrAds.setCustomCategory")])
   .inputValidator((input: unknown) =>
     z
       .object({
@@ -189,7 +189,7 @@ export const setQrAdTemplateCategory = createServerFn({ method: "POST" })
   });
 
 export const setQrAdBuiltinCategory = createServerFn({ method: "POST" })
-  .middleware([requireAdminRoleAudited("shareKit.setBuiltinCategory")])
+  .middleware([requireAdminRoleAudited("qrAds.setBuiltinCategory")])
   .inputValidator((input: unknown) =>
     z
       .object({

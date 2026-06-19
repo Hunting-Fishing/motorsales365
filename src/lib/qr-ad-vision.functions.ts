@@ -1,5 +1,5 @@
 /**
- * AI-powered "Scan Here" panel detector for share-kit flyers.
+ * AI-powered "Scan Here" panel detector for QR ad flyers.
  *
  * Sends the flyer to Gemini and asks for the bounding box of the white QR
  * placeholder. Used by the admin Smart auto-fit flow as a smarter alternative

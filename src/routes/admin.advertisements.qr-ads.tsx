@@ -32,7 +32,7 @@ import {
   setQrAdBuiltinCategory,
   type CustomTemplateRow,
   type BuiltinCategoryRow,
-} from "@/lib/share-kit-templates.functions";
+} from "@/lib/qr-ad-templates.functions";
 import { detectQrSlotFromUrl, isDetected } from "@/lib/qr-ads/detect-qr-slot";
 import { assessQrReadability } from "@/lib/qr-ads/qr-readability";
 import { detectScanHereWithVision } from "@/lib/qr-ad-vision.functions";

@@ -1,7 +1,7 @@
 import type { ShareTemplate } from "./types";
 
 /**
- * Built-in share-kit templates.
+ * Built-in QR ad templates.
  *
  * Intentionally empty — all live templates are now uploaded by admins
  * through the QR Ads admin page and stored in `qr_ad_templates`.

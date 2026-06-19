@@ -14,7 +14,7 @@ import { interpolate } from "@/lib/qr-ads/types";
 import { TemplateEditor } from "./template-editor";
 import {
   upsertQrAdLayout,
-  deleteShareKitLayout,
+  deleteQrAdLayout,
 } from "@/lib/qr-ad-layouts.functions";
 
 interface Props {
@@ -56,7 +56,7 @@ export function TemplateCard({ template, context, override }: Props) {
   const [visible, setVisible] = useState(false);
   const qc = useQueryClient();
   const upsertFn = useServerFn(upsertQrAdLayout);
-  const deleteFn = useServerFn(deleteShareKitLayout);
+  const deleteFn = useServerFn(deleteQrAdLayout);
 
   const defaults: QrOverride = {
     cx: template.qr.cx,

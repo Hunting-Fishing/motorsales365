@@ -56,7 +56,7 @@ export const upsertQrAdLayout = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const deleteShareKitLayout = createServerFn({ method: "POST" })
+export const deleteQrAdLayout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => deleteSchema.parse(input))
   .handler(async ({ data, context }) => {

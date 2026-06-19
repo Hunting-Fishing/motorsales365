@@ -1,7 +1,7 @@
 /**
  * AI-powered category classifier for QR Ads ads.
  * Looks at the rendered flyer / uploaded ad and picks one (category, subcategory)
- * from the taxonomy in `src/lib/share-kit/categories.ts`.
+ * from the taxonomy in `src/lib/qr-ads/categories.ts`.
  */
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";

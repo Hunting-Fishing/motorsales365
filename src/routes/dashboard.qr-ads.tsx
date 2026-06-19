@@ -27,7 +27,7 @@ import {
   setBuiltinHidden,
   type CustomTemplateRow,
   type BuiltinCategoryRow,
-} from "@/lib/share-kit-templates.functions";
+} from "@/lib/qr-ad-templates.functions";
 import { siteOrigin } from "@/lib/site-config";
 
 
