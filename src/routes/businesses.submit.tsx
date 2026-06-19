@@ -126,6 +126,7 @@ function SubmitBusinessPage() {
   const [suggestLabel, setSuggestLabel] = useState("");
   const [suggestNotes, setSuggestNotes] = useState("");
   const [suggestSubmitting, setSuggestSubmitting] = useState(false);
+  const [step, setStep] = useState<"basics" | "services" | "contact" | "location" | "review">("basics");
 
   const submitTypeSuggestion = async () => {
     const label = suggestLabel.trim();
