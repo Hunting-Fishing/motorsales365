@@ -14,7 +14,7 @@ import {
   categoryLabel,
   subcategoryLabel,
   subsFor,
-} from "@/lib/share-kit/categories";
+} from "@/lib/qr-ads/categories";
 
 type Props = {
   category: string | null;

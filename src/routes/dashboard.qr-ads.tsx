@@ -8,22 +8,22 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { TemplateCard } from "@/components/share-kit/template-card";
-import { ShareKitTemplateUpload } from "@/components/share-kit/template-upload-dialog";
-import { useSignedCustomTemplates } from "@/components/share-kit/use-signed-custom-templates";
-import { TEMPLATES } from "@/lib/share-kit/templates";
-import type { ShareTemplate } from "@/lib/share-kit/types";
+import { TemplateCard } from "@/components/qr-ads/template-card";
+import { QrAdTemplateUpload } from "@/components/qr-ads/template-upload-dialog";
+import { useSignedCustomTemplates } from "@/components/qr-ads/use-signed-custom-templates";
+import { TEMPLATES } from "@/lib/qr-ads/templates";
+import type { ShareTemplate } from "@/lib/qr-ads/types";
 import {
   CATEGORY_TREE,
   categoryLabel,
   subcategoryLabel,
   UNCATEGORIZED_KEY,
   type CategoryKey,
-} from "@/lib/share-kit/categories";
-import { listShareKitLayouts } from "@/lib/share-kit-layouts.functions";
+} from "@/lib/qr-ads/categories";
+import { listQrAdLayouts } from "@/lib/qr-ad-layouts.functions";
 import {
-  listShareKitCustomTemplates,
-  deleteShareKitCustomTemplate,
+  listQrAdTemplates,
+  deleteQrAdTemplate,
   setBuiltinHidden,
   type CustomTemplateRow,
   type BuiltinCategoryRow,
@@ -31,11 +31,11 @@ import {
 import { siteOrigin } from "@/lib/site-config";
 
 
-export const Route = createFileRoute("/dashboard/share-kit")({
-  component: ShareKitPage,
+export const Route = createFileRoute("/dashboard/qr-ads")({
+  component: QrAdsPage,
   head: () => ({
     meta: [
-      { title: "Your Share Kit — 365 Motor Sales" },
+      { title: "Your QR Advertisements — 365 Motor Sales" },
       {
         name: "description",
         content:
@@ -76,7 +76,7 @@ function customToTemplate(row: CustomTemplateRow): ShareTemplate {
 }
 
 
-function ShareKitPage() {
+function QrAdsPage() {
   const { user, realIsAdmin, loading: authLoading } = useAuth();
   const isAdmin = realIsAdmin;
   const navigate = useNavigate();
@@ -88,7 +88,7 @@ function ShareKitPage() {
   const [openCats, setOpenCats] = useState<Record<string, boolean>>(() => {
     if (typeof window === "undefined") return {};
     try {
-      return JSON.parse(localStorage.getItem("share-kit-open-cats") ?? "{}");
+      return JSON.parse(localStorage.getItem("qr-ads-open-cats-v1") ?? "{}");
     } catch {
       return {};
     }
@@ -122,22 +122,22 @@ function ShareKitPage() {
     };
   }, [staff]);
 
-  const layoutsFn = useServerFn(listShareKitLayouts);
+  const layoutsFn = useServerFn(listQrAdLayouts);
   const { data: layouts } = useQuery({
-    queryKey: ["share-kit-layouts"],
+    queryKey: ["qr-ad-layouts"],
     queryFn: () => layoutsFn(),
     enabled: !!user && !!staff,
   });
 
-  const customFn = useServerFn(listShareKitCustomTemplates);
+  const customFn = useServerFn(listQrAdTemplates);
   const { data: customData, refetch: refetchCustom } = useQuery({
-    queryKey: ["share-kit-custom-templates"],
+    queryKey: ["qr-ad-templates"],
     queryFn: () => customFn(),
     enabled: !!user,
   });
   const { data: signedCustoms } = useSignedCustomTemplates(customData?.templates);
 
-  const deleteFn = useServerFn(deleteShareKitCustomTemplate);
+  const deleteFn = useServerFn(deleteQrAdTemplate);
   const hideFn = useServerFn(setBuiltinHidden);
 
   async function deleteCustom(id: string, label: string) {
@@ -145,7 +145,7 @@ function ShareKitPage() {
     try {
       await deleteFn({ data: { id } });
       toast.success("Template deleted");
-      qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+      qc.invalidateQueries({ queryKey: ["qr-ad-templates"] });
     } catch (e: any) {
       toast.error(e?.message ?? "Delete failed");
     }
@@ -156,7 +156,7 @@ function ShareKitPage() {
     try {
       await hideFn({ data: { templateId, hidden: true } });
       toast.success("Template deleted");
-      qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+      qc.invalidateQueries({ queryKey: ["qr-ad-templates"] });
     } catch (e: any) {
       toast.error(e?.message ?? "Failed");
     }
@@ -166,14 +166,14 @@ function ShareKitPage() {
     try {
       await hideFn({ data: { templateId, hidden: false } });
       toast.success("Template restored");
-      qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+      qc.invalidateQueries({ queryKey: ["qr-ad-templates"] });
     } catch (e: any) {
       toast.error(e?.message ?? "Failed");
     }
   }
 
   if (authLoading || loading) {
-    return <div className="p-12 text-center text-muted-foreground">Loading your share kit…</div>;
+    return <div className="p-12 text-center text-muted-foreground">Loading your QR ads…</div>;
   }
 
   if (!staff) {
@@ -255,7 +255,7 @@ function ShareKitPage() {
     setOpenCats((prev) => {
       const next = { ...prev, [cat]: v };
       try {
-        localStorage.setItem("share-kit-open-cats", JSON.stringify(next));
+        localStorage.setItem("qr-ads-open-cats-v1", JSON.stringify(next));
       } catch {}
       return next;
     });
@@ -266,7 +266,7 @@ function ShareKitPage() {
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-            365 Member Share Kit
+            365 QR Advertisements
           </div>
           <h1 className="mt-1 font-display text-2xl font-bold">
             {staff.full_name}'s personalized ads
@@ -436,7 +436,7 @@ function ShareKitPage() {
       </p>
 
       {isAdmin && (
-        <ShareKitTemplateUpload
+        <QrAdTemplateUpload
           open={uploadOpen}
           onOpenChange={setUploadOpen}
           onSaved={() => refetchCustom()}

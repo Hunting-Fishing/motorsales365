@@ -84,7 +84,7 @@ const NAV: NavItem[] = [
     Icon: BarChart3,
     exact: true,
     roles: ["admin", "sales", "advertising", "support"],
-    info: "Consolidated sales workspace: overview, accounts, ads, promotions, referrals and QR share-kit.",
+    info: "Consolidated sales workspace: overview, accounts, ads, promotions, referrals and QR ads.",
     section: "Sales & Advertising",
   },
   {
@@ -108,7 +108,7 @@ const NAV: NavItem[] = [
     label: "Advertisements",
     Icon: Megaphone,
     roles: ["admin", "advertising", "sales"],
-    info: "Ad inquiries, sponsored campaigns, promotions, share-kit and history — tabbed workspace.",
+    info: "Ad inquiries, sponsored campaigns, promotions, QR ads and history — tabbed workspace.",
     section: "Sales & Advertising",
   },
   {
@@ -128,8 +128,8 @@ const NAV: NavItem[] = [
     section: "Sales & Advertising",
   },
   {
-    to: "/admin/advertisements/share-kit",
-    label: "My QR / Share Kit",
+    to: "/admin/advertisements/qr-ads",
+    label: "QR Advertisements",
     Icon: QrCode,
     roles: ["admin", "sales", "advertising", "support", "moderator"],
     info: "Your personal QR applied to printable templates (arm band, shirt, banners).",

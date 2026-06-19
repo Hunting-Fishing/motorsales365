@@ -1,8 +1,8 @@
 /**
- * Share Kit category taxonomy. Used by:
+ * QR Ads category taxonomy. Used by:
  * - built-in templates (`templates.ts`)
- * - custom uploads (`share_kit_custom_templates.{category,subcategory}`)
- * - admin overrides for built-ins (`share_kit_builtin_categories`)
+ * - custom uploads (`qr_ad_templates.{category,subcategory}`)
+ * - admin overrides for built-ins (`qr_ad_builtin_categories`)
  * - the AI classifier (the prompt is generated from this list)
  */
 

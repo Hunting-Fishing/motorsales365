@@ -155,9 +155,9 @@ function MyQrPage() {
               <Printer className="mr-1 h-4 w-4" /> Print poster
             </Button>
           </Link>
-          <Link to="/dashboard/share-kit">
+          <Link to="/dashboard/qr-ads">
             <Button size="sm">
-              Open share kit
+              Open QR ads
             </Button>
           </Link>
         </div>

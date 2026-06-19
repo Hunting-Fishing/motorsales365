@@ -117,7 +117,7 @@ function buildHubs(opts: {
       Icon: Share2,
       items: [
         { to: "/dashboard/referral", label: "My referral", Icon: QrCode },
-        { to: "/dashboard/share-kit", label: "Share Kit", Icon: Share2 },
+        { to: "/dashboard/qr-ads", label: "QR Ads", Icon: Share2 },
         { to: "/my-qr", label: "My QR code", Icon: QrCode },
       ],
     });

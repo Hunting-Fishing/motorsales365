@@ -88,7 +88,7 @@ async function fetchImageAsBytes(url: string): Promise<{ bytes: Uint8Array; medi
 }
 
 export const detectScanHereWithVision = createServerFn({ method: "POST" })
-  .middleware([requireAdminRoleAudited("shareKit.smartFit")])
+  .middleware([requireAdminRoleAudited("qrAds.smartFit")])
   .inputValidator((input: unknown) => inputSchema.parse(input))
   .handler(async ({ data }): Promise<VisionDetection> => {
     const key = process.env.LOVABLE_API_KEY;

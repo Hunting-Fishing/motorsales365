@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { TemplateCard } from "@/components/share-kit/template-card";
-import { TEMPLATES } from "@/lib/share-kit/templates";
+import { TemplateCard } from "@/components/qr-ads/template-card";
+import { TEMPLATES } from "@/lib/qr-ads/templates";
 import { siteOrigin } from "@/lib/site-config";
 
 type Props = {

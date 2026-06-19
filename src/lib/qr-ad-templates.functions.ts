@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { requireAdminRoleAudited } from "@/integrations/supabase/admin-middleware";
-import { isValidCategory, isValidSubcategory } from "@/lib/share-kit/categories";
+import { isValidCategory, isValidSubcategory } from "@/lib/qr-ads/categories";
 
 export type CustomTemplateRow = {
   id: string;
@@ -46,18 +46,18 @@ const upsertSchema = z.object({
 });
 
 // List active custom templates + hidden built-in ids + admin builtin category overrides (any authed staff)
-export const listShareKitCustomTemplates = createServerFn({ method: "GET" })
+export const listQrAdTemplates = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase } = context as any;
     const [tplRes, hidRes, biRes] = await Promise.all([
       supabase
-        .from("share_kit_custom_templates")
+        .from("qr_ad_templates")
         .select("*")
         .order("sort_order", { ascending: true })
         .order("created_at", { ascending: false }),
-      supabase.from("share_kit_hidden_builtins").select("template_id"),
-      supabase.from("share_kit_builtin_categories").select("template_id, category, subcategory"),
+      supabase.from("qr_ad_hidden_builtins").select("template_id"),
+      supabase.from("qr_ad_builtin_categories").select("template_id, category, subcategory"),
     ]);
     if (tplRes.error) throw new Error(tplRes.error.message);
     if (hidRes.error) throw new Error(hidRes.error.message);
@@ -70,7 +70,7 @@ export const listShareKitCustomTemplates = createServerFn({ method: "GET" })
   });
 
 
-export const upsertShareKitCustomTemplate = createServerFn({ method: "POST" })
+export const upsertQrAdTemplate = createServerFn({ method: "POST" })
   .middleware([requireAdminRoleAudited("shareKit.upsertTemplate")])
   .inputValidator((input: unknown) => upsertSchema.parse(input))
   .handler(async ({ data, context }) => {
@@ -78,14 +78,14 @@ export const upsertShareKitCustomTemplate = createServerFn({ method: "POST" })
     const payload = { ...data, created_by: userId };
     if (data.id) {
       const { error } = await supabase
-        .from("share_kit_custom_templates")
+        .from("qr_ad_templates")
         .update(payload)
         .eq("id", data.id);
       if (error) throw new Error(error.message);
       return { id: data.id };
     }
     const { data: row, error } = await supabase
-      .from("share_kit_custom_templates")
+      .from("qr_ad_templates")
       .insert(payload)
       .select("id")
       .single();
@@ -93,13 +93,13 @@ export const upsertShareKitCustomTemplate = createServerFn({ method: "POST" })
     return { id: row.id };
   });
 
-export const deleteShareKitCustomTemplate = createServerFn({ method: "POST" })
+export const deleteQrAdTemplate = createServerFn({ method: "POST" })
   .middleware([requireAdminRoleAudited("shareKit.deleteTemplate")])
   .inputValidator((input: { id: string }) => z.object({ id: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     const { supabase } = context as any;
     const { error } = await supabase
-      .from("share_kit_custom_templates")
+      .from("qr_ad_templates")
       .delete()
       .eq("id", data.id);
     if (error) throw new Error(error.message);
@@ -115,12 +115,12 @@ export const setBuiltinHidden = createServerFn({ method: "POST" })
     const { supabase, userId } = context as any;
     if (data.hidden) {
       const { error } = await supabase
-        .from("share_kit_hidden_builtins")
+        .from("qr_ad_hidden_builtins")
         .upsert({ template_id: data.templateId, hidden_by: userId });
       if (error) throw new Error(error.message);
     } else {
       const { error } = await supabase
-        .from("share_kit_hidden_builtins")
+        .from("qr_ad_hidden_builtins")
         .delete()
         .eq("template_id", data.templateId);
       if (error) throw new Error(error.message);
@@ -130,7 +130,7 @@ export const setBuiltinHidden = createServerFn({ method: "POST" })
 
 // Update only QR placement on an existing custom template.
 // Used by the auto-fit / re-detect flow so we don't have to resend image_url etc.
-export const updateShareKitTemplateQrPlacement = createServerFn({ method: "POST" })
+export const updateQrAdTemplateQrPlacement = createServerFn({ method: "POST" })
   .middleware([requireAdminRoleAudited("shareKit.updateQrPlacement")])
   .inputValidator((input: unknown) =>
     z
@@ -145,7 +145,7 @@ export const updateShareKitTemplateQrPlacement = createServerFn({ method: "POST"
   .handler(async ({ data, context }) => {
     const { supabase } = context as any;
     const { error } = await supabase
-      .from("share_kit_custom_templates")
+      .from("qr_ad_templates")
       .update({ qr_cx: data.qr_cx, qr_cy: data.qr_cy, qr_size: data.qr_size })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
@@ -167,7 +167,7 @@ function validateCatPair(category: string | null, subcategory: string | null) {
   }
 }
 
-export const setShareKitCustomCategory = createServerFn({ method: "POST" })
+export const setQrAdTemplateCategory = createServerFn({ method: "POST" })
   .middleware([requireAdminRoleAudited("shareKit.setCustomCategory")])
   .inputValidator((input: unknown) =>
     z
@@ -181,14 +181,14 @@ export const setShareKitCustomCategory = createServerFn({ method: "POST" })
     validateCatPair(data.category, data.subcategory);
     const { supabase } = context as any;
     const { error } = await supabase
-      .from("share_kit_custom_templates")
+      .from("qr_ad_templates")
       .update({ category: data.category, subcategory: data.subcategory })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
 
-export const setShareKitBuiltinCategory = createServerFn({ method: "POST" })
+export const setQrAdBuiltinCategory = createServerFn({ method: "POST" })
   .middleware([requireAdminRoleAudited("shareKit.setBuiltinCategory")])
   .inputValidator((input: unknown) =>
     z
@@ -203,14 +203,14 @@ export const setShareKitBuiltinCategory = createServerFn({ method: "POST" })
     const { supabase, userId } = context as any;
     if (data.category === null && data.subcategory === null) {
       const { error } = await supabase
-        .from("share_kit_builtin_categories")
+        .from("qr_ad_builtin_categories")
         .delete()
         .eq("template_id", data.templateId);
       if (error) throw new Error(error.message);
       return { ok: true };
     }
     const { error } = await supabase
-      .from("share_kit_builtin_categories")
+      .from("qr_ad_builtin_categories")
       .upsert({
         template_id: data.templateId,
         category: data.category,

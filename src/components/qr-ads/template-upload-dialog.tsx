@@ -24,9 +24,9 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
-import { upsertShareKitCustomTemplate } from "@/lib/share-kit-templates.functions";
-import { detectQrSlotFromBlob, isDetected } from "@/lib/share-kit/detect-qr-slot";
-import { assessQrReadability } from "@/lib/share-kit/qr-readability";
+import { upsertQrAdTemplate } from "@/lib/share-kit-templates.functions";
+import { detectQrSlotFromBlob, isDetected } from "@/lib/qr-ads/detect-qr-slot";
+import { assessQrReadability } from "@/lib/qr-ads/qr-readability";
 
 interface Props {
   open: boolean;
@@ -117,8 +117,8 @@ async function uploadWithProgress(args: {
   });
 }
 
-export function ShareKitTemplateUpload({ open, onOpenChange, onSaved }: Props) {
-  const upsertFn = useServerFn(upsertShareKitCustomTemplate);
+export function QrAdTemplateUpload({ open, onOpenChange, onSaved }: Props) {
+  const upsertFn = useServerFn(upsertQrAdTemplate);
   const [items, setItems] = useState<Item[]>([]);
   const [busy, setBusy] = useState(false);
   const [dragOver, setDragOver] = useState(false);

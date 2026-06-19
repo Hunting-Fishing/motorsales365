@@ -35,7 +35,7 @@ const TILES: Tile[] = [
   { to: "/admin/advertisements/promotions", label: "Promotions & Discounts", desc: "Promo codes and one-off customer discounts.", Icon: Ticket },
   { to: "/admin/shop", label: "Affiliate Shop", desc: "Affiliate networks, products and click analytics.", Icon: Store },
   { to: "/admin/referrals", label: "Referrals", desc: "Staff QR codes and redemption history.", Icon: QrCode },
-  { to: "/admin/advertisements/share-kit", label: "My QR / Share Kit", desc: "Apply your QR to printable templates (arm band, shirt, banners).", Icon: QrCode },
+  { to: "/admin/advertisements/qr-ads", label: "QR Advertisements", desc: "Apply your QR to printable templates (arm band, shirt, banners).", Icon: QrCode },
   { to: "/admin/lead-offers", label: "Lead Marketplace", desc: "Qualified buyer leads businesses pay to unlock.", Icon: Inbox },
   { to: "/admin/sales-reps", label: "Sales Reps", desc: "Reps, territories and assignments.", Icon: UserCog },
 ];
@@ -46,7 +46,7 @@ function SalesHub() {
       <header>
         <h1 className="text-2xl font-bold tracking-tight">Sales Hub</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Everything sales-related in one place — accounts, ads, promotions, referrals and your printable QR share-kit.
+          Everything sales-related in one place — accounts, ads, promotions, referrals and your printable QR ads.
         </p>
       </header>
 

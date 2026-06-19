@@ -8,12 +8,12 @@ import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { TemplateCard } from "@/components/share-kit/template-card";
-import { ShareKitTemplateUpload } from "@/components/share-kit/template-upload-dialog";
-import { useSignedCustomTemplates } from "@/components/share-kit/use-signed-custom-templates";
-import { CategoryPicker } from "@/components/share-kit/category-picker";
-import { TEMPLATES } from "@/lib/share-kit/templates";
-import type { ShareTemplate } from "@/lib/share-kit/types";
+import { TemplateCard } from "@/components/qr-ads/template-card";
+import { QrAdTemplateUpload } from "@/components/qr-ads/template-upload-dialog";
+import { useSignedCustomTemplates } from "@/components/qr-ads/use-signed-custom-templates";
+import { CategoryPicker } from "@/components/qr-ads/category-picker";
+import { TEMPLATES } from "@/lib/qr-ads/templates";
+import type { ShareTemplate } from "@/lib/qr-ads/types";
 import {
   CATEGORY_TREE,
   categoryLabel,
@@ -21,22 +21,22 @@ import {
   subsFor,
   UNCATEGORIZED_KEY,
   type CategoryKey,
-} from "@/lib/share-kit/categories";
-import { listShareKitLayouts, upsertShareKitLayout } from "@/lib/share-kit-layouts.functions";
+} from "@/lib/qr-ads/categories";
+import { listQrAdLayouts, upsertQrAdLayout } from "@/lib/qr-ad-layouts.functions";
 import {
-  listShareKitCustomTemplates,
-  deleteShareKitCustomTemplate,
+  listQrAdTemplates,
+  deleteQrAdTemplate,
   setBuiltinHidden,
-  updateShareKitTemplateQrPlacement,
-  setShareKitCustomCategory,
-  setShareKitBuiltinCategory,
+  updateQrAdTemplateQrPlacement,
+  setQrAdTemplateCategory,
+  setQrAdBuiltinCategory,
   type CustomTemplateRow,
   type BuiltinCategoryRow,
 } from "@/lib/share-kit-templates.functions";
-import { detectQrSlotFromUrl, isDetected } from "@/lib/share-kit/detect-qr-slot";
-import { assessQrReadability } from "@/lib/share-kit/qr-readability";
-import { detectScanHereWithVision } from "@/lib/share-kit-vision.functions";
-import { classifyShareKitTemplate } from "@/lib/share-kit-classify.functions";
+import { detectQrSlotFromUrl, isDetected } from "@/lib/qr-ads/detect-qr-slot";
+import { assessQrReadability } from "@/lib/qr-ads/qr-readability";
+import { detectScanHereWithVision } from "@/lib/qr-ad-vision.functions";
+import { classifyQrAdTemplate } from "@/lib/qr-ad-classify.functions";
 import { siteOrigin } from "@/lib/site-config";
 
 type SmartTarget =
@@ -47,11 +47,11 @@ type ClassifyTarget =
   | { kind: "custom"; id: string; label: string; imageUrl: string }
   | { kind: "builtin"; id: string; label: string; imageUrl: string };
 
-export const Route = createFileRoute("/admin/advertisements/share-kit")({
-  component: AdminShareKitPage,
+export const Route = createFileRoute("/admin/advertisements/qr-ads")({
+  component: AdminQrAdsPage,
   head: () => ({
     meta: [
-      { title: "My QR / Share Kit — Advertisements" },
+      { title: "QR Advertisements — Advertisements" },
       { name: "robots", content: "noindex,nofollow" },
     ],
   }),
@@ -82,7 +82,7 @@ function customToTemplate(row: CustomTemplateRow): ShareTemplate {
   };
 }
 
-function AdminShareKitPage() {
+function AdminQrAdsPage() {
   const { user, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -95,7 +95,7 @@ function AdminShareKitPage() {
   const [openCats, setOpenCats] = useState<Record<string, boolean>>(() => {
     if (typeof window === "undefined") return {};
     try {
-      return JSON.parse(localStorage.getItem("share-kit-open-cats-v2") ?? "{}");
+      return JSON.parse(localStorage.getItem("qr-ads-open-cats-v1") ?? "{}");
     } catch {
       return {};
     }
@@ -129,36 +129,36 @@ function AdminShareKitPage() {
     };
   }, [staff]);
 
-  const layoutsFn = useServerFn(listShareKitLayouts);
+  const layoutsFn = useServerFn(listQrAdLayouts);
   const { data: layouts } = useQuery({
-    queryKey: ["share-kit-layouts"],
+    queryKey: ["qr-ad-layouts"],
     queryFn: () => layoutsFn(),
     enabled: !!user && !!staff,
   });
 
-  const customFn = useServerFn(listShareKitCustomTemplates);
+  const customFn = useServerFn(listQrAdTemplates);
   const { data: customData, refetch: refetchCustom } = useQuery({
-    queryKey: ["share-kit-custom-templates"],
+    queryKey: ["qr-ad-templates"],
     queryFn: () => customFn(),
     enabled: !!user,
   });
   const { data: signedCustoms } = useSignedCustomTemplates(customData?.templates);
 
-  const deleteFn = useServerFn(deleteShareKitCustomTemplate);
+  const deleteFn = useServerFn(deleteQrAdTemplate);
   const hideFn = useServerFn(setBuiltinHidden);
-  const updateQrFn = useServerFn(updateShareKitTemplateQrPlacement);
+  const updateQrFn = useServerFn(updateQrAdTemplateQrPlacement);
   const visionFn = useServerFn(detectScanHereWithVision);
-  const upsertLayoutFn = useServerFn(upsertShareKitLayout);
-  const setCustomCatFn = useServerFn(setShareKitCustomCategory);
-  const setBuiltinCatFn = useServerFn(setShareKitBuiltinCategory);
-  const classifyFn = useServerFn(classifyShareKitTemplate);
+  const upsertLayoutFn = useServerFn(upsertQrAdLayout);
+  const setCustomCatFn = useServerFn(setQrAdTemplateCategory);
+  const setBuiltinCatFn = useServerFn(setQrAdBuiltinCategory);
+  const classifyFn = useServerFn(classifyQrAdTemplate);
 
   async function deleteCustom(id: string, label: string) {
     if (!confirm(`Delete template "${label}"? This cannot be undone.`)) return;
     try {
       await deleteFn({ data: { id } });
       toast.success("Template deleted");
-      qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+      qc.invalidateQueries({ queryKey: ["qr-ad-templates"] });
     } catch (e: any) {
       toast.error(e?.message ?? "Delete failed");
     }
@@ -168,7 +168,7 @@ function AdminShareKitPage() {
     try {
       await hideFn({ data: { templateId, hidden: !currentlyHidden } });
       toast.success(currentlyHidden ? "Template restored" : "Template hidden");
-      qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+      qc.invalidateQueries({ queryKey: ["qr-ad-templates"] });
     } catch (e: any) {
       toast.error(e?.message ?? "Failed");
     }
@@ -178,7 +178,7 @@ function AdminShareKitPage() {
     try {
       await setCustomCatFn({ data: { id, category, subcategory } });
       toast.success("Category updated");
-      qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+      qc.invalidateQueries({ queryKey: ["qr-ad-templates"] });
     } catch (e: any) {
       toast.error(e?.message ?? "Failed");
     }
@@ -188,7 +188,7 @@ function AdminShareKitPage() {
     try {
       await setBuiltinCatFn({ data: { templateId, category, subcategory } });
       toast.success("Category updated");
-      qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+      qc.invalidateQueries({ queryKey: ["qr-ad-templates"] });
     } catch (e: any) {
       toast.error(e?.message ?? "Failed");
     }
@@ -292,8 +292,8 @@ function AdminShareKitPage() {
     toast.dismiss(t);
     setAutoFittingId(null);
     toast.success(`Smart fit done — ${aiPlaced} AI · ${heuristicPlaced} heuristic · ${unreadable} need review · ${skipped} no panel · ${failed} failed`);
-    qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
-    qc.invalidateQueries({ queryKey: ["share-kit-layouts"] });
+    qc.invalidateQueries({ queryKey: ["qr-ad-templates"] });
+    qc.invalidateQueries({ queryKey: ["qr-ad-layouts"] });
     setBulkFitting(false);
   }
 
@@ -332,12 +332,12 @@ function AdminShareKitPage() {
     await Promise.all(Array.from({ length: Math.min(concurrency, targets.length) }, () => worker()));
     toast.dismiss(t);
     toast.success(`Auto-categorize done — ${ok} tagged · ${skipped} unclear · ${failed} failed`);
-    qc.invalidateQueries({ queryKey: ["share-kit-custom-templates"] });
+    qc.invalidateQueries({ queryKey: ["qr-ad-templates"] });
     setBulkClassifying(false);
   }
 
   if (authLoading || loading) {
-    return <div className="p-12 text-center text-muted-foreground">Loading your share kit…</div>;
+    return <div className="p-12 text-center text-muted-foreground">Loading your QR ads…</div>;
   }
 
   if (!staff) {
@@ -414,7 +414,7 @@ function AdminShareKitPage() {
   const toggleCat = (cat: string, v: boolean) => {
     setOpenCats((prev) => {
       const next = { ...prev, [cat]: v };
-      try { localStorage.setItem("share-kit-open-cats-v2", JSON.stringify(next)); } catch {}
+      try { localStorage.setItem("qr-ads-open-cats-v1", JSON.stringify(next)); } catch {}
       return next;
     });
   };
@@ -444,7 +444,7 @@ function AdminShareKitPage() {
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-            365 Member Share Kit
+            365 QR Advertisements
           </div>
           <h1 className="mt-1 font-display text-2xl font-bold">
             {staff.full_name}'s personalized ads
@@ -613,7 +613,7 @@ function AdminShareKitPage() {
       </p>
 
       {isAdmin && (
-        <ShareKitTemplateUpload
+        <QrAdTemplateUpload
           open={uploadOpen}
           onOpenChange={setUploadOpen}
           onSaved={() => refetchCustom()}

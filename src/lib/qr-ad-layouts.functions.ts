@@ -18,12 +18,12 @@ const deleteSchema = z.object({
 
 type Row = { template_id: string; cx: number; cy: number; size: number };
 
-export const listShareKitLayouts = createServerFn({ method: "GET" })
+export const listQrAdLayouts = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
     const { data, error } = await supabase
-      .from("share_kit_layouts")
+      .from("qr_ad_layouts")
       .select("template_id, cx, cy, size")
       .eq("user_id", userId);
     if (error) throw new Error(error.message);
@@ -34,13 +34,13 @@ export const listShareKitLayouts = createServerFn({ method: "GET" })
     return map;
   });
 
-export const upsertShareKitLayout = createServerFn({ method: "POST" })
+export const upsertQrAdLayout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => upsertSchema.parse(input))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { error } = await supabase
-      .from("share_kit_layouts")
+      .from("qr_ad_layouts")
       .upsert(
         {
           user_id: userId,
@@ -62,7 +62,7 @@ export const deleteShareKitLayout = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { error } = await supabase
-      .from("share_kit_layouts")
+      .from("qr_ad_layouts")
       .delete()
       .eq("user_id", userId)
       .eq("template_id", data.templateId);
