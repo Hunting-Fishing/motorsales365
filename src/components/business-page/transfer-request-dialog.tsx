@@ -151,7 +151,7 @@ export function TransferRequestDialog({
               </Button>
               <Button
                 onClick={handleSubmit}
-                disabled={busy || reason.trim().length < 20}
+                disabled={busy || reason.trim().length < 10}
               >
                 {busy ? "Submitting…" : "Continue → attach proof"}
               </Button>
