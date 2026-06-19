@@ -582,8 +582,16 @@ function AdminQrAdsPage() {
                 className="rounded-lg border border-border bg-card/40"
               >
                 <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-muted/40">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? "" : "-rotate-90"}`} />
+                    {(() => {
+                      const { icon: Icon, tone } = categoryVisual(cat.catKey);
+                      return (
+                        <span className={`inline-flex h-8 w-8 items-center justify-center rounded-lg ${tone}`} aria-hidden>
+                          <Icon className="h-4 w-4" />
+                        </span>
+                      );
+                    })()}
                     <span className="text-sm font-semibold">{cat.catLabel}</span>
                     <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
                       {cat.total}
