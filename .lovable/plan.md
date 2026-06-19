@@ -1,27 +1,30 @@
-# Forgot/Reset Password — Already Implemented
+# Reset-password UX polish
 
-Both pages exist and are fully wired end to end.
+Add explicit loading/success/error UI, expired-token guidance, and a cooldown-gated resend.
 
-## `/forgot-password` (`src/routes/forgot-password.tsx`, 150 lines)
-- Tabbed UI: **Email link** + **SMS OTP (PH mobile)**.
-- Email tab: `supabase.auth.resetPasswordForEmail(email, { redirectTo: <site>/reset-password })`.
-- SMS tab: `signInWithOtp({ phone })` → `verifyOtp` → navigates to `/reset-password` in recovery mode.
-- Linked from `/login` ("Forgot?").
+## `/forgot-password`
 
-## `/reset-password` (`src/routes/reset-password.tsx`, 198 lines)
-- Detects all three Supabase recovery flows:
-  - `?token_hash=…&type=recovery` → `verifyOtp({ token_hash, type: 'recovery' })` (works cross-device).
-  - `?code=…` (PKCE) → `exchangeCodeForSession`.
-  - `#access_token=…&type=recovery` (legacy hash).
-- Also listens for `PASSWORD_RECOVERY` on `onAuthStateChange`.
-- Shows a "Set new password" form (new + confirm, min 8 chars) and calls `supabase.auth.updateUser({ password })`, then redirects to `/dashboard`.
-- Renders clear errors for invalid/expired/already-used links and lets the user request a new one inline.
+- Add `status: 'idle' | 'sending' | 'sent' | 'error'` and `errorMsg` state for the **Email link** tab (toasts stay as a supplement).
+- After a successful send, replace the form with a **success panel**: green check icon, "Reset link sent to <email>. It expires in 1 hour. Check spam if you don't see it." plus a **Resend reset link** button.
+- **Cooldown timer**: when a link is sent (initial or resend), start a 60s cooldown stored in `useState` + `useEffect` interval. The Resend button shows `Resend in 0:45` and is disabled until the timer ends. Persist the cooldown deadline in `sessionStorage` keyed by email so a refresh keeps the timer honest.
+- Error state shows an inline destructive alert (in addition to the toast) with the Supabase message and a Retry hint; on rate-limit errors (`status 429` / "rate limit" in message), force the cooldown to ~60s and show "Too many requests — try again in X seconds".
+- SMS tab gets the same `status` model: spinner-labeled buttons, success/error alerts inline, and a 30s "Resend OTP" cooldown on the OTP step.
 
-## Backend
-- Branded recovery email is already wired through `src/routes/lovable/email/auth/webhook.ts` + `src/lib/email-templates/recovery.tsx`, sending from the verified `notify.365motorsales.com` domain with a `token_hash` link to `/reset-password`.
+## `/reset-password`
 
-## Recommendation
-No code changes needed. If you want any polish on top, tell me which:
-- Resend cooldown / rate-limit on the "Send reset link" button.
-- Password strength meter on `/reset-password`.
-- Post-reset confirmation email ("Your password was changed").
+- Replace the boolean `mode` with `state: 'verifying' | 'request' | 'set' | 'updating' | 'success' | 'invalid' | 'expired'`.
+- While exchanging the token (`verifyOtp` / `exchangeCodeForSession`) show a centered **spinner + "Verifying your reset link…"** card so users don't see a flash of the request form.
+- On Supabase errors, classify the message:
+  - "expired", "otp_expired", "Token has expired" → `expired` state.
+  - everything else (invalid, already used, bad code) → `invalid` state.
+- `expired` / `invalid` panels show: destructive icon, plain-English explanation, and a **primary CTA "Request a new reset link"** that links to `/forgot-password`, plus a secondary "Back to sign in" link.
+- `updating` disables the form and shows a spinner button label.
+- `success` state shows a green panel "Password updated" and auto-redirects to `/dashboard` after a 1.5s delay (with a manual "Go to dashboard" button as fallback).
+- Password mismatch / length errors stay as inline field errors (already present), augmented with `aria-live="polite"` on the error region for accessibility.
+
+## Files
+
+- **Edit** `src/routes/forgot-password.tsx` — status states, success panel, cooldown timer (Email + SMS), inline alerts.
+- **Edit** `src/routes/reset-password.tsx` — state machine, verifying spinner, expired/invalid panels with CTA back to `/forgot-password`, success panel.
+
+No backend, schema, or new dependency changes — uses existing shadcn `Button`, `Alert` (or local destructive panel), `Input`, sonner toasts, and lucide icons.
