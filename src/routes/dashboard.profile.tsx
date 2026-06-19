@@ -105,6 +105,50 @@ function ProfilePage() {
     setNewEmail("");
   };
 
+  // Password change
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [passwordSubmitting, setPasswordSubmitting] = useState(false);
+  const [resetSubmitting, setResetSubmitting] = useState(false);
+
+  const changePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user?.email) return toast.error("No account email on file.");
+    if (newPassword.length < 8) return toast.error("New password must be at least 8 characters.");
+    if (newPassword !== confirmNewPassword) return toast.error("New passwords do not match.");
+    if (newPassword === currentPassword)
+      return toast.error("New password must be different from the current one.");
+
+    setPasswordSubmitting(true);
+    const { error: signInErr } = await supabase.auth.signInWithPassword({
+      email: user.email,
+      password: currentPassword,
+    });
+    if (signInErr) {
+      setPasswordSubmitting(false);
+      return toast.error("Current password is incorrect.");
+    }
+    const { error: updErr } = await supabase.auth.updateUser({ password: newPassword });
+    setPasswordSubmitting(false);
+    if (updErr) return toast.error(updErr.message);
+    toast.success("Password updated.");
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmNewPassword("");
+  };
+
+  const sendPasswordResetEmail = async () => {
+    if (!user?.email) return toast.error("No account email on file.");
+    setResetSubmitting(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+      redirectTo: `${siteOrigin()}/reset-password`,
+    });
+    setResetSubmitting(false);
+    if (error) return toast.error(error.message);
+    toast.success(`Reset link sent to ${user.email}. Check your inbox.`);
+  };
+
   useEffect(() => {
     if (!user) return;
     supabase
