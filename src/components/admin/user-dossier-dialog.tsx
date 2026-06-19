@@ -32,9 +32,6 @@ import {
 } from "@/lib/admin-user-dossier.functions";
 import { AccountTeamStrip } from "./account-team-strip";
 import { ResetPasswordDialog } from "./reset-password-dialog";
-import { useAuth } from "@/hooks/use-auth";
-
-const SUPER_ADMIN_EMAIL = "jordilwbailey@gmail.com";
 
 const php = (n: number | string | null | undefined) =>
   "₱" + Math.round(Number(n ?? 0)).toLocaleString("en-PH", { maximumFractionDigits: 0 });
