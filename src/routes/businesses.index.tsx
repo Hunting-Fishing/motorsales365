@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import ogBusinesses from "@/assets/og/businesses.jpg";
 import { useEffect, useMemo, useState } from "react";
-import { Search, MapPin, Star, Store as StoreIcon, Plus, BadgeCheck } from "lucide-react";
+import { Search, MapPin, Star, Store as StoreIcon, Plus, BadgeCheck, Shield } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
