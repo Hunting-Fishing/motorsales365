@@ -2,11 +2,14 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { zodValidator, fallback } from "@tanstack/zod-adapter";
+import { z } from "zod";
 import { toast } from "sonner";
-import { ChevronDown, Eye, EyeOff, Plus, Trash2, History } from "lucide-react";
+import { ChevronDown, Eye, EyeOff, Plus, Trash2, History, Search, X } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { TemplateCard } from "@/components/qr-ads/template-card";
 import { QrAdTemplateUpload } from "@/components/qr-ads/template-upload-dialog";
@@ -31,7 +34,12 @@ import {
 import { siteOrigin } from "@/lib/site-config";
 
 
+const adsSearchSchema = z.object({
+  q: fallback(z.string(), "").default(""),
+});
+
 export const Route = createFileRoute("/dashboard/qr-ads")({
+  validateSearch: zodValidator(adsSearchSchema),
   component: QrAdsPage,
   head: () => ({
     meta: [
@@ -45,6 +53,19 @@ export const Route = createFileRoute("/dashboard/qr-ads")({
     ],
   }),
 });
+
+function matchesQuery(t: ShareTemplate, q: string): boolean {
+  if (!q) return true;
+  const needle = q.toLowerCase();
+  const cat = categoryLabel(t.category).toLowerCase();
+  const sub = subcategoryLabel(t.subcategory).toLowerCase();
+  return (
+    t.label.toLowerCase().includes(needle) ||
+    (t.description ?? "").toLowerCase().includes(needle) ||
+    cat.includes(needle) ||
+    sub.includes(needle)
+  );
+}
 
 type StaffRow = {
   referral_code: string;
