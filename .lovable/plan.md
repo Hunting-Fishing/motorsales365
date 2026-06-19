@@ -1,38 +1,25 @@
 ## Goal
-Make the resend cooldown on `/forgot-password` unmistakable to users by adding a prominent countdown indicator and explicit disabled-state messaging.
+Restrict admin-only UI in the site header to users whose real role is `admin`. Non-admin staff (sales, moderator, support, advertising) keep only the controls their role actually grants.
 
-## Current behavior
-- Buttons swap label text to show `Resend in 0:45` or `Try again in 0:45` when disabled.
-- No visual distinction between "disabled because input is empty" and "disabled because cooldown is active."
-- Cooldown reason is implied, not stated.
+## Problem
+In `src/components/site-header.tsx`, two admin-only controls are gated by `isStaff` instead of `isAdmin`, so any staff role currently sees:
+- The "Admin" portal button (line 243) — links to `/admin`
+- The "View as: …" seller-type simulator (line 259) — admin-only debug tool
+
+The "Role simulator" already correctly uses `realIsAdmin`.
 
 ## Changes
 
-### 1. Prominent cooldown timer (Email + SMS)
-Add a small dedicated countdown chip/badge above the primary button, visible only while the cooldown is active:
-- Shows `Resend available in 0:45` with a `Timer` (or `Clock`) icon.
-- Uses `text-muted-foreground` so it does not compete with alerts.
+### `src/components/site-header.tsx`
+- Line 243 (desktop Admin button): change `{user && isStaff && (` → `{user && isAdmin && (`.
+- Line 259 ("View as:" seller-type dropdown): change `{user && isStaff && (` → `{user && realIsAdmin && (`. Use `realIsAdmin` (not `isAdmin`) so the control disappears when an admin simulates a non-admin role, matching the existing Role simulator gate on line 296.
 
-### 2. Explicit disabled reasons
-When a button is disabled solely because of cooldown, append a subtle line of helper text beneath the button:
-- "You can request another link once the timer ends."
-- This distinguishes cooldown from validation errors.
+### Leave as-is (already role-correct)
+- Lines 443–489 (desktop avatar menu) and 755–811 (mobile sheet): the `isStaff` group header is fine because the inner items are already gated — `isSales` shows lead/referral/performance links, `isAdmin` shows "Manage sales reps" and "Admin console". Non-admin sales reps see only their own items.
+- Line 296 Role simulator: already gated by `realIsAdmin`.
 
-### 3. Clearer button states
-- **Initial request button** while cooldown active:
-  - Keep text `Try again in 0:45` (already present).
-  - Add `cursor-not-allowed` and ensure the existing shadcn `disabled:opacity-50` is visible.
-- **Success-panel resend button** while cooldown active:
-  - Keep text `Resend in 0:45`.
-  - Use `variant="outline"` instead of `secondary` so the disabled state is visually flatter and less inviting.
+## Out of scope
+No changes to route-level guards (`/admin/*` already protected server-side), no changes to permissions logic in `useAuth`, no backend changes.
 
-### 4. Rate-limit helper text
-When the cooldown was triggered by a 429/rate-limit error, show an additional inline warning:
-- "Too many requests. Please wait before trying again."
-- Already present as an Alert; keep it, but ensure the cooldown timer chip also appears so the user sees exactly how long to wait.
-
-## Files to edit
-- `src/routes/forgot-password.tsx` — add cooldown timer chip, helper text, and refine button variants during cooldown.
-
-## No new dependencies
-Uses existing `lucide-react` icons and shadcn components.
+## Files
+- `src/components/site-header.tsx` — two one-line gating changes.
