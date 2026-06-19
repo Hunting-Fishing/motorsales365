@@ -92,17 +92,9 @@ function StaffReferral() {
     })();
   }, [user]);
 
-  const layoutsFn = useServerFn(listQrAdLayouts);
-  const { data: layouts } = useQuery({
-    queryKey: ["qr-ad-layouts"],
-    queryFn: () => layoutsFn(),
-    enabled: !!user && !!staff,
-  });
-
   const adContext = useMemo(() => {
     if (!staff) return null;
-    const origin =
-      siteOrigin();
+    const origin = siteOrigin();
     return {
       name: staff.full_name,
       firstName: staff.full_name.split(" ")[0] || staff.full_name,
