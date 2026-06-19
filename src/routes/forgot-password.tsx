@@ -390,15 +390,23 @@ function ForgotPasswordPage() {
 
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant={smsCooldown.active ? "outline" : "ghost"}
                   className="w-full"
                   disabled={smsCooldown.active || smsStatus === "sending"}
+                  aria-disabled={smsCooldown.active || smsStatus === "sending"}
                   onClick={sendSmsOtp}
                 >
                   {smsCooldown.active
                     ? `Resend OTP in ${formatTimer(smsCooldown.remaining)}`
                     : "Resend OTP"}
                 </Button>
+
+                {smsCooldown.active && (
+                  <CooldownNotice
+                    remaining={smsCooldown.remaining}
+                    label="Next OTP available in"
+                  />
+                )}
 
                 <button
                   type="button"
