@@ -53,7 +53,7 @@ function NewRidePage() {
   };
 
   return (
-    <form onSubmit={submit} className="mx-auto max-w-2xl space-y-5">
+    <form onSubmit={submit} className="mx-auto max-w-2xl space-y-5 px-4 pb-24 md:px-0 md:pb-0">
       <div>
         <h1 className="font-display text-2xl font-bold">Add a ride</h1>
         <p className="text-sm text-muted-foreground">
@@ -70,7 +70,7 @@ function NewRidePage() {
       </div>
       <div className="space-y-2">
         <Label>Vehicle type</Label>
-        <div className="flex gap-2">
+        <div className="flex flex-col gap-2 sm:flex-row">
           {(["car", "motorcycle"] as const).map((t) => (
             <Button
               key={t}
@@ -78,6 +78,7 @@ function NewRidePage() {
               variant={vehicleType === t ? "default" : "outline"}
               size="sm"
               onClick={() => setVehicleType(t)}
+              className="w-full sm:w-auto"
             >
               {t === "car" ? "Car / SUV / Truck" : "Motorcycle"}
             </Button>
@@ -101,8 +102,8 @@ function NewRidePage() {
         />
       </div>
       <FormFeedbackLink formId="ride-create" />
-      <div className="flex justify-end gap-2">
-        <Button type="submit" disabled={busy}>
+      <div className="flex justify-stretch sm:justify-end">
+        <Button type="submit" disabled={busy} className="w-full sm:w-auto">
           {busy ? "Creating…" : "Create ride"}
         </Button>
       </div>

@@ -112,7 +112,7 @@ function NewWantedPage() {
 
   return (
     <SiteLayout>
-      <div className="container mx-auto max-w-2xl px-4 py-8">
+      <div className="container mx-auto max-w-2xl px-4 py-8 pb-24 md:pb-8">
         <div className="mb-6">
           <Link to="/wanted" className="text-sm text-muted-foreground hover:text-foreground">
             ← Back to wanted board
@@ -126,7 +126,7 @@ function NewWantedPage() {
           </p>
         </div>
 
-        <form onSubmit={onSubmit} className="space-y-5 rounded-xl border border-border bg-card p-6">
+        <form onSubmit={onSubmit} className="space-y-5 rounded-xl border border-border bg-card p-4 sm:p-6">
           <div className="space-y-2">
             <Label htmlFor="title">Title</Label>
             <Input
@@ -268,11 +268,11 @@ function NewWantedPage() {
           </div>
 
           <FormFeedbackLink formId="wanted-new" className="mb-1" />
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="ghost" asChild>
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+            <Button type="button" variant="ghost" asChild className="w-full sm:w-auto">
               <Link to="/wanted">Cancel</Link>
             </Button>
-            <Button type="submit" disabled={submitting}>
+            <Button type="submit" disabled={submitting} className="w-full sm:w-auto">
               {submitting ? "Posting…" : "Post wanted request"}
             </Button>
           </div>
