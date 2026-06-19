@@ -31,6 +31,10 @@ import {
   type DossierScore,
 } from "@/lib/admin-user-dossier.functions";
 import { AccountTeamStrip } from "./account-team-strip";
+import { ResetPasswordDialog } from "./reset-password-dialog";
+import { useAuth } from "@/hooks/use-auth";
+
+const SUPER_ADMIN_EMAIL = "jordilwbailey@gmail.com";
 
 const php = (n: number | string | null | undefined) =>
   "₱" + Math.round(Number(n ?? 0)).toLocaleString("en-PH", { maximumFractionDigits: 0 });
@@ -51,6 +55,8 @@ export function UserDossierDialog({
   score: DossierScore;
 }) {
   const [tab, setTab] = useState("overview");
+  const { user: authUser } = useAuth();
+  const isSuperAdmin = (authUser?.email ?? "").toLowerCase() === SUPER_ADMIN_EMAIL;
   const displayName =
     identity.full_name || identity.business_name || identity.email || "User";
 
@@ -68,6 +74,11 @@ export function UserDossierDialog({
             <Badge variant="outline" className="text-[10px]">
               Trust {score.score}
             </Badge>
+            {isSuperAdmin && (
+              <span className="ml-auto">
+                <ResetPasswordDialog user={{ id: userId, full_name: displayName }} />
+              </span>
+            )}
           </DialogTitle>
         </DialogHeader>
 
