@@ -552,9 +552,22 @@ function SubmitBusinessPage() {
         <h1 className="mt-2 font-display text-2xl font-bold tracking-tight md:text-3xl">
           List your business
         </h1>
-        <p className="mb-6 text-sm text-muted-foreground">
+        <p className="mb-4 text-sm text-muted-foreground">
           Submissions go through a quick review before being published.
         </p>
+
+        <Card className="mb-6 flex flex-col gap-2 border-primary/30 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-sm">
+            <div className="font-medium">Already listed on 365 MotorSales?</div>
+            <div className="text-muted-foreground">
+              Search the directory and claim your existing business, or request an ownership transfer.
+            </div>
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/dashboard/claim-business">Claim a business</Link>
+          </Button>
+        </Card>
+
 
         <Card className="space-y-5 p-5">
           <div>
