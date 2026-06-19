@@ -106,6 +106,17 @@ function customToTemplate(row: CustomTemplateRow): ShareTemplate {
 function AdminQrAdsPage() {
   const { user, isAdmin, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const { q } = Route.useSearch();
+  const [queryInput, setQueryInput] = useState(q);
+  useEffect(() => { setQueryInput(q); }, [q]);
+  useEffect(() => {
+    const id = setTimeout(() => {
+      if (queryInput !== q) {
+        navigate({ to: ".", search: (prev) => ({ ...prev, q: queryInput }), replace: true });
+      }
+    }, 150);
+    return () => clearTimeout(id);
+  }, [queryInput, q, navigate]);
   const qc = useQueryClient();
   const [staff, setStaff] = useState<StaffRow | null>(null);
   const [loading, setLoading] = useState(true);
@@ -391,7 +402,10 @@ function AdminQrAdsPage() {
       subcategory: override.subcategory ?? t.subcategory,
     };
   });
-  const allTemplates: ShareTemplate[] = [...customTemplates, ...visibleBuiltins];
+  const allTemplatesUnfiltered: ShareTemplate[] = [...customTemplates, ...visibleBuiltins];
+  const allTemplates: ShareTemplate[] = q
+    ? allTemplatesUnfiltered.filter((t) => matchesQuery(t, q))
+    : allTemplatesUnfiltered;
 
   // Group by category -> subcategory
   type GroupedSub = { subKey: string; subLabel: string; items: ShareTemplate[] };
