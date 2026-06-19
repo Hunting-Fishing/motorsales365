@@ -182,6 +182,36 @@ function ShareKitPage() {
   const historyBuiltins = TEMPLATES.filter((t) => hiddenBuiltins.has(t.id));
   const allTemplates: ShareTemplate[] = [...customTemplates, ...activeBuiltins];
 
+  const CUSTOM_CAT = "Custom Uploads";
+  const CATEGORY_ORDER = [
+    CUSTOM_CAT,
+    "Social Posts",
+    "Stories & Reels",
+    "Print & Wearables",
+    "Vehicles For Sale",
+    "Parts & Accessories",
+    "Services (Tow / Roadside)",
+    "Other",
+  ];
+  const grouped = new Map<string, ShareTemplate[]>();
+  for (const t of allTemplates) {
+    const isCustom = t.id.startsWith("custom:");
+    const cat = isCustom ? CUSTOM_CAT : (t.category ?? "Other");
+    const arr = grouped.get(cat) ?? [];
+    arr.push(t);
+    grouped.set(cat, arr);
+  }
+
+  const toggleCat = (cat: string, v: boolean) => {
+    setOpenCats((prev) => {
+      const next = { ...prev, [cat]: v };
+      try {
+        localStorage.setItem("share-kit-open-cats", JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  };
+
   return (
     <div className="space-y-6">
       <header className="flex flex-wrap items-start justify-between gap-3">
