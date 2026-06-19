@@ -359,6 +359,16 @@ function ClaimsPage() {
                     </div>
                   </div>
                   <div className="flex flex-wrap items-center gap-1.5">
+                    <Badge
+                      variant="outline"
+                      className={
+                        c.kind === "transfer"
+                          ? "border-orange-300 bg-orange-50 text-orange-800"
+                          : "border-blue-200 bg-blue-50 text-blue-800"
+                      }
+                    >
+                      {c.kind === "transfer" ? "Transfer" : "Claim"}
+                    </Badge>
                     <Badge variant="outline" className="capitalize">
                       {c.contact_method}
                     </Badge>
@@ -376,6 +386,14 @@ function ClaimsPage() {
                     </Badge>
                   </div>
                 </div>
+
+                {c.kind === "transfer" && c.businesses?.owner_id && (
+                  <div className="rounded-md border border-orange-300 bg-orange-50 p-2 text-xs text-orange-900 dark:border-orange-700 dark:bg-orange-950/40 dark:text-orange-100">
+                    <span className="font-semibold">Ownership transfer requested.</span>{" "}
+                    Current owner: <code>{c.businesses.owner_id}</code>. Approving will reassign
+                    this business to the requester.
+                  </div>
+                )}
 
                 <div className="grid gap-3 lg:grid-cols-[280px_1fr]">
                   <div className="space-y-3">
