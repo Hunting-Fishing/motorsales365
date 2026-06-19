@@ -20,7 +20,7 @@ import {
   useAdminPendingCounts,
   pendingCountForRoute,
 } from "@/hooks/use-admin-pending-counts";
-import { ADMIN_NAV, type AdminNavItem } from "@/lib/admin-nav";
+import { ADMIN_NAV, type AdminAdminNavItem } from "@/lib/admin-nav";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
@@ -166,20 +166,20 @@ function SidebarNav({
   visibleNav,
   pendingCounts,
 }: {
-  visibleNav: NavItem[];
+  visibleNav: AdminNavItem[];
   pendingCounts: any;
 }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
 
   // Group items by section. Items without a section (Overview) render at top.
-  const groups: { section: string | undefined; items: NavItem[] }[] = [];
+  const groups: { section: string | undefined; items: AdminNavItem[] }[] = [];
   visibleNav.forEach((item) => {
     const last = groups[groups.length - 1];
     if (last && last.section === item.section) last.items.push(item);
     else groups.push({ section: item.section, items: [item] });
   });
 
-  const renderLink = (item: NavItem) => {
+  const renderLink = (item: AdminNavItem) => {
     const { to, label, Icon, exact, info, external } = item;
     const count = pendingCountForRoute(to, pendingCounts);
     const linkClass =
