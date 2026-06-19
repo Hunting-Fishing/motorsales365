@@ -240,7 +240,7 @@ export function SiteHeader() {
           </Button>
 
           {/* Admin Portal shortcut — visible for all staff roles */}
-          {user && isStaff && (
+          {user && isAdmin && (
             <Button
               asChild
               variant="outline"
@@ -256,7 +256,7 @@ export function SiteHeader() {
           )}
 
 
-          {user && isStaff && (
+          {user && realIsAdmin && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="sm" className="hidden md:inline-flex gap-2">
