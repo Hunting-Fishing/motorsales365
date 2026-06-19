@@ -95,7 +95,10 @@ export function TemplateCard({ template, context, override }: Props) {
     if (!visible) return;
     let cancelled = false;
     let released = false;
-    setPreviewUrl(null);
+    setPreviewUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
     (async () => {
       await acquireRenderSlot();
       if (cancelled) {
@@ -107,7 +110,13 @@ export function TemplateCard({ template, context, override }: Props) {
         const canvas = await composeTemplate(template, context, effective);
         if (cancelled) return;
         canvasRef.current = canvas;
-        setPreviewUrl(canvas.toDataURL("image/png"));
+        const blob = await canvasToBlob(canvas);
+        if (cancelled) return;
+        const url = URL.createObjectURL(blob);
+        setPreviewUrl((prev) => {
+          if (prev) URL.revokeObjectURL(prev);
+          return url;
+        });
       } catch (e) {
         console.error("Template render failed", template.id, e);
         if (!cancelled) toast.error(`Could not render ${template.label}`);
@@ -120,6 +129,17 @@ export function TemplateCard({ template, context, override }: Props) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible, template, context, effective.cx, effective.cy, effective.size]);
+
+  // Revoke the blob URL on unmount.
+  useEffect(() => {
+    return () => {
+      setPreviewUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+    };
+  }, []);
+
 
 
   const fileName = `365-${template.id}-${context.code}.png`;
