@@ -235,38 +235,71 @@ function ShareKitPage() {
       </div>
 
       {context && (
-        <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(140px,1fr))]">
-          {allTemplates.map((t) => {
-            const custom = customById.get(t.id);
+        <div className="space-y-2">
+          {CATEGORY_ORDER.map((cat) => {
+            const items = grouped.get(cat) ?? [];
+            if (items.length === 0) return null;
+            const isOpen = openCats[cat] ?? cat === CATEGORY_ORDER[0];
             return (
-              <div key={t.id} className="relative mx-auto w-full max-w-[180px]">
-                <TemplateCard
-                  template={t}
-                  context={context}
-                  override={layouts?.[t.id]}
-                />
-                {isAdmin && (
-                  <div className="mt-2 flex justify-end">
-                    {custom ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => deleteCustom(custom.id, custom.label)}
-                      >
-                        <Trash2 className="mr-1 h-3.5 w-3.5" /> Delete
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => deleteBuiltin(t.id, t.label)}
-                      >
-                        <EyeOff className="mr-1 h-3.5 w-3.5" /> Archive
-                      </Button>
-                    )}
+              <Collapsible
+                key={cat}
+                open={isOpen}
+                onOpenChange={(v) => toggleCat(cat, v)}
+                className="rounded-lg border border-border bg-card/40"
+              >
+                <CollapsibleTrigger className="flex w-full items-center justify-between gap-2 px-3 py-2 text-left hover:bg-muted/40">
+                  <div className="flex items-center gap-2">
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform ${isOpen ? "" : "-rotate-90"}`}
+                    />
+                    <span className="text-sm font-semibold">{cat}</span>
+                    <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
+                      {items.length}
+                    </span>
                   </div>
-                )}
-              </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <div className="grid gap-2 p-3 pt-1 [grid-template-columns:repeat(auto-fill,minmax(96px,1fr))]">
+                    {items.map((t) => {
+                      const custom = customById.get(t.id);
+                      return (
+                        <div key={t.id} className="relative mx-auto w-full max-w-[120px]">
+                          <TemplateCard
+                            template={t}
+                            context={context}
+                            override={layouts?.[t.id]}
+                          />
+                          {isAdmin && (
+                            <div className="mt-1 flex justify-end">
+                              {custom ? (
+                                <Button
+                                  variant="outline"
+                                  size="icon"
+                                  className="h-6 w-6"
+                                  title="Delete"
+                                  onClick={() => deleteCustom(custom.id, custom.label)}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              ) : (
+                                <Button
+                                  variant="outline"
+                                  size="icon"
+                                  className="h-6 w-6"
+                                  title="Archive"
+                                  onClick={() => deleteBuiltin(t.id, t.label)}
+                                >
+                                  <EyeOff className="h-3 w-3" />
+                                </Button>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
             );
           })}
         </div>
@@ -286,13 +319,19 @@ function ShareKitPage() {
           {historyBuiltins.length === 0 ? (
             <p className="text-sm text-muted-foreground">Nothing in history yet.</p>
           ) : (
-            <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(140px,1fr))]">
+            <div className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(96px,1fr))]">
               {historyBuiltins.map((t) => (
-                <div key={t.id} className="relative mx-auto w-full max-w-[180px] opacity-80">
+                <div key={t.id} className="relative mx-auto w-full max-w-[120px] opacity-80">
                   <TemplateCard template={t} context={context} override={layouts?.[t.id]} />
-                  <div className="mt-2 flex justify-end">
-                    <Button variant="outline" size="sm" onClick={() => restoreBuiltin(t.id)}>
-                      <Eye className="mr-1 h-3.5 w-3.5" /> Restore
+                  <div className="mt-1 flex justify-end">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-6 w-6"
+                      title="Restore"
+                      onClick={() => restoreBuiltin(t.id)}
+                    >
+                      <Eye className="h-3 w-3" />
                     </Button>
                   </div>
                 </div>
