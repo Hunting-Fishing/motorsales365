@@ -73,6 +73,14 @@ function ShareKitPage() {
   const [loading, setLoading] = useState(true);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [openCats, setOpenCats] = useState<Record<string, boolean>>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      return JSON.parse(localStorage.getItem("share-kit-open-cats") ?? "{}");
+    } catch {
+      return {};
+    }
+  });
 
   useEffect(() => {
     if (!authLoading && !user) navigate({ to: "/login" });
