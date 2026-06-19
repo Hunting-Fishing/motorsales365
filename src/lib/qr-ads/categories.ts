@@ -1,33 +1,71 @@
 /**
- * QR Ads category taxonomy. Used by:
+ * QR Advertisement category taxonomy. Used by:
  * - built-in templates (`templates.ts`)
  * - custom uploads (`qr_ad_templates.{category,subcategory}`)
  * - admin overrides for built-ins (`qr_ad_builtin_categories`)
  * - the AI classifier (the prompt is generated from this list)
+ *
+ * The taxonomy mirrors what 365 Motor Sales actually sells: a service
+ * directory, vehicle/parts marketplace, towing/dispatch, training, and
+ * brand/referral content.
  */
 
 export type CategoryKey =
-  | "service-repair"
-  | "sales-service"
+  | "repair-service"
+  | "towing-roadside"
+  | "sales-marketplace"
   | "insurance-finance"
-  | "advertising-365"
+  | "training-certification"
+  | "membership-referrals"
+  | "brand-format"
   | "other";
 
 export type SubcategoryKey =
+  // repair-service
   | "mechanic"
+  | "body-paint"
   | "detailing-carwash"
   | "upholstery-interior"
-  | "tow-roadside"
-  | "inspection-testing"
   | "tire-wheel"
-  | "vehicles-for-sale"
+  | "glass-windshield"
+  | "ac-electrical"
+  | "diesel-heavy-duty"
+  | "motorcycle-service"
+  | "inspection-testing"
+  // towing-roadside
+  | "tow-247"
+  | "roadside-assist"
+  | "fleet-dispatch"
+  | "heavy-recovery"
+  // sales-marketplace
+  | "cars-for-sale"
+  | "motorcycles-for-sale"
+  | "trucks-vans"
+  | "heavy-equipment"
+  | "boats-marine"
   | "parts-accessories"
   | "fuel-lubricants"
+  | "tools-equipment"
+  // insurance-finance
   | "insurance"
   | "financing"
+  | "warranty-protection"
+  // training-certification
+  | "courses"
+  | "instructor-referrals"
+  | "workshops-events"
+  // membership-referrals
+  | "member-promo"
+  | "referral-card"
+  | "member-perks"
+  // brand-format
   | "social-posts"
   | "stories-reels"
+  | "landscape-banner"
   | "print-wearables"
+  | "stickers-decals"
+  | "business-cards"
+  // catch-all
   | "other";
 
 export type CategoryDef = {
@@ -38,41 +76,82 @@ export type CategoryDef = {
 
 export const CATEGORY_TREE: CategoryDef[] = [
   {
-    key: "service-repair",
-    label: "Service & Repair Shops",
+    key: "repair-service",
+    label: "Repair & Service Shops",
     subs: [
       { key: "mechanic", label: "Auto Repair / Mechanic" },
+      { key: "body-paint", label: "Body & Paint" },
       { key: "detailing-carwash", label: "Detailing & Carwash" },
       { key: "upholstery-interior", label: "Upholstery & Interior" },
-      { key: "tow-roadside", label: "Tow & Roadside" },
-      { key: "inspection-testing", label: "Inspection & Testing" },
       { key: "tire-wheel", label: "Tire / Wheel / Alignment" },
+      { key: "glass-windshield", label: "Glass & Windshield" },
+      { key: "ac-electrical", label: "AC / Electrical" },
+      { key: "diesel-heavy-duty", label: "Diesel & Heavy-Duty" },
+      { key: "motorcycle-service", label: "Motorcycle Service" },
+      { key: "inspection-testing", label: "Inspection & Testing" },
     ],
   },
   {
-    key: "sales-service",
-    label: "Sales & Service",
+    key: "towing-roadside",
+    label: "Towing & Roadside",
     subs: [
-      { key: "vehicles-for-sale", label: "Vehicles For Sale" },
+      { key: "tow-247", label: "24/7 Tow" },
+      { key: "roadside-assist", label: "Roadside Assistance" },
+      { key: "fleet-dispatch", label: "Fleet & Dispatch" },
+      { key: "heavy-recovery", label: "Heavy Recovery" },
+    ],
+  },
+  {
+    key: "sales-marketplace",
+    label: "Sales & Marketplace",
+    subs: [
+      { key: "cars-for-sale", label: "Cars For Sale" },
+      { key: "motorcycles-for-sale", label: "Motorcycles For Sale" },
+      { key: "trucks-vans", label: "Trucks & Vans" },
+      { key: "heavy-equipment", label: "Heavy Equipment" },
+      { key: "boats-marine", label: "Boats & Marine" },
       { key: "parts-accessories", label: "Parts & Accessories" },
       { key: "fuel-lubricants", label: "Fuel / Lubricants" },
+      { key: "tools-equipment", label: "Tools & Equipment" },
     ],
   },
   {
     key: "insurance-finance",
-    label: "Insurance / Finance",
+    label: "Insurance & Finance",
     subs: [
       { key: "insurance", label: "Insurance" },
       { key: "financing", label: "Financing & Loans" },
+      { key: "warranty-protection", label: "Warranty & Protection" },
     ],
   },
   {
-    key: "advertising-365",
-    label: "Advertising 365",
+    key: "training-certification",
+    label: "Training & Certification",
     subs: [
-      { key: "social-posts", label: "Social Posts" },
-      { key: "stories-reels", label: "Stories & Reels" },
+      { key: "courses", label: "Courses" },
+      { key: "instructor-referrals", label: "Instructor Referrals" },
+      { key: "workshops-events", label: "Workshops & Events" },
+    ],
+  },
+  {
+    key: "membership-referrals",
+    label: "Membership & Referrals",
+    subs: [
+      { key: "member-promo", label: "365 Member Promo" },
+      { key: "referral-card", label: "Referral Code Card" },
+      { key: "member-perks", label: "Member Perks" },
+    ],
+  },
+  {
+    key: "brand-format",
+    label: "Brand & Format",
+    subs: [
+      { key: "social-posts", label: "Social Posts (1:1)" },
+      { key: "stories-reels", label: "Stories & Reels (9:16)" },
+      { key: "landscape-banner", label: "Landscape Banner" },
       { key: "print-wearables", label: "Print & Wearables" },
+      { key: "stickers-decals", label: "Stickers & Decals" },
+      { key: "business-cards", label: "Business Cards" },
     ],
   },
   {
