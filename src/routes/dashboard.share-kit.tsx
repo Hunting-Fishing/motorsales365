@@ -13,14 +13,23 @@ import { ShareKitTemplateUpload } from "@/components/share-kit/template-upload-d
 import { useSignedCustomTemplates } from "@/components/share-kit/use-signed-custom-templates";
 import { TEMPLATES } from "@/lib/share-kit/templates";
 import type { ShareTemplate } from "@/lib/share-kit/types";
+import {
+  CATEGORY_TREE,
+  categoryLabel,
+  subcategoryLabel,
+  UNCATEGORIZED_KEY,
+  type CategoryKey,
+} from "@/lib/share-kit/categories";
 import { listShareKitLayouts } from "@/lib/share-kit-layouts.functions";
 import {
   listShareKitCustomTemplates,
   deleteShareKitCustomTemplate,
   setBuiltinHidden,
   type CustomTemplateRow,
+  type BuiltinCategoryRow,
 } from "@/lib/share-kit-templates.functions";
 import { siteOrigin } from "@/lib/site-config";
+
 
 export const Route = createFileRoute("/dashboard/share-kit")({
   component: ShareKitPage,
@@ -61,8 +70,11 @@ function customToTemplate(row: CustomTemplateRow): ShareTemplate {
       plateRadius: 0,
     },
     shareText: row.share_text,
+    category: row.category ?? undefined,
+    subcategory: row.subcategory ?? undefined,
   };
 }
+
 
 function ShareKitPage() {
   const { user, realIsAdmin, loading: authLoading } = useAuth();
