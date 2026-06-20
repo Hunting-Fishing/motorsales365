@@ -188,7 +188,7 @@ function SectionBody({ section }: { section: SectionValue }) {
     case "rides":
       return (
         <div className="flex h-full flex-col gap-1">
-          <AdSlot src={adParts} alt="Sample rides feed banner ad" sub="Rides feed top" className="h-[26%] w-full" />
+          <AdSlot src={adTires} alt="Sample performance tires banner ad" sub="Rides feed top" className="h-[26%] w-full" />
           <div className="grid grid-cols-2 gap-1 flex-1">
             <Block /> <Block />
             <Block /> <Block />
