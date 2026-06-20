@@ -680,3 +680,18 @@ function FeatureImage({
     </article>
   );
 }
+
+function CompareCell({ ok, note, highlight = false }: { ok: boolean; note: string; highlight?: boolean }) {
+  return (
+    <div className={"border-t border-border p-4 " + (highlight ? "bg-primary/5" : "")}>
+      <div className="flex items-start gap-2">
+        {ok ? (
+          <Check className={"mt-0.5 h-4 w-4 shrink-0 " + (highlight ? "text-primary" : "text-foreground")} />
+        ) : (
+          <X className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+        )}
+        <span className={highlight ? "text-foreground" : "text-muted-foreground"}>{note}</span>
+      </div>
+    </div>
+  );
+}
