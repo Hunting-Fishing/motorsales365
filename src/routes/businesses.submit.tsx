@@ -938,7 +938,8 @@ function SubmitBusinessPage() {
                   />
                 </div>
               </div>
-            )}
+            </div>
+
 
             {/* ===== SERVICES ===== */}
             {step === "services" && (
