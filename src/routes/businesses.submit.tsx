@@ -554,12 +554,37 @@ function SubmitBusinessPage() {
   ] as const;
   type StepKey = (typeof STEPS)[number]["key"];
   const stepIndex = STEPS.findIndex((s) => s.key === step);
+
+  const stepperRef = useRef<HTMLOListElement | null>(null);
+  const cardRef = useRef<HTMLDivElement | null>(null);
+
+  // Keep the active stepper pill visible on mobile when it overflows.
+  useEffect(() => {
+    const el = stepperRef.current?.querySelector<HTMLButtonElement>(
+      `button[data-step="${step}"]`,
+    );
+    el?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [step]);
+
   const goTo = (k: StepKey) => {
+    if (k === step) return;
     setStep(k);
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+    if (typeof window !== "undefined") {
+      // Scroll the card into view, offset for sticky header + stepper on mobile.
+      const card = cardRef.current;
+      if (card) {
+        const isMobile = window.matchMedia("(max-width: 767px)").matches;
+        const offset = isMobile ? 120 : 16;
+        const top = card.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
   };
   const next = () => stepIndex < STEPS.length - 1 && goTo(STEPS[stepIndex + 1].key);
   const prev = () => stepIndex > 0 && goTo(STEPS[stepIndex - 1].key);
+
 
   // Lightweight completion hints (visual only; submit() still enforces rules)
   const completed: Record<StepKey, boolean> = {
