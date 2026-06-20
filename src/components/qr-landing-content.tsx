@@ -500,7 +500,7 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
               />
             </section>
 
-            <section className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {TRUST_CARDS.map((card) => (
                 <ImageInfoCard key={card.title} {...card} />
               ))}
