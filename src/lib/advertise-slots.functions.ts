@@ -212,7 +212,7 @@ export const createPlaceholderCreative = createServerFn({ method: "POST" })
         target_url: data.target_url ?? null,
         spec_ok: check.ok,
         spec_errors: check.errors,
-        status: "approved",
+        status: "pending",
       })
       .select("id")
       .single();
@@ -227,11 +227,12 @@ export const createPlaceholderCreative = createServerFn({ method: "POST" })
       .limit(1);
     const nextPos = (existing?.[0]?.position ?? -1) + 1;
 
+    // Inactive until an admin approves the creative
     const { error: e3 } = await supabase.from("ad_slot_assignments").insert({
       slot_id: data.slot_id,
       creative_id: creative.id,
       position: nextPos,
-      active: true,
+      active: false,
     });
     if (e3) throw new Error(e3.message);
     return { id: creative.id };
