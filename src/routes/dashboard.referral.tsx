@@ -177,6 +177,9 @@ function StaffReferral() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <Link to="/resources/qr-landing">
+            <Button size="sm" variant="outline">Preview scanner view</Button>
+          </Link>
           <Link to="/dashboard/qr-ads">
             <Button size="sm">Open QR ads</Button>
           </Link>

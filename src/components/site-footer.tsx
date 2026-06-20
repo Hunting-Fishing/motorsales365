@@ -80,6 +80,7 @@ export function SiteFooter() {
         { to: "/support", label: "Help & Support" },
         { to: "/report", label: "Report a scam" },
         { to: "/advertise", label: "Advertise / buy ad space" },
+        { to: "/resources/qr-landing", label: "QR landing preview" },
         ...(referralCode ? [{ to: "/my-qr", label: "My QR Code" }] : []),
       ],
     },

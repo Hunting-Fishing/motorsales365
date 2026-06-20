@@ -1,52 +1,49 @@
-# Rebuild the QR scan landing page into a sales pitch
+## Goal
 
-The QR scan destination (`src/routes/r.$code.tsx`) currently reads like internal placeholder copy ("Shared 365 feature page", "Feature the roadmap clearly", "Coming soon"). When a real person scans a printed/worn QR, this page needs to **sell the platform in the first screen** and convert them into a signup, a listing, or a business partner.
+Let 365 members (advertisers, promoters, staff) preview what a first-time QR scanner sees on `/r/{code}`, so they can use it as a sales/promo resource and give feedback to improve it.
 
-## Goals
+## Approach
 
-1. Replace placeholder/meta copy with a benefit-led pitch aimed at three audiences: **buyers, sellers, and businesses**.
-2. Add a clear **"Why 365 beats Facebook & Google"** section with side-by-side comparison.
-3. Add a **boost & ads pricing callout** showing how much cheaper 365 is than FB Boost / Google Ads.
-4. Keep all referral-tracking logic intact (scan recording, visit counter, contact line, active promos).
-5. Reuse existing design tokens — no new color hardcoding.
+Add a **"QR Landing Preview"** resource page that renders the same content as `/r/{code}` in a non-tracking, preview mode — reachable from the member dashboard and the site footer.
 
-## What changes
+### 1. Refactor `/r/$code` into a shared component
 
-**File:** `src/routes/r.$code.tsx` (single-file rewrite of the marketing sections; data-loading useEffect untouched).
+- Extract the visual body of `src/routes/r.$code.tsx` (hero, "why 365 vs FB/Google", pricing comparison, lead form section) into a new component `src/components/qr-landing-content.tsx`.
+- Props: `{ mode: "live" | "preview", referralCode?, promoterName? }`.
+- In `preview` mode:
+  - Skip the `recordTouch` / referral-credit cookie write.
+  - Skip the lead-capture insert (render the `QrLeadForm` as a visual demo with a disabled submit + "Preview only — submissions disabled" note, OR hide the form and replace with a callout).
+  - Show a top banner: "This is what a new visitor sees after scanning your QR code."
+- `r.$code.tsx` keeps its loader/tracking and just renders `<QrLandingContent mode="live" referralCode={code} … />`.
 
-### New section order (after the existing referral-credit card)
+### 2. New preview route: `/resources/qr-landing`
 
-1. **Hero** — strong headline + subhead + two CTAs (Create account / Browse listings). Keep the small "{referrer} brought you to 365 Motor Sales" credit chip above it. Drop the "Shared 365 feature page" eyebrow.
-2. **Why 365 vs Facebook vs Google** — 3-column comparison card. Rows: Built for vehicles, Real seller verification, Direct buyer messaging, Local services map, Boost cost, No algorithm guessing. ✓/✗ + short cell text. On mobile collapses to stacked cards per competitor.
-3. **Boost & advertising pricing** — three pricing tiles using real numbers from `pricing.tsx`:
-   - Search Boost ₱99 / 7 days
-   - Province Boost ₱199 / 7 days
-   - Compare to: "Facebook Boost typically ₱500–₱2,000 for similar reach" / "Google Ads ₱20–₱60 per click"
-   Include a footnote that FB/Google figures are typical PH market ranges, not quotes.
-4. **For buyers / For sellers / For businesses** — 3 short benefit cards replacing the current generic image panels. Reuse 3 of the existing referral images (find-vehicles, post-connect-sell, services-near-you) so we keep visual richness without new assets.
-5. **Trust strip** — chips (existing FEATURE_CHIPS) + a one-line trust statement ("Verified sellers · PH-based support · No bidding wars").
-6. **Final CTA band** — Sign up free / List your business. Keep current styling.
+- File: `src/routes/resources.qr-landing.tsx` (public — promoters share it too).
+- Renders `<QrLandingContent mode="preview" />` inside `SiteLayout`.
+- Adds a "Promoter resources" header block above:
+  - Short intro: how the QR funnel works (scan → land → lead).
+  - Buttons: **"Get my QR poster"** → `/my-qr` (or `/r/{myCode}/poster` if signed-in promoter), **"View my leads"** → `/dashboard/referral`, **"Print materials"** → `/admin/advertisements/qr-ads` (admins only).
+  - Tips list: where to place QR (helmet, shop window, business card), what to say when handing it out.
+- `head()` with noindex (internal resource, not for SEO).
 
-### Removed
+### 3. Entry points
 
-- "Shared 365 feature page" eyebrow and all copy framing the page as an internal tool.
-- The 5 `SECONDARY_PANELS` referring to "Featured page", "Coming soon", "Future roadmap", "What's next" — those read as internal product-roadmap notes, not buyer-facing.
-- Orphaned imports for the dropped image assets (`everythingInOnePlaceAsset`, `manyOpportunitiesAsset`, `comingSoonAsset`, `whatsNextAsset`).
+- **Footer** (`src/components/site-footer.tsx`): add "QR landing preview" link under the existing Resources / Company column.
+- **Member dashboard** (`src/routes/dashboard.index.tsx` or the dashboard quick-links): add a tile **"Preview QR landing page"** in the existing Promote / Referral section.
+- **Referral dashboard** (`src/routes/dashboard.referral.tsx`): add a prominent "Preview what scanners see" link/button near the QR code display.
 
-### Kept untouched
+### 4. No DB changes
 
-- All `useEffect` data loading (scan recording, promos, contact, visit counter).
-- Referral credit card, repeat-scan tooltip, active-promo grid.
-- Route head/meta (still `noindex, nofollow`).
+Pure UI/refactor. No migrations, no RLS changes, no new server functions.
 
-## Technical notes
+## Files touched
 
-- Pure presentational changes in one route file; no new routes, no new packages, no schema changes.
-- Comparison table uses `lucide-react` `Check` / `X` icons (already a dependency).
-- Boost numbers are imported as plain constants matching `pricing.tsx` so they stay easy to keep in sync; FB/Google ranges are static copy with a footnote.
-- Mobile: comparison grid uses `md:grid-cols-3` with stacked cards below `md`.
+- New: `src/components/qr-landing-content.tsx`
+- New: `src/routes/resources.qr-landing.tsx`
+- Edit: `src/routes/r.$code.tsx` (use shared component)
+- Edit: `src/components/site-footer.tsx` (footer link)
+- Edit: `src/routes/dashboard.index.tsx` and/or `src/routes/dashboard.referral.tsx` (member entry point)
 
-## Out of scope
+## Open question
 
-- No edits to `/pricing`, no new admin controls, no DB changes.
-- No new images generated — reusing existing referral assets.
+The lead form on the preview — **disable the submit** (so promoters see the exact form a visitor sees) or **replace it with a static "Lead form appears here" placeholder**? Default in this plan: disabled submit with a clear preview banner, since seeing the real form is more useful for promoter feedback.
