@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { SiteLayout } from "@/components/site-layout";
 import { useAuth } from "@/hooks/use-auth";
@@ -554,12 +554,37 @@ function SubmitBusinessPage() {
   ] as const;
   type StepKey = (typeof STEPS)[number]["key"];
   const stepIndex = STEPS.findIndex((s) => s.key === step);
+
+  const stepperRef = useRef<HTMLOListElement | null>(null);
+  const cardRef = useRef<HTMLDivElement | null>(null);
+
+  // Keep the active stepper pill visible on mobile when it overflows.
+  useEffect(() => {
+    const el = stepperRef.current?.querySelector<HTMLButtonElement>(
+      `button[data-step="${step}"]`,
+    );
+    el?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }, [step]);
+
   const goTo = (k: StepKey) => {
+    if (k === step) return;
     setStep(k);
-    if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+    if (typeof window !== "undefined") {
+      // Scroll the card into view, offset for sticky header + stepper on mobile.
+      const card = cardRef.current;
+      if (card) {
+        const isMobile = window.matchMedia("(max-width: 767px)").matches;
+        const offset = isMobile ? 120 : 16;
+        const top = card.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+      } else {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    }
   };
   const next = () => stepIndex < STEPS.length - 1 && goTo(STEPS[stepIndex + 1].key);
   const prev = () => stepIndex > 0 && goTo(STEPS[stepIndex - 1].key);
+
 
   // Lightweight completion hints (visual only; submit() still enforces rules)
   const completed: Record<StepKey, boolean> = {
@@ -607,7 +632,7 @@ function SubmitBusinessPage() {
 
           {/* Stepper */}
           <div className="sticky top-14 z-10 mb-4 -mx-4 overflow-x-auto rounded-none border-y border-border bg-card/90 p-2 shadow-sm backdrop-blur md:top-2 md:mx-0 md:rounded-2xl md:border">
-            <ol className="flex min-w-max items-center gap-1">
+            <ol ref={stepperRef} className="flex min-w-max items-center gap-1" role="tablist" aria-label="Listing steps">
               {STEPS.map((s, i) => {
                 const Icon = s.icon;
                 const active = s.key === step;
@@ -617,6 +642,10 @@ function SubmitBusinessPage() {
                     <button
                       type="button"
                       onClick={() => goTo(s.key)}
+                      data-step={s.key}
+                      role="tab"
+                      aria-selected={active}
+                      aria-controls={`panel-${s.key}`}
                       className={`group flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition ${
                         active
                           ? "bg-primary text-primary-foreground shadow"
@@ -625,6 +654,7 @@ function SubmitBusinessPage() {
                             : "text-muted-foreground hover:bg-secondary"
                       }`}
                     >
+
                       <span
                         className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs ${
                           active
@@ -650,9 +680,11 @@ function SubmitBusinessPage() {
             </ol>
           </div>
 
-          <Card className="space-y-6 rounded-2xl p-5 ring-1 ring-border/60 sm:p-7">
+          <Card ref={cardRef} className="space-y-6 rounded-2xl p-5 ring-1 ring-border/60 sm:p-7">
             {/* ===== BASICS ===== */}
-            {step === "basics" && (
+            <div hidden={step !== "basics"} role="tabpanel" id="panel-basics">
+
+
               <div className="space-y-5">
                 <div>
                   <h2 className="font-display text-xl font-semibold">Tell us about your business</h2>
@@ -906,10 +938,11 @@ function SubmitBusinessPage() {
                   />
                 </div>
               </div>
-            )}
+            </div>
+
 
             {/* ===== SERVICES ===== */}
-            {step === "services" && (
+            <div hidden={step !== "services"} role="tabpanel" id="panel-services">
               <div className="space-y-5">
                 <div>
                   <h2 className="font-display text-xl font-semibold">Services & pricing</h2>
@@ -920,10 +953,13 @@ function SubmitBusinessPage() {
                 </div>
                 <ServicesTable typeSlug={typeSlug} value={services} onChange={setServices} />
               </div>
-            )}
+            </div>
+
 
             {/* ===== CONTACT ===== */}
-            {step === "contact" && (
+            <div hidden={step !== "contact"} role="tabpanel" id="panel-contact">
+
+            {/* basics keep-mounted via parent state */}
               <div className="space-y-5">
                 <div>
                   <h2 className="font-display text-xl font-semibold">How customers can reach you</h2>
@@ -969,10 +1005,11 @@ function SubmitBusinessPage() {
                   </div>
                 </div>
               </div>
-            )}
+            </div>
 
             {/* ===== LOCATION ===== */}
-            {step === "location" && (
+            <div hidden={step !== "location"} role="tabpanel" id="panel-location">
+
               <div className="space-y-5">
                 <div>
                   <h2 className="font-display text-xl font-semibold">Where you're located</h2>
@@ -1041,10 +1078,11 @@ function SubmitBusinessPage() {
                   </div>
                 </div>
               </div>
-            )}
+            </div>
 
             {/* ===== HOURS & REVIEW ===== */}
-            {step === "review" && (
+            <div hidden={step !== "review"} role="tabpanel" id="panel-review">
+
               <div className="space-y-6">
                 <div>
                   <h2 className="font-display text-xl font-semibold">Business hours & review</h2>
@@ -1094,7 +1132,8 @@ function SubmitBusinessPage() {
 
                 <FormFeedbackLink formId="business-submit" />
               </div>
-            )}
+            </div>
+
 
             {/* ===== Footer nav ===== */}
             <div className="sticky bottom-16 -mx-5 -mb-5 flex flex-wrap items-center justify-between gap-3 border-t border-border bg-card/95 px-5 py-3 backdrop-blur md:bottom-0 sm:-mx-7 sm:-mb-7 sm:px-7">
