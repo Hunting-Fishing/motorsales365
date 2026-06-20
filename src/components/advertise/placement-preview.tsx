@@ -1,9 +1,16 @@
 import { type SectionValue } from "./placements";
+import adHero from "@/assets/advertise-samples/ad-hero-dealership.jpg";
+import adParts from "@/assets/advertise-samples/ad-parts-banner.jpg";
+import adSidebar from "@/assets/advertise-samples/ad-sidebar-insurance.jpg";
+import adAcademy from "@/assets/advertise-samples/ad-square-academy.jpg";
+import adShop from "@/assets/advertise-samples/ad-shop-feature.jpg";
+import adNewsletter from "@/assets/advertise-samples/ad-newsletter.jpg";
 
 /**
- * Realistic mini-snapshot of each ad surface with a dashed "Your advertisement here"
- * slot in the exact position the ad would appear. Built with theme tokens so it
- * stays on-brand.
+ * Realistic mini-snapshot of each ad surface with a sample ad creative
+ * rendered in the exact position the live ad would appear. Each ad slot
+ * shows an AI-generated example with an "Example ad" pill so visitors can
+ * picture their own creative there.
  */
 export function PlacementPreview({ section }: { section: SectionValue }) {
   return (
@@ -68,24 +75,42 @@ function SiteHeader({ newsletter }: { newsletter?: boolean }) {
   );
 }
 
+/**
+ * Renders a real sample ad image inside the slot. The ring + "Example ad"
+ * pill make it obvious this is an illustrative creative.
+ */
 function AdSlot({
-  label = "Your advertisement here",
+  src,
+  alt,
   sub,
   className = "",
+  showPill = true,
 }: {
-  label?: string;
+  src: string;
+  alt: string;
   sub?: string;
   className?: string;
+  showPill?: boolean;
 }) {
   return (
     <div
-      className={`relative flex flex-col items-center justify-center rounded-sm border border-dashed border-primary bg-primary/10 text-center animate-pulse ${className}`}
+      className={`relative overflow-hidden rounded-sm ring-1 ring-primary/60 shadow-sm ${className}`}
     >
-      <span className="px-1 text-[9px] font-semibold leading-tight text-primary">
-        {label}
-      </span>
+      <img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        className="absolute inset-0 h-full w-full object-cover"
+      />
+      {showPill && (
+        <span className="absolute left-0.5 top-0.5 rounded-[2px] bg-primary/90 px-1 py-[1px] text-[6px] font-semibold uppercase tracking-wide text-primary-foreground">
+          Example ad
+        </span>
+      )}
       {sub && (
-        <span className="text-[7px] uppercase tracking-wide text-primary/70">{sub}</span>
+        <span className="absolute right-0.5 bottom-0.5 rounded-[2px] bg-background/85 px-1 py-[1px] text-[6px] uppercase tracking-wide text-foreground">
+          {sub}
+        </span>
       )}
     </div>
   );
@@ -100,7 +125,7 @@ function SectionBody({ section }: { section: SectionValue }) {
     case "marketplace_home":
       return (
         <div className="flex h-full flex-col gap-1">
-          <AdSlot sub="Hero banner" className="h-[38%] w-full" />
+          <AdSlot src={adHero} alt="Sample dealership hero ad" sub="Hero banner" className="h-[38%] w-full" />
           <div className="grid grid-cols-4 gap-1 flex-1">
             <Block /> <Block /> <Block /> <Block />
           </div>
@@ -112,7 +137,7 @@ function SectionBody({ section }: { section: SectionValue }) {
     case "marketplace_category":
       return (
         <div className="flex h-full flex-col gap-1">
-          <AdSlot sub="Category banner" className="h-[28%] w-full" />
+          <AdSlot src={adParts} alt="Sample parts category banner ad" sub="Category banner" className="h-[28%] w-full" />
           <div className="grid grid-cols-3 gap-1 flex-1">
             <Block /> <Block /> <Block />
             <Block /> <Block /> <Block />
@@ -131,7 +156,7 @@ function SectionBody({ section }: { section: SectionValue }) {
             <Block className="h-2 w-2/3" />
           </div>
           <div className="flex flex-col gap-1">
-            <AdSlot sub="Sidebar tile" className="h-[60%]" />
+            <AdSlot src={adSidebar} alt="Sample sidebar insurance ad" sub="Sidebar tile" className="h-[60%]" />
             <Block className="flex-1" />
           </div>
         </div>
@@ -139,7 +164,7 @@ function SectionBody({ section }: { section: SectionValue }) {
     case "browse":
       return (
         <div className="flex h-full flex-col gap-1">
-          <AdSlot sub="Results banner" className="h-[26%] w-full" />
+          <AdSlot src={adHero} alt="Sample browse results banner ad" sub="Results banner" className="h-[26%] w-full" />
           <div className="grid grid-cols-[28%_1fr] gap-1 flex-1">
             <div className="flex flex-col gap-1">
               <Block className="h-2" />
@@ -157,7 +182,7 @@ function SectionBody({ section }: { section: SectionValue }) {
     case "rides":
       return (
         <div className="flex h-full flex-col gap-1">
-          <AdSlot sub="Rides feed top" className="h-[26%] w-full" />
+          <AdSlot src={adParts} alt="Sample rides feed banner ad" sub="Rides feed top" className="h-[26%] w-full" />
           <div className="grid grid-cols-2 gap-1 flex-1">
             <Block /> <Block />
             <Block /> <Block />
@@ -167,7 +192,7 @@ function SectionBody({ section }: { section: SectionValue }) {
     case "export":
       return (
         <div className="flex h-full flex-col gap-1">
-          <AdSlot sub="Export top" className="h-[26%] w-full" />
+          <AdSlot src={adHero} alt="Sample export page banner ad" sub="Export top" className="h-[26%] w-full" />
           <div className="flex flex-col gap-1 flex-1">
             <Block className="h-3" />
             <Block className="h-3" />
@@ -179,9 +204,9 @@ function SectionBody({ section }: { section: SectionValue }) {
     case "shop":
       return (
         <div className="flex h-full flex-col gap-1">
-          <AdSlot sub="Shop banner" className="h-[26%] w-full" />
+          <AdSlot src={adParts} alt="Sample shop banner ad" sub="Shop banner" className="h-[26%] w-full" />
           <div className="grid grid-cols-[24%_1fr] gap-1 flex-1">
-            <AdSlot label="Ad" sub="Sidebar" className="h-full" />
+            <AdSlot src={adSidebar} alt="Sample shop sidebar ad" sub="Sidebar" className="h-full" showPill={false} />
             <div className="grid grid-cols-3 gap-1">
               <Block /> <Block /> <Block />
               <Block /> <Block /> <Block />
@@ -195,7 +220,7 @@ function SectionBody({ section }: { section: SectionValue }) {
           <Block className="h-2 w-1/3" />
           <div className="grid grid-cols-4 gap-1 flex-1">
             <Block />
-            <AdSlot sub="Academy card" className="h-full" />
+            <AdSlot src={adAcademy} alt="Sample academy sponsor card ad" sub="Academy card" className="h-full" />
             <Block />
             <Block />
           </div>
@@ -207,7 +232,7 @@ function SectionBody({ section }: { section: SectionValue }) {
     case "businesses":
       return (
         <div className="flex h-full flex-col gap-1">
-          <AdSlot sub="Featured business" className="h-[28%] w-full" />
+          <AdSlot src={adShop} alt="Sample featured business ad" sub="Featured business" className="h-[28%] w-full" />
           <div className="flex flex-col gap-1 flex-1">
             <Block className="h-3" />
             <Block className="h-3" />
@@ -220,7 +245,7 @@ function SectionBody({ section }: { section: SectionValue }) {
         <div className="mx-auto flex h-full w-[78%] flex-col gap-1 rounded-sm border border-border bg-card p-1.5 shadow-sm">
           <Block className="h-2 w-1/2" />
           <Block className="h-4" />
-          <AdSlot sub="Newsletter slot" className="h-[34%] w-full" />
+          <AdSlot src={adNewsletter} alt="Sample newsletter sponsor ad" sub="Newsletter slot" className="h-[34%] w-full" />
           <Block className="h-2" />
           <Block className="h-2 w-2/3" />
         </div>
@@ -229,7 +254,7 @@ function SectionBody({ section }: { section: SectionValue }) {
     default:
       return (
         <div className="flex h-full items-center justify-center">
-          <AdSlot label="Custom partnership" sub="Tell us your idea" className="h-[70%] w-[70%]" />
+          <AdSlot src={adShop} alt="Sample custom partnership ad" sub="Custom partnership" className="h-[70%] w-[70%]" />
         </div>
       );
   }
