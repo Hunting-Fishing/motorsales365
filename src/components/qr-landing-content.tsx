@@ -31,9 +31,16 @@ import {
 
 import { siteOrigin } from "@/lib/site-config";
 import { formatPHP } from "@/lib/format";
-import findVehiclesAsset from "@/assets/referral/referral-find-vehicles.png.asset.json";
-import postConnectSellAsset from "@/assets/referral/referral-post-connect-sell.png.asset.json";
-import servicesNearYouAsset from "@/assets/referral/referral-services-near-you.png.asset.json";
+import carsAndMotorcyclesAsset from "@/assets/qr-landing-uploaded/365-cars-and-motorcycles.png.asset.json";
+import partsAndAccessoriesAsset from "@/assets/qr-landing-uploaded/365-parts-and-accessories.png.asset.json";
+import shopsAndBusinessesAsset from "@/assets/qr-landing-uploaded/365-shops-and-businesses.png.asset.json";
+import towAndDeliveryAsset from "@/assets/qr-landing-uploaded/365-tow-and-delivery.png.asset.json";
+import allPhRegionsAsset from "@/assets/qr-landing-uploaded/all-ph-regions.png.asset.json";
+import createYourFreeAccountAsset from "@/assets/qr-landing-uploaded/create-your-free-account.png.asset.json";
+import growingWeeklyAsset from "@/assets/qr-landing-uploaded/growing-weekly.png.asset.json";
+import nationwideMapAsset from "@/assets/qr-landing-uploaded/nationwide-map.png.asset.json";
+import verifiedAccountsAsset from "@/assets/qr-landing-uploaded/verified-accounts.png.asset.json";
+import scanOrVisitAsset from "@/assets/qr-landing-uploaded/scan-or-visit.png.asset.json";
 import { QrLeadForm } from "@/components/qr-lead-form";
 
 type Promo = {
@@ -56,6 +63,16 @@ type ImagePanel = {
   alt: string;
 };
 
+type VisualCard = {
+  eyebrow?: string;
+  title: string;
+  description: string;
+  image: string;
+  alt: string;
+  icon?: typeof Car;
+  badge?: string;
+};
+
 const VISITS_KEY = (code: string) => `mref_visits_${code}`;
 
 const FEATURE_CHIPS = [
@@ -74,25 +91,158 @@ const AUDIENCE_PANELS: ImagePanel[] = [
     eyebrow: "For buyers",
     title: "Find the right ride — without scrolling through memes",
     description:
-      "Real vehicle filters (make, model, year, transmission, location), verified sellers, and direct messaging. No bumping the same post 14 times to be seen.",
-    image: findVehiclesAsset.url,
-    alt: "365 Motor Sales listings on desktop and mobile.",
+      "Real vehicle filters, verified sellers, direct messaging, and serious listings for Philippine buyers who want to move faster.",
+    image: carsAndMotorcyclesAsset.url,
+    alt: "Blue car and red motorcycle with Philippine-inspired 365 styling.",
   },
   {
     eyebrow: "For sellers",
     title: "List once. Reach buyers all week.",
     description:
-      "Post your car, motorcycle, or part in minutes. Your listing keeps its place — no algorithm penalty for posting at the wrong hour.",
-    image: postConnectSellAsset.url,
-    alt: "Sellers posting vehicles on 365 Motor Sales.",
+      "Create your account, verify once, then list vehicles, parts, or services with a clean profile buyers can trust.",
+    image: createYourFreeAccountAsset.url,
+    alt: "Mobile signup and verification artwork with a car, motorcycle, shield, and Philippine-inspired styling.",
   },
   {
     eyebrow: "For businesses",
     title: "Get found by people already shopping for motor",
     description:
-      "Shops, towing, parts stores, repair, car wash — a business page on the map, in the directory, and in every relevant search.",
-    image: servicesNearYouAsset.url,
-    alt: "365 Motor Sales business and services map across the Philippines.",
+      "Shops, towing, parts stores, and service businesses show up where people search, browse, and compare near them.",
+    image: shopsAndBusinessesAsset.url,
+    alt: "Auto shop and service businesses presented in 365 visual style.",
+  },
+];
+
+const TRUST_CARDS: VisualCard[] = [
+  {
+    eyebrow: "Reach",
+    title: "All PH regions",
+    description: "Vehicles, bikes, businesses, delivery, and service demand visible across the country.",
+    image: allPhRegionsAsset.url,
+    alt: "Map of the Philippines with automotive coverage markers across regions.",
+    icon: Car,
+  },
+  {
+    eyebrow: "Momentum",
+    title: "Growing weekly",
+    description: "More verified shops, more listings, and more reasons for first-time scanners to stay and explore.",
+    image: growingWeeklyAsset.url,
+    alt: "Automotive business growth artwork with an upward trend line.",
+    icon: Store,
+  },
+  {
+    eyebrow: "Coverage",
+    title: "Nationwide map",
+    description: "Search by area and connect across Luzon, Visayas, and Mindanao in one motor-focused network.",
+    image: nationwideMapAsset.url,
+    alt: "Nationwide map with connected vehicle and motorcycle routes.",
+    icon: MapPin,
+  },
+  {
+    eyebrow: "Trust",
+    title: "Verified accounts",
+    description: "Identity and business checks help buyers and sellers see who they are really dealing with.",
+    image: verifiedAccountsAsset.url,
+    alt: "Verified account and security artwork for 365 Motor Sales.",
+    icon: Shield,
+  },
+];
+
+const HOW_IT_WORKS_CARDS: VisualCard[] = [
+  {
+    badge: "01",
+    eyebrow: "Entry",
+    title: "Scan or visit",
+    description: "You arrived from a QR or link, so there is no app install barrier before browsing.",
+    image: scanOrVisitAsset.url,
+    alt: "Person scanning a QR code on a tricycle with a mobile phone.",
+    icon: QrCode,
+  },
+  {
+    badge: "02",
+    eyebrow: "Account",
+    title: "Create your free account",
+    description: "Buyers, sellers, and businesses all start with one clean account and one verification flow.",
+    image: createYourFreeAccountAsset.url,
+    alt: "Create account visual with mobile verification and security styling.",
+    icon: Users,
+  },
+  {
+    badge: "03",
+    eyebrow: "Marketplace",
+    title: "List or browse",
+    description: "Filter real vehicles, parts, and services or post your own listing in a marketplace built for motor.",
+    image: carsAndMotorcyclesAsset.url,
+    alt: "Cars and motorcycles marketplace artwork.",
+    icon: Search,
+  },
+  {
+    badge: "04",
+    eyebrow: "Trust",
+    title: "Message & close",
+    description: "Talk directly with verified sellers and businesses, then move to inspection, meetup, and deal closing.",
+    image: verifiedAccountsAsset.url,
+    alt: "Verified marketplace and secure account artwork.",
+    icon: MessageSquare,
+  },
+];
+
+const CATEGORY_CARDS: VisualCard[] = [
+  {
+    eyebrow: "Marketplace",
+    title: "Cars & Motorcycles",
+    description: "Brand-new, used, and project units across the Philippines in one search experience.",
+    image: carsAndMotorcyclesAsset.url,
+    alt: "Cars and motorcycles category artwork.",
+    icon: Car,
+  },
+  {
+    eyebrow: "Catalog",
+    title: "Parts & Accessories",
+    description: "OEM, aftermarket, performance, and consumables presented in a cleaner parts-shopping flow.",
+    image: partsAndAccessoriesAsset.url,
+    alt: "Parts and accessories category artwork showing wheels, brakes, suspension, and tools.",
+    icon: Wrench,
+  },
+  {
+    eyebrow: "Directory",
+    title: "Shops & Businesses",
+    description: "Dealerships, repair shops, detailing, tire centers, and motor businesses that want real visibility.",
+    image: shopsAndBusinessesAsset.url,
+    alt: "Shops and businesses category artwork showing automotive businesses.",
+    icon: Store,
+  },
+  {
+    eyebrow: "Logistics",
+    title: "Tow & Delivery",
+    description: "On-demand towing and vehicle delivery presented in the same trusted 365 visual system.",
+    image: towAndDeliveryAsset.url,
+    alt: "Tow and delivery category artwork showing a flatbed truck carrying a car and motorcycle.",
+    icon: Truck,
+  },
+];
+
+const SAFETY_CARDS: VisualCard[] = [
+  {
+    eyebrow: "Verification",
+    title: "Verified identities",
+    description: "Sellers and businesses verify by phone, email, ID, and documents before earning visible trust signals.",
+    image: verifiedAccountsAsset.url,
+    alt: "Verified identity and secure marketplace artwork.",
+  },
+  {
+    eyebrow: "Safe start",
+    title: "Meet in safe places",
+    description: "Use mapped businesses, public locations, and known service points to keep inspections and meetups safer.",
+    image: scanOrVisitAsset.url,
+    alt: "Real-world QR scan and marketplace entry artwork.",
+  },
+  {
+    eyebrow: "Support",
+    title: "Report & moderation",
+    description: "Every listing and conversation can be flagged so the platform can respond faster when something looks wrong.",
+    image: createYourFreeAccountAsset.url,
+    alt: "Secure account and moderation-support artwork.",
   },
 ];
 
@@ -404,8 +554,7 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
                       <>This is your first visit to this page.</>
                     ) : (
                       <>
-                        You&apos;ve opened this page{" "}
-                        <strong className="text-foreground">{visitCount}</strong>
+                        You&apos;ve opened this page <strong className="text-foreground">{visitCount}</strong>
                         {firstSeenAt ? (
                           <> times since {new Date(firstSeenAt).toLocaleDateString()}</>
                         ) : (
@@ -417,7 +566,6 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
                   </span>
                 </div>
               )}
-
 
               {promos.length > 0 && (
                 <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -459,7 +607,6 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
               )}
             </section>
 
-            {/* Hero */}
             <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.26em] text-primary">
@@ -508,23 +655,12 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
               />
             </section>
 
-            {/* Trust stats strip */}
-            <section className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {[
-                { icon: Car, label: "Vehicles listed", value: "All PH regions" },
-                { icon: Store, label: "Verified businesses", value: "Growing weekly" },
-                { icon: MapPin, label: "Coverage", value: "Nationwide map" },
-                { icon: Shield, label: "ID + business verification", value: "Trust badges" },
-              ].map(({ icon: Icon, label, value }) => (
-                <div key={label} className="rounded-xl border border-border bg-card p-4">
-                  <Icon className="h-5 w-5 text-primary" />
-                  <p className="mt-2 text-sm font-semibold">{value}</p>
-                  <p className="text-xs text-muted-foreground">{label}</p>
-                </div>
+            <section className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+              {TRUST_CARDS.map((card) => (
+                <ImageInfoCard key={card.title} {...card} />
               ))}
             </section>
 
-            {/* How it works */}
             <section className="mt-12">
               <div className="mb-6 max-w-3xl">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
@@ -535,54 +671,28 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
                 </h2>
               </div>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {[
-                  { icon: QrCode, step: "01", title: "Scan or visit", body: "You arrived here from a QR or referral link — no app install needed." },
-                  { icon: Users, step: "02", title: "Create your free account", body: "Verify by phone or email. Buyers, sellers, and businesses use the same login." },
-                  { icon: Search, step: "03", title: "List or browse", body: "Post a vehicle, part, or service. Or filter listings by make, model, year, location." },
-                  { icon: MessageSquare, step: "04", title: "Message & close", body: "Talk directly to verified sellers in-app. Meet, inspect, agree, done." },
-                ].map(({ icon: Icon, step, title, body }) => (
-                  <div key={step} className="rounded-xl border border-border bg-card p-5">
-                    <div className="flex items-center gap-3">
-                      <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-bold text-primary">{step}</span>
-                      <Icon className="h-5 w-5 text-primary" />
-                    </div>
-                    <h3 className="mt-3 font-semibold">{title}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">{body}</p>
-                  </div>
+                {HOW_IT_WORKS_CARDS.map((card) => (
+                  <ImageInfoCard key={card.title} {...card} />
                 ))}
               </div>
             </section>
 
-            {/* Categories grid */}
             <section className="mt-12">
               <div className="mb-6 max-w-3xl">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
-                  What's on 365
+                  What&apos;s on 365
                 </p>
                 <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
                   Every part of the motor world — under one roof.
                 </h2>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                {[
-                  { icon: Car, title: "Cars & Motorcycles", body: "Brand-new, used, and project units across the Philippines." },
-                  { icon: Wrench, title: "Parts & Accessories", body: "OEM, aftermarket, performance — searchable by fitment." },
-                  { icon: Store, title: "Shops & Businesses", body: "Dealerships, repair, parts stores, detailing, car wash." },
-                  { icon: Truck, title: "Tow & Delivery", body: "On-demand towing and vehicle delivery near you." },
-                ].map(({ icon: Icon, title, body }) => (
-                  <div key={title} className="rounded-xl border border-border bg-card p-5">
-                    <Icon className="h-6 w-6 text-primary" />
-                    <h3 className="mt-3 font-semibold">{title}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">{body}</p>
-                  </div>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {CATEGORY_CARDS.map((card) => (
+                  <ImageInfoCard key={card.title} {...card} />
                 ))}
               </div>
             </section>
 
-
-
-
-            {/* Why 365 vs Facebook vs Google */}
             <section className="mt-12">
               <div className="mb-6 max-w-3xl">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
@@ -729,7 +839,6 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
               />
             </section>
 
-            {/* Lead capture */}
             <section className="mt-12">
               {preview ? (
                 <div className="rounded-2xl border-2 border-dashed border-border bg-card p-6 sm:p-8">
@@ -761,7 +870,6 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
               ) : null}
             </section>
 
-            {/* Safety & trust */}
             <section className="mt-12 rounded-2xl border border-border bg-card p-6 sm:p-8">
               <div className="max-w-3xl">
                 <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-primary">
@@ -772,20 +880,12 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
                 </h2>
               </div>
               <div className="mt-6 grid gap-4 md:grid-cols-3">
-                {[
-                  { title: "Verified identities", body: "Sellers and businesses verify by ID, phone, and business documents before earning trust badges." },
-                  { title: "Meet in safe places", body: "We recommend public locations, daytime meets, and inspection at known shops listed on the map." },
-                  { title: "Report & moderation", body: "One-tap report on every listing and message. Real PH-based moderation, not just AI filters." },
-                ].map((s) => (
-                  <div key={s.title} className="rounded-xl border border-border bg-background p-5">
-                    <h3 className="font-semibold">{s.title}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground">{s.body}</p>
-                  </div>
+                {SAFETY_CARDS.map((card) => (
+                  <ImageInfoCard key={card.title} {...card} />
                 ))}
               </div>
             </section>
 
-            {/* Roadmap */}
             <section className="mt-12">
               <div className="mb-6 max-w-3xl">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
@@ -818,7 +918,6 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
               </div>
             </section>
 
-            {/* FAQ */}
             <section className="mt-12 rounded-2xl border border-border bg-card p-6 sm:p-8">
               <div className="mb-4 max-w-3xl">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
@@ -845,8 +944,6 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
               </Accordion>
             </section>
 
-
-
             <section className="mt-12 rounded-2xl border border-border bg-card p-6 sm:p-8">
               <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
                 <div>
@@ -859,7 +956,7 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
                   </h2>
                   <p className="mt-3 max-w-3xl text-muted-foreground">
                     Whether you&apos;re looking for your next ride, selling one, or running a motor
-                    business — start here{preview ? "." : ` and ${referrer} still gets credit for bringing you in.`}
+                    business — start here.
                   </p>
                 </div>
 
@@ -877,6 +974,53 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
         )}
       </div>
     </TooltipProvider>
+  );
+}
+
+function ImageInfoCard({ eyebrow, title, description, image, alt, icon: Icon, badge }: VisualCard) {
+  return (
+    <article className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+      <Dialog>
+        <DialogTrigger asChild>
+          <button
+            type="button"
+            className="group block w-full bg-muted/40 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            aria-label={`View full image: ${alt}`}
+          >
+            <img
+              src={image}
+              alt={alt}
+              className="aspect-square w-full object-contain transition-transform group-hover:scale-[1.01]"
+              loading="lazy"
+            />
+          </button>
+        </DialogTrigger>
+        <DialogContent className="max-w-5xl border-none bg-background/95 p-2 sm:p-4">
+          <VisuallyHidden>
+            <DialogTitle>{title}</DialogTitle>
+            <DialogDescription>{description}</DialogDescription>
+          </VisuallyHidden>
+          <img src={image} alt={alt} className="h-auto max-h-[85vh] w-full object-contain" />
+        </DialogContent>
+      </Dialog>
+      <div className="p-4 sm:p-5">
+        <div className="flex flex-wrap items-center gap-2">
+          {badge ? (
+            <span className="rounded-full bg-primary/10 px-2 py-1 text-[11px] font-bold text-primary">
+              {badge}
+            </span>
+          ) : null}
+          {Icon ? <Icon className="h-4 w-4 text-primary" /> : null}
+          {eyebrow ? (
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
+              {eyebrow}
+            </p>
+          ) : null}
+        </div>
+        <h3 className="font-display mt-3 text-lg font-bold leading-tight sm:text-xl">{title}</h3>
+        <p className="mt-2 text-sm text-muted-foreground">{description}</p>
+      </div>
+    </article>
   );
 }
 
@@ -919,7 +1063,6 @@ function FeatureImage({
         <p className="mt-2 text-sm text-muted-foreground sm:text-base">{description}</p>
       </div>
     </article>
-
   );
 }
 
