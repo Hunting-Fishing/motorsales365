@@ -20,7 +20,6 @@ import findVehiclesAsset from "@/assets/referral/referral-find-vehicles.png.asse
 import postConnectSellAsset from "@/assets/referral/referral-post-connect-sell.png.asset.json";
 import servicesNearYouAsset from "@/assets/referral/referral-services-near-you.png.asset.json";
 import { QrLeadForm } from "@/components/qr-lead-form";
-import { getVisitorId as readVisitorId } from "@/lib/referral";
 
 export const Route = createFileRoute("/r/$code")({
   head: ({ params }) => ({
