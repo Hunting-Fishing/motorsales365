@@ -74,6 +74,13 @@ const TABS: Tab[] = [
     roles: ["admin", "advertising"],
   },
   {
+    to: "/admin/advertisements/approvals",
+    label: "Approvals",
+    desc: "Review and approve pending ad creatives.",
+    Icon: ShieldCheck,
+    roles: ["admin", "advertising"],
+  },
+  {
     to: "/admin/advertisements/preview",
     label: "Live preview",
     desc: "See what's rendering in each slot right now.",
