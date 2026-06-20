@@ -40,12 +40,6 @@ import findVehiclesBannerAsset from "@/assets/qr-landing-uploaded/find-vehicles-
 import discoverServicesBannerAsset from "@/assets/qr-landing-uploaded/discover-motor-services-near-you.png.asset.json";
 import postConnectSellBannerAsset from "@/assets/qr-landing-uploaded/post-connect-sell.png.asset.json";
 import onePlatformBannerAsset from "@/assets/qr-landing-uploaded/one-platform-many-opportunities.png.asset.json";
-import roadmapLoanAsset from "@/assets/qr-landing-uploaded/roadmap-loan-financing-match.png.asset.json";
-import roadmapVehicleHistoryAsset from "@/assets/qr-landing-uploaded/roadmap-vehicle-history-badges.png.asset.json";
-import roadmapTradeInAsset from "@/assets/qr-landing-uploaded/roadmap-trade-in-offers.png.asset.json";
-import roadmapDriverEduAsset from "@/assets/qr-landing-uploaded/roadmap-driver-education-hub.png.asset.json";
-import roadmapInsuranceAsset from "@/assets/qr-landing-uploaded/roadmap-insurance-comparison.png.asset.json";
-import roadmapLiveAuctionsAsset from "@/assets/qr-landing-uploaded/roadmap-live-auctions.png.asset.json";
 
 type Promo = {
   id: string;
