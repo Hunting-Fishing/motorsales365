@@ -750,15 +750,23 @@ export const listShopFavoriteProducts = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const { data, error } = await supabase
+    const { data: favs, error: favErr } = await supabase
       .from("shop_favorites")
-      .select(
-        "created_at, product:shop_products(id, slug, title, brand, image_url, price_php, currency, featured, universal_fit, active)",
-      )
+      .select("product_id, created_at")
       .eq("user_id", userId)
       .order("created_at", { ascending: false });
-    if (error) throw new Error(error.message);
-    const products = (data ?? []).map((r: any) => r.product).filter((p: any) => p && p.active);
+    if (favErr) throw new Error(favErr.message);
+    const ids = (favs ?? []).map((r: any) => r.product_id as string);
+    if (ids.length === 0) return { products: [] };
+    const { data: prods, error: prodErr } = await supabase
+      .from("shop_products")
+      .select("id, slug, title, brand, image_url, price_php, currency, featured, universal_fit, active")
+      .in("id", ids);
+    if (prodErr) throw new Error(prodErr.message);
+    const order = new Map(ids.map((id, i) => [id, i]));
+    const products = (prods ?? [])
+      .filter((p: any) => p.active)
+      .sort((a: any, b: any) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
     return { products };
   });
 
