@@ -19,6 +19,7 @@ import { formatPHP } from "@/lib/format";
 import findVehiclesAsset from "@/assets/referral/referral-find-vehicles.png.asset.json";
 import postConnectSellAsset from "@/assets/referral/referral-post-connect-sell.png.asset.json";
 import servicesNearYouAsset from "@/assets/referral/referral-services-near-you.png.asset.json";
+import { QrLeadForm } from "@/components/qr-lead-form";
 
 export const Route = createFileRoute("/r/$code")({
   head: ({ params }) => ({
@@ -620,6 +621,11 @@ function ReferralLanding() {
                   title={AUDIENCE_PANELS[2].title}
                   description={AUDIENCE_PANELS[2].description}
                 />
+              </section>
+
+              {/* Lead capture */}
+              <section className="mt-12">
+                <QrLeadForm referralCode={code} visitorId={getVisitorId()} />
               </section>
 
               {/* Final CTA */}

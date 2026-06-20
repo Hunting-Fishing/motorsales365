@@ -133,6 +133,7 @@ import { Route as AdminRewardsRouteImport } from './routes/admin.rewards'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
 import { Route as AdminReferralsRouteImport } from './routes/admin.referrals'
 import { Route as AdminRedemptionsRouteImport } from './routes/admin.redemptions'
+import { Route as AdminQrLeadsRouteImport } from './routes/admin.qr-leads'
 import { Route as AdminPricingRouteImport } from './routes/admin.pricing'
 import { Route as AdminPermissionsRouteImport } from './routes/admin.permissions'
 import { Route as AdminPerformanceRouteImport } from './routes/admin.performance'
@@ -841,6 +842,11 @@ const AdminRedemptionsRoute = AdminRedemptionsRouteImport.update({
   path: '/redemptions',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminQrLeadsRoute = AdminQrLeadsRouteImport.update({
+  id: '/qr-leads',
+  path: '/qr-leads',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPricingRoute = AdminPricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
@@ -1379,6 +1385,7 @@ export interface FileRoutesByFullPath {
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/permissions': typeof AdminPermissionsRoute
   '/admin/pricing': typeof AdminPricingRoute
+  '/admin/qr-leads': typeof AdminQrLeadsRoute
   '/admin/redemptions': typeof AdminRedemptionsRoute
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -1587,6 +1594,7 @@ export interface FileRoutesByTo {
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/permissions': typeof AdminPermissionsRoute
   '/admin/pricing': typeof AdminPricingRoute
+  '/admin/qr-leads': typeof AdminQrLeadsRoute
   '/admin/redemptions': typeof AdminRedemptionsRoute
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -1799,6 +1807,7 @@ export interface FileRoutesById {
   '/admin/performance': typeof AdminPerformanceRoute
   '/admin/permissions': typeof AdminPermissionsRoute
   '/admin/pricing': typeof AdminPricingRoute
+  '/admin/qr-leads': typeof AdminQrLeadsRoute
   '/admin/redemptions': typeof AdminRedemptionsRoute
   '/admin/referrals': typeof AdminReferralsRoute
   '/admin/reports': typeof AdminReportsRoute
@@ -2013,6 +2022,7 @@ export interface FileRouteTypes {
     | '/admin/performance'
     | '/admin/permissions'
     | '/admin/pricing'
+    | '/admin/qr-leads'
     | '/admin/redemptions'
     | '/admin/referrals'
     | '/admin/reports'
@@ -2221,6 +2231,7 @@ export interface FileRouteTypes {
     | '/admin/performance'
     | '/admin/permissions'
     | '/admin/pricing'
+    | '/admin/qr-leads'
     | '/admin/redemptions'
     | '/admin/referrals'
     | '/admin/reports'
@@ -2432,6 +2443,7 @@ export interface FileRouteTypes {
     | '/admin/performance'
     | '/admin/permissions'
     | '/admin/pricing'
+    | '/admin/qr-leads'
     | '/admin/redemptions'
     | '/admin/referrals'
     | '/admin/reports'
@@ -3567,6 +3579,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRedemptionsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/qr-leads': {
+      id: '/admin/qr-leads'
+      path: '/qr-leads'
+      fullPath: '/admin/qr-leads'
+      preLoaderRoute: typeof AdminQrLeadsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/pricing': {
       id: '/admin/pricing'
       path: '/pricing'
@@ -4249,6 +4268,7 @@ interface AdminRouteChildren {
   AdminPerformanceRoute: typeof AdminPerformanceRoute
   AdminPermissionsRoute: typeof AdminPermissionsRoute
   AdminPricingRoute: typeof AdminPricingRoute
+  AdminQrLeadsRoute: typeof AdminQrLeadsRoute
   AdminRedemptionsRoute: typeof AdminRedemptionsRoute
   AdminReferralsRoute: typeof AdminReferralsRoute
   AdminReportsRoute: typeof AdminReportsRoute
@@ -4290,6 +4310,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPerformanceRoute: AdminPerformanceRoute,
   AdminPermissionsRoute: AdminPermissionsRoute,
   AdminPricingRoute: AdminPricingRoute,
+  AdminQrLeadsRoute: AdminQrLeadsRoute,
   AdminRedemptionsRoute: AdminRedemptionsRoute,
   AdminReferralsRoute: AdminReferralsRoute,
   AdminReportsRoute: AdminReportsRoute,

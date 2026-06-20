@@ -5796,6 +5796,54 @@ export type Database = {
         }
         Relationships: []
       }
+      qr_lead_captures: {
+        Row: {
+          contact: string
+          created_at: string
+          id: string
+          interest_detail: string | null
+          interest_type: string
+          landing_url: string | null
+          name: string
+          notes: string | null
+          referral_code: string | null
+          status: string
+          updated_at: string
+          user_agent: string | null
+          visitor_id: string | null
+        }
+        Insert: {
+          contact: string
+          created_at?: string
+          id?: string
+          interest_detail?: string | null
+          interest_type: string
+          landing_url?: string | null
+          name: string
+          notes?: string | null
+          referral_code?: string | null
+          status?: string
+          updated_at?: string
+          user_agent?: string | null
+          visitor_id?: string | null
+        }
+        Update: {
+          contact?: string
+          created_at?: string
+          id?: string
+          interest_detail?: string | null
+          interest_type?: string
+          landing_url?: string | null
+          name?: string
+          notes?: string | null
+          referral_code?: string | null
+          status?: string
+          updated_at?: string
+          user_agent?: string | null
+          visitor_id?: string | null
+        }
+        Relationships: []
+      }
       qr_scans: {
         Row: {
           browser: string | null
