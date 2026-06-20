@@ -22,6 +22,7 @@ type Tab = {
     | "/admin/advertisements/history"
     | "/admin/advertisements/slots"
     | "/admin/advertisements/placeholders"
+    | "/admin/advertisements/approvals"
     | "/admin/advertisements/preview";
   label: string;
   desc: string;
