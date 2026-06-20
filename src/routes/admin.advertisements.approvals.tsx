@@ -210,3 +210,61 @@ function AdminApprovalsPage() {
     </div>
   );
 }
+
+const ACTION_TONE: Record<string, string> = {
+  approved: "bg-emerald-500 text-white",
+  rejected: "bg-destructive text-destructive-foreground",
+  revoked: "bg-amber-500 text-white",
+  resubmitted: "bg-blue-500 text-white",
+};
+
+function CreativeAuditButton({ creativeId }: { creativeId: string }) {
+  const [open, setOpen] = useState(false);
+  const fetcher = useServerFn(listCreativeAuditAdmin);
+  const { data, isLoading } = useQuery({
+    queryKey: ["creative-audit", creativeId],
+    queryFn: () => fetcher({ data: { creativeId } }),
+    enabled: open,
+  });
+  const rows = (data as any)?.rows ?? [];
+  return (
+    <>
+      <Button size="sm" variant="ghost" onClick={() => setOpen(true)}>
+        <HistoryIcon className="h-3 w-3 mr-1" /> History
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Review history</DialogTitle>
+          </DialogHeader>
+          {isLoading ? (
+            <p className="text-sm text-muted-foreground">Loading…</p>
+          ) : rows.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No review actions yet.</p>
+          ) : (
+            <ul className="space-y-3 max-h-96 overflow-y-auto">
+              {rows.map((r: any) => (
+                <li key={r.id} className="rounded border p-3 text-sm space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Badge className={ACTION_TONE[r.action] ?? "bg-muted text-foreground"}>
+                      {r.action}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(r.created_at).toLocaleString()}
+                    </span>
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    by {r.actor?.name || r.actor?.email || r.actor_id || "system"}
+                    {r.previous_status ? ` · ${r.previous_status} → ${r.new_status}` : null}
+                  </div>
+                  {r.reason && <div className="text-sm"><strong>Reason:</strong> {r.reason}</div>}
+                  {r.notes && <div className="text-sm"><strong>Notes:</strong> {r.notes}</div>}
+                </li>
+              ))}
+            </ul>
+          )}
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
