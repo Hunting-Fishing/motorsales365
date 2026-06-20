@@ -100,6 +100,7 @@ import { Route as DashboardSearchesRouteImport } from './routes/dashboard.search
 import { Route as DashboardRidesRouteImport } from './routes/dashboard.rides'
 import { Route as DashboardReferralRouteImport } from './routes/dashboard.referral'
 import { Route as DashboardQrAdsRouteImport } from './routes/dashboard.qr-ads'
+import { Route as DashboardPromoterResourcesRouteImport } from './routes/dashboard.promoter-resources'
 import { Route as DashboardProfileRouteImport } from './routes/dashboard.profile'
 import { Route as DashboardMessagesRouteImport } from './routes/dashboard.messages'
 import { Route as DashboardLikesRouteImport } from './routes/dashboard.likes'
@@ -677,6 +678,12 @@ const DashboardQrAdsRoute = DashboardQrAdsRouteImport.update({
   path: '/qr-ads',
   getParentRoute: () => DashboardRoute,
 } as any)
+const DashboardPromoterResourcesRoute =
+  DashboardPromoterResourcesRouteImport.update({
+    id: '/promoter-resources',
+    path: '/promoter-resources',
+    getParentRoute: () => DashboardRoute,
+  } as any)
 const DashboardProfileRoute = DashboardProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -1426,6 +1433,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
   '/dashboard/qr-ads': typeof DashboardQrAdsRoute
   '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/rides': typeof DashboardRidesRoute
@@ -1636,6 +1644,7 @@ export interface FileRoutesByTo {
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
   '/dashboard/qr-ads': typeof DashboardQrAdsRoute
   '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/rides': typeof DashboardRidesRoute
@@ -1850,6 +1859,7 @@ export interface FileRoutesById {
   '/dashboard/likes': typeof DashboardLikesRoute
   '/dashboard/messages': typeof DashboardMessagesRoute
   '/dashboard/profile': typeof DashboardProfileRoute
+  '/dashboard/promoter-resources': typeof DashboardPromoterResourcesRoute
   '/dashboard/qr-ads': typeof DashboardQrAdsRoute
   '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/rides': typeof DashboardRidesRoute
@@ -2066,6 +2076,7 @@ export interface FileRouteTypes {
     | '/dashboard/likes'
     | '/dashboard/messages'
     | '/dashboard/profile'
+    | '/dashboard/promoter-resources'
     | '/dashboard/qr-ads'
     | '/dashboard/referral'
     | '/dashboard/rides'
@@ -2276,6 +2287,7 @@ export interface FileRouteTypes {
     | '/dashboard/likes'
     | '/dashboard/messages'
     | '/dashboard/profile'
+    | '/dashboard/promoter-resources'
     | '/dashboard/qr-ads'
     | '/dashboard/referral'
     | '/dashboard/rides'
@@ -2489,6 +2501,7 @@ export interface FileRouteTypes {
     | '/dashboard/likes'
     | '/dashboard/messages'
     | '/dashboard/profile'
+    | '/dashboard/promoter-resources'
     | '/dashboard/qr-ads'
     | '/dashboard/referral'
     | '/dashboard/rides'
@@ -3359,6 +3372,13 @@ declare module '@tanstack/react-router' {
       path: '/qr-ads'
       fullPath: '/dashboard/qr-ads'
       preLoaderRoute: typeof DashboardQrAdsRouteImport
+      parentRoute: typeof DashboardRoute
+    }
+    '/dashboard/promoter-resources': {
+      id: '/dashboard/promoter-resources'
+      path: '/promoter-resources'
+      fullPath: '/dashboard/promoter-resources'
+      preLoaderRoute: typeof DashboardPromoterResourcesRouteImport
       parentRoute: typeof DashboardRoute
     }
     '/dashboard/profile': {
@@ -4427,6 +4447,7 @@ interface DashboardRouteChildren {
   DashboardLikesRoute: typeof DashboardLikesRoute
   DashboardMessagesRoute: typeof DashboardMessagesRoute
   DashboardProfileRoute: typeof DashboardProfileRoute
+  DashboardPromoterResourcesRoute: typeof DashboardPromoterResourcesRoute
   DashboardQrAdsRoute: typeof DashboardQrAdsRoute
   DashboardReferralRoute: typeof DashboardReferralRoute
   DashboardRidesRoute: typeof DashboardRidesRoute
@@ -4459,6 +4480,7 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardLikesRoute: DashboardLikesRoute,
   DashboardMessagesRoute: DashboardMessagesRoute,
   DashboardProfileRoute: DashboardProfileRoute,
+  DashboardPromoterResourcesRoute: DashboardPromoterResourcesRoute,
   DashboardQrAdsRoute: DashboardQrAdsRoute,
   DashboardReferralRoute: DashboardReferralRoute,
   DashboardRidesRoute: DashboardRidesRoute,
