@@ -680,9 +680,11 @@ function SubmitBusinessPage() {
             </ol>
           </div>
 
-          <Card className="space-y-6 rounded-2xl p-5 ring-1 ring-border/60 sm:p-7">
+          <Card ref={cardRef} className="space-y-6 rounded-2xl p-5 ring-1 ring-border/60 sm:p-7">
             {/* ===== BASICS ===== */}
-            {step === "basics" && (
+            <div hidden={step !== "basics"} role="tabpanel" id="panel-basics" aria-labelledby="tab-basics">
+              {step === "basics" && (
+
               <div className="space-y-5">
                 <div>
                   <h2 className="font-display text-xl font-semibold">Tell us about your business</h2>
