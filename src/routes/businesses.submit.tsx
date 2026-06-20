@@ -632,7 +632,7 @@ function SubmitBusinessPage() {
 
           {/* Stepper */}
           <div className="sticky top-14 z-10 mb-4 -mx-4 overflow-x-auto rounded-none border-y border-border bg-card/90 p-2 shadow-sm backdrop-blur md:top-2 md:mx-0 md:rounded-2xl md:border">
-            <ol className="flex min-w-max items-center gap-1">
+            <ol ref={stepperRef} className="flex min-w-max items-center gap-1" role="tablist" aria-label="Listing steps">
               {STEPS.map((s, i) => {
                 const Icon = s.icon;
                 const active = s.key === step;
