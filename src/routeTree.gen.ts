@@ -95,7 +95,6 @@ import { Route as DashboardTeamRouteImport } from './routes/dashboard.team'
 import { Route as DashboardStaffRouteImport } from './routes/dashboard.staff'
 import { Route as DashboardSponsorshipsRouteImport } from './routes/dashboard.sponsorships'
 import { Route as DashboardShopFavoritesRouteImport } from './routes/dashboard.shop-favorites'
-import { Route as DashboardShareKitRouteImport } from './routes/dashboard.share-kit'
 import { Route as DashboardSearchesRouteImport } from './routes/dashboard.searches'
 import { Route as DashboardRidesRouteImport } from './routes/dashboard.rides'
 import { Route as DashboardReferralRouteImport } from './routes/dashboard.referral'
@@ -178,7 +177,6 @@ import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocod
 import { Route as ApiPublicGeoSearchRouteImport } from './routes/api/public/geo-search'
 import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
 import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions_.$staffId'
-import { Route as AdminAdvertisementsShareKitRouteImport } from './routes/admin.advertisements.share-kit'
 import { Route as AdminAdvertisementsQrAdsRouteImport } from './routes/admin.advertisements.qr-ads'
 import { Route as AdminAdvertisementsPromotionsRouteImport } from './routes/admin.advertisements.promotions'
 import { Route as AdminAdvertisementsInquiriesRouteImport } from './routes/admin.advertisements.inquiries'
@@ -652,11 +650,6 @@ const DashboardShopFavoritesRoute = DashboardShopFavoritesRouteImport.update({
   path: '/shop-favorites',
   getParentRoute: () => DashboardRoute,
 } as any)
-const DashboardShareKitRoute = DashboardShareKitRouteImport.update({
-  id: '/share-kit',
-  path: '/share-kit',
-  getParentRoute: () => DashboardRoute,
-} as any)
 const DashboardSearchesRoute = DashboardSearchesRouteImport.update({
   id: '/searches',
   path: '/searches',
@@ -1073,12 +1066,6 @@ const AdminRedemptionsStaffIdRoute = AdminRedemptionsStaffIdRouteImport.update({
   path: '/redemptions/$staffId',
   getParentRoute: () => AdminRoute,
 } as any)
-const AdminAdvertisementsShareKitRoute =
-  AdminAdvertisementsShareKitRouteImport.update({
-    id: '/share-kit',
-    path: '/share-kit',
-    getParentRoute: () => AdminAdvertisementsRoute,
-  } as any)
 const AdminAdvertisementsQrAdsRoute =
   AdminAdvertisementsQrAdsRouteImport.update({
     id: '/qr-ads',
@@ -1430,7 +1417,6 @@ export interface FileRoutesByFullPath {
   '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
-  '/dashboard/share-kit': typeof DashboardShareKitRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
   '/dashboard/sponsorships': typeof DashboardSponsorshipsRoute
   '/dashboard/staff': typeof DashboardStaffRoute
@@ -1490,7 +1476,6 @@ export interface FileRoutesByFullPath {
   '/admin/advertisements/inquiries': typeof AdminAdvertisementsInquiriesRoute
   '/admin/advertisements/promotions': typeof AdminAdvertisementsPromotionsRoute
   '/admin/advertisements/qr-ads': typeof AdminAdvertisementsQrAdsRoute
-  '/admin/advertisements/share-kit': typeof AdminAdvertisementsShareKitRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1640,7 +1625,6 @@ export interface FileRoutesByTo {
   '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
-  '/dashboard/share-kit': typeof DashboardShareKitRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
   '/dashboard/sponsorships': typeof DashboardSponsorshipsRoute
   '/dashboard/staff': typeof DashboardStaffRoute
@@ -1699,7 +1683,6 @@ export interface FileRoutesByTo {
   '/admin/advertisements/inquiries': typeof AdminAdvertisementsInquiriesRoute
   '/admin/advertisements/promotions': typeof AdminAdvertisementsPromotionsRoute
   '/admin/advertisements/qr-ads': typeof AdminAdvertisementsQrAdsRoute
-  '/admin/advertisements/share-kit': typeof AdminAdvertisementsShareKitRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1854,7 +1837,6 @@ export interface FileRoutesById {
   '/dashboard/referral': typeof DashboardReferralRoute
   '/dashboard/rides': typeof DashboardRidesRoute
   '/dashboard/searches': typeof DashboardSearchesRoute
-  '/dashboard/share-kit': typeof DashboardShareKitRoute
   '/dashboard/shop-favorites': typeof DashboardShopFavoritesRoute
   '/dashboard/sponsorships': typeof DashboardSponsorshipsRoute
   '/dashboard/staff': typeof DashboardStaffRoute
@@ -1914,7 +1896,6 @@ export interface FileRoutesById {
   '/admin/advertisements/inquiries': typeof AdminAdvertisementsInquiriesRoute
   '/admin/advertisements/promotions': typeof AdminAdvertisementsPromotionsRoute
   '/admin/advertisements/qr-ads': typeof AdminAdvertisementsQrAdsRoute
-  '/admin/advertisements/share-kit': typeof AdminAdvertisementsShareKitRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -2070,7 +2051,6 @@ export interface FileRouteTypes {
     | '/dashboard/referral'
     | '/dashboard/rides'
     | '/dashboard/searches'
-    | '/dashboard/share-kit'
     | '/dashboard/shop-favorites'
     | '/dashboard/sponsorships'
     | '/dashboard/staff'
@@ -2130,7 +2110,6 @@ export interface FileRouteTypes {
     | '/admin/advertisements/inquiries'
     | '/admin/advertisements/promotions'
     | '/admin/advertisements/qr-ads'
-    | '/admin/advertisements/share-kit'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2280,7 +2259,6 @@ export interface FileRouteTypes {
     | '/dashboard/referral'
     | '/dashboard/rides'
     | '/dashboard/searches'
-    | '/dashboard/share-kit'
     | '/dashboard/shop-favorites'
     | '/dashboard/sponsorships'
     | '/dashboard/staff'
@@ -2339,7 +2317,6 @@ export interface FileRouteTypes {
     | '/admin/advertisements/inquiries'
     | '/admin/advertisements/promotions'
     | '/admin/advertisements/qr-ads'
-    | '/admin/advertisements/share-kit'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2493,7 +2470,6 @@ export interface FileRouteTypes {
     | '/dashboard/referral'
     | '/dashboard/rides'
     | '/dashboard/searches'
-    | '/dashboard/share-kit'
     | '/dashboard/shop-favorites'
     | '/dashboard/sponsorships'
     | '/dashboard/staff'
@@ -2553,7 +2529,6 @@ export interface FileRouteTypes {
     | '/admin/advertisements/inquiries'
     | '/admin/advertisements/promotions'
     | '/admin/advertisements/qr-ads'
-    | '/admin/advertisements/share-kit'
     | '/admin/redemptions_/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -3326,13 +3301,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardShopFavoritesRouteImport
       parentRoute: typeof DashboardRoute
     }
-    '/dashboard/share-kit': {
-      id: '/dashboard/share-kit'
-      path: '/share-kit'
-      fullPath: '/dashboard/share-kit'
-      preLoaderRoute: typeof DashboardShareKitRouteImport
-      parentRoute: typeof DashboardRoute
-    }
     '/dashboard/searches': {
       id: '/dashboard/searches'
       path: '/searches'
@@ -3907,13 +3875,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRedemptionsStaffIdRouteImport
       parentRoute: typeof AdminRoute
     }
-    '/admin/advertisements/share-kit': {
-      id: '/admin/advertisements/share-kit'
-      path: '/share-kit'
-      fullPath: '/admin/advertisements/share-kit'
-      preLoaderRoute: typeof AdminAdvertisementsShareKitRouteImport
-      parentRoute: typeof AdminAdvertisementsRoute
-    }
     '/admin/advertisements/qr-ads': {
       id: '/admin/advertisements/qr-ads'
       path: '/qr-ads'
@@ -4250,7 +4211,6 @@ interface AdminAdvertisementsRouteChildren {
   AdminAdvertisementsInquiriesRoute: typeof AdminAdvertisementsInquiriesRoute
   AdminAdvertisementsPromotionsRoute: typeof AdminAdvertisementsPromotionsRoute
   AdminAdvertisementsQrAdsRoute: typeof AdminAdvertisementsQrAdsRoute
-  AdminAdvertisementsShareKitRoute: typeof AdminAdvertisementsShareKitRoute
   AdminAdvertisementsIndexRoute: typeof AdminAdvertisementsIndexRoute
 }
 
@@ -4260,7 +4220,6 @@ const AdminAdvertisementsRouteChildren: AdminAdvertisementsRouteChildren = {
   AdminAdvertisementsInquiriesRoute: AdminAdvertisementsInquiriesRoute,
   AdminAdvertisementsPromotionsRoute: AdminAdvertisementsPromotionsRoute,
   AdminAdvertisementsQrAdsRoute: AdminAdvertisementsQrAdsRoute,
-  AdminAdvertisementsShareKitRoute: AdminAdvertisementsShareKitRoute,
   AdminAdvertisementsIndexRoute: AdminAdvertisementsIndexRoute,
 }
 
@@ -4431,7 +4390,6 @@ interface DashboardRouteChildren {
   DashboardReferralRoute: typeof DashboardReferralRoute
   DashboardRidesRoute: typeof DashboardRidesRoute
   DashboardSearchesRoute: typeof DashboardSearchesRoute
-  DashboardShareKitRoute: typeof DashboardShareKitRoute
   DashboardShopFavoritesRoute: typeof DashboardShopFavoritesRoute
   DashboardSponsorshipsRoute: typeof DashboardSponsorshipsRoute
   DashboardStaffRoute: typeof DashboardStaffRoute
@@ -4464,7 +4422,6 @@ const DashboardRouteChildren: DashboardRouteChildren = {
   DashboardReferralRoute: DashboardReferralRoute,
   DashboardRidesRoute: DashboardRidesRoute,
   DashboardSearchesRoute: DashboardSearchesRoute,
-  DashboardShareKitRoute: DashboardShareKitRoute,
   DashboardShopFavoritesRoute: DashboardShopFavoritesRoute,
   DashboardSponsorshipsRoute: DashboardSponsorshipsRoute,
   DashboardStaffRoute: DashboardStaffRoute,
@@ -4674,13 +4631,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
