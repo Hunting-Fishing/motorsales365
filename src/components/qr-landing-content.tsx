@@ -11,13 +11,9 @@ import {
   ArrowRight,
   Car,
   Check,
-  CheckCircle2,
-  Info,
-  Mail,
   MapPin,
   MessageSquare,
   QrCode,
-  RotateCcw,
   Search,
   Shield,
   Sparkles,
@@ -434,17 +430,6 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
     };
   }, [code, preview]);
 
-  const referrer = preview ? "Your name" : staffName || "a local promoter";
-  const contactLine =
-    !preview && staffEmail ? (
-      <a
-        href={`mailto:${staffEmail}`}
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
-      >
-        <Mail className="h-3.5 w-3.5" />
-        {staffEmail}
-      </a>
-    ) : null;
 
   return (
     <TooltipProvider delayDuration={150}>
@@ -466,145 +451,6 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
           </div>
         ) : (
           <>
-            <section className="rounded-xl border border-border bg-card p-5 shadow-sm sm:p-6">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                <div className="max-w-3xl">
-                  <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">
-                    This QR spot
-                  </p>
-                  <div className="mt-2 flex flex-wrap items-center gap-3">
-                    <h2 className="font-display text-2xl font-bold sm:text-3xl">
-                      {preview
-                        ? "Your name will appear here"
-                        : `This QR Code Spot brought to you by ${referrer}`}
-                    </h2>
-                    {counted !== null && !preview && (
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button
-                            type="button"
-                            className={
-                              "inline-flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium transition-colors " +
-                              (counted
-                                ? "bg-primary/15 text-primary hover:bg-primary/20"
-                                : "bg-secondary text-muted-foreground hover:bg-secondary/80")
-                            }
-                            aria-label={counted ? "First visit from this device" : "Welcome back"}
-                          >
-                            {counted ? (
-                              <CheckCircle2 className="h-3.5 w-3.5" />
-                            ) : (
-                              <RotateCcw className="h-3.5 w-3.5" />
-                            )}
-                            <span>{counted ? "First visit from this device" : "Welcome back"}</span>
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom" align="start" className="max-w-[260px] text-xs">
-                          {counted ? (
-                            <p>First visit recorded from this device.</p>
-                          ) : (
-                            <p>Thanks for stopping by again.</p>
-                          )}
-                        </TooltipContent>
-                      </Tooltip>
-                    )}
-                  </div>
-                  <p className="mt-3 max-w-2xl text-muted-foreground">
-                    Welcome to 365 Motor Sales — the Philippines marketplace for vehicles, parts,
-                    and motor services. Browse listings, find local shops, or list your own ride in
-                    minutes.
-                  </p>
-                  {!preview && (
-                    <p className="mt-3 text-sm text-muted-foreground">
-                      {contactLine ? (
-                        <>Message them if you need assistance: {contactLine}</>
-                      ) : (
-                        <>
-                          Need assistance?{" "}
-                          <button
-                            type="button"
-                            onClick={() => navigate({ to: "/contact" })}
-                            className="font-medium text-primary hover:underline"
-                          >
-                            Get help
-                          </button>
-                        </>
-                      )}
-                    </p>
-                  )}
-                </div>
-
-                <div className="flex flex-wrap gap-3 lg:justify-end">
-                  <Button onClick={() => navigate({ to: "/signup" })}>Create account</Button>
-                  <Button variant="outline" onClick={() => navigate({ to: "/" })}>
-                    Browse listings
-                  </Button>
-                  <Button variant="outline" onClick={() => navigate({ to: "/businesses" })}>
-                    Partner your business
-                  </Button>
-                </div>
-              </div>
-
-              {!preview && visitCount > 0 && (
-                <div className="mt-4 flex items-center gap-2 rounded-lg border border-dashed border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-                  <Info className="h-3.5 w-3.5 shrink-0" />
-                  <span>
-                    {visitCount === 1 ? (
-                      <>This is your first visit to this page.</>
-                    ) : (
-                      <>
-                        You&apos;ve opened this page <strong className="text-foreground">{visitCount}</strong>
-                        {firstSeenAt ? (
-                          <> times since {new Date(firstSeenAt).toLocaleDateString()}</>
-                        ) : (
-                          <> times</>
-                        )}
-                        .
-                      </>
-                    )}
-                  </span>
-                </div>
-              )}
-
-              {promos.length > 0 && (
-                <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                  {promos.map((p) => (
-                    <div key={p.id} className="rounded-lg border border-border bg-background p-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                            Active offer
-                          </p>
-                          <h3 className="mt-1 font-semibold">{p.title}</h3>
-                        </div>
-                        <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                          {p.kind}
-                        </span>
-                      </div>
-                      {p.description && (
-                        <p className="mt-2 text-sm text-muted-foreground">{p.description}</p>
-                      )}
-                      <p className="mt-3 text-sm font-medium text-foreground">
-                        {p.percent_off ? `${p.percent_off}% off` : null}
-                        {p.percent_off && p.flat_amount_php ? " · " : null}
-                        {p.flat_amount_php ? `₱${p.flat_amount_php}` : null}
-                        {(p.percent_off || p.flat_amount_php) && (
-                          <span className="font-normal text-muted-foreground">
-                            {" "}· applies to {p.applies_to}
-                          </span>
-                        )}
-                      </p>
-                      {p.ends_at && (
-                        <p className="mt-1 text-xs text-muted-foreground">
-                          Ends {new Date(p.ends_at).toLocaleDateString()}
-                        </p>
-                      )}
-                      {p.terms && <p className="mt-1 text-xs text-muted-foreground">{p.terms}</p>}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </section>
 
             <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
               <div>
