@@ -20,6 +20,8 @@ import { template as adInquiryStaffNotice } from "./ad-inquiry-staff-notice";
 import { template as adInquiryReply } from "./ad-inquiry-reply";
 import { template as adInquiryApproved } from "./ad-inquiry-approved";
 import { template as adInquiryRejected } from "./ad-inquiry-rejected";
+import { template as adCreativeApproved } from "./ad-creative-approved";
+import { template as adCreativeRejected } from "./ad-creative-rejected";
 import { template as teamInvite } from "./team-invite";
 import { template as teamNewLead } from "./team-new-lead";
 import { template as supportTicketReceived } from "./support-ticket-received";
@@ -65,4 +67,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   "booking-status-changed": bookingStatusChanged,
   "ops-alerts-digest": opsAlertsDigest,
   "parts-wanted-match": partsWantedMatch,
+  "ad-creative-approved": adCreativeApproved,
+  "ad-creative-rejected": adCreativeRejected,
 };
