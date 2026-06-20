@@ -276,7 +276,7 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
     };
   }, [code, preview]);
 
-  const referrer = preview ? "Your referral code" : staffName || "your referrer";
+  const referrer = preview ? "Your name" : staffName || "a local promoter";
   const contactLine =
     !preview && staffEmail ? (
       <a
@@ -297,8 +297,7 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             <div className="flex-1">
               <p className="font-semibold text-foreground">Promoter preview</p>
               <p className="text-muted-foreground">
-                This is the exact page a new visitor sees after scanning your QR code. Tracking,
-                referral credit and lead submissions are disabled here.
+                Tracking and lead submissions are disabled in preview mode.
               </p>
             </div>
           </div>
@@ -308,9 +307,9 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
           <p className="text-center text-muted-foreground">Loading…</p>
         ) : active === false ? (
           <div className="mx-auto max-w-2xl rounded-xl border border-border bg-card p-8 text-center">
-            <h1 className="font-display text-2xl font-bold">Referral link unavailable</h1>
+            <h1 className="font-display text-2xl font-bold">Link unavailable</h1>
             <p className="mt-2 text-muted-foreground">
-              This referral code isn&apos;t active. You can still create an account and browse.
+              This QR link isn&apos;t active. You can still create an account and browse.
             </p>
             <Button className="mt-6" onClick={() => navigate({ to: "/" })}>
               Continue to site
@@ -322,13 +321,13 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
               <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <div className="max-w-3xl">
                   <p className="text-xs uppercase tracking-[0.24em] text-muted-foreground">
-                    Referral credit
+                    This QR spot
                   </p>
                   <div className="mt-2 flex flex-wrap items-center gap-3">
                     <h2 className="font-display text-2xl font-bold sm:text-3xl">
                       {preview
-                        ? "Your name will appear here when a visitor scans"
-                        : `${referrer} brought you to 365 Motor Sales`}
+                        ? "Your name will appear here"
+                        : `This QR Code Spot brought to you by ${referrer}`}
                     </h2>
                     {counted !== null && !preview && (
                       <Tooltip>
@@ -341,39 +340,47 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
                                 ? "bg-primary/15 text-primary hover:bg-primary/20"
                                 : "bg-secondary text-muted-foreground hover:bg-secondary/80")
                             }
-                            aria-label={counted ? "New scan counted" : "Repeat scan"}
+                            aria-label={counted ? "First visit from this device" : "Welcome back"}
                           >
                             {counted ? (
                               <CheckCircle2 className="h-3.5 w-3.5" />
                             ) : (
                               <RotateCcw className="h-3.5 w-3.5" />
                             )}
-                            <span>{counted ? "New scan counted" : "Repeat scan"}</span>
+                            <span>{counted ? "First visit from this device" : "Welcome back"}</span>
                           </button>
                         </TooltipTrigger>
                         <TooltipContent side="bottom" align="start" className="max-w-[260px] text-xs">
                           {counted ? (
-                            <p>
-                              First scan from this device — counted toward {referrer}&apos;s stats.
-                            </p>
+                            <p>First visit recorded from this device.</p>
                           ) : (
-                            <p>
-                              You&apos;ve already scanned this code from this device. Repeat scans
-                              are not counted.
-                            </p>
+                            <p>Thanks for stopping by again.</p>
                           )}
                         </TooltipContent>
                       </Tooltip>
                     )}
                   </div>
                   <p className="mt-3 max-w-2xl text-muted-foreground">
-                    This QR keeps {preview ? "the promoter's" : `${referrer}'s`} referral credit,
-                    but the page works like a shared featured destination — one strong page that
-                    sells the platform, the services, and the upcoming roadmap.
+                    Welcome to 365 Motor Sales — the Philippines marketplace for vehicles, parts,
+                    and motor services. Browse listings, find local shops, or list your own ride in
+                    minutes.
                   </p>
-                  {contactLine && (
+                  {!preview && (
                     <p className="mt-3 text-sm text-muted-foreground">
-                      Contact {referrer}: {contactLine}
+                      {contactLine ? (
+                        <>Message them if you need assistance: {contactLine}</>
+                      ) : (
+                        <>
+                          Need assistance?{" "}
+                          <button
+                            type="button"
+                            onClick={() => navigate({ to: "/contact" })}
+                            className="font-medium text-primary hover:underline"
+                          >
+                            Get help
+                          </button>
+                        </>
+                      )}
                     </p>
                   )}
                 </div>
@@ -394,7 +401,7 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
                   <Info className="h-3.5 w-3.5 shrink-0" />
                   <span>
                     {visitCount === 1 ? (
-                      <>This is your first visit to this referral page.</>
+                      <>This is your first visit to this page.</>
                     ) : (
                       <>
                         You&apos;ve opened this page{" "}
@@ -404,12 +411,13 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
                         ) : (
                           <> times</>
                         )}
-                        . Only the first scan counts toward stats.
+                        .
                       </>
                     )}
                   </span>
                 </div>
               )}
+
 
               {promos.length > 0 && (
                 <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
