@@ -719,49 +719,6 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
               </div>
             </section>
 
-            <section className="mt-12">
-              <div className="mb-6 max-w-3xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
-                  Coming next
-                </p>
-                <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
-                  The roadmap — built with our community.
-                </h2>
-                <p className="mt-3 text-muted-foreground">
-                  Join early and help shape what ships next. Members vote on priorities.
-                </p>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {[
-                  { src: roadmapLoanAsset.url, alt: "Loan & financing match — shipping soon" },
-                  { src: roadmapVehicleHistoryAsset.url, alt: "Vehicle history badges — in design" },
-                  { src: roadmapTradeInAsset.url, alt: "Trade-in offers — planned" },
-                  { src: roadmapDriverEduAsset.url, alt: "Driver education hub — planned" },
-                  { src: roadmapInsuranceAsset.url, alt: "Insurance comparison — exploring" },
-                  { src: roadmapLiveAuctionsAsset.url, alt: "Live auctions — exploring" },
-                ].map((r) => (
-                  <Dialog key={r.alt}>
-                    <DialogTrigger asChild>
-                      <button
-                        type="button"
-                        className="group overflow-hidden rounded-xl border border-border bg-card transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary"
-                        aria-label={`${r.alt} — click to enlarge`}
-                      >
-                        <img
-                          src={r.src}
-                          alt={r.alt}
-                          loading="lazy"
-                          className="block w-full h-auto cursor-zoom-in transition group-hover:scale-[1.01]"
-                        />
-                      </button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-5xl p-2 sm:p-4">
-                      <img src={r.src} alt={r.alt} className="w-full h-auto max-h-[85vh] object-contain" />
-                    </DialogContent>
-                  </Dialog>
-                ))}
-              </div>
-            </section>
 
             <section className="mt-12 rounded-2xl border border-border bg-card p-6 sm:p-8">
               <div className="mb-4 max-w-3xl">
