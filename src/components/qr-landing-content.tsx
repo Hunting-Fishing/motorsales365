@@ -41,7 +41,10 @@ import growingWeeklyAsset from "@/assets/qr-landing-uploaded/growing-weekly.png.
 import nationwideMapAsset from "@/assets/qr-landing-uploaded/nationwide-map.png.asset.json";
 import verifiedAccountsAsset from "@/assets/qr-landing-uploaded/verified-accounts.png.asset.json";
 import scanOrVisitAsset from "@/assets/qr-landing-uploaded/scan-or-visit.png.asset.json";
-import { QrLeadForm } from "@/components/qr-lead-form";
+import findVehiclesBannerAsset from "@/assets/qr-landing-uploaded/find-vehicles-parts-services-faster.png.asset.json";
+import discoverServicesBannerAsset from "@/assets/qr-landing-uploaded/discover-motor-services-near-you.png.asset.json";
+import postConnectSellBannerAsset from "@/assets/qr-landing-uploaded/post-connect-sell.png.asset.json";
+import onePlatformBannerAsset from "@/assets/qr-landing-uploaded/one-platform-many-opportunities.png.asset.json";
 
 type Promo = {
   id: string;
