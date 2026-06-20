@@ -1,33 +1,52 @@
-## Findings
+# Rebuild the QR scan landing page into a sales pitch
 
-Searched the whole codebase. There are **no live navigation links** pointing to `/dashboard/share-kit` or `/admin/advertisements/share-kit` anywhere in the UI (sidebar, header, dashboard nav, admin nav — all clean). The only things left are:
+The QR scan destination (`src/routes/r.$code.tsx`) currently reads like internal placeholder copy ("Shared 365 feature page", "Feature the roadmap clearly", "Coming soon"). When a real person scans a printed/worn QR, this page needs to **sell the platform in the first screen** and convert them into a signup, a listing, or a business partner.
 
-1. **Two redirect-only route files** that forward to the QR Ads pages:
-   - `src/routes/dashboard.share-kit.tsx` → `/dashboard/qr-ads`
-   - `src/routes/admin.advertisements.share-kit.tsx` → `/admin/advertisements/qr-ads`
-2. **Two orphaned image assets** never imported anywhere:
-   - `src/assets/share-kit/arm-band.png.asset.json`
-   - `src/assets/share-kit/rear-shirt.png.asset.json`
-3. **A Supabase storage bucket named `share-kit-templates`** that is actively used by the QR Ads custom-template uploader (`src/components/qr-ads/use-signed-custom-templates.ts`, `src/components/qr-ads/template-upload-dialog.tsx`). This is just an internal bucket identifier — users never see it — and renaming it would require migrating existing uploaded files. Migration history confirms it's already in production use.
+## Goals
 
-## Plan
+1. Replace placeholder/meta copy with a benefit-led pitch aimed at three audiences: **buyers, sellers, and businesses**.
+2. Add a clear **"Why 365 beats Facebook & Google"** section with side-by-side comparison.
+3. Add a **boost & ads pricing callout** showing how much cheaper 365 is than FB Boost / Google Ads.
+4. Keep all referral-tracking logic intact (scan recording, visit counter, contact line, active promos).
+5. Reuse existing design tokens — no new color hardcoding.
 
-### 1. Delete legacy redirect routes
-Remove both files so the URLs cleanly 404 and the route tree no longer carries dead entries:
-- `src/routes/dashboard.share-kit.tsx`
-- `src/routes/admin.advertisements.share-kit.tsx`
+## What changes
 
-The TanStack route tree (`src/routeTree.gen.ts`) is auto-generated and will regenerate without these entries on the next build.
+**File:** `src/routes/r.$code.tsx` (single-file rewrite of the marketing sections; data-loading useEffect untouched).
 
-### 2. Delete unused share-kit image assets
-- `src/assets/share-kit/arm-band.png.asset.json`
-- `src/assets/share-kit/rear-shirt.png.asset.json`
-- Remove the now-empty `src/assets/share-kit/` directory
+### New section order (after the existing referral-credit card)
 
-### 3. Leave the storage bucket name alone
-The `share-kit-templates` bucket stays as `share-kit-templates` internally. It is referenced only by the QR Ads code, not exposed to users, and renaming would orphan existing uploaded template files. No code change needed.
+1. **Hero** — strong headline + subhead + two CTAs (Create account / Browse listings). Keep the small "{referrer} brought you to 365 Motor Sales" credit chip above it. Drop the "Shared 365 feature page" eyebrow.
+2. **Why 365 vs Facebook vs Google** — 3-column comparison card. Rows: Built for vehicles, Real seller verification, Direct buyer messaging, Local services map, Boost cost, No algorithm guessing. ✓/✗ + short cell text. On mobile collapses to stacked cards per competitor.
+3. **Boost & advertising pricing** — three pricing tiles using real numbers from `pricing.tsx`:
+   - Search Boost ₱99 / 7 days
+   - Province Boost ₱199 / 7 days
+   - Compare to: "Facebook Boost typically ₱500–₱2,000 for similar reach" / "Google Ads ₱20–₱60 per click"
+   Include a footnote that FB/Google figures are typical PH market ranges, not quotes.
+4. **For buyers / For sellers / For businesses** — 3 short benefit cards replacing the current generic image panels. Reuse 3 of the existing referral images (find-vehicles, post-connect-sell, services-near-you) so we keep visual richness without new assets.
+5. **Trust strip** — chips (existing FEATURE_CHIPS) + a one-line trust statement ("Verified sellers · PH-based support · No bidding wars").
+6. **Final CTA band** — Sign up free / List your business. Keep current styling.
 
-## Risk
+### Removed
 
-- Anyone with an old bookmark to `/dashboard/share-kit` or `/admin/advertisements/share-kit` will get a 404 instead of being redirected. Given there's no current UI pointing to those URLs, this is the intended outcome per your request.
-- No other code paths break — confirmed by full-repo search.
+- "Shared 365 feature page" eyebrow and all copy framing the page as an internal tool.
+- The 5 `SECONDARY_PANELS` referring to "Featured page", "Coming soon", "Future roadmap", "What's next" — those read as internal product-roadmap notes, not buyer-facing.
+- Orphaned imports for the dropped image assets (`everythingInOnePlaceAsset`, `manyOpportunitiesAsset`, `comingSoonAsset`, `whatsNextAsset`).
+
+### Kept untouched
+
+- All `useEffect` data loading (scan recording, promos, contact, visit counter).
+- Referral credit card, repeat-scan tooltip, active-promo grid.
+- Route head/meta (still `noindex, nofollow`).
+
+## Technical notes
+
+- Pure presentational changes in one route file; no new routes, no new packages, no schema changes.
+- Comparison table uses `lucide-react` `Check` / `X` icons (already a dependency).
+- Boost numbers are imported as plain constants matching `pricing.tsx` so they stay easy to keep in sync; FB/Google ranges are static copy with a footnote.
+- Mobile: comparison grid uses `md:grid-cols-3` with stacked cards below `md`.
+
+## Out of scope
+
+- No edits to `/pricing`, no new admin controls, no DB changes.
+- No new images generated — reusing existing referral assets.
