@@ -41,7 +41,10 @@ import growingWeeklyAsset from "@/assets/qr-landing-uploaded/growing-weekly.png.
 import nationwideMapAsset from "@/assets/qr-landing-uploaded/nationwide-map.png.asset.json";
 import verifiedAccountsAsset from "@/assets/qr-landing-uploaded/verified-accounts.png.asset.json";
 import scanOrVisitAsset from "@/assets/qr-landing-uploaded/scan-or-visit.png.asset.json";
-import { QrLeadForm } from "@/components/qr-lead-form";
+import findVehiclesBannerAsset from "@/assets/qr-landing-uploaded/find-vehicles-parts-services-faster.png.asset.json";
+import discoverServicesBannerAsset from "@/assets/qr-landing-uploaded/discover-motor-services-near-you.png.asset.json";
+import postConnectSellBannerAsset from "@/assets/qr-landing-uploaded/post-connect-sell.png.asset.json";
+import onePlatformBannerAsset from "@/assets/qr-landing-uploaded/one-platform-many-opportunities.png.asset.json";
 
 type Promo = {
   id: string;
@@ -447,7 +450,7 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             <div className="flex-1">
               <p className="font-semibold text-foreground">Promoter preview</p>
               <p className="text-muted-foreground">
-                Tracking and lead submissions are disabled in preview mode.
+                Tracking is disabled in preview mode.
               </p>
             </div>
           </div>
@@ -609,6 +612,11 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
 
             <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
               <div>
+                <SectionBanner
+                  image={findVehiclesBannerAsset.url}
+                  alt="365 Motor Sales — Find vehicles, parts and services faster across the Philippines."
+                  className="mb-4"
+                />
                 <p className="text-xs font-semibold uppercase tracking-[0.26em] text-primary">
                   The motor marketplace for the Philippines
                 </p>
@@ -662,13 +670,19 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             </section>
 
             <section className="mt-12">
-              <div className="mb-6 max-w-3xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
-                  How it works
-                </p>
-                <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
-                  From scan to sale in four steps.
-                </h2>
+              <div className="mb-6 flex flex-wrap items-start gap-4 max-w-3xl">
+                <SectionBanner
+                  image={postConnectSellBannerAsset.url}
+                  alt="Post. Connect. Sell. — Create an account, post listings and connect with buyers."
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                    How it works
+                  </p>
+                  <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
+                    From scan to sale in four steps.
+                  </h2>
+                </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {HOW_IT_WORKS_CARDS.map((card) => (
@@ -678,13 +692,19 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             </section>
 
             <section className="mt-12">
-              <div className="mb-6 max-w-3xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
-                  What&apos;s on 365
-                </p>
-                <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
-                  Every part of the motor world — under one roof.
-                </h2>
+              <div className="mb-6 flex flex-wrap items-start gap-4 max-w-3xl">
+                <SectionBanner
+                  image={onePlatformBannerAsset.url}
+                  alt="One platform, many opportunities — Marketplace, services, logistics, learning and growth."
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                    What&apos;s on 365
+                  </p>
+                  <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
+                    Every part of the motor world — under one roof.
+                  </h2>
+                </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {CATEGORY_CARDS.map((card) => (
@@ -694,7 +714,12 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             </section>
 
             <section className="mt-12">
-              <div className="mb-6 max-w-3xl">
+              <div className="mb-6 flex flex-wrap items-start gap-4 max-w-3xl">
+                <SectionBanner
+                  image={discoverServicesBannerAsset.url}
+                  alt="Discover motor services near you — from towing to parts stores, nationwide."
+                />
+                <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
                   Why 365 beats the alternatives
                 </p>
@@ -705,7 +730,9 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
                   Side-by-side, here is what you actually get when you list, search, or advertise on
                   each.
                 </p>
+                </div>
               </div>
+
 
               <div className="hidden overflow-hidden rounded-2xl border border-border bg-card md:block">
                 <div className="grid grid-cols-[1.2fr_1fr_1fr_1fr] border-b border-border bg-muted/40 text-sm font-semibold">
@@ -839,36 +866,6 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
               />
             </section>
 
-            <section className="mt-12">
-              {preview ? (
-                <div className="rounded-2xl border-2 border-dashed border-border bg-card p-6 sm:p-8">
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
-                    Lead capture form
-                  </p>
-                  <h3 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
-                    Visitors can drop their name & contact here without signing up.
-                  </h3>
-                  <p className="mt-2 text-muted-foreground">
-                    The live page renders a form (name, email/phone, vehicle or business interest)
-                    that pushes leads directly to the 365 admin dashboard. The preview is
-                    submission-disabled — open it on a real <code>/r/&lt;code&gt;</code> link to test
-                    a real submission.
-                  </p>
-                  <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                    {["Name", "Email or phone", "Vehicle / business interest"].map((f) => (
-                      <div key={f} className="rounded-lg border border-border bg-background p-3">
-                        <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                          Field
-                        </p>
-                        <p className="mt-1 text-sm font-medium">{f}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : code ? (
-                <QrLeadForm referralCode={code} visitorId={getVisitorId()} />
-              ) : null}
-            </section>
 
             <section className="mt-12 rounded-2xl border border-border bg-card p-6 sm:p-8">
               <div className="max-w-3xl">
@@ -1073,6 +1070,39 @@ function FeatureImage({
     </article>
   );
 }
+
+function SectionBanner({ image, alt, className = "" }: { image: string; alt: string; className?: string }) {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button
+          type="button"
+          aria-label={`View full image: ${alt}`}
+          className={
+            "group block overflow-hidden rounded-lg border border-border bg-card shadow-sm transition hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary " +
+            className
+          }
+          style={{ cursor: "zoom-in" }}
+        >
+          <img
+            src={image}
+            alt={alt}
+            loading="lazy"
+            className="h-16 w-auto object-contain sm:h-20 md:h-24"
+          />
+        </button>
+      </DialogTrigger>
+      <DialogContent className="max-w-5xl border-none bg-background/95 p-2 sm:p-4">
+        <VisuallyHidden>
+          <DialogTitle>{alt}</DialogTitle>
+          <DialogDescription>{alt}</DialogDescription>
+        </VisuallyHidden>
+        <img src={image} alt={alt} className="h-auto max-h-[85vh] w-full object-contain" />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 
 function CompareCell({ ok, note, highlight = false }: { ok: boolean; note: string; highlight?: boolean }) {
   return (
