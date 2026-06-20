@@ -1132,7 +1132,8 @@ function SubmitBusinessPage() {
 
                 <FormFeedbackLink formId="business-submit" />
               </div>
-            )}
+            </div>
+
 
             {/* ===== Footer nav ===== */}
             <div className="sticky bottom-16 -mx-5 -mb-5 flex flex-wrap items-center justify-between gap-3 border-t border-border bg-card/95 px-5 py-3 backdrop-blur md:bottom-0 sm:-mx-7 sm:-mb-7 sm:px-7">
