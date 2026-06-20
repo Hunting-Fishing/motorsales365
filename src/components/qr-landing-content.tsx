@@ -44,6 +44,12 @@ import findVehiclesBannerAsset from "@/assets/qr-landing-uploaded/find-vehicles-
 import discoverServicesBannerAsset from "@/assets/qr-landing-uploaded/discover-motor-services-near-you.png.asset.json";
 import postConnectSellBannerAsset from "@/assets/qr-landing-uploaded/post-connect-sell.png.asset.json";
 import onePlatformBannerAsset from "@/assets/qr-landing-uploaded/one-platform-many-opportunities.png.asset.json";
+import roadmapLoanAsset from "@/assets/qr-landing-uploaded/roadmap-loan-financing-match.png.asset.json";
+import roadmapVehicleHistoryAsset from "@/assets/qr-landing-uploaded/roadmap-vehicle-history-badges.png.asset.json";
+import roadmapTradeInAsset from "@/assets/qr-landing-uploaded/roadmap-trade-in-offers.png.asset.json";
+import roadmapDriverEduAsset from "@/assets/qr-landing-uploaded/roadmap-driver-education-hub.png.asset.json";
+import roadmapInsuranceAsset from "@/assets/qr-landing-uploaded/roadmap-insurance-comparison.png.asset.json";
+import roadmapLiveAuctionsAsset from "@/assets/qr-landing-uploaded/roadmap-live-auctions.png.asset.json";
 
 type Promo = {
   id: string;
@@ -885,22 +891,34 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
                   Join early and help shape what ships next. Members vote on priorities.
                 </p>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {[
-                  { tag: "Shipping soon", title: "Loan & financing match", body: "Connect with PH lenders directly from a listing." },
-                  { tag: "In design", title: "Vehicle history badges", body: "Service records and verified mileage history." },
-                  { tag: "Planned", title: "Trade-in offers", body: "Get instant offers from dealerships in your area." },
-                  { tag: "Planned", title: "Driver education hub", body: "Driving schools, defensive courses, mechanic basics." },
-                  { tag: "Exploring", title: "Insurance comparison", body: "Side-by-side TPL and comprehensive quotes." },
-                  { tag: "Exploring", title: "Live auctions", body: "Time-boxed bidding for dealer-listed units." },
+                  { src: roadmapLoanAsset.url, alt: "Loan & financing match — shipping soon" },
+                  { src: roadmapVehicleHistoryAsset.url, alt: "Vehicle history badges — in design" },
+                  { src: roadmapTradeInAsset.url, alt: "Trade-in offers — planned" },
+                  { src: roadmapDriverEduAsset.url, alt: "Driver education hub — planned" },
+                  { src: roadmapInsuranceAsset.url, alt: "Insurance comparison — exploring" },
+                  { src: roadmapLiveAuctionsAsset.url, alt: "Live auctions — exploring" },
                 ].map((r) => (
-                  <div key={r.title} className="rounded-xl border border-border bg-card p-5">
-                    <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                      {r.tag}
-                    </span>
-                    <h3 className="mt-3 font-semibold">{r.title}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">{r.body}</p>
-                  </div>
+                  <Dialog key={r.alt}>
+                    <DialogTrigger asChild>
+                      <button
+                        type="button"
+                        className="group overflow-hidden rounded-xl border border-border bg-card transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary"
+                        aria-label={`${r.alt} — click to enlarge`}
+                      >
+                        <img
+                          src={r.src}
+                          alt={r.alt}
+                          loading="lazy"
+                          className="block w-full h-auto cursor-zoom-in transition group-hover:scale-[1.01]"
+                        />
+                      </button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-5xl p-2 sm:p-4">
+                      <img src={r.src} alt={r.alt} className="w-full h-auto max-h-[85vh] object-contain" />
+                    </DialogContent>
+                  </Dialog>
                 ))}
               </div>
             </section>
