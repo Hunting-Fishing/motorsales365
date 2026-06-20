@@ -171,7 +171,7 @@ function QrLeadsAdmin() {
               </TableRow>
             ) : (
               filtered.map((l) => (
-                <>
+                <Fragment key={l.id}>
                   <TableRow
                     key={l.id}
                     className="cursor-pointer hover:bg-muted/40"
