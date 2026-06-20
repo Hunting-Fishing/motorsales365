@@ -6,21 +6,19 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import {
   ArrowRight,
+  Check,
   CheckCircle2,
   Info,
   Mail,
   RotateCcw,
   Sparkles,
+  X,
 } from "lucide-react";
 import { siteOrigin } from "@/lib/site-config";
+import { formatPHP } from "@/lib/format";
 import findVehiclesAsset from "@/assets/referral/referral-find-vehicles.png.asset.json";
-import socialPostAsset from "@/assets/referral/referral-social-post.png.asset.json";
-import everythingInOnePlaceAsset from "@/assets/referral/referral-everything-in-one-place.png.asset.json";
-import servicesNearYouAsset from "@/assets/referral/referral-services-near-you.png.asset.json";
 import postConnectSellAsset from "@/assets/referral/referral-post-connect-sell.png.asset.json";
-import manyOpportunitiesAsset from "@/assets/referral/referral-many-opportunities.png.asset.json";
-import comingSoonAsset from "@/assets/referral/referral-coming-soon.png.asset.json";
-import whatsNextAsset from "@/assets/referral/referral-whats-next.png.asset.json";
+import servicesNearYouAsset from "@/assets/referral/referral-services-near-you.png.asset.json";
 
 export const Route = createFileRoute("/r/$code")({
   head: ({ params }) => ({
