@@ -1078,10 +1078,11 @@ function SubmitBusinessPage() {
                   </div>
                 </div>
               </div>
-            )}
+            </div>
 
             {/* ===== HOURS & REVIEW ===== */}
-            {step === "review" && (
+            <div hidden={step !== "review"} role="tabpanel" id="panel-review">
+
               <div className="space-y-6">
                 <div>
                   <h2 className="font-display text-xl font-semibold">Business hours & review</h2>
