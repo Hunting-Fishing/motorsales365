@@ -23,6 +23,7 @@ import {
   submitMyAdvertisement,
   pauseMyAdvertisement,
 } from "@/lib/advertiser-portal.functions";
+import { CreativeNotificationsPanel } from "@/components/advertise/creative-notifications-panel";
 
 export const Route = createFileRoute("/dashboard/ads")({
   component: AdvertiserPortalPage,
@@ -127,9 +128,12 @@ function AdvertiserPortalPage() {
               Submit your own campaigns — our team reviews and activates them within 1 business day.
             </p>
           </div>
-          <Button onClick={() => setEditing({ ...EMPTY })}>
-            <Plus className="h-4 w-4 mr-1" /> New campaign
-          </Button>
+          <div className="flex items-center gap-2">
+            <CreativeNotificationsPanel />
+            <Button onClick={() => setEditing({ ...EMPTY })}>
+              <Plus className="h-4 w-4 mr-1" /> New campaign
+            </Button>
+          </div>
         </div>
       </div>
 
