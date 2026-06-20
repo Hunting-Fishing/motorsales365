@@ -343,6 +343,76 @@ export const listPendingCreatives = createServerFn({ method: "GET" })
     return { creatives: data ?? [] };
   });
 
+async function loadCreativeForReview(supabase: any, creativeId: string) {
+  const { data: cr } = await supabase
+    .from("ad_creatives")
+    .select(
+      "id, order_id, uploaded_by, kind, headline, image_url, status, assignments:ad_slot_assignments(slot:ad_slots(slot_key, label))",
+    )
+    .eq("id", creativeId)
+    .maybeSingle();
+  return cr;
+}
+
+async function notifyUploader(opts: {
+  creative: any;
+  action: "approved" | "rejected";
+  reason?: string | null;
+  notes?: string | null;
+}) {
+  const { creative, action, reason, notes } = opts;
+  if (!creative?.uploaded_by || creative.kind === "placeholder") return;
+  try {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const slotLabels: string[] = (creative.assignments ?? [])
+      .map((a: any) => a.slot?.label || a.slot?.slot_key)
+      .filter(Boolean);
+
+    // In-app notification (insert via admin to bypass RLS on insert).
+    await supabaseAdmin.from("user_notifications").insert({
+      user_id: creative.uploaded_by,
+      category: action === "approved" ? "ad_creative_approved" : "ad_creative_rejected",
+      title:
+        action === "approved"
+          ? `Your ad "${creative.headline ?? "creative"}" is approved`
+          : `Your ad "${creative.headline ?? "creative"}" needs changes`,
+      body: action === "approved" ? (notes ?? null) : (reason ?? null),
+      link_url: "/dashboard/ads",
+      entity_type: "ad_creative",
+      entity_id: creative.id,
+      metadata: { slot_labels: slotLabels },
+    } as any);
+
+    // Look up recipient email.
+    const { data: udata } = await (supabaseAdmin as any).auth.admin.getUserById(
+      creative.uploaded_by,
+    );
+    const recipientEmail = udata?.user?.email;
+    const uploaderName =
+      udata?.user?.user_metadata?.display_name ||
+      udata?.user?.user_metadata?.full_name ||
+      undefined;
+    if (!recipientEmail) return;
+
+    const { enqueueTransactionalEmailServer } = await import("@/lib/email/server-enqueue.server");
+    await enqueueTransactionalEmailServer({
+      templateName: action === "approved" ? "ad-creative-approved" : "ad-creative-rejected",
+      recipientEmail,
+      idempotencyKey: `ad-creative-${action}-${creative.id}`,
+      templateData: {
+        uploader_name: uploaderName,
+        headline: creative.headline,
+        image_url: creative.image_url,
+        slot_labels: slotLabels,
+        notes: notes ?? undefined,
+        reason: reason ?? undefined,
+      },
+    });
+  } catch (err) {
+    console.warn("[advertise-slots] notifyUploader failed", err);
+  }
+}
+
 export const approveCreative = createServerFn({ method: "POST" })
   .middleware([requireAdminRoleAudited("advertise-approvals.approve")])
   .inputValidator((input: { id: string; notes?: string }) =>
@@ -350,6 +420,9 @@ export const approveCreative = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context as any;
+    const before = await loadCreativeForReview(supabase, data.id);
+    const previousStatus = before?.status ?? null;
+
     const { error: e1 } = await supabase
       .from("ad_creatives")
       .update({
@@ -361,28 +434,45 @@ export const approveCreative = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (e1) throw new Error(e1.message);
 
-    // Activate every assignment for this creative
     const { error: e2 } = await supabase
       .from("ad_slot_assignments")
       .update({ active: true })
       .eq("creative_id", data.id);
     if (e2) throw new Error(e2.message);
 
-    // Audit trail when tied to an order
-    const { data: cr } = await supabase
-      .from("ad_creatives")
-      .select("order_id")
-      .eq("id", data.id)
-      .maybeSingle();
-    if (cr?.order_id) {
+    // Audit trail (permanent)
+    await supabase.from("ad_creative_audit_log").insert({
+      creative_id: data.id,
+      order_id: before?.order_id ?? null,
+      actor_id: userId,
+      action: "approved",
+      previous_status: previousStatus,
+      new_status: "approved",
+      notes: data.notes ?? null,
+      metadata: {
+        slot_keys: (before?.assignments ?? [])
+          .map((a: any) => a.slot?.slot_key)
+          .filter(Boolean),
+      },
+    });
+
+    // Order-level event for advertiser ads
+    if (before?.order_id) {
       await supabase.from("ad_order_events").insert({
-        order_id: cr.order_id,
+        order_id: before.order_id,
         actor_id: userId,
         event_type: "approved",
         notes: data.notes ?? null,
         payload: { creative_id: data.id },
       });
     }
+
+    await notifyUploader({
+      creative: before,
+      action: "approved",
+      notes: data.notes ?? null,
+    });
+
     return { ok: true };
   });
 
@@ -395,6 +485,9 @@ export const rejectCreative = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context as any;
+    const before = await loadCreativeForReview(supabase, data.id);
+    const previousStatus = before?.status ?? null;
+
     const { error: e1 } = await supabase
       .from("ad_creatives")
       .update({
@@ -406,22 +499,94 @@ export const rejectCreative = createServerFn({ method: "POST" })
       .eq("id", data.id);
     if (e1) throw new Error(e1.message);
 
-    // Deactivate any assignments so a rejected creative never renders
     await supabase.from("ad_slot_assignments").update({ active: false }).eq("creative_id", data.id);
 
-    const { data: cr } = await supabase
-      .from("ad_creatives")
-      .select("order_id")
-      .eq("id", data.id)
-      .maybeSingle();
-    if (cr?.order_id) {
+    await supabase.from("ad_creative_audit_log").insert({
+      creative_id: data.id,
+      order_id: before?.order_id ?? null,
+      actor_id: userId,
+      action: "rejected",
+      previous_status: previousStatus,
+      new_status: "rejected",
+      reason: data.reason,
+      metadata: {
+        slot_keys: (before?.assignments ?? [])
+          .map((a: any) => a.slot?.slot_key)
+          .filter(Boolean),
+      },
+    });
+
+    if (before?.order_id) {
       await supabase.from("ad_order_events").insert({
-        order_id: cr.order_id,
+        order_id: before.order_id,
         actor_id: userId,
         event_type: "rejected",
         notes: data.reason,
         payload: { creative_id: data.id },
       });
     }
+
+    await notifyUploader({
+      creative: before,
+      action: "rejected",
+      reason: data.reason,
+    });
+
     return { ok: true };
   });
+
+// ---------------- AUDIT LOG READS ----------------
+
+export const listCreativeAuditAdmin = createServerFn({ method: "POST" })
+  .middleware([requireDomainRole("ads")])
+  .inputValidator((d: { creativeId: string }) =>
+    z.object({ creativeId: z.string().uuid() }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context as any;
+    const { data: rows, error } = await supabase
+      .from("ad_creative_audit_log")
+      .select("id, action, previous_status, new_status, reason, notes, actor_id, created_at, metadata")
+      .eq("creative_id", data.creativeId)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+
+    // Hydrate actor display names via admin client (best-effort).
+    let actorMap: Record<string, { email?: string; name?: string }> = {};
+    try {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const ids = Array.from(new Set((rows ?? []).map((r: any) => r.actor_id).filter(Boolean)));
+      await Promise.all(
+        ids.map(async (id: string) => {
+          const { data: u } = await (supabaseAdmin as any).auth.admin.getUserById(id);
+          actorMap[id] = {
+            email: u?.user?.email,
+            name:
+              u?.user?.user_metadata?.display_name ||
+              u?.user?.user_metadata?.full_name ||
+              undefined,
+          };
+        }),
+      );
+    } catch {
+      /* best-effort */
+    }
+    return { rows: (rows ?? []).map((r: any) => ({ ...r, actor: actorMap[r.actor_id] ?? null })) };
+  });
+
+export const listMyCreativeAudit = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { creativeId: string }) =>
+    z.object({ creativeId: z.string().uuid() }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context as any;
+    const { data: rows, error } = await supabase
+      .from("ad_creative_audit_log")
+      .select("id, action, previous_status, new_status, reason, notes, created_at")
+      .eq("creative_id", data.creativeId)
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return { rows: rows ?? [] };
+  });
+
