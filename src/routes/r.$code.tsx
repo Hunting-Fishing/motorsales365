@@ -75,75 +75,83 @@ const FEATURE_CHIPS = [
   "Shop Manager",
 ];
 
-const PRIMARY_PANELS: ImagePanel[] = [
+const AUDIENCE_PANELS: ImagePanel[] = [
   {
-    eyebrow: "Marketplace",
-    title: "Find vehicles, parts, and services faster",
+    eyebrow: "For buyers",
+    title: "Find the right ride — without scrolling through memes",
     description:
-      "A structured motor marketplace built for search, discovery, and direct action across the Philippines.",
+      "Real vehicle filters (make, model, year, transmission, location), verified sellers, and direct messaging. No bumping the same post 14 times to be seen.",
     image: findVehiclesAsset.url,
-    alt: "365 Motor Sales feature graphic showing vehicle listings on desktop and mobile with create account and browse listings calls to action.",
+    alt: "365 Motor Sales listings on desktop and mobile.",
   },
   {
-    eyebrow: "Featured page",
-    title: "More than just a social post",
+    eyebrow: "For sellers",
+    title: "List once. Reach buyers all week.",
     description:
-      "Every QR code can lead into the same shared 365 showcase page while still keeping credit tied to the person whose QR was scanned.",
-    image: socialPostAsset.url,
-    alt: "365 Motor Sales promotional image highlighting organized categories, searchable listings, map discovery, business pages, and browse listings and create account actions.",
+      "Post your car, motorcycle, or part in minutes. Your listing keeps its place — no algorithm penalty for posting at the wrong hour.",
+    image: postConnectSellAsset.url,
+    alt: "Sellers posting vehicles on 365 Motor Sales.",
   },
   {
-    eyebrow: "One ecosystem",
-    title: "Everything motor in one place",
+    eyebrow: "For businesses",
+    title: "Get found by people already shopping for motor",
     description:
-      "Marketplace, services, logistics, learning, export, shop tools, and business growth connected in one destination.",
-    image: everythingInOnePlaceAsset.url,
-    alt: "365 Motor Sales campaign image featuring listings, wanted board, tow and deliver, export, shop, learn, and shop manager platform sections.",
+      "Shops, towing, parts stores, repair, car wash — a business page on the map, in the directory, and in every relevant search.",
+    image: servicesNearYouAsset.url,
+    alt: "365 Motor Sales business and services map across the Philippines.",
   },
 ];
 
-const SECONDARY_PANELS: ImagePanel[] = [
+// Numbers mirrored from /pricing (Search Boost / Province Boost).
+const BOOST_SEARCH_PHP = 99;
+const BOOST_PROVINCE_PHP = 199;
+
+type CompareRow = {
+  label: string;
+  motorsales: { ok: boolean; note: string };
+  facebook: { ok: boolean; note: string };
+  google: { ok: boolean; note: string };
+};
+
+const COMPARE_ROWS: CompareRow[] = [
   {
-    eyebrow: "Services",
-    title: "Discover motor services near you",
-    description:
-      "Show towing, parts stores, repairs, tire shops, aircon repair, car wash, and local businesses on a stronger featured page.",
-    image: servicesNearYouAsset.url,
-    alt: "365 Motor Sales map-based services image showing parts stores, towing, motorcycle repair, tire vulcanizing, car wash, and aircon repair across the Philippines.",
+    label: "Built for vehicles",
+    motorsales: { ok: true, note: "Make, model, year, mileage, transmission, location filters." },
+    facebook: { ok: false, note: "General feed — buried under everything else." },
+    google: { ok: false, note: "Generic search results, not a marketplace." },
   },
   {
-    eyebrow: "Sellers & buyers",
-    title: "Post. Connect. Sell.",
-    description:
-      "Bring buyers and sellers into the same marketplace with trust signals, business pages, and listing-first calls to action.",
-    image: postConnectSellAsset.url,
-    alt: "365 Motor Sales signup and listing promotional image featuring sellers and buyers using desktop and mobile experiences.",
+    label: "Verified sellers & businesses",
+    motorsales: { ok: true, note: "ID + business verification badges." },
+    facebook: { ok: false, note: "Anyone with an account, real or fake." },
+    google: { ok: false, note: "No seller identity layer." },
   },
   {
-    eyebrow: "Growth",
-    title: "One platform, many opportunities",
-    description:
-      "Use one shared destination page to explain the bigger 365 vision to buyers, sellers, shops, and future partners.",
-    image: manyOpportunitiesAsset.url,
-    alt: "365 Motor Sales platform overview image showing post listings, wanted board, tow and deliver, shop, learn, shop manager, and export opportunities.",
+    label: "Direct buyer ↔ seller messaging",
+    motorsales: { ok: true, note: "In-app messages, listing context attached." },
+    facebook: { ok: true, note: "Messenger — but mixed with everything else." },
+    google: { ok: false, note: "You leave Google to talk to anyone." },
   },
   {
-    eyebrow: "Coming soon",
-    title: "Feature the roadmap clearly",
-    description:
-      "Highlight online parts ordering, shop software, education, games and rewards, and international learning standards.",
-    image: comingSoonAsset.url,
-    alt: "365 Motor Sales upcoming features image showing online parts ordering, shop management software, education and skills, mobile games and rewards, and international learning standards.",
+    label: "Local services map",
+    motorsales: { ok: true, note: "Towing, parts, repair, car wash near you." },
+    facebook: { ok: false, note: "No native services map." },
+    google: { ok: true, note: "Maps — but pay-per-click to stand out." },
   },
   {
-    eyebrow: "Future",
-    title: "What’s next for 365",
-    description:
-      "A shared QR destination can also sell the next chapter of the platform so every scan markets what is live and what is coming.",
-    image: whatsNextAsset.url,
-    alt: "365 Motor Sales future roadmap image showing online parts ordering, shop management software, education and skills, mobile games and rewards, and trust and verification.",
+    label: "Cost to boost a listing",
+    motorsales: { ok: true, note: `${formatPHP(BOOST_SEARCH_PHP)} – ${formatPHP(BOOST_PROVINCE_PHP)} for 7 days.` },
+    facebook: { ok: false, note: "Typically ₱500–₱2,000 for similar reach." },
+    google: { ok: false, note: "₱20–₱60 per click — adds up fast." },
+  },
+  {
+    label: "Predictable reach",
+    motorsales: { ok: true, note: "Listings stay searchable — no algorithm guessing." },
+    facebook: { ok: false, note: "Reach changes daily based on the algorithm." },
+    google: { ok: false, note: "Rank depends on bid wars and SEO." },
   },
 ];
+
 
 function ReferralLanding() {
   const { code } = Route.useParams();
