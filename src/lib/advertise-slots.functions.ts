@@ -54,7 +54,8 @@ export const getLiveCreativesForSlots = createServerFn({ method: "POST" })
         if (a.ends_at && a.ends_at < nowIso) return false;
         const cr = a.creative;
         if (!cr) return false;
-        if (cr.kind === "advertiser" && cr.status !== "approved") return false;
+        // Only approved creatives go live, regardless of kind
+        if (cr.status !== "approved") return false;
         return true;
       });
       // advertiser ads beat placeholders, then lowest position
