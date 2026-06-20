@@ -500,6 +500,77 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
               />
             </section>
 
+            {/* Trust stats strip */}
+            <section className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                { icon: Car, label: "Vehicles listed", value: "All PH regions" },
+                { icon: Store, label: "Verified businesses", value: "Growing weekly" },
+                { icon: MapPin, label: "Coverage", value: "Nationwide map" },
+                { icon: Shield, label: "ID + business verification", value: "Trust badges" },
+              ].map(({ icon: Icon, label, value }) => (
+                <div key={label} className="rounded-xl border border-border bg-card p-4">
+                  <Icon className="h-5 w-5 text-primary" />
+                  <p className="mt-2 text-sm font-semibold">{value}</p>
+                  <p className="text-xs text-muted-foreground">{label}</p>
+                </div>
+              ))}
+            </section>
+
+            {/* How it works */}
+            <section className="mt-12">
+              <div className="mb-6 max-w-3xl">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                  How it works
+                </p>
+                <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
+                  From scan to sale in four steps.
+                </h2>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {[
+                  { icon: QrCode, step: "01", title: "Scan or visit", body: "You arrived here from a QR or referral link — no app install needed." },
+                  { icon: Users, step: "02", title: "Create your free account", body: "Verify by phone or email. Buyers, sellers, and businesses use the same login." },
+                  { icon: Search, step: "03", title: "List or browse", body: "Post a vehicle, part, or service. Or filter listings by make, model, year, location." },
+                  { icon: MessageSquare, step: "04", title: "Message & close", body: "Talk directly to verified sellers in-app. Meet, inspect, agree, done." },
+                ].map(({ icon: Icon, step, title, body }) => (
+                  <div key={step} className="rounded-xl border border-border bg-card p-5">
+                    <div className="flex items-center gap-3">
+                      <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-bold text-primary">{step}</span>
+                      <Icon className="h-5 w-5 text-primary" />
+                    </div>
+                    <h3 className="mt-3 font-semibold">{title}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Categories grid */}
+            <section className="mt-12">
+              <div className="mb-6 max-w-3xl">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                  What's on 365
+                </p>
+                <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
+                  Every part of the motor world — under one roof.
+                </h2>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {[
+                  { icon: Car, title: "Cars & Motorcycles", body: "Brand-new, used, and project units across the Philippines." },
+                  { icon: Wrench, title: "Parts & Accessories", body: "OEM, aftermarket, performance — searchable by fitment." },
+                  { icon: Store, title: "Shops & Businesses", body: "Dealerships, repair, parts stores, detailing, car wash." },
+                  { icon: Truck, title: "Tow & Delivery", body: "On-demand towing and vehicle delivery near you." },
+                ].map(({ icon: Icon, title, body }) => (
+                  <div key={title} className="rounded-xl border border-border bg-card p-5">
+                    <Icon className="h-6 w-6 text-primary" />
+                    <h3 className="mt-3 font-semibold">{title}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+                  </div>
+                ))}
+              </div>
+
+
             {/* Why 365 vs Facebook vs Google */}
             <section className="mt-12">
               <div className="mb-6 max-w-3xl">
