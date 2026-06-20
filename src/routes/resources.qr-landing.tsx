@@ -22,14 +22,17 @@ function ResourceQrLandingPreview() {
   return (
     <div>
       <section className="border-b border-border bg-secondary/40">
-        <div className="container mx-auto max-w-7xl px-4 py-8 sm:py-10">
-          <img
-            src={bannerAsset.url}
-            alt="365 Motor Sales — Buy, Sell, List vehicles and equipment nationwide in the Philippines"
-            className="w-full h-auto object-contain rounded-xl border border-border bg-white"
-            loading="eager"
-          />
-          <p className="mt-6 max-w-3xl text-muted-foreground">
+        <div className="container mx-auto max-w-7xl px-4 py-6 sm:py-10">
+          <div className="overflow-hidden rounded-xl border border-border bg-white">
+            <img
+              src={bannerAsset.url}
+              alt="365 Motor Sales — Buy, Sell, List vehicles and equipment nationwide in the Philippines"
+              className="block w-full h-auto max-h-48 sm:max-h-64 md:max-h-80 object-contain"
+              loading="eager"
+            />
+          </div>
+          <p className="mt-5 max-w-3xl text-sm sm:text-base text-muted-foreground">
+
             This is the exact page someone sees after scanning your 365 QR code. Use it to brief
             new promoters, gather feedback, and improve the message before printing more codes.
           </p>
