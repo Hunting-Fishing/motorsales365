@@ -59,6 +59,27 @@ const TABS: Tab[] = [
     roles: ["admin", "advertising", "sales"],
   },
   {
+    to: "/admin/advertisements/slots",
+    label: "Slots",
+    desc: "Define ad positions, dimensions and ordering.",
+    Icon: Settings2,
+    roles: ["admin", "advertising"],
+  },
+  {
+    to: "/admin/advertisements/placeholders",
+    label: "Placeholders",
+    desc: "Upload and manage default creatives per slot.",
+    Icon: ImageIcon,
+    roles: ["admin", "advertising"],
+  },
+  {
+    to: "/admin/advertisements/preview",
+    label: "Live preview",
+    desc: "See what's rendering in each slot right now.",
+    Icon: Eye,
+    roles: ["admin", "advertising"],
+  },
+  {
     to: "/admin/advertisements/history",
     label: "History",
     desc: "Legal record of all ad / promo changes.",
