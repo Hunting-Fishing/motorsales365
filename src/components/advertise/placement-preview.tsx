@@ -260,7 +260,7 @@ function SectionBody({ section }: { section: SectionValue }) {
     default:
       return (
         <div className="flex h-full items-center justify-center">
-          <AdSlot src={adShop} alt="Sample custom partnership ad" sub="Custom partnership" className="h-[70%] w-[70%]" />
+          <AdSlot src={adDetailing} alt="Sample ceramic coating detailing ad" sub="Custom partnership" className="h-[70%] w-[70%]" />
         </div>
       );
   }
