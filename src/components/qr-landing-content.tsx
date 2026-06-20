@@ -670,13 +670,19 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             </section>
 
             <section className="mt-12">
-              <div className="mb-6 max-w-3xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
-                  How it works
-                </p>
-                <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
-                  From scan to sale in four steps.
-                </h2>
+              <div className="mb-6 flex flex-wrap items-start gap-4 max-w-3xl">
+                <SectionBanner
+                  image={postConnectSellBannerAsset.url}
+                  alt="Post. Connect. Sell. — Create an account, post listings and connect with buyers."
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                    How it works
+                  </p>
+                  <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
+                    From scan to sale in four steps.
+                  </h2>
+                </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {HOW_IT_WORKS_CARDS.map((card) => (
@@ -686,13 +692,19 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             </section>
 
             <section className="mt-12">
-              <div className="mb-6 max-w-3xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
-                  What&apos;s on 365
-                </p>
-                <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
-                  Every part of the motor world — under one roof.
-                </h2>
+              <div className="mb-6 flex flex-wrap items-start gap-4 max-w-3xl">
+                <SectionBanner
+                  image={onePlatformBannerAsset.url}
+                  alt="One platform, many opportunities — Marketplace, services, logistics, learning and growth."
+                />
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                    What&apos;s on 365
+                  </p>
+                  <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
+                    Every part of the motor world — under one roof.
+                  </h2>
+                </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {CATEGORY_CARDS.map((card) => (
@@ -702,7 +714,12 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             </section>
 
             <section className="mt-12">
-              <div className="mb-6 max-w-3xl">
+              <div className="mb-6 flex flex-wrap items-start gap-4 max-w-3xl">
+                <SectionBanner
+                  image={discoverServicesBannerAsset.url}
+                  alt="Discover motor services near you — from towing to parts stores, nationwide."
+                />
+                <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
                   Why 365 beats the alternatives
                 </p>
