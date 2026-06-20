@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { Inbox, Megaphone, Ticket, QrCode, History } from "lucide-react";
+import { Inbox, Megaphone, Ticket, QrCode, History, Settings2, ImageIcon, Eye } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +19,10 @@ type Tab = {
     | "/admin/advertisements/campaigns"
     | "/admin/advertisements/promotions"
     | "/admin/advertisements/qr-ads"
-    | "/admin/advertisements/history";
+    | "/admin/advertisements/history"
+    | "/admin/advertisements/slots"
+    | "/admin/advertisements/placeholders"
+    | "/admin/advertisements/preview";
   label: string;
   desc: string;
   Icon: typeof Inbox;
