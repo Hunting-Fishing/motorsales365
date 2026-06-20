@@ -5,6 +5,12 @@ import adSidebar from "@/assets/advertise-samples/ad-sidebar-insurance.jpg";
 import adAcademy from "@/assets/advertise-samples/ad-square-academy.jpg";
 import adShop from "@/assets/advertise-samples/ad-shop-feature.jpg";
 import adNewsletter from "@/assets/advertise-samples/ad-newsletter.jpg";
+import adFinancing from "@/assets/advertise-samples/ad-browse-financing.jpg";
+import adTires from "@/assets/advertise-samples/ad-rides-tires.jpg";
+import adShipping from "@/assets/advertise-samples/ad-export-shipping.jpg";
+import adOil from "@/assets/advertise-samples/ad-shop-oil.jpg";
+import adBattery from "@/assets/advertise-samples/ad-shop-battery.jpg";
+import adDetailing from "@/assets/advertise-samples/ad-custom-detailing.jpg";
 
 /**
  * Realistic mini-snapshot of each ad surface with a sample ad creative
