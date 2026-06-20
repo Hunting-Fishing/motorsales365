@@ -507,18 +507,31 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             </section>
 
             <section className="mt-12">
-              <div className="mb-6 flex flex-wrap items-start gap-4 max-w-3xl">
+              <div className="mb-6 grid items-center gap-6 md:grid-cols-2">
                 <SectionBanner
                   image={postConnectSellBannerAsset.url}
                   alt="Post. Connect. Sell. — Create an account, post listings and connect with buyers."
+                  className="w-full"
                 />
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0">
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
                     How it works
                   </p>
                   <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
                     From scan to sale in four steps.
                   </h2>
+                  <p className="mt-3 text-sm sm:text-base text-muted-foreground">
+                    Scan, sign up, and post your first listing in minutes. Buyers reach you directly
+                    through verified messages — no bidding wars, no paywalls, no algorithm fighting
+                    for your audience.
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {["Free to start", "Verified buyers", "Direct messages", "Nationwide reach"].map((t) => (
+                      <span key={t} className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -529,18 +542,31 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             </section>
 
             <section className="mt-12">
-              <div className="mb-6 flex flex-wrap items-start gap-4 max-w-3xl">
+              <div className="mb-6 grid items-center gap-6 md:grid-cols-2">
                 <SectionBanner
                   image={onePlatformBannerAsset.url}
                   alt="One platform, many opportunities — Marketplace, services, logistics, learning and growth."
+                  className="w-full"
                 />
-                <div className="min-w-0 flex-1">
+                <div className="min-w-0">
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
                     What&apos;s on 365
                   </p>
                   <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
                     Every part of the motor world — under one roof.
                   </h2>
+                  <p className="mt-3 text-sm sm:text-base text-muted-foreground">
+                    Listings, a wanted board, tow &amp; deliver, a parts shop, learning hub, and shop
+                    manager tools — built so buyers, sellers, and motor businesses can grow together
+                    in one connected platform.
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {["Marketplace", "Services", "Logistics", "Learning", "Growth tools"].map((t) => (
+                      <span key={t} className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -551,22 +577,31 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             </section>
 
             <section className="mt-12">
-              <div className="mb-6 flex flex-wrap items-start gap-4 max-w-3xl">
+              <div className="mb-6 grid items-center gap-6 md:grid-cols-2">
                 <SectionBanner
                   image={discoverServicesBannerAsset.url}
                   alt="Discover motor services near you — from towing to parts stores, nationwide."
+                  className="w-full"
                 />
-                <div className="min-w-0 flex-1">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
-                  Why 365 beats the alternatives
-                </p>
-                <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
-                  Facebook is a feed. Google is a search box. 365 is a motor marketplace.
-                </h2>
-                <p className="mt-3 text-muted-foreground">
-                  Side-by-side, here is what you actually get when you list, search, or advertise on
-                  each.
-                </p>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                    Why 365 beats the alternatives
+                  </p>
+                  <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
+                    Facebook is a feed. Google is a search box. 365 is a motor marketplace.
+                  </h2>
+                  <p className="mt-3 text-sm sm:text-base text-muted-foreground">
+                    Find trusted parts stores, towing, repair shops and car wash businesses near you
+                    — mapped nationwide. Side-by-side, here is what you actually get when you list,
+                    search, or advertise on each.
+                  </p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {["Near you", "Verified shops", "Real filters", "Fair pricing"].map((t) => (
+                      <span key={t} className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
                 </div>
               </div>
 
