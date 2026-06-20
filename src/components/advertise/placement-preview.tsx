@@ -94,12 +94,14 @@ function AdSlot({
   sub,
   className = "",
   showPill = true,
+  fit = "contain",
 }: {
   src: string;
   alt: string;
   sub?: string;
   className?: string;
   showPill?: boolean;
+  fit?: "contain" | "cover";
 }) {
   return (
     <div
@@ -109,7 +111,7 @@ function AdSlot({
         src={src}
         alt={alt}
         loading="lazy"
-        className="absolute inset-0 h-full w-full object-contain"
+        className={`absolute inset-0 h-full w-full ${fit === "cover" ? "object-cover" : "object-contain"}`}
       />
       {showPill && (
         <span className="absolute left-0.5 top-0.5 rounded-[2px] bg-primary/90 px-1 py-[1px] text-[6px] font-semibold uppercase tracking-wide text-primary-foreground">
