@@ -957,6 +957,8 @@ function SubmitBusinessPage() {
 
 
             {/* ===== CONTACT ===== */}
+            <div hidden={step !== "contact"} role="tabpanel" id="panel-contact">
+
             {step === "contact" && (
               <div className="space-y-5">
                 <div>
