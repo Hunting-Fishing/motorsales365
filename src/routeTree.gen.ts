@@ -70,6 +70,7 @@ import { Route as ServicesInspectionRouteImport } from './routes/services.inspec
 import { Route as SellerIdRouteImport } from './routes/seller.$id'
 import { Route as SSlugRouteImport } from './routes/s.$slug'
 import { Route as RidesSlugRouteImport } from './routes/rides.$slug'
+import { Route as ResourcesQrLandingRouteImport } from './routes/resources.qr-landing'
 import { Route as RCodeRouteImport } from './routes/r.$code'
 import { Route as PayManualRouteImport } from './routes/pay.manual'
 import { Route as PassportSlugRouteImport } from './routes/passport.$slug'
@@ -524,6 +525,11 @@ const SSlugRoute = SSlugRouteImport.update({
 const RidesSlugRoute = RidesSlugRouteImport.update({
   id: '/rides/$slug',
   path: '/rides/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResourcesQrLandingRoute = ResourcesQrLandingRouteImport.update({
+  id: '/resources/qr-landing',
+  path: '/resources/qr-landing',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RCodeRoute = RCodeRouteImport.update({
@@ -1449,6 +1455,7 @@ export interface FileRoutesByFullPath {
   '/passport/$slug': typeof PassportSlugRoute
   '/pay/manual': typeof PayManualRoute
   '/r/$code': typeof RCodeRouteWithChildren
+  '/resources/qr-landing': typeof ResourcesQrLandingRoute
   '/rides/$slug': typeof RidesSlugRoute
   '/s/$slug': typeof SSlugRoute
   '/seller/$id': typeof SellerIdRoute
@@ -1657,6 +1664,7 @@ export interface FileRoutesByTo {
   '/passport/$slug': typeof PassportSlugRoute
   '/pay/manual': typeof PayManualRoute
   '/r/$code': typeof RCodeRouteWithChildren
+  '/resources/qr-landing': typeof ResourcesQrLandingRoute
   '/rides/$slug': typeof RidesSlugRoute
   '/s/$slug': typeof SSlugRoute
   '/seller/$id': typeof SellerIdRoute
@@ -1871,6 +1879,7 @@ export interface FileRoutesById {
   '/passport/$slug': typeof PassportSlugRoute
   '/pay/manual': typeof PayManualRoute
   '/r/$code': typeof RCodeRouteWithChildren
+  '/resources/qr-landing': typeof ResourcesQrLandingRoute
   '/rides/$slug': typeof RidesSlugRoute
   '/s/$slug': typeof SSlugRoute
   '/seller/$id': typeof SellerIdRoute
@@ -2086,6 +2095,7 @@ export interface FileRouteTypes {
     | '/passport/$slug'
     | '/pay/manual'
     | '/r/$code'
+    | '/resources/qr-landing'
     | '/rides/$slug'
     | '/s/$slug'
     | '/seller/$id'
@@ -2294,6 +2304,7 @@ export interface FileRouteTypes {
     | '/passport/$slug'
     | '/pay/manual'
     | '/r/$code'
+    | '/resources/qr-landing'
     | '/rides/$slug'
     | '/s/$slug'
     | '/seller/$id'
@@ -2507,6 +2518,7 @@ export interface FileRouteTypes {
     | '/passport/$slug'
     | '/pay/manual'
     | '/r/$code'
+    | '/resources/qr-landing'
     | '/rides/$slug'
     | '/s/$slug'
     | '/seller/$id'
@@ -2659,6 +2671,7 @@ export interface RootRouteChildren {
   PassportSlugRoute: typeof PassportSlugRoute
   PayManualRoute: typeof PayManualRoute
   RCodeRoute: typeof RCodeRouteWithChildren
+  ResourcesQrLandingRoute: typeof ResourcesQrLandingRoute
   RidesSlugRoute: typeof RidesSlugRoute
   SSlugRoute: typeof SSlugRoute
   SellerIdRoute: typeof SellerIdRoute
@@ -3136,6 +3149,13 @@ declare module '@tanstack/react-router' {
       path: '/rides/$slug'
       fullPath: '/rides/$slug'
       preLoaderRoute: typeof RidesSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/resources/qr-landing': {
+      id: '/resources/qr-landing'
+      path: '/resources/qr-landing'
+      fullPath: '/resources/qr-landing'
+      preLoaderRoute: typeof ResourcesQrLandingRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/r/$code': {
@@ -4600,6 +4620,7 @@ const rootRouteChildren: RootRouteChildren = {
   PassportSlugRoute: PassportSlugRoute,
   PayManualRoute: PayManualRoute,
   RCodeRoute: RCodeRouteWithChildren,
+  ResourcesQrLandingRoute: ResourcesQrLandingRoute,
   RidesSlugRoute: RidesSlugRoute,
   SSlugRoute: SSlugRoute,
   SellerIdRoute: SellerIdRoute,
