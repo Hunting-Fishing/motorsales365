@@ -12,7 +12,6 @@ import {
   Car,
   Check,
   CheckCircle2,
-  Eye,
   Info,
   Mail,
   MapPin,
@@ -444,17 +443,8 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
   return (
     <TooltipProvider delayDuration={150}>
       <div className="container mx-auto max-w-7xl px-4 py-8 sm:py-10">
-        {preview && (
-          <div className="mb-6 flex flex-wrap items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 px-4 py-3 text-sm">
-            <Eye className="h-4 w-4 shrink-0 text-primary" />
-            <div className="flex-1">
-              <p className="font-semibold text-foreground">Promoter preview</p>
-              <p className="text-muted-foreground">
-                Tracking is disabled in preview mode.
-              </p>
-            </div>
-          </div>
-        )}
+
+
 
         {loading ? (
           <p className="text-center text-muted-foreground">Loading…</p>
