@@ -427,16 +427,16 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
 
   return (
     <TooltipProvider delayDuration={150}>
-      <div className="container mx-auto max-w-7xl px-4 py-8 sm:py-10">
+      <div className="container mx-auto max-w-7xl px-4 py-6 sm:py-10">
 
 
 
         {loading ? (
           <p className="text-center text-muted-foreground">Loading…</p>
         ) : active === false ? (
-          <div className="mx-auto max-w-2xl rounded-xl border border-border bg-card p-8 text-center">
-            <h1 className="font-display text-2xl font-bold">Link unavailable</h1>
-            <p className="mt-2 text-muted-foreground">
+          <div className="mx-auto max-w-2xl rounded-xl border border-border bg-card p-6 sm:p-8 text-center">
+            <h1 className="font-display text-xl sm:text-2xl font-bold">Link unavailable</h1>
+            <p className="mt-2 text-sm sm:text-base text-muted-foreground">
               This QR link isn&apos;t active. You can still create an account and browse.
             </p>
             <Button className="mt-6" onClick={() => navigate({ to: "/" })}>
@@ -446,24 +446,25 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
         ) : (
           <>
 
-            <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
+            <section className="mt-6 sm:mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
               <div>
                 <SectionBanner
                   image={findVehiclesBannerAsset.url}
                   alt="365 Motor Sales — Find vehicles, parts and services faster across the Philippines."
                   className="mb-4"
                 />
-                <p className="text-xs font-semibold uppercase tracking-[0.26em] text-primary">
+                <p className="text-[11px] sm:text-xs font-semibold uppercase tracking-[0.2em] sm:tracking-[0.26em] text-primary">
                   The motor marketplace for the Philippines
                 </p>
-                <h1 className="font-display mt-3 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
+                <h1 className="font-display mt-3 text-3xl font-bold leading-[1.1] sm:text-4xl md:text-5xl lg:text-6xl">
                   Buy, sell, and grow — without fighting an algorithm.
                 </h1>
-                <p className="mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">
+                <p className="mt-4 max-w-2xl text-sm text-muted-foreground sm:text-base lg:text-lg">
                   365 Motor Sales is built for vehicles, parts, and motor businesses. Real filters,
                   verified sellers, fair pricing, and boosts that cost a fraction of Facebook or
                   Google ads.
                 </p>
+
 
                 <div className="mt-6 flex flex-wrap gap-2">
                   {FEATURE_CHIPS.map((chip) => (
