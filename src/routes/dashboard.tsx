@@ -113,11 +113,13 @@ function buildHubs(opts: {
   if (opts.hasReferral) {
     hubs.push({
       key: "referral",
-      label: "Referral & Share",
+      label: "Promote & Earn",
       Icon: Share2,
       items: [
-        { to: "/dashboard/referral", label: "My referral", Icon: QrCode },
+        { to: "/dashboard/referral", label: "My referral & stats", Icon: QrCode },
         { to: "/dashboard/qr-ads", label: "QR Ads", Icon: Share2 },
+        { to: "/dashboard/promoter-resources", label: "Promoter resources", Icon: Megaphone },
+        { to: "/resources/qr-landing", label: "Preview scanner view", Icon: QrCode },
         { to: "/my-qr", label: "My QR code", Icon: QrCode },
       ],
     });
