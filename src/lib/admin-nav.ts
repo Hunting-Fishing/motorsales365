@@ -55,6 +55,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { to: "/admin/shop", label: "Affiliate Shop", Icon: Store, roles: ["admin", "advertising", "sales"], info: "Manage affiliate products, networks and click analytics.", section: "Sales & Advertising" },
   { to: "/admin/referrals", label: "Referrals", Icon: QrCode, roles: ["admin", "sales"], info: "Staff QR codes and redemption history.", section: "Sales & Advertising" },
   { to: "/admin/advertisements/qr-ads", label: "QR Advertisements", Icon: QrCode, roles: ["admin", "sales", "advertising", "support", "moderator"], info: "Your personal QR applied to printable templates (arm band, shirt, banners).", section: "Sales & Advertising" },
+  { to: "/admin/qr-leads", label: "QR Leads", Icon: Inbox, roles: ["admin", "sales", "support"], info: "Leads submitted from the QR scan landing page form.", section: "Sales & Advertising" },
   { to: "/admin/lead-offers", label: "Lead Marketplace", Icon: Inbox, roles: ["admin"], info: "Post qualified buyer leads. Featured/Premium businesses pay per unlock.", section: "Sales & Advertising" },
   { to: "/admin/sales-reps", label: "Sales Reps", Icon: UserCog, roles: ["admin"], info: "Manage sales reps, territories and assignments.", section: "Sales & Advertising" },
 
