@@ -120,7 +120,7 @@ function buildHubs(opts: {
         { to: "/dashboard/qr-ads", label: "QR Ads", Icon: Share2 },
         { to: "/dashboard/promoter-resources", label: "Promoter resources", Icon: Megaphone },
         { to: "/resources/qr-landing", label: "Preview scanner view", Icon: QrCode },
-        { to: "/my-qr", label: "My QR code", Icon: QrCode },
+        { to: "/resources/qr-landing", label: "Preview scanner view", Icon: QrCode },
       ],
     });
   }
