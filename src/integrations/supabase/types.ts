@@ -50,6 +50,69 @@ export type Database = {
         }
         Relationships: []
       }
+      ad_creative_audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          creative_id: string
+          id: string
+          metadata: Json
+          new_status: Database["public"]["Enums"]["ad_creative_status"] | null
+          notes: string | null
+          order_id: string | null
+          previous_status:
+            | Database["public"]["Enums"]["ad_creative_status"]
+            | null
+          reason: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          creative_id: string
+          id?: string
+          metadata?: Json
+          new_status?: Database["public"]["Enums"]["ad_creative_status"] | null
+          notes?: string | null
+          order_id?: string | null
+          previous_status?:
+            | Database["public"]["Enums"]["ad_creative_status"]
+            | null
+          reason?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          creative_id?: string
+          id?: string
+          metadata?: Json
+          new_status?: Database["public"]["Enums"]["ad_creative_status"] | null
+          notes?: string | null
+          order_id?: string | null
+          previous_status?:
+            | Database["public"]["Enums"]["ad_creative_status"]
+            | null
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_creative_audit_log_creative_id_fkey"
+            columns: ["creative_id"]
+            isOneToOne: false
+            referencedRelation: "ad_creatives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ad_creative_audit_log_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "ad_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ad_creatives: {
         Row: {
           alt_text: string | null
@@ -8883,6 +8946,48 @@ export type Database = {
           updated_at?: string
           user_id?: string
           year?: number | null
+        }
+        Relationships: []
+      }
+      user_notifications: {
+        Row: {
+          body: string | null
+          category: string
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          link_url: string | null
+          metadata: Json
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          category: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          link_url?: string | null
+          metadata?: Json
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          category?: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          link_url?: string | null
+          metadata?: Json
+          read_at?: string | null
+          title?: string
+          user_id?: string
         }
         Relationships: []
       }

@@ -1,96 +1,98 @@
-## Admin Ad Slots & Placeholders Manager
+## Goal
+When an admin approves or rejects an ad creative:
+1. The uploader gets an **email** and an **in-app notification**.
+2. Every approve/reject action is permanently recorded in an **audit trail** (admin, timestamp, reason, before/after status).
 
-Build the admin UI to manage everything that drives the `/advertise` preview and live ad rendering: slot specs, placeholder creatives, advertiser-creative assignments, and a live preview that mirrors the public `placement-preview.tsx`.
+---
 
-### New routes
-- `/admin/advertisements/slots` — list & edit all 12 seeded `ad_slots`
-- `/admin/advertisements/placeholders` — upload/manage `ad_creatives` where `kind='placeholder'`
-- `/admin/advertisements/preview` — full-page live preview of every section, pulling real data from `ad_slot_assignments`
+## 1. Database (one migration)
 
-All three added as tabs under the existing `admin.advertisements.tsx` shell, beside Campaigns / Inquiries / Promotions / QR Ads / History.
+### `ad_creative_audit_log` — permanent record of every review action
+- `creative_id` → `ad_creatives.id` (cascade)
+- `order_id` → `ad_orders.id` nullable (for advertiser ads)
+- `actor_id` → `auth.users.id` (the admin)
+- `action` text check in (`approved`, `rejected`, `revoked`, `resubmitted`)
+- `previous_status`, `new_status` (ad_creative_status enum)
+- `reason` text (required for reject)
+- `notes` text (optional approve notes)
+- `metadata` jsonb (slot keys, dimensions snapshot, etc.)
+- `created_at`
 
-### Screen 1 — Slots manager (`/admin/advertisements/slots`)
-Grid of slot cards grouped by `placement` (marketplace_home, marketplace_category, browse, rides, …). Each card shows:
-- `slot_key`, `label`, `placement`, `position`
-- Current image spec: `min_width × min_height`, `aspect_ratio`, `max_bytes`, allowed MIME
-- Active toggle
-- Thumbnail of currently-assigned creative (advertiser ad if live, else placeholder, else empty state)
-- Edit button → dialog to update label/description/spec/position/active
-- Drag-and-drop reordering inside a placement (updates `position`)
+RLS:
+- Admins / `advertising` role → SELECT all, INSERT.
+- Uploader → SELECT rows where `creative_id` belongs to them (so they can see their own history).
+- GRANTs: SELECT/INSERT to `authenticated`, ALL to `service_role`.
 
-Server fns: `listAdSlots`, `updateAdSlot`, `reorderAdSlots` (admin-only, `has_role(...,'admin')` or `canManageAds`).
+### `user_notifications` — generic in-app inbox (first use: ad approvals)
+- `user_id` → `auth.users.id` (cascade)
+- `category` text (`ad_creative_approved`, `ad_creative_rejected`, future-proofed)
+- `title` text, `body` text
+- `link_url` text (e.g. `/advertise/creatives/{id}`)
+- `entity_type` text, `entity_id` uuid (creative id)
+- `metadata` jsonb
+- `read_at` timestamptz nullable
+- `created_at`
 
-### Screen 2 — Placeholders manager (`/admin/advertisements/placeholders`)
-Per-slot panel listing placeholder creatives stacked for that slot. Each row:
-- Image preview, headline, alt text, target URL
-- Spec validation badge (green if `spec_ok`, red with `spec_errors` tooltip)
-- Active/inactive toggle, drag handle for ordering, delete
-- "Upload placeholder" button → file picker
+RLS:
+- Owner can SELECT and UPDATE (`read_at` only — enforced via policy + trigger preventing other column changes by non-service callers).
+- Service role inserts.
+- GRANTs: SELECT/UPDATE to `authenticated`, ALL to `service_role`.
 
-Upload flow:
-1. Client reads file → measures dimensions, MIME, byte size
-2. Validates against the slot's `image_spec` before upload (instant feedback)
-3. Uploads to `advertisements` storage bucket at `placeholders/{slot_key}/{uuid}-{filename}`
-4. Calls `createPlaceholderCreative` server fn → inserts `ad_creatives` row (`kind='placeholder'`, `order_id=null`) + `ad_slot_assignments` row (no `ends_at`, `active=true`)
-5. Re-validates server-side and stores `spec_ok` + `spec_errors`
+Indexes: `(user_id, read_at, created_at desc)`, `(creative_id)` on audit.
 
-Server fns: `listPlaceholdersForSlot`, `createPlaceholderCreative`, `updatePlaceholderCreative`, `deletePlaceholderCreative`, `reorderPlaceholders`.
+---
 
-### Screen 3 — Live preview (`/admin/advertisements/preview`)
-Renders the same `PlacementPreview` component used on `/advertise`, but switched to data mode:
-- Reuses `placement-preview.tsx` layout
-- For each `AdSlot`, calls `getLiveCreativeForSlot(slot_key)` (anon-safe server fn) which returns the highest-priority active assignment: advertiser ad in window first, then placeholder, then `null`
-- Falls back to a dashed "Empty slot — no creative" tile when null
-- Section dropdown + "Refresh" button + last-updated timestamp
-- Each rendered slot has an overlay with `slot_key`, current creative kind, and a quick "Manage" link to the Placeholders screen filtered to that slot
+## 2. Email templates (`src/lib/email-templates/`)
+- `ad-creative-approved.tsx` — "Your ad creative is approved" + slot list + preview thumbnail + link to advertise dashboard.
+- `ad-creative-rejected.tsx` — "Your ad creative needs changes" + rejection reason + link to re-upload.
+- Register both in `registry.ts`.
 
-### Wire `/advertise` preview to live data
-Refactor `src/components/advertise/placement-preview.tsx`:
-- Replace hardcoded `import adHero from ...` lines with a `useSlotCreative(slot_key)` hook that calls `getLiveCreativeForSlot` (via TanStack Query, 60s stale)
-- `AdSlot` accepts `slotKey` instead of `src`, derives src/alt/sub from data, keeps the "Example ad" pill when `kind='placeholder'`
-- Bundled `src/assets/advertise-samples/*` images become the initial placeholder seed (uploaded once into `ad_creatives` via a one-off migration that copies them via signed upload OR an admin-run "Seed defaults" button)
+Brand-consistent with existing ad-inquiry templates (reuse `_styles.ts`).
 
-### Seeding strategy for current sample images
-Add a "Seed default placeholders" button on the Placeholders screen (admin-only, idempotent). It:
-1. For each of the 15 current `src/assets/advertise-samples/*.jpg`, fetches the bundled asset
-2. Uploads to `advertisements/placeholders/seed/...`
-3. Inserts a placeholder `ad_creatives` row + `ad_slot_assignments` mapped to the matching `slot_key`
+---
 
-Mapping table lives in `src/lib/advertise-seed-map.ts` (slot_key → asset path → headline/alt).
+## 3. Server functions (`src/lib/advertise-slots.functions.ts`)
 
-### Server functions (new file `src/lib/advertise-admin.functions.ts`)
-- All admin write fns use `requireSupabaseAuth` + `has_role(userId, 'admin')` or `canManageAds` check
-- `getLiveCreativeForSlot` is public (anon-safe), uses server publishable client, narrow SELECT, picks one row per slot
+Extend `approveCreative` and `rejectCreative` handlers (after the existing status update + assignment toggle):
 
-### RLS additions
-Current migration already covers slots/creatives/assignments admin-write + anon-read-active. Add: storage policy on `advertisements/placeholders/**` allowing admin upload/delete.
+1. Load creative with `uploaded_by`, `kind`, `headline`, `order_id`, `status` (previous), and uploader's email/display name from `profiles`/`auth.users` via `supabaseAdmin`.
+2. Insert into `ad_creative_audit_log` (action, previous_status, new_status, reason/notes, actor_id, metadata).
+3. **Skip notifications for `kind = 'placeholder'`** (admin-created, no advertiser to notify) — still write audit row.
+4. For advertiser creatives:
+   - Insert `user_notifications` row (admin client) for the uploader.
+   - Call `enqueueTransactionalEmailServer` with template `ad-creative-approved` or `ad-creative-rejected`, `idempotencyKey: \`ad-creative-${action}-${creativeId}\``.
 
-### Files to create
-- `src/routes/admin.advertisements.slots.tsx`
-- `src/routes/admin.advertisements.placeholders.tsx`
-- `src/routes/admin.advertisements.preview.tsx`
-- `src/lib/advertise-admin.functions.ts`
-- `src/lib/advertise-public.functions.ts` (`getLiveCreativeForSlot`)
-- `src/lib/advertise-seed-map.ts`
-- `src/components/advertise/slot-card.tsx`
-- `src/components/advertise/placeholder-uploader.tsx`
-- `src/hooks/use-slot-creative.ts`
+Keep existing `ad_order_events` insert intact (order-level log stays).
 
-### Files to edit
-- `src/routes/admin.advertisements.tsx` — add 3 tabs
-- `src/routes/admin.advertisements.index.tsx` — keep redirect target
-- `src/components/advertise/placement-preview.tsx` — switch to live data with sample images as fallback while DB empty
+New read fns:
+- `listMyCreativeAudit({ creativeId })` — uploader can fetch their creative's history.
+- `listCreativeAuditAdmin({ creativeId })` — admin view.
 
-### Verification
-- Admin can edit a slot's `min_width`; uploading a too-small image shows red badge and stores `spec_errors`
-- Drag-reorder persists `position` across reload
-- Toggling a placeholder inactive immediately removes it from `/advertise` preview after refetch
-- Seed button is idempotent (re-running doesn't duplicate)
-- Non-admins hitting any of the 3 routes see "Ads manager role required"
+---
 
-### Out of scope (next phase)
-- Advertiser-facing upload wizard
-- Stripe checkout for `ad_orders`
-- Admin order review queue
-- Owner dashboard at `/account/advertisements`
-- Cron expiry job
+## 4. In-app notification surface
+
+- New hook `src/hooks/use-user-notifications.ts` (TanStack Query, 30s stale).
+- New server fns `listMyNotifications`, `markNotificationRead`, `markAllNotificationsRead` (with `requireSupabaseAuth`).
+- New small component `src/components/advertise/creative-notifications-panel.tsx` rendered on the advertiser advertise portal page — shows unread count badge, dropdown list, mark-as-read on click, link to the creative.
+- Mount the panel in the existing `/advertise` route header (advertiser portal). No global header changes.
+
+---
+
+## 5. Admin audit trail UI
+
+- New tab "History" on the existing `/admin/advertisements/approvals` route (or inline expander on each creative card) showing the audit log entries for the selected creative: action badge, admin name, timestamp, reason/notes.
+- Reuses `listCreativeAuditAdmin`.
+
+---
+
+## 6. Verification
+- Approve a pending creative → audit row inserted, `user_notifications` row appears for uploader, `email_send_log` shows pending row for `ad-creative-approved`.
+- Reject with reason → audit row with reason, notification + email use rejection template, reason text shown in both.
+- Placeholder approve/reject → audit row only, no email/notification.
+- Re-approving an already-approved creative still creates a fresh audit row.
+
+## Out of scope
+- Push/SMS notifications.
+- Notifications for non-ad events.
+- Bulk approve UI changes.
