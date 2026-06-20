@@ -434,17 +434,6 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
     };
   }, [code, preview]);
 
-  const referrer = preview ? "Your name" : staffName || "a local promoter";
-  const contactLine =
-    !preview && staffEmail ? (
-      <a
-        href={`mailto:${staffEmail}`}
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
-      >
-        <Mail className="h-3.5 w-3.5" />
-        {staffEmail}
-      </a>
-    ) : null;
 
   return (
     <TooltipProvider delayDuration={150}>
