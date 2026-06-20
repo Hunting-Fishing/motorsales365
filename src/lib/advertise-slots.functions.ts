@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { createClient } from "@supabase/supabase-js";
 import { requireDomainRole, requireAdminRoleAudited } from "@/integrations/supabase/admin-middleware";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
 
 const slotKeySchema = z.string().min(1).max(80).regex(/^[a-z0-9_]+$/);
@@ -538,7 +539,7 @@ export const rejectCreative = createServerFn({ method: "POST" })
 // ---------------- AUDIT LOG READS ----------------
 
 export const listCreativeAuditAdmin = createServerFn({ method: "POST" })
-  .middleware([requireDomainRole("ads")])
+  .middleware([requireDomainRole("ads", "advertise-approvals.audit-list")])
   .inputValidator((d: { creativeId: string }) =>
     z.object({ creativeId: z.string().uuid() }).parse(d),
   )
@@ -555,9 +556,11 @@ export const listCreativeAuditAdmin = createServerFn({ method: "POST" })
     let actorMap: Record<string, { email?: string; name?: string }> = {};
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const ids = Array.from(new Set((rows ?? []).map((r: any) => r.actor_id).filter(Boolean)));
+      const ids: string[] = Array.from(
+        new Set((rows ?? []).map((r: any) => r.actor_id).filter(Boolean)),
+      ) as string[];
       await Promise.all(
-        ids.map(async (id: string) => {
+        ids.map(async (id) => {
           const { data: u } = await (supabaseAdmin as any).auth.admin.getUserById(id);
           actorMap[id] = {
             email: u?.user?.email,
