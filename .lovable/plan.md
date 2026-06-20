@@ -1,38 +1,33 @@
-## Goal
-Turn the long single-card "List your business" form (`src/routes/businesses.submit.tsx`) into a polished, tabbed multi-step experience. Keep **every existing field, validation rule, upload, geocode flow, services table, tag picker, hours editor, and submit logic** — only the layout, navigation, and visual polish change.
+## Findings
 
-## Tab structure
-Five tabs, in this order, rendered as a horizontal stepper at the top (numbered pills + label, current tab highlighted, completed tabs get a check, click to jump). On mobile it scrolls horizontally; on desktop it sits as a sticky bar above the card.
+Searched the whole codebase. There are **no live navigation links** pointing to `/dashboard/share-kit` or `/admin/advertisements/share-kit` anywhere in the UI (sidebar, header, dashboard nav, admin nav — all clean). The only things left are:
 
-1. **Basics** — Business name, logo upload, business type (with "+ Add" suggest dialog), tags (inline popular + Browse all dialog), brands carried (conditional), description.
-2. **Services** — `ServicesTable` (unchanged).
-3. **Contact** — Phone, Email, Website, Messenger.
-4. **Location** — Street address, postal code, `LocationDrilldown`, "Find on map"/"Use my location" buttons, `LocationPicker`, lat/lng inputs.
-5. **Hours & Review** — `WeekHoursEditor`, then a compact summary card (name, type, # tags, # services, city, has-hours), feedback link, and the **Submit for review** button.
+1. **Two redirect-only route files** that forward to the QR Ads pages:
+   - `src/routes/dashboard.share-kit.tsx` → `/dashboard/qr-ads`
+   - `src/routes/admin.advertisements.share-kit.tsx` → `/admin/advertisements/qr-ads`
+2. **Two orphaned image assets** never imported anywhere:
+   - `src/assets/share-kit/arm-band.png.asset.json`
+   - `src/assets/share-kit/rear-shirt.png.asset.json`
+3. **A Supabase storage bucket named `share-kit-templates`** that is actively used by the QR Ads custom-template uploader (`src/components/qr-ads/use-signed-custom-templates.ts`, `src/components/qr-ads/template-upload-dialog.tsx`). This is just an internal bucket identifier — users never see it — and renaming it would require migrating existing uploaded files. Migration history confirms it's already in production use.
 
-Each tab has a footer row with `Back` / `Continue` buttons. The final tab swaps `Continue` for `Submit for review` (same `submit()` handler, same disabled/loading state, same toasts, same navigate-on-success).
+## Plan
 
-## Validation surfacing
-- Required-field checks stay in `submit()` exactly as today (name, type, at least one open day).
-- Add lightweight per-tab "completeness" indicators (green check on the tab pill) computed from existing state — purely visual, never blocks navigation between tabs.
-- The "Claim a business" callout card stays above the tabs, unchanged.
+### 1. Delete legacy redirect routes
+Remove both files so the URLs cleanly 404 and the route tree no longer carries dead entries:
+- `src/routes/dashboard.share-kit.tsx`
+- `src/routes/admin.advertisements.share-kit.tsx`
 
-## Visual polish (no new dependencies)
-- Wrap the page in a soft gradient background band behind the card (using existing `--primary` / `--muted` tokens, no hardcoded colors) for a more premium feel.
-- Card gets a slightly larger radius, subtle ring, and section headings inside each tab with a one-line helper sentence.
-- Inputs/labels keep current shadcn styling; tighten spacing and group related fields with subtle dividers.
-- Logo block becomes a friendlier dashed drop-zone-style tile (still uses the same `onLogoChange` handler — no drag-drop logic added, just better visuals around the existing file input).
-- Sticky bottom action bar on mobile so `Back`/`Continue`/`Submit` is always reachable.
-- All colors via semantic tokens in `src/styles.css` (no `text-white`, no `bg-[#...]`).
+The TanStack route tree (`src/routeTree.gen.ts`) is auto-generated and will regenerate without these entries on the next build.
 
-## What does NOT change
-- No schema/db/server-function/route changes.
-- No change to `submitBusiness`, `saveBusinessServices`, tag fetching, PSGC resolver, geocode endpoints, dynamic meta/JSON-LD, or auth gating.
-- No change to `ServicesTable`, `LocationDrilldown`, `LocationPicker`, `WeekHoursEditor`, `PhoneInput`, or the tag-browser dialog component contents.
-- Route path, SEO `head()`, and the existing "Claim a business" CTA remain.
+### 2. Delete unused share-kit image assets
+- `src/assets/share-kit/arm-band.png.asset.json`
+- `src/assets/share-kit/rear-shirt.png.asset.json`
+- Remove the now-empty `src/assets/share-kit/` directory
 
-## Files
-- `src/routes/businesses.submit.tsx` — restructure JSX into tabs + stepper + review summary; add small local `Stepper` and `ReviewSummary` components in the same file (kept private to avoid new files unless needed).
+### 3. Leave the storage bucket name alone
+The `share-kit-templates` bucket stays as `share-kit-templates` internally. It is referenced only by the QR Ads code, not exposed to users, and renaming would orphan existing uploaded template files. No code change needed.
 
-## Open question
-None blocking — confirming you want the **stepper-style numbered pills** look (vs. plain shadcn `<Tabs>`). If you'd rather have the standard tab bar look, say the word and I'll use shadcn `Tabs` instead.
+## Risk
+
+- Anyone with an old bookmark to `/dashboard/share-kit` or `/admin/advertisements/share-kit` will get a 404 instead of being redirected. Given there's no current UI pointing to those URLs, this is the intended outcome per your request.
+- No other code paths break — confirmed by full-repo search.
