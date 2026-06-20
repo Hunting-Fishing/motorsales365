@@ -959,7 +959,7 @@ function SubmitBusinessPage() {
             {/* ===== CONTACT ===== */}
             <div hidden={step !== "contact"} role="tabpanel" id="panel-contact">
 
-            {step === "contact" && (
+            {/* basics keep-mounted via parent state */}
               <div className="space-y-5">
                 <div>
                   <h2 className="font-display text-xl font-semibold">How customers can reach you</h2>
