@@ -180,8 +180,11 @@ import { Route as ApiPublicGeocodeRouteImport } from './routes/api/public/geocod
 import { Route as ApiPublicGeoSearchRouteImport } from './routes/api/public/geo-search'
 import { Route as ApiAdminCreateUserRouteImport } from './routes/api/admin/create-user'
 import { Route as AdminRedemptionsStaffIdRouteImport } from './routes/admin.redemptions_.$staffId'
+import { Route as AdminAdvertisementsSlotsRouteImport } from './routes/admin.advertisements.slots'
 import { Route as AdminAdvertisementsQrAdsRouteImport } from './routes/admin.advertisements.qr-ads'
 import { Route as AdminAdvertisementsPromotionsRouteImport } from './routes/admin.advertisements.promotions'
+import { Route as AdminAdvertisementsPreviewRouteImport } from './routes/admin.advertisements.preview'
+import { Route as AdminAdvertisementsPlaceholdersRouteImport } from './routes/admin.advertisements.placeholders'
 import { Route as AdminAdvertisementsInquiriesRouteImport } from './routes/admin.advertisements.inquiries'
 import { Route as AdminAdvertisementsHistoryRouteImport } from './routes/admin.advertisements.history'
 import { Route as AdminAdvertisementsCampaignsRouteImport } from './routes/admin.advertisements.campaigns'
@@ -1085,6 +1088,12 @@ const AdminRedemptionsStaffIdRoute = AdminRedemptionsStaffIdRouteImport.update({
   path: '/redemptions/$staffId',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAdvertisementsSlotsRoute =
+  AdminAdvertisementsSlotsRouteImport.update({
+    id: '/slots',
+    path: '/slots',
+    getParentRoute: () => AdminAdvertisementsRoute,
+  } as any)
 const AdminAdvertisementsQrAdsRoute =
   AdminAdvertisementsQrAdsRouteImport.update({
     id: '/qr-ads',
@@ -1095,6 +1104,18 @@ const AdminAdvertisementsPromotionsRoute =
   AdminAdvertisementsPromotionsRouteImport.update({
     id: '/promotions',
     path: '/promotions',
+    getParentRoute: () => AdminAdvertisementsRoute,
+  } as any)
+const AdminAdvertisementsPreviewRoute =
+  AdminAdvertisementsPreviewRouteImport.update({
+    id: '/preview',
+    path: '/preview',
+    getParentRoute: () => AdminAdvertisementsRoute,
+  } as any)
+const AdminAdvertisementsPlaceholdersRoute =
+  AdminAdvertisementsPlaceholdersRouteImport.update({
+    id: '/placeholders',
+    path: '/placeholders',
     getParentRoute: () => AdminAdvertisementsRoute,
   } as any)
 const AdminAdvertisementsInquiriesRoute =
@@ -1496,8 +1517,11 @@ export interface FileRoutesByFullPath {
   '/admin/advertisements/campaigns': typeof AdminAdvertisementsCampaignsRoute
   '/admin/advertisements/history': typeof AdminAdvertisementsHistoryRoute
   '/admin/advertisements/inquiries': typeof AdminAdvertisementsInquiriesRoute
+  '/admin/advertisements/placeholders': typeof AdminAdvertisementsPlaceholdersRoute
+  '/admin/advertisements/preview': typeof AdminAdvertisementsPreviewRoute
   '/admin/advertisements/promotions': typeof AdminAdvertisementsPromotionsRoute
   '/admin/advertisements/qr-ads': typeof AdminAdvertisementsQrAdsRoute
+  '/admin/advertisements/slots': typeof AdminAdvertisementsSlotsRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1706,8 +1730,11 @@ export interface FileRoutesByTo {
   '/admin/advertisements/campaigns': typeof AdminAdvertisementsCampaignsRoute
   '/admin/advertisements/history': typeof AdminAdvertisementsHistoryRoute
   '/admin/advertisements/inquiries': typeof AdminAdvertisementsInquiriesRoute
+  '/admin/advertisements/placeholders': typeof AdminAdvertisementsPlaceholdersRoute
+  '/admin/advertisements/preview': typeof AdminAdvertisementsPreviewRoute
   '/admin/advertisements/promotions': typeof AdminAdvertisementsPromotionsRoute
   '/admin/advertisements/qr-ads': typeof AdminAdvertisementsQrAdsRoute
+  '/admin/advertisements/slots': typeof AdminAdvertisementsSlotsRoute
   '/admin/redemptions/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -1922,8 +1949,11 @@ export interface FileRoutesById {
   '/admin/advertisements/campaigns': typeof AdminAdvertisementsCampaignsRoute
   '/admin/advertisements/history': typeof AdminAdvertisementsHistoryRoute
   '/admin/advertisements/inquiries': typeof AdminAdvertisementsInquiriesRoute
+  '/admin/advertisements/placeholders': typeof AdminAdvertisementsPlaceholdersRoute
+  '/admin/advertisements/preview': typeof AdminAdvertisementsPreviewRoute
   '/admin/advertisements/promotions': typeof AdminAdvertisementsPromotionsRoute
   '/admin/advertisements/qr-ads': typeof AdminAdvertisementsQrAdsRoute
+  '/admin/advertisements/slots': typeof AdminAdvertisementsSlotsRoute
   '/admin/redemptions_/$staffId': typeof AdminRedemptionsStaffIdRoute
   '/api/admin/create-user': typeof ApiAdminCreateUserRoute
   '/api/public/geo-search': typeof ApiPublicGeoSearchRoute
@@ -2139,8 +2169,11 @@ export interface FileRouteTypes {
     | '/admin/advertisements/campaigns'
     | '/admin/advertisements/history'
     | '/admin/advertisements/inquiries'
+    | '/admin/advertisements/placeholders'
+    | '/admin/advertisements/preview'
     | '/admin/advertisements/promotions'
     | '/admin/advertisements/qr-ads'
+    | '/admin/advertisements/slots'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2349,8 +2382,11 @@ export interface FileRouteTypes {
     | '/admin/advertisements/campaigns'
     | '/admin/advertisements/history'
     | '/admin/advertisements/inquiries'
+    | '/admin/advertisements/placeholders'
+    | '/admin/advertisements/preview'
     | '/admin/advertisements/promotions'
     | '/admin/advertisements/qr-ads'
+    | '/admin/advertisements/slots'
     | '/admin/redemptions/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -2564,8 +2600,11 @@ export interface FileRouteTypes {
     | '/admin/advertisements/campaigns'
     | '/admin/advertisements/history'
     | '/admin/advertisements/inquiries'
+    | '/admin/advertisements/placeholders'
+    | '/admin/advertisements/preview'
     | '/admin/advertisements/promotions'
     | '/admin/advertisements/qr-ads'
+    | '/admin/advertisements/slots'
     | '/admin/redemptions_/$staffId'
     | '/api/admin/create-user'
     | '/api/public/geo-search'
@@ -3934,6 +3973,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRedemptionsStaffIdRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/advertisements/slots': {
+      id: '/admin/advertisements/slots'
+      path: '/slots'
+      fullPath: '/admin/advertisements/slots'
+      preLoaderRoute: typeof AdminAdvertisementsSlotsRouteImport
+      parentRoute: typeof AdminAdvertisementsRoute
+    }
     '/admin/advertisements/qr-ads': {
       id: '/admin/advertisements/qr-ads'
       path: '/qr-ads'
@@ -3946,6 +3992,20 @@ declare module '@tanstack/react-router' {
       path: '/promotions'
       fullPath: '/admin/advertisements/promotions'
       preLoaderRoute: typeof AdminAdvertisementsPromotionsRouteImport
+      parentRoute: typeof AdminAdvertisementsRoute
+    }
+    '/admin/advertisements/preview': {
+      id: '/admin/advertisements/preview'
+      path: '/preview'
+      fullPath: '/admin/advertisements/preview'
+      preLoaderRoute: typeof AdminAdvertisementsPreviewRouteImport
+      parentRoute: typeof AdminAdvertisementsRoute
+    }
+    '/admin/advertisements/placeholders': {
+      id: '/admin/advertisements/placeholders'
+      path: '/placeholders'
+      fullPath: '/admin/advertisements/placeholders'
+      preLoaderRoute: typeof AdminAdvertisementsPlaceholdersRouteImport
       parentRoute: typeof AdminAdvertisementsRoute
     }
     '/admin/advertisements/inquiries': {
@@ -4268,8 +4328,11 @@ interface AdminAdvertisementsRouteChildren {
   AdminAdvertisementsCampaignsRoute: typeof AdminAdvertisementsCampaignsRoute
   AdminAdvertisementsHistoryRoute: typeof AdminAdvertisementsHistoryRoute
   AdminAdvertisementsInquiriesRoute: typeof AdminAdvertisementsInquiriesRoute
+  AdminAdvertisementsPlaceholdersRoute: typeof AdminAdvertisementsPlaceholdersRoute
+  AdminAdvertisementsPreviewRoute: typeof AdminAdvertisementsPreviewRoute
   AdminAdvertisementsPromotionsRoute: typeof AdminAdvertisementsPromotionsRoute
   AdminAdvertisementsQrAdsRoute: typeof AdminAdvertisementsQrAdsRoute
+  AdminAdvertisementsSlotsRoute: typeof AdminAdvertisementsSlotsRoute
   AdminAdvertisementsIndexRoute: typeof AdminAdvertisementsIndexRoute
 }
 
@@ -4277,8 +4340,11 @@ const AdminAdvertisementsRouteChildren: AdminAdvertisementsRouteChildren = {
   AdminAdvertisementsCampaignsRoute: AdminAdvertisementsCampaignsRoute,
   AdminAdvertisementsHistoryRoute: AdminAdvertisementsHistoryRoute,
   AdminAdvertisementsInquiriesRoute: AdminAdvertisementsInquiriesRoute,
+  AdminAdvertisementsPlaceholdersRoute: AdminAdvertisementsPlaceholdersRoute,
+  AdminAdvertisementsPreviewRoute: AdminAdvertisementsPreviewRoute,
   AdminAdvertisementsPromotionsRoute: AdminAdvertisementsPromotionsRoute,
   AdminAdvertisementsQrAdsRoute: AdminAdvertisementsQrAdsRoute,
+  AdminAdvertisementsSlotsRoute: AdminAdvertisementsSlotsRoute,
   AdminAdvertisementsIndexRoute: AdminAdvertisementsIndexRoute,
 }
 
