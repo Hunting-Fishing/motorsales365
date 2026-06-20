@@ -6,17 +6,29 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   ArrowRight,
+  Car,
   Check,
   CheckCircle2,
   Eye,
   Info,
   Mail,
+  MapPin,
+  MessageSquare,
+  QrCode,
   RotateCcw,
+  Search,
+  Shield,
   Sparkles,
+  Store,
+  Truck,
+  Users,
+  Wrench,
   X,
 } from "lucide-react";
+
 import { siteOrigin } from "@/lib/site-config";
 import { formatPHP } from "@/lib/format";
 import findVehiclesAsset from "@/assets/referral/referral-find-vehicles.png.asset.json";
