@@ -1005,10 +1005,11 @@ function SubmitBusinessPage() {
                   </div>
                 </div>
               </div>
-            )}
+            </div>
 
             {/* ===== LOCATION ===== */}
-            {step === "location" && (
+            <div hidden={step !== "location"} role="tabpanel" id="panel-location">
+
               <div className="space-y-5">
                 <div>
                   <h2 className="font-display text-xl font-semibold">Where you're located</h2>
