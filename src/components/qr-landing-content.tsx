@@ -710,18 +710,36 @@ function FeatureImage({
 }: ImagePanel & { priority?: boolean }) {
   return (
     <article className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-      <img
-        src={image}
-        alt={alt}
-        className="aspect-[16/10] w-full object-cover object-center"
-        loading={priority ? "eager" : "lazy"}
-      />
+      <Dialog>
+        <DialogTrigger asChild>
+          <button
+            type="button"
+            className="group block w-full bg-muted/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            aria-label={`View full image: ${alt}`}
+          >
+            <img
+              src={image}
+              alt={alt}
+              className="aspect-[16/10] w-full object-contain transition-transform group-hover:scale-[1.01]"
+              loading={priority ? "eager" : "lazy"}
+            />
+          </button>
+        </DialogTrigger>
+        <DialogContent className="max-w-5xl border-none bg-background/95 p-2 sm:p-4">
+          <VisuallyHidden>
+            <DialogTitle>{title}</DialogTitle>
+            <DialogDescription>{description}</DialogDescription>
+          </VisuallyHidden>
+          <img src={image} alt={alt} className="h-auto max-h-[85vh] w-full object-contain" />
+        </DialogContent>
+      </Dialog>
       <div className="p-4 sm:p-5">
         <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">{eyebrow}</p>
         <h2 className="font-display mt-2 text-xl font-bold leading-tight sm:text-2xl">{title}</h2>
         <p className="mt-2 text-sm text-muted-foreground sm:text-base">{description}</p>
       </div>
     </article>
+
   );
 }
 
