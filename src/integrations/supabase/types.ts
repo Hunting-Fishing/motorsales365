@@ -50,6 +50,89 @@ export type Database = {
         }
         Relationships: []
       }
+      ad_creatives: {
+        Row: {
+          alt_text: string | null
+          caption: string | null
+          created_at: string
+          file_size_bytes: number | null
+          headline: string | null
+          id: string
+          image_height: number | null
+          image_url: string
+          image_width: number | null
+          kind: Database["public"]["Enums"]["ad_creative_kind"]
+          mime_type: string | null
+          order_id: string | null
+          rejection_reason: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          spec_errors: Json
+          spec_ok: boolean
+          status: Database["public"]["Enums"]["ad_creative_status"]
+          storage_path: string
+          target_url: string | null
+          updated_at: string
+          uploaded_by: string
+        }
+        Insert: {
+          alt_text?: string | null
+          caption?: string | null
+          created_at?: string
+          file_size_bytes?: number | null
+          headline?: string | null
+          id?: string
+          image_height?: number | null
+          image_url: string
+          image_width?: number | null
+          kind?: Database["public"]["Enums"]["ad_creative_kind"]
+          mime_type?: string | null
+          order_id?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          spec_errors?: Json
+          spec_ok?: boolean
+          status?: Database["public"]["Enums"]["ad_creative_status"]
+          storage_path: string
+          target_url?: string | null
+          updated_at?: string
+          uploaded_by: string
+        }
+        Update: {
+          alt_text?: string | null
+          caption?: string | null
+          created_at?: string
+          file_size_bytes?: number | null
+          headline?: string | null
+          id?: string
+          image_height?: number | null
+          image_url?: string
+          image_width?: number | null
+          kind?: Database["public"]["Enums"]["ad_creative_kind"]
+          mime_type?: string | null
+          order_id?: string | null
+          rejection_reason?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          spec_errors?: Json
+          spec_ok?: boolean
+          status?: Database["public"]["Enums"]["ad_creative_status"]
+          storage_path?: string
+          target_url?: string | null
+          updated_at?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_creatives_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "ad_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ad_events: {
         Row: {
           ad_id: string
@@ -254,6 +337,309 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      ad_order_events: {
+        Row: {
+          actor_id: string | null
+          created_at: string
+          event_type: Database["public"]["Enums"]["ad_order_event_type"]
+          id: string
+          notes: string | null
+          order_id: string
+          payload: Json | null
+        }
+        Insert: {
+          actor_id?: string | null
+          created_at?: string
+          event_type: Database["public"]["Enums"]["ad_order_event_type"]
+          id?: string
+          notes?: string | null
+          order_id: string
+          payload?: Json | null
+        }
+        Update: {
+          actor_id?: string | null
+          created_at?: string
+          event_type?: Database["public"]["Enums"]["ad_order_event_type"]
+          id?: string
+          notes?: string | null
+          order_id?: string
+          payload?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_order_events_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "ad_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_orders: {
+        Row: {
+          actual_end: string | null
+          actual_start: string | null
+          admin_notes: string | null
+          advertiser_id: string
+          amount_cents: number
+          category_slug: string | null
+          created_at: string
+          currency: string
+          id: string
+          package_id: string
+          payment_id: string | null
+          placement: Database["public"]["Enums"]["ad_placement"]
+          rejection_reason: string | null
+          requested_end: string | null
+          requested_start: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["ad_order_status"]
+          updated_at: string
+        }
+        Insert: {
+          actual_end?: string | null
+          actual_start?: string | null
+          admin_notes?: string | null
+          advertiser_id: string
+          amount_cents?: number
+          category_slug?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          package_id: string
+          payment_id?: string | null
+          placement: Database["public"]["Enums"]["ad_placement"]
+          rejection_reason?: string | null
+          requested_end?: string | null
+          requested_start?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["ad_order_status"]
+          updated_at?: string
+        }
+        Update: {
+          actual_end?: string | null
+          actual_start?: string | null
+          admin_notes?: string | null
+          advertiser_id?: string
+          amount_cents?: number
+          category_slug?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          package_id?: string
+          payment_id?: string | null
+          placement?: Database["public"]["Enums"]["ad_placement"]
+          rejection_reason?: string | null
+          requested_end?: string | null
+          requested_start?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["ad_order_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_orders_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "ad_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ad_orders_payment_id_fkey"
+            columns: ["payment_id"]
+            isOneToOne: false
+            referencedRelation: "payments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_packages: {
+        Row: {
+          active: boolean
+          allowed_mime: string[]
+          aspect_ratio: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          description: string | null
+          duration_days: number
+          id: string
+          max_bytes: number
+          max_impressions: number | null
+          min_height: number
+          min_width: number
+          name: string
+          placement: Database["public"]["Enums"]["ad_placement"]
+          price_cents: number
+          priority_weight: number
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          allowed_mime?: string[]
+          aspect_ratio?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string | null
+          duration_days: number
+          id?: string
+          max_bytes?: number
+          max_impressions?: number | null
+          min_height?: number
+          min_width?: number
+          name: string
+          placement: Database["public"]["Enums"]["ad_placement"]
+          price_cents: number
+          priority_weight?: number
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          allowed_mime?: string[]
+          aspect_ratio?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          description?: string | null
+          duration_days?: number
+          id?: string
+          max_bytes?: number
+          max_impressions?: number | null
+          min_height?: number
+          min_width?: number
+          name?: string
+          placement?: Database["public"]["Enums"]["ad_placement"]
+          price_cents?: number
+          priority_weight?: number
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      ad_slot_assignments: {
+        Row: {
+          active: boolean
+          created_at: string
+          creative_id: string
+          ends_at: string | null
+          id: string
+          order_id: string | null
+          position: number
+          slot_id: string
+          starts_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          creative_id: string
+          ends_at?: string | null
+          id?: string
+          order_id?: string | null
+          position?: number
+          slot_id: string
+          starts_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          creative_id?: string
+          ends_at?: string | null
+          id?: string
+          order_id?: string | null
+          position?: number
+          slot_id?: string
+          starts_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_slot_assignments_creative_id_fkey"
+            columns: ["creative_id"]
+            isOneToOne: false
+            referencedRelation: "ad_creatives"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ad_slot_assignments_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "ad_orders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ad_slot_assignments_slot_id_fkey"
+            columns: ["slot_id"]
+            isOneToOne: false
+            referencedRelation: "ad_slots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_slots: {
+        Row: {
+          active: boolean
+          allowed_mime: string[]
+          aspect_ratio: string | null
+          category_slug: string | null
+          created_at: string
+          description: string | null
+          id: string
+          label: string
+          max_bytes: number
+          min_height: number
+          min_width: number
+          placement: Database["public"]["Enums"]["ad_placement"]
+          position: number
+          slot_key: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          allowed_mime?: string[]
+          aspect_ratio?: string | null
+          category_slug?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          label: string
+          max_bytes?: number
+          min_height?: number
+          min_width?: number
+          placement: Database["public"]["Enums"]["ad_placement"]
+          position?: number
+          slot_key: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          allowed_mime?: string[]
+          aspect_ratio?: string | null
+          category_slug?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          label?: string
+          max_bytes?: number
+          min_height?: number
+          min_width?: number
+          placement?: Database["public"]["Enums"]["ad_placement"]
+          position?: number
+          slot_key?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       admin_audit_log: {
         Row: {
@@ -9571,6 +9957,8 @@ export type Database = {
     }
     Enums: {
       account_status: "active" | "paused" | "banned"
+      ad_creative_kind: "advertiser" | "placeholder"
+      ad_creative_status: "pending" | "approved" | "rejected"
       ad_inquiry_status:
         | "new"
         | "in_review"
@@ -9578,6 +9966,29 @@ export type Database = {
         | "won"
         | "lost"
         | "spam"
+      ad_order_event_type:
+        | "submitted"
+        | "payment_verified"
+        | "package_verified"
+        | "image_verified"
+        | "approved"
+        | "rejected"
+        | "paused"
+        | "resumed"
+        | "expired"
+        | "refunded"
+        | "note"
+      ad_order_status:
+        | "pending_payment"
+        | "paid"
+        | "submitted"
+        | "in_review"
+        | "approved"
+        | "rejected"
+        | "live"
+        | "expired"
+        | "refunded"
+        | "cancelled"
       ad_placement:
         | "homepage_banner"
         | "category_banner"
@@ -9908,7 +10319,34 @@ export const Constants = {
   public: {
     Enums: {
       account_status: ["active", "paused", "banned"],
+      ad_creative_kind: ["advertiser", "placeholder"],
+      ad_creative_status: ["pending", "approved", "rejected"],
       ad_inquiry_status: ["new", "in_review", "quoted", "won", "lost", "spam"],
+      ad_order_event_type: [
+        "submitted",
+        "payment_verified",
+        "package_verified",
+        "image_verified",
+        "approved",
+        "rejected",
+        "paused",
+        "resumed",
+        "expired",
+        "refunded",
+        "note",
+      ],
+      ad_order_status: [
+        "pending_payment",
+        "paid",
+        "submitted",
+        "in_review",
+        "approved",
+        "rejected",
+        "live",
+        "expired",
+        "refunded",
+        "cancelled",
+      ],
       ad_placement: [
         "homepage_banner",
         "category_banner",
