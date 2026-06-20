@@ -11,6 +11,9 @@ import adShipping from "@/assets/advertise-samples/ad-export-shipping.jpg";
 import adOil from "@/assets/advertise-samples/ad-shop-oil.jpg";
 import adBattery from "@/assets/advertise-samples/ad-shop-battery.jpg";
 import adDetailing from "@/assets/advertise-samples/ad-custom-detailing.jpg";
+import adHeroTradein from "@/assets/advertise-samples/ad-hero-tradein.jpg";
+import adHeroMoto from "@/assets/advertise-samples/ad-hero-moto.jpg";
+import adCategoryWide from "@/assets/advertise-samples/ad-category-wide.jpg";
 
 /**
  * Realistic mini-snapshot of each ad surface with a sample ad creative
