@@ -191,6 +191,46 @@ function StaffReferral() {
         </div>
       </header>
 
+      <section className="grid gap-3 sm:grid-cols-3">
+        {[
+          {
+            to: "/dashboard/promoter-resources",
+            title: "Promoter resources",
+            body: "Copy/paste ad templates, placement tips, scanner walkthrough.",
+            Icon: Megaphone,
+            cta: "Open resources",
+          },
+          {
+            to: "/resources/qr-landing",
+            title: "Preview scanner view",
+            body: "See the exact page a new visitor sees after scanning your QR.",
+            Icon: MousePointerClick,
+            cta: "Open preview",
+          },
+          {
+            to: "/dashboard/qr-ads",
+            title: "QR Ads & print",
+            body: "Posters, arm bands, banners and shirts with your QR baked in.",
+            Icon: Printer,
+            cta: "Open QR ads",
+          },
+        ].map(({ to, title, body, Icon, cta }) => (
+          <Link
+            key={to}
+            to={to}
+            className="group rounded-xl border border-border bg-card p-4 transition hover:border-primary/40 hover:bg-secondary/40"
+          >
+            <Icon className="h-4 w-4 text-primary" />
+            <h3 className="mt-2 text-sm font-semibold">{title}</h3>
+            <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+            <p className="mt-3 text-xs font-medium text-primary group-hover:underline">
+              {cta} →
+            </p>
+          </Link>
+        ))}
+      </section>
+
+
       <section className="grid gap-6 md:grid-cols-[260px_1fr]">
         <div className="rounded-xl border border-border bg-card p-4">
           {qrUrl ? (
