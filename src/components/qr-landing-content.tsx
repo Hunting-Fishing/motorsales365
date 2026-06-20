@@ -6,17 +6,29 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import {
   ArrowRight,
+  Car,
   Check,
   CheckCircle2,
   Eye,
   Info,
   Mail,
+  MapPin,
+  MessageSquare,
+  QrCode,
   RotateCcw,
+  Search,
+  Shield,
   Sparkles,
+  Store,
+  Truck,
+  Users,
+  Wrench,
   X,
 } from "lucide-react";
+
 import { siteOrigin } from "@/lib/site-config";
 import { formatPHP } from "@/lib/format";
 import findVehiclesAsset from "@/assets/referral/referral-find-vehicles.png.asset.json";
@@ -488,6 +500,80 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
               />
             </section>
 
+            {/* Trust stats strip */}
+            <section className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {[
+                { icon: Car, label: "Vehicles listed", value: "All PH regions" },
+                { icon: Store, label: "Verified businesses", value: "Growing weekly" },
+                { icon: MapPin, label: "Coverage", value: "Nationwide map" },
+                { icon: Shield, label: "ID + business verification", value: "Trust badges" },
+              ].map(({ icon: Icon, label, value }) => (
+                <div key={label} className="rounded-xl border border-border bg-card p-4">
+                  <Icon className="h-5 w-5 text-primary" />
+                  <p className="mt-2 text-sm font-semibold">{value}</p>
+                  <p className="text-xs text-muted-foreground">{label}</p>
+                </div>
+              ))}
+            </section>
+
+            {/* How it works */}
+            <section className="mt-12">
+              <div className="mb-6 max-w-3xl">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                  How it works
+                </p>
+                <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
+                  From scan to sale in four steps.
+                </h2>
+              </div>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {[
+                  { icon: QrCode, step: "01", title: "Scan or visit", body: "You arrived here from a QR or referral link — no app install needed." },
+                  { icon: Users, step: "02", title: "Create your free account", body: "Verify by phone or email. Buyers, sellers, and businesses use the same login." },
+                  { icon: Search, step: "03", title: "List or browse", body: "Post a vehicle, part, or service. Or filter listings by make, model, year, location." },
+                  { icon: MessageSquare, step: "04", title: "Message & close", body: "Talk directly to verified sellers in-app. Meet, inspect, agree, done." },
+                ].map(({ icon: Icon, step, title, body }) => (
+                  <div key={step} className="rounded-xl border border-border bg-card p-5">
+                    <div className="flex items-center gap-3">
+                      <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-bold text-primary">{step}</span>
+                      <Icon className="h-5 w-5 text-primary" />
+                    </div>
+                    <h3 className="mt-3 font-semibold">{title}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Categories grid */}
+            <section className="mt-12">
+              <div className="mb-6 max-w-3xl">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                  What's on 365
+                </p>
+                <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
+                  Every part of the motor world — under one roof.
+                </h2>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {[
+                  { icon: Car, title: "Cars & Motorcycles", body: "Brand-new, used, and project units across the Philippines." },
+                  { icon: Wrench, title: "Parts & Accessories", body: "OEM, aftermarket, performance — searchable by fitment." },
+                  { icon: Store, title: "Shops & Businesses", body: "Dealerships, repair, parts stores, detailing, car wash." },
+                  { icon: Truck, title: "Tow & Delivery", body: "On-demand towing and vehicle delivery near you." },
+                ].map(({ icon: Icon, title, body }) => (
+                  <div key={title} className="rounded-xl border border-border bg-card p-5">
+                    <Icon className="h-6 w-6 text-primary" />
+                    <h3 className="mt-3 font-semibold">{title}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">{body}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+
+
+
             {/* Why 365 vs Facebook vs Google */}
             <section className="mt-12">
               <div className="mb-6 max-w-3xl">
@@ -666,6 +752,92 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
                 <QrLeadForm referralCode={code} visitorId={getVisitorId()} />
               ) : null}
             </section>
+
+            {/* Safety & trust */}
+            <section className="mt-12 rounded-2xl border border-border bg-card p-6 sm:p-8">
+              <div className="max-w-3xl">
+                <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                  <Shield className="h-3.5 w-3.5" /> Safer transactions
+                </p>
+                <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
+                  Built-in safety for every deal.
+                </h2>
+              </div>
+              <div className="mt-6 grid gap-4 md:grid-cols-3">
+                {[
+                  { title: "Verified identities", body: "Sellers and businesses verify by ID, phone, and business documents before earning trust badges." },
+                  { title: "Meet in safe places", body: "We recommend public locations, daytime meets, and inspection at known shops listed on the map." },
+                  { title: "Report & moderation", body: "One-tap report on every listing and message. Real PH-based moderation, not just AI filters." },
+                ].map((s) => (
+                  <div key={s.title} className="rounded-xl border border-border bg-background p-5">
+                    <h3 className="font-semibold">{s.title}</h3>
+                    <p className="mt-2 text-sm text-muted-foreground">{s.body}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* Roadmap */}
+            <section className="mt-12">
+              <div className="mb-6 max-w-3xl">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                  Coming next
+                </p>
+                <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
+                  The roadmap — built with our community.
+                </h2>
+                <p className="mt-3 text-muted-foreground">
+                  Join early and help shape what ships next. Members vote on priorities.
+                </p>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {[
+                  { tag: "Shipping soon", title: "Loan & financing match", body: "Connect with PH lenders directly from a listing." },
+                  { tag: "In design", title: "Vehicle history badges", body: "Service records and verified mileage history." },
+                  { tag: "Planned", title: "Trade-in offers", body: "Get instant offers from dealerships in your area." },
+                  { tag: "Planned", title: "Driver education hub", body: "Driving schools, defensive courses, mechanic basics." },
+                  { tag: "Exploring", title: "Insurance comparison", body: "Side-by-side TPL and comprehensive quotes." },
+                  { tag: "Exploring", title: "Live auctions", body: "Time-boxed bidding for dealer-listed units." },
+                ].map((r) => (
+                  <div key={r.title} className="rounded-xl border border-border bg-card p-5">
+                    <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      {r.tag}
+                    </span>
+                    <h3 className="mt-3 font-semibold">{r.title}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">{r.body}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            {/* FAQ */}
+            <section className="mt-12 rounded-2xl border border-border bg-card p-6 sm:p-8">
+              <div className="mb-4 max-w-3xl">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                  Common questions
+                </p>
+                <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
+                  Quick answers before you sign up.
+                </h2>
+              </div>
+              <Accordion type="single" collapsible className="w-full">
+                {[
+                  { q: "Is it really free?", a: "Yes — creating an account, browsing, and posting listings is free. You only pay if you choose a paid boost or a business plan." },
+                  { q: "How are sellers verified?", a: "Sellers verify their phone and email. Businesses additionally submit IDs and business documents to earn a verification badge." },
+                  { q: "Do you charge commission on sales?", a: "No. 365 does not take a cut of your private sale. Buyers and sellers transact directly." },
+                  { q: "Can I use 365 on mobile without an app?", a: "Yes. The site is mobile-first — no app install needed. You can also add it to your home screen." },
+                  { q: "What's the difference between Search Boost and Province Boost?", a: `Search Boost (${formatPHP(BOOST_SEARCH_PHP)}) lifts your listing in search results. Province Boost (${formatPHP(BOOST_PROVINCE_PHP)}) features it at the top of your entire province. Both run for 7 days at a fixed price.` },
+                  { q: "How is my data handled?", a: "We only collect what's needed to run your account and listings. See our Privacy Policy for full details. We never sell your data." },
+                ].map((item, i) => (
+                  <AccordionItem key={i} value={`faq-${i}`}>
+                    <AccordionTrigger className="text-left">{item.q}</AccordionTrigger>
+                    <AccordionContent className="text-muted-foreground">{item.a}</AccordionContent>
+                  </AccordionItem>
+                ))}
+              </Accordion>
+            </section>
+
+
 
             <section className="mt-12 rounded-2xl border border-border bg-card p-6 sm:p-8">
               <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
