@@ -11,7 +11,11 @@ import {
   listPendingCreatives,
   approveCreative,
   rejectCreative,
+  listCreativeAuditAdmin,
 } from "@/lib/advertise-slots.functions";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
+import { History as HistoryIcon } from "lucide-react";
 
 export const Route = createFileRoute("/admin/advertisements/approvals")({
   component: AdminApprovalsPage,
@@ -171,6 +175,7 @@ function AdminApprovalsPage() {
                 >
                   <X className="h-3 w-3 mr-1" /> Reject
                 </Button>
+                <CreativeAuditButton creativeId={cr.id} />
               </div>
             </div>
           ))}
