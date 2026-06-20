@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { Inbox, Megaphone, Ticket, QrCode, History } from "lucide-react";
+import { Inbox, Megaphone, Ticket, QrCode, History, Settings2, ImageIcon, Eye } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
@@ -19,7 +19,10 @@ type Tab = {
     | "/admin/advertisements/campaigns"
     | "/admin/advertisements/promotions"
     | "/admin/advertisements/qr-ads"
-    | "/admin/advertisements/history";
+    | "/admin/advertisements/history"
+    | "/admin/advertisements/slots"
+    | "/admin/advertisements/placeholders"
+    | "/admin/advertisements/preview";
   label: string;
   desc: string;
   Icon: typeof Inbox;
@@ -54,6 +57,27 @@ const TABS: Tab[] = [
     desc: "Your personal QR on printable templates.",
     Icon: QrCode,
     roles: ["admin", "advertising", "sales"],
+  },
+  {
+    to: "/admin/advertisements/slots",
+    label: "Slots",
+    desc: "Define ad positions, dimensions and ordering.",
+    Icon: Settings2,
+    roles: ["admin", "advertising"],
+  },
+  {
+    to: "/admin/advertisements/placeholders",
+    label: "Placeholders",
+    desc: "Upload and manage default creatives per slot.",
+    Icon: ImageIcon,
+    roles: ["admin", "advertising"],
+  },
+  {
+    to: "/admin/advertisements/preview",
+    label: "Live preview",
+    desc: "See what's rendering in each slot right now.",
+    Icon: Eye,
+    roles: ["admin", "advertising"],
   },
   {
     to: "/admin/advertisements/history",

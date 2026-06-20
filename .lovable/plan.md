@@ -1,133 +1,96 @@
-## Goal
+## Admin Ad Slots & Placeholders Manager
 
-Turn `/advertise` from a marketing/preview page into a working portal: advertisers submit creatives → pay/select package → admin verifies (purchase, package, image specs, content) → approved ads slot into placements alongside admin-managed placeholder creatives, all reorderable via drag-and-drop.
+Build the admin UI to manage everything that drives the `/advertise` preview and live ad rendering: slot specs, placeholder creatives, advertiser-creative assignments, and a live preview that mirrors the public `placement-preview.tsx`.
 
-## What we already have
+### New routes
+- `/admin/advertisements/slots` — list & edit all 12 seeded `ad_slots`
+- `/admin/advertisements/placeholders` — upload/manage `ad_creatives` where `kind='placeholder'`
+- `/admin/advertisements/preview` — full-page live preview of every section, pulling real data from `ad_slot_assignments`
 
-- `public.advertisements` table (basic: title, image_url, target_url, placement enum, status, priority, dates, counters, created_by, category_slug).
-- `src/lib/advertiser-portal.functions.ts` — list / submit (draft) / pause for owners.
-- Admin tabs scaffolded at `/admin/advertisements` (inquiries, campaigns, promotions, qr-ads, history).
-- `placement-preview.tsx` shows hardcoded sample images per placement.
+All three added as tabs under the existing `admin.advertisements.tsx` shell, beside Campaigns / Inquiries / Promotions / QR Ads / History.
 
-What's missing: packages/pricing, payments link, asset storage + spec validation, admin-curated placeholder library, slot ordering, structured approval workflow with reasons, per-placement spec rules.
+### Screen 1 — Slots manager (`/admin/advertisements/slots`)
+Grid of slot cards grouped by `placement` (marketplace_home, marketplace_category, browse, rides, …). Each card shows:
+- `slot_key`, `label`, `placement`, `position`
+- Current image spec: `min_width × min_height`, `aspect_ratio`, `max_bytes`, allowed MIME
+- Active toggle
+- Thumbnail of currently-assigned creative (advertiser ad if live, else placeholder, else empty state)
+- Edit button → dialog to update label/description/spec/position/active
+- Drag-and-drop reordering inside a placement (updates `position`)
 
-## New database structure
+Server fns: `listAdSlots`, `updateAdSlot`, `reorderAdSlots` (admin-only, `has_role(...,'admin')` or `canManageAds`).
 
-### 1. `ad_packages` (admin-managed catalog)
-- `slug` (unique), `name`, `description`
-- `placement` (enum, reuse existing `ad_placement`)
-- `duration_days`, `price_cents`, `currency`
-- `max_impressions` (nullable), `priority_weight`
-- `image_spec`: `min_width`, `min_height`, `aspect_ratio` (text e.g. "16:9"), `max_bytes`, `allowed_mime` (text[])
-- `active`, `sort_order`
-- RLS: anon SELECT where active; admin/advertising full write.
+### Screen 2 — Placeholders manager (`/admin/advertisements/placeholders`)
+Per-slot panel listing placeholder creatives stacked for that slot. Each row:
+- Image preview, headline, alt text, target URL
+- Spec validation badge (green if `spec_ok`, red with `spec_errors` tooltip)
+- Active/inactive toggle, drag handle for ordering, delete
+- "Upload placeholder" button → file picker
 
-### 2. `ad_orders` (one row per purchase attempt)
-- `advertiser_id` (auth.users), `package_id` (fk), `placement`, `category_slug`
-- `status` enum: `pending_payment | paid | submitted | in_review | approved | rejected | live | expired | refunded | cancelled`
-- `payment_id` (fk → existing `payments`), `amount_cents`, `currency`
-- `requested_start`, `requested_end`, `actual_start`, `actual_end`
-- `rejection_reason`, `admin_notes`, `reviewed_by`, `reviewed_at`
-- Timestamps + update trigger.
-- RLS: owner read own; admin/advertising read+write all.
+Upload flow:
+1. Client reads file → measures dimensions, MIME, byte size
+2. Validates against the slot's `image_spec` before upload (instant feedback)
+3. Uploads to `advertisements` storage bucket at `placeholders/{slot_key}/{uuid}-{filename}`
+4. Calls `createPlaceholderCreative` server fn → inserts `ad_creatives` row (`kind='placeholder'`, `order_id=null`) + `ad_slot_assignments` row (no `ends_at`, `active=true`)
+5. Re-validates server-side and stores `spec_ok` + `spec_errors`
 
-### 3. `ad_creatives` (uploaded images, 1..N per order)
-- `order_id` (fk, nullable for placeholder library entries), `uploaded_by`
-- `image_url` (storage path), `image_width`, `image_height`, `file_size_bytes`, `mime_type`
-- `headline`, `caption`, `target_url`, `alt_text`
-- `kind` enum: `advertiser | placeholder` (placeholders shown when no paid ad fills a slot)
-- `spec_ok` bool + `spec_errors` jsonb (server-validated on upload)
-- `status`: `pending | approved | rejected`, `rejection_reason`
-- Timestamps. RLS: owner CRUD own draft; admin all; public SELECT only via server fn that joins to live orders/placeholders.
+Server fns: `listPlaceholdersForSlot`, `createPlaceholderCreative`, `updatePlaceholderCreative`, `deletePlaceholderCreative`, `reorderPlaceholders`.
 
-### 4. `ad_slots` (the actual placement positions on the site)
-- `slot_key` (unique, e.g. `marketplace_home_hero_1`, `category_cars_banner`, `rides_top`)
-- `placement` (enum), `category_slug` (nullable), `label`, `description`
-- `image_spec` (same shape as package), `position` (int, for drag-drop ordering inside a placement group)
-- `active`
-- Seeded with every placement the current `placement-preview.tsx` shows.
-- Admin/advertising write; anon read active.
+### Screen 3 — Live preview (`/admin/advertisements/preview`)
+Renders the same `PlacementPreview` component used on `/advertise`, but switched to data mode:
+- Reuses `placement-preview.tsx` layout
+- For each `AdSlot`, calls `getLiveCreativeForSlot(slot_key)` (anon-safe server fn) which returns the highest-priority active assignment: advertiser ad in window first, then placeholder, then `null`
+- Falls back to a dashed "Empty slot — no creative" tile when null
+- Section dropdown + "Refresh" button + last-updated timestamp
+- Each rendered slot has an overlay with `slot_key`, current creative kind, and a quick "Manage" link to the Placeholders screen filtered to that slot
 
-### 5. `ad_slot_assignments` (which creative occupies which slot, when)
-- `slot_id` (fk), `creative_id` (fk), `order_id` (nullable — null = placeholder)
-- `starts_at`, `ends_at`, `position` (drag-drop order within slot rotation), `active`
-- Unique partial index: one active assignment per (slot, position, time window).
-- RLS: anon read currently-live rows via SECURITY DEFINER fn; admin full write.
+### Wire `/advertise` preview to live data
+Refactor `src/components/advertise/placement-preview.tsx`:
+- Replace hardcoded `import adHero from ...` lines with a `useSlotCreative(slot_key)` hook that calls `getLiveCreativeForSlot` (via TanStack Query, 60s stale)
+- `AdSlot` accepts `slotKey` instead of `src`, derives src/alt/sub from data, keeps the "Example ad" pill when `kind='placeholder'`
+- Bundled `src/assets/advertise-samples/*` images become the initial placeholder seed (uploaded once into `ad_creatives` via a one-off migration that copies them via signed upload OR an admin-run "Seed defaults" button)
 
-### 6. `ad_order_events` (audit / approval history)
-- `order_id`, `actor_id`, `event_type` (`submitted | payment_verified | package_verified | image_verified | approved | rejected | paused | resumed | expired`), `notes`, `created_at`. Admin/owner read; insert via server fns.
+### Seeding strategy for current sample images
+Add a "Seed default placeholders" button on the Placeholders screen (admin-only, idempotent). It:
+1. For each of the 15 current `src/assets/advertise-samples/*.jpg`, fetches the bundled asset
+2. Uploads to `advertisements/placeholders/seed/...`
+3. Inserts a placeholder `ad_creatives` row + `ad_slot_assignments` mapped to the matching `slot_key`
 
-### 7. Storage bucket `advertisements`
-- Private bucket. Server fns issue signed URLs for review; approved creatives served via signed URL or copied to a public read path.
-- RLS on `storage.objects`: owner can insert/read own prefix `{user_id}/...`; admin all.
+Mapping table lives in `src/lib/advertise-seed-map.ts` (slot_key → asset path → headline/alt).
 
-## Server functions (new / extended)
+### Server functions (new file `src/lib/advertise-admin.functions.ts`)
+- All admin write fns use `requireSupabaseAuth` + `has_role(userId, 'admin')` or `canManageAds` check
+- `getLiveCreativeForSlot` is public (anon-safe), uses server publishable client, narrow SELECT, picks one row per slot
 
-`src/lib/advertise-packages.functions.ts`
-- `listAdPackages` (public), `upsertAdPackage` / `deleteAdPackage` (admin).
+### RLS additions
+Current migration already covers slots/creatives/assignments admin-write + anon-read-active. Add: storage policy on `advertisements/placeholders/**` allowing admin upload/delete.
 
-`src/lib/advertise-orders.functions.ts`
-- `createAdOrder` (auth) → returns order + Stripe checkout link (reuses existing `payments` infra).
-- `listMyAdOrders`, `getAdOrder`.
-- `adminListAdOrders`, `adminReviewAdOrder({ id, decision: 'approved'|'rejected', reason })` — writes `ad_order_events`, flips status, on approve creates `ad_slot_assignments`.
+### Files to create
+- `src/routes/admin.advertisements.slots.tsx`
+- `src/routes/admin.advertisements.placeholders.tsx`
+- `src/routes/admin.advertisements.preview.tsx`
+- `src/lib/advertise-admin.functions.ts`
+- `src/lib/advertise-public.functions.ts` (`getLiveCreativeForSlot`)
+- `src/lib/advertise-seed-map.ts`
+- `src/components/advertise/slot-card.tsx`
+- `src/components/advertise/placeholder-uploader.tsx`
+- `src/hooks/use-slot-creative.ts`
 
-`src/lib/advertise-creatives.functions.ts`
-- `uploadCreativeMetadata` — called after client uploads to storage; server reads file from storage, validates: mime in `allowed_mime`, `file_size_bytes <= max_bytes`, dimensions ≥ `min_width/height`, aspect within tolerance. Writes row with `spec_ok` + `spec_errors`.
-- `listMyCreatives`, `deleteMyCreative` (only draft).
-- Admin: `adminApproveCreative`, `adminRejectCreative`.
+### Files to edit
+- `src/routes/admin.advertisements.tsx` — add 3 tabs
+- `src/routes/admin.advertisements.index.tsx` — keep redirect target
+- `src/components/advertise/placement-preview.tsx` — switch to live data with sample images as fallback while DB empty
 
-`src/lib/advertise-slots.functions.ts`
-- `listSlots`, `upsertSlot`, `reorderSlots({ placement, ids[] })` (admin drag-drop).
-- `listSlotAssignments(slotId)`, `assignCreativeToSlot`, `reorderSlotAssignments({ slotId, ids[] })`.
-- `getLiveCreativeForSlot(slotKey)` — anon, used by frontend; picks first active assignment (advertiser priority over placeholder).
+### Verification
+- Admin can edit a slot's `min_width`; uploading a too-small image shows red badge and stores `spec_errors`
+- Drag-reorder persists `position` across reload
+- Toggling a placeholder inactive immediately removes it from `/advertise` preview after refetch
+- Seed button is idempotent (re-running doesn't duplicate)
+- Non-admins hitting any of the 3 routes see "Ads manager role required"
 
-`src/lib/advertise-placeholders.functions.ts` (admin)
-- CRUD on `ad_creatives` where `kind='placeholder'`, plus quick "replace placeholder" action.
-
-## Frontend work (after DB is approved)
-
-### `/advertise` (public portal)
-- Replace static preview with: packages grid (from `ad_packages`), "Buy this placement" CTA.
-- Auth gate → wizard:
-  1. Pick package
-  2. Upload creative(s) → live spec check (client-side dims/size, then server confirms)
-  3. Pick start date / category
-  4. Stripe checkout
-  5. Submitted screen → "in review"
-- Dashboard tab at `/account/advertisements`: list orders + status, can pause live ads, edit drafts.
-
-### `/admin/advertisements/campaigns` (extend)
-- Tabs: **Orders to review** | **Live** | **Placeholders** | **Slots**.
-- Orders table → review drawer (image preview, spec check results, advertiser info, payment status). Approve/Reject with required reason. Approval auto-creates slot assignment for selected slot/position.
-- Placeholders: gallery; upload + assign to slot. Drag-and-drop reorder within a placement group (uses `@dnd-kit/sortable`, already common in the project).
-- Slots: list per placement, drag-drop reorder, edit image_spec, toggle active.
-
-### `placement-preview.tsx`
-- Switch from hardcoded imports to `getLiveCreativeForSlot(slotKey)` so admin changes show up immediately. Keep current AI-generated images as seeded placeholder rows so visuals don't regress.
-
-## Verification checklist (the "anything I'm missing" list)
-
-- Purchase verify → `payments.status = 'succeeded'` linked to `ad_orders.payment_id` before approval is allowed.
-- Package verify → order's package must be `active` and creative's `placement` matches package's `placement`.
-- Image verify → mime, byte size, min dimensions, aspect ratio tolerance, NSFW flag field (manual for now, AI-moderation hook later).
-- Content verify → required `alt_text`, `target_url` must be https + same/whitelisted domain or admin override.
-- Schedule verify → `starts_at < ends_at`, ends within package `duration_days` from start.
-- Conflict verify → no overlapping active assignment in same `(slot, position)` window.
-- Audit trail → every state change writes `ad_order_events`; admin actions also go to existing `admin_audit_log`.
-- Owner controls → pause/resume own live ad; pausing flips assignment `active=false` without deleting history.
-- Expiry job → daily server route under `/api/public/cron/expire-ads` flips finished ads to `expired` and deactivates assignments.
-- Refund path → admin can mark `refunded`, automatically pauses assignment.
-- Anti-abuse → rate-limit creative uploads per user/hour; max creatives per order.
-- Accessibility → require `alt_text`; enforce min contrast in admin guidance.
-- Analytics → keep existing `impressions_count` / `clicks_count`; log to `ad_events` (already exists) for time-series.
-
-## Build order (one approval per migration)
-
-1. **Migration 1** — `ad_packages`, `ad_orders`, `ad_creatives`, `ad_slots`, `ad_slot_assignments`, `ad_order_events` + grants + RLS + triggers + storage bucket + seed slots from current placements.
-2. Server functions for packages/orders/creatives/slots.
-3. Admin UI: slots + placeholders + orders review (drag-drop).
-4. Public `/advertise` wizard + Stripe checkout reuse.
-5. Wire `placement-preview.tsx` to live data; keep current images as seeded placeholders.
-6. Cron expiry route + owner dashboard.
-
-Confirm and I'll start with Migration 1.
+### Out of scope (next phase)
+- Advertiser-facing upload wizard
+- Stripe checkout for `ad_orders`
+- Admin order review queue
+- Owner dashboard at `/account/advertisements`
+- Cron expiry job
