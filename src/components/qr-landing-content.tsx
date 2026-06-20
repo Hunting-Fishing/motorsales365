@@ -12,7 +12,7 @@ import {
   Car,
   Check,
   CheckCircle2,
-  Eye,
+  CheckCircle2,
   Info,
   Mail,
   MapPin,
