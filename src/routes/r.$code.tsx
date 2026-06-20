@@ -441,21 +441,18 @@ function ReferralLanding() {
                 )}
               </section>
 
+              {/* Hero */}
               <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.26em] text-primary">
-                    Shared 365 feature page
+                    The motor marketplace for the Philippines
                   </p>
                   <h1 className="font-display mt-3 text-4xl font-bold leading-tight sm:text-5xl lg:text-6xl">
-                    365 Motor Sales
+                    Buy, sell, and grow — without fighting an algorithm.
                   </h1>
-                  <p className="mt-3 text-xl font-semibold text-foreground sm:text-2xl">
-                    The motor marketplace built for the Philippines.
-                  </p>
                   <p className="mt-4 max-w-2xl text-base text-muted-foreground sm:text-lg">
-                    Keep the referral setup, keep every user&apos;s QR working, and send every scan into
-                    one stronger destination page that explains what 365 already does and what is
-                    coming next.
+                    365 Motor Sales is built for vehicles, parts, and motor businesses.
+                    Real filters, verified sellers, fair pricing, and boosts that cost a fraction of Facebook or Google ads.
                   </p>
 
                   <div className="mt-6 flex flex-wrap gap-2">
@@ -471,81 +468,173 @@ function ReferralLanding() {
 
                   <div className="mt-7 flex flex-wrap gap-3">
                     <Button size="lg" onClick={() => navigate({ to: "/signup" })}>
-                      Join 365
+                      Create free account
                     </Button>
                     <Button size="lg" variant="outline" onClick={() => navigate({ to: "/" })}>
-                      Browse website
+                      Browse listings
                     </Button>
                   </div>
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    Verified sellers · PH-based support · No bidding wars
+                  </p>
                 </div>
 
                 <FeatureImage
-                  image={PRIMARY_PANELS[0].image}
-                  alt={PRIMARY_PANELS[0].alt}
-                  eyebrow={PRIMARY_PANELS[0].eyebrow}
-                  title={PRIMARY_PANELS[0].title}
-                  description={PRIMARY_PANELS[0].description}
+                  image={AUDIENCE_PANELS[0].image}
+                  alt={AUDIENCE_PANELS[0].alt}
+                  eyebrow={AUDIENCE_PANELS[0].eyebrow}
+                  title={AUDIENCE_PANELS[0].title}
+                  description={AUDIENCE_PANELS[0].description}
                   priority
                 />
               </section>
 
-              <section className="mt-10 grid gap-6 lg:grid-cols-2">
+              {/* Why 365 vs Facebook vs Google */}
+              <section className="mt-12">
+                <div className="mb-6 max-w-3xl">
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                    Why 365 beats the alternatives
+                  </p>
+                  <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
+                    Facebook is a feed. Google is a search box. 365 is a motor marketplace.
+                  </h2>
+                  <p className="mt-3 text-muted-foreground">
+                    Side-by-side, here is what you actually get when you list, search, or advertise on each.
+                  </p>
+                </div>
+
+                {/* Desktop table */}
+                <div className="hidden overflow-hidden rounded-2xl border border-border bg-card md:block">
+                  <div className="grid grid-cols-[1.2fr_1fr_1fr_1fr] border-b border-border bg-muted/40 text-sm font-semibold">
+                    <div className="p-4">&nbsp;</div>
+                    <div className="p-4 text-primary">365 Motor Sales</div>
+                    <div className="p-4 text-muted-foreground">Facebook</div>
+                    <div className="p-4 text-muted-foreground">Google</div>
+                  </div>
+                  {COMPARE_ROWS.map((row, i) => (
+                    <div
+                      key={row.label}
+                      className={
+                        "grid grid-cols-[1.2fr_1fr_1fr_1fr] text-sm " +
+                        (i % 2 ? "bg-background" : "bg-card")
+                      }
+                    >
+                      <div className="border-t border-border p-4 font-medium">{row.label}</div>
+                      <CompareCell ok={row.motorsales.ok} note={row.motorsales.note} highlight />
+                      <CompareCell ok={row.facebook.ok} note={row.facebook.note} />
+                      <CompareCell ok={row.google.ok} note={row.google.note} />
+                    </div>
+                  ))}
+                </div>
+
+                {/* Mobile stacked */}
+                <div className="grid gap-4 md:hidden">
+                  {(["motorsales", "facebook", "google"] as const).map((col) => (
+                    <div key={col} className="rounded-xl border border-border bg-card p-4">
+                      <p
+                        className={
+                          "text-sm font-bold " +
+                          (col === "motorsales" ? "text-primary" : "text-muted-foreground")
+                        }
+                      >
+                        {col === "motorsales" ? "365 Motor Sales" : col === "facebook" ? "Facebook" : "Google"}
+                      </p>
+                      <ul className="mt-3 space-y-2 text-sm">
+                        {COMPARE_ROWS.map((row) => {
+                          const cell = row[col];
+                          return (
+                            <li key={row.label} className="flex gap-2">
+                              {cell.ok ? (
+                                <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                              ) : (
+                                <X className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+                              )}
+                              <span>
+                                <span className="font-medium">{row.label}: </span>
+                                <span className="text-muted-foreground">{cell.note}</span>
+                              </span>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Boost & ads pricing */}
+              <section className="mt-12 rounded-2xl border border-border bg-card p-6 sm:p-8">
+                <div className="max-w-3xl">
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
+                    Boosts & advertising
+                  </p>
+                  <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
+                    A week of real reach for less than one Facebook boost.
+                  </h2>
+                  <p className="mt-3 text-muted-foreground">
+                    Our boost prices are fixed — no daily bidding, no surprise spend.
+                  </p>
+                </div>
+
+                <div className="mt-6 grid gap-4 md:grid-cols-3">
+                  <div className="rounded-xl border-2 border-primary bg-primary/5 p-5">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-primary">365 — Search Boost</p>
+                    <p className="mt-2 font-display text-3xl font-bold">{formatPHP(BOOST_SEARCH_PHP)}</p>
+                    <p className="text-sm text-muted-foreground">7 days · higher placement in search</p>
+                  </div>
+                  <div className="rounded-xl border-2 border-primary bg-primary/5 p-5">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-primary">365 — Province Boost</p>
+                    <p className="mt-2 font-display text-3xl font-bold">{formatPHP(BOOST_PROVINCE_PHP)}</p>
+                    <p className="text-sm text-muted-foreground">7 days · featured top of your province</p>
+                  </div>
+                  <div className="rounded-xl border border-border bg-background p-5">
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Typical Facebook / Google
+                    </p>
+                    <p className="mt-2 font-display text-3xl font-bold text-muted-foreground">
+                      ₱500–₱2,000
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      FB Boost for comparable reach · Google Ads ₱20–₱60 per click
+                    </p>
+                  </div>
+                </div>
+                <p className="mt-4 text-xs text-muted-foreground">
+                  Facebook and Google figures are typical Philippine market ranges for motor-related campaigns, not official quotes. Your spend on those platforms varies daily based on bidding.
+                </p>
+              </section>
+
+              {/* For sellers + for businesses */}
+              <section className="mt-12 grid gap-6 lg:grid-cols-2">
                 <FeatureImage
-                  image={PRIMARY_PANELS[1].image}
-                  alt={PRIMARY_PANELS[1].alt}
-                  eyebrow={PRIMARY_PANELS[1].eyebrow}
-                  title={PRIMARY_PANELS[1].title}
-                  description={PRIMARY_PANELS[1].description}
+                  image={AUDIENCE_PANELS[1].image}
+                  alt={AUDIENCE_PANELS[1].alt}
+                  eyebrow={AUDIENCE_PANELS[1].eyebrow}
+                  title={AUDIENCE_PANELS[1].title}
+                  description={AUDIENCE_PANELS[1].description}
                 />
                 <FeatureImage
-                  image={PRIMARY_PANELS[2].image}
-                  alt={PRIMARY_PANELS[2].alt}
-                  eyebrow={PRIMARY_PANELS[2].eyebrow}
-                  title={PRIMARY_PANELS[2].title}
-                  description={PRIMARY_PANELS[2].description}
+                  image={AUDIENCE_PANELS[2].image}
+                  alt={AUDIENCE_PANELS[2].alt}
+                  eyebrow={AUDIENCE_PANELS[2].eyebrow}
+                  title={AUDIENCE_PANELS[2].title}
+                  description={AUDIENCE_PANELS[2].description}
                 />
               </section>
 
-              <section className="mt-10 grid gap-6 lg:grid-cols-2">
-                {SECONDARY_PANELS.slice(0, 2).map((panel) => (
-                  <FeatureImage
-                    key={panel.title}
-                    image={panel.image}
-                    alt={panel.alt}
-                    eyebrow={panel.eyebrow}
-                    title={panel.title}
-                    description={panel.description}
-                  />
-                ))}
-              </section>
-
-              <section className="mt-10 grid gap-6 lg:grid-cols-3">
-                {SECONDARY_PANELS.slice(2).map((panel) => (
-                  <FeatureImage
-                    key={panel.title}
-                    image={panel.image}
-                    alt={panel.alt}
-                    eyebrow={panel.eyebrow}
-                    title={panel.title}
-                    description={panel.description}
-                  />
-                ))}
-              </section>
-
-              <section className="mt-10 rounded-2xl border border-border bg-card p-6 sm:p-8">
+              {/* Final CTA */}
+              <section className="mt-12 rounded-2xl border border-border bg-card p-6 sm:p-8">
                 <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
                   <div>
                     <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.24em] text-primary">
                       <Sparkles className="h-3.5 w-3.5" />
-                      Shared destination for every QR code
+                      Join the marketplace built for motor
                     </p>
                     <h2 className="font-display mt-3 text-2xl font-bold sm:text-3xl">
-                      One page can do the selling for the whole network.
+                      Free to join. Free to list. Boost only when you want to.
                     </h2>
                     <p className="mt-3 max-w-3xl text-muted-foreground">
-                      Buyers get the big picture. Sellers see the opportunity. Shops see where
-                      they fit. Partners see the roadmap. And the person whose QR was scanned still
-                      gets the referral credit.
+                      Whether you&apos;re looking for your next ride, selling one, or running a motor business — start here and {referrer} still gets credit for bringing you in.
                     </p>
                   </div>
 
@@ -554,11 +643,12 @@ function ReferralLanding() {
                       Sign up free <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                     <Button size="lg" variant="outline" onClick={() => navigate({ to: "/businesses" })}>
-                      Grow with us
+                      List my business
                     </Button>
                   </div>
                 </div>
               </section>
+
             </>
           )}
         </div>
