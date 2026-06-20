@@ -642,6 +642,10 @@ function SubmitBusinessPage() {
                     <button
                       type="button"
                       onClick={() => goTo(s.key)}
+                      data-step={s.key}
+                      role="tab"
+                      aria-selected={active}
+                      aria-controls={`panel-${s.key}`}
                       className={`group flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium transition ${
                         active
                           ? "bg-primary text-primary-foreground shadow"
@@ -650,6 +654,7 @@ function SubmitBusinessPage() {
                             : "text-muted-foreground hover:bg-secondary"
                       }`}
                     >
+
                       <span
                         className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs ${
                           active
