@@ -539,7 +539,7 @@ export const rejectCreative = createServerFn({ method: "POST" })
 // ---------------- AUDIT LOG READS ----------------
 
 export const listCreativeAuditAdmin = createServerFn({ method: "POST" })
-  .middleware([requireDomainRole("ads", "advertise-approvals.audit-list")])
+  .middleware([requireAdminRoleAudited("advertise-approvals.audit-list")])
   .inputValidator((d: { creativeId: string }) =>
     z.object({ creativeId: z.string().uuid() }).parse(d),
   )
