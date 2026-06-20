@@ -170,7 +170,7 @@ function SectionBody({ section }: { section: SectionValue }) {
     case "browse":
       return (
         <div className="flex h-full flex-col gap-1">
-          <AdSlot src={adHero} alt="Sample browse results banner ad" sub="Results banner" className="h-[26%] w-full" />
+          <AdSlot src={adFinancing} alt="Sample car loan financing banner ad" sub="Results banner" className="h-[26%] w-full" />
           <div className="grid grid-cols-[28%_1fr] gap-1 flex-1">
             <div className="flex flex-col gap-1">
               <Block className="h-2" />
