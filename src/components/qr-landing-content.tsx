@@ -730,7 +730,9 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
                   Side-by-side, here is what you actually get when you list, search, or advertise on
                   each.
                 </p>
+                </div>
               </div>
+
 
               <div className="hidden overflow-hidden rounded-2xl border border-border bg-card md:block">
                 <div className="grid grid-cols-[1.2fr_1fr_1fr_1fr] border-b border-border bg-muted/40 text-sm font-semibold">
