@@ -842,36 +842,6 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
               />
             </section>
 
-            <section className="mt-12">
-              {preview ? (
-                <div className="rounded-2xl border-2 border-dashed border-border bg-card p-6 sm:p-8">
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
-                    Lead capture form
-                  </p>
-                  <h3 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
-                    Visitors can drop their name & contact here without signing up.
-                  </h3>
-                  <p className="mt-2 text-muted-foreground">
-                    The live page renders a form (name, email/phone, vehicle or business interest)
-                    that pushes leads directly to the 365 admin dashboard. The preview is
-                    submission-disabled — open it on a real <code>/r/&lt;code&gt;</code> link to test
-                    a real submission.
-                  </p>
-                  <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                    {["Name", "Email or phone", "Vehicle / business interest"].map((f) => (
-                      <div key={f} className="rounded-lg border border-border bg-background p-3">
-                        <p className="text-xs uppercase tracking-wider text-muted-foreground">
-                          Field
-                        </p>
-                        <p className="mt-1 text-sm font-medium">{f}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : code ? (
-                <QrLeadForm referralCode={code} visitorId={getVisitorId()} />
-              ) : null}
-            </section>
 
             <section className="mt-12 rounded-2xl border border-border bg-card p-6 sm:p-8">
               <div className="max-w-3xl">
