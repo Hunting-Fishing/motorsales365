@@ -980,44 +980,48 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
 function ImageInfoCard({ eyebrow, title, description, image, alt, icon: Icon, badge }: VisualCard) {
   return (
     <article className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-      <Dialog>
-        <DialogTrigger asChild>
-          <button
-            type="button"
-            className="group block w-full bg-muted/40 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            aria-label={`View full image: ${alt}`}
-          >
-            <img
-              src={image}
-              alt={alt}
-              className="aspect-square w-full object-contain transition-transform group-hover:scale-[1.01]"
-              loading="lazy"
-            />
-          </button>
-        </DialogTrigger>
-        <DialogContent className="max-w-5xl border-none bg-background/95 p-2 sm:p-4">
-          <VisuallyHidden>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>{description}</DialogDescription>
-          </VisuallyHidden>
-          <img src={image} alt={alt} className="h-auto max-h-[85vh] w-full object-contain" />
-        </DialogContent>
-      </Dialog>
       <div className="p-4 sm:p-5">
-        <div className="flex flex-wrap items-center gap-2">
-          {badge ? (
-            <span className="rounded-full bg-primary/10 px-2 py-1 text-[11px] font-bold text-primary">
-              {badge}
-            </span>
-          ) : null}
-          {Icon ? <Icon className="h-4 w-4 text-primary" /> : null}
-          {eyebrow ? (
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
-              {eyebrow}
-            </p>
-          ) : null}
+        <div className="flex items-start gap-3">
+          <Dialog>
+            <DialogTrigger asChild>
+              <button
+                type="button"
+                className="shrink-0 rounded-lg bg-muted/30 p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label={`View full image: ${alt}`}
+              >
+                <img
+                  src={image}
+                  alt={alt}
+                  className="h-10 w-10 object-contain sm:h-12 sm:w-12"
+                  loading="lazy"
+                />
+              </button>
+            </DialogTrigger>
+            <DialogContent className="max-w-5xl border-none bg-background/95 p-2 sm:p-4">
+              <VisuallyHidden>
+                <DialogTitle>{title}</DialogTitle>
+                <DialogDescription>{description}</DialogDescription>
+              </VisuallyHidden>
+              <img src={image} alt={alt} className="h-auto max-h-[85vh] w-full object-contain" />
+            </DialogContent>
+          </Dialog>
+          <div className="flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              {badge ? (
+                <span className="rounded-full bg-primary/10 px-2 py-1 text-[11px] font-bold text-primary">
+                  {badge}
+                </span>
+              ) : null}
+              {Icon ? <Icon className="h-4 w-4 text-primary" /> : null}
+              {eyebrow ? (
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-primary">
+                  {eyebrow}
+                </p>
+              ) : null}
+            </div>
+            <h3 className="font-display mt-1 text-lg font-bold leading-tight sm:text-xl">{title}</h3>
+          </div>
         </div>
-        <h3 className="font-display mt-3 text-lg font-bold leading-tight sm:text-xl">{title}</h3>
         <p className="mt-2 text-sm text-muted-foreground">{description}</p>
       </div>
     </article>
@@ -1034,32 +1038,36 @@ function FeatureImage({
 }: ImagePanel & { priority?: boolean }) {
   return (
     <article className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-      <Dialog>
-        <DialogTrigger asChild>
-          <button
-            type="button"
-            className="group block w-full bg-muted/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            aria-label={`View full image: ${alt}`}
-          >
-            <img
-              src={image}
-              alt={alt}
-              className="aspect-[16/10] w-full object-contain transition-transform group-hover:scale-[1.01]"
-              loading={priority ? "eager" : "lazy"}
-            />
-          </button>
-        </DialogTrigger>
-        <DialogContent className="max-w-5xl border-none bg-background/95 p-2 sm:p-4">
-          <VisuallyHidden>
-            <DialogTitle>{title}</DialogTitle>
-            <DialogDescription>{description}</DialogDescription>
-          </VisuallyHidden>
-          <img src={image} alt={alt} className="h-auto max-h-[85vh] w-full object-contain" />
-        </DialogContent>
-      </Dialog>
       <div className="p-4 sm:p-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">{eyebrow}</p>
-        <h2 className="font-display mt-2 text-xl font-bold leading-tight sm:text-2xl">{title}</h2>
+        <div className="flex items-start gap-3">
+          <Dialog>
+            <DialogTrigger asChild>
+              <button
+                type="button"
+                className="shrink-0 rounded-lg bg-muted/30 p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+                aria-label={`View full image: ${alt}`}
+              >
+                <img
+                  src={image}
+                  alt={alt}
+                  className="h-10 w-10 object-contain sm:h-14 sm:w-14"
+                  loading={priority ? "eager" : "lazy"}
+                />
+              </button>
+            </DialogTrigger>
+            <DialogContent className="max-w-5xl border-none bg-background/95 p-2 sm:p-4">
+              <VisuallyHidden>
+                <DialogTitle>{title}</DialogTitle>
+                <DialogDescription>{description}</DialogDescription>
+              </VisuallyHidden>
+              <img src={image} alt={alt} className="h-auto max-h-[85vh] w-full object-contain" />
+            </DialogContent>
+          </Dialog>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-primary">{eyebrow}</p>
+            <h2 className="font-display text-xl font-bold leading-tight sm:text-2xl">{title}</h2>
+          </div>
+        </div>
         <p className="mt-2 text-sm text-muted-foreground sm:text-base">{description}</p>
       </div>
     </article>
