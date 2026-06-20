@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { ArrowRight, QrCode, Share2, Users } from "lucide-react";
 import { QrLandingContent } from "@/components/qr-landing-content";
 import { Button } from "@/components/ui/button";
-import bannerAsset from "@/assets/qr-landing-uploaded/find-vehicles-parts-services-faster.png.asset.json";
+import bannerAsset from "@/assets/qr-landing-uploaded/365-motor-sales-banner.png.asset.json";
 
 export const Route = createFileRoute("/resources/qr-landing")({
   head: () => ({
@@ -25,8 +25,8 @@ function ResourceQrLandingPreview() {
         <div className="container mx-auto max-w-7xl px-4 py-8 sm:py-10">
           <img
             src={bannerAsset.url}
-            alt="365 Motor Sales — find vehicles, parts and services faster"
-            className="w-full max-h-48 sm:max-h-64 object-cover rounded-xl border border-border"
+            alt="365 Motor Sales — Buy, Sell, List vehicles and equipment nationwide in the Philippines"
+            className="w-full h-auto object-contain rounded-xl border border-border bg-white"
             loading="eager"
           />
           <p className="mt-6 max-w-3xl text-muted-foreground">
