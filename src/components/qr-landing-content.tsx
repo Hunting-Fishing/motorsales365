@@ -40,12 +40,6 @@ import findVehiclesBannerAsset from "@/assets/qr-landing-uploaded/find-vehicles-
 import discoverServicesBannerAsset from "@/assets/qr-landing-uploaded/discover-motor-services-near-you.png.asset.json";
 import postConnectSellBannerAsset from "@/assets/qr-landing-uploaded/post-connect-sell.png.asset.json";
 import onePlatformBannerAsset from "@/assets/qr-landing-uploaded/one-platform-many-opportunities.png.asset.json";
-import roadmapLoanAsset from "@/assets/qr-landing-uploaded/roadmap-loan-financing-match.png.asset.json";
-import roadmapVehicleHistoryAsset from "@/assets/qr-landing-uploaded/roadmap-vehicle-history-badges.png.asset.json";
-import roadmapTradeInAsset from "@/assets/qr-landing-uploaded/roadmap-trade-in-offers.png.asset.json";
-import roadmapDriverEduAsset from "@/assets/qr-landing-uploaded/roadmap-driver-education-hub.png.asset.json";
-import roadmapInsuranceAsset from "@/assets/qr-landing-uploaded/roadmap-insurance-comparison.png.asset.json";
-import roadmapLiveAuctionsAsset from "@/assets/qr-landing-uploaded/roadmap-live-auctions.png.asset.json";
 
 type Promo = {
   id: string;
@@ -725,49 +719,6 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
               </div>
             </section>
 
-            <section className="mt-12">
-              <div className="mb-6 max-w-3xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-primary">
-                  Coming next
-                </p>
-                <h2 className="font-display mt-2 text-2xl font-bold sm:text-3xl">
-                  The roadmap — built with our community.
-                </h2>
-                <p className="mt-3 text-muted-foreground">
-                  Join early and help shape what ships next. Members vote on priorities.
-                </p>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {[
-                  { src: roadmapLoanAsset.url, alt: "Loan & financing match — shipping soon" },
-                  { src: roadmapVehicleHistoryAsset.url, alt: "Vehicle history badges — in design" },
-                  { src: roadmapTradeInAsset.url, alt: "Trade-in offers — planned" },
-                  { src: roadmapDriverEduAsset.url, alt: "Driver education hub — planned" },
-                  { src: roadmapInsuranceAsset.url, alt: "Insurance comparison — exploring" },
-                  { src: roadmapLiveAuctionsAsset.url, alt: "Live auctions — exploring" },
-                ].map((r) => (
-                  <Dialog key={r.alt}>
-                    <DialogTrigger asChild>
-                      <button
-                        type="button"
-                        className="group overflow-hidden rounded-xl border border-border bg-card transition hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary"
-                        aria-label={`${r.alt} — click to enlarge`}
-                      >
-                        <img
-                          src={r.src}
-                          alt={r.alt}
-                          loading="lazy"
-                          className="block w-full h-auto cursor-zoom-in transition group-hover:scale-[1.01]"
-                        />
-                      </button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-5xl p-2 sm:p-4">
-                      <img src={r.src} alt={r.alt} className="w-full h-auto max-h-[85vh] object-contain" />
-                    </DialogContent>
-                  </Dialog>
-                ))}
-              </div>
-            </section>
 
             <section className="mt-12 rounded-2xl border border-border bg-card p-6 sm:p-8">
               <div className="mb-4 max-w-3xl">

@@ -7,13 +7,12 @@ import bannerAsset from "@/assets/qr-landing-uploaded/find-vehicles-parts-servic
 export const Route = createFileRoute("/resources/qr-landing")({
   head: () => ({
     meta: [
-      { title: "QR Landing Preview — 365 Promoter Resources" },
+      { title: "365 Motor Sales — Buy, Sell & Grow in the PH Motor World" },
       {
         name: "description",
         content:
-          "Preview the QR scan landing page exactly as a new visitor sees it. Promoter resources for sharing 365 Motor Sales.",
+          "Scanned a 365 QR? Welcome. Browse verified vehicles, parts and motor services across the Philippines — list free, boost fairly, sell faster.",
       },
-      { name: "robots", content: "noindex, nofollow" },
     ],
   }),
   component: ResourceQrLandingPreview,
