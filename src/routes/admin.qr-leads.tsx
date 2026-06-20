@@ -246,7 +246,7 @@ function QrLeadsAdmin() {
                       </TableCell>
                     </TableRow>
                   )}
-                </>
+                </Fragment>
               ))
             )}
           </TableBody>
