@@ -268,6 +268,18 @@ export const setAssignmentActive = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase } = context as any;
+    if (data.active) {
+      // Block activating an assignment whose creative isn't approved
+      const { data: row } = await supabase
+        .from("ad_slot_assignments")
+        .select("creative:ad_creatives(status)")
+        .eq("id", data.id)
+        .maybeSingle();
+      const status = (row as any)?.creative?.status;
+      if (status !== "approved") {
+        throw new Error(`Cannot activate — creative is ${status ?? "missing"}. Approve it first.`);
+      }
+    }
     const { error } = await supabase
       .from("ad_slot_assignments")
       .update({ active: data.active })
