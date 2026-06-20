@@ -623,6 +623,11 @@ function ReferralLanding() {
                 />
               </section>
 
+              {/* Lead capture */}
+              <section className="mt-12">
+                <QrLeadForm referralCode={code} visitorId={getVisitorId()} />
+              </section>
+
               {/* Final CTA */}
               <section className="mt-12 rounded-2xl border border-border bg-card p-6 sm:p-8">
                 <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
