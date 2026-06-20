@@ -198,7 +198,7 @@ function SectionBody({ section }: { section: SectionValue }) {
     case "export":
       return (
         <div className="flex h-full flex-col gap-1">
-          <AdSlot src={adHero} alt="Sample export page banner ad" sub="Export top" className="h-[26%] w-full" />
+          <AdSlot src={adShipping} alt="Sample vehicle export shipping banner ad" sub="Export top" className="h-[26%] w-full" />
           <div className="flex flex-col gap-1 flex-1">
             <Block className="h-3" />
             <Block className="h-3" />
