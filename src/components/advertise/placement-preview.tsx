@@ -5,6 +5,12 @@ import adSidebar from "@/assets/advertise-samples/ad-sidebar-insurance.jpg";
 import adAcademy from "@/assets/advertise-samples/ad-square-academy.jpg";
 import adShop from "@/assets/advertise-samples/ad-shop-feature.jpg";
 import adNewsletter from "@/assets/advertise-samples/ad-newsletter.jpg";
+import adFinancing from "@/assets/advertise-samples/ad-browse-financing.jpg";
+import adTires from "@/assets/advertise-samples/ad-rides-tires.jpg";
+import adShipping from "@/assets/advertise-samples/ad-export-shipping.jpg";
+import adOil from "@/assets/advertise-samples/ad-shop-oil.jpg";
+import adBattery from "@/assets/advertise-samples/ad-shop-battery.jpg";
+import adDetailing from "@/assets/advertise-samples/ad-custom-detailing.jpg";
 
 /**
  * Realistic mini-snapshot of each ad surface with a sample ad creative
@@ -164,7 +170,7 @@ function SectionBody({ section }: { section: SectionValue }) {
     case "browse":
       return (
         <div className="flex h-full flex-col gap-1">
-          <AdSlot src={adHero} alt="Sample browse results banner ad" sub="Results banner" className="h-[26%] w-full" />
+          <AdSlot src={adFinancing} alt="Sample car loan financing banner ad" sub="Results banner" className="h-[26%] w-full" />
           <div className="grid grid-cols-[28%_1fr] gap-1 flex-1">
             <div className="flex flex-col gap-1">
               <Block className="h-2" />
@@ -182,7 +188,7 @@ function SectionBody({ section }: { section: SectionValue }) {
     case "rides":
       return (
         <div className="flex h-full flex-col gap-1">
-          <AdSlot src={adParts} alt="Sample rides feed banner ad" sub="Rides feed top" className="h-[26%] w-full" />
+          <AdSlot src={adTires} alt="Sample performance tires banner ad" sub="Rides feed top" className="h-[26%] w-full" />
           <div className="grid grid-cols-2 gap-1 flex-1">
             <Block /> <Block />
             <Block /> <Block />
@@ -192,7 +198,7 @@ function SectionBody({ section }: { section: SectionValue }) {
     case "export":
       return (
         <div className="flex h-full flex-col gap-1">
-          <AdSlot src={adHero} alt="Sample export page banner ad" sub="Export top" className="h-[26%] w-full" />
+          <AdSlot src={adShipping} alt="Sample vehicle export shipping banner ad" sub="Export top" className="h-[26%] w-full" />
           <div className="flex flex-col gap-1 flex-1">
             <Block className="h-3" />
             <Block className="h-3" />
@@ -204,9 +210,9 @@ function SectionBody({ section }: { section: SectionValue }) {
     case "shop":
       return (
         <div className="flex h-full flex-col gap-1">
-          <AdSlot src={adParts} alt="Sample shop banner ad" sub="Shop banner" className="h-[26%] w-full" />
+          <AdSlot src={adOil} alt="Sample synthetic motor oil banner ad" sub="Shop banner" className="h-[26%] w-full" />
           <div className="grid grid-cols-[24%_1fr] gap-1 flex-1">
-            <AdSlot src={adSidebar} alt="Sample shop sidebar ad" sub="Sidebar" className="h-full" showPill={false} />
+            <AdSlot src={adBattery} alt="Sample car battery sidebar ad" sub="Sidebar" className="h-full" showPill={false} />
             <div className="grid grid-cols-3 gap-1">
               <Block /> <Block /> <Block />
               <Block /> <Block /> <Block />
@@ -254,7 +260,7 @@ function SectionBody({ section }: { section: SectionValue }) {
     default:
       return (
         <div className="flex h-full items-center justify-center">
-          <AdSlot src={adShop} alt="Sample custom partnership ad" sub="Custom partnership" className="h-[70%] w-[70%]" />
+          <AdSlot src={adDetailing} alt="Sample ceramic coating detailing ad" sub="Custom partnership" className="h-[70%] w-[70%]" />
         </div>
       );
   }
