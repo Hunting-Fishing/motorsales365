@@ -11,6 +11,9 @@ import adShipping from "@/assets/advertise-samples/ad-export-shipping.jpg";
 import adOil from "@/assets/advertise-samples/ad-shop-oil.jpg";
 import adBattery from "@/assets/advertise-samples/ad-shop-battery.jpg";
 import adDetailing from "@/assets/advertise-samples/ad-custom-detailing.jpg";
+import adHeroTradein from "@/assets/advertise-samples/ad-hero-tradein.jpg";
+import adHeroMoto from "@/assets/advertise-samples/ad-hero-moto.jpg";
+import adCategoryWide from "@/assets/advertise-samples/ad-category-wide.jpg";
 
 /**
  * Realistic mini-snapshot of each ad surface with a sample ad creative
@@ -91,12 +94,14 @@ function AdSlot({
   sub,
   className = "",
   showPill = true,
+  fit = "contain",
 }: {
   src: string;
   alt: string;
   sub?: string;
   className?: string;
   showPill?: boolean;
+  fit?: "contain" | "cover";
 }) {
   return (
     <div
@@ -106,7 +111,7 @@ function AdSlot({
         src={src}
         alt={alt}
         loading="lazy"
-        className="absolute inset-0 h-full w-full object-contain"
+        className={`absolute inset-0 h-full w-full ${fit === "cover" ? "object-cover" : "object-contain"}`}
       />
       {showPill && (
         <span className="absolute left-0.5 top-0.5 rounded-[2px] bg-primary/90 px-1 py-[1px] text-[6px] font-semibold uppercase tracking-wide text-primary-foreground">
@@ -131,7 +136,11 @@ function SectionBody({ section }: { section: SectionValue }) {
     case "marketplace_home":
       return (
         <div className="flex h-full flex-col gap-1">
-          <AdSlot src={adHero} alt="Sample dealership hero ad" sub="Hero banner" className="h-[38%] w-full" />
+          <div className="grid grid-cols-3 gap-1 h-[42%]">
+            <AdSlot src={adHero} alt="Sample dealership hero ad" sub="Hero 1" fit="cover" />
+            <AdSlot src={adHeroTradein} alt="Sample trade-in hero ad" sub="Hero 2" fit="cover" />
+            <AdSlot src={adHeroMoto} alt="Sample motorcycle sale hero ad" sub="Hero 3" fit="cover" />
+          </div>
           <div className="grid grid-cols-4 gap-1 flex-1">
             <Block /> <Block /> <Block /> <Block />
           </div>
@@ -143,7 +152,7 @@ function SectionBody({ section }: { section: SectionValue }) {
     case "marketplace_category":
       return (
         <div className="flex h-full flex-col gap-1">
-          <AdSlot src={adParts} alt="Sample parts category banner ad" sub="Category banner" className="h-[28%] w-full" />
+          <AdSlot src={adCategoryWide} alt="Sample wide category banner ad" sub="Category banner" className="h-[34%] w-full" fit="cover" />
           <div className="grid grid-cols-3 gap-1 flex-1">
             <Block /> <Block /> <Block />
             <Block /> <Block /> <Block />
