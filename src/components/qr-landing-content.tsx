@@ -1047,6 +1047,39 @@ function FeatureImage({
   );
 }
 
+function SectionBanner({ image, alt, className = "" }: { image: string; alt: string; className?: string }) {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <button
+          type="button"
+          aria-label={`View full image: ${alt}`}
+          className={
+            "group block overflow-hidden rounded-lg border border-border bg-card shadow-sm transition hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-primary " +
+            className
+          }
+          style={{ cursor: "zoom-in" }}
+        >
+          <img
+            src={image}
+            alt={alt}
+            loading="lazy"
+            className="h-16 w-auto object-contain sm:h-20 md:h-24"
+          />
+        </button>
+      </DialogTrigger>
+      <DialogContent className="max-w-5xl border-none bg-background/95 p-2 sm:p-4">
+        <VisuallyHidden>
+          <DialogTitle>{alt}</DialogTitle>
+          <DialogDescription>{alt}</DialogDescription>
+        </VisuallyHidden>
+        <img src={image} alt={alt} className="h-auto max-h-[85vh] w-full object-contain" />
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+
 function CompareCell({ ok, note, highlight = false }: { ok: boolean; note: string; highlight?: boolean }) {
   return (
     <div className={"border-t border-border p-4 " + (highlight ? "bg-primary/5" : "")}>
