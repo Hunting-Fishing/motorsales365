@@ -612,6 +612,11 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
 
             <section className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:items-center">
               <div>
+                <SectionBanner
+                  image={findVehiclesBannerAsset.url}
+                  alt="365 Motor Sales — Find vehicles, parts and services faster across the Philippines."
+                  className="mb-4"
+                />
                 <p className="text-xs font-semibold uppercase tracking-[0.26em] text-primary">
                   The motor marketplace for the Philippines
                 </p>
