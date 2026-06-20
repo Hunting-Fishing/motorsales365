@@ -569,6 +569,9 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
                   </div>
                 ))}
               </div>
+            </section>
+
+
 
 
             {/* Why 365 vs Facebook vs Google */}
