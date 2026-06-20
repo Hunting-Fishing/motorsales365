@@ -188,6 +188,7 @@ import { Route as AdminAdvertisementsPlaceholdersRouteImport } from './routes/ad
 import { Route as AdminAdvertisementsInquiriesRouteImport } from './routes/admin.advertisements.inquiries'
 import { Route as AdminAdvertisementsHistoryRouteImport } from './routes/admin.advertisements.history'
 import { Route as AdminAdvertisementsCampaignsRouteImport } from './routes/admin.advertisements.campaigns'
+import { Route as AdminAdvertisementsApprovalsRouteImport } from './routes/admin.advertisements.approvals'
 import { Route as AuthenticatedDisputeReportIdRouteImport } from './routes/_authenticated/dispute.$reportId'
 import { Route as AuthenticatedDashboardStaffRequestsRouteImport } from './routes/_authenticated/dashboard.staff-requests'
 import { Route as AuthenticatedDashboardPartsWantedRouteImport } from './routes/_authenticated/dashboard.parts-wanted'
@@ -1136,6 +1137,12 @@ const AdminAdvertisementsCampaignsRoute =
     path: '/campaigns',
     getParentRoute: () => AdminAdvertisementsRoute,
   } as any)
+const AdminAdvertisementsApprovalsRoute =
+  AdminAdvertisementsApprovalsRouteImport.update({
+    id: '/approvals',
+    path: '/approvals',
+    getParentRoute: () => AdminAdvertisementsRoute,
+  } as any)
 const AuthenticatedDisputeReportIdRoute =
   AuthenticatedDisputeReportIdRouteImport.update({
     id: '/dispute/$reportId',
@@ -1514,6 +1521,7 @@ export interface FileRoutesByFullPath {
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
+  '/admin/advertisements/approvals': typeof AdminAdvertisementsApprovalsRoute
   '/admin/advertisements/campaigns': typeof AdminAdvertisementsCampaignsRoute
   '/admin/advertisements/history': typeof AdminAdvertisementsHistoryRoute
   '/admin/advertisements/inquiries': typeof AdminAdvertisementsInquiriesRoute
@@ -1727,6 +1735,7 @@ export interface FileRoutesByTo {
   '/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
+  '/admin/advertisements/approvals': typeof AdminAdvertisementsApprovalsRoute
   '/admin/advertisements/campaigns': typeof AdminAdvertisementsCampaignsRoute
   '/admin/advertisements/history': typeof AdminAdvertisementsHistoryRoute
   '/admin/advertisements/inquiries': typeof AdminAdvertisementsInquiriesRoute
@@ -1946,6 +1955,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard/parts-wanted': typeof AuthenticatedDashboardPartsWantedRoute
   '/_authenticated/dashboard/staff-requests': typeof AuthenticatedDashboardStaffRequestsRoute
   '/_authenticated/dispute/$reportId': typeof AuthenticatedDisputeReportIdRoute
+  '/admin/advertisements/approvals': typeof AdminAdvertisementsApprovalsRoute
   '/admin/advertisements/campaigns': typeof AdminAdvertisementsCampaignsRoute
   '/admin/advertisements/history': typeof AdminAdvertisementsHistoryRoute
   '/admin/advertisements/inquiries': typeof AdminAdvertisementsInquiriesRoute
@@ -2166,6 +2176,7 @@ export interface FileRouteTypes {
     | '/dashboard/parts-wanted'
     | '/dashboard/staff-requests'
     | '/dispute/$reportId'
+    | '/admin/advertisements/approvals'
     | '/admin/advertisements/campaigns'
     | '/admin/advertisements/history'
     | '/admin/advertisements/inquiries'
@@ -2379,6 +2390,7 @@ export interface FileRouteTypes {
     | '/dashboard/parts-wanted'
     | '/dashboard/staff-requests'
     | '/dispute/$reportId'
+    | '/admin/advertisements/approvals'
     | '/admin/advertisements/campaigns'
     | '/admin/advertisements/history'
     | '/admin/advertisements/inquiries'
@@ -2597,6 +2609,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard/parts-wanted'
     | '/_authenticated/dashboard/staff-requests'
     | '/_authenticated/dispute/$reportId'
+    | '/admin/advertisements/approvals'
     | '/admin/advertisements/campaigns'
     | '/admin/advertisements/history'
     | '/admin/advertisements/inquiries'
@@ -4029,6 +4042,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdvertisementsCampaignsRouteImport
       parentRoute: typeof AdminAdvertisementsRoute
     }
+    '/admin/advertisements/approvals': {
+      id: '/admin/advertisements/approvals'
+      path: '/approvals'
+      fullPath: '/admin/advertisements/approvals'
+      preLoaderRoute: typeof AdminAdvertisementsApprovalsRouteImport
+      parentRoute: typeof AdminAdvertisementsRoute
+    }
     '/_authenticated/dispute/$reportId': {
       id: '/_authenticated/dispute/$reportId'
       path: '/dispute/$reportId'
@@ -4325,6 +4345,7 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface AdminAdvertisementsRouteChildren {
+  AdminAdvertisementsApprovalsRoute: typeof AdminAdvertisementsApprovalsRoute
   AdminAdvertisementsCampaignsRoute: typeof AdminAdvertisementsCampaignsRoute
   AdminAdvertisementsHistoryRoute: typeof AdminAdvertisementsHistoryRoute
   AdminAdvertisementsInquiriesRoute: typeof AdminAdvertisementsInquiriesRoute
@@ -4337,6 +4358,7 @@ interface AdminAdvertisementsRouteChildren {
 }
 
 const AdminAdvertisementsRouteChildren: AdminAdvertisementsRouteChildren = {
+  AdminAdvertisementsApprovalsRoute: AdminAdvertisementsApprovalsRoute,
   AdminAdvertisementsCampaignsRoute: AdminAdvertisementsCampaignsRoute,
   AdminAdvertisementsHistoryRoute: AdminAdvertisementsHistoryRoute,
   AdminAdvertisementsInquiriesRoute: AdminAdvertisementsInquiriesRoute,
