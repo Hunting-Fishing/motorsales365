@@ -54,7 +54,8 @@ export const getLiveCreativesForSlots = createServerFn({ method: "POST" })
         if (a.ends_at && a.ends_at < nowIso) return false;
         const cr = a.creative;
         if (!cr) return false;
-        if (cr.kind === "advertiser" && cr.status !== "approved") return false;
+        // Only approved creatives go live, regardless of kind
+        if (cr.status !== "approved") return false;
         return true;
       });
       // advertiser ads beat placeholders, then lowest position
@@ -211,7 +212,7 @@ export const createPlaceholderCreative = createServerFn({ method: "POST" })
         target_url: data.target_url ?? null,
         spec_ok: check.ok,
         spec_errors: check.errors,
-        status: "approved",
+        status: "pending",
       })
       .select("id")
       .single();
@@ -226,11 +227,12 @@ export const createPlaceholderCreative = createServerFn({ method: "POST" })
       .limit(1);
     const nextPos = (existing?.[0]?.position ?? -1) + 1;
 
+    // Inactive until an admin approves the creative
     const { error: e3 } = await supabase.from("ad_slot_assignments").insert({
       slot_id: data.slot_id,
       creative_id: creative.id,
       position: nextPos,
-      active: true,
+      active: false,
     });
     if (e3) throw new Error(e3.message);
     return { id: creative.id };
@@ -266,6 +268,18 @@ export const setAssignmentActive = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase } = context as any;
+    if (data.active) {
+      // Block activating an assignment whose creative isn't approved
+      const { data: row } = await supabase
+        .from("ad_slot_assignments")
+        .select("creative:ad_creatives(status)")
+        .eq("id", data.id)
+        .maybeSingle();
+      const status = (row as any)?.creative?.status;
+      if (status !== "approved") {
+        throw new Error(`Cannot activate — creative is ${status ?? "missing"}. Approve it first.`);
+      }
+    }
     const { error } = await supabase
       .from("ad_slot_assignments")
       .update({ active: data.active })
@@ -309,5 +323,105 @@ export const reorderAssignments = createServerFn({ method: "POST" })
         supabase.from("ad_slot_assignments").update({ position: idx }).eq("id", id).eq("slot_id", data.slot_id),
       ),
     );
+    return { ok: true };
+  });
+
+// ---------------- ADMIN: approval workflow ----------------
+
+export const listPendingCreatives = createServerFn({ method: "GET" })
+  .middleware([adminGate("advertise-approvals.list")])
+  .handler(async ({ context }) => {
+    const { supabase } = context as any;
+    const { data, error } = await supabase
+      .from("ad_creatives")
+      .select(
+        "id, kind, image_url, image_width, image_height, file_size_bytes, mime_type, headline, alt_text, target_url, spec_ok, spec_errors, status, created_at, uploaded_by, assignments:ad_slot_assignments(id, slot_id, position, active, slot:ad_slots(slot_key, label, placement))",
+      )
+      .eq("status", "pending")
+      .order("created_at", { ascending: true });
+    if (error) throw new Error(error.message);
+    return { creatives: data ?? [] };
+  });
+
+export const approveCreative = createServerFn({ method: "POST" })
+  .middleware([requireAdminRoleAudited("advertise-approvals.approve")])
+  .inputValidator((input: { id: string; notes?: string }) =>
+    z.object({ id: z.string().uuid(), notes: z.string().max(500).optional() }).parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context as any;
+    const { error: e1 } = await supabase
+      .from("ad_creatives")
+      .update({
+        status: "approved",
+        rejection_reason: null,
+        reviewed_by: userId,
+        reviewed_at: new Date().toISOString(),
+      })
+      .eq("id", data.id);
+    if (e1) throw new Error(e1.message);
+
+    // Activate every assignment for this creative
+    const { error: e2 } = await supabase
+      .from("ad_slot_assignments")
+      .update({ active: true })
+      .eq("creative_id", data.id);
+    if (e2) throw new Error(e2.message);
+
+    // Audit trail when tied to an order
+    const { data: cr } = await supabase
+      .from("ad_creatives")
+      .select("order_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (cr?.order_id) {
+      await supabase.from("ad_order_events").insert({
+        order_id: cr.order_id,
+        actor_id: userId,
+        event_type: "approved",
+        notes: data.notes ?? null,
+        payload: { creative_id: data.id },
+      });
+    }
+    return { ok: true };
+  });
+
+export const rejectCreative = createServerFn({ method: "POST" })
+  .middleware([requireAdminRoleAudited("advertise-approvals.reject")])
+  .inputValidator((input: { id: string; reason: string }) =>
+    z
+      .object({ id: z.string().uuid(), reason: z.string().trim().min(3).max(500) })
+      .parse(input),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context as any;
+    const { error: e1 } = await supabase
+      .from("ad_creatives")
+      .update({
+        status: "rejected",
+        rejection_reason: data.reason,
+        reviewed_by: userId,
+        reviewed_at: new Date().toISOString(),
+      })
+      .eq("id", data.id);
+    if (e1) throw new Error(e1.message);
+
+    // Deactivate any assignments so a rejected creative never renders
+    await supabase.from("ad_slot_assignments").update({ active: false }).eq("creative_id", data.id);
+
+    const { data: cr } = await supabase
+      .from("ad_creatives")
+      .select("order_id")
+      .eq("id", data.id)
+      .maybeSingle();
+    if (cr?.order_id) {
+      await supabase.from("ad_order_events").insert({
+        order_id: cr.order_id,
+        actor_id: userId,
+        event_type: "rejected",
+        notes: data.reason,
+        payload: { creative_id: data.id },
+      });
+    }
     return { ok: true };
   });

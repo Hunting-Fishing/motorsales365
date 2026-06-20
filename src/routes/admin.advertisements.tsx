@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { Inbox, Megaphone, Ticket, QrCode, History, Settings2, ImageIcon, Eye } from "lucide-react";
+import { Inbox, Megaphone, Ticket, QrCode, History, Settings2, ImageIcon, Eye, ShieldCheck } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 
@@ -22,6 +22,7 @@ type Tab = {
     | "/admin/advertisements/history"
     | "/admin/advertisements/slots"
     | "/admin/advertisements/placeholders"
+    | "/admin/advertisements/approvals"
     | "/admin/advertisements/preview";
   label: string;
   desc: string;
@@ -70,6 +71,13 @@ const TABS: Tab[] = [
     label: "Placeholders",
     desc: "Upload and manage default creatives per slot.",
     Icon: ImageIcon,
+    roles: ["admin", "advertising"],
+  },
+  {
+    to: "/admin/advertisements/approvals",
+    label: "Approvals",
+    desc: "Review and approve pending ad creatives.",
+    Icon: ShieldCheck,
     roles: ["admin", "advertising"],
   },
   {
