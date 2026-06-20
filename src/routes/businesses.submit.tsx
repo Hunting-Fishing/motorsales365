@@ -942,7 +942,7 @@ function SubmitBusinessPage() {
 
 
             {/* ===== SERVICES ===== */}
-            {step === "services" && (
+            <div hidden={step !== "services"} role="tabpanel" id="panel-services">
               <div className="space-y-5">
                 <div>
                   <h2 className="font-display text-xl font-semibold">Services & pricing</h2>
@@ -953,7 +953,8 @@ function SubmitBusinessPage() {
                 </div>
                 <ServicesTable typeSlug={typeSlug} value={services} onChange={setServices} />
               </div>
-            )}
+            </div>
+
 
             {/* ===== CONTACT ===== */}
             {step === "contact" && (
