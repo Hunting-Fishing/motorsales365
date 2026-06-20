@@ -94,13 +94,13 @@ function AdSlot({
 }) {
   return (
     <div
-      className={`relative overflow-hidden rounded-sm ring-1 ring-primary/60 shadow-sm ${className}`}
+      className={`relative overflow-hidden rounded-sm ring-1 ring-primary/60 shadow-sm bg-muted ${className}`}
     >
       <img
         src={src}
         alt={alt}
         loading="lazy"
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute inset-0 h-full w-full object-contain"
       />
       {showPill && (
         <span className="absolute left-0.5 top-0.5 rounded-[2px] bg-primary/90 px-1 py-[1px] text-[6px] font-semibold uppercase tracking-wide text-primary-foreground">
