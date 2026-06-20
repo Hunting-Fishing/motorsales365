@@ -450,7 +450,7 @@ export function QrLandingContent({ code, preview = false }: QrLandingContentProp
             <div className="flex-1">
               <p className="font-semibold text-foreground">Promoter preview</p>
               <p className="text-muted-foreground">
-                Tracking and lead submissions are disabled in preview mode.
+                Tracking is disabled in preview mode.
               </p>
             </div>
           </div>
