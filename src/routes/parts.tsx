@@ -38,6 +38,8 @@ function PartsHub() {
   const [tab, setTab] = useState<Tab>("find");
   const browse = useServerFn(browseUsedParts);
   const [browseRows, setBrowseRows] = useState<ListingCardData[] | null>(null);
+  const [density, setDensity] = useGridDensity(3);
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
   useEffect(() => {
     if (tab !== "browse" || browseRows !== null) return;
@@ -46,9 +48,12 @@ function PartsHub() {
       .catch(() => setBrowseRows([]));
   }, [tab, browseRows, browse]);
 
+  const gridClass = densityGridClass(density);
+
   return (
     <SiteLayout>
       <div className="container mx-auto max-w-6xl px-4 py-8 md:py-12">
+
         {/* Hero */}
         <div className="mb-6 rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-card p-6 md:p-8">
           <div className="flex items-start gap-3">
