@@ -289,6 +289,8 @@ export const getBrowseListings = createServerFn({ method: "POST" })
         registration_status: r.registration_status,
         region: r.region,
         city: r.city,
+        lat: r.lat != null ? Number(r.lat) : null,
+        lng: r.lng != null ? Number(r.lng) : null,
         seller_type: r.seller_type,
         boost_until: r.boost_until,
         category_slug: r.category_slug,
