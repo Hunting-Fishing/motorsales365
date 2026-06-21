@@ -116,10 +116,15 @@ function SectionCard({
   return (
     <Collapsible
       defaultOpen={open}
-      className={`mt-6 rounded-xl border border-border bg-card p-5 ${className ?? ""}`}
+      className={`group/section mt-4 overflow-hidden rounded-xl border border-border bg-card p-4 ${className ?? ""}`}
     >
+      {/* Subtle PH flag accent stripe */}
+      <div
+        aria-hidden
+        className="-mx-4 -mt-4 mb-3 h-1 bg-gradient-to-r from-[#0038A8] via-[#FCD116] to-[#CE1126]"
+      />
       <CollapsibleTrigger className="group flex w-full items-center justify-between gap-3 text-left">
-        <h2 className="font-display text-lg font-semibold">{title}</h2>
+        <h2 className="font-display text-base font-semibold sm:text-lg">{title}</h2>
         <div className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
           {meta}
           <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]:rotate-180" />
