@@ -7,6 +7,10 @@ import { PartsWizard } from "@/components/parts/parts-wizard";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
 import { Button } from "@/components/ui/button";
 import { browseUsedParts } from "@/lib/parts-search.functions";
+import { MarketplaceToolbar, type ViewMode } from "@/components/marketplace/marketplace-toolbar";
+import { ListingCardSkeletonGrid } from "@/components/marketplace/listing-card-skeleton";
+import { ListingsMapView } from "@/components/marketplace/listings-map-view";
+import { useGridDensity, densityGridClass } from "@/hooks/use-grid-density";
 
 const TITLE = "Used Auto Parts Marketplace — 365 MotorSales Philippines";
 const DESCRIPTION =
