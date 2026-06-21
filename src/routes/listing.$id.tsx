@@ -962,9 +962,7 @@ function ListingDetailPage() {
                   </Badge>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  We're building a partner network for financing, insurance, OR/CR, title
-                  transfer, and pre-purchase inspections. Not available yet — we'll notify you
-                  once it launches.
+                  Sweet! These will be Awesome Future Services!
                 </p>
 
               </div>
