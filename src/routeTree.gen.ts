@@ -53,6 +53,7 @@ import { Route as WantedPartsIndexRouteImport } from './routes/wanted-parts.inde
 import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as RidesIndexRouteImport } from './routes/rides.index'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
+import { Route as GamesIndexRouteImport } from './routes/games.index'
 import { Route as DispatchIndexRouteImport } from './routes/dispatch.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as BusinessesIndexRouteImport } from './routes/businesses.index'
@@ -446,6 +447,11 @@ const RidesIndexRoute = RidesIndexRouteImport.update({
 const LearnIndexRoute = LearnIndexRouteImport.update({
   id: '/learn/',
   path: '/learn/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GamesIndexRoute = GamesIndexRouteImport.update({
+  id: '/games/',
+  path: '/games/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DispatchIndexRoute = DispatchIndexRouteImport.update({
@@ -1516,6 +1522,7 @@ export interface FileRoutesByFullPath {
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dispatch/': typeof DispatchIndexRoute
+  '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop/': typeof ShopIndexRoute
@@ -1731,6 +1738,7 @@ export interface FileRoutesByTo {
   '/businesses': typeof BusinessesIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dispatch': typeof DispatchIndexRoute
+  '/games': typeof GamesIndexRoute
   '/learn': typeof LearnIndexRoute
   '/rides': typeof RidesIndexRoute
   '/shop': typeof ShopIndexRoute
@@ -1952,6 +1960,7 @@ export interface FileRoutesById {
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dispatch/': typeof DispatchIndexRoute
+  '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop/': typeof ShopIndexRoute
@@ -2174,6 +2183,7 @@ export interface FileRouteTypes {
     | '/businesses/'
     | '/dashboard/'
     | '/dispatch/'
+    | '/games/'
     | '/learn/'
     | '/rides/'
     | '/shop/'
@@ -2389,6 +2399,7 @@ export interface FileRouteTypes {
     | '/businesses'
     | '/dashboard'
     | '/dispatch'
+    | '/games'
     | '/learn'
     | '/rides'
     | '/shop'
@@ -2609,6 +2620,7 @@ export interface FileRouteTypes {
     | '/businesses/'
     | '/dashboard/'
     | '/dispatch/'
+    | '/games/'
     | '/learn/'
     | '/rides/'
     | '/shop/'
@@ -2764,6 +2776,7 @@ export interface RootRouteChildren {
   WantedIdRoute: typeof WantedIdRoute
   WantedNewRoute: typeof WantedNewRoute
   BusinessesIndexRoute: typeof BusinessesIndexRoute
+  GamesIndexRoute: typeof GamesIndexRoute
   LearnIndexRoute: typeof LearnIndexRoute
   RidesIndexRoute: typeof RidesIndexRoute
   ShopIndexRoute: typeof ShopIndexRoute
@@ -3108,6 +3121,13 @@ declare module '@tanstack/react-router' {
       path: '/learn'
       fullPath: '/learn/'
       preLoaderRoute: typeof LearnIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/games/': {
+      id: '/games/'
+      path: '/games'
+      fullPath: '/games/'
+      preLoaderRoute: typeof GamesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dispatch/': {
@@ -4766,6 +4786,7 @@ const rootRouteChildren: RootRouteChildren = {
   WantedIdRoute: WantedIdRoute,
   WantedNewRoute: WantedNewRoute,
   BusinessesIndexRoute: BusinessesIndexRoute,
+  GamesIndexRoute: GamesIndexRoute,
   LearnIndexRoute: LearnIndexRoute,
   RidesIndexRoute: RidesIndexRoute,
   ShopIndexRoute: ShopIndexRoute,
