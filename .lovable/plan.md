@@ -1,98 +1,50 @@
-## Goal
-When an admin approves or rejects an ad creative:
-1. The uploader gets an **email** and an **in-app notification**.
-2. Every approve/reject action is permanently recorded in an **audit trail** (admin, timestamp, reason, before/after status).
+# PayPal payments + unified admin log
 
----
+## 1. PayPal account setup (what you do)
+You need a **PayPal Business account** + **Developer dashboard** access:
+1. Go to https://developer.paypal.com → log in with your PayPal Business account.
+2. Apps & Credentials → **Sandbox** → Create App → copy `Client ID` and `Secret`.
+3. Switch to **Live** → Create App → copy `Client ID` and `Secret`.
+4. In each app, enable the **Webhook** for events: `CHECKOUT.ORDER.APPROVED`, `PAYMENT.CAPTURE.COMPLETED`, `PAYMENT.CAPTURE.REFUNDED`, `BILLING.SUBSCRIPTION.ACTIVATED`, `BILLING.SUBSCRIPTION.CANCELLED`, `BILLING.SUBSCRIPTION.PAYMENT.FAILED`. I'll give you the exact webhook URLs to paste in once the endpoint exists.
+5. Hand me the 4 values via the secret form — I'll store them as `PAYPAL_SANDBOX_CLIENT_ID`, `PAYPAL_SANDBOX_SECRET`, `PAYPAL_LIVE_CLIENT_ID`, `PAYPAL_LIVE_SECRET` (plus two webhook IDs once webhooks are registered).
 
-## 1. Database (one migration)
+## 2. Database
+One migration adds:
+- `payment_provider` enum: `stripe`, `paypal`, `manual`.
+- `payments.provider` column (default `stripe`, backfilled).
+- `payments.provider_reference` (e.g. PayPal order/capture/subscription id) + unique index for idempotency.
+- `paypal_subscriptions` table linking `user_id` → PayPal subscription id + plan kind (business/dispatch), mirroring the Stripe tables for reconciliation.
+- Indexes on `payments(provider, created_at)` and a `profiles` join helper for name/email search.
 
-### `ad_creative_audit_log` — permanent record of every review action
-- `creative_id` → `ad_creatives.id` (cascade)
-- `order_id` → `ad_orders.id` nullable (for advertiser ads)
-- `actor_id` → `auth.users.id` (the admin)
-- `action` text check in (`approved`, `rejected`, `revoked`, `resubmitted`)
-- `previous_status`, `new_status` (ad_creative_status enum)
-- `reason` text (required for reject)
-- `notes` text (optional approve notes)
-- `metadata` jsonb (slot keys, dimensions snapshot, etc.)
-- `created_at`
+## 3. Server (TanStack server functions + one public webhook route)
+- `src/lib/paypal.server.ts` — REST client (OAuth token cache, sandbox/live switch, signature/webhook verification helper).
+- `src/lib/paypal-checkout.functions.ts` — `createPayPalOrder({ kind, refId })` and `capturePayPalOrder({ orderId })` covering all four kinds: listing fee, boost, subscription (uses PayPal Subscriptions API), ad order. Pricing reuses existing `pricing_settings` / package tables so admin price edits apply to both rails.
+- `src/routes/api/public/webhooks/paypal.ts` — verifies PayPal webhook signature, records `payments` rows via a shared `recordPaymentForPayPal` helper (mirrors the Stripe recorder), activates listings/boosts/subs.
+- Existing checkout call sites (listing payment, boost, subscription, ad order) gain a `provider` param so the UI can pick Stripe or PayPal.
 
-RLS:
-- Admins / `advertising` role → SELECT all, INSERT.
-- Uploader → SELECT rows where `creative_id` belongs to them (so they can see their own history).
-- GRANTs: SELECT/INSERT to `authenticated`, ALL to `service_role`.
+## 4. UI changes (minimal, additive)
+- Checkout dialogs (listing fee, boost, subscription, ad order) get a **"Pay with"** toggle: Stripe card/e-wallets *or* PayPal. PayPal renders the official PayPal JS Buttons SDK using the publishable client ID.
+- `/payments` info page: add PayPal to the Cards / E-wallets group as **Live**.
 
-### `user_notifications` — generic in-app inbox (first use: ad approvals)
-- `user_id` → `auth.users.id` (cascade)
-- `category` text (`ad_creative_approved`, `ad_creative_rejected`, future-proofed)
-- `title` text, `body` text
-- `link_url` text (e.g. `/advertise/creatives/{id}`)
-- `entity_type` text, `entity_id` uuid (creative id)
-- `metadata` jsonb
-- `read_at` timestamptz nullable
-- `created_at`
-
-RLS:
-- Owner can SELECT and UPDATE (`read_at` only — enforced via policy + trigger preventing other column changes by non-service callers).
-- Service role inserts.
-- GRANTs: SELECT/UPDATE to `authenticated`, ALL to `service_role`.
-
-Indexes: `(user_id, read_at, created_at desc)`, `(creative_id)` on audit.
-
----
-
-## 2. Email templates (`src/lib/email-templates/`)
-- `ad-creative-approved.tsx` — "Your ad creative is approved" + slot list + preview thumbnail + link to advertise dashboard.
-- `ad-creative-rejected.tsx` — "Your ad creative needs changes" + rejection reason + link to re-upload.
-- Register both in `registry.ts`.
-
-Brand-consistent with existing ad-inquiry templates (reuse `_styles.ts`).
-
----
-
-## 3. Server functions (`src/lib/advertise-slots.functions.ts`)
-
-Extend `approveCreative` and `rejectCreative` handlers (after the existing status update + assignment toggle):
-
-1. Load creative with `uploaded_by`, `kind`, `headline`, `order_id`, `status` (previous), and uploader's email/display name from `profiles`/`auth.users` via `supabaseAdmin`.
-2. Insert into `ad_creative_audit_log` (action, previous_status, new_status, reason/notes, actor_id, metadata).
-3. **Skip notifications for `kind = 'placeholder'`** (admin-created, no advertiser to notify) — still write audit row.
-4. For advertiser creatives:
-   - Insert `user_notifications` row (admin client) for the uploader.
-   - Call `enqueueTransactionalEmailServer` with template `ad-creative-approved` or `ad-creative-rejected`, `idempotencyKey: \`ad-creative-${action}-${creativeId}\``.
-
-Keep existing `ad_order_events` insert intact (order-level log stays).
-
-New read fns:
-- `listMyCreativeAudit({ creativeId })` — uploader can fetch their creative's history.
-- `listCreativeAuditAdmin({ creativeId })` — admin view.
-
----
-
-## 4. In-app notification surface
-
-- New hook `src/hooks/use-user-notifications.ts` (TanStack Query, 30s stale).
-- New server fns `listMyNotifications`, `markNotificationRead`, `markAllNotificationsRead` (with `requireSupabaseAuth`).
-- New small component `src/components/advertise/creative-notifications-panel.tsx` rendered on the advertiser advertise portal page — shows unread count badge, dropdown list, mark-as-read on click, link to the creative.
-- Mount the panel in the existing `/advertise` route header (advertiser portal). No global header changes.
-
----
-
-## 5. Admin audit trail UI
-
-- New tab "History" on the existing `/admin/advertisements/approvals` route (or inline expander on each creative card) showing the audit log entries for the selected creative: action badge, admin name, timestamp, reason/notes.
-- Reuses `listCreativeAuditAdmin`.
-
----
+## 5. Admin payments log (`/admin/payments`)
+Extend the existing page in place:
+- Provider column + filter chips (All / Stripe / PayPal / Manual).
+- Search box matching user **name OR email** (joined via `profiles`).
+- Clicking a row's user name opens a **per-user purchase history drawer** (all payments across providers, totals, refund status).
+- "Export CSV" button respecting active filters.
+- Server-side pagination + filter pushed into one `adminListPayments` server function (admin-gated) so the table stays fast.
 
 ## 6. Verification
-- Approve a pending creative → audit row inserted, `user_notifications` row appears for uploader, `email_send_log` shows pending row for `ad-creative-approved`.
-- Reject with reason → audit row with reason, notification + email use rejection template, reason text shown in both.
-- Placeholder approve/reject → audit row only, no email/notification.
-- Re-approving an already-approved creative still creates a fresh audit row.
+- Sandbox end-to-end test for each of: listing fee, boost, subscription start, ad order — confirm `payments` row is inserted once via webhook (idempotent on retry).
+- Admin log filter/search/CSV smoke test.
+- Switch toggle to live only after you confirm sandbox flows.
 
-## Out of scope
-- Push/SMS notifications.
-- Notifications for non-ad events.
-- Bulk approve UI changes.
+## Technical notes
+- PayPal Orders v2 + Subscriptions v1 over REST (no SDK needed for Workers).
+- Webhook verification uses PayPal's `/v1/notifications/verify-webhook-signature`; the webhook ID secret is stored per environment.
+- `provider_reference` makes the recorder idempotent the same way `stripe_invoice:{id}` does today.
+- No changes to existing Stripe code paths.
+
+## Out of scope (ask if you want them)
+- Refund initiation from the admin UI (today refunds are provider-side).
+- Migrating existing Stripe subscribers to PayPal.
