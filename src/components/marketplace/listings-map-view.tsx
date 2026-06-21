@@ -153,7 +153,7 @@ export function ListingsMapView({ listings }: { listings: ListingCardData[] }) {
             {selected.listings.map((l) => (
               <li key={l.id}>
                 <Link
-                  to="/l/$id"
+                  to="/listing/$id"
                   params={{ id: l.id }}
                   className="flex gap-2 rounded-md border border-border bg-background p-2 transition-colors hover:bg-secondary"
                 >
