@@ -601,9 +601,12 @@ describe("manual payment submission smoke test", () => {
         // The note + entity_id keep the audit row linked back to the right payment.
         expect(audit.entity_id).toBe(payment.invoice_number ? `pay_${i + 1}` : `pay_${i + 1}`);
         expect(audit.note).toContain(s.reference);
+      });
+    });
   });
 
   describe("proof_url presence + validity on audit log entries for boost renewals", () => {
+
     const isValidProofPath = (p: unknown): p is string =>
       typeof p === "string" &&
       p.length > 0 &&
