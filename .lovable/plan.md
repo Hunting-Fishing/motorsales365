@@ -1,39 +1,13 @@
-## Goal
-Make GCash the obvious, properly-wired manual payment option that lands funds directly in **GCash +63 969 606 3830**.
+## Scope
+Update the "Coming soon" partner-services section on the listing detail page (`src/routes/listing.$id.tsx`).
 
-## 1. Seed GCash details (data insert)
-Update `payment_method_config` row where `method = 'gcash'`:
-- `account_name`: "365 MotorSales"
-- `account_number`: "+63 969 606 3830"
-- `instructions`: "Open GCash → Send Money → enter +63 969 606 3830 → send the exact amount → copy the GCash reference number → upload your receipt below. We confirm within 1 business day."
-- `enabled`: true
-- `display_order`: 1 (so it appears first)
+## Changes
+1. **Remove per-row badges** — Delete the "Soon" pill from each service row; keep only the header-level "Coming soon" badge.
+2. **Orange caution styling** — Change the section container from `bg-card`/`border-border` to a light amber/orange background and border (e.g. `bg-amber-50`, `border-amber-200`, with dark-mode equivalents). Add a caution icon (`AlertTriangle` or `Construction` from lucide-react) beside the header badge.
+3. **Text fit & professionalism** — Verify all labels wrap cleanly without overflow (`break-words`, adequate line-height). Keep the header text and subtext readable at current sizes.
+4. **Subtext cleanup** — Keep the current "Sweet! These will be Awesome Future Services!" copy (already concise).
 
-(QR image can be added later from admin once you upload one.)
-
-## 2. Promote GCash on `/payments` (src/routes/payments.tsx)
-- Add a top hero card above the method grid: "Pay directly to our GCash — +63 969 606 3830" with a "Pay with GCash now" button → `/pay/manual?kind=listing` and a "How it works" link → `/help/pay-with-gcash`.
-- Reorder so the GCash card sits first with a "Recommended" badge.
-- Update copy to make clear: GCash via Stripe routes to our bank; **direct GCash sends to our GCash wallet instantly** and is the fastest path.
-
-## 3. Surface GCash as a first-class choice at checkout
-Touch the four checkout pages (`listing.checkout.tsx`, `boost.checkout.tsx`, `business.checkout.tsx`, `dispatch.checkout.tsx`) and `passport-premium.checkout.tsx`:
-- Add a prominent "Pay with GCash (direct)" button alongside the existing Stripe/manual options, deep-linking to `/pay/manual?kind=…&ref=…&amount=…&desc=…` with GCash pre-selected.
-- Listing checkout already has a GCash button (Stripe rail) — relabel that as "GCash via Stripe (card sheet)" and add the new "GCash direct to wallet" button so users understand the difference.
-
-## 4. Pre-select GCash on the manual pay form
-`src/components/checkout/manual-pay-form.tsx`: accept an optional `?method=gcash` search param and auto-select GCash in the method picker.
-
-## 5. Admin clarity
-On `/admin/payments`, the existing "GCash (Manual)" filter chip already exists — add a small header showing the seeded GCash number so admins see what buyers are paying to. Editable via existing payment-methods admin UI.
-
-## 6. Update /terms and /privacy
-Per project memory: bump "Last updated" date on `/terms` (new payment destination/account) — no policy change needed beyond noting GCash direct-to-wallet payments are processed manually.
-
-## Files
-- migration/insert: update `payment_method_config` GCash row
-- edit: `src/routes/payments.tsx`, `src/routes/listing.checkout.tsx`, `src/routes/boost.checkout.tsx`, `src/routes/business.checkout.tsx`, `src/routes/dispatch.checkout.tsx`, `src/routes/passport-premium.checkout.tsx`, `src/components/checkout/manual-pay-form.tsx`, `src/routes/admin.payments.tsx`, `src/routes/terms.tsx`
-
-## Out of scope
-- Automated GCash API (GCash has no public merchant API for direct wallet-to-wallet receipts; manual + receipt approval is the correct flow).
-- Changing Stripe GCash rail (kept as-is, secondary option).
+## Technical details
+- Edit only `src/routes/listing.$id.tsx` lines ~950–1003.
+- Use Tailwind amber/orange semantic utilities (not hardcoded hex) for theming consistency.
+- No backend or business-logic changes.
