@@ -472,6 +472,8 @@ function EditListingPage() {
         province,
         city,
         barangay,
+        lat,
+        lng,
         condition,
         contact_phone: buildE164(phoneIso, phoneNational) ?? null,
         allow_messages: allowMessages,
