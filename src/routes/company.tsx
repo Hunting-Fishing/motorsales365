@@ -118,8 +118,8 @@ function CompanyPage() {
               <Row
                 label="Customer hotline"
                 value={
-                  <a className="text-primary underline" href="tel:+639696063830">
-                    +63 969 606 3830
+                  <a className="text-primary underline" href="tel:09696063830">
+                    09696063830
                   </a>
                 }
               />

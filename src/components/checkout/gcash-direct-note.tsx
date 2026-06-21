@@ -14,7 +14,7 @@ export function GCashDirectNote() {
           <div className="font-semibold">Prefer GCash direct?</div>
           <p className="text-muted-foreground">
             Send to our GCash wallet{" "}
-            <span className="font-mono font-medium text-foreground">+63 969 606 3830</span>{" "}
+            <span className="font-mono font-medium text-foreground">09696063830</span>{" "}
             (365 MotorSales) and upload your receipt — we confirm within 1 business day.
           </p>
           <Link

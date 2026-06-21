@@ -53,8 +53,8 @@ function ContactPage() {
           <Card
             icon={<Phone className="h-5 w-5" />}
             title="Phone (Mon–Sat, 9am–6pm)"
-            body="+63 969 606 3830"
-            href="tel:+639696063830"
+            body="09696063830"
+            href="tel:09696063830"
           />
           <Card
             icon={<MapPin className="h-5 w-5" />}
