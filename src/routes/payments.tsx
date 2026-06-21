@@ -47,6 +47,10 @@ type Method = {
   iconColor?: string;
   status: Status;
   provider?: string;
+  /** Full brand logo image (used for hero/live tiles). */
+  imageSrc?: string;
+  /** Optional caption shown beneath a hero brand tile. */
+  tag?: string;
 };
 
 // Small lettered brand badges for marks not available as SVG icons.
