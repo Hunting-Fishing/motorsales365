@@ -1,5 +1,5 @@
 import logoSrc from "@/assets/logo-small.webp";
-import { Badge } from "@/components/ui/badge";
+import { ComingSoonBadge, ComingSoonSection } from "@/components/coming-soon";
 
 interface Props {
   make?: string | null;
@@ -24,21 +24,15 @@ const PLACEHOLDER_ITEMS = [
  */
 export function AffiliatePartsSection(_props: Props) {
   return (
-    <div className="relative">
-      <div className="flex items-center gap-2">
-        <Badge variant="secondary" className="text-[10px]">
-          Coming Soon
-        </Badge>
-      </div>
-      <p className="mt-2 text-xs text-muted-foreground">
-        Curated parts &amp; accessories from partner shops will appear here once supplier onboarding is complete.
-      </p>
-
+    <ComingSoonSection
+      title="Partner parts & accessories"
+      subtitle="Curated parts & accessories from partner shops will appear here once supplier onboarding is complete."
+    >
       <div className="mt-3 grid grid-cols-3 gap-2 sm:grid-cols-6">
         {PLACEHOLDER_ITEMS.map((label) => (
           <div
             key={label}
-            className="flex flex-col items-center gap-1 rounded-lg border border-border bg-muted/30 p-2 text-center opacity-60"
+            className="flex flex-col items-center gap-1 rounded-lg border border-amber-200 bg-white/70 p-2 text-center opacity-60 dark:border-amber-800/60 dark:bg-amber-950/40"
           >
             <img
               src={logoSrc}
@@ -46,14 +40,14 @@ export function AffiliatePartsSection(_props: Props) {
               className="h-8 w-8 object-contain"
               loading="lazy"
             />
-            <span className="text-[10px] leading-tight text-muted-foreground">{label}</span>
+            <span className="text-[10px] leading-tight text-amber-900/80 dark:text-amber-200/80">{label}</span>
           </div>
         ))}
       </div>
 
-      <p className="mt-2 text-[10px] text-muted-foreground">
+      <p className="mt-2 text-[10px] text-amber-900/70 dark:text-amber-200/70">
         Affiliate links — 365 MotorSales may earn a commission at no extra cost to you.
       </p>
-    </div>
+    </ComingSoonSection>
   );
 }
