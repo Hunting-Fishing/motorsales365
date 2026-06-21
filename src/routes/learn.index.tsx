@@ -46,7 +46,13 @@ function LearnIndex() {
   return (
     <SiteLayout>
       <div className="container mx-auto px-4 py-8">
-        <div className="mb-8 rounded-2xl border bg-gradient-to-br from-primary/5 via-background to-background p-6 sm:p-10">
+        <div className="flex justify-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+            <Sparkles className="h-3.5 w-3.5" />
+            Designed by 365MotorSales
+          </span>
+        </div>
+        <div className="mt-4 mb-8 rounded-2xl border bg-gradient-to-br from-primary/5 via-background to-background p-6 sm:p-10">
           <div className="flex items-center gap-2 text-sm font-medium text-primary">
             <Sparkles className="h-4 w-4" /> 365 Learn
           </div>
@@ -58,6 +64,12 @@ function LearnIndex() {
             — taught by working pros. Pay per course or unlock everything with a 365 subscription.
           </p>
           <div className="mt-6 flex flex-wrap gap-2">
+            <Button asChild size="sm">
+              <Link to="/learn/flashcards">Play 365 Flashcards</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/games">Browse all games</Link>
+            </Button>
             <Button asChild variant="outline" size="sm">
               <Link to="/pricing">View subscriptions</Link>
             </Button>
@@ -69,6 +81,7 @@ function LearnIndex() {
             </Button>
           </div>
         </div>
+
 
         <FeaturedTrainingRail className="mb-8" />
 

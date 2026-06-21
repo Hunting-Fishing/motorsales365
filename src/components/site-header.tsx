@@ -202,6 +202,14 @@ export function SiteHeader() {
               Learn
             </Link>
             <Link
+              to="/games"
+              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              activeProps={{ className: "bg-secondary text-foreground" }}
+            >
+              Games
+            </Link>
+
+            <Link
               to="/shop-manager"
               className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               activeProps={{ className: "bg-secondary text-foreground" }}
@@ -617,6 +625,14 @@ export function SiteHeader() {
                       className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
                     >
                       Shop Manager
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link
+                      to="/games"
+                      className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                    >
+                      Games
                     </Link>
                   </SheetClose>
                   <SheetClose asChild>

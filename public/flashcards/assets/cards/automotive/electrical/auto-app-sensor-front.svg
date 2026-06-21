@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 840" role="img" aria-label="Acceleration Pedal Sensor — front (placeholder)">
+  <rect width="600" height="840" rx="20" fill="#ffffff" stroke="#cdd6e0" stroke-width="2"/>
+  <path d="M0 20 Q0 0 20 0 H560 L600 64 V20 Q600 0 580 0 Z" fill="#1d2733"/>
+  <rect x="0" y="0" width="600" height="64" rx="0" fill="#1d2733"/>
+  <path d="M540 0 H580 Q600 0 600 20 V64 H540 Z" fill="#d11f2a"/>
+  <text x="28" y="42" font-family="Arial,sans-serif" font-size="26" font-weight="900" fill="#fff">CARD — FRONT</text>
+  <text x="565" y="44" font-family="Arial,sans-serif" font-size="22" font-weight="900" fill="#fff" text-anchor="end">K</text>
+  <text x="300" y="120" font-family="Arial,sans-serif" font-size="24" font-weight="800" fill="#16202e" text-anchor="middle">Identify the component shown</text>
+  <text x="300" y="150" font-family="Arial,sans-serif" font-size="24" font-weight="800" fill="#16202e" text-anchor="middle">and state its function.</text>
+  <rect x="80" y="200" width="440" height="330" rx="12" fill="#f4f7fa" stroke="#cdd6e0" stroke-width="2" stroke-dasharray="8 7"/>
+  <text x="300" y="360" font-family="Arial,sans-serif" font-size="20" font-weight="800" fill="#5a6b7e" text-anchor="middle">COMPONENT PHOTO</text>
+  <text x="300" y="388" font-family="Arial,sans-serif" font-size="13" fill="#8694a6" text-anchor="middle">replace auto-app-sensor-front.(png/svg)</text>
+  <rect x="60" y="580" width="480" height="120" rx="12" fill="#eef3fb" stroke="#c7ddf5" stroke-width="2"/>
+  <text x="86" y="618" font-family="Arial,sans-serif" font-size="15" font-weight="800" fill="#1c4e80">HINT</text>
+  <text x="86" y="646" font-family="Arial,sans-serif" font-size="14" fill="#28415c">Plays a key role in how the engine responds</text>
+  <text x="86" y="668" font-family="Arial,sans-serif" font-size="14" fill="#28415c">when the driver presses the accelerator pedal.</text>
+  <text x="300" y="800" font-family="Arial,sans-serif" font-size="13" font-weight="700" fill="#90a0b0" text-anchor="middle">365 MOTOR SALES · ENGINE TRAINING</text>
+</svg>

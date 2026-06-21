@@ -53,6 +53,7 @@ import { Route as WantedPartsIndexRouteImport } from './routes/wanted-parts.inde
 import { Route as ShopIndexRouteImport } from './routes/shop.index'
 import { Route as RidesIndexRouteImport } from './routes/rides.index'
 import { Route as LearnIndexRouteImport } from './routes/learn.index'
+import { Route as GamesIndexRouteImport } from './routes/games.index'
 import { Route as DispatchIndexRouteImport } from './routes/dispatch.index'
 import { Route as DashboardIndexRouteImport } from './routes/dashboard.index'
 import { Route as BusinessesIndexRouteImport } from './routes/businesses.index'
@@ -78,6 +79,7 @@ import { Route as PassportPremiumCheckoutRouteImport } from './routes/passport-p
 import { Route as ListingCheckoutRouteImport } from './routes/listing.checkout'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as LearnMechanicsRouteImport } from './routes/learn.mechanics'
+import { Route as LearnFlashcardsRouteImport } from './routes/learn.flashcards'
 import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
 import { Route as InvitesTokenRouteImport } from './routes/invites.$token'
 import { Route as HelpTrustScoreRouteImport } from './routes/help.trust-score'
@@ -447,6 +449,11 @@ const LearnIndexRoute = LearnIndexRouteImport.update({
   path: '/learn/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GamesIndexRoute = GamesIndexRouteImport.update({
+  id: '/games/',
+  path: '/games/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DispatchIndexRoute = DispatchIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -570,6 +577,11 @@ const ListingIdRoute = ListingIdRouteImport.update({
 const LearnMechanicsRoute = LearnMechanicsRouteImport.update({
   id: '/learn/mechanics',
   path: '/learn/mechanics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnFlashcardsRoute = LearnFlashcardsRouteImport.update({
+  id: '/learn/flashcards',
+  path: '/learn/flashcards',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LearnSlugRoute = LearnSlugRouteImport.update({
@@ -1484,6 +1496,7 @@ export interface FileRoutesByFullPath {
   '/help/trust-score': typeof HelpTrustScoreRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/learn/flashcards': typeof LearnFlashcardsRoute
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
@@ -1509,6 +1522,7 @@ export interface FileRoutesByFullPath {
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dispatch/': typeof DispatchIndexRoute
+  '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop/': typeof ShopIndexRoute
@@ -1698,6 +1712,7 @@ export interface FileRoutesByTo {
   '/help/trust-score': typeof HelpTrustScoreRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/learn/flashcards': typeof LearnFlashcardsRoute
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
@@ -1723,6 +1738,7 @@ export interface FileRoutesByTo {
   '/businesses': typeof BusinessesIndexRoute
   '/dashboard': typeof DashboardIndexRoute
   '/dispatch': typeof DispatchIndexRoute
+  '/games': typeof GamesIndexRoute
   '/learn': typeof LearnIndexRoute
   '/rides': typeof RidesIndexRoute
   '/shop': typeof ShopIndexRoute
@@ -1918,6 +1934,7 @@ export interface FileRoutesById {
   '/help/trust-score': typeof HelpTrustScoreRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/learn/flashcards': typeof LearnFlashcardsRoute
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
@@ -1943,6 +1960,7 @@ export interface FileRoutesById {
   '/businesses/': typeof BusinessesIndexRoute
   '/dashboard/': typeof DashboardIndexRoute
   '/dispatch/': typeof DispatchIndexRoute
+  '/games/': typeof GamesIndexRoute
   '/learn/': typeof LearnIndexRoute
   '/rides/': typeof RidesIndexRoute
   '/shop/': typeof ShopIndexRoute
@@ -2139,6 +2157,7 @@ export interface FileRouteTypes {
     | '/help/trust-score'
     | '/invites/$token'
     | '/learn/$slug'
+    | '/learn/flashcards'
     | '/learn/mechanics'
     | '/listing/$id'
     | '/listing/checkout'
@@ -2164,6 +2183,7 @@ export interface FileRouteTypes {
     | '/businesses/'
     | '/dashboard/'
     | '/dispatch/'
+    | '/games/'
     | '/learn/'
     | '/rides/'
     | '/shop/'
@@ -2353,6 +2373,7 @@ export interface FileRouteTypes {
     | '/help/trust-score'
     | '/invites/$token'
     | '/learn/$slug'
+    | '/learn/flashcards'
     | '/learn/mechanics'
     | '/listing/$id'
     | '/listing/checkout'
@@ -2378,6 +2399,7 @@ export interface FileRouteTypes {
     | '/businesses'
     | '/dashboard'
     | '/dispatch'
+    | '/games'
     | '/learn'
     | '/rides'
     | '/shop'
@@ -2572,6 +2594,7 @@ export interface FileRouteTypes {
     | '/help/trust-score'
     | '/invites/$token'
     | '/learn/$slug'
+    | '/learn/flashcards'
     | '/learn/mechanics'
     | '/listing/$id'
     | '/listing/checkout'
@@ -2597,6 +2620,7 @@ export interface FileRouteTypes {
     | '/businesses/'
     | '/dashboard/'
     | '/dispatch/'
+    | '/games/'
     | '/learn/'
     | '/rides/'
     | '/shop/'
@@ -2729,6 +2753,7 @@ export interface RootRouteChildren {
   HelpTrustScoreRoute: typeof HelpTrustScoreRoute
   InvitesTokenRoute: typeof InvitesTokenRoute
   LearnSlugRoute: typeof LearnSlugRoute
+  LearnFlashcardsRoute: typeof LearnFlashcardsRoute
   LearnMechanicsRoute: typeof LearnMechanicsRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   ListingCheckoutRoute: typeof ListingCheckoutRoute
@@ -2751,6 +2776,7 @@ export interface RootRouteChildren {
   WantedIdRoute: typeof WantedIdRoute
   WantedNewRoute: typeof WantedNewRoute
   BusinessesIndexRoute: typeof BusinessesIndexRoute
+  GamesIndexRoute: typeof GamesIndexRoute
   LearnIndexRoute: typeof LearnIndexRoute
   RidesIndexRoute: typeof RidesIndexRoute
   ShopIndexRoute: typeof ShopIndexRoute
@@ -3097,6 +3123,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LearnIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/games/': {
+      id: '/games/'
+      path: '/games'
+      fullPath: '/games/'
+      preLoaderRoute: typeof GamesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dispatch/': {
       id: '/dispatch/'
       path: '/'
@@ -3270,6 +3303,13 @@ declare module '@tanstack/react-router' {
       path: '/learn/mechanics'
       fullPath: '/learn/mechanics'
       preLoaderRoute: typeof LearnMechanicsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn/flashcards': {
+      id: '/learn/flashcards'
+      path: '/learn/flashcards'
+      fullPath: '/learn/flashcards'
+      preLoaderRoute: typeof LearnFlashcardsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/learn/$slug': {
@@ -4723,6 +4763,7 @@ const rootRouteChildren: RootRouteChildren = {
   HelpTrustScoreRoute: HelpTrustScoreRoute,
   InvitesTokenRoute: InvitesTokenRoute,
   LearnSlugRoute: LearnSlugRoute,
+  LearnFlashcardsRoute: LearnFlashcardsRoute,
   LearnMechanicsRoute: LearnMechanicsRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   ListingCheckoutRoute: ListingCheckoutRoute,
@@ -4745,6 +4786,7 @@ const rootRouteChildren: RootRouteChildren = {
   WantedIdRoute: WantedIdRoute,
   WantedNewRoute: WantedNewRoute,
   BusinessesIndexRoute: BusinessesIndexRoute,
+  GamesIndexRoute: GamesIndexRoute,
   LearnIndexRoute: LearnIndexRoute,
   RidesIndexRoute: RidesIndexRoute,
   ShopIndexRoute: ShopIndexRoute,

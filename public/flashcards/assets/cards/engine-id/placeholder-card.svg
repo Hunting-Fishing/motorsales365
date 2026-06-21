@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 300" role="img" aria-label="Placeholder card art">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f4f6f9"/>
+      <stop offset="1" stop-color="#e2e8f1"/>
+    </linearGradient>
+  </defs>
+  <rect width="480" height="300" rx="16" fill="url(#g)" stroke="#c8102e" stroke-width="3" stroke-dasharray="10 8"/>
+  <rect x="20" y="20" width="46" height="46" rx="10" fill="#c8102e"/>
+  <text x="43" y="51" font-family="Arial, sans-serif" font-size="18" font-weight="800" fill="#fff" text-anchor="middle">365</text>
+  <g font-family="Arial, sans-serif" text-anchor="middle">
+    <text x="240" y="150" font-size="26" font-weight="800" fill="#2b3a52">PLACEHOLDER ART</text>
+    <text x="240" y="184" font-size="15" fill="#46566b">Drop your card image here</text>
+    <text x="240" y="208" font-size="13" fill="#8694a6">assets/cards/&lt;section&gt;/your-image.png</text>
+  </g>
+</svg>
