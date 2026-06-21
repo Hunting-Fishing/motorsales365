@@ -34,6 +34,7 @@ import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
 
 import { AffiliatePartsSection } from "@/components/affiliate-parts-section";
 import { ComingSoonSection, ComingSoonRow } from "@/components/coming-soon";
+import { SpecRow } from "@/components/listing/spec-display";
 import { NeededPartsRail } from "@/components/listing/needed-parts-rail";
 import { GalleryLightbox } from "@/components/listing/gallery-lightbox";
 import { MobileActionBar } from "@/components/listing/mobile-action-bar";
