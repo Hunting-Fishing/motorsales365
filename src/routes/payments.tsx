@@ -67,8 +67,15 @@ const METHODS: { group: string; items: Method[] }[] = [
     group: "E-wallets (Philippines)",
     items: [
       {
-        name: "GCash",
-        desc: "Pay instantly from your GCash wallet. One-tap 'Pay with GCash' button at listing checkout, or pick GCash inside the Stripe card sheet.",
+        name: "GCash (direct to our wallet)",
+        desc: "Send straight to our GCash +63 969 606 3830 (365 MotorSales) and upload your receipt — funds land in our wallet instantly. We confirm within 1 business day.",
+        icon: Smartphone,
+        status: "live",
+        provider: "Direct GCash",
+      },
+      {
+        name: "GCash (via Stripe)",
+        desc: "Pay GCash from inside the Stripe card sheet — funds settle to our bank in 2–3 days. Pick GCash at checkout.",
         icon: Smartphone,
         status: "live",
         provider: "Stripe",
