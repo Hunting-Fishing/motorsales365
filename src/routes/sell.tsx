@@ -29,6 +29,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { formatPHP } from "@/lib/format";
 import { LocationPicker } from "@/components/location-picker";
+import { LocationPicker as MapLocationPicker } from "@/components/businesses/location-picker";
 import { VehiclePicker } from "@/components/vehicle-picker";
 import { TagPicker } from "@/components/tag-picker";
 import { CATEGORY_DEFAULT_GROUPS, SERVICE_CATEGORIES } from "@/data/service-tags";
