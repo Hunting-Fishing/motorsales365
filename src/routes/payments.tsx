@@ -223,6 +223,34 @@ function MethodCard({ m }: { m: Method }) {
   const meta = STATUS_META[m.status];
   const Icon = m.icon;
   const StatusIcon = meta.icon;
+
+  // Live/featured methods: render the full brand image with no card chrome,
+  // just a small caption underneath.
+  if (m.imageSrc) {
+    return (
+      <div className="flex flex-col items-center text-center">
+        <div className="w-full overflow-hidden rounded-xl">
+          <img
+            src={m.imageSrc}
+            alt={`${m.name} logo`}
+            className="block aspect-[16/9] w-full object-cover"
+            loading="lazy"
+          />
+        </div>
+        <div className="mt-3 flex items-center gap-2">
+          <span className="font-display text-base font-semibold">{m.name}</span>
+          <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-5 ${meta.cls}`}>
+            <StatusIcon className="mr-0.5 h-2.5 w-2.5" />
+            {meta.label}
+          </Badge>
+        </div>
+        {m.tag && (
+          <p className="mt-1 text-xs text-muted-foreground">{m.tag}</p>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-lg border border-border bg-card p-3">
       <div className="flex items-start justify-between gap-2">
