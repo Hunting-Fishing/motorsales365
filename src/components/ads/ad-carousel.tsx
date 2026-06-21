@@ -74,10 +74,13 @@ export function AdCarousel({ placement, limit = 6, className, rotateMs = 6000 }:
     if (!api) return;
     const onSelect = () => {
       const idx = api.selectedScrollSnap();
+      setSelectedIndex(idx);
       const ad = ads[idx];
       if (ad) trackImpression(ad.id);
     };
     api.on("select", onSelect);
+    api.on("reInit", onSelect);
+    setSelectedIndex(api.selectedScrollSnap());
   };
 
   const autoplay = useRef(
