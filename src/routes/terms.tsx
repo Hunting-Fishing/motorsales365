@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 17, 2026 (expanded business contact details: Facebook Page URL, WhatsApp number, and a structured Brands Carried list per business — used publicly on business pages and for future directory filtering.)";
+  const lastUpdated = "June 21, 2026 (added direct-to-wallet GCash payments to 365 MotorSales GCash +63 969 606 3830; receipts uploaded by buyer, confirmed by admin within 1 business day)";
 
   return (
     <SiteLayout>
