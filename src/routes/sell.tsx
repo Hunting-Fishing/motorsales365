@@ -1746,6 +1746,38 @@ function SellPage() {
                 setBarangay(v.barangay ?? null);
               }}
             />
+            <div className="space-y-1 pt-1">
+              <Label className="text-xs">Pin exact location on map (optional)</Label>
+              <p className="text-[11px] text-muted-foreground">
+                Tap or drag the marker to your city/neighborhood. Buyers see this pin on the marketplace map. If left blank, your listing groups by region.
+              </p>
+              <MapLocationPicker
+                lat={lat}
+                lng={lng}
+                region={region}
+                onChange={(la, ln) => {
+                  setLat(la);
+                  setLng(ln);
+                }}
+              />
+              {lat != null && lng != null && (
+                <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                  <span>
+                    Pinned: {lat.toFixed(5)}, {lng.toFixed(5)}
+                  </span>
+                  <button
+                    type="button"
+                    className="underline hover:text-foreground"
+                    onClick={() => {
+                      setLat(null);
+                      setLng(null);
+                    }}
+                  >
+                    Clear pin
+                  </button>
+                </div>
+              )}
+            </div>
             <div className="grid gap-2 sm:grid-cols-2 pt-1">
               <div>
                 <Label htmlFor="phone" className="text-xs">Contact phone (optional)</Label>
