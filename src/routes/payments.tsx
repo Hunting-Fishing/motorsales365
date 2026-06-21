@@ -279,7 +279,7 @@ function PaymentsPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-4">
               <div className="rounded-xl bg-primary/15 p-3">
-                <Smartphone className="h-7 w-7 text-primary" />
+                <GCashMark className="h-7 w-7" />
               </div>
               <div>
                 <div className="flex flex-wrap items-center gap-2">
