@@ -540,6 +540,69 @@ describe("manual payment submission smoke test", () => {
       expect(fake.inserts["admin_audit_log"][0].metadata.reference).toBe("A");
       expect(fake.inserts["admin_audit_log"][1].metadata.reference).toBe("B");
     });
+
+    it("audit log entries carry listing_id, reference, and proof_uploaded_at across PH/UTC boundaries", async () => {
+      vi.useFakeTimers();
+      const fake = makeFakeSupabase();
+
+      const submissions = [
+        {
+          utc: "2026-06-21T15:59:00.000Z", // PH Jun 21 23:59
+          listing: "listing-ph-jun21",
+          reference: "GC-PH-JUN21",
+        },
+        {
+          utc: "2026-06-21T16:01:00.000Z", // PH Jun 22 00:01
+          listing: "listing-ph-jun22",
+          reference: "GC-PH-JUN22",
+        },
+        {
+          utc: "2026-12-31T16:30:00.000Z", // PH Jan 1 2027 00:30
+          listing: "listing-ph-newyear",
+          reference: "GC-PH-NY",
+        },
+      ];
+
+      for (const s of submissions) {
+        vi.setSystemTime(new Date(s.utc));
+        await submitManualPaymentCore(
+          { supabase: fake.client as any, supabaseAdmin: fake.client as any, userId: "u-audit" },
+          {
+            kind: "boost",
+            ref_id: s.listing,
+            method: "gcash_manual",
+            amount_php: 99,
+            reference: s.reference,
+            proof_path: `proofs/${s.listing}.png`,
+          },
+        );
+      }
+
+      const audits = fake.inserts["admin_audit_log"];
+      const payments = fake.inserts["payments"];
+      expect(audits).toHaveLength(submissions.length);
+
+      submissions.forEach((s, i) => {
+        const audit = audits[i];
+        const payment = payments[i];
+
+        // Listing id + reference flow into audit metadata so /admin/payments
+        // can group/search audit rows by listing without joining back to payments.
+        expect(audit.metadata.listing_id).toBe(s.listing);
+        expect(audit.metadata.reference).toBe(s.reference);
+
+        // proof_uploaded_at on the audit row exactly matches the payment row
+        // and the faked submission instant — no drift across PH/UTC boundary.
+        expect(audit.metadata.proof_uploaded_at).toBe(s.utc);
+        expect(audit.metadata.proof_uploaded_at).toBe(payment.proof_uploaded_at);
+        expect(audit.metadata.proof_url).toBe(`proofs/${s.listing}.png`);
+        expect(audit.metadata.proof_attached).toBe(true);
+
+        // The note + entity_id keep the audit row linked back to the right payment.
+        expect(audit.entity_id).toBe(payment.invoice_number ? `pay_${i + 1}` : `pay_${i + 1}`);
+        expect(audit.note).toContain(s.reference);
+      });
+    });
   });
 });
 
