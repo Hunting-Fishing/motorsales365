@@ -26,7 +26,7 @@ export function ComingSoonBadge({ className, size = "sm" }: ComingSoonBadgeProps
 
 interface ComingSoonRowProps {
   label: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: ComponentType<{ className?: string }>;
   span?: boolean;
 }
 
@@ -51,7 +51,7 @@ export function ComingSoonRow({ label, icon: Icon, span }: ComingSoonRowProps) {
 interface ComingSoonSectionProps {
   title?: string;
   subtitle?: string;
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 }
 
