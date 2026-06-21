@@ -18,6 +18,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import gcashLogo from "@/assets/payments/gcash.webp.asset.json";
+import stripeLogo from "@/assets/payments/stripe.jpg.asset.json";
 
 export const Route = createFileRoute("/payments")({
   head: () => ({
