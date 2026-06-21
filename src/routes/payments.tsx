@@ -18,6 +18,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import gcashLogo from "@/assets/payments/gcash.webp.asset.json";
+import stripeLogo from "@/assets/payments/stripe.jpg.asset.json";
 
 export const Route = createFileRoute("/payments")({
   head: () => ({
@@ -45,6 +47,10 @@ type Method = {
   iconColor?: string;
   status: Status;
   provider?: string;
+  /** Full brand logo image (used for hero/live tiles). */
+  imageSrc?: string;
+  /** Optional caption shown beneath a hero brand tile. */
+  tag?: string;
 };
 
 // Small lettered brand badges for marks not available as SVG icons.
@@ -112,18 +118,12 @@ const METHODS: { group: string; items: Method[] }[] = [
     group: "E-wallets (Philippines)",
     items: [
       {
-        name: "GCash (direct to our wallet)",
-        desc: "Send straight to our GCash 09696063830 (365 MotorSales) and upload your receipt — funds land in our wallet instantly. We confirm within 1 business day.",
+        name: "GCash",
+        desc: "Send to 365 MotorSales · 09696063830 and upload your receipt.",
         icon: GCashMark,
         status: "live",
-        provider: "Direct GCash",
-      },
-      {
-        name: "GCash (via Stripe)",
-        desc: "Pay GCash from inside the Stripe card sheet — funds settle to our bank in 2–3 days. Pick GCash at checkout.",
-        icon: GCashMark,
-        status: "live",
-        provider: "Stripe",
+        imageSrc: gcashLogo.url,
+        tag: "Direct to our wallet · 09696063830",
       },
       {
         name: "GrabPay",
@@ -190,6 +190,20 @@ const METHODS: { group: string; items: Method[] }[] = [
       },
     ],
   },
+  {
+    group: "Cards & international",
+    items: [
+      {
+        name: "Stripe",
+        desc: "Pay with Visa, Mastercard, JCB, or AMEX. 3D Secure supported.",
+        icon: SiStripe,
+        iconColor: "text-[#635BFF]",
+        status: "live",
+        imageSrc: stripeLogo.url,
+        tag: "Cards · 3D Secure",
+      },
+    ],
+  },
 ];
 
 const STATUS_META: Record<
@@ -209,6 +223,34 @@ function MethodCard({ m }: { m: Method }) {
   const meta = STATUS_META[m.status];
   const Icon = m.icon;
   const StatusIcon = meta.icon;
+
+  // Live/featured methods: render the full brand image with no card chrome,
+  // just a small caption underneath.
+  if (m.imageSrc) {
+    return (
+      <div className="flex flex-col items-center text-center">
+        <div className="w-full overflow-hidden rounded-xl">
+          <img
+            src={m.imageSrc}
+            alt={`${m.name} logo`}
+            className="block aspect-[16/9] w-full object-cover"
+            loading="lazy"
+          />
+        </div>
+        <div className="mt-3 flex items-center gap-2">
+          <span className="font-display text-base font-semibold">{m.name}</span>
+          <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-5 ${meta.cls}`}>
+            <StatusIcon className="mr-0.5 h-2.5 w-2.5" />
+            {meta.label}
+          </Badge>
+        </div>
+        {m.tag && (
+          <p className="mt-1 text-xs text-muted-foreground">{m.tag}</p>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-lg border border-border bg-card p-3">
       <div className="flex items-start justify-between gap-2">
@@ -274,41 +316,6 @@ function PaymentsPage() {
         </div>
       </section>
 
-      {/* GCash direct-to-wallet hero — fastest path, funds land in our GCash instantly. */}
-      <section className="container mx-auto px-4 pt-8">
-        <div className="rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-6 sm:p-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-start gap-4">
-              <div className="rounded-xl bg-primary/15 p-3">
-                <GCashMark className="h-7 w-7 text-base" />
-              </div>
-              <div>
-                <div className="flex flex-wrap items-center gap-2">
-                  <h2 className="font-display text-xl font-bold sm:text-2xl">
-                    Pay direct to our GCash
-                  </h2>
-                  <Badge className="bg-primary text-primary-foreground">Recommended</Badge>
-                </div>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Fastest path — funds land in our GCash wallet instantly. Send to:
-                </p>
-                <div className="mt-2 text-base">
-                  <span className="font-semibold">365 MotorSales</span> ·{" "}
-                  <span className="font-mono font-semibold tracking-tight">09696063830</span>
-                </div>
-              </div>
-            </div>
-            <div className="flex flex-col gap-2 sm:items-end">
-              <Button asChild size="lg">
-                <Link to="/help/pay-with-gcash">How to pay with GCash</Link>
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                Or pick GCash inside any checkout below
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
 
 
       <section className="container mx-auto px-4 py-12 space-y-10">
