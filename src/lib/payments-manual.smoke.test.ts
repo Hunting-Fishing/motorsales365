@@ -331,5 +331,103 @@ describe("manual payment submission smoke test", () => {
       proof_attached: true,
     });
   });
+
+  describe("boost renewals across tricky date boundaries", () => {
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    const cases = [
+      { label: "month boundary (Jan 31 → Feb)", iso: "2026-01-31T23:59:30.000Z" },
+      { label: "year boundary (Dec 31 → Jan)", iso: "2026-12-31T23:59:59.000Z" },
+      { label: "leap day (Feb 29)", iso: "2028-02-29T12:00:00.000Z" },
+      { label: "DST forward UTC reference", iso: "2027-03-14T07:30:00.000Z" },
+    ];
+
+    for (const c of cases) {
+      it(`boost renewal at ${c.label} produces correct timeline + audit row`, async () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date(c.iso));
+
+        const fake = makeFakeSupabase();
+        const userId = `user-${c.iso}`;
+        const reference = `GC-${c.iso.slice(0, 10)}`;
+
+        await submitManualPaymentCore(
+          { supabase: fake.client as any, supabaseAdmin: fake.client as any, userId },
+          {
+            kind: "boost",
+            ref_id: "listing-renewal",
+            method: "gcash_manual",
+            amount_php: 99,
+            reference,
+            proof_path: `proofs/${c.iso}.png`,
+          },
+        );
+
+        // proof_uploaded_at is stamped from new Date() — must match the faked clock
+        // and round-trip cleanly through Date parsing for /admin/payments formatDate().
+        const inserted = fake.inserts["payments"][0];
+        expect(inserted.proof_uploaded_at).toBe(c.iso);
+        expect(new Date(inserted.proof_uploaded_at).toISOString()).toBe(c.iso);
+
+        // review_state stamp still flips to awaiting_review across the boundary.
+        const stamp = fake.updates["payments"].find((u) => u.patch.review_state);
+        expect(stamp?.patch.review_state).toBe("awaiting_review");
+
+        // Timeline event /admin/payments drawer renders.
+        const evt = fake.inserts["payment_review_events"][0];
+        expect(evt).toMatchObject({
+          actor_id: userId,
+          from_state: null,
+          to_state: "awaiting_review",
+        });
+        expect(evt.note).toContain(reference);
+
+        // Audit log entry visible in /admin/payments audit trail.
+        const audit = fake.inserts["admin_audit_log"][0];
+        expect(audit).toMatchObject({
+          action: "payment_submitted",
+          entity_type: "payment",
+          new_value: "awaiting_review",
+        });
+        expect(audit.metadata).toMatchObject({
+          kind: "boost",
+          method: "gcash_manual",
+          amount_php: 99,
+          reference,
+          proof_attached: true,
+        });
+      });
+    }
+
+    it("two boost renewals straddling the year boundary stay independent", async () => {
+      vi.useFakeTimers();
+      const fake = makeFakeSupabase();
+
+      vi.setSystemTime(new Date("2026-12-31T23:59:55.000Z"));
+      await submitManualPaymentCore(
+        { supabase: fake.client as any, supabaseAdmin: fake.client as any, userId: "u-eoy" },
+        { kind: "boost", ref_id: "L1", method: "gcash_manual", amount_php: 99, reference: "EOY", proof_path: "p1.png" },
+      );
+
+      vi.setSystemTime(new Date("2027-01-01T00:00:05.000Z"));
+      await submitManualPaymentCore(
+        { supabase: fake.client as any, supabaseAdmin: fake.client as any, userId: "u-ny" },
+        { kind: "boost", ref_id: "L2", method: "gcash_manual", amount_php: 99, reference: "NY", proof_path: "p2.png" },
+      );
+
+      expect(fake.inserts["payments"]).toHaveLength(2);
+      expect(fake.inserts["payment_review_events"]).toHaveLength(2);
+      expect(fake.inserts["admin_audit_log"]).toHaveLength(2);
+
+      expect(fake.inserts["payments"][0].proof_uploaded_at.startsWith("2026-12-31")).toBe(true);
+      expect(fake.inserts["payments"][1].proof_uploaded_at.startsWith("2027-01-01")).toBe(true);
+
+      // Audit metadata stays aligned with its own payment row across the rollover.
+      expect(fake.inserts["admin_audit_log"][0].metadata.reference).toBe("EOY");
+      expect(fake.inserts["admin_audit_log"][1].metadata.reference).toBe("NY");
+    });
+  });
 });
 
