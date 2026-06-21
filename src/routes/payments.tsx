@@ -67,8 +67,15 @@ const METHODS: { group: string; items: Method[] }[] = [
     group: "E-wallets (Philippines)",
     items: [
       {
-        name: "GCash",
-        desc: "Pay instantly from your GCash wallet. One-tap 'Pay with GCash' button at listing checkout, or pick GCash inside the Stripe card sheet.",
+        name: "GCash (direct to our wallet)",
+        desc: "Send straight to our GCash +63 969 606 3830 (365 MotorSales) and upload your receipt — funds land in our wallet instantly. We confirm within 1 business day.",
+        icon: Smartphone,
+        status: "live",
+        provider: "Direct GCash",
+      },
+      {
+        name: "GCash (via Stripe)",
+        desc: "Pay GCash from inside the Stripe card sheet — funds settle to our bank in 2–3 days. Pick GCash at checkout.",
         icon: Smartphone,
         status: "live",
         provider: "Stripe",
@@ -214,6 +221,43 @@ function PaymentsPage() {
           </div>
         </div>
       </section>
+
+      {/* GCash direct-to-wallet hero — fastest path, funds land in our GCash instantly. */}
+      <section className="container mx-auto px-4 pt-8">
+        <div className="rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-6 sm:p-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="rounded-xl bg-primary/15 p-3">
+                <Smartphone className="h-7 w-7 text-primary" />
+              </div>
+              <div>
+                <div className="flex flex-wrap items-center gap-2">
+                  <h2 className="font-display text-xl font-bold sm:text-2xl">
+                    Pay direct to our GCash
+                  </h2>
+                  <Badge className="bg-primary text-primary-foreground">Recommended</Badge>
+                </div>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Fastest path — funds land in our GCash wallet instantly. Send to:
+                </p>
+                <div className="mt-2 text-base">
+                  <span className="font-semibold">365 MotorSales</span> ·{" "}
+                  <span className="font-mono font-semibold tracking-tight">+63 969 606 3830</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-col gap-2 sm:items-end">
+              <Button asChild size="lg">
+                <Link to="/help/pay-with-gcash">How to pay with GCash</Link>
+              </Button>
+              <p className="text-xs text-muted-foreground">
+                Or pick GCash inside any checkout below
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
 
       <section className="container mx-auto px-4 py-12 space-y-10">
         {visibleGroups.map((group) => (

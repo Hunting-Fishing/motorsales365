@@ -20,10 +20,11 @@ type Props = {
   refId?: string | null;
   amountPhp: number;
   description?: string;
+  preselectMethod?: string;
   onSuccess?: (invoiceNumber: string, paymentId: string) => void;
 };
 
-export function ManualPayForm({ kind, refId, amountPhp, description, onSuccess }: Props) {
+export function ManualPayForm({ kind, refId, amountPhp, description, preselectMethod, onSuccess }: Props) {
   const list = useServerFn(listPaymentMethods);
   const submit = useServerFn(submitManualPayment);
   const [methods, setMethods] = useState<ManualPaymentMethod[]>([]);
@@ -38,10 +39,14 @@ export function ManualPayForm({ kind, refId, amountPhp, description, onSuccess }
     list().then((all) => {
       const manuals = all.filter((m) => m.is_manual);
       setMethods(manuals);
-      if (manuals.length && !selected) setSelected(manuals[0].method);
+      if (manuals.length && !selected) {
+        // Prefer caller-requested method (e.g. ?method=gcash_manual) when enabled.
+        const requested = preselectMethod && manuals.find((m) => m.method === preselectMethod);
+        setSelected(requested ? requested.method : manuals[0].method);
+      }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [preselectMethod]);
 
   const active = methods.find((m) => m.method === selected);
 

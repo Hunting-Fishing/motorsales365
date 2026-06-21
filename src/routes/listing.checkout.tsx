@@ -5,6 +5,7 @@ import { ArrowLeft, Smartphone, CreditCard } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { GCashDirectNote } from "@/components/checkout/gcash-direct-note";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createListingPaymentCheckout } from "@/lib/listing-payment.functions";
 import { useAuth } from "@/hooks/use-auth";
@@ -150,6 +151,7 @@ function ListingCheckoutPage() {
             <EmbeddedCheckout />
           </EmbeddedCheckoutProvider>
         </div>
+        <GCashDirectNote />
         <p className="mt-4 text-center text-xs text-muted-foreground">
           Changed your mind?{" "}
           <Link
