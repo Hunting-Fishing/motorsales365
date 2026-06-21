@@ -629,7 +629,7 @@ function BrowsePage() {
                     </div>
                     <div className={promotedGridClass}>
                       {promoted.slice(0, density === 4 ? 4 : 3).map((l) => (
-                        <ListingCard key={l.id} listing={l} />
+                        <ListingCard key={l.id} listing={l} compact />
                       ))}
                     </div>
                   </section>
@@ -657,7 +657,7 @@ function BrowsePage() {
                 ) : (
                   <div className={gridClass}>
                     {organic.map((l) => (
-                      <ListingCard key={l.id} listing={l} />
+                      <ListingCard key={l.id} listing={l} compact />
                     ))}
                   </div>
                 )}
