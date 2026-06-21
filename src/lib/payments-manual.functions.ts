@@ -74,104 +74,117 @@ export const adminUpdateMethod = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export type SubmitManualPaymentInput = {
+  kind: "listing" | "upgrade" | "boost" | "subscription" | "course";
+  ref_id?: string | null;
+  method: string;
+  amount_php: number;
+  reference?: string;
+  proof_path?: string;
+  notes?: string;
+};
+
+/**
+ * Pure orchestration for a manual payment submission. Exported so a smoke
+ * test can drive it with mocked Supabase clients and assert the rows
+ * /admin/payments reads from (payments, payment_review_events,
+ * admin_audit_log) are all created with the right shape.
+ */
+export async function submitManualPaymentCore(
+  deps: { supabase: any; supabaseAdmin: any; userId: string },
+  data: SubmitManualPaymentInput,
+) {
+  const { supabase, supabaseAdmin, userId } = deps;
+
+  const { data: cfg } = await supabaseAdmin
+    .from("payment_method_config")
+    .select("method,enabled,is_manual")
+    .eq("method", data.method)
+    .maybeSingle();
+  if (!cfg || !cfg.enabled || !cfg.is_manual) {
+    throw new Error("Payment method not available");
+  }
+
+  const { data: invNum } = await supabaseAdmin.rpc("generate_invoice_number");
+
+  const proofUrl = data.proof_path ?? null;
+
+  const { data: payment, error } = await supabase
+    .from("payments")
+    .insert({
+      user_id: userId,
+      kind: data.kind,
+      listing_id:
+        data.kind === "listing" || data.kind === "upgrade" || data.kind === "boost"
+          ? data.ref_id ?? null
+          : null,
+      amount_php: data.amount_php,
+      gross_amount_php: data.amount_php,
+      status: "pending",
+      method: data.method,
+      reference: data.reference ?? null,
+      notes: data.notes ?? null,
+      proof_url: proofUrl,
+      proof_uploaded_at: proofUrl ? new Date().toISOString() : null,
+      invoice_number: invNum as string,
+    } as any)
+    .select("id,invoice_number")
+    .single();
+  if (error) throw error;
+
+  await supabaseAdmin
+    .from("payments")
+    .update({ review_state: "awaiting_review" } as any)
+    .eq("id", payment.id);
+
+  const submissionNote = proofUrl
+    ? `Buyer submitted ${data.method} payment with proof${data.reference ? ` (ref ${data.reference})` : ""}.`
+    : `Buyer submitted ${data.method} payment${data.reference ? ` (ref ${data.reference})` : ""} — no proof attached.`;
+  await Promise.all([
+    supabaseAdmin.from("payment_review_events").insert({
+      payment_id: payment.id,
+      actor_id: userId,
+      from_state: null,
+      to_state: "awaiting_review",
+      note: submissionNote,
+    } as any),
+    supabaseAdmin.from("admin_audit_log").insert({
+      actor_id: userId,
+      target_user_id: userId,
+      action: "payment_submitted",
+      field: "payment",
+      entity_type: "payment",
+      entity_id: payment.id,
+      new_value: "awaiting_review",
+      note: submissionNote,
+      metadata: {
+        invoice_number: payment.invoice_number,
+        method: data.method,
+        kind: data.kind,
+        amount_php: data.amount_php,
+        reference: data.reference ?? null,
+        proof_attached: !!proofUrl,
+      },
+    } as any),
+  ]);
+
+  return {
+    id: payment.id,
+    invoice_number: payment.invoice_number,
+    review_state: "awaiting_review" as const,
+    proof_attached: !!proofUrl,
+  };
+}
+
 export const submitManualPayment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (data: {
-      kind: "listing" | "upgrade" | "boost" | "subscription" | "course";
-      ref_id?: string | null;
-      method: string;
-      amount_php: number;
-      reference?: string;
-      proof_path?: string;
-      notes?: string;
-    }) => data,
-  )
+  .inputValidator((data: SubmitManualPaymentInput) => data)
   .handler(async ({ data, context }) => {
-    const { supabase, userId } = context;
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    const { data: cfg } = await supabaseAdmin
-      .from("payment_method_config")
-      .select("method,enabled,is_manual")
-      .eq("method", data.method)
-      .maybeSingle();
-    if (!cfg || !cfg.enabled || !cfg.is_manual) {
-      throw new Error("Payment method not available");
-    }
-
-    const { data: invNum } = await supabaseAdmin.rpc("generate_invoice_number");
-
-    const proofUrl = data.proof_path ?? null;
-
-    const { data: payment, error } = await supabase
-      .from("payments")
-      .insert({
-        user_id: userId,
-        kind: data.kind,
-        listing_id:
-          data.kind === "listing" || data.kind === "upgrade" || data.kind === "boost"
-            ? data.ref_id ?? null
-            : null,
-        amount_php: data.amount_php,
-        gross_amount_php: data.amount_php,
-        status: "pending",
-        method: data.method,
-        reference: data.reference ?? null,
-        notes: data.notes ?? null,
-        proof_url: proofUrl,
-        proof_uploaded_at: proofUrl ? new Date().toISOString() : null,
-        invoice_number: invNum as string,
-      } as any)
-      .select("id,invoice_number")
-      .single();
-    if (error) throw error;
-
-    // Stamp review_state via admin client (column may not be writable by user policy)
-    await supabaseAdmin
-      .from("payments")
-      .update({ review_state: "awaiting_review" } as any)
-      .eq("id", payment.id);
-
-    // Record a review event so the admin timeline shows the buyer's submission,
-    // and write an admin_audit_log entry so /admin/payments has a traceable log.
-    const submissionNote = proofUrl
-      ? `Buyer submitted ${data.method} payment with proof${data.reference ? ` (ref ${data.reference})` : ""}.`
-      : `Buyer submitted ${data.method} payment${data.reference ? ` (ref ${data.reference})` : ""} — no proof attached.`;
-    await Promise.all([
-      supabaseAdmin.from("payment_review_events").insert({
-        payment_id: payment.id,
-        actor_id: userId,
-        from_state: null,
-        to_state: "awaiting_review",
-        note: submissionNote,
-      } as any),
-      supabaseAdmin.from("admin_audit_log").insert({
-        actor_id: userId,
-        target_user_id: userId,
-        action: "payment_submitted",
-        field: "payment",
-        entity_type: "payment",
-        entity_id: payment.id,
-        new_value: "awaiting_review",
-        note: submissionNote,
-        metadata: {
-          invoice_number: payment.invoice_number,
-          method: data.method,
-          kind: data.kind,
-          amount_php: data.amount_php,
-          reference: data.reference ?? null,
-          proof_attached: !!proofUrl,
-        },
-      } as any),
-    ]);
-
-    return {
-      id: payment.id,
-      invoice_number: payment.invoice_number,
-      review_state: "awaiting_review" as const,
-      proof_attached: !!proofUrl,
-    };
+    return submitManualPaymentCore(
+      { supabase: context.supabase, supabaseAdmin, userId: context.userId },
+      data,
+    );
   });
 
 // ===== Staged review workflow =====
