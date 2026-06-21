@@ -33,7 +33,7 @@ export function ManualPayForm({ kind, refId, amountPhp, description, preselectMe
   const [notes, setNotes] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [submitted, setSubmitted] = useState<{ invoice: string; id: string } | null>(null);
+  const [submitted, setSubmitted] = useState<{ invoice: string; id: string; proofAttached: boolean } | null>(null);
 
   useEffect(() => {
     list().then((all) => {
@@ -77,7 +77,7 @@ export function ManualPayForm({ kind, refId, amountPhp, description, preselectMe
           proof_path: proofPath,
         },
       });
-      setSubmitted({ invoice: res.invoice_number ?? "", id: res.id });
+      setSubmitted({ invoice: res.invoice_number ?? "", id: res.id, proofAttached: !!file });
       toast.success("Payment submitted — pending admin review");
       onSuccess?.(res.invoice_number ?? "", res.id);
     } catch (err: any) {
@@ -92,16 +92,30 @@ export function ManualPayForm({ kind, refId, amountPhp, description, preselectMe
       <Card>
         <CardContent className="space-y-3 p-6 text-center">
           <CheckCircle2 className="mx-auto h-10 w-10 text-emerald-600" />
-          <div className="font-semibold">Payment submitted</div>
+          <div className="font-semibold">Payment submitted for review</div>
           <div className="text-sm text-muted-foreground">
             Invoice <span className="font-mono">{submitted.invoice}</span>
           </div>
-          <p className="text-xs text-muted-foreground">
-            We'll confirm within 1 business day. You'll receive an email once approved.
-          </p>
-          <Button asChild variant="outline" size="sm">
-            <a href={`/payments/${submitted.id}/receipt`}>View invoice</a>
-          </Button>
+          <div className="mx-auto max-w-sm rounded-md border bg-muted/40 p-3 text-left text-xs">
+            <div className="mb-1 font-semibold text-foreground">What happens next</div>
+            <ol className="list-decimal space-y-1 pl-4 text-muted-foreground">
+              <li>An admin is notified and your submission is queued for review.</li>
+              <li>
+                {submitted.proofAttached
+                  ? "Your proof of payment is attached and visible to the reviewer."
+                  : "No proof was attached — please reply to the confirmation email with your receipt to speed up approval."}
+              </li>
+              <li>You'll receive an email once it's approved (usually within 1 business day).</li>
+            </ol>
+          </div>
+          <div className="flex flex-wrap justify-center gap-2">
+            <Button asChild variant="outline" size="sm">
+              <a href={`/payments/${submitted.id}/receipt`}>View invoice</a>
+            </Button>
+            <Button asChild variant="ghost" size="sm">
+              <a href="/payments">Back to payments</a>
+            </Button>
+          </div>
         </CardContent>
       </Card>
     );
