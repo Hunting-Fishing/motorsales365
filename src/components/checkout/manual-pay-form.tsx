@@ -54,10 +54,22 @@ export function ManualPayForm({ kind, refId, amountPhp, description, preselectMe
     if (!selected) return;
     setUploading(true);
     try {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) {
+        toast.error("Please sign in to submit a payment", {
+          action: {
+            label: "Sign in",
+            onClick: () => {
+              window.location.href = `/signin?redirect=${encodeURIComponent(
+                window.location.pathname + window.location.search,
+              )}`;
+            },
+          },
+        });
+        return;
+      }
       let proofPath: string | undefined;
       if (file) {
-        const { data: u } = await supabase.auth.getUser();
-        if (!u.user) throw new Error("Sign in required");
         const ext = file.name.split(".").pop()?.toLowerCase() ?? "jpg";
         const path = `${u.user.id}/${Date.now()}.${ext}`;
         const { error: upErr } = await supabase.storage
@@ -81,7 +93,19 @@ export function ManualPayForm({ kind, refId, amountPhp, description, preselectMe
       toast.success("Payment submitted — pending admin review");
       onSuccess?.(res.invoice_number ?? "", res.id);
     } catch (err: any) {
-      toast.error(err?.message ?? "Failed to submit");
+      // Server fns can throw a raw `Response` (e.g. 401 from requireSupabaseAuth).
+      // Without this guard, accessing err.message on a Response surfaces as a
+      // blank-screen runtime error.
+      if (err instanceof Response) {
+        if (err.status === 401) {
+          toast.error("Your session expired — please sign in again");
+        } else {
+          const text = await err.text().catch(() => "");
+          toast.error(text || `Submission failed (${err.status})`);
+        }
+      } else {
+        toast.error(err?.message ?? "Failed to submit");
+      }
     } finally {
       setUploading(false);
     }
