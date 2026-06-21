@@ -22,7 +22,6 @@ import {
   ChevronDown,
   Play,
   Expand,
-  AlertTriangle,
 } from "lucide-react";
 import {
   Collapsible,
@@ -34,6 +33,7 @@ import { cn } from "@/lib/utils";
 import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
 
 import { AffiliatePartsSection } from "@/components/affiliate-parts-section";
+import { ComingSoonSection, ComingSoonRow } from "@/components/coming-soon";
 import { NeededPartsRail } from "@/components/listing/needed-parts-rail";
 import { GalleryLightbox } from "@/components/listing/gallery-lightbox";
 import { MobileActionBar } from "@/components/listing/mobile-action-bar";
@@ -948,57 +948,28 @@ function ListingDetailPage() {
 
           {/* Services around this vehicle — coming soon.
               Revenue: lead-gen for finance/insurance/OR-CR partners (not yet wired). */}
-          <Collapsible
-            defaultOpen
-            className="rounded-xl border border-amber-300 bg-amber-50 p-5 dark:border-amber-700/60 dark:bg-amber-950/30"
-          >
-            <CollapsibleTrigger className="group flex w-full items-start justify-between gap-3 text-left">
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge className="gap-1 border-amber-400 bg-amber-200 text-[10px] uppercase tracking-wide text-amber-900 hover:bg-amber-200 dark:border-amber-700 dark:bg-amber-900/60 dark:text-amber-100">
-                    <AlertTriangle className="h-3 w-3" />
-                    Coming soon
-                  </Badge>
+          <Collapsible defaultOpen asChild>
+            <ComingSoonSection
+              title="Need inspection or insurance for this car?"
+              subtitle="Sweet! These will be Awesome Future Services!"
+            >
+              <CollapsibleTrigger className="group flex w-full items-start justify-between gap-3 text-left">
+                <div className="min-w-0 flex-1" />
+                <ChevronDown className="mt-1 h-4 w-4 shrink-0 text-amber-700 transition-transform group-data-[state=open]:rotate-180 dark:text-amber-300" />
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  <ComingSoonRow icon={Wrench} label="Request a pre-purchase inspection" span />
+                  <ComingSoonRow icon={Shield} label="Get insurance quote" />
+                  <ComingSoonRow icon={Banknote} label="Get financing" />
+                  <ComingSoonRow icon={FileText} label="OR/CR renewal help" />
+                  <ComingSoonRow icon={ClipboardCheck} label="Title transfer help" />
                 </div>
-                <h3 className="mt-2 font-display text-lg font-semibold text-amber-950 dark:text-amber-100">
-                  Need inspection or insurance for this car?
-                </h3>
-                <p className="mt-1 text-xs text-amber-900/80 dark:text-amber-200/80">
-                  Sweet! These will be Awesome Future Services!
+                <p className="mt-3 text-[11px] text-amber-900/70 dark:text-amber-200/70">
+                  Partner network launching shortly. We'll notify you when quotes go live.
                 </p>
-              </div>
-              <ChevronDown className="mt-1 h-4 w-4 shrink-0 text-amber-700 transition-transform group-data-[state=open]:rotate-180 dark:text-amber-300" />
-            </CollapsibleTrigger>
-            <CollapsibleContent>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                {[
-                  { Icon: Wrench, label: "Request a pre-purchase inspection", span: true },
-                  { Icon: Shield, label: "Get insurance quote" },
-                  { Icon: Banknote, label: "Get financing" },
-                  { Icon: FileText, label: "OR/CR renewal help" },
-                  { Icon: ClipboardCheck, label: "Title transfer help" },
-                ].map(({ Icon, label, span }) => (
-                  <div
-                    key={label}
-                    title="Coming soon"
-                    aria-disabled="true"
-                    className={cn(
-                      "flex w-full min-w-0 items-center gap-2 rounded-md border border-amber-200 bg-white/70 px-3 py-2 text-sm text-amber-950 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-100",
-                      span && "sm:col-span-2",
-                    )}
-                  >
-                    <Icon className="h-4 w-4 shrink-0 text-amber-700 dark:text-amber-300" />
-                    <span className="min-w-0 flex-1 whitespace-normal break-words text-left leading-snug">
-                      {label}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <p className="mt-3 text-[11px] text-amber-900/70 dark:text-amber-200/70">
-                Partner network launching shortly. We'll notify you when quotes go live.
-              </p>
-            </CollapsibleContent>
+              </CollapsibleContent>
+            </ComingSoonSection>
           </Collapsible>
 
 
