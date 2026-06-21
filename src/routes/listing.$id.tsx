@@ -29,6 +29,7 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 import { waMeUrl } from "@/lib/whatsapp";
+import { cn } from "@/lib/utils";
 import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
 
 import { AffiliatePartsSection } from "@/components/affiliate-parts-section";
