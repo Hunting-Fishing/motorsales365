@@ -116,10 +116,10 @@ function CompanyPage() {
                 }
               />
               <Row
-                label="Customer hotline"
+                label="Customer support"
                 value={
-                  <a className="text-primary underline" href="tel:09696063830">
-                    09696063830
+                  <a className="text-primary underline" href="mailto:support@365motorsales.com">
+                    support@365motorsales.com
                   </a>
                 }
               />

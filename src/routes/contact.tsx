@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Mail, Phone, MapPin, MessageSquare } from "lucide-react";
+import { Mail, MapPin, MessageSquare } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 
 export const Route = createFileRoute("/contact")({
@@ -51,10 +51,10 @@ function ContactPage() {
             href="mailto:partners@365motorsales.com"
           />
           <Card
-            icon={<Phone className="h-5 w-5" />}
-            title="Phone (Mon–Sat, 9am–6pm)"
-            body="09696063830"
-            href="tel:09696063830"
+            icon={<Mail className="h-5 w-5" />}
+            title="General inquiries"
+            body="hello@365motorsales.com"
+            href="mailto:hello@365motorsales.com"
           />
           <Card
             icon={<MapPin className="h-5 w-5" />}

@@ -23,7 +23,7 @@ export const Route = createFileRoute("/terms")({
 });
 
 function TermsPage() {
-  const lastUpdated = "June 21, 2026 (added direct-to-wallet GCash payments to 365 MotorSales GCash 09696063830; receipts uploaded by buyer, confirmed by admin within 1 business day)";
+  const lastUpdated = "June 21, 2026 (added direct-to-wallet GCash payments to 365 MotorSales; receipts uploaded by buyer, confirmed by admin within 1 business day)";
 
   return (
     <SiteLayout>
