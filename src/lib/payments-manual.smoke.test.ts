@@ -130,6 +130,67 @@ describe("manual payment submission smoke test", () => {
     });
   });
 
+  it("creates boost payment + audit log entry with boost metadata", async () => {
+    const fake = makeFakeSupabase();
+
+    const result = await submitManualPaymentCore(
+      { supabase: fake.client as any, supabaseAdmin: fake.client as any, userId: "user-789" },
+      {
+        kind: "boost",
+        ref_id: "listing-xyz",
+        method: "gcash_manual",
+        amount_php: 149,
+        reference: "GC-BOOST-42",
+        proof_path: "proofs/user-789/boost.png",
+        notes: "Boost renewal — 7 days",
+      },
+    );
+
+    expect(result).toMatchObject({
+      review_state: "awaiting_review",
+      proof_attached: true,
+      invoice_number: "INV-0001",
+    });
+
+    // payments row carries kind=boost and the listing_id so /admin/payments
+    // can render it under the right buyer + listing.
+    const paymentRow = fake.inserts["payments"]?.[0];
+    expect(paymentRow).toMatchObject({
+      user_id: "user-789",
+      kind: "boost",
+      listing_id: "listing-xyz",
+      amount_php: 149,
+      method: "gcash_manual",
+      reference: "GC-BOOST-42",
+      status: "pending",
+      notes: "Boost renewal — 7 days",
+    });
+
+    // Admin timeline entry exists for the boost submission.
+    const evt = fake.inserts["payment_review_events"]?.[0];
+    expect(evt).toMatchObject({
+      actor_id: "user-789",
+      to_state: "awaiting_review",
+    });
+    expect(evt.note).toContain("GC-BOOST-42");
+
+    // Audit log row tags the action as a boost payment so it's filterable in /admin/payments.
+    const audit = fake.inserts["admin_audit_log"]?.[0];
+    expect(audit).toMatchObject({
+      action: "payment_submitted",
+      entity_type: "payment",
+      new_value: "awaiting_review",
+    });
+    expect(audit.metadata).toMatchObject({
+      kind: "boost",
+      method: "gcash_manual",
+      amount_php: 149,
+      reference: "GC-BOOST-42",
+      proof_attached: true,
+    });
+  });
+
+
   it("rejects submission when payment method is disabled", async () => {
     const fake = makeFakeSupabase();
     // Override config to disabled.
