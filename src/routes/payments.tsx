@@ -1,18 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import {
-  Check,
-  Clock,
-  CreditCard,
-  Smartphone,
-  Landmark,
-  Wallet,
-  Banknote,
-  QrCode,
-  ShoppingBag,
-  Store,
-  ArrowLeftRight,
-  Car,
-} from "lucide-react";
+import { Check, Clock, Landmark, Store, ArrowLeftRight } from "lucide-react";
 import {
   SiVisa,
   SiMastercard,
