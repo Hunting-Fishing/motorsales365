@@ -601,8 +601,88 @@ describe("manual payment submission smoke test", () => {
         // The note + entity_id keep the audit row linked back to the right payment.
         expect(audit.entity_id).toBe(payment.invoice_number ? `pay_${i + 1}` : `pay_${i + 1}`);
         expect(audit.note).toContain(s.reference);
+  });
+
+  describe("proof_url presence + validity on audit log entries for boost renewals", () => {
+    const isValidProofPath = (p: unknown): p is string =>
+      typeof p === "string" &&
+      p.length > 0 &&
+      !p.includes("..") &&
+      !p.startsWith("/") &&
+      /\.(png|jpg|jpeg|webp|pdf)$/i.test(p);
+
+    it("every boost renewal audit row has a non-empty proof_url matching its payment row", async () => {
+      const fake = makeFakeSupabase();
+
+      const renewals = [
+        { listing: "L-boost-a", reference: "GC-A", proof: "proofs/u1/boost-a.png" },
+        { listing: "L-boost-b", reference: "GC-B", proof: "proofs/u1/boost-b.jpg" },
+        { listing: "L-boost-c", reference: "GC-C", proof: "proofs/u2/boost-c.webp" },
+        { listing: "L-boost-d", reference: "GC-D", proof: "proofs/u2/boost-d.pdf" },
+      ];
+
+      for (const r of renewals) {
+        await submitManualPaymentCore(
+          { supabase: fake.client as any, supabaseAdmin: fake.client as any, userId: "u-proof" },
+          {
+            kind: "boost",
+            ref_id: r.listing,
+            method: "gcash_manual",
+            amount_php: 99,
+            reference: r.reference,
+            proof_path: r.proof,
+          },
+        );
+      }
+
+      const payments = fake.inserts["payments"];
+      const audits = fake.inserts["admin_audit_log"];
+      expect(audits).toHaveLength(renewals.length);
+      expect(payments).toHaveLength(renewals.length);
+
+      renewals.forEach((r, i) => {
+        const audit = audits[i];
+        const payment = payments[i];
+
+        // proof_url is present, non-empty, and a safe storage path with a known extension.
+        expect(audit.metadata.proof_url).toBeDefined();
+        expect(isValidProofPath(audit.metadata.proof_url)).toBe(true);
+
+        // audit proof_url matches the payment row's proof_url AND the submitted proof_path.
+        expect(audit.metadata.proof_url).toBe(payment.proof_url);
+        expect(audit.metadata.proof_url).toBe(r.proof);
+
+        // proof_attached flag stays consistent with proof_url presence.
+        expect(audit.metadata.proof_attached).toBe(true);
+
+        // audit row is linked back to the right payment via entity_id.
+        expect(audit.entity_id).toBe(`pay_${i + 1}`);
       });
     });
+
+    it("submission without proof_path produces audit row with no proof_url and proof_attached=false", async () => {
+      const fake = makeFakeSupabase();
+
+      await submitManualPaymentCore(
+        { supabase: fake.client as any, supabaseAdmin: fake.client as any, userId: "u-noproof" },
+        {
+          kind: "boost",
+          ref_id: "L-noproof",
+          method: "gcash_manual",
+          amount_php: 99,
+          reference: "GC-NOPROOF",
+        },
+      );
+
+      const payment = fake.inserts["payments"][0];
+      const audit = fake.inserts["admin_audit_log"][0];
+
+      expect(payment.proof_url ?? null).toBeNull();
+      expect(audit.metadata.proof_url ?? null).toBeNull();
+      expect(audit.metadata.proof_attached).toBe(false);
+    });
+  });
+});
   });
 });
 
