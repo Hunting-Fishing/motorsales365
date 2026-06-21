@@ -78,6 +78,7 @@ import { Route as PassportPremiumCheckoutRouteImport } from './routes/passport-p
 import { Route as ListingCheckoutRouteImport } from './routes/listing.checkout'
 import { Route as ListingIdRouteImport } from './routes/listing.$id'
 import { Route as LearnMechanicsRouteImport } from './routes/learn.mechanics'
+import { Route as LearnFlashcardsRouteImport } from './routes/learn.flashcards'
 import { Route as LearnSlugRouteImport } from './routes/learn.$slug'
 import { Route as InvitesTokenRouteImport } from './routes/invites.$token'
 import { Route as HelpTrustScoreRouteImport } from './routes/help.trust-score'
@@ -570,6 +571,11 @@ const ListingIdRoute = ListingIdRouteImport.update({
 const LearnMechanicsRoute = LearnMechanicsRouteImport.update({
   id: '/learn/mechanics',
   path: '/learn/mechanics',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LearnFlashcardsRoute = LearnFlashcardsRouteImport.update({
+  id: '/learn/flashcards',
+  path: '/learn/flashcards',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LearnSlugRoute = LearnSlugRouteImport.update({
@@ -1484,6 +1490,7 @@ export interface FileRoutesByFullPath {
   '/help/trust-score': typeof HelpTrustScoreRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/learn/flashcards': typeof LearnFlashcardsRoute
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
@@ -1698,6 +1705,7 @@ export interface FileRoutesByTo {
   '/help/trust-score': typeof HelpTrustScoreRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/learn/flashcards': typeof LearnFlashcardsRoute
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
@@ -1918,6 +1926,7 @@ export interface FileRoutesById {
   '/help/trust-score': typeof HelpTrustScoreRoute
   '/invites/$token': typeof InvitesTokenRoute
   '/learn/$slug': typeof LearnSlugRoute
+  '/learn/flashcards': typeof LearnFlashcardsRoute
   '/learn/mechanics': typeof LearnMechanicsRoute
   '/listing/$id': typeof ListingIdRouteWithChildren
   '/listing/checkout': typeof ListingCheckoutRoute
@@ -2139,6 +2148,7 @@ export interface FileRouteTypes {
     | '/help/trust-score'
     | '/invites/$token'
     | '/learn/$slug'
+    | '/learn/flashcards'
     | '/learn/mechanics'
     | '/listing/$id'
     | '/listing/checkout'
@@ -2353,6 +2363,7 @@ export interface FileRouteTypes {
     | '/help/trust-score'
     | '/invites/$token'
     | '/learn/$slug'
+    | '/learn/flashcards'
     | '/learn/mechanics'
     | '/listing/$id'
     | '/listing/checkout'
@@ -2572,6 +2583,7 @@ export interface FileRouteTypes {
     | '/help/trust-score'
     | '/invites/$token'
     | '/learn/$slug'
+    | '/learn/flashcards'
     | '/learn/mechanics'
     | '/listing/$id'
     | '/listing/checkout'
@@ -2729,6 +2741,7 @@ export interface RootRouteChildren {
   HelpTrustScoreRoute: typeof HelpTrustScoreRoute
   InvitesTokenRoute: typeof InvitesTokenRoute
   LearnSlugRoute: typeof LearnSlugRoute
+  LearnFlashcardsRoute: typeof LearnFlashcardsRoute
   LearnMechanicsRoute: typeof LearnMechanicsRoute
   ListingIdRoute: typeof ListingIdRouteWithChildren
   ListingCheckoutRoute: typeof ListingCheckoutRoute
@@ -3270,6 +3283,13 @@ declare module '@tanstack/react-router' {
       path: '/learn/mechanics'
       fullPath: '/learn/mechanics'
       preLoaderRoute: typeof LearnMechanicsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/learn/flashcards': {
+      id: '/learn/flashcards'
+      path: '/learn/flashcards'
+      fullPath: '/learn/flashcards'
+      preLoaderRoute: typeof LearnFlashcardsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/learn/$slug': {
@@ -4723,6 +4743,7 @@ const rootRouteChildren: RootRouteChildren = {
   HelpTrustScoreRoute: HelpTrustScoreRoute,
   InvitesTokenRoute: InvitesTokenRoute,
   LearnSlugRoute: LearnSlugRoute,
+  LearnFlashcardsRoute: LearnFlashcardsRoute,
   LearnMechanicsRoute: LearnMechanicsRoute,
   ListingIdRoute: ListingIdRouteWithChildren,
   ListingCheckoutRoute: ListingCheckoutRoute,
