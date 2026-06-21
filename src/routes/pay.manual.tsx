@@ -56,7 +56,7 @@ function ManualPayPage() {
               <div className="font-semibold">Send to GCash</div>
               <div className="mt-1 text-muted-foreground">
                 <span className="font-medium text-foreground">365 MotorSales</span> ·{" "}
-                <span className="font-mono font-medium text-foreground">+63 969 606 3830</span>
+                <span className="font-mono font-medium text-foreground">09696063830</span>
               </div>
             </div>
           </div>
