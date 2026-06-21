@@ -29,6 +29,7 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { formatPHP } from "@/lib/format";
 import { LocationPicker } from "@/components/location-picker";
+import { LocationPicker as MapLocationPicker } from "@/components/businesses/location-picker";
 import { VehiclePicker } from "@/components/vehicle-picker";
 import { TagPicker } from "@/components/tag-picker";
 import { CATEGORY_DEFAULT_GROUPS, SERVICE_CATEGORIES } from "@/data/service-tags";
@@ -260,6 +261,8 @@ function SellPage() {
   const [province, setProvince] = useState<string | null>(null);
   const [city, setCity] = useState<string | null>(null);
   const [barangay, setBarangay] = useState<string | null>(null);
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
   const [condition, setCondition] = useState("Used");
   const [phone, setPhone] = useState("");
   const [phoneIso, setPhoneIso] = useState("PH");
@@ -805,6 +808,8 @@ function SellPage() {
             province,
             city,
             barangay,
+            lat,
+            lng,
             seller_type: sellerType,
             plan,
             contact_phone: textParsed.data.contact_phone ?? null,
@@ -1743,6 +1748,38 @@ function SellPage() {
                 setBarangay(v.barangay ?? null);
               }}
             />
+            <div className="space-y-1 pt-1">
+              <Label className="text-xs">Pin exact location on map (optional)</Label>
+              <p className="text-[11px] text-muted-foreground">
+                Tap or drag the marker to your city/neighborhood. Buyers see this pin on the marketplace map. If left blank, your listing groups by region.
+              </p>
+              <MapLocationPicker
+                lat={lat}
+                lng={lng}
+                region={region}
+                onChange={(la, ln) => {
+                  setLat(la);
+                  setLng(ln);
+                }}
+              />
+              {lat != null && lng != null && (
+                <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                  <span>
+                    Pinned: {lat.toFixed(5)}, {lng.toFixed(5)}
+                  </span>
+                  <button
+                    type="button"
+                    className="underline hover:text-foreground"
+                    onClick={() => {
+                      setLat(null);
+                      setLng(null);
+                    }}
+                  >
+                    Clear pin
+                  </button>
+                </div>
+              )}
+            </div>
             <div className="grid gap-2 sm:grid-cols-2 pt-1">
               <div>
                 <Label htmlFor="phone" className="text-xs">Contact phone (optional)</Label>

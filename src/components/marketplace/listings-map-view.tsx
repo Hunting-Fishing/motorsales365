@@ -38,30 +38,44 @@ function loadMaps(): Promise<void> {
   return loadPromise;
 }
 
-interface RegionGroup {
-  region: string;
-  lat: number;
-  lng: number;
-  listings: ListingCardData[];
+type Pin =
+  | { kind: "exact"; lat: number; lng: number; listing: ListingCardData }
+  | { kind: "region"; lat: number; lng: number; region: string; listings: ListingCardData[] };
+
+/** Build pins: exact lat/lng per listing when available; otherwise group leftovers by region centroid. */
+function buildPins(listings: ListingCardData[]): { pins: Pin[]; unmapped: number } {
+  const pins: Pin[] = [];
+  const byRegion = new Map<string, ListingCardData[]>();
+  let unmapped = 0;
+
+  for (const l of listings) {
+    if (l.lat != null && l.lng != null && Number.isFinite(l.lat) && Number.isFinite(l.lng)) {
+      pins.push({ kind: "exact", lat: Number(l.lat), lng: Number(l.lng), listing: l });
+      continue;
+    }
+    if (l.region && CENTROIDS[l.region]) {
+      const arr = byRegion.get(l.region) ?? [];
+      arr.push(l);
+      byRegion.set(l.region, arr);
+    } else {
+      unmapped++;
+    }
+  }
+  for (const [region, ls] of byRegion) {
+    pins.push({
+      kind: "region",
+      lat: CENTROIDS[region].lat,
+      lng: CENTROIDS[region].lng,
+      region,
+      listings: ls,
+    });
+  }
+  return { pins, unmapped };
 }
 
-/** Groups listings by region with a tiny lat/lng jitter so overlapping pins stay clickable. */
-function groupByRegion(listings: ListingCardData[]): RegionGroup[] {
-  const byRegion = new Map<string, ListingCardData[]>();
-  for (const l of listings) {
-    if (!l.region) continue;
-    if (!CENTROIDS[l.region]) continue;
-    const arr = byRegion.get(l.region) ?? [];
-    arr.push(l);
-    byRegion.set(l.region, arr);
-  }
-  return Array.from(byRegion.entries()).map(([region, ls]) => ({
-    region,
-    lat: CENTROIDS[region].lat,
-    lng: CENTROIDS[region].lng,
-    listings: ls,
-  }));
-}
+type Selection =
+  | { kind: "exact"; listing: ListingCardData }
+  | { kind: "region"; region: string; listings: ListingCardData[] };
 
 export function ListingsMapView({ listings }: { listings: ListingCardData[] }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -69,10 +83,9 @@ export function ListingsMapView({ listings }: { listings: ListingCardData[] }) {
   const markersRef = useRef<any[]>([]);
   const [ready, setReady] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const [selected, setSelected] = useState<RegionGroup | null>(null);
+  const [selected, setSelected] = useState<Selection | null>(null);
 
-  const groups = useMemo(() => groupByRegion(listings), [listings]);
-  const unmapped = listings.length - groups.reduce((n, g) => n + g.listings.length, 0);
+  const { pins, unmapped } = useMemo(() => buildPins(listings), [listings]);
 
   useEffect(() => {
     let cancelled = false;
@@ -95,29 +108,62 @@ export function ListingsMapView({ listings }: { listings: ListingCardData[] }) {
     };
   }, []);
 
-  // Render markers when groups change
   useEffect(() => {
     if (!ready || !mapRef.current || !window.google?.maps) return;
     markersRef.current.forEach((m) => m.setMap(null));
     markersRef.current = [];
-    for (const g of groups) {
+
+    const bounds = new window.google.maps.LatLngBounds();
+    let hasAny = false;
+
+    for (const pin of pins) {
       const marker = new window.google.maps.Marker({
-        position: { lat: g.lat, lng: g.lng },
+        position: { lat: pin.lat, lng: pin.lng },
         map: mapRef.current,
-        label: {
-          text: String(g.listings.length),
-          color: "#ffffff",
-          fontSize: "11px",
-          fontWeight: "700",
-        },
+        title: pin.kind === "exact" ? pin.listing.title : pin.region,
+        label:
+          pin.kind === "region"
+            ? {
+                text: String(pin.listings.length),
+                color: "#ffffff",
+                fontSize: "11px",
+                fontWeight: "700",
+              }
+            : undefined,
       });
       marker.addListener("click", () => {
-        setSelected(g);
-        mapRef.current.panTo({ lat: g.lat, lng: g.lng });
+        if (pin.kind === "exact") {
+          setSelected({ kind: "exact", listing: pin.listing });
+        } else {
+          setSelected({ kind: "region", region: pin.region, listings: pin.listings });
+        }
+        mapRef.current.panTo({ lat: pin.lat, lng: pin.lng });
       });
       markersRef.current.push(marker);
+      bounds.extend({ lat: pin.lat, lng: pin.lng });
+      hasAny = true;
     }
-  }, [ready, groups]);
+
+    if (hasAny && pins.length > 1) {
+      mapRef.current.fitBounds(bounds, 48);
+    } else if (hasAny && pins.length === 1) {
+      mapRef.current.setCenter({ lat: pins[0].lat, lng: pins[0].lng });
+      mapRef.current.setZoom(14);
+    }
+  }, [ready, pins]);
+
+  const selectionList: ListingCardData[] =
+    selected?.kind === "exact"
+      ? [selected.listing]
+      : selected?.kind === "region"
+        ? selected.listings
+        : [];
+  const selectionTitle =
+    selected?.kind === "exact"
+      ? selected.listing.city ?? selected.listing.region ?? "Listing"
+      : selected?.kind === "region"
+        ? selected.region
+        : "Tap a pin";
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
@@ -131,14 +177,14 @@ export function ListingsMapView({ listings }: { listings: ListingCardData[] }) {
             {err}
           </div>
         )}
-        {!err && groups.length === 0 && (
+        {!err && pins.length === 0 && (
           <div className="pointer-events-none absolute inset-x-0 bottom-3 mx-auto w-fit rounded-full bg-background/90 px-3 py-1.5 text-xs text-muted-foreground shadow">
-            No listings have a mappable region yet.
+            No listings have a mappable location yet.
           </div>
         )}
-        {unmapped > 0 && groups.length > 0 && (
+        {unmapped > 0 && pins.length > 0 && (
           <div className="pointer-events-none absolute right-3 top-3 rounded-full bg-background/90 px-3 py-1 text-xs text-muted-foreground shadow">
-            {unmapped} listing{unmapped === 1 ? "" : "s"} without a region
+            {unmapped} listing{unmapped === 1 ? "" : "s"} without a location
           </div>
         )}
       </div>
@@ -146,11 +192,11 @@ export function ListingsMapView({ listings }: { listings: ListingCardData[] }) {
       <aside className="rounded-xl border border-border bg-card p-3">
         <h3 className="mb-2 flex items-center gap-1.5 text-sm font-semibold">
           <MapPin className="h-4 w-4 text-primary" />
-          {selected ? selected.region : "Tap a pin"}
+          {selectionTitle}
         </h3>
         {selected ? (
           <ul className="max-h-[55vh] space-y-2 overflow-y-auto pr-1">
-            {selected.listings.map((l) => (
+            {selectionList.map((l) => (
               <li key={l.id}>
                 <Link
                   to="/listing/$id"
@@ -182,8 +228,8 @@ export function ListingsMapView({ listings }: { listings: ListingCardData[] }) {
           </ul>
         ) : (
           <p className="text-xs text-muted-foreground">
-            Tap any pin on the map to see listings in that region.
-            {groups.length > 0 ? ` ${groups.length} region${groups.length === 1 ? "" : "s"} with listings.` : ""}
+            Tap any pin on the map to see the listing.
+            {pins.length > 0 ? ` ${pins.length} pin${pins.length === 1 ? "" : "s"} shown.` : ""}
           </p>
         )}
       </aside>
