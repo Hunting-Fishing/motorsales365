@@ -251,6 +251,8 @@ function EditListingPage() {
     setProvince(l.province ?? null);
     setCity(l.city ?? null);
     setBarangay(l.barangay ?? null);
+    setLat((l as any).lat != null ? Number((l as any).lat) : null);
+    setLng((l as any).lng != null ? Number((l as any).lng) : null);
     setCondition(l.condition ?? "Used");
     {
       const p = parseE164(l.contact_phone ?? null);
