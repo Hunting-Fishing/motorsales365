@@ -13,9 +13,8 @@ export function GCashDirectNote() {
         <div className="space-y-1">
           <div className="font-semibold">Prefer GCash direct?</div>
           <p className="text-muted-foreground">
-            Send to our GCash wallet{" "}
-            <span className="font-mono font-medium text-foreground">09696063830</span>{" "}
-            (365 MotorSales) and upload your receipt — we confirm within 1 business day.
+            Pay straight to our 365 MotorSales GCash wallet and upload your receipt —
+            we confirm within 1 business day. Wallet details are shown on the payment page.
           </p>
           <Link
             to="/help/pay-with-gcash"
