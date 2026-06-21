@@ -4,10 +4,14 @@ import {
   Clock,
   CreditCard,
   Smartphone,
-  Building2,
+  Landmark,
   Wallet,
   Banknote,
   QrCode,
+  ShoppingBag,
+  Store,
+  ArrowLeftRight,
+  Car,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
