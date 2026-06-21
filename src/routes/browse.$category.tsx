@@ -297,6 +297,10 @@ function BrowsePage() {
 
 
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [density, setDensity] = useGridDensity(3);
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const gridClass = densityGridClass(density);
+  const promotedGridClass = densityGridClass(density === 4 ? 4 : 3);
 
   const applyFilters = (e?: React.FormEvent) => {
     e?.preventDefault();
