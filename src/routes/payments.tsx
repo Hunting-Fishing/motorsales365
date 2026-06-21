@@ -13,6 +13,15 @@ import {
   ArrowLeftRight,
   Car,
 } from "lucide-react";
+import {
+  SiVisa,
+  SiMastercard,
+  SiJcb,
+  SiAmericanexpress,
+  SiGrab,
+  SiShopee,
+  SiStripe,
+} from "react-icons/si";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
