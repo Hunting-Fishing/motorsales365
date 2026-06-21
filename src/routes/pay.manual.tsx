@@ -26,7 +26,7 @@ export const Route = createFileRoute("/pay/manual")({
       {
         name: "description",
         content:
-          "Pay for your listing, boost, subscription, or course using GCash (+63 969 606 3830), Maya, QR Ph, bank transfer, or PayPal. Upload your receipt and we confirm within 1 business day.",
+          "Pay for your listing, boost, subscription, or course using GCash (09696063830), Maya, QR Ph, bank transfer, or PayPal. Upload your receipt and we confirm within 1 business day.",
       },
     ],
   }),
