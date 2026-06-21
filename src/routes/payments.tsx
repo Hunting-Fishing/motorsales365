@@ -242,7 +242,7 @@ function PaymentsPage() {
                 </p>
                 <div className="mt-2 text-base">
                   <span className="font-semibold">365 MotorSales</span> ·{" "}
-                  <span className="font-mono font-semibold tracking-tight">+63 969 606 3830</span>
+                  <span className="font-mono font-semibold tracking-tight">09696063830</span>
                 </div>
               </div>
             </div>
