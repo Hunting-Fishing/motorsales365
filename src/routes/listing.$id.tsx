@@ -944,17 +944,22 @@ function ListingDetailPage() {
 
 
 
-          {/* Services around this vehicle — merged from former ServiceStrip.
-              Revenue: lead-gen for finance/insurance/OR-CR partners. */}
+          {/* Services around this vehicle — coming soon.
+              Revenue: lead-gen for finance/insurance/OR-CR partners (not yet wired). */}
           <Collapsible
             defaultOpen
             className="rounded-xl border border-border bg-card p-5"
           >
             <CollapsibleTrigger className="group flex w-full items-start justify-between gap-3 text-left">
-              <div className="min-w-0">
-                <h3 className="font-display text-lg font-semibold">
-                  Need inspection or insurance for this car?
-                </h3>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <h3 className="font-display text-lg font-semibold">
+                    Need inspection or insurance for this car?
+                  </h3>
+                  <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">
+                    Coming soon
+                  </Badge>
+                </div>
                 <p className="mt-1 text-xs text-muted-foreground">
                   Free quotes from vetted PH partners — financing, insurance, OR/CR, title
                   transfer, and a 365-vetted pre-purchase inspection from ₱99. One form, no
@@ -965,52 +970,35 @@ function ListingDetailPage() {
             </CollapsibleTrigger>
             <CollapsibleContent>
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                <ServiceInquiryDialog
-                  inquiryType="inspection"
-                  listingId={listing.id}
-                  vehicleSummary={listing.title}
-                >
-                  <Button variant="outline" className="w-full justify-start sm:col-span-2">
-                    <Wrench className="mr-2 h-4 w-4" /> Request a pre-purchase inspection
+                {[
+                  { Icon: Wrench, label: "Request a pre-purchase inspection", span: true },
+                  { Icon: Shield, label: "Get insurance quote" },
+                  { Icon: Banknote, label: "Get financing" },
+                  { Icon: FileText, label: "OR/CR renewal help" },
+                  { Icon: ClipboardCheck, label: "Title transfer help" },
+                ].map(({ Icon, label, span }) => (
+                  <Button
+                    key={label}
+                    variant="outline"
+                    disabled
+                    aria-disabled="true"
+                    title="Coming soon"
+                    className={cn(
+                      "w-full min-w-0 justify-start gap-2 opacity-70",
+                      span && "sm:col-span-2",
+                    )}
+                  >
+                    <Icon className="h-4 w-4 shrink-0" />
+                    <span className="min-w-0 flex-1 truncate text-left">{label}</span>
+                    <span className="ml-auto shrink-0 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                      Soon
+                    </span>
                   </Button>
-                </ServiceInquiryDialog>
-                <ServiceInquiryDialog
-                  inquiryType="insurance"
-                  listingId={listing.id}
-                  vehicleSummary={listing.title}
-                >
-                  <Button variant="outline" className="w-full justify-start">
-                    <Shield className="mr-2 h-4 w-4" /> Get insurance quote
-                  </Button>
-                </ServiceInquiryDialog>
-                <ServiceInquiryDialog
-                  inquiryType="financing"
-                  listingId={listing.id}
-                  vehicleSummary={listing.title}
-                >
-                  <Button variant="outline" className="w-full justify-start">
-                    <Banknote className="mr-2 h-4 w-4" /> Get financing
-                  </Button>
-                </ServiceInquiryDialog>
-                <ServiceInquiryDialog
-                  inquiryType="or_cr"
-                  listingId={listing.id}
-                  vehicleSummary={listing.title}
-                >
-                  <Button variant="outline" className="w-full justify-start">
-                    <FileText className="mr-2 h-4 w-4" /> OR/CR renewal help
-                  </Button>
-                </ServiceInquiryDialog>
-                <ServiceInquiryDialog
-                  inquiryType="title_transfer"
-                  listingId={listing.id}
-                  vehicleSummary={listing.title}
-                >
-                  <Button variant="outline" className="w-full justify-start">
-                    <ClipboardCheck className="mr-2 h-4 w-4" /> Title transfer help
-                  </Button>
-                </ServiceInquiryDialog>
+                ))}
               </div>
+              <p className="mt-3 text-[11px] text-muted-foreground">
+                Partner network launching shortly. We'll notify you when quotes go live.
+              </p>
             </CollapsibleContent>
           </Collapsible>
 
