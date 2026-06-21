@@ -48,6 +48,7 @@ export function AdCarousel({ placement, limit = 6, className, rotateMs = 6000 }:
     staleTime: 5 * 60 * 1000,
   });
   const ads = useMemo(() => data?.ads ?? [], [data]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const trackedRef = useRef<Set<string>>(new Set());
   const visitorId = useMemo(() => getVisitorId(), []);
   const apiRef = useRef<CarouselApi | null>(null);
