@@ -20,6 +20,7 @@ import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { ServiceStrip } from "@/components/service-strip";
 import { TrustBadges } from "@/components/listings/trust-badges";
 import { ListingActionsMenu } from "@/components/listings/listing-actions-menu";
+import { ListingQuickActions } from "@/components/listings/listing-quick-actions";
 import { ListingBadges, pickHeadlinePrice } from "@/components/listings/listing-badges";
 import { ListingReportBadge } from "@/components/listings/listing-report-badge";
 import { PricingWidget } from "@/components/listings/pricing-widget";
@@ -159,6 +160,7 @@ export function ListingCard({
             className="transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
           />
+          <ListingQuickActions listingId={listing.id} title={listing.title} />
           <div className="absolute left-2 top-2 flex flex-wrap gap-1">
             {openReports > 0 && (
               <ListingReportBadge listingId={listing.id} openCount={openReports} />
