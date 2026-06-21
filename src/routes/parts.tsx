@@ -109,9 +109,19 @@ function PartsHub() {
         {tab === "find" && <PartsWizard />}
 
         {tab === "browse" && (
-          <div className="space-y-4">
+          <div className="space-y-2">
+            <MarketplaceToolbar
+              resultCount={browseRows?.length ?? 0}
+              loading={browseRows === null}
+              view={viewMode}
+              onViewChange={setViewMode}
+              density={density}
+              onDensityChange={setDensity}
+            />
             {browseRows === null ? (
-              <p className="text-sm text-muted-foreground">Loading…</p>
+              <div className={gridClass}>
+                <ListingCardSkeletonGrid count={density === 4 ? 8 : 6} />
+              </div>
             ) : browseRows.length === 0 ? (
               <div className="rounded-lg border border-dashed border-border bg-card p-8 text-center">
                 <Wrench className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
@@ -120,8 +130,10 @@ function PartsHub() {
                   Be the first — list parts you have, or post a wanted ad to attract sellers.
                 </p>
               </div>
+            ) : viewMode === "map" ? (
+              <ListingsMapView listings={browseRows} />
             ) : (
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className={gridClass}>
                 {browseRows.map((l) => (
                   <ListingCard key={l.id} listing={l} />
                 ))}
