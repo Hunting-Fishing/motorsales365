@@ -153,6 +153,29 @@ export function ManualPayForm({ kind, refId, amountPhp, description, preselectMe
     );
   }
 
+  if (loadingMethods) {
+    return (
+      <Card>
+        <CardContent className="flex items-center gap-2 p-4 text-sm text-muted-foreground">
+          <Loader2 className="h-4 w-4 animate-spin" /> Loading payment methods…
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <Card>
+        <CardContent className="space-y-2 p-4 text-sm">
+          <div className="text-destructive">{loadError}</div>
+          <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
+            Retry
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
   if (!methods.length) {
     return (
       <Card>
