@@ -260,6 +260,8 @@ function SellPage() {
   const [province, setProvince] = useState<string | null>(null);
   const [city, setCity] = useState<string | null>(null);
   const [barangay, setBarangay] = useState<string | null>(null);
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
   const [condition, setCondition] = useState("Used");
   const [phone, setPhone] = useState("");
   const [phoneIso, setPhoneIso] = useState("PH");
