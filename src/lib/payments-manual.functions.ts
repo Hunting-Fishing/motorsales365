@@ -108,6 +108,7 @@ export async function submitManualPaymentCore(
   const { data: invNum } = await supabaseAdmin.rpc("generate_invoice_number");
 
   const proofUrl = data.proof_path ?? null;
+  const proofUploadedAt = proofUrl ? new Date().toISOString() : null;
 
   const { data: payment, error } = await supabase
     .from("payments")
