@@ -135,7 +135,7 @@ function PartsHub() {
             ) : (
               <div className={gridClass}>
                 {browseRows.map((l) => (
-                  <ListingCard key={l.id} listing={l} />
+                  <ListingCard key={l.id} listing={l} compact />
                 ))}
               </div>
             )}
