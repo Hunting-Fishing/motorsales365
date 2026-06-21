@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Autoplay from "embla-carousel-autoplay";
 import { getActiveAds, trackAdEvent } from "@/lib/ads.functions";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
@@ -48,6 +48,7 @@ export function AdCarousel({ placement, limit = 6, className, rotateMs = 6000 }:
     staleTime: 5 * 60 * 1000,
   });
   const ads = useMemo(() => data?.ads ?? [], [data]);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const trackedRef = useRef<Set<string>>(new Set());
   const visitorId = useMemo(() => getVisitorId(), []);
   const apiRef = useRef<CarouselApi | null>(null);
@@ -73,10 +74,13 @@ export function AdCarousel({ placement, limit = 6, className, rotateMs = 6000 }:
     if (!api) return;
     const onSelect = () => {
       const idx = api.selectedScrollSnap();
+      setSelectedIndex(idx);
       const ad = ads[idx];
       if (ad) trackImpression(ad.id);
     };
     api.on("select", onSelect);
+    api.on("reInit", onSelect);
+    setSelectedIndex(api.selectedScrollSnap());
   };
 
   const autoplay = useRef(
@@ -153,16 +157,20 @@ export function AdCarousel({ placement, limit = 6, className, rotateMs = 6000 }:
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="left-2" />
-      <CarouselNext className="right-2" />
-      {/* Dots */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center gap-1.5">
+      <CarouselPrevious className="left-2 z-10 bg-background/80 hover:bg-background" />
+      <CarouselNext className="right-2 z-10 bg-background/80 hover:bg-background" />
+      {/* Pagination dots */}
+      <div className="absolute inset-x-0 bottom-3 z-10 flex justify-center gap-2">
         {ads.map((ad: any, i: number) => (
-          <span
+          <button
             key={ad.id}
-            className="h-1.5 w-1.5 rounded-full bg-white/60 shadow"
-            aria-hidden
-            data-idx={i}
+            type="button"
+            onClick={() => apiRef.current?.scrollTo(i)}
+            aria-label={`Go to slide ${i + 1}`}
+            aria-current={i === selectedIndex}
+            className={`h-2 rounded-full shadow transition-all ${
+              i === selectedIndex ? "w-6 bg-white" : "w-2 bg-white/60 hover:bg-white/80"
+            }`}
           />
         ))}
       </div>
