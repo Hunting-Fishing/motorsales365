@@ -629,6 +629,14 @@ export function SiteHeader() {
                   </SheetClose>
                   <SheetClose asChild>
                     <Link
+                      to="/games"
+                      className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                    >
+                      Games
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link
                       to="/learn"
                       className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
                     >
