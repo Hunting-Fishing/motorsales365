@@ -164,7 +164,13 @@ export async function submitManualPaymentCore(
         kind: data.kind,
         amount_php: data.amount_php,
         reference: data.reference ?? null,
+        listing_id:
+          data.kind === "listing" || data.kind === "upgrade" || data.kind === "boost"
+            ? data.ref_id ?? null
+            : null,
         proof_attached: !!proofUrl,
+        proof_url: proofUrl,
+        proof_uploaded_at: proofUploadedAt,
       },
     } as any),
   ]);
