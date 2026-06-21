@@ -48,12 +48,14 @@ type Method = {
 };
 
 // Small lettered brand badges for marks not available as SVG icons.
+// Use explicit pixel-ish sizes (not em/h-full) so they render reliably inside
+// any container — em-based sizes collapse when the parent has no font-size,
+// and h-full collapses inside an inline-flex parent with no explicit height.
 const makeLetterBrand = (letter: string, bg: string): IconCmp =>
   function LetterBrand({ className }: { className?: string }) {
     return (
       <span
-        className={`inline-flex items-center justify-center rounded-sm font-bold text-white ${bg} ${className ?? ""}`}
-        style={{ fontSize: "0.65em", lineHeight: 1 }}
+        className={`inline-flex h-full w-full items-center justify-center rounded-sm text-[10px] font-bold leading-none text-white ${bg} ${className ?? ""}`}
         aria-hidden
       >
         {letter}
@@ -65,8 +67,7 @@ const GCashMark = makeLetterBrand("G", "bg-[#007DFE]");
 const MayaMark = makeLetterBrand("M", "bg-[#00C566]");
 const QrPhMark: IconCmp = ({ className }) => (
   <span
-    className={`inline-flex items-center justify-center rounded-sm bg-[#E03A3E] font-bold text-white ${className ?? ""}`}
-    style={{ fontSize: "0.5em", lineHeight: 1, letterSpacing: "-0.02em" }}
+    className={`inline-flex h-full w-full items-center justify-center rounded-sm bg-[#E03A3E] text-[8px] font-bold leading-none tracking-tight text-white ${className ?? ""}`}
     aria-hidden
   >
     QR
@@ -75,15 +76,15 @@ const QrPhMark: IconCmp = ({ className }) => (
 
 const CardsMark: IconCmp = ({ className }) => (
   <span className={`inline-flex items-center gap-0.5 ${className ?? ""}`}>
-    <SiVisa className="h-full w-auto text-[#1A1F71]" />
-    <SiMastercard className="h-full w-auto text-[#EB001B]" />
+    <SiVisa className="h-2.5 w-auto text-[#1A1F71]" />
+    <SiMastercard className="h-2.5 w-auto text-[#EB001B]" />
   </span>
 );
 
 const JcbAmexMark: IconCmp = ({ className }) => (
   <span className={`inline-flex items-center gap-0.5 ${className ?? ""}`}>
-    <SiJcb className="h-full w-auto text-[#0E4C96]" />
-    <SiAmericanexpress className="h-full w-auto text-[#2E77BB]" />
+    <SiJcb className="h-2.5 w-auto text-[#0E4C96]" />
+    <SiAmericanexpress className="h-2.5 w-auto text-[#2E77BB]" />
   </span>
 );
 
@@ -279,7 +280,7 @@ function PaymentsPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-start gap-4">
               <div className="rounded-xl bg-primary/15 p-3">
-                <GCashMark className="h-7 w-7" />
+                <GCashMark className="h-7 w-7 text-base" />
               </div>
               <div>
                 <div className="flex flex-wrap items-center gap-2">
