@@ -22,7 +22,6 @@ import {
   ChevronDown,
   Play,
   Expand,
-  AlertTriangle,
 } from "lucide-react";
 import {
   Collapsible,
@@ -34,7 +33,7 @@ import { cn } from "@/lib/utils";
 import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
 
 import { AffiliatePartsSection } from "@/components/affiliate-parts-section";
-import { ComingSoonBadge, ComingSoonSection, ComingSoonRow } from "@/components/coming-soon";
+import { ComingSoonSection, ComingSoonRow } from "@/components/coming-soon";
 import { NeededPartsRail } from "@/components/listing/needed-parts-rail";
 import { GalleryLightbox } from "@/components/listing/gallery-lightbox";
 import { MobileActionBar } from "@/components/listing/mobile-action-bar";
