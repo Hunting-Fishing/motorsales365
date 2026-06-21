@@ -125,7 +125,7 @@ export async function submitManualPaymentCore(
       reference: data.reference ?? null,
       notes: data.notes ?? null,
       proof_url: proofUrl,
-      proof_uploaded_at: proofUrl ? new Date().toISOString() : null,
+      proof_uploaded_at: proofUrl ? proofUploadedAt : null,
       invoice_number: invNum as string,
     } as any)
     .select("id,invoice_number")
