@@ -1,5 +1,5 @@
 import logoSrc from "@/assets/logo-small.webp";
-import { ComingSoonBadge, ComingSoonSection } from "@/components/coming-soon";
+import { ComingSoonSection } from "@/components/coming-soon";
 
 interface Props {
   make?: string | null;
