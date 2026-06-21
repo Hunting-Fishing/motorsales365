@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Autoplay from "embla-carousel-autoplay";
 import { getActiveAds, trackAdEvent } from "@/lib/ads.functions";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
