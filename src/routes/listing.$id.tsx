@@ -901,21 +901,23 @@ function ListingDetailPage() {
                   <MessageSquare className="mr-2 h-4 w-4" /> Message seller
                 </Button>
               )}
-              <ListingQr
-                listingId={listing.id}
-                title={listing.title}
-                pricePhp={listing.price_php}
-                location={[listing.city, listing.region].filter(Boolean).join(", ") || null}
-                coverUrl={photos[0]?.url ?? null}
-                className="w-full"
-              />
-              {listing.category_slug !== "towing" && (
-                <Button asChild variant="outline" className="w-full">
-                  <Link to="/tow" search={{ listing: listing.id }}>
-                    <Truck className="mr-2 h-4 w-4" /> Need this towed?
-                  </Link>
-                </Button>
-              )}
+              <div className="grid grid-cols-2 gap-2">
+                <ListingQr
+                  listingId={listing.id}
+                  title={listing.title}
+                  pricePhp={listing.price_php}
+                  location={[listing.city, listing.region].filter(Boolean).join(", ") || null}
+                  coverUrl={photos[0]?.url ?? null}
+                  className="w-full"
+                />
+                {listing.category_slug !== "towing" && (
+                  <Button asChild variant="outline" size="sm" className="w-full">
+                    <Link to="/tow" search={{ listing: listing.id }}>
+                      <Truck className="mr-1.5 h-4 w-4" /> Tow it
+                    </Link>
+                  </Button>
+                )}
+              </div>
               {listing.category_slug === "towing" && (
                 <Button asChild className="w-full">
                   <Link to="/tow" search={{ provider: listing.id }}>
