@@ -21,6 +21,8 @@ import {
   type ReviewState,
 } from "@/lib/payments-manual.functions";
 import { PaymentReviewDrawer } from "@/components/admin/payment-review-drawer";
+import { StripeGCashAdminPanel } from "@/components/admin/stripe-gcash-admin-panel";
+import { Download, Smartphone } from "lucide-react";
 
 export const Route = createFileRoute("/admin/payments")({
   component: AdminPayments,
@@ -340,22 +342,25 @@ function RailsTab() {
   if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
 
   return (
-    <Card>
-      <CardContent className="space-y-3 p-4">
-        <p className="text-xs text-muted-foreground">
-          Toggle payment rails. Disabled rails are hidden from checkout pickers globally.
-        </p>
-        {flags.map((f) => (
-          <div key={f.key} className="flex items-center justify-between rounded-md border p-3">
-            <div>
-              <div className="font-mono text-sm">{f.key}</div>
-              {f.description && <div className="text-xs text-muted-foreground">{f.description}</div>}
+    <div className="space-y-4">
+      <StripeGCashAdminPanel />
+      <Card>
+        <CardContent className="space-y-3 p-4">
+          <p className="text-xs text-muted-foreground">
+            Toggle payment rails. Disabled rails are hidden from checkout pickers globally.
+          </p>
+          {flags.map((f) => (
+            <div key={f.key} className="flex items-center justify-between rounded-md border p-3">
+              <div>
+                <div className="font-mono text-sm">{f.key}</div>
+                {f.description && <div className="text-xs text-muted-foreground">{f.description}</div>}
+              </div>
+              <Switch checked={!!f.enabled} onCheckedChange={(c) => toggle(f.key, c)} />
             </div>
-            <Switch checked={!!f.enabled} onCheckedChange={(c) => toggle(f.key, c)} />
-          </div>
-        ))}
-      </CardContent>
-    </Card>
+          ))}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
