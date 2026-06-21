@@ -180,7 +180,7 @@ export function ListingCard({
               </Badge>
             )}
             {!boosted && <NewBadge publishedAt={listing.published_at} />}
-            {!boosted && (
+            {!compact && !boosted && (
               <RenewedBadge
                 updatedAt={listing.updated_at}
                 publishedAt={listing.published_at}
@@ -198,13 +198,13 @@ export function ListingCard({
                 {matchBadge.label}
               </Badge>
             )}
-            {catMeta && (
+            {!compact && catMeta && (
               <Badge className="bg-primary text-primary-foreground">
                 <catMeta.Icon className="mr-1 h-3 w-3" />
                 {catMeta.label}
               </Badge>
             )}
-            {listing.seller_type === "business" && listing.seller_dealer_plan && (
+            {!compact && listing.seller_type === "business" && listing.seller_dealer_plan && (
               <DealerSubscriptionBadge
                 planName={listing.seller_dealer_plan}
                 currentPeriodEnd={listing.seller_dealer_period_end ?? null}
