@@ -33,7 +33,7 @@ export function ManualPayForm({ kind, refId, amountPhp, description, preselectMe
   const [notes, setNotes] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  const [submitted, setSubmitted] = useState<{ invoice: string; id: string } | null>(null);
+  const [submitted, setSubmitted] = useState<{ invoice: string; id: string; proofAttached: boolean } | null>(null);
 
   useEffect(() => {
     list().then((all) => {
