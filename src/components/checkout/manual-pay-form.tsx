@@ -33,18 +33,26 @@ export function ManualPayForm({ kind, refId, amountPhp, description, preselectMe
   const [notes, setNotes] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadingMethods, setLoadingMethods] = useState(true);
   const [submitted, setSubmitted] = useState<{ invoice: string; id: string; proofAttached: boolean } | null>(null);
 
   useEffect(() => {
-    list().then((all) => {
-      const manuals = all.filter((m) => m.is_manual);
-      setMethods(manuals);
-      if (manuals.length && !selected) {
-        // Prefer caller-requested method (e.g. ?method=gcash_manual) when enabled.
-        const requested = preselectMethod && manuals.find((m) => m.method === preselectMethod);
-        setSelected(requested ? requested.method : manuals[0].method);
-      }
-    });
+    setLoadingMethods(true);
+    setLoadError(null);
+    list()
+      .then((all) => {
+        const manuals = all.filter((m) => m.is_manual);
+        setMethods(manuals);
+        if (manuals.length && !selected) {
+          const requested = preselectMethod && manuals.find((m) => m.method === preselectMethod);
+          setSelected(requested ? requested.method : manuals[0].method);
+        }
+      })
+      .catch((err) => {
+        setLoadError(err?.message ?? "Couldn't load payment methods. Please refresh.");
+      })
+      .finally(() => setLoadingMethods(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preselectMethod]);
 
