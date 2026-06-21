@@ -84,7 +84,12 @@ export function AdCarousel({ placement, limit = 6, className, rotateMs = 6000 }:
   };
 
   const autoplay = useRef(
-    Autoplay({ delay: rotateMs, stopOnInteraction: false, stopOnMouseEnter: true }),
+    Autoplay({
+      delay: rotateMs,
+      stopOnInteraction: false,
+      stopOnMouseEnter: true,
+      stopOnFocusIn: true,
+    }),
   );
 
   if (!ads.length) return null;
@@ -104,7 +109,8 @@ export function AdCarousel({ placement, limit = 6, className, rotateMs = 6000 }:
         target="_blank"
         rel="sponsored noopener"
         onClick={() => handleClick(ad.id)}
-        className={`group relative block overflow-hidden rounded-xl border bg-card ${className ?? ""}`}
+        aria-label={`Sponsored: ${ad.title}${ad.caption ? ` — ${ad.caption}` : ""} (opens in a new tab)`}
+        className={`group relative block overflow-hidden rounded-xl border bg-card focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${className ?? ""}`}
       >
         <ImageWithSkeleton
           src={ad.image_url}
@@ -125,22 +131,41 @@ export function AdCarousel({ placement, limit = 6, className, rotateMs = 6000 }:
     );
   }
 
+  const currentAd: any = ads[selectedIndex];
+
   return (
     <Carousel
       className={className}
       opts={{ loop: true, align: "start", watchDrag: true }}
       plugins={[autoplay.current]}
       setApi={handleApi}
+      aria-label="Sponsored advertisements carousel"
+      aria-roledescription="carousel"
     >
+      {/* Screen-reader announcement of the active slide */}
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {currentAd
+          ? `Slide ${selectedIndex + 1} of ${ads.length}: ${currentAd.title}`
+          : ""}
+      </div>
       <CarouselContent>
-        {ads.map((ad: any) => (
-          <CarouselItem key={ad.id} className="basis-full">
+        {ads.map((ad: any, i: number) => (
+          <CarouselItem
+            key={ad.id}
+            className="basis-full"
+            role="group"
+            aria-roledescription="slide"
+            aria-label={`${i + 1} of ${ads.length}: ${ad.title}`}
+            aria-hidden={i !== selectedIndex}
+          >
             <a
               href={ad.target_url}
               target="_blank"
               rel="sponsored noopener"
               onClick={() => handleClick(ad.id)}
-              className="group relative block overflow-hidden rounded-xl border bg-card"
+              tabIndex={i === selectedIndex ? 0 : -1}
+              aria-label={`Sponsored: ${ad.title}${ad.caption ? ` — ${ad.caption}` : ""} (opens in a new tab)`}
+              className="group relative block overflow-hidden rounded-xl border bg-card focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
               <ImageWithSkeleton
                 src={ad.image_url}
@@ -159,22 +184,38 @@ export function AdCarousel({ placement, limit = 6, className, rotateMs = 6000 }:
           </CarouselItem>
         ))}
       </CarouselContent>
-      <CarouselPrevious className="left-2 z-10 bg-background/80 hover:bg-background" />
-      <CarouselNext className="right-2 z-10 bg-background/80 hover:bg-background" />
+      <CarouselPrevious
+        aria-label="Previous advertisement"
+        className="left-2 z-10 bg-background/80 hover:bg-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      />
+      <CarouselNext
+        aria-label="Next advertisement"
+        className="right-2 z-10 bg-background/80 hover:bg-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+      />
       {/* Pagination dots */}
-      <div className="absolute inset-x-0 bottom-3 z-10 flex justify-center gap-2">
-        {ads.map((ad: any, i: number) => (
-          <button
-            key={ad.id}
-            type="button"
-            onClick={() => apiRef.current?.scrollTo(i)}
-            aria-label={`Go to slide ${i + 1}`}
-            aria-current={i === selectedIndex}
-            className={`h-2 rounded-full shadow transition-all ${
-              i === selectedIndex ? "w-6 bg-white" : "w-2 bg-white/60 hover:bg-white/80"
-            }`}
-          />
-        ))}
+      <div
+        role="tablist"
+        aria-label="Select advertisement slide"
+        className="absolute inset-x-0 bottom-3 z-10 flex justify-center gap-2"
+      >
+        {ads.map((ad: any, i: number) => {
+          const isActive = i === selectedIndex;
+          return (
+            <button
+              key={ad.id}
+              type="button"
+              role="tab"
+              onClick={() => apiRef.current?.scrollTo(i)}
+              aria-label={`Go to slide ${i + 1} of ${ads.length}`}
+              aria-selected={isActive}
+              aria-current={isActive}
+              tabIndex={isActive ? 0 : -1}
+              className={`h-2 rounded-full shadow transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40 ${
+                isActive ? "w-6 bg-white" : "w-2 bg-white/60 hover:bg-white/80"
+              }`}
+            />
+          );
+        })}
       </div>
     </Carousel>
   );
