@@ -686,6 +686,5 @@ describe("manual payment submission smoke test", () => {
     });
   });
 });
-  });
-});
+
 
