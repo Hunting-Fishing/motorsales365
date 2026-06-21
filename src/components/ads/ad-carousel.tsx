@@ -145,6 +145,7 @@ export function AdCarousel({ placement, limit = 6, className, rotateMs = 6000 }:
               <ImageWithSkeleton
                 src={ad.image_url}
                 alt={ad.title}
+                draggable={false}
                 className="aspect-[21/9] w-full object-cover transition-transform group-hover:scale-[1.02]"
               />
               <Badge variant="secondary" className="absolute right-3 top-3 backdrop-blur">
