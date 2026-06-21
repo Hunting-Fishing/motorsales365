@@ -26,7 +26,7 @@ export const Route = createFileRoute("/pay/manual")({
       {
         name: "description",
         content:
-          "Pay for your listing, boost, subscription, or course using GCash (+63 969 606 3830), Maya, QR Ph, bank transfer, or PayPal. Upload your receipt and we confirm within 1 business day.",
+          "Pay for your listing, boost, subscription, or course using GCash (09696063830), Maya, QR Ph, bank transfer, or PayPal. Upload your receipt and we confirm within 1 business day.",
       },
     ],
   }),
@@ -56,7 +56,7 @@ function ManualPayPage() {
               <div className="font-semibold">Send to GCash</div>
               <div className="mt-1 text-muted-foreground">
                 <span className="font-medium text-foreground">365 MotorSales</span> ·{" "}
-                <span className="font-mono font-medium text-foreground">+63 969 606 3830</span>
+                <span className="font-mono font-medium text-foreground">09696063830</span>
               </div>
             </div>
           </div>
