@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef } from "react";
+import Autoplay from "embla-carousel-autoplay";
 import { getActiveAds, trackAdEvent } from "@/lib/ads.functions";
 import { ImageWithSkeleton } from "@/components/image-with-skeleton";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +10,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi,
 } from "@/components/ui/carousel";
 
 type Placement =
@@ -24,6 +26,8 @@ interface AdCarouselProps {
   placement: Placement;
   limit?: number;
   className?: string;
+  /** Auto-rotate interval in ms. Defaults to 6000. */
+  rotateMs?: number;
 }
 
 function getVisitorId(): string {
@@ -37,7 +41,7 @@ function getVisitorId(): string {
   return v;
 }
 
-export function AdCarousel({ placement, limit = 6, className }: AdCarouselProps) {
+export function AdCarousel({ placement, limit = 6, className, rotateMs = 6000 }: AdCarouselProps) {
   const { data } = useQuery({
     queryKey: ["ads", placement, limit],
     queryFn: () => getActiveAds({ data: { placement, limit } }),
@@ -46,17 +50,38 @@ export function AdCarousel({ placement, limit = 6, className }: AdCarouselProps)
   const ads = useMemo(() => data?.ads ?? [], [data]);
   const trackedRef = useRef<Set<string>>(new Set());
   const visitorId = useMemo(() => getVisitorId(), []);
+  const apiRef = useRef<CarouselApi | null>(null);
 
+  const trackImpression = (adId: string) => {
+    if (trackedRef.current.has(adId)) return;
+    trackedRef.current.add(adId);
+    trackAdEvent({
+      data: { adId, eventType: "impression", visitorId: visitorId || undefined },
+    }).catch(() => {});
+  };
+
+  // Track first/visible ad on mount
   useEffect(() => {
     if (!ads.length) return;
-    ads.forEach((ad: any) => {
-      if (trackedRef.current.has(ad.id)) return;
-      trackedRef.current.add(ad.id);
-      trackAdEvent({
-        data: { adId: ad.id, eventType: "impression", visitorId: visitorId || undefined },
-      }).catch(() => {});
-    });
-  }, [ads, visitorId]);
+    trackImpression(ads[0].id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ads]);
+
+  // Track impressions as the carousel rotates
+  const handleApi = (api: CarouselApi) => {
+    apiRef.current = api;
+    if (!api) return;
+    const onSelect = () => {
+      const idx = api.selectedScrollSnap();
+      const ad = ads[idx];
+      if (ad) trackImpression(ad.id);
+    };
+    api.on("select", onSelect);
+  };
+
+  const autoplay = useRef(
+    Autoplay({ delay: rotateMs, stopOnInteraction: false, stopOnMouseEnter: true }),
+  );
 
   if (!ads.length) return null;
 
@@ -66,6 +91,7 @@ export function AdCarousel({ placement, limit = 6, className }: AdCarouselProps)
     );
   };
 
+  // Single ad: no need to rotate, render full-bleed.
   if (ads.length === 1) {
     const ad = ads[0];
     return (
@@ -95,10 +121,15 @@ export function AdCarousel({ placement, limit = 6, className }: AdCarouselProps)
   }
 
   return (
-    <Carousel className={className} opts={{ loop: true, align: "start" }}>
+    <Carousel
+      className={className}
+      opts={{ loop: true, align: "start" }}
+      plugins={[autoplay.current]}
+      setApi={handleApi}
+    >
       <CarouselContent>
         {ads.map((ad: any) => (
-          <CarouselItem key={ad.id} className="md:basis-1/2 lg:basis-1/2">
+          <CarouselItem key={ad.id} className="basis-full">
             <a
               href={ad.target_url}
               target="_blank"
@@ -124,6 +155,17 @@ export function AdCarousel({ placement, limit = 6, className }: AdCarouselProps)
       </CarouselContent>
       <CarouselPrevious className="left-2" />
       <CarouselNext className="right-2" />
+      {/* Dots */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center gap-1.5">
+        {ads.map((ad: any, i: number) => (
+          <span
+            key={ad.id}
+            className="h-1.5 w-1.5 rounded-full bg-white/60 shadow"
+            aria-hidden
+            data-idx={i}
+          />
+        ))}
+      </div>
     </Carousel>
   );
 }
