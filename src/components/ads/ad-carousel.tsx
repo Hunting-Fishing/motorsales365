@@ -127,7 +127,7 @@ export function AdCarousel({ placement, limit = 6, className, rotateMs = 6000 }:
   return (
     <Carousel
       className={className}
-      opts={{ loop: true, align: "start" }}
+      opts={{ loop: true, align: "start", watchDrag: true }}
       plugins={[autoplay.current]}
       setApi={handleApi}
     >
