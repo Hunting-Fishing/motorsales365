@@ -13,6 +13,18 @@ function parseEnv(url: URL): StripeEnv {
   return v === "live" ? "live" : "sandbox";
 }
 
+/**
+ * Map a Checkout session's rail metadata onto the `payments.method` column.
+ * Lets the admin payments log distinguish Stripe-GCash from card transactions
+ * with a simple `method = 'stripe:gcash'` filter. Falls back to plain
+ * `"stripe"` for anything that didn't force a specific rail.
+ */
+function methodForSession(session: Stripe.Checkout.Session | null | undefined): string {
+  const rail = session?.metadata?.rail;
+  if (rail === "gcash") return "stripe:gcash";
+  return "stripe";
+}
+
 async function resolvePlanId(lookupKey: string | null | undefined): Promise<string | null> {
   if (!lookupKey) return null;
   const { data } = await supabaseAdmin
