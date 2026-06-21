@@ -962,10 +962,11 @@ function ListingDetailPage() {
                   </Badge>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">
-                  Free quotes from vetted PH partners — financing, insurance, OR/CR, title
-                  transfer, and a 365-vetted pre-purchase inspection from ₱99. One form, no
-                  commitment.
+                  We're building a partner network for financing, insurance, OR/CR, title
+                  transfer, and pre-purchase inspections. Not available yet — we'll notify you
+                  once it launches.
                 </p>
+
               </div>
               <ChevronDown className="mt-1 h-4 w-4 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-180" />
             </CollapsibleTrigger>
