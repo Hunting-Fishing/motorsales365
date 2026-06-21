@@ -34,6 +34,7 @@ import { ServiceInquiryDialog } from "@/components/service-inquiry-dialog";
 
 import { AffiliatePartsSection } from "@/components/affiliate-parts-section";
 import { ComingSoonSection, ComingSoonRow } from "@/components/coming-soon";
+import { SpecRow } from "@/components/listing/spec-display";
 import { NeededPartsRail } from "@/components/listing/needed-parts-rail";
 import { GalleryLightbox } from "@/components/listing/gallery-lightbox";
 import { MobileActionBar } from "@/components/listing/mobile-action-bar";
@@ -115,10 +116,15 @@ function SectionCard({
   return (
     <Collapsible
       defaultOpen={open}
-      className={`mt-6 rounded-xl border border-border bg-card p-5 ${className ?? ""}`}
+      className={`group/section mt-4 overflow-hidden rounded-xl border border-border bg-card p-4 ${className ?? ""}`}
     >
+      {/* Subtle PH flag accent stripe */}
+      <div
+        aria-hidden
+        className="-mx-4 -mt-4 mb-3 h-1 bg-gradient-to-r from-[#0038A8] via-[#FCD116] to-[#CE1126]"
+      />
       <CollapsibleTrigger className="group flex w-full items-center justify-between gap-3 text-left">
-        <h2 className="font-display text-lg font-semibold">{title}</h2>
+        <h2 className="font-display text-base font-semibold sm:text-lg">{title}</h2>
         <div className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
           {meta}
           <ChevronDown className="h-4 w-4 transition-transform group-data-[state=open]:rotate-180" />
@@ -693,25 +699,9 @@ function ListingDetailPage() {
                   </span>
                 }
               >
-                <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <dl className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
                   {specEntries.map(([k, v]) => (
-                    <div
-                      key={k}
-                      className="flex justify-between gap-3 border-b border-border/60 pb-2 text-sm"
-                    >
-                      <dt className="capitalize text-muted-foreground">
-                        {k.replace(/_/g, " ")}
-                      </dt>
-                      <dd className="font-medium text-right">
-                        {Array.isArray(v)
-                          ? v.join(", ")
-                          : typeof v === "boolean"
-                            ? v
-                              ? "Yes"
-                              : "No"
-                            : String(v)}
-                      </dd>
-                    </div>
+                    <SpecRow key={k} specKey={k} value={v} />
                   ))}
                 </dl>
               </SectionCard>
@@ -814,9 +804,13 @@ function ListingDetailPage() {
 
         {/* Sidebar */}
         <aside className="space-y-4 pb-20 lg:sticky lg:top-20 lg:self-start lg:pb-0">
-          <div className="rounded-xl border border-border bg-card p-5">
+          <div className="overflow-hidden rounded-xl border border-border bg-card p-4">
+            <div
+              aria-hidden
+              className="-mx-4 -mt-4 mb-3 h-1 bg-gradient-to-r from-[#0038A8] via-[#FCD116] to-[#CE1126]"
+            />
             <div className="flex items-start justify-between gap-2">
-              <h3 className="font-display text-lg font-semibold">Seller</h3>
+              <h3 className="font-display text-base font-semibold sm:text-lg">Seller</h3>
               <ListingActionsMenu
                 listingId={listing.id}
                 sellerUserId={listing.user_id}
@@ -907,21 +901,23 @@ function ListingDetailPage() {
                   <MessageSquare className="mr-2 h-4 w-4" /> Message seller
                 </Button>
               )}
-              <ListingQr
-                listingId={listing.id}
-                title={listing.title}
-                pricePhp={listing.price_php}
-                location={[listing.city, listing.region].filter(Boolean).join(", ") || null}
-                coverUrl={photos[0]?.url ?? null}
-                className="w-full"
-              />
-              {listing.category_slug !== "towing" && (
-                <Button asChild variant="outline" className="w-full">
-                  <Link to="/tow" search={{ listing: listing.id }}>
-                    <Truck className="mr-2 h-4 w-4" /> Need this towed?
-                  </Link>
-                </Button>
-              )}
+              <div className="grid grid-cols-2 gap-2">
+                <ListingQr
+                  listingId={listing.id}
+                  title={listing.title}
+                  pricePhp={listing.price_php}
+                  location={[listing.city, listing.region].filter(Boolean).join(", ") || null}
+                  coverUrl={photos[0]?.url ?? null}
+                  className="w-full"
+                />
+                {listing.category_slug !== "towing" && (
+                  <Button asChild variant="outline" size="sm" className="w-full">
+                    <Link to="/tow" search={{ listing: listing.id }}>
+                      <Truck className="mr-1.5 h-4 w-4" /> Tow it
+                    </Link>
+                  </Button>
+                )}
+              </div>
               {listing.category_slug === "towing" && (
                 <Button asChild className="w-full">
                   <Link to="/tow" search={{ provider: listing.id }}>

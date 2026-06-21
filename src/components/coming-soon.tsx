@@ -64,18 +64,29 @@ export function ComingSoonSection({
   return (
     <div
       className={cn(
-        "rounded-xl border border-amber-300 bg-amber-50 p-5 dark:border-amber-700/60 dark:bg-amber-950/30",
+        "relative overflow-hidden rounded-xl border border-amber-300 bg-amber-50 p-4 dark:border-amber-700/60 dark:bg-amber-950/30",
         className,
       )}
     >
-      <div className="flex flex-wrap items-center gap-2">
-        <ComingSoonBadge />
+      {/* Subtle Filipino sun-ray motif */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 opacity-20 dark:opacity-10"
+        style={{
+          background:
+            "radial-gradient(circle, #FCD116 0%, transparent 60%), repeating-conic-gradient(from 0deg, #FCD116 0deg 10deg, transparent 10deg 30deg)",
+        }}
+      />
+      <div className="relative">
+        <div className="flex flex-wrap items-center gap-2">
+          <ComingSoonBadge />
+        </div>
+        <h3 className="mt-2 font-display text-base font-semibold text-amber-950 dark:text-amber-100 sm:text-lg">
+          {title}
+        </h3>
+        <p className="mt-1 text-xs text-amber-900/80 dark:text-amber-200/80">{subtitle}</p>
+        <div className="mt-3">{children}</div>
       </div>
-      <h3 className="mt-2 font-display text-lg font-semibold text-amber-950 dark:text-amber-100">
-        {title}
-      </h3>
-      <p className="mt-1 text-xs text-amber-900/80 dark:text-amber-200/80">{subtitle}</p>
-      <div className="mt-3">{children}</div>
     </div>
   );
 }
