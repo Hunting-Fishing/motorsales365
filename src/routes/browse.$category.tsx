@@ -618,7 +618,7 @@ function BrowsePage() {
             );
             return (
               <>
-                {promoted.length > 0 && (
+                {promoted.length > 0 && viewMode === "grid" && (
                   <section className="mb-6">
                     <div className="mb-2 flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground">
                       <Rocket className="h-3.5 w-3.5 text-primary" />
@@ -627,24 +627,35 @@ function BrowsePage() {
                         Sponsored
                       </span>
                     </div>
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                      {promoted.slice(0, 3).map((l) => (
+                    <div className={promotedGridClass}>
+                      {promoted.slice(0, density === 4 ? 4 : 3).map((l) => (
                         <ListingCard key={l.id} listing={l} />
                       ))}
                     </div>
                   </section>
                 )}
-                <div className="mb-4 text-sm text-muted-foreground">
-                  {loading
-                    ? "Loading…"
-                    : `${organic.length} result${organic.length === 1 ? "" : "s"}`}
-                </div>
-                {!loading && organic.length === 0 && promoted.length === 0 ? (
+
+                <MarketplaceToolbar
+                  resultCount={organic.length + promoted.length}
+                  loading={loading}
+                  view={viewMode}
+                  onViewChange={setViewMode}
+                  density={density}
+                  onDensityChange={setDensity}
+                />
+
+                {loading ? (
+                  <div className={gridClass}>
+                    <ListingCardSkeletonGrid count={density === 4 ? 8 : 6} />
+                  </div>
+                ) : viewMode === "map" ? (
+                  <ListingsMapView listings={[...promoted, ...organic]} />
+                ) : organic.length === 0 && promoted.length === 0 ? (
                   <div className="rounded-xl border border-dashed border-border bg-card p-12 text-center text-muted-foreground">
                     No listings match your filters yet.
                   </div>
                 ) : (
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  <div className={gridClass}>
                     {organic.map((l) => (
                       <ListingCard key={l.id} listing={l} />
                     ))}
