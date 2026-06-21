@@ -136,13 +136,13 @@ const METHODS: { group: string; items: Method[] }[] = [
       {
         name: "7-Eleven / Cebuana / M Lhuillier",
         desc: "Pay cash at any partner outlet.",
-        icon: Banknote,
+        icon: Store,
         status: "planned",
       },
       {
         name: "Manual Bank Deposit",
         desc: "Deposit to our bank account and upload proof.",
-        icon: Banknote,
+        icon: Landmark,
         status: "planned",
       },
     ],
