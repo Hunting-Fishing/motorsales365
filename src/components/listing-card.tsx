@@ -122,14 +122,17 @@ export type ListingCardBadge = { label: string; tone: "exact" | "good" | "loose"
 export function ListingCard({
   listing,
   matchBadge,
+  compact = false,
 }: {
   listing: ListingCardData;
   matchBadge?: ListingCardBadge | null;
+  /** FB-Marketplace style: image-forward, minimal chrome (price + 1-line title + city). */
+  compact?: boolean;
 }) {
   const boosted = listing.boost_until && new Date(listing.boost_until) > new Date();
   const catMeta = CATEGORY_META[listing.category_slug];
   const summary = summarizeAttributes(listing.category_slug, listing.attributes);
-  const showServices = VEHICLE_CATEGORIES.has(listing.category_slug);
+  const showServices = VEHICLE_CATEGORIES.has(listing.category_slug) && !compact;
   const trust = deriveTrustSignals(listing);
   const tier = getSellerTier(listing);
   const { data: reportSummary } = useListingReportSummary(listing.id);
@@ -141,7 +144,10 @@ export function ListingCard({
   return (
     <div
       className={cn(
-        "group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-elegant)]",
+        "group relative flex flex-col overflow-hidden border border-border bg-card transition-all hover:-translate-y-0.5",
+        compact
+          ? "rounded-lg shadow-sm hover:shadow-md"
+          : "rounded-xl shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-elegant)]",
         tier.ringClass,
         tier.glowClass,
       )}
