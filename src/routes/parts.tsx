@@ -7,6 +7,10 @@ import { PartsWizard } from "@/components/parts/parts-wizard";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
 import { Button } from "@/components/ui/button";
 import { browseUsedParts } from "@/lib/parts-search.functions";
+import { MarketplaceToolbar, type ViewMode } from "@/components/marketplace/marketplace-toolbar";
+import { ListingCardSkeletonGrid } from "@/components/marketplace/listing-card-skeleton";
+import { ListingsMapView } from "@/components/marketplace/listings-map-view";
+import { useGridDensity, densityGridClass } from "@/hooks/use-grid-density";
 
 const TITLE = "Used Auto Parts Marketplace — 365 MotorSales Philippines";
 const DESCRIPTION =
@@ -34,6 +38,8 @@ function PartsHub() {
   const [tab, setTab] = useState<Tab>("find");
   const browse = useServerFn(browseUsedParts);
   const [browseRows, setBrowseRows] = useState<ListingCardData[] | null>(null);
+  const [density, setDensity] = useGridDensity(3);
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
 
   useEffect(() => {
     if (tab !== "browse" || browseRows !== null) return;
@@ -42,9 +48,12 @@ function PartsHub() {
       .catch(() => setBrowseRows([]));
   }, [tab, browseRows, browse]);
 
+  const gridClass = densityGridClass(density);
+
   return (
     <SiteLayout>
       <div className="container mx-auto max-w-6xl px-4 py-8 md:py-12">
+
         {/* Hero */}
         <div className="mb-6 rounded-2xl border border-border bg-gradient-to-br from-primary/10 via-card to-card p-6 md:p-8">
           <div className="flex items-start gap-3">
@@ -100,9 +109,19 @@ function PartsHub() {
         {tab === "find" && <PartsWizard />}
 
         {tab === "browse" && (
-          <div className="space-y-4">
+          <div className="space-y-2">
+            <MarketplaceToolbar
+              resultCount={browseRows?.length ?? 0}
+              loading={browseRows === null}
+              view={viewMode}
+              onViewChange={setViewMode}
+              density={density}
+              onDensityChange={setDensity}
+            />
             {browseRows === null ? (
-              <p className="text-sm text-muted-foreground">Loading…</p>
+              <div className={gridClass}>
+                <ListingCardSkeletonGrid count={density === 4 ? 8 : 6} />
+              </div>
             ) : browseRows.length === 0 ? (
               <div className="rounded-lg border border-dashed border-border bg-card p-8 text-center">
                 <Wrench className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
@@ -111,8 +130,10 @@ function PartsHub() {
                   Be the first — list parts you have, or post a wanted ad to attract sellers.
                 </p>
               </div>
+            ) : viewMode === "map" ? (
+              <ListingsMapView listings={browseRows} />
             ) : (
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              <div className={gridClass}>
                 {browseRows.map((l) => (
                   <ListingCard key={l.id} listing={l} />
                 ))}
