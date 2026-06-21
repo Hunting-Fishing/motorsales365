@@ -108,6 +108,7 @@ export async function submitManualPaymentCore(
   const { data: invNum } = await supabaseAdmin.rpc("generate_invoice_number");
 
   const proofUrl = data.proof_path ?? null;
+  const proofUploadedAt = proofUrl ? new Date().toISOString() : null;
 
   const { data: payment, error } = await supabase
     .from("payments")
@@ -125,7 +126,7 @@ export async function submitManualPaymentCore(
       reference: data.reference ?? null,
       notes: data.notes ?? null,
       proof_url: proofUrl,
-      proof_uploaded_at: proofUrl ? new Date().toISOString() : null,
+      proof_uploaded_at: proofUrl ? proofUploadedAt : null,
       invoice_number: invNum as string,
     } as any)
     .select("id,invoice_number")
@@ -163,7 +164,13 @@ export async function submitManualPaymentCore(
         kind: data.kind,
         amount_php: data.amount_php,
         reference: data.reference ?? null,
+        listing_id:
+          data.kind === "listing" || data.kind === "upgrade" || data.kind === "boost"
+            ? data.ref_id ?? null
+            : null,
         proof_attached: !!proofUrl,
+        proof_url: proofUrl,
+        proof_uploaded_at: proofUploadedAt,
       },
     } as any),
   ]);
