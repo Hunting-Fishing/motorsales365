@@ -22,6 +22,7 @@ import {
   ChevronDown,
   Play,
   Expand,
+  AlertTriangle,
 } from "lucide-react";
 import {
   Collapsible,
