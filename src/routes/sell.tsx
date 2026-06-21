@@ -808,6 +808,8 @@ function SellPage() {
             province,
             city,
             barangay,
+            lat,
+            lng,
             seller_type: sellerType,
             plan,
             contact_phone: textParsed.data.contact_phone ?? null,
