@@ -125,7 +125,45 @@ export const submitManualPayment = createServerFn({ method: "POST" })
       .update({ review_state: "awaiting_review" } as any)
       .eq("id", payment.id);
 
-    return { id: payment.id, invoice_number: payment.invoice_number };
+    // Record a review event so the admin timeline shows the buyer's submission,
+    // and write an admin_audit_log entry so /admin/payments has a traceable log.
+    const submissionNote = proofUrl
+      ? `Buyer submitted ${data.method} payment with proof${data.reference ? ` (ref ${data.reference})` : ""}.`
+      : `Buyer submitted ${data.method} payment${data.reference ? ` (ref ${data.reference})` : ""} — no proof attached.`;
+    await Promise.all([
+      supabaseAdmin.from("payment_review_events").insert({
+        payment_id: payment.id,
+        actor_id: userId,
+        from_state: null,
+        to_state: "awaiting_review",
+        note: submissionNote,
+      } as any),
+      supabaseAdmin.from("admin_audit_log").insert({
+        actor_id: userId,
+        target_user_id: userId,
+        action: "payment_submitted",
+        field: "payment",
+        entity_type: "payment",
+        entity_id: payment.id,
+        new_value: "awaiting_review",
+        note: submissionNote,
+        metadata: {
+          invoice_number: payment.invoice_number,
+          method: data.method,
+          kind: data.kind,
+          amount_php: data.amount_php,
+          reference: data.reference ?? null,
+          proof_attached: !!proofUrl,
+        },
+      } as any),
+    ]);
+
+    return {
+      id: payment.id,
+      invoice_number: payment.invoice_number,
+      review_state: "awaiting_review" as const,
+      proof_attached: !!proofUrl,
+    };
   });
 
 // ===== Staged review workflow =====
