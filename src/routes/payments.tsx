@@ -190,6 +190,20 @@ const METHODS: { group: string; items: Method[] }[] = [
       },
     ],
   },
+  {
+    group: "Cards & international",
+    items: [
+      {
+        name: "Stripe",
+        desc: "Pay with Visa, Mastercard, JCB, or AMEX. 3D Secure supported.",
+        icon: SiStripe,
+        iconColor: "text-[#635BFF]",
+        status: "live",
+        imageSrc: stripeLogo.url,
+        tag: "Cards · 3D Secure",
+      },
+    ],
+  },
 ];
 
 const STATUS_META: Record<
