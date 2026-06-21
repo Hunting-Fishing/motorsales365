@@ -163,21 +163,21 @@ function MethodCard({ m }: { m: Method }) {
   const Icon = m.icon;
   const StatusIcon = meta.icon;
   return (
-    <div className="rounded-xl border border-border bg-card p-5">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="rounded-lg bg-secondary p-2">
-            <Icon className="h-5 w-5" />
+    <div className="rounded-lg border border-border bg-card p-3">
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <div className="rounded-md bg-secondary p-1.5">
+            <Icon className="h-4 w-4" />
           </div>
-          <div className="font-display font-semibold">{m.name}</div>
+          <div className="font-display text-sm font-semibold leading-tight">{m.name}</div>
         </div>
-        <Badge variant="outline" className={meta.cls}>
-          <StatusIcon className="mr-1 h-3 w-3" />
+        <Badge variant="outline" className={`text-[10px] px-1.5 py-0 h-5 ${meta.cls}`}>
+          <StatusIcon className="mr-0.5 h-2.5 w-2.5" />
           {meta.label}
         </Badge>
       </div>
-      <p className="mt-3 text-sm text-muted-foreground">{m.desc}</p>
-      {m.provider && <p className="mt-2 text-xs text-muted-foreground">via {m.provider}</p>}
+      <p className="mt-2 text-xs text-muted-foreground leading-snug">{m.desc}</p>
+      {m.provider && <p className="mt-1 text-[10px] text-muted-foreground">via {m.provider}</p>}
     </div>
   );
 }
