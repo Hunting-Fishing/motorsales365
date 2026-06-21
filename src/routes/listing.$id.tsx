@@ -699,25 +699,9 @@ function ListingDetailPage() {
                   </span>
                 }
               >
-                <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <dl className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
                   {specEntries.map(([k, v]) => (
-                    <div
-                      key={k}
-                      className="flex justify-between gap-3 border-b border-border/60 pb-2 text-sm"
-                    >
-                      <dt className="capitalize text-muted-foreground">
-                        {k.replace(/_/g, " ")}
-                      </dt>
-                      <dd className="font-medium text-right">
-                        {Array.isArray(v)
-                          ? v.join(", ")
-                          : typeof v === "boolean"
-                            ? v
-                              ? "Yes"
-                              : "No"
-                            : String(v)}
-                      </dd>
-                    </div>
+                    <SpecRow key={k} specKey={k} value={v} />
                   ))}
                 </dl>
               </SectionCard>
