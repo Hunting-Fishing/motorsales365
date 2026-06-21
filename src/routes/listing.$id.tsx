@@ -690,6 +690,57 @@ function ListingDetailPage() {
               ([k]) => k !== "tags",
             );
             if (specEntries.length === 0) return null;
+
+            const LEFT_GROUPS: string[][] = [
+              ["mileage_km", "mileage", "odometer"],
+              ["year"],
+              ["make"],
+              ["model"],
+              ["trim"],
+              ["body_type", "body"],
+              ["transmission"],
+              ["drivetrain"],
+              ["fuel"],
+              ["owner_status", "owners"],
+            ];
+            const RIGHT_GROUPS: string[][] = [
+              ["or_cr_status", "orcr"],
+              ["accident_history"],
+              ["flood_history"],
+              ["registered_owner"],
+              ["financing_available"],
+              ["deed_chain_available"],
+              ["inspection_available"],
+              ["trade_accepted"],
+            ];
+
+            const map = new Map(specEntries.map(([k, v]) => [k.toLowerCase(), [k, v] as const]));
+            const used = new Set<string>();
+            const pickGroups = (groups: string[][]) =>
+              groups
+                .map((aliases) => {
+                  for (const a of aliases) {
+                    const hit = map.get(a);
+                    if (hit && !used.has(hit[0])) {
+                      used.add(hit[0]);
+                      return hit;
+                    }
+                  }
+                  return null;
+                })
+                .filter(Boolean) as Array<readonly [string, unknown]>;
+
+            const leftCol = pickGroups(LEFT_GROUPS);
+            const rightCol = pickGroups(RIGHT_GROUPS);
+            const leftover = specEntries.filter(([k]) => !used.has(k));
+            rightCol.push(...leftover);
+
+            const rows = Math.max(leftCol.length, rightCol.length);
+            const interleaved: Array<readonly [string, unknown] | null> = [];
+            for (let i = 0; i < rows; i++) {
+              interleaved.push(leftCol[i] ?? null, rightCol[i] ?? null);
+            }
+
             return (
               <SectionCard
                 title="Specifications"
@@ -700,9 +751,13 @@ function ListingDetailPage() {
                 }
               >
                 <dl className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
-                  {specEntries.map(([k, v]) => (
-                    <SpecRow key={k} specKey={k} value={v} />
-                  ))}
+                  {interleaved.map((entry, i) =>
+                    entry ? (
+                      <SpecRow key={entry[0]} specKey={entry[0]} value={entry[1]} />
+                    ) : (
+                      <div key={`empty-${i}`} aria-hidden className="hidden sm:block" />
+                    ),
+                  )}
                 </dl>
               </SectionCard>
             );
