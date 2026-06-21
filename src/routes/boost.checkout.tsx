@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { GCashDirectNote } from "@/components/checkout/gcash-direct-note";
 import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { createBoostCheckout } from "@/lib/boosts.functions";
 import { useAuth } from "@/hooks/use-auth";
@@ -81,6 +82,7 @@ function BoostCheckoutPage() {
             <EmbeddedCheckout />
           </EmbeddedCheckoutProvider>
         </div>
+        <GCashDirectNote />
       </section>
     </SiteLayout>
   );

@@ -6,6 +6,7 @@ import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { StripeEmbeddedCheckout } from "@/components/StripeEmbeddedCheckout";
+import { GCashDirectNote } from "@/components/checkout/gcash-direct-note";
 import { useAuth } from "@/hooks/use-auth";
 import { getMyDispatchStatus } from "@/lib/dispatch.functions";
 
@@ -123,6 +124,7 @@ function DispatchCheckout() {
         <div className="mt-6">
           <StripeEmbeddedCheckout priceId={priceId} />
         </div>
+        <GCashDirectNote />
       </section>
     </SiteLayout>
   );
