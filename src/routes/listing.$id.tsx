@@ -979,25 +979,26 @@ function ListingDetailPage() {
                   { Icon: FileText, label: "OR/CR renewal help" },
                   { Icon: ClipboardCheck, label: "Title transfer help" },
                 ].map(({ Icon, label, span }) => (
-                  <Button
+                  <div
                     key={label}
-                    variant="outline"
-                    disabled
-                    aria-disabled="true"
                     title="Coming soon"
+                    aria-disabled="true"
                     className={cn(
-                      "w-full min-w-0 justify-start gap-2 opacity-70",
+                      "flex w-full min-w-0 items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-sm opacity-70",
                       span && "sm:col-span-2",
                     )}
                   >
                     <Icon className="h-4 w-4 shrink-0" />
-                    <span className="min-w-0 flex-1 truncate text-left">{label}</span>
+                    <span className="min-w-0 flex-1 whitespace-normal break-words text-left leading-snug">
+                      {label}
+                    </span>
                     <span className="ml-auto shrink-0 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                       Soon
                     </span>
-                  </Button>
+                  </div>
                 ))}
               </div>
+
               <p className="mt-3 text-[11px] text-muted-foreground">
                 Partner network launching shortly. We'll notify you when quotes go live.
               </p>
