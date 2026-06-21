@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="365 Motor Sales">
+  <defs>
+    <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2b3a4d"/><stop offset="1" stop-color="#1d2733"/></linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="58" fill="url(#lg)" stroke="#d11f2a" stroke-width="4"/>
+  <text x="60" y="58" font-family="Arial,sans-serif" font-size="40" font-weight="900" fill="#fff" text-anchor="middle" letter-spacing="-1">
+    <tspan fill="#3b6fd4">3</tspan><tspan fill="#ffffff">6</tspan><tspan fill="#d11f2a">5</tspan>
+  </text>
+  <text x="60" y="82" font-family="Arial,sans-serif" font-size="12.5" font-weight="800" fill="#cdd6e0" text-anchor="middle" letter-spacing="1.2">MOTOR SALES</text>
+</svg>

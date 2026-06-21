@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>365 Flash Cards Training — Engine &amp; Vehicle Mastery</title>
+  <meta name="description" content="Multi-level engine and vehicle training flash cards: small engines to heavy duty, marine, automotive, EV, history to future. Identify famous engines." />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="app">
+
+    <header class="topbar">
+      <div class="brand" id="brandHome" title="Return to home" role="button" tabindex="0">
+        <span class="brand-badge" id="brandBadge">
+          <img id="brandLogo" src="assets/brand/logo-365.png" alt="365 Motor Sales" />
+          <span class="brand-fallback">365</span>
+        </span>
+        <div class="brand-text">
+          <strong>Flash Cards Training</strong>
+          <small>Engine &amp; Vehicle Mastery &middot; 365motorsales.com</small>
+        </div>
+      </div>
+      <div class="header-right">
+        <nav class="modes" id="modeNav" hidden>
+          <button data-mode="study" class="mode-btn is-active">Study</button>
+          <button data-mode="quiz" class="mode-btn">Quiz</button>
+          <button data-mode="identify" class="mode-btn">Identify</button>
+          <button id="reconfigBtn" class="mode-btn ghost">Home</button>
+        </nav>
+        <span class="points-badge" id="pointsBadge" title="Your points">&#9733; 0</span>
+        <button id="historyBtn" class="mode-btn ghost">History</button>
+      </div>
+    </header>
+
+    <!-- ================= HOME ================= -->
+    <section id="setupScreen" class="screen">
+      <div class="hero">
+        <h1>Train on every engine ever built.</h1>
+        <p>Small engines to heavy diesel, marine to motorcycle, the first engines in history to tomorrow's drivetrains. Choose a mode, pick a deck, set your difficulty, and earn points.</p>
+      </div>
+
+      <div class="section-label"><span>1.</span> Choose a mode</div>
+      <div class="mode-picker" id="modePicker">
+        <button class="mode-card is-active" data-mode="study"><span class="mode-card-ico">&#9719;</span><strong>Study</strong><small>Flip cards &amp; self-rate</small></button>
+        <button class="mode-card" data-mode="quiz"><span class="mode-card-ico">&#9745;</span><strong>Quiz</strong><small>Multiple choice, earn points</small></button>
+        <button class="mode-card" data-mode="identify"><span class="mode-card-ico">&#9881;</span><strong>Identify the Engine</strong><small>Name famous engines</small></button>
+      </div>
+
+      <div class="section-label"><span>2.</span> Pick a category</div>
+      <p class="gallery-hint">Tap a category to choose a system &amp; difficulty inside it.</p>
+      <div class="card-gallery" id="categoryGallery"><!-- generated --></div>
+    </section>
+
+    <!-- ================= CATEGORY DETAIL ================= -->
+    <section id="categoryScreen" class="screen" hidden>
+      <div class="cat-head">
+        <button id="catBack" class="nav-btn">&larr; Home</button>
+        <h2 id="catTitle">Category</h2>
+        <span class="cat-mode" id="catMode">Study</span>
+      </div>
+      <div class="section-label"><span>A.</span> Choose a sub-category (system)</div>
+      <div class="subchips" id="systemChips"><!-- generated --></div>
+      <div class="section-label"><span>B.</span> Choose difficulty</div>
+      <div class="subchips" id="levelChips"><!-- generated --></div>
+      <div class="setup-footer">
+        <div class="deck-count" id="catCount">0 cards</div>
+        <button id="catStart" class="primary-btn">Start &rarr;</button>
+      </div>
+    </section>
+
+    <!-- ================= STUDY ================= -->
+    <section id="studyScreen" class="screen" hidden>
+      <div class="progress-row">
+        <div class="progress-bar"><span id="studyProgressFill"></span></div>
+        <div class="counter" id="studyCounter">1 / 1</div>
+      </div>
+      <div class="card-stage">
+        <div class="flashcard" id="flashcard" tabindex="0" role="button" aria-label="Flash card, click to flip">
+          <div class="flashcard-inner">
+            <div class="face front" id="faceFront">
+              <div class="face-img" id="frontImg"></div>
+              <div class="face-tags" id="frontTags"></div>
+              <div class="face-content" id="frontText"></div>
+              <button class="hint-btn" id="hintBtn" type="button" hidden>Show hint</button>
+              <div class="hint-text" id="hintText" hidden></div>
+              <div class="flip-cue">Tap / Space to flip</div>
+            </div>
+            <div class="face back" id="faceBack">
+              <div class="face-img" id="backImg"></div>
+              <div class="face-label">Answer</div>
+              <div class="face-content" id="backText"></div>
+              <div class="region-values" id="regionValues" hidden></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="study-controls">
+        <button id="prevBtn" class="nav-btn">&larr; Prev</button>
+        <div class="confidence" id="confidenceRow" hidden>
+          <span>How well did you know it?</span>
+          <button data-conf="again" class="conf-btn again">Again</button>
+          <button data-conf="good" class="conf-btn good">Good</button>
+          <button data-conf="easy" class="conf-btn easy">Easy</button>
+        </div>
+        <button id="nextBtn" class="nav-btn">Next &rarr;</button>
+      </div>
+    </section>
+
+    <!-- ================= CHOICE (Quiz + Identify) ================= -->
+    <section id="quizScreen" class="screen" hidden>
+      <div class="progress-row">
+        <div class="progress-bar"><span id="quizProgressFill"></span></div>
+        <div class="counter"><span id="quizCounter">1 / 1</span> &middot; <strong id="quizScore">0</strong> pts</div>
+      </div>
+      <div class="quiz-card">
+        <div class="face-tags" id="quizTags"></div>
+        <figure class="quiz-figure" id="quizFigure" hidden><img id="quizImage" alt="Engine to identify" /></figure>
+        <h2 id="quizQuestion" class="quiz-question"></h2>
+        <div class="quiz-options" id="quizOptions"></div>
+        <div class="quiz-feedback" id="quizFeedback" hidden></div>
+        <button id="quizNextBtn" class="primary-btn" hidden>Next &rarr;</button>
+      </div>
+    </section>
+
+    <!-- ================= RESULTS ================= -->
+    <section id="resultsScreen" class="screen" hidden>
+      <div class="results-card">
+        <h1 id="resultsTitle">Session complete</h1>
+        <div class="score-big" id="resultsScore">0%</div>
+        <p id="resultsDetail" class="lede"></p>
+        <div class="results-points" id="resultsPoints" hidden></div>
+        <div class="results-actions">
+          <button id="retryBtn" class="primary-btn">Train again</button>
+          <button id="reviewMissedBtn" class="nav-btn" hidden>Review missed cards</button>
+          <button id="newDeckBtn" class="nav-btn">New deck</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= HISTORY ================= -->
+    <section id="historyScreen" class="screen" hidden>
+      <div class="cat-head">
+        <button id="histBack" class="nav-btn">&larr; Back</button>
+        <h2>Your Progress</h2>
+      </div>
+      <div class="stats-row" id="statsRow"><!-- generated --></div>
+      <div class="history-head">
+        <h3>Mistakes to review</h3>
+        <button id="clearHist" class="mini-btn">Clear history</button>
+      </div>
+      <div class="history-list" id="historyList"><!-- generated --></div>
+    </section>
+
+    <footer class="appfoot">
+      <span id="cardTotal"></span>
+      <span>&copy; 365 Motor Sales &middot; Training preview</span>
+    </footer>
+  </div>
+
+  <script src="data/taxonomy.js"></script>
+  <script src="data/card-db.js"></script>
+  <script src="data/manifest.js"></script>
+  <script src="data/card-images.js"></script>
+  <script src="data/loader.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
