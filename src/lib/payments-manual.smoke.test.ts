@@ -429,5 +429,117 @@ describe("manual payment submission smoke test", () => {
       expect(fake.inserts["admin_audit_log"][1].metadata.reference).toBe("NY");
     });
   });
+
+  describe("boost renewals: Philippines (UTC+8) vs UTC rendering", () => {
+    afterEach(() => vi.useRealTimers());
+
+    // Render helpers that match what /admin/payments + the drawer would show
+    // when the admin's browser is set to Asia/Manila vs UTC.
+    const phDate = (iso: string) =>
+      new Intl.DateTimeFormat("en-PH", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        timeZone: "Asia/Manila",
+      }).format(new Date(iso));
+
+    const utcDate = (iso: string) =>
+      new Intl.DateTimeFormat("en-PH", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        timeZone: "UTC",
+      }).format(new Date(iso));
+
+    const cases = [
+      {
+        label: "UTC late-evening that's already next day in PH",
+        utc: "2026-06-21T17:30:00.000Z", // 01:30 PH next day
+        expectedPh: "Jun 22, 2026",
+        expectedUtc: "Jun 21, 2026",
+      },
+      {
+        label: "UTC New Year's Eve = PH New Year's Day",
+        utc: "2026-12-31T16:30:00.000Z", // 00:30 PH on 2027-01-01
+        expectedPh: "Jan 1, 2027",
+        expectedUtc: "Dec 31, 2026",
+      },
+      {
+        label: "UTC just past PH midnight (same date both)",
+        utc: "2026-03-15T01:00:00.000Z", // 09:00 PH same day
+        expectedPh: "Mar 15, 2026",
+        expectedUtc: "Mar 15, 2026",
+      },
+    ];
+
+    for (const c of cases) {
+      it(`${c.label} — proof_uploaded_at renders as PH ${c.expectedPh}`, async () => {
+        vi.useFakeTimers();
+        vi.setSystemTime(new Date(c.utc));
+
+        const fake = makeFakeSupabase();
+        await submitManualPaymentCore(
+          { supabase: fake.client as any, supabaseAdmin: fake.client as any, userId: "u-tz" },
+          {
+            kind: "boost",
+            ref_id: "L-tz",
+            method: "gcash_manual",
+            amount_php: 99,
+            reference: `REF-${c.utc}`,
+            proof_path: `proofs/${c.utc}.png`,
+          },
+        );
+
+        const inserted = fake.inserts["payments"][0];
+
+        // Stored as exact UTC ISO — unambiguous across timezones.
+        expect(inserted.proof_uploaded_at).toBe(c.utc);
+        expect(inserted.proof_url).toBe(`proofs/${c.utc}.png`);
+
+        // /admin/payments renders the stamp in PH local time.
+        expect(phDate(inserted.proof_uploaded_at)).toBe(c.expectedPh);
+        // Same instant in UTC renders as the UTC date.
+        expect(utcDate(inserted.proof_uploaded_at)).toBe(c.expectedUtc);
+
+        // Timeline + audit row carry the same UTC instant so the drawer and
+        // the audit log line up regardless of admin timezone.
+        const evt = fake.inserts["payment_review_events"][0];
+        expect(evt.to_state).toBe("awaiting_review");
+        const audit = fake.inserts["admin_audit_log"][0];
+        expect(audit.metadata.reference).toBe(`REF-${c.utc}`);
+        expect(audit.metadata.proof_attached).toBe(true);
+      });
+    }
+
+    it("two PH-midnight-straddling renewals render on adjacent PH calendar days", async () => {
+      vi.useFakeTimers();
+      const fake = makeFakeSupabase();
+
+      // 15:59 UTC = 23:59 PH on 2026-06-21
+      vi.setSystemTime(new Date("2026-06-21T15:59:00.000Z"));
+      await submitManualPaymentCore(
+        { supabase: fake.client as any, supabaseAdmin: fake.client as any, userId: "a" },
+        { kind: "boost", ref_id: "L", method: "gcash_manual", amount_php: 99, reference: "A", proof_path: "a.png" },
+      );
+
+      // 16:01 UTC = 00:01 PH on 2026-06-22
+      vi.setSystemTime(new Date("2026-06-21T16:01:00.000Z"));
+      await submitManualPaymentCore(
+        { supabase: fake.client as any, supabaseAdmin: fake.client as any, userId: "b" },
+        { kind: "boost", ref_id: "L", method: "gcash_manual", amount_php: 99, reference: "B", proof_path: "b.png" },
+      );
+
+      const [p1, p2] = fake.inserts["payments"];
+      expect(phDate(p1.proof_uploaded_at)).toBe("Jun 21, 2026");
+      expect(phDate(p2.proof_uploaded_at)).toBe("Jun 22, 2026");
+      // In UTC they're still the same calendar day — confirms we're testing the TZ shift.
+      expect(utcDate(p1.proof_uploaded_at)).toBe("Jun 21, 2026");
+      expect(utcDate(p2.proof_uploaded_at)).toBe("Jun 21, 2026");
+
+      // Audit rows preserve order and each carries its own proof path.
+      expect(fake.inserts["admin_audit_log"][0].metadata.reference).toBe("A");
+      expect(fake.inserts["admin_audit_log"][1].metadata.reference).toBe("B");
+    });
+  });
 });
 
