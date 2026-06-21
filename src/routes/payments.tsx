@@ -68,7 +68,7 @@ const METHODS: { group: string; items: Method[] }[] = [
     items: [
       {
         name: "GCash (direct to our wallet)",
-        desc: "Send straight to our GCash +63 969 606 3830 (365 MotorSales) and upload your receipt — funds land in our wallet instantly. We confirm within 1 business day.",
+        desc: "Send straight to our GCash 09696063830 (365 MotorSales) and upload your receipt — funds land in our wallet instantly. We confirm within 1 business day.",
         icon: Smartphone,
         status: "live",
         provider: "Direct GCash",
