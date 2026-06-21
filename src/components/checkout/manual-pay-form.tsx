@@ -77,7 +77,7 @@ export function ManualPayForm({ kind, refId, amountPhp, description, preselectMe
           proof_path: proofPath,
         },
       });
-      setSubmitted({ invoice: res.invoice_number ?? "", id: res.id });
+      setSubmitted({ invoice: res.invoice_number ?? "", id: res.id, proofAttached: !!file });
       toast.success("Payment submitted — pending admin review");
       onSuccess?.(res.invoice_number ?? "", res.id);
     } catch (err: any) {
