@@ -41,6 +41,8 @@ export interface ListingCardData {
   price_php: number;
   region: string | null;
   city: string | null;
+  lat?: number | null;
+  lng?: number | null;
   seller_type: "private" | "business";
   boost_until: string | null;
   cover_url?: string | null;
