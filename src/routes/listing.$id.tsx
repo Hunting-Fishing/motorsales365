@@ -804,9 +804,13 @@ function ListingDetailPage() {
 
         {/* Sidebar */}
         <aside className="space-y-4 pb-20 lg:sticky lg:top-20 lg:self-start lg:pb-0">
-          <div className="rounded-xl border border-border bg-card p-5">
+          <div className="overflow-hidden rounded-xl border border-border bg-card p-4">
+            <div
+              aria-hidden
+              className="-mx-4 -mt-4 mb-3 h-1 bg-gradient-to-r from-[#0038A8] via-[#FCD116] to-[#CE1126]"
+            />
             <div className="flex items-start justify-between gap-2">
-              <h3 className="font-display text-lg font-semibold">Seller</h3>
+              <h3 className="font-display text-base font-semibold sm:text-lg">Seller</h3>
               <ListingActionsMenu
                 listingId={listing.id}
                 sellerUserId={listing.user_id}
