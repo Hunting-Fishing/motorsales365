@@ -229,54 +229,84 @@ export function ListingCard({
             )}
           </div>
         </div>
-        <div className="flex flex-1 flex-col p-4">
-          <h3 className="line-clamp-2 font-semibold leading-snug">{listing.title}</h3>
-          {summary && <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{summary}</p>}
-          {(() => {
-            const headline = pickHeadlinePrice(listing);
-            return (
-              <div className="mt-2 flex flex-wrap items-center gap-2">
-                <ListingPrice
-                  pricePhp={headline.amount}
-                  size="md"
-                  headlineKind={headline.kind === "hidden" ? "asking" : headline.kind}
-                  negotiable={!!listing.negotiable}
-                  priceHidden={!!listing.price_hidden || headline.kind === "hidden"}
-                />
-                <PriceTrendBadge trend={effectiveTrend} />
+        <div className={cn("flex flex-1 flex-col", compact ? "p-2.5" : "p-4")}>
+          {compact ? (
+            <>
+              {(() => {
+                const headline = pickHeadlinePrice(listing);
+                return (
+                  <ListingPrice
+                    pricePhp={headline.amount}
+                    size="sm"
+                    headlineKind={headline.kind === "hidden" ? "asking" : headline.kind}
+                    negotiable={!!listing.negotiable}
+                    priceHidden={!!listing.price_hidden || headline.kind === "hidden"}
+                  />
+                );
+              })()}
+              <h3 className="mt-0.5 line-clamp-1 text-sm font-medium leading-snug text-foreground">
+                {listing.title}
+              </h3>
+              <div className="mt-1 flex min-w-0 items-center gap-1 text-xs text-muted-foreground">
+                <MapPin className="h-3 w-3 shrink-0" />
+                <span className="truncate">
+                  {[listing.city, listing.region].filter(Boolean).join(", ") || "Philippines"}
+                </span>
               </div>
-            );
-          })()}
-          <PricingWidget listing={listing} className="mt-2" />
-          <ListingBadges
-            listing={{
-              ...listing,
-              headlineKind:
-                pickHeadlinePrice(listing).kind === "hidden"
-                  ? null
-                  : (pickHeadlinePrice(listing).kind as "asking" | "monthly" | "down_payment"),
-            }}
-            className="mt-2"
-          />
-          <TrustBadges signals={trust} size="sm" className="mt-2" />
-          <div className="mt-auto flex items-center justify-between gap-2 pt-3 text-xs text-muted-foreground">
-            <span className="flex min-w-0 items-center gap-1">
-              <MapPin className="h-3 w-3" />
-              <span className="truncate">
-                {[listing.city, listing.region].filter(Boolean).join(", ") || "Philippines"}
-              </span>
-            </span>
-            <span className="flex shrink-0 items-center gap-2">
-              <span className="inline-flex items-center gap-0.5">
-                <Eye className="h-3 w-3" />
-                {(listing.view_count ?? 0).toLocaleString()}
-              </span>
-              <span className="inline-flex items-center gap-0.5">
-                <Heart className="h-3 w-3" />
-                {(listing.like_count ?? 0).toLocaleString()}
-              </span>
-            </span>
-          </div>
+            </>
+          ) : (
+            <>
+              <h3 className="line-clamp-2 font-semibold leading-snug">{listing.title}</h3>
+              {summary && (
+                <p className="mt-1 line-clamp-1 text-xs text-muted-foreground">{summary}</p>
+              )}
+              {(() => {
+                const headline = pickHeadlinePrice(listing);
+                return (
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <ListingPrice
+                      pricePhp={headline.amount}
+                      size="md"
+                      headlineKind={headline.kind === "hidden" ? "asking" : headline.kind}
+                      negotiable={!!listing.negotiable}
+                      priceHidden={!!listing.price_hidden || headline.kind === "hidden"}
+                    />
+                    <PriceTrendBadge trend={effectiveTrend} />
+                  </div>
+                );
+              })()}
+              <PricingWidget listing={listing} className="mt-2" />
+              <ListingBadges
+                listing={{
+                  ...listing,
+                  headlineKind:
+                    pickHeadlinePrice(listing).kind === "hidden"
+                      ? null
+                      : (pickHeadlinePrice(listing).kind as "asking" | "monthly" | "down_payment"),
+                }}
+                className="mt-2"
+              />
+              <TrustBadges signals={trust} size="sm" className="mt-2" />
+              <div className="mt-auto flex items-center justify-between gap-2 pt-3 text-xs text-muted-foreground">
+                <span className="flex min-w-0 items-center gap-1">
+                  <MapPin className="h-3 w-3" />
+                  <span className="truncate">
+                    {[listing.city, listing.region].filter(Boolean).join(", ") || "Philippines"}
+                  </span>
+                </span>
+                <span className="flex shrink-0 items-center gap-2">
+                  <span className="inline-flex items-center gap-0.5">
+                    <Eye className="h-3 w-3" />
+                    {(listing.view_count ?? 0).toLocaleString()}
+                  </span>
+                  <span className="inline-flex items-center gap-0.5">
+                    <Heart className="h-3 w-3" />
+                    {(listing.like_count ?? 0).toLocaleString()}
+                  </span>
+                </span>
+              </div>
+            </>
+          )}
         </div>
       </Link>
       {showServices && (
