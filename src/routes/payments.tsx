@@ -68,7 +68,7 @@ const METHODS: { group: string; items: Method[] }[] = [
     items: [
       {
         name: "GCash",
-        desc: "Pay instantly from your GCash wallet at checkout.",
+        desc: "Pay instantly from your GCash wallet. One-tap 'Pay with GCash' button at listing checkout, or pick GCash inside the Stripe card sheet.",
         icon: Smartphone,
         status: "live",
         provider: "Stripe",

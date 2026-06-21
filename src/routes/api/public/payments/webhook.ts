@@ -13,6 +13,18 @@ function parseEnv(url: URL): StripeEnv {
   return v === "live" ? "live" : "sandbox";
 }
 
+/**
+ * Map a Checkout session's rail metadata onto the `payments.method` column.
+ * Lets the admin payments log distinguish Stripe-GCash from card transactions
+ * with a simple `method = 'stripe:gcash'` filter. Falls back to plain
+ * `"stripe"` for anything that didn't force a specific rail.
+ */
+function methodForSession(session: Stripe.Checkout.Session | null | undefined): string {
+  const rail = session?.metadata?.rail;
+  if (rail === "gcash") return "stripe:gcash";
+  return "stripe";
+}
+
 async function resolvePlanId(lookupKey: string | null | undefined): Promise<string | null> {
   if (!lookupKey) return null;
   const { data } = await supabaseAdmin
@@ -312,7 +324,7 @@ async function activateBoostFromSession(env: StripeEnv, session: Stripe.Checkout
       kind: "boost" as any,
       status: "paid" as any,
       amount_php: (session.amount_total ?? 0) / 100,
-      method: "stripe",
+      method: methodForSession(session),
       reference,
       paid_at: new Date().toISOString(),
     } as any)
@@ -395,7 +407,7 @@ async function activatePassportPremiumFromSession(env: StripeEnv, session: Strip
       kind: "passport_premium" as any,
       status: "paid" as any,
       amount_php: (session.amount_total ?? 0) / 100,
-      method: "stripe",
+      method: methodForSession(session),
       reference,
       paid_at: new Date().toISOString(),
     } as any)
@@ -470,7 +482,7 @@ async function activateListingFromSession(env: StripeEnv, session: Stripe.Checko
     kind: (plan === "upgraded" ? "upgrade" : "listing") as any,
     status: "paid" as any,
     amount_php: (session.amount_total ?? 0) / 100,
-    method: "stripe",
+    method: methodForSession(session),
     reference,
     paid_at: new Date().toISOString(),
     new_plan: plan,
@@ -517,7 +529,7 @@ async function recordFailedListingPayment(
     kind: (plan === "upgraded" ? "upgrade" : "listing") as any,
     status: "failed" as any,
     amount_php: (session.amount_total ?? 0) / 100,
-    method: "stripe",
+    method: methodForSession(session),
     reference,
     new_plan: plan,
     notes: reason === "expired" ? "Checkout session expired" : "Payment failed",
@@ -553,7 +565,7 @@ async function enrollCourseFromSession(env: StripeEnv, session: Stripe.Checkout.
         kind: "course" as any,
         status: "paid" as any,
         amount_php: (session.amount_total ?? 0) / 100,
-        method: "stripe",
+        method: methodForSession(session),
         reference,
         paid_at: new Date().toISOString(),
       } as any)

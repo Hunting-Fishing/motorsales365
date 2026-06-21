@@ -21,6 +21,8 @@ import {
   type ReviewState,
 } from "@/lib/payments-manual.functions";
 import { PaymentReviewDrawer } from "@/components/admin/payment-review-drawer";
+import { StripeGCashAdminPanel } from "@/components/admin/stripe-gcash-admin-panel";
+import { Download, Smartphone } from "lucide-react";
 
 export const Route = createFileRoute("/admin/payments")({
   component: AdminPayments,
@@ -340,22 +342,25 @@ function RailsTab() {
   if (loading) return <div className="p-6 text-sm text-muted-foreground">Loading…</div>;
 
   return (
-    <Card>
-      <CardContent className="space-y-3 p-4">
-        <p className="text-xs text-muted-foreground">
-          Toggle payment rails. Disabled rails are hidden from checkout pickers globally.
-        </p>
-        {flags.map((f) => (
-          <div key={f.key} className="flex items-center justify-between rounded-md border p-3">
-            <div>
-              <div className="font-mono text-sm">{f.key}</div>
-              {f.description && <div className="text-xs text-muted-foreground">{f.description}</div>}
+    <div className="space-y-4">
+      <StripeGCashAdminPanel />
+      <Card>
+        <CardContent className="space-y-3 p-4">
+          <p className="text-xs text-muted-foreground">
+            Toggle payment rails. Disabled rails are hidden from checkout pickers globally.
+          </p>
+          {flags.map((f) => (
+            <div key={f.key} className="flex items-center justify-between rounded-md border p-3">
+              <div>
+                <div className="font-mono text-sm">{f.key}</div>
+                {f.description && <div className="text-xs text-muted-foreground">{f.description}</div>}
+              </div>
+              <Switch checked={!!f.enabled} onCheckedChange={(c) => toggle(f.key, c)} />
             </div>
-            <Switch checked={!!f.enabled} onCheckedChange={(c) => toggle(f.key, c)} />
-          </div>
-        ))}
-      </CardContent>
-    </Card>
+          ))}
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
@@ -368,10 +373,62 @@ const REVIEW_STATES: (ReviewState | "all")[] = [
   "not_applicable",
 ];
 
+type MethodFilter = "all" | "gcash" | "gcash_stripe" | "gcash_manual";
+
+const METHOD_FILTERS: { id: MethodFilter; label: string; methods: string[] | null }[] = [
+  { id: "all", label: "All methods", methods: null },
+  { id: "gcash", label: "All GCash", methods: ["stripe:gcash", "gcash_manual"] },
+  { id: "gcash_stripe", label: "GCash (Stripe)", methods: ["stripe:gcash"] },
+  { id: "gcash_manual", label: "GCash (Manual)", methods: ["gcash_manual"] },
+];
+
+function downloadCSV(filename: string, rows: any[]) {
+  const cols = [
+    "invoice_number",
+    "created_at",
+    "kind",
+    "method",
+    "amount_php",
+    "status",
+    "review_state",
+    "buyer",
+    "reference",
+  ];
+  const escape = (v: any) => {
+    const s = v == null ? "" : String(v);
+    return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  const body = rows
+    .map((r) =>
+      [
+        r.invoice_number ?? r.id,
+        r.created_at,
+        r.kind,
+        r.method ?? "",
+        r.amount_php,
+        r.status,
+        r.review_state,
+        r.profile?.business_name || r.profile?.full_name || "",
+        r.reference ?? "",
+      ]
+        .map(escape)
+        .join(","),
+    )
+    .join("\n");
+  const blob = new Blob([cols.join(",") + "\n" + body], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 function AllPaymentsTab() {
   const list = useServerFn(adminListPayments);
   const [rows, setRows] = useState<any[]>([]);
   const [state, setState] = useState<ReviewState | "all">("all");
+  const [methodFilter, setMethodFilter] = useState<MethodFilter>("all");
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(false);
   const [selected, setSelected] = useState<string | null>(null);
@@ -379,13 +436,22 @@ function AllPaymentsTab() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      setRows(await list({ data: { review_state: state, q: q || undefined, limit: 300 } }));
+      setRows(await list({ data: { review_state: state, q: q || undefined, limit: 500 } }));
     } finally {
       setLoading(false);
     }
   }, [list, state, q]);
 
   useEffect(() => { load(); }, [load]);
+
+  const allowedMethods = METHOD_FILTERS.find((f) => f.id === methodFilter)?.methods;
+  const filteredRows = allowedMethods
+    ? rows.filter((r) => allowedMethods.includes(r.method))
+    : rows;
+
+  const gcashTotal = filteredRows
+    .filter((r) => r.status === "paid" && (r.method === "stripe:gcash" || r.method === "gcash_manual"))
+    .reduce((sum, r) => sum + Number(r.amount_php || 0), 0);
 
   return (
     <Card>
@@ -412,6 +478,41 @@ function AllPaymentsTab() {
             {loading ? <Loader2 className="h-3 w-3 animate-spin" /> : "Search"}
           </Button>
         </div>
+
+        <div className="flex flex-wrap items-center gap-2 border-t pt-3">
+          <Smartphone className="h-3.5 w-3.5 text-muted-foreground" />
+          {METHOD_FILTERS.map((f) => (
+            <Button
+              key={f.id}
+              size="sm"
+              variant={methodFilter === f.id ? "default" : "outline"}
+              onClick={() => setMethodFilter(f.id)}
+            >
+              {f.label}
+            </Button>
+          ))}
+          {methodFilter !== "all" && (
+            <Badge variant="outline" className="ml-1">
+              {filteredRows.length} match{filteredRows.length === 1 ? "" : "es"} · paid GCash {formatPHP(gcashTotal)}
+            </Badge>
+          )}
+          <Button
+            size="sm"
+            variant="outline"
+            className="ml-auto"
+            onClick={() =>
+              downloadCSV(
+                `payments-${methodFilter}-${new Date().toISOString().slice(0, 10)}.csv`,
+                filteredRows,
+              )
+            }
+            disabled={!filteredRows.length}
+          >
+            <Download className="mr-1 h-3 w-3" />
+            Export CSV
+          </Button>
+        </div>
+
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="text-left text-xs uppercase text-muted-foreground">
@@ -427,7 +528,7 @@ function AllPaymentsTab() {
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => (
+              {filteredRows.map((r) => (
                 <tr
                   key={r.id}
                   className="cursor-pointer border-t hover:bg-accent/30"
@@ -440,7 +541,19 @@ function AllPaymentsTab() {
                     {r.profile?.business_name || r.profile?.full_name || "—"}
                   </td>
                   <td>{r.kind}</td>
-                  <td>{r.method ?? "—"}</td>
+                  <td>
+                    {r.method === "stripe:gcash" ? (
+                      <Badge className="gap-1 bg-primary/15 text-primary border-primary/30">
+                        <Smartphone className="h-3 w-3" /> GCash · Stripe
+                      </Badge>
+                    ) : r.method === "gcash_manual" ? (
+                      <Badge className="gap-1 bg-amber-500/15 text-amber-600 border-amber-500/30 dark:text-amber-400">
+                        <Smartphone className="h-3 w-3" /> GCash · Manual
+                      </Badge>
+                    ) : (
+                      r.method ?? "—"
+                    )}
+                  </td>
                   <td className="text-right">{formatPHP(Number(r.amount_php))}</td>
                   <td>
                     <Badge variant={STATE_VARIANT[r.review_state] ?? "outline"}>
@@ -453,7 +566,7 @@ function AllPaymentsTab() {
                   <td className="text-xs text-muted-foreground">{formatDate(r.created_at)}</td>
                 </tr>
               ))}
-              {!rows.length && !loading && (
+              {!filteredRows.length && !loading && (
                 <tr>
                   <td colSpan={8} className="p-6 text-center text-sm text-muted-foreground">
                     No payments match these filters.

@@ -1,7 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { EmbeddedCheckoutProvider, EmbeddedCheckout } from "@stripe/react-stripe-js";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Smartphone, CreditCard } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { Button } from "@/components/ui/button";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
@@ -12,9 +12,10 @@ import { useAuth } from "@/hooks/use-auth";
 export const Route = createFileRoute("/listing/checkout")({
   validateSearch: (
     search: Record<string, unknown>,
-  ): { listingId?: string; boost?: string } => ({
+  ): { listingId?: string; boost?: string; method?: string } => ({
     listingId: typeof search.listingId === "string" ? search.listingId : undefined,
     boost: typeof search.boost === "string" ? search.boost : undefined,
+    method: typeof search.method === "string" ? search.method : undefined,
   }),
   head: () => ({
     meta: [
@@ -26,9 +27,10 @@ export const Route = createFileRoute("/listing/checkout")({
 });
 
 function ListingCheckoutPage() {
-  const { listingId, boost } = Route.useSearch();
+  const { listingId, boost, method } = Route.useSearch();
   const { user, loading } = useAuth();
   const navigate = useNavigate();
+  const [rail, setRail] = useState<"all" | "gcash">(method === "gcash" ? "gcash" : "all");
 
   useEffect(() => {
     if (!loading && !user) navigate({ to: "/login" });
@@ -69,6 +71,7 @@ function ListingCheckoutPage() {
         // the braces that URL serialization escapes.
         returnUrl: decodeURIComponent(returnUrl.toString()),
         environment: getStripeEnvironment(),
+        ...(rail === "gcash" && { paymentMethod: "gcash" as const }),
       },
     });
     if (!secret) throw new Error("No client secret returned");
@@ -90,8 +93,60 @@ function ListingCheckoutPage() {
           Secure payment via Stripe. Your listing goes live as soon as payment clears.
           {boost ? " A boost will be offered right after." : ""}
         </p>
+
+        <div
+          className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2"
+          role="radiogroup"
+          aria-label="Choose a payment method"
+        >
+          <button
+            type="button"
+            role="radio"
+            aria-checked={rail === "all"}
+            onClick={() => setRail("all")}
+            className={`flex items-start gap-3 rounded-lg border p-4 text-left transition ${
+              rail === "all"
+                ? "border-primary bg-primary/5 ring-2 ring-primary/40"
+                : "border-border hover:bg-accent/40"
+            }`}
+          >
+            <CreditCard className="mt-0.5 h-5 w-5 text-primary" />
+            <div>
+              <div className="font-semibold">Card &amp; wallets</div>
+              <div className="text-xs text-muted-foreground">
+                Visa, Mastercard, Maya, GrabPay, GCash — pick at checkout.
+              </div>
+            </div>
+          </button>
+          <button
+            type="button"
+            role="radio"
+            aria-checked={rail === "gcash"}
+            onClick={() => setRail("gcash")}
+            className={`flex items-start gap-3 rounded-lg border p-4 text-left transition ${
+              rail === "gcash"
+                ? "border-primary bg-primary/5 ring-2 ring-primary/40"
+                : "border-border hover:bg-accent/40"
+            }`}
+          >
+            <Smartphone className="mt-0.5 h-5 w-5 text-primary" />
+            <div>
+              <div className="font-semibold">Pay with GCash</div>
+              <div className="text-xs text-muted-foreground">
+                Skip the picker — opens straight into the GCash flow.
+              </div>
+            </div>
+          </button>
+        </div>
+
         <div id="checkout" className="mt-6 min-h-[600px]">
-          <EmbeddedCheckoutProvider stripe={getStripe()} options={{ fetchClientSecret }}>
+          {/* Re-key on rail change so EmbeddedCheckoutProvider remounts with the
+              right client secret (it doesn't allow swapping mid-flight). */}
+          <EmbeddedCheckoutProvider
+            key={rail}
+            stripe={getStripe()}
+            options={{ fetchClientSecret }}
+          >
             <EmbeddedCheckout />
           </EmbeddedCheckoutProvider>
         </div>

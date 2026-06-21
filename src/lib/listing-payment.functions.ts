@@ -50,10 +50,20 @@ async function resolveOrCreateCustomer(
 export const createListingPaymentCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (data: { listingId: string; returnUrl: string; environment: StripeEnv }) => {
+    (data: {
+      listingId: string;
+      returnUrl: string;
+      environment: StripeEnv;
+      /** Force a single PH e-wallet rail (currently only `gcash`). When set,
+       * Stripe shows the GCash flow directly instead of the full method picker. */
+      paymentMethod?: "gcash";
+    }) => {
       if (!/^[0-9a-f-]{36}$/i.test(data.listingId)) throw new Error("Invalid listingId");
       validateEnv(data.environment);
       validateReturnUrl(data.returnUrl);
+      if (data.paymentMethod && data.paymentMethod !== "gcash") {
+        throw new Error("Unsupported paymentMethod");
+      }
       return data;
     },
   )
@@ -98,6 +108,15 @@ export const createListingPaymentCheckout = createServerFn({ method: "POST" })
     const email = (claims as any)?.email as string | undefined;
     const customerId = await resolveOrCreateCustomer(stripe, { email, userId });
 
+    const forceGCash = data.paymentMethod === "gcash";
+
+    // GCash-only sessions can't use managed_payments (incompatible with
+    // payment_method_types). Fall back to automatic_tax in that case so we
+    // still collect PH tax correctly.
+    const railOptions = forceGCash
+      ? { payment_method_types: ["gcash"], automatic_tax: { enabled: true } }
+      : { managed_payments: { enabled: true } };
+
     const session = await stripe.checkout.sessions.create({
       line_items: [
         {
@@ -117,14 +136,15 @@ export const createListingPaymentCheckout = createServerFn({ method: "POST" })
       ui_mode: "embedded_page",
       return_url: data.returnUrl,
       customer: customerId,
-      managed_payments: { enabled: true },
+      ...railOptions,
       metadata: {
         userId,
         kind: "listing_payment",
         listingId: data.listingId,
         plan,
         productName,
-        managed_payments: "true",
+        managed_payments: forceGCash ? "false" : "true",
+        rail: forceGCash ? "gcash" : "all",
       },
     } as any);
 
