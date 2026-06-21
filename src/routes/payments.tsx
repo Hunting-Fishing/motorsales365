@@ -48,13 +48,57 @@ export const Route = createFileRoute("/payments")({
 
 type Status = "live" | "soon" | "planned";
 
+type IconCmp = React.ComponentType<{ className?: string }>;
+
 type Method = {
   name: string;
   desc: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: IconCmp;
+  /** Tailwind text color class for the brand mark, e.g. "text-[#1A1F71]". */
+  iconColor?: string;
   status: Status;
   provider?: string;
 };
+
+// Small lettered brand badges for marks not available as SVG icons.
+const makeLetterBrand = (letter: string, bg: string): IconCmp =>
+  function LetterBrand({ className }: { className?: string }) {
+    return (
+      <span
+        className={`inline-flex items-center justify-center rounded-sm font-bold text-white ${bg} ${className ?? ""}`}
+        style={{ fontSize: "0.65em", lineHeight: 1 }}
+        aria-hidden
+      >
+        {letter}
+      </span>
+    );
+  };
+
+const GCashMark = makeLetterBrand("G", "bg-[#007DFE]");
+const MayaMark = makeLetterBrand("M", "bg-[#00C566]");
+const QrPhMark: IconCmp = ({ className }) => (
+  <span
+    className={`inline-flex items-center justify-center rounded-sm bg-[#E03A3E] font-bold text-white ${className ?? ""}`}
+    style={{ fontSize: "0.5em", lineHeight: 1, letterSpacing: "-0.02em" }}
+    aria-hidden
+  >
+    QR
+  </span>
+);
+
+const CardsMark: IconCmp = ({ className }) => (
+  <span className={`inline-flex items-center gap-0.5 ${className ?? ""}`}>
+    <SiVisa className="h-full w-auto text-[#1A1F71]" />
+    <SiMastercard className="h-full w-auto text-[#EB001B]" />
+  </span>
+);
+
+const JcbAmexMark: IconCmp = ({ className }) => (
+  <span className={`inline-flex items-center gap-0.5 ${className ?? ""}`}>
+    <SiJcb className="h-full w-auto text-[#0E4C96]" />
+    <SiAmericanexpress className="h-full w-auto text-[#2E77BB]" />
+  </span>
+);
 
 const METHODS: { group: string; items: Method[] }[] = [
   {
@@ -63,14 +107,14 @@ const METHODS: { group: string; items: Method[] }[] = [
       {
         name: "Visa / Mastercard",
         desc: "Credit and debit cards, local and international. 3D Secure supported.",
-        icon: CreditCard,
+        icon: CardsMark,
         status: "planned",
         provider: "Stripe",
       },
       {
         name: "JCB / AMEX",
         desc: "Additional card networks accepted at checkout.",
-        icon: CreditCard,
+        icon: JcbAmexMark,
         status: "planned",
         provider: "Stripe",
       },
@@ -82,35 +126,37 @@ const METHODS: { group: string; items: Method[] }[] = [
       {
         name: "GCash (direct to our wallet)",
         desc: "Send straight to our GCash 09696063830 (365 MotorSales) and upload your receipt — funds land in our wallet instantly. We confirm within 1 business day.",
-        icon: Smartphone,
+        icon: GCashMark,
         status: "live",
         provider: "Direct GCash",
       },
       {
         name: "GCash (via Stripe)",
         desc: "Pay GCash from inside the Stripe card sheet — funds settle to our bank in 2–3 days. Pick GCash at checkout.",
-        icon: Smartphone,
+        icon: GCashMark,
         status: "live",
         provider: "Stripe",
       },
       {
         name: "GrabPay",
         desc: "Pay using your GrabPay balance.",
-        icon: Car,
+        icon: SiGrab,
+        iconColor: "text-[#00B14F]",
         status: "planned",
         provider: "Stripe",
       },
       {
         name: "Maya",
         desc: "Pay with Maya wallet or Maya credit.",
-        icon: Wallet,
+        icon: MayaMark,
         status: "planned",
         provider: "Stripe",
       },
       {
         name: "ShopeePay",
         desc: "Pay from your ShopeePay wallet.",
-        icon: ShoppingBag,
+        icon: SiShopee,
+        iconColor: "text-[#EE4D2D]",
         status: "planned",
       },
     ],
@@ -121,7 +167,7 @@ const METHODS: { group: string; items: Method[] }[] = [
       {
         name: "QR Ph",
         desc: "Scan-to-pay using the national QR standard.",
-        icon: QrCode,
+        icon: QrPhMark,
         status: "planned",
         provider: "Stripe",
       },
@@ -179,8 +225,8 @@ function MethodCard({ m }: { m: Method }) {
     <div className="rounded-lg border border-border bg-card p-3">
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2">
-          <div className="rounded-md bg-secondary p-1.5">
-            <Icon className="h-4 w-4" />
+          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-secondary">
+            <Icon className={`h-4 w-4 ${m.iconColor ?? ""}`} />
           </div>
           <div className="font-display text-sm font-semibold leading-tight">{m.name}</div>
         </div>
@@ -190,7 +236,12 @@ function MethodCard({ m }: { m: Method }) {
         </Badge>
       </div>
       <p className="mt-2 text-xs text-muted-foreground leading-snug">{m.desc}</p>
-      {m.provider && <p className="mt-1 text-[10px] text-muted-foreground">via {m.provider}</p>}
+      {m.provider && (
+        <p className="mt-1 flex items-center gap-1 text-[10px] text-muted-foreground">
+          via {m.provider === "Stripe" ? <SiStripe className="h-2.5 w-auto text-[#635BFF]" /> : null}
+          {m.provider !== "Stripe" && m.provider}
+        </p>
+      )}
     </div>
   );
 }
