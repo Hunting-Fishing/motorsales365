@@ -37,7 +37,7 @@ function PaymentsPage() {
               />
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
-              Direct to our wallet · 09696063830
+              Safe Secure{" "}
             </p>
           </div>
 
