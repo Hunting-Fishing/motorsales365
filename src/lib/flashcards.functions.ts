@@ -69,7 +69,7 @@ export const getFlashcardContent = createServerFn({ method: "GET" }).handler(
     const { data, error } = await supabase
       .from("flashcard_content")
       .select(
-        "cards, taxonomy, card_images, version, card_count, source_repo, source_ref, source_commit, synced_at, updated_at, auto_sync_enabled, auto_sync_interval, auto_sync_last_run_at, auto_sync_last_status, auto_sync_last_error",
+        "cards, taxonomy, card_images, version, card_count, source_repo, source_ref, source_commit, synced_at, updated_at, is_published, auto_sync_enabled, auto_sync_interval, auto_sync_last_run_at, auto_sync_last_status, auto_sync_last_error",
       )
       .eq("id", 1)
       .maybeSingle();
@@ -85,7 +85,9 @@ export const getFlashcardContent = createServerFn({ method: "GET" }).handler(
       sourceCommit: (data?.source_commit as string | null) ?? null,
       syncedAt: (data?.synced_at as string | null) ?? null,
       updatedAt: (data?.updated_at as string | null) ?? null,
+      isPublished: data?.is_published ?? false,
       autoSyncEnabled: data?.auto_sync_enabled ?? false,
+
       autoSyncInterval: ((data?.auto_sync_interval as AutoSyncInterval | undefined) ?? "daily"),
       autoSyncLastRunAt: (data?.auto_sync_last_run_at as string | null) ?? null,
       autoSyncLastStatus: (data?.auto_sync_last_status as "success" | "error" | null) ?? null,
