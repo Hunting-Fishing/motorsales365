@@ -197,7 +197,8 @@ function AdminFlashcardsPage() {
     );
   }
 
-  const content = contentQuery.data;
+
+
 
   return (
     <div className="space-y-6">
