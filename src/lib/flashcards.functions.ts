@@ -229,7 +229,7 @@ export const saveFlashcardProgress = createServerFn({ method: "POST" })
     // Read current row to apply deltas.
     const { data: cur, error: readErr } = await context.supabase
       .from("flashcard_progress")
-      .select("correct_count, wrong_count, seen_count, points, extra")
+      .select("confidence, correct_count, wrong_count, seen_count, points, extra")
       .eq("user_id", context.userId)
       .eq("card_id", data.cardId)
       .maybeSingle();
