@@ -18,6 +18,8 @@ const DEFAULT_REF = "main";
 
 // ---------- Types ----------
 
+export type AutoSyncInterval = "daily" | "weekly" | "biweekly" | "monthly";
+
 export type FlashcardContent = {
   cards: any[];
   taxonomy: any;
@@ -29,6 +31,11 @@ export type FlashcardContent = {
   sourceCommit: string | null;
   syncedAt: string | null;
   updatedAt: string | null;
+  autoSyncEnabled: boolean;
+  autoSyncInterval: AutoSyncInterval;
+  autoSyncLastRunAt: string | null;
+  autoSyncLastStatus: "success" | "error" | null;
+  autoSyncLastError: string | null;
 };
 
 export type FlashcardProgressRow = {
