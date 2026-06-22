@@ -31,12 +31,14 @@ export type FlashcardContent = {
   sourceCommit: string | null;
   syncedAt: string | null;
   updatedAt: string | null;
+  isPublished: boolean;
   autoSyncEnabled: boolean;
   autoSyncInterval: AutoSyncInterval;
   autoSyncLastRunAt: string | null;
   autoSyncLastStatus: "success" | "error" | null;
   autoSyncLastError: string | null;
 };
+
 
 export type FlashcardProgressRow = {
   cardId: string;
