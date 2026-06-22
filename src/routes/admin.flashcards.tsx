@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
 import {
+  CheckCircle2,
   CloudDownload,
   Database,
   GitBranch,
@@ -11,6 +12,12 @@ import {
   RefreshCw,
   ShieldCheck,
   Sparkles,
+  XCircle,
+  Clock,
+  AlertTriangle,
+  TrendingUp,
+  TrendingDown,
+  Minus,
 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -49,6 +56,49 @@ function formatDate(iso: string | null | undefined) {
   }
 }
 
+function relativeTime(iso: string | null | undefined) {
+  if (!iso) return "never";
+  try {
+    const d = new Date(iso);
+    const diff = Date.now() - d.getTime();
+    const mins = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+    if (mins < 1) return "just now";
+    if (mins < 60) return `${mins} min${mins === 1 ? "" : "s"} ago`;
+    if (hours < 24) return `${hours} hour${hours === 1 ? "" : "s"} ago`;
+    if (days < 7) return `${days} day${days === 1 ? "" : "s"} ago`;
+    return d.toLocaleDateString();
+  } catch {
+    return iso;
+  }
+}
+
+function SyncStatusBadge({ syncedAt, isSyncing }: { syncedAt: string | null | undefined; isSyncing: boolean }) {
+  if (isSyncing) {
+    return (
+      <Badge variant="outline" className="gap-1 bg-amber-500/10 text-amber-600 border-amber-500/30">
+        <Loader2 className="h-3 w-3 animate-spin" />
+        Syncing…
+      </Badge>
+    );
+  }
+  if (!syncedAt) {
+    return (
+      <Badge variant="outline" className="gap-1 bg-slate-500/10 text-slate-500 border-slate-500/30">
+        <AlertTriangle className="h-3 w-3" />
+        Not synced
+      </Badge>
+    );
+  }
+  return (
+    <Badge variant="outline" className="gap-1 bg-emerald-500/10 text-emerald-600 border-emerald-500/30">
+      <CheckCircle2 className="h-3 w-3" />
+      Synced
+    </Badge>
+  );
+}
+
 function AdminFlashcardsPage() {
   const { isAdmin, isModerator, loading } = useAuth();
   const allowed = isAdmin || isModerator;
@@ -64,11 +114,13 @@ function AdminFlashcardsPage() {
   });
 
   const [lastResult, setLastResult] = useState<SyncResult | null>(null);
+  const [lastError, setLastError] = useState<string | null>(null);
 
   const syncMutation = useMutation({
     mutationFn: () => runSync({ data: {} }),
     onSuccess: (result) => {
       setLastResult(result);
+      setLastError(null);
       const delta = result.cardCount - result.previousCardCount;
       const deltaText = delta === 0 ? "no change" : `${delta > 0 ? "+" : ""}${delta} cards`;
       toast.success(`Synced ${result.cardCount} cards (${deltaText}). Version ${result.version}.`);
@@ -76,6 +128,8 @@ function AdminFlashcardsPage() {
     },
     onError: (err: unknown) => {
       const message = err instanceof Error ? err.message : "Sync failed";
+      setLastError(message);
+      setLastResult(null);
       toast.error(message);
     },
   });
@@ -83,6 +137,7 @@ function AdminFlashcardsPage() {
   // Reset any stale result if the user navigates back into the page.
   useEffect(() => {
     setLastResult(null);
+    setLastError(null);
   }, []);
 
   if (loading) {
@@ -113,12 +168,15 @@ function AdminFlashcardsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="font-display text-2xl font-bold tracking-tight">365 Flashcards</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Pull the latest card decks from the upstream GitHub repo. User progress
-          is stored in a separate table and is never affected by a sync.
-        </p>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="font-display text-2xl font-bold tracking-tight">365 Flashcards</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Pull the latest card decks from the upstream GitHub repo. User progress
+            is stored in a separate table and is never affected by a sync.
+          </p>
+        </div>
+        <SyncStatusBadge syncedAt={content?.syncedAt ?? null} isSyncing={syncMutation.isPending} />
       </div>
 
       <Card>
@@ -189,36 +247,108 @@ function AdminFlashcardsPage() {
             )}
           </Button>
         </CardContent>
-        {lastResult && (
-          <CardFooter className="flex flex-col items-start gap-1 border-t border-border pt-4 text-sm">
-            <div className="font-medium">Last sync</div>
-            <div className="text-muted-foreground">
-              {lastResult.cardCount.toLocaleString()} cards (
-              {lastResult.cardCount - lastResult.previousCardCount >= 0 ? "+" : ""}
-              {lastResult.cardCount - lastResult.previousCardCount} vs previous), version{" "}
-              v{lastResult.version}
-              {lastResult.sourceCommit ? (
-                <>
-                  {" "}
-                  at <code className="font-mono text-xs">{lastResult.sourceCommit.slice(0, 7)}</code>
-                </>
-              ) : null}
-              .
-            </div>
-          </CardFooter>
-        )}
       </Card>
 
-      <Card className="border-amber-500/40 bg-amber-500/5">
-        <CardHeader>
-          <CardTitle className="text-sm">Wiring status</CardTitle>
-        </CardHeader>
-        <CardContent className="text-sm text-muted-foreground">
-          The sync writes the latest content into Lovable Cloud. The live game at{" "}
-          <code>/learn/flashcards</code> currently still reads the bundled static files
-          for fastest load; wiring the game to read the cloud snapshot is the next step.
-        </CardContent>
-      </Card>
+      {(lastResult || lastError) && (
+        <Card className={lastError ? "border-red-500/40 bg-red-500/5" : "border-emerald-500/40 bg-emerald-500/5"}>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              {lastError ? (
+                <>
+                  <XCircle className="h-4 w-4 text-red-500" />
+                  <span className="text-red-600">Sync failed</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                  <span className="text-emerald-600">Sync succeeded</span>
+                </>
+              )}
+            </CardTitle>
+            <CardDescription>
+              {lastError ? (
+                "The last sync attempt did not complete."
+              ) : (
+                <span className="flex items-center gap-1">
+                  <Clock className="h-3 w-3" />
+                  {lastResult ? relativeTime(lastResult.syncedAt) : "just now"}
+                </span>
+              )}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {lastError ? (
+              <div className="text-sm text-red-600">{lastError}</div>
+            ) : lastResult ? (
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                  <ResultStat
+                    label="Cards"
+                    value={lastResult.cardCount.toLocaleString()}
+                    icon={<Database className="h-3 w-3 text-muted-foreground" />}
+                  />
+                  <ResultStat
+                    label="Version"
+                    value={`v${lastResult.version}`}
+                    icon={<GitBranch className="h-3 w-3 text-muted-foreground" />}
+                  />
+                  <ResultStat
+                    label="Change"
+                    value={(() => {
+                      const delta = lastResult.cardCount - lastResult.previousCardCount;
+                      if (delta === 0) return <span className="flex items-center gap-1"><Minus className="h-3 w-3" /> No change</span>;
+                      if (delta > 0) return <span className="flex items-center gap-1 text-emerald-600"><TrendingUp className="h-3 w-3" /> +{delta}</span>;
+                      return <span className="flex items-center gap-1 text-red-600"><TrendingDown className="h-3 w-3" /> {delta}</span>;
+                    })()}
+                    icon={null}
+                  />
+                  <ResultStat
+                    label="Commit"
+                    value={
+                      lastResult.sourceCommit ? (
+                        <code className="font-mono text-xs">{lastResult.sourceCommit.slice(0, 7)}</code>
+                      ) : (
+                        "—"
+                      )
+                    }
+                    icon={<GitBranch className="h-3 w-3 text-muted-foreground" />}
+                  />
+                </div>
+                <div className="text-xs text-muted-foreground">
+                  Previous count: {lastResult.previousCardCount.toLocaleString()} cards
+                </div>
+              </div>
+            ) : null}
+          </CardContent>
+        </Card>
+      )}
+
+      {!lastResult && !lastError && content?.syncedAt && (
+        <Card className="border-muted bg-muted/30">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              Last successful sync
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-sm text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+              <span>
+                {formatDate(content.syncedAt)}
+                <span className="mx-1">·</span>
+                {relativeTime(content.syncedAt)}
+                {content.sourceCommit && (
+                  <>
+                    <span className="mx-1">·</span>
+                    <code className="rounded bg-muted px-1 py-0.5 font-mono text-xs">{content.sourceCommit.slice(0, 7)}</code>
+                  </>
+                )}
+              </span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
@@ -233,3 +363,16 @@ function Stat({ label, value }: { label: string; value: React.ReactNode }) {
     </div>
   );
 }
+
+function ResultStat({ label, value, icon }: { label: string; value: React.ReactNode; icon: React.ReactNode | null }) {
+  return (
+    <div className="rounded-lg border border-border/60 bg-background/50 p-3">
+      <div className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+        {icon}
+        {label}
+      </div>
+      <div className="mt-1 text-sm font-semibold">{value}</div>
+    </div>
+  );
+}
+
