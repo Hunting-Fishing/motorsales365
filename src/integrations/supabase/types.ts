@@ -3903,6 +3903,7 @@ export type Database = {
           cards: Json
           created_at: string
           id: number
+          is_published: boolean
           source_commit: string | null
           source_ref: string
           source_repo: string
@@ -3923,6 +3924,7 @@ export type Database = {
           cards?: Json
           created_at?: string
           id?: number
+          is_published?: boolean
           source_commit?: string | null
           source_ref?: string
           source_repo?: string
@@ -3943,6 +3945,7 @@ export type Database = {
           cards?: Json
           created_at?: string
           id?: number
+          is_published?: boolean
           source_commit?: string | null
           source_ref?: string
           source_repo?: string

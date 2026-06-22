@@ -34,10 +34,12 @@ import {
   getFlashcardContent,
   syncFlashcardsFromGithub,
   updateFlashcardAutoSync,
+  setFlashcardPublished,
   type FlashcardContent,
   type SyncResult,
   type AutoSyncInterval,
 } from "@/lib/flashcards.functions";
+
 import { Switch } from "@/components/ui/switch";
 import {
   Select,
@@ -116,6 +118,8 @@ function AdminFlashcardsPage() {
   const fetchContent = useServerFn(getFlashcardContent);
   const runSync = useServerFn(syncFlashcardsFromGithub);
   const saveAutoSync = useServerFn(updateFlashcardAutoSync);
+  const savePublished = useServerFn(setFlashcardPublished);
+
 
   const contentQuery = useQuery<FlashcardContent>({
     queryKey: ["admin", "flashcard-content"],
@@ -167,6 +171,19 @@ function AdminFlashcardsPage() {
     },
   });
 
+  const publishMutation = useMutation({
+    mutationFn: (isPublished: boolean) => savePublished({ data: { isPublished } }),
+    onSuccess: (_r, isPublished) => {
+      toast.success(isPublished ? "Flashcards set to Active (public can play)." : "Flashcards set to Coming Soon.");
+      void queryClient.invalidateQueries({ queryKey: ["admin", "flashcard-content"] });
+      void queryClient.invalidateQueries({ queryKey: ["flashcards", "publish-state"] });
+    },
+    onError: (err: unknown) => {
+      toast.error(err instanceof Error ? err.message : "Failed to update publish state");
+    },
+  });
+
+
   // Reset any stale result if the user navigates back into the page.
   useEffect(() => {
     setLastResult(null);
@@ -212,6 +229,60 @@ function AdminFlashcardsPage() {
         </div>
         <SyncStatusBadge syncedAt={content?.syncedAt ?? null} isSyncing={syncMutation.isPending} />
       </div>
+
+      <Card className={content?.isPublished ? "border-emerald-500/40" : "border-amber-500/40"}>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Sparkles className="h-4 w-4" /> Public availability
+          </CardTitle>
+          <CardDescription>
+            Toggle whether the Flashcards game is playable on the public Learn page.
+            When inactive, visitors see a <b>Coming Soon</b> screen. Staff can still preview the game.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Switch
+              checked={content?.isPublished ?? false}
+              onCheckedChange={(v) => publishMutation.mutate(v)}
+              disabled={publishMutation.isPending || contentQuery.isLoading}
+              aria-label="Toggle public availability"
+            />
+            <div>
+              <div className="text-sm font-semibold">
+                {content?.isPublished ? "Active — public can play" : "Inactive — Coming Soon"}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                Flip this once card images are finalized to launch publicly.
+              </div>
+            </div>
+          </div>
+          <Badge
+            variant="outline"
+            className={
+              content?.isPublished
+                ? "gap-1 bg-emerald-500/10 text-emerald-600 border-emerald-500/30"
+                : "gap-1 bg-amber-500/10 text-amber-600 border-amber-500/30"
+            }
+          >
+            {publishMutation.isPending ? (
+              <>
+                <Loader2 className="h-3 w-3 animate-spin" /> Saving…
+              </>
+            ) : content?.isPublished ? (
+              <>
+                <CheckCircle2 className="h-3 w-3" /> Active
+              </>
+            ) : (
+              <>
+                <AlertTriangle className="h-3 w-3" /> Coming Soon
+              </>
+            )}
+          </Badge>
+        </CardContent>
+      </Card>
+
+
 
       <Card>
         <CardHeader>

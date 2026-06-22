@@ -31,12 +31,14 @@ export type FlashcardContent = {
   sourceCommit: string | null;
   syncedAt: string | null;
   updatedAt: string | null;
+  isPublished: boolean;
   autoSyncEnabled: boolean;
   autoSyncInterval: AutoSyncInterval;
   autoSyncLastRunAt: string | null;
   autoSyncLastStatus: "success" | "error" | null;
   autoSyncLastError: string | null;
 };
+
 
 export type FlashcardProgressRow = {
   cardId: string;
@@ -67,7 +69,7 @@ export const getFlashcardContent = createServerFn({ method: "GET" }).handler(
     const { data, error } = await supabase
       .from("flashcard_content")
       .select(
-        "cards, taxonomy, card_images, version, card_count, source_repo, source_ref, source_commit, synced_at, updated_at, auto_sync_enabled, auto_sync_interval, auto_sync_last_run_at, auto_sync_last_status, auto_sync_last_error",
+        "cards, taxonomy, card_images, version, card_count, source_repo, source_ref, source_commit, synced_at, updated_at, is_published, auto_sync_enabled, auto_sync_interval, auto_sync_last_run_at, auto_sync_last_status, auto_sync_last_error",
       )
       .eq("id", 1)
       .maybeSingle();
@@ -83,7 +85,9 @@ export const getFlashcardContent = createServerFn({ method: "GET" }).handler(
       sourceCommit: (data?.source_commit as string | null) ?? null,
       syncedAt: (data?.synced_at as string | null) ?? null,
       updatedAt: (data?.updated_at as string | null) ?? null,
+      isPublished: data?.is_published ?? false,
       autoSyncEnabled: data?.auto_sync_enabled ?? false,
+
       autoSyncInterval: ((data?.auto_sync_interval as AutoSyncInterval | undefined) ?? "daily"),
       autoSyncLastRunAt: (data?.auto_sync_last_run_at as string | null) ?? null,
       autoSyncLastStatus: (data?.auto_sync_last_status as "success" | "error" | null) ?? null,
@@ -159,6 +163,28 @@ export const updateFlashcardAutoSync = createServerFn({ method: "POST" })
     if (error) throw new Error(`Failed to update auto-sync: ${error.message}`);
     return { ok: true as const };
   });
+
+// ---------- Publish toggle ----------
+
+export const setFlashcardPublished = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ isPublished: z.boolean() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { data: allowed, error: rpcErr } = await context.supabase.rpc("can_moderate", {
+      _user_id: context.userId,
+    });
+    if (rpcErr) throw new Error(`Permission check failed: ${rpcErr.message}`);
+    if (!allowed) throw new Error("Forbidden: staff only");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("flashcard_content")
+      .upsert({ id: 1, is_published: data.isPublished }, { onConflict: "id" });
+    if (error) throw new Error(`Failed to update publish state: ${error.message}`);
+    return { ok: true as const };
+  });
+
+
 
 // ---------- Per-user progress ----------
 
