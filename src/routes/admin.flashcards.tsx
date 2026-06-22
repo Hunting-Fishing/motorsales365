@@ -34,10 +34,12 @@ import {
   getFlashcardContent,
   syncFlashcardsFromGithub,
   updateFlashcardAutoSync,
+  setFlashcardPublished,
   type FlashcardContent,
   type SyncResult,
   type AutoSyncInterval,
 } from "@/lib/flashcards.functions";
+
 import { Switch } from "@/components/ui/switch";
 import {
   Select,
