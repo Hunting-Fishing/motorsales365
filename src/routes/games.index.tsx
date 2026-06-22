@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Sparkles, Gamepad2, Brain, Wrench, Zap, Play } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { ComingSoonSection } from "@/components/coming-soon";
+import { FlashcardsIframe } from "@/components/flashcards-iframe";
+
 
 export const Route = createFileRoute("/games/")({
   head: () => ({
