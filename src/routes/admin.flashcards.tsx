@@ -33,9 +33,19 @@ import { Badge } from "@/components/ui/badge";
 import {
   getFlashcardContent,
   syncFlashcardsFromGithub,
+  updateFlashcardAutoSync,
   type FlashcardContent,
   type SyncResult,
+  type AutoSyncInterval,
 } from "@/lib/flashcards.functions";
+import { Switch } from "@/components/ui/switch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const Route = createFileRoute("/admin/flashcards")({
   component: AdminFlashcardsPage,
