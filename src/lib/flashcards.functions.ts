@@ -19,9 +19,9 @@ const DEFAULT_REF = "main";
 // ---------- Types ----------
 
 export type FlashcardContent = {
-  cards: unknown[];
-  taxonomy: Record<string, unknown>;
-  cardImages: Record<string, unknown>;
+  cards: any[];
+  taxonomy: any;
+  cardImages: any;
   version: number;
   cardCount: number;
   sourceRepo: string;
@@ -39,7 +39,7 @@ export type FlashcardProgressRow = {
   seenCount: number;
   points: number;
   lastSeenAt: string | null;
-  extra: Record<string, unknown>;
+  extra: any;
 };
 
 // ---------- Public read ----------
@@ -66,9 +66,9 @@ export const getFlashcardContent = createServerFn({ method: "GET" }).handler(
       .maybeSingle();
     if (error) throw new Error(`Failed to load flashcard content: ${error.message}`);
     return {
-      cards: (data?.cards as unknown[]) ?? [],
-      taxonomy: (data?.taxonomy as Record<string, unknown>) ?? {},
-      cardImages: (data?.card_images as Record<string, unknown>) ?? {},
+      cards: (data?.cards as any[]) ?? [],
+      taxonomy: (data?.taxonomy as any) ?? {},
+      cardImages: (data?.card_images as any) ?? {},
       version: data?.version ?? 0,
       cardCount: data?.card_count ?? 0,
       sourceRepo: data?.source_repo ?? DEFAULT_REPO,
@@ -120,8 +120,8 @@ export const syncFlashcardsFromGithub = createServerFn({ method: "POST" })
     if (!taxRes.ok) throw new Error(`taxonomy.json fetch failed (${taxRes.status})`);
 
     const [cards, taxonomy] = await Promise.all([
-      cardsRes.json() as Promise<unknown[]>,
-      taxRes.json() as Promise<Record<string, unknown>>,
+      cardsRes.json() as Promise<any[]>,
+      taxRes.json() as Promise<any>,
     ]);
     if (!Array.isArray(cards)) throw new Error("cards.json did not return an array");
     if (typeof taxonomy !== "object" || taxonomy === null) {
@@ -208,7 +208,7 @@ export const getFlashcardProgress = createServerFn({ method: "GET" })
       seenCount: r.seen_count,
       points: r.points,
       lastSeenAt: r.last_seen_at,
-      extra: (r.extra as Record<string, unknown>) ?? {},
+      extra: (r.extra as any) ?? {},
     }));
   });
 
@@ -219,7 +219,7 @@ const SaveProgressInput = z.object({
   wrongDelta: z.number().int().min(0).max(100).optional(),
   seenDelta: z.number().int().min(0).max(100).optional(),
   pointsDelta: z.number().int().min(-1000).max(1000).optional(),
-  extra: z.record(z.string(), z.unknown()).optional(),
+  extra: z.record(z.string(), z.any()).optional(),
 });
 
 export const saveFlashcardProgress = createServerFn({ method: "POST" })
