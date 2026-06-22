@@ -230,6 +230,7 @@ import { Route as ApiPublicHooksDispatchExpandRouteImport } from './routes/api/p
 import { Route as ApiPublicHooksDiscoverSyncRouteImport } from './routes/api/public/hooks/discover-sync'
 import { Route as ApiPublicHooksAnnualBonusesRouteImport } from './routes/api/public/hooks/annual-bonuses'
 import { Route as ApiPublicFxRefreshRouteImport } from './routes/api/public/fx/refresh'
+import { Route as ApiPublicFlashcardsContentRouteImport } from './routes/api/public/flashcards.content'
 import { Route as ApiPublicTrainingPartnersIdClickRouteImport } from './routes/api/public/training-partners.$id.click'
 
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
@@ -1382,6 +1383,12 @@ const ApiPublicFxRefreshRoute = ApiPublicFxRefreshRouteImport.update({
   path: '/api/public/fx/refresh',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicFlashcardsContentRoute =
+  ApiPublicFlashcardsContentRouteImport.update({
+    id: '/api/public/flashcards/content',
+    path: '/api/public/flashcards/content',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicTrainingPartnersIdClickRoute =
   ApiPublicTrainingPartnersIdClickRouteImport.update({
     id: '/api/public/training-partners/$id/click',
@@ -1580,6 +1587,7 @@ export interface FileRoutesByFullPath {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
+  '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
@@ -1797,6 +1805,7 @@ export interface FileRoutesByTo {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements': typeof AdminAdvertisementsIndexRoute
   '/dashboard/team': typeof DashboardTeamIndexRoute
+  '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
@@ -2022,6 +2031,7 @@ export interface FileRoutesById {
   '/shop/p/$slug': typeof ShopPSlugRoute
   '/admin/advertisements/': typeof AdminAdvertisementsIndexRoute
   '/dashboard/team/': typeof DashboardTeamIndexRoute
+  '/api/public/flashcards/content': typeof ApiPublicFlashcardsContentRoute
   '/api/public/fx/refresh': typeof ApiPublicFxRefreshRoute
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
@@ -2247,6 +2257,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/admin/advertisements/'
     | '/dashboard/team/'
+    | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
     | '/api/public/hooks/annual-bonuses'
     | '/api/public/hooks/discover-sync'
@@ -2464,6 +2475,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/admin/advertisements'
     | '/dashboard/team'
+    | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
     | '/api/public/hooks/annual-bonuses'
     | '/api/public/hooks/discover-sync'
@@ -2688,6 +2700,7 @@ export interface FileRouteTypes {
     | '/shop/p/$slug'
     | '/admin/advertisements/'
     | '/dashboard/team/'
+    | '/api/public/flashcards/content'
     | '/api/public/fx/refresh'
     | '/api/public/hooks/annual-bonuses'
     | '/api/public/hooks/discover-sync'
@@ -2816,6 +2829,7 @@ export interface RootRouteChildren {
   ShopBrandSlugRoute: typeof ShopBrandSlugRoute
   ShopDepartmentSlugRoute: typeof ShopDepartmentSlugRoute
   ShopPSlugRoute: typeof ShopPSlugRoute
+  ApiPublicFlashcardsContentRoute: typeof ApiPublicFlashcardsContentRoute
   ApiPublicFxRefreshRoute: typeof ApiPublicFxRefreshRoute
   ApiPublicHooksAnnualBonusesRoute: typeof ApiPublicHooksAnnualBonusesRoute
   ApiPublicHooksDiscoverSyncRoute: typeof ApiPublicHooksDiscoverSyncRoute
@@ -4387,6 +4401,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicFxRefreshRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/flashcards/content': {
+      id: '/api/public/flashcards/content'
+      path: '/api/public/flashcards/content'
+      fullPath: '/api/public/flashcards/content'
+      preLoaderRoute: typeof ApiPublicFlashcardsContentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/training-partners/$id/click': {
       id: '/api/public/training-partners/$id/click'
       path: '/api/public/training-partners/$id/click'
@@ -4843,6 +4864,7 @@ const rootRouteChildren: RootRouteChildren = {
   ShopBrandSlugRoute: ShopBrandSlugRoute,
   ShopDepartmentSlugRoute: ShopDepartmentSlugRoute,
   ShopPSlugRoute: ShopPSlugRoute,
+  ApiPublicFlashcardsContentRoute: ApiPublicFlashcardsContentRoute,
   ApiPublicFxRefreshRoute: ApiPublicFxRefreshRoute,
   ApiPublicHooksAnnualBonusesRoute: ApiPublicHooksAnnualBonusesRoute,
   ApiPublicHooksDiscoverSyncRoute: ApiPublicHooksDiscoverSyncRoute,
@@ -4867,13 +4889,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
