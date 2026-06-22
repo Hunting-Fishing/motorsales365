@@ -164,6 +164,28 @@ export const updateFlashcardAutoSync = createServerFn({ method: "POST" })
     return { ok: true as const };
   });
 
+// ---------- Publish toggle ----------
+
+export const setFlashcardPublished = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ isPublished: z.boolean() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { data: allowed, error: rpcErr } = await context.supabase.rpc("can_moderate", {
+      _user_id: context.userId,
+    });
+    if (rpcErr) throw new Error(`Permission check failed: ${rpcErr.message}`);
+    if (!allowed) throw new Error("Forbidden: staff only");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("flashcard_content")
+      .upsert({ id: 1, is_published: data.isPublished }, { onConflict: "id" });
+    if (error) throw new Error(`Failed to update publish state: ${error.message}`);
+    return { ok: true as const };
+  });
+
+
+
 // ---------- Per-user progress ----------
 
 export const getFlashcardProgress = createServerFn({ method: "GET" })
