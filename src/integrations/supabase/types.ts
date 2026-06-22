@@ -3891,6 +3891,99 @@ export type Database = {
         }
         Relationships: []
       }
+      flashcard_content: {
+        Row: {
+          card_count: number
+          card_images: Json
+          cards: Json
+          created_at: string
+          id: number
+          source_commit: string | null
+          source_ref: string
+          source_repo: string
+          synced_at: string | null
+          synced_by: string | null
+          taxonomy: Json
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          card_count?: number
+          card_images?: Json
+          cards?: Json
+          created_at?: string
+          id?: number
+          source_commit?: string | null
+          source_ref?: string
+          source_repo?: string
+          synced_at?: string | null
+          synced_by?: string | null
+          taxonomy?: Json
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          card_count?: number
+          card_images?: Json
+          cards?: Json
+          created_at?: string
+          id?: number
+          source_commit?: string | null
+          source_ref?: string
+          source_repo?: string
+          synced_at?: string | null
+          synced_by?: string | null
+          taxonomy?: Json
+          updated_at?: string
+          version?: number
+        }
+        Relationships: []
+      }
+      flashcard_progress: {
+        Row: {
+          card_id: string
+          confidence: string | null
+          correct_count: number
+          created_at: string
+          extra: Json
+          id: string
+          last_seen_at: string | null
+          points: number
+          seen_count: number
+          updated_at: string
+          user_id: string
+          wrong_count: number
+        }
+        Insert: {
+          card_id: string
+          confidence?: string | null
+          correct_count?: number
+          created_at?: string
+          extra?: Json
+          id?: string
+          last_seen_at?: string | null
+          points?: number
+          seen_count?: number
+          updated_at?: string
+          user_id: string
+          wrong_count?: number
+        }
+        Update: {
+          card_id?: string
+          confidence?: string | null
+          correct_count?: number
+          created_at?: string
+          extra?: Json
+          id?: string
+          last_seen_at?: string | null
+          points?: number
+          seen_count?: number
+          updated_at?: string
+          user_id?: string
+          wrong_count?: number
+        }
+        Relationships: []
+      }
       form_feedback: {
         Row: {
           contact_email: string | null
