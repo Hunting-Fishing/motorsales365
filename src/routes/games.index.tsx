@@ -95,7 +95,7 @@ function GamesIndex() {
           subtitle="We're building more ways to learn and test your knowledge."
           className="mt-3"
         >
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2">
             <div className="rounded-lg border border-amber-300/60 bg-white/60 p-4 dark:bg-amber-950/20">
               <div className="flex items-center gap-2 text-amber-900 dark:text-amber-100">
                 <Wrench className="h-5 w-5" />
@@ -112,15 +112,6 @@ function GamesIndex() {
               </div>
               <p className="mt-1 text-xs text-amber-900/80 dark:text-amber-100/80">
                 Read the symptoms — call the fix before time runs out.
-              </p>
-            </div>
-            <div className="rounded-lg border border-amber-300/60 bg-white/60 p-4 dark:bg-amber-950/20">
-              <div className="flex items-center gap-2 text-amber-900 dark:text-amber-100">
-                <Brain className="h-5 w-5" />
-                <span className="font-semibold">Engine ID Challenge</span>
-              </div>
-              <p className="mt-1 text-xs text-amber-900/80 dark:text-amber-100/80">
-                Identify engines by sight, sound and spec.
               </p>
             </div>
           </div>
