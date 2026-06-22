@@ -226,6 +226,7 @@ import { Route as ApiPublicHooksRecomputeTiersRouteImport } from './routes/api/p
 import { Route as ApiPublicHooksQuarterlyBonusesRouteImport } from './routes/api/public/hooks/quarterly-bonuses'
 import { Route as ApiPublicHooksPartsWantedDigestRouteImport } from './routes/api/public/hooks/parts-wanted-digest'
 import { Route as ApiPublicHooksOpsAlertsDigestRouteImport } from './routes/api/public/hooks/ops-alerts-digest'
+import { Route as ApiPublicHooksFlashcardsAutosyncRouteImport } from './routes/api/public/hooks/flashcards-autosync'
 import { Route as ApiPublicHooksDispatchExpandRouteImport } from './routes/api/public/hooks/dispatch-expand'
 import { Route as ApiPublicHooksDiscoverSyncRouteImport } from './routes/api/public/hooks/discover-sync'
 import { Route as ApiPublicHooksAnnualBonusesRouteImport } from './routes/api/public/hooks/annual-bonuses'
@@ -1360,6 +1361,12 @@ const ApiPublicHooksOpsAlertsDigestRoute =
     path: '/api/public/hooks/ops-alerts-digest',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksFlashcardsAutosyncRoute =
+  ApiPublicHooksFlashcardsAutosyncRouteImport.update({
+    id: '/api/public/hooks/flashcards-autosync',
+    path: '/api/public/hooks/flashcards-autosync',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksDispatchExpandRoute =
   ApiPublicHooksDispatchExpandRouteImport.update({
     id: '/api/public/hooks/dispatch-expand',
@@ -1592,6 +1599,7 @@ export interface FileRoutesByFullPath {
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
   '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
+  '/api/public/hooks/flashcards-autosync': typeof ApiPublicHooksFlashcardsAutosyncRoute
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/parts-wanted-digest': typeof ApiPublicHooksPartsWantedDigestRoute
   '/api/public/hooks/quarterly-bonuses': typeof ApiPublicHooksQuarterlyBonusesRoute
@@ -1810,6 +1818,7 @@ export interface FileRoutesByTo {
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
   '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
+  '/api/public/hooks/flashcards-autosync': typeof ApiPublicHooksFlashcardsAutosyncRoute
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/parts-wanted-digest': typeof ApiPublicHooksPartsWantedDigestRoute
   '/api/public/hooks/quarterly-bonuses': typeof ApiPublicHooksQuarterlyBonusesRoute
@@ -2036,6 +2045,7 @@ export interface FileRoutesById {
   '/api/public/hooks/annual-bonuses': typeof ApiPublicHooksAnnualBonusesRoute
   '/api/public/hooks/discover-sync': typeof ApiPublicHooksDiscoverSyncRoute
   '/api/public/hooks/dispatch-expand': typeof ApiPublicHooksDispatchExpandRoute
+  '/api/public/hooks/flashcards-autosync': typeof ApiPublicHooksFlashcardsAutosyncRoute
   '/api/public/hooks/ops-alerts-digest': typeof ApiPublicHooksOpsAlertsDigestRoute
   '/api/public/hooks/parts-wanted-digest': typeof ApiPublicHooksPartsWantedDigestRoute
   '/api/public/hooks/quarterly-bonuses': typeof ApiPublicHooksQuarterlyBonusesRoute
@@ -2262,6 +2272,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/annual-bonuses'
     | '/api/public/hooks/discover-sync'
     | '/api/public/hooks/dispatch-expand'
+    | '/api/public/hooks/flashcards-autosync'
     | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/parts-wanted-digest'
     | '/api/public/hooks/quarterly-bonuses'
@@ -2480,6 +2491,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/annual-bonuses'
     | '/api/public/hooks/discover-sync'
     | '/api/public/hooks/dispatch-expand'
+    | '/api/public/hooks/flashcards-autosync'
     | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/parts-wanted-digest'
     | '/api/public/hooks/quarterly-bonuses'
@@ -2705,6 +2717,7 @@ export interface FileRouteTypes {
     | '/api/public/hooks/annual-bonuses'
     | '/api/public/hooks/discover-sync'
     | '/api/public/hooks/dispatch-expand'
+    | '/api/public/hooks/flashcards-autosync'
     | '/api/public/hooks/ops-alerts-digest'
     | '/api/public/hooks/parts-wanted-digest'
     | '/api/public/hooks/quarterly-bonuses'
@@ -2834,6 +2847,7 @@ export interface RootRouteChildren {
   ApiPublicHooksAnnualBonusesRoute: typeof ApiPublicHooksAnnualBonusesRoute
   ApiPublicHooksDiscoverSyncRoute: typeof ApiPublicHooksDiscoverSyncRoute
   ApiPublicHooksDispatchExpandRoute: typeof ApiPublicHooksDispatchExpandRoute
+  ApiPublicHooksFlashcardsAutosyncRoute: typeof ApiPublicHooksFlashcardsAutosyncRoute
   ApiPublicHooksOpsAlertsDigestRoute: typeof ApiPublicHooksOpsAlertsDigestRoute
   ApiPublicHooksPartsWantedDigestRoute: typeof ApiPublicHooksPartsWantedDigestRoute
   ApiPublicHooksQuarterlyBonusesRoute: typeof ApiPublicHooksQuarterlyBonusesRoute
@@ -4373,6 +4387,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksOpsAlertsDigestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/flashcards-autosync': {
+      id: '/api/public/hooks/flashcards-autosync'
+      path: '/api/public/hooks/flashcards-autosync'
+      fullPath: '/api/public/hooks/flashcards-autosync'
+      preLoaderRoute: typeof ApiPublicHooksFlashcardsAutosyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/dispatch-expand': {
       id: '/api/public/hooks/dispatch-expand'
       path: '/api/public/hooks/dispatch-expand'
@@ -4869,6 +4890,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicHooksAnnualBonusesRoute: ApiPublicHooksAnnualBonusesRoute,
   ApiPublicHooksDiscoverSyncRoute: ApiPublicHooksDiscoverSyncRoute,
   ApiPublicHooksDispatchExpandRoute: ApiPublicHooksDispatchExpandRoute,
+  ApiPublicHooksFlashcardsAutosyncRoute: ApiPublicHooksFlashcardsAutosyncRoute,
   ApiPublicHooksOpsAlertsDigestRoute: ApiPublicHooksOpsAlertsDigestRoute,
   ApiPublicHooksPartsWantedDigestRoute: ApiPublicHooksPartsWantedDigestRoute,
   ApiPublicHooksQuarterlyBonusesRoute: ApiPublicHooksQuarterlyBonusesRoute,
