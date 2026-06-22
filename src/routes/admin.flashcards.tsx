@@ -115,6 +115,7 @@ function AdminFlashcardsPage() {
   const queryClient = useQueryClient();
   const fetchContent = useServerFn(getFlashcardContent);
   const runSync = useServerFn(syncFlashcardsFromGithub);
+  const saveAutoSync = useServerFn(updateFlashcardAutoSync);
 
   const contentQuery = useQuery<FlashcardContent>({
     queryKey: ["admin", "flashcard-content"],
