@@ -18,9 +18,10 @@ export const Route = createFileRoute("/api/public/hooks/flashcards-autosync")({
         }
 
         const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        const { runFlashcardSync, isAutoSyncDue, type AutoSyncInterval } = await import(
+        const { runFlashcardSync, isAutoSyncDue } = await import(
           "@/lib/flashcards.server"
         );
+        type AutoSyncInterval = "daily" | "weekly" | "biweekly" | "monthly";
 
         const { data: row, error: readErr } = await supabaseAdmin
           .from("flashcard_content")
