@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { ChevronLeft, Sparkles } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
+import { FlashcardsIframe } from "@/components/flashcards-iframe";
+
 
 export const Route = createFileRoute("/learn/flashcards")({
   head: () => ({
