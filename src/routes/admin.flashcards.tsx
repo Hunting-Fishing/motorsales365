@@ -171,6 +171,19 @@ function AdminFlashcardsPage() {
     },
   });
 
+  const publishMutation = useMutation({
+    mutationFn: (isPublished: boolean) => savePublished({ data: { isPublished } }),
+    onSuccess: (_r, isPublished) => {
+      toast.success(isPublished ? "Flashcards set to Active (public can play)." : "Flashcards set to Coming Soon.");
+      void queryClient.invalidateQueries({ queryKey: ["admin", "flashcard-content"] });
+      void queryClient.invalidateQueries({ queryKey: ["flashcards", "publish-state"] });
+    },
+    onError: (err: unknown) => {
+      toast.error(err instanceof Error ? err.message : "Failed to update publish state");
+    },
+  });
+
+
   // Reset any stale result if the user navigates back into the page.
   useEffect(() => {
     setLastResult(null);
