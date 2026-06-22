@@ -239,14 +239,14 @@
     var fb=$("quizFeedback");
     if(ok){
       state.sessionPoints+=pts;
-      Store.record(true, pts, null); refreshPoints();
+      Store.record(true, pts, null, card.id); refreshPoints();
       fb.className="quiz-feedback ok"; fb.textContent=(state.mode==="identify"?"Correct (+"+pts+" pts) — "+card.back:"Correct! +"+pts+" pts");
     } else {
       btn.classList.add("wrong"); state.missed.push(card);
       Store.record(false, 0, {
         id:card.id, front:card.front, correct:correct,
         mode:state.mode, industry:(card.industries||[])[0]||"", system:(card.systems||[])[0]||"", level:card.level, ts:Date.now()
-      });
+      }, card.id);
       fb.className="quiz-feedback no"; fb.textContent=(state.mode==="identify"?"It's the "+correct+". "+card.back:"Answer: "+correct);
     }
     $("quizScore").textContent=state.sessionPoints; fb.hidden=false;
