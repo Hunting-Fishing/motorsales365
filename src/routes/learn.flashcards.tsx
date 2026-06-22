@@ -50,13 +50,9 @@ function FlashcardsPage() {
 
       <div className="container mx-auto px-4 pb-10 pt-4">
         <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-          <iframe
-            src="/flashcards/index.html"
-            title="365 Flashcards"
-            className="block h-[80vh] w-full border-0"
-            allow="fullscreen"
-          />
+          <FlashcardsIframe className="h-[80vh] w-full" />
         </div>
+
       </div>
     </SiteLayout>
   );
