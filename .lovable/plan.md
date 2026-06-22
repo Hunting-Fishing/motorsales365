@@ -1,44 +1,74 @@
-## Goal
-Bring the `Hunting-Fishing/365_flashcards` flashcard game into this site under `/learn`, add a `/games` hub for future games, and put a "Designed by 365MotorSales" tag at the top of the `/learn` page.
 
-## Approach
-The repo is a self-contained vanilla JS/HTML/CSS app (no React). The fastest faithful integration is to copy the static `game/` folder into `public/flashcards/` and embed it via `<iframe>` from a new route. A React port would discard the upstream code and break parity with future updates to that repo.
+## Why the page feels slow today
 
-## Steps
+`/learn/flashcards` and `/games` mount the game in an `<iframe>` pointing at `/flashcards/index.html`. The iframe boots an entirely separate document: re-parses HTML, re-fetches CSS, loads ~20 small script files sequentially (`taxonomy.js`, `card-db.js`, `manifest.js`, every per-section data file, then `app.js`), then runs through every section file calling `CardDB.register(...)`. That's the bulk of the perceived load time, not the network.
 
-### 1. Copy the static game into `public/`
-- Clone the repo into a temp dir, copy `game/` → `public/flashcards/` (no `.git`).
-- Result: the game becomes reachable at `/flashcards/index.html`.
+## Architectural blocker (important)
 
-### 2. New flashcards route + hub card under /learn
-- Add `src/routes/learn.flashcards.tsx` (`/learn/flashcards`) — `SiteLayout` shell with a full-bleed `<iframe src="/flashcards/index.html">` (responsive height, allow fullscreen). Includes `head()` meta and the designed-by tag.
-- On `src/routes/learn.index.tsx`, add a "Flashcards" card linking to `/learn/flashcards` in the hero CTA row (next to the existing buttons).
+> A runtime "pull from GitHub and overwrite `public/flashcards/`" button is **not possible** on this stack. The app runs on Cloudflare Workers — `public/` is bundled at build time and served from CDN. There is no writable filesystem at runtime.
 
-### 3. "Designed by 365MotorSales" tag at top of /Learn
-- Add a small centered pill at the very top of `src/routes/learn.index.tsx` and `src/routes/learn.flashcards.tsx`:
-  `★ Designed by 365MotorSales ★` — uses `bg-primary/10 text-primary` styling, sits above the hero.
+So the Update button has to write somewhere that *is* writable at runtime: **Lovable Cloud** (a `flashcards_content` table + Storage bucket for any binary assets the cards reference). The game then loads card data from Cloud instead of static `.js` files.
 
-### 4. New /games hub route
-- Add `src/routes/games.index.tsx` (`/games`) with:
-  - "Designed by 365MotorSales" tag at top.
-  - Hero: "365 Games — Learn. Play. Master."
-  - Card grid: one live card ("365 Flashcards" → `/learn/flashcards`) and 2–3 "Coming soon" cards using the existing `ComingSoonSection`/`ComingSoonRow` amber-caution components (e.g., "Parts Match", "Diagnostic Sprint", "Engine ID Challenge").
-  - `head()` meta for SEO.
+## Plan
 
-### 5. Header nav
-- Find the main header/nav component and add a `Games` link next to `Learn`. (Won't touch unrelated nav items.)
+### 1. Drop the iframe, mount natively (`/learn/flashcards` and `/games`)
 
-## Files
-**Create**
-- `public/flashcards/**` (copied from upstream `game/`)
-- `src/routes/learn.flashcards.tsx`
-- `src/routes/games.index.tsx`
+- Convert the `index.html` markup into JSX inside each route component (header, screens, footer — all already in `public/flashcards/index.html`).
+- Move `public/flashcards/css/styles.css` to `src/components/flashcards/flashcards.css` and import it from the route. Scope it under a `.flashcards-root` wrapper class to avoid leaking into the rest of the app.
+- Move `public/flashcards/js/app.js` into `src/components/flashcards/engine.ts`. Wrap it as a single `mountFlashcards(rootEl, { loadCards, saveProgress, loadProgress })` function — `useEffect` calls it on mount, returns a cleanup that detaches listeners.
+- Loader page shows a skeleton until `mountFlashcards` resolves.
 
-**Edit**
-- `src/routes/learn.index.tsx` — add designed-by tag + Flashcards CTA card.
-- Header/nav component — add `/games` link.
+Result: one document, one stylesheet load, no iframe handshake, scripts bundled by Vite (one chunk, parallel with the rest of the app).
 
-## Notes / non-goals
-- No React port of the flashcard engine — the upstream repo stays the source of truth. To pull updates later, re-copy `game/` → `public/flashcards/`.
-- No backend changes, no schema changes, no auth gating on `/games` or `/learn/flashcards` (public, same as `/learn`).
-- iframe is sandboxed to same-origin (`/flashcards/*` is served by our app), so links inside the game stay inside the iframe.
+### 2. Card data → Lovable Cloud
+
+New tables:
+- `flashcard_content` — single-row JSON blob (`sections`, `cards`, `taxonomy`, `manifest_version`, `updated_at`). Public `SELECT to anon` (cards are not sensitive).
+- `flashcard_progress` — per-user progress (`user_id`, `card_id`, `confidence`, `last_seen_at`, `correct_count`, `wrong_count`, `points`).
+- `flashcard_sessions` — optional per-session history for the existing History screen.
+
+Seed `flashcard_content` from the current `public/flashcards/data/cards/*.js` files in the same migration (one-time import script reads them and inserts the JSON).
+
+Server functions:
+- `getFlashcardContent` (public, anon-key client) — returns the row, cached.
+- `saveFlashcardProgress` (auth) — upserts a row.
+- `getFlashcardProgress` (auth) — returns the user's rows.
+- `recordFlashcardSession` (auth) — appends to sessions table.
+
+Engine changes (`engine.ts`):
+- Replace the `CardDB.register(...)` bootstrap with a single fetch of `getFlashcardContent`.
+- Replace every `localStorage.getItem/setItem` for progress with the new server fns. Falls back to localStorage when signed out.
+
+### 3. Admin "Update from GitHub" button
+
+- New admin route `/admin/flashcards`.
+- Server fn `syncFlashcardsFromGithub` (admin-only):
+  1. Fetches the file tree from `https://api.github.com/repos/Hunting-Fishing/365_flashcards/contents/game/data/cards` (raw, no token needed for public repo; 60 req/hr unauthenticated is fine).
+  2. Downloads each `*.js` section file and `taxonomy.js`.
+  3. Parses them in a sandboxed VM-like way (the files call `CardDB.register({…}, [...])`; we shim `CardDB` with a collector).
+  4. Writes the merged JSON into `flashcard_content` and bumps `manifest_version`.
+  5. Returns counts for the admin UI (e.g. "Added 12 cards, updated 4, removed 0").
+- UI: a single big "Pull latest from GitHub" button, last-sync timestamp, current version, a diff summary after each run.
+- Progress is in a separate table keyed by `card_id` — never touched during sync, so all user progress survives.
+
+### 4. Loading polish
+
+- Suspense fallback with a skeleton (avoid the white flash).
+- Preload the content fetch in the route loader (TanStack Query `ensureQueryData`).
+- Tree-shake: the iframe pulled `/flashcards/*` regardless of route. After this change, the engine ships only when the route is visited (code-split).
+
+## Out of scope (call out for later)
+
+- Porting `app.js` to idiomatic React. The wrap-and-mount approach above is intentionally minimal — it eliminates the iframe overhead without rewriting ~1.5k lines of working game logic.
+- Removing `public/flashcards/` entirely. After step 1+2 lands and is verified, a follow-up can delete it.
+
+## Files I'll touch (rough)
+
+- New: `src/components/flashcards/engine.ts`, `flashcards.css`, `markup.tsx`, `src/lib/flashcards.functions.ts`, `src/routes/admin.flashcards.tsx`.
+- Edit: `src/routes/learn.flashcards.tsx`, `src/routes/games.index.tsx`, `src/components/site-header.tsx` (admin nav link).
+- Migration: 3 new tables + grants + RLS + seed.
+
+## Confirm before I start
+
+1. Sound good to proceed with all of the above?
+2. Anything you want cut for a first pass (e.g. skip History sync, ship admin button later)?
