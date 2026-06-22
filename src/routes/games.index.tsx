@@ -39,28 +39,54 @@ function GamesIndex() {
           </span>
         </div>
         <h1 className="mt-2 font-display text-2xl font-bold tracking-tight sm:text-3xl">
-          365 Flashcards — Learn. Play. Master.
+          365 Games — Learn. Play. Master.
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Training & knowledge cards across automotive, marine, motorcycle, heavy-duty and more.
+          Training & knowledge games across automotive, marine, motorcycle, heavy-duty and more.
           More games coming soon — see below.
         </p>
 
-        <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-          <iframe
-            src="/flashcards/index.html"
-            title="365 Flashcards"
-            className="block h-[80vh] w-full border-0"
-            allow="fullscreen"
-          />
-        </div>
-
-        <div className="mt-3 text-xs text-muted-foreground">
-          Prefer a dedicated page?{" "}
-          <Link to="/learn/flashcards" className="underline">
-            Open flashcards in Learn
+        <h2 className="mt-8 font-display text-lg font-semibold">Active now</h2>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+            <iframe
+              src="/flashcards/index.html"
+              title="365 Flashcards"
+              className="block h-[60vh] w-full border-0"
+              allow="fullscreen"
+            />
+            <div className="flex items-center justify-between border-t border-border p-3">
+              <div className="flex items-center gap-2 text-sm font-semibold">
+                <Gamepad2 className="h-4 w-4 text-primary" />
+                365 Flashcards
+              </div>
+              <Link
+                to="/learn/flashcards"
+                className="inline-flex items-center gap-1 text-xs font-medium text-primary underline"
+              >
+                Open in Learn <Play className="h-3 w-3" />
+              </Link>
+            </div>
+          </div>
+          <Link
+            to="/learn/flashcards"
+            className="flex flex-col justify-between rounded-2xl border border-border bg-card p-5 shadow-sm transition-shadow hover:shadow-md"
+          >
+            <div>
+              <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                <Brain className="h-5 w-5" />
+                Engine ID Challenge
+              </div>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Identify famous engines by sight, sound, and spec. Choose the
+                “Identify the Engine” mode inside 365 Flashcards and earn points
+                as you name history’s most iconic powerplants.
+              </p>
+            </div>
+            <div className="mt-4 inline-flex items-center gap-1 text-xs font-medium text-primary">
+              Play now <Play className="h-3 w-3" />
+            </div>
           </Link>
-          .
         </div>
 
         <h2 className="mt-10 font-display text-xl font-semibold">Coming soon</h2>
