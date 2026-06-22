@@ -255,6 +255,91 @@ function AdminFlashcardsPage() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
+            <Clock className="h-4 w-4" /> Auto-sync
+          </CardTitle>
+          <CardDescription>
+            Automatically pull the latest cards on a schedule. A daily cron checks at 00:00 UTC
+            and runs the sync only when your chosen interval is due.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-border bg-muted/30 p-3">
+            <div>
+              <div className="text-sm font-medium">Enable auto-sync</div>
+              <div className="text-xs text-muted-foreground">
+                When off, only the manual button below pulls from GitHub.
+              </div>
+            </div>
+            <Switch
+              checked={autoEnabled}
+              onCheckedChange={setAutoEnabled}
+              aria-label="Enable auto-sync"
+            />
+          </div>
+          <div className="grid gap-2">
+            <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Interval
+            </label>
+            <Select
+              value={autoInterval}
+              onValueChange={(v) => setAutoInterval(v as AutoSyncInterval)}
+              disabled={!autoEnabled}
+            >
+              <SelectTrigger className="w-full sm:w-72">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="daily">Every day at midnight (UTC)</SelectItem>
+                <SelectItem value="weekly">Once a week</SelectItem>
+                <SelectItem value="biweekly">Every 14 days</SelectItem>
+                <SelectItem value="monthly">Every 30 days</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <Button
+              onClick={() =>
+                autoSyncMutation.mutate({ enabled: autoEnabled, interval: autoInterval })
+              }
+              disabled={
+                autoSyncMutation.isPending ||
+                (content?.autoSyncEnabled === autoEnabled &&
+                  content?.autoSyncInterval === autoInterval)
+              }
+              className="gap-2"
+            >
+              {autoSyncMutation.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" /> Saving…
+                </>
+              ) : (
+                <>Save auto-sync settings</>
+              )}
+            </Button>
+            {content?.autoSyncLastRunAt && (
+              <div className="text-xs text-muted-foreground">
+                Last auto-run:{" "}
+                <span className="font-medium">{relativeTime(content.autoSyncLastRunAt)}</span>
+                {" · "}
+                {content.autoSyncLastStatus === "error" ? (
+                  <span className="text-red-600">failed</span>
+                ) : (
+                  <span className="text-emerald-600">success</span>
+                )}
+              </div>
+            )}
+          </div>
+          {content?.autoSyncLastStatus === "error" && content.autoSyncLastError && (
+            <div className="rounded-md border border-red-500/30 bg-red-500/5 p-2 text-xs text-red-600">
+              {content.autoSyncLastError}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
             <CloudDownload className="h-4 w-4" /> Pull latest from GitHub
           </CardTitle>
           <CardDescription>
