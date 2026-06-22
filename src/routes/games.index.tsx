@@ -10,13 +10,13 @@ export const Route = createFileRoute("/games/")({
       {
         name: "description",
         content:
-          "Play training games from 365MotorSales. Flashcards, parts match, diagnostic sprints and more coming soon.",
+          "Play training games from 365MotorSales. 365 Flashcards and Engine ID Challenge are live; more games coming soon.",
       },
       { property: "og:title", content: "365 Games — Learn. Play. Master." },
       {
         property: "og:description",
         content:
-          "Interactive training games for the auto trade. Flashcards are live; more games coming soon.",
+          "Interactive training games for the auto trade. Flashcards and Engine ID Challenge are live; more games coming soon.",
       },
       { property: "og:url", content: "https://365motorsales.com/games" },
     ],
