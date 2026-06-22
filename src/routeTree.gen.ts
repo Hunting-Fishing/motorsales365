@@ -35,6 +35,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as LeadsMarketplaceRouteImport } from './routes/leads-marketplace'
 import { Route as GuidelinesRouteImport } from './routes/guidelines'
+import { Route as GameRouteImport } from './routes/game'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as ExportRouteImport } from './routes/export'
 import { Route as DispatchRouteImport } from './routes/dispatch'
@@ -358,6 +359,11 @@ const LeadsMarketplaceRoute = LeadsMarketplaceRouteImport.update({
 const GuidelinesRoute = GuidelinesRouteImport.update({
   id: '/guidelines',
   path: '/guidelines',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GameRoute = GameRouteImport.update({
+  id: '/game',
+  path: '/game',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -1390,6 +1396,7 @@ export interface FileRoutesByFullPath {
   '/dispatch': typeof DispatchRouteWithChildren
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
+  '/game': typeof GameRoute
   '/guidelines': typeof GuidelinesRoute
   '/leads-marketplace': typeof LeadsMarketplaceRoute
   '/llms.txt': typeof LlmsDottxtRoute
@@ -1608,6 +1615,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
+  '/game': typeof GameRoute
   '/guidelines': typeof GuidelinesRoute
   '/leads-marketplace': typeof LeadsMarketplaceRoute
   '/llms.txt': typeof LlmsDottxtRoute
@@ -1828,6 +1836,7 @@ export interface FileRoutesById {
   '/dispatch': typeof DispatchRouteWithChildren
   '/export': typeof ExportRouteWithChildren
   '/forgot-password': typeof ForgotPasswordRoute
+  '/game': typeof GameRoute
   '/guidelines': typeof GuidelinesRoute
   '/leads-marketplace': typeof LeadsMarketplaceRoute
   '/llms.txt': typeof LlmsDottxtRoute
@@ -2051,6 +2060,7 @@ export interface FileRouteTypes {
     | '/dispatch'
     | '/export'
     | '/forgot-password'
+    | '/game'
     | '/guidelines'
     | '/leads-marketplace'
     | '/llms.txt'
@@ -2269,6 +2279,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/export'
     | '/forgot-password'
+    | '/game'
     | '/guidelines'
     | '/leads-marketplace'
     | '/llms.txt'
@@ -2488,6 +2499,7 @@ export interface FileRouteTypes {
     | '/dispatch'
     | '/export'
     | '/forgot-password'
+    | '/game'
     | '/guidelines'
     | '/leads-marketplace'
     | '/llms.txt'
@@ -2711,6 +2723,7 @@ export interface RootRouteChildren {
   DispatchRoute: typeof DispatchRouteWithChildren
   ExportRoute: typeof ExportRouteWithChildren
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  GameRoute: typeof GameRoute
   GuidelinesRoute: typeof GuidelinesRoute
   LeadsMarketplaceRoute: typeof LeadsMarketplaceRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
@@ -2995,6 +3008,13 @@ declare module '@tanstack/react-router' {
       path: '/guidelines'
       fullPath: '/guidelines'
       preLoaderRoute: typeof GuidelinesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/game': {
+      id: '/game'
+      path: '/game'
+      fullPath: '/game'
+      preLoaderRoute: typeof GameRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -4721,6 +4741,7 @@ const rootRouteChildren: RootRouteChildren = {
   DispatchRoute: DispatchRouteWithChildren,
   ExportRoute: ExportRouteWithChildren,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  GameRoute: GameRoute,
   GuidelinesRoute: GuidelinesRoute,
   LeadsMarketplaceRoute: LeadsMarketplaceRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
@@ -4825,13 +4846,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
