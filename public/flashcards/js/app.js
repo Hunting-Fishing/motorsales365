@@ -14,7 +14,11 @@
   var CAT_IMG = "assets/categories/";
   var LEVEL_POINTS = { "pre-apprentice":5, "apprentice":10, "technician":15, "journeyman":20, "master":25 };
 
-  /* ---- Persistent store (points + mistakes), graceful fallback ---- */
+  /* ---- Persistent store (points + mistakes), graceful fallback ----
+   * Mirrors per-card progress to the parent window via postMessage so the
+   * React shell can persist it to Lovable Cloud for the signed-in user.
+   * Parent may seed aggregate stats back via a `flashcards-init` message. */
+  function postToParent(msg){ try { if (window.parent && window.parent !== window) window.parent.postMessage(msg, "*"); } catch (e) {} }
   var Store = (function () {
     var KEY = "365fct_v1";
     var data = { points: 0, attempts: 0, correct: 0, history: [] };
@@ -23,14 +27,28 @@
     function save() { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (e) {} }
     return {
       data: data,
-      record: function (ok, pts, mistake) {
+      record: function (ok, pts, mistake, cardId) {
         data.attempts++; if (ok) { data.correct++; data.points += pts; }
         else if (mistake) { data.history.unshift(mistake); if (data.history.length > 200) data.history.length = 200; }
         save();
+        if (cardId) postToParent({ type: "flashcards-progress", cardId: cardId, ok: !!ok, pts: pts || 0 });
+      },
+      hydrate: function (incoming) {
+        if (!incoming || typeof incoming !== "object") return;
+        if (typeof incoming.points === "number") data.points = incoming.points;
+        if (typeof incoming.attempts === "number") data.attempts = incoming.attempts;
+        if (typeof incoming.correct === "number") data.correct = incoming.correct;
+        save();
+        try { var pb = document.getElementById("pointsBadge"); if (pb) pb.innerHTML = "★ " + data.points.toLocaleString(); } catch (e) {}
       },
       clearHistory: function () { data.history = []; save(); }
     };
   })();
+
+  window.addEventListener("message", function (ev) {
+    var msg = ev && ev.data; if (!msg || typeof msg !== "object") return;
+    if (msg.type === "flashcards-init") Store.hydrate(msg.data);
+  });
 
   var state = {
     mode: "study",
