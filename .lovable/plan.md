@@ -1,74 +1,49 @@
+## Auto-sync flashcards from GitHub
 
-## Why the page feels slow today
+Add an optional scheduled auto-sync for the flashcards content, plus admin UI to configure it. Manual "Pull latest" button stays.
 
-`/learn/flashcards` and `/games` mount the game in an `<iframe>` pointing at `/flashcards/index.html`. The iframe boots an entirely separate document: re-parses HTML, re-fetches CSS, loads ~20 small script files sequentially (`taxonomy.js`, `card-db.js`, `manifest.js`, every per-section data file, then `app.js`), then runs through every section file calling `CardDB.register(...)`. That's the bulk of the perceived load time, not the network.
+### Schema (new migration)
 
-## Architectural blocker (important)
+Extend `flashcard_content` (singleton row id=1) with:
+- `auto_sync_enabled boolean not null default false`
+- `auto_sync_interval text not null default 'daily'` — one of `daily | weekly | biweekly | monthly`
+- `auto_sync_last_run_at timestamptz`
+- `auto_sync_last_status text` — `success | error`
+- `auto_sync_last_error text`
 
-> A runtime "pull from GitHub and overwrite `public/flashcards/`" button is **not possible** on this stack. The app runs on Cloudflare Workers — `public/` is bundled at build time and served from CDN. There is no writable filesystem at runtime.
+No new table, no new RLS surface.
 
-So the Update button has to write somewhere that *is* writable at runtime: **Lovable Cloud** (a `flashcards_content` table + Storage bucket for any binary assets the cards reference). The game then loads card data from Cloud instead of static `.js` files.
+### Cron endpoint
 
-## Plan
+New public route `src/routes/api/public/hooks/flashcards-autosync.ts` (POST). Verifies `apikey` header == project anon key, then:
+1. Reads `flashcard_content` row via `supabaseAdmin`.
+2. If `auto_sync_enabled` is false → returns `{ skipped: "disabled" }`.
+3. Computes due window from `auto_sync_interval` vs `auto_sync_last_run_at`:
+   - daily ≥ 23h, weekly ≥ 7d, biweekly ≥ 14d, monthly ≥ 30d
+4. If not due → `{ skipped: "not-due" }`.
+5. If due → runs the same fetch+upsert logic factored out of `syncFlashcardsFromGithub` (shared helper `runFlashcardSync()` in `src/lib/flashcards.server.ts`), then writes `auto_sync_last_run_at` + status. Errors are caught and stored, never thrown to caller.
 
-### 1. Drop the iframe, mount natively (`/learn/flashcards` and `/games`)
+Scheduled via `pg_cron` to run **daily at 00:00 UTC**, hitting the published stable URL `project--0738c881-614d-4885-8d75-1b7c90e0835e.lovable.app/api/public/hooks/flashcards-autosync` with `apikey` header. The endpoint itself decides whether the interval is due, so a single daily cron handles all four intervals.
 
-- Convert the `index.html` markup into JSX inside each route component (header, screens, footer — all already in `public/flashcards/index.html`).
-- Move `public/flashcards/css/styles.css` to `src/components/flashcards/flashcards.css` and import it from the route. Scope it under a `.flashcards-root` wrapper class to avoid leaking into the rest of the app.
-- Move `public/flashcards/js/app.js` into `src/components/flashcards/engine.ts`. Wrap it as a single `mountFlashcards(rootEl, { loadCards, saveProgress, loadProgress })` function — `useEffect` calls it on mount, returns a cleanup that detaches listeners.
-- Loader page shows a skeleton until `mountFlashcards` resolves.
+### Server functions
 
-Result: one document, one stylesheet load, no iframe handshake, scripts bundled by Vite (one chunk, parallel with the rest of the app).
+In `src/lib/flashcards.functions.ts`:
+- Extend `FlashcardContent` type with the new auto-sync fields and include them in `getFlashcardContent`.
+- New `updateFlashcardAutoSync` (admin-only, `requireSupabaseAuth` + `can_moderate` check) with input `{ enabled: boolean; interval: 'daily'|'weekly'|'biweekly'|'monthly' }`. Writes via `supabaseAdmin`.
+- Refactor `syncFlashcardsFromGithub` to call the shared `runFlashcardSync()` helper.
 
-### 2. Card data → Lovable Cloud
+### Admin UI (`src/routes/admin.flashcards.tsx`)
 
-New tables:
-- `flashcard_content` — single-row JSON blob (`sections`, `cards`, `taxonomy`, `manifest_version`, `updated_at`). Public `SELECT to anon` (cards are not sensitive).
-- `flashcard_progress` — per-user progress (`user_id`, `card_id`, `confidence`, `last_seen_at`, `correct_count`, `wrong_count`, `points`).
-- `flashcard_sessions` — optional per-session history for the existing History screen.
+Add a new "Auto-sync" card above the manual pull card:
+- Toggle (Switch) — Enabled / Disabled
+- Interval selector (Select): Daily (midnight UTC) / Weekly / Every 14 days / Every 30 days
+- Save button (mutation → `updateFlashcardAutoSync`, then invalidate query)
+- Status line: "Last auto-run: {relative time} · {success|error}"; on error show the message in red
 
-Seed `flashcard_content` from the current `public/flashcards/data/cards/*.js` files in the same migration (one-time import script reads them and inserts the JSON).
+The existing manual sync, snapshot card, and result feedback are unchanged.
 
-Server functions:
-- `getFlashcardContent` (public, anon-key client) — returns the row, cached.
-- `saveFlashcardProgress` (auth) — upserts a row.
-- `getFlashcardProgress` (auth) — returns the user's rows.
-- `recordFlashcardSession` (auth) — appends to sessions table.
+### Technical notes
 
-Engine changes (`engine.ts`):
-- Replace the `CardDB.register(...)` bootstrap with a single fetch of `getFlashcardContent`.
-- Replace every `localStorage.getItem/setItem` for progress with the new server fns. Falls back to localStorage when signed out.
-
-### 3. Admin "Update from GitHub" button
-
-- New admin route `/admin/flashcards`.
-- Server fn `syncFlashcardsFromGithub` (admin-only):
-  1. Fetches the file tree from `https://api.github.com/repos/Hunting-Fishing/365_flashcards/contents/game/data/cards` (raw, no token needed for public repo; 60 req/hr unauthenticated is fine).
-  2. Downloads each `*.js` section file and `taxonomy.js`.
-  3. Parses them in a sandboxed VM-like way (the files call `CardDB.register({…}, [...])`; we shim `CardDB` with a collector).
-  4. Writes the merged JSON into `flashcard_content` and bumps `manifest_version`.
-  5. Returns counts for the admin UI (e.g. "Added 12 cards, updated 4, removed 0").
-- UI: a single big "Pull latest from GitHub" button, last-sync timestamp, current version, a diff summary after each run.
-- Progress is in a separate table keyed by `card_id` — never touched during sync, so all user progress survives.
-
-### 4. Loading polish
-
-- Suspense fallback with a skeleton (avoid the white flash).
-- Preload the content fetch in the route loader (TanStack Query `ensureQueryData`).
-- Tree-shake: the iframe pulled `/flashcards/*` regardless of route. After this change, the engine ships only when the route is visited (code-split).
-
-## Out of scope (call out for later)
-
-- Porting `app.js` to idiomatic React. The wrap-and-mount approach above is intentionally minimal — it eliminates the iframe overhead without rewriting ~1.5k lines of working game logic.
-- Removing `public/flashcards/` entirely. After step 1+2 lands and is verified, a follow-up can delete it.
-
-## Files I'll touch (rough)
-
-- New: `src/components/flashcards/engine.ts`, `flashcards.css`, `markup.tsx`, `src/lib/flashcards.functions.ts`, `src/routes/admin.flashcards.tsx`.
-- Edit: `src/routes/learn.flashcards.tsx`, `src/routes/games.index.tsx`, `src/components/site-header.tsx` (admin nav link).
-- Migration: 3 new tables + grants + RLS + seed.
-
-## Confirm before I start
-
-1. Sound good to proceed with all of the above?
-2. Anything you want cut for a first pass (e.g. skip History sync, ship admin button later)?
+- All new code paths use the existing `supabaseAdmin` import-inside-handler pattern.
+- Cron SQL is run via `supabase--insert` (per `schedule-jobs-modern` guidance) after the migration is approved, since the URL/anon-key live outside migration files.
+- No client bundle changes to the flashcards game itself — `loader.js` still reads `/api/public/flashcards/content` and picks up whatever the latest snapshot is.

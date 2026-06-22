@@ -3893,6 +3893,11 @@ export type Database = {
       }
       flashcard_content: {
         Row: {
+          auto_sync_enabled: boolean
+          auto_sync_interval: string
+          auto_sync_last_error: string | null
+          auto_sync_last_run_at: string | null
+          auto_sync_last_status: string | null
           card_count: number
           card_images: Json
           cards: Json
@@ -3908,6 +3913,11 @@ export type Database = {
           version: number
         }
         Insert: {
+          auto_sync_enabled?: boolean
+          auto_sync_interval?: string
+          auto_sync_last_error?: string | null
+          auto_sync_last_run_at?: string | null
+          auto_sync_last_status?: string | null
           card_count?: number
           card_images?: Json
           cards?: Json
@@ -3923,6 +3933,11 @@ export type Database = {
           version?: number
         }
         Update: {
+          auto_sync_enabled?: boolean
+          auto_sync_interval?: string
+          auto_sync_last_error?: string | null
+          auto_sync_last_run_at?: string | null
+          auto_sync_last_status?: string | null
           card_count?: number
           card_images?: Json
           cards?: Json
