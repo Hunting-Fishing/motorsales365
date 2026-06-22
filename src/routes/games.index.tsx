@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Sparkles, Gamepad2, Brain, Wrench, Zap } from "lucide-react";
+import { Sparkles, Gamepad2, Brain, Wrench, Zap, Play } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { ComingSoonSection } from "@/components/coming-soon";
 
