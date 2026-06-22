@@ -158,11 +158,35 @@
     </footer>
   </div>
 
-  <script src="data/taxonomy.js"></script>
-  <script src="data/card-db.js"></script>
-  <script src="data/manifest.js"></script>
-  <script src="data/card-images.js"></script>
-  <script src="data/loader.js"></script>
-  <script src="js/app.js"></script>
+    <!-- Core (must run before section files) -->
+    <script defer src="data/taxonomy.js"></script>
+    <script defer src="data/card-db.js"></script>
+    <script defer src="data/manifest.js"></script>
+    <script defer src="data/card-images.js"></script>
+
+    <!-- Section files: inlined with defer so the browser parallelizes downloads
+         and executes in order, instead of sequential <script> injection via loader.js. -->
+    <script defer src="data/cards/small-engines.js"></script>
+    <script defer src="data/cards/automotive.js"></script>
+    <script defer src="data/cards/motorcycle-powersports.js"></script>
+    <script defer src="data/cards/heavy-duty.js"></script>
+    <script defer src="data/cards/agricultural.js"></script>
+    <script defer src="data/cards/industrial.js"></script>
+    <script defer src="data/cards/marine-inboard.js"></script>
+    <script defer src="data/cards/marine-outboard.js"></script>
+    <script defer src="data/cards/engine-id.js"></script>
+    <script defer src="data/cards/agricultural-catalog.js"></script>
+    <script defer src="data/cards/automotive-catalog.js"></script>
+    <script defer src="data/cards/heavy-duty-catalog.js"></script>
+    <script defer src="data/cards/imported-cards.js"></script>
+    <script defer src="data/cards/industrial-catalog.js"></script>
+    <script defer src="data/cards/marine-inboard-catalog.js"></script>
+    <script defer src="data/cards/marine-outboard-catalog.js"></script>
+    <script defer src="data/cards/motorcycle-catalog.js"></script>
+    <script defer src="data/cards/small-engine-catalog.js"></script>
+
+    <!-- Publish + game (run last) -->
+    <script defer src="data/loader.js"></script>
+    <script defer src="js/app.js"></script>
 </body>
 </html>
