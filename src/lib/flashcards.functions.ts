@@ -18,6 +18,8 @@ const DEFAULT_REF = "main";
 
 // ---------- Types ----------
 
+export type AutoSyncInterval = "daily" | "weekly" | "biweekly" | "monthly";
+
 export type FlashcardContent = {
   cards: any[];
   taxonomy: any;
@@ -29,6 +31,11 @@ export type FlashcardContent = {
   sourceCommit: string | null;
   syncedAt: string | null;
   updatedAt: string | null;
+  autoSyncEnabled: boolean;
+  autoSyncInterval: AutoSyncInterval;
+  autoSyncLastRunAt: string | null;
+  autoSyncLastStatus: "success" | "error" | null;
+  autoSyncLastError: string | null;
 };
 
 export type FlashcardProgressRow = {
@@ -60,7 +67,7 @@ export const getFlashcardContent = createServerFn({ method: "GET" }).handler(
     const { data, error } = await supabase
       .from("flashcard_content")
       .select(
-        "cards, taxonomy, card_images, version, card_count, source_repo, source_ref, source_commit, synced_at, updated_at",
+        "cards, taxonomy, card_images, version, card_count, source_repo, source_ref, source_commit, synced_at, updated_at, auto_sync_enabled, auto_sync_interval, auto_sync_last_run_at, auto_sync_last_status, auto_sync_last_error",
       )
       .eq("id", 1)
       .maybeSingle();
@@ -76,6 +83,11 @@ export const getFlashcardContent = createServerFn({ method: "GET" }).handler(
       sourceCommit: (data?.source_commit as string | null) ?? null,
       syncedAt: (data?.synced_at as string | null) ?? null,
       updatedAt: (data?.updated_at as string | null) ?? null,
+      autoSyncEnabled: data?.auto_sync_enabled ?? false,
+      autoSyncInterval: ((data?.auto_sync_interval as AutoSyncInterval | undefined) ?? "daily"),
+      autoSyncLastRunAt: (data?.auto_sync_last_run_at as string | null) ?? null,
+      autoSyncLastStatus: (data?.auto_sync_last_status as "success" | "error" | null) ?? null,
+      autoSyncLastError: (data?.auto_sync_last_error as string | null) ?? null,
     };
   },
 );
@@ -100,92 +112,52 @@ export const syncFlashcardsFromGithub = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d) => SyncInput.parse(d ?? {}))
   .handler(async ({ data, context }): Promise<SyncResult> => {
-    // Authorize: only staff who can_moderate may sync.
     const { data: allowed, error: rpcErr } = await context.supabase.rpc("can_moderate", {
       _user_id: context.userId,
     });
     if (rpcErr) throw new Error(`Permission check failed: ${rpcErr.message}`);
     if (!allowed) throw new Error("Forbidden: staff only");
 
-    const repo = data.repo ?? DEFAULT_REPO;
-    const ref = data.ref ?? DEFAULT_REF;
-    const base = `https://raw.githubusercontent.com/${repo}/${ref}/game/data`;
-
-    // Fetch the two source-of-truth JSON files in parallel.
-    const [cardsRes, taxRes] = await Promise.all([
-      fetch(`${base}/cards.json`, { headers: { "user-agent": "365motorsales-sync" } }),
-      fetch(`${base}/taxonomy.json`, { headers: { "user-agent": "365motorsales-sync" } }),
-    ]);
-    if (!cardsRes.ok) throw new Error(`cards.json fetch failed (${cardsRes.status})`);
-    if (!taxRes.ok) throw new Error(`taxonomy.json fetch failed (${taxRes.status})`);
-
-    const [cards, taxonomy] = await Promise.all([
-      cardsRes.json() as Promise<any[]>,
-      taxRes.json() as Promise<any>,
-    ]);
-    if (!Array.isArray(cards)) throw new Error("cards.json did not return an array");
-    if (typeof taxonomy !== "object" || taxonomy === null) {
-      throw new Error("taxonomy.json did not return an object");
-    }
-
-    // Resolve the commit SHA for the ref so admins can see what version they pulled.
-    let sourceCommit: string | null = null;
-    try {
-      const commitRes = await fetch(
-        `https://api.github.com/repos/${repo}/commits/${ref}`,
-        { headers: { accept: "application/vnd.github.v3+json", "user-agent": "365motorsales-sync" } },
-      );
-      if (commitRes.ok) {
-        const j = (await commitRes.json()) as { sha?: string };
-        sourceCommit = j.sha ?? null;
-      }
-    } catch {
-      // Best-effort; not fatal.
-    }
-
-    // Use the admin client to write the singleton row (RLS has no write policy).
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { runFlashcardSync } = await import("./flashcards.server");
+    return runFlashcardSync({
+      supabaseAdmin,
+      repo: data.repo,
+      ref: data.ref,
+      syncedBy: context.userId,
+    });
+  });
 
-    // Read current row to compute previousCardCount and bump version.
-    const { data: current, error: readErr } = await supabaseAdmin
-      .from("flashcard_content")
-      .select("version, card_count")
-      .eq("id", 1)
-      .maybeSingle();
-    if (readErr) throw new Error(`Failed to read current snapshot: ${readErr.message}`);
+// ---------- Auto-sync configuration ----------
 
-    const nextVersion = (current?.version ?? 0) + 1;
-    const previousCardCount = current?.card_count ?? 0;
-    const syncedAt = new Date().toISOString();
+const AutoSyncInput = z.object({
+  enabled: z.boolean(),
+  interval: z.enum(["daily", "weekly", "biweekly", "monthly"]),
+});
 
-    const { error: writeErr } = await supabaseAdmin
+export const updateFlashcardAutoSync = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => AutoSyncInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { data: allowed, error: rpcErr } = await context.supabase.rpc("can_moderate", {
+      _user_id: context.userId,
+    });
+    if (rpcErr) throw new Error(`Permission check failed: ${rpcErr.message}`);
+    if (!allowed) throw new Error("Forbidden: staff only");
+
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
       .from("flashcard_content")
       .upsert(
         {
           id: 1,
-          cards,
-          taxonomy,
-          card_images: {},
-          version: nextVersion,
-          card_count: cards.length,
-          source_repo: repo,
-          source_ref: ref,
-          source_commit: sourceCommit,
-          synced_at: syncedAt,
-          synced_by: context.userId,
+          auto_sync_enabled: data.enabled,
+          auto_sync_interval: data.interval,
         },
         { onConflict: "id" },
       );
-    if (writeErr) throw new Error(`Failed to write snapshot: ${writeErr.message}`);
-
-    return {
-      ok: true,
-      cardCount: cards.length,
-      previousCardCount,
-      version: nextVersion,
-      sourceCommit,
-      syncedAt,
-    };
+    if (error) throw new Error(`Failed to update auto-sync: ${error.message}`);
+    return { ok: true as const };
   });
 
 // ---------- Per-user progress ----------
