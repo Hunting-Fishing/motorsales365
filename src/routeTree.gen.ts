@@ -148,6 +148,7 @@ import { Route as AdminLocationCorrectionsRouteImport } from './routes/admin.loc
 import { Route as AdminListingsRouteImport } from './routes/admin.listings'
 import { Route as AdminLeadOffersRouteImport } from './routes/admin.lead-offers'
 import { Route as AdminInquiriesRouteImport } from './routes/admin.inquiries'
+import { Route as AdminFlashcardsRouteImport } from './routes/admin.flashcards'
 import { Route as AdminFeatureFlagsRouteImport } from './routes/admin.feature-flags'
 import { Route as AdminEducationRouteImport } from './routes/admin.education'
 import { Route as AdminDispatchRouteImport } from './routes/admin.dispatch'
@@ -928,6 +929,11 @@ const AdminInquiriesRoute = AdminInquiriesRouteImport.update({
   path: '/inquiries',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminFlashcardsRoute = AdminFlashcardsRouteImport.update({
+  id: '/flashcards',
+  path: '/flashcards',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminFeatureFlagsRoute = AdminFeatureFlagsRouteImport.update({
   id: '/feature-flags',
   path: '/feature-flags',
@@ -1436,6 +1442,7 @@ export interface FileRoutesByFullPath {
   '/admin/dispatch': typeof AdminDispatchRoute
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
+  '/admin/flashcards': typeof AdminFlashcardsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
@@ -1654,6 +1661,7 @@ export interface FileRoutesByTo {
   '/admin/dispatch': typeof AdminDispatchRoute
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
+  '/admin/flashcards': typeof AdminFlashcardsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
@@ -1876,6 +1884,7 @@ export interface FileRoutesById {
   '/admin/dispatch': typeof AdminDispatchRoute
   '/admin/education': typeof AdminEducationRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
+  '/admin/flashcards': typeof AdminFlashcardsRoute
   '/admin/inquiries': typeof AdminInquiriesRoute
   '/admin/lead-offers': typeof AdminLeadOffersRoute
   '/admin/listings': typeof AdminListingsRoute
@@ -2100,6 +2109,7 @@ export interface FileRouteTypes {
     | '/admin/dispatch'
     | '/admin/education'
     | '/admin/feature-flags'
+    | '/admin/flashcards'
     | '/admin/inquiries'
     | '/admin/lead-offers'
     | '/admin/listings'
@@ -2318,6 +2328,7 @@ export interface FileRouteTypes {
     | '/admin/dispatch'
     | '/admin/education'
     | '/admin/feature-flags'
+    | '/admin/flashcards'
     | '/admin/inquiries'
     | '/admin/lead-offers'
     | '/admin/listings'
@@ -2539,6 +2550,7 @@ export interface FileRouteTypes {
     | '/admin/dispatch'
     | '/admin/education'
     | '/admin/feature-flags'
+    | '/admin/flashcards'
     | '/admin/inquiries'
     | '/admin/lead-offers'
     | '/admin/listings'
@@ -3801,6 +3813,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminInquiriesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/flashcards': {
+      id: '/admin/flashcards'
+      path: '/flashcards'
+      fullPath: '/admin/flashcards'
+      preLoaderRoute: typeof AdminFlashcardsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/feature-flags': {
       id: '/admin/feature-flags'
       path: '/feature-flags'
@@ -4447,6 +4466,7 @@ interface AdminRouteChildren {
   AdminDispatchRoute: typeof AdminDispatchRoute
   AdminEducationRoute: typeof AdminEducationRoute
   AdminFeatureFlagsRoute: typeof AdminFeatureFlagsRoute
+  AdminFlashcardsRoute: typeof AdminFlashcardsRoute
   AdminInquiriesRoute: typeof AdminInquiriesRoute
   AdminLeadOffersRoute: typeof AdminLeadOffersRoute
   AdminListingsRoute: typeof AdminListingsRoute
@@ -4489,6 +4509,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminDispatchRoute: AdminDispatchRoute,
   AdminEducationRoute: AdminEducationRoute,
   AdminFeatureFlagsRoute: AdminFeatureFlagsRoute,
+  AdminFlashcardsRoute: AdminFlashcardsRoute,
   AdminInquiriesRoute: AdminInquiriesRoute,
   AdminLeadOffersRoute: AdminLeadOffersRoute,
   AdminListingsRoute: AdminListingsRoute,
