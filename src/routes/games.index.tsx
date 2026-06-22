@@ -49,12 +49,8 @@ function GamesIndex() {
         <h2 className="mt-8 font-display text-lg font-semibold">Active now</h2>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
-            <iframe
-              src="/flashcards/index.html"
-              title="365 Flashcards"
-              className="block h-[60vh] w-full border-0"
-              allow="fullscreen"
-            />
+            <FlashcardsIframe className="h-[60vh] w-full" />
+
             <div className="flex items-center justify-between border-t border-border p-3">
               <div className="flex items-center gap-2 text-sm font-semibold">
                 <Gamepad2 className="h-4 w-4 text-primary" />
