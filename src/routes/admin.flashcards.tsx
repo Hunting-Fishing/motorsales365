@@ -145,6 +145,28 @@ function AdminFlashcardsPage() {
     },
   });
 
+  const content = contentQuery.data;
+  const [autoEnabled, setAutoEnabled] = useState(false);
+  const [autoInterval, setAutoInterval] = useState<AutoSyncInterval>("daily");
+  useEffect(() => {
+    if (content) {
+      setAutoEnabled(content.autoSyncEnabled);
+      setAutoInterval(content.autoSyncInterval);
+    }
+  }, [content?.autoSyncEnabled, content?.autoSyncInterval]);
+
+  const autoSyncMutation = useMutation({
+    mutationFn: (input: { enabled: boolean; interval: AutoSyncInterval }) =>
+      saveAutoSync({ data: input }),
+    onSuccess: () => {
+      toast.success("Auto-sync settings saved.");
+      void queryClient.invalidateQueries({ queryKey: ["admin", "flashcard-content"] });
+    },
+    onError: (err: unknown) => {
+      toast.error(err instanceof Error ? err.message : "Failed to save auto-sync");
+    },
+  });
+
   // Reset any stale result if the user navigates back into the page.
   useEffect(() => {
     setLastResult(null);
