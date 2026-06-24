@@ -33,7 +33,7 @@ export const Route = createFileRoute("/parts")({
   component: PartsHub,
 });
 
-type Tab = "find" | "browse";
+type Tab = "find" | "browse" | "order";
 
 function PartsHub() {
   const [tab, setTab] = useState<Tab>("find");
