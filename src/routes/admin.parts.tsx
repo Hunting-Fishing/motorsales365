@@ -2,7 +2,8 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Wrench, Tag, ClipboardList, CheckSquare, Plus, Trash2, Save, Inbox } from "lucide-react";
+import { Wrench, Tag, ClipboardList, CheckSquare, Plus, Trash2, Save, Inbox, Building2 } from "lucide-react";
+import { OutletsTab } from "@/components/admin/parts-outlets-tab";
 import {
   adminListCatalog,
   adminUpsertCatalog,
