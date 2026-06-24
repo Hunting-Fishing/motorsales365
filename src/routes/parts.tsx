@@ -39,9 +39,15 @@ type Tab = "find" | "browse" | "order";
 function PartsHub() {
   const [tab, setTab] = useState<Tab>("find");
   const browse = useServerFn(browseUsedParts);
+  const fetchCountries = useServerFn(listPartsCountries);
   const [browseRows, setBrowseRows] = useState<ListingCardData[] | null>(null);
   const [density, setDensity] = useGridDensity(3);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [countries, setCountries] = useState<Array<{ code: string; name: string; is_active: boolean }>>([]);
+
+  useEffect(() => {
+    fetchCountries().then(setCountries as any).catch(() => {});
+  }, [fetchCountries]);
 
   useEffect(() => {
     if (tab !== "browse" || browseRows !== null) return;
