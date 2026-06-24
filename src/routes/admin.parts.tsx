@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Wrench, Tag, ClipboardList, CheckSquare, Plus, Trash2, Save } from "lucide-react";
+import { Wrench, Tag, ClipboardList, CheckSquare, Plus, Trash2, Save, Inbox } from "lucide-react";
 import {
   adminListCatalog,
   adminUpsertCatalog,
@@ -12,6 +12,8 @@ import {
   adminDeleteTireSpec,
   adminListQuoteRequests,
   adminUpdateQuoteRequest,
+  adminListPartsInterest,
+  adminUpdatePartsInterest,
 } from "@/lib/parts-fulfillment.functions";
 import { formatPHP } from "@/lib/format";
 
@@ -20,7 +22,7 @@ export const Route = createFileRoute("/admin/parts")({
   head: () => ({ meta: [{ title: "Parts Fulfillment — Admin" }] }),
 });
 
-type Tab = "catalog" | "quotes" | "tires" | "setup";
+type Tab = "catalog" | "quotes" | "tires" | "setup" | "interest";
 
 function AdminPartsPage() {
   const [tab, setTab] = useState<Tab>("quotes");
@@ -39,6 +41,9 @@ function AdminPartsPage() {
         <TabButton active={tab === "quotes"} onClick={() => setTab("quotes")}>
           <ClipboardList className="h-4 w-4" /> Quote requests
         </TabButton>
+        <TabButton active={tab === "interest"} onClick={() => setTab("interest")}>
+          <Inbox className="h-4 w-4" /> OEM interest leads
+        </TabButton>
         <TabButton active={tab === "catalog"} onClick={() => setTab("catalog")}>
           <Tag className="h-4 w-4" /> Catalog
         </TabButton>
@@ -51,6 +56,7 @@ function AdminPartsPage() {
       </div>
 
       {tab === "quotes" && <QuotesTab />}
+      {tab === "interest" && <InterestTab />}
       {tab === "catalog" && <CatalogTab />}
       {tab === "tires" && <TireSpecsTab />}
       {tab === "setup" && <SetupTab />}
@@ -662,6 +668,192 @@ function Input({
         onChange={(e) => onChange(e.target.value)}
         className="w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm"
       />
+    </div>
+  );
+}
+
+// ---------- OEM interest leads ----------
+
+const STATUS_OPTIONS = ["new", "contacted", "quoted", "closed_won", "closed_lost"] as const;
+
+function InterestTab() {
+  const list = useServerFn(adminListPartsInterest);
+  const update = useServerFn(adminUpdatePartsInterest);
+  const [rows, setRows] = useState<any[]>([]);
+  const [status, setStatus] = useState<string>("all");
+  const [loading, setLoading] = useState(true);
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [noteDraft, setNoteDraft] = useState<Record<string, string>>({});
+
+  async function refresh() {
+    setLoading(true);
+    try {
+      const r = await list({ data: { status } });
+      setRows(r as any[]);
+    } catch (e: any) {
+      toast.error(e?.message ?? "Failed to load");
+    } finally {
+      setLoading(false);
+    }
+  }
+  useEffect(() => {
+    refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status]);
+
+  async function setRowStatus(id: string, next: string) {
+    await update({ data: { id, status: next as any } });
+    toast.success("Status updated");
+    refresh();
+  }
+
+  async function saveNote(id: string) {
+    await update({ data: { id, admin_notes: noteDraft[id] ?? "" } });
+    toast.success("Note saved");
+    refresh();
+  }
+
+  const counts = useMemo(() => {
+    const c: Record<string, number> = { all: rows.length };
+    for (const r of rows) c[r.status] = (c[r.status] ?? 0) + 1;
+    return c;
+  }, [rows]);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-2">
+        <label className="text-xs font-medium">Filter:</label>
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="rounded-md border border-border bg-background px-2 py-1 text-sm"
+        >
+          <option value="all">All ({counts.all ?? 0})</option>
+          {STATUS_OPTIONS.map((s) => (
+            <option key={s} value={s}>
+              {s.replace("_", " ")} ({counts[s] ?? 0})
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          onClick={refresh}
+          className="rounded-md border border-border bg-background px-2 py-1 text-xs font-medium hover:bg-secondary"
+        >
+          Refresh
+        </button>
+      </div>
+
+      {loading ? (
+        <p className="text-sm text-muted-foreground">Loading…</p>
+      ) : rows.length === 0 ? (
+        <p className="rounded-md border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+          No interest submissions yet.
+        </p>
+      ) : (
+        <ul className="space-y-2">
+          {rows.map((r) => {
+            const isOpen = expanded === r.id;
+            const vehicle = r.vin
+              ? `VIN ${r.vin}`
+              : [r.year, r.make, r.model].filter(Boolean).join(" ") || "—";
+            return (
+              <li key={r.id} className="rounded-lg border border-border bg-card">
+                <button
+                  type="button"
+                  onClick={() => setExpanded(isOpen ? null : r.id)}
+                  className="flex w-full items-start justify-between gap-3 p-3 text-left"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium">{vehicle}</p>
+                    <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
+                      {r.parts_description}
+                    </p>
+                    <p className="mt-1 text-[11px] text-muted-foreground">
+                      {new Date(r.created_at).toLocaleString()} · {r.contact_email}
+                      {r.contact_phone ? ` · ${r.contact_phone}` : ""}
+                    </p>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-secondary px-2 py-0.5 text-[11px] font-medium">
+                    {r.status.replace("_", " ")}
+                  </span>
+                </button>
+
+                {isOpen && (
+                  <div className="space-y-3 border-t border-border p-3">
+                    <div className="grid gap-2 sm:grid-cols-2 text-xs">
+                      <div>
+                        <span className="text-muted-foreground">VIN/chassis:</span>{" "}
+                        <span className="font-mono">{r.vin ?? "—"}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Make/Model:</span>{" "}
+                        {[r.make, r.model].filter(Boolean).join(" ") || "—"}
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Year:</span> {r.year ?? "—"}
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Trim:</span> {r.trim ?? "—"}
+                      </div>
+                      <div className="sm:col-span-2">
+                        <span className="text-muted-foreground">Engine:</span> {r.engine ?? "—"}
+                      </div>
+                    </div>
+
+                    <div>
+                      <p className="text-xs font-medium text-muted-foreground">Parts requested</p>
+                      <p className="mt-1 whitespace-pre-wrap text-sm">{r.parts_description}</p>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <label className="text-xs font-medium">Status:</label>
+                      <select
+                        value={r.status}
+                        onChange={(e) => setRowStatus(r.id, e.target.value)}
+                        className="rounded-md border border-border bg-background px-2 py-1 text-sm"
+                      >
+                        {STATUS_OPTIONS.map((s) => (
+                          <option key={s} value={s}>
+                            {s.replace("_", " ")}
+                          </option>
+                        ))}
+                      </select>
+                      <a
+                        href={`mailto:${r.contact_email}`}
+                        className="rounded-md border border-border bg-background px-2 py-1 text-xs font-medium hover:bg-secondary"
+                      >
+                        Email buyer
+                      </a>
+                    </div>
+
+                    <div>
+                      <label className="text-xs font-medium text-muted-foreground">
+                        Internal notes
+                      </label>
+                      <textarea
+                        rows={2}
+                        defaultValue={r.admin_notes ?? ""}
+                        onChange={(e) =>
+                          setNoteDraft((d) => ({ ...d, [r.id]: e.target.value }))
+                        }
+                        className="mt-1 w-full rounded-md border border-border bg-background px-2 py-1.5 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => saveNote(r.id)}
+                        className="mt-1 inline-flex items-center gap-1 rounded-md bg-primary px-2 py-1 text-xs font-medium text-primary-foreground"
+                      >
+                        <Save className="h-3 w-3" /> Save note
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </div>
   );
 }

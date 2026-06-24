@@ -300,3 +300,111 @@ export const adminDeleteTireSpec = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// ---------- OEM parts interest (Coming Soon ordering capture) ----------
+
+const OemInterestSchema = z
+  .object({
+    vin: z
+      .string()
+      .trim()
+      .toUpperCase()
+      .regex(/^[A-HJ-NPR-Z0-9]{11,17}$/i, "VIN/chassis must be 11–17 characters (no I, O, Q)")
+      .optional()
+      .or(z.literal("").transform(() => undefined)),
+    make: z.string().trim().max(100).optional().or(z.literal("").transform(() => undefined)),
+    model: z.string().trim().max(100).optional().or(z.literal("").transform(() => undefined)),
+    year: z
+      .number()
+      .int()
+      .min(1900)
+      .max(2100)
+      .optional()
+      .nullable(),
+    trim: z.string().trim().max(100).optional().or(z.literal("").transform(() => undefined)),
+    engine: z.string().trim().max(200).optional().or(z.literal("").transform(() => undefined)),
+    parts_description: z.string().trim().min(5).max(1000),
+    contact_email: z.string().trim().email().max(255),
+    contact_phone: z.string().trim().max(40).optional().or(z.literal("").transform(() => undefined)),
+    source: z.string().trim().max(50).optional(),
+  })
+  .refine((d) => !!d.vin || (!!d.make && !!d.model && !!d.year), {
+    message: "Provide a VIN/chassis number, or make + model + year.",
+    path: ["vin"],
+  });
+
+export const submitOemPartsInterest = createServerFn({ method: "POST" })
+  .inputValidator((d: unknown) => OemInterestSchema.parse(d))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    // Best-effort rate limit: max 5 submissions per email per hour.
+    const sinceIso = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    const { count } = await supabaseAdmin
+      .from("oem_parts_interest")
+      .select("id", { count: "exact", head: true })
+      .eq("contact_email", data.contact_email)
+      .gte("created_at", sinceIso);
+    if ((count ?? 0) >= 5) {
+      throw new Error("Too many submissions from this email — please try again later.");
+    }
+
+    const { error } = await supabaseAdmin.from("oem_parts_interest").insert({
+      vin: data.vin ?? null,
+      make: data.make ?? null,
+      model: data.model ?? null,
+      year: data.year ?? null,
+      trim: data.trim ?? null,
+      engine: data.engine ?? null,
+      parts_description: data.parts_description,
+      contact_email: data.contact_email,
+      contact_phone: data.contact_phone ?? null,
+      source: data.source ?? "parts_page",
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const adminListPartsInterest = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { status?: string } | undefined) =>
+    z.object({ status: z.string().optional() }).parse(d ?? {}),
+  )
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    let q = supabaseAdmin
+      .from("oem_parts_interest")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(200);
+    if (data.status && data.status !== "all") q = q.eq("status", data.status);
+    const { data: rows, error } = await q;
+    if (error) throw new Error(error.message);
+    return rows ?? [];
+  });
+
+export const adminUpdatePartsInterest = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { id: string; status?: string; admin_notes?: string }) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        status: z.enum(["new", "contacted", "quoted", "closed_won", "closed_lost"]).optional(),
+        admin_notes: z.string().max(2000).nullable().optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await requireAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const patch: any = {};
+    if (data.status) patch.status = data.status;
+    if (data.admin_notes !== undefined) patch.admin_notes = data.admin_notes;
+    const { error } = await supabaseAdmin
+      .from("oem_parts_interest")
+      .update(patch)
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });

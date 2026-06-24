@@ -188,6 +188,13 @@ export function SiteHeader() {
               Map
             </Link>
             <Link
+              to="/parts"
+              className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              activeProps={{ className: "bg-secondary text-foreground" }}
+            >
+              Parts
+            </Link>
+            <Link
               to="/shop"
               className="rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
               activeProps={{ className: "bg-secondary text-foreground" }}
@@ -609,6 +616,14 @@ export function SiteHeader() {
                       className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
                     >
                       Map
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link
+                      to="/parts"
+                      className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                    >
+                      Parts
                     </Link>
                   </SheetClose>
                   <SheetClose asChild>
