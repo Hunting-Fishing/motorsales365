@@ -44,6 +44,8 @@ export function SiteFooter() {
         { to: "/browse/$category", params: { category: "boat" }, label: "Boats" },
         { to: "/browse/$category", params: { category: "airplane" }, label: "Airplanes" },
         { to: "/browse/$category", params: { category: "equipment" }, label: "Equipment" },
+        { to: "/parts", label: "Parts (used & OEM coming soon)" },
+        { to: "/wanted-parts", label: "Parts wanted board" },
         { to: "/tow", label: "Towing & Transport Services" },
       ],
     },
