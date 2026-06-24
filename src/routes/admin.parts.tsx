@@ -45,6 +45,9 @@ function AdminPartsPage() {
         <TabButton active={tab === "interest"} onClick={() => setTab("interest")}>
           <Inbox className="h-4 w-4" /> OEM interest leads
         </TabButton>
+        <TabButton active={tab === "outlets"} onClick={() => setTab("outlets")}>
+          <Building2 className="h-4 w-4" /> Markets & outlets
+        </TabButton>
         <TabButton active={tab === "catalog"} onClick={() => setTab("catalog")}>
           <Tag className="h-4 w-4" /> Catalog
         </TabButton>
