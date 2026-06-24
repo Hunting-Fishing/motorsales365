@@ -94,6 +94,29 @@ function PartsHub() {
           </div>
         </div>
 
+        {/* Market availability strip */}
+        {countries.length > 0 && (
+          <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card/60 px-4 py-2 text-xs">
+            <Globe2 className="h-3.5 w-3.5 text-primary" />
+            <span className="font-medium text-foreground">Available markets:</span>
+            {countries.filter((c) => c.is_active).map((c) => (
+              <span key={c.code} className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-emerald-700 dark:text-emerald-300">
+                {c.name}
+              </span>
+            ))}
+            {countries.some((c) => !c.is_active) && (
+              <>
+                <span className="text-muted-foreground">· coming soon:</span>
+                {countries.filter((c) => !c.is_active).map((c) => (
+                  <span key={c.code} className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">
+                    {c.name}
+                  </span>
+                ))}
+              </>
+            )}
+          </div>
+        )}
+
         {/* Tabs */}
         <div className="mb-4 flex flex-wrap gap-1 rounded-lg border border-border bg-card p-1">
           <button
