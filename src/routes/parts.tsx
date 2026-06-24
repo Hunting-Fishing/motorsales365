@@ -88,10 +88,10 @@ function PartsHub() {
         </div>
 
         {/* Tabs */}
-        <div className="mb-4 flex gap-1 rounded-lg border border-border bg-card p-1">
+        <div className="mb-4 flex flex-wrap gap-1 rounded-lg border border-border bg-card p-1">
           <button
             onClick={() => setTab("find")}
-            className={`flex-1 rounded-md px-3 py-2 text-sm font-medium inline-flex items-center justify-center gap-1.5 ${
+            className={`flex-1 min-w-[140px] rounded-md px-3 py-2 text-sm font-medium inline-flex items-center justify-center gap-1.5 ${
               tab === "find" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary"
             }`}
           >
@@ -99,15 +99,27 @@ function PartsHub() {
           </button>
           <button
             onClick={() => setTab("browse")}
-            className={`flex-1 rounded-md px-3 py-2 text-sm font-medium inline-flex items-center justify-center gap-1.5 ${
+            className={`flex-1 min-w-[140px] rounded-md px-3 py-2 text-sm font-medium inline-flex items-center justify-center gap-1.5 ${
               tab === "browse" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary"
             }`}
           >
             <Grid3x3 className="h-4 w-4" /> Browse all
           </button>
+          <button
+            onClick={() => setTab("order")}
+            className={`flex-1 min-w-[140px] rounded-md px-3 py-2 text-sm font-medium inline-flex items-center justify-center gap-1.5 ${
+              tab === "order" ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-secondary"
+            }`}
+          >
+            <ShoppingCart className="h-4 w-4" /> Order OEM
+            <span className="ml-1 rounded-full bg-amber-500/15 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-700 dark:text-amber-300">
+              Soon
+            </span>
+          </button>
         </div>
 
         {tab === "find" && <PartsWizard />}
+        {tab === "order" && <OemOrderForm />}
 
         {tab === "browse" && (
           <div className="space-y-2">
