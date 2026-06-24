@@ -1,13 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { Search, Grid3x3, Wrench, Recycle, Car, Tag, ShoppingCart } from "lucide-react";
+import { Search, Grid3x3, Wrench, Recycle, Car, Tag, ShoppingCart, Globe2 } from "lucide-react";
 import { SiteLayout } from "@/components/site-layout";
 import { PartsWizard } from "@/components/parts/parts-wizard";
 import { OemOrderForm } from "@/components/parts/oem-order-form";
 import { ListingCard, type ListingCardData } from "@/components/listing-card";
 import { Button } from "@/components/ui/button";
 import { browseUsedParts } from "@/lib/parts-search.functions";
+import { listPartsCountries } from "@/lib/parts-catalog.functions";
 import { MarketplaceToolbar, type ViewMode } from "@/components/marketplace/marketplace-toolbar";
 import { ListingCardSkeletonGrid } from "@/components/marketplace/listing-card-skeleton";
 import { ListingsMapView } from "@/components/marketplace/listings-map-view";
@@ -38,9 +39,15 @@ type Tab = "find" | "browse" | "order";
 function PartsHub() {
   const [tab, setTab] = useState<Tab>("find");
   const browse = useServerFn(browseUsedParts);
+  const fetchCountries = useServerFn(listPartsCountries);
   const [browseRows, setBrowseRows] = useState<ListingCardData[] | null>(null);
   const [density, setDensity] = useGridDensity(3);
   const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [countries, setCountries] = useState<Array<{ code: string; name: string; is_active: boolean }>>([]);
+
+  useEffect(() => {
+    fetchCountries().then(setCountries as any).catch(() => {});
+  }, [fetchCountries]);
 
   useEffect(() => {
     if (tab !== "browse" || browseRows !== null) return;
@@ -86,6 +93,29 @@ function PartsHub() {
             </Button>
           </div>
         </div>
+
+        {/* Market availability strip */}
+        {countries.length > 0 && (
+          <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card/60 px-4 py-2 text-xs">
+            <Globe2 className="h-3.5 w-3.5 text-primary" />
+            <span className="font-medium text-foreground">Available markets:</span>
+            {countries.filter((c) => c.is_active).map((c) => (
+              <span key={c.code} className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-emerald-700 dark:text-emerald-300">
+                {c.name}
+              </span>
+            ))}
+            {countries.some((c) => !c.is_active) && (
+              <>
+                <span className="text-muted-foreground">· coming soon:</span>
+                {countries.filter((c) => !c.is_active).map((c) => (
+                  <span key={c.code} className="rounded-full bg-muted px-2 py-0.5 text-muted-foreground">
+                    {c.name}
+                  </span>
+                ))}
+              </>
+            )}
+          </div>
+        )}
 
         {/* Tabs */}
         <div className="mb-4 flex flex-wrap gap-1 rounded-lg border border-border bg-card p-1">

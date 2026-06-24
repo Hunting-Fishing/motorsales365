@@ -5090,6 +5090,7 @@ export type Database = {
           admin_notes: string | null
           contact_email: string
           contact_phone: string | null
+          country_code: string | null
           created_at: string
           engine: string | null
           id: string
@@ -5108,6 +5109,7 @@ export type Database = {
           admin_notes?: string | null
           contact_email: string
           contact_phone?: string | null
+          country_code?: string | null
           created_at?: string
           engine?: string | null
           id?: string
@@ -5126,6 +5128,7 @@ export type Database = {
           admin_notes?: string | null
           contact_email?: string
           contact_phone?: string | null
+          country_code?: string | null
           created_at?: string
           engine?: string | null
           id?: string
@@ -5140,7 +5143,15 @@ export type Database = {
           vin?: string | null
           year?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "oem_parts_interest_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "parts_countries"
+            referencedColumns: ["code"]
+          },
+        ]
       }
       ops_alerts: {
         Row: {
@@ -5478,6 +5489,138 @@ export type Database = {
           year_min?: number | null
         }
         Relationships: []
+      }
+      parts_countries: {
+        Row: {
+          code: string
+          created_at: string
+          currency_code: string
+          is_active: boolean
+          launched_at: string | null
+          name: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          currency_code: string
+          is_active?: boolean
+          launched_at?: string | null
+          name: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          currency_code?: string
+          is_active?: boolean
+          launched_at?: string | null
+          name?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      parts_outlets: {
+        Row: {
+          address: string | null
+          brands: string[]
+          business_id: string | null
+          city: string | null
+          commission_pct: number | null
+          contact_name: string | null
+          contact_role: string | null
+          country_code: string
+          created_at: string
+          created_by: string | null
+          email: string | null
+          id: string
+          is_active: boolean
+          is_d2c_enabled: boolean
+          is_verified: boolean
+          latitude: number | null
+          longitude: number | null
+          name: string
+          notes: string | null
+          outlet_type: string
+          phone: string | null
+          region: string | null
+          slug: string
+          updated_at: string
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          brands?: string[]
+          business_id?: string | null
+          city?: string | null
+          commission_pct?: number | null
+          contact_name?: string | null
+          contact_role?: string | null
+          country_code: string
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          is_d2c_enabled?: boolean
+          is_verified?: boolean
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          notes?: string | null
+          outlet_type: string
+          phone?: string | null
+          region?: string | null
+          slug: string
+          updated_at?: string
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          brands?: string[]
+          business_id?: string | null
+          city?: string | null
+          commission_pct?: number | null
+          contact_name?: string | null
+          contact_role?: string | null
+          country_code?: string
+          created_at?: string
+          created_by?: string | null
+          email?: string | null
+          id?: string
+          is_active?: boolean
+          is_d2c_enabled?: boolean
+          is_verified?: boolean
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          notes?: string | null
+          outlet_type?: string
+          phone?: string | null
+          region?: string | null
+          slug?: string
+          updated_at?: string
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "parts_outlets_business_id_fkey"
+            columns: ["business_id"]
+            isOneToOne: false
+            referencedRelation: "businesses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "parts_outlets_country_code_fkey"
+            columns: ["country_code"]
+            isOneToOne: false
+            referencedRelation: "parts_countries"
+            referencedColumns: ["code"]
+          },
+        ]
       }
       parts_wanted: {
         Row: {
