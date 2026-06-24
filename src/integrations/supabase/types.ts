@@ -5085,6 +5085,63 @@ export type Database = {
           },
         ]
       }
+      oem_parts_interest: {
+        Row: {
+          admin_notes: string | null
+          contact_email: string
+          contact_phone: string | null
+          created_at: string
+          engine: string | null
+          id: string
+          make: string | null
+          model: string | null
+          parts_description: string
+          source: string
+          status: string
+          trim: string | null
+          updated_at: string
+          user_id: string | null
+          vin: string | null
+          year: number | null
+        }
+        Insert: {
+          admin_notes?: string | null
+          contact_email: string
+          contact_phone?: string | null
+          created_at?: string
+          engine?: string | null
+          id?: string
+          make?: string | null
+          model?: string | null
+          parts_description: string
+          source?: string
+          status?: string
+          trim?: string | null
+          updated_at?: string
+          user_id?: string | null
+          vin?: string | null
+          year?: number | null
+        }
+        Update: {
+          admin_notes?: string | null
+          contact_email?: string
+          contact_phone?: string | null
+          created_at?: string
+          engine?: string | null
+          id?: string
+          make?: string | null
+          model?: string | null
+          parts_description?: string
+          source?: string
+          status?: string
+          trim?: string | null
+          updated_at?: string
+          user_id?: string | null
+          vin?: string | null
+          year?: number | null
+        }
+        Relationships: []
+      }
       ops_alerts: {
         Row: {
           acknowledged: boolean
