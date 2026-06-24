@@ -41,6 +41,9 @@ function AdminPartsPage() {
         <TabButton active={tab === "quotes"} onClick={() => setTab("quotes")}>
           <ClipboardList className="h-4 w-4" /> Quote requests
         </TabButton>
+        <TabButton active={tab === "interest"} onClick={() => setTab("interest")}>
+          <Inbox className="h-4 w-4" /> OEM interest leads
+        </TabButton>
         <TabButton active={tab === "catalog"} onClick={() => setTab("catalog")}>
           <Tag className="h-4 w-4" /> Catalog
         </TabButton>
@@ -53,6 +56,7 @@ function AdminPartsPage() {
       </div>
 
       {tab === "quotes" && <QuotesTab />}
+      {tab === "interest" && <InterestTab />}
       {tab === "catalog" && <CatalogTab />}
       {tab === "tires" && <TireSpecsTab />}
       {tab === "setup" && <SetupTab />}
