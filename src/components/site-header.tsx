@@ -620,6 +620,14 @@ export function SiteHeader() {
                   </SheetClose>
                   <SheetClose asChild>
                     <Link
+                      to="/parts"
+                      className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
+                    >
+                      Parts
+                    </Link>
+                  </SheetClose>
+                  <SheetClose asChild>
+                    <Link
                       to="/shop"
                       className="rounded-md px-3 py-3 text-sm font-medium hover:bg-secondary"
                     >
