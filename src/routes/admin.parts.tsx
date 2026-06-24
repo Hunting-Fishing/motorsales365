@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Wrench, Tag, ClipboardList, CheckSquare, Plus, Trash2, Save } from "lucide-react";
+import { Wrench, Tag, ClipboardList, CheckSquare, Plus, Trash2, Save, Inbox } from "lucide-react";
 import {
   adminListCatalog,
   adminUpsertCatalog,
@@ -12,6 +12,8 @@ import {
   adminDeleteTireSpec,
   adminListQuoteRequests,
   adminUpdateQuoteRequest,
+  adminListPartsInterest,
+  adminUpdatePartsInterest,
 } from "@/lib/parts-fulfillment.functions";
 import { formatPHP } from "@/lib/format";
 
