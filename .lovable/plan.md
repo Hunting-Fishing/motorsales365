@@ -1,49 +1,55 @@
-## Auto-sync flashcards from GitHub
+## Goal
+Promote the Parts hub in primary navigation, lay the foundation for an OEM parts-ordering experience (VIN/chassis or make+model lookup) shown as a real, working *Coming Soon* interest-capture, and make sure the admin can see the demand. Used-parts browsing already lives at `/parts` and stays unchanged. The admin page `/admin/parts` already exists and is already listed in the admin sidebar — we extend it with an "Interest leads" tab.
 
-Add an optional scheduled auto-sync for the flashcards content, plus admin UI to configure it. Manual "Pull latest" button stays.
+## What changes for users
 
-### Schema (new migration)
+**Header & footer nav**
+- `src/components/site-header.tsx` — add a `Parts` link in the desktop nav (between `Shop` and `Learn`), pointing to `/parts`.
+- `src/components/site-footer.tsx` — add `Parts` under the existing marketplace column (verify position).
+- Mobile tab bar already only has 5 slots and stays as-is; the header link covers mobile via the menu.
 
-Extend `flashcard_content` (singleton row id=1) with:
-- `auto_sync_enabled boolean not null default false`
-- `auto_sync_interval text not null default 'daily'` — one of `daily | weekly | biweekly | monthly`
-- `auto_sync_last_run_at timestamptz`
-- `auto_sync_last_status text` — `success | error`
-- `auto_sync_last_error text`
+**`/parts` page — new tab "Order OEM parts"**
+A third tab is added next to *Find a part (wizard)* and *Browse all*:
 
-No new table, no new RLS surface.
+- Clear headline: **Online OEM parts ordering — coming soon**. No fake catalog, no fake prices.
+- Two real input modes (toggle):
+  1. **By VIN / chassis number** — single input, 11–17 chars, validated.
+  2. **By vehicle** — make, model, year, optional trim/engine. Reuses the existing `VehiclePicker` pattern.
+- Free-text "What part(s) do you need?" field, optional photo upload (skip in this pass — text only).
+- Contact: email (required), phone (optional). If user is logged in, prefilled from profile.
+- Submit → writes a row to a new `oem_parts_interest` table and shows a success state: "Thanks — we'll email you the moment OEM ordering goes live for your vehicle." No fake ETA.
+- A small explainer card under the form: what OEM ordering will include (genuine parts sourced through partner dealers, fitment guaranteed, PH-wide shipping) — written as roadmap, not as live promises.
 
-### Cron endpoint
+## What changes for admin
 
-New public route `src/routes/api/public/hooks/flashcards-autosync.ts` (POST). Verifies `apikey` header == project anon key, then:
-1. Reads `flashcard_content` row via `supabaseAdmin`.
-2. If `auto_sync_enabled` is false → returns `{ skipped: "disabled" }`.
-3. Computes due window from `auto_sync_interval` vs `auto_sync_last_run_at`:
-   - daily ≥ 23h, weekly ≥ 7d, biweekly ≥ 14d, monthly ≥ 30d
-4. If not due → `{ skipped: "not-due" }`.
-5. If due → runs the same fetch+upsert logic factored out of `syncFlashcardsFromGithub` (shared helper `runFlashcardSync()` in `src/lib/flashcards.server.ts`), then writes `auto_sync_last_run_at` + status. Errors are caught and stored, never thrown to caller.
+**`/admin/parts`** — already exists with tabs *Quotes / Catalog / Tires / Setup*. We add one more tab: **Interest leads**.
+- Table of `oem_parts_interest` rows: created date, vehicle (VIN or make/model/year), parts requested, contact, status.
+- Status workflow: `new` → `contacted` → `quoted` → `closed_won` / `closed_lost`. Admin can change status and add an internal note.
+- Server fns live in `src/lib/parts-fulfillment.functions.ts` (extend existing file): `adminListPartsInterest`, `adminUpdatePartsInterest`. Both gated by `requireSupabaseAuth` + `has_role('admin')`.
 
-Scheduled via `pg_cron` to run **daily at 00:00 UTC**, hitting the published stable URL `project--0738c881-614d-4885-8d75-1b7c90e0835e.lovable.app/api/public/hooks/flashcards-autosync` with `apikey` header. The endpoint itself decides whether the interval is due, so a single daily cron handles all four intervals.
+## Database (one migration)
 
-### Server functions
+New table `public.oem_parts_interest`:
+- `id uuid pk`, `user_id uuid null` (no FK to `auth.users`), `vin text null`, `make text null`, `model text null`, `year int null`, `trim text null`, `engine text null`, `parts_description text not null`, `contact_email text not null`, `contact_phone text null`, `status text not null default 'new' check (...)`, `admin_notes text null`, `source text default 'parts_page'`, `created_at`, `updated_at`, plus the standard updated-at trigger.
+- GRANTs: `INSERT` to `anon, authenticated`; `SELECT/UPDATE` to `authenticated` (gated by admin policy); `ALL` to `service_role`.
+- RLS: anyone (anon or auth) can insert their own lead; only `has_role(auth.uid(),'admin')` or `'moderator'` can select/update.
 
-In `src/lib/flashcards.functions.ts`:
-- Extend `FlashcardContent` type with the new auto-sync fields and include them in `getFlashcardContent`.
-- New `updateFlashcardAutoSync` (admin-only, `requireSupabaseAuth` + `can_moderate` check) with input `{ enabled: boolean; interval: 'daily'|'weekly'|'biweekly'|'monthly' }`. Writes via `supabaseAdmin`.
-- Refactor `syncFlashcardsFromGithub` to call the shared `runFlashcardSync()` helper.
+## Server functions
+In `src/lib/parts-fulfillment.functions.ts`:
+- `submitOemPartsInterest` — public `createServerFn`, Zod-validated (VIN regex OR make+model+year required; email required; description 5–1000 chars). Uses `supabaseAdmin` inside the handler. Lightweight rate limit by IP/email pair (best-effort: check for >5 in last hour).
+- `adminListPartsInterest({ status? })` — admin-only.
+- `adminUpdatePartsInterest({ id, status?, admin_notes? })` — admin-only.
 
-### Admin UI (`src/routes/admin.flashcards.tsx`)
+## Files touched
+- New: `supabase/migrations/<ts>_oem_parts_interest.sql`
+- New: `src/components/parts/oem-order-form.tsx`
+- Edited: `src/routes/parts.tsx` (add third tab)
+- Edited: `src/routes/admin.parts.tsx` (add "Interest leads" tab)
+- Edited: `src/lib/parts-fulfillment.functions.ts` (3 new server fns + types)
+- Edited: `src/components/site-header.tsx` (add Parts link)
+- Edited: `src/components/site-footer.tsx` (add Parts link)
 
-Add a new "Auto-sync" card above the manual pull card:
-- Toggle (Switch) — Enabled / Disabled
-- Interval selector (Select): Daily (midnight UTC) / Weekly / Every 14 days / Every 30 days
-- Save button (mutation → `updateFlashcardAutoSync`, then invalidate query)
-- Status line: "Last auto-run: {relative time} · {success|error}"; on error show the message in red
-
-The existing manual sync, snapshot card, and result feedback are unchanged.
-
-### Technical notes
-
-- All new code paths use the existing `supabaseAdmin` import-inside-handler pattern.
-- Cron SQL is run via `supabase--insert` (per `schedule-jobs-modern` guidance) after the migration is approved, since the URL/anon-key live outside migration files.
-- No client bundle changes to the flashcards game itself — `loader.js` still reads `/api/public/flashcards/content` and picks up whatever the latest snapshot is.
+## Out of scope (deliberate)
+- No real OEM catalog, no live pricing, no checkout/payments. Those land in a follow-up once a dealer-supply partner is wired up.
+- No VIN decoder API integration yet — we store the raw VIN; decoding can be added later.
+- No customer-facing "my parts orders" dashboard yet.
