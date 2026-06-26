@@ -48,8 +48,8 @@ function QrAnalyticsPage() {
     queryKey: ["qr-analytics", "my-codes", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("staff_referrals")
+      const { data, error } = await (supabase as any)
+        .from("staff_referrals_directory")
         .select("id, referral_code, full_name, active, created_at")
         .order("created_at", { ascending: false });
       if (error) throw error;
