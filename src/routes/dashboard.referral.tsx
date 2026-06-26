@@ -233,35 +233,13 @@ function StaffReferral() {
 
 
       <section className="grid gap-6 md:grid-cols-[260px_1fr]">
-        <div className="rounded-xl border border-border bg-card p-4">
-          {qrUrl ? (
-            <img
-              src={qrUrl}
-              alt={`QR for ${staff.full_name}`}
-              className="aspect-square w-full rounded-md bg-white object-contain p-2"
-            />
-          ) : (
-            <div className="aspect-square w-full rounded-md bg-muted" />
-          )}
-          <div className="mt-3 text-center">
-            <div className="font-display text-lg font-bold">{staff.full_name}</div>
-            <div className="font-mono text-xs text-muted-foreground">{staff.referral_code}</div>
-          </div>
-          <div className="mt-3 grid grid-cols-2 gap-2">
-            {qrUrl && (
-              <a href={qrUrl} download={`${staff.referral_code}.png`}>
-                <Button variant="outline" size="sm" className="w-full">
-                  <Download className="mr-1 h-4 w-4" /> PNG
-                </Button>
-              </a>
-            )}
-            <a href={posterUrl} target="_blank" rel="noreferrer">
-              <Button variant="outline" size="sm" className="w-full">
-                <Printer className="mr-1 h-4 w-4" /> Poster
-              </Button>
-            </a>
-          </div>
-        </div>
+        <ReferralQrCard
+          link={link}
+          fullName={staff.full_name}
+          referralCode={staff.referral_code}
+          storedQrUrl={qrUrl}
+          posterUrl={posterUrl}
+        />
 
         <div className="space-y-4">
           <div className="rounded-xl border border-border bg-card p-4">
