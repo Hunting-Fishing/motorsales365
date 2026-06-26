@@ -19,6 +19,7 @@ type Tab = {
     | "/admin/advertisements/campaigns"
     | "/admin/advertisements/promotions"
     | "/admin/advertisements/qr-ads"
+    | "/admin/advertisements/analytics"
     | "/admin/advertisements/history"
     | "/admin/advertisements/slots"
     | "/admin/advertisements/placeholders"
