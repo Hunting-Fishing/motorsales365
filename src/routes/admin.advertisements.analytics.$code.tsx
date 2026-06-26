@@ -100,35 +100,53 @@ function QrCodeDrilldownPage() {
     },
   });
 
-  // Daily rollup combining scans + signups
+  // Activated listings = listings published by users credited to this code
+  const listingsQ = useQuery({
+    queryKey: ["qr-drill", "listings", userIds, since],
+    enabled: userIds.length > 0,
+    queryFn: async () => {
+      let q = supabase
+        .from("listings")
+        .select("id, user_id, published_at, status, created_at")
+        .in("user_id", userIds)
+        .not("published_at", "is", null);
+      if (since) q = q.gte("published_at", since);
+      const { data, error } = await q.order("published_at", { ascending: false }).limit(2000);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  // Daily funnel: scans -> signups -> activated listings
   const byDay = useMemo(() => {
-    const m = new Map<string, { scans: number; signups: number }>();
-    for (const s of scansQ.data ?? []) {
-      const k = dayKey(s.scanned_at);
-      const v = m.get(k) ?? { scans: 0, signups: 0 };
-      v.scans += 1;
+    const m = new Map<string, { scans: number; signups: number; listings: number }>();
+    const ensure = (k: string) => {
+      const v = m.get(k) ?? { scans: 0, signups: 0, listings: 0 };
       m.set(k, v);
-    }
-    for (const s of signupsQ.data ?? []) {
-      const k = dayKey(s.signup_date);
-      const v = m.get(k) ?? { scans: 0, signups: 0 };
-      v.signups += 1;
-      m.set(k, v);
+      return v;
+    };
+    for (const s of scansQ.data ?? []) ensure(dayKey(s.scanned_at)).scans += 1;
+    for (const s of signupsQ.data ?? []) ensure(dayKey(s.signup_date)).signups += 1;
+    for (const l of listingsQ.data ?? []) {
+      if (!l.published_at) continue;
+      ensure(dayKey(l.published_at)).listings += 1;
     }
     return Array.from(m.entries())
       .map(([day, v]) => ({ day, ...v }))
       .sort((a, b) => (a.day < b.day ? 1 : -1));
-  }, [scansQ.data, signupsQ.data]);
+  }, [scansQ.data, signupsQ.data, listingsQ.data]);
 
-  const maxBar = Math.max(1, ...byDay.map((d) => d.scans + d.signups));
+  const maxBar = Math.max(1, ...byDay.map((d) => d.scans + d.signups + d.listings));
 
   const totals = {
     scans: scansQ.data?.length ?? 0,
     signups: signupsQ.data?.length ?? 0,
+    listings: listingsQ.data?.length ?? 0,
     uniqueVisitors: new Set((scansQ.data ?? []).map((s) => s.visitor_id).filter(Boolean)).size,
   };
 
   const convRate = totals.uniqueVisitors > 0 ? (totals.signups / totals.uniqueVisitors) * 100 : 0;
+  const listingRate = totals.signups > 0 ? (totals.listings / totals.signups) * 100 : 0;
 
   type BreakdownRow = { key: string; scans: number; visitors: number; share: number };
   const breakdowns = useMemo(() => {
@@ -190,15 +208,16 @@ function QrCodeDrilldownPage() {
         </Select>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Stat icon={ScanLine} label="Scans" value={totals.scans} loading={scansQ.isLoading} />
         <Stat icon={Inbox} label="Unique visitors" value={totals.uniqueVisitors} loading={scansQ.isLoading} />
         <Stat icon={UserPlus} label="Credited signups" value={totals.signups} loading={signupsQ.isLoading} />
+        <Stat icon={Ticket} label="Activated listings" value={totals.listings} loading={listingsQ.isLoading} />
         <Stat
           icon={Ticket}
-          label="Conversion (visitor → signup)"
-          value={`${convRate.toFixed(1)}%`}
-          loading={scansQ.isLoading || signupsQ.isLoading}
+          label="Visitor → Signup → Listing"
+          value={`${convRate.toFixed(1)}% · ${listingRate.toFixed(1)}%`}
+          loading={scansQ.isLoading || signupsQ.isLoading || listingsQ.isLoading}
         />
       </div>
 
@@ -210,8 +229,10 @@ function QrCodeDrilldownPage() {
 
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">Daily activity</CardTitle>
-          <CardDescription>Scans and credited signups per day in the selected range.</CardDescription>
+          <CardTitle className="text-base">Funnel timeline</CardTitle>
+          <CardDescription>
+            Scans → credited signups → activated listings per day, with stage-by-stage conversion.
+          </CardDescription>
         </CardHeader>
         <CardContent className="p-0">
           {byDay.length === 0 ? (
@@ -224,31 +245,50 @@ function QrCodeDrilldownPage() {
                     <th className="px-4 py-2 text-left">Date</th>
                     <th className="px-4 py-2 text-right">Scans</th>
                     <th className="px-4 py-2 text-right">Signups</th>
-                    <th className="px-4 py-2 text-left w-1/2">Volume</th>
+                    <th className="px-4 py-2 text-right">Listings</th>
+                    <th className="px-4 py-2 text-right" title="Signups ÷ Scans">S→U</th>
+                    <th className="px-4 py-2 text-right" title="Listings ÷ Signups">U→L</th>
+                    <th className="px-4 py-2 text-left w-2/5">Funnel</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {byDay.map((d) => (
-                    <tr key={d.day} className="border-t">
-                      <td className="px-4 py-2 font-mono text-xs">{d.day}</td>
-                      <td className="px-4 py-2 text-right tabular-nums">{d.scans}</td>
-                      <td className="px-4 py-2 text-right tabular-nums">{d.signups}</td>
-                      <td className="px-4 py-2">
-                        <div className="flex h-3 items-center gap-px overflow-hidden rounded bg-muted">
-                          <div
-                            className="h-full bg-primary/70"
-                            style={{ width: `${(d.scans / maxBar) * 100}%` }}
-                            aria-label={`${d.scans} scans`}
-                          />
-                          <div
-                            className="h-full bg-emerald-500/80"
-                            style={{ width: `${(d.signups / maxBar) * 100}%` }}
-                            aria-label={`${d.signups} signups`}
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {byDay.map((d) => {
+                    const su = d.scans > 0 ? (d.signups / d.scans) * 100 : 0;
+                    const ul = d.signups > 0 ? (d.listings / d.signups) * 100 : 0;
+                    return (
+                      <tr key={d.day} className="border-t">
+                        <td className="px-4 py-2 font-mono text-xs">{d.day}</td>
+                        <td className="px-4 py-2 text-right tabular-nums">{d.scans}</td>
+                        <td className="px-4 py-2 text-right tabular-nums">{d.signups}</td>
+                        <td className="px-4 py-2 text-right tabular-nums">{d.listings}</td>
+                        <td className="px-4 py-2 text-right tabular-nums text-muted-foreground">
+                          {d.scans > 0 ? `${su.toFixed(0)}%` : "—"}
+                        </td>
+                        <td className="px-4 py-2 text-right tabular-nums text-muted-foreground">
+                          {d.signups > 0 ? `${ul.toFixed(0)}%` : "—"}
+                        </td>
+                        <td className="px-4 py-2">
+                          <div className="flex h-3 items-center gap-px overflow-hidden rounded bg-muted">
+                            <div
+                              className="h-full bg-primary/70"
+                              style={{ width: `${(d.scans / maxBar) * 100}%` }}
+                              aria-label={`${d.scans} scans`}
+                            />
+                            <div
+                              className="h-full bg-emerald-500/80"
+                              style={{ width: `${(d.signups / maxBar) * 100}%` }}
+                              aria-label={`${d.signups} signups`}
+                            />
+                            <div
+                              className="h-full bg-amber-500/80"
+                              style={{ width: `${(d.listings / maxBar) * 100}%` }}
+                              aria-label={`${d.listings} activated listings`}
+                            />
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
