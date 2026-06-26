@@ -91,10 +91,10 @@ function QrCodeDrilldownPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, full_name, email, phone, city")
+        .select("id, full_name, phone")
         .in("id", userIds);
       if (error) throw error;
-      const m = new Map<string, { full_name: string | null; email: string | null; phone: string | null; city: string | null }>();
+      const m = new Map<string, { full_name: string | null; phone: string | null }>();
       for (const p of data ?? []) m.set(p.id, p as never);
       return m;
     },
