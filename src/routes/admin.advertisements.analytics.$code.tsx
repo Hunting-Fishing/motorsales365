@@ -141,10 +141,12 @@ function QrCodeDrilldownPage() {
   const totals = {
     scans: scansQ.data?.length ?? 0,
     signups: signupsQ.data?.length ?? 0,
+    listings: listingsQ.data?.length ?? 0,
     uniqueVisitors: new Set((scansQ.data ?? []).map((s) => s.visitor_id).filter(Boolean)).size,
   };
 
   const convRate = totals.uniqueVisitors > 0 ? (totals.signups / totals.uniqueVisitors) * 100 : 0;
+  const listingRate = totals.signups > 0 ? (totals.listings / totals.signups) * 100 : 0;
 
   type BreakdownRow = { key: string; scans: number; visitors: number; share: number };
   const breakdowns = useMemo(() => {
