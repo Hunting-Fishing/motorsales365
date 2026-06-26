@@ -140,7 +140,7 @@ export function SiteHeader() {
             </span>
           )}
 
-          <nav className="hidden items-center gap-0.5 xl:flex">
+          <nav className="hidden items-center gap-0.5 2xl:flex">
             {NAV.map((n) => (
               <Link
                 key={n.category}
@@ -225,7 +225,7 @@ export function SiteHeader() {
             </Link>
             <Link
               to="/export"
-              className="hidden rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground xl:inline-flex"
+              className="hidden rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground 2xl:inline-flex"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               Export
@@ -534,7 +534,7 @@ export function SiteHeader() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="xl:hidden h-9 w-9"
+                className="2xl:hidden h-9 w-9"
                 aria-label="Open menu"
               >
                 <Menu className="h-5 w-5" />
