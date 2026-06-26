@@ -208,19 +208,18 @@ function QrCodeDrilldownPage() {
         </Select>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         <Stat icon={ScanLine} label="Scans" value={totals.scans} loading={scansQ.isLoading} />
         <Stat icon={Inbox} label="Unique visitors" value={totals.uniqueVisitors} loading={scansQ.isLoading} />
         <Stat icon={UserPlus} label="Credited signups" value={totals.signups} loading={signupsQ.isLoading} />
+        <Stat icon={Ticket} label="Activated listings" value={totals.listings} loading={listingsQ.isLoading} />
         <Stat
           icon={Ticket}
-          label="Conversion (visitor → signup)"
-          value={`${convRate.toFixed(1)}%`}
-          loading={scansQ.isLoading || signupsQ.isLoading}
+          label="Visitor → Signup → Listing"
+          value={`${convRate.toFixed(1)}% · ${listingRate.toFixed(1)}%`}
+          loading={scansQ.isLoading || signupsQ.isLoading || listingsQ.isLoading}
         />
       </div>
-
-      <div className="grid gap-3 lg:grid-cols-3">
         <BreakdownCard title="By device" rows={breakdowns.device} loading={scansQ.isLoading} emptyLabel="No device data." />
         <BreakdownCard title="By browser" rows={breakdowns.browser} loading={scansQ.isLoading} emptyLabel="No browser data." />
         <BreakdownCard title="By country" rows={breakdowns.country} loading={scansQ.isLoading} emptyLabel="No location data." />
