@@ -82,13 +82,8 @@ export const decodeVin = createServerFn({ method: "POST" })
       const head = raw.split("-")[0];
       const candidates = Array.from(new Set([raw, head])).filter((c) => c.length >= 2 && c.length <= 10);
       if (candidates.length) {
-        const { createClient } = await import("@supabase/supabase-js");
-        const supabase = createClient(
-          process.env.SUPABASE_URL!,
-          process.env.SUPABASE_PUBLISHABLE_KEY!,
-          { auth: { storage: undefined, persistSession: false, autoRefreshToken: false } },
-        );
-        const { data: rows } = await supabase
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { data: rows } = await supabaseAdmin
           .from("jdm_chassis_codes")
           .select("code,make,model,year_min,year_max,engine")
           .in("code", candidates)
