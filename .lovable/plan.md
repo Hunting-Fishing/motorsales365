@@ -1,55 +1,69 @@
-## Goal
-Promote the Parts hub in primary navigation, lay the foundation for an OEM parts-ordering experience (VIN/chassis or make+model lookup) shown as a real, working *Coming Soon* interest-capture, and make sure the admin can see the demand. Used-parts browsing already lives at `/parts` and stays unchanged. The admin page `/admin/parts` already exists and is already listed in the admin sidebar — we extend it with an "Interest leads" tab.
 
-## What changes for users
+# OEM Parts Search by VIN/Chassis — Phase 1
 
-**Header & footer nav**
-- `src/components/site-header.tsx` — add a `Parts` link in the desktop nav (between `Shop` and `Learn`), pointing to `/parts`.
-- `src/components/site-footer.tsx` — add `Parts` under the existing marketplace column (verify position).
-- Mobile tab bar already only has 5 slots and stays as-is; the header link covers mobile via the menu.
+Add a real search experience to `/parts` that takes a VIN, JDM chassis code, or manual make/model, decodes it to make/model/year/engine, and shows partner outlets (from `parts_outlets`) that carry that brand in the selected country.
 
-**`/parts` page — new tab "Order OEM parts"**
-A third tab is added next to *Find a part (wizard)* and *Browse all*:
+## User flow
 
-- Clear headline: **Online OEM parts ordering — coming soon**. No fake catalog, no fake prices.
-- Two real input modes (toggle):
-  1. **By VIN / chassis number** — single input, 11–17 chars, validated.
-  2. **By vehicle** — make, model, year, optional trim/engine. Reuses the existing `VehiclePicker` pattern.
-- Free-text "What part(s) do you need?" field, optional photo upload (skip in this pass — text only).
-- Contact: email (required), phone (optional). If user is logged in, prefilled from profile.
-- Submit → writes a row to a new `oem_parts_interest` table and shows a success state: "Thanks — we'll email you the moment OEM ordering goes live for your vehicle." No fake ETA.
-- A small explainer card under the form: what OEM ordering will include (genuine parts sourced through partner dealers, fitment guaranteed, PH-wide shipping) — written as roadmap, not as live promises.
+```text
+[Country selector: PH ▼]
+[VIN or Chassis #________________] [Decode]
+   ↳ "Toyota Corolla 2018 1.6L (decoded)"     [edit/clear]
+   — or — switch to Manual: Make ▼ Model ▼ Year ▼
 
-## What changes for admin
+→ Results (live)
+   "12 outlets in Philippines carry Toyota parts"
+   [Outlet card] name · type badge · city · brands · D2C badge · Call · Website · "Request quote" → existing OemOrderForm prefilled
+```
 
-**`/admin/parts`** — already exists with tabs *Quotes / Catalog / Tires / Setup*. We add one more tab: **Interest leads**.
-- Table of `oem_parts_interest` rows: created date, vehicle (VIN or make/model/year), parts requested, contact, status.
-- Status workflow: `new` → `contacted` → `quoted` → `closed_won` / `closed_lost`. Admin can change status and add an internal note.
-- Server fns live in `src/lib/parts-fulfillment.functions.ts` (extend existing file): `adminListPartsInterest`, `adminUpdatePartsInterest`. Both gated by `requireSupabaseAuth` + `has_role('admin')`.
+If VIN decode fails, surface the error inline and auto-offer the manual picker (keep the typed value as `chassis_or_vin` on the quote form).
 
-## Database (one migration)
+## Pieces to build
 
-New table `public.oem_parts_interest`:
-- `id uuid pk`, `user_id uuid null` (no FK to `auth.users`), `vin text null`, `make text null`, `model text null`, `year int null`, `trim text null`, `engine text null`, `parts_description text not null`, `contact_email text not null`, `contact_phone text null`, `status text not null default 'new' check (...)`, `admin_notes text null`, `source text default 'parts_page'`, `created_at`, `updated_at`, plus the standard updated-at trigger.
-- GRANTs: `INSERT` to `anon, authenticated`; `SELECT/UPDATE` to `authenticated` (gated by admin policy); `ALL` to `service_role`.
-- RLS: anyone (anon or auth) can insert their own lead; only `has_role(auth.uid(),'admin')` or `'moderator'` can select/update.
+### 1. VIN decoder server fn — `src/lib/vin-decode.functions.ts`
+- `decodeVin({ value })` — public `createServerFn`.
+- 17-char standard VIN → NHTSA free endpoint `https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues/{VIN}?format=json` via `fetch` (no key, Worker-safe). Map to `{ make, model, year, engine, trim, source: "nhtsa" }`.
+- JDM short chassis (regex like `^[A-Z0-9]{2,7}-?\d{3,7}$`, e.g. `JZX100`, `EK9`, `GC8`) → lookup against a seeded `jdm_chassis_codes` table (code, make, model, year_min, year_max, engine). Return same shape with `source: "jdm_table"`.
+- Otherwise return `{ ok: false, reason: "unrecognized" }` so UI falls back to manual.
+- Zod-validate input (3–20 chars, uppercase, alphanumerics + dash).
 
-## Server functions
-In `src/lib/parts-fulfillment.functions.ts`:
-- `submitOemPartsInterest` — public `createServerFn`, Zod-validated (VIN regex OR make+model+year required; email required; description 5–1000 chars). Uses `supabaseAdmin` inside the handler. Lightweight rate limit by IP/email pair (best-effort: check for >5 in last hour).
-- `adminListPartsInterest({ status? })` — admin-only.
-- `adminUpdatePartsInterest({ id, status?, admin_notes? })` — admin-only.
+### 2. Catalog server fn — extend `src/lib/parts-catalog.functions.ts`
+- `searchOemOutlets({ country, make, model?, year? })` — public. Reuses existing `parts_outlets` query, filters `country_code` + `is_verified DESC` + `brands @> [make]`. Returns same shape as `listPartsOutlets` plus an `outlet_match_score` (verified+d2c first).
+- No new outlet inventory yet (per user's "show all active outlets for that brand" choice).
 
-## Files touched
-- New: `supabase/migrations/<ts>_oem_parts_interest.sql`
-- New: `src/components/parts/oem-order-form.tsx`
-- Edited: `src/routes/parts.tsx` (add third tab)
-- Edited: `src/routes/admin.parts.tsx` (add "Interest leads" tab)
-- Edited: `src/lib/parts-fulfillment.functions.ts` (3 new server fns + types)
-- Edited: `src/components/site-header.tsx` (add Parts link)
-- Edited: `src/components/site-footer.tsx` (add Parts link)
+### 3. JDM chassis seed table
+Migration `jdm_chassis_codes`:
+- columns: `code` (PK, upper), `make`, `model`, `year_min`, `year_max`, `engine`, `notes`
+- GRANT `SELECT` to `anon, authenticated`; `ALL` to `service_role`
+- RLS on, single policy: public read
+- Seed ~40 common PH grey-import codes (JZX100, JZA80, EK9, DC2/DC5, GC8/GD/GR, BNR32/33/34, S13/14/15, AE86, FD3S, EVO4–10, etc.) in a follow-up `supabase--insert`.
 
-## Out of scope (deliberate)
-- No real OEM catalog, no live pricing, no checkout/payments. Those land in a follow-up once a dealer-supply partner is wired up.
-- No VIN decoder API integration yet — we store the raw VIN; decoding can be added later.
-- No customer-facing "my parts orders" dashboard yet.
+### 4. UI — new `src/components/parts/oem-search.tsx`
+Replaces the static "Order OEM" tab content (keeps `OemOrderForm` as the quote-request CTA inside each outlet card and as the empty-state fallback).
+
+Sections:
+- **CountrySelect** (driven by `listPartsCountries`, defaults to PH, only `is_active` selectable; others render as disabled "coming soon").
+- **VinInput** with `Decode` button + spinner; on success shows a confirmation chip with vehicle summary and `Edit`/`Clear`.
+- **Manual fallback** (`Make` / `Model` / `Year`) — collapsible accordion, opens automatically on decode failure.
+- **Results list**: outlet cards with `Phone`, `Website`, `Request quote` (opens `OemOrderForm` pre-filled with decoded VIN+vehicle+outlet name).
+- Empty state: "No outlets yet for {Make} in {Country}. We'll notify you when one joins." → falls back to `OemOrderForm`.
+
+### 5. Wire into `/parts`
+- `src/routes/parts.tsx`: render `<OemSearch />` instead of `<OemOrderForm />` in the `order` tab. Tab label stays "Order OEM" (drop the "Soon" badge since search is live; outlets directory may still be small).
+
+### 6. State / URL
+Persist `country`, `vin`, `make`, `model`, `year` in the URL via `validateSearch` on the parts route so a result link is shareable (matches project convention).
+
+## Out of scope (explicit, for later phases)
+- Per-part OEM number lookup / catalog tree (PartSouq-style diagrams)
+- Per-outlet pricing/inventory
+- Paid VIN decoder fallback for JDM VINs that NHTSA can't read
+- D2C cart / checkout
+
+## Acceptance
+- Entering `JTDBR32E720123456` (or any valid VIN) shows decoded Toyota + a filtered Toyota outlet list for PH.
+- Entering `JZX100` shows Toyota Chaser/Mark II/Cresta 1996–2001 + Toyota outlets.
+- Garbage input → inline error + manual picker visible.
+- Switching country to Vietnam shows "coming soon" and empty results without errors.
+- Lighthouse: no new console errors; SSR works (route still public, all reads use publishable-key client).
+
