@@ -141,9 +141,9 @@ function AdminQrAdsPage() {
     if (!user) return;
     (async () => {
       const { data } = await (supabase as any)
-        .from("staff_referrals")
+        .from("staff_referrals_directory")
         .select("referral_code, full_name, active")
-        .or(`staff_user_id.eq.${user.id},email.eq.${user.email?.toLowerCase()}`)
+        .eq("staff_user_id", user.id)
         .maybeSingle();
       setStaff((data as StaffRow) ?? null);
       setLoading(false);

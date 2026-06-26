@@ -8627,6 +8627,13 @@ export type Database = {
             referencedRelation: "staff_referrals"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "staff_promotions_staff_referral_id_fkey"
+            columns: ["staff_referral_id"]
+            isOneToOne: false
+            referencedRelation: "staff_referrals_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       staff_referral_audit: {
@@ -9374,6 +9381,13 @@ export type Database = {
             referencedRelation: "staff_referrals"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "user_referrals_referred_by_staff_id_fkey"
+            columns: ["referred_by_staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff_referrals_directory"
+            referencedColumns: ["id"]
+          },
         ]
       }
       user_roles: {
@@ -10073,6 +10087,33 @@ export type Database = {
             | Database["public"]["Enums"]["verification_status"]
             | null
           verified_at?: string | null
+        }
+        Relationships: []
+      }
+      staff_referrals_directory: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          full_name: string | null
+          id: string | null
+          referral_code: string | null
+          staff_user_id: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string | null
+          referral_code?: string | null
+          staff_user_id?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          full_name?: string | null
+          id?: string | null
+          referral_code?: string | null
+          staff_user_id?: string | null
         }
         Relationships: []
       }

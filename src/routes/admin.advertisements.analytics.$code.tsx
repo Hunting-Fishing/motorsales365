@@ -50,9 +50,9 @@ function QrCodeDrilldownPage() {
   const ownerQ = useQuery({
     queryKey: ["qr-drill", "owner", code],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("staff_referrals")
-        .select("full_name, email, phone, active, created_at")
+      const { data, error } = await (supabase as any)
+        .from("staff_referrals_directory")
+        .select("full_name, active, created_at")
         .eq("referral_code", code)
         .maybeSingle();
       if (error) throw error;
