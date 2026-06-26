@@ -225,7 +225,7 @@ export function SiteHeader() {
             </Link>
             <Link
               to="/export"
-              className="hidden rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground xl:inline-flex"
+              className="hidden rounded-md px-2.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground 2xl:inline-flex"
               activeProps={{ className: "bg-secondary text-foreground" }}
             >
               Export
