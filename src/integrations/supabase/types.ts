@@ -5658,6 +5658,90 @@ export type Database = {
           },
         ]
       }
+      parts_suppliers: {
+        Row: {
+          account_email: string | null
+          account_ref: string | null
+          api_docs_url: string | null
+          api_status: string
+          brands: string[]
+          category: string
+          commission_notes: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          id: string
+          is_recommended: boolean
+          name: string
+          notes: string | null
+          priority: number
+          region: string
+          signup_status: string
+          signup_url: string | null
+          slug: string
+          supports_api: boolean
+          supports_dropship: boolean
+          supports_wholesale: boolean
+          updated_at: string
+          vin_lookup: boolean
+          website: string | null
+        }
+        Insert: {
+          account_email?: string | null
+          account_ref?: string | null
+          api_docs_url?: string | null
+          api_status?: string
+          brands?: string[]
+          category?: string
+          commission_notes?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          is_recommended?: boolean
+          name: string
+          notes?: string | null
+          priority?: number
+          region?: string
+          signup_status?: string
+          signup_url?: string | null
+          slug: string
+          supports_api?: boolean
+          supports_dropship?: boolean
+          supports_wholesale?: boolean
+          updated_at?: string
+          vin_lookup?: boolean
+          website?: string | null
+        }
+        Update: {
+          account_email?: string | null
+          account_ref?: string | null
+          api_docs_url?: string | null
+          api_status?: string
+          brands?: string[]
+          category?: string
+          commission_notes?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          id?: string
+          is_recommended?: boolean
+          name?: string
+          notes?: string | null
+          priority?: number
+          region?: string
+          signup_status?: string
+          signup_url?: string | null
+          slug?: string
+          supports_api?: boolean
+          supports_dropship?: boolean
+          supports_wholesale?: boolean
+          updated_at?: string
+          vin_lookup?: boolean
+          website?: string | null
+        }
+        Relationships: []
+      }
       parts_wanted: {
         Row: {
           alert_frequency: string

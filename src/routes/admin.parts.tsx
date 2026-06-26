@@ -2,8 +2,9 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Wrench, Tag, ClipboardList, CheckSquare, Plus, Trash2, Save, Inbox, Building2 } from "lucide-react";
+import { Wrench, Tag, ClipboardList, CheckSquare, Plus, Trash2, Save, Inbox, Building2, Network } from "lucide-react";
 import { OutletsTab } from "@/components/admin/parts-outlets-tab";
+import { SuppliersTab } from "@/components/admin/parts-suppliers-tab";
 import {
   adminListCatalog,
   adminUpsertCatalog,
@@ -23,7 +24,7 @@ export const Route = createFileRoute("/admin/parts")({
   head: () => ({ meta: [{ title: "Parts Fulfillment — Admin" }] }),
 });
 
-type Tab = "catalog" | "quotes" | "tires" | "setup" | "interest" | "outlets";
+type Tab = "catalog" | "quotes" | "tires" | "setup" | "interest" | "outlets" | "suppliers";
 
 function AdminPartsPage() {
   const [tab, setTab] = useState<Tab>("quotes");
@@ -45,6 +46,9 @@ function AdminPartsPage() {
         <TabButton active={tab === "interest"} onClick={() => setTab("interest")}>
           <Inbox className="h-4 w-4" /> OEM interest leads
         </TabButton>
+        <TabButton active={tab === "suppliers"} onClick={() => setTab("suppliers")}>
+          <Network className="h-4 w-4" /> Suppliers & APIs
+        </TabButton>
         <TabButton active={tab === "outlets"} onClick={() => setTab("outlets")}>
           <Building2 className="h-4 w-4" /> Markets & outlets
         </TabButton>
@@ -61,6 +65,7 @@ function AdminPartsPage() {
 
       {tab === "quotes" && <QuotesTab />}
       {tab === "interest" && <InterestTab />}
+      {tab === "suppliers" && <SuppliersTab />}
       {tab === "outlets" && <OutletsTab />}
       {tab === "catalog" && <CatalogTab />}
       {tab === "tires" && <TireSpecsTab />}
